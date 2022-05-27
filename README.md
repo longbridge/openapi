@@ -20,6 +20,10 @@ Longbridge OpenAPI provides programmatic quote trading interfaces for investors 
 
 2. Log in to the [longbridgeapp.com](https://longbridgeapp.com) and enter the developer platform, complete the developer verification (OpenAPI permission application), and obtain a token.
 
+## SDK Documenation
+
+https://longbridgeapp.github.io/openapi-sdk
+
 ## Pricing
 
 Longbridge does not charge any additional fees for activating or using interface services. You only need to open a Longbridge Integrated A/C and get OpenAPI service permissions to use it for free. Please refer to [Pricing](https://longbridge.hk/rate) or consult online customer service for the actual commissions or advanced quotes fees incurred by transactions.
