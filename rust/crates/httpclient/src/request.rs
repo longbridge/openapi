@@ -151,7 +151,6 @@ where
         .map_err(|_| HttpClientError::RequestTimeout)??;
 
         tracing::debug!(body = text.as_str(), "http response");
-        println!("{}", text);
 
         let resp = serde_json::from_str::<OpenApiResponse<R>>(&text)?;
         match resp.code {
