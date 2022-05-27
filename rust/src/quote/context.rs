@@ -736,6 +736,9 @@ impl QuoteContext {
 
     /// Get market trading days
     ///
+    /// The interval must be less than one month, and only the most recent year
+    /// is supported.
+    ///
     /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/trade-day>
     ///
     /// # Examples

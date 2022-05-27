@@ -74,6 +74,37 @@ pub struct Trade {
     /// Time of trading
     pub timestamp: OffsetDateTime,
     /// Trade type
+    ///
+    /// HK
+    ///
+    /// - `*` - Overseas trade
+    /// - `D` - Odd-lot trade
+    /// - `M` - Non-direct off-exchange trade
+    /// - `P` - Late trade (Off-exchange previous day)
+    /// - `U` - Auction trade
+    /// - `X` - Direct off-exchange trade
+    /// - `Y` - Automatch internalized
+    /// - `<empty string>` -  Automatch normal
+    ///
+    /// US
+    ///
+    /// - `<empty string>` - Regular sale
+    /// - `A` - Acquisition
+    /// - `B` - Bunched trade
+    /// - `D` - Distribution
+    /// - `F` - Intermarket sweep
+    /// - `G` - Bunched sold trades
+    /// - `H` - Price variation trade
+    /// - `I` - Odd lot trade
+    /// - `K` - Rule 155 trde(NYSE MKT)
+    /// - `M` - Market center close price
+    /// - `P` - Prior reference price
+    /// - `Q` - Market center open price
+    /// - `S` - Split trade
+    /// - `V` - Contingent trade
+    /// - `W` - Average price trade
+    /// - `X` - Cross trade
+    /// - `1` - Stopped stock(Regular trade)
     pub trade_type: String,
     /// Trade direction
     pub direction: TradeDirection,

@@ -911,9 +911,9 @@ class TradeSession:
         """
 
 
-class Execution:
+class Trade:
     """
-    Execution
+    Trade
     """
 
     price: Decimal
@@ -934,6 +934,37 @@ class Execution:
     trade_type: str
     """
     Trade type
+
+    HK
+
+    - `*` - Overseas trade
+    - `D` - Odd-lot trade
+    - `M` - Non-direct off-exchange trade
+    - `P` - Late trade (Off-exchange previous day)
+    - `U` - Auction trade
+    - `X` - Direct off-exchange trade
+    - `Y` - Automatch internalized
+    - `<empty string>` - Automatch normal
+
+    US
+
+    - `<empty string>` - Regular sale
+    - `A` - Acquisition
+    - `B` - Bunched trade
+    - `D` - Distribution
+    - `F` - Intermarket sweep
+    - `G` - Bunched sold trades
+    - `H` - Price variation trade
+    - `I` - Odd lot trade
+    - `K` - Rule 155 trde(NYSE MKT)
+    - `M` - Market center close price
+    - `P` - Prior reference price
+    - `Q` - Market center open price
+    - `S` - Split trade
+    - `V` - Contingent trade
+    - `W` - Average price trade
+    - `X` - Cross trade
+    - `1` - Stopped stock(Regular trade)
     """
 
     direction: Type[TradeDirection]
@@ -1554,19 +1585,27 @@ class QuoteContext:
                 print(resp)
         """
 
-    def trading_days(self) -> MarketTradingDays:
+    def trading_days(self, market: Type[Market], begin: date, end: date) -> MarketTradingDays:
         """
         Get trading session of the day
+
+        The interval must be less than one month, and only the most recent year is supported.
+
+        Args:
+            market: Market
+            begin: Begin date
+            end: End date
 
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from datetime import date
+                from longbridge.openapi import QuoteContext, Config, Market
 
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                resp = ctx.trading_days()
+                resp = ctx.trading_days(Market.HK, date(2022, 1, 1), date(2022, 2, 1))
                 print(resp)
         """
 
@@ -1908,9 +1947,9 @@ class TriggerStatus:
         """
 
 
-class Trade:
+class Execution:
     """
-    Trade
+    Execution
     """
 
     order_id: str
@@ -2553,7 +2592,7 @@ class TradeContext:
             topics: Topic list
         """
 
-    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[date] = None, end_at: Optional[date] = None) -> List[Trade]:
+    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[date] = None, end_at: Optional[date] = None) -> List[Execution]:
         """
         Get history executions
 
@@ -2579,7 +2618,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def today_executions(self, symbol: Optional[str] = None, order_id: Optional[str] = None) -> List[Trade]:
+    def today_executions(self, symbol: Optional[str] = None, order_id: Optional[str] = None) -> List[Execution]:
         """
         Get today executions
 

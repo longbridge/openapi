@@ -468,6 +468,9 @@ impl QuoteContextSync {
 
     /// Get market trading days
     ///
+    /// The interval must be less than one month, and only the most recent year
+    /// is supported.
+    ///
     /// # Examples
     ///
     /// ```no_run
