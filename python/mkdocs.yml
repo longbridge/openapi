@@ -1,8 +1,8 @@
 site_name: Longbridge OpenAPI SDK
 docs_dir: docs
 
-theme:
-  name: readthedocs
+# theme:
+#   name: readthedocs
 
 nav:
   - Index: index.md
@@ -24,13 +24,11 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          import:
-            - https://docs.python.org/3/objects.inv
+          # import:
+          #   - https://docs.python.org/3/objects.inv
           selection:
             docstring_style: google
           rendering:
             show_source: false
-            show_signature: true
-            show_if_no_docstring: false
-            show_signature_annotations: true
+            show_if_no_docstring: true
             members_order: source
