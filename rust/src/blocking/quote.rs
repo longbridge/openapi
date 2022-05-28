@@ -7,8 +7,8 @@ use crate::{
     blocking::runtime::BlockingRuntime,
     quote::{
         AdjustType, Candlestick, IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession,
-        OptionQuote, ParticipantInfo, Period, PushEvent, RealtimeQuote, SecuritiyStaticInfo,
-        SecurityBrokers, SecurityDepth, SecurityQuote, StrikePriceInfo, SubFlags, Trade,
+        OptionQuote, ParticipantInfo, Period, PushEvent, RealtimeQuote, SecurityBrokers,
+        SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, SubFlags, Trade,
         WarrantQuote,
     },
     Config, Market, QuoteContext,
@@ -115,7 +115,7 @@ impl QuoteContextSync {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn static_info<I, T>(&self, symbols: I) -> Result<Vec<SecuritiyStaticInfo>>
+    pub fn static_info<I, T>(&self, symbols: I) -> Result<Vec<SecurityStaticInfo>>
     where
         I: IntoIterator<Item = T> + Send + 'static,
         I::IntoIter: Send + 'static,

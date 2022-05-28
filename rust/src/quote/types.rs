@@ -139,7 +139,7 @@ pub enum DerivativeType {
 
 /// The basic information of securities
 #[derive(Debug)]
-pub struct SecuritiyStaticInfo {
+pub struct SecurityStaticInfo {
     /// Security code
     pub symbol: String,
     /// Security name (zh-CN)
@@ -172,11 +172,11 @@ pub struct SecuritiyStaticInfo {
     pub stock_derivatives: Vec<DerivativeType>,
 }
 
-impl TryFrom<quote::StaticInfo> for SecuritiyStaticInfo {
+impl TryFrom<quote::StaticInfo> for SecurityStaticInfo {
     type Error = Error;
 
     fn try_from(resp: quote::StaticInfo) -> Result<Self, Self::Error> {
-        Ok(SecuritiyStaticInfo {
+        Ok(SecurityStaticInfo {
             symbol: resp.symbol,
             name_cn: resp.name_cn,
             name_en: resp.name_en,

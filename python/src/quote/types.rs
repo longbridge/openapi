@@ -221,8 +221,8 @@ impl From<AdjustType> for longbridge::quote::AdjustType {
 /// The basic information of securities
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::quote::SecuritiyStaticInfo")]
-pub(crate) struct SecuritiyStaticInfo {
+#[py(from = "longbridge::quote::SecurityStaticInfo")]
+pub(crate) struct SecurityStaticInfo {
     /// Security code
     symbol: String,
     /// Security name (zh-CN)

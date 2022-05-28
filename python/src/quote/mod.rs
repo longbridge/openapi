@@ -13,7 +13,7 @@ pub(crate) fn register_types(parent: &PyModule) -> PyResult<()> {
     parent.add_class::<types::OptionType>()?;
     parent.add_class::<types::Period>()?;
     parent.add_class::<types::AdjustType>()?;
-    parent.add_class::<types::SecuritiyStaticInfo>()?;
+    parent.add_class::<types::SecurityStaticInfo>()?;
     parent.add_class::<types::PrePostQuote>()?;
     parent.add_class::<types::SecurityQuote>()?;
     parent.add_class::<types::OptionQuote>()?;

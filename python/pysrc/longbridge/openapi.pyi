@@ -220,7 +220,7 @@ class DerivativeType:
         """
 
 
-class SecuritiyStaticInfo:
+class SecurityStaticInfo:
     """
     The basic information of securities
     """
@@ -795,7 +795,7 @@ class Depth:
     """
 
 
-class SecuritiyDepth:
+class SecurityDepth:
     """
     Security depth
     """
@@ -1322,7 +1322,7 @@ class QuoteContext:
                 ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
         """
 
-    def static_info(self, symbols: List[str]) -> List[SecuritiyStaticInfo]:
+    def static_info(self, symbols: List[str]) -> List[SecurityStaticInfo]:
         """
         Get basic information of securities
 
@@ -1410,7 +1410,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def depth(self, symbol: str) -> SecuritiyDepth:
+    def depth(self, symbol: str) -> SecurityDepth:
         """
         Get security depth
 
@@ -1681,7 +1681,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def realtime_depth(self, symbol: str) -> SecuritiyDepth:
+    def realtime_depth(self, symbol: str) -> SecurityDepth:
         """
         Get real-time depth
 

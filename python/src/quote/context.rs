@@ -10,7 +10,7 @@ use crate::{
         types::{
             AdjustType, Candlestick, IntradayLine, IssuerInfo, MarketTradingDays,
             MarketTradingSession, OptionQuote, ParticipantInfo, Period, RealtimeQuote,
-            SecuritiyStaticInfo, SecurityBrokers, SecurityDepth, SecurityQuote, StrikePriceInfo,
+            SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
             SubType, SubTypes, Trade, WarrantQuote,
         },
     },
@@ -53,7 +53,7 @@ impl QuoteContext {
     }
 
     /// Get basic information of securities
-    fn static_info(&self, symbols: Vec<String>) -> PyResult<Vec<SecuritiyStaticInfo>> {
+    fn static_info(&self, symbols: Vec<String>) -> PyResult<Vec<SecurityStaticInfo>> {
         self.0
             .static_info(symbols)?
             .into_iter()

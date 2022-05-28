@@ -14,8 +14,8 @@ use crate::{
         sub_flags::SubFlags,
         utils::{format_date, parse_date},
         AdjustType, Candlestick, IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession,
-        OptionQuote, ParticipantInfo, Period, PushEvent, RealtimeQuote, SecuritiyStaticInfo,
-        SecurityBrokers, SecurityDepth, SecurityQuote, StrikePriceInfo, Trade, WarrantQuote,
+        OptionQuote, ParticipantInfo, Period, PushEvent, RealtimeQuote, SecurityBrokers,
+        SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, Trade, WarrantQuote,
     },
     Config, Market,
 };
@@ -204,7 +204,7 @@ impl QuoteContext {
     /// # Ok::<_, anyhow::Error>(())
     /// # });
     /// ```
-    pub async fn static_info<I, T>(&self, symbols: I) -> Result<Vec<SecuritiyStaticInfo>>
+    pub async fn static_info<I, T>(&self, symbols: I) -> Result<Vec<SecurityStaticInfo>>
     where
         I: IntoIterator<Item = T>,
         T: Into<String>,
