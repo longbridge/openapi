@@ -2517,7 +2517,7 @@ class FundPosition:
     Current equity
     """
 
-    net_asset_value_day: Decimal
+    net_asset_value_day: datetime
     """
     Current equity PyDecimal
     """
@@ -2537,10 +2537,15 @@ class FundPosition:
     Net cost
     """
 
-
-class FundPositionsResponse:
+    holding_units: Decimal
     """
-    Fund positions response
+    Holding units
+    """
+
+
+class FundPositionChannel:
+    """
+    Fund position channel
     """
 
     account_channel: str
@@ -2551,6 +2556,17 @@ class FundPositionsResponse:
     positions: List[FundPosition]
     """
     Fund positions
+    """
+
+
+class FundPositionsResponse:
+    """
+    Fund positions response
+    """
+
+    channels: List[FundPositionChannel]
+    """
+    Channels
     """
 
 
@@ -2590,9 +2606,9 @@ class StockPosition:
     """
 
 
-class StockPositionsResponse:
+class StockPositionChannel:
     """
-    Stock positions response
+    Stock position channel
     """
 
     account_channel: str
@@ -2603,6 +2619,17 @@ class StockPositionsResponse:
     positions: List[StockPosition]
     """
     Stock positions
+    """
+
+
+class StockPositionsResponse:
+    """
+    Stock positions response
+    """
+
+    channels: List[StockPositionChannel]
+    """
+    Channels
     """
 
 

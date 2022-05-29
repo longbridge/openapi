@@ -61,6 +61,18 @@ pub(crate) mod timestamp_opt {
     }
 }
 
+pub(crate) mod timestamp_int {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<OffsetDateTime, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = i64::deserialize(deserializer)?;
+        OffsetDateTime::from_unix_timestamp(value).map_err(|_| Error::custom("invalid timestamp"))
+    }
+}
+
 pub(crate) mod date_opt {
     use super::*;
 

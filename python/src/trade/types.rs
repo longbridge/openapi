@@ -409,6 +409,15 @@ pub(crate) struct CashFlow {
 #[derive(Debug, PyObject)]
 #[py(from = "longbridge::trade::FundPositionsResponse")]
 pub(crate) struct FundPositionsResponse {
+    #[py(array)]
+    pub channels: Vec<FundPositionChannel>,
+}
+
+/// Fund position channel
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(from = "longbridge::trade::FundPositionChannel")]
+pub(crate) struct FundPositionChannel {
     /// Account type
     account_channel: String,
     /// Fund positions
@@ -425,14 +434,16 @@ pub(crate) struct FundPosition {
     symbol: String,
     /// Current equity
     current_net_asset_value: PyDecimal,
-    /// Current equity PyDecimal
-    net_asset_value_day: PyDecimal,
+    /// Current equity time
+    net_asset_value_day: PyOffsetDateTimeWrapper,
     /// Fund name
     symbol_name: String,
     /// Currency
     currency: String,
     /// Net cost
     cost_net_asset_value: PyDecimal,
+    /// Holding units
+    pub holding_units: PyDecimal,
 }
 
 /// Stock positions response
@@ -440,6 +451,15 @@ pub(crate) struct FundPosition {
 #[derive(Debug, PyObject, Clone)]
 #[py(from = "longbridge::trade::StockPositionsResponse")]
 pub(crate) struct StockPositionsResponse {
+    #[py(array)]
+    pub channels: Vec<StockPositionChannel>,
+}
+
+/// Stock position channel
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(from = "longbridge::trade::StockPositionChannel")]
+pub(crate) struct StockPositionChannel {
     /// Account type
     account_channel: String,
     /// Fund details

@@ -17,6 +17,7 @@ pub use requests::{
 };
 pub use types::{
     AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo, Execution, FundPosition,
-    FundPositionsResponse, Order, OrderSide, OrderStatus, OrderTag, OrderType, OutsideRTH,
-    StockPosition, StockPositionsResponse, TimeInForceType, TriggerPriceType, TriggerStatus,
+    FundPositionChannel, FundPositionsResponse, Order, OrderSide, OrderStatus, OrderTag, OrderType,
+    OutsideRTH, StockPosition, StockPositionChannel, StockPositionsResponse, TimeInForceType,
+    TriggerPriceType, TriggerStatus,
 };
