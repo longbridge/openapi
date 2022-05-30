@@ -202,8 +202,7 @@ pub(crate) struct Order {
     #[py(opt)]
     executed_price: Option<PyDecimal>,
     /// Submitted time
-    #[py(opt)]
-    submitted_at: Option<PyOffsetDateTimeWrapper>,
+    submitted_at: PyOffsetDateTimeWrapper,
     /// Order side
     side: OrderSide,
     /// Security code

@@ -242,8 +242,8 @@ pub struct Order {
     #[serde(with = "serde_utils::decimal_opt_0_is_none")]
     pub executed_price: Option<Decimal>,
     /// Submitted time
-    #[serde(with = "serde_utils::timestamp_opt")]
-    pub submitted_at: Option<OffsetDateTime>,
+    #[serde(with = "serde_utils::timestamp")]
+    pub submitted_at: OffsetDateTime,
     /// Order side
     pub side: OrderSide,
     /// Security code
@@ -254,7 +254,7 @@ pub struct Order {
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub last_done: Option<Decimal>,
     /// `LIT` / `MIT` Order Trigger Price
-    #[serde(with = "serde_utils::decimal_opt_0_is_none")]
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub trigger_price: Option<Decimal>,
     /// Rejected Message or remark
     pub msg: String,
@@ -720,5 +720,184 @@ mod tests {
         assert_eq!(cash_info.frozen_cash, "28723.76".parse().unwrap());
         assert_eq!(cash_info.settling_cash, "-276806.51".parse().unwrap());
         assert_eq!(cash_info.currency, "USD");
+    }
+
+    #[test]
+    fn history_orders() {
+        let data = r#"
+        {
+            "orders": [
+              {
+                "currency": "HKD",
+                "executed_price": "0.000",
+                "executed_quantity": "0",
+                "expire_date": "",
+                "last_done": "",
+                "limit_offset": "",
+                "msg": "",
+                "order_id": "706388312699592704",
+                "order_type": "ELO",
+                "outside_rth": "UnknownOutsideRth",
+                "price": "11.900",
+                "quantity": "200",
+                "side": "Buy",
+                "status": "RejectedStatus",
+                "stock_name": "Bank of East Asia Ltd/The",
+                "submitted_at": "1651644897",
+                "symbol": "23.HK",
+                "tag": "Normal",
+                "time_in_force": "Day",
+                "trailing_amount": "",
+                "trailing_percent": "",
+                "trigger_at": "0",
+                "trigger_price": "",
+                "trigger_status": "NOT_USED",
+                "updated_at": "1651644898"
+              }
+            ]
+          }
+        "#;
+
+        #[derive(Deserialize)]
+        struct Response {
+            orders: Vec<Order>,
+        }
+
+        let resp: Response = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.orders.len(), 1);
+
+        let order = &resp.orders[0];
+        assert_eq!(order.currency, "HKD");
+        assert!(order.executed_price.is_none());
+        assert!(order.executed_quantity.is_none());
+        assert!(order.expire_date.is_none());
+        assert!(order.last_done.is_none());
+        assert!(order.limit_offset.is_none());
+        assert_eq!(order.msg, "");
+        assert_eq!(order.order_id, "706388312699592704");
+        assert_eq!(order.order_type, OrderType::ELO);
+        assert!(order.outside_rth.is_none());
+        assert_eq!(order.price, Some("11.900".parse().unwrap()));
+        assert_eq!(order.quantity, "200".parse().unwrap());
+        assert_eq!(order.side, OrderSide::Buy);
+        assert_eq!(order.status, OrderStatus::Rejected);
+        assert_eq!(order.stock_name, "Bank of East Asia Ltd/The");
+        assert_eq!(order.submitted_at, datetime!(2022-05-04 14:14:57 +8));
+        assert_eq!(order.symbol, "23.HK");
+        assert_eq!(order.tag, OrderTag::Normal);
+        assert_eq!(order.time_in_force, TimeInForceType::Day);
+        assert!(order.trailing_amount.is_none());
+        assert!(order.trailing_percent.is_none());
+        assert!(order.trigger_at.is_none());
+        assert!(order.trigger_price.is_none());
+        assert!(order.trigger_status.is_none());
+        assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
+    }
+
+    #[test]
+    fn today_orders() {
+        let data = r#"
+        {
+            "orders": [
+              {
+                "currency": "HKD",
+                "executed_price": "0.000",
+                "executed_quantity": "0",
+                "expire_date": "",
+                "last_done": "",
+                "limit_offset": "",
+                "msg": "",
+                "order_id": "706388312699592704",
+                "order_type": "ELO",
+                "outside_rth": "UnknownOutsideRth",
+                "price": "11.900",
+                "quantity": "200",
+                "side": "Buy",
+                "status": "RejectedStatus",
+                "stock_name": "Bank of East Asia Ltd/The",
+                "submitted_at": "1651644897",
+                "symbol": "23.HK",
+                "tag": "Normal",
+                "time_in_force": "Day",
+                "trailing_amount": "",
+                "trailing_percent": "",
+                "trigger_at": "0",
+                "trigger_price": "",
+                "trigger_status": "NOT_USED",
+                "updated_at": "1651644898"
+              }
+            ]
+          }
+        "#;
+
+        #[derive(Deserialize)]
+        struct Response {
+            orders: Vec<Order>,
+        }
+
+        let resp: Response = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.orders.len(), 1);
+
+        let order = &resp.orders[0];
+        assert_eq!(order.currency, "HKD");
+        assert!(order.executed_price.is_none());
+        assert!(order.executed_quantity.is_none());
+        assert!(order.expire_date.is_none());
+        assert!(order.last_done.is_none());
+        assert!(order.limit_offset.is_none());
+        assert_eq!(order.msg, "");
+        assert_eq!(order.order_id, "706388312699592704");
+        assert_eq!(order.order_type, OrderType::ELO);
+        assert!(order.outside_rth.is_none());
+        assert_eq!(order.price, Some("11.900".parse().unwrap()));
+        assert_eq!(order.quantity, "200".parse().unwrap());
+        assert_eq!(order.side, OrderSide::Buy);
+        assert_eq!(order.status, OrderStatus::Rejected);
+        assert_eq!(order.stock_name, "Bank of East Asia Ltd/The");
+        assert_eq!(order.submitted_at, datetime!(2022-05-04 14:14:57 +8));
+        assert_eq!(order.symbol, "23.HK");
+        assert_eq!(order.tag, OrderTag::Normal);
+        assert_eq!(order.time_in_force, TimeInForceType::Day);
+        assert!(order.trailing_amount.is_none());
+        assert!(order.trailing_percent.is_none());
+        assert!(order.trigger_at.is_none());
+        assert!(order.trigger_price.is_none());
+        assert!(order.trigger_status.is_none());
+        assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
+    }
+
+    #[test]
+    fn history_executions() {
+        let data = r#"
+        {
+            "has_more": false,
+            "trades": [
+              {
+                "order_id": "693664675163312128",
+                "price": "388",
+                "quantity": "100",
+                "symbol": "700.HK",
+                "trade_done_at": "1648611351",
+                "trade_id": "693664675163312128-1648611351433741210"
+              }
+            ]
+          }
+        "#;
+
+        #[derive(Deserialize)]
+        struct Response {
+            trades: Vec<Execution>,
+        }
+
+        let resp: Response = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.trades.len(), 1);
+
+        let execution = &resp.trades[0];
+        assert_eq!(execution.order_id, "693664675163312128");
+        assert_eq!(execution.price, "388".parse().unwrap());
+        assert_eq!(execution.quantity, "100".parse().unwrap());
+        assert_eq!(execution.symbol, "700.HK");
+        assert_eq!(execution.trade_done_at, datetime!(2022-03-30 11:35:51 +8));
+        assert_eq!(execution.trade_id, "693664675163312128-1648611351433741210");
     }
 }

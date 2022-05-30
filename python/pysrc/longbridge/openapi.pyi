@@ -2243,7 +2243,7 @@ class Order:
     Executed price
     """
 
-    submitted_at: Optional[datetime]
+    submitted_at: datetime
     """
     Submitted time
     """
