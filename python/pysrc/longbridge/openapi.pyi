@@ -874,9 +874,9 @@ class TradeDirection:
     Trade direction
     """
 
-    class Nature(TradeDirection):
+    class Neutral(TradeDirection):
         """
-        Nature
+        Neutral
         """
 
     class Down(TradeDirection):
@@ -2585,7 +2585,7 @@ class StockPosition:
     Stock name
     """
 
-    quality: Decimal
+    quantity: Decimal
     """
     The number of holdings
     """

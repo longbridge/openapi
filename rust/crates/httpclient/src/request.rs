@@ -143,6 +143,7 @@ where
             http_cli
                 .execute(request)
                 .await?
+                .error_for_status()?
                 .text()
                 .await
                 .map_err(HttpClientError::from)

@@ -56,7 +56,7 @@ jobs:
           mkdir -p gh-pages/python
           mv -f target/doc gh-pages/rust/$RUST_SDK_VERSION
           mv -f python/site gh-pages/python/$PYTHON_SDK_VERSION
-          python misc/render_docs_index.py > gh-pages/index.html
+          python .github/misc/render_docs_index.py > gh-pages/index.html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v2.5.1
         with:

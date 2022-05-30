@@ -13,6 +13,7 @@ use pyo3::{pyclass, pymethods, PyObject, PyResult};
 use crate::{
     config::Config,
     decimal::PyDecimal,
+    error::ErrorNewType,
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
     trade::{
         push::handle_push_event,
@@ -36,24 +37,29 @@ impl TradeContext {
             if let Some(handler) = &handler {
                 handle_push_event(handler, event);
             }
-        })?;
+        })
+        .map_err(ErrorNewType)?;
         Ok(Self(ctx))
     }
 
     /// Subscribe
     fn subscribe(&self, topics: Vec<TopicType>) -> PyResult<()> {
-        self.0.subscribe(topics.into_iter().map(Into::into))?;
+        self.0
+            .subscribe(topics.into_iter().map(Into::into))
+            .map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Unsubscribe
     fn unsubscribe(&self, topics: Vec<TopicType>) -> PyResult<()> {
-        self.0.unsubscribe(topics.into_iter().map(Into::into))?;
+        self.0
+            .unsubscribe(topics.into_iter().map(Into::into))
+            .map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Get history executions
-    pub fn history_executions(
+    fn history_executions(
         &self,
         symbol: Option<String>,
         start_at: Option<PyOffsetDateTimeWrapper>,
@@ -72,14 +78,15 @@ impl TradeContext {
         }
 
         self.0
-            .history_executions(Some(opts))?
+            .history_executions(Some(opts))
+            .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect()
     }
 
     /// Get today executions
-    pub fn today_executions(
+    fn today_executions(
         &self,
         symbol: Option<String>,
         order_id: Option<String>,
@@ -94,15 +101,16 @@ impl TradeContext {
         }
 
         self.0
-            .today_executions(Some(opts))?
+            .today_executions(Some(opts))
+            .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect()
     }
 
     /// Get history orders
-    #[args(default = "[]")]
-    pub fn history_orders(
+    #[args(status = "vec![]")]
+    fn history_orders(
         &self,
         symbol: Option<String>,
         status: Vec<OrderStatus>,
@@ -131,14 +139,15 @@ impl TradeContext {
         }
 
         self.0
-            .history_orders(Some(opts))?
+            .history_orders(Some(opts))
+            .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect()
     }
 
     /// Get today orders
-    pub fn today_orders(
+    fn today_orders(
         &self,
         symbol: Option<String>,
         status: Vec<OrderStatus>,
@@ -159,7 +168,8 @@ impl TradeContext {
         }
 
         self.0
-            .today_orders(Some(opts))?
+            .today_orders(Some(opts))
+            .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect()
@@ -167,7 +177,7 @@ impl TradeContext {
 
     /// Replace order
     #[allow(clippy::too_many_arguments)]
-    pub fn replace_order(
+    fn replace_order(
         &self,
         order_id: String,
         quantity: PyDecimal,
@@ -199,13 +209,13 @@ impl TradeContext {
             opts = opts.remark(remark);
         }
 
-        self.0.replace_order(opts)?;
+        self.0.replace_order(opts).map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Submit order
     #[allow(clippy::too_many_arguments)]
-    pub fn submit_order(
+    fn submit_order(
         &self,
         symbol: String,
         order_type: OrderType,
@@ -254,26 +264,27 @@ impl TradeContext {
             opts = opts.remark(remark);
         }
 
-        self.0.submit_order(opts)?.try_into()
+        self.0.submit_order(opts).map_err(ErrorNewType)?.try_into()
     }
 
     /// Withdraw order
-    pub fn withdraw_order(&self, order_id: String) -> PyResult<()> {
-        self.0.withdraw_order(order_id)?;
+    fn withdraw_order(&self, order_id: String) -> PyResult<()> {
+        self.0.withdraw_order(order_id).map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Get account balance
-    pub fn account_balance(&self) -> PyResult<Vec<AccountBalance>> {
+    fn account_balance(&self) -> PyResult<Vec<AccountBalance>> {
         self.0
-            .account_balance()?
+            .account_balance()
+            .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect::<PyResult<Vec<_>>>()
     }
 
     /// Get cash flow
-    pub fn cash_flow(
+    fn cash_flow(
         &self,
         start_at: PyOffsetDateTimeWrapper,
         end_at: PyOffsetDateTimeWrapper,
@@ -298,7 +309,8 @@ impl TradeContext {
         }
 
         self.0
-            .cash_flow(opts)?
+            .cash_flow(opts)
+            .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect::<PyResult<Vec<_>>>()
@@ -306,17 +318,19 @@ impl TradeContext {
 
     /// Get fund positions
     #[args(symbols = "vec![]")]
-    pub fn fund_positions(&self, symbols: Vec<String>) -> PyResult<FundPositionsResponse> {
+    fn fund_positions(&self, symbols: Vec<String>) -> PyResult<FundPositionsResponse> {
         self.0
-            .fund_positions(GetFundPositionsOptions::new().symbols(symbols))?
+            .fund_positions(GetFundPositionsOptions::new().symbols(symbols))
+            .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get stock positions
     #[args(symbols = "vec![]")]
-    pub fn stock_positions(&self, symbols: Vec<String>) -> PyResult<StockPositionsResponse> {
+    fn stock_positions(&self, symbols: Vec<String>) -> PyResult<StockPositionsResponse> {
         self.0
-            .stock_positions(GetStockPositionsOptions::new().symbols(symbols))?
+            .stock_positions(GetStockPositionsOptions::new().symbols(symbols))
+            .map_err(ErrorNewType)?
             .try_into()
     }
 }

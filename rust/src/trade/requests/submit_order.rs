@@ -5,7 +5,7 @@ use time::Date;
 use crate::trade::{serde_utils, OrderSide, OrderType, OutsideRTH, TimeInForceType};
 
 /// Options for submit order request
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct SubmitOrderOptions {
     symbol: String,
     order_type: OrderType,

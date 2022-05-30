@@ -1,6 +1,5 @@
 use std::{sync::Arc, time::Duration};
 
-use anyhow::Result;
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
 use time::Date;
@@ -17,7 +16,7 @@ use crate::{
         OptionQuote, ParticipantInfo, Period, PushEvent, RealtimeQuote, SecurityBrokers,
         SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, Trade, WarrantQuote,
     },
-    Config, Market,
+    Config, Error, Market, Result,
 };
 
 const PARTICIPANT_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
@@ -123,7 +122,7 @@ impl QuoteContext {
     pub async fn subscribe<I, T>(
         &self,
         symbols: I,
-        sub_types: SubFlags,
+        sub_types: impl Into<SubFlags>,
         is_first_push: bool,
     ) -> Result<()>
     where
@@ -134,7 +133,7 @@ impl QuoteContext {
         self.command_tx
             .send(Command::Subscribe {
                 symbols: symbols.into_iter().map(Into::into).collect(),
-                sub_types,
+                sub_types: sub_types.into(),
                 is_first_push,
                 reply_tx,
             })
@@ -166,7 +165,7 @@ impl QuoteContext {
     /// # Ok::<_, anyhow::Error>(())
     /// # });
     /// ```
-    pub async fn unsubscribe<I, T>(&self, symbols: I, sub_types: SubFlags) -> Result<()>
+    pub async fn unsubscribe<I, T>(&self, symbols: I, sub_types: impl Into<SubFlags>) -> Result<()>
     where
         I: IntoIterator<Item = T>,
         T: Into<String>,
@@ -175,7 +174,7 @@ impl QuoteContext {
         self.command_tx
             .send(Command::Unsubscribe {
                 symbols: symbols.into_iter().map(Into::into).collect(),
-                sub_types,
+                sub_types: sub_types.into(),
                 reply_tx,
             })
             .map_err(|_| WsClientError::ClientClosed)?;
@@ -609,7 +608,9 @@ impl QuoteContext {
                     .await?;
                 resp.expiry_date
                     .iter()
-                    .map(|value| parse_date(value))
+                    .map(|value| {
+                        parse_date(value).map_err(|err| Error::parse_field_error("date", err))
+                    })
                     .collect::<Result<Vec<_>>>()
             })
             .await
@@ -779,12 +780,16 @@ impl QuoteContext {
         let trading_days = resp
             .trade_day
             .iter()
-            .map(|value| parse_date(value))
+            .map(|value| {
+                parse_date(value).map_err(|err| Error::parse_field_error("trade_day", err))
+            })
             .collect::<Result<Vec<_>>>()?;
         let half_trading_days = resp
             .half_trade_day
             .iter()
-            .map(|value| parse_date(value))
+            .map(|value| {
+                parse_date(value).map_err(|err| Error::parse_field_error("half_trade_day", err))
+            })
             .collect::<Result<Vec<_>>>()?;
         Ok(MarketTradingDays {
             trading_days,

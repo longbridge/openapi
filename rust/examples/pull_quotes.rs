@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
-use anyhow::Result;
-use longbridge::{Config, QuoteContext};
+use longbridge::{Config, QuoteContext, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {

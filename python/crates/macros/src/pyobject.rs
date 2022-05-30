@@ -23,11 +23,15 @@ struct ObjectArgs {
     ident: Ident,
     data: Data<Ignored, ObjectField>,
 
-    from: TypePath,
+    remote: TypePath,
 }
 
 pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
-    let ObjectArgs { ident, data, from } = ObjectArgs::from_derive_input(&args)?;
+    let ObjectArgs {
+        ident,
+        data,
+        remote,
+    } = ObjectArgs::from_derive_input(&args)?;
 
     let s = match data {
         Data::Struct(s) => s,
@@ -84,10 +88,10 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
             #(#getters)*
         }
 
-        impl ::std::convert::TryFrom<#from> for #ident {
+        impl ::std::convert::TryFrom<#remote> for #ident {
             type Error = ::pyo3::PyErr;
 
-            fn try_from(value: #from) -> ::std::result::Result<Self, Self::Error> {
+            fn try_from(value: #remote) -> ::std::result::Result<Self, Self::Error> {
                 use ::std::convert::TryInto;
                 use ::std::iter::Iterator;
 

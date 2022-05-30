@@ -7,7 +7,7 @@ use crate::{
 };
 
 /// Options for get history orders request
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone)]
 pub struct GetHistoryOrdersOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     symbol: Option<String>,

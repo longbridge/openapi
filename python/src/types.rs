@@ -3,7 +3,7 @@ use pyo3::prelude::*;
 
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::Market")]
+#[py(remote = "longbridge::Market")]
 pub(crate) enum Market {
     /// Unknown
     Unknown,

@@ -1,5 +1,6 @@
-use anyhow::Result;
 use longbridge_httpcli::{HttpClient, HttpClientConfig};
+
+use crate::error::Result;
 
 const QUOTE_WS_URL: &str = "wss://openapi-quote.longbridgeapp.com";
 const TRADE_WS_URL: &str = "wss://openapi-trade.longbridgeapp.com";

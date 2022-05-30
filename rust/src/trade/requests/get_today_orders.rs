@@ -6,7 +6,7 @@ use crate::{
 };
 
 /// Options for get today orders request
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone)]
 pub struct GetTodayOrdersOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     symbol: Option<String>,

@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::Result;
 use time::Date;
 
 use crate::{
@@ -11,7 +10,7 @@ use crate::{
         SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, SubFlags, Trade,
         WarrantQuote,
     },
-    Config, Market, QuoteContext,
+    Config, Market, QuoteContext, Result,
 };
 
 /// Quote context

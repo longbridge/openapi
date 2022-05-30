@@ -1,13 +1,12 @@
 use std::{collections::HashSet, sync::Arc, time::Duration};
 
-use anyhow::Result;
 use longbridge_proto::trade::{Sub, SubResponse, Unsub, UnsubResponse};
 use longbridge_wscli::{CodecType, Platform, ProtocolVersion, WsClient, WsEvent, WsSession};
 use tokio::sync::{mpsc, oneshot};
 
 use crate::{
     trade::{cmd_code, PushEvent, TopicType},
-    Config,
+    Config, Result,
 };
 
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);
@@ -169,9 +168,10 @@ impl Core {
 
     async fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
         match PushEvent::parse(command_code, &body) {
-            Ok(event) => {
+            Ok(Some(event)) => {
                 let _ = self.push_tx.send(event);
             }
+            Ok(None) => {}
             Err(err) => {
                 tracing::error!(error = %err, "failed to parse push message");
             }

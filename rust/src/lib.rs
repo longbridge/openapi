@@ -8,6 +8,7 @@
 mod macros;
 
 mod config;
+mod error;
 mod types;
 
 #[cfg(feature = "blocking")]
@@ -17,6 +18,7 @@ pub mod quote;
 pub mod trade;
 
 pub use config::Config;
+pub use error::{Error, Result};
 pub use quote::QuoteContext;
 pub use rust_decimal::Decimal;
 pub use trade::TradeContext;

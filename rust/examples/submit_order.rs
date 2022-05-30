@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
-use anyhow::Result;
 use longbridge::{
     decimal,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
-    Config, TradeContext,
+    Config, Result, TradeContext,
 };
 
 #[tokio::main]

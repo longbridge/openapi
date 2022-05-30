@@ -4,7 +4,7 @@ use time::OffsetDateTime;
 use crate::trade::serde_utils;
 
 /// Options for get histroy executions request
-#[derive(Debug, Serialize, Default)]
+#[derive(Debug, Serialize, Default, Clone)]
 pub struct GetHistoryExecutionsOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     symbol: Option<String>,

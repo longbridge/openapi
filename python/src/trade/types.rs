@@ -9,8 +9,8 @@ use crate::{
 /// Topic type
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::TopicType")]
-pub enum TopicType {
+#[py(remote = "longbridge::trade::TopicType")]
+pub(crate) enum TopicType {
     /// Private notification for trade
     Private,
 }
@@ -18,7 +18,7 @@ pub enum TopicType {
 /// Trade
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::trade::Execution")]
+#[py(remote = "longbridge::trade::Execution")]
 pub(crate) struct Execution {
     /// Order ID
     order_id: String,
@@ -36,7 +36,7 @@ pub(crate) struct Execution {
 
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::OrderStatus")]
+#[py(remote = "longbridge::trade::OrderStatus")]
 pub(crate) enum OrderStatus {
     /// Unknown
     Unknown,
@@ -78,7 +78,7 @@ pub(crate) enum OrderStatus {
 
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::OrderSide")]
+#[py(remote = "longbridge::trade::OrderSide")]
 pub(crate) enum OrderSide {
     /// Unknown
     Unknown,
@@ -90,7 +90,7 @@ pub(crate) enum OrderSide {
 
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::OrderType")]
+#[py(remote = "longbridge::trade::OrderType")]
 #[allow(clippy::upper_case_acronyms)]
 pub(crate) enum OrderType {
     /// Unknown
@@ -124,7 +124,7 @@ pub(crate) enum OrderType {
 /// Order tag
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::OrderTag")]
+#[py(remote = "longbridge::trade::OrderTag")]
 pub(crate) enum OrderTag {
     /// Unknown
     Unknown,
@@ -139,7 +139,7 @@ pub(crate) enum OrderTag {
 /// Time in force type
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::TimeInForceType")]
+#[py(remote = "longbridge::trade::TimeInForceType")]
 pub(crate) enum TimeInForceType {
     /// Unknown
     Unknown,
@@ -154,8 +154,8 @@ pub(crate) enum TimeInForceType {
 /// Trigger status
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::TriggerStatus")]
-pub enum TriggerStatus {
+#[py(remote = "longbridge::trade::TriggerStatus")]
+pub(crate) enum TriggerStatus {
     /// Unknown
     Unknown,
     /// Deactive
@@ -169,8 +169,8 @@ pub enum TriggerStatus {
 /// Enable or disable outside regular trading hours
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::OutsideRTH")]
-pub enum OutsideRTH {
+#[py(remote = "longbridge::trade::OutsideRTH")]
+pub(crate) enum OutsideRTH {
     /// Unknown
     Unknown,
     /// Regular trading hour only
@@ -182,7 +182,7 @@ pub enum OutsideRTH {
 /// Order
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::trade::Order")]
+#[py(remote = "longbridge::trade::Order")]
 pub(crate) struct Order {
     /// Order ID
     order_id: String,
@@ -252,7 +252,7 @@ pub(crate) struct Order {
 /// Order changed message
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::trade::PushOrderChanged")]
+#[py(remote = "longbridge::trade::PushOrderChanged")]
 pub(crate) struct PushOrderChanged {
     /// Order side
     side: OrderSide,
@@ -309,7 +309,7 @@ pub(crate) struct PushOrderChanged {
 /// Response for withdraw order request
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::trade::SubmitOrderResponse")]
+#[py(remote = "longbridge::trade::SubmitOrderResponse")]
 pub(crate) struct SubmitOrderResponse {
     /// Order id
     order_id: String,
@@ -318,7 +318,7 @@ pub(crate) struct SubmitOrderResponse {
 /// Account balance
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(from = "longbridge::trade::CashInfo")]
+#[py(remote = "longbridge::trade::CashInfo")]
 pub(crate) struct CashInfo {
     /// Withdraw cash
     withdraw_cash: PyDecimal,
@@ -335,7 +335,7 @@ pub(crate) struct CashInfo {
 /// Account balance
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::trade::AccountBalance")]
+#[py(remote = "longbridge::trade::AccountBalance")]
 pub(crate) struct AccountBalance {
     /// Total cash
     total_cash: PyDecimal,
@@ -356,8 +356,8 @@ pub(crate) struct AccountBalance {
 
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::BalanceType")]
-pub enum BalanceType {
+#[py(remote = "longbridge::trade::BalanceType")]
+pub(crate) enum BalanceType {
     /// Unknown
     Unknown,
     /// Limit Order
@@ -370,8 +370,8 @@ pub enum BalanceType {
 
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(from = "longbridge::trade::CashFlowDirection")]
-pub enum CashFlowDirection {
+#[py(remote = "longbridge::trade::CashFlowDirection")]
+pub(crate) enum CashFlowDirection {
     /// Unknown
     Unknown,
     /// Out
@@ -383,7 +383,7 @@ pub enum CashFlowDirection {
 /// Account balance
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::trade::CashFlow")]
+#[py(remote = "longbridge::trade::CashFlow")]
 pub(crate) struct CashFlow {
     /// Cash flow name
     transaction_flow_name: String,
@@ -406,16 +406,16 @@ pub(crate) struct CashFlow {
 /// Fund positions response
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(from = "longbridge::trade::FundPositionsResponse")]
+#[py(remote = "longbridge::trade::FundPositionsResponse")]
 pub(crate) struct FundPositionsResponse {
     #[py(array)]
-    pub channels: Vec<FundPositionChannel>,
+    channels: Vec<FundPositionChannel>,
 }
 
 /// Fund position channel
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(from = "longbridge::trade::FundPositionChannel")]
+#[py(remote = "longbridge::trade::FundPositionChannel")]
 pub(crate) struct FundPositionChannel {
     /// Account type
     account_channel: String,
@@ -427,7 +427,7 @@ pub(crate) struct FundPositionChannel {
 /// Fund position
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(from = "longbridge::trade::FundPosition")]
+#[py(remote = "longbridge::trade::FundPosition")]
 pub(crate) struct FundPosition {
     /// Fund ISIN code
     symbol: String,
@@ -442,22 +442,22 @@ pub(crate) struct FundPosition {
     /// Net cost
     cost_net_asset_value: PyDecimal,
     /// Holding units
-    pub holding_units: PyDecimal,
+    holding_units: PyDecimal,
 }
 
 /// Stock positions response
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(from = "longbridge::trade::StockPositionsResponse")]
+#[py(remote = "longbridge::trade::StockPositionsResponse")]
 pub(crate) struct StockPositionsResponse {
     #[py(array)]
-    pub channels: Vec<StockPositionChannel>,
+    channels: Vec<StockPositionChannel>,
 }
 
 /// Stock position channel
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(from = "longbridge::trade::StockPositionChannel")]
+#[py(remote = "longbridge::trade::StockPositionChannel")]
 pub(crate) struct StockPositionChannel {
     /// Account type
     account_channel: String,
@@ -469,14 +469,14 @@ pub(crate) struct StockPositionChannel {
 /// Stock position
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(from = "longbridge::trade::StockPosition")]
+#[py(remote = "longbridge::trade::StockPosition")]
 pub(crate) struct StockPosition {
     /// Stock code
     symbol: String,
     /// Stock name
     symbol_name: String,
     /// The number of holdings
-    quality: PyDecimal,
+    quantity: PyDecimal,
     /// Available quantity
     available_quality: PyDecimal,
     /// Currency

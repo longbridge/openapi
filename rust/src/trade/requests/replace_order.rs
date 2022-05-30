@@ -2,7 +2,7 @@ use rust_decimal::Decimal;
 use serde::Serialize;
 
 /// Options for replace order request
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct ReplaceOrderOptions {
     order_id: String,
     quantity: Decimal,

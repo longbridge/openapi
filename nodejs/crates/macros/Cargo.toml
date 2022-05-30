@@ -1,0 +1,14 @@
+[package]
+name = "longbridge-nodejs-macros"
+version = "0.2.8"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+darling = "0.13.0"
+proc-macro2 = "1.0.29"
+quote = "1.0.9"
+syn = { version = "1.0.77", features = [] }
+thiserror = "1.0.29"

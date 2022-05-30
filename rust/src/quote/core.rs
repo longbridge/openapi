@@ -1,6 +1,5 @@
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-use anyhow::Result;
 use longbridge_proto::quote::{SubscribeRequest, SubscriptionResponse, UnsubscribeRequest};
 use longbridge_wscli::{CodecType, Platform, ProtocolVersion, WsClient, WsEvent, WsSession};
 use tokio::sync::{mpsc, oneshot};
@@ -10,7 +9,7 @@ use crate::{
         cmd_code, store::Store, sub_flags::SubFlags, PushEvent, RealtimeQuote, SecurityBrokers,
         SecurityDepth, Trade,
     },
-    Config,
+    Config, Result,
 };
 
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);

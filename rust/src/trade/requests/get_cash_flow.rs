@@ -4,7 +4,7 @@ use time::OffsetDateTime;
 use crate::trade::{serde_utils, BalanceType};
 
 /// Options for submit order request
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct GetCashFlowOptions {
     #[serde(rename = "start_time", with = "serde_utils::timestamp")]
     start_at: OffsetDateTime,

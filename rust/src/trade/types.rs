@@ -464,7 +464,8 @@ pub struct StockPosition {
     /// Stock name
     pub symbol_name: String,
     /// The number of holdings
-    pub quality: Decimal,
+    #[serde(rename = "quality")]
+    pub quantity: Decimal,
     /// Available quantity
     pub available_quality: Decimal,
     /// Currency
@@ -578,7 +579,7 @@ mod tests {
         assert_eq!(position.symbol, "700.HK");
         assert_eq!(position.symbol_name, "腾讯控股");
         assert_eq!(position.currency, "HK");
-        assert_eq!(position.quality, decimal!(650i32));
+        assert_eq!(position.quantity, decimal!(650i32));
         assert_eq!(position.available_quality, decimal!(-450i32));
         assert_eq!(position.cost_price, decimal!(457.53f32));
 
@@ -586,7 +587,7 @@ mod tests {
         assert_eq!(position.symbol, "700.HK");
         assert_eq!(position.symbol_name, "腾讯控股");
         assert_eq!(position.currency, "HK");
-        assert_eq!(position.quality, decimal!(650i32));
+        assert_eq!(position.quantity, decimal!(650i32));
         assert_eq!(position.available_quality, decimal!(-450i32));
         assert_eq!(position.cost_price, decimal!(457.53f32));
 
@@ -594,7 +595,7 @@ mod tests {
         assert_eq!(position.symbol, "9991.HK");
         assert_eq!(position.symbol_name, "宝尊电商-SW");
         assert_eq!(position.currency, "HK");
-        assert_eq!(position.quality, decimal!(200i32));
+        assert_eq!(position.quantity, decimal!(200i32));
         assert_eq!(position.available_quality, decimal!(0i32));
         assert_eq!(position.cost_price, decimal!(32.25f32));
     }

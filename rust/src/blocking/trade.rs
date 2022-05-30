@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::Result;
-
 use crate::{
     blocking::runtime::BlockingRuntime,
     trade::{
@@ -11,7 +9,7 @@ use crate::{
         PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
         SubmitOrderResponse, TopicType, TradeContext,
     },
-    Config,
+    Config, Result,
 };
 
 /// Trade context

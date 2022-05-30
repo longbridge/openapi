@@ -1,0 +1,491 @@
+use chrono::{DateTime, Utc};
+use longbridge_nodejs_macros::{JsEnum, JsObject};
+use napi::bindgen_prelude::*;
+
+use crate::{decimal::Decimal, time::NaiveDate};
+
+/// Topic type
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::TopicType")]
+pub enum TopicType {
+    /// Private notification for trade
+    Private,
+}
+
+/// Trade
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::Execution")]
+pub struct Execution {
+    /// Order ID
+    order_id: String,
+    /// Execution ID
+    trade_id: String,
+    /// Security code
+    symbol: String,
+    /// Trade done time
+    #[js(datetime)]
+    trade_done_at: DateTime<Utc>,
+    /// Executed quantity
+    quantity: Decimal,
+    /// Executed price
+    price: Decimal,
+}
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::OrderStatus")]
+pub enum OrderStatus {
+    /// Unknown
+    Unknown,
+    /// Not reported
+    NotReported,
+    /// Not reported (Replaced Order)
+    ReplacedNotReported,
+    /// Not reported (Protected Order)
+    ProtectedNotReported,
+    /// Not reported (Conditional Order)
+    VarietiesNotReported,
+    /// Filled
+    Filled,
+    /// Wait To New
+    WaitToNew,
+    /// New
+    New,
+    /// Wait To Replace
+    WaitToReplace,
+    /// Pending Replace
+    PendingReplace,
+    /// Replaced
+    Replaced,
+    /// Partial Filled
+    PartialFilled,
+    /// Wait To Cancel
+    WaitToCancel,
+    /// Pending Cancel
+    PendingCancel,
+    /// Rejected
+    Rejected,
+    /// Canceled
+    Canceled,
+    /// Expired
+    Expired,
+    /// Partial Withdrawal
+    PartialWithdrawal,
+}
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::OrderSide")]
+pub enum OrderSide {
+    /// Unknown
+    Unknown,
+    /// Buy
+    Buy,
+    /// Sell
+    Sell,
+}
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::OrderType")]
+#[allow(clippy::upper_case_acronyms)]
+pub enum OrderType {
+    /// Unknown
+    Unknown,
+    /// Limit Order
+    LO,
+    /// Enhanced Limit Order
+    ELO,
+    /// Market Order
+    MO,
+    /// At-auction Order
+    AO,
+    /// At-auction Limit Order
+    ALO,
+    /// Odd Lots
+    ODD,
+    /// Limit If Touched
+    LIT,
+    /// Market If Touched
+    MIT,
+    /// Trailing Limit If Touched (Trailing Amount)
+    TSLPAMT,
+    /// Trailing Limit If Touched (Trailing Percent)
+    TSLPPCT,
+    /// Trailing Market If Touched (Trailing Amount)
+    TSMAMT,
+    /// Trailing Market If Touched (Trailing Percent)
+    TSMPCT,
+}
+
+/// Order tag
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::OrderTag")]
+pub enum OrderTag {
+    /// Unknown
+    Unknown,
+    /// Normal Order
+    Normal,
+    /// Long term Order
+    LongTerm,
+    /// Grey Order
+    Grey,
+}
+
+/// Time in force type
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::TimeInForceType")]
+pub enum TimeInForceType {
+    /// Unknown
+    Unknown,
+    /// Day Order
+    Day,
+    /// Good Til Canceled Order
+    GoodTilCanceled,
+    /// Good Til Date Order
+    GoodTilDate,
+}
+
+/// Trigger status
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::TriggerStatus")]
+pub enum TriggerStatus {
+    /// Unknown
+    Unknown,
+    /// Deactive
+    Deactive,
+    /// Active
+    Active,
+    /// Released
+    Released,
+}
+
+/// Enable or disable outside regular trading hours
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::OutsideRTH")]
+pub enum OutsideRTH {
+    /// Unknown
+    Unknown,
+    /// Regular trading hour only
+    RTHOnly,
+    /// Any time
+    AnyTime,
+}
+
+/// Order
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::Order")]
+pub struct Order {
+    /// Order ID
+    order_id: String,
+    /// Order status
+    status: OrderStatus,
+    /// Stock name
+    stock_name: String,
+    /// Submitted quantity
+    quantity: Decimal,
+    /// Executed quantity
+    #[js(opt)]
+    executed_quantity: Option<Decimal>,
+    /// Submitted price
+    #[js(opt)]
+    price: Option<Decimal>,
+    /// Executed price
+    #[js(opt)]
+    executed_price: Option<Decimal>,
+    /// Submitted time
+    #[js(datetime)]
+    submitted_at: DateTime<Utc>,
+    /// Order side
+    side: OrderSide,
+    /// Security code
+    symbol: String,
+    /// Order type
+    order_type: OrderType,
+    /// Last done
+    #[js(opt)]
+    last_done: Option<Decimal>,
+    /// `LIT` / `MIT` Order Trigger Price
+    #[js(opt)]
+    trigger_price: Option<Decimal>,
+    /// Rejected Message or remark
+    msg: String,
+    /// Order tag
+    tag: OrderTag,
+    /// Time in force type
+    time_in_force: TimeInForceType,
+    /// Long term order expire date
+    #[js(opt)]
+    expire_date: Option<NaiveDate>,
+    /// Last updated time
+    #[js(opt, datetime)]
+    updated_at: Option<DateTime<Utc>>,
+    /// Conditional order trigger time
+    #[js(opt, datetime)]
+    trigger_at: Option<DateTime<Utc>>,
+    /// `TSMAMT` / `TSLPAMT` order trailing amount
+    #[js(opt)]
+    trailing_amount: Option<Decimal>,
+    /// `TSMPCT` / `TSLPPCT` order trailing percent
+    #[js(opt)]
+    trailing_percent: Option<Decimal>,
+    /// `TSLPAMT` / `TSLPPCT` order limit offset amount
+    #[js(opt)]
+    limit_offset: Option<Decimal>,
+    /// Conditional order trigger status
+    #[js(opt)]
+    trigger_status: Option<TriggerStatus>,
+    /// Currency
+    currency: String,
+    /// Enable or disable outside regular trading hours
+    #[js(opt)]
+    outside_rth: Option<OutsideRTH>,
+}
+
+/// Order changed message
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::PushOrderChanged")]
+pub struct PushOrderChanged {
+    /// Order side
+    side: OrderSide,
+    /// Stock name
+    stock_name: String,
+    /// Submitted quantity
+    quantity: String,
+    /// Order symbol
+    symbol: String,
+    /// Order type
+    order_type: OrderType,
+    /// Submitted price
+    price: Decimal,
+    /// Executed quantity
+    executed_quantity: i64,
+    /// Executed price
+    executed_price: Decimal,
+    /// Order ID
+    order_id: String,
+    /// Currency
+    currency: String,
+    /// Order status
+    status: OrderStatus,
+    /// Submitted time
+    #[js(datetime)]
+    submitted_at: DateTime<Utc>,
+    /// Last updated time
+    #[js(datetime)]
+    updated_at: DateTime<Utc>,
+    /// Order trigger price
+    #[js(opt)]
+    trigger_price: Option<Decimal>,
+    /// Rejected message or remark
+    msg: String,
+    /// Order tag
+    tag: OrderTag,
+    /// Conditional order trigger status
+    #[js(opt)]
+    trigger_status: Option<TriggerStatus>,
+    /// Conditional order trigger time
+    #[js(opt, datetime)]
+    trigger_at: Option<DateTime<Utc>>,
+    /// Trailing amount
+    #[js(opt)]
+    trailing_amount: Option<Decimal>,
+    /// Trailing percent
+    #[js(opt)]
+    trailing_percent: Option<Decimal>,
+    /// Limit offset amount
+    #[js(opt)]
+    limit_offset: Option<Decimal>,
+    /// Account no
+    account_no: String,
+}
+
+/// Response for withdraw order request
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::SubmitOrderResponse")]
+pub struct SubmitOrderResponse {
+    /// Order id
+    order_id: String,
+}
+
+/// Account balance
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::CashInfo")]
+pub struct CashInfo {
+    /// Withdraw cash
+    withdraw_cash: Decimal,
+    /// Available cash
+    available_cash: Decimal,
+    /// Frozen cash
+    frozen_cash: Decimal,
+    /// Cash to be settled
+    settling_cash: Decimal,
+    /// Currency
+    currency: String,
+}
+
+/// Account balance
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::AccountBalance")]
+pub struct AccountBalance {
+    /// Total cash
+    total_cash: Decimal,
+    /// Maximum financing amount
+    max_finance_amount: Decimal,
+    /// Remaining financing amount
+    remaining_finance_amount: Decimal,
+    /// Risk control level
+    risk_level: Option<i32>,
+    /// Margin call
+    margin_call: Decimal,
+    /// Currency
+    currency: String,
+    /// Cash details
+    #[js(array)]
+    cash_infos: Vec<CashInfo>,
+}
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::BalanceType")]
+pub enum BalanceType {
+    /// Unknown
+    Unknown,
+    /// Limit Order
+    Cash,
+    /// Stock
+    Stock,
+    /// Fund
+    Fund,
+}
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::CashFlowDirection")]
+pub enum CashFlowDirection {
+    /// Unknown
+    Unknown,
+    /// Out
+    Out,
+    /// Stock
+    In,
+}
+
+/// Account balance
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::CashFlow")]
+pub struct CashFlow {
+    /// Cash flow name
+    transaction_flow_name: String,
+    /// Outflow direction
+    direction: CashFlowDirection,
+    /// Balance type
+    business_type: BalanceType,
+    /// Cash amount
+    balance: Decimal,
+    /// Cash currency
+    currency: String,
+    /// Business time
+    #[js(datetime)]
+    business_time: DateTime<Utc>,
+    /// Associated Stock code information
+    symbol: Option<String>,
+    /// Cash flow description
+    description: String,
+}
+
+/// Fund positions response
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::FundPositionsResponse")]
+pub struct FundPositionsResponse {
+    #[js(array)]
+    channels: Vec<FundPositionChannel>,
+}
+
+/// Fund position channel
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::FundPositionChannel")]
+pub struct FundPositionChannel {
+    /// Account type
+    account_channel: String,
+    /// Fund positions
+    #[js(array)]
+    positions: Vec<FundPosition>,
+}
+
+/// Fund position
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::FundPosition")]
+pub struct FundPosition {
+    /// Fund ISIN code
+    symbol: String,
+    /// Current equity
+    current_net_asset_value: Decimal,
+    /// Current equity time
+    #[js(datetime)]
+    net_asset_value_day: DateTime<Utc>,
+    /// Fund name
+    symbol_name: String,
+    /// Currency
+    currency: String,
+    /// Net cost
+    cost_net_asset_value: Decimal,
+    /// Holding units
+    holding_units: Decimal,
+}
+
+/// Stock positions response
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::StockPositionsResponse")]
+pub struct StockPositionsResponse {
+    #[js(array)]
+    channels: Vec<StockPositionChannel>,
+}
+
+/// Stock position channel
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::StockPositionChannel")]
+pub struct StockPositionChannel {
+    /// Account type
+    account_channel: String,
+    /// Fund details
+    #[js(array)]
+    positions: Vec<StockPosition>,
+}
+
+/// Stock position
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::StockPosition")]
+pub struct StockPosition {
+    /// Stock code
+    symbol: String,
+    /// Stock name
+    symbol_name: String,
+    /// The number of holdings
+    quantity: Decimal,
+    /// Available quantity
+    available_quality: Decimal,
+    /// Currency
+    currency: String,
+    /// Cost Price(According to the client's choice of average purchase or
+    /// diluted cost)
+    cost_price: Decimal,
+}

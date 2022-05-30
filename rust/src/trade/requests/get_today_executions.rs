@@ -1,7 +1,7 @@
 use serde::Serialize;
 
 /// Options for get today executions request
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone)]
 pub struct GetTodayExecutionsOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     symbol: Option<String>,

@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::Result;
 use longbridge_httpcli::{HttpClient, Method};
 use longbridge_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
@@ -14,7 +13,7 @@ use crate::{
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, Order,
         PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
     },
-    Config,
+    Config, Result,
 };
 
 /// Response for withdraw order request

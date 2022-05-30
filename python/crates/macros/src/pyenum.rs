@@ -16,7 +16,7 @@ struct EnumItem {
     fields: Fields<Ignored>,
 
     #[darling(default)]
-    from: Option<Ident>,
+    remote: Option<Ident>,
 }
 
 #[derive(FromDeriveInput)]
@@ -25,11 +25,23 @@ struct EnumArgs {
     ident: Ident,
     data: Data<EnumItem, Ignored>,
 
-    from: TypePath,
+    remote: TypePath,
+    #[darling(default)]
+    from: Option<bool>,
+    #[darling(default)]
+    into: Option<bool>,
 }
 
 pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
-    let EnumArgs { ident, data, from } = EnumArgs::from_derive_input(&args)?;
+    let EnumArgs {
+        ident,
+        data,
+        remote,
+        from,
+        into,
+    } = EnumArgs::from_derive_input(&args)?;
+    let from = from.unwrap_or(true);
+    let into = into.unwrap_or(true);
 
     let e = match data {
         Data::Enum(e) => e,
@@ -49,32 +61,47 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
         }
 
         let item_ident = &variant.ident;
-        let remote_ident = variant.from.as_ref().unwrap_or(&variant.ident);
+        let remote_ident = variant.remote.as_ref().unwrap_or(&variant.ident);
 
         from_remote.push(quote! {
-            #from::#remote_ident => #ident::#item_ident,
+            #remote::#remote_ident => #ident::#item_ident,
         });
         from_local.push(quote! {
-            #ident::#item_ident => #from::#remote_ident,
+            #ident::#item_ident => #remote::#remote_ident,
         });
     }
 
-    let expanded = quote! {
-        impl ::std::convert::From<#from> for #ident {
-            fn from(value: #from) -> #ident {
-                match value {
-                    #(#from_remote)*
+    let impl_from = if from {
+        Some(quote! {
+            impl ::std::convert::From<#remote> for #ident {
+                fn from(value: #remote) -> #ident {
+                    match value {
+                        #(#from_remote)*
+                    }
                 }
             }
-        }
+        })
+    } else {
+        None
+    };
 
-        impl ::std::convert::From<#ident> for #from {
-            fn from(value: #ident) -> #from {
-                match value {
-                    #(#from_local)*
+    let impl_into = if into {
+        Some(quote! {
+            impl ::std::convert::From<#ident> for #remote {
+                fn from(value: #ident) -> #remote {
+                    match value {
+                        #(#from_local)*
+                    }
                 }
             }
-        }
+        })
+    } else {
+        None
+    };
+
+    let expanded = quote! {
+        #impl_from
+        #impl_into
     };
 
     Ok(expanded)

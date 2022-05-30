@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use anyhow::{Context, Result};
 use longbridge_proto::trade::Notification;
 use prost::Message;
 use rust_decimal::Decimal;
@@ -8,8 +7,9 @@ use serde::Deserialize;
 use strum_macros::{Display, EnumString};
 use time::OffsetDateTime;
 
-use crate::trade::{
-    cmd_code, serde_utils, OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus,
+use crate::{
+    trade::{cmd_code, serde_utils, OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus},
+    Error, Result,
 };
 
 /// Topic type
@@ -87,17 +87,18 @@ pub enum PushEvent {
 }
 
 impl PushEvent {
-    pub(crate) fn parse(command_code: u8, data: &[u8]) -> Result<PushEvent> {
+    pub(crate) fn parse(command_code: u8, data: &[u8]) -> Result<Option<PushEvent>> {
         if command_code == cmd_code::PUSH_NOTIFICATION {
-            let notification = Notification::decode(data).context("decode push notification")?;
-            match TopicType::from_str(&notification.topic) {
-                Ok(TopicType::Private) => {
-                    Ok(serde_json::from_slice::<PushEvent>(&notification.data)?)
-                }
-                Err(_) => anyhow::bail!("unknown topic: {}", notification.topic),
+            let notification = Notification::decode(data)?;
+            if let Ok(TopicType::Private) = TopicType::from_str(&notification.topic) {
+                Ok(Some(serde_json::from_slice::<PushEvent>(
+                    &notification.data,
+                )?))
+            } else {
+                Ok(None)
             }
         } else {
-            anyhow::bail!("unknown command: {}", command_code)
+            Err(Error::UnknownCommand(command_code))
         }
     }
 }

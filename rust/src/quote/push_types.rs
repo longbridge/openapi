@@ -1,10 +1,12 @@
-use anyhow::{Context, Result};
 use longbridge_proto::quote::{self, TradeSession, TradeStatus};
 use prost::Message;
 use rust_decimal::Decimal;
 use time::OffsetDateTime;
 
-use crate::quote::{cmd_code, Brokers, Depth, Trade};
+use crate::{
+    quote::{cmd_code, Brokers, Depth, Trade},
+    Error, Result,
+};
 
 /// Quote message
 #[derive(Debug, Clone)]
@@ -96,13 +98,11 @@ pub struct PushEvent {
 impl PushEvent {
     pub(crate) fn parse(command_code: u8, data: &[u8]) -> Result<PushEvent> {
         match command_code {
-            cmd_code::PUSH_REALTIME_QUOTE => parse_push_quote(data).context("decode push quote"),
-            cmd_code::PUSH_REALTIME_DEPTH => parse_push_depth(data).context("decode push depth"),
-            cmd_code::PUSH_REALTIME_BROKERS => {
-                parse_push_brokers(data).context("decode push brokers")
-            }
-            cmd_code::PUSH_REALTIME_TRADES => parse_push_trade(data).context("decode push trades"),
-            _ => anyhow::bail!("unknown command: {}", command_code),
+            cmd_code::PUSH_REALTIME_QUOTE => parse_push_quote(data),
+            cmd_code::PUSH_REALTIME_DEPTH => parse_push_depth(data),
+            cmd_code::PUSH_REALTIME_BROKERS => parse_push_brokers(data),
+            cmd_code::PUSH_REALTIME_TRADES => parse_push_trade(data),
+            _ => Err(Error::UnknownCommand(command_code)),
         }
     }
 }
@@ -117,7 +117,8 @@ fn parse_push_quote(data: &[u8]) -> Result<PushEvent> {
             open: push_quote.open.parse().unwrap_or_default(),
             high: push_quote.high.parse().unwrap_or_default(),
             low: push_quote.low.parse().unwrap_or_default(),
-            timestamp: OffsetDateTime::from_unix_timestamp(push_quote.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(push_quote.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
             volume: push_quote.volume,
             turnover: push_quote.turnover.parse().unwrap_or_default(),
             trade_status: TradeStatus::from_i32(push_quote.trade_status).unwrap_or_default(),

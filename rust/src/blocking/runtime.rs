@@ -1,10 +1,9 @@
 use std::{sync::Arc, thread};
 
-use anyhow::Result;
 use futures_util::{future::BoxFuture, Future};
 use tokio::sync::mpsc;
 
-use crate::blocking::BlockingError;
+use crate::{blocking::BlockingError, Result};
 
 const THREAD_NAME: &str = "longbridge-sync-runtime";
 

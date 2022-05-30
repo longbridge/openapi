@@ -1,11 +1,10 @@
-use anyhow::{Error, Result};
 use longbridge_proto::quote::{self, TradeSession, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
 use rust_decimal::Decimal;
 use strum_macros::EnumString;
 use time::{Date, OffsetDateTime, Time};
 
-use crate::{quote::utils::parse_date, Market};
+use crate::{quote::utils::parse_date, Error, Market, Result};
 
 /// Depth
 #[derive(Debug, Clone)]
@@ -23,7 +22,7 @@ pub struct Depth {
 impl TryFrom<quote::Depth> for Depth {
     type Error = Error;
 
-    fn try_from(depth: quote::Depth) -> Result<Self, Self::Error> {
+    fn try_from(depth: quote::Depth) -> Result<Self> {
         Ok(Self {
             position: depth.position,
             price: depth.price.parse().unwrap_or_default(),
@@ -55,9 +54,9 @@ impl From<quote::Brokers> for Brokers {
 #[derive(Debug, FromPrimitive, Copy, Clone, Hash, Eq, PartialEq)]
 #[repr(i32)]
 pub enum TradeDirection {
-    /// Nature
+    /// Neutral
     #[num_enum(default)]
-    Nature = 0,
+    Neutral = 0,
     /// Down
     Down = 1,
     /// Up
@@ -115,11 +114,12 @@ pub struct Trade {
 impl TryFrom<quote::Trade> for Trade {
     type Error = Error;
 
-    fn try_from(trade: quote::Trade) -> Result<Self, Self::Error> {
+    fn try_from(trade: quote::Trade) -> Result<Self> {
         Ok(Self {
             price: trade.price.parse().unwrap_or_default(),
             volume: trade.volume,
-            timestamp: OffsetDateTime::from_unix_timestamp(trade.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(trade.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
             trade_type: trade.trade_type,
             direction: trade.direction.into(),
             trade_session: TradeSession::from_i32(trade.trade_session).unwrap_or_default(),
@@ -175,7 +175,7 @@ pub struct SecurityStaticInfo {
 impl TryFrom<quote::StaticInfo> for SecurityStaticInfo {
     type Error = Error;
 
-    fn try_from(resp: quote::StaticInfo) -> Result<Self, Self::Error> {
+    fn try_from(resp: quote::StaticInfo) -> Result<Self> {
         Ok(SecurityStaticInfo {
             symbol: resp.symbol,
             name_cn: resp.name_cn,
@@ -245,10 +245,11 @@ pub struct PrePostQuote {
 impl TryFrom<quote::PrePostQuote> for PrePostQuote {
     type Error = Error;
 
-    fn try_from(quote: quote::PrePostQuote) -> Result<Self, Self::Error> {
+    fn try_from(quote: quote::PrePostQuote) -> Result<Self> {
         Ok(Self {
             last_done: quote.last_done.parse().unwrap_or_default(),
-            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
             volume: quote.volume,
             turnover: quote.turnover.parse().unwrap_or_default(),
             high: quote.high.parse().unwrap_or_default(),
@@ -290,7 +291,7 @@ pub struct SecurityQuote {
 impl TryFrom<quote::SecurityQuote> for SecurityQuote {
     type Error = Error;
 
-    fn try_from(quote: quote::SecurityQuote) -> Result<Self, Self::Error> {
+    fn try_from(quote: quote::SecurityQuote) -> Result<Self> {
         Ok(Self {
             symbol: quote.symbol,
             last_done: quote.last_done.parse().unwrap_or_default(),
@@ -298,7 +299,8 @@ impl TryFrom<quote::SecurityQuote> for SecurityQuote {
             open: quote.open.parse().unwrap_or_default(),
             high: quote.high.parse().unwrap_or_default(),
             low: quote.low.parse().unwrap_or_default(),
-            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
             volume: quote.volume,
             turnover: quote.turnover.parse().unwrap_or_default(),
             trade_status: TradeStatus::from_i32(quote.trade_status).unwrap_or_default(),
@@ -384,7 +386,7 @@ pub struct OptionQuote {
 impl TryFrom<quote::OptionQuote> for OptionQuote {
     type Error = Error;
 
-    fn try_from(quote: quote::OptionQuote) -> Result<Self, Self::Error> {
+    fn try_from(quote: quote::OptionQuote) -> Result<Self> {
         let option_extend = quote.option_extend.unwrap_or_default();
 
         Ok(Self {
@@ -394,13 +396,15 @@ impl TryFrom<quote::OptionQuote> for OptionQuote {
             open: quote.open.parse().unwrap_or_default(),
             high: quote.high.parse().unwrap_or_default(),
             low: quote.low.parse().unwrap_or_default(),
-            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
             volume: quote.volume,
             turnover: quote.turnover.parse().unwrap_or_default(),
             trade_status: TradeStatus::from_i32(quote.trade_status).unwrap_or_default(),
             implied_volatility: option_extend.implied_volatility.parse().unwrap_or_default(),
             open_interest: option_extend.open_interest,
-            expiry_date: parse_date(&option_extend.expiry_date)?,
+            expiry_date: parse_date(&option_extend.expiry_date)
+                .map_err(|err| Error::parse_field_error("expiry_date", err))?,
             strike_price: option_extend.strike_price.parse().unwrap_or_default(),
             contract_multiplier: option_extend
                 .contract_multiplier
@@ -489,7 +493,7 @@ pub struct WarrantQuote {
 impl TryFrom<quote::WarrantQuote> for WarrantQuote {
     type Error = Error;
 
-    fn try_from(quote: quote::WarrantQuote) -> Result<Self, Self::Error> {
+    fn try_from(quote: quote::WarrantQuote) -> Result<Self> {
         let warrant_extend = quote.warrant_extend.unwrap_or_default();
 
         Ok(Self {
@@ -499,7 +503,8 @@ impl TryFrom<quote::WarrantQuote> for WarrantQuote {
             open: quote.open.parse().unwrap_or_default(),
             high: quote.high.parse().unwrap_or_default(),
             low: quote.low.parse().unwrap_or_default(),
-            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(quote.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
             volume: quote.volume,
             turnover: quote.turnover.parse().unwrap_or_default(),
             trade_status: TradeStatus::from_i32(quote.trade_status).unwrap_or_default(),
@@ -507,8 +512,10 @@ impl TryFrom<quote::WarrantQuote> for WarrantQuote {
                 .implied_volatility
                 .parse()
                 .unwrap_or_default(),
-            expiry_date: parse_date(&warrant_extend.expiry_date)?,
-            last_trade_date: parse_date(&warrant_extend.last_trade_date)?,
+            expiry_date: parse_date(&warrant_extend.expiry_date)
+                .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+            last_trade_date: parse_date(&warrant_extend.last_trade_date)
+                .map_err(|err| Error::parse_field_error("last_trade_date", err))?,
             outstanding_ratio: warrant_extend.outstanding_ratio.parse().unwrap_or_default(),
             outstanding_qty: warrant_extend.outstanding_qty,
             conversion_ratio: warrant_extend.conversion_ratio.parse().unwrap_or_default(),
@@ -588,10 +595,11 @@ pub struct IntradayLine {
 impl TryFrom<quote::Line> for IntradayLine {
     type Error = Error;
 
-    fn try_from(value: quote::Line) -> Result<Self, Self::Error> {
+    fn try_from(value: quote::Line) -> Result<Self> {
         Ok(Self {
             price: value.price.parse().unwrap_or_default(),
-            timestamp: OffsetDateTime::from_unix_timestamp(value.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(value.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
             volume: value.volume,
             turnover: value.turnover.parse().unwrap_or_default(),
             avg_price: value.avg_price.parse().unwrap_or_default(),
@@ -621,7 +629,7 @@ pub struct Candlestick {
 impl TryFrom<quote::Candlestick> for Candlestick {
     type Error = Error;
 
-    fn try_from(value: quote::Candlestick) -> Result<Self, Self::Error> {
+    fn try_from(value: quote::Candlestick) -> Result<Self> {
         Ok(Self {
             close: value.close.parse().unwrap_or_default(),
             open: value.open.parse().unwrap_or_default(),
@@ -629,7 +637,8 @@ impl TryFrom<quote::Candlestick> for Candlestick {
             high: value.high.parse().unwrap_or_default(),
             volume: value.volume,
             turnover: value.turnover.parse().unwrap_or_default(),
-            timestamp: OffsetDateTime::from_unix_timestamp(value.timestamp)?,
+            timestamp: OffsetDateTime::from_unix_timestamp(value.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?,
         })
     }
 }
@@ -650,7 +659,7 @@ pub struct StrikePriceInfo {
 impl TryFrom<quote::StrikePriceInfo> for StrikePriceInfo {
     type Error = Error;
 
-    fn try_from(value: quote::StrikePriceInfo) -> Result<Self, Self::Error> {
+    fn try_from(value: quote::StrikePriceInfo) -> Result<Self> {
         Ok(Self {
             price: value.price.parse().unwrap_or_default(),
             call_symbol: value.call_symbol,
@@ -748,18 +757,17 @@ pub struct TradingSessionInfo {
 impl TryFrom<quote::TradePeriod> for TradingSessionInfo {
     type Error = Error;
 
-    fn try_from(value: quote::TradePeriod) -> Result<Self, Self::Error> {
-        fn parse_time(value: i32) -> Result<Time> {
-            Ok(Time::from_hms(
-                ((value / 100) % 100) as u8,
-                (value % 100) as u8,
-                0,
-            )?)
+    fn try_from(value: quote::TradePeriod) -> Result<Self> {
+        #[inline]
+        fn parse_time(value: i32) -> ::std::result::Result<Time, time::error::ComponentRange> {
+            Time::from_hms(((value / 100) % 100) as u8, (value % 100) as u8, 0)
         }
 
         Ok(Self {
-            begin_time: parse_time(value.beg_time)?,
-            end_time: parse_time(value.end_time)?,
+            begin_time: parse_time(value.beg_time)
+                .map_err(|err| Error::parse_field_error("beg_time", err))?,
+            end_time: parse_time(value.end_time)
+                .map_err(|err| Error::parse_field_error("end_time", err))?,
             trade_session: TradeSession::from_i32(value.trade_session).unwrap_or_default(),
         })
     }
@@ -777,7 +785,7 @@ pub struct MarketTradingSession {
 impl TryFrom<quote::MarketTradePeriod> for MarketTradingSession {
     type Error = Error;
 
-    fn try_from(value: quote::MarketTradePeriod) -> Result<Self, Self::Error> {
+    fn try_from(value: quote::MarketTradePeriod) -> Result<Self> {
         Ok(Self {
             market: value.market.parse().unwrap_or_default(),
             trade_session: value

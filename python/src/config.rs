@@ -1,5 +1,7 @@
 use pyo3::{prelude::*, types::PyType};
 
+use crate::error::ErrorNewType;
+
 #[pyclass(name = "Config")]
 pub(crate) struct Config(pub(crate) longbridge::Config);
 
@@ -29,6 +31,6 @@ impl Config {
 
     #[classmethod]
     fn from_env(_cls: &PyType) -> PyResult<Self> {
-        Ok(Self(longbridge::Config::from_env()?))
+        Ok(Self(longbridge::Config::from_env().map_err(ErrorNewType)?))
     }
 }
