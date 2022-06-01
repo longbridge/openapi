@@ -1,0 +1,8 @@
+{
+    "typedocOptions": {
+        "entryPoints": [
+            "index.d.ts"
+        ],
+        "out": "docs"
+    }
+}

@@ -116,7 +116,7 @@ impl QuoteContext {
     /// while let Some(msg) = receiver.recv().await {
     ///     println!("{:?}", msg);
     /// }
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn subscribe<I, T>(
@@ -162,7 +162,7 @@ impl QuoteContext {
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, false)
     ///     .await?;
     /// ctx.unsubscribe(["AAPL.US"], SubFlags::QUOTE).await?;
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn unsubscribe<I, T>(&self, symbols: I, sub_types: impl Into<SubFlags>) -> Result<()>
@@ -200,7 +200,7 @@ impl QuoteContext {
     ///     .static_info(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
     ///     .await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn static_info<I, T>(&self, symbols: I) -> Result<Vec<SecurityStaticInfo>>
@@ -241,7 +241,7 @@ impl QuoteContext {
     ///     .quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
     ///     .await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn quote<I, T>(&self, symbols: I) -> Result<Vec<SecurityQuote>>
@@ -277,7 +277,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.option_quote(["AAPL230317P160000.US"]).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn option_quote<I, T>(&self, symbols: I) -> Result<Vec<OptionQuote>>
@@ -313,7 +313,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.warrant_quote(["21125.HK"]).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn warrant_quote<I, T>(&self, symbols: I) -> Result<Vec<WarrantQuote>>
@@ -349,7 +349,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.depth("700.HK").await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn depth(&self, symbol: impl Into<String>) -> Result<SecurityDepth> {
@@ -392,7 +392,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.brokers("700.HK").await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {
@@ -427,7 +427,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.participants().await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn participants(&self) -> Result<Vec<ParticipantInfo>> {
@@ -465,7 +465,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.trades("700.HK", 10).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn trades(&self, symbol: impl Into<String>, count: usize) -> Result<Vec<Trade>> {
@@ -503,7 +503,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.intraday("700.HK").await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn intraday(&self, symbol: impl Into<String>) -> Result<Vec<IntradayLine>> {
@@ -545,7 +545,7 @@ impl QuoteContext {
     ///     .candlesticks("700.HK", Period::Day, 10, AdjustType::NoAdjust)
     ///     .await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn candlesticks(
@@ -591,7 +591,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.option_chain_expiry_date_list("AAPL.US").await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn option_chain_expiry_date_list(
@@ -636,7 +636,7 @@ impl QuoteContext {
     ///     .option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20))
     ///     .await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn option_chain_info_by_date(
@@ -683,7 +683,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.warrant_issuers().await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn warrant_issuers(&self) -> Result<Vec<IssuerInfo>> {
@@ -716,7 +716,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.trading_session().await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn trading_session(&self) -> Result<Vec<MarketTradingSession>> {
@@ -758,7 +758,7 @@ impl QuoteContext {
     ///     .trading_days(Market::HK, date!(2022 - 01 - 20), date!(2022 - 02 - 20))
     ///     .await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn trading_days(
@@ -822,7 +822,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.realtime_quote(["HK.700", "AAPL.US"]).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn realtime_quote<I, T>(&self, symbols: I) -> Result<Vec<RealtimeQuote>>
@@ -865,7 +865,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.realtime_depth("HK.700").await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn realtime_depth(&self, symbol: impl Into<String>) -> Result<SecurityDepth> {
@@ -904,7 +904,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.realtime_trades("HK.700", 10).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn realtime_trades(
@@ -949,7 +949,7 @@ impl QuoteContext {
     ///
     /// let resp = ctx.realtime_brokers("HK.700").await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn realtime_brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {

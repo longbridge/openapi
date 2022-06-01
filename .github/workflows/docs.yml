@@ -5,7 +5,7 @@ on:
       - release
 
 jobs:
-  build_api_docs:
+  build-api-docs:
     name: Build API docs
     runs-on: ubuntu-latest
     steps:
@@ -24,9 +24,14 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: "3.9"
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          check-latest: true
+
       - name: Build Rust docs
-        run: |
-          cargo doc -p longbridge --no-deps
+        run: cargo doc -p longbridge --no-deps
       - name: Build Python wheels
         uses: messense/maturin-action@v1
         with:
@@ -37,25 +42,34 @@ jobs:
         run: |
           pip install longbridge --no-index --find-links dist --force-reinstall
           python -c "import longbridge"
-      - name: Install mkdocs
-        run: |
-          pip install -r python/docs/requirements.txt
+
       - name: Build Python docs
         run: |
+          pip install -r python/docs/requirements.txt
           mkdocs build
         working-directory: ./python
+
+      - name: Build Node.js docs
+        run: |
+          npm install -g typedoc
+          typedoc
+        working-directory: ./nodejs
+
       - name: Get SDK Version
-        working-directory: ${{ matrix.package.path }}
         run: |
           echo RUST_SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' rust/Cargo.toml) >> $GITHUB_ENV
           echo PYTHON_SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' python/Cargo.toml) >> $GITHUB_ENV
+          echo NODEJS_SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' nodejs/Cargo.toml) >> $GITHUB_ENV
+
       - name: Copy to gh-pages
         run: |
           mkdir -p gh-pages
           mkdir -p gh-pages/rust
           mkdir -p gh-pages/python
+          mkdir -p gh-pages/nodejs
           mv -f target/doc gh-pages/rust/$RUST_SDK_VERSION
           mv -f python/site gh-pages/python/$PYTHON_SDK_VERSION
+          mv -f nodejs/docs gh-pages/nodejs/$NODEJS_SDK_VERSION
           python .github/misc/render_docs_index.py > gh-pages/index.html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v2.5.1

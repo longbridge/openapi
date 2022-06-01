@@ -24,6 +24,8 @@ jobs:
         run: cargo fmt --all -- --check
 
   check-rust-sdk:
+    needs:
+      - check-format
     strategy:
       fail-fast: true
       matrix:
@@ -53,6 +55,8 @@ jobs:
         run: cargo test -p longbridge --all-features
 
   check-python-sdk:
+    needs:
+      - check-format
     strategy:
       fail-fast: true
       matrix:
@@ -88,18 +92,39 @@ jobs:
         run: cargo test -p longbridge-python --all-features
 
   check-nodejs-sdk:
+    needs:
+      - check-format
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        settings:
+          - host: macos-latest
+            architecture: x64
+            build: |
+              npm run build
+              strip -x *.node
+
+          - host: windows-latest
+            build: npm run build
+            architecture: x64
+
+          - host: ubuntu-latest
+            build: |
+              npm run build
+              strip *.node
+
+    runs-on: ${{ matrix.settings.host }}
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 16
           check-latest: true
-          architecture: x86_64
+          architecture: ${{ matrix.settings.architecture }}
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
@@ -113,5 +138,15 @@ jobs:
           override: true
           components: rustfmt, clippy
 
+      - name: Check with clippy
+        run: cargo clippy -p longbridge-nodejs --all-features
+
+      - name: Test
+        run: cargo test -p longbridge-nodejs --all-features
+
+      - name: Install napi-rs/cli
+        run: npm install -g @napi-rs/cli
+
       - name: Build
-        run: npm run build
+        working-directory: nodejs
+        run: ${{ matrix.settings.build }}

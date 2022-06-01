@@ -107,7 +107,7 @@ impl TradeContext {
     ///     .end_at(datetime!(2022-05-12 0:00 UTC));
     /// let resp = ctx.history_executions(opts).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn history_executions(
@@ -150,7 +150,7 @@ impl TradeContext {
     /// let opts = GetTodayExecutionsOptions::new().symbol("700.HK");
     /// let resp = ctx.today_executions(opts).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn today_executions(
@@ -200,7 +200,7 @@ impl TradeContext {
     ///     .end_at(datetime!(2022-05-12 0:00 UTC));
     /// let resp = ctx.history_orders(opts).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn history_orders(
@@ -247,7 +247,7 @@ impl TradeContext {
     ///     .market(Market::HK);
     /// let resp = ctx.today_orders(opts).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn today_orders(
@@ -292,7 +292,7 @@ impl TradeContext {
     ///     ReplaceOrderOptions::new("709043056541253632", decimal!(100i32)).price(decimal!(300i32));
     /// let resp = ctx.replace_order(opts).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn replace_order(&self, options: ReplaceOrderOptions) -> Result<()> {
@@ -333,7 +333,7 @@ impl TradeContext {
     /// .submitted_price(decimal!(50i32));
     /// let resp = ctx.submit_order(opts).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn submit_order(&self, options: SubmitOrderOptions) -> Result<SubmitOrderResponse> {
@@ -362,7 +362,7 @@ impl TradeContext {
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// ctx.withdraw_order("709043056541253632").await?;
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn withdraw_order(&self, order_id: impl Into<String>) -> Result<()> {
@@ -398,7 +398,7 @@ impl TradeContext {
     ///
     /// let resp = ctx.account_balance().await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn account_balance(&self) -> Result<Vec<AccountBalance>> {
@@ -438,7 +438,7 @@ impl TradeContext {
     /// let opts = GetCashFlowOptions::new(datetime!(2022-05-09 0:00 UTC), datetime!(2022-05-12 0:00 UTC));
     /// let resp = ctx.cash_flow(opts).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn cash_flow(&self, options: GetCashFlowOptions) -> Result<Vec<CashFlow>> {
@@ -474,7 +474,7 @@ impl TradeContext {
     ///
     /// let resp = ctx.fund_positions(None).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn fund_positions(
@@ -507,7 +507,7 @@ impl TradeContext {
     ///
     /// let resp = ctx.stock_positions(None).await?;
     /// println!("{:?}", resp);
-    /// # Ok::<_, anyhow::Error>(())
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
     pub async fn stock_positions(

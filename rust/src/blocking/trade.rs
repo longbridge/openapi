@@ -55,7 +55,7 @@ impl TradeContextSync {
     /// use longbridge::{blocking::TradeContextSync, trade::GetHistoryExecutionsOptions, Config};
     /// use time::macros::datetime;
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -85,7 +85,7 @@ impl TradeContextSync {
     /// use longbridge::{blocking::TradeContextSync, trade::GetTodayExecutionsOptions, Config};
     /// use time::macros::datetime;
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -117,7 +117,7 @@ impl TradeContextSync {
     /// };
     /// use time::macros::datetime;
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -154,7 +154,7 @@ impl TradeContextSync {
     ///     Config, Market,
     /// };
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -185,7 +185,7 @@ impl TradeContextSync {
     ///
     /// use longbridge::{blocking::TradeContextSync, decimal, trade::ReplaceOrderOptions, Config};
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -215,7 +215,7 @@ impl TradeContextSync {
     ///     Config,
     /// };
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -246,7 +246,7 @@ impl TradeContextSync {
     ///
     /// use longbridge::{blocking::TradeContextSync, Config};
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -268,7 +268,7 @@ impl TradeContextSync {
     ///
     /// use longbridge::{blocking::TradeContextSync, Config};
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -291,7 +291,7 @@ impl TradeContextSync {
     /// use longbridge::{blocking::TradeContextSync, trade::GetCashFlowOptions, Config};
     /// use time::macros::datetime;
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -314,7 +314,7 @@ impl TradeContextSync {
     ///
     /// use longbridge::{blocking::TradeContextSync, Config};
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
@@ -339,7 +339,7 @@ impl TradeContextSync {
     ///
     /// use longbridge::{blocking::TradeContextSync, Config};
     ///
-    /// # fn main() -> anyhow::Result<()> {
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///

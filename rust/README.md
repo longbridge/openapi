@@ -50,7 +50,7 @@ setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ## Quote API _(Get basic information of securities)_
 
 ```rust,no_run
-use std::{error::Error, sync::Arc};
+use std::sync::Arc;
 
 use longbridge::{
     decimal,
@@ -59,7 +59,7 @@ use longbridge::{
 };
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load configuration from environment variables
     let config = Arc::new(Config::from_env()?);
 
@@ -81,11 +81,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 ```rust, no_run
 use std::sync::Arc;
 
-use anyhow::Result;
 use longbridge::{quote::SubFlags, Config, QuoteContext};
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load configuration from environment variables
     let config = Arc::new(Config::from_env()?);
 
@@ -109,7 +108,6 @@ async fn main() -> Result<()> {
 ```rust, no_run
 use std::sync::Arc;
 
-use anyhow::Result;
 use longbridge::{
     decimal,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
@@ -117,7 +115,7 @@ use longbridge::{
 };
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load configuration from environment variables
     let config = Arc::new(Config::from_env()?);
 
