@@ -43,6 +43,15 @@ impl NaiveDate {
     pub fn day(&self) -> u8 {
         self.0.day()
     }
+
+    #[napi(getter)]
+    #[inline]
+    #[allow(clippy::wrong_self_convention, clippy::inherent_to_string)]
+    pub fn to_string(&self) -> String {
+        self.0
+            .format(time::macros::format_description!("[year]-[month]-[day]"))
+            .unwrap()
+    }
 }
 
 /// Naive date type
@@ -81,8 +90,13 @@ impl Time {
 
     #[napi(getter)]
     #[inline]
-    pub fn second(&self) -> u8 {
-        self.0.second()
+    #[allow(clippy::wrong_self_convention, clippy::inherent_to_string)]
+    pub fn to_string(&self) -> String {
+        self.0
+            .format(time::macros::format_description!(
+                "[hour]:[minute]:[second]"
+            ))
+            .unwrap()
     }
 }
 

@@ -105,6 +105,11 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
     let expanded = quote! {
         #[napi_derive::napi]
         impl #ident {
+            #[napi]
+            pub fn to_string(&self) -> String {
+                ::std::format!("{:?}", self)
+            }
+
             #(#getters)*
         }
 

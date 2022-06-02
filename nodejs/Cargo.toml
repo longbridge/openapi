@@ -20,7 +20,7 @@ napi = { git = "https://github.com/sunli829/napi-rs", rev = "d708d55", default-f
 napi-derive = { git = "https://github.com/sunli829/napi-rs", rev = "d708d55" }
 rust_decimal = { version = "1.23.1", features = ["maths"] }
 chrono = "0.4.19"
-time = "0.3.9"
+time = { version = "0.3.9", features = ["macros", "formatting"] }
 tokio = { version = "1.18.2", features = ["rt", "time"] }
 
 [build-dependencies]

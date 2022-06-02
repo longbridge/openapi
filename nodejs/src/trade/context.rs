@@ -33,7 +33,10 @@ pub struct TradeContext {
 
 #[napi_derive::napi]
 impl TradeContext {
-    #[napi(ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void")]
+    #[napi(
+        constructor,
+        ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void"
+    )]
     pub fn new(config: &Config, on_push: Option<JsFunction>) -> Result<TradeContext> {
         Ok(TradeContext {
             config: config.0.clone(),

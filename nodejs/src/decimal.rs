@@ -76,8 +76,7 @@ impl Decimal {
     }
 
     #[napi]
-    #[allow(clippy::wrong_self_convention)]
-    #[allow(clippy::inherent_to_string)]
+    #[allow(clippy::wrong_self_convention, clippy::inherent_to_string)]
     pub fn to_string(&self) -> String {
         self.0.to_string()
     }

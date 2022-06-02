@@ -37,6 +37,7 @@ pub struct QuoteContext {
 #[napi_derive::napi]
 impl QuoteContext {
     #[napi(
+        constructor,
         ts_args_type = "callback: (err: null | Error, event: PushQuoteEvent | PushDepthEvent | PushBrokersEvent | PushTradesEvent) => void"
     )]
     pub fn new(config: &Config, on_push: Option<JsFunction>) -> Result<QuoteContext> {
@@ -125,15 +126,14 @@ impl QuoteContext {
 
     /// Subscribe
     ///
-    /// Example
+    /// #### Example
     ///
     /// ```javascript
     /// import { Config, QuoteContext, SubType } from 'longbridge'
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = await QuoteContext.new(config);
-    ///
-    /// ctx.on_quote = (_, data) => console.log(data)
+    /// let ctx = new QuoteContext(config, (_, event) => console.log(event.toString()))
+    /// await ctx.open()
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
     /// ```
     #[napi]
@@ -151,6 +151,18 @@ impl QuoteContext {
     }
 
     /// Unsubscribe
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, SubType } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config)
+    /// await ctx.open()
+    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+    /// await ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true)
+    /// ```
     #[napi]
     pub async fn unsubscribe(&self, symbols: Vec<String>, sub_types: Vec<SubType>) -> Result<()> {
         get_ctx!(self.ctx)
@@ -161,6 +173,20 @@ impl QuoteContext {
     }
 
     /// Get basic information of securities
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn static_info(&self, symbols: Vec<String>) -> Result<Vec<SecurityStaticInfo>> {
         get_ctx!(self.ctx)
@@ -173,6 +199,20 @@ impl QuoteContext {
     }
 
     /// Get quote of securities
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn quote(&self, symbols: Vec<String>) -> Result<Vec<SecurityQuote>> {
         get_ctx!(self.ctx)
@@ -185,6 +225,20 @@ impl QuoteContext {
     }
 
     /// Get quote of option securities
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.optionQuote(["AAPL230317P160000.US"])
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn option_quote(&self, symbols: Vec<String>) -> Result<Vec<OptionQuote>> {
         get_ctx!(self.ctx)
@@ -197,6 +251,20 @@ impl QuoteContext {
     }
 
     /// Get quote of warrant securities
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.warrantQuote(["21125.HK"])
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn warrant_quote(&self, symbols: Vec<String>) -> Result<Vec<WarrantQuote>> {
         get_ctx!(self.ctx)
@@ -209,6 +277,18 @@ impl QuoteContext {
     }
 
     /// Get security depth
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.depth("700.HK")
+    /// console.log(resp.toString())
+    /// ```
     #[napi]
     pub async fn depth(&self, symbol: String) -> Result<SecurityDepth> {
         get_ctx!(self.ctx)
@@ -219,6 +299,18 @@ impl QuoteContext {
     }
 
     /// Get security brokers
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.brokers("700.HK")
+    /// console.log(resp.toString())
+    /// ```
     #[napi]
     pub async fn brokers(&self, symbol: String) -> Result<SecurityBrokers> {
         get_ctx!(self.ctx)
@@ -229,6 +321,20 @@ impl QuoteContext {
     }
 
     /// Get participants
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.participants()
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString());
+    /// }
+    /// ```
     #[napi]
     pub async fn participants(&self) -> Result<Vec<ParticipantInfo>> {
         get_ctx!(self.ctx)
@@ -241,6 +347,20 @@ impl QuoteContext {
     }
 
     /// Get security trades
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.trades("700.HK", 10)
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString());
+    /// }
+    /// ```
     #[napi]
     pub async fn trades(&self, symbol: String, count: i32) -> Result<Vec<Trade>> {
         get_ctx!(self.ctx)
@@ -253,6 +373,20 @@ impl QuoteContext {
     }
 
     /// Get security intraday
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.intraday("700.HK")
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString());
+    /// }
+    /// ```
     #[napi]
     pub async fn intraday(&self, symbol: String) -> Result<Vec<IntradayLine>> {
         get_ctx!(self.ctx)
@@ -265,6 +399,20 @@ impl QuoteContext {
     }
 
     /// Get security candlesticks
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, Period, AdjustType } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust)
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString());
+    /// }
+    /// ```
     #[napi]
     pub async fn candlesticks(
         &self,
@@ -288,6 +436,20 @@ impl QuoteContext {
     }
 
     /// Get option chain expiry date list
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.optionChainExpiryDateList("AAPL.US")
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn option_chain_expiry_date_list(&self, symbol: String) -> Result<Vec<NaiveDate>> {
         Ok(get_ctx!(self.ctx)
@@ -300,6 +462,20 @@ impl QuoteContext {
     }
 
     /// Get option chain info by date
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20))
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn option_chain_info_by_date(
         &self,
@@ -316,6 +492,20 @@ impl QuoteContext {
     }
 
     /// Get warrant issuers
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.warrantIssuers()
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn warrant_issuers(&self) -> Result<Vec<IssuerInfo>> {
         get_ctx!(self.ctx)
@@ -328,6 +518,20 @@ impl QuoteContext {
     }
 
     /// Get trading session of the day
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.tradingSession()
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn trading_session(&self) -> Result<Vec<MarketTradingSession>> {
         get_ctx!(self.ctx)
@@ -340,6 +544,18 @@ impl QuoteContext {
     }
 
     /// Get trading session of the day
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.open()
+    /// let resp = await ctx.tradingDays()
+    /// console.log(resp.toString())
+    /// ```
     #[napi]
     pub async fn trading_days(
         &self,
@@ -355,6 +571,24 @@ impl QuoteContext {
     }
 
     /// Get real-time quote
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Quote], true)
+    /// await ctx.open()
+    ///
+    /// await sleep(5000)
+    ///
+    /// let resp = await ctx.realtimeQuote(["HK.700", "AAPL.US"])
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn realtime_quote(&self, symbols: Vec<String>) -> Result<Vec<RealtimeQuote>> {
         get_ctx!(self.ctx)
@@ -367,6 +601,22 @@ impl QuoteContext {
     }
 
     /// Get real-time depth
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Depth], true)
+    /// await ctx.open()
+    ///
+    /// await sleep(5000)
+    ///
+    /// let resp = await ctx.realtimeDepth("HK.700")
+    /// console.log(resp.toString())
+    /// ```
     #[napi]
     pub async fn realtime_depth(&self, symbol: String) -> Result<SecurityDepth> {
         get_ctx!(self.ctx)
@@ -377,6 +627,22 @@ impl QuoteContext {
     }
 
     /// Get real-time brokers
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Brokers], true)
+    /// await ctx.open()
+    ///
+    /// await sleep(5000)
+    ///
+    /// let resp = await ctx.realtimeBrokers("HK.700")
+    /// console.log(resp.toString())
+    /// ```
     #[napi]
     pub async fn realtime_brokers(&self, symbol: String) -> Result<SecurityBrokers> {
         get_ctx!(self.ctx)
@@ -387,6 +653,24 @@ impl QuoteContext {
     }
 
     /// Get real-time trades
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new QuoteContext(config);
+    /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Trade], false)
+    /// await ctx.open()
+    ///
+    /// await sleep(5000)
+    ///
+    /// let resp = await ctx.realtimeTrades("HK.700")
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }
+    /// ```
     #[napi]
     pub async fn realtime_trades(&self, symbol: String, count: i32) -> Result<Vec<Trade>> {
         get_ctx!(self.ctx)

@@ -371,68 +371,391 @@ export class Decimal {
   eq(other: Decimal): boolean
   lt(other: Decimal): boolean
   le(other: Decimal): boolean
-  cmp(other: Decimal): number
+  compare(other: Decimal): number
 }
 /** Quote context */
 export class QuoteContext {
-  static new(callback: (err: null | Error, event: PushQuoteEvent | PushDepthEvent | PushBrokersEvent | PushTradesEvent) => void): QuoteContext
+  constructor(callback: (err: null | Error, event: PushQuoteEvent | PushDepthEvent | PushBrokersEvent | PushTradesEvent) => void)
   /** Open quote context */
   open(): Promise<void>
   /**
    * Subscribe
    *
-   * Example
+   * #### Example
    *
    * ```javascript
    * import { Config, QuoteContext, SubType } from 'longbridge'
    *
    * let config = Config.fromEnv()
-   * let ctx = await QuoteContext.new(config);
-   *
-   * ctx.on_quote = (_, data) => console.log(data)
+   * let ctx = new QuoteContext(config, (_, event) => console.log(event))
+   * await ctx.open()
    * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
    * ```
    */
   subscribe(symbols: Array<string>, subTypes: Array<SubType>, isFirstPush: boolean): Promise<void>
-  /** Unsubscribe */
+  /**
+   * Unsubscribe
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, SubType } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config)
+   * await ctx.open()
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+   * await ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true)
+   * ```
+   */
   unsubscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
-  /** Get basic information of securities */
+  /**
+   * Get basic information of securities
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config)
+   * await ctx.open()
+   * let resp = await ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   staticInfo(symbols: Array<string>): Promise<Array<SecurityStaticInfo>>
-  /** Get quote of securities */
+  /**
+   * Get quote of securities
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config)
+   * await ctx.open()
+   * let resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   quote(symbols: Array<string>): Promise<Array<SecurityQuote>>
-  /** Get quote of option securities */
+  /**
+   * Get quote of option securities
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config)
+   * await ctx.open()
+   * let resp = await ctx.optionQuote(["AAPL230317P160000.US"])
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   optionQuote(symbols: Array<string>): Promise<Array<OptionQuote>>
-  /** Get quote of warrant securities */
+  /**
+   * Get quote of warrant securities
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config)
+   * await ctx.open()
+   * let resp = await ctx.warrantQuote(["21125.HK"])
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   warrantQuote(symbols: Array<string>): Promise<Array<WarrantQuote>>
-  /** Get security depth */
+  /**
+   * Get security depth
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.depth("700.HK")
+   * console.log(obj.toString())
+   * ```
+   */
   depth(symbol: string): Promise<SecurityDepth>
-  /** Get security brokers */
+  /**
+   * Get security brokers
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.brokers("700.HK")
+   * console.log(obj.toString())
+   * ```
+   */
   brokers(symbol: string): Promise<SecurityBrokers>
-  /** Get participants */
+  /**
+   * Get participants
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.participants()
+   * for (let obj of resp) {
+   *     console.log(obj.toString());
+   * }
+   * ```
+   */
   participants(): Promise<Array<ParticipantInfo>>
-  /** Get security trades */
+  /**
+   * Get security trades
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.trades("700.HK", 10)
+   * for (let obj of resp) {
+   *     console.log(obj.toString());
+   * }
+   * ```
+   */
   trades(symbol: string, count: number): Promise<Array<Trade>>
-  /** Get security intraday */
+  /**
+   * Get security intraday
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.intraday("700.HK")
+   * for (let obj of resp) {
+   *     console.log(obj.toString());
+   * }
+   * ```
+   */
   intraday(symbol: string): Promise<Array<IntradayLine>>
-  /** Get security candlesticks */
+  /**
+   * Get security candlesticks
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, Period, AdjustType } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust)
+   * for (let obj of resp) {
+   *     console.log(obj.toString());
+   * }
+   * ```
+   */
   candlesticks(symbol: string, period: Period, count: number, adjustType: AdjustType): Promise<Array<Candlestick>>
-  /** Get option chain expiry date list */
+  /**
+   * Get option chain expiry date list
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.optionChainExpiryDateList("AAPL.US")
+   * for (let obj of resp) {
+   *     console.log(obj)
+   * }
+   * ```
+   */
   optionChainExpiryDateList(symbol: string): Promise<Array<NaiveDate>>
-  /** Get option chain info by date */
+  /**
+   * Get option chain info by date
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20))
+   * for (let obj of resp) {
+   *     console.log(obj)
+   * }
+   * ```
+   */
   optionChainInfoByDate(symbol: string, expiryDate: NaiveDate): Promise<Array<StrikePriceInfo>>
-  /** Get warrant issuers */
+  /**
+   * Get warrant issuers
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.warrantIssuers()
+   * for (let obj of resp) {
+   *     console.log(obj)
+   * }
+   * ```
+   */
   warrantIssuers(): Promise<Array<IssuerInfo>>
-  /** Get trading session of the day */
+  /**
+   * Get trading session of the day
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.tradingSession()
+   * for (let obj of resp) {
+   *     console.log(obj)
+   * }
+   * ```
+   */
   tradingSession(): Promise<Array<MarketTradingSession>>
-  /** Get trading session of the day */
+  /**
+   * Get trading session of the day
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.open()
+   * let resp = await ctx.tradingDays()
+   * console.log(resp)
+   * ```
+   */
   tradingDays(market: Market, begin: NaiveDate, end: NaiveDate): Promise<MarketTradingDays>
-  /** Get real-time quote */
+  /**
+   * Get real-time quote
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Quote], true)
+   * await ctx.open()
+   *
+   * await sleep(5000)
+   *
+   * let resp = await ctx.realtimeQuote(["HK.700", "AAPL.US"])
+   * for (let obj of resp) {
+   *     console.log(obj)
+   * }
+   * ```
+   */
   realtimeQuote(symbols: Array<string>): Promise<Array<RealtimeQuote>>
-  /** Get real-time depth */
+  /**
+   * Get real-time depth
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Depth], true)
+   * await ctx.open()
+   *
+   * await sleep(5000)
+   *
+   * let resp = await ctx.realtimeDepth("HK.700")
+   * console.log(resp)
+   * ```
+   */
   realtimeDepth(symbol: string): Promise<SecurityDepth>
-  /** Get real-time brokers */
+  /**
+   * Get real-time brokers
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Brokers], true)
+   * await ctx.open()
+   *
+   * await sleep(5000)
+   *
+   * let resp = await ctx.realtimeBrokers("HK.700")
+   * console.log(resp)
+   * ```
+   */
   realtimeBrokers(symbol: string): Promise<SecurityBrokers>
-  /** Get real-time trades */
+  /**
+   * Get real-time trades
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, QuoteContext, NaiveDate, SubType, sleep } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new QuoteContext(config);
+   * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Trade], false)
+   * await ctx.open()
+   *
+   * await sleep(5000)
+   *
+   * let resp = await ctx.realtimeTrades("HK.700")
+   * for (let obj of resp) {
+   *     console.log(obj)
+   * }
+   * ```
+   */
   realtimeTrades(symbol: string, count: number): Promise<Array<Trade>>
 }
 export class PushQuoteEvent {
@@ -453,6 +776,7 @@ export class PushTradesEvent {
 }
 /** The basic information of securities */
 export class SecurityStaticInfo {
+  toString(): string
   /** Security code */
   get symbol(): string
   /** Security name (zh-CN) */
@@ -486,6 +810,7 @@ export class SecurityStaticInfo {
 }
 /** Quote of US pre/post market */
 export class PrePostQuote {
+  toString(): string
   /** Latest price */
   get lastDone(): Decimal
   /** Time of latest price */
@@ -503,6 +828,7 @@ export class PrePostQuote {
 }
 /** Quote of securitity */
 export class SecurityQuote {
+  toString(): string
   /** Security code */
   get symbol(): string
   /** Latest price */
@@ -530,6 +856,7 @@ export class SecurityQuote {
 }
 /** Quote of option */
 export class OptionQuote {
+  toString(): string
   /** Security code */
   get symbol(): string
   /** Latest price */
@@ -573,6 +900,7 @@ export class OptionQuote {
 }
 /** Quote of warrant */
 export class WarrantQuote {
+  toString(): string
   /** Security code */
   get symbol(): string
   /** Latest price */
@@ -620,6 +948,7 @@ export class WarrantQuote {
 }
 /** Depth */
 export class Depth {
+  toString(): string
   /** Position */
   get position(): number
   /** Price */
@@ -631,6 +960,7 @@ export class Depth {
 }
 /** Security depth */
 export class SecurityDepth {
+  toString(): string
   /** Ask depth */
   get asks(): Array<Depth>
   /** Bid depth */
@@ -638,6 +968,7 @@ export class SecurityDepth {
 }
 /** Brokers */
 export class Brokers {
+  toString(): string
   /** Position */
   get position(): number
   /** Broker IDs */
@@ -645,6 +976,7 @@ export class Brokers {
 }
 /** Security brokers */
 export class SecurityBrokers {
+  toString(): string
   /** Ask brokers */
   get askBrokers(): Array<Brokers>
   /** Bid brokers */
@@ -652,6 +984,7 @@ export class SecurityBrokers {
 }
 /** Participant info */
 export class ParticipantInfo {
+  toString(): string
   /** Broker IDs */
   get brokerIds(): Array<number>
   /** Participant name (zh-CN) */
@@ -663,6 +996,7 @@ export class ParticipantInfo {
 }
 /** Trade */
 export class Trade {
+  toString(): string
   /** Price */
   get price(): Decimal
   /** Volume */
@@ -678,6 +1012,7 @@ export class Trade {
 }
 /** Intraday line */
 export class IntradayLine {
+  toString(): string
   /** Close price of the minute */
   get price(): Decimal
   /** Start time of the minute */
@@ -691,6 +1026,7 @@ export class IntradayLine {
 }
 /** Candlestick */
 export class Candlestick {
+  toString(): string
   /** Close price */
   get close(): Decimal
   /** Open price */
@@ -708,6 +1044,7 @@ export class Candlestick {
 }
 /** Strike price info */
 export class StrikePriceInfo {
+  toString(): string
   /** Strike price */
   get price(): Decimal
   /** Security code of call option */
@@ -719,6 +1056,7 @@ export class StrikePriceInfo {
 }
 /** Issuer info */
 export class IssuerInfo {
+  toString(): string
   /** Issuer ID */
   get issuerId(): number
   /** Issuer name (zh-CN) */
@@ -730,6 +1068,7 @@ export class IssuerInfo {
 }
 /** The information of trading session */
 export class TradingSessionInfo {
+  toString(): string
   /** Being trading time */
   get beginTime(): Time
   /** End trading time */
@@ -739,6 +1078,7 @@ export class TradingSessionInfo {
 }
 /** Market trading session */
 export class MarketTradingSession {
+  toString(): string
   /** Market */
   get market(): Market
   /** Trading session */
@@ -746,6 +1086,7 @@ export class MarketTradingSession {
 }
 /** Real-time quote */
 export class RealtimeQuote {
+  toString(): string
   /** Security code */
   get symbol(): string
   /** Latest price */
@@ -767,6 +1108,7 @@ export class RealtimeQuote {
 }
 /** Push real-time quote */
 export class PushQuote {
+  toString(): string
   /** Latest price */
   get lastDone(): Decimal
   /** Open */
@@ -788,6 +1130,7 @@ export class PushQuote {
 }
 /** Push real-time depth */
 export class PushDepth {
+  toString(): string
   /** Ask depth */
   get asks(): Array<Depth>
   /** Bid depth */
@@ -795,6 +1138,7 @@ export class PushDepth {
 }
 /** Push real-time brokers */
 export class PushBrokers {
+  toString(): string
   /** Ask brokers */
   get askBrokers(): Array<Brokers>
   /** Bid brokers */
@@ -802,11 +1146,13 @@ export class PushBrokers {
 }
 /** Push real-time trades */
 export class PushTrades {
+  toString(): string
   /** Trades data */
   get trades(): Array<Trade>
 }
 /** Market trading days */
 export class MarketTradingDays {
+  toString(): string
   /** Trading days */
   get tradingDays(): Array<NaiveDate>
   /** Half trading days */
@@ -818,17 +1164,18 @@ export class NaiveDate {
   get year(): number
   get month(): number
   get day(): number
+  get toString(): string
 }
 /** Naive date type */
 export class Time {
   constructor(hour: number, minute: number, second: number)
   get hour(): number
   get monute(): number
-  get second(): number
+  get toString(): string
 }
 /** Trade context */
 export class TradeContext {
-  static new(callback: (err: null | Error, event: PushOrderChanged) => void): TradeContext
+  constructor(callback: (err: null | Error, event: PushOrderChanged) => void)
   /** Open trade context */
   open(): Promise<void>
   /** Subscribe */
@@ -961,6 +1308,7 @@ export class SubmitOrderOptions {
 }
 /** Trade */
 export class Execution {
+  toString(): string
   /** Order ID */
   get orderId(): string
   /** Execution ID */
@@ -976,6 +1324,7 @@ export class Execution {
 }
 /** Order */
 export class Order {
+  toString(): string
   /** Order ID */
   get orderId(): string
   /** Order status */
@@ -1029,6 +1378,7 @@ export class Order {
 }
 /** Order changed message */
 export class PushOrderChanged {
+  toString(): string
   /** Order side */
   get side(): OrderSide
   /** Stock name */
@@ -1076,11 +1426,13 @@ export class PushOrderChanged {
 }
 /** Response for withdraw order request */
 export class SubmitOrderResponse {
+  toString(): string
   /** Order id */
   get orderId(): string
 }
 /** Account balance */
 export class CashInfo {
+  toString(): string
   /** Withdraw cash */
   get withdrawCash(): Decimal
   /** Available cash */
@@ -1094,6 +1446,7 @@ export class CashInfo {
 }
 /** Account balance */
 export class AccountBalance {
+  toString(): string
   /** Total cash */
   get totalCash(): Decimal
   /** Maximum financing amount */
@@ -1111,6 +1464,7 @@ export class AccountBalance {
 }
 /** Account balance */
 export class CashFlow {
+  toString(): string
   /** Cash flow name */
   get transactionFlowName(): string
   /** Outflow direction */
@@ -1130,10 +1484,12 @@ export class CashFlow {
 }
 /** Fund positions response */
 export class FundPositionsResponse {
+  toString(): string
   get channels(): Array<FundPositionChannel>
 }
 /** Fund position channel */
 export class FundPositionChannel {
+  toString(): string
   /** Account type */
   get accountChannel(): string
   /** Fund positions */
@@ -1141,6 +1497,7 @@ export class FundPositionChannel {
 }
 /** Fund position */
 export class FundPosition {
+  toString(): string
   /** Fund ISIN code */
   get symbol(): string
   /** Current equity */
@@ -1158,10 +1515,12 @@ export class FundPosition {
 }
 /** Stock positions response */
 export class StockPositionsResponse {
+  toString(): string
   get channels(): Array<StockPositionChannel>
 }
 /** Stock position channel */
 export class StockPositionChannel {
+  toString(): string
   /** Account type */
   get accountChannel(): string
   /** Fund details */
@@ -1169,6 +1528,7 @@ export class StockPositionChannel {
 }
 /** Stock position */
 export class StockPosition {
+  toString(): string
   /** Stock code */
   get symbol(): string
   /** Stock name */
