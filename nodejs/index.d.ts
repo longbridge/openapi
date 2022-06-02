@@ -24,21 +24,6 @@ export interface ConfigParams {
    */
   tradeWsUrl?: string
 }
-export const E: Decimal
-export const E_INVERSE: Decimal
-export const HALF_PI: Decimal
-export const MAX: Decimal
-export const MIN: Decimal
-export const NEGATIVE_ONE: Decimal
-export const ONE: Decimal
-export const ONE_HUNDRED: Decimal
-export const ONE_THOUSAND: Decimal
-export const PI: Decimal
-export const QUARTER_PI: Decimal
-export const TEN: Decimal
-export const TWO: Decimal
-export const TWO_PI: Decimal
-export const ZERO: Decimal
 /** Derivative type */
 export const enum DerivativeType {
   /** US stock options */
@@ -320,9 +305,73 @@ export class Config {
   static fromEnv(): Config
 }
 export class Decimal {
+  static E(): Decimal
+  static E_INVERSE(): Decimal
+  static HALF_PI(): Decimal
+  static MAX(): Decimal
+  static MIN(): Decimal
+  static NEGATIVE_ONE(): Decimal
+  static ONE(): Decimal
+  static ONE_HUNDRED(): Decimal
+  static ONE_THOUSAND(): Decimal
+  static PI(): Decimal
+  static QUARTER_PI(): Decimal
+  static TEN(): Decimal
+  static TWO(): Decimal
+  static TWO_PI(): Decimal
+  static ZERO(): Decimal
   constructor(value: string | number)
   toString(): string
   toNumber(): number
+  /** Computes the absolute value. */
+  abs(): Decimal
+  /** Returns the smallest integer greater than or equal to a number. */
+  ceil(): Decimal
+  /** Returns the largest integer less than or equal to a number. */
+  floor(): Decimal
+  /** Returns a new Decimal representing the fractional portion of the number. */
+  fract(): Decimal
+  /** Returns `true` if the decimal is negative. */
+  isNegative(): boolean
+  /** Returns `true` if the decimal is positive. */
+  isPositive(): boolean
+  /** Returns `true` if this Decimal number is equivalent to zero. */
+  isZero(): boolean
+  /** Returns the maximum of the two numbers. */
+  max(other: Decimal): Decimal
+  /** Returns the minimum of the two numbers. */
+  min(other: Decimal): Decimal
+  /** Strips any trailing zero’s from a Decimal and converts `-0` to `0`. */
+  normalize(): Decimal
+  /**
+   * Returns a new Decimal number with no fractional portion (i.e. an
+   * integer). Rounding currently follows “Bankers Rounding” rules. e.g.
+   * `6.5` -> `6`, `7.5` -> `8`
+   */
+  round(): Decimal
+  /**
+   * Returns a new Decimal integral with no fractional portion. This is a
+   * true truncation whereby no rounding is performed.
+   */
+  trunc(): Decimal
+  /** Performs the `+` operation. */
+  add(other: Decimal): Decimal
+  /** Performs the `-` operation. */
+  sub(other: Decimal): Decimal
+  /** Performs the `*` operation. */
+  mul(other: Decimal): Decimal
+  /** Performs the `/` operation. */
+  div(other: Decimal): Decimal
+  /** Performs the `%` operation. */
+  rem(other: Decimal): Decimal
+  /** Performs the unary `-` operation. */
+  neg(): Decimal
+  gt(other: Decimal): boolean
+  ge(other: Decimal): boolean
+  eq(other: Decimal): boolean
+  lt(other: Decimal): boolean
+  le(other: Decimal): boolean
+  cmp(other: Decimal): number
 }
 /** Quote context */
 export class QuoteContext {

@@ -236,25 +236,10 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { Config, Decimal, E, E_INVERSE, HALF_PI, MAX, MIN, NEGATIVE_ONE, ONE, ONE_HUNDRED, ONE_THOUSAND, PI, QUARTER_PI, TEN, TWO, TWO_PI, ZERO, QuoteContext, PushQuoteEvent, PushDepthEvent, PushBrokersEvent, PushTradesEvent, DerivativeType, TradeStatus, TradeSession, SubType, TradeDirection, OptionType, OptionDirection, WarrantType, Period, AdjustType, SecurityStaticInfo, PrePostQuote, SecurityQuote, OptionQuote, WarrantQuote, Depth, SecurityDepth, Brokers, SecurityBrokers, ParticipantInfo, Trade, IntradayLine, Candlestick, StrikePriceInfo, IssuerInfo, TradingSessionInfo, MarketTradingSession, RealtimeQuote, PushQuote, PushDepth, PushBrokers, PushTrades, MarketTradingDays, NaiveDate, Time, sleep, TradeContext, GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TopicType, Execution, OrderStatus, OrderSide, OrderType, OrderTag, TimeInForceType, TriggerStatus, OutsideRTH, Order, PushOrderChanged, SubmitOrderResponse, CashInfo, AccountBalance, BalanceType, CashFlowDirection, CashFlow, FundPositionsResponse, FundPositionChannel, FundPosition, StockPositionsResponse, StockPositionChannel, StockPosition, Market } = nativeBinding
+const { Config, Decimal, QuoteContext, PushQuoteEvent, PushDepthEvent, PushBrokersEvent, PushTradesEvent, DerivativeType, TradeStatus, TradeSession, SubType, TradeDirection, OptionType, OptionDirection, WarrantType, Period, AdjustType, SecurityStaticInfo, PrePostQuote, SecurityQuote, OptionQuote, WarrantQuote, Depth, SecurityDepth, Brokers, SecurityBrokers, ParticipantInfo, Trade, IntradayLine, Candlestick, StrikePriceInfo, IssuerInfo, TradingSessionInfo, MarketTradingSession, RealtimeQuote, PushQuote, PushDepth, PushBrokers, PushTrades, MarketTradingDays, NaiveDate, Time, sleep, TradeContext, GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TopicType, Execution, OrderStatus, OrderSide, OrderType, OrderTag, TimeInForceType, TriggerStatus, OutsideRTH, Order, PushOrderChanged, SubmitOrderResponse, CashInfo, AccountBalance, BalanceType, CashFlowDirection, CashFlow, FundPositionsResponse, FundPositionChannel, FundPosition, StockPositionsResponse, StockPositionChannel, StockPosition, Market } = nativeBinding
 
 module.exports.Config = Config
 module.exports.Decimal = Decimal
-module.exports.E = E
-module.exports.E_INVERSE = E_INVERSE
-module.exports.HALF_PI = HALF_PI
-module.exports.MAX = MAX
-module.exports.MIN = MIN
-module.exports.NEGATIVE_ONE = NEGATIVE_ONE
-module.exports.ONE = ONE
-module.exports.ONE_HUNDRED = ONE_HUNDRED
-module.exports.ONE_THOUSAND = ONE_THOUSAND
-module.exports.PI = PI
-module.exports.QUARTER_PI = QUARTER_PI
-module.exports.TEN = TEN
-module.exports.TWO = TWO
-module.exports.TWO_PI = TWO_PI
-module.exports.ZERO = ZERO
 module.exports.QuoteContext = QuoteContext
 module.exports.PushQuoteEvent = PushQuoteEvent
 module.exports.PushDepthEvent = PushDepthEvent
