@@ -387,7 +387,7 @@ export class QuoteContext {
    * import { Config, QuoteContext, SubType } from 'longbridge'
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config, (_, event) => console.log(event))
+   * let ctx = new QuoteContext(config, (_, event) => console.log(event.toString()))
    * await ctx.open()
    * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
    * ```
@@ -493,7 +493,7 @@ export class QuoteContext {
    * let ctx = new QuoteContext(config);
    * await ctx.open()
    * let resp = await ctx.depth("700.HK")
-   * console.log(obj.toString())
+   * console.log(resp.toString())
    * ```
    */
   depth(symbol: string): Promise<SecurityDepth>
@@ -509,7 +509,7 @@ export class QuoteContext {
    * let ctx = new QuoteContext(config);
    * await ctx.open()
    * let resp = await ctx.brokers("700.HK")
-   * console.log(obj.toString())
+   * console.log(resp.toString())
    * ```
    */
   brokers(symbol: string): Promise<SecurityBrokers>
@@ -598,7 +598,7 @@ export class QuoteContext {
    * await ctx.open()
    * let resp = await ctx.optionChainExpiryDateList("AAPL.US")
    * for (let obj of resp) {
-   *     console.log(obj)
+   *     console.log(obj.toString())
    * }
    * ```
    */
@@ -616,7 +616,7 @@ export class QuoteContext {
    * await ctx.open()
    * let resp = await ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20))
    * for (let obj of resp) {
-   *     console.log(obj)
+   *     console.log(obj.toString())
    * }
    * ```
    */
@@ -634,7 +634,7 @@ export class QuoteContext {
    * await ctx.open()
    * let resp = await ctx.warrantIssuers()
    * for (let obj of resp) {
-   *     console.log(obj)
+   *     console.log(obj.toString())
    * }
    * ```
    */
@@ -652,7 +652,7 @@ export class QuoteContext {
    * await ctx.open()
    * let resp = await ctx.tradingSession()
    * for (let obj of resp) {
-   *     console.log(obj)
+   *     console.log(obj.toString())
    * }
    * ```
    */
@@ -669,7 +669,7 @@ export class QuoteContext {
    * let ctx = new QuoteContext(config);
    * await ctx.open()
    * let resp = await ctx.tradingDays()
-   * console.log(resp)
+   * console.log(resp.toString())
    * ```
    */
   tradingDays(market: Market, begin: NaiveDate, end: NaiveDate): Promise<MarketTradingDays>
@@ -690,7 +690,7 @@ export class QuoteContext {
    *
    * let resp = await ctx.realtimeQuote(["HK.700", "AAPL.US"])
    * for (let obj of resp) {
-   *     console.log(obj)
+   *     console.log(obj.toString())
    * }
    * ```
    */
@@ -711,7 +711,7 @@ export class QuoteContext {
    * await sleep(5000)
    *
    * let resp = await ctx.realtimeDepth("HK.700")
-   * console.log(resp)
+   * console.log(resp.toString())
    * ```
    */
   realtimeDepth(symbol: string): Promise<SecurityDepth>
@@ -731,7 +731,7 @@ export class QuoteContext {
    * await sleep(5000)
    *
    * let resp = await ctx.realtimeBrokers("HK.700")
-   * console.log(resp)
+   * console.log(resp.toString())
    * ```
    */
   realtimeBrokers(symbol: string): Promise<SecurityBrokers>
@@ -752,7 +752,7 @@ export class QuoteContext {
    *
    * let resp = await ctx.realtimeTrades("HK.700")
    * for (let obj of resp) {
-   *     console.log(obj)
+   *     console.log(obj.toString())
    * }
    * ```
    */
@@ -1182,27 +1182,216 @@ export class TradeContext {
   subscribe(topics: Array<TopicType>): Promise<void>
   /** Unsubscribe */
   unsubscribe(topics: Array<TopicType>): Promise<void>
-  /** Get history executions */
+  /**
+   * Get history executions
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext, GetHistoryExecutionsOptions } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.historyExecutions(
+   *     new GetHistoryExecutionsOptions()
+   *         .symbol("700.HK")
+   *         .startAt(new Date(2022, 5, 9))
+   *         .endAt(new Date(2022, 5, 12))
+   * )
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   historyExecutions(opts?: GetHistoryExecutionsOptions | undefined | null): Promise<Array<Execution>>
-  /** Get today executions */
+  /**
+   * Get today executions
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext, GetTodayExecutionsOptions } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK"))
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
-  /** Get history orders */
+  /**
+   * Get history orders
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.historyOrders(
+   *     new GetHistoryOrdersOptions()
+   *         .symbol("700.HK")
+   *         .status([OrderStatus.Filled, OrderStatus.New])
+   *         .side(OrderSide.Buy)
+   *         .market(Market.HK)
+   *         .startAt(2022, 5, 9)
+   *         .endAt(2022, 5, 12)
+   * )
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   historyOrders(opts?: GetHistoryOrdersOptions | undefined | null): Promise<Array<Order>>
-  /** Get today orders */
+  /**
+   * Get today orders
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.todayOrders(
+   *     new GetTodayOrdersOptions()
+   *         .symbol("700.HK")
+   *         .status([OrderStatus.Filled, OrderStatus.New])
+   *         .side(OrderSide.Buy)
+   *         .market(Market.HK)
+   * )
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   todayOrders(opts?: GetTodayOrdersOptions | undefined | null): Promise<Array<Order>>
-  /** Replace order */
+  /**
+   * Replace order
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext, ReplaceOrderOptions, Decimal } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.replaceOrder(new ReplaceOrderOptions("700.HK", new Decimal("100")).price(new Decimal("300")))
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   replaceOrder(opts: ReplaceOrderOptions): Promise<void>
-  /** Submit order */
+  /**
+   * Submit order
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.submitOrder(
+   *     new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, new Decimal("200"), TimeInForceType.Day)
+   *         .price(new Decimal("300"))
+   * )
+   * console.log(resp)
+   * ```
+   */
   submitOrder(opts: SubmitOrderOptions): Promise<SubmitOrderResponse>
-  /** Withdraw order */
+  /**
+   * Withdraw order
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * await ctx.withdrawOrder("709043056541253632")
+   * ```
+   */
   withdrawOrder(orderId: string): Promise<void>
-  /** Get account balance */
+  /**
+   * Get account balance
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.accountBalance()
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   accountBalance(): Promise<Array<AccountBalance>>
-  /** Get cash flow */
+  /**
+   * Get cash flow
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext, GetCashFlowOptions } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12)))
+   * for (let obj of resp) {
+   *     console.log(obj.toString())
+   * }
+   * ```
+   */
   cashFlow(opts: GetCashFlowOptions): Promise<Array<CashFlow>>
-  /** Get fund positions */
+  /**
+   * Get fund positions
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.fundPositions()
+   * console.log(resp)
+   * ```
+   */
   fundPositions(symbols?: Array<string> | undefined | null): Promise<FundPositionsResponse>
-  /** Get stock positions */
+  /**
+   * Get stock positions
+   *
+   * #### Example
+   *
+   * ```javascript
+   * import { Config, TradeContext } from 'longbridge'
+   *
+   * let config = Config.fromEnv()
+   * let ctx = new TradeContext(config)
+   * await ctx.open()
+   * let resp = await ctx.stockPositions()
+   * console.log(resp)
+   * ```
+   */
   stockPositions(symbols?: Array<string> | undefined | null): Promise<StockPositionsResponse>
 }
 /** Options for submit order request */

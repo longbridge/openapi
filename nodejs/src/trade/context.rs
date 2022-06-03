@@ -267,9 +267,7 @@ impl TradeContext {
     ///     new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, new Decimal("200"), TimeInForceType.Day)
     ///         .price(new Decimal("300"))
     /// )
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
+    /// console.log(resp)
     /// ```
     #[napi]
     pub async fn submit_order(&self, opts: &SubmitOrderOptions) -> Result<SubmitOrderResponse> {
