@@ -98,6 +98,25 @@ impl TradeContext {
     }
 
     /// Get history executions
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext, GetHistoryExecutionsOptions } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.historyExecutions(
+    ///     new GetHistoryExecutionsOptions()
+    ///         .symbol("700.HK")
+    ///         .startAt(new Date(2022, 5, 9))
+    ///         .endAt(new Date(2022, 5, 12))
+    /// )
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn history_executions(
         &self,
@@ -113,6 +132,20 @@ impl TradeContext {
     }
 
     /// Get today executions
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext, GetTodayExecutionsOptions } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK"))
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn today_executions(
         &self,
@@ -128,6 +161,28 @@ impl TradeContext {
     }
 
     /// Get history orders
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.historyOrders(
+    ///     new GetHistoryOrdersOptions()
+    ///         .symbol("700.HK")
+    ///         .status([OrderStatus.Filled, OrderStatus.New])
+    ///         .side(OrderSide.Buy)
+    ///         .market(Market.HK)
+    ///         .startAt(2022, 5, 9)
+    ///         .endAt(2022, 5, 12)
+    /// )
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn history_orders(
         &self,
@@ -143,6 +198,26 @@ impl TradeContext {
     }
 
     /// Get today orders
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.todayOrders(
+    ///     new GetTodayOrdersOptions()
+    ///         .symbol("700.HK")
+    ///         .status([OrderStatus.Filled, OrderStatus.New])
+    ///         .side(OrderSide.Buy)
+    ///         .market(Market.HK)
+    /// )
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn today_orders(&self, opts: Option<&GetTodayOrdersOptions>) -> Result<Vec<Order>> {
         get_ctx!(self.ctx)
@@ -155,6 +230,20 @@ impl TradeContext {
     }
 
     /// Replace order
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext, ReplaceOrderOptions, Decimal } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.replaceOrder(new ReplaceOrderOptions("700.HK", new Decimal("100")).price(new Decimal("300")))
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn replace_order(&self, opts: &ReplaceOrderOptions) -> Result<()> {
         get_ctx!(self.ctx)
@@ -165,6 +254,23 @@ impl TradeContext {
     }
 
     /// Submit order
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.submitOrder(
+    ///     new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, new Decimal("200"), TimeInForceType.Day)
+    ///         .price(new Decimal("300"))
+    /// )
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn submit_order(&self, opts: &SubmitOrderOptions) -> Result<SubmitOrderResponse> {
         get_ctx!(self.ctx)
@@ -175,6 +281,17 @@ impl TradeContext {
     }
 
     /// Withdraw order
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// await ctx.withdrawOrder("709043056541253632")
+    /// ```
     #[napi]
     pub async fn withdraw_order(&self, order_id: String) -> Result<()> {
         get_ctx!(self.ctx)
@@ -185,6 +302,20 @@ impl TradeContext {
     }
 
     /// Get account balance
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.accountBalance()
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn account_balance(&self) -> Result<Vec<AccountBalance>> {
         get_ctx!(self.ctx)
@@ -197,6 +328,20 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext, GetCashFlowOptions } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12)))
+    /// for (let obj of resp) {
+    ///     console.log(obj.toString())
+    /// }    
+    /// ```
     #[napi]
     pub async fn cash_flow(&self, opts: &GetCashFlowOptions) -> Result<Vec<CashFlow>> {
         get_ctx!(self.ctx)
@@ -209,6 +354,18 @@ impl TradeContext {
     }
 
     /// Get fund positions
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.fundPositions()
+    /// console.log(resp)
+    /// ```
     #[napi]
     pub async fn fund_positions(
         &self,
@@ -222,6 +379,18 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// import { Config, TradeContext } from 'longbridge'
+    ///
+    /// let config = Config.fromEnv()
+    /// let ctx = new TradeContext(config)
+    /// await ctx.open()
+    /// let resp = await ctx.stockPositions()
+    /// console.log(resp)
+    /// ```
     #[napi]
     pub async fn stock_positions(
         &self,
