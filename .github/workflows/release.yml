@@ -311,6 +311,7 @@ jobs:
           toolchain: 1.60.0
           override: true
           components: rustfmt, clippy
+          target: ${{ matrix.settings.target }}
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-nodejs --all-features

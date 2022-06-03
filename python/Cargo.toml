@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longbridge-python"
-version = "0.2.9"
+version = "0.2.10"
 description = "Longbridge OpenAPI SDK for Python"
 homepage = "https://open.longbridgeapp.com/en/"
 readme = "README.md"
@@ -15,8 +15,8 @@ name = "longbridge"
 crate-type = ["cdylib"]
 
 [dependencies]
-longbridge = { path = "../rust", version = "0.2.9", features = ["blocking"] }
-longbridge-python-macros = { path = "crates/macros", version = "0.2.9" }
+longbridge = { path = "../rust", version = "0.2.10", features = ["blocking"] }
+longbridge-python-macros = { path = "crates/macros", version = "0.2.10" }
 
 once_cell = "1.11.0"
 pyo3 = { version = "0.16.4", features = ["extension-module"] }
