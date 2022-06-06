@@ -145,7 +145,6 @@ export const enum AdjustType {
   /** Adjust forward */
   ForwardAdjust = 1
 }
-export function sleep(milliseconds: number): Promise<void>
 /** Topic type */
 export const enum TopicType {
   /** Private notification for trade */
@@ -775,12 +774,12 @@ export class QuoteContext {
    * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Quote], true)
    * await ctx.open()
    *
-   * await sleep(5000)
-   *
-   * let resp = await ctx.realtimeQuote(["HK.700", "AAPL.US"])
-   * for (let obj of resp) {
-   *     console.log(obj.toString())
-   * }
+   * setTimeout(() => {
+   *     let resp = await ctx.realtimeQuote(["HK.700", "AAPL.US"])
+   *     for (let obj of resp) {
+   *         console.log(obj.toString())
+   *     }
+   * }, 5000)
    * ```
    */
   realtimeQuote(symbols: Array<string>): Promise<Array<RealtimeQuote>>
@@ -797,10 +796,10 @@ export class QuoteContext {
    * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Depth], true)
    * await ctx.open()
    *
-   * await sleep(5000)
-   *
-   * let resp = await ctx.realtimeDepth("HK.700")
-   * console.log(resp.toString())
+   * setTimeout(() => {
+   *     let resp = await ctx.realtimeDepth("HK.700")
+   *     console.log(resp.toString())
+   * }, 5000)
    * ```
    */
   realtimeDepth(symbol: string): Promise<SecurityDepth>
@@ -817,10 +816,10 @@ export class QuoteContext {
    * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Brokers], true)
    * await ctx.open()
    *
-   * await sleep(5000)
-   *
-   * let resp = await ctx.realtimeBrokers("HK.700")
-   * console.log(resp.toString())
+   * setTimeout(() => {
+   *     let resp = await ctx.realtimeBrokers("HK.700")
+   *     console.log(resp.toString())
+   * }, 5000)
    * ```
    */
   realtimeBrokers(symbol: string): Promise<SecurityBrokers>
@@ -837,12 +836,12 @@ export class QuoteContext {
    * await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Trade], false)
    * await ctx.open()
    *
-   * await sleep(5000)
-   *
-   * let resp = await ctx.realtimeTrades("HK.700")
-   * for (let obj of resp) {
-   *     console.log(obj.toString())
-   * }
+   * setTimeout(() => {
+   *     let resp = await ctx.realtimeTrades("HK.700")
+   *     for (let obj of resp) {
+   *         console.log(obj.toString())
+   *     }
+   * }, 5000)
    * ```
    */
   realtimeTrades(symbol: string, count: number): Promise<Array<Trade>>

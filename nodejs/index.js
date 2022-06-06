@@ -236,7 +236,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { Config, Decimal, QuoteContext, PushQuoteEvent, PushDepthEvent, PushBrokersEvent, PushTradesEvent, Subscription, DerivativeType, TradeStatus, TradeSession, SubType, TradeDirection, OptionType, OptionDirection, WarrantType, Period, AdjustType, SecurityStaticInfo, PrePostQuote, SecurityQuote, OptionQuote, WarrantQuote, Depth, SecurityDepth, Brokers, SecurityBrokers, ParticipantInfo, Trade, IntradayLine, Candlestick, StrikePriceInfo, IssuerInfo, TradingSessionInfo, MarketTradingSession, RealtimeQuote, PushQuote, PushDepth, PushBrokers, PushTrades, MarketTradingDays, NaiveDate, Time, sleep, TradeContext, GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TopicType, Execution, OrderStatus, OrderSide, OrderType, OrderTag, TimeInForceType, TriggerStatus, OutsideRTH, Order, PushOrderChanged, SubmitOrderResponse, CashInfo, AccountBalance, BalanceType, CashFlowDirection, CashFlow, FundPositionsResponse, FundPositionChannel, FundPosition, StockPositionsResponse, StockPositionChannel, StockPosition, Market } = nativeBinding
+const { Config, Decimal, QuoteContext, PushQuoteEvent, PushDepthEvent, PushBrokersEvent, PushTradesEvent, Subscription, DerivativeType, TradeStatus, TradeSession, SubType, TradeDirection, OptionType, OptionDirection, WarrantType, Period, AdjustType, SecurityStaticInfo, PrePostQuote, SecurityQuote, OptionQuote, WarrantQuote, Depth, SecurityDepth, Brokers, SecurityBrokers, ParticipantInfo, Trade, IntradayLine, Candlestick, StrikePriceInfo, IssuerInfo, TradingSessionInfo, MarketTradingSession, RealtimeQuote, PushQuote, PushDepth, PushBrokers, PushTrades, MarketTradingDays, NaiveDate, Time, TradeContext, GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TopicType, Execution, OrderStatus, OrderSide, OrderType, OrderTag, TimeInForceType, TriggerStatus, OutsideRTH, Order, PushOrderChanged, SubmitOrderResponse, CashInfo, AccountBalance, BalanceType, CashFlowDirection, CashFlow, FundPositionsResponse, FundPositionChannel, FundPosition, StockPositionsResponse, StockPositionChannel, StockPosition, Market } = nativeBinding
 
 module.exports.Config = Config
 module.exports.Decimal = Decimal
@@ -281,7 +281,6 @@ module.exports.PushTrades = PushTrades
 module.exports.MarketTradingDays = MarketTradingDays
 module.exports.NaiveDate = NaiveDate
 module.exports.Time = Time
-module.exports.sleep = sleep
 module.exports.TradeContext = TradeContext
 module.exports.GetCashFlowOptions = GetCashFlowOptions
 module.exports.GetHistoryExecutionsOptions = GetHistoryExecutionsOptions

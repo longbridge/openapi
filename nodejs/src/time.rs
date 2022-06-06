@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use napi::{Error, Result};
 
 /// Naive date type
@@ -98,9 +96,4 @@ impl Time {
             ))
             .unwrap()
     }
-}
-
-#[napi_derive::napi]
-async fn sleep(milliseconds: i64) {
-    tokio::time::sleep(Duration::from_millis(milliseconds as u64)).await
 }

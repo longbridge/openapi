@@ -607,12 +607,12 @@ impl QuoteContext {
     /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Quote], true)
     /// await ctx.open()
     ///
-    /// await sleep(5000)
-    ///
-    /// let resp = await ctx.realtimeQuote(["HK.700", "AAPL.US"])
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// setTimeout(() => {
+    ///     let resp = await ctx.realtimeQuote(["HK.700", "AAPL.US"])
+    ///     for (let obj of resp) {
+    ///         console.log(obj.toString())
+    ///     }
+    /// }, 5000)
     /// ```
     #[napi]
     pub async fn realtime_quote(&self, symbols: Vec<String>) -> Result<Vec<RealtimeQuote>> {
@@ -637,10 +637,10 @@ impl QuoteContext {
     /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Depth], true)
     /// await ctx.open()
     ///
-    /// await sleep(5000)
-    ///
-    /// let resp = await ctx.realtimeDepth("HK.700")
-    /// console.log(resp.toString())
+    /// setTimeout(() => {
+    ///     let resp = await ctx.realtimeDepth("HK.700")
+    ///     console.log(resp.toString())
+    /// }, 5000)
     /// ```
     #[napi]
     pub async fn realtime_depth(&self, symbol: String) -> Result<SecurityDepth> {
@@ -663,10 +663,10 @@ impl QuoteContext {
     /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Brokers], true)
     /// await ctx.open()
     ///
-    /// await sleep(5000)
-    ///
-    /// let resp = await ctx.realtimeBrokers("HK.700")
-    /// console.log(resp.toString())
+    /// setTimeout(() => {
+    ///     let resp = await ctx.realtimeBrokers("HK.700")
+    ///     console.log(resp.toString())
+    /// }, 5000)
     /// ```
     #[napi]
     pub async fn realtime_brokers(&self, symbol: String) -> Result<SecurityBrokers> {
@@ -689,12 +689,12 @@ impl QuoteContext {
     /// await ctx.subscribe(["HK.700", "AAPL.US"], [SubType.Trade], false)
     /// await ctx.open()
     ///
-    /// await sleep(5000)
-    ///
-    /// let resp = await ctx.realtimeTrades("HK.700")
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// setTimeout(() => {
+    ///     let resp = await ctx.realtimeTrades("HK.700")
+    ///     for (let obj of resp) {
+    ///         console.log(obj.toString())
+    ///     }
+    /// }, 5000)
     /// ```
     #[napi]
     pub async fn realtime_trades(&self, symbol: String, count: i32) -> Result<Vec<Trade>> {
