@@ -53,7 +53,74 @@ impl Error {
             error: error.to_string(),
         }
     }
+
+    /// Consumes this error and returns a simple error
+    pub fn into_simple_error(self) -> SimpleError {
+        match self {
+            Error::HttpClient(HttpClientError::OpenApi { code, message }) => {
+                SimpleError::Response {
+                    code: code as i64,
+                    message,
+                }
+            }
+            Error::WsClient(WsClientError::ResponseError {
+                detail: Some(detail),
+                ..
+            }) => SimpleError::Response {
+                code: detail.code as i64,
+                message: detail.msg,
+            },
+            Error::DecodeProtobuf(_)
+            | Error::DecodeJSON(_)
+            | Error::ParseField { .. }
+            | Error::UnknownCommand(_)
+            | Error::Blocking(_)
+            | Error::HttpClient(_)
+            | Error::WsClient(_) => SimpleError::Other(self.to_string()),
+        }
+    }
 }
 
 /// Longbridge OpenAPI SDK result type
 pub type Result<T> = ::std::result::Result<T, Error>;
+
+/// Simple error type
+#[derive(Debug, thiserror::Error)]
+pub enum SimpleError {
+    /// Response error
+    #[error("response error: code={code} message={message}")]
+    Response {
+        /// Error code
+        code: i64,
+        /// Error message
+        message: String,
+    },
+    /// Other error
+    #[error("other error: {0}")]
+    Other(String),
+}
+
+impl From<Error> for SimpleError {
+    #[inline]
+    fn from(err: Error) -> Self {
+        err.into_simple_error()
+    }
+}
+
+impl SimpleError {
+    /// Returns the error code
+    pub fn code(&self) -> Option<i64> {
+        match self {
+            SimpleError::Response { code, .. } => Some(*code),
+            SimpleError::Other(_) => None,
+        }
+    }
+
+    /// Returns the error message
+    pub fn message(&self) -> &str {
+        match self {
+            SimpleError::Response { message, .. } => message.as_str(),
+            SimpleError::Other(message) => message.as_str(),
+        }
+    }
+}
