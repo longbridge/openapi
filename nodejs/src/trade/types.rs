@@ -465,7 +465,7 @@ pub struct StockPositionsResponse {
 pub struct StockPositionChannel {
     /// Account type
     account_channel: String,
-    /// Fund details
+    /// Stock positions
     #[js(array)]
     positions: Vec<StockPosition>,
 }

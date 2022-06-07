@@ -423,6 +423,7 @@ pub struct FundPosition {
     /// Fund ISIN code
     pub symbol: String,
     /// Current equity
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub current_net_asset_value: Decimal,
     /// Current equity time
     #[serde(with = "serde_utils::timestamp")]
@@ -432,8 +433,10 @@ pub struct FundPosition {
     /// Currency
     pub currency: String,
     /// Net cost
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub cost_net_asset_value: Decimal,
     /// Holding units
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub holding_units: Decimal,
 }
 
@@ -451,7 +454,7 @@ pub struct StockPositionChannel {
     /// Account type
     pub account_channel: String,
 
-    /// Fund positions
+    /// Stock positions
     #[serde(default, rename = "stock_info")]
     pub positions: Vec<StockPosition>,
 }

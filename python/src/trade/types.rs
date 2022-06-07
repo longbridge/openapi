@@ -461,7 +461,7 @@ pub(crate) struct StockPositionsResponse {
 pub(crate) struct StockPositionChannel {
     /// Account type
     account_channel: String,
-    /// Fund details
+    /// Stock positions
     #[py(array)]
     positions: Vec<StockPosition>,
 }
