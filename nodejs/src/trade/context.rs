@@ -102,20 +102,23 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext, GetHistoryExecutionsOptions } from 'longbridge'
+    /// const { Config, TradeContext, GetHistoryExecutionsOptions } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.historyExecutions(
-    ///     new GetHistoryExecutionsOptions()
-    ///         .symbol("700.HK")
-    ///         .startAt(new Date(2022, 5, 9))
-    ///         .endAt(new Date(2022, 5, 12))
+    ///
+    /// let opts = new GetHistoryExecutionsOptions()
+    ///     .symbol("700.HK")
+    ///     .startAt(new Date(2022, 5, 9))
+    ///     .endAt(new Date(2022, 5, 12))
+    /// ctx.open()
+    ///     .then(() => ctx.historyExecutions(opts))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }    
+    ///     })
     /// )
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
     /// ```
     #[napi]
     pub async fn history_executions(
@@ -136,15 +139,18 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext, GetTodayExecutionsOptions } from 'longbridge'
+    /// const { Config, TradeContext, GetTodayExecutionsOptions } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK"))
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
+    ///
+    /// ctx.open()
+    ///     .then(() => ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK")))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }    
+    ///     })
     /// ```
     #[napi]
     pub async fn today_executions(
@@ -165,23 +171,25 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } from 'longbridge'
+    /// const { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.historyOrders(
-    ///     new GetHistoryOrdersOptions()
-    ///         .symbol("700.HK")
-    ///         .status([OrderStatus.Filled, OrderStatus.New])
-    ///         .side(OrderSide.Buy)
-    ///         .market(Market.HK)
-    ///         .startAt(2022, 5, 9)
-    ///         .endAt(2022, 5, 12)
-    /// )
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
+    ///
+    /// let opts = new GetHistoryOrdersOptions()
+    ///     .symbol("700.HK")
+    ///     .status([OrderStatus.Filled, OrderStatus.New])
+    ///     .side(OrderSide.Buy)
+    ///     .market(Market.HK)
+    ///     .startAt(2022, 5, 9)
+    ///     .endAt(2022, 5, 12)
+    /// ctx.open()
+    ///     .then(() => ctx.historyOrders(opts))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn history_orders(
@@ -202,21 +210,24 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } from 'longbridge'
+    /// const { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.todayOrders(
-    ///     new GetTodayOrdersOptions()
-    ///         .symbol("700.HK")
-    ///         .status([OrderStatus.Filled, OrderStatus.New])
-    ///         .side(OrderSide.Buy)
-    ///         .market(Market.HK)
+    ///
+    /// let opts = new GetTodayOrdersOptions()
+    ///     .symbol("700.HK")
+    ///     .status([OrderStatus.Filled, OrderStatus.New])
+    ///     .side(OrderSide.Buy)
+    ///     .market(Market.HK)
+    /// ctx.open()
+    ///     .then(() => ctx.todayOrders(opts))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// )
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
     /// ```
     #[napi]
     pub async fn today_orders(&self, opts: Option<&GetTodayOrdersOptions>) -> Result<Vec<Order>> {
@@ -234,15 +245,18 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext, ReplaceOrderOptions, Decimal } from 'longbridge'
+    /// const { Config, TradeContext, ReplaceOrderOptions, Decimal } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.replaceOrder(new ReplaceOrderOptions("700.HK", new Decimal("100")).price(new Decimal("300")))
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
+    ///
+    /// ctx.open()
+    ///     .then(() => ctx.replaceOrder(new ReplaceOrderOptions("700.HK", new Decimal("100")).price(new Decimal("300"))))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn replace_order(&self, opts: &ReplaceOrderOptions) -> Result<()> {
@@ -258,16 +272,16 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } from 'longbridge'
+    /// const { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.submitOrder(
-    ///     new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, new Decimal("200"), TimeInForceType.Day)
-    ///         .price(new Decimal("300"))
-    /// )
-    /// console.log(resp)
+    ///
+    /// let opts = new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, new Decimal("200"), TimeInForceType.Day)
+    ///     .submittedPrice(new Decimal("300"));
+    /// ctx.open()
+    ///     .then(() => ctx.submitOrder(opts))
+    ///     .then((resp) => console.log(resp))
     /// ```
     #[napi]
     pub async fn submit_order(&self, opts: &SubmitOrderOptions) -> Result<SubmitOrderResponse> {
@@ -283,12 +297,13 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext } from 'longbridge'
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// await ctx.withdrawOrder("709043056541253632")
+    ///
+    /// ctx.open()
+    ///     .then(() => ctx.withdrawOrder("709043056541253632"))
     /// ```
     #[napi]
     pub async fn withdraw_order(&self, order_id: String) -> Result<()> {
@@ -304,15 +319,18 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext } from 'longbridge'
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.accountBalance()
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
+    ///
+    /// ctx.open()
+    ///     .then(() => ctx.accountBalance())
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }    
+    ///     })
     /// ```
     #[napi]
     pub async fn account_balance(&self) -> Result<Vec<AccountBalance>> {
@@ -330,15 +348,18 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext, GetCashFlowOptions } from 'longbridge'
+    /// const { Config, TradeContext, GetCashFlowOptions } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12)))
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
+    ///
+    /// ctx.open()
+    ///     .then(() => ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12))))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn cash_flow(&self, opts: &GetCashFlowOptions) -> Result<Vec<CashFlow>> {
@@ -356,13 +377,14 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext } from 'longbridge'
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.fundPositions()
-    /// console.log(resp)
+    ///
+    /// ctx.open()
+    ///     .then(() => ctx.fundPositions())
+    ///     .then((resp) => console.log(resp))
     /// ```
     #[napi]
     pub async fn fund_positions(
@@ -381,13 +403,13 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, TradeContext } from 'longbridge'
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new TradeContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.stockPositions()
-    /// console.log(resp)
+    /// ctx.open()
+    ///     .then(() => ctx.stockPositions())
+    ///     .then((resp) => console.log(resp))
     /// ```
     #[napi]
     pub async fn stock_positions(

@@ -129,12 +129,11 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, SubType } from 'longbridge'
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config, (_, event) => console.log(event.toString()))
-    /// await ctx.open()
-    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+    /// ctx.open().then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
     /// ```
     #[napi]
     pub async fn subscribe(
@@ -155,13 +154,13 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, SubType } from 'longbridge'
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config)
-    /// await ctx.open()
-    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
-    /// await ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true)
+    /// ctx.open()
+    ///     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
+    ///     .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true))
     /// ```
     #[napi]
     pub async fn unsubscribe(&self, symbols: Vec<String>, sub_types: Vec<SubType>) -> Result<()> {
@@ -177,14 +176,14 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, SubType } from 'longbridge'
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config)
-    /// await ctx.open()
-    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
-    /// let resp = await ctx.subscriptions()
-    /// console.log(resp.toString())
+    /// ctx.open()
+    ///     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
+    ///     .then(() => ctx.subscriptions())
+    ///     .then((resp) => console.log(resp.toString()))
     /// ```
     #[napi]
     pub async fn subscriptions(&self) -> Result<Vec<Subscription>> {
@@ -202,15 +201,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }    
+    /// ctx.open()
+    ///     .then(() => ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
+    ///     .then(() => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }    
+    ///     })
     /// ```
     #[napi]
     pub async fn static_info(&self, symbols: Vec<String>) -> Result<Vec<SecurityStaticInfo>> {
@@ -228,15 +229,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn quote(&self, symbols: Vec<String>) -> Result<Vec<SecurityQuote>> {
@@ -258,11 +261,13 @@ impl QuoteContext {
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.optionQuote(["AAPL230317P160000.US"])
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.optionQuote(["AAPL230317P160000.US"]))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn option_quote(&self, symbols: Vec<String>) -> Result<Vec<OptionQuote>> {
@@ -280,15 +285,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config)
-    /// await ctx.open()
-    /// let resp = await ctx.warrantQuote(["21125.HK"])
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.warrantQuote(["21125.HK"]))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn warrant_quote(&self, symbols: Vec<String>) -> Result<Vec<WarrantQuote>> {
@@ -306,13 +313,13 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.depth("700.HK")
-    /// console.log(resp.toString())
+    /// ctx.open()
+    ///     .then(() => ctx.depth("700.HK"))
+    ///     .then((resp) => console.log(resp.toString()))
     /// ```
     #[napi]
     pub async fn depth(&self, symbol: String) -> Result<SecurityDepth> {
@@ -328,13 +335,13 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.brokers("700.HK")
-    /// console.log(resp.toString())
+    /// ctx.open()
+    ///     .then(() => ctx.brokers("700.HK"))
+    ///     .then((resp) => console.log(resp.toString()))
     /// ```
     #[napi]
     pub async fn brokers(&self, symbol: String) -> Result<SecurityBrokers> {
@@ -350,15 +357,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.participants()
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString());
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.participants())
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString());
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn participants(&self) -> Result<Vec<ParticipantInfo>> {
@@ -376,15 +385,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.trades("700.HK", 10)
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString());
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.trades("700.HK", 10))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString());
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn trades(&self, symbol: String, count: i32) -> Result<Vec<Trade>> {
@@ -402,15 +413,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.intraday("700.HK")
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString());
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.intraday("700.HK"))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString());
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn intraday(&self, symbol: String) -> Result<Vec<IntradayLine>> {
@@ -428,15 +441,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, Period, AdjustType } from 'longbridge'
+    /// const { Config, QuoteContext, Period, AdjustType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust)
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString());
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString());
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn candlesticks(
@@ -465,15 +480,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longbridge'
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.optionChainExpiryDateList("AAPL.US")
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.optionChainExpiryDateList("AAPL.US"))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn option_chain_expiry_date_list(&self, symbol: String) -> Result<Vec<NaiveDate>> {
@@ -491,15 +508,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, NaiveDate } from 'longbridge'
+    /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20))
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20)))
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn option_chain_info_by_date(
@@ -521,15 +540,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, NaiveDate } from 'longbridge'
+    /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.warrantIssuers()
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.warrantIssuers())
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn warrant_issuers(&self) -> Result<Vec<IssuerInfo>> {
@@ -547,15 +568,17 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, NaiveDate } from 'longbridge'
+    /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.tradingSession()
-    /// for (let obj of resp) {
-    ///     console.log(obj.toString())
-    /// }
+    /// ctx.open()
+    ///     .then(() => ctx.tradingSession())
+    ///     .then((resp) => {
+    ///         for (let obj of resp) {
+    ///             console.log(obj.toString())
+    ///         }
+    ///     })
     /// ```
     #[napi]
     pub async fn trading_session(&self) -> Result<Vec<MarketTradingSession>> {
@@ -573,13 +596,13 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, Market, NaiveDate } from 'longbridge'
+    /// const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// let resp = await ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20))
-    /// console.log(resp.toString())
+    /// ctx.open()
+    ///     .then(() => ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20)))
+    ///     .then((resp) => console.log(resp.toString()))
     /// ```
     #[napi]
     pub async fn trading_days(
@@ -600,20 +623,21 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, SubType } from 'longbridge'
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
-    ///
-    /// setTimeout(() => {
-    ///     ctx.realtimeQuote(["700.HK", "AAPL.US"]).then(resp => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }
+    /// ctx.open()
+    ///     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
+    ///     .then(() => {
+    ///         setTimeout(() => {
+    ///             ctx.realtimeQuote(["700.HK", "AAPL.US"]).then((resp) => {
+    ///                 for (let obj of resp) {
+    ///                     console.log(obj.toString())
+    ///                 }
+    ///             })
+    ///         }, 5000)
     ///     })
-    /// }, 5000)
     /// ```
     #[napi]
     pub async fn realtime_quote(&self, symbols: Vec<String>) -> Result<Vec<RealtimeQuote>> {
@@ -631,14 +655,16 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, SubType } from 'longbridge'
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
-    /// await ctx.open()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], true)
-    ///
-    /// setTimeout(() => ctx.realtimeDepth("700.HK").then(resp => console.log(resp.toString())), 5000)
+    /// ctx.open()
+    ///     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], true))
+    ///     .then(() => {
+    ///         setTimeout(() => ctx.realtimeDepth("700.HK")
+    ///             .then((resp) => console.log(resp.toString())), 5000)
+    ///     })
     /// ```
     #[napi]
     pub async fn realtime_depth(&self, symbol: String) -> Result<SecurityDepth> {
@@ -654,14 +680,16 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, NaiveDate, SubType } from 'longbridge'
+    /// const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], true)
-    ///
-    /// setTimeout(() => ctx.realtimeBrokers("700.HK").then(resp => console.log(resp.toString())), 5000)
+    /// ctx.open()
+    ///     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], true))
+    ///     .then(() => {
+    ///         setTimeout(() => ctx.realtimeBrokers("700.HK")
+    ///             .then(resp => console.log(resp.toString())), 5000)
+    ///     })
     /// ```
     #[napi]
     pub async fn realtime_brokers(&self, symbol: String) -> Result<SecurityBrokers> {
@@ -677,20 +705,21 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext, NaiveDate, SubType } from 'longbridge'
+    /// const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// let ctx = new QuoteContext(config);
-    /// await ctx.open()
-    /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], false)
-    ///
-    /// setTimeout(() => {
-    ///     ctx.realtimeTrades("700.HK", 10).then(resp => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }
+    /// ctx.open()
+    ///     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], false))
+    ///     .then(() => {
+    ///         setTimeout(() => {
+    ///             ctx.realtimeTrades("700.HK", 10).then((resp) => {
+    ///                 for (let obj of resp) {
+    ///                     console.log(obj.toString())
+    ///                 }
+    ///             })
+    ///         }, 5000)
     ///     })
-    /// }, 5000)
     /// ```
     #[napi]
     pub async fn realtime_trades(&self, symbol: String, count: i32) -> Result<Vec<Trade>> {
