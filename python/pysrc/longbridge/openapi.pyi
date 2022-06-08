@@ -2468,6 +2468,21 @@ class AccountBalance:
     Cash details
     """
 
+    net_assets: Decimal
+    """
+    Net assets
+    """
+
+    init_margin: Decimal
+    """
+    Initial margin
+    """
+
+    maintenance_margin: Decimal
+    """
+    Maintenance margin
+    """
+
 
 class BalanceType:
     class Unknown(BalanceType):
@@ -2641,7 +2656,7 @@ class StockPosition:
     The number of holdings
     """
 
-    available_quality: Optional[Decimal]
+    available_quantity: Optional[Decimal]
     """
     Available quantity
     """
@@ -2654,6 +2669,11 @@ class StockPosition:
     cost_price: Decimal
     """
     Cost Price(According to the client's choice of average purchase or diluted cost)
+    """
+
+    market: Market
+    """
+    Market
     """
 
 

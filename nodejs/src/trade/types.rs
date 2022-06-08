@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use longbridge_nodejs_macros::{JsEnum, JsObject};
 use napi::bindgen_prelude::*;
 
-use crate::{decimal::Decimal, time::NaiveDate};
+use crate::{decimal::Decimal, time::NaiveDate, types::Market};
 
 /// Topic type
 #[napi_derive::napi]
@@ -346,7 +346,7 @@ pub struct AccountBalance {
     /// Remaining financing amount
     remaining_finance_amount: Decimal,
     /// Risk control level
-    risk_level: Option<i32>,
+    risk_level: i32,
     /// Margin call
     margin_call: Decimal,
     /// Currency
@@ -354,6 +354,12 @@ pub struct AccountBalance {
     /// Cash details
     #[js(array)]
     cash_infos: Vec<CashInfo>,
+    /// Net assets
+    net_assets: Decimal,
+    /// Initial margin
+    init_margin: Decimal,
+    /// Maintenance margin
+    maintenance_margin: Decimal,
 }
 
 #[napi_derive::napi]
@@ -483,10 +489,12 @@ pub struct StockPosition {
     quantity: Decimal,
     /// Available quantity
     #[js(opt)]
-    available_quality: Option<Decimal>,
+    available_quantity: Option<Decimal>,
     /// Currency
     currency: String,
     /// Cost Price(According to the client's choice of average purchase or
     /// diluted cost)
     cost_price: Decimal,
+    /// Market
+    market: Market,
 }

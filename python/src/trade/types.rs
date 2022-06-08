@@ -4,6 +4,7 @@ use pyo3::pyclass;
 use crate::{
     decimal::PyDecimal,
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
+    types::Market,
 };
 
 /// Topic type
@@ -344,7 +345,7 @@ pub(crate) struct AccountBalance {
     /// Remaining financing amount
     remaining_finance_amount: PyDecimal,
     /// Risk control level
-    risk_level: Option<i32>,
+    risk_level: i32,
     /// Margin call
     margin_call: PyDecimal,
     /// Currency
@@ -352,6 +353,12 @@ pub(crate) struct AccountBalance {
     /// Cash details
     #[py(array)]
     cash_infos: Vec<CashInfo>,
+    /// Net assets
+    pub net_assets: PyDecimal,
+    /// Initial margin
+    pub init_margin: PyDecimal,
+    /// Maintenance margin
+    pub maintenance_margin: PyDecimal,
 }
 
 #[pyclass]
@@ -479,10 +486,12 @@ pub(crate) struct StockPosition {
     quantity: PyDecimal,
     /// Available quantity
     #[py(opt)]
-    available_quality: Option<PyDecimal>,
+    available_quantity: Option<PyDecimal>,
     /// Currency
     currency: String,
     /// Cost Price(According to the client's choice of average purchase or
     /// diluted cost)
     cost_price: PyDecimal,
+    /// Market
+    market: Market,
 }

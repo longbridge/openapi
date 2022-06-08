@@ -74,9 +74,10 @@ impl Error {
             | Error::DecodeJSON(_)
             | Error::ParseField { .. }
             | Error::UnknownCommand(_)
-            | Error::Blocking(_)
             | Error::HttpClient(_)
             | Error::WsClient(_) => SimpleError::Other(self.to_string()),
+            #[cfg(feature = "blocking")]
+            Error::Blocking(_) => SimpleError::Other(self.to_string()),
         }
     }
 }

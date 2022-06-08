@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::{fmt::Display, str::FromStr};
+use std::str::FromStr;
 
 use serde::{de::Error, Deserialize, Deserializer, Serializer};
 use time::{Date, OffsetDateTime};
@@ -96,35 +96,20 @@ pub(crate) mod date_opt {
     }
 }
 
-pub(crate) mod number_str_opt {
-    use num_traits::Num;
-
+pub(crate) mod risk_level {
     use super::*;
 
-    pub(crate) fn serialize<S, T>(value: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-        T: Num + Display,
-    {
-        match value {
-            Some(value) => serializer.collect_str(value),
-            None => serializer.serialize_none(),
-        }
-    }
-
-    pub(crate) fn deserialize<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<i32, D::Error>
     where
         D: Deserializer<'de>,
-        T: Num,
-        T::FromStrRadixErr: Display,
     {
         let value = String::deserialize(deserializer)?;
         if !value.is_empty() {
-            let n = <T as Num>::from_str_radix(&value, 10)
-                .map_err(|err| D::Error::custom(err.to_string()))?;
-            Ok(Some(n))
+            Ok(value
+                .parse::<i32>()
+                .map_err(|err| D::Error::custom(err.to_string()))?)
         } else {
-            Ok(None)
+            Ok(0)
         }
     }
 }

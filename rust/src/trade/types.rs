@@ -4,7 +4,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use strum_macros::{Display, EnumString};
 use time::{Date, OffsetDateTime};
 
-use crate::trade::serde_utils;
+use crate::{trade::serde_utils, Market};
 
 /// Order type
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
@@ -315,8 +315,8 @@ pub struct AccountBalance {
     /// Remaining financing amount
     pub remaining_finance_amount: Decimal,
     /// Risk control level
-    #[serde(with = "serde_utils::number_str_opt")]
-    pub risk_level: Option<i32>,
+    #[serde(with = "serde_utils::risk_level")]
+    pub risk_level: i32,
     /// Margin call
     pub margin_call: Decimal,
     /// Currency
@@ -324,6 +324,15 @@ pub struct AccountBalance {
     /// Cash details
     #[serde(default)]
     pub cash_infos: Vec<CashInfo>,
+    /// Net assets
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub net_assets: Decimal,
+    /// Initial margin
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub init_margin: Decimal,
+    /// Maintenance margin
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub maintenance_margin: Decimal,
 }
 
 /// Balance type
@@ -467,17 +476,19 @@ pub struct StockPosition {
     /// Stock name
     pub symbol_name: String,
     /// The number of holdings
-    #[serde(rename = "quality", with = "serde_utils::decimal_empty_is_0")]
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub quantity: Decimal,
     /// Available quantity
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
-    pub available_quality: Option<Decimal>,
+    pub available_quantity: Option<Decimal>,
     /// Currency
     pub currency: String,
     /// Cost Price(According to the client's choice of average purchase or
     /// diluted cost)
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub cost_price: Decimal,
+    /// Market
+    pub market: Market,
 }
 
 impl_serde_for_enum_string!(
@@ -555,17 +566,19 @@ mod tests {
                     "symbol": "700.HK",
                     "symbol_name": "腾讯控股",
                     "currency": "HK",
-                    "quality": "650",
-                    "available_quality": "-450",
-                    "cost_price": "457.53"
+                    "quantity": "650",
+                    "available_quantity": "-450",
+                    "cost_price": "457.53",
+                    "market": "HK"
                   },
                   {
                     "symbol": "9991.HK",
                     "symbol_name": "宝尊电商-SW",
                     "currency": "HK",
-                    "quality": "200",
-                    "available_quality": "0",
-                    "cost_price": "32.25"
+                    "quantity": "200",
+                    "available_quantity": "0",
+                    "cost_price": "32.25",
+                    "market": "HK"
                   }
                 ]
               }
@@ -585,23 +598,25 @@ mod tests {
         assert_eq!(position.symbol_name, "腾讯控股");
         assert_eq!(position.currency, "HK");
         assert_eq!(position.quantity, decimal!(650i32));
-        assert_eq!(position.available_quality, Some(decimal!(-450i32)));
+        assert_eq!(position.available_quantity, Some(decimal!(-450i32)));
         assert_eq!(position.cost_price, decimal!(457.53f32));
+        assert_eq!(position.market, Market::HK);
 
         let position = &channel.positions[0];
         assert_eq!(position.symbol, "700.HK");
         assert_eq!(position.symbol_name, "腾讯控股");
         assert_eq!(position.currency, "HK");
         assert_eq!(position.quantity, decimal!(650i32));
-        assert_eq!(position.available_quality, Some(decimal!(-450i32)));
+        assert_eq!(position.available_quantity, Some(decimal!(-450i32)));
         assert_eq!(position.cost_price, decimal!(457.53f32));
+        assert_eq!(position.market, Market::HK);
 
         let position = &channel.positions[1];
         assert_eq!(position.symbol, "9991.HK");
         assert_eq!(position.symbol_name, "宝尊电商-SW");
         assert_eq!(position.currency, "HK");
         assert_eq!(position.quantity, decimal!(200i32));
-        assert_eq!(position.available_quality, Some(decimal!(0i32)));
+        assert_eq!(position.available_quantity, Some(decimal!(0i32)));
         assert_eq!(position.cost_price, decimal!(32.25f32));
     }
 
@@ -690,7 +705,10 @@ mod tests {
                     "settling_cash": "-276806.51",
                     "currency": "USD"
                   }
-                ]
+                ],
+                "net_assets": "11111.12",
+                "init_margin": "2222.23",
+                "maintenance_margin": "3333.45"
               }
             ]
           }"#;
@@ -707,9 +725,12 @@ mod tests {
         assert_eq!(balance.total_cash, "1759070010.72".parse().unwrap());
         assert_eq!(balance.max_finance_amount, "977582000".parse().unwrap());
         assert_eq!(balance.remaining_finance_amount, decimal!(0i32));
-        assert_eq!(balance.risk_level, Some(1));
+        assert_eq!(balance.risk_level, 1);
         assert_eq!(balance.margin_call, "2598051051.50".parse().unwrap());
         assert_eq!(balance.currency, "HKD");
+        assert_eq!(balance.net_assets, "11111.12".parse().unwrap());
+        assert_eq!(balance.init_margin, "2222.23".parse().unwrap());
+        assert_eq!(balance.maintenance_margin, "3333.45".parse().unwrap());
 
         assert_eq!(balance.cash_infos.len(), 2);
 
