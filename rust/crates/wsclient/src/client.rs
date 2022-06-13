@@ -68,14 +68,14 @@ struct Context<'a> {
     inflight_requests: HashMap<u32, oneshot::Sender<WsClientResult<Vec<u8>>>>,
     sink: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
     stream: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
-    command_tx: &'a mut mpsc::UnboundedReceiver<Command>,
+    command_rx: &'a mut mpsc::UnboundedReceiver<Command>,
     event_sender: &'a mut mpsc::UnboundedSender<WsEvent>,
 }
 
 impl<'a> Context<'a> {
     fn new(
         conn: WebSocketStream<MaybeTlsStream<TcpStream>>,
-        command_tx: &'a mut mpsc::UnboundedReceiver<Command>,
+        command_rx: &'a mut mpsc::UnboundedReceiver<Command>,
         event_sender: &'a mut mpsc::UnboundedSender<WsEvent>,
     ) -> Self {
         let (sink, stream) = conn.split();
@@ -84,7 +84,7 @@ impl<'a> Context<'a> {
             inflight_requests: Default::default(),
             sink,
             stream,
-            command_tx,
+            command_rx,
             event_sender,
         }
     }
@@ -108,7 +108,7 @@ impl<'a> Context<'a> {
                         None => return Err(WsClientError::ConnectionClosed { reason: None }),
                     }
                 }
-                item = self.command_tx.recv() => {
+                item = self.command_rx.recv() => {
                     match item {
                         Some(command) => self.handle_command(command).await?,
                         None => return Ok(()),
