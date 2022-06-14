@@ -6,7 +6,7 @@ use jni::{
     JNIEnv,
 };
 
-use crate::types::{IntoJValue, JClassName, JSignature};
+use crate::types::{FromJValue, IntoJValue, JClassName, JSignature};
 
 impl<T: JClassName> JClassName for Option<T> {
     const CLASSNAME: &'static str = T::CLASSNAME;
@@ -24,6 +24,17 @@ impl<T: IntoJValue> IntoJValue for Option<T> {
         match self {
             Some(value) => value.into_jvalue(env),
             None => Ok(JValue::from(JObject::null())),
+        }
+    }
+}
+
+impl<T: FromJValue> FromJValue for Option<T> {
+    fn from_jvalue(env: &JNIEnv, value: JValue) -> Result<Self> {
+        let obj = value.l()?;
+        if !obj.is_null() {
+            Ok(Some(T::from_jvalue(env, obj.into())?))
+        } else {
+            Ok(None)
         }
     }
 }

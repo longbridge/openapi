@@ -6,4 +6,5 @@ mod error;
 mod init;
 mod quote_context;
 mod runtime;
+mod trade_context;
 mod types;

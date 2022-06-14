@@ -52,3 +52,13 @@ where
 {
     env.set_field(obj, name, T::signature(), value.into_jvalue(env)?)
 }
+
+#[inline]
+pub(crate) fn get_field<'a, O, N, T>(env: &JNIEnv<'a>, obj: O, name: N) -> Result<T>
+where
+    O: Into<JObject<'a>>,
+    N: Into<JNIString>,
+    T: FromJValue + JSignature,
+{
+    T::from_jvalue(env, env.get_field(obj, name, T::signature())?)
+}

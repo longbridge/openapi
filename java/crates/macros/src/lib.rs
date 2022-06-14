@@ -127,6 +127,7 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
         }
 
         impl crate::types::JSignature for #type_path {
+            #[inline]
             fn signature() -> ::std::borrow::Cow<'static, str> {
                 #signature.into()
             }
@@ -241,6 +242,7 @@ pub fn impl_java_enum(input: TokenStream) -> TokenStream {
         }
 
         impl crate::types::JSignature for #type_path {
+            #[inline]
             fn signature() -> std::borrow::Cow<'static, str> {
                 concat!("L", #classname, ";").into()
             }

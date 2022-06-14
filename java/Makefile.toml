@@ -1,4 +1,4 @@
-[tasks.build-java-sdk]
+[tasks.java]
 command = "cargo"
 args = ["build", "-p", "longbridge-java"]
 
@@ -36,4 +36,4 @@ cwd = "java"
 [tasks.test-java]
 command = "java"
 args = ["-Djava.library.path=target/debug", "-cp", "java/classes", "Test"]
-dependencies = ["build-java-sdk", "javac", "compile-test-java"]
+dependencies = ["java", "javac", "compile-test-java"]

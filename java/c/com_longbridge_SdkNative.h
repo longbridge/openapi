@@ -42,10 +42,10 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_freeConfig
 /*
  * Class:     com_longbridge_SdkNative
  * Method:    newQuoteContext
- * Signature: (JLcom/longbridge/quote/QuotePushHandler;Lcom/longbridge/AsyncCallback;)V
+ * Signature: (JLcom/longbridge/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_newQuoteContext
-  (JNIEnv *, jclass, jlong, jobject, jobject);
+  (JNIEnv *, jclass, jlong, jobject);
 
 /*
  * Class:     com_longbridge_SdkNative
@@ -54,6 +54,38 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_newQuoteContext
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_freeQuoteContext
   (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextSetOnQuote
+ * Signature: (JLcom/longbridge/quote/QuoteHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSetOnQuote
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextSetOnDepth
+ * Signature: (JLcom/longbridge/quote/DepthHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSetOnDepth
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextSetOnBrokers
+ * Signature: (JLcom/longbridge/quote/BrokersHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSetOnBrokers
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextSetOnTrades
+ * Signature: (JLcom/longbridge/quote/TradesHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSetOnTrades
+  (JNIEnv *, jclass, jlong, jobject);
 
 /*
  * Class:     com_longbridge_SdkNative
@@ -230,6 +262,134 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextRealtimeBrokers
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextRealtimeTrades
   (JNIEnv *, jclass, jlong, jstring, jint, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    newTradeContext
+ * Signature: (JLcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_newTradeContext
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    freeTradeContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_freeTradeContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextSetOnOrderChanged
+ * Signature: (JLcom/longbridge/trade/OrderChangedHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextSetOnOrderChanged
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextSubscribe
+ * Signature: (J[Lcom/longbridge/trade/TopicType;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextSubscribe
+  (JNIEnv *, jclass, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextUnsubscribe
+ * Signature: (J[Lcom/longbridge/trade/TopicType;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextUnsubscribe
+  (JNIEnv *, jclass, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextHistoryExecutions
+ * Signature: (JLcom/longbridge/trade/GetHistoryExecutionsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextHistoryExecutions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextTodayExecutions
+ * Signature: (JLcom/longbridge/trade/GetTodayExecutionsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextTodayExecutions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextHistoryOrders
+ * Signature: (JLcom/longbridge/trade/GetHistoryOrdersOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextHistoryOrders
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextTodayOrders
+ * Signature: (JLcom/longbridge/trade/GetTodayOrdersOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextTodayOrders
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextReplaceOrder
+ * Signature: (JLcom/longbridge/trade/ReplaceOrderOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextReplaceOrder
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextSubmitOrder
+ * Signature: (JLcom/longbridge/trade/SubmitOrderOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextSubmitOrder
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextCancelOrder
+ * Signature: (JLjava/lang/String;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextCancelOrder
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextAccountBalance
+ * Signature: (JLcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextAccountBalance
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextCashFlow
+ * Signature: (JLcom/longbridge/trade/GetCashFlowOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextCashFlow
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextFundPositions
+ * Signature: (JLcom/longbridge/trade/GetFundPositionsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextFundPositions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextStockPositions
+ * Signature: (JLcom/longbridge/trade/GetStockPositionsOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextStockPositions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
 
 #ifdef __cplusplus
 }

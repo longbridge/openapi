@@ -7,24 +7,32 @@ import com.longbridge.*;
 public class QuoteContext implements AutoCloseable {
     private long raw;
 
-    public static CompletableFuture<QuoteContext> create(Config config, QuotePushHandler handler)
+    public static CompletableFuture<QuoteContext> create(Config config)
             throws OpenApiException {
-        CompletableFuture<QuoteContext> fut = new CompletableFuture<QuoteContext>();
-
-        SdkNative.newQuoteContext(config.getRaw(), handler, (err, obj) -> {
-            if (err == null) {
-                fut.complete((QuoteContext) obj);
-            } else {
-                fut.completeExceptionally((Throwable) err);
-            }
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.newQuoteContext(config.getRaw(), callback);
         });
-
-        return fut;
     }
 
     @Override
     public void close() throws Exception {
         SdkNative.freeQuoteContext(raw);
+    }
+
+    public void setOnQuote(QuoteHandler handler) {
+        SdkNative.quoteContextSetOnQuote(this.raw, handler);
+    }
+
+    public void setOnDepth(DepthHandler handler) {
+        SdkNative.quoteContextSetOnDepth(this.raw, handler);
+    }
+
+    public void setOnBrokers(BrokersHandler handler) {
+        SdkNative.quoteContextSetOnBrokers(this.raw, handler);
+    }
+
+    public void setOnTrades(TradesHandler handler) {
+        SdkNative.quoteContextSetOnTrades(this.raw, handler);
     }
 
     public CompletableFuture<Void> subscribe(String[] symbols, int flags, boolean isFirstPush) throws OpenApiException {

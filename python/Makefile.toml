@@ -1,4 +1,4 @@
-[tasks.build-python-sdk]
+[tasks.python]
 command = "maturin"
 args = ["build"]
 cwd = "python"

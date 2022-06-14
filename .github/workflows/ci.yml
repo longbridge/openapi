@@ -162,3 +162,46 @@ jobs:
       - name: Build
         working-directory: nodejs
         run: ${{ matrix.settings.build }}
+
+  check-java-sdk:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java-version: ["8", "11", "16", "17"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ github.token }}
+
+      - name: Install JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java-version }}
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.60.0
+          override: true
+          components: rustfmt, clippy
+
+      - name: Install cargo make
+        run: cargo instal cargo-make
+
+      - name: Check with clippy
+        run: cargo clippy -p longbridge-java --all-features
+
+      - name: Test
+        run: cargo test -p longbridge-java --all-features
+
+      - name: Compile java sources
+        run: cargo make javac
