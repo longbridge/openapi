@@ -3,55 +3,61 @@ use longbridge::quote::{
 };
 use pyo3::prelude::*;
 
-pub(crate) fn handle_push_event(handler: &PyObject, event: PushEvent) {
+use crate::quote::context::Callbacks;
+
+pub(crate) fn handle_push_event(callbacks: &Callbacks, event: PushEvent) {
     match event.detail {
-        PushEventDetail::Quote(quote) => handle_quote(handler, event.symbol, quote),
-        PushEventDetail::Depth(depth) => handle_depth(handler, event.symbol, depth),
-        PushEventDetail::Brokers(brokers) => handle_brokers(handler, event.symbol, brokers),
-        PushEventDetail::Trade(trades) => handle_trades(handler, event.symbol, trades),
+        PushEventDetail::Quote(quote) => handle_quote(callbacks, event.symbol, quote),
+        PushEventDetail::Depth(depth) => handle_depth(callbacks, event.symbol, depth),
+        PushEventDetail::Brokers(brokers) => handle_brokers(callbacks, event.symbol, brokers),
+        PushEventDetail::Trade(trades) => handle_trades(callbacks, event.symbol, trades),
     }
 }
 
-fn handle_quote(handler: &PyObject, symbol: String, quote: PushQuote) {
-    let _ = Python::with_gil(|py| {
-        handler.call_method1(
-            py,
-            "on_event",
-            (symbol, crate::quote::types::PushQuote::try_from(quote)?),
-        )?;
-        Ok::<_, PyErr>(())
-    });
+fn handle_quote(callbacks: &Callbacks, symbol: String, quote: PushQuote) {
+    if let Some(callback) = &callbacks.quote {
+        let _ = Python::with_gil(|py| {
+            callback.call(
+                py,
+                (symbol, crate::quote::types::PushQuote::try_from(quote)?),
+                None,
+            )
+        });
+    }
 }
 
-fn handle_depth(handler: &PyObject, symbol: String, depth: PushDepth) {
-    let _ = Python::with_gil(|py| {
-        handler.call_method1(
-            py,
-            "on_event",
-            (symbol, crate::quote::types::PushDepth::try_from(depth)?),
-        )?;
-        Ok::<_, PyErr>(())
-    });
+fn handle_depth(callbacks: &Callbacks, symbol: String, depth: PushDepth) {
+    if let Some(callback) = &callbacks.depth {
+        let _ = Python::with_gil(|py| {
+            callback.call(
+                py,
+                (symbol, crate::quote::types::PushDepth::try_from(depth)?),
+                None,
+            )
+        });
+    }
 }
 
-fn handle_brokers(handler: &PyObject, symbol: String, brokers: PushBrokers) {
-    let _ = Python::with_gil(|py| {
-        handler.call_method1(
-            py,
-            "on_event",
-            (symbol, crate::quote::types::PushBrokers::try_from(brokers)?),
-        )?;
-        Ok::<_, PyErr>(())
-    });
+fn handle_brokers(callbacks: &Callbacks, symbol: String, brokers: PushBrokers) {
+    if let Some(callback) = &callbacks.brokers {
+        let _ = Python::with_gil(|py| {
+            callback.call(
+                py,
+                (symbol, crate::quote::types::PushBrokers::try_from(brokers)?),
+                None,
+            )
+        });
+    }
 }
 
-fn handle_trades(handler: &PyObject, symbol: String, trades: PushTrades) {
-    let _ = Python::with_gil(|py| {
-        handler.call_method1(
-            py,
-            "on_event",
-            (symbol, crate::quote::types::PushTrades::try_from(trades)?),
-        )?;
-        Ok::<_, PyErr>(())
-    });
+fn handle_trades(callbacks: &Callbacks, symbol: String, trades: PushTrades) {
+    if let Some(callback) = &callbacks.trades {
+        let _ = Python::with_gil(|py| {
+            callback.call(
+                py,
+                (symbol, crate::quote::types::PushTrades::try_from(trades)?),
+                None,
+            )
+        });
+    }
 }

@@ -1,16 +1,15 @@
 from time import sleep
-from longbridge.openapi import QuoteContext, Config, SubType
+from longbridge.openapi import QuoteContext, Config, SubType, PushQuote
 
 
-class EventHandler:
-    def on_event(self, symbol: str, msg):
-        print(symbol, msg)
+def on_quote(symbol: str, quote: PushQuote):
+    print(symbol, quote)
 
 
 config = Config.from_env()
-ctx = QuoteContext(config, EventHandler())
+ctx = QuoteContext(config)
+ctx.set_on_quote(on_quote)
 
-symbols = ["700.HK", "AAPL.US", "TSLA.US",
-           "NFLX.US"]
+symbols = ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]
 ctx.subscribe(symbols, [SubType.Quote], True)
 sleep(30)

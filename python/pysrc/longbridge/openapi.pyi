@@ -1,6 +1,6 @@
 from datetime import datetime, date, time
 from decimal import Decimal
-from typing import List, Optional, Type, Protocol
+from typing import Callable, List, Optional, Type, Protocol
 
 
 class OpenApiException(Exception):
@@ -186,17 +186,6 @@ class PushTrades:
     """
     Trades data
     """
-
-
-class QuoteHandler(Protocol):
-    """
-    Quote push message handler
-    """
-
-    def on_event(self, symbol: str, msg: PushQuote | PushDepth | PushBrokers | PushTrades) -> None:
-        """
-        Called when a new message is received
-        """
 
 
 class SubType:
@@ -1305,14 +1294,29 @@ class QuoteContext:
 
     Args:
         config: Configuration object
-        handler: Push message handler
     """
 
-    def __init__(
-        self,
-        config: Config,
-        handler: Optional[QuoteHandler] = None,
-    ) -> None: ...
+    def __init__(self, config: Config) -> None: ...
+
+    def set_on_quote(self, callback: Callable[[str, PushQuote], None]) -> None:
+        """
+        Set quote callback, after receiving the quote data push, it will call back to this function.
+        """
+
+    def set_on_depth(self, callback: Callable[[str, PushDepth], None]) -> None:
+        """
+        Set quote callback, after receiving the depth data push, it will call back to this function.
+        """
+
+    def set_on_brokers(self, callback: Callable[[str, PushBrokers], None]) -> None:
+        """
+        Set quote callback, after receiving the brokers data push, it will call back to this function.
+        """
+
+    def set_on_trades(self, callback: Callable[[str, PushTrades], None]) -> None:
+        """
+        Set quote callback, after receiving the trades data push, it will call back to this function.
+        """
 
     def subscribe(self, symbols: List[str], sub_types: List[Type[SubType]], is_first_push: bool = False) -> None:
         """
@@ -1327,14 +1331,14 @@ class QuoteContext:
             ::
 
                 from time import sleep
-                from longbridge.openapi import QuoteContext, Config, SubType
+                from longbridge.openapi import QuoteContext, Config, SubType, PushQuote
 
-                class EventHandler:
-                    def on_event(self, symbol: str, msg):
-                        print(symbol, msg)
+                def on_quote(symbol: str, quote: PushQuote):
+                    print(symbol, quote)
 
                 config = Config.from_env()
-                ctx = QuoteContext(config, EventHandler())
+                ctx = QuoteContext(config)
+                ctx.set_on_quote(on_quote)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], is_first_push = True)
                 sleep(30)
@@ -2387,17 +2391,6 @@ class Order:
     """
 
 
-class TradeHandler(Protocol):
-    """
-    Trade push message handler
-    """
-
-    def on_event(self, msg: PushOrderChanged) -> None:
-        """
-        Called when a new message is received
-        """
-
-
 class SubmitOrderResponse:
     """
     Response for submit order request
@@ -2724,14 +2717,14 @@ class TradeContext:
 
     Args:
         config: Configuration object
-        handler: Push message handler
     """
 
-    def __init__(
-        self,
-        config: Config,
-        handler: Optional[TradeHandler] = None,
-    ) -> None: ...
+    def __init__(self, config: Config) -> None: ...
+
+    def set_on_order_changed(self, callback: Callable[[PushOrderChanged], None]) -> None:
+        """
+        Set order changed callback, after receiving the order changed event, it will call back to this function.
+        """
 
     def subscribe(self, topics: List[Type[TopicType]]) -> None:
         """
@@ -2748,13 +2741,13 @@ class TradeContext:
                 from longbridge.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType, PushOrderChanged, TopicType
 
 
-                class EventHandler:
-                    def on_event(self, msg: PushOrderChanged):
-                        print(msg)
+                def on_order_changed(event: PushOrderChanged):
+                    print(event)
 
 
                 config = Config.from_env()
-                ctx = TradeContext(config, EventHandler())
+                ctx = TradeContext(config)
+                ctx.set_on_order_changed(on_order_changed)
                 ctx.subscribe([TopicType.Private])
 
                 resp = ctx.submit_order(

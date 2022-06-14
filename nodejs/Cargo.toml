@@ -10,18 +10,17 @@ crate-type = ["cdylib"]
 longbridge = { path = "../rust", version = "0.2.16" }
 longbridge-nodejs-macros = { path = "crates/macros", version = "0.2.16" }
 
-# napi = { version = "2.4.3", default-features = false, features = ["napi4"] }
-# napi-derive = "2.4.1"
-napi = { git = "https://github.com/napi-rs/napi-rs", rev = "548f358", default-features = false, features = [
+napi = { version = "2.5.0", default-features = false, features = [
     "napi4",
     "chrono_date",
     "async",
 ] }
-napi-derive = { git = "https://github.com/napi-rs/napi-rs", rev = "548f358" }
+napi-derive = "2.5.0"
 rust_decimal = { version = "1.23.1", features = ["maths"] }
 chrono = "0.4.19"
 time = { version = "0.3.9", features = ["macros", "formatting"] }
 tokio = { version = "1.18.2", features = ["rt", "time"] }
+parking_lot = "0.12.1"
 
 [build-dependencies]
 napi-build = "2.0.0"

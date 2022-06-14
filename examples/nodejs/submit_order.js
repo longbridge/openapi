@@ -9,11 +9,8 @@ const {
 } = require("longbridge");
 
 let config = Config.fromEnv();
-let ctx = new TradeContext(config);
-
-ctx
-  .open()
-  .then(() =>
+TradeContext.new(config)
+  .then((ctx) =>
     ctx.submitOrder(
       new SubmitOrderOptions(
         "700.HK",

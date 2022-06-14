@@ -1,8 +1,5 @@
 #![allow(dead_code)]
 
-#[macro_use]
-mod macros;
-
 mod config;
 mod decimal;
 mod error;

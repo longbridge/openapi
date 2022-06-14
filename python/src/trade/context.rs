@@ -8,7 +8,8 @@ use longbridge::{
         GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
-use pyo3::{pyclass, pymethods, PyObject, PyResult};
+use parking_lot::Mutex;
+use pyo3::{pyclass, pymethods, PyObject, PyResult, Python};
 
 use crate::{
     config::Config,
@@ -26,25 +27,45 @@ use crate::{
     types::Market,
 };
 
+#[derive(Debug, Default)]
+pub(crate) struct Callbacks {
+    pub(crate) order_changed: Option<PyObject>,
+}
+
 #[pyclass]
-pub(crate) struct TradeContext(TradeContextSync);
+pub(crate) struct TradeContext {
+    ctx: TradeContextSync,
+    callbacks: Arc<Mutex<Callbacks>>,
+}
 
 #[pymethods]
 impl TradeContext {
     #[new]
-    fn new(config: &Config, handler: Option<PyObject>) -> PyResult<Self> {
-        let ctx = TradeContextSync::try_new(Arc::new(config.0.clone()), move |event| {
-            if let Some(handler) = &handler {
-                handle_push_event(handler, event);
+    fn new(config: &Config) -> PyResult<Self> {
+        let callbacks = Arc::new(Mutex::new(Callbacks::default()));
+        let ctx = TradeContextSync::try_new(Arc::new(config.0.clone()), {
+            let callbacks = callbacks.clone();
+            move |event| {
+                handle_push_event(&*callbacks.lock(), event);
             }
         })
         .map_err(ErrorNewType)?;
-        Ok(Self(ctx))
+        Ok(Self { ctx, callbacks })
+    }
+
+    /// Set order changed callback, after receiving the order changed event, it
+    /// will call back to this function.
+    fn set_on_order_changed(&self, py: Python<'_>, callback: PyObject) {
+        if callback.is_none(py) {
+            self.callbacks.lock().order_changed = None;
+        } else {
+            self.callbacks.lock().order_changed = Some(callback);
+        }
     }
 
     /// Subscribe
     fn subscribe(&self, topics: Vec<TopicType>) -> PyResult<()> {
-        self.0
+        self.ctx
             .subscribe(topics.into_iter().map(Into::into))
             .map_err(ErrorNewType)?;
         Ok(())
@@ -52,7 +73,7 @@ impl TradeContext {
 
     /// Unsubscribe
     fn unsubscribe(&self, topics: Vec<TopicType>) -> PyResult<()> {
-        self.0
+        self.ctx
             .unsubscribe(topics.into_iter().map(Into::into))
             .map_err(ErrorNewType)?;
         Ok(())
@@ -77,7 +98,7 @@ impl TradeContext {
             opts = opts.end_at(end_at.0);
         }
 
-        self.0
+        self.ctx
             .history_executions(Some(opts))
             .map_err(ErrorNewType)?
             .into_iter()
@@ -100,7 +121,7 @@ impl TradeContext {
             opts = opts.order_id(order_id);
         }
 
-        self.0
+        self.ctx
             .today_executions(Some(opts))
             .map_err(ErrorNewType)?
             .into_iter()
@@ -138,7 +159,7 @@ impl TradeContext {
             opts = opts.end_at(end_at.0);
         }
 
-        self.0
+        self.ctx
             .history_orders(Some(opts))
             .map_err(ErrorNewType)?
             .into_iter()
@@ -168,7 +189,7 @@ impl TradeContext {
             opts = opts.market(market.into());
         }
 
-        self.0
+        self.ctx
             .today_orders(Some(opts))
             .map_err(ErrorNewType)?
             .into_iter()
@@ -210,7 +231,7 @@ impl TradeContext {
             opts = opts.remark(remark);
         }
 
-        self.0.replace_order(opts).map_err(ErrorNewType)?;
+        self.ctx.replace_order(opts).map_err(ErrorNewType)?;
         Ok(())
     }
 
@@ -265,18 +286,21 @@ impl TradeContext {
             opts = opts.remark(remark);
         }
 
-        self.0.submit_order(opts).map_err(ErrorNewType)?.try_into()
+        self.ctx
+            .submit_order(opts)
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Cancel order
     fn cancel_order(&self, order_id: String) -> PyResult<()> {
-        self.0.cancel_order(order_id).map_err(ErrorNewType)?;
+        self.ctx.cancel_order(order_id).map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Get account balance
     fn account_balance(&self) -> PyResult<Vec<AccountBalance>> {
-        self.0
+        self.ctx
             .account_balance()
             .map_err(ErrorNewType)?
             .into_iter()
@@ -309,7 +333,7 @@ impl TradeContext {
             opts = opts.size(size);
         }
 
-        self.0
+        self.ctx
             .cash_flow(opts)
             .map_err(ErrorNewType)?
             .into_iter()
@@ -320,7 +344,7 @@ impl TradeContext {
     /// Get fund positions
     #[args(symbols = "vec![]")]
     fn fund_positions(&self, symbols: Vec<String>) -> PyResult<FundPositionsResponse> {
-        self.0
+        self.ctx
             .fund_positions(GetFundPositionsOptions::new().symbols(symbols))
             .map_err(ErrorNewType)?
             .try_into()
@@ -329,7 +353,7 @@ impl TradeContext {
     /// Get stock positions
     #[args(symbols = "vec![]")]
     fn stock_positions(&self, symbols: Vec<String>) -> PyResult<StockPositionsResponse> {
-        self.0
+        self.ctx
             .stock_positions(GetStockPositionsOptions::new().symbols(symbols))
             .map_err(ErrorNewType)?
             .try_into()

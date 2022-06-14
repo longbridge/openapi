@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use longbridge::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
 use napi::{threadsafe_function::ThreadsafeFunctionCallMode, JsFunction, Result};
+use parking_lot::Mutex;
 
 use crate::{
     config::Config,
@@ -20,53 +21,43 @@ use crate::{
     utils::JsCallback,
 };
 
-type TradeCallback = JsCallback<PushOrderChanged>;
+#[derive(Default)]
+struct Callbacks {
+    order_changed: Option<JsCallback<PushOrderChanged>>,
+}
 
 /// Trade context
 #[napi_derive::napi]
 #[derive(Clone)]
 pub struct TradeContext {
-    config: longbridge::Config,
-    ctx: Option<longbridge::trade::TradeContext>,
-    on_push: Option<TradeCallback>,
+    ctx: longbridge::trade::TradeContext,
+    callbacks: Arc<Mutex<Callbacks>>,
 }
 
 #[napi_derive::napi]
 impl TradeContext {
-    #[napi(
-        constructor,
-        ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void"
-    )]
-    pub fn new(config: &Config, on_push: Option<JsFunction>) -> Result<TradeContext> {
-        Ok(TradeContext {
-            config: config.0.clone(),
-            ctx: None,
-            on_push: on_push
-                .map(|on_push| on_push.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value])))
-                .transpose()?,
-        })
-    }
-
-    /// Open trade context
     #[napi]
-    pub async fn open(&mut self) -> Result<()> {
-        check_ctx_exists!(self.ctx);
-
+    pub async fn new(config: &Config) -> Result<TradeContext> {
+        let callbacks = Arc::new(Mutex::new(Callbacks::default()));
         let (ctx, mut receiver) =
-            longbridge::trade::TradeContext::try_new(Arc::new(self.config.clone()))
+            longbridge::trade::TradeContext::try_new(Arc::new(config.0.clone()))
                 .await
                 .map_err(ErrorNewType)?;
-        self.ctx = Some(ctx);
 
-        let handler = self.on_push.take();
-        tokio::spawn(async move {
-            while let Some(msg) = receiver.recv().await {
-                match msg {
-                    PushEvent::OrderChanged(order_changed) => {
-                        if let Some(handler) = &handler {
-                            if let Ok(order_changed) = order_changed.try_into() {
-                                handler
-                                    .call(Ok(order_changed), ThreadsafeFunctionCallMode::Blocking);
+        tokio::spawn({
+            let callbacks = callbacks.clone();
+            async move {
+                while let Some(msg) = receiver.recv().await {
+                    let callbacks = callbacks.lock();
+                    match msg {
+                        PushEvent::OrderChanged(order_changed) => {
+                            if let Some(callback) = &callbacks.order_changed {
+                                if let Ok(order_changed) = order_changed.try_into() {
+                                    callback.call(
+                                        Ok(order_changed),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
                             }
                         }
                     }
@@ -74,6 +65,15 @@ impl TradeContext {
             }
         });
 
+        Ok(TradeContext { ctx, callbacks })
+    }
+
+    /// Set order changed callback, after receiving the order changed event, it
+    /// will call back to this function.
+    #[napi(ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void")]
+    pub fn set_on_quote(&self, callback: JsFunction) -> Result<()> {
+        self.callbacks.lock().order_changed =
+            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
         Ok(())
     }
 
@@ -83,38 +83,36 @@ impl TradeContext {
     ///
     /// ```javascript
     /// const {
-    ///     Config,
-    ///     TradeContext,
-    ///     SubmitOrderOptions,
-    ///     Decimal,
-    ///     OrderSide,
-    ///     TimeInForceType,
-    ///     OrderType,
-    ///     TopicType,
-    ///   } = require("longbridge");
+    ///   Config,
+    ///   TradeContext,
+    ///   SubmitOrderOptions,
+    ///   Decimal,
+    ///   OrderSide,
+    ///   TimeInForceType,
+    ///   OrderType,
+    ///   TopicType,
+    /// } = require("longbridge");
     ///   
-    ///   let config = Config.fromEnv();
-    ///   let ctx = new TradeContext(config, (_, event) => console.log(event.toString()));
-    ///   
-    ///   ctx
-    ///     .open()
-    ///     .then(() => ctx.subscribe([TopicType.Private]))
-    ///     .then(() =>
-    ///       ctx.submitOrder(
-    ///         new SubmitOrderOptions(
-    ///           "700.HK",
-    ///           OrderType.LO,
-    ///           OrderSide.Buy,
-    ///           200,
-    ///           TimeInForceType.Day
-    ///         ).submittedPrice(new Decimal("50"))
-    ///       )
-    ///     )
-    ///     .then((resp) => console.log(resp.toString()));      
+    /// let config = Config.fromEnv();
+    /// TradeContext.new(config)
+    ///   .then((ctx) => {
+    ///     ctx.setOnQuote((_, event) => console.log(event.toString()));
+    ///     ctx.subscribe([TopicType.Private]);
+    ///     return ctx.submitOrder(
+    ///       new SubmitOrderOptions(
+    ///         "700.HK",
+    ///         OrderType.LO,
+    ///         OrderSide.Buy,
+    ///         200,
+    ///         TimeInForceType.Day
+    ///       ).submittedPrice(new Decimal("50"))
+    ///     );
+    ///   })
+    ///   .then((resp) => console.log(resp.toString()));     
     /// ```
     #[napi]
     pub async fn subscribe(&self, topics: Vec<TopicType>) -> Result<()> {
-        get_ctx!(self.ctx)
+        self.ctx
             .subscribe(topics.into_iter().map(Into::into))
             .await
             .map_err(ErrorNewType)?;
@@ -124,7 +122,7 @@ impl TradeContext {
     /// Unsubscribe
     #[napi]
     pub async fn unsubscribe(&self, topics: Vec<TopicType>) -> Result<()> {
-        get_ctx!(self.ctx)
+        self.ctx
             .unsubscribe(topics.into_iter().map(Into::into))
             .await
             .map_err(ErrorNewType)?;
@@ -136,29 +134,27 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, GetHistoryExecutionsOptions } = require('longbridge')
+    /// const { Config, TradeContext, GetHistoryExecutionsOptions } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
     /// let opts = new GetHistoryExecutionsOptions()
-    ///     .symbol("700.HK")
-    ///     .startAt(new Date(2022, 5, 9))
-    ///     .endAt(new Date(2022, 5, 12))
-    /// ctx.open()
-    ///     .then(() => ctx.historyExecutions(opts))
-    ///     .then((resp) => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }    
-    ///     })
+    ///   .symbol("700.HK")
+    ///   .startAt(new Date(2022, 5, 9))
+    ///   .endAt(new Date(2022, 5, 12))
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.historyExecutions(opts))
+    ///   .then((resp) => {
+    ///     for (let obj of resp) {
+    ///       console.log(obj.toString())
+    ///     }    
+    ///   })
     /// ```
     #[napi]
     pub async fn history_executions(
         &self,
         opts: Option<&GetHistoryExecutionsOptions>,
     ) -> Result<Vec<Execution>> {
-        get_ctx!(self.ctx)
+        self.ctx
             .history_executions(opts.cloned().map(Into::into))
             .await
             .map_err(ErrorNewType)?
@@ -172,25 +168,23 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, GetTodayExecutionsOptions } = require('longbridge')
+    /// const { Config, TradeContext, GetTodayExecutionsOptions } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
-    /// ctx.open()
-    ///     .then(() => ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK")))
-    ///     .then((resp) => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }    
-    ///     })
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK")))
+    ///   .then((resp) => {
+    ///     for (let obj of resp) {
+    ///       console.log(obj.toString())
+    ///     }    
+    ///   })
     /// ```
     #[napi]
     pub async fn today_executions(
         &self,
         opts: Option<&GetTodayExecutionsOptions>,
     ) -> Result<Vec<Execution>> {
-        get_ctx!(self.ctx)
+        self.ctx
             .today_executions(opts.cloned().map(Into::into))
             .await
             .map_err(ErrorNewType)?
@@ -204,32 +198,30 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } = require('longbridge')
+    /// const { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
     /// let opts = new GetHistoryOrdersOptions()
-    ///     .symbol("700.HK")
-    ///     .status([OrderStatus.Filled, OrderStatus.New])
-    ///     .side(OrderSide.Buy)
-    ///     .market(Market.HK)
-    ///     .startAt(2022, 5, 9)
-    ///     .endAt(2022, 5, 12)
-    /// ctx.open()
-    ///     .then(() => ctx.historyOrders(opts))
-    ///     .then((resp) => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }
-    ///     })
+    ///   .symbol("700.HK")
+    ///   .status([OrderStatus.Filled, OrderStatus.New])
+    ///   .side(OrderSide.Buy)
+    ///   .market(Market.HK)
+    ///   .startAt(2022, 5, 9)
+    ///   .endAt(2022, 5, 12)
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.historyOrders(opts))
+    ///   .then((resp) => {
+    ///     for (let obj of resp) {
+    ///       console.log(obj.toString())
+    ///     }
+    ///   })
     /// ```
     #[napi]
     pub async fn history_orders(
         &self,
         opts: Option<&GetHistoryOrdersOptions>,
     ) -> Result<Vec<Order>> {
-        get_ctx!(self.ctx)
+        self.ctx
             .history_orders(opts.cloned().map(Into::into))
             .await
             .map_err(ErrorNewType)?
@@ -243,28 +235,27 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } = require('longbridge')
+    /// const { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
     ///
     /// let opts = new GetTodayOrdersOptions()
-    ///     .symbol("700.HK")
-    ///     .status([OrderStatus.Filled, OrderStatus.New])
-    ///     .side(OrderSide.Buy)
-    ///     .market(Market.HK)
-    /// ctx.open()
-    ///     .then(() => ctx.todayOrders(opts))
-    ///     .then((resp) => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }
-    ///     })
+    ///   .symbol("700.HK")
+    ///   .status([OrderStatus.Filled, OrderStatus.New])
+    ///   .side(OrderSide.Buy)
+    ///   .market(Market.HK)
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.todayOrders(opts))
+    ///   .then((resp) => {
+    ///     for (let obj of resp) {
+    ///       console.log(obj.toString())
+    ///     }
+    ///   })
     /// )
     /// ```
     #[napi]
     pub async fn today_orders(&self, opts: Option<&GetTodayOrdersOptions>) -> Result<Vec<Order>> {
-        get_ctx!(self.ctx)
+        self.ctx
             .today_orders(opts.cloned().map(Into::into))
             .await
             .map_err(ErrorNewType)?
@@ -278,22 +269,20 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, ReplaceOrderOptions, Decimal } = require('longbridge')
+    /// const { Config, TradeContext, ReplaceOrderOptions, Decimal } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
-    /// ctx.open()
-    ///     .then(() => ctx.replaceOrder(new ReplaceOrderOptions("700.HK", 100).price(new Decimal("300"))))
-    ///     .then((resp) => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }
-    ///     })
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.replaceOrder(new ReplaceOrderOptions("700.HK", 100).price(new Decimal("300"))))
+    ///   .then((resp) => {
+    ///     for (let obj of resp) {
+    ///       console.log(obj.toString())
+    ///     }
+    ///   })
     /// ```
     #[napi]
     pub async fn replace_order(&self, opts: &ReplaceOrderOptions) -> Result<()> {
-        get_ctx!(self.ctx)
+        self.ctx
             .replace_order(opts.clone().into())
             .await
             .map_err(ErrorNewType)?;
@@ -305,20 +294,18 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } = require('longbridge')
+    /// const { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
     /// let opts = new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, 200, TimeInForceType.Day)
-    ///     .submittedPrice(new Decimal("300"));
-    /// ctx.open()
-    ///     .then(() => ctx.submitOrder(opts))
-    ///     .then((resp) => console.log(resp))
+    ///   .submittedPrice(new Decimal("300"));
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.submitOrder(opts))
+    ///   .then((resp) => console.log(resp))
     /// ```
     #[napi]
     pub async fn submit_order(&self, opts: &SubmitOrderOptions) -> Result<SubmitOrderResponse> {
-        get_ctx!(self.ctx)
+        self.ctx
             .submit_order(opts.clone().into())
             .await
             .map_err(ErrorNewType)?
@@ -330,17 +317,15 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { Config, TradeContext } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
-    /// ctx.open()
-    ///     .then(() => ctx.cancelOrder("709043056541253632"))
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.cancelOrder("709043056541253632"))
     /// ```
     #[napi]
     pub async fn cancel_order(&self, order_id: String) -> Result<()> {
-        get_ctx!(self.ctx)
+        self.ctx
             .cancel_order(order_id)
             .await
             .map_err(ErrorNewType)?;
@@ -352,22 +337,20 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { Config, TradeContext } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
-    /// ctx.open()
-    ///     .then(() => ctx.accountBalance())
-    ///     .then((resp) => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }    
-    ///     })
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.accountBalance())
+    ///   .then((resp) => {
+    ///     for (let obj of resp) {
+    ///       console.log(obj.toString())
+    ///     }    
+    ///   })
     /// ```
     #[napi]
     pub async fn account_balance(&self) -> Result<Vec<AccountBalance>> {
-        get_ctx!(self.ctx)
+        self.ctx
             .account_balance()
             .await
             .map_err(ErrorNewType)?
@@ -381,22 +364,20 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, GetCashFlowOptions } = require('longbridge')
+    /// const { Config, TradeContext, GetCashFlowOptions } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
-    /// ctx.open()
-    ///     .then(() => ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12))))
-    ///     .then((resp) => {
-    ///         for (let obj of resp) {
-    ///             console.log(obj.toString())
-    ///         }
-    ///     })
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12))))
+    ///   .then((resp) => {
+    ///     for (let obj of resp) {
+    ///       console.log(obj.toString())
+    ///     }
+    ///   })
     /// ```
     #[napi]
     pub async fn cash_flow(&self, opts: &GetCashFlowOptions) -> Result<Vec<CashFlow>> {
-        get_ctx!(self.ctx)
+        self.ctx
             .cash_flow(opts.clone().into())
             .await
             .map_err(ErrorNewType)?
@@ -410,21 +391,19 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { Config, TradeContext } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    ///
-    /// ctx.open()
-    ///     .then(() => ctx.fundPositions())
-    ///     .then((resp) => console.log(resp))
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.fundPositions())
+    ///   .then((resp) => console.log(resp))
     /// ```
     #[napi]
     pub async fn fund_positions(
         &self,
         symbols: Option<Vec<String>>,
     ) -> Result<FundPositionsResponse> {
-        get_ctx!(self.ctx)
+        self.ctx
             .fund_positions(GetFundPositionsOptions::new().symbols(symbols.unwrap_or_default()))
             .await
             .map_err(ErrorNewType)?
@@ -436,20 +415,19 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { Config, TradeContext } = require("longbridge")
     ///
     /// let config = Config.fromEnv()
-    /// let ctx = new TradeContext(config)
-    /// ctx.open()
-    ///     .then(() => ctx.stockPositions())
-    ///     .then((resp) => console.log(resp))
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.stockPositions())
+    ///   .then((resp) => console.log(resp))
     /// ```
     #[napi]
     pub async fn stock_positions(
         &self,
         symbols: Option<Vec<String>>,
     ) -> Result<StockPositionsResponse> {
-        get_ctx!(self.ctx)
+        self.ctx
             .stock_positions(GetStockPositionsOptions::new().symbols(symbols.unwrap_or_default()))
             .await
             .map_err(ErrorNewType)?

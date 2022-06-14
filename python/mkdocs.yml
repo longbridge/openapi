@@ -32,3 +32,6 @@ plugins:
             show_source: false
             show_if_no_docstring: true
             members_order: source
+            show_signature_annotations: true
+            separate_signature: true
+            

@@ -1,6 +1,6 @@
 use std::{marker::PhantomData, time::Duration};
 
-use reqwest::{header::HeaderValue, Method};
+use reqwest::{header::HeaderValue, Method, StatusCode};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crate::{
@@ -144,13 +144,11 @@ where
 
         // send request
         let text = tokio::time::timeout(REQUEST_TIMEOUT, async move {
-            http_cli
-                .execute(request)
-                .await?
-                .error_for_status()?
-                .text()
-                .await
-                .map_err(HttpClientError::from)
+            let resp = http_cli.execute(request).await?;
+            if !resp.status().is_success() && resp.status() != StatusCode::BAD_REQUEST {
+                resp.error_for_status_ref()?;
+            }
+            resp.text().await.map_err(HttpClientError::from)
         })
         .await
         .map_err(|_| HttpClientError::RequestTimeout)??;

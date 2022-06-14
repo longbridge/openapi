@@ -1,21 +1,23 @@
 use longbridge::trade::{PushEvent, PushOrderChanged};
-use pyo3::{PyErr, PyObject, Python};
+use pyo3::Python;
 
-pub(crate) fn handle_push_event(handler: &PyObject, event: PushEvent) {
+use crate::trade::context::Callbacks;
+
+pub(crate) fn handle_push_event(callbacks: &Callbacks, event: PushEvent) {
     match event {
-        PushEvent::OrderChanged(order_changed) => handle_order_changed(handler, order_changed),
+        PushEvent::OrderChanged(order_changed) => handle_order_changed(callbacks, order_changed),
     }
 }
 
-fn handle_order_changed(handler: &PyObject, order_changed: PushOrderChanged) {
-    let _ = Python::with_gil(|py| {
-        handler.call_method1(
-            py,
-            "on_event",
-            (crate::trade::types::PushOrderChanged::try_from(
-                order_changed,
-            )?,),
-        )?;
-        Ok::<_, PyErr>(())
-    });
+fn handle_order_changed(callbacks: &Callbacks, order_changed: PushOrderChanged) {
+    if let Some(callback) = &callbacks.order_changed {
+        let _ = Python::with_gil(|py| {
+            callback.call1(
+                py,
+                (crate::trade::types::PushOrderChanged::try_from(
+                    order_changed,
+                )?,),
+            )
+        });
+    }
 }

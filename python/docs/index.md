@@ -51,22 +51,13 @@ from longbridge.openapi import Config, QuoteContext, SubType, PushQuote
 # Load configuration from environment variables
 config = Config.from_env()
 
-
-class EventHandler:
-    """
-    An event handler to receive push events
-    """
-
-    def on_event(self, symbol: str, msg):
-        """
-        Handle push events
-        """
-        if isinstance(msg, PushQuote):
-            print(symbol, msg)
-
+# A callback to receive quote data
+def on_quote(self, symbol: str, quote: PushQuote):
+    print(symbol, quote)
 
 # Create a context for quote APIs
-ctx = QuoteContext(config, EventHandler())
+ctx = QuoteContext(config)
+ctx.set_on_quote(on_quote)
 
 # Subscribe
 resp = ctx.subscribe(["700.HK"], [SubType.Quote], is_first_push=True)

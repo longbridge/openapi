@@ -29,41 +29,61 @@ setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ## Quote API _(Get basic information of securities)_
 
 ```javascript
-import { Config, QuoteContext } from 'longbridge'
+const { Config, QuoteContext } = require("longbridge");
 
-let config = Config.fromEnv()
-let ctx = new QuoteContext(config)
-await ctx.open()
-let resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
-for (let obj of resp) {
-    console.log(obj.toString())
-}
+let config = Config.fromEnv();
+QuoteContext.new(config)
+    .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
+    .then((resp) => {
+        for (let obj of resp) {
+            console.log(obj.toString())
+        }
+    });
 ```
 
 ## Quote API _(Subscribe quotes)_
 
 ```javascript
-import { Config, QuoteContext, SubType } from 'longbridge'
+const { Config, QuoteContext, SubType } = require("longbridge");
 
-let config = Config.fromEnv()
-let ctx = new QuoteContext(config, (_, event) => console.log(event.toString()))
-await ctx.open()
-await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+let config = Config.fromEnv();
+QuoteContext.new(config).then((ctx) => {
+  ctx.setOnQuote((_, event) => console.log(event.toString()));
+  ctx.subscribe(
+    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
+    [SubType.Quote],
+    true
+  );
+});
 ```
 
 ## Trade API _(Submit order)_
 
 ```javascript
-import { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } from 'longbridge'
+const {
+  Config,
+  TradeContext,
+  SubmitOrderOptions,
+  Decimal,
+  OrderSide,
+  TimeInForceType,
+  OrderType,
+} = require("longbridge");
 
-let config = Config.fromEnv()
-let ctx = new TradeContext(config)
-await ctx.open()
-let resp = await ctx.submitOrder(
-    new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, new Decimal("200"), TimeInForceType.Day)
-        .price(new Decimal("300"))
-)
-console.log(resp)
+let config = Config.fromEnv();
+TradeContext.new(config)
+  .then((ctx) =>
+    ctx.submitOrder(
+      new SubmitOrderOptions(
+        "700.HK",
+        OrderType.LO,
+        OrderSide.Buy,
+        200,
+        TimeInForceType.Day
+      ).submittedPrice(new Decimal("50"))
+    )
+  )
+  .then((resp) => console.log(resp.toString()));
 ```
 
 ## License

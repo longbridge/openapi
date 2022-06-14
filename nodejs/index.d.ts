@@ -460,20 +460,41 @@ export class Decimal {
 }
 /** Quote context */
 export class QuoteContext {
-  constructor(callback: (err: null | Error, event: PushQuoteEvent | PushDepthEvent | PushBrokersEvent | PushTradesEvent) => void)
-  /** Open quote context */
-  open(): Promise<void>
+  static new(config: Config): Promise<QuoteContext>
+  /**
+   * Set quote callback, after receiving the quote data push, it will call
+   * back to this function.
+   */
+  setOnQuote(callback: (err: null | Error, event: PushQuoteEvent) => void): void
+  /**
+   * Set quote callback, after receiving the depth data push, it will call
+   * back to this function.
+   */
+  setOnDepth(callback: (err: null | Error, event: PushDepthEvent) => void): void
+  /**
+   * Set quote callback, after receiving the brokers data push, it will call
+   * back to this function.
+   */
+  setOnBrokers(callback: (err: null | Error, event: PushBrokersEvent) => void): void
+  /**
+   * Set quote callback, after receiving the trades data push, it will call
+   * back to this function.
+   */
+  setOnTrades(callback: (err: null | Error, event: PushTradesEvent) => void): void
   /**
    * Subscribe
    *
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { Config, QuoteContext, SubType } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config, (_, event) => console.log(event.toString()))
-   * ctx.open().then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
+   * QuoteContext.new(config)
+   *   .then((ctx) => {
+   *     ctx.setOnQuote((_, event) => console.log(event.toString()));
+   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true);
+   *   });
    * ```
    */
   subscribe(symbols: Array<string>, subTypes: Array<SubType>, isFirstPush: boolean): Promise<void>
@@ -483,13 +504,14 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { Config, QuoteContext, SubType } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config)
-   * ctx.open()
-   *     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
-   *     .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true))
+   * QuoteContext.new(config)
+   *   .then((ctx) => {
+   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+   *       .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true)))
+   *   })
    * ```
    */
   unsubscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
@@ -499,14 +521,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { Config, QuoteContext, SubType } = require("longbridge")
    *
-   * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config)
-   * ctx.open()
-   *     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
-   *     .then(() => ctx.subscriptions())
-   *     .then((resp) => console.log(resp.toString()))
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config)
+   *   .then((ctx) => {
+   *     return ctx
+   *       .subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+   *       .then(() => ctx.subscriptions());
+   *   })
+   *   .then((resp) => console.log(resp.toString()));
    * ```
    */
   subscriptions(): Promise<Array<Subscription>>
@@ -516,17 +540,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config)
-   * ctx.open()
-   *     .then(() => ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
-   *     .then(() => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   staticInfo(symbols: Array<string>): Promise<Array<SecurityStaticInfo>>
@@ -536,17 +559,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config)
-   * ctx.open()
-   *     .then(() => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   quote(symbols: Array<string>): Promise<Array<SecurityQuote>>
@@ -559,14 +581,13 @@ export class QuoteContext {
    * import { Config, QuoteContext } from 'longbridge'
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config)
-   * ctx.open()
-   *     .then(() => ctx.optionQuote(["AAPL230317P160000.US"]))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.optionQuote(["AAPL230317P160000.US"]))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   optionQuote(symbols: Array<string>): Promise<Array<OptionQuote>>
@@ -576,17 +597,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config)
-   * ctx.open()
-   *     .then(() => ctx.warrantQuote(["21125.HK"]))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.warrantQuote(["21125.HK"]))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   warrantQuote(symbols: Array<string>): Promise<Array<WarrantQuote>>
@@ -596,13 +616,12 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.depth("700.HK"))
-   *     .then((resp) => console.log(resp.toString()))
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.depth("700.HK"))
+   *   .then((resp) => console.log(resp.toString()))
    * ```
    */
   depth(symbol: string): Promise<SecurityDepth>
@@ -612,13 +631,12 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.brokers("700.HK"))
-   *     .then((resp) => console.log(resp.toString()))
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.brokers("700.HK"))
+   *   .then((resp) => console.log(resp.toString()))
    * ```
    */
   brokers(symbol: string): Promise<SecurityBrokers>
@@ -628,17 +646,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.participants())
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString());
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.participants())
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString());
+   *     }
+   *   })
    * ```
    */
   participants(): Promise<Array<ParticipantInfo>>
@@ -648,17 +665,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.trades("700.HK", 10))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString());
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.trades("700.HK", 10))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString());
+   *     }
+   *   })
    * ```
    */
   trades(symbol: string, count: number): Promise<Array<Trade>>
@@ -668,17 +684,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.intraday("700.HK"))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString());
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.intraday("700.HK"))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString());
+   *     }
+   *   })
    * ```
    */
   intraday(symbol: string): Promise<Array<IntradayLine>>
@@ -688,17 +703,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Period, AdjustType } = require('longbridge')
+   * const { Config, QuoteContext, Period, AdjustType } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString());
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString());
+   *     }
+   *   })
    * ```
    */
   candlesticks(symbol: string, period: Period, count: number, adjustType: AdjustType): Promise<Array<Candlestick>>
@@ -708,17 +722,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { Config, QuoteContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.optionChainExpiryDateList("AAPL.US"))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.optionChainExpiryDateList("AAPL.US"))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   optionChainExpiryDateList(symbol: string): Promise<Array<NaiveDate>>
@@ -728,17 +741,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require('longbridge')
+   * const { Config, QuoteContext, NaiveDate } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20)))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20)))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   optionChainInfoByDate(symbol: string, expiryDate: NaiveDate): Promise<Array<StrikePriceInfo>>
@@ -748,17 +760,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require('longbridge')
+   * const { Config, QuoteContext, NaiveDate } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.warrantIssuers())
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.warrantIssuers())
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   warrantIssuers(): Promise<Array<IssuerInfo>>
@@ -768,17 +779,16 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require('longbridge')
+   * const { Config, QuoteContext, NaiveDate } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.tradingSession())
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.tradingSession())
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   tradingSession(): Promise<Array<MarketTradingSession>>
@@ -788,13 +798,12 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
+   * const { Config, QuoteContext, Market, NaiveDate } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20)))
-   *     .then((resp) => console.log(resp.toString()))
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20)))
+   *   .then((resp) => console.log(resp.toString()))
    * ```
    */
   tradingDays(market: Market, begin: NaiveDate, end: NaiveDate): Promise<MarketTradingDays>
@@ -804,21 +813,20 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { Config, QuoteContext, SubType } = require("longbridge")
    *
-   * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true))
-   *     .then(() => {
-   *         setTimeout(() => {
-   *             ctx.realtimeQuote(["700.HK", "AAPL.US"]).then((resp) => {
-   *                 for (let obj of resp) {
-   *                     console.log(obj.toString())
-   *                 }
-   *             })
-   *         }, 5000)
-   *     })
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config).then((ctx) => {
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true).then(() => {
+   *     setTimeout(() => {
+   *       ctx.realtimeQuote(["700.HK", "AAPL.US"]).then((resp) => {
+   *         for (let obj of resp) {
+   *           console.log(obj.toString());
+   *         }
+   *       });
+   *     }, 5000);
+   *   });
+   * });
    * ```
    */
   realtimeQuote(symbols: Array<string>): Promise<Array<RealtimeQuote>>
@@ -828,16 +836,17 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { Config, QuoteContext, SubType } = require("longbridge")
    *
-   * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], true))
-   *     .then(() => {
-   *         setTimeout(() => ctx.realtimeDepth("700.HK")
-   *             .then((resp) => console.log(resp.toString())), 5000)
-   *     })
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config).then((ctx) => {
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], true);
+   *   setTimeout(
+   *     () =>
+   *       ctx.realtimeDepth("700.HK").then((resp) => console.log(resp.toString())),
+   *     5000
+   *   );
+   * });
    * ```
    */
   realtimeDepth(symbol: string): Promise<SecurityDepth>
@@ -847,16 +856,20 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
+   * const { Config, QuoteContext, NaiveDate, SubType } = require("longbridge")
    *
-   * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], true))
-   *     .then(() => {
-   *         setTimeout(() => ctx.realtimeBrokers("700.HK")
-   *             .then(resp => console.log(resp.toString())), 5000)
-   *     })
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config).then((ctx) => {
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], true).then(() => {
+   *     setTimeout(
+   *       () =>
+   *         ctx
+   *           .realtimeBrokers("700.HK")
+   *           .then((resp) => console.log(resp.toString())),
+   *       5000
+   *     );
+   *   });
+   * });
    * ```
    */
   realtimeBrokers(symbol: string): Promise<SecurityBrokers>
@@ -866,21 +879,20 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
+   * const { Config, QuoteContext, SubType } = require("longbridge")
    *
-   * let config = Config.fromEnv()
-   * let ctx = new QuoteContext(config);
-   * ctx.open()
-   *     .then(() => ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], false))
-   *     .then(() => {
-   *         setTimeout(() => {
-   *             ctx.realtimeTrades("700.HK", 10).then((resp) => {
-   *                 for (let obj of resp) {
-   *                     console.log(obj.toString())
-   *                 }
-   *             })
-   *         }, 5000)
-   *     })
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config).then((ctx) => {
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], false).then(() => {
+   *     setTimeout(() => {
+   *       ctx.realtimeTrades("700.HK", 10).then((resp) => {
+   *         for (let obj of resp) {
+   *           console.log(obj.toString());
+   *         }
+   *       });
+   *     }, 5000);
+   *   });
+   * });
    * ```
    */
   realtimeTrades(symbol: string, count: number): Promise<Array<Trade>>
@@ -1067,7 +1079,7 @@ export class WarrantQuote {
   /** Outstanding ratio */
   get outstandingRatio(): Decimal
   /** Outstanding quantity */
-  get outstandingQty(): number
+  get outstandingQuantity(): number
   /** Conversion ratio */
   get conversionRatio(): Decimal
   /** Warrant type */
@@ -1312,10 +1324,47 @@ export class Time {
 }
 /** Trade context */
 export class TradeContext {
-  constructor(callback: (err: null | Error, event: PushOrderChanged) => void)
-  /** Open trade context */
-  open(): Promise<void>
-  /** Subscribe */
+  static new(config: Config): Promise<TradeContext>
+  /**
+   * Set order changed callback, after receiving the order changed event, it
+   * will call back to this function.
+   */
+  setOnQuote(callback: (err: null | Error, event: PushOrderChanged) => void): void
+  /**
+   * Subscribe
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const {
+   *     Config,
+   *     TradeContext,
+   *     SubmitOrderOptions,
+   *     Decimal,
+   *     OrderSide,
+   *     TimeInForceType,
+   *     OrderType,
+   *     TopicType,
+   *   } = require("longbridge");
+   *
+   *   let config = Config.fromEnv();
+   *   TradeContext.new(config)
+   *     .then((ctx) => {
+   *       ctx.setOnQuote((_, event) => console.log(event.toString()));
+   *       ctx.subscribe([TopicType.Private]);
+   *       return ctx.submitOrder(
+   *         new SubmitOrderOptions(
+   *           "700.HK",
+   *           OrderType.LO,
+   *           OrderSide.Buy,
+   *           200,
+   *           TimeInForceType.Day
+   *         ).submittedPrice(new Decimal("50"))
+   *       );
+   *     })
+   *     .then((resp) => console.log(resp.toString()));
+   * ```
+   */
   subscribe(topics: Array<TopicType>): Promise<void>
   /** Unsubscribe */
   unsubscribe(topics: Array<TopicType>): Promise<void>
@@ -1325,23 +1374,21 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, GetHistoryExecutionsOptions } = require('longbridge')
+   * const { Config, TradeContext, GetHistoryExecutionsOptions } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
    *
    * let opts = new GetHistoryExecutionsOptions()
    *     .symbol("700.HK")
    *     .startAt(new Date(2022, 5, 9))
    *     .endAt(new Date(2022, 5, 12))
-   * ctx.open()
-   *     .then(() => ctx.historyExecutions(opts))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.historyExecutions(opts))
    *     .then((resp) => {
    *         for (let obj of resp) {
    *             console.log(obj.toString())
    *         }
    *     })
-   * )
    * ```
    */
   historyExecutions(opts?: GetHistoryExecutionsOptions | undefined | null): Promise<Array<Execution>>
@@ -1351,13 +1398,11 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, GetTodayExecutionsOptions } = require('longbridge')
+   * const { Config, TradeContext, GetTodayExecutionsOptions } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
-   *
-   * ctx.open()
-   *     .then(() => ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK")))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK")))
    *     .then((resp) => {
    *         for (let obj of resp) {
    *             console.log(obj.toString())
@@ -1372,10 +1417,9 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } = require('longbridge')
+   * const { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
    *
    * let opts = new GetHistoryOrdersOptions()
    *     .symbol("700.HK")
@@ -1384,8 +1428,8 @@ export class TradeContext {
    *     .market(Market.HK)
    *     .startAt(2022, 5, 9)
    *     .endAt(2022, 5, 12)
-   * ctx.open()
-   *     .then(() => ctx.historyOrders(opts))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.historyOrders(opts))
    *     .then((resp) => {
    *         for (let obj of resp) {
    *             console.log(obj.toString())
@@ -1400,18 +1444,17 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } = require('longbridge')
+   * const { Config, TradeContext, GetTodayOrdersOptions, OrderStatus, OrderSide, Market } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
    *
    * let opts = new GetTodayOrdersOptions()
    *     .symbol("700.HK")
    *     .status([OrderStatus.Filled, OrderStatus.New])
    *     .side(OrderSide.Buy)
    *     .market(Market.HK)
-   * ctx.open()
-   *     .then(() => ctx.todayOrders(opts))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.todayOrders(opts))
    *     .then((resp) => {
    *         for (let obj of resp) {
    *             console.log(obj.toString())
@@ -1427,13 +1470,11 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, ReplaceOrderOptions, Decimal } = require('longbridge')
+   * const { Config, TradeContext, ReplaceOrderOptions, Decimal } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
-   *
-   * ctx.open()
-   *     .then(() => ctx.replaceOrder(new ReplaceOrderOptions("700.HK", 100).price(new Decimal("300"))))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.replaceOrder(new ReplaceOrderOptions("700.HK", 100).price(new Decimal("300"))))
    *     .then((resp) => {
    *         for (let obj of resp) {
    *             console.log(obj.toString())
@@ -1448,15 +1489,14 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } = require('longbridge')
+   * const { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
    *
    * let opts = new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, 200, TimeInForceType.Day)
    *     .submittedPrice(new Decimal("300"));
-   * ctx.open()
-   *     .then(() => ctx.submitOrder(opts))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.submitOrder(opts))
    *     .then((resp) => console.log(resp))
    * ```
    */
@@ -1467,29 +1507,25 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { Config, TradeContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
-   *
-   * ctx.open()
-   *     .then(() => ctx.withdrawOrder("709043056541253632"))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.cancelOrder("709043056541253632"))
    * ```
    */
-  withdrawOrder(orderId: string): Promise<void>
+  cancelOrder(orderId: string): Promise<void>
   /**
    * Get account balance
    *
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { Config, TradeContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
-   *
-   * ctx.open()
-   *     .then(() => ctx.accountBalance())
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.accountBalance())
    *     .then((resp) => {
    *         for (let obj of resp) {
    *             console.log(obj.toString())
@@ -1504,13 +1540,11 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, GetCashFlowOptions } = require('longbridge')
+   * const { Config, TradeContext, GetCashFlowOptions } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
-   *
-   * ctx.open()
-   *     .then(() => ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12))))
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12))))
    *     .then((resp) => {
    *         for (let obj of resp) {
    *             console.log(obj.toString())
@@ -1525,13 +1559,11 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { Config, TradeContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
-   *
-   * ctx.open()
-   *     .then(() => ctx.fundPositions())
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.fundPositions())
    *     .then((resp) => console.log(resp))
    * ```
    */
@@ -1542,12 +1574,11 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { Config, TradeContext } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   * let ctx = new TradeContext(config)
-   * ctx.open()
-   *     .then(() => ctx.stockPositions())
+   * TradeContext.new(config)
+   *     .then((ctx) => ctx.stockPositions())
    *     .then((resp) => console.log(resp))
    * ```
    */
@@ -1772,7 +1803,7 @@ export class PushOrderChanged {
   /** Account no */
   get accountNo(): string
 }
-/** Response for withdraw order request */
+/** Response for submit order request */
 export class SubmitOrderResponse {
   toString(): string
   /** Order id */
