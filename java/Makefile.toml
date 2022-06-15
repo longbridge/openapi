@@ -2,18 +2,6 @@
 command = "cargo"
 args = ["build", "-p", "longbridge-java"]
 
-[tasks.javac]
-command = "javac"
-args = [
-    "-sourcepath",
-    "javasrc",
-    "-d",
-    "classes",
-    "javasrc/com/longbridge/*.java",
-    "javasrc/com/longbridge/quote/*.java",
-]
-cwd = "java"
-
 [tasks.javah]
 command = "javac"
 args = [
@@ -26,14 +14,72 @@ args = [
     "javasrc/com/longbridge/SdkNative.java",
 ]
 cwd = "java"
-dependencies = ["javac"]
 
-[tasks.compile-test-java]
-command = "javac"
-args = ["-cp", "classes", "-d", "classes", "test/Test.java"]
-cwd = "java"
+[tasks.move-jni-target]
+script_runner = "@rust"
+script = '''
+fn main() {
+    let _ = std::fs::remove_dir_all("java/javasrc/target/natives");
+
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+    {
+        std::fs::create_dir_all("java/javasrc/target/natives/linux_64").unwrap();
+        std::fs::copy(
+            "target/debug/longbridge_java.so",
+            "java/javasrc/target/natives/linux_64/longbridge_java.so"
+        ).unwrap();
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+    {
+        std::fs::create_dir_all("java/javasrc/target/natives/osx_64").unwrap();
+        std::fs::copy(
+            "target/debug/longbridge_java.so",
+            "java/javasrc/target/natives/osx_64/longbridge_java.so"
+        ).unwrap();
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    {
+        std::fs::create_dir_all("java/javasrc/target/natives/osx_arm64").unwrap();
+        std::fs::copy(
+            "target/debug/longbridge_java.dylib",
+            "java/javasrc/target/natives/osx_arm64/longbridge_java.dylib"
+        ).unwrap();
+    }
+
+    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    {
+        std::fs::create_dir_all("java/javasrc/target/natives/windows_64").unwrap();
+        std::fs::copy(
+            "target/debug/longbridge_java.dll",
+            "java/javasrc/target/natives/windows_64/longbridge_java.dll"
+        ).unwrap();
+    }
+}
+'''
+
+[tasks.mvn-package.windows]
+command = "mvn.cmd"
+args = ["package", "-Dmaven.test.skip=true"]
+cwd = "java/javasrc"
+
+[tasks.mvn-package]
+command = "mvn"
+args = ["package", "-Dmaven.test.skip=true"]
+cwd = "java/javasrc"
+
+[tasks.package-debug-jar]
+dependencies = ["java", "move-jni-target", "mvn-package"]
+
+[tasks.test-java.windows]
+command = "mvn.cmd"
+args = ["test"]
+cwd = "java/javasrc"
+dependencies = ["package-debug-jar"]
 
 [tasks.test-java]
-command = "java"
-args = ["-Djava.library.path=target/debug", "-cp", "java/classes", "Test"]
-dependencies = ["java", "javac", "compile-test-java"]
+command = "mvn"
+args = ["test"]
+cwd = "java/javasrc"
+dependencies = ["package-debug-jar"]

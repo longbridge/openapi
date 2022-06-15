@@ -1,8 +1,10 @@
 import com.longbridge.*;
 import com.longbridge.quote.*;
+import org.junit.Test;
 
-public class Test {
-    public static void main(String[] args) {
+public class TestMain {
+    @Test
+    public void main() {
         try {
             Config config = Config.fromEnv();
             QuoteContext ctx = QuoteContext.create(config).get();

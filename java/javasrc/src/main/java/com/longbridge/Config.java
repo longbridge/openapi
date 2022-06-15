@@ -1,9 +1,9 @@
 package com.longbridge;
 
 public class Config implements AutoCloseable {
-    protected long raw;
+    private long raw;
 
-    protected Config(long config) {
+    Config(long config) {
         this.raw = config;
     }
 

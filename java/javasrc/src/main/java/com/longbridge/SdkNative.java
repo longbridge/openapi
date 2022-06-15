@@ -1,6 +1,8 @@
 package com.longbridge;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import org.scijava.nativelib.NativeLoader;
 
 import com.longbridge.quote.*;
 import com.longbridge.trade.*;
@@ -119,7 +121,11 @@ public class SdkNative {
                         AsyncCallback callback);
 
         static {
-                System.loadLibrary("longbridge_java");
-                SdkNative.init();
+                try {
+                        NativeLoader.loadLibrary("longbridge_java");
+                        SdkNative.init();
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
         }
 }
