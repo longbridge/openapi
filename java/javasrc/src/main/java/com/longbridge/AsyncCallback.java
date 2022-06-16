@@ -2,6 +2,9 @@ package com.longbridge;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @hidden
+ */
 public interface AsyncCallback {
     public void callback(Object err, Object obj);
 

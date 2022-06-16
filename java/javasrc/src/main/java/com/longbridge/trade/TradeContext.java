@@ -4,9 +4,19 @@ import java.util.concurrent.CompletableFuture;
 
 import com.longbridge.*;
 
+/**
+ * Trade context
+ */
 public class TradeContext implements AutoCloseable {
     private long raw;
 
+    /**
+     * Create a TradeContext object
+     * 
+     * @param config Config object
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
     public static CompletableFuture<TradeContext> create(Config config)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
@@ -19,84 +29,181 @@ public class TradeContext implements AutoCloseable {
         SdkNative.freeTradeContext(raw);
     }
 
+    /**
+     * Set order changed event callback, after receiving the order changed event, it
+     * will call back to this handler.
+     * 
+     * @param handler A order changed handler
+     */
     public void setOnOrderChange(OrderChangedHandler handler) {
         SdkNative.tradeContextSetOnOrderChanged(this.raw, handler);
     }
 
+    /**
+     * Subscribe
+     * 
+     * @param topics Topics
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
     public CompletableFuture<Void> subscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextSubscribe(this.raw, topics, callback);
         });
     }
 
+    /**
+     * Unsubscribe
+     * 
+     * @param topics Topics
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
     public CompletableFuture<Void> unsubscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextUnsubscribe(this.raw, topics, callback);
         });
     }
 
-    public CompletableFuture<Execution[]> historyExecutions(GetHistoryExecutionsOptions opts) throws OpenApiException {
+    /**
+     * Get history executions
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Execution[]> getHistoryExecutions(GetHistoryExecutionsOptions opts)
+            throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextHistoryExecutions(this.raw, opts, callback);
         });
     }
 
-    public CompletableFuture<Execution[]> todayExecutions(GetTodayExecutionsOptions opts) throws OpenApiException {
+    /**
+     * Get today executions
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Execution[]> getTodayExecutions(GetTodayExecutionsOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextTodayExecutions(this.raw, opts, callback);
         });
     }
 
-    public CompletableFuture<Order[]> historyOrders(GetHistoryOrdersOptions opts) throws OpenApiException {
+    /**
+     * Get history orders
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Order[]> getHistoryOrders(GetHistoryOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextHistoryOrders(this.raw, opts, callback);
         });
     }
 
-    public CompletableFuture<Order[]> todayOrders(GetTodayOrdersOptions opts) throws OpenApiException {
+    /**
+     * Get today orders
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Order[]> getTodayOrders(GetTodayOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextTodayOrders(this.raw, opts, callback);
         });
     }
 
+    /**
+     * Replace order
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
     public CompletableFuture<Void> replaceOrder(ReplaceOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextReplaceOrder(this.raw, opts, callback);
         });
     }
 
+    /**
+     * Submit order
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
     public CompletableFuture<SubmitOrderResponse> submitOrder(SubmitOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextSubmitOrder(this.raw, opts, callback);
         });
     }
 
-    public CompletableFuture<Void> cancelOrder(String orderIdId) throws OpenApiException {
+    /**
+     * Cancel order
+     * 
+     * @param orderId Order ID
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextCancelOrder(this.raw, orderIdId, callback);
+            SdkNative.tradeContextCancelOrder(this.raw, orderId, callback);
         });
     }
 
-    public CompletableFuture<AccountBalance[]> accountBalance() throws OpenApiException {
+    /**
+     * Get account balance
+     * 
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<AccountBalance[]> getAccountBalance() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextAccountBalance(this.raw, callback);
         });
     }
 
-    public CompletableFuture<CashFlow[]> cashFlow(GetCashFlowOptions opts) throws OpenApiException {
+    /**
+     * Get cash flow
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<CashFlow[]> getCashFlow(GetCashFlowOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextCashFlow(this.raw, opts, callback);
         });
     }
 
-    public CompletableFuture<FundPositionsResponse> fundPositions(GetFundPositionsOptions opts)
+    /**
+     * Get fund positions
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<FundPositionsResponse> getFundPositions(GetFundPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextFundPositions(this.raw, opts, callback);
         });
     }
 
-    public CompletableFuture<StockPositionsResponse> stockPositions(GetStockPositionsOptions opts)
+    /**
+     * Get stock positions
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<StockPositionsResponse> getStockPositions(GetStockPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextStockPositions(this.raw, opts, callback);
