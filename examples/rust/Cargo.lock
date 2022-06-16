@@ -482,7 +482,7 @@ dependencies = [
 
 [[package]]
 name = "longbridge"
-version = "0.2.16"
+version = "0.2.17"
 dependencies = [
  "bitflags",
  "dotenv",
@@ -505,7 +505,7 @@ dependencies = [
 
 [[package]]
 name = "longbridge-httpcli"
-version = "0.2.16"
+version = "0.2.17"
 dependencies = [
  "futures-util",
  "hmac",
@@ -523,7 +523,7 @@ dependencies = [
 
 [[package]]
 name = "longbridge-proto"
-version = "0.2.16"
+version = "0.2.17"
 dependencies = [
  "prost",
  "prost-build",
@@ -531,7 +531,7 @@ dependencies = [
 
 [[package]]
 name = "longbridge-wscli"
-version = "0.2.16"
+version = "0.2.17"
 dependencies = [
  "byteorder",
  "flate2",

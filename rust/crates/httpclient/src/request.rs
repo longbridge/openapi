@@ -116,7 +116,8 @@ where
 
         // set the request body
         if let Some(body) = self.body {
-            request_builder = request_builder.body(serde_json::to_string(&body)?);
+            request_builder = request_builder
+                .body(serde_json::to_string(&body).map_err(HttpClientError::SerializeRequestBody)?);
         }
 
         let mut request = request_builder.build().expect("invalid request");
@@ -143,25 +144,27 @@ where
         tracing::debug!(method = %request.method(), url = %request.url(), "http request");
 
         // send request
-        let text = tokio::time::timeout(REQUEST_TIMEOUT, async move {
+        let (status, text) = tokio::time::timeout(REQUEST_TIMEOUT, async move {
             let resp = http_cli.execute(request).await?;
-            if !resp.status().is_success() && resp.status() != StatusCode::BAD_REQUEST {
-                resp.error_for_status_ref()?;
-            }
-            resp.text().await.map_err(HttpClientError::from)
+            let status = resp.status();
+            let text = resp.text().await.map_err(HttpClientError::from)?;
+            Ok::<_, HttpClientError>((status, text))
         })
         .await
         .map_err(|_| HttpClientError::RequestTimeout)??;
 
         tracing::debug!(body = text.as_str(), "http response");
 
-        let resp = serde_json::from_str::<OpenApiResponse<R>>(&text)?;
-        match resp.code {
-            0 => resp.data.ok_or(HttpClientError::UnexpectedResponse),
-            _ => Err(HttpClientError::OpenApi {
+        match serde_json::from_str::<OpenApiResponse<R>>(&text) {
+            Ok(resp) if resp.code == 0 => resp.data.ok_or(HttpClientError::UnexpectedResponse),
+            Ok(resp) => Err(HttpClientError::OpenApi {
                 code: resp.code,
                 message: resp.message,
             }),
+            Err(err) if status == StatusCode::OK => {
+                Err(HttpClientError::DeserializeResponseBody(err))
+            }
+            Err(_) => Err(HttpClientError::BadStatus(status)),
         }
     }
 }

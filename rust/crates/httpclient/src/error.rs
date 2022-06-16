@@ -1,3 +1,5 @@
+use reqwest::StatusCode;
+
 use crate::qs::QsError;
 
 /// Http client error type
@@ -35,13 +37,21 @@ pub enum HttpClientError {
         message: String,
     },
 
-    /// JSON error
-    #[error(transparent)]
-    Json(#[from] serde_json::Error),
+    /// Deserialize response body
+    #[error("deserialize response body error: {0}")]
+    DeserializeResponseBody(serde_json::Error),
+
+    /// Serialize request body
+    #[error("serialize request body error: {0}")]
+    SerializeRequestBody(serde_json::Error),
 
     /// Serialize query string error
-    #[error("serialize body: {0}")]
+    #[error("serialize query string error: {0}")]
     SerializeQueryString(#[from] QsError),
+
+    /// Bad status
+    #[error("status error: {0}")]
+    BadStatus(StatusCode),
 
     /// Http error
     #[error(transparent)]

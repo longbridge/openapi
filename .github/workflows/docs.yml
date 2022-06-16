@@ -62,7 +62,7 @@ jobs:
         working-directory: ./nodejs
 
       - name: Build Java docs
-        working-directory: ./java
+        working-directory: ./java/javasrc
         run: mvn javadoc:javadoc
 
       - name: Get SDK Version
