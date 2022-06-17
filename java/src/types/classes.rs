@@ -255,7 +255,7 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/quote/MarketTradingSession",
+    "com/longbridge/quote/TradingSessionInfo",
     longbridge::quote::TradingSessionInfo,
     [begin_time, end_time, trade_session]
 );

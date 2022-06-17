@@ -16,4 +16,9 @@ public class OpenApiException extends Exception {
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public String toString() {
+        return "OpenApiException [code=" + code + ", message=" + message + "]";
+    }
 }

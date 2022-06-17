@@ -1,18 +1,15 @@
 import com.longbridge.*;
-import com.longbridge.trade.*;
-import java.math.BigDecimal;
+import com.longbridge.quote.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
         try (Config config = Config.fromEnv()) {
-            try (TradeContext ctx = TradeContext.create(config).get()) {
-                SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
-                        OrderType.LO,
-                        OrderSide.Buy,
-                        200,
-                        TimeInForceType.Day).setSubmittedPrice(new BigDecimal(50));
-                SubmitOrderResponse resp = ctx.submitOrder(opts).join();
-                System.out.println(resp);
+            try (QuoteContext ctx = QuoteContext.create(config).get()) {
+                ctx.setOnQuote((symbol, quote) -> {
+                    System.out.println("%s\t%s\n", symbol, quote);
+                });
+                ctx.subscribe(new String[] { "700.HK1", "AAPL.US", "TSLA.US", "NFLX.US" }, SubFlags.Quote, true).get();
+                Thread.sleep(30000);
             }
         }
     }
