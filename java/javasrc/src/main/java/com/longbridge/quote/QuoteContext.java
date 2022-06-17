@@ -72,6 +72,25 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Subscribe
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.setOnQuote((symbol, quote) -> {
+     *                 System.out.printf("%s\t%s\n", symbol, quote);
+     *             });
+     *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Quote, true).get();
+     *             Thread.sleep(30000);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbols     Security symbols
      * @param flags       Subscription flags
      * @param isFirstPush Whether to perform a data push immediately after
@@ -88,6 +107,26 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Unsubscribe
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.setOnQuote((symbol, quote) -> {
+     *                 System.out.printf("%s\t%s\n", symbol, quote);
+     *             });
+     *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Quote, true).get();
+     *             ctx.unsubscribe(new String[] { "AAPL.US" }, SubFlags.Quote).get();
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * 
      * @param symbols Security symbols
      * @param flags   Subscription flags
      * @return A Future representing the result of the operation
@@ -102,6 +141,25 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get subscription information
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Quote, true);
+     *             Subscription[] subscriptions = ctx.getSubscrptions().get();
+     *             for (Subscription obj : subscriptions) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -113,6 +171,26 @@ public class QuoteContext implements AutoCloseable {
 
     /**
      * Get basic information of securities
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             SecurityStaticInfo[] resp = ctx
+     *                     .getStaticInfo(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" })
+     *                     .get();
+     *             for (SecurityStaticInfo obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param symbols Security symbols
      * @return A Future representing the result of the operation
@@ -127,6 +205,25 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get quote of securities
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             SecurityQuote[] resp = ctx.getQuote(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" })
+     *                     .get();
+     *             for (SecurityQuote obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbols Security symbols
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -140,6 +237,24 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get quote of option securities
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             OptionQuote[] resp = ctx.getOptionQuote(new String[] { "AAPL230317P160000.US" }).get();
+     *             for (OptionQuote obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbols Security symbols
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -151,7 +266,54 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Get quote of warrant securities
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             WarrantQuote[] resp = ctx.getWarrantQuote(new String[] { "21125.HK" }).get();
+     *             for (WarrantQuote obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param symbols Security symbols
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<WarrantQuote[]> getWarrantQuote(String[] symbols) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextWarrantQuote(this.raw, symbols, callback);
+        });
+    }
+
+    /**
      * Get security depth
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             SecurityDepth resp = ctx.getDepth("700.HK").get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param symbol Security symbol
      * @return A Future representing the result of the operation
@@ -166,6 +328,22 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get security brokers
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             SecurityBrokers resp = ctx.getBrokers("700.HK").get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbol Security symbol
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -179,6 +357,24 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get participants
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ParticipantInfo[] resp = ctx.getParticipants().get();
+     *             for (ParticipantInfo obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -190,6 +386,24 @@ public class QuoteContext implements AutoCloseable {
 
     /**
      * Get security trades
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             Trade[] resp = ctx.getTrades("700.HK", 10).get();
+     *             for (Trade obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param symbol Security symbol
      * @param count  Count of trades
@@ -205,6 +419,24 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get security intraday lines
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             IntradayLine[] resp = ctx.getIntraday("700.HK").get();
+     *             for (IntradayLine obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbol Security symbol
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -217,6 +449,24 @@ public class QuoteContext implements AutoCloseable {
 
     /**
      * Get security candlesticks
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             Candlestick[] resp = ctx.getCandlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust).get();
+     *             for (Candlestick obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param symbol     Security symbol
      * @param period     Candlestick period
@@ -235,6 +485,25 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get option chain expiry date list
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * import java.time.LocalDate;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             LocalDate[] resp = ctx.getOptionChainExpiryDateList("AAPL.US").get();
+     *             for (LocalDate obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbol Security symbol
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -247,6 +516,25 @@ public class QuoteContext implements AutoCloseable {
 
     /**
      * Get option chain info by date
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * import java.time.LocalDate;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             StrikePriceInfo[] resp = ctx.getOptionChainInfoByDate("AAPL.US", LocalDate.of(2023, 1, 20)).get();
+     *             for (StrikePriceInfo obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param symbol     Security symbol
      * @param expiryDate Option expiry date
@@ -263,11 +551,28 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get warrant issuers
      * 
-     * @param symbol Security symbol
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             IssuerInfo[] resp = ctx.getWarrantIssuers().get();
+     *             for (IssuerInfo obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<IssuerInfo[]> getWarrantIssuers(String symbol)
+    public CompletableFuture<IssuerInfo[]> getWarrantIssuers()
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextWarrantIssuers(this.raw, callback);
@@ -276,6 +581,24 @@ public class QuoteContext implements AutoCloseable {
 
     /**
      * Get trading session of the day
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             MarketTradingSession[] resp = ctx.getTradingSession().get();
+     *             for (MarketTradingSession obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -292,6 +615,24 @@ public class QuoteContext implements AutoCloseable {
      * <p>
      * The interval must be less than one month, and only the most recent year is
      * supported.
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * import java.time.LocalDate;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             MarketTradingDays resp = ctx
+     *                     .getTradingDays(Market.HK, LocalDate.of(2022, 1, 20), LocalDate.of(2022, 2, 20)).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param market Market
      * @param begin  Begin date
@@ -312,6 +653,26 @@ public class QuoteContext implements AutoCloseable {
      * Get real-time quotes of the subscribed symbols, it always returns the data in
      * the local storage.
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Quote, true).get();
+     *             Thread.sleep(5000);
+     *             RealtimeQuote[] resp = ctx.getRealtimeQuote(new String[] { "700.HK", "AAPL.US" }).get();
+     *             for (RealtimeQuote obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbols Security symbols
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -328,6 +689,24 @@ public class QuoteContext implements AutoCloseable {
      * <p>
      * Get real-time depth of the subscribed symbols, it always returns the data in
      * the local storage.
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Depth, true).get();
+     *             Thread.sleep(5000);
+     *             SecurityDepth resp = ctx.getRealtimeDepth("700.HK").get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param symbol Security symbol
      * @return A Future representing the result of the operation
@@ -346,6 +725,24 @@ public class QuoteContext implements AutoCloseable {
      * Get real-time broker queue of the subscribed symbols, it always returns the
      * data in the local storage.
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Brokers, true).get();
+     *             Thread.sleep(5000);
+     *             SecurityBrokers resp = ctx.getRealtimeBrokers("700.HK").get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbol Security symbol
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -363,12 +760,32 @@ public class QuoteContext implements AutoCloseable {
      * Get real-time trades of the subscribed symbols, it always returns the data in
      * the local storage.
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Trade, false).get();
+     *             Thread.sleep(5000);
+     *             Trade[] resp = ctx.getRealtimeTrades("700.HK", 10).get();
+     *             for (Trade obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param symbol Security symbol
      * @param count  Count of trades
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Trade[]> getRealtimeBrokers(String symbol, int count)
+    public CompletableFuture<Trade[]> getRealtimeTrades(String symbol, int count)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextRealtimeTrades(this.raw, symbol, count, callback);

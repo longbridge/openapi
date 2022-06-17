@@ -44,7 +44,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                 env.call_method(
                     handler,
                     "onOrderChanged",
-                    "(Ljava/lang/String;Lcom/longbridge/trade/PushOrderChanged;)V",
+                    "(Lcom/longbridge/trade/PushOrderChanged;)V",
                     &[order_changed.into_jvalue(&env)?],
                 )?;
             }
@@ -463,17 +463,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCashFlow
         if let Some(business_type) = business_type {
             new_opts = new_opts.business_type(business_type);
         }
-        let page: Option<i32> = get_field(&env, opts, "page")?;
-        if let Some(page) = page {
-            if page > 0 {
-                new_opts = new_opts.page(page as usize);
-            }
+        let page: i32 = get_field(&env, opts, "page")?;
+        if page > 0 {
+            new_opts = new_opts.page(page as usize);
         }
-        let size: Option<i32> = get_field(&env, opts, "size")?;
-        if let Some(size) = size {
-            if size > 0 {
-                new_opts = new_opts.size(size as usize);
-            }
+        let size: i32 = get_field(&env, opts, "size")?;
+        if size > 0 {
+            new_opts = new_opts.size(size as usize);
         }
 
         async_util::execute(&env, callback, async move {

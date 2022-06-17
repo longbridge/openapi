@@ -42,6 +42,34 @@ public class TradeContext implements AutoCloseable {
     /**
      * Subscribe
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * import java.math.BigDecimal;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             ctx.setOnOrderChange((order_changed) -> {
+     *                 System.out.println(order_changed);
+     *             });
+     *             ctx.subscribe(new TopicType[] { TopicType.Private }).get();
+     * 
+     *             SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
+     *                     OrderType.LO,
+     *                     OrderSide.Buy,
+     *                     200,
+     *                     TimeInForceType.Day).setSubmittedPrice(new BigDecimal(50));
+     *             SubmitOrderResponse resp = ctx.submitOrder(opts).get();
+     *             System.out.println(resp);
+     *             Thread.sleep(3000);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param topics Topics
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -68,6 +96,28 @@ public class TradeContext implements AutoCloseable {
     /**
      * Get history executions
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * import java.time.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             GetHistoryExecutionsOptions opts = new GetHistoryExecutionsOptions().setSymbol("700.HK")
+     *                     .setStartAt(OffsetDateTime.of(2022, 5, 9, 0, 0, 0, 0, ZoneOffset.UTC))
+     *                     .setEndAt(OffsetDateTime.of(2022, 5, 12, 0, 0, 0, 0, ZoneOffset.UTC));
+     *             Execution[] resp = ctx.getHistoryExecutions(opts).get();
+     *             for (Execution obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param opts Options for this request
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -82,6 +132,26 @@ public class TradeContext implements AutoCloseable {
     /**
      * Get today executions
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             GetTodayExecutionsOptions opts = new GetTodayExecutionsOptions().setSymbol("700.HK");
+     *             Execution[] resp = ctx.getTodayExecutions(opts).get();
+     *             for (Execution obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * 
+     * }
+     * </pre>
+     * 
      * @param opts Options for this request
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -94,6 +164,31 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get history orders
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * import java.time.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             GetHistoryOrdersOptions opts = new GetHistoryOrdersOptions().setSymbol("700.HK")
+     *                     .setStatus(new OrderStatus[] { OrderStatus.Filled, OrderStatus.New })
+     *                     .setSide(OrderSide.Buy)
+     *                     .setMarket(Market.HK)
+     *                     .setStartAt(OffsetDateTime.of(2022, 5, 9, 0, 0, 0, 0, ZoneOffset.UTC))
+     *                     .setStartAt(OffsetDateTime.of(2022, 5, 12, 0, 0, 0, 0, ZoneOffset.UTC));
+     *             Order[] resp = ctx.getHistoryOrders(opts).get();
+     *             for (Order obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param opts Options for this request
      * @return A Future representing the result of the operation
@@ -108,6 +203,28 @@ public class TradeContext implements AutoCloseable {
     /**
      * Get today orders
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             GetTodayOrdersOptions opts = new GetTodayOrdersOptions().setSymbol("700.HK")
+     *                     .setStatus(new OrderStatus[] { OrderStatus.Filled, OrderStatus.New })
+     *                     .setSide(OrderSide.Buy)
+     *                     .setMarket(Market.HK);
+     *             Order[] resp = ctx.getTodayOrders(opts).get();
+     *             for (Order obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @param opts Options for this request
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
@@ -121,7 +238,25 @@ public class TradeContext implements AutoCloseable {
     /**
      * Replace order
      * 
-     * @param opts Options for this request
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * import java.math.BigDecimal;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             ReplaceOrderOptions opts = new ReplaceOrderOptions("709043056541253632", 100)
+     *                     .setPrice(new BigDecimal(300));
+     *             ctx.replaceOrder(opts).get();
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param opts Options for this request, not null
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -134,7 +269,30 @@ public class TradeContext implements AutoCloseable {
     /**
      * Submit order
      * 
-     * @param opts Options for this request
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * import java.math.BigDecimal;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             SubmitOrderOptions opts = new SubmitOrderOptions(
+     *                     "700.HK",
+     *                     OrderType.LO,
+     *                     OrderSide.Buy,
+     *                     200,
+     *                     TimeInForceType.Day).setSubmittedPrice(new BigDecimal(50));
+     *             SubmitOrderResponse resp = ctx.submitOrder(opts).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param opts Options for this request, not null
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -146,6 +304,21 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Cancel order
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             ctx.cancelOrder("709043056541253632").get();
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param orderId Order ID
      * @return A Future representing the result of the operation
@@ -160,6 +333,24 @@ public class TradeContext implements AutoCloseable {
     /**
      * Get account balance
      * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             AccountBalance[] resp = ctx.getAccountBalance().get();
+     *             for (AccountBalance obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -172,7 +363,29 @@ public class TradeContext implements AutoCloseable {
     /**
      * Get cash flow
      * 
-     * @param opts Options for this request
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * import java.time.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             GetCashFlowOptions opts = new GetCashFlowOptions(
+     *                     OffsetDateTime.of(2022, 5, 9, 0, 0, 0, 0, ZoneOffset.UTC),
+     *                     OffsetDateTime.of(2022, 5, 12, 0, 0, 0, 0, ZoneOffset.UTC));
+     *             CashFlow[] resp = ctx.getCashFlow(opts).get();
+     *             for (CashFlow obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param opts Options for this request, not null
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -184,6 +397,22 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get fund positions
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             FundPositionsResponse resp = ctx.getFundPositions(null).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param opts Options for this request
      * @return A Future representing the result of the operation
@@ -198,6 +427,22 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get stock positions
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             StockPositionsResponse resp = ctx.getStockPositions(null).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
      * 
      * @param opts Options for this request
      * @return A Future representing the result of the operation

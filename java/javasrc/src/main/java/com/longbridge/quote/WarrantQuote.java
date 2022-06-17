@@ -26,7 +26,7 @@ public class WarrantQuote {
     private BigDecimal strikePrice;
     private BigDecimal upperStrikePrice;
     private BigDecimal lowerStrikePrice;
-    private BigDecimal call_price;
+    private BigDecimal callPrice;
     private String underlyingSymbol;
 
     public String getSymbol() {
@@ -113,8 +113,8 @@ public class WarrantQuote {
         return lowerStrikePrice;
     }
 
-    public BigDecimal getCall_price() {
-        return call_price;
+    public BigDecimal getCallPrice() {
+        return callPrice;
     }
 
     public String getUnderlyingSymbol() {
@@ -123,7 +123,7 @@ public class WarrantQuote {
 
     @Override
     public String toString() {
-        return "WarrantQuote [call_price=" + call_price + ", category=" + category + ", conversionRatio="
+        return "WarrantQuote [callPrice=" + callPrice + ", category=" + category + ", conversionRatio="
                 + conversionRatio + ", expiryDate=" + expiryDate + ", high=" + high + ", impliedVolatility="
                 + impliedVolatility + ", lastDone=" + lastDone + ", lastTradeDate=" + lastTradeDate + ", low=" + low
                 + ", lowerStrikePrice=" + lowerStrikePrice + ", open=" + open + ", openInterest=" + openInterest

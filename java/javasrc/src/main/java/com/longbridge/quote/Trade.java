@@ -9,7 +9,7 @@ public class Trade {
     private OffsetDateTime timestamp;
     private String tradeType;
     private TradeDirection direction;
-    private TradeSession trade_sessions;
+    private TradeSession tradeSession;
 
     public BigDecimal getPrice() {
         return price;
@@ -31,13 +31,13 @@ public class Trade {
         return direction;
     }
 
-    public TradeSession getTrade_sessions() {
-        return trade_sessions;
+    public TradeSession getTradeSession() {
+        return tradeSession;
     }
 
     @Override
     public String toString() {
         return "Trade [direction=" + direction + ", price=" + price + ", timestamp=" + timestamp + ", tradeType="
-                + tradeType + ", trade_sessions=" + trade_sessions + ", volume=" + volume + "]";
+                + tradeType + ", tradeSession=" + tradeSession + ", volume=" + volume + "]";
     }
 }

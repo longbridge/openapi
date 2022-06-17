@@ -51,7 +51,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
             }
         }
         PushEventDetail::Depth(push_depth) => {
-            if let Some(handler) = &callbacks.quote {
+            if let Some(handler) = &callbacks.depth {
                 env.call_method(
                     handler,
                     "onDepth",
@@ -64,7 +64,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
             }
         }
         PushEventDetail::Brokers(push_brokers) => {
-            if let Some(handler) = &callbacks.quote {
+            if let Some(handler) = &callbacks.brokers {
                 env.call_method(
                     handler,
                     "onBrokers",
@@ -77,7 +77,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
             }
         }
         PushEventDetail::Trade(push_trades) => {
-            if let Some(handler) = &callbacks.quote {
+            if let Some(handler) = &callbacks.trades {
                 env.call_method(
                     handler,
                     "onTrades",
