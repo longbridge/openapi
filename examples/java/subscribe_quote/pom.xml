@@ -23,18 +23,22 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1.1</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <phase>test</phase>
                         <goals>
-                            <goal>java</goal>
+                            <goal>exec</goal>
                         </goals>
-                        <configuration>
-                            <mainClass>com.longbridge.examples.subscribe_quote.Main</mainClass>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <classpath />
+                        <argument>Main</argument>
+                    </arguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>

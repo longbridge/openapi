@@ -5,13 +5,13 @@ args = ["build", "-p", "longbridge-java"]
 [tasks.javah]
 command = "javac"
 args = [
-    "-h",
-    "c",
-    "-sourcepath",
-    "javasrc",
-    "-d",
-    "classes",
-    "javasrc/com/longbridge/SdkNative.java",
+  "-h",
+  "c",
+  "-sourcepath",
+  "javasrc",
+  "-d",
+  "classes",
+  "javasrc/com/longbridge/SdkNative.java",
 ]
 cwd = "java"
 
@@ -19,21 +19,21 @@ cwd = "java"
 command = "javac"
 cwd = "java"
 args = [
-    "-cp",
-    "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;",
-    "-sourcepath",
-    "javasrc/src/main/java",
-    "-d",
-    "classes",
-    "test/Main.java",
+  "-cp",
+  "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;",
+  "-sourcepath",
+  "javasrc/src/main/java",
+  "-d",
+  "classes",
+  "test/Main.java",
 ]
 
 [tasks.test-java]
 command = "java"
 args = [
-    "-Djava.library.path=target/debug",
-    "-cp",
-    "java/classes;java/libs/native-lib-loader-2.4.0.jar;java/libs/slf4j-api-1.7.30.jar;",
-    "Main",
+  "-Djava.library.path=target/debug",
+  "-cp",
+  "java/classes;java/libs/native-lib-loader-2.4.0.jar;java/libs/slf4j-api-1.7.30.jar;",
+  "Main",
 ]
 dependencies = ["java", "compile-java-test"]
