@@ -1,14 +1,14 @@
 [package]
 edition = "2021"
 name = "longbridge-nodejs"
-version = "0.2.18"
+version = "0.2.19"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-longbridge = { path = "../rust", version = "0.2.18" }
-longbridge-nodejs-macros = { path = "crates/macros", version = "0.2.18" }
+longbridge = { path = "../rust", version = "0.2.19" }
+longbridge-nodejs-macros = { path = "crates/macros", version = "0.2.19" }
 
 napi = { version = "2.5.0", default-features = false, features = [
     "napi4",

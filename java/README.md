@@ -13,7 +13,7 @@ Add `io.github.longbridgeapp:openapi-sdk` to `pom.xml`
     <dependency>
         <groupId>io.github.longbridgeapp</groupId>
         <artifactId>openapi-sdk</artifactId>
-        <version>0.2.18</version>
+        <version>0.2.19</version>
     </dependency>
 </dependencies>
 ```
