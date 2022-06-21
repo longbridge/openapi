@@ -32,10 +32,18 @@ public class SdkNative {
 
     public static native void quoteContextSetOnTrades(long context, TradesHandler handler);
 
+    public static native void quoteContextSetOnCandlestick(long context, CandlestickHandler handler);
+
     public static native void quoteContextSubscribe(long context, String[] symbols, int flags, boolean isFirstPush,
             AsyncCallback callback);
 
     public static native void quoteContextUnsubscribe(long context, String[] symbols, int flags,
+            AsyncCallback callback);
+
+    public static native void quoteContextSubscribeCandlesticks(long context, String symbol, Period period,
+            AsyncCallback callback);
+
+    public static native void quoteContextUnsubscribeCandlesticks(long context, String symbol, Period period,
             AsyncCallback callback);
 
     public static native void quoteContextSubscriptions(long context, AsyncCallback callback);
@@ -85,6 +93,9 @@ public class SdkNative {
     public static native void quoteContextRealtimeBrokers(long context, String symbol, AsyncCallback callback);
 
     public static native void quoteContextRealtimeTrades(long context, String symbol, int count,
+            AsyncCallback callback);
+
+    public static native void quoteContextRealtimeCandlesticks(long context, String symbol, Period period, int count,
             AsyncCallback callback);
 
     public static native void newTradeContext(long config, AsyncCallback callback);

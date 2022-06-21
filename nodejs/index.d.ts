@@ -120,23 +120,25 @@ export const enum WarrantType {
 /** Candlestick period */
 export const enum Period {
   /** One Minute */
-  Min_1 = 0,
+  Unknown = 0,
+  /** One Minute */
+  Min_1 = 1,
   /** Five Minutes */
-  Min_5 = 1,
+  Min_5 = 2,
   /** Fifteen Minutes */
-  Min_15 = 2,
+  Min_15 = 3,
   /** Thirty Minutes */
-  Min_30 = 3,
+  Min_30 = 4,
   /** Sixty Minutes */
-  Min_60 = 4,
+  Min_60 = 5,
   /** One Days */
-  Day = 5,
+  Day = 6,
   /** One Week */
-  Week = 6,
+  Week = 7,
   /** One Month */
-  Month = 7,
+  Month = 8,
   /** One Year */
-  Year = 8
+  Year = 9
 }
 /** Candlestick adjustment type */
 export const enum AdjustType {
@@ -467,20 +469,25 @@ export class QuoteContext {
    */
   setOnQuote(callback: (err: null | Error, event: PushQuoteEvent) => void): void
   /**
-   * Set quote callback, after receiving the depth data push, it will call
+   * Set depth callback, after receiving the depth data push, it will call
    * back to this function.
    */
   setOnDepth(callback: (err: null | Error, event: PushDepthEvent) => void): void
   /**
-   * Set quote callback, after receiving the brokers data push, it will call
-   * back to this function.
+   * Set brokers callback, after receiving the brokers data push, it will
+   * call back to this function.
    */
   setOnBrokers(callback: (err: null | Error, event: PushBrokersEvent) => void): void
   /**
-   * Set quote callback, after receiving the trades data push, it will call
+   * Set trades callback, after receiving the trades data push, it will call
    * back to this function.
    */
   setOnTrades(callback: (err: null | Error, event: PushTradesEvent) => void): void
+  /**
+   * Set candlestick callback, after receiving the trades data push, it will
+   * call back to this function.
+   */
+  setOnCandlestick(callback: (err: null | Error, event: PushCandlestickEvent) => void): void
   /**
    * Subscribe
    *
@@ -515,6 +522,10 @@ export class QuoteContext {
    * ```
    */
   unsubscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
+  /** Subscribe security candlesticks */
+  subscribeCandlesticks(symbol: string, period: Period): Promise<void>
+  /** Unsubscribe security candlesticks */
+  unsubscribeCandlesticks(symbol: string, period: Period): Promise<void>
   /**
    * Get subscription information
    *
@@ -808,6 +819,40 @@ export class QuoteContext {
    */
   tradingDays(market: Market, begin: NaiveDate, end: NaiveDate): Promise<MarketTradingDays>
   /**
+   * Get capital flow intraday
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext } = require("longbridge")
+   *
+   * let config = Config.fromEnv()
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.capitalFlow("700.HK"))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
+   * ```
+   */
+  capitalFlow(symbol: string): Promise<Array<CapitalFlowLine>>
+  /**
+   * Get capital distribution
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext } = require("longbridge")
+   *
+   * let config = Config.fromEnv()
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.capitalDistribution("700.HK"))
+   *   .then((resp) => console.log(resp.toString()))
+   * ```
+   */
+  capitalDistribution(symbol: string): Promise<CapitalDistributionResponse>
+  /**
    * Get real-time quote
    *
    * #### Example
@@ -896,6 +941,29 @@ export class QuoteContext {
    * ```
    */
   realtimeTrades(symbol: string, count: number): Promise<Array<Trade>>
+  /**
+   * Get real-time candlesticks
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext, Period } = require("longbridge")
+   *
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config).then((ctx) => {
+   *   ctx.subscribeCandlesticks("700.HK", Period.Min_1).then(() => {
+   *     setTimeout(() => {
+   *       ctx.realtimeCandlesticks("700.HK", Period.Min_1, 10).then((resp) => {
+   *         for (let obj of resp) {
+   *           console.log(obj.toString());
+   *         }
+   *       });
+   *     }, 5000);
+   *   });
+   * });
+   * ```
+   */
+  realtimeCandlesticks(symbol: string, period: Period, count: number): Promise<Array<Candlestick>>
 }
 export class PushQuoteEvent {
   get symbol(): string
@@ -917,11 +985,17 @@ export class PushTradesEvent {
   get data(): PushTrades
   toString(): string
 }
+export class PushCandlestickEvent {
+  get symbol(): string
+  get data(): PushCandlestick
+  toString(): string
+}
 /** Subscription */
 export class Subscription {
   toString(): string
   get symbol(): string
   get subTypes(): Array<SubType>
+  get candlesticks(): Array<Period>
 }
 /** The basic information of securities */
 export class SecurityStaticInfo {
@@ -1299,6 +1373,14 @@ export class PushTrades {
   /** Trades data */
   get trades(): Array<Trade>
 }
+/** Candlestick updated event */
+export class PushCandlestick {
+  toString(): string
+  /** Period type */
+  get period(): Period
+  /** Candlestick */
+  get candlestick(): Candlestick
+}
 /** Market trading days */
 export class MarketTradingDays {
   toString(): string
@@ -1306,6 +1388,34 @@ export class MarketTradingDays {
   get tradingDays(): Array<NaiveDate>
   /** Half trading days */
   get halfTradingDays(): Array<NaiveDate>
+}
+/** Capital flow line */
+export class CapitalFlowLine {
+  toString(): string
+  /** Inflow capital data */
+  get inflow(): Decimal
+  /** Time */
+  get timestamp(): Date
+}
+/** Capital distribution */
+export class CapitalDistribution {
+  toString(): string
+  /** Large order */
+  get large(): Decimal
+  /** Medium order */
+  get medium(): Decimal
+  /** Small order */
+  get small(): Decimal
+}
+/** Capital distribution response */
+export class CapitalDistributionResponse {
+  toString(): string
+  /** Time */
+  get timestamp(): Date
+  /** Inflow capital data */
+  get capitalIn(): CapitalDistribution
+  /** Outflow capital data */
+  get capitalOut(): CapitalDistribution
 }
 /** Naive date type */
 export class NaiveDate {
@@ -1337,32 +1447,32 @@ export class TradeContext {
    *
    * ```javascript
    * const {
-   *     Config,
-   *     TradeContext,
-   *     SubmitOrderOptions,
-   *     Decimal,
-   *     OrderSide,
-   *     TimeInForceType,
-   *     OrderType,
-   *     TopicType,
-   *   } = require("longbridge");
+   *   Config,
+   *   TradeContext,
+   *   SubmitOrderOptions,
+   *   Decimal,
+   *   OrderSide,
+   *   TimeInForceType,
+   *   OrderType,
+   *   TopicType,
+   * } = require("longbridge");
    *
-   *   let config = Config.fromEnv();
-   *   TradeContext.new(config)
-   *     .then((ctx) => {
-   *       ctx.setOnQuote((_, event) => console.log(event.toString()));
-   *       ctx.subscribe([TopicType.Private]);
-   *       return ctx.submitOrder(
-   *         new SubmitOrderOptions(
-   *           "700.HK",
-   *           OrderType.LO,
-   *           OrderSide.Buy,
-   *           200,
-   *           TimeInForceType.Day
-   *         ).submittedPrice(new Decimal("50"))
-   *       );
-   *     })
-   *     .then((resp) => console.log(resp.toString()));
+   * let config = Config.fromEnv();
+   * TradeContext.new(config)
+   *   .then((ctx) => {
+   *     ctx.setOnQuote((_, event) => console.log(event.toString()));
+   *     ctx.subscribe([TopicType.Private]);
+   *     return ctx.submitOrder(
+   *       new SubmitOrderOptions(
+   *         "700.HK",
+   *         OrderType.LO,
+   *         OrderSide.Buy,
+   *         200,
+   *         TimeInForceType.Day
+   *       ).submittedPrice(new Decimal("50"))
+   *     );
+   *   })
+   *   .then((resp) => console.log(resp.toString()));
    * ```
    */
   subscribe(topics: Array<TopicType>): Promise<void>
@@ -1377,18 +1487,17 @@ export class TradeContext {
    * const { Config, TradeContext, GetHistoryExecutionsOptions } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   *
    * let opts = new GetHistoryExecutionsOptions()
-   *     .symbol("700.HK")
-   *     .startAt(new Date(2022, 5, 9))
-   *     .endAt(new Date(2022, 5, 12))
+   *   .symbol("700.HK")
+   *   .startAt(new Date(2022, 5, 9))
+   *   .endAt(new Date(2022, 5, 12))
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.historyExecutions(opts))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   *   .then((ctx) => ctx.historyExecutions(opts))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   historyExecutions(opts?: GetHistoryExecutionsOptions | undefined | null): Promise<Array<Execution>>
@@ -1402,12 +1511,12 @@ export class TradeContext {
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK")))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   *   .then((ctx) => ctx.todayExecutions(new GetTodayExecutionsOptions().symbol("700.HK")))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
@@ -1420,21 +1529,20 @@ export class TradeContext {
    * const { Config, TradeContext, GetHistoryOrdersOptions, OrderStatus, OrderSide, Market } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   *
    * let opts = new GetHistoryOrdersOptions()
-   *     .symbol("700.HK")
-   *     .status([OrderStatus.Filled, OrderStatus.New])
-   *     .side(OrderSide.Buy)
-   *     .market(Market.HK)
-   *     .startAt(2022, 5, 9)
-   *     .endAt(2022, 5, 12)
+   *   .symbol("700.HK")
+   *   .status([OrderStatus.Filled, OrderStatus.New])
+   *   .side(OrderSide.Buy)
+   *   .market(Market.HK)
+   *   .startAt(2022, 5, 9)
+   *   .endAt(2022, 5, 12)
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.historyOrders(opts))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   *   .then((ctx) => ctx.historyOrders(opts))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   historyOrders(opts?: GetHistoryOrdersOptions | undefined | null): Promise<Array<Order>>
@@ -1449,17 +1557,17 @@ export class TradeContext {
    * let config = Config.fromEnv()
    *
    * let opts = new GetTodayOrdersOptions()
-   *     .symbol("700.HK")
-   *     .status([OrderStatus.Filled, OrderStatus.New])
-   *     .side(OrderSide.Buy)
-   *     .market(Market.HK)
+   *   .symbol("700.HK")
+   *   .status([OrderStatus.Filled, OrderStatus.New])
+   *   .side(OrderSide.Buy)
+   *   .market(Market.HK)
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.todayOrders(opts))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   *   .then((ctx) => ctx.todayOrders(opts))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * )
    * ```
    */
@@ -1474,12 +1582,12 @@ export class TradeContext {
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.replaceOrder(new ReplaceOrderOptions("700.HK", 100).price(new Decimal("300"))))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   *   .then((ctx) => ctx.replaceOrder(new ReplaceOrderOptions("700.HK", 100).price(new Decimal("300"))))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   replaceOrder(opts: ReplaceOrderOptions): Promise<void>
@@ -1492,12 +1600,11 @@ export class TradeContext {
    * const { Config, TradeContext, SubmitOrderOptions, OrderType, OrderSide, Decimal, TimeInForceType } = require("longbridge")
    *
    * let config = Config.fromEnv()
-   *
    * let opts = new SubmitOrderOptions("700.HK", OrderType.LO, OrderSide.Buy, 200, TimeInForceType.Day)
-   *     .submittedPrice(new Decimal("300"));
+   *   .submittedPrice(new Decimal("300"));
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.submitOrder(opts))
-   *     .then((resp) => console.log(resp))
+   *   .then((ctx) => ctx.submitOrder(opts))
+   *   .then((resp) => console.log(resp))
    * ```
    */
   submitOrder(opts: SubmitOrderOptions): Promise<SubmitOrderResponse>
@@ -1511,7 +1618,7 @@ export class TradeContext {
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.cancelOrder("709043056541253632"))
+   *   .then((ctx) => ctx.cancelOrder("709043056541253632"))
    * ```
    */
   cancelOrder(orderId: string): Promise<void>
@@ -1525,12 +1632,12 @@ export class TradeContext {
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.accountBalance())
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   *   .then((ctx) => ctx.accountBalance())
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   accountBalance(): Promise<Array<AccountBalance>>
@@ -1544,12 +1651,12 @@ export class TradeContext {
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12))))
-   *     .then((resp) => {
-   *         for (let obj of resp) {
-   *             console.log(obj.toString())
-   *         }
-   *     })
+   *   .then((ctx) => ctx.cashFlow(new GetCashFlowOptions(new Date(2022, 5, 9), new Date(2022, 5, 12))))
+   *   .then((resp) => {
+   *     for (let obj of resp) {
+   *       console.log(obj.toString())
+   *     }
+   *   })
    * ```
    */
   cashFlow(opts: GetCashFlowOptions): Promise<Array<CashFlow>>
@@ -1563,8 +1670,8 @@ export class TradeContext {
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.fundPositions())
-   *     .then((resp) => console.log(resp))
+   *   .then((ctx) => ctx.fundPositions())
+   *   .then((resp) => console.log(resp))
    * ```
    */
   fundPositions(symbols?: Array<string> | undefined | null): Promise<FundPositionsResponse>
@@ -1578,8 +1685,8 @@ export class TradeContext {
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
-   *     .then((ctx) => ctx.stockPositions())
-   *     .then((resp) => console.log(resp))
+   *   .then((ctx) => ctx.stockPositions())
+   *   .then((resp) => console.log(resp))
    * ```
    */
   stockPositions(symbols?: Array<string> | undefined | null): Promise<StockPositionsResponse>
@@ -1646,6 +1753,8 @@ export class GetTodayOrdersOptions {
   side(side: OrderSide): GetTodayOrdersOptions
   /** Set the market */
   market(market: Market): GetTodayOrdersOptions
+  /** Set the order id */
+  orderId(orderId: string): GetTodayOrdersOptions
 }
 /** Options for get today orders request */
 export class ReplaceOrderOptions {

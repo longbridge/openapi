@@ -16,6 +16,8 @@ pub(crate) struct Subscription {
     symbol: String,
     #[py(sub_types)]
     sub_types: Vec<SubType>,
+    #[py(array)]
+    candlesticks: Vec<Period>,
 }
 
 /// Derivative type
@@ -189,8 +191,11 @@ pub(crate) enum WarrantType {
 #[pyclass]
 #[allow(non_camel_case_types)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::Period", from = false)]
+#[py(remote = "longbridge::quote::Period")]
 pub(crate) enum Period {
+    /// Unknown
+    #[py(remote = "UnknownPeriod")]
+    Unknown,
     /// One Minute
     #[py(remote = "OneMinute")]
     Min_1,
@@ -522,7 +527,7 @@ pub(crate) struct IntradayLine {
 
 /// Candlestick
 #[pyclass]
-#[derive(Debug, PyObject)]
+#[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::quote::Candlestick")]
 pub(crate) struct Candlestick {
     /// Close price
@@ -681,6 +686,17 @@ pub struct PushTrades {
     /// Trades data
     #[py(array)]
     trades: Vec<Trade>,
+}
+
+/// Push candlestick updated event
+#[pyclass]
+#[derive(Debug, PyObject)]
+#[py(remote = "longbridge::quote::PushCandlestick")]
+pub struct PushCandlestick {
+    /// Period type
+    period: Period,
+    /// Candlestick
+    candlestick: Candlestick,
 }
 
 /// Market trading days

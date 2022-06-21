@@ -202,6 +202,14 @@ pub struct WsSession {
     pub deadline: SystemTime,
 }
 
+impl WsSession {
+    /// Returns `true` if the session id is expired, otherwise returns `false
+    #[inline]
+    pub fn is_expired(&self) -> bool {
+        self.deadline < SystemTime::now()
+    }
+}
+
 /// Longbridge Websocket client
 #[derive(Clone)]
 pub struct WsClient {

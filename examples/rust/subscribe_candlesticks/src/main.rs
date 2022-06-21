@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longbridge::{
-    quote::{QuoteContext, SubFlags},
+    quote::{Period, QuoteContext},
     Config,
 };
 
@@ -9,12 +9,8 @@ use longbridge::{
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_env()?);
     let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
-    ctx.subscribe(
-        ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
-        SubFlags::QUOTE,
-        true,
-    )
-    .await?;
+    ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute)
+        .await?;
     while let Some(event) = receiver.recv().await {
         println!("{:?}", event);
     }

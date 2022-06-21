@@ -89,6 +89,14 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSetOnTrades
 
 /*
  * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextSetOnCandlestick
+ * Signature: (JLcom/longbridge/quote/CandlestickHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSetOnCandlestick
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
  * Method:    quoteContextSubscribe
  * Signature: (J[Ljava/lang/String;IZLcom/longbridge/AsyncCallback;)V
  */
@@ -102,6 +110,22 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSubscribe
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextUnsubscribe
   (JNIEnv *, jclass, jlong, jobjectArray, jint, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextSubscribeCandlesticks
+ * Signature: (JLjava/lang/String;Lcom/longbridge/quote/Period;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextSubscribeCandlesticks
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextUnsubscribeCandlesticks
+ * Signature: (JLjava/lang/String;Lcom/longbridge/quote/Period;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextUnsubscribeCandlesticks
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
 
 /*
  * Class:     com_longbridge_SdkNative
@@ -278,6 +302,14 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextRealtimeBrokers
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextRealtimeTrades
   (JNIEnv *, jclass, jlong, jstring, jint, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextRealtimeCandlesticks
+ * Signature: (JLjava/lang/String;Lcom/longbridge/quote/Period;ILcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextRealtimeCandlesticks
+  (JNIEnv *, jclass, jlong, jstring, jobject, jint, jobject);
 
 /*
  * Class:     com_longbridge_SdkNative

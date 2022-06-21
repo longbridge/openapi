@@ -17,6 +17,8 @@ pub struct Subscription {
     symbol: String,
     #[js(sub_types)]
     sub_types: Vec<SubType>,
+    #[js(array)]
+    candlesticks: Vec<Period>,
 }
 
 /// Derivative type
@@ -190,8 +192,11 @@ pub enum WarrantType {
 #[napi_derive::napi]
 #[allow(non_camel_case_types)]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longbridge::quote::Period", from = false)]
+#[js(remote = "longbridge::quote::Period")]
 pub enum Period {
+    /// One Minute
+    #[js(remote = "UnknownPeriod")]
+    Unknown,
     /// One Minute
     #[js(remote = "OneMinute")]
     Min_1,
@@ -529,7 +534,7 @@ pub struct IntradayLine {
 
 /// Candlestick
 #[napi_derive::napi]
-#[derive(Debug, JsObject)]
+#[derive(Debug, JsObject, Copy, Clone)]
 #[js(remote = "longbridge::quote::Candlestick")]
 pub struct Candlestick {
     /// Close price
@@ -690,6 +695,17 @@ pub struct PushTrades {
     /// Trades data
     #[js(array)]
     trades: Vec<Trade>,
+}
+
+/// Candlestick updated event
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::quote::PushCandlestick")]
+pub struct PushCandlestick {
+    /// Period type
+    period: Period,
+    /// Candlestick
+    candlestick: Candlestick,
 }
 
 /// Market trading days

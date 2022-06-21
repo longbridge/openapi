@@ -1,10 +1,10 @@
-use longbridge_proto::quote::{self, TradeSession, TradeStatus};
+use longbridge_proto::quote::{self, Period, TradeSession, TradeStatus};
 use prost::Message;
 use rust_decimal::Decimal;
 use time::OffsetDateTime;
 
 use crate::{
-    quote::{cmd_code, Brokers, Depth, Trade},
+    quote::{cmd_code, Brokers, Candlestick, Depth, Trade},
     Error, Result,
 };
 
@@ -72,6 +72,15 @@ pub struct PushTrades {
     pub trades: Vec<Trade>,
 }
 
+/// Candlestick updated message
+#[derive(Debug, Copy, Clone)]
+pub struct PushCandlestick {
+    /// Period type
+    pub period: Period,
+    /// Candlestick
+    pub candlestick: Candlestick,
+}
+
 /// Push event detail
 #[derive(Debug)]
 pub enum PushEventDetail {
@@ -83,14 +92,16 @@ pub enum PushEventDetail {
     Brokers(PushBrokers),
     /// Trade
     Trade(PushTrades),
+    /// Candlestick
+    Candlestick(PushCandlestick),
 }
 
 /// Push event
 #[derive(Debug)]
 pub struct PushEvent {
+    pub(crate) sequence: i64,
     /// Security code
     pub symbol: String,
-    pub(crate) sequence: i64,
     /// Event detail
     pub detail: PushEventDetail,
 }

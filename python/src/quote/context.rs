@@ -27,6 +27,7 @@ pub(crate) struct Callbacks {
     pub(crate) depth: Option<PyObject>,
     pub(crate) brokers: Option<PyObject>,
     pub(crate) trades: Option<PyObject>,
+    pub(crate) candlestick: Option<PyObject>,
 }
 
 #[pyclass]
@@ -90,6 +91,16 @@ impl QuoteContext {
         }
     }
 
+    /// Set candlestick callback, after receiving the candlestick updated event,
+    /// it will call back to this function.
+    fn set_on_candlestick(&self, py: Python<'_>, callback: PyObject) {
+        if callback.is_none(py) {
+            self.callbacks.lock().candlestick = None;
+        } else {
+            self.callbacks.lock().candlestick = Some(callback);
+        }
+    }
+
     /// Subscribe
     #[args(is_first_push = false)]
     fn subscribe(
@@ -108,6 +119,22 @@ impl QuoteContext {
     fn unsubscribe(&self, symbols: Vec<String>, sub_types: Vec<SubType>) -> PyResult<()> {
         self.ctx
             .unsubscribe(symbols, SubTypes(sub_types))
+            .map_err(ErrorNewType)?;
+        Ok(())
+    }
+
+    /// Subscribe security candlesticks
+    fn subscribe_candlesticks(&self, symbol: String, period: Period) -> PyResult<()> {
+        self.ctx
+            .subscribe_candlesticks(symbol, period.into())
+            .map_err(ErrorNewType)?;
+        Ok(())
+    }
+
+    /// Subscribe security candlesticks
+    fn unsubscribe_candlesticks(&self, symbol: String, period: Period) -> PyResult<()> {
+        self.ctx
+            .unsubscribe_candlesticks(symbol, period.into())
             .map_err(ErrorNewType)?;
         Ok(())
     }
@@ -325,6 +352,22 @@ impl QuoteContext {
     fn realtime_trades(&self, symbol: String, count: usize) -> PyResult<Vec<Trade>> {
         self.ctx
             .realtime_trades(symbol, count)
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
+    }
+
+    /// Get real-time candlesticks
+    #[args(count = 1000)]
+    fn realtime_candlesticks(
+        &self,
+        symbol: String,
+        period: Period,
+        count: usize,
+    ) -> PyResult<Vec<Candlestick>> {
+        self.ctx
+            .realtime_candlesticks(symbol, period.into(), count)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)

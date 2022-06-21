@@ -96,6 +96,49 @@ impl QuoteContextSync {
             .call(move |ctx| async move { ctx.unsubscribe(symbols, sub_types.into()).await })
     }
 
+    /// Subscribe security candlesticks
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::{sync::Arc, thread::sleep, time::Duration};
+    ///
+    /// use longbridge::{
+    ///     blocking::QuoteContextSync,
+    ///     quote::{Period, PushEvent},
+    ///     Config,
+    /// };
+    ///
+    /// fn event_handler(event: PushEvent) {
+    ///     println!("{:?}", event);
+    /// }
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
+    ///
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute)?;
+    /// sleep(Duration::from_secs(30));
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
+    where
+        T: Into<String> + Send + 'static,
+    {
+        self.rt
+            .call(move |ctx| async move { ctx.subscribe_candlesticks(symbol, period).await })
+    }
+
+    /// Unsubscribe security candlesticks
+    pub fn unsubscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
+    where
+        T: Into<String> + Send + 'static,
+    {
+        self.rt
+            .call(move |ctx| async move { ctx.unsubscribe_candlesticks(symbol, period).await })
+    }
+
     /// Get subscription information
     ///
     /// # Examples
@@ -704,5 +747,39 @@ impl QuoteContextSync {
     ) -> Result<SecurityBrokers> {
         self.rt
             .call(move |ctx| async move { ctx.realtime_brokers(symbol).await })
+    }
+
+    /// Get real-time candlesticks
+    ///
+    /// Get real-time candlesticks of the subscribed symbols, it always returns
+    /// the data in the local storage.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::{sync::Arc, thread::sleep, time::Duration};
+    ///
+    /// use longbridge::{blocking::QuoteContextSync, quote::Period, Config, Market};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    ///
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute)?;
+    /// sleep(Duration::from_secs(5));
+    ///
+    /// let resp = ctx.realtime_candlesticks("AAPL.US", Period::OneMinute, 10)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn realtime_candlesticks(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+        period: Period,
+        count: usize,
+    ) -> Result<Vec<Candlestick>> {
+        self.rt
+            .call(move |ctx| async move { ctx.realtime_candlesticks(symbol, period, count).await })
     }
 }

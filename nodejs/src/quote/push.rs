@@ -1,4 +1,4 @@
-use crate::quote::types::{PushBrokers, PushDepth, PushQuote, PushTrades};
+use crate::quote::types::{PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades};
 
 macro_rules! define_push_event {
     ($name:ident, $ty:ty) => {
@@ -35,3 +35,4 @@ define_push_event!(PushQuoteEvent, PushQuote);
 define_push_event!(PushDepthEvent, PushDepth);
 define_push_event!(PushBrokersEvent, PushBrokers);
 define_push_event!(PushTradesEvent, PushTrades);
+define_push_event!(PushCandlestickEvent, PushCandlestick);

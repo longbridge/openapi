@@ -8,6 +8,7 @@ public class GetTodayOrdersOptions {
     private OrderStatus[] status;
     private OrderSide side;
     private Market market;
+    private String orderId;
 
     public GetTodayOrdersOptions setSymbol(String symbol) {
         this.symbol = symbol;
@@ -26,6 +27,11 @@ public class GetTodayOrdersOptions {
 
     public GetTodayOrdersOptions setMarket(Market market) {
         this.market = market;
+        return this;
+    }
+
+    public GetTodayOrdersOptions setOrderId(String orderId) {
+        this.orderId = orderId;
         return this;
     }
 

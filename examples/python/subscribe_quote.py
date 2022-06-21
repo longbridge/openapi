@@ -2,8 +2,8 @@ from time import sleep
 from longbridge.openapi import QuoteContext, Config, SubType, PushQuote
 
 
-def on_quote(symbol: str, quote: PushQuote):
-    print(symbol, quote)
+def on_quote(symbol: str, event: PushQuote):
+    print(symbol, event)
 
 
 config = Config.from_env()

@@ -1,8 +1,11 @@
 package com.longbridge.quote;
 
+import java.util.Arrays;
+
 public class Subscription {
     private String symbol;
     private int subTypes;
+    private Period[] candlesticks;
 
     public String getSymbol() {
         return symbol;
@@ -12,8 +15,13 @@ public class Subscription {
         return subTypes;
     }
 
+    public Period[] getCandlesticks() {
+        return candlesticks;
+    }
+
     @Override
     public String toString() {
-        return "Subscription [subTypes=" + subTypes + ", symbol=" + symbol + "]";
+        return "Subscription [candlesticks=" + Arrays.toString(candlesticks) + ", subTypes=" + subTypes + ", symbol="
+                + symbol + "]";
     }
 }

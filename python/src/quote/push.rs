@@ -1,5 +1,5 @@
 use longbridge::quote::{
-    PushBrokers, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades,
+    PushBrokers, PushCandlestick, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades,
 };
 use pyo3::prelude::*;
 
@@ -11,6 +11,9 @@ pub(crate) fn handle_push_event(callbacks: &Callbacks, event: PushEvent) {
         PushEventDetail::Depth(depth) => handle_depth(callbacks, event.symbol, depth),
         PushEventDetail::Brokers(brokers) => handle_brokers(callbacks, event.symbol, brokers),
         PushEventDetail::Trade(trades) => handle_trades(callbacks, event.symbol, trades),
+        PushEventDetail::Candlestick(candlestick) => {
+            handle_candlesticks(callbacks, event.symbol, candlestick)
+        }
     }
 }
 
@@ -56,6 +59,21 @@ fn handle_trades(callbacks: &Callbacks, symbol: String, trades: PushTrades) {
             callback.call(
                 py,
                 (symbol, crate::quote::types::PushTrades::try_from(trades)?),
+                None,
+            )
+        });
+    }
+}
+
+fn handle_candlesticks(callbacks: &Callbacks, symbol: String, candlestick: PushCandlestick) {
+    if let Some(callback) = &callbacks.trades {
+        let _ = Python::with_gil(|py| {
+            callback.call(
+                py,
+                (
+                    symbol,
+                    crate::quote::types::PushCandlestick::try_from(candlestick)?,
+                ),
                 None,
             )
         });

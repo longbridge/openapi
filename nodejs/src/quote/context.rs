@@ -8,7 +8,9 @@ use crate::{
     config::Config,
     error::ErrorNewType,
     quote::{
-        push::{PushBrokersEvent, PushDepthEvent, PushQuoteEvent, PushTradesEvent},
+        push::{
+            PushBrokersEvent, PushCandlestickEvent, PushDepthEvent, PushQuoteEvent, PushTradesEvent,
+        },
         types::{
             AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
             IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo,
@@ -28,6 +30,7 @@ struct Callbacks {
     depth: Option<JsCallback<PushDepthEvent>>,
     brokers: Option<JsCallback<PushBrokersEvent>>,
     trades: Option<JsCallback<PushTradesEvent>>,
+    candlestick: Option<JsCallback<PushCandlestickEvent>>,
 }
 
 /// Quote context
@@ -106,6 +109,19 @@ impl QuoteContext {
                                 }
                             }
                         }
+                        PushEventDetail::Candlestick(candlestick) => {
+                            if let Some(callback) = &callbacks.candlestick {
+                                if let Ok(candlestick) = candlestick.try_into() {
+                                    callback.call(
+                                        Ok(PushCandlestickEvent {
+                                            symbol: msg.symbol,
+                                            data: candlestick,
+                                        }),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -123,7 +139,7 @@ impl QuoteContext {
         Ok(())
     }
 
-    /// Set quote callback, after receiving the depth data push, it will call
+    /// Set depth callback, after receiving the depth data push, it will call
     /// back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushDepthEvent) => void")]
     pub fn set_on_depth(&self, callback: JsFunction) -> Result<()> {
@@ -132,8 +148,8 @@ impl QuoteContext {
         Ok(())
     }
 
-    /// Set quote callback, after receiving the brokers data push, it will call
-    /// back to this function.
+    /// Set brokers callback, after receiving the brokers data push, it will
+    /// call back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushBrokersEvent) => void")]
     pub fn set_on_brokers(&self, callback: JsFunction) -> Result<()> {
         self.callbacks.lock().brokers =
@@ -141,10 +157,19 @@ impl QuoteContext {
         Ok(())
     }
 
-    /// Set quote callback, after receiving the trades data push, it will call
+    /// Set trades callback, after receiving the trades data push, it will call
     /// back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushTradesEvent) => void")]
     pub fn set_on_trades(&self, callback: JsFunction) -> Result<()> {
+        self.callbacks.lock().brokers =
+            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
+        Ok(())
+    }
+
+    /// Set candlestick callback, after receiving the trades data push, it will
+    /// call back to this function.
+    #[napi(ts_args_type = "callback: (err: null | Error, event: PushCandlestickEvent) => void")]
+    pub fn set_on_candlestick(&self, callback: JsFunction) -> Result<()> {
         self.callbacks.lock().brokers =
             Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
         Ok(())
@@ -196,6 +221,26 @@ impl QuoteContext {
     pub async fn unsubscribe(&self, symbols: Vec<String>, sub_types: Vec<SubType>) -> Result<()> {
         self.ctx
             .unsubscribe(symbols, SubTypes(sub_types))
+            .await
+            .map_err(ErrorNewType)?;
+        Ok(())
+    }
+
+    /// Subscribe security candlesticks
+    #[napi]
+    pub async fn subscribe_candlesticks(&self, symbol: String, period: Period) -> Result<()> {
+        self.ctx
+            .subscribe_candlesticks(symbol, period.into())
+            .await
+            .map_err(ErrorNewType)?;
+        Ok(())
+    }
+
+    /// Unsubscribe security candlesticks
+    #[napi]
+    pub async fn unsubscribe_candlesticks(&self, symbol: String, period: Period) -> Result<()> {
+        self.ctx
+            .unsubscribe_candlesticks(symbol, period.into())
             .await
             .map_err(ErrorNewType)?;
         Ok(())
@@ -797,6 +842,42 @@ impl QuoteContext {
     pub async fn realtime_trades(&self, symbol: String, count: i32) -> Result<Vec<Trade>> {
         self.ctx
             .realtime_trades(symbol, count.max(0) as usize)
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
+    }
+
+    /// Get real-time candlesticks
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext, Period } = require("longbridge")
+    ///
+    /// let config = Config.fromEnv();
+    /// QuoteContext.new(config).then((ctx) => {
+    ///   ctx.subscribeCandlesticks("700.HK", Period.Min_1).then(() => {
+    ///     setTimeout(() => {
+    ///       ctx.realtimeCandlesticks("700.HK", Period.Min_1, 10).then((resp) => {
+    ///         for (let obj of resp) {
+    ///           console.log(obj.toString());
+    ///         }
+    ///       });
+    ///     }, 5000);
+    ///   });
+    /// });    
+    /// ```
+    #[napi]
+    pub async fn realtime_candlesticks(
+        &self,
+        symbol: String,
+        period: Period,
+        count: i32,
+    ) -> Result<Vec<Candlestick>> {
+        self.ctx
+            .realtime_candlesticks(symbol, period.into(), count.max(0) as usize)
             .await
             .map_err(ErrorNewType)?
             .into_iter()

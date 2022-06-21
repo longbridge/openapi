@@ -1,4 +1,4 @@
-use longbridge_proto::quote::{self, TradeSession, TradeStatus};
+use longbridge_proto::quote::{self, Period, TradeSession, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
 use rust_decimal::Decimal;
 use strum_macros::EnumString;
@@ -16,6 +16,8 @@ pub struct Subscription {
     pub symbol: String,
     /// Subscription flags
     pub sub_types: SubFlags,
+    /// Candlesticks
+    pub candlesticks: Vec<Period>,
 }
 
 /// Depth
@@ -620,7 +622,7 @@ impl TryFrom<quote::Line> for IntradayLine {
 }
 
 /// Candlestick
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Candlestick {
     /// Close price
     pub close: Decimal,
@@ -652,6 +654,36 @@ impl TryFrom<quote::Candlestick> for Candlestick {
             timestamp: OffsetDateTime::from_unix_timestamp(value.timestamp)
                 .map_err(|err| Error::parse_field_error("timestamp", err))?,
         })
+    }
+}
+
+impl From<longbridge_candlesticks::Candlestick> for Candlestick {
+    #[inline]
+    fn from(candlestick: longbridge_candlesticks::Candlestick) -> Self {
+        Self {
+            close: candlestick.close,
+            open: candlestick.open,
+            low: candlestick.low,
+            high: candlestick.high,
+            volume: candlestick.volume,
+            turnover: candlestick.turnover,
+            timestamp: candlestick.time,
+        }
+    }
+}
+
+impl From<Candlestick> for longbridge_candlesticks::Candlestick {
+    #[inline]
+    fn from(candlestick: Candlestick) -> Self {
+        Self {
+            time: candlestick.timestamp,
+            open: candlestick.open,
+            high: candlestick.high,
+            low: candlestick.low,
+            close: candlestick.close,
+            volume: candlestick.volume,
+            turnover: candlestick.turnover,
+        }
     }
 }
 

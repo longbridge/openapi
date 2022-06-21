@@ -17,13 +17,14 @@ blocking = ["flume"]
 longbridge-wscli = { path = "crates/wsclient", version = "0.2.20" }
 longbridge-httpcli = { path = "crates/httpclient", version = "0.2.20" }
 longbridge-proto = { path = "crates/proto", version = "0.2.20" }
+longbridge-candlesticks = { path = "crates/candlesticks", version = "0.2.20" }
 
 tokio = { version = "1.18.2", features = [
-    "time",
-    "rt",
-    "macros",
-    "sync",
-    "net",
+  "time",
+  "rt",
+  "macros",
+  "sync",
+  "net",
 ] }
 rust_decimal = { version = "1.23.1", features = ["serde-with-str"] }
 num_enum = "0.5.7"

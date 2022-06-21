@@ -16,6 +16,8 @@ pub struct GetTodayOrdersOptions {
     side: Option<OrderSide>,
     #[serde(skip_serializing_if = "Option::is_none")]
     market: Option<Market>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    order_id: Option<String>,
 }
 
 impl GetTodayOrdersOptions {
@@ -61,6 +63,16 @@ impl GetTodayOrdersOptions {
     pub fn market(self, market: Market) -> Self {
         Self {
             market: Some(market),
+            ..self
+        }
+    }
+
+    /// Set the order id
+    #[inline]
+    #[must_use]
+    pub fn order_id(self, order_id: String) -> Self {
+        Self {
+            order_id: Some(order_id),
             ..self
         }
     }

@@ -35,6 +35,7 @@ pub(crate) fn register_types(parent: &PyModule) -> PyResult<()> {
     parent.add_class::<types::PushDepth>()?;
     parent.add_class::<types::PushBrokers>()?;
     parent.add_class::<types::PushTrades>()?;
+    parent.add_class::<types::PushCandlestick>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     Ok(())

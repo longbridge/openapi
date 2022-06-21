@@ -188,6 +188,22 @@ class PushTrades:
     """
 
 
+class PushCandlestick:
+    """
+    Candlestick updated event
+    """
+
+    period: Period
+    """
+    Period type
+    """
+
+    candlestick: Candlestick
+    """
+    Candlestick
+    """
+
+
 class SubType:
     """
     Subscription flags
@@ -1081,6 +1097,11 @@ class Period:
     Candlestick period
     """
 
+    class Unknown(Period):
+        """
+        Unknown
+        """
+
     class Min_1(Period):
         """
         One Minute
@@ -1340,9 +1361,14 @@ class Subscription:
     Security code
     """
 
-    sub_types: List[SubType]
+    sub_types: List[Type[SubType]]
     """
     Subscription types
+    """
+
+    candlesticks: List[Type[Period]]
+    """
+    Candlesticks
     """
 
 
@@ -1363,17 +1389,22 @@ class QuoteContext:
 
     def set_on_depth(self, callback: Callable[[str, PushDepth], None]) -> None:
         """
-        Set quote callback, after receiving the depth data push, it will call back to this function.
+        Set depth callback, after receiving the depth data push, it will call back to this function.
         """
 
     def set_on_brokers(self, callback: Callable[[str, PushBrokers], None]) -> None:
         """
-        Set quote callback, after receiving the brokers data push, it will call back to this function.
+        Set brokers callback, after receiving the brokers data push, it will call back to this function.
         """
 
     def set_on_trades(self, callback: Callable[[str, PushTrades], None]) -> None:
         """
-        Set quote callback, after receiving the trades data push, it will call back to this function.
+        Set trades callback, after receiving the trades data push, it will call back to this function.
+        """
+
+    def set_on_candlestick(self, callback: Callable[[str, PushCandlestick], None]) -> None:
+        """
+        Set candlestick callback, after receiving the candlestick updated event, it will call back to this function.
         """
 
     def subscribe(self, symbols: List[str], sub_types: List[Type[SubType]], is_first_push: bool = False) -> None:
@@ -1391,8 +1422,8 @@ class QuoteContext:
                 from time import sleep
                 from longbridge.openapi import QuoteContext, Config, SubType, PushQuote
 
-                def on_quote(symbol: str, quote: PushQuote):
-                    print(symbol, quote)
+                def on_quote(symbol: str, event: PushQuote):
+                    print(symbol, event)
 
                 config = Config.from_env()
                 ctx = QuoteContext(config)
@@ -1419,6 +1450,37 @@ class QuoteContext:
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                 ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
+        """
+
+    def subscribe_candlesticks(self, symbol: str, period: Type[Period]) -> None:
+        """
+        Subscribe security candlesticks
+
+        Args:
+            symbol: Security code
+            period: Period type
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, PushCandlestick
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+
+                def on_candlestick(symbol: str, event: PushCandlestick):
+                    print(symbol, event)
+
+                ctx.subscribe_candlesticks("700.HK", Period.Min_1)
+                sleep(30)
+        """
+
+    def unsubscribe_candlesticks(self, symbol: str, period: Type[Period]) -> None:
+        """
+        Subscribe security candlesticks
+
+        Args:
+            symbol: Security code
+            period: Period type
         """
 
     def subscriptions(self) -> List[Subscription]:
@@ -1919,6 +1981,35 @@ class QuoteContext:
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], is_first_push = False)
                 sleep(5)
                 resp = ctx.realtime_trades("700.HK", 10)
+                print(resp)
+        """
+
+    def realtime_candlesticks(self, symbol: str, period: Type[Period], count: int) -> List[Candlestick]:
+        """
+        Get real-time candlesticks
+
+        Get Get real-time candlesticks of the subscribed symbols, it always returns the data in the local storage.
+
+        Args:
+            symbol: Security code
+            period: Period type
+            count: Count of candlesticks
+
+        Returns:
+            Security candlesticks
+
+        Examples:
+            ::
+
+                from time import sleep
+                from longbridge.openapi import QuoteContext, Config, Period
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe_candlesticks("AAPL.US", Period.Min_1)
+                sleep(5)
+                resp = ctx.realtime_candlesticks("AAPL.US", Period.Min_1, 10)
                 print(resp)
         """
 
@@ -2960,7 +3051,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def today_orders(self, symbol: Optional[str] = None, status: List[Type[OrderStatus]] = [], side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None) -> List[Order]:
+    def today_orders(self, symbol: Optional[str] = None, status: List[Type[OrderStatus]] = [], side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> List[Order]:
         """
         Get today orders
 
@@ -2969,6 +3060,7 @@ class TradeContext:
             status: Filter by order status
             side: Filter by order side
             market: Filter by market type
+            order_id: Filter by order id
 
         Returns:
             Order list

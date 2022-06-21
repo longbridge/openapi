@@ -175,6 +175,7 @@ impl TradeContext {
         status: Vec<OrderStatus>,
         side: Option<OrderSide>,
         market: Option<Market>,
+        order_id: Option<String>,
     ) -> PyResult<Vec<Order>> {
         let mut opts = GetTodayOrdersOptions::new();
 
@@ -187,6 +188,9 @@ impl TradeContext {
         }
         if let Some(market) = market {
             opts = opts.market(market.into());
+        }
+        if let Some(order_id) = order_id {
+            opts = opts.order_id(order_id);
         }
 
         self.ctx

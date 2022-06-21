@@ -49,6 +49,13 @@ impl GetTodayOrdersOptions {
     pub fn market(&self, market: Market) -> GetTodayOrdersOptions {
         Self(self.0.clone().market(market.into()))
     }
+
+    /// Set the order id
+    #[napi]
+    #[inline]
+    pub fn order_id(&self, order_id: String) -> GetTodayOrdersOptions {
+        Self(self.0.clone().order_id(order_id))
+    }
 }
 
 impl From<GetTodayOrdersOptions> for longbridge::trade::GetTodayOrdersOptions {

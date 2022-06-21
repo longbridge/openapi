@@ -182,6 +182,61 @@ impl QuoteContext {
         reply_rx.await.map_err(|_| WsClientError::ClientClosed)?
     }
 
+    /// Subscribe security candlesticks
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{
+    ///     quote::{Period, QuoteContext},
+    ///     Config,
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
+    ///
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute)
+    ///     .await?;
+    /// while let Some(msg) = receiver.recv().await {
+    ///     println!("{:?}", msg);
+    /// }
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
+    where
+        T: Into<String>,
+    {
+        let (reply_tx, reply_rx) = oneshot::channel();
+        self.command_tx
+            .send(Command::SubscribeCandlesticks {
+                symbol: symbol.into(),
+                period,
+                reply_tx,
+            })
+            .map_err(|_| WsClientError::ClientClosed)?;
+        reply_rx.await.map_err(|_| WsClientError::ClientClosed)?
+    }
+
+    /// Unsubscribe security candlesticks
+    pub async fn unsubscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
+    where
+        T: Into<String>,
+    {
+        let (reply_tx, reply_rx) = oneshot::channel();
+        self.command_tx
+            .send(Command::UnsubscribeCandlesticks {
+                symbol: symbol.into(),
+                period,
+                reply_tx,
+            })
+            .map_err(|_| WsClientError::ClientClosed)?;
+        reply_rx.await.map_err(|_| WsClientError::ClientClosed)?
+    }
+
     /// Get subscription information
     ///
     /// # Examples
@@ -1055,6 +1110,54 @@ impl QuoteContext {
         self.command_tx
             .send(Command::GetRealtimeBrokers {
                 symbol: symbol.into(),
+                reply_tx,
+            })
+            .map_err(|_| WsClientError::ClientClosed)?;
+        Ok(reply_rx.await.map_err(|_| WsClientError::ClientClosed)?)
+    }
+
+    /// Get real-time candlesticks
+    ///
+    /// Get real-time candlesticks of the subscribed symbols, it always returns
+    /// the data in the local storage.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::{sync::Arc, time::Duration};
+    ///
+    /// use longbridge::{
+    ///     quote::{Period, QuoteContext},
+    ///     Config,
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    ///
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute)
+    ///     .await?;
+    /// tokio::time::sleep(Duration::from_secs(5)).await;
+    ///
+    /// let resp = ctx
+    ///     .realtime_candlesticks("AAPL.US", Period::OneMinute, 10)
+    ///     .await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn realtime_candlesticks(
+        &self,
+        symbol: impl Into<String>,
+        period: Period,
+        count: usize,
+    ) -> Result<Vec<Candlestick>> {
+        let (reply_tx, reply_rx) = oneshot::channel();
+        self.command_tx
+            .send(Command::GetRealtimeCandlesticks {
+                symbol: symbol.into(),
+                period,
+                count,
                 reply_tx,
             })
             .map_err(|_| WsClientError::ClientClosed)?;

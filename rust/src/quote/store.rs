@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
+use longbridge_proto::quote::Period;
+
 use crate::quote::{
     push_types::{PushEventDetail, PushQuote},
-    Brokers, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, Trade,
+    Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, Trade,
 };
 
 macro_rules! check_sequence {
@@ -49,6 +51,8 @@ pub(crate) struct SecuritiesData {
 
     pub(crate) trades_sequence: i64,
     pub(crate) trades: Vec<Trade>,
+
+    pub(crate) candlesticks: HashMap<Period, Vec<Candlestick>>,
 }
 
 #[derive(Debug, Default)]
@@ -77,6 +81,7 @@ impl Store {
                 check_sequence!(data.trades_sequence, event.sequence);
                 merge_trades(data, trade);
             }
+            PushEventDetail::Candlestick(_) => {}
         }
     }
 }

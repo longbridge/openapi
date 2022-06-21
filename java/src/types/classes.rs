@@ -32,7 +32,12 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/quote/Subscription",
     longbridge::quote::Subscription,
-    [symbol, sub_types]
+    [
+        symbol,
+        sub_types,
+        #[java(objarray)]
+        candlesticks
+    ]
 );
 
 impl_java_class!(
@@ -80,6 +85,12 @@ impl_java_class!(
         #[java(objarray)]
         trades,
     ]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/PushCandlestick",
+    longbridge::quote::PushCandlestick,
+    [period, candlestick]
 );
 
 impl_java_class!(

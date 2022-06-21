@@ -299,6 +299,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayOrd
             if let Some(market) = market {
                 new_opts = new_opts.market(market);
             }
+            let order_id: Option<String> = get_field(&env, opts, "orderId")?;
+            if let Some(order_id) = order_id {
+                new_opts = new_opts.order_id(order_id);
+            }
             Some(new_opts)
         } else {
             None

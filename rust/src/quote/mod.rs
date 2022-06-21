@@ -12,7 +12,9 @@ mod utils;
 
 pub use context::QuoteContext;
 pub use longbridge_proto::quote::{AdjustType, Period, TradeSession, TradeStatus};
-pub use push_types::{PushBrokers, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades};
+pub use push_types::{
+    PushBrokers, PushCandlestick, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades,
+};
 pub use sub_flags::SubFlags;
 pub use types::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,

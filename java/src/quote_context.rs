@@ -26,6 +26,7 @@ struct Callbacks {
     depth: Option<GlobalRef>,
     brokers: Option<GlobalRef>,
     trades: Option<GlobalRef>,
+    candlestick: Option<GlobalRef>,
 }
 
 struct ContextObj {
@@ -85,6 +86,19 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                     &[
                         event.symbol.into_jvalue(&env)?,
                         push_trades.into_jvalue(&env)?,
+                    ],
+                )?;
+            }
+        }
+        PushEventDetail::Candlestick(push_candlestick) => {
+            if let Some(handler) = &callbacks.candlestick {
+                env.call_method(
+                    handler,
+                    "onCandlestick",
+                    "(Ljava/lang/String;Lcom/longbridge/quote/PushCandlestick;)V",
+                    &[
+                        event.symbol.into_jvalue(&env)?,
+                        push_candlestick.into_jvalue(&env)?,
                     ],
                 )?;
             }
@@ -221,6 +235,24 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSetOnTra
 }
 
 #[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSetOnCandlestick(
+    env: JNIEnv,
+    _class: JClass,
+    ctx: i64,
+    handler: JObject,
+) {
+    let context = &*(ctx as *const ContextObj);
+    jni_result(&env, (), || {
+        if !handler.is_null() {
+            context.callbacks.lock().candlestick = Some(env.new_global_ref(handler)?);
+        } else {
+            context.callbacks.lock().candlestick = None;
+        }
+        Ok(())
+    })
+}
+
+#[no_mangle]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSubscribe(
     env: JNIEnv,
     _class: JClass,
@@ -259,6 +291,46 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUnsubscr
         let sub_flags = SubFlags::from_bits(flags as u8).unwrap_or(SubFlags::empty());
         async_util::execute(&env, callback, async move {
             Ok(context.ctx.unsubscribe(symbols.0, sub_flags).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSubscribeCandlesticks(
+    env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JString,
+    period: JObject,
+    callback: JObject,
+) {
+    jni_result(&env, (), || {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(&env, symbol.into())?;
+        let period: Period = FromJValue::from_jvalue(&env, period.into())?;
+        async_util::execute(&env, callback, async move {
+            Ok(context.ctx.subscribe_candlesticks(symbol, period).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUnsubscribeCandlesticks(
+    env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JString,
+    period: JObject,
+    callback: JObject,
+) {
+    jni_result(&env, (), || {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(&env, symbol.into())?;
+        let period: Period = FromJValue::from_jvalue(&env, period.into())?;
+        async_util::execute(&env, callback, async move {
+            Ok(context.ctx.unsubscribe_candlesticks(symbol, period).await?)
         })?;
         Ok(())
     })
@@ -682,6 +754,32 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtime
                 context
                     .ctx
                     .realtime_trades(symbol, count.max(0) as usize)
+                    .await?,
+            ))
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeCandlesticks(
+    env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JString,
+    period: JObject,
+    count: i32,
+    callback: JObject,
+) {
+    jni_result(&env, (), || {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(&env, symbol.into())?;
+        let period: Period = FromJValue::from_jvalue(&env, period.into())?;
+        async_util::execute(&env, callback, async move {
+            Ok(ObjectArray(
+                context
+                    .ctx
+                    .realtime_candlesticks(symbol, period, count.max(0) as usize)
                     .await?,
             ))
         })?;

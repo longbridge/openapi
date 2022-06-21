@@ -40,7 +40,7 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
-     * Set quote callback, after receiving the depth data push, it will call back to
+     * Set depth callback, after receiving the depth data push, it will call back to
      * this handler.
      * 
      * @param handler A depth handler
@@ -50,7 +50,8 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
-     * Set quote callback, after receiving the brokers data push, it will call back
+     * Set brokers callback, after receiving the brokers data push, it will call
+     * back
      * to this handler.
      * 
      * @param handler A brokers handler
@@ -60,13 +61,24 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
-     * Set quote callback, after receiving the trades data push, it will call backto
+     * Set trades callback, after receiving the trades data push, it will call
+     * backto
      * this handler.
      * 
      * @param handler A trades handler
      */
     public void setOnTrades(TradesHandler handler) {
         SdkNative.quoteContextSetOnTrades(this.raw, handler);
+    }
+
+    /**
+     * Set candlestick callback, after receiving the trades data push, it will call
+     * back to this function.
+     * 
+     * @param handler A candlestick handler
+     */
+    public void setOnCandlestick(CandlestickHandler handler) {
+        SdkNative.quoteContextSetOnCandlestick(this.raw, handler);
     }
 
     /**
@@ -80,8 +92,8 @@ public class QuoteContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
-     *             ctx.setOnQuote((symbol, quote) -> {
-     *                 System.out.printf("%s\t%s\n", symbol, quote);
+     *             ctx.setOnQuote((symbol, event) -> {
+     *                 System.out.printf("%s\t%s\n", symbol, event);
      *             });
      *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Quote, true).get();
      *             Thread.sleep(30000);
@@ -135,6 +147,53 @@ public class QuoteContext implements AutoCloseable {
     public CompletableFuture<Void> unsubscribe(String[] symbols, int flags) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextUnsubscribe(this.raw, symbols, flags, callback);
+        });
+    }
+
+    /**
+     * Subscribe security candlesticks
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.setOnCandlestick((symbol, event) -> {
+     *                 System.out.printf("%s\t%s\n", symbol, event);
+     *             });
+     *             ctx.subscribeCandlesticks("700.HK", Period.Min_1).get();
+     *             Thread.sleep(30000);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param symbol Security symbol
+     * @param period Period type
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> subscribeCandlesticks(String symbol, Period period) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextSubscribeCandlesticks(this.raw, symbol, period, callback);
+        });
+    }
+
+    /**
+     * Unsubscribe security candlesticks
+     * 
+     * @param symbol Security symbol
+     * @param period Period type
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> unsubscribeCandlesticks(String symbol, Period period) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextUnsubscribeCandlesticks(this.raw, symbol, period, callback);
         });
     }
 
@@ -850,6 +909,45 @@ public class QuoteContext implements AutoCloseable {
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextRealtimeTrades(this.raw, symbol, count, callback);
+        });
+    }
+
+    /**
+     * Get real-time candlesticks
+     * <p>
+     * Get real-time candlesticks of the subscribed symbols, it always returns the
+     * data in the local storage.
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             ctx.subscribeCandlesticks("AAPL.US", Period.Min_1).get();
+     *             Thread.sleep(5000);
+     *             Candlestick[] resp = ctx.getRealtimeCandlesticks("AAPL.US", Period.Min_1, 10).get();
+     *             for (Candlestick obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param symbol Security symbol
+     * @param period Period type
+     * @param count  Count of trades
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Candlestick[]> getRealtimeCandlesticks(String symbol, Period period, int count)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextRealtimeCandlesticks(this.raw, symbol, period, count, callback);
         });
     }
 }

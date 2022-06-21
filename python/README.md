@@ -52,8 +52,8 @@ from longbridge.openapi import Config, QuoteContext, SubType, PushQuote
 config = Config.from_env()
 
 # A callback to receive quote data
-def on_quote(self, symbol: str, quote: PushQuote):
-    print(symbol, quote)
+def on_quote(self, symbol: str, event: PushQuote):
+    print(symbol, event)
 
 # Create a context for quote APIs
 ctx = QuoteContext(config)
