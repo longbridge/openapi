@@ -1,8 +1,8 @@
 [package]
 edition = "2021"
 name = "longbridge-candlesticks"
-version = "0.2.20"
-description = "Longbridge candlesticks utils for Rust"
+version = "0.2.21"
+description = "Longbridge candlestick utils for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
