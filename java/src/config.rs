@@ -5,7 +5,7 @@ use jni::{
 };
 use longbridge::Config;
 
-use crate::error::jni_result;
+use crate::{error::jni_result, types::FromJValue};
 
 #[no_mangle]
 pub extern "system" fn Java_com_longbridge_SdkNative_newConfig(
@@ -19,22 +19,23 @@ pub extern "system" fn Java_com_longbridge_SdkNative_newConfig(
     trade_ws_url: JString,
 ) -> jlong {
     jni_result(&env, 0, || {
-        let mut config = Config::new(
-            env.get_string(app_key)?,
-            env.get_string(app_secret)?,
-            env.get_string(access_token)?,
-        );
+        let app_key = String::from_jvalue(&env, app_key.into())?;
+        let app_secret = String::from_jvalue(&env, app_secret.into())?;
+        let access_token = String::from_jvalue(&env, access_token.into())?;
+        let http_url = <Option<String>>::from_jvalue(&env, http_url.into())?;
+        let quote_ws_url = <Option<String>>::from_jvalue(&env, quote_ws_url.into())?;
+        let trade_ws_url = <Option<String>>::from_jvalue(&env, trade_ws_url.into())?;
 
-        if !http_url.is_null() {
-            config = config.http_url(env.get_string(http_url)?);
+        let mut config = Config::new(app_key, app_secret, access_token);
+
+        if let Some(http_url) = http_url {
+            config = config.http_url(http_url);
         }
-
-        if !quote_ws_url.is_null() {
-            config = config.quote_ws_url(env.get_string(quote_ws_url)?);
+        if let Some(quote_ws_url) = quote_ws_url {
+            config = config.quote_ws_url(quote_ws_url);
         }
-
-        if !trade_ws_url.is_null() {
-            config = config.trade_ws_url(env.get_string(trade_ws_url)?);
+        if let Some(trade_ws_url) = trade_ws_url {
+            config = config.trade_ws_url(trade_ws_url);
         }
 
         Ok(Box::into_raw(Box::new(config)) as jlong)

@@ -10,6 +10,9 @@ use crate::{
 };
 
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
+const RETRY_COUNT: usize = 5;
+const RETRY_INITIAL_DELAY: Duration = Duration::from_millis(100);
+const RETRY_FACTOR: f32 = 2.0;
 
 #[derive(Deserialize)]
 struct OpenApiResponse<T> {
@@ -97,9 +100,7 @@ where
     Q: Serialize + Send + 'static,
     R: DeserializeOwned + Send + 'static,
 {
-    /// Send request and get the response
-    #[tracing::instrument(level = "debug", skip(self))]
-    pub async fn send(self) -> HttpClientResult<R> {
+    async fn do_send(&self) -> HttpClientResult<R> {
         let HttpClient { http_cli, config } = &self.client;
         let now = Timestamp::now();
         let app_key_value =
@@ -108,22 +109,25 @@ where
             .map_err(|_| HttpClientError::InvalidAccessToken)?;
 
         let mut request_builder = http_cli
-            .request(self.method, &format!("{}{}", config.http_url, self.path))
+            .request(
+                self.method.clone(),
+                &format!("{}{}", config.http_url, self.path),
+            )
             .header("X-Api-Key", app_key_value)
             .header("Authorization", access_token_value)
             .header("X-Timestamp", now.to_string())
             .header("Content-Type", "application/json; charset=utf-8");
 
         // set the request body
-        if let Some(body) = self.body {
+        if let Some(body) = &self.body {
             request_builder = request_builder
-                .body(serde_json::to_string(&body).map_err(HttpClientError::SerializeRequestBody)?);
+                .body(serde_json::to_string(body).map_err(HttpClientError::SerializeRequestBody)?);
         }
 
         let mut request = request_builder.build().expect("invalid request");
 
         // set the query string
-        if let Some(query_params) = self.query_params {
+        if let Some(query_params) = &self.query_params {
             let query_string = crate::qs::to_string(&query_params)?;
             request.url_mut().set_query(Some(&query_string));
         }
@@ -165,6 +169,34 @@ where
                 Err(HttpClientError::DeserializeResponseBody(err))
             }
             Err(_) => Err(HttpClientError::BadStatus(status)),
+        }
+    }
+
+    /// Send request and get the response
+    #[tracing::instrument(level = "debug", skip(self))]
+    pub async fn send(self) -> HttpClientResult<R> {
+        match self.do_send().await {
+            Ok(resp) => Ok(resp),
+            Err(HttpClientError::BadStatus(StatusCode::TOO_MANY_REQUESTS)) => {
+                let mut retry_delay = RETRY_INITIAL_DELAY;
+
+                for _ in 0..RETRY_COUNT {
+                    tokio::time::sleep(retry_delay).await;
+
+                    match self.do_send().await {
+                        Ok(resp) => return Ok(resp),
+                        Err(HttpClientError::BadStatus(StatusCode::TOO_MANY_REQUESTS)) => {
+                            retry_delay =
+                                Duration::from_secs_f32(retry_delay.as_secs_f32() * RETRY_FACTOR);
+                            continue;
+                        }
+                        Err(err) => return Err(err),
+                    }
+                }
+
+                Err(HttpClientError::BadStatus(StatusCode::TOO_MANY_REQUESTS))
+            }
+            Err(err) => Err(err),
         }
     }
 }

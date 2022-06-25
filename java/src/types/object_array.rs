@@ -18,7 +18,12 @@ impl<T: JSignature> JSignature for ObjectArray<T> {
 
 impl<T: FromJValue> FromJValue for ObjectArray<T> {
     fn from_jvalue(env: &JNIEnv, value: JValue) -> Result<Self> {
-        let array = value.l()?.into_inner();
+        let obj = value.l()?;
+        if obj.is_null() {
+            return Ok(ObjectArray(Vec::new()));
+        }
+
+        let array = obj.into_inner();
         let len = env.get_array_length(array)?;
         let mut res = Vec::with_capacity(len as usize);
 
