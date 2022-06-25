@@ -1,6 +1,6 @@
 [package]
 name = "longbridge-wscli"
-version = "0.2.21"
+version = "0.2.22"
 edition = "2021"
 description = "Longbridge Websocket SDK for Rust"
 license = "MIT OR Apache-2.0"
