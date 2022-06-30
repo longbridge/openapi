@@ -1,3 +1,29 @@
 [tasks.rust]
 command = "cargo"
 args = ["build", "-p", "longbridge"]
+
+[tasks.protoc]
+script_runner = "@rust"
+script = '''
+//! ```cargo
+//! [dependencies]
+//! prost-build = "0.10.3"
+//! ```
+use prost_build::Config;
+
+fn main() {
+    Config::new()
+        .out_dir("rust/crates/proto/src")
+        .protoc_arg("--experimental_allow_proto3_optional")
+        .compile_protos(
+            &[
+                "rust/crates/proto/openapi-protobufs/control/control.proto",
+                "rust/crates/proto/openapi-protobufs/quote/api.proto",
+                "rust/crates/proto/openapi-protobufs/trade/subscribe.proto",
+                "rust/crates/proto/error/error.proto",
+            ],
+            &["rust/crates/proto/openapi-protobufs", "rust/crates/proto/error"],
+        )
+        .unwrap();
+}
+'''
