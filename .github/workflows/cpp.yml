@@ -1,0 +1,135 @@
+name: cpp
+
+on:
+  push:
+    branches:
+      - cpp
+  pull_request: {}
+
+jobs:
+  copy-cpp-headers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: include
+          path: c/csrc/include
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: include
+          path: cpp/include
+
+  build-cpp-sdk:
+    needs:
+      - copy-cpp-headers
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: x86_64_linux
+            dylib_ext: so
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: x86_64_windows
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            platform: x86_64_macos
+            dylib_ext: dylib
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            platform: aarch64_macos
+            dylib_ext: dylib
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install MSBuild
+        if: ${{ matrix.settings.host == 'windows-latest' }}
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.60.0
+          override: true
+          components: rustfmt, clippy
+          target: ${{ matrix.settings.target }}
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Install cargo make
+        run: cargo install cargo-make
+
+      - name: Build
+        if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
+        run: |
+          cargo make cmake-release
+          cargo make cpp-release
+
+      - name: Build
+        if: ${{ matrix.settings.target == 'aarch64-apple-darwin' }}
+        run: |
+          cargo make cmake-release-macos-aarch64
+          cargo make cpp-release
+
+      - name: Copy files
+        if: ${{ matrix.settings.host == 'windows-latest' }}
+        run: |
+          md dist\lib\${{ matrix.settings.platform }}
+          copy cmake.build\C\Release\longbridge_c.dll dist\lib\${{ matrix.settings.platform }}
+          copy cmake.build\C\Release\longbridge_c.dll.lib dist\lib\${{ matrix.settings.platform }}\longbridge_c.lib
+          copy cmake.build\Release\longbridge_cpp.dll dist\lib\${{ matrix.settings.platform }}
+          copy cmake.build\cpp\Release\longbridge_cpp.lib dist\lib\${{ matrix.settings.platform }}
+
+      - name: Copy files
+        if: ${{ matrix.settings.host != 'windows-latest' }}
+        run: |
+          mkdir -p dist/lib/${{ matrix.settings.platform }}
+          cp cmake.build/c/liblongbridge_c.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}
+          cp cmake.build/liblongbridge_cpp.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: libs
+          path: dist/lib
+
+  publish-cpp-sdk:
+    needs:
+      - build-cpp-sdk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download includes
+        uses: actions/download-artifact@v2
+        with:
+          name: libs
+          path: ./sdk/libs
+
+      - name: Download includes
+        uses: actions/download-artifact@v2
+        with:
+          name: include
+          path: ./sdk/include
+
+      - name: Package
+        run:
+          tar czvf openapi-cpp-sdk.tar.gz ./sdk
+      
+      - name: Upload SDK
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_SECRET }}
+        run: |
+          aws --region=${{ secrets.PROD_BJ_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_BUCKET }}/openapi-sdk/ --cache-control no-cache

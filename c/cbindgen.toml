@@ -10,6 +10,7 @@ cpp_compat = true
 "CAsyncResult" = "lb_async_result_t"
 "CError" = "lb_error_t"
 "CConfig" = "lb_config_t"
+"CSubscription" = "lb_subscription_t"
 "CPushQuote" = "lb_push_quote_t"
 "CPushDepth" = "lb_push_depth_t"
 "CPushBrokers" = "lb_push_brokers_t"
@@ -50,7 +51,7 @@ cpp_compat = true
 "CMarketTradingSession" = "lb_market_trading_session_t"
 "CMarketTradingDays" = "lb_market_trading_days_t"
 "CCapitalFlowLine" = "lb_capital_flow_line_t"
-"CCapitalDistributionResponse" = "ln_capital_distribution_response_t"
+"CCapitalDistributionResponse" = "lb_capital_distribution_response_t"
 "CCapitalDistribution" = "lb_capital_distribution_t"
 "CRealtimeQuote" = "lb_realtime_quote_t"
 "CTradeContext" = "lb_trade_context_t"
@@ -86,9 +87,12 @@ cpp_compat = true
 "CStockPositionsResponse" = "lb_stock_position_response_t"
 "CStockPositionChannel" = "lb_stock_position_channel_t"
 "CStockPosition" = "lb_stock_position_t"
+"CFreeUserDataFunc" = "lb_free_userdata_func_t"
+"CSubmitOrderResponse" = "lb_submit_order_response_t"
 
 [export]
 include = [
+    "CSubscription",
     "CSecurityStaticInfo",
     "CSecurityQuote",
     "COptionQuote",
@@ -111,4 +115,5 @@ include = [
     "CCashFlow",
     "CFundPositionsResponse",
     "CStockPositionsResponse",
+    "CSubmitOrderResponse",
 ]

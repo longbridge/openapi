@@ -296,20 +296,20 @@ impl ToFFI for CExecutionOwned {
 /// Options for get histroy executions request
 #[repr(C)]
 pub struct CGetHistoryExecutionsOptions {
-    /// Start time (can null)
+    /// Start time (can be null)
     pub start_at: *const i64,
-    /// End time (can null)
+    /// End time (can be null)
     pub end_at: *const i64,
-    /// Security code (can null)
+    /// Security code (can be null)
     pub symbol: *const c_char,
 }
 
 /// Options for get today executions request
 #[repr(C)]
 pub struct CGetTodayExecutionsOptions {
-    /// Security code (can null)
+    /// Security code (can be null)
     pub symbol: *const c_char,
-    /// Order id (can null)
+    /// Order id (can be null)
     pub order_id: *const c_char,
 }
 
@@ -557,19 +557,19 @@ impl ToFFI for COrderOwned {
 #[derive(Debug)]
 #[repr(C)]
 pub struct CGetHistoryOrdersOptions {
-    /// Security symbol (can null)
+    /// Security symbol (can be null)
     pub symbol: *const c_char,
-    /// Order status (can null)
+    /// Order status (can be null)
     pub status: *const COrderStatus,
     /// Number of order status
     pub num_status: usize,
-    /// Order side (can null)
+    /// Order side (can be null)
     pub side: *const COrderSide,
-    /// Market (can null)
+    /// Market (can be null)
     pub market: *const CMarket,
-    /// Start time (can null)
+    /// Start time (can be null)
     pub start_at: *const i64,
-    /// End time (can null)
+    /// End time (can be null)
     pub end_at: *const i64,
 }
 
@@ -577,17 +577,17 @@ pub struct CGetHistoryOrdersOptions {
 #[derive(Debug)]
 #[repr(C)]
 pub struct CGetTodayOrdersOptions {
-    /// Security symbol (can null)
+    /// Security symbol (can be null)
     pub symbol: *const c_char,
-    /// Order status (can null)
+    /// Order status (can be null)
     pub status: *const COrderStatus,
     /// Number of order status
     pub num_status: usize,
-    /// Order side (can null)
+    /// Order side (can be null)
     pub side: *const COrderSide,
-    /// Market (can null)
+    /// Market (can be null)
     pub market: *const CMarket,
-    /// Order id (can null)
+    /// Order id (can be null)
     pub order_id: *const c_char,
 }
 
@@ -599,17 +599,17 @@ pub struct CReplaceOrderOptions {
     pub order_id: *const c_char,
     /// Quantity
     pub quantity: i64,
-    /// Price (can null)
+    /// Price (can be null)
     pub price: *const CDecimal,
-    /// Trigger price (can null)
+    /// Trigger price (can be null)
     pub trigger_price: *const CDecimal,
-    /// Limit offset (can null)
+    /// Limit offset (can be null)
     pub limit_offset: *const CDecimal,
-    /// Trailing amount (can null)
+    /// Trailing amount (can be null)
     pub trailing_amount: *const CDecimal,
-    /// Trailing percent (can null)
+    /// Trailing percent (can be null)
     pub trailing_percent: *const CDecimal,
-    /// Remark (can null)
+    /// Remark (can be null)
     pub remark: *const c_char,
 }
 
@@ -627,27 +627,29 @@ pub struct CSubmitOrderOptions {
     pub submitted_quantity: i64,
     /// Time in force type
     pub time_in_force: CTimeInForceType,
-    /// Submitted price (can null)
+    /// Submitted price (can be null)
     pub submitted_price: *const CDecimal,
-    /// Trigger price (`LIT` / `MIT` Required) (can null)
+    /// Trigger price (`LIT` / `MIT` Required) (can be null)
     pub trigger_price: *const CDecimal,
-    /// Limit offset amount (`TSLPAMT` / `TSLPPCT` Required) (can null)
+    /// Limit offset amount (`TSLPAMT` / `TSLPPCT` Required) (can be null)
     pub limit_offset: *const CDecimal,
-    /// Trailing amount (`TSLPAMT` / `TSMAMT` Required) (can null)
+    /// Trailing amount (`TSLPAMT` / `TSMAMT` Required) (can be null)
     pub trailing_amount: *const CDecimal,
-    /// Trailing percent (`TSLPPCT` / `TSMAPCT` Required) (can null)
+    /// Trailing percent (`TSLPPCT` / `TSMAPCT` Required) (can be null)
     pub trailing_percent: *const CDecimal,
     /// Long term order expire date (Required when `time_in_force` is
-    /// `GoodTilDate`) (can null)
+    /// `GoodTilDate`) (can be null)
     pub expire_date: *const CDate,
-    /// Enable or disable outside regular trading hours (can null)
+    /// Enable or disable outside regular trading hours (can be null)
     pub outside_rth: *const COutsideRTH,
-    /// Remark (Maximum 64 characters) (can null)
+    /// Remark (Maximum 64 characters) (can be null)
     pub remark: *const c_char,
 }
 
+/// Response for submit order request
 #[repr(C)]
 pub struct CSubmitOrderResponse {
+    /// Order id
     pub order_id: *const c_char,
 }
 
@@ -936,20 +938,20 @@ pub struct CGetCashFlowOptions {
     pub start_at: i64,
     /// End time
     pub end_at: i64,
-    /// Business type (can null)
+    /// Business type (can be null)
     pub business_type: *const CBalanceType,
-    /// Security symbol
+    /// Security symbol (can be null)
     pub symbol: *const c_char,
-    /// Page number
+    /// Page number (can be null)
     pub page: *const usize,
-    /// Page size
+    /// Page size (can be null)
     pub size: *const usize,
 }
 
 /// Options for get fund positions request
 #[repr(C)]
 pub struct CGetFundPositionsOptions {
-    /// Fund symbols (can null)
+    /// Fund symbols (can be null)
     pub symbols: *const *const c_char,
     /// Number of fund symbols
     pub num_symbols: usize,
@@ -958,7 +960,9 @@ pub struct CGetFundPositionsOptions {
 /// Fund positions response
 #[repr(C)]
 pub struct CFundPositionsResponse {
+    /// Channels
     pub channels: *const CFundPositionChannel,
+    /// Number of channels
     pub num_channels: usize,
 }
 
@@ -1243,7 +1247,9 @@ impl ToFFI for CStockPositionChannelOwned {
 /// Stock positions response
 #[repr(C)]
 pub struct CStockPositionsResponse {
+    /// Channels
     pub channels: *const CStockPositionChannel,
+    /// Number of channels
     pub num_channels: usize,
 }
 
@@ -1275,8 +1281,8 @@ impl ToFFI for CStockPositionsResponseOwned {
 /// Options for get stock positions request
 #[repr(C)]
 pub struct CGetStockPositionsOptions {
-    /// Fund symbols (can null)
+    /// Fund symbols (can be null)
     pub symbols: *const *const c_char,
-    /// Number of fund symbols
+    /// Number of stock symbols
     pub num_symbols: usize,
 }

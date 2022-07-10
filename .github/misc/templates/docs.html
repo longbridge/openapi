@@ -7,9 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Longbridge OpenAPI SDK Documents</title>
     <style type="text/css">
+        hr {
+            margin-bottom: 20px;
+        }
         a {
-            display: block;
-            margin: 10px;
+            margin: 20px;
+            font-size: 20pt;
         }
     </style>
 </head>
@@ -17,26 +20,12 @@
 <body>
     <h1>Longbridge OpenAPI SDK Documents</h1>
     <hr>
-
-    <h2>Rust</h2>
-    {% for version in rust_versions %}
-    <a href="rust/{{ version }}/longbridge/index.html">{{ version }}</a>
-    {% endfor %}
-
-    <h2>Python</h2>
-    {% for version in python_versions %}
-    <a href="python/{{ version }}/index.html">{{ version }}</a>
-    {% endfor %}
-
-    <h2>Node.js</h2>
-    {% for version in nodejs_versions %}
-    <a href="nodejs/{{ version }}/index.html">{{ version }}</a>
-    {% endfor %}
-
-    <h2>Java</h2>
-    {% for version in java_versions %}
-    <a href="java/{{ version }}/index.html">{{ version }}</a>
-    {% endfor %}
+    <a href="rust/longbridge/index.html">Rust</a>
+    <a href="python/index.html">Python</a>
+    <a href="nodejs/index.html">Node.js</a>
+    <a href="java/index.html">Java</a>
+    <a href="c/index.html">C</a>
+    <a href="cpp/index.html">C++</a>
 </body>
 
 </html>

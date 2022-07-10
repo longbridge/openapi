@@ -2705,7 +2705,7 @@ class CashFlowDirection:
 
     class In(CashFlowDirection):
         """
-        Stock
+        In
         """
         ...
 

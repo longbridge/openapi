@@ -59,15 +59,15 @@ typedef enum lb_balance_type_t {
    */
   BalanceTypeUnknown,
   /**
-   * Unknown
+   * Cash
    */
   BalanceTypeCash,
   /**
-   * Unknown
+   * Stock
    */
   BalanceTypeStock,
   /**
-   * Unknown
+   * Fund
    */
   BalanceTypeFund,
 } lb_balance_type_t;
@@ -83,7 +83,7 @@ typedef enum lb_cash_flow_direction_t {
   /**
    * Out
    */
-  CashFlowDirectionOutside,
+  CashFlowDirectionOut,
   /**
    * In
    */
@@ -127,11 +127,11 @@ typedef enum lb_option_direction_t {
   /**
    * Put
    */
-  OptionDirectionAmerican,
+  OptionDirectionPut,
   /**
    * Call
    */
-  OptionDirectionEurope,
+  OptionDirectionCall,
 } lb_option_direction_t;
 
 /**
@@ -161,11 +161,11 @@ typedef enum lb_order_side_t {
    */
   OrderSideUnknown,
   /**
-   * Unknown
+   * Buy
    */
   OrderSideBuy,
   /**
-   * Unknown
+   * Sell
    */
   OrderSideSell,
 } lb_order_side_t;
@@ -351,7 +351,7 @@ typedef enum lb_outside_rth_t {
  */
 typedef enum lb_period_t {
   /**
-   * One Minute
+   * Unknown
    */
   PeriodUnknown,
   /**
@@ -572,11 +572,6 @@ typedef struct lb_decimal_t lb_decimal_t;
 typedef struct lb_error_t lb_error_t;
 
 /**
- * Quote of US pre/post market
- */
-typedef struct lb_prepost_quote_t lb_prepost_quote_t;
-
-/**
  * Quote context
  */
 typedef struct lb_quote_context_t lb_quote_context_t;
@@ -595,6 +590,8 @@ typedef struct lb_async_result_t {
 } lb_async_result_t;
 
 typedef void (*lb_async_callback_t)(const struct lb_async_result_t*);
+
+typedef void (*lb_free_userdata_func_t)(void*);
 
 /**
  * Quote message
@@ -642,7 +639,7 @@ typedef struct lb_push_quote_t {
   enum lb_trade_session_t trade_session;
 } lb_push_quote_t;
 
-typedef void (*lb_quote_callback_t)(const struct lb_quote_context_t*, const struct lb_push_quote_t*);
+typedef void (*lb_quote_callback_t)(const struct lb_quote_context_t*, const struct lb_push_quote_t*, void*);
 
 /**
  * Depth
@@ -692,7 +689,7 @@ typedef struct lb_push_depth_t {
   uintptr_t num_bids;
 } lb_push_depth_t;
 
-typedef void (*lb_depth_callback_t)(const struct lb_quote_context_t*, const struct lb_push_depth_t*);
+typedef void (*lb_depth_callback_t)(const struct lb_quote_context_t*, const struct lb_push_depth_t*, void*);
 
 /**
  * Brokers
@@ -735,10 +732,10 @@ typedef struct lb_push_brokers_t {
   /**
    * Number of bid brokers
    */
-  uintptr_t num_bids;
+  uintptr_t num_bid_brokers;
 } lb_push_brokers_t;
 
-typedef void (*lb_brokers_callback_t)(const struct lb_quote_context_t*, const struct lb_push_brokers_t*);
+typedef void (*lb_brokers_callback_t)(const struct lb_quote_context_t*, const struct lb_push_brokers_t*, void*);
 
 /**
  * Trade
@@ -819,7 +816,7 @@ typedef struct lb_push_trades_t {
   uintptr_t num_trades;
 } lb_push_trades_t;
 
-typedef void (*lb_trades_callback_t)(const struct lb_quote_context_t*, const struct lb_push_trades_t*);
+typedef void (*lb_trades_callback_t)(const struct lb_quote_context_t*, const struct lb_push_trades_t*, void*);
 
 /**
  * Candlestick
@@ -873,7 +870,7 @@ typedef struct lb_push_candlestick_t {
   struct lb_candlestick_t candlestick;
 } lb_push_candlestick_t;
 
-typedef void (*lb_candlestick_callback_t)(const struct lb_quote_context_t*, const struct lb_push_candlestick_t*);
+typedef void (*lb_candlestick_callback_t)(const struct lb_quote_context_t*, const struct lb_push_candlestick_t*, void*);
 
 typedef struct lb_date_t {
   int32_t year;
@@ -975,22 +972,22 @@ typedef struct lb_push_order_changed_t {
   const char *account_no;
 } lb_push_order_changed_t;
 
-typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*, const struct lb_push_order_changed_t*);
+typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*, const struct lb_push_order_changed_t*, void*);
 
 /**
  * Options for get histroy executions request
  */
 typedef struct lb_get_history_executions_options_t {
   /**
-   * Start time (can null)
+   * Start time (can be null)
    */
   const int64_t *start_at;
   /**
-   * End time (can null)
+   * End time (can be null)
    */
   const int64_t *end_at;
   /**
-   * Security code (can null)
+   * Security code (can be null)
    */
   const char *symbol;
 } lb_get_history_executions_options_t;
@@ -1000,11 +997,11 @@ typedef struct lb_get_history_executions_options_t {
  */
 typedef struct lb_get_today_executions_options_t {
   /**
-   * Security code (can null)
+   * Security code (can be null)
    */
   const char *symbol;
   /**
-   * Order id (can null)
+   * Order id (can be null)
    */
   const char *order_id;
 } lb_get_today_executions_options_t;
@@ -1014,11 +1011,11 @@ typedef struct lb_get_today_executions_options_t {
  */
 typedef struct lb_get_history_orders_options_t {
   /**
-   * Security symbol (can null)
+   * Security symbol (can be null)
    */
   const char *symbol;
   /**
-   * Order status (can null)
+   * Order status (can be null)
    */
   const enum lb_order_status_t *status;
   /**
@@ -1026,19 +1023,19 @@ typedef struct lb_get_history_orders_options_t {
    */
   uintptr_t num_status;
   /**
-   * Order side (can null)
+   * Order side (can be null)
    */
   const enum lb_order_side_t *side;
   /**
-   * Market (can null)
+   * Market (can be null)
    */
   const enum lb_market_t *market;
   /**
-   * Start time (can null)
+   * Start time (can be null)
    */
   const int64_t *start_at;
   /**
-   * End time (can null)
+   * End time (can be null)
    */
   const int64_t *end_at;
 } lb_get_history_orders_options_t;
@@ -1048,11 +1045,11 @@ typedef struct lb_get_history_orders_options_t {
  */
 typedef struct lb_get_today_orders_options_t {
   /**
-   * Security symbol (can null)
+   * Security symbol (can be null)
    */
   const char *symbol;
   /**
-   * Order status (can null)
+   * Order status (can be null)
    */
   const enum lb_order_status_t *status;
   /**
@@ -1060,15 +1057,15 @@ typedef struct lb_get_today_orders_options_t {
    */
   uintptr_t num_status;
   /**
-   * Order side (can null)
+   * Order side (can be null)
    */
   const enum lb_order_side_t *side;
   /**
-   * Market (can null)
+   * Market (can be null)
    */
   const enum lb_market_t *market;
   /**
-   * Order id (can null)
+   * Order id (can be null)
    */
   const char *order_id;
 } lb_get_today_orders_options_t;
@@ -1086,27 +1083,27 @@ typedef struct lb_replace_order_options_t {
    */
   int64_t quantity;
   /**
-   * Price (can null)
+   * Price (can be null)
    */
   const struct lb_decimal_t *price;
   /**
-   * Trigger price (can null)
+   * Trigger price (can be null)
    */
   const struct lb_decimal_t *trigger_price;
   /**
-   * Limit offset (can null)
+   * Limit offset (can be null)
    */
   const struct lb_decimal_t *limit_offset;
   /**
-   * Trailing amount (can null)
+   * Trailing amount (can be null)
    */
   const struct lb_decimal_t *trailing_amount;
   /**
-   * Trailing percent (can null)
+   * Trailing percent (can be null)
    */
   const struct lb_decimal_t *trailing_percent;
   /**
-   * Remark (can null)
+   * Remark (can be null)
    */
   const char *remark;
 } lb_replace_order_options_t;
@@ -1136,36 +1133,36 @@ typedef struct lb_submit_order_options_t {
    */
   enum lb_time_in_force_type_t time_in_force;
   /**
-   * Submitted price (can null)
+   * Submitted price (can be null)
    */
   const struct lb_decimal_t *submitted_price;
   /**
-   * Trigger price (`LIT` / `MIT` Required) (can null)
+   * Trigger price (`LIT` / `MIT` Required) (can be null)
    */
   const struct lb_decimal_t *trigger_price;
   /**
-   * Limit offset amount (`TSLPAMT` / `TSLPPCT` Required) (can null)
+   * Limit offset amount (`TSLPAMT` / `TSLPPCT` Required) (can be null)
    */
   const struct lb_decimal_t *limit_offset;
   /**
-   * Trailing amount (`TSLPAMT` / `TSMAMT` Required) (can null)
+   * Trailing amount (`TSLPAMT` / `TSMAMT` Required) (can be null)
    */
   const struct lb_decimal_t *trailing_amount;
   /**
-   * Trailing percent (`TSLPPCT` / `TSMAPCT` Required) (can null)
+   * Trailing percent (`TSLPPCT` / `TSMAPCT` Required) (can be null)
    */
   const struct lb_decimal_t *trailing_percent;
   /**
    * Long term order expire date (Required when `time_in_force` is
-   * `GoodTilDate`) (can null)
+   * `GoodTilDate`) (can be null)
    */
   const struct lb_date_t *expire_date;
   /**
-   * Enable or disable outside regular trading hours (can null)
+   * Enable or disable outside regular trading hours (can be null)
    */
   const enum lb_outside_rth_t *outside_rth;
   /**
-   * Remark (Maximum 64 characters) (can null)
+   * Remark (Maximum 64 characters) (can be null)
    */
   const char *remark;
 } lb_submit_order_options_t;
@@ -1183,19 +1180,19 @@ typedef struct lb_get_cash_flow_options_t {
    */
   int64_t end_at;
   /**
-   * Business type (can null)
+   * Business type (can be null)
    */
   const enum lb_balance_type_t *business_type;
   /**
-   * Security symbol
+   * Security symbol (can be null)
    */
   const char *symbol;
   /**
-   * Page number
+   * Page number (can be null)
    */
   const uintptr_t *page;
   /**
-   * Page size
+   * Page size (can be null)
    */
   const uintptr_t *size;
 } lb_get_cash_flow_options_t;
@@ -1205,7 +1202,7 @@ typedef struct lb_get_cash_flow_options_t {
  */
 typedef struct lb_get_fund_positions_options_t {
   /**
-   * Fund symbols (can null)
+   * Fund symbols (can be null)
    */
   const char *const *symbols;
   /**
@@ -1219,14 +1216,21 @@ typedef struct lb_get_fund_positions_options_t {
  */
 typedef struct lb_get_stock_positions_options_t {
   /**
-   * Fund symbols (can null)
+   * Fund symbols (can be null)
    */
   const char *const *symbols;
   /**
-   * Number of fund symbols
+   * Number of stock symbols
    */
   uintptr_t num_symbols;
 } lb_get_stock_positions_options_t;
+
+typedef struct lb_subscription_t {
+  const char *symbol;
+  uint8_t sub_types;
+  const enum lb_period_t *candlesticks;
+  uintptr_t num_candlesticks;
+} lb_subscription_t;
 
 /**
  * The basic information of securities
@@ -1293,6 +1297,40 @@ typedef struct lb_security_static_info_t {
    */
   uint8_t stock_derivatives;
 } lb_security_static_info_t;
+
+/**
+ * Quote of US pre/post market
+ */
+typedef struct lb_prepost_quote_t {
+  /**
+   * Latest price
+   */
+  const struct lb_decimal_t *last_done;
+  /**
+   * Time of latest price
+   */
+  int64_t timestamp;
+  /**
+   * Volume
+   */
+  int64_t volume;
+  /**
+   * Turnover
+   */
+  const struct lb_decimal_t *turnover;
+  /**
+   * High
+   */
+  const struct lb_decimal_t *high;
+  /**
+   * Low
+   */
+  const struct lb_decimal_t *low;
+  /**
+   * Close of the last trade session
+   */
+  const struct lb_decimal_t *prev_close;
+} lb_prepost_quote_t;
 
 /**
  * Quote of securitity
@@ -1767,7 +1805,7 @@ typedef struct lb_capital_distribution_t {
 /**
  * Capital distribution response
  */
-typedef struct ln_capital_distribution_response_t {
+typedef struct lb_capital_distribution_response_t {
   /**
    * Time
    */
@@ -1780,7 +1818,7 @@ typedef struct ln_capital_distribution_response_t {
    * Outflow capital data
    */
   struct lb_capital_distribution_t capital_out;
-} ln_capital_distribution_response_t;
+} lb_capital_distribution_response_t;
 
 /**
  * Real-time quote
@@ -2130,7 +2168,13 @@ typedef struct lb_fund_position_channel_t {
  * Fund positions response
  */
 typedef struct lb_fund_position_response_t {
+  /**
+   * Channels
+   */
   const struct lb_fund_position_channel_t *channels;
+  /**
+   * Number of channels
+   */
   uintptr_t num_channels;
 } lb_fund_position_response_t;
 
@@ -2191,9 +2235,25 @@ typedef struct lb_stock_position_channel_t {
  * Stock positions response
  */
 typedef struct lb_stock_position_response_t {
+  /**
+   * Channels
+   */
   const struct lb_stock_position_channel_t *channels;
+  /**
+   * Number of channels
+   */
   uintptr_t num_channels;
 } lb_stock_position_response_t;
+
+/**
+ * Response for submit order request
+ */
+typedef struct lb_submit_order_response_t {
+  /**
+   * Order id
+   */
+  const char *order_id;
+} lb_submit_order_response_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -2251,40 +2311,53 @@ void lb_quote_context_set_userdata(const struct lb_quote_context_t *ctx, void *u
 
 void *lb_quote_context_userdata(const struct lb_quote_context_t *ctx);
 
+void lb_quote_context_set_free_userdata_func(const struct lb_quote_context_t *ctx,
+                                             lb_free_userdata_func_t f);
+
 /**
  * Set quote callback, after receiving the quote data push, it will call back
  * to this function.
  */
 void lb_quote_context_set_on_quote(const struct lb_quote_context_t *ctx,
-                                   lb_quote_callback_t callback);
+                                   lb_quote_callback_t callback,
+                                   void *userdata,
+                                   lb_free_userdata_func_t free_userdata);
 
 /**
  * Set depth callback, after receiving the depth data push, it will call
  * back to this function.
  */
 void lb_quote_context_set_on_depth(const struct lb_quote_context_t *ctx,
-                                   lb_depth_callback_t callback);
+                                   lb_depth_callback_t callback,
+                                   void *userdata,
+                                   lb_free_userdata_func_t free_userdata);
 
 /**
  * Set brokers callback, after receiving the brokers data push, it will
  * call back to this function.
  */
 void lb_quote_context_set_on_brokers(const struct lb_quote_context_t *ctx,
-                                     lb_brokers_callback_t callback);
+                                     lb_brokers_callback_t callback,
+                                     void *userdata,
+                                     lb_free_userdata_func_t free_userdata);
 
 /**
  * Set trades callback, after receiving the trades data push, it will call
  * back to this function.
  */
 void lb_quote_context_set_on_trades(const struct lb_quote_context_t *ctx,
-                                    lb_trades_callback_t callback);
+                                    lb_trades_callback_t callback,
+                                    void *userdata,
+                                    lb_free_userdata_func_t free_userdata);
 
 /**
  * Set candlestick callback, after receiving the trades data push, it will
  * call back to this function.
  */
 void lb_quote_context_set_on_candlestick(const struct lb_quote_context_t *ctx,
-                                         lb_candlestick_callback_t callback);
+                                         lb_candlestick_callback_t callback,
+                                         void *userdata,
+                                         lb_free_userdata_func_t free_userdata);
 
 void lb_quote_context_subscribe(const struct lb_quote_context_t *ctx,
                                 const char *const *symbols,
@@ -2544,12 +2617,17 @@ void lb_trade_context_set_userdata(const struct lb_trade_context_t *ctx, void *u
 
 void *lb_trade_context_userdata(const struct lb_trade_context_t *ctx);
 
+void lb_trade_context_set_free_userdata_func(const struct lb_trade_context_t *ctx,
+                                             lb_free_userdata_func_t f);
+
 /**
  * Set order changed callback, after receiving the order changed event, it will
  * call back to this function.
  */
 void lb_trade_context_set_on_order_changed(const struct lb_trade_context_t *ctx,
-                                           lb_order_changed_callback_t callback);
+                                           lb_order_changed_callback_t callback,
+                                           void *userdata,
+                                           lb_free_userdata_func_t free_userdata);
 
 void lb_trade_context_subscribe(const struct lb_trade_context_t *ctx,
                                 const enum lb_topic_type_t *topics,
@@ -2566,7 +2644,7 @@ void lb_trade_context_unsubscribe(const struct lb_trade_context_t *ctx,
 /**
  * Get history executions
  *
- * @param[in] opts Options for get histroy executions request (can null)
+ * @param[in] opts Options for get histroy executions request (can be null)
  */
 void lb_trade_context_history_executions(const struct lb_trade_context_t *ctx,
                                          const struct lb_get_history_executions_options_t *opts,
@@ -2576,7 +2654,7 @@ void lb_trade_context_history_executions(const struct lb_trade_context_t *ctx,
 /**
  * Get today executions
  *
- * @param[in] opts Options for get today executions request (can null)
+ * @param[in] opts Options for get today executions request (can be null)
  */
 void lb_trade_context_today_executions(const struct lb_trade_context_t *ctx,
                                        const struct lb_get_today_executions_options_t *opts,
@@ -2586,7 +2664,7 @@ void lb_trade_context_today_executions(const struct lb_trade_context_t *ctx,
 /**
  * Get history orders
  *
- * @param[in] opts Options for get history orders request (can null)
+ * @param[in] opts Options for get history orders request (can be null)
  */
 void lb_trade_context_history_orders(const struct lb_trade_context_t *ctx,
                                      const struct lb_get_history_orders_options_t *opts,
@@ -2596,7 +2674,7 @@ void lb_trade_context_history_orders(const struct lb_trade_context_t *ctx,
 /**
  * Get today orders
  *
- * @param[in] opts Options for get today orders request (can null)
+ * @param[in] opts Options for get today orders request (can be null)
  */
 void lb_trade_context_today_orders(const struct lb_trade_context_t *ctx,
                                    const struct lb_get_today_orders_options_t *opts,

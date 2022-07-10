@@ -103,10 +103,10 @@ pub enum COptionDirection {
     OptionDirectionUnknown,
     /// Put
     #[c(remote = "Put")]
-    OptionDirectionAmerican,
+    OptionDirectionPut,
     /// Call
     #[c(remote = "Call")]
-    OptionDirectionEurope,
+    OptionDirectionCall,
 }
 
 /// Warrant type
@@ -155,7 +155,7 @@ pub enum CAdjustType {
 #[allow(clippy::enum_variant_names, non_camel_case_types)]
 #[repr(C)]
 pub enum CPeriod {
-    /// One Minute
+    /// Unknown
     #[c(remote = "UnknownPeriod")]
     PeriodUnknown,
     /// One Minute

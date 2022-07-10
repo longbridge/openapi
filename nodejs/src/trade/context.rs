@@ -71,7 +71,7 @@ impl TradeContext {
     /// Set order changed callback, after receiving the order changed event, it
     /// will call back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void")]
-    pub fn set_on_quote(&self, callback: JsFunction) -> Result<()> {
+    pub fn set_on_order_changed(&self, callback: JsFunction) -> Result<()> {
         self.callbacks.lock().order_changed =
             Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
         Ok(())

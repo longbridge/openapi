@@ -1,0 +1,29 @@
+[tasks.cpp]
+command = "make"
+args = ["longbridge_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-release]
+command = "make"
+args = ["longbridge_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp.windows]
+command = "msbuild"
+args = ["longbridge.sln", "-p:Configuration=Debug", "/t:longbridge_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-release.windows]
+command = "msbuild"
+args = ["longbridge.sln", "-p:Configuration=Release", "/t:longbridge_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-test]
+command = "make"
+args = ["test-cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-test.windows]
+command = "msbuild"
+args = ["longbridge.sln", "-p:Configuration=Debug", "/t:test-cpp"]
+cwd = "cmake.build"

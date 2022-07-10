@@ -187,3 +187,39 @@ jobs:
       - name: Compile java sources
         working-directory: java/javasrc
         run: mvn package
+
+  check-cpp-sdk:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install MSBuild
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.60.0
+          override: true
+          components: rustfmt, clippy
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Install cargo make
+        run: cargo install cargo-make
+
+      - name: Check with clippy
+        run: cargo clippy -p longbridge-c --all-features
+      
+      - name: Build with cmake
+        run: |
+          cargo make cmake
+          cargo make cpp

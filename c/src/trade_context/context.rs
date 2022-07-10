@@ -13,6 +13,7 @@ use time::OffsetDateTime;
 
 use crate::{
     async_call::{execute_async, CAsyncCallback, CAsyncResult},
+    callback::{CFreeUserDataFunc, Callback},
     config::CConfig,
     trade_context::{
         enum_types::CTopicType,
@@ -28,16 +29,18 @@ use crate::{
     types::{cstr_array_to_rust, cstr_to_rust, CCow, CVec, ToFFI},
 };
 
-pub type COnOrderChangedCallback = extern "C" fn(*const CTradeContext, *const CPushOrderChanged);
+pub type COnOrderChangedCallback =
+    extern "C" fn(*const CTradeContext, *const CPushOrderChanged, *mut c_void);
 
 #[derive(Default)]
 struct Callbacks {
-    order_changed: Option<COnOrderChangedCallback>,
+    order_changed: Option<Callback<COnOrderChangedCallback>>,
 }
 
 pub struct CTradeContextState {
-    userdata: *mut c_void,
     callbacks: Callbacks,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 }
 
 unsafe impl Send for CTradeContextState {}
@@ -46,6 +49,15 @@ unsafe impl Send for CTradeContextState {}
 pub struct CTradeContext {
     ctx: TradeContext,
     state: Mutex<CTradeContextState>,
+}
+
+impl Drop for CTradeContext {
+    fn drop(&mut self) {
+        let state = self.state.lock();
+        if let Some(free_userdata) = state.free_userdata {
+            free_userdata(state.userdata);
+        }
+    }
 }
 
 #[no_mangle]
@@ -66,6 +78,7 @@ pub unsafe extern "C" fn lb_trade_context_new(
             let state = Mutex::new(CTradeContextState {
                 userdata: std::ptr::null_mut(),
                 callbacks: Callbacks::default(),
+                free_userdata: None,
             });
             let arc_ctx = Arc::new(CTradeContext { ctx, state });
             let weak_ctx = Arc::downgrade(&arc_ctx);
@@ -81,10 +94,14 @@ pub unsafe extern "C" fn lb_trade_context_new(
                     let state = ctx.state.lock();
                     match event {
                         PushEvent::OrderChanged(order_changed) => {
-                            if let Some(callback) = state.callbacks.order_changed {
+                            if let Some(callback) = &state.callbacks.order_changed {
                                 let order_changed_owned: CPushOrderChangedOwned =
                                     order_changed.into();
-                                callback(Arc::as_ptr(&ctx), &order_changed_owned.to_ffi_type());
+                                (callback.f)(
+                                    Arc::as_ptr(&ctx),
+                                    &order_changed_owned.to_ffi_type(),
+                                    callback.userdata,
+                                );
                             }
                         }
                     }
@@ -125,14 +142,28 @@ pub unsafe extern "C" fn lb_trade_context_userdata(ctx: *const CTradeContext) ->
     (*ctx).state.lock().userdata
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn lb_trade_context_set_free_userdata_func(
+    ctx: *const CTradeContext,
+    f: CFreeUserDataFunc,
+) {
+    (*ctx).state.lock().free_userdata = f;
+}
+
 /// Set order changed callback, after receiving the order changed event, it will
 /// call back to this function.
 #[no_mangle]
 pub unsafe extern "C" fn lb_trade_context_set_on_order_changed(
     ctx: *const CTradeContext,
     callback: COnOrderChangedCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 ) {
-    (*ctx).state.lock().callbacks.order_changed = Some(callback);
+    (*ctx).state.lock().callbacks.order_changed = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
 }
 
 #[no_mangle]
@@ -175,7 +206,7 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
 
 /// Get history executions
 ///
-/// @param[in] opts Options for get histroy executions request (can null)
+/// @param[in] opts Options for get histroy executions request (can be null)
 #[no_mangle]
 pub unsafe extern "C" fn lb_trade_context_history_executions(
     ctx: *const CTradeContext,
@@ -208,7 +239,7 @@ pub unsafe extern "C" fn lb_trade_context_history_executions(
 
 /// Get today executions
 ///
-/// @param[in] opts Options for get today executions request (can null)
+/// @param[in] opts Options for get today executions request (can be null)
 #[no_mangle]
 pub unsafe extern "C" fn lb_trade_context_today_executions(
     ctx: *const CTradeContext,
@@ -234,7 +265,7 @@ pub unsafe extern "C" fn lb_trade_context_today_executions(
 
 /// Get history orders
 ///
-/// @param[in] opts Options for get history orders request (can null)
+/// @param[in] opts Options for get history orders request (can be null)
 #[no_mangle]
 pub unsafe extern "C" fn lb_trade_context_history_orders(
     ctx: *const CTradeContext,
@@ -277,7 +308,7 @@ pub unsafe extern "C" fn lb_trade_context_history_orders(
 
 /// Get today orders
 ///
-/// @param[in] opts Options for get today orders request (can null)
+/// @param[in] opts Options for get today orders request (can be null)
 #[no_mangle]
 pub unsafe extern "C" fn lb_trade_context_today_orders(
     ctx: *const CTradeContext,

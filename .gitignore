@@ -2,3 +2,4 @@
 /Cargo.lock
 .vscode
 *.log
+cmake.build

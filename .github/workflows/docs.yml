@@ -61,25 +61,26 @@ jobs:
         working-directory: ./java/javasrc
         run: mvn javadoc:javadoc
 
-      - name: Get SDK Version
-        run: |
-          echo RUST_SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' rust/Cargo.toml) >> $GITHUB_ENV
-          echo PYTHON_SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' python/Cargo.toml) >> $GITHUB_ENV
-          echo NODEJS_SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' nodejs/Cargo.toml) >> $GITHUB_ENV
-          echo JAVA_SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' java/Cargo.toml) >> $GITHUB_ENV
+      - name: Build C docs
+        uses: mattnotmitt/doxygen-action@v1.9.4
+        with:
+          working-directory: ./c
+
+      - name: Build C++ docs
+        uses: mattnotmitt/doxygen-action@v1.9.4
+        with:
+          working-directory: ./cpp
 
       - name: Copy to gh-pages
         run: |
           mkdir -p gh-pages
-          mkdir -p gh-pages/rust
-          mkdir -p gh-pages/python
-          mkdir -p gh-pages/nodejs
-          mkdir -p gh-pages/java
-          mv -f target/doc gh-pages/rust/$RUST_SDK_VERSION
-          mv -f python/site gh-pages/python/$PYTHON_SDK_VERSION
-          mv -f nodejs/docs gh-pages/nodejs/$NODEJS_SDK_VERSION
-          mv -f java/javasrc/target/site/apidocs gh-pages/java/$JAVA_SDK_VERSION
-          python .github/misc/render_docs_index.py > gh-pages/index.html
+          mv -f target/doc gh-pages/rust
+          mv -f python/site gh-pages/python
+          mv -f nodejs/docs gh-pages/nodejs
+          mv -f java/javasrc/target/site/apidocs gh-pages/java
+          mv -f c/html gh-pages/c
+          mv -f cpp/html gh-pages/cpp
+          cp .github/misc/templates/docs.html gh-pages/index.html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v2.5.1
         with:

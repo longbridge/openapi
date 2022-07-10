@@ -8,6 +8,7 @@ use parking_lot::Mutex;
 
 use crate::{
     async_call::{execute_async, CAsyncCallback, CAsyncResult},
+    callback::{CFreeUserDataFunc, Callback},
     config::CConfig,
     quote_context::{
         enum_types::{CAdjustType, CPeriod},
@@ -25,28 +26,30 @@ use crate::{
     types::{cstr_array_to_rust, cstr_to_rust, CCow, CDate, CMarket, CVec, ToFFI},
 };
 
-pub type COnQuoteCallback = extern "C" fn(*const CQuoteContext, *const CPushQuote);
+pub type COnQuoteCallback = extern "C" fn(*const CQuoteContext, *const CPushQuote, *mut c_void);
 
-pub type COnDepthCallback = extern "C" fn(*const CQuoteContext, *const CPushDepth);
+pub type COnDepthCallback = extern "C" fn(*const CQuoteContext, *const CPushDepth, *mut c_void);
 
-pub type COnBrokersCallback = extern "C" fn(*const CQuoteContext, *const CPushBrokers);
+pub type COnBrokersCallback = extern "C" fn(*const CQuoteContext, *const CPushBrokers, *mut c_void);
 
-pub type COnTradesCallback = extern "C" fn(*const CQuoteContext, *const CPushTrades);
+pub type COnTradesCallback = extern "C" fn(*const CQuoteContext, *const CPushTrades, *mut c_void);
 
-pub type COnCandlestickCallback = extern "C" fn(*const CQuoteContext, *const CPushCandlestick);
+pub type COnCandlestickCallback =
+    extern "C" fn(*const CQuoteContext, *const CPushCandlestick, *mut c_void);
 
 #[derive(Default)]
 struct Callbacks {
-    quote: Option<COnQuoteCallback>,
-    depth: Option<COnDepthCallback>,
-    brokers: Option<COnBrokersCallback>,
-    trades: Option<COnTradesCallback>,
-    candlestick: Option<COnCandlestickCallback>,
+    quote: Option<Callback<COnQuoteCallback>>,
+    depth: Option<Callback<COnDepthCallback>>,
+    brokers: Option<Callback<COnBrokersCallback>>,
+    trades: Option<Callback<COnTradesCallback>>,
+    candlestick: Option<Callback<COnCandlestickCallback>>,
 }
 
 pub struct CQuoteContextState {
-    userdata: *mut c_void,
     callbacks: Callbacks,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 }
 
 unsafe impl Send for CQuoteContextState {}
@@ -55,6 +58,15 @@ unsafe impl Send for CQuoteContextState {}
 pub struct CQuoteContext {
     ctx: QuoteContext,
     state: Mutex<CQuoteContextState>,
+}
+
+impl Drop for CQuoteContext {
+    fn drop(&mut self) {
+        let state = self.state.lock();
+        if let Some(free_userdata) = state.free_userdata {
+            free_userdata(state.userdata);
+        }
+    }
 }
 
 #[no_mangle]
@@ -75,6 +87,7 @@ pub unsafe extern "C" fn lb_quote_context_new(
             let state = Mutex::new(CQuoteContextState {
                 userdata: std::ptr::null_mut(),
                 callbacks: Callbacks::default(),
+                free_userdata: None,
             });
             let arc_ctx = Arc::new(CQuoteContext { ctx, state });
             let weak_ctx = Arc::downgrade(&arc_ctx);
@@ -94,9 +107,13 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             detail: PushEventDetail::Quote(quote),
                             ..
                         } => {
-                            if let Some(callback) = state.callbacks.quote {
+                            if let Some(callback) = &state.callbacks.quote {
                                 let quote_owned: CPushQuoteOwned = (symbol, quote).into();
-                                callback(Arc::as_ptr(&ctx), &quote_owned.to_ffi_type());
+                                (callback.f)(
+                                    Arc::as_ptr(&ctx),
+                                    &quote_owned.to_ffi_type(),
+                                    callback.userdata,
+                                );
                             }
                         }
                         PushEvent {
@@ -104,9 +121,13 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             detail: PushEventDetail::Depth(depth),
                             ..
                         } => {
-                            if let Some(callback) = state.callbacks.depth {
+                            if let Some(callback) = &state.callbacks.depth {
                                 let depth_owned: CPushDepthOwned = (symbol, depth).into();
-                                callback(Arc::as_ptr(&ctx), &depth_owned.to_ffi_type());
+                                (callback.f)(
+                                    Arc::as_ptr(&ctx),
+                                    &depth_owned.to_ffi_type(),
+                                    callback.userdata,
+                                );
                             }
                         }
                         PushEvent {
@@ -114,9 +135,13 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             detail: PushEventDetail::Brokers(brokers),
                             ..
                         } => {
-                            if let Some(callback) = state.callbacks.brokers {
+                            if let Some(callback) = &state.callbacks.brokers {
                                 let brokers_owned: CPushBrokersOwned = (symbol, brokers).into();
-                                callback(Arc::as_ptr(&ctx), &brokers_owned.to_ffi_type());
+                                (callback.f)(
+                                    Arc::as_ptr(&ctx),
+                                    &brokers_owned.to_ffi_type(),
+                                    callback.userdata,
+                                );
                             }
                         }
                         PushEvent {
@@ -124,9 +149,13 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             detail: PushEventDetail::Trade(trades),
                             ..
                         } => {
-                            if let Some(callback) = state.callbacks.trades {
+                            if let Some(callback) = &state.callbacks.trades {
                                 let trades_owned: CPushTradesOwned = (symbol, trades).into();
-                                callback(Arc::as_ptr(&ctx), &trades_owned.to_ffi_type());
+                                (callback.f)(
+                                    Arc::as_ptr(&ctx),
+                                    &trades_owned.to_ffi_type(),
+                                    callback.userdata,
+                                );
                             }
                         }
                         PushEvent {
@@ -134,10 +163,14 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             detail: PushEventDetail::Candlestick(candlestick),
                             ..
                         } => {
-                            if let Some(callback) = state.callbacks.candlestick {
+                            if let Some(callback) = &state.callbacks.candlestick {
                                 let candlestick_owned: CPushCandlestickOwned =
                                     (symbol, candlestick).into();
-                                callback(Arc::as_ptr(&ctx), &candlestick_owned.to_ffi_type());
+                                (callback.f)(
+                                    Arc::as_ptr(&ctx),
+                                    &candlestick_owned.to_ffi_type(),
+                                    callback.userdata,
+                                );
                             }
                         }
                     }
@@ -178,14 +211,28 @@ pub unsafe extern "C" fn lb_quote_context_userdata(ctx: *const CQuoteContext) ->
     (*ctx).state.lock().userdata
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_set_free_userdata_func(
+    ctx: *const CQuoteContext,
+    f: CFreeUserDataFunc,
+) {
+    (*ctx).state.lock().free_userdata = f;
+}
+
 /// Set quote callback, after receiving the quote data push, it will call back
 /// to this function.
 #[no_mangle]
 pub unsafe extern "C" fn lb_quote_context_set_on_quote(
     ctx: *const CQuoteContext,
     callback: COnQuoteCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 ) {
-    (*ctx).state.lock().callbacks.quote = Some(callback);
+    (*ctx).state.lock().callbacks.quote = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
 }
 
 /// Set depth callback, after receiving the depth data push, it will call
@@ -194,8 +241,14 @@ pub unsafe extern "C" fn lb_quote_context_set_on_quote(
 pub unsafe extern "C" fn lb_quote_context_set_on_depth(
     ctx: *const CQuoteContext,
     callback: COnDepthCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 ) {
-    (*ctx).state.lock().callbacks.depth = Some(callback);
+    (*ctx).state.lock().callbacks.depth = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
 }
 
 /// Set brokers callback, after receiving the brokers data push, it will
@@ -204,8 +257,14 @@ pub unsafe extern "C" fn lb_quote_context_set_on_depth(
 pub unsafe extern "C" fn lb_quote_context_set_on_brokers(
     ctx: *const CQuoteContext,
     callback: COnBrokersCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 ) {
-    (*ctx).state.lock().callbacks.brokers = Some(callback);
+    (*ctx).state.lock().callbacks.brokers = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
 }
 
 /// Set trades callback, after receiving the trades data push, it will call
@@ -214,8 +273,14 @@ pub unsafe extern "C" fn lb_quote_context_set_on_brokers(
 pub unsafe extern "C" fn lb_quote_context_set_on_trades(
     ctx: *const CQuoteContext,
     callback: COnTradesCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 ) {
-    (*ctx).state.lock().callbacks.trades = Some(callback);
+    (*ctx).state.lock().callbacks.trades = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
 }
 
 /// Set candlestick callback, after receiving the trades data push, it will
@@ -224,8 +289,14 @@ pub unsafe extern "C" fn lb_quote_context_set_on_trades(
 pub unsafe extern "C" fn lb_quote_context_set_on_candlestick(
     ctx: *const CQuoteContext,
     callback: COnCandlestickCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
 ) {
-    (*ctx).state.lock().callbacks.candlestick = Some(callback);
+    (*ctx).state.lock().callbacks.candlestick = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
 }
 
 #[no_mangle]

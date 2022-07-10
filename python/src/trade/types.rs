@@ -367,7 +367,7 @@ pub(crate) struct AccountBalance {
 pub(crate) enum BalanceType {
     /// Unknown
     Unknown,
-    /// Limit Order
+    /// Cash
     Cash,
     /// Stock
     Stock,
@@ -383,7 +383,7 @@ pub(crate) enum CashFlowDirection {
     Unknown,
     /// Out
     Out,
-    /// Stock
+    /// In
     In,
 }
 

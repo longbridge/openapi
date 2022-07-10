@@ -25,9 +25,12 @@ pub struct CConfig(pub(crate) Arc<Config>);
 #[no_mangle]
 pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_env() {
-        Ok(config) => Box::into_raw(Box::new(CConfig(Arc::new(config)))),
+        Ok(config) => {
+            set_error(error, None);
+            Box::into_raw(Box::new(CConfig(Arc::new(config))))
+        }
         Err(err) => {
-            set_error(error, err);
+            set_error(error, Some(err));
             std::ptr::null_mut()
         }
     }

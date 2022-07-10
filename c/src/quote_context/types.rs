@@ -260,7 +260,7 @@ pub struct CPushBrokers {
     /// Bid depth
     pub bid_brokers: *const CBrokers,
     /// Number of bid brokers
-    pub num_bids: usize,
+    pub num_bid_brokers: usize,
 }
 
 /// Brokers message
@@ -299,7 +299,7 @@ impl ToFFI for CPushBrokersOwned {
             ask_brokers: ask_brokers.to_ffi_type(),
             num_ask_brokers: ask_brokers.len(),
             bid_brokers: bid_brokers.to_ffi_type(),
-            num_bids: bid_brokers.len(),
+            num_bid_brokers: bid_brokers.len(),
         }
     }
 }
@@ -573,7 +573,7 @@ impl ToFFI for CPushCandlestickOwned {
 pub struct CSubscription {
     symbol: *const c_char,
     sub_types: u8,
-    candlesticks: *const i32,
+    candlesticks: *const CPeriod,
     num_candlesticks: usize,
 }
 
@@ -581,7 +581,7 @@ pub struct CSubscription {
 pub(crate) struct CSubscriptionOwned {
     symbol: CString,
     sub_types: u8,
-    candlesticks: Vec<i32>,
+    candlesticks: Vec<CPeriod>,
 }
 
 impl From<Subscription> for CSubscriptionOwned {
@@ -594,7 +594,7 @@ impl From<Subscription> for CSubscriptionOwned {
         CSubscriptionOwned {
             symbol: symbol.into(),
             sub_types: sub_types.bits(),
-            candlesticks: candlesticks.into_iter().map(|value| value as i32).collect(),
+            candlesticks: candlesticks.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -752,7 +752,7 @@ impl ToFFI for CSecurityStaticInfoOwned {
 }
 
 /// Quote of US pre/post market
-#[derive(Debug, Clone)]
+#[repr(C)]
 pub struct CPrePostQuote {
     /// Latest price
     pub last_done: *const CDecimal,

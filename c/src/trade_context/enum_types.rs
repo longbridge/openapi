@@ -20,10 +20,10 @@ pub enum COrderSide {
     /// Unknown
     #[c(remote = "Unknown")]
     OrderSideUnknown,
-    /// Unknown
+    /// Buy
     #[c(remote = "Buy")]
     OrderSideBuy,
-    /// Unknown
+    /// Sell
     #[c(remote = "Sell")]
     OrderSideSell,
 }
@@ -225,7 +225,7 @@ pub enum CCashFlowDirection {
     CashFlowDirectionUnknown,
     /// Out
     #[c(remote = "Out")]
-    CashFlowDirectionOutside,
+    CashFlowDirectionOut,
     /// In
     #[c(remote = "In")]
     CashFlowDirectionIn,
@@ -240,13 +240,13 @@ pub enum CBalanceType {
     /// Unknown
     #[c(remote = "Unknown")]
     BalanceTypeUnknown,
-    /// Unknown
+    /// Cash
     #[c(remote = "Cash")]
     BalanceTypeCash,
-    /// Unknown
+    /// Stock
     #[c(remote = "Stock")]
     BalanceTypeStock,
-    /// Unknown
+    /// Fund
     #[c(remote = "Fund")]
     BalanceTypeFund,
 }

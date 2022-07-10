@@ -1,7 +1,12 @@
 [tasks.c]
 command = "make"
 args = ["cargo-build_longbridge-c"]
-cwd = "c/cmake"
+cwd = "cmake.build"
+
+[tasks.c-release]
+command = "make"
+args = ["cargo-build_longbridge-c"]
+cwd = "cmake.build"
 
 [tasks.c.windows]
 command = "msbuild"
@@ -10,29 +15,23 @@ args = [
     "-p:Configuration=Debug",
     "/t:cargo-build_longbridge-c",
 ]
-cwd = "c/cmake"
+cwd = "cmake.build"
+
+[tasks.c-release.windows]
+command = "msbuild"
+args = [
+    "longbridge.sln",
+    "-p:Configuration=Release",
+    "/t:cargo-build_longbridge-c",
+]
+cwd = "cmake.build"
 
 [tasks.c-test]
 command = "make"
-args = ["test"]
-cwd = "c/cmake"
+args = ["test-c"]
+cwd = "cmake.build"
 
 [tasks.c-test.windows]
 command = "msbuild"
-args = ["longbridge.sln", "-p:Configuration=Debug", "/t:test"]
-cwd = "c/cmake"
-
-[tasks.cpp-test]
-command = "make"
-args = ["test_cpp"]
-cwd = "c/cmake"
-
-[tasks.cpp-test.windows]
-command = "msbuild"
-args = ["longbridge.sln", "-p:Configuration=Debug", "/t:test_cpp"]
-cwd = "c/cmake"
-
-[tasks.c-cmake]
-command = "cmake"
-args = ["../"]
-cwd = "c/cmake"
+args = ["longbridge.sln", "-p:Configuration=Debug", "/t:test-c"]
+cwd = "cmake.build"

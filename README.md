@@ -15,6 +15,8 @@ Longbridge OpenAPI provides programmatic quote trading interfaces for investors 
 | [Python](python/README.md)  | Longbridge OpenAPI for Python 3 `(>= 3.7)`  |
 | [Node.js](nodejs/README.md) | Longbridge OpenAPI for Node.js `(>= 10)`    |
 | [Java](java/README.md)      | Longbridge OpenAPI for Java `(>= 1.8)`      |
+| [C]                         | Longbridge OpenAPI for C `(>= C89)`         |
+| [C++]                       | Longbridge OpenAPI for C++`(>= C++17)`      |
 | Go                          | https://github.com/longbridgeapp/openapi-go |
 
 ## How to enable Longbridge OpenAPI

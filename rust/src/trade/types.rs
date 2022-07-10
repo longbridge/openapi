@@ -344,7 +344,7 @@ pub enum BalanceType {
     /// Unknown
     #[num_enum(default)]
     Unknown = 0,
-    /// Limit Order
+    /// Cash
     Cash = 1,
     /// Stock
     Stock = 2,
@@ -375,7 +375,7 @@ pub enum CashFlowDirection {
     Unknown,
     /// Out
     Out = 1,
-    /// Stock
+    /// In
     In = 2,
 }
 

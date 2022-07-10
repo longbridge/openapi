@@ -368,7 +368,7 @@ pub struct AccountBalance {
 pub enum BalanceType {
     /// Unknown
     Unknown,
-    /// Limit Order
+    /// Cash
     Cash,
     /// Stock
     Stock,
@@ -384,7 +384,7 @@ pub enum CashFlowDirection {
     Unknown,
     /// Out
     Out,
-    /// Stock
+    /// In
     In,
 }
 
@@ -417,6 +417,7 @@ pub struct CashFlow {
 #[derive(Debug, JsObject)]
 #[js(remote = "longbridge::trade::FundPositionsResponse")]
 pub struct FundPositionsResponse {
+    /// Channels
     #[js(array)]
     channels: Vec<FundPositionChannel>,
 }
@@ -460,6 +461,7 @@ pub struct FundPosition {
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::trade::StockPositionsResponse")]
 pub struct StockPositionsResponse {
+    /// Channels
     #[js(array)]
     channels: Vec<StockPositionChannel>,
 }

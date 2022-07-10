@@ -25,9 +25,12 @@ pub unsafe extern "C" fn lb_error_free(error: *mut CError) {
     let _ = Box::from_raw(error);
 }
 
-pub(crate) unsafe fn set_error(error: *mut *mut CError, err: Error) {
+pub(crate) unsafe fn set_error(error: *mut *mut CError, err: Option<Error>) {
     if !error.is_null() {
-        *error = Box::into_raw(Box::new(err.into()));
+        match err {
+            Some(err) => *error = Box::into_raw(Box::new(err.into())),
+            None => *error = std::ptr::null_mut(),
+        }
     }
 }
 
