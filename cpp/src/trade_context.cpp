@@ -9,6 +9,11 @@ namespace trade {
 
 using longbridge::convert::convert;
 
+TradeContext::TradeContext()
+  : ctx_(nullptr)
+{
+}
+
 TradeContext::TradeContext(const lb_trade_context_t* ctx)
 {
 
@@ -384,7 +389,7 @@ TradeContext::submit_order(
   AsyncCallback<TradeContext, SubmitOrderResponse> callback) const
 {
   lb_submit_order_options_t opts2 = {
-    nullptr,
+    opts.symbol.c_str(),
     convert(opts.order_type),
     convert(opts.side),
     opts.submitted_quantity,

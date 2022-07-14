@@ -22,6 +22,7 @@ public:
 
   operator const lb_decimal_t*() const;
   operator lb_decimal_t*();
+  operator double() const;
 
   Decimal operator+(const Decimal& other) const;
   Decimal& operator+=(const Decimal& other);

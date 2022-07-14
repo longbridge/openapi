@@ -18,6 +18,8 @@ private:
   const lb_quote_context_t* ctx_;
 
 public:
+  QuoteContext();
+
   QuoteContext(const lb_quote_context_t* ctx);
 
   QuoteContext(const QuoteContext& ctx);

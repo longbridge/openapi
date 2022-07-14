@@ -16,11 +16,31 @@ on_account_balance(const struct lb_async_result_t* res)
 
   lb_account_balance_t* data = (lb_account_balance_t*)res->data;
   for (int i = 0; i < res->length; i++) {
+    printf("total_cash: %f\n", lb_decimal_to_double(data->total_cash));
+    printf("max_finance_amount: %f\n",
+           lb_decimal_to_double(data->max_finance_amount));
+    printf("remaining_finance_amount: %f\n",
+           lb_decimal_to_double(data->remaining_finance_amount));
+    printf("risk_level: %d\n", data->risk_level);
+    printf("margin_call: %f\n", lb_decimal_to_double(data->margin_call));
+    printf("currency: %s\n", data->currency);
     printf("init_margin: %f\n", lb_decimal_to_double(data->init_margin));
+    printf("maintenance_margin: %f\n",
+           lb_decimal_to_double(data->maintenance_margin));
+    printf("cash_infos:\n");
+
     for (int j = 0; j < data->num_cash_infos; j++) {
-      printf("currency: %s\n", data->cash_infos[j].currency);
-      printf("available_cash: %f\n",
-             lb_decimal_to_double(data->cash_infos[j].available_cash));
+      const lb_cash_info_t* cash_info = &data->cash_infos[j];
+
+      printf("\t%s\n", cash_info->currency);
+      printf("\t\twithdraw_cash: %f\n",
+             lb_decimal_to_double(cash_info->withdraw_cash));
+      printf("\t\tavailable_cash: %f\n",
+             lb_decimal_to_double(cash_info->available_cash));
+      printf("\t\tfrozen_cash: %f\n",
+             lb_decimal_to_double(cash_info->frozen_cash));
+      printf("\t\tsettling_cash: %f\n",
+             lb_decimal_to_double(cash_info->settling_cash));
     }
   }
 }
@@ -29,13 +49,13 @@ void
 on_trade_context_created(const struct lb_async_result_t* res)
 {
   if (res->error) {
-    printf("failed to create quote context: %s\n",
+    printf("failed to create trade context: %s\n",
            lb_error_message(res->error));
     return;
   }
 
+  *((const lb_quote_context_t**)res->userdata) = res->ctx;
   lb_trade_context_account_balance(res->ctx, on_account_balance, NULL);
-  lb_quote_context_release(res->ctx);
 }
 
 int
@@ -54,7 +74,9 @@ main(int argc, char const* argv[])
     return -1;
   }
 
-  lb_trade_context_new(config, on_trade_context_created, NULL);
+  const lb_trade_context_t* ctx = NULL;
+  lb_trade_context_new(config, on_trade_context_created, &ctx);
   getchar();
+  lb_trade_context_release(ctx);
   return 0;
 }

@@ -18,6 +18,8 @@ private:
   const lb_trade_context_t* ctx_;
 
 public:
+  TradeContext();
+
   TradeContext(const lb_trade_context_t* ctx);
 
   TradeContext(const TradeContext& ctx);

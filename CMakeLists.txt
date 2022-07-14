@@ -22,3 +22,8 @@ add_subdirectory(c)
 add_subdirectory(cpp)
 
 add_subdirectory(examples/c/account_asset)
+add_subdirectory(examples/c/subscribe_quote)
+add_subdirectory(examples/c/submit_order)
+
+add_subdirectory(examples/cpp/submit_order)
+add_subdirectory(examples/cpp/subscribe_quote)

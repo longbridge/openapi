@@ -9,6 +9,11 @@ namespace quote {
 
 using longbridge::convert::convert;
 
+QuoteContext::QuoteContext()
+  : ctx_(nullptr)
+{
+}
+
 QuoteContext::QuoteContext(const lb_quote_context_t* ctx)
 {
   ctx_ = ctx;

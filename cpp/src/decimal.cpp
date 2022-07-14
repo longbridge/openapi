@@ -156,6 +156,11 @@ Decimal::operator<=(const Decimal& other) const
   return lb_decimal_lte(value_, other);
 }
 
+Decimal::operator double() const
+{
+  return to_double();
+}
+
 double
 Decimal::to_double() const
 {
