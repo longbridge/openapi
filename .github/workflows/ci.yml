@@ -189,6 +189,8 @@ jobs:
         run: mvn package
 
   check-cpp-sdk:
+    needs:
+      - check-format
     strategy:
       fail-fast: true
       matrix:
