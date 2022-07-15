@@ -167,6 +167,10 @@ public:
     const std::string& symbol,
     AsyncCallback<QuoteContext, CapitalDistributionResponse> callback) const;
 
+  /// Get watch list
+  void watch_list(
+    AsyncCallback<QuoteContext, std::vector<WatchListGroup>> callback) const;
+
   /// Get real-time quotes
   ///
   /// Get real-time quotes of the subscribed symbols, it always returns the data

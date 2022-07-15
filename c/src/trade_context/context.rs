@@ -21,9 +21,9 @@ use crate::{
             CAccountBalanceOwned, CCashFlowOwned, CExecutionOwned, CFundPositionsResponseOwned,
             CGetCashFlowOptions, CGetFundPositionsOptions, CGetHistoryExecutionsOptions,
             CGetHistoryOrdersOptions, CGetStockPositionsOptions, CGetTodayExecutionsOptions,
-            CGetTodayOrdersOptions, COrderOwned, CPushOrderChanged, CPushOrderChangedOwned,
-            CReplaceOrderOptions, CStockPositionsResponseOwned, CSubmitOrderOptions,
-            CSubmitOrderResponseOwned,
+            CGetTodayOrdersOptions, CMarginRatioOwned, COrderOwned, CPushOrderChanged,
+            CPushOrderChangedOwned, CReplaceOrderOptions, CStockPositionsResponseOwned,
+            CSubmitOrderOptions, CSubmitOrderResponseOwned,
         },
     },
     types::{cstr_array_to_rust, cstr_to_rust, CCow, CVec, ToFFI},
@@ -538,6 +538,22 @@ pub unsafe extern "C" fn lb_trade_context_stock_positions(
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CStockPositionsResponseOwned> =
             CCow::new(ctx_inner.stock_positions(opts2).await?);
+        Ok(resp)
+    });
+}
+
+/// Get margin ratio
+#[no_mangle]
+pub unsafe extern "C" fn lb_trade_context_margin_ratio(
+    ctx: *const CTradeContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CMarginRatioOwned> = CCow::new(ctx_inner.margin_ratio(symbol).await?);
         Ok(resp)
     });
 }

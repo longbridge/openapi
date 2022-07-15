@@ -9,15 +9,15 @@ Longbridge OpenAPI provides programmatic quote trading interfaces for investors 
 
 **This repo contains the following main components:**
 
-| Name                        | Description                                 |
-|-----------------------------|---------------------------------------------|
-| [Rust](rust/README.md)      | Longbridge OpenAPI for Rust `(>= 1.56.1)`   |
-| [Python](python/README.md)  | Longbridge OpenAPI for Python 3 `(>= 3.7)`  |
-| [Node.js](nodejs/README.md) | Longbridge OpenAPI for Node.js `(>= 10)`    |
-| [Java](java/README.md)      | Longbridge OpenAPI for Java `(>= 1.8)`      |
-| [C](c/README.md)            | Longbridge OpenAPI for C `(>= C99)`         |
-| [C++](cpp/README.md)        | Longbridge OpenAPI for C++`(>= C++17)`      |
-| Go                          | https://github.com/longbridgeapp/openapi-go |
+| Name                        | Document                                                                      | Description                                 |
+|-----------------------------|-------------------------------------------------------------------------------|---------------------------------------------|
+| [Rust](rust/README.md)      | [Doc](https://longbridgeapp.github.io/openapi-sdk/rust/longbridge/index.html) | Longbridge OpenAPI for Rust `(>= 1.56.1)`   |
+| [Python](python/README.md)  | [Doc](https://longbridgeapp.github.io/openapi-sdk/python/index.html)          | Longbridge OpenAPI for Python 3 `(>= 3.7)`  |
+| [Node.js](nodejs/README.md) | [Doc](https://longbridgeapp.github.io/openapi-sdk/nodejs/index.html)          | Longbridge OpenAPI for Node.js `(>= 10)`    |
+| [Java](java/README.md)      | [Doc](https://longbridgeapp.github.io/openapi-sdk/java/index.html)            | Longbridge OpenAPI for Java `(>= 1.8)`      |
+| [C](c/README.md)            | [Doc](https://longbridgeapp.github.io/openapi-sdk/c/index.html)               | Longbridge OpenAPI for C `(>= C99)`         |
+| [C++](cpp/README.md)        | [Doc](https://longbridgeapp.github.io/openapi-sdk/cpp/index.html)             | Longbridge OpenAPI for C++`(>= C++17)`      |
+| Go                          |                                                                               | https://github.com/longbridgeapp/openapi-go |
 
 ## How to enable Longbridge OpenAPI
 

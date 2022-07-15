@@ -1,7 +1,7 @@
 use serde::Serialize;
 use time::OffsetDateTime;
 
-use crate::trade::serde_utils;
+use crate::serde_utils;
 
 /// Options for get histroy executions request
 #[derive(Debug, Serialize, Default, Clone)]

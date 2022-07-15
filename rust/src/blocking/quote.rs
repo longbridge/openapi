@@ -9,6 +9,7 @@ use crate::{
         IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
         PushEvent, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
         SecurityStaticInfo, StrikePriceInfo, SubFlags, Subscription, Trade, WarrantQuote,
+        WatchListGroup,
     },
     Config, Market, QuoteContext, Result,
 };
@@ -616,6 +617,29 @@ impl QuoteContextSync {
     ) -> Result<CapitalDistributionResponse> {
         self.rt
             .call(move |ctx| async move { ctx.capital_distribution(symbol).await })
+    }
+
+    /// Get watch list
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{blocking::QuoteContextSync, Config};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    ///
+    /// let resp = ctx.watch_list()?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn watch_list(&self) -> Result<Vec<WatchListGroup>> {
+        self.rt
+            .call(move |ctx| async move { ctx.watch_list().await })
     }
 
     /// Get real-time quotes

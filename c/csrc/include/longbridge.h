@@ -2255,6 +2255,72 @@ typedef struct lb_submit_order_response_t {
   const char *order_id;
 } lb_submit_order_response_t;
 
+/**
+ * Watch list security
+ */
+typedef struct lb_watch_list_security_t {
+  /**
+   * Security symbol
+   */
+  const char *symbol;
+  /**
+   * Market
+   */
+  enum lb_market_t market;
+  /**
+   * Security name
+   */
+  const char *name;
+  /**
+   * Latest price
+   */
+  const struct lb_decimal_t *price;
+  /**
+   * Watched time
+   */
+  int64_t watched_at;
+} lb_watch_list_security_t;
+
+/**
+ * Watch list group
+ */
+typedef struct lb_watch_list_group_t {
+  /**
+   * Group id
+   */
+  int64_t id;
+  /**
+   * Group name
+   */
+  const char *name;
+  /**
+   * Securities
+   */
+  const struct lb_watch_list_security_t *securities;
+  /**
+   * Number of securities
+   */
+  uintptr_t num_securities;
+} lb_watch_list_group_t;
+
+/**
+ * Margin ratio
+ */
+typedef struct lb_margin_ratio_t {
+  /**
+   * Initial margin ratio
+   */
+  const struct lb_decimal_t *im_factor;
+  /**
+   * Maintain the initial margin ratio
+   */
+  const struct lb_decimal_t *mm_factor;
+  /**
+   * Forced close-out margin ratio
+   */
+  const struct lb_decimal_t *fm_factor;
+} lb_margin_ratio_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -2549,6 +2615,13 @@ void lb_quote_context_capital_distribution(const struct lb_quote_context_t *ctx,
                                            void *userdata);
 
 /**
+ * Get watch list
+ */
+void lb_quote_context_watch_list(const struct lb_quote_context_t *ctx,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
  * Get quote of securities
  *
  * Get real-time quotes of the subscribed symbols, it always returns the data
@@ -2749,6 +2822,14 @@ void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
                                       const struct lb_get_stock_positions_options_t *opts,
                                       lb_async_callback_t callback,
                                       void *userdata);
+
+/**
+ * Get margin ratio
+ */
+void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
+                                   const char *symbol,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
 
 /**
  * Create a decimal value with a 64 bit `m` representation and corresponding

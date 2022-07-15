@@ -273,6 +273,14 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextCapitalDistribu
 
 /*
  * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextWatchList
+ * Signature: (JLcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextWatchList
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
  * Method:    quoteContextRealtimeQuote
  * Signature: (J[Ljava/lang/String;Lcom/longbridge/AsyncCallback;)V
  */
@@ -438,6 +446,14 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextFundPositions
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextStockPositions
   (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextMarginRatio
+ * Signature: (JLjava/lang/String;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextMarginRatio
+  (JNIEnv *, jclass, jlong, jstring, jobject);
 
 #ifdef __cplusplus
 }

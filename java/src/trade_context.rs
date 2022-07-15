@@ -531,3 +531,21 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextStockPos
         Ok(())
     })
 }
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextMarginRatio(
+    env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JString,
+    callback: JObject,
+) {
+    jni_result(&env, (), || {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(&env, symbol.into())?;
+        async_util::execute(&env, callback, async move {
+            Ok(context.ctx.margin_ratio(symbol).await?)
+        })?;
+        Ok(())
+    })
+}

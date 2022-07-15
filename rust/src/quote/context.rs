@@ -1,7 +1,9 @@
 use std::{sync::Arc, time::Duration};
 
+use longbridge_httpcli::{HttpClient, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
+use serde::Deserialize;
 use time::Date;
 use tokio::sync::{mpsc, oneshot};
 
@@ -15,7 +17,7 @@ use crate::{
         AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
         IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
         PushEvent, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
-        SecurityStaticInfo, StrikePriceInfo, Subscription, Trade, WarrantQuote,
+        SecurityStaticInfo, StrikePriceInfo, Subscription, Trade, WarrantQuote, WatchListGroup,
     },
     Config, Error, Market, Result,
 };
@@ -29,6 +31,7 @@ const TRADING_SESSION_CACHE_TIMEOUT: Duration = Duration::from_secs(60 * 60 * 2)
 /// Quote context
 #[derive(Clone)]
 pub struct QuoteContext {
+    http_cli: HttpClient,
     command_tx: mpsc::UnboundedSender<Command>,
     cache_participants: Cache<Vec<ParticipantInfo>>,
     cache_issuers: Cache<Vec<IssuerInfo>>,
@@ -42,11 +45,13 @@ impl QuoteContext {
     pub async fn try_new(
         config: Arc<Config>,
     ) -> Result<(Self, mpsc::UnboundedReceiver<PushEvent>)> {
+        let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
         tokio::spawn(Core::try_new(config, command_rx, push_tx).await?.run());
         Ok((
             QuoteContext {
+                http_cli,
                 command_tx,
                 cache_participants: Cache::new(PARTICIPANT_INFO_CACHE_TIMEOUT),
                 cache_issuers: Cache::new(ISSUER_INFO_CACHE_TIMEOUT),
@@ -948,6 +953,41 @@ impl QuoteContext {
         )
         .await?
         .try_into()
+    }
+
+    /// Get watch list
+    ///
+    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_groups>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{quote::QuoteContext, Config};
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    ///
+    /// let resp = ctx.watch_list().await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn watch_list(&self) -> Result<Vec<WatchListGroup>> {
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            groups: Vec<WatchListGroup>,
+        }
+
+        let resp = self
+            .http_cli
+            .request(Method::GET, "/v1/watchlist/groups")
+            .response::<Response>()
+            .send()
+            .await?;
+        Ok(resp.groups)
     }
 
     /// Get real-time quotes

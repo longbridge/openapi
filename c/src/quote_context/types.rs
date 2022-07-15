@@ -6,7 +6,7 @@ use longbridge::quote::{
     OptionQuote, OptionType, ParticipantInfo, Period, PrePostQuote, PushBrokers, PushCandlestick,
     PushDepth, PushQuote, PushTrades, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
     SecurityStaticInfo, StrikePriceInfo, Subscription, Trade, TradeDirection, TradeSession,
-    TradeStatus, TradingSessionInfo, WarrantQuote, WarrantType,
+    TradeStatus, TradingSessionInfo, WarrantQuote, WarrantType, WatchListGroup, WatchListSecurity,
 };
 
 use crate::{
@@ -1970,6 +1970,123 @@ impl ToFFI for CRealtimeQuoteOwned {
             volume: *volume,
             turnover: turnover.to_ffi_type(),
             trade_status: (*trade_status).into(),
+        }
+    }
+}
+
+/// Watch list security
+#[repr(C)]
+pub struct CWatchListSecurity {
+    /// Security symbol
+    pub symbol: *const c_char,
+    /// Market
+    pub market: CMarket,
+    /// Security name
+    pub name: *const c_char,
+    /// Latest price
+    pub price: *const CDecimal,
+    /// Watched time
+    pub watched_at: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CWatchListSecurityOwned {
+    symbol: CString,
+    market: CMarket,
+    name: CString,
+    price: CDecimal,
+    watched_at: i64,
+}
+
+impl From<WatchListSecurity> for CWatchListSecurityOwned {
+    fn from(resp: WatchListSecurity) -> Self {
+        let WatchListSecurity {
+            symbol,
+            market,
+            name,
+            price,
+            watched_at,
+        } = resp;
+        CWatchListSecurityOwned {
+            symbol: symbol.into(),
+            market: market.into(),
+            name: name.into(),
+            price: price.into(),
+            watched_at: watched_at.unix_timestamp(),
+        }
+    }
+}
+
+impl ToFFI for CWatchListSecurityOwned {
+    type FFIType = CWatchListSecurity;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CWatchListSecurityOwned {
+            symbol,
+            market,
+            name,
+            price,
+            watched_at,
+        } = self;
+        CWatchListSecurity {
+            symbol: symbol.to_ffi_type(),
+            market: *market,
+            name: name.to_ffi_type(),
+            price: price.to_ffi_type(),
+            watched_at: *watched_at,
+        }
+    }
+}
+
+/// Watch list group
+#[repr(C)]
+pub struct CWatchListGroup {
+    /// Group id
+    pub id: i64,
+    /// Group name
+    pub name: *const c_char,
+    /// Securities
+    pub securities: *const CWatchListSecurity,
+    /// Number of securities
+    pub num_securities: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct CWatchListGroupOwned {
+    id: i64,
+    name: CString,
+    securities: CVec<CWatchListSecurityOwned>,
+}
+
+impl From<WatchListGroup> for CWatchListGroupOwned {
+    fn from(resp: WatchListGroup) -> Self {
+        let WatchListGroup {
+            id,
+            name,
+            securities,
+        } = resp;
+        CWatchListGroupOwned {
+            id,
+            name: name.into(),
+            securities: securities.into(),
+        }
+    }
+}
+
+impl ToFFI for CWatchListGroupOwned {
+    type FFIType = CWatchListGroup;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CWatchListGroupOwned {
+            id,
+            name,
+            securities,
+        } = self;
+        CWatchListGroup {
+            id: *id,
+            name: name.to_ffi_type(),
+            securities: securities.to_ffi_type(),
+            num_securities: securities.len(),
         }
     }
 }

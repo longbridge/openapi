@@ -494,3 +494,16 @@ pub(crate) struct StockPosition {
     /// Market
     market: Market,
 }
+
+/// Margin ratio
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::MarginRatio")]
+pub(crate) struct MarginRatio {
+    /// Initial margin ratio
+    im_factor: PyDecimal,
+    /// Maintain the initial margin ratio
+    mm_factor: PyDecimal,
+    /// Forced close-out margin ratio
+    fm_factor: PyDecimal,
+}

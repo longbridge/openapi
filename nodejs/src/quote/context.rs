@@ -16,7 +16,7 @@ use crate::{
             IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo,
             Period, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
             SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes, Subscription, Trade,
-            WarrantQuote,
+            WarrantQuote, WatchListGroup,
         },
     },
     time::NaiveDate,
@@ -730,6 +730,29 @@ impl QuoteContext {
             .await
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    /// Get watch list
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext } = require("longbridge")
+    ///
+    /// let config = Config.fromEnv()
+    /// QuoteContext.new(config)
+    ///   .then((ctx) => ctx.watchList())
+    ///   .then((resp) => console.log(resp.toString()))
+    /// ```
+    #[napi]
+    pub async fn watch_list(&self) -> Result<Vec<WatchListGroup>> {
+        self.ctx
+            .watch_list()
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Get real-time quote

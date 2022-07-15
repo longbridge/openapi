@@ -22,6 +22,7 @@ pub use types::{
     OptionDirection, OptionQuote, OptionType, ParticipantInfo, PrePostQuote, RealtimeQuote,
     SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
     Subscription, Trade, TradeDirection, TradingSessionInfo, WarrantQuote, WarrantType,
+    WatchListGroup, WatchListSecurity,
 };
 // pub use types::{FilterWarrantExpiryDate,
 // FilterWarrantStatus,Language,SortType};

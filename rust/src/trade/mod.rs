@@ -5,7 +5,6 @@ mod context;
 mod core;
 mod push_types;
 mod requests;
-mod serde_utils;
 mod types;
 
 pub use context::{SubmitOrderResponse, TradeContext};
@@ -17,7 +16,7 @@ pub use requests::{
 };
 pub use types::{
     AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo, Execution, FundPosition,
-    FundPositionChannel, FundPositionsResponse, Order, OrderSide, OrderStatus, OrderTag, OrderType,
-    OutsideRTH, StockPosition, StockPositionChannel, StockPositionsResponse, TimeInForceType,
-    TriggerPriceType, TriggerStatus,
+    FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderSide, OrderStatus,
+    OrderTag, OrderType, OutsideRTH, StockPosition, StockPositionChannel, StockPositionsResponse,
+    TimeInForceType, TriggerPriceType, TriggerStatus,
 };

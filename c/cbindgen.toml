@@ -89,6 +89,9 @@ cpp_compat = true
 "CStockPosition" = "lb_stock_position_t"
 "CFreeUserDataFunc" = "lb_free_userdata_func_t"
 "CSubmitOrderResponse" = "lb_submit_order_response_t"
+"CWatchListGroup" = "lb_watch_list_group_t"
+"CWatchListSecurity" = "lb_watch_list_security_t"
+"CMarginRatio" = "lb_margin_ratio_t"
 
 [export]
 include = [
@@ -116,4 +119,7 @@ include = [
     "CFundPositionsResponse",
     "CStockPositionsResponse",
     "CSubmitOrderResponse",
+    "CWatchListGroup",
+    "CWatchListSecurity",
+    "CMarginRatio",
 ]

@@ -86,6 +86,8 @@ public class SdkNative {
 
     public static native void quoteContextCapitalDistribution(long context, String symbol, AsyncCallback callback);
 
+    public static native void quoteContextWatchList(long context, AsyncCallback callback);
+
     public static native void quoteContextRealtimeQuote(long context, String[] symbols, AsyncCallback callback);
 
     public static native void quoteContextRealtimeDepth(long context, String symbol, AsyncCallback callback);
@@ -138,6 +140,8 @@ public class SdkNative {
 
     public static native void tradeContextStockPositions(long context, GetStockPositionsOptions opts,
             AsyncCallback callback);
+
+    public static native void tradeContextMarginRatio(long context, String symbol, AsyncCallback callback);
 
     static {
         try {

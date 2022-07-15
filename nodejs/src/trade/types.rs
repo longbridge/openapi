@@ -499,3 +499,16 @@ pub struct StockPosition {
     /// Market
     market: Market,
 }
+
+/// Margin ratio
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::MarginRatio")]
+pub struct MarginRatio {
+    /// Initial margin ratio
+    im_factor: Decimal,
+    /// Maintain the initial margin ratio
+    mm_factor: Decimal,
+    /// Forced close-out margin ratio
+    fm_factor: Decimal,
+}

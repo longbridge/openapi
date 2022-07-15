@@ -125,6 +125,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init(env: JNIEnv, _class: J
         longbridge::quote::CapitalFlowLine,
         longbridge::quote::CapitalDistribution,
         longbridge::quote::CapitalDistributionResponse,
+        longbridge::quote::WatchListGroup,
+        longbridge::quote::WatchListSecurity,
         longbridge::quote::RealtimeQuote,
         longbridge::trade::PushOrderChanged,
         longbridge::trade::Execution,
@@ -138,6 +140,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init(env: JNIEnv, _class: J
         longbridge::trade::FundPosition,
         longbridge::trade::StockPositionsResponse,
         longbridge::trade::StockPositionChannel,
-        longbridge::trade::StockPosition
+        longbridge::trade::StockPosition,
+        longbridge::trade::MarginRatio
     );
 }

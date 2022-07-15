@@ -1,7 +1,7 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
 
-use crate::trade::serde_utils;
+use crate::serde_utils;
 
 /// Options for replace order request
 #[derive(Debug, Serialize, Clone)]

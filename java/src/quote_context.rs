@@ -683,6 +683,22 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCapitalD
 }
 
 #[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWatchList(
+    env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    callback: JObject,
+) {
+    jni_result(&env, (), || {
+        let context = &*(context as *const ContextObj);
+        async_util::execute(&env, callback, async move {
+            Ok(ObjectArray(context.ctx.watch_list().await?))
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeQuote(
     env: JNIEnv,
     _class: JClass,

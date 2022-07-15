@@ -14,7 +14,7 @@ use crate::{
             IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo,
             Period, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
             SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes, Subscription, Trade,
-            WarrantQuote,
+            WarrantQuote, WatchListGroup,
         },
     },
     time::PyDateWrapper,
@@ -319,6 +319,16 @@ impl QuoteContext {
             .capital_distribution(symbol)
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    /// Get watch list
+    fn watch_list(&self) -> PyResult<Vec<WatchListGroup>> {
+        self.ctx
+            .watch_list()
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Get real-time quote

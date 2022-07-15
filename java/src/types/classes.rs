@@ -295,6 +295,23 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/quote/WatchListGroup",
+    longbridge::quote::WatchListGroup,
+    [
+        id,
+        name,
+        #[java(objarray)]
+        securities
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/WatchListSecurity",
+    longbridge::quote::WatchListSecurity,
+    [symbol, market, name, price, watched_at]
+);
+
+impl_java_class!(
     "com/longbridge/quote/CapitalDistributionResponse",
     longbridge::quote::CapitalDistributionResponse,
     [timestamp, capital_in, capital_out]
@@ -498,4 +515,10 @@ impl_java_class!(
         cost_price,
         market
     ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/MarginRatio",
+    longbridge::trade::MarginRatio,
+    [im_factor, mm_factor, fm_factor]
 );

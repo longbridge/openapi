@@ -10,8 +10,9 @@ use crate::{
         core::{Command, Core},
         AccountBalance, CashFlow, Execution, FundPositionsResponse, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, Order,
-        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
+        Order, PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
+        TopicType,
     },
     Config, Result,
 };
@@ -559,6 +560,43 @@ impl TradeContext {
             .request(Method::GET, "/v1/asset/stock")
             .query_params(opts.into().unwrap_or_default())
             .response::<StockPositionsResponse>()
+            .send()
+            .await?)
+    }
+
+    /// Get margin ratio
+    ///
+    /// Reference: <https://open.longbridgeapp.com/en/docs/trade/asset/margin_ratio>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{trade::TradeContext, Config};
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    ///
+    /// let resp = ctx.margin_ratio("700.HK").await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn margin_ratio(&self, symbol: impl Into<String>) -> Result<MarginRatio> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            symbol: String,
+        }
+
+        Ok(self
+            .http_cli
+            .request(Method::GET, "/v1/risk/margin-ratio")
+            .query_params(Request {
+                symbol: symbol.into(),
+            })
+            .response::<MarginRatio>()
             .send()
             .await?)
     }

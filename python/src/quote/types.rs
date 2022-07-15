@@ -696,7 +696,7 @@ pub(crate) struct PushBrokers {
 #[pyclass]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::quote::PushTrades")]
-pub struct PushTrades {
+pub(crate) struct PushTrades {
     /// Trades data
     #[py(array)]
     trades: Vec<Trade>,
@@ -717,7 +717,7 @@ pub struct PushCandlestick {
 #[pyclass]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::quote::MarketTradingDays")]
-pub struct MarketTradingDays {
+pub(crate) struct MarketTradingDays {
     /// Trading days
     #[py(array)]
     trading_days: Vec<PyDateWrapper>,
@@ -730,7 +730,7 @@ pub struct MarketTradingDays {
 #[pyclass]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::quote::CapitalFlowLine")]
-pub struct CapitalFlowLine {
+pub(crate) struct CapitalFlowLine {
     /// Inflow capital data
     inflow: PyDecimal,
     /// Time
@@ -741,7 +741,7 @@ pub struct CapitalFlowLine {
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::quote::CapitalDistribution")]
-pub struct CapitalDistribution {
+pub(crate) struct CapitalDistribution {
     /// Large order
     large: PyDecimal,
     /// Medium order
@@ -754,11 +754,42 @@ pub struct CapitalDistribution {
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::quote::CapitalDistributionResponse")]
-pub struct CapitalDistributionResponse {
+pub(crate) struct CapitalDistributionResponse {
     /// Time
     timestamp: PyOffsetDateTimeWrapper,
     /// Inflow capital data
     capital_in: CapitalDistribution,
     /// Outflow capital data
     capital_out: CapitalDistribution,
+}
+
+/// Watch list group
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::quote::WatchListGroup")]
+pub(crate) struct WatchListGroup {
+    /// Group id
+    pub id: i64,
+    /// Group name
+    pub name: String,
+    /// Securities
+    #[py(array)]
+    securities: Vec<WatchListSecurity>,
+}
+
+/// Watch list security
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::quote::WatchListSecurity")]
+pub(crate) struct WatchListSecurity {
+    /// Security symbol
+    symbol: String,
+    /// Market
+    market: Market,
+    /// Security name
+    name: String,
+    /// Latest price
+    price: PyDecimal,
+    /// Watched time
+    watched_at: PyOffsetDateTimeWrapper,
 }

@@ -20,7 +20,7 @@ use crate::{
             CPushDepthOwned, CPushQuote, CPushQuoteOwned, CPushTrades, CPushTradesOwned,
             CRealtimeQuoteOwned, CSecurityBrokersOwned, CSecurityDepthOwned, CSecurityQuoteOwned,
             CSecurityStaticInfoOwned, CStrikePriceInfoOwned, CSubscriptionOwned, CTradeOwned,
-            CWarrantQuoteOwned,
+            CWarrantQuoteOwned, CWatchListGroupOwned,
         },
     },
     types::{cstr_array_to_rust, cstr_to_rust, CCow, CDate, CMarket, CVec, ToFFI},
@@ -701,6 +701,20 @@ pub unsafe extern "C" fn lb_quote_context_capital_distribution(
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CCapitalDistributionResponseOwned> =
             CCow::new(ctx_inner.capital_distribution(symbol).await?);
+        Ok(resp)
+    });
+}
+
+/// Get watch list
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_watch_list(
+    ctx: *const CQuoteContext,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CVec<CWatchListGroupOwned> = ctx_inner.watch_list().await?.into();
         Ok(resp)
     });
 }

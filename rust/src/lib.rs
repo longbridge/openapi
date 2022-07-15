@@ -9,6 +9,7 @@ mod macros;
 
 mod config;
 mod error;
+mod serde_utils;
 mod types;
 
 #[cfg(feature = "blocking")]

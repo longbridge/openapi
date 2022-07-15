@@ -14,8 +14,8 @@ use crate::{
             SubmitOrderOptions,
         },
         types::{
-            AccountBalance, CashFlow, Execution, FundPositionsResponse, Order, PushOrderChanged,
-            StockPositionsResponse, SubmitOrderResponse, TopicType,
+            AccountBalance, CashFlow, Execution, FundPositionsResponse, MarginRatio, Order,
+            PushOrderChanged, StockPositionsResponse, SubmitOrderResponse, TopicType,
         },
     },
     utils::JsCallback,
@@ -481,6 +481,27 @@ impl TradeContext {
     ) -> Result<StockPositionsResponse> {
         self.ctx
             .stock_positions(GetStockPositionsOptions::new().symbols(symbols.unwrap_or_default()))
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Get margin ratio
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, TradeContext } = require("longbridge")
+    ///
+    /// let config = Config.fromEnv()
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.marginRatio("700.HK"))
+    ///   .then((resp) => console.log(resp))
+    /// ```
+    #[napi]
+    pub async fn margin_ratio(&self, symbol: String) -> Result<MarginRatio> {
+        self.ctx
+            .margin_ratio(symbol)
             .await
             .map_err(ErrorNewType)?
             .try_into()

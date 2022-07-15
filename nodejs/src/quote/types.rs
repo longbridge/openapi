@@ -773,3 +773,35 @@ pub struct CapitalDistributionResponse {
     /// Outflow capital data
     capital_out: CapitalDistribution,
 }
+
+/// Watch list group
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::quote::WatchListGroup")]
+pub struct WatchListGroup {
+    /// Group id
+    pub id: i64,
+    /// Group name
+    pub name: String,
+    /// Securities
+    #[js(array)]
+    securities: Vec<WatchListSecurity>,
+}
+
+/// Watch list security
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::quote::WatchListSecurity")]
+pub struct WatchListSecurity {
+    /// Security symbol
+    symbol: String,
+    /// Market
+    market: Market,
+    /// Security name
+    name: String,
+    /// Latest price
+    price: Decimal,
+    /// Watched time
+    #[js(datetime)]
+    watched_at: DateTime<Utc>,
+}

@@ -2,7 +2,8 @@ use serde::Serialize;
 use time::OffsetDateTime;
 
 use crate::{
-    trade::{serde_utils, OrderSide, OrderStatus},
+    serde_utils,
+    trade::{OrderSide, OrderStatus},
     Market,
 };
 

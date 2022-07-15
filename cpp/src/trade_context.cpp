@@ -657,5 +657,31 @@ TradeContext::stock_positions(
     new AsyncCallback<TradeContext, StockPositionsResponse>(callback));
 }
 
+void
+TradeContext::margin_ratio(
+  const std::string& symbol,
+  AsyncCallback<TradeContext, MarginRatio> callback) const
+{
+  lb_trade_context_margin_ratio(
+    ctx_,
+    symbol.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, MarginRatio>(res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        MarginRatio resp = convert((const lb_margin_ratio_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, MarginRatio>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, MarginRatio>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, MarginRatio>(callback));
+}
+
 } // namespace trade
 } // namespace longbridge

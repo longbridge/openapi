@@ -95,6 +95,10 @@ public:
   void stock_positions(
     const std::optional<GetStockPositionsOptions>& opts,
     AsyncCallback<TradeContext, StockPositionsResponse> callback) const;
+
+  /// Get margin ratio
+  void margin_ratio(const std::string& symbol,
+                    AsyncCallback<TradeContext, MarginRatio> callback) const;
 };
 
 } // namespace trade

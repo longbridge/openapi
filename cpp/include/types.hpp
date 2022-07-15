@@ -646,6 +646,32 @@ struct CapitalDistributionResponse
   CapitalDistribution capital_out;
 };
 
+/// Watch list security
+struct WatchListSecurity
+{
+  /// Security symbol
+  std::string symbol;
+  /// Market
+  Market market;
+  /// Security name
+  std::string name;
+  /// Latest price
+  Decimal price;
+  /// Watched time
+  int64_t watched_at;
+};
+
+/// Watch list group
+struct WatchListGroup
+{
+  /// Group id
+  int64_t id;
+  /// Group name
+  std::string name;
+  /// Securities
+  std::vector<WatchListSecurity> securities;
+};
+
 /// Real-time quote
 struct RealtimeQuote
 {
@@ -1225,6 +1251,17 @@ struct StockPositionsResponse
 {
   /// Channels
   std::vector<StockPositionChannel> channels;
+};
+
+/// Margin ratio
+struct MarginRatio
+{
+  /// Initial margin ratio
+  Decimal im_factor;
+  /// Maintain the initial margin ratio
+  Decimal mm_factor;
+  /// Forced close-out margin ratio
+  Decimal fm_factor;
 };
 
 } // namespace trade

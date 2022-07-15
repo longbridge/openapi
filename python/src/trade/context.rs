@@ -19,8 +19,8 @@ use crate::{
     trade::{
         push::handle_push_event,
         types::{
-            AccountBalance, BalanceType, CashFlow, Execution, FundPositionsResponse, Order,
-            OrderSide, OrderStatus, OrderType, OutsideRTH, StockPositionsResponse,
+            AccountBalance, BalanceType, CashFlow, Execution, FundPositionsResponse, MarginRatio,
+            Order, OrderSide, OrderStatus, OrderType, OutsideRTH, StockPositionsResponse,
             SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
@@ -359,6 +359,14 @@ impl TradeContext {
     fn stock_positions(&self, symbols: Vec<String>) -> PyResult<StockPositionsResponse> {
         self.ctx
             .stock_positions(GetStockPositionsOptions::new().symbols(symbols))
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Get margin ratio
+    fn margin_ratio(&self, symbol: String) -> PyResult<MarginRatio> {
+        self.ctx
+            .margin_ratio(symbol)
             .map_err(ErrorNewType)?
             .try_into()
     }

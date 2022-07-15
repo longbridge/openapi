@@ -47,6 +47,8 @@ using longbridge::quote::TradeStatus;
 using longbridge::quote::TradingSessionInfo;
 using longbridge::quote::WarrantQuote;
 using longbridge::quote::WarrantType;
+using longbridge::quote::WatchListGroup;
+using longbridge::quote::WatchListSecurity;
 using longbridge::trade::AccountBalance;
 using longbridge::trade::BalanceType;
 using longbridge::trade::CashFlow;
@@ -59,6 +61,7 @@ using longbridge::trade::FundPositionsResponse;
 using longbridge::trade::GetHistoryExecutionsOptions;
 using longbridge::trade::GetHistoryOrdersOptions;
 using longbridge::trade::GetTodayExecutionsOptions;
+using longbridge::trade::MarginRatio;
 using longbridge::trade::Order;
 using longbridge::trade::OrderSide;
 using longbridge::trade::OrderStatus;
@@ -1278,6 +1281,34 @@ convert(const lb_push_order_changed_t* info)
                        : std::nullopt,
     info->account_no,
   };
+}
+
+inline WatchListSecurity
+convert(const lb_watch_list_security_t* info)
+{
+  return WatchListSecurity{
+    info->symbol,         convert(info->market), info->name,
+    Decimal(info->price), info->watched_at,
+  };
+}
+
+inline WatchListGroup
+convert(const lb_watch_list_group_t* info)
+{
+  std::vector<WatchListSecurity> securities;
+  std::transform(info->securities,
+                 info->securities + info->num_securities,
+                 std::back_inserter(securities),
+                 [](auto item) { return convert(&item); });
+  return WatchListGroup{ info->id, info->name, securities };
+}
+
+inline MarginRatio
+convert(const lb_margin_ratio_t* info)
+{
+  return MarginRatio{ Decimal(info->im_factor),
+                      Decimal(info->mm_factor),
+                      Decimal(info->fm_factor) };
 }
 
 } // namespace convert

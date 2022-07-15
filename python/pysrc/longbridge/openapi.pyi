@@ -1300,6 +1300,53 @@ class CapitalDistributionResponse:
     """
 
 
+class WatchListSecurity:
+    """
+    Watch list security
+    """
+
+    symbol: str
+    """
+    Security symbol
+    """
+
+    market: Market
+    """
+    Market
+    """
+
+    name: str
+    """
+    Security name
+    """
+
+    price: Decimal
+    """
+    """
+
+    watched_at: datetime
+    """
+    Watched time
+    """
+
+
+class WatchListGroup:
+    id: int
+    """
+    Group id
+    """
+
+    name: str
+    """
+    Group name
+    """
+
+    securities: List[WatchListSecurity]
+    """
+    Securities
+    """
+
+
 class RealtimeQuote:
     """
     Real-time quote
@@ -1872,6 +1919,25 @@ class QuoteContext:
                 ctx = QuoteContext(config)
 
                 resp = ctx.capital_distribution("700.HK")
+                print(resp)
+        """
+
+    def watch_list(self) -> List[WatchListGroup]:
+        """
+        Get watch list
+
+        Returns:
+            Watch list groups
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.watch_list()
                 print(resp)
         """
 
@@ -2904,6 +2970,27 @@ class TopicType:
         ...
 
 
+class MarginRatio:
+    """
+    Margin ratio
+    """
+
+    im_factor: Decimal
+    """
+    Initial margin ratio
+    """
+
+    mm_factor: Decimal
+    """
+    Maintain the initial margin ratio
+    """
+
+    fm_factor: Decimal
+    """
+    Forced close-out margin ratio
+    """
+
+
 class TradeContext:
     """
     Trade context
@@ -3263,5 +3350,27 @@ class TradeContext:
                 ctx = TradeContext(config)
 
                 resp = ctx.stock_positions()
+                print(resp)
+        """
+
+    def margin_ratio(self, symbol: str) -> MarginRatio:
+        """
+        Get margin ratio
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            Margin ratio
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.margin_ratio("700.HK")
                 print(resp)
         """

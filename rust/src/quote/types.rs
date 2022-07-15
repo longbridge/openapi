@@ -1,12 +1,13 @@
 use longbridge_proto::quote::{self, Period, TradeSession, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive};
 use rust_decimal::Decimal;
+use serde::Deserialize;
 use strum_macros::EnumString;
 use time::{Date, OffsetDateTime, Time};
 
 use crate::{
     quote::{utils::parse_date, SubFlags},
-    Error, Market, Result,
+    serde_utils, Error, Market, Result,
 };
 
 /// Subscription
@@ -928,6 +929,34 @@ impl TryFrom<quote::CapitalDistributionResponse> for CapitalDistributionResponse
                 .unwrap_or_default(),
         })
     }
+}
+
+/// Watch list security
+#[derive(Debug, Clone, Deserialize)]
+pub struct WatchListSecurity {
+    /// Security symbol
+    pub symbol: String,
+    /// Market
+    pub market: Market,
+    /// Security name
+    pub name: String,
+    /// Latest price
+    pub price: Decimal,
+    /// Watched time
+    #[serde(with = "serde_utils::timestamp")]
+    pub watched_at: OffsetDateTime,
+}
+
+/// Watch list group
+#[derive(Debug, Clone, Deserialize)]
+pub struct WatchListGroup {
+    /// Group id
+    #[serde(with = "serde_utils::int64_str")]
+    pub id: i64,
+    /// Group name
+    pub name: String,
+    /// Securities
+    pub securities: Vec<WatchListSecurity>,
 }
 
 impl_default_for_enum_string!(OptionType, OptionDirection, WarrantType);

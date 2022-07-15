@@ -5,8 +5,8 @@ use crate::{
     trade::{
         AccountBalance, CashFlow, Execution, FundPositionsResponse, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, Order,
-        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
+        Order, PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
         SubmitOrderResponse, TopicType, TradeContext,
     },
     Config, Result,
@@ -271,7 +271,8 @@ impl TradeContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.account_balance()?;
+    /// let resp = ctx.account_balance()?;
+    /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
     /// ```
@@ -295,7 +296,8 @@ impl TradeContextSync {
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts = GetCashFlowOptions::new(datetime!(2022-05-09 0:00 UTC), datetime!(2022-05-12 0:00 UTC));
-    /// ctx.cash_flow(opts)?;
+    /// let resp = ctx.cash_flow(opts)?;
+    /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
     /// ```
@@ -317,7 +319,8 @@ impl TradeContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.fund_positions(None)?;
+    /// let resp = ctx.fund_positions(None)?;
+    /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
     /// ```
@@ -342,7 +345,8 @@ impl TradeContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.stock_positions(None)?;
+    /// let resp = ctx.stock_positions(None)?;
+    /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
     /// ```
@@ -352,5 +356,28 @@ impl TradeContextSync {
     ) -> Result<StockPositionsResponse> {
         self.rt
             .call(move |ctx| async move { ctx.stock_positions(opts).await })
+    }
+
+    /// Get margin ratio
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{blocking::TradeContextSync, Config};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    ///
+    /// let resp = ctx.margin_ratio("700.HK")?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn margin_ratio(&self, symbol: impl Into<String> + Send + 'static) -> Result<MarginRatio> {
+        self.rt
+            .call(move |ctx| async move { ctx.margin_ratio(symbol).await })
     }
 }

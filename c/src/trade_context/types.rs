@@ -3,8 +3,8 @@ use std::os::raw::c_char;
 use longbridge::{
     trade::{
         AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo, Execution,
-        FundPosition, FundPositionChannel, FundPositionsResponse, Order, OrderSide, OrderStatus,
-        OrderTag, OrderType, PushOrderChanged, StockPosition, StockPositionChannel,
+        FundPosition, FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderSide,
+        OrderStatus, OrderTag, OrderType, PushOrderChanged, StockPosition, StockPositionChannel,
         StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
     },
     Market,
@@ -1285,4 +1285,54 @@ pub struct CGetStockPositionsOptions {
     pub symbols: *const *const c_char,
     /// Number of stock symbols
     pub num_symbols: usize,
+}
+
+/// Margin ratio
+#[repr(C)]
+pub struct CMarginRatio {
+    /// Initial margin ratio
+    pub im_factor: *const CDecimal,
+    /// Maintain the initial margin ratio
+    pub mm_factor: *const CDecimal,
+    /// Forced close-out margin ratio
+    pub fm_factor: *const CDecimal,
+}
+
+#[derive(Debug)]
+pub(crate) struct CMarginRatioOwned {
+    pub im_factor: CDecimal,
+    pub mm_factor: CDecimal,
+    pub fm_factor: CDecimal,
+}
+
+impl From<MarginRatio> for CMarginRatioOwned {
+    fn from(resp: MarginRatio) -> Self {
+        let MarginRatio {
+            im_factor,
+            mm_factor,
+            fm_factor,
+        } = resp;
+        CMarginRatioOwned {
+            im_factor: im_factor.into(),
+            mm_factor: mm_factor.into(),
+            fm_factor: fm_factor.into(),
+        }
+    }
+}
+
+impl ToFFI for CMarginRatioOwned {
+    type FFIType = CMarginRatio;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CMarginRatioOwned {
+            im_factor,
+            mm_factor,
+            fm_factor,
+        } = self;
+        CMarginRatio {
+            im_factor: im_factor.to_ffi_type(),
+            mm_factor: mm_factor.to_ffi_type(),
+            fm_factor: fm_factor.to_ffi_type(),
+        }
+    }
 }

@@ -2,7 +2,10 @@ use rust_decimal::Decimal;
 use serde::Serialize;
 use time::Date;
 
-use crate::trade::{serde_utils, OrderSide, OrderType, OutsideRTH, TimeInForceType};
+use crate::{
+    serde_utils,
+    trade::{OrderSide, OrderType, OutsideRTH, TimeInForceType},
+};
 
 /// Options for submit order request
 #[derive(Debug, Serialize, Clone)]

@@ -4,7 +4,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use strum_macros::{Display, EnumString};
 use time::{Date, OffsetDateTime};
 
-use crate::{trade::serde_utils, Market};
+use crate::{serde_utils, Market};
 
 /// Order type
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
@@ -491,6 +491,17 @@ pub struct StockPosition {
     pub cost_price: Decimal,
     /// Market
     pub market: Market,
+}
+
+/// Margin ratio
+#[derive(Debug, Clone, Deserialize)]
+pub struct MarginRatio {
+    /// Initial margin ratio
+    pub im_factor: Decimal,
+    /// Maintain the initial margin ratio
+    pub mm_factor: Decimal,
+    /// Forced close-out margin ratio
+    pub fm_factor: Decimal,
 }
 
 impl_serde_for_enum_string!(

@@ -738,7 +738,7 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
-     * Get capital distribution
+     * Get watch list
      * 
      * <pre>
      * {@code
@@ -748,7 +748,7 @@ public class QuoteContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
-     *             CapitalDistributionResponse resp = ctx.getCapitalDistribution("700.HK").get();
+     *             CapitalDistributionResponse resp = ctx.getWatchList().get();
      *             System.out.println(resp);
      *         }
      *     }
@@ -756,14 +756,13 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param symbol Security code
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<CapitalDistributionResponse> getCapitalDistribution(String symbol)
+    public CompletableFuture<WatchListGroup[]> getWatchList()
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextCapitalDistribution(this.raw, symbol, callback);
+            SdkNative.quoteContextWatchList(this.raw, callback);
         });
     }
 

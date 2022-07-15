@@ -381,7 +381,7 @@ export const enum OutsideRTH {
 export const enum BalanceType {
   /** Unknown */
   Unknown = 0,
-  /** Limit Order */
+  /** Cash */
   Cash = 1,
   /** Stock */
   Stock = 2,
@@ -393,7 +393,7 @@ export const enum CashFlowDirection {
   Unknown = 0,
   /** Out */
   Out = 1,
-  /** Stock */
+  /** In */
   In = 2
 }
 export const enum Market {
@@ -964,6 +964,21 @@ export class QuoteContext {
    */
   capitalDistribution(symbol: string): Promise<CapitalDistributionResponse>
   /**
+   * Get watch list
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext } = require("longbridge")
+   *
+   * let config = Config.fromEnv()
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.watchList())
+   *   .then((resp) => console.log(resp.toString()))
+   * ```
+   */
+  watchList(): Promise<Array<WatchListGroup>>
+  /**
    * Get real-time quote
    *
    * #### Example
@@ -1416,7 +1431,7 @@ export class MarketTradingSession {
   /** Market */
   get market(): Market
   /** Trading session */
-  get tradeSession(): Array<TradingSessionInfo>
+  get tradeSessions(): Array<TradingSessionInfo>
 }
 /** Real-time quote */
 export class RealtimeQuote {
@@ -1528,6 +1543,34 @@ export class CapitalDistributionResponse {
   /** Outflow capital data */
   get capitalOut(): CapitalDistribution
 }
+/** Watch list group */
+export class WatchListGroup {
+  /** Group id */
+  id: number
+  /** Group name */
+  name: string
+  toString(): string
+  /** Group id */
+  get id(): number
+  /** Group name */
+  get name(): string
+  /** Securities */
+  get securities(): Array<WatchListSecurity>
+}
+/** Watch list security */
+export class WatchListSecurity {
+  toString(): string
+  /** Security symbol */
+  get symbol(): string
+  /** Market */
+  get market(): Market
+  /** Security name */
+  get name(): string
+  /** Latest price */
+  get price(): Decimal
+  /** Watched time */
+  get watchedAt(): Date
+}
 /** Naive date type */
 export class NaiveDate {
   constructor(year: number, month: number, day: number)
@@ -1550,7 +1593,7 @@ export class TradeContext {
    * Set order changed callback, after receiving the order changed event, it
    * will call back to this function.
    */
-  setOnQuote(callback: (err: null | Error, event: PushOrderChanged) => void): void
+  setOnOrderChanged(callback: (err: null | Error, event: PushOrderChanged) => void): void
   /**
    * Subscribe
    *
@@ -1839,6 +1882,21 @@ export class TradeContext {
    * ```
    */
   stockPositions(symbols?: Array<string> | undefined | null): Promise<StockPositionsResponse>
+  /**
+   * Get margin ratio
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, TradeContext } = require("longbridge")
+   *
+   * let config = Config.fromEnv()
+   * TradeContext.new(config)
+   *   .then((ctx) => ctx.marginRatio("700.HK"))
+   *   .then((resp) => console.log(resp))
+   * ```
+   */
+  marginRatio(symbol: string): Promise<MarginRatio>
 }
 /** Trade */
 export class Execution {
@@ -2025,6 +2083,7 @@ export class CashFlow {
 /** Fund positions response */
 export class FundPositionsResponse {
   toString(): string
+  /** Channels */
   get channels(): Array<FundPositionChannel>
 }
 /** Fund position channel */
@@ -2056,6 +2115,7 @@ export class FundPosition {
 /** Stock positions response */
 export class StockPositionsResponse {
   toString(): string
+  /** Channels */
   get channels(): Array<StockPositionChannel>
 }
 /** Stock position channel */
@@ -2086,4 +2146,14 @@ export class StockPosition {
   get costPrice(): Decimal
   /** Market */
   get market(): Market
+}
+/** Margin ratio */
+export class MarginRatio {
+  toString(): string
+  /** Initial margin ratio */
+  get imFactor(): Decimal
+  /** Maintain the initial margin ratio */
+  get mmFactor(): Decimal
+  /** Forced close-out margin ratio */
+  get fmFactor(): Decimal
 }

@@ -1,7 +1,7 @@
 use serde::Serialize;
 use time::OffsetDateTime;
 
-use crate::trade::{serde_utils, BalanceType};
+use crate::{serde_utils, trade::BalanceType};
 
 /// Options for cash flow request
 #[derive(Debug, Serialize, Clone)]
