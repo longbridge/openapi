@@ -546,6 +546,8 @@ jobs:
       - build-cpp-sdk
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Download includes
         uses: actions/download-artifact@v2
         with:
@@ -557,6 +559,9 @@ jobs:
         with:
           name: include
           path: ./sdk/include
+
+      - name: Write VERSION
+        run: echo $(sed -nE 's/^\s*version = "(.*?)"/\1/p' c/Cargo.toml) >> ./sdk/VERSION
 
       - name: Package
         run:
