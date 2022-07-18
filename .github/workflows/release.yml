@@ -560,16 +560,22 @@ jobs:
           name: include
           path: ./sdk/include
 
-      - name: Write VERSION
-        run: echo $(sed -nE 's/^\s*version = "(.*?)"/\1/p' c/Cargo.toml) >> ./sdk/VERSION
+      - name: Get Version
+        run: echo SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' c/Cargo.toml) >> $GITHUB_ENV
 
       - name: Package
-        run:
-          tar czvf openapi-cpp-sdk.tar.gz ./sdk
-      
-      - name: Upload SDK
+        run: tar czvf openapi-cpp-sdk-$SDK_VERSION.tar.gz ./sdk
+
+      - name: Upload SDK to BJ
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_SECRET }}
         run: |
-          aws --region=${{ secrets.PROD_BJ_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_BUCKET }}/openapi-sdk/ --cache-control no-cache
+          aws --region=${{ secrets.PROD_BJ_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
+
+      - name: Upload SDK to HK
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_SECRET }}
+        run: |
+          aws --region=${{ secrets.PROD_HK_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
