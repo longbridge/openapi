@@ -579,3 +579,10 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_SECRET }}
         run: |
           aws --region=${{ secrets.PROD_HK_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
+
+      - name: Create cpp sdk release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: openapi-cpp-sdk-$SDK_VERSION
+          files: |
+            openapi-cpp-sdk-$SDK_VERSION.tar.gz
