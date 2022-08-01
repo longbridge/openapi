@@ -4,6 +4,7 @@ use jni::{
     JNIEnv,
 };
 use longbridge::{Config, Language};
+use time::OffsetDateTime;
 
 use crate::{async_util, error::jni_result, types::FromJValue};
 
@@ -72,12 +73,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configRefreshAccessT
     env: JNIEnv,
     _class: JClass,
     config: jlong,
+    expired_at: JObject,
     callback: JObject,
 ) {
     jni_result(&env, (), || {
         let config = &*(config as *const Config);
+        let expired_at: Option<OffsetDateTime> = FromJValue::from_jvalue(&env, expired_at.into())?;
         async_util::execute(&env, callback, async move {
-            let token = config.refresh_access_token().await?;
+            let token = config.refresh_access_token(expired_at).await?;
             Ok(token)
         })?;
         Ok(())

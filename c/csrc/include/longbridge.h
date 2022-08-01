@@ -2489,6 +2489,7 @@ void lb_config_free(struct lb_config_t *config);
  * Gets a new `access_token`
  */
 void lb_config_refresh_access_token(struct lb_config_t *config,
+                                    int64_t expired_at,
                                     lb_async_callback_t callback,
                                     void *userdata);
 

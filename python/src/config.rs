@@ -1,6 +1,6 @@
 use pyo3::{prelude::*, types::PyType};
 
-use crate::{error::ErrorNewType, types::Language};
+use crate::{error::ErrorNewType, time::PyOffsetDateTimeWrapper, types::Language};
 
 #[pyclass(name = "Config")]
 pub(crate) struct Config(pub(crate) longbridge::Config);
@@ -38,10 +38,16 @@ impl Config {
     }
 
     /// Gets a new `access_token`.
-    pub fn refresh_access_token(&self) -> PyResult<String> {
+    ///
+    /// `expired_at` - The expiration time of the access token, defaults to `90`
+    /// days.
+    pub fn refresh_access_token(
+        &self,
+        expired_at: Option<PyOffsetDateTimeWrapper>,
+    ) -> PyResult<String> {
         Ok(self
             .0
-            .refresh_access_token_blocking()
+            .refresh_access_token_blocking(expired_at.map(|t| t.0))
             .map_err(ErrorNewType)?)
     }
 }

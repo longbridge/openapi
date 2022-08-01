@@ -34,10 +34,10 @@ JNIEXPORT jlong JNICALL Java_com_longbridge_SdkNative_newConfigFromEnv
 /*
  * Class:     com_longbridge_SdkNative
  * Method:    configRefreshAccessToken
- * Signature: (JLcom/longbridge/AsyncCallback;)V
+ * Signature: (JLjava/time/OffsetDateTime;Lcom/longbridge/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_configRefreshAccessToken
-  (JNIEnv *, jclass, jlong, jobject);
+  (JNIEnv *, jclass, jlong, jobject, jobject);
 
 /*
  * Class:     com_longbridge_SdkNative

@@ -1,6 +1,7 @@
+use chrono::{DateTime, Utc};
 use napi::Result;
 
-use crate::{error::ErrorNewType, types::Language};
+use crate::{error::ErrorNewType, types::Language, utils::from_datetime};
 
 /// Configuration parameters
 #[napi_derive::napi(object)]
@@ -73,8 +74,15 @@ impl Config {
     }
 
     /// Gets a new `access_token`
+    ///
+    /// `expired_at` - The expiration time of the access token, defaults to `90`
+    /// days.
     #[napi]
-    pub async fn refresh_access_token(&self) -> Result<String> {
-        Ok(self.0.refresh_access_token().await.map_err(ErrorNewType)?)
+    pub async fn refresh_access_token(&self, expired_at: Option<DateTime<Utc>>) -> Result<String> {
+        Ok(self
+            .0
+            .refresh_access_token(expired_at.map(from_datetime))
+            .await
+            .map_err(ErrorNewType)?)
     }
 }

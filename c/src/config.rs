@@ -5,6 +5,7 @@ use std::{
 };
 
 use longbridge::Config;
+use time::OffsetDateTime;
 
 use crate::{
     async_call::{execute_async, CAsyncCallback},
@@ -97,12 +98,20 @@ pub unsafe extern "C" fn lb_config_free(config: *mut CConfig) {
 #[no_mangle]
 pub unsafe extern "C" fn lb_config_refresh_access_token(
     config: *mut CConfig,
+    expired_at: i64,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let config = &mut (*config).0;
     execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
-        let token: CString = config.refresh_access_token().await?.into();
+        let token: CString = config
+            .refresh_access_token(if expired_at == 0 {
+                None
+            } else {
+                Some(OffsetDateTime::from_unix_timestamp(expired_at).unwrap())
+            })
+            .await?
+            .into();
         Ok(token)
     });
 }

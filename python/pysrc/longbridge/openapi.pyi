@@ -64,9 +64,11 @@ class Config:
         - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url
         """
 
-    def refresh_access_token(self) -> str:
+    def refresh_access_token(self, expired_at: Optional[datetime] = None) -> str:
         """
         Gets a new `access_token`
+
+        `expired_at` - The expiration time of the access token, defaults to `90` days.
         """
 
 

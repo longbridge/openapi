@@ -1,5 +1,6 @@
 package com.longbridge;
 
+import java.time.OffsetDateTime;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -41,9 +42,9 @@ public class Config implements AutoCloseable {
         SdkNative.freeConfig(this.raw);
     }
 
-    public CompletableFuture<String> refreshAccessToken() throws OpenApiException {
+    public CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.configRefreshAccessToken(this.raw, callback);
+            SdkNative.configRefreshAccessToken(this.raw, expiredAt, callback);
         });
     }
 }

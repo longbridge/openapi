@@ -68,10 +68,12 @@ Config::from_env(Config& config)
 }
 
 void
-Config::refresh_access_token(AsyncCallback<void*, std::string> callback)
+Config::refresh_access_token(int64_t expired_at,
+                             AsyncCallback<void*, std::string> callback)
 {
   lb_config_refresh_access_token(
     config_,
+    expired_at,
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<void*, std::string>(res->userdata);
