@@ -344,6 +344,10 @@ typedef enum lb_order_type_t {
    * Trailing Market If Touched (Trailing Percent)
    */
   OrderTypeTSMPCT,
+  /**
+   * Special Limit Order
+   */
+  OrderTypeSLO,
 } lb_order_type_t;
 
 /**

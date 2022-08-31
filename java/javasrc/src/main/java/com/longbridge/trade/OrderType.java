@@ -14,4 +14,5 @@ public enum OrderType {
     TSLPPCT,
     TSMAMT,
     TSMPCT,
+    SLO,
 }

@@ -120,6 +120,8 @@ pub(crate) enum OrderType {
     TSMAMT,
     /// Trailing Market If Touched (Trailing Percent)
     TSMPCT,
+    /// Special Limit Order
+    SLO,
 }
 
 /// Order tag

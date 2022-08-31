@@ -73,6 +73,9 @@ pub enum COrderType {
     /// Trailing Market If Touched (Trailing Percent)
     #[c(remote = "TSMPCT")]
     OrderTypeTSMPCT,
+    /// Special Limit Order
+    #[c(remote = "SLO")]
+    OrderTypeSLO,
 }
 
 /// Order status

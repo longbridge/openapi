@@ -49,6 +49,9 @@ pub enum OrderType {
     /// Trailing Market If Touched (Trailing Percent)
     #[strum(serialize = "TSMPCT")]
     TSMPCT,
+    /// Special Limit Order
+    #[strum(serialize = "SLO")]
+    SLO,
 }
 
 /// Order status

@@ -971,6 +971,8 @@ convert(lb_order_type_t ty)
       return OrderType::TSMAMT;
     case OrderTypeTSMPCT:
       return OrderType::TSMPCT;
+    case OrderTypeSLO:
+      return OrderType::SLO;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1006,6 +1008,8 @@ convert(OrderType ty)
       return OrderTypeTSMAMT;
     case OrderType::TSMPCT:
       return OrderTypeTSMPCT;
+    case OrderType::SLO:
+      return OrderTypeSLO;
     default:
       throw std::invalid_argument("unreachable");
   }

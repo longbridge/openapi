@@ -192,7 +192,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longbridge/trade/OrderType",
     longbridge::trade::OrderType,
-    [Unknown, LO, ELO, MO, AO, ALO, ODD, LIT, MIT, TSLPAMT, TSLPPCT, TSMAMT, TSMPCT]
+    [Unknown, LO, ELO, MO, AO, ALO, ODD, LIT, MIT, TSLPAMT, TSLPPCT, TSMAMT, TSMPCT, SLO]
 );
 
 impl_java_enum!(

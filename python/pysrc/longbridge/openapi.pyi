@@ -2338,6 +2338,10 @@ class OrderType:
         Trailing Market If Touched (Trailing Percent)
         """
 
+    class SLO(OrderType):
+        """
+        Special Limit Order
+        """
 
 class OrderStatus:
     """
