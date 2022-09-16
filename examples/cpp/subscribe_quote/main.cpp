@@ -40,7 +40,7 @@ main(int argc, char const* argv[])
                 << " open=" << (double)event->open
                 << " high=" << (double)event->high
                 << " low=" << (double)event->low << " volume=" << event->volume
-                << " turnover=" << event->turnover << std::endl;
+                << " turnover=" << (double)event->turnover << std::endl;
     });
 
     std::vector<std::string> symbols = {

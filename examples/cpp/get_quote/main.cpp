@@ -46,8 +46,8 @@ main(int argc, char const* argv[])
                   << " prev_close=" << (double)it->prev_close
                   << " open=" << (double)it->open
                   << " high=" << (double)it->high << " low=" << (double)it->low
-                  << " volume=" << it->volume << " turnover=" << it->turnover
-                  << std::endl;
+                  << " volume=" << it->volume
+                  << " turnover=" << (double)it->turnover << std::endl;
       }
     });
   });
