@@ -106,32 +106,35 @@ fn merge_quote(data: &mut SecuritiesData, quote: &mut PushQuote) {
 }
 
 fn merge_depth(data: &mut SecuritiesData, depth: &PushDepth) {
-    replace(&mut data.asks, depth.asks.clone(), |v| v.position);
-    replace(&mut data.bids, depth.bids.clone(), |v| v.position);
+    replace_depth(&mut data.asks, &depth.asks);
+    replace_depth(&mut data.bids, &depth.bids);
 }
 
 fn merge_brokers(data: &mut SecuritiesData, brokers: &PushBrokers) {
-    replace(&mut data.ask_brokers, brokers.ask_brokers.clone(), |v| {
-        v.position
-    });
-    replace(&mut data.bid_brokers, brokers.bid_brokers.clone(), |v| {
-        v.position
-    });
+    replace_brokers(&mut data.ask_brokers, &brokers.ask_brokers);
+    replace_brokers(&mut data.bid_brokers, &brokers.bid_brokers);
 }
 
 fn merge_trades(data: &mut SecuritiesData, trades: &PushTrades) {
     data.trades.extend(trades.trades.clone());
 }
 
-fn replace<T, B, F>(elements: &mut Vec<T>, others: Vec<T>, f: F)
-where
-    F: Fn(&T) -> B,
-    B: Ord,
-{
-    for v in others {
-        match elements.binary_search_by_key(&f(&v), &f) {
-            Ok(index) => elements[index] = v,
-            Err(index) => elements.insert(index, v),
+fn replace_depth(elements: &mut Vec<Depth>, others: &[Depth]) {
+    for depth in others {
+        match elements.binary_search_by_key(&depth.position, |depth| depth.position) {
+            Ok(index) if depth.price.is_zero() => _ = elements.remove(index),
+            Ok(index) => elements[index] = depth.clone(),
+            Err(_) if depth.price.is_zero() => {}
+            Err(index) => elements.insert(index, depth.clone()),
+        }
+    }
+}
+
+fn replace_brokers(elements: &mut Vec<Brokers>, others: &[Brokers]) {
+    for brokers in others {
+        match elements.binary_search_by_key(&brokers.position, |brokers| brokers.position) {
+            Ok(index) => elements[index] = brokers.clone(),
+            Err(index) => elements.insert(index, brokers.clone()),
         }
     }
 }
