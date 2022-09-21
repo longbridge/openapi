@@ -2472,7 +2472,7 @@ extern "C" {
  * - `LONGBRIDGE_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
  *   `wss://openapi-quote.longbridgeapp.com`)
  * - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url (Default:
- *   `wss://openapi-trade.longbridgeapp.com`)
+ *   `wss://openapi-trade.longbridgeapp.com/v2`)
  */
 struct lb_config_t *lb_config_from_env(struct lb_error_t **error);
 

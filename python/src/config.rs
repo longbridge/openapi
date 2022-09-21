@@ -11,7 +11,7 @@ impl Config {
     #[args(
         http_url = "\"https://openapi.longbridgeapp.com\"",
         quote_ws_url = "\"wss://openapi-quote.longbridgeapp.com\"",
-        trade_ws_url = "\"wss://openapi-trade.longbridgeapp.com\"",
+        trade_ws_url = "\"wss://openapi-trade.longbridgeapp.com/v2\"",
         language = "Language::EN"
     )]
     fn py_new(

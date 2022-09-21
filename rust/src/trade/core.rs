@@ -45,7 +45,7 @@ impl Core {
         push_tx: mpsc::UnboundedSender<PushEvent>,
     ) -> Result<Self> {
         let http_cli = config.create_http_client();
-        let otp = http_cli.get_otp().await?;
+        let otp = http_cli.get_otp_v2().await?;
 
         let (event_tx, event_rx) = mpsc::unbounded_channel();
 
@@ -121,7 +121,7 @@ impl Core {
 
                 // request new session
                 if self.session.is_expired() {
-                    let otp = match self.http_cli.get_otp().await {
+                    let otp = match self.http_cli.get_otp_v2().await {
                         Ok(otp) => otp,
                         Err(err) => {
                             tracing::error!(error = %err, "failed to request otp");

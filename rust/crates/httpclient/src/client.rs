@@ -62,4 +62,21 @@ impl HttpClient {
             .await?
             .otp)
     }
+
+    /// Get the socket OTP v2(One Time Password)
+    ///
+    /// Reference: <https://open.longbridgeapp.com/en/docs/socket-token-api>
+    pub async fn get_otp_v2(&self) -> HttpClientResult<String> {
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            otp: String,
+        }
+
+        Ok(self
+            .request(Method::GET, "/v2/socket/token")
+            .response::<Response>()
+            .send()
+            .await?
+            .otp)
+    }
 }

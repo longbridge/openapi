@@ -8,7 +8,7 @@ use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use crate::error::Result;
 
 const QUOTE_WS_URL: &str = "wss://openapi-quote.longbridgeapp.com";
-const TRADE_WS_URL: &str = "wss://openapi-trade.longbridgeapp.com";
+const TRADE_WS_URL: &str = "wss://openapi-trade.longbridgeapp.com/v2";
 
 /// Language identifier
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -123,7 +123,7 @@ impl Config {
 
     /// Specifies the url of the OpenAPI trade websocket server.
     ///
-    /// Default: `wss://openapi-trade.longbridgeapp.com`
+    /// Default: `wss://openapi-trade.longbridgeapp.com/v2`
     ///
     /// NOTE: Usually you don't need to change it.
     #[must_use]

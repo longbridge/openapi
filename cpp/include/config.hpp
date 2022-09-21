@@ -33,7 +33,7 @@ public:
    * @param quote_ws_url Quote websocket endpoint url (Default:
    * wss://openapi-quote.longbridgeapp.com)
    * @param trade_ws_url Trade websocket endpoint url (Default:
-   * wss://openapi-trade.longbridgeapp.com)
+   * wss://openapi-trade.longbridgeapp.com/v2)
    * @param language Language identifer (Default: Language::EN)
    */
   Config(const std::string& app_key,

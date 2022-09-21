@@ -20,7 +20,7 @@ export interface ConfigParams {
   quoteWsUrl?: string
   /**
    * Websocket url for trade API (default:
-   * "wss://openapi-trade.longbridgeapp.com")
+   * "wss://openapi-trade.longbridgeapp.com/v2")
    */
   tradeWsUrl?: string
   /** Language identifier (default: Language.EN) */
@@ -389,7 +389,9 @@ export const enum OrderType {
   /** Trailing Market If Touched (Trailing Amount) */
   TSMAMT = 11,
   /** Trailing Market If Touched (Trailing Percent) */
-  TSMPCT = 12
+  TSMPCT = 12,
+  /** Special Limit Order */
+  SLO = 13
 }
 /** Order tag */
 export const enum OrderTag {
@@ -492,10 +494,12 @@ export class Config {
    */
   static fromEnv(): Config
   /**
-   * Gets a new `access_token`, and also replaces the `access_token` in
-   * `Config`
+   * Gets a new `access_token`
+   *
+   * `expired_at` - The expiration time of the access token, defaults to `90`
+   * days.
    */
-  refreshAccessToken(): Promise<string>
+  refreshAccessToken(expiredAt?: Date | undefined | null): Promise<string>
 }
 export class Decimal {
   static E(): Decimal

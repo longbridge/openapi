@@ -30,7 +30,7 @@ pub struct CConfig(pub(crate) Arc<Config>);
 /// - `LONGBRIDGE_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
 ///   `wss://openapi-quote.longbridgeapp.com`)
 /// - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url (Default:
-///   `wss://openapi-trade.longbridgeapp.com`)
+///   `wss://openapi-trade.longbridgeapp.com/v2`)
 #[no_mangle]
 pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_env() {
