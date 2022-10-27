@@ -61,6 +61,7 @@ impl Core {
             CodecType::Protobuf,
             Platform::OpenAPI,
             event_tx.clone(),
+            None,
         )
         .await?;
 
@@ -104,6 +105,7 @@ impl Core {
                     CodecType::Protobuf,
                     Platform::OpenAPI,
                     self.event_tx.clone(),
+                    None,
                 )
                 .await
                 {

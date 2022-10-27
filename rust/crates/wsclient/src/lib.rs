@@ -10,6 +10,6 @@ mod codec;
 mod error;
 mod event;
 
-pub use client::{CodecType, Platform, ProtocolVersion, WsClient, WsSession};
+pub use client::{CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsSession};
 pub use error::{WsClientError, WsClientResult, WsCloseReason, WsResponseErrorDetail};
 pub use event::WsEvent;

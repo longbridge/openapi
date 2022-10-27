@@ -8,6 +8,7 @@ use futures_util::{
     stream::{SplitSink, SplitStream},
     SinkExt, StreamExt, TryFutureExt,
 };
+use leaky_bucket::RateLimiter;
 use longbridge_proto::control::{AuthRequest, AuthResponse, ReconnectRequest, ReconnectResponse};
 use num_enum::IntoPrimitive;
 use prost::Message as _;
@@ -67,6 +68,19 @@ enum Command {
     },
 }
 
+/// Rate limiter config
+#[derive(Debug, Copy, Clone)]
+pub struct RateLimit {
+    /// The time duration between which we add refill number to the bucket
+    pub interval: Duration,
+    /// The initial number of tokens
+    pub initial: usize,
+    /// The max number of tokens to use
+    pub max: usize,
+    /// The number of tokens to add at each interval interval
+    pub refill: usize,
+}
+
 struct Context<'a> {
     request_id: u32,
     inflight_requests: HashMap<u32, oneshot::Sender<WsClientResult<Vec<u8>>>>,
@@ -74,6 +88,7 @@ struct Context<'a> {
     stream: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
     command_rx: &'a mut mpsc::UnboundedReceiver<Command>,
     event_sender: &'a mut mpsc::UnboundedSender<WsEvent>,
+    rate_limiter: Option<RateLimiter>,
 }
 
 impl<'a> Context<'a> {
@@ -81,6 +96,7 @@ impl<'a> Context<'a> {
         conn: WebSocketStream<MaybeTlsStream<TcpStream>>,
         command_rx: &'a mut mpsc::UnboundedReceiver<Command>,
         event_sender: &'a mut mpsc::UnboundedSender<WsEvent>,
+        rate_limit: Option<RateLimit>,
     ) -> Self {
         let (sink, stream) = conn.split();
         Context {
@@ -90,6 +106,14 @@ impl<'a> Context<'a> {
             stream,
             command_rx,
             event_sender,
+            rate_limiter: rate_limit.map(|config| {
+                RateLimiter::builder()
+                    .interval(config.interval)
+                    .refill(config.refill)
+                    .max(config.max)
+                    .initial(config.initial)
+                    .build()
+            }),
         }
     }
 
@@ -143,6 +167,10 @@ impl<'a> Context<'a> {
                 body,
                 reply_tx,
             } => {
+                if let Some(rate_limiter) = &mut self.rate_limiter {
+                    rate_limiter.acquire_one().await;
+                }
+
                 let request_id = self.get_request_id();
                 let msg = Message::Binary(
                     Packet::Request {
@@ -241,10 +269,11 @@ impl WsClient {
         codec: CodecType,
         platform: Platform,
         event_sender: mpsc::UnboundedSender<WsEvent>,
+        rate_limit: Option<RateLimit>,
     ) -> WsClientResult<Self> {
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let conn = do_connect(request, version, codec, platform).await?;
-        tokio::spawn(client_loop(conn, command_rx, event_sender));
+        tokio::spawn(client_loop(conn, command_rx, event_sender, rate_limit));
         Ok(Self { command_tx })
     }
 
@@ -372,8 +401,9 @@ async fn client_loop(
     conn: WebSocketStream<MaybeTlsStream<TcpStream>>,
     mut command_tx: mpsc::UnboundedReceiver<Command>,
     mut event_sender: mpsc::UnboundedSender<WsEvent>,
+    rate_limit: Option<RateLimit>,
 ) {
-    let mut ctx = Context::new(conn, &mut command_tx, &mut event_sender);
+    let mut ctx = Context::new(conn, &mut command_tx, &mut event_sender, rate_limit);
 
     let res = ctx.process_loop().await;
     match res {

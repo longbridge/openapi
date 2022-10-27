@@ -72,7 +72,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newTradeContext(
     }
 
     jni_result(&env, (), || {
-        let config = Arc::new((&*(config as *const Config)).clone());
+        let config = Arc::new((*(config as *const Config)).clone());
         let jvm = env.get_java_vm()?;
 
         async_util::execute(&env, callback, async move {

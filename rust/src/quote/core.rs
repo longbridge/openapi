@@ -11,7 +11,7 @@ use longbridge_proto::quote::{
     SubscribeRequest, TradeSession, UnsubscribeRequest,
 };
 use longbridge_wscli::{
-    CodecType, Platform, ProtocolVersion, WsClient, WsClientError, WsEvent, WsSession,
+    CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
 };
 use time::{Date, OffsetDateTime};
 use tokio::{
@@ -132,6 +132,15 @@ pub(crate) struct Core {
     store: Store,
 }
 
+const fn rate_limit() -> RateLimit {
+    RateLimit {
+        interval: Duration::from_millis(100),
+        initial: 5,
+        max: 5,
+        refill: 1,
+    }
+}
+
 impl Core {
     pub(crate) async fn try_new(
         config: Arc<Config>,
@@ -155,6 +164,7 @@ impl Core {
             CodecType::Protobuf,
             Platform::OpenAPI,
             event_tx.clone(),
+            Some(rate_limit()),
         )
         .await?;
 
@@ -201,6 +211,7 @@ impl Core {
                     CodecType::Protobuf,
                     Platform::OpenAPI,
                     self.event_tx.clone(),
+                    Some(rate_limit()),
                 )
                 .await
                 {
