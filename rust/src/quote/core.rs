@@ -478,7 +478,7 @@ impl Core {
             .store
             .securities
             .get(&symbol)
-            .map(|data| !data.candlesticks.contains_key(&period))
+            .map(|data| data.candlesticks.contains_key(&period))
             .unwrap_or_default()
         {
             return Ok(());
