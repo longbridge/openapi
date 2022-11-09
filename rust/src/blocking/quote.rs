@@ -59,7 +59,7 @@ impl QuoteContextSync {
     where
         I: IntoIterator<Item = T> + Send + 'static,
         I::IntoIter: Send + 'static,
-        T: Into<String> + Send + 'static,
+        T: AsRef<str> + Send + 'static,
         F: Into<SubFlags> + Send + 'static,
     {
         self.rt.call(move |ctx| async move {
@@ -90,7 +90,7 @@ impl QuoteContextSync {
     where
         I: IntoIterator<Item = T> + Send + 'static,
         I::IntoIter: Send + 'static,
-        T: Into<String> + Send + 'static,
+        T: AsRef<str> + Send + 'static,
         F: Into<SubFlags> + Send + 'static,
     {
         self.rt
@@ -125,7 +125,7 @@ impl QuoteContextSync {
     /// ```
     pub fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
     where
-        T: Into<String> + Send + 'static,
+        T: AsRef<str> + Send + 'static,
     {
         self.rt
             .call(move |ctx| async move { ctx.subscribe_candlesticks(symbol, period).await })
@@ -134,7 +134,7 @@ impl QuoteContextSync {
     /// Unsubscribe security candlesticks
     pub fn unsubscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
     where
-        T: Into<String> + Send + 'static,
+        T: AsRef<str> + Send + 'static,
     {
         self.rt
             .call(move |ctx| async move { ctx.unsubscribe_candlesticks(symbol, period).await })

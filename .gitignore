@@ -3,3 +3,4 @@
 .vscode
 *.log
 cmake.build
+build

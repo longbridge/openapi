@@ -133,12 +133,15 @@ impl QuoteContext {
     ) -> Result<()>
     where
         I: IntoIterator<Item = T>,
-        T: Into<String>,
+        T: AsRef<str>,
     {
         let (reply_tx, reply_rx) = oneshot::channel();
         self.command_tx
             .send(Command::Subscribe {
-                symbols: symbols.into_iter().map(Into::into).collect(),
+                symbols: symbols
+                    .into_iter()
+                    .map(|symbol| normalize_symbol(symbol.as_ref()).to_string())
+                    .collect(),
                 sub_types: sub_types.into(),
                 is_first_push,
                 reply_tx,
@@ -174,12 +177,15 @@ impl QuoteContext {
     pub async fn unsubscribe<I, T>(&self, symbols: I, sub_types: impl Into<SubFlags>) -> Result<()>
     where
         I: IntoIterator<Item = T>,
-        T: Into<String>,
+        T: AsRef<str>,
     {
         let (reply_tx, reply_rx) = oneshot::channel();
         self.command_tx
             .send(Command::Unsubscribe {
-                symbols: symbols.into_iter().map(Into::into).collect(),
+                symbols: symbols
+                    .into_iter()
+                    .map(|symbol| normalize_symbol(symbol.as_ref()).to_string())
+                    .collect(),
                 sub_types: sub_types.into(),
                 reply_tx,
             })
@@ -213,12 +219,12 @@ impl QuoteContext {
     /// ```
     pub async fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
     where
-        T: Into<String>,
+        T: AsRef<str>,
     {
         let (reply_tx, reply_rx) = oneshot::channel();
         self.command_tx
             .send(Command::SubscribeCandlesticks {
-                symbol: symbol.into(),
+                symbol: normalize_symbol(symbol.as_ref()).into(),
                 period,
                 reply_tx,
             })
@@ -229,12 +235,12 @@ impl QuoteContext {
     /// Unsubscribe security candlesticks
     pub async fn unsubscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
     where
-        T: Into<String>,
+        T: AsRef<str>,
     {
         let (reply_tx, reply_rx) = oneshot::channel();
         self.command_tx
             .send(Command::UnsubscribeCandlesticks {
-                symbol: symbol.into(),
+                symbol: normalize_symbol(symbol.as_ref()).into(),
                 period,
                 reply_tx,
             })
@@ -1202,5 +1208,12 @@ impl QuoteContext {
             })
             .map_err(|_| WsClientError::ClientClosed)?;
         Ok(reply_rx.await.map_err(|_| WsClientError::ClientClosed)?)
+    }
+}
+
+fn normalize_symbol(symbol: &str) -> &str {
+    match symbol.split_once('.') {
+        Some((_, market)) if market.eq_ignore_ascii_case("HK") => symbol.trim_start_matches('0'),
+        _ => symbol,
     }
 }
