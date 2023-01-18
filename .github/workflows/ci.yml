@@ -224,4 +224,5 @@ jobs:
       - name: Build with cmake
         run: |
           cargo make cmake
+          cargo make c
           cargo make cpp

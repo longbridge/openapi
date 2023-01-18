@@ -511,6 +511,7 @@ jobs:
         if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
         run: |
           cargo make cmake-release
+          cargo make c-release
           cargo make cpp-release
 
       - name: Build
