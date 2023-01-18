@@ -3,7 +3,7 @@ use serde::Serialize;
 /// Options for get stock positions request
 #[derive(Debug, Serialize, Default)]
 pub struct GetStockPositionsOptions {
-    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    #[serde(skip_serializing_if = "<[_]>::is_empty", rename = "symbol")]
     symbols: Vec<String>,
 }
 
