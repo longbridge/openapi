@@ -286,7 +286,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
           target: ${{ matrix.settings.target }}
@@ -375,7 +375,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
           target: ${{ matrix.settings.target }}
@@ -496,7 +496,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
           target: ${{ matrix.settings.target }}

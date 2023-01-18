@@ -39,7 +39,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
 
@@ -71,7 +71,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
 
@@ -130,7 +130,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
           target: ${{ matrix.settings.target }}
@@ -166,12 +166,12 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'temurin'
+          distribution: "temurin"
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
 
@@ -208,7 +208,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.60.0
+          toolchain: stable
           override: true
           components: rustfmt, clippy
 
@@ -220,7 +220,7 @@ jobs:
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-c --all-features
-      
+
       - name: Build with cmake
         run: |
           cargo make cmake
