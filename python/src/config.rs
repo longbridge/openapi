@@ -8,12 +8,15 @@ pub(crate) struct Config(pub(crate) longbridge::Config);
 #[pymethods]
 impl Config {
     #[new]
-    #[args(
+    #[pyo3(signature = (
+        app_key,
+        app_secret,
+        access_token,
         http_url = "\"https://openapi.longbridgeapp.com\"",
         quote_ws_url = "\"wss://openapi-quote.longbridgeapp.com/v2\"",
         trade_ws_url = "\"wss://openapi-trade.longbridgeapp.com/v2\"",
-        language = "Language::EN"
-    )]
+        language = Language::EN,
+    ))]
     fn py_new(
         app_key: String,
         app_secret: String,

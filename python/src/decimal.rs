@@ -41,7 +41,7 @@ impl<'py> FromPyObject<'py> for PyDecimal {
         if let Ok(value) = ob.extract::<f64>() {
             // convert from PyFloat
             Ok(Self(Decimal::try_from(value).map_err(|err| {
-                PyBaseException::new_err(format!("cannot create decimal value: {}", err))
+                PyBaseException::new_err(format!("cannot create decimal value: {err}"))
             })?))
         } else if let Ok(value) = ob.extract::<i64>() {
             // convert from PyInt/PyLong
@@ -49,7 +49,7 @@ impl<'py> FromPyObject<'py> for PyDecimal {
         } else {
             // convert from decimal.Decimal
             Python::with_gil(|py| {
-                let decimal_type = DECIMAL_TYPE.cast_as::<PyType>(py).expect("decimal type");
+                let decimal_type = DECIMAL_TYPE.downcast::<PyType>(py).expect("decimal type");
                 if ob.is_instance(decimal_type)? {
                     let value = ob
                         .str()

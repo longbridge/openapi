@@ -46,7 +46,7 @@ impl TradeContext {
         let ctx = TradeContextSync::try_new(Arc::new(config.0.clone()), {
             let callbacks = callbacks.clone();
             move |event| {
-                handle_push_event(&*callbacks.lock(), event);
+                handle_push_event(&callbacks.lock(), event);
             }
         })
         .map_err(ErrorNewType)?;
@@ -130,11 +130,10 @@ impl TradeContext {
     }
 
     /// Get history orders
-    #[args(status = "vec![]")]
     fn history_orders(
         &self,
         symbol: Option<String>,
-        status: Vec<OrderStatus>,
+        status: Option<Vec<OrderStatus>>,
         side: Option<OrderSide>,
         market: Option<Market>,
         start_at: Option<PyOffsetDateTimeWrapper>,
@@ -145,7 +144,7 @@ impl TradeContext {
         if let Some(symbol) = symbol {
             opts = opts.symbol(symbol);
         }
-        opts = opts.status(status.into_iter().map(Into::into));
+        opts = opts.status(status.unwrap_or_default().into_iter().map(Into::into));
         if let Some(side) = side {
             opts = opts.side(side.into());
         }
@@ -168,11 +167,10 @@ impl TradeContext {
     }
 
     /// Get today orders
-    #[args(status = "vec![]")]
     fn today_orders(
         &self,
         symbol: Option<String>,
-        status: Vec<OrderStatus>,
+        status: Option<Vec<OrderStatus>>,
         side: Option<OrderSide>,
         market: Option<Market>,
         order_id: Option<String>,
@@ -182,7 +180,7 @@ impl TradeContext {
         if let Some(symbol) = symbol {
             opts = opts.symbol(symbol);
         }
-        opts = opts.status(status.into_iter().map(Into::into));
+        opts = opts.status(status.unwrap_or_default().into_iter().map(Into::into));
         if let Some(side) = side {
             opts = opts.side(side.into());
         }
@@ -346,19 +344,17 @@ impl TradeContext {
     }
 
     /// Get fund positions
-    #[args(symbols = "vec![]")]
-    fn fund_positions(&self, symbols: Vec<String>) -> PyResult<FundPositionsResponse> {
+    fn fund_positions(&self, symbols: Option<Vec<String>>) -> PyResult<FundPositionsResponse> {
         self.ctx
-            .fund_positions(GetFundPositionsOptions::new().symbols(symbols))
+            .fund_positions(GetFundPositionsOptions::new().symbols(symbols.unwrap_or_default()))
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get stock positions
-    #[args(symbols = "vec![]")]
-    fn stock_positions(&self, symbols: Vec<String>) -> PyResult<StockPositionsResponse> {
+    fn stock_positions(&self, symbols: Option<Vec<String>>) -> PyResult<StockPositionsResponse> {
         self.ctx
-            .stock_positions(GetStockPositionsOptions::new().symbols(symbols))
+            .stock_positions(GetStockPositionsOptions::new().symbols(symbols.unwrap_or_default()))
             .map_err(ErrorNewType)?
             .try_into()
     }

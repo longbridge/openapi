@@ -102,7 +102,7 @@ impl QuoteContext {
     }
 
     /// Subscribe
-    #[args(is_first_push = false)]
+    #[pyo3(signature = (symbols, sub_types, is_first_push = false))]
     fn subscribe(
         &self,
         symbols: Vec<String>,
@@ -358,7 +358,7 @@ impl QuoteContext {
     }
 
     /// Get real-time trades
-    #[args(count = 500)]
+    #[pyo3(signature = (symbol, count = 500))]
     fn realtime_trades(&self, symbol: String, count: usize) -> PyResult<Vec<Trade>> {
         self.ctx
             .realtime_trades(symbol, count)
@@ -369,7 +369,7 @@ impl QuoteContext {
     }
 
     /// Get real-time candlesticks
-    #[args(count = 1000)]
+    #[pyo3(signature = (symbol, period, count = 500))]
     fn realtime_candlesticks(
         &self,
         symbol: String,

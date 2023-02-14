@@ -2343,6 +2343,7 @@ class OrderType:
         Special Limit Order
         """
 
+
 class OrderStatus:
     """
     Order status
@@ -3274,7 +3275,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def history_orders(self, symbol: Optional[str] = None, status: List[Type[OrderStatus]] = [], side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, start_at: Optional[date] = None, end_at: Optional[date] = None) -> List[Order]:
+    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, start_at: Optional[date] = None, end_at: Optional[date] = None) -> List[Order]:
         """
         Get history orders
 
@@ -3309,7 +3310,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def today_orders(self, symbol: Optional[str] = None, status: List[Type[OrderStatus]] = [], side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> List[Order]:
+    def today_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> List[Order]:
         """
         Get today orders
 
@@ -3480,7 +3481,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def fund_positions(self, symbols: List[str] = []) -> FundPositionsResponse:
+    def fund_positions(self, symbols: Optional[List[str]] = None) -> FundPositionsResponse:
         """
         Get fund positions
 
@@ -3502,7 +3503,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def stock_positions(self, symbols: List[str] = []) -> StockPositionsResponse:
+    def stock_positions(self, symbols: Optional[List[str]] = None) -> StockPositionsResponse:
         """
         Get stock positions
 
