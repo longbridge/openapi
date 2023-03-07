@@ -14,7 +14,7 @@ public class HttpClient implements AutoCloseable {
         this.raw = raw;
     }
 
-    HttpClient(String httpUrl, String appKey, String appSecret, String accessToken) {
+    public HttpClient(String httpUrl, String appKey, String appSecret, String accessToken) {
         this.raw = SdkNative.newHttpClient(httpUrl, appKey, appSecret, accessToken);
     }
 

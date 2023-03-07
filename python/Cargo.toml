@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longbridge-python"
-version = "0.2.46"
+version = "0.2.47"
 description = "Longbridge OpenAPI SDK for Python"
 homepage = "https://open.longbridgeapp.com/en/"
 readme = "README.md"
