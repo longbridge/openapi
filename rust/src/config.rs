@@ -82,10 +82,6 @@ impl Config {
             language: Language::EN,
         };
 
-        if let Ok(http_url) = std::env::var("LONGBRIDGE_HTTP_URL") {
-            config.http_cli_config = config.http_cli_config.http_url(http_url);
-        }
-
         if let Ok(quote_ws_url) = std::env::var("LONGBRIDGE_QUOTE_WS_URL") {
             config.quote_ws_url = quote_ws_url;
         }

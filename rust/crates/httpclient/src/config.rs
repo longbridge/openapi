@@ -54,7 +54,12 @@ impl HttpClientConfig {
                 name: "LONGBRIDGE_ACCESS_TOKEN",
             }
         })?;
-        Ok(Self::new(app_key, app_secret, access_token))
+
+        let mut config = Self::new(app_key, app_secret, access_token);
+        if let Ok(http_url) = std::env::var("LONGBRIDGE_HTTP_URL") {
+            config.http_url = http_url;
+        }
+        Ok(config)
     }
 
     /// Specifies the url of the OpenAPI server.
