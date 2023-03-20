@@ -66,7 +66,7 @@ fn handle_trades(callbacks: &Callbacks, symbol: String, trades: PushTrades) {
 }
 
 fn handle_candlesticks(callbacks: &Callbacks, symbol: String, candlestick: PushCandlestick) {
-    if let Some(callback) = &callbacks.trades {
+    if let Some(callback) = &callbacks.candlestick {
         let _ = Python::with_gil(|py| {
             callback.call(
                 py,

@@ -797,7 +797,8 @@ mod tests {
                 "trigger_at": "0",
                 "trigger_price": "",
                 "trigger_status": "NOT_USED",
-                "updated_at": "1651644898"
+                "updated_at": "1651644898",
+                "remark": "abc"
               }
             ]
           }
@@ -837,6 +838,7 @@ mod tests {
         assert!(order.trigger_price.is_none());
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
+        assert_eq!(order.remark, "abc");
     }
 
     #[test]
@@ -869,7 +871,8 @@ mod tests {
                 "trigger_at": "0",
                 "trigger_price": "",
                 "trigger_status": "NOT_USED",
-                "updated_at": "1651644898"
+                "updated_at": "1651644898",
+                "remark": "abc"
               }
             ]
           }
@@ -909,6 +912,7 @@ mod tests {
         assert!(order.trigger_price.is_none());
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
+        assert_eq!(order.remark, "abc");
     }
 
     #[test]
