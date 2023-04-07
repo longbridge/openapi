@@ -382,7 +382,7 @@ jobs:
 
       - name: Build
         run: |
-          if [[ ${{ matrix.settings.target }} =~ "musl" ]]
+          if [[ ${{ matrix.settings.target }} =~ "musl" ]];
           then
             RUSTFLAGS="-C target-feature=-crt-static" cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
           else
