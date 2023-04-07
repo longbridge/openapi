@@ -380,14 +380,18 @@ jobs:
           components: rustfmt, clippy
           target: ${{ matrix.settings.target }}
 
-      - name: Build
+      - name: Build for musl
+        if: ${{ contains(matrix.settings.target, 'musl') }}
+        env:
+          RUSTFLAGS: "-C target-feature=-crt-static"
         run: |
-          if [[ ${{ matrix.settings.target }} =~ "musl" ]];
-          then
-            RUSTFLAGS="-C target-feature=-crt-static" cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
-          else
-            cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
-          fi
+          cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
+          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+
+      - name: Build
+        if: ${{ !contains(matrix.settings.target, 'musl') }}
+        run: |
+          cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
           mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
       - name: Upload artifact
