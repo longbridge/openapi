@@ -382,7 +382,12 @@ jobs:
 
       - name: Build
         run: |
-          cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
+          if [[ ${{ matrix.settings.target }} =~ "musl" ]]
+          then
+            RUSTFLAGS="-C target-feature=-crt-static" cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
+          else
+            cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
+          fi
           mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
       - name: Upload artifact
