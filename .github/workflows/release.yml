@@ -385,6 +385,7 @@ jobs:
         env:
           RUSTFLAGS: "-C target-feature=-crt-static"
         run: |
+          apt-get install -y musl-tools
           cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
           mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
