@@ -1,3 +1,4 @@
+mod estimate_max_purchase_quantity;
 mod get_cash_flow;
 mod get_history_executions;
 mod get_history_orders;
@@ -6,6 +7,7 @@ mod get_today_orders;
 mod replace_order;
 mod submit_order;
 
+pub use estimate_max_purchase_quantity::EstimateMaxPurchaseQuantityOptions;
 pub use get_cash_flow::GetCashFlowOptions;
 pub use get_history_executions::GetHistoryExecutionsOptions;
 pub use get_history_orders::GetHistoryOrdersOptions;

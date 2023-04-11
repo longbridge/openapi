@@ -683,5 +683,77 @@ TradeContext::margin_ratio(
     new AsyncCallback<TradeContext, MarginRatio>(callback));
 }
 
+void
+TradeContext::order_detail(
+  const std::string& order_id,
+  AsyncCallback<TradeContext, OrderDetail> callback) const
+{
+  lb_trade_context_order_detail(
+    ctx_,
+    order_id.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, OrderDetail>(res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        OrderDetail resp = convert((const lb_order_detail_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, OrderDetail>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, OrderDetail>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, OrderDetail>(callback));
+}
+
+void
+TradeContext::estimate_max_purchase_quantity(
+  const EstimateMaxPurchaseQuantityOptions& opts,
+  AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse> callback)
+  const
+{
+  lb_estimate_max_purchase_quantity_options_t opts2 = {
+    opts.symbol.c_str(),
+    convert(opts.order_type),
+    opts.price ? (const lb_decimal_t*)opts.price.value() : nullptr,
+    convert(opts.side),
+    opts.currency ? opts.currency->c_str() : nullptr,
+    opts.order_id ? opts.order_id->c_str() : nullptr,
+  };
+
+  lb_trade_context_estimate_max_purchase_quantity(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext,
+                                     EstimateMaxPurchaseQuantityResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto res_data =
+          (const lb_estimate_max_purchase_quantity_response_t*)res->data;
+        EstimateMaxPurchaseQuantityResponse resp = {
+          res_data->cash_max_qty,
+          res_data->margin_max_qty,
+        };
+        (*callback_ptr)(
+          AsyncResult<TradeContext, EstimateMaxPurchaseQuantityResponse>(
+            ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<TradeContext, EstimateMaxPurchaseQuantityResponse>(
+            ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse>(
+      callback));
+}
+
 } // namespace trade
 } // namespace longbridge

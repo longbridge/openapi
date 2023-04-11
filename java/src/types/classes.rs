@@ -526,3 +526,88 @@ impl_java_class!(
     longbridge::trade::MarginRatio,
     [im_factor, mm_factor, fm_factor]
 );
+
+impl_java_class!(
+    "com/longbridge/trade/OrderHistoryDetail",
+    longbridge::trade::OrderHistoryDetail,
+    [price, quantity, status, msg, time]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/OrderChargeFee",
+    longbridge::trade::OrderChargeFee,
+    [code, name, amount, currency]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/OrderChargeItem",
+    longbridge::trade::OrderChargeItem,
+    [
+        code,
+        name,
+        #[java(objarray)]
+        fees
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/OrderChargeDetail",
+    longbridge::trade::OrderChargeDetail,
+    [
+        total_amount,
+        currency,
+        #[java(objarray)]
+        items
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/OrderDetail",
+    longbridge::trade::OrderDetail,
+    [
+        order_id,
+        status,
+        stock_name,
+        quantity,
+        executed_quantity,
+        price,
+        executed_price,
+        submitted_at,
+        side,
+        symbol,
+        order_type,
+        last_done,
+        trigger_price,
+        msg,
+        tag,
+        time_in_force,
+        expire_date,
+        updated_at,
+        trigger_at,
+        trailing_amount,
+        trailing_percent,
+        limit_offset,
+        trigger_status,
+        currency,
+        outside_rth,
+        remark,
+        free_status,
+        free_amount,
+        free_currency,
+        deductions_status,
+        deductions_amount,
+        deductions_currency,
+        platform_deducted_status,
+        platform_deducted_amount,
+        platform_deducted_currency,
+        #[java(objarray)]
+        history,
+        charge_detail
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/EstimateMaxPurchaseQuantityResponse",
+    longbridge::trade::EstimateMaxPurchaseQuantityResponse,
+    [cash_max_qty, margin_max_qty]
+);

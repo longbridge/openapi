@@ -2,9 +2,10 @@ use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 
 use longbridge::{
     trade::{
-        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
-        GetHistoryOrdersOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-        GetTodayOrdersOptions, PushEvent, ReplaceOrderOptions, SubmitOrderOptions,
+        EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent, ReplaceOrderOptions,
+        SubmitOrderOptions,
     },
     TradeContext,
 };
@@ -18,12 +19,13 @@ use crate::{
     trade_context::{
         enum_types::CTopicType,
         types::{
-            CAccountBalanceOwned, CCashFlowOwned, CExecutionOwned, CFundPositionsResponseOwned,
+            CAccountBalanceOwned, CCashFlowOwned, CEstimateMaxPurchaseQuantityOptions,
+            CEstimateMaxPurchaseQuantityResponse, CExecutionOwned, CFundPositionsResponseOwned,
             CGetCashFlowOptions, CGetFundPositionsOptions, CGetHistoryExecutionsOptions,
             CGetHistoryOrdersOptions, CGetStockPositionsOptions, CGetTodayExecutionsOptions,
-            CGetTodayOrdersOptions, CMarginRatioOwned, COrderOwned, CPushOrderChanged,
-            CPushOrderChangedOwned, CReplaceOrderOptions, CStockPositionsResponseOwned,
-            CSubmitOrderOptions, CSubmitOrderResponseOwned,
+            CGetTodayOrdersOptions, CMarginRatioOwned, COrderDetailOwned, COrderOwned,
+            CPushOrderChanged, CPushOrderChangedOwned, CReplaceOrderOptions,
+            CStockPositionsResponseOwned, CSubmitOrderOptions, CSubmitOrderResponseOwned,
         },
     },
     types::{cstr_array_to_rust, cstr_to_rust, CCow, CVec, ToFFI},
@@ -554,6 +556,51 @@ pub unsafe extern "C" fn lb_trade_context_margin_ratio(
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CMarginRatioOwned> = CCow::new(ctx_inner.margin_ratio(symbol).await?);
+        Ok(resp)
+    });
+}
+
+/// Get order detail
+#[no_mangle]
+pub unsafe extern "C" fn lb_trade_context_order_detail(
+    ctx: *const CTradeContext,
+    order_id: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let order_id = cstr_to_rust(order_id);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<COrderDetailOwned> = CCow::new(ctx_inner.order_detail(order_id).await?);
+        Ok(resp)
+    });
+}
+
+/// Get order detail
+#[no_mangle]
+pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
+    ctx: *const CTradeContext,
+    opts: *const CEstimateMaxPurchaseQuantityOptions,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust((*opts).symbol);
+    let order_type = (*opts).order_type.into();
+    let side = (*opts).side.into();
+    let mut opts2 = EstimateMaxPurchaseQuantityOptions::new(symbol, order_type, side);
+    if !(*opts).price.is_null() {
+        opts2 = opts2.price((*(*opts).price).0);
+    }
+    if !(*opts).currency.is_null() {
+        opts2 = opts2.currency(cstr_to_rust((*opts).currency));
+    }
+    if !(*opts).order_id.is_null() {
+        opts2 = opts2.order_id(cstr_to_rust((*opts).order_id));
+    }
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CEstimateMaxPurchaseQuantityResponse> =
+            CCow::new(ctx_inner.estimate_max_purchase_quantity(opts2).await?);
         Ok(resp)
     });
 }

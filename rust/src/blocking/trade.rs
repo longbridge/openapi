@@ -3,11 +3,12 @@ use std::sync::Arc;
 use crate::{
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, CashFlow, Execution, FundPositionsResponse, GetCashFlowOptions,
+        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
-        SubmitOrderResponse, TopicType, TradeContext,
+        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
     },
     Config, Result,
 };
@@ -379,5 +380,43 @@ impl TradeContextSync {
     pub fn margin_ratio(&self, symbol: impl Into<String> + Send + 'static) -> Result<MarginRatio> {
         self.rt
             .call(move |ctx| async move { ctx.margin_ratio(symbol).await })
+    }
+
+    /// Get order detail
+    ///
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/order_detail>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{blocking::TradeContextSync, Config};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    ///
+    /// let resp = ctx.order_detail("701276261045858304")?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn order_detail(
+        &self,
+        order_id: impl Into<String> + Send + 'static,
+    ) -> Result<OrderDetail> {
+        self.rt
+            .call(move |ctx| async move { ctx.order_detail(order_id).await })
+    }
+
+    /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
+    /// warrants, and options
+    pub fn estimate_max_purchase_quantity(
+        &self,
+        opts: EstimateMaxPurchaseQuantityOptions,
+    ) -> Result<EstimateMaxPurchaseQuantityResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
     }
 }

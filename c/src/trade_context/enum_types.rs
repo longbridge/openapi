@@ -253,3 +253,66 @@ pub enum CBalanceType {
     #[c(remote = "Fund")]
     BalanceTypeFund,
 }
+
+/// Commission-free Status
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::trade::CommissionFreeStatus")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CCommissionFreeStatus {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    CommissionFreeStatusUnknown,
+    /// None
+    #[c(remote = "None")]
+    CommissionFreeStatusNone,
+    /// Commission-free amount to be calculated
+    #[c(remote = "Calculated")]
+    CommissionFreeStatusCalculated,
+    /// Pending commission-free
+    #[c(remote = "Pending")]
+    CommissionFreeStatusPending,
+    /// Commission-free applied
+    #[c(remote = "Ready")]
+    CommissionFreeStatusReady,
+}
+
+/// Deduction status
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::trade::DeductionStatus")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CDeductionStatus {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    DeductionStatusUnknown,
+    /// Pending Settlement
+    #[c(remote = "None")]
+    DeductionStatusNone,
+    /// Commission-free amount to be calculated
+    #[c(remote = "NoData")]
+    DeductionStatusNoData,
+    /// Pending commission-free
+    #[c(remote = "Pending")]
+    DeductionStatusPending,
+    /// Commission-free applied
+    #[c(remote = "Done")]
+    DeductionStatusDone,
+}
+
+/// Charge category code
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::trade::ChargeCategoryCode")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CChargeCategoryCode {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    ChargeCategoryCodeUnknown,
+    /// Broker
+    #[c(remote = "Broker")]
+    ChargeCategoryCodeBroker,
+    /// Third
+    #[c(remote = "Third")]
+    ChargeCategoryCodeThird,
+}

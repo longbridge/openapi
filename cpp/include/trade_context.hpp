@@ -99,6 +99,17 @@ public:
   /// Get margin ratio
   void margin_ratio(const std::string& symbol,
                     AsyncCallback<TradeContext, MarginRatio> callback) const;
+
+  /// Get order detail
+  void order_detail(const std::string& order_id,
+                    AsyncCallback<TradeContext, OrderDetail> callback) const;
+
+  /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
+  /// warrants, and options
+  void estimate_max_purchase_quantity(
+    const EstimateMaxPurchaseQuantityOptions& opts,
+    AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse> callback)
+    const;
 };
 
 } // namespace trade

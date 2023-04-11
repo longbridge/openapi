@@ -81,6 +81,9 @@ cpp_compat = true
 "CCashFlowDirection" = "lb_cash_flow_direction_t"
 "CCashFlow" = "lb_cash_flow_t"
 "CBalanceType" = "lb_balance_type_t"
+"CCommissionFreeStatus" = "lb_commission_free_status_t"
+"CDeductionStatus" = "lb_deduction_status_t"
+"CChargeCategoryCode" = "lb_charge_category_code_t"
 "CGetCashFlowOptions" = "lb_get_cash_flow_options_t"
 "CGetFundPositionsOptions" = "lb_get_fund_positions_options_t"
 "CFundPositionsResponse" = "lb_fund_position_response_t"
@@ -96,6 +99,13 @@ cpp_compat = true
 "CWatchListSecurity" = "lb_watch_list_security_t"
 "CMarginRatio" = "lb_margin_ratio_t"
 "CSecurityBoard" = "lb_security_board_t"
+"COrderHistoryDetail" = "lb_order_history_detail_t"
+"COrderChargeFee" = "lb_order_charge_fee_t"
+"COrderChargeItem" = "lb_order_charge_item_t"
+"COrderChargeDetail" = "lb_order_charge_detail_t"
+"COrderDetail" = "lb_order_detail_t"
+"CEstimateMaxPurchaseQuantityOptions" = "lb_estimate_max_purchase_quantity_options_t"
+"CEstimateMaxPurchaseQuantityResponse" = "lb_estimate_max_purchase_quantity_response_t"
 
 [export]
 include = [
@@ -126,4 +136,6 @@ include = [
     "CWatchListGroup",
     "CWatchListSecurity",
     "CMarginRatio",
+    "COrderDetail",
+    "CEstimateMaxPurchaseQuantityResponse",
 ]

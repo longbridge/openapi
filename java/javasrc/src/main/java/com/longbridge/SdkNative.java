@@ -155,6 +155,12 @@ public class SdkNative {
 
         public static native void tradeContextMarginRatio(long context, String symbol, AsyncCallback callback);
 
+        public static native void tradeContextOrderDetail(long context, String orderId, AsyncCallback callback);
+
+        public static native void tradeContextEstimateMaxPurchaseQuantity(long context,
+                        EstimateMaxPurchaseQuantityOptions opts,
+                        AsyncCallback callback);
+
         static {
                 try {
                         NativeLoader.loadLibrary("longbridge_java");

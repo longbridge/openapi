@@ -253,6 +253,216 @@ pub(crate) struct Order {
     remark: String,
 }
 
+/// Commission-free Status
+#[pyclass]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::CommissionFreeStatus")]
+pub(crate) enum CommissionFreeStatus {
+    /// Unknown
+    Unknown,
+    /// None
+    #[py(remote = "None")]
+    None_,
+    /// Commission-free amount to be calculated
+    Calculated,
+    /// Pending commission-free
+    Pending,
+    /// Commission-free applied
+    Ready,
+}
+
+/// Deduction status
+#[pyclass]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::DeductionStatus")]
+pub(crate) enum DeductionStatus {
+    /// Unknown
+    Unknown,
+    /// Pending Settlement
+    #[py(remote = "None")]
+    None_,
+    /// Settled with no data
+    NoData,
+    /// Settled and pending distribution
+    Pending,
+    /// Settled and distributed
+    Done,
+}
+
+/// Charge category code
+#[pyclass]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::ChargeCategoryCode")]
+pub(crate) enum ChargeCategoryCode {
+    /// Unknown
+    Unknown,
+    /// Broker
+    Broker,
+    /// Third
+    Third,
+}
+
+/// Order history detail
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::OrderHistoryDetail")]
+pub(crate) struct OrderHistoryDetail {
+    /// Executed price for executed orders, submitted price for expired,
+    /// canceled, rejected orders, etc.
+    price: PyDecimal,
+    /// Executed quantity for executed orders, remaining quantity for expired,
+    /// canceled, rejected orders, etc.
+    quantity: i64,
+    /// Order status
+    status: OrderStatus,
+    /// Execution or error message
+    msg: String,
+    /// Occurrence time
+    time: PyOffsetDateTimeWrapper,
+}
+
+/// Order charge fee
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::OrderChargeFee")]
+pub(crate) struct OrderChargeFee {
+    /// Charge code
+    code: String,
+    /// Charge name
+    name: String,
+    /// Charge amount
+    amount: PyDecimal,
+    /// Charge currency
+    currency: String,
+}
+
+/// Order charge item
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::OrderChargeItem")]
+pub(crate) struct OrderChargeItem {
+    /// Charge category code
+    code: ChargeCategoryCode,
+    /// Charge category name
+    name: String,
+    /// Charge details
+    #[py(array)]
+    fees: Vec<OrderChargeFee>,
+}
+
+/// Order charge detail
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::OrderChargeDetail")]
+pub(crate) struct OrderChargeDetail {
+    /// Total charges amount
+    total_amount: PyDecimal,
+    /// Settlement currency
+    currency: String,
+    /// Order charge items
+    #[py(array)]
+    items: Vec<OrderChargeItem>,
+}
+
+/// Order detail
+#[pyclass]
+#[derive(Debug, PyObject)]
+#[py(remote = "longbridge::trade::OrderDetail")]
+pub(crate) struct OrderDetail {
+    /// Order ID
+    order_id: String,
+    /// Order status
+    status: OrderStatus,
+    /// Stock name
+    stock_name: String,
+    /// Submitted quantity
+    quantity: i64,
+    /// Executed quantity
+    executed_quantity: i64,
+    /// Submitted price
+    #[py(opt)]
+    price: Option<PyDecimal>,
+    /// Executed price
+    #[py(opt)]
+    executed_price: Option<PyDecimal>,
+    /// Submitted time
+    submitted_at: PyOffsetDateTimeWrapper,
+    /// Order side
+    side: OrderSide,
+    /// Security code
+    symbol: String,
+    /// Order type
+    order_type: OrderType,
+    /// Last done
+    #[py(opt)]
+    last_done: Option<PyDecimal>,
+    /// `LIT` / `MIT` Order Trigger Price
+    #[py(opt)]
+    trigger_price: Option<PyDecimal>,
+    /// Rejected Message or remark
+    msg: String,
+    /// Order tag
+    tag: OrderTag,
+    /// Time in force type
+    time_in_force: TimeInForceType,
+    /// Long term order expire date
+    #[py(opt)]
+    expire_date: Option<PyDateWrapper>,
+    /// Last updated time
+    #[py(opt)]
+    updated_at: Option<PyOffsetDateTimeWrapper>,
+    /// Conditional order trigger time
+    #[py(opt)]
+    trigger_at: Option<PyOffsetDateTimeWrapper>,
+    /// `TSMAMT` / `TSLPAMT` order trailing amount
+    #[py(opt)]
+    trailing_amount: Option<PyDecimal>,
+    /// `TSMPCT` / `TSLPPCT` order trailing percent
+    #[py(opt)]
+    trailing_percent: Option<PyDecimal>,
+    /// `TSLPAMT` / `TSLPPCT` order limit offset amount
+    #[py(opt)]
+    limit_offset: Option<PyDecimal>,
+    /// Conditional order trigger status
+    #[py(opt)]
+    trigger_status: Option<TriggerStatus>,
+    /// Currency
+    currency: String,
+    /// Enable or disable outside regular trading hours
+    #[py(opt)]
+    outside_rth: Option<OutsideRTH>,
+    /// Remark
+    remark: String,
+    /// Commission-free Status
+    free_status: CommissionFreeStatus,
+    /// Commission-free amount
+    #[py(opt)]
+    free_amount: Option<PyDecimal>,
+    /// Commission-free currency
+    #[py(opt)]
+    free_currency: Option<String>,
+    /// Deduction status
+    deductions_status: DeductionStatus,
+    /// Deduction amount
+    #[py(opt)]
+    deductions_amount: Option<PyDecimal>,
+    /// Deduction currency
+    deductions_currency: Option<String>,
+    /// Platform fee deduction status
+    platform_deducted_status: DeductionStatus,
+    /// Platform deduction amount
+    #[py(opt)]
+    platform_deducted_amount: Option<PyDecimal>,
+    /// Platform deduction currency
+    #[py(opt)]
+    platform_deducted_currency: Option<String>,
+    /// Order history details
+    #[py(array)]
+    history: Vec<OrderHistoryDetail>,
+    /// Order charges
+    charge_detail: OrderChargeDetail,
+}
+
 /// Order changed message
 #[pyclass]
 #[derive(Debug, PyObject)]
@@ -510,4 +720,15 @@ pub(crate) struct MarginRatio {
     mm_factor: PyDecimal,
     /// Forced close-out margin ratio
     fm_factor: PyDecimal,
+}
+
+/// Response for estimate maximum purchase quantity
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::EstimateMaxPurchaseQuantityResponse")]
+pub(crate) struct EstimateMaxPurchaseQuantityResponse {
+    /// Cash available quantity
+    pub cash_max_qty: i64,
+    /// Margin available quantity
+    pub margin_max_qty: i64,
 }

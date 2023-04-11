@@ -261,3 +261,21 @@ impl_java_enum!(
     longbridge::trade::CashFlowDirection,
     [Unknown, Out, In]
 );
+
+impl_java_enum!(
+    "com/longbridge/trade/CommissionFreeStatus",
+    longbridge::trade::CommissionFreeStatus,
+    [Unknown, None, Calculated, Pending, Ready]
+);
+
+impl_java_enum!(
+    "com/longbridge/trade/DeductionStatus",
+    longbridge::trade::DeductionStatus,
+    [Unknown, None, NoData, Pending, Done]
+);
+
+impl_java_enum!(
+    "com/longbridge/trade/ChargeCategoryCode",
+    longbridge::trade::ChargeCategoryCode,
+    [Unknown, Broker, Third]
+);

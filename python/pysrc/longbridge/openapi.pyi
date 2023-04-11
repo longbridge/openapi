@@ -2877,6 +2877,379 @@ class Order:
     """
 
 
+class CommissionFreeStatus:
+    """
+    Commission-free Status
+    """
+
+    class Unknown(CommissionFreeStatus):
+        """
+        Unknown
+        """
+
+    class None_(CommissionFreeStatus):
+        """
+        None
+        """
+
+    class Calculated(CommissionFreeStatus):
+        """
+        Commission-free amount to be calculated
+        """
+
+    class Pending(CommissionFreeStatus):
+        """
+        Pending commission-free
+        """
+
+    class Ready(CommissionFreeStatus):
+        """
+        Commission-free applied
+        """
+
+
+class DeductionStatus:
+    """
+    Deduction status
+    """
+
+    class Unknown(DeductionStatus):
+        """
+        Unknown
+        """
+
+    class None_(DeductionStatus):
+        """
+        None
+        """
+
+    class NoData(DeductionStatus):
+        """
+        Settled with no data
+        """
+
+    class Pending(DeductionStatus):
+        """
+        Settled and pending distribution
+        """
+
+    class Done(DeductionStatus):
+        """
+        Settled and distributed
+        """
+
+
+class ChargeCategoryCode:
+    """
+    Charge category code
+    """
+
+    class Unknown(ChargeCategoryCode):
+        """
+        Unknown
+        """
+
+    class Broker(ChargeCategoryCode):
+        """
+        Broker
+        """
+
+    class Third(ChargeCategoryCode):
+        """
+        Third
+        """
+
+
+class OrderHistoryDetail:
+    """
+    Order history detail
+    """
+
+    price: Decimal
+    """
+    Executed price for executed orders, submitted price for expired, canceled, rejected orders, etc.
+    """
+
+    quantity: int
+    """
+    Executed quantity for executed orders, remaining quantity for expired, canceled, rejected orders, etc.
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    msg: str
+    """
+    Execution or error message
+    """
+
+    time: datetime
+    """
+    Occurrence time
+    """
+
+
+class OrderChargeFee:
+    """
+    Order charge fee
+    """
+
+    code: str
+    """
+    Charge code
+    """
+
+    name: str
+    """
+    Charge name
+    """
+
+    amount: Decimal
+    """
+    Charge amount
+    """
+
+    currency: str
+    """
+    Charge currency
+    """
+
+
+class OrderChargeItem:
+    """
+    Order charge item
+    """
+
+    code: Type[ChargeCategoryCode]
+    """
+    Charge category code
+    """
+
+    name: str
+    """
+    Charge category name
+    """
+
+    fees: List[OrderChargeFee]
+    """
+    Charge details
+    """
+
+
+class OrderChargeDetail:
+    """
+    Order charge detail
+    """
+
+    total_amount: Decimal
+    """
+    Total charges amount
+    """
+
+    currency: str
+    """
+    Settlement currency
+    """
+
+    items: List[OrderChargeItem]
+    """
+    Order charge items
+    """
+
+
+class OrderDetail:
+    """
+    Order detail
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    stock_name: str
+    """
+    Stock name
+    """
+
+    quantity: int
+    """
+    Submitted quantity
+    """
+
+    executed_quantity: int
+    """
+    Executed quantity
+    """
+
+    price: Optional[Decimal]
+    """
+    Submitted price
+    """
+
+    executed_price: Optional[Decimal]
+    """
+    Executed price
+    """
+
+    submitted_at: datetime
+    """
+    Submitted time
+    """
+
+    side: Type[OrderSide]
+    """
+    Order side
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    order_type: Type[OrderType]
+    """
+    Order type
+    """
+
+    last_done: Optional[Decimal]
+    """
+    Last done
+    """
+
+    trigger_price: Optional[Decimal]
+    """
+    `LIT` / `MIT` Order Trigger Price
+    """
+
+    msg: str
+    """
+    Rejected Message or remark
+    """
+
+    tag: Type[OrderTag]
+    """
+    Order tag
+    """
+
+    time_in_force: Type[TimeInForceType]
+    """
+    Time in force type
+    """
+
+    expire_date: Optional[date]
+    """
+    Long term order expire date
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Last updated time
+    """
+
+    trigger_at: Optional[datetime]
+    """
+    Conditional order trigger time
+    """
+
+    trailing_amount: Optional[Decimal]
+    """
+    `TSMAMT` / `TSLPAMT` order trailing amount
+    """
+
+    trailing_percent: Optional[Decimal]
+    """
+    `TSMPCT` / `TSLPPCT` order trailing percent
+    """
+
+    limit_offset: Optional[Decimal]
+    """
+    `TSLPAMT` / `TSLPPCT` order limit offset amount
+    """
+
+    trigger_status: Optional[Type[TriggerStatus]]
+    """
+    Conditional order trigger status
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    outside_rth: Optional[Type[OutsideRTH]]
+    """
+    Enable or disable outside regular trading hours
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    free_status: Type[CommissionFreeStatus]
+    """
+    Commission-free Status
+    """
+
+    free_amount: Optional[Decimal]
+    """
+    Commission-free amount
+    """
+
+    free_currency: Optional[str]
+    """
+    Commission-free currency
+    """
+
+    deductions_status: Type[DeductionStatus]
+    """
+    Deduction status
+    """
+
+    deductions_amount: Optional[Decimal]
+    """
+    Deduction amount
+    """
+
+    deductions_currency: Optional[str]
+    """
+    Deduction currency
+    """
+
+    platform_deducted_status: Type[DeductionStatus]
+    """
+    Platform fee deduction status
+    """
+
+    platform_deducted_amount: Optional[Decimal]
+    """
+    Platform deduction amount
+    """
+
+    platform_deducted_currency: Optional[str]
+    """
+    Platform deduction currency
+    """
+
+    history: List[OrderHistoryDetail]
+    """
+    Order history details
+    """
+
+    charge_detail: OrderChargeDetail
+    """
+    Order charges
+    """
+
+
 class SubmitOrderResponse:
     """
     Response for submit order request
@@ -3215,6 +3588,22 @@ class MarginRatio:
     fm_factor: Decimal
     """
     Forced close-out margin ratio
+    """
+
+
+class EstimateMaxPurchaseQuantityResponse:
+    """
+    Response for estimate maximum purchase quantity
+    """
+
+    cash_max_qty: int
+    """
+    Cash available quantity
+    """
+
+    margin_max_qty: int
+    """
+    Margin available quantity
     """
 
 
@@ -3599,5 +3988,58 @@ class TradeContext:
                 ctx = TradeContext(config)
 
                 resp = ctx.margin_ratio("700.HK")
+                print(resp)
+        """
+
+    def order_detail(self, order_id: str) -> OrderDetail:
+        """
+        Get order detail
+
+        Args:
+            order id: Order id
+
+        Returns:
+            Order detail
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.order_detail("701276261045858304")
+                print(resp)
+        """
+
+    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal], currency: Optional[str], order_id: Optional[str]) -> EstimateMaxPurchaseQuantityResponse:
+        """
+        Estimating the maximum purchase quantity for Hong Kong and US stocks, warrants, and options
+
+        Args:
+            symbol: Security symbol
+            order_type: Order type
+            side: Order side
+            price: Estimated order price,
+            currency: Settlement currency
+            order_id: Order ID, required when estimating the maximum purchase quantity for a modified order
+
+        Returns:
+            Response
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config, OrderType, OrderSide
+
+                config = Config.from_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.estimate_max_purchase_quantity(
+                    symbol = "700.HK",
+                    order_type = OrderType.LO,
+                    side = OrderSide.Buy,
+                )
                 print(resp)
         """

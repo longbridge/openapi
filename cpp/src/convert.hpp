@@ -55,6 +55,9 @@ using longbridge::trade::BalanceType;
 using longbridge::trade::CashFlow;
 using longbridge::trade::CashFlowDirection;
 using longbridge::trade::CashInfo;
+using longbridge::trade::ChargeCategoryCode;
+using longbridge::trade::CommissionFreeStatus;
+using longbridge::trade::DeductionStatus;
 using longbridge::trade::Execution;
 using longbridge::trade::FundPosition;
 using longbridge::trade::FundPositionChannel;
@@ -64,6 +67,11 @@ using longbridge::trade::GetHistoryOrdersOptions;
 using longbridge::trade::GetTodayExecutionsOptions;
 using longbridge::trade::MarginRatio;
 using longbridge::trade::Order;
+using longbridge::trade::OrderChargeDetail;
+using longbridge::trade::OrderChargeFee;
+using longbridge::trade::OrderChargeItem;
+using longbridge::trade::OrderDetail;
+using longbridge::trade::OrderHistoryDetail;
 using longbridge::trade::OrderSide;
 using longbridge::trade::OrderStatus;
 using longbridge::trade::OrderTag;
@@ -1394,6 +1402,174 @@ convert(const lb_margin_ratio_t* info)
   return MarginRatio{ Decimal(info->im_factor),
                       Decimal(info->mm_factor),
                       Decimal(info->fm_factor) };
+}
+
+inline OrderHistoryDetail
+convert(const lb_order_history_detail_t* history)
+{
+  return OrderHistoryDetail{
+    Decimal(history->price),   history->quantity, convert(history->status),
+    std::string(history->msg), history->time,
+  };
+}
+
+inline OrderChargeFee
+convert(const lb_order_charge_fee_t* item)
+{
+  return OrderChargeFee{
+    std::string(item->code),
+    std::string(item->name),
+    Decimal(item->amount),
+    std::string(item->currency),
+  };
+}
+
+inline ChargeCategoryCode
+convert(lb_charge_category_code_t code)
+{
+  switch (code) {
+    case ChargeCategoryCodeBroker:
+      return ChargeCategoryCode::Broker;
+    case ChargeCategoryCodeThird:
+      return ChargeCategoryCode::Third;
+    default:
+      return ChargeCategoryCode::Unknown;
+  }
+}
+
+inline CommissionFreeStatus
+convert(lb_commission_free_status_t status)
+{
+  switch (status) {
+    case CommissionFreeStatusNone:
+      return CommissionFreeStatus::None;
+    case CommissionFreeStatusCalculated:
+      return CommissionFreeStatus::Calculated;
+    case CommissionFreeStatusPending:
+      return CommissionFreeStatus::Pending;
+    case CommissionFreeStatusReady:
+      return CommissionFreeStatus::Ready;
+    default:
+      return CommissionFreeStatus::Unknown;
+  }
+}
+
+inline DeductionStatus
+convert(lb_deduction_status_t status)
+{
+  switch (status) {
+    case DeductionStatusNone:
+      return DeductionStatus::None;
+    case DeductionStatusNoData:
+      return DeductionStatus::NoData;
+    case DeductionStatusPending:
+      return DeductionStatus::Pending;
+    case DeductionStatusDone:
+      return DeductionStatus::Done;
+    default:
+      return DeductionStatus::Unknown;
+  }
+}
+
+inline OrderChargeItem
+convert(const lb_order_charge_item_t* item)
+{
+  std::vector<OrderChargeFee> fees;
+  std::transform(item->fees,
+                 item->fees + item->num_fees,
+                 std::back_inserter(fees),
+                 [](auto item) { return convert(&item); });
+
+  return OrderChargeItem{
+    convert(item->code),
+    std::string(item->name),
+    fees,
+  };
+}
+
+inline OrderChargeDetail
+convert(const lb_order_charge_detail_t* detail)
+{
+  std::vector<OrderChargeItem> items;
+  std::transform(detail->items,
+                 detail->items + detail->num_items,
+                 std::back_inserter(items),
+                 [](auto item) { return convert(&item); });
+
+  return OrderChargeDetail{
+    Decimal(detail->total_amount),
+    std::string(detail->currency),
+    items,
+  };
+}
+
+inline OrderDetail
+convert(const lb_order_detail_t* order)
+{
+  std::vector<OrderHistoryDetail> history;
+  std::transform(order->history,
+                 order->history + order->num_history,
+                 std::back_inserter(history),
+                 [](auto item) { return convert(&item); });
+
+  return OrderDetail{
+    order->order_id,
+    convert(order->status),
+    order->stock_name,
+    order->quantity,
+    order->executed_quantity,
+    order->price ? std::optional{ Decimal(order->price) } : std::nullopt,
+    order->executed_price ? std::optional{ Decimal(order->executed_price) }
+                          : std::nullopt,
+    order->submitted_at,
+    convert(order->side),
+    order->symbol,
+    convert(order->order_type),
+    order->last_done ? std::optional{ Decimal(order->last_done) }
+                     : std::nullopt,
+    order->trigger_price ? std::optional{ Decimal(order->trigger_price) }
+                         : std::nullopt,
+    order->msg,
+    convert(order->tag),
+    convert(order->time_in_force),
+    order->expire_date ? std::optional{ convert(order->expire_date) }
+                       : std::nullopt,
+    order->updated_at ? std::optional{ *order->updated_at } : std::nullopt,
+    order->trigger_at ? std::optional{ *order->trigger_at } : std::nullopt,
+    order->trailing_amount ? std::optional{ Decimal(order->trailing_amount) }
+                           : std::nullopt,
+    order->trailing_percent ? std::optional{ Decimal(order->trailing_percent) }
+                            : std::nullopt,
+    order->limit_offset ? std::optional{ Decimal(order->limit_offset) }
+                        : std::nullopt,
+    order->trigger_status ? std::optional{ convert(*order->trigger_status) }
+                          : std::nullopt,
+    order->currency,
+    order->outside_rth ? std::optional{ convert(*order->outside_rth) }
+                       : std::nullopt,
+    order->remark,
+    convert(order->free_status),
+    order->free_amount ? std::optional{ Decimal(order->free_amount) }
+                       : std::nullopt,
+    order->free_currency ? std::optional{ std::string(order->free_currency) }
+                         : std::nullopt,
+    convert(order->deductions_status),
+    order->deductions_amount
+      ? std::optional{ Decimal(order->deductions_amount) }
+      : std::nullopt,
+    order->deductions_currency
+      ? std::optional{ std::string(order->deductions_currency) }
+      : std::nullopt,
+    convert(order->platform_deducted_status),
+    order->platform_deducted_amount
+      ? std::optional{ Decimal(order->platform_deducted_amount) }
+      : std::nullopt,
+    order->platform_deducted_currency
+      ? std::optional{ std::string(order->platform_deducted_currency) }
+      : std::nullopt,
+    history,
+    convert(&order->charge_detail),
+  };
 }
 
 } // namespace convert

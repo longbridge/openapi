@@ -9,13 +9,13 @@ use crate::{
     error::ErrorNewType,
     trade::{
         requests::{
-            GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-            GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions,
-            SubmitOrderOptions,
+            EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetHistoryExecutionsOptions,
+            GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+            ReplaceOrderOptions, SubmitOrderOptions,
         },
         types::{
             AccountBalance, CashFlow, Execution, FundPositionsResponse, MarginRatio, Order,
-            PushOrderChanged, StockPositionsResponse, SubmitOrderResponse, TopicType,
+            OrderDetail, PushOrderChanged, StockPositionsResponse, SubmitOrderResponse, TopicType,
         },
     },
     utils::JsCallback,
@@ -94,7 +94,7 @@ impl TradeContext {
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
-    ///   .then((ctx) => {
+    ///   .then((ctx) => {`
     ///     ctx.setOnQuote((_, event) => console.log(event.toString()));
     ///     ctx.subscribe([TopicType.Private]);
     ///     return ctx.submitOrder({
@@ -505,5 +505,62 @@ impl TradeContext {
             .await
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    /// Get order detail
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, TradeContext } = require("longbridge")
+    ///
+    /// let config = Config.fromEnv()
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.orderDetail("701276261045858304"))
+    ///   .then((resp) => console.log(resp))
+    /// ```
+    #[napi]
+    pub async fn order_detail(&self, order_id: String) -> Result<OrderDetail> {
+        self.ctx
+            .order_detail(order_id)
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
+    /// warrants, and options
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, TradeContext, OrderType, OrderSide } = require("longbridge")
+    ///
+    /// let config = Config.fromEnv()
+    /// TradeContext.new(config)
+    ///   .then((ctx) => ctx.estimate_max_purchase_quantity({
+    ///     symbol: "700.HK",
+    ///     orderType: OrderType.LO,
+    ///     side: OrderSide.Buy,
+    ///   }))
+    ///   .then((resp) => console.log(resp))
+    /// ```
+    #[napi(ts_return_type = "Promise<EstimateMaxPurchaseQuantityResponse>")]
+    pub fn estimate_max_purchase_quantity(
+        &self,
+        env: Env,
+        opts: EstimateMaxPurchaseQuantityOptions,
+    ) -> Result<JsObject> {
+        let opts: longbridge::trade::EstimateMaxPurchaseQuantityOptions = opts.into();
+        let ctx = self.ctx.clone();
+        env.execute_tokio_future(
+            async move {
+                ctx.estimate_max_purchase_quantity(opts)
+                    .await
+                    .map_err(ErrorNewType)
+                    .map_err(napi::Error::from)
+            },
+            |_, _| Ok(()),
+        )
     }
 }

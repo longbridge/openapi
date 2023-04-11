@@ -2,10 +2,12 @@ use std::os::raw::c_char;
 
 use longbridge::{
     trade::{
-        AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo, Execution,
-        FundPosition, FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderSide,
-        OrderStatus, OrderTag, OrderType, PushOrderChanged, StockPosition, StockPositionChannel,
-        StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
+        AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,
+        EstimateMaxPurchaseQuantityResponse, Execution, FundPosition, FundPositionChannel,
+        FundPositionsResponse, MarginRatio, Order, OrderChargeDetail, OrderChargeFee,
+        OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag,
+        OrderType, PushOrderChanged, StockPosition, StockPositionChannel, StockPositionsResponse,
+        SubmitOrderResponse, TimeInForceType,
     },
     Market,
 };
@@ -13,8 +15,9 @@ use time::OffsetDateTime;
 
 use crate::{
     trade_context::enum_types::{
-        CBalanceType, CCashFlowDirection, COrderSide, COrderStatus, COrderTag, COrderType,
-        COutsideRTH, CTimeInForceType, CTriggerStatus,
+        CBalanceType, CCashFlowDirection, CChargeCategoryCode, CCommissionFreeStatus,
+        CDeductionStatus, COrderSide, COrderStatus, COrderTag, COrderType, COutsideRTH,
+        CTimeInForceType, CTriggerStatus,
     },
     types::{CDate, CDecimal, CMarket, CString, CVec, ToFFI},
 };
@@ -1341,5 +1344,582 @@ impl ToFFI for CMarginRatioOwned {
             mm_factor: mm_factor.to_ffi_type(),
             fm_factor: fm_factor.to_ffi_type(),
         }
+    }
+}
+
+/// Order detail
+#[repr(C)]
+pub struct COrderHistoryDetail {
+    pub price: *const CDecimal,
+    pub quantity: i64,
+    pub status: COrderStatus,
+    pub msg: *const c_char,
+    pub time: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct COrderHistoryDetailOwned {
+    pub(crate) price: CDecimal,
+    pub(crate) quantity: i64,
+    pub(crate) status: COrderStatus,
+    pub(crate) msg: CString,
+    pub(crate) time: i64,
+}
+
+impl From<OrderHistoryDetail> for COrderHistoryDetailOwned {
+    fn from(value: OrderHistoryDetail) -> Self {
+        COrderHistoryDetailOwned {
+            price: value.price.into(),
+            quantity: value.quantity,
+            status: value.status.into(),
+            msg: value.msg.into(),
+            time: value.time.unix_timestamp(),
+        }
+    }
+}
+
+impl ToFFI for COrderHistoryDetailOwned {
+    type FFIType = COrderHistoryDetail;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let COrderHistoryDetailOwned {
+            price,
+            quantity,
+            status,
+            msg,
+            time,
+        } = self;
+        COrderHistoryDetail {
+            price: price.to_ffi_type(),
+            quantity: *quantity,
+            status: *status,
+            msg: msg.to_ffi_type(),
+            time: *time,
+        }
+    }
+}
+
+/// Order charge fee
+#[repr(C)]
+pub struct COrderChargeFee {
+    /// Charge code
+    pub code: *const c_char,
+    /// Charge name
+    pub name: *const c_char,
+    /// Charge amount
+    pub amount: *const CDecimal,
+    /// Charge currency
+    pub currency: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct COrderChargeFeeOwned {
+    pub(crate) code: CString,
+    pub(crate) name: CString,
+    pub(crate) amount: CDecimal,
+    pub(crate) currency: CString,
+}
+
+impl From<OrderChargeFee> for COrderChargeFeeOwned {
+    fn from(value: OrderChargeFee) -> Self {
+        COrderChargeFeeOwned {
+            code: value.code.into(),
+            name: value.name.into(),
+            amount: value.amount.into(),
+            currency: value.currency.into(),
+        }
+    }
+}
+
+impl ToFFI for COrderChargeFeeOwned {
+    type FFIType = COrderChargeFee;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let COrderChargeFeeOwned {
+            code,
+            name,
+            amount,
+            currency,
+        } = self;
+        COrderChargeFee {
+            code: code.to_ffi_type(),
+            name: name.to_ffi_type(),
+            amount: amount.to_ffi_type(),
+            currency: currency.to_ffi_type(),
+        }
+    }
+}
+
+/// Order charge item
+#[repr(C)]
+pub struct COrderChargeItem {
+    /// Charge category code
+    pub code: CChargeCategoryCode,
+    /// Charge category name
+    pub name: *const c_char,
+    /// Charge details
+    pub fees: *const COrderChargeFee,
+    /// Number of charge details
+    pub num_fees: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct COrderChargeItemOwned {
+    pub(crate) code: CChargeCategoryCode,
+    pub(crate) name: CString,
+    pub(crate) fees: CVec<COrderChargeFeeOwned>,
+}
+
+impl From<OrderChargeItem> for COrderChargeItemOwned {
+    fn from(value: OrderChargeItem) -> Self {
+        COrderChargeItemOwned {
+            code: value.code.into(),
+            name: value.name.into(),
+            fees: value.fees.into(),
+        }
+    }
+}
+
+impl ToFFI for COrderChargeItemOwned {
+    type FFIType = COrderChargeItem;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let COrderChargeItemOwned { code, name, fees } = self;
+        COrderChargeItem {
+            code: *code,
+            name: name.to_ffi_type(),
+            fees: fees.to_ffi_type(),
+            num_fees: fees.len(),
+        }
+    }
+}
+
+/// Order charge detail
+#[repr(C)]
+pub struct COrderChargeDetail {
+    /// Total charges amount
+    pub total_amount: *const CDecimal,
+    /// Settlement currency
+    pub currency: *const c_char,
+    /// Order charge items
+    pub items: *const COrderChargeItem,
+    /// Number of items
+    pub num_items: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct COrderChargeDetailOwned {
+    /// Total charges amount
+    pub(crate) total_amount: CDecimal,
+    /// Settlement currency
+    pub(crate) currency: CString,
+    /// Order charge items
+    pub(crate) items: CVec<COrderChargeItemOwned>,
+}
+
+impl From<OrderChargeDetail> for COrderChargeDetailOwned {
+    fn from(value: OrderChargeDetail) -> Self {
+        Self {
+            total_amount: value.total_amount.into(),
+            currency: value.currency.into(),
+            items: value.items.into(),
+        }
+    }
+}
+
+impl ToFFI for COrderChargeDetailOwned {
+    type FFIType = COrderChargeDetail;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        COrderChargeDetail {
+            total_amount: self.total_amount.to_ffi_type(),
+            currency: self.currency.to_ffi_type(),
+            items: self.items.to_ffi_type(),
+            num_items: self.items.len(),
+        }
+    }
+}
+
+/// Order detail
+#[repr(C)]
+pub struct COrderDetail {
+    /// Order ID
+    pub order_id: *const c_char,
+    /// Order status
+    pub status: COrderStatus,
+    /// Stock name
+    pub stock_name: *const c_char,
+    /// Submitted quantity
+    pub quantity: i64,
+    /// Executed quantity
+    pub executed_quantity: i64,
+    /// Submitted price (maybe null)
+    pub price: *const CDecimal,
+    /// Executed price (maybe null)
+    pub executed_price: *const CDecimal,
+    /// Submitted time
+    pub submitted_at: i64,
+    /// Order side
+    pub side: COrderSide,
+    /// Security code
+    pub symbol: *const c_char,
+    /// Order type
+    pub order_type: COrderType,
+    /// Last done (maybe null)
+    pub last_done: *const CDecimal,
+    /// `LIT` / `MIT` Order Trigger Price (maybe null)
+    pub trigger_price: *const CDecimal,
+    /// Rejected Message or remark
+    pub msg: *const c_char,
+    /// Order tag
+    pub tag: COrderTag,
+    /// Time in force type
+    pub time_in_force: CTimeInForceType,
+    /// Long term order expire date (maybe null)
+    pub expire_date: *const CDate,
+    /// Last updated time (maybe null)
+    pub updated_at: *const i64,
+    /// Conditional order trigger time (maybe null)
+    pub trigger_at: *const i64,
+    /// `TSMAMT` / `TSLPAMT` order trailing amount (maybe null)
+    pub trailing_amount: *const CDecimal,
+    /// `TSMPCT` / `TSLPPCT` order trailing percent (maybe null)
+    pub trailing_percent: *const CDecimal,
+    /// `TSLPAMT` / `TSLPPCT` order limit offset amount (maybe null)
+    pub limit_offset: *const CDecimal,
+    /// Conditional order trigger status (maybe null)
+    pub trigger_status: *const CTriggerStatus,
+    /// Currency
+    pub currency: *const c_char,
+    /// Enable or disable outside regular trading hours (maybe null)
+    pub outside_rth: *const COutsideRTH,
+    /// Remark
+    pub remark: *const c_char,
+    /// Commission-free Status
+    pub free_status: CCommissionFreeStatus,
+    /// Commission-free amount
+    pub free_amount: *const CDecimal,
+    /// Commission-free currency
+    pub free_currency: *const c_char,
+    /// Deduction status
+    pub deductions_status: CDeductionStatus,
+    /// Deduction amount
+    pub deductions_amount: *const CDecimal,
+    /// Deduction currency
+    pub deductions_currency: *const c_char,
+    /// Platform fee deduction status
+    pub platform_deducted_status: CDeductionStatus,
+    /// Platform deduction amount
+    pub platform_deducted_amount: *const CDecimal,
+    /// Platform deduction currency
+    pub platform_deducted_currency: *const c_char,
+    /// Order history details
+    pub history: *const COrderHistoryDetail,
+    /// Number of history
+    pub num_history: usize,
+    /// Order charges
+    pub charge_detail: COrderChargeDetail,
+}
+
+#[derive(Debug)]
+pub(crate) struct COrderDetailOwned {
+    order_id: CString,
+    status: OrderStatus,
+    stock_name: CString,
+    quantity: i64,
+    executed_quantity: i64,
+    price: Option<CDecimal>,
+    executed_price: Option<CDecimal>,
+    submitted_at: OffsetDateTime,
+    side: OrderSide,
+    symbol: CString,
+    order_type: OrderType,
+    last_done: Option<CDecimal>,
+    trigger_price: Option<CDecimal>,
+    msg: CString,
+    tag: OrderTag,
+    time_in_force: TimeInForceType,
+    expire_date: Option<CDate>,
+    updated_at: Option<i64>,
+    trigger_at: Option<i64>,
+    trailing_amount: Option<CDecimal>,
+    trailing_percent: Option<CDecimal>,
+    limit_offset: Option<CDecimal>,
+    trigger_status: Option<CTriggerStatus>,
+    currency: CString,
+    outside_rth: Option<COutsideRTH>,
+    remark: CString,
+    free_status: CCommissionFreeStatus,
+    free_amount: Option<CDecimal>,
+    free_currency: Option<CString>,
+    deductions_status: CDeductionStatus,
+    deductions_amount: Option<CDecimal>,
+    deductions_currency: Option<CString>,
+    platform_deducted_status: CDeductionStatus,
+    platform_deducted_amount: Option<CDecimal>,
+    platform_deducted_currency: Option<CString>,
+    history: CVec<COrderHistoryDetailOwned>,
+    charge_detail: COrderChargeDetailOwned,
+}
+
+impl From<OrderDetail> for COrderDetailOwned {
+    fn from(order: OrderDetail) -> Self {
+        let OrderDetail {
+            order_id,
+            status,
+            stock_name,
+            quantity,
+            executed_quantity,
+            price,
+            executed_price,
+            submitted_at,
+            side,
+            symbol,
+            order_type,
+            last_done,
+            trigger_price,
+            msg,
+            tag,
+            time_in_force,
+            expire_date,
+            updated_at,
+            trigger_at,
+            trailing_amount,
+            trailing_percent,
+            limit_offset,
+            trigger_status,
+            currency,
+            outside_rth,
+            remark,
+            free_status,
+            free_amount,
+            free_currency,
+            deductions_status,
+            deductions_amount,
+            deductions_currency,
+            platform_deducted_status,
+            platform_deducted_amount,
+            platform_deducted_currency,
+            history,
+            charge_detail,
+        } = order;
+        COrderDetailOwned {
+            order_id: order_id.into(),
+            status,
+            stock_name: stock_name.into(),
+            quantity,
+            executed_quantity,
+            price: price.map(Into::into),
+            executed_price: executed_price.map(Into::into),
+            submitted_at,
+            side,
+            symbol: symbol.into(),
+            order_type,
+            last_done: last_done.map(Into::into),
+            trigger_price: trigger_price.map(Into::into),
+            msg: msg.into(),
+            tag,
+            time_in_force,
+            expire_date: expire_date.map(Into::into),
+            updated_at: updated_at.map(OffsetDateTime::unix_timestamp),
+            trigger_at: trigger_at.map(OffsetDateTime::unix_timestamp),
+            trailing_amount: trailing_amount.map(Into::into),
+            trailing_percent: trailing_percent.map(Into::into),
+            limit_offset: limit_offset.map(Into::into),
+            trigger_status: trigger_status.map(Into::into),
+            currency: currency.into(),
+            outside_rth: outside_rth.map(Into::into),
+            remark: remark.into(),
+            free_status: free_status.into(),
+            free_amount: free_amount.map(Into::into),
+            free_currency: free_currency.map(Into::into),
+            deductions_status: deductions_status.into(),
+            deductions_amount: deductions_amount.map(Into::into),
+            deductions_currency: deductions_currency.map(Into::into),
+            platform_deducted_status: platform_deducted_status.into(),
+            platform_deducted_amount: platform_deducted_amount.map(Into::into),
+            platform_deducted_currency: platform_deducted_currency.map(Into::into),
+            history: history.into(),
+            charge_detail: charge_detail.into(),
+        }
+    }
+}
+
+impl ToFFI for COrderDetailOwned {
+    type FFIType = COrderDetail;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let COrderDetailOwned {
+            order_id,
+            status,
+            stock_name,
+            quantity,
+            executed_quantity,
+            price,
+            executed_price,
+            submitted_at,
+            side,
+            symbol,
+            order_type,
+            last_done,
+            trigger_price,
+            msg,
+            tag,
+            time_in_force,
+            expire_date,
+            updated_at,
+            trigger_at,
+            trailing_amount,
+            trailing_percent,
+            limit_offset,
+            trigger_status,
+            currency,
+            outside_rth,
+            remark,
+            free_status,
+            free_amount,
+            free_currency,
+            deductions_status,
+            deductions_amount,
+            deductions_currency,
+            platform_deducted_status,
+            platform_deducted_amount,
+            platform_deducted_currency,
+            history,
+            charge_detail,
+        } = self;
+        COrderDetail {
+            order_id: order_id.to_ffi_type(),
+            status: (*status).into(),
+            stock_name: stock_name.to_ffi_type(),
+            quantity: *quantity,
+            executed_quantity: *executed_quantity,
+            price: price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            executed_price: executed_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            submitted_at: submitted_at.unix_timestamp(),
+            side: (*side).into(),
+            symbol: symbol.to_ffi_type(),
+            order_type: (*order_type).into(),
+            last_done: last_done
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            trigger_price: trigger_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            msg: msg.to_ffi_type(),
+            tag: (*tag).into(),
+            time_in_force: (*time_in_force).into(),
+            expire_date: expire_date
+                .as_ref()
+                .map(|value| value as *const CDate)
+                .unwrap_or(std::ptr::null()),
+            updated_at: updated_at
+                .as_ref()
+                .map(|value| value as *const i64)
+                .unwrap_or(std::ptr::null()),
+            trigger_at: trigger_at
+                .as_ref()
+                .map(|value| value as *const i64)
+                .unwrap_or(std::ptr::null()),
+            trailing_amount: trailing_amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            trailing_percent: trailing_percent
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            limit_offset: limit_offset
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            trigger_status: trigger_status
+                .as_ref()
+                .map(|value| value as *const CTriggerStatus)
+                .unwrap_or(std::ptr::null()),
+            currency: currency.to_ffi_type(),
+            outside_rth: outside_rth
+                .as_ref()
+                .map(|value| value as *const COutsideRTH)
+                .unwrap_or(std::ptr::null()),
+            remark: remark.to_ffi_type(),
+            free_status: *free_status,
+            free_amount: free_amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            free_currency: free_currency
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            deductions_status: *deductions_status,
+            deductions_amount: deductions_amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            deductions_currency: deductions_currency
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            platform_deducted_status: *platform_deducted_status,
+            platform_deducted_amount: platform_deducted_amount
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            platform_deducted_currency: platform_deducted_currency
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            history: history.to_ffi_type(),
+            num_history: history.len(),
+            charge_detail: charge_detail.to_ffi_type(),
+        }
+    }
+}
+
+/// Options for estimate maximum purchase quantity
+#[derive(Debug)]
+#[repr(C)]
+pub struct CEstimateMaxPurchaseQuantityOptions {
+    pub symbol: *const c_char,
+    pub order_type: COrderType,
+    pub price: *const CDecimal,
+    pub side: COrderSide,
+    pub currency: *const c_char,
+    pub order_id: *const c_char,
+}
+
+/// Options for estimate maximum purchase quantity
+#[derive(Debug, Copy, Clone)]
+#[repr(C)]
+pub struct CEstimateMaxPurchaseQuantityResponse {
+    /// Cash available quantity
+    pub cash_max_qty: i64,
+    /// Margin available quantity
+    pub margin_max_qty: i64,
+}
+
+impl From<EstimateMaxPurchaseQuantityResponse> for CEstimateMaxPurchaseQuantityResponse {
+    fn from(value: EstimateMaxPurchaseQuantityResponse) -> Self {
+        CEstimateMaxPurchaseQuantityResponse {
+            cash_max_qty: value.cash_max_qty,
+            margin_max_qty: value.margin_max_qty,
+        }
+    }
+}
+
+impl ToFFI for CEstimateMaxPurchaseQuantityResponse {
+    type FFIType = CEstimateMaxPurchaseQuantityResponse;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        *self
     }
 }

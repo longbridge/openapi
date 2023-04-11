@@ -252,6 +252,216 @@ pub struct Order {
     remark: String,
 }
 
+/// Commission-free Status
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::CommissionFreeStatus")]
+pub enum CommissionFreeStatus {
+    /// Unknown
+    Unknown,
+    /// None
+    None,
+    /// Commission-free amount to be calculated
+    Calculated,
+    /// Pending commission-free
+    Pending,
+    /// Commission-free applied
+    Ready,
+}
+
+/// Deduction status
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::DeductionStatus")]
+pub enum DeductionStatus {
+    /// Unknown
+    Unknown,
+    /// Pending Settlement
+    None,
+    /// Settled with no data
+    NoData,
+    /// Settled and pending distribution
+    Pending,
+    /// Settled and distributed
+    Done,
+}
+
+/// Charge category code
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::trade::ChargeCategoryCode")]
+pub enum ChargeCategoryCode {
+    /// Unknown
+    Unknown,
+    /// Broker
+    Broker,
+    /// Third
+    Third,
+}
+
+/// Order history detail
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::OrderHistoryDetail")]
+pub struct OrderHistoryDetail {
+    /// Executed price for executed orders, submitted price for expired,
+    /// canceled, rejected orders, etc.
+    price: Decimal,
+    /// Executed quantity for executed orders, remaining quantity for expired,
+    /// canceled, rejected orders, etc.
+    quantity: i64,
+    /// Order status
+    status: OrderStatus,
+    /// Execution or error message
+    msg: String,
+    /// Occurrence time
+    #[js(datetime)]
+    time: DateTime<Utc>,
+}
+
+/// Order charge fee
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::OrderChargeFee")]
+pub struct OrderChargeFee {
+    /// Charge code
+    code: String,
+    /// Charge name
+    name: String,
+    /// Charge amount
+    amount: Decimal,
+    /// Charge currency
+    currency: String,
+}
+
+/// Order charge item
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::OrderChargeItem")]
+pub struct OrderChargeItem {
+    /// Charge category code
+    code: ChargeCategoryCode,
+    /// Charge category name
+    name: String,
+    /// Charge details
+    #[js(array)]
+    fees: Vec<OrderChargeFee>,
+}
+
+/// Order charge detail
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::OrderChargeDetail")]
+pub struct OrderChargeDetail {
+    /// Total charges amount
+    total_amount: Decimal,
+    /// Settlement currency
+    currency: String,
+    /// Order charge items
+    #[js(array)]
+    items: Vec<OrderChargeItem>,
+}
+
+/// Order detail
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::OrderDetail")]
+pub struct OrderDetail {
+    /// Order ID
+    order_id: String,
+    /// Order status
+    status: OrderStatus,
+    /// Stock name
+    stock_name: String,
+    /// Submitted quantity
+    quantity: i64,
+    /// Executed quantity
+    executed_quantity: i64,
+    /// Submitted price
+    #[js(opt)]
+    price: Option<Decimal>,
+    /// Executed price
+    #[js(opt)]
+    executed_price: Option<Decimal>,
+    /// Submitted time
+    #[js(datetime)]
+    submitted_at: DateTime<Utc>,
+    /// Order side
+    side: OrderSide,
+    /// Security code
+    symbol: String,
+    /// Order type
+    order_type: OrderType,
+    /// Last done
+    #[js(opt)]
+    last_done: Option<Decimal>,
+    /// `LIT` / `MIT` Order Trigger Price
+    #[js(opt)]
+    trigger_price: Option<Decimal>,
+    /// Rejected Message or remark
+    msg: String,
+    /// Order tag
+    tag: OrderTag,
+    /// Time in force type
+    time_in_force: TimeInForceType,
+    /// Long term order expire date
+    #[js(opt)]
+    expire_date: Option<NaiveDate>,
+    /// Last updated time
+    #[js(opt, datetime)]
+    updated_at: Option<DateTime<Utc>>,
+    /// Conditional order trigger time
+    #[js(opt, datetime)]
+    trigger_at: Option<DateTime<Utc>>,
+    /// `TSMAMT` / `TSLPAMT` order trailing amount
+    #[js(opt)]
+    trailing_amount: Option<Decimal>,
+    /// `TSMPCT` / `TSLPPCT` order trailing percent
+    #[js(opt)]
+    trailing_percent: Option<Decimal>,
+    /// `TSLPAMT` / `TSLPPCT` order limit offset amount
+    #[js(opt)]
+    limit_offset: Option<Decimal>,
+    /// Conditional order trigger status
+    #[js(opt)]
+    trigger_status: Option<TriggerStatus>,
+    /// Currency
+    currency: String,
+    /// Enable or disable outside regular trading hours
+    #[js(opt)]
+    outside_rth: Option<OutsideRTH>,
+    /// Remark
+    remark: String,
+    /// Commission-free Status
+    free_status: CommissionFreeStatus,
+    /// Commission-free amount
+    #[js(opt)]
+    free_amount: Option<Decimal>,
+    /// Commission-free currency
+    #[js(opt)]
+    free_currency: Option<String>,
+    /// Deduction status
+    deductions_status: DeductionStatus,
+    /// Deduction amount
+    #[js(opt)]
+    deductions_amount: Option<Decimal>,
+    /// Deduction currency
+    deductions_currency: Option<String>,
+    /// Platform fee deduction status
+    platform_deducted_status: DeductionStatus,
+    /// Platform deduction amount
+    #[js(opt)]
+    platform_deducted_amount: Option<Decimal>,
+    /// Platform deduction currency
+    #[js(opt)]
+    platform_deducted_currency: Option<String>,
+    /// Order history details
+    #[js(array)]
+    history: Vec<OrderHistoryDetail>,
+    /// Order charges
+    charge_detail: OrderChargeDetail,
+}
+
 /// Order changed message
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
@@ -515,4 +725,15 @@ pub struct MarginRatio {
     mm_factor: Decimal,
     /// Forced close-out margin ratio
     fm_factor: Decimal,
+}
+
+/// Response for estimate maximum purchase quantity
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::EstimateMaxPurchaseQuantityResponse")]
+pub struct EstimateMaxPurchaseQuantityResponse {
+    /// Cash available quantity
+    cash_max_qty: i64,
+    /// Margin available quantity
+    margin_max_qty: i64,
 }

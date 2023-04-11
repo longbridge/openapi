@@ -10,13 +10,13 @@ crate-type = ["cdylib"]
 longbridge = { path = "../rust" }
 longbridge-nodejs-macros = { path = "crates/macros" }
 
-napi = { version = "2.11.1", default-features = false, features = [
+napi = { version = "2.12.3", default-features = false, features = [
     "napi4",
     "chrono_date",
     "async",
     "serde-json",
 ] }
-napi-derive = "2.5.0"
+napi-derive = "2.12.3"
 rust_decimal = { version = "1.23.1", features = ["maths"] }
 chrono = "0.4.19"
 time = { version = "0.3.9", features = ["macros", "formatting"] }

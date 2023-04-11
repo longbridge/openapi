@@ -9,7 +9,7 @@ args = [
   "-h",
   "c",
   "-cp",
-  "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;libs/gson-2.10.1.jar",
+  "libs/native-lib-loader-2.4.0.jar:libs/slf4j-api-1.7.30.jar:libs/gson-2.10.1.jar",
   "-sourcepath",
   "javasrc/src/main/java",
   "-d",
@@ -24,7 +24,7 @@ args = [
   "--release",
   "8",
   "-cp",
-  "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;libs/gson-2.10.1.jar",
+  "libs/native-lib-loader-2.4.0.jar:libs/slf4j-api-1.7.30.jar:libs/gson-2.10.1.jar",
   "-sourcepath",
   "javasrc/src/main/java",
   "-d",
@@ -124,6 +124,14 @@ args = [
   "javasrc/src/main/java/com/longbridge/trade/TopicType.java",
   "javasrc/src/main/java/com/longbridge/trade/TradeContext.java",
   "javasrc/src/main/java/com/longbridge/trade/TriggerStatus.java",
+  "javasrc/src/main/java/com/longbridge/trade/CommissionFreeStatus.java",
+  "javasrc/src/main/java/com/longbridge/trade/DeductionStatus.java",
+  "javasrc/src/main/java/com/longbridge/trade/ChargeCategoryCode.java",
+  "javasrc/src/main/java/com/longbridge/trade/OrderHistoryDetail.java",
+  "javasrc/src/main/java/com/longbridge/trade/OrderChargeFee.java",
+  "javasrc/src/main/java/com/longbridge/trade/OrderChargeItem.java",
+  "javasrc/src/main/java/com/longbridge/trade/OrderChargeDetail.java",
+  "javasrc/src/main/java/com/longbridge/trade/OrderDetail.java",
 
   "test/Main.java",
 ]
@@ -133,11 +141,9 @@ cwd = "java"
 [tasks.test-java]
 command = "java"
 args = [
-  "--release",
-  "8",
   "-Djava.library.path=target/debug",
   "-cp",
-  "java/classes;java/libs/native-lib-loader-2.4.0.jar;java/libs/slf4j-api-1.7.30.jar;java/libs/gson-2.10.1.jar",
+  "java/classes:java/libs/native-lib-loader-2.4.0.jar:java/libs/slf4j-api-1.7.30.jar:java/libs/gson-2.10.1.jar",
   "Main",
 ]
 dependencies = ["java", "compile-java-test"]

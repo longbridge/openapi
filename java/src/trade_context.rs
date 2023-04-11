@@ -8,10 +8,11 @@ use jni::{
 };
 use longbridge::{
     trade::{
-        BalanceType, GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
-        GetHistoryOrdersOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-        GetTodayOrdersOptions, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
-        ReplaceOrderOptions, SubmitOrderOptions, TimeInForceType, TopicType,
+        BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
+        OrderStatus, OrderType, OutsideRTH, PushEvent, ReplaceOrderOptions, SubmitOrderOptions,
+        TimeInForceType, TopicType,
     },
     Config, Decimal, Market, TradeContext,
 };
@@ -553,6 +554,57 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextMarginRa
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             Ok(context.ctx.margin_ratio(symbol).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDetail(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context.ctx.order_detail(order_id).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimateMaxPurchaseQuantity(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let order_type: OrderType = get_field(env, &opts, "orderType")?;
+        let side: OrderSide = get_field(env, &opts, "side")?;
+        let mut new_opts = EstimateMaxPurchaseQuantityOptions::new(symbol, order_type, side);
+        let price: Option<Decimal> = get_field(env, &opts, "price")?;
+        if let Some(price) = price {
+            new_opts = new_opts.price(price);
+        }
+        let currency: Option<String> = get_field(env, &opts, "currency")?;
+        if let Some(currency) = currency {
+            new_opts = new_opts.currency(currency);
+        }
+        let order_id: Option<String> = get_field(env, &opts, "orderId")?;
+        if let Some(order_id) = order_id {
+            new_opts = new_opts.order_id(order_id);
+        }
+        async_util::execute(env, callback, async move {
+            Ok(context.ctx.estimate_max_purchase_quantity(new_opts).await?)
         })?;
         Ok(())
     })

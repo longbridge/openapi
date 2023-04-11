@@ -95,7 +95,10 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::TimeInForceType,
         longbridge::trade::OutsideRTH,
         longbridge::trade::BalanceType,
-        longbridge::trade::CashFlowDirection
+        longbridge::trade::CashFlowDirection,
+        longbridge::trade::CommissionFreeStatus,
+        longbridge::trade::DeductionStatus,
+        longbridge::trade::ChargeCategoryCode
     );
 
     // classes
@@ -144,6 +147,11 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::StockPositionsResponse,
         longbridge::trade::StockPositionChannel,
         longbridge::trade::StockPosition,
-        longbridge::trade::MarginRatio
+        longbridge::trade::MarginRatio,
+        longbridge::trade::OrderHistoryDetail,
+        longbridge::trade::OrderChargeFee,
+        longbridge::trade::OrderChargeItem,
+        longbridge::trade::OrderChargeDetail,
+        longbridge::trade::OrderDetail
     );
 }

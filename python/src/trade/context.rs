@@ -3,9 +3,9 @@ use std::sync::Arc;
 use longbridge::{
     blocking::TradeContextSync,
     trade::{
-        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
-        GetHistoryOrdersOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-        GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+        EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -19,9 +19,10 @@ use crate::{
     trade::{
         push::handle_push_event,
         types::{
-            AccountBalance, BalanceType, CashFlow, Execution, FundPositionsResponse, MarginRatio,
-            Order, OrderSide, OrderStatus, OrderType, OutsideRTH, StockPositionsResponse,
-            SubmitOrderResponse, TimeInForceType, TopicType,
+            AccountBalance, BalanceType, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
+            FundPositionsResponse, MarginRatio, Order, OrderDetail, OrderSide, OrderStatus,
+            OrderType, OutsideRTH, StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
+            TopicType,
         },
     },
     types::Market,
@@ -363,6 +364,44 @@ impl TradeContext {
     fn margin_ratio(&self, symbol: String) -> PyResult<MarginRatio> {
         self.ctx
             .margin_ratio(symbol)
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Get order detail
+    fn order_detail(&self, order_id: String) -> PyResult<OrderDetail> {
+        self.ctx
+            .order_detail(order_id)
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
+    /// warrants, and options
+    pub fn estimate_max_purchase_quantity(
+        &self,
+        symbol: String,
+        order_type: OrderType,
+        side: OrderSide,
+        price: Option<PyDecimal>,
+        currency: Option<String>,
+        order_id: Option<String>,
+    ) -> PyResult<EstimateMaxPurchaseQuantityResponse> {
+        let mut opts =
+            EstimateMaxPurchaseQuantityOptions::new(symbol, order_type.into(), side.into());
+
+        if let Some(price) = price {
+            opts = opts.price(price.into());
+        }
+        if let Some(currency) = currency {
+            opts = opts.currency(currency);
+        }
+        if let Some(order_id) = order_id {
+            opts = opts.order_id(order_id);
+        }
+
+        self.ctx
+            .estimate_max_purchase_quantity(opts)
             .map_err(ErrorNewType)?
             .try_into()
     }

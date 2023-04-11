@@ -6,13 +6,14 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::{mpsc, oneshot};
 
 use crate::{
+    serde_utils,
     trade::{
         core::{Command, Core},
-        AccountBalance, CashFlow, Execution, FundPositionsResponse, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
-        TopicType,
+        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
+        FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio, Order, OrderDetail,
+        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
     },
     Config, Result,
 };
@@ -25,6 +26,17 @@ struct EmptyResponse {}
 pub struct SubmitOrderResponse {
     /// Order id
     pub order_id: String,
+}
+
+/// Response for estimate maximum purchase quantity
+#[derive(Debug, Deserialize)]
+pub struct EstimateMaxPurchaseQuantityResponse {
+    /// Cash available quantity
+    #[serde(with = "serde_utils::int64_str")]
+    pub cash_max_qty: i64,
+    /// Margin available quantity
+    #[serde(with = "serde_utils::int64_str")]
+    pub margin_max_qty: i64,
 }
 
 /// Trade context
@@ -606,6 +618,94 @@ impl TradeContext {
                 symbol: symbol.into(),
             })
             .response::<Json<MarginRatio>>()
+            .send()
+            .await?
+            .0)
+    }
+
+    /// Get order detail
+    ///
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/order_detail>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{
+    ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus, TradeContext},
+    ///     Config, Market,
+    /// };
+    /// use time::macros::datetime;
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    ///
+    /// let resp = ctx.order_detail("701276261045858304").await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn order_detail(&self, order_id: impl Into<String>) -> Result<OrderDetail> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            order_id: String,
+        }
+
+        Ok(self
+            .http_cli
+            .request(Method::GET, "/v1/trade/order")
+            .response::<Json<OrderDetail>>()
+            .query_params(Request {
+                order_id: order_id.into(),
+            })
+            .send()
+            .await?
+            .0)
+    }
+
+    /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
+    /// warrants, and options
+    ///
+    ///
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/estimate_available_buy_limit>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{
+    ///     trade::{EstimateMaxPurchaseQuantityOptions, OrderSide, OrderType, TradeContext},
+    ///     Config,
+    /// };
+    /// use time::macros::datetime;
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    ///
+    /// let resp = ctx
+    ///     .estimate_max_purchase_quantity(EstimateMaxPurchaseQuantityOptions::new(
+    ///         "700.HK",
+    ///         OrderType::LO,
+    ///         OrderSide::Buy,
+    ///     ))
+    ///     .await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn estimate_max_purchase_quantity(
+        &self,
+        opts: EstimateMaxPurchaseQuantityOptions,
+    ) -> Result<EstimateMaxPurchaseQuantityResponse> {
+        Ok(self
+            .http_cli
+            .request(Method::GET, "/v1/trade/estimate/buy_limit")
+            .query_params(opts)
+            .response::<Json<EstimateMaxPurchaseQuantityResponse>>()
             .send()
             .await?
             .0)

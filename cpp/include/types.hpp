@@ -1336,6 +1336,192 @@ struct MarginRatio
   Decimal fm_factor;
 };
 
+/// Commission-free Status
+enum class CommissionFreeStatus
+{
+  Unknown,
+  None,
+  Calculated,
+  Pending,
+  Ready,
+};
+
+/// Deduction status
+enum class DeductionStatus
+{
+  Unknown,
+  None,
+  NoData,
+  Pending,
+  Done,
+};
+
+/// Charge category code
+enum class ChargeCategoryCode
+{
+  Unknown,
+  Broker,
+  Third,
+};
+
+/// Order history detail
+struct OrderHistoryDetail
+{
+  /// Executed price for executed orders, submitted price for expired, canceled,
+  /// rejected orders, etc.
+  Decimal price;
+  /// Executed quantity for executed orders, remaining quantity for expired,
+  /// canceled, rejected orders, etc.
+  int64_t quantity;
+  /// Order status
+  OrderStatus status;
+  /// Execution or error message
+  std::string msg;
+  /// Occurrence time
+  int64_t time;
+};
+
+/// Order charge fee
+struct OrderChargeFee
+{
+  /// Charge code
+  std::string code;
+  /// Charge name
+  std::string name;
+  /// Charge amount
+  Decimal amount;
+  /// Charge currency
+  std::string currency;
+};
+
+/// Order charge item
+struct OrderChargeItem
+{
+  /// Charge category code
+  ChargeCategoryCode code;
+  /// Charge category name
+  std::string name;
+  /// Charge details
+  std::vector<OrderChargeFee> fees;
+};
+
+/// Order charge detail
+struct OrderChargeDetail
+{
+  /// Total charges amount
+  Decimal total_amount;
+  /// Settlement currency
+  std::string currency;
+  /// Order charge items
+  std::vector<OrderChargeItem> items;
+};
+
+/// Order detail
+struct OrderDetail
+{
+  /// Order ID
+  std::string order_id;
+  /// Order status
+  OrderStatus status;
+  /// Stock name
+  std::string stock_name;
+  /// Submitted quantity
+  int64_t quantity;
+  /// Executed quantity
+  int64_t executed_quantity;
+  /// Submitted price
+  std::optional<Decimal> price;
+  /// Executed price
+  std::optional<Decimal> executed_price;
+  /// Submitted time
+  int64_t submitted_at;
+  /// Order side
+  OrderSide side;
+  /// Security code
+  std::string symbol;
+  /// Order type
+  OrderType order_type;
+  /// Last done
+  std::optional<Decimal> last_done;
+  /// `LIT` / `MIT` Order Trigger Price
+  std::optional<Decimal> trigger_price;
+  /// Rejected Message or remark
+  std::string msg;
+  /// Order tag
+  OrderTag tag;
+  /// Time in force type
+  TimeInForceType time_in_force;
+  /// Long term order expire date
+  std::optional<Date> expire_date;
+  /// Last updated time
+  std::optional<int64_t> updated_at;
+  /// Conditional order trigger time
+  std::optional<int64_t> trigger_at;
+  /// `TSMAMT` / `TSLPAMT` order trailing amount
+  std::optional<Decimal> trailing_amount;
+  /// `TSMPCT` / `TSLPPCT` order trailing percent
+  std::optional<Decimal> trailing_percent;
+  /// `TSLPAMT` / `TSLPPCT` order limit offset amount
+  std::optional<Decimal> limit_offset;
+  /// Conditional order trigger status
+  std::optional<TriggerStatus> trigger_status;
+  /// Currency
+  std::string currency;
+  /// Enable or disable outside regular trading hours
+  std::optional<OutsideRTH> outside_rth;
+  /// Remark
+  std::string remark;
+  /// Commission-free Status
+  CommissionFreeStatus free_status;
+  /// Commission-free amount
+  std::optional<Decimal> free_amount;
+  /// Commission-free currency
+  std::optional<std::string> free_currency;
+  /// Deduction status
+  DeductionStatus deductions_status;
+  /// Deduction amount
+  std::optional<Decimal> deductions_amount;
+  /// Deduction currency
+  std::optional<std::string> deductions_currency;
+  /// Platform fee deduction status
+  DeductionStatus platform_deducted_status;
+  /// Platform deduction amount
+  std::optional<Decimal> platform_deducted_amount;
+  /// Platform deduction currency
+  std::optional<std::string> platform_deducted_currency;
+  /// Order history details
+  std::vector<OrderHistoryDetail> history;
+  /// Order charges
+  OrderChargeDetail charge_detail;
+};
+
+/// Options for estimate maximum purchase quantity
+struct EstimateMaxPurchaseQuantityOptions
+{
+  /// Security code
+  std::string symbol;
+  /// Order type
+  OrderType order_type;
+  /// Order side
+  OrderSide side;
+  /// Estimated order price
+  std::optional<Decimal> price;
+  /// Settlement currency
+  std::optional<std::string> currency;
+  /// Order ID, required when estimating the maximum purchase quantity for a
+  /// modified order
+  std::optional<std::string> order_id;
+};
+
+/// Response for estimate maximum purchase quantity
+struct EstimateMaxPurchaseQuantityResponse
+{
+  /// Cash available quantity
+  int64_t cash_max_qty;
+  /// Margin available quantity
+  int64_t margin_max_qty;
+};
+
 } // namespace trade
 
 } // namespace longbridge

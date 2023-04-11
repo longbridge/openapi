@@ -91,6 +91,76 @@ typedef enum lb_cash_flow_direction_t {
 } lb_cash_flow_direction_t;
 
 /**
+ * Charge category code
+ */
+typedef enum lb_charge_category_code_t {
+  /**
+   * Unknown
+   */
+  ChargeCategoryCodeUnknown,
+  /**
+   * Broker
+   */
+  ChargeCategoryCodeBroker,
+  /**
+   * Third
+   */
+  ChargeCategoryCodeThird,
+} lb_charge_category_code_t;
+
+/**
+ * Commission-free Status
+ */
+typedef enum lb_commission_free_status_t {
+  /**
+   * Unknown
+   */
+  CommissionFreeStatusUnknown,
+  /**
+   * None
+   */
+  CommissionFreeStatusNone,
+  /**
+   * Commission-free amount to be calculated
+   */
+  CommissionFreeStatusCalculated,
+  /**
+   * Pending commission-free
+   */
+  CommissionFreeStatusPending,
+  /**
+   * Commission-free applied
+   */
+  CommissionFreeStatusReady,
+} lb_commission_free_status_t;
+
+/**
+ * Deduction status
+ */
+typedef enum lb_deduction_status_t {
+  /**
+   * Unknown
+   */
+  DeductionStatusUnknown,
+  /**
+   * Pending Settlement
+   */
+  DeductionStatusNone,
+  /**
+   * Commission-free amount to be calculated
+   */
+  DeductionStatusNoData,
+  /**
+   * Pending commission-free
+   */
+  DeductionStatusPending,
+  /**
+   * Commission-free applied
+   */
+  DeductionStatusDone,
+} lb_deduction_status_t;
+
+/**
  * Language identifer
  */
 typedef enum lb_language_t {
@@ -1360,6 +1430,18 @@ typedef struct lb_get_stock_positions_options_t {
   uintptr_t num_symbols;
 } lb_get_stock_positions_options_t;
 
+/**
+ * Options for estimate maximum purchase quantity
+ */
+typedef struct lb_estimate_max_purchase_quantity_options_t {
+  const char *symbol;
+  enum lb_order_type_t order_type;
+  const struct lb_decimal_t *price;
+  enum lb_order_side_t side;
+  const char *currency;
+  const char *order_id;
+} lb_estimate_max_purchase_quantity_options_t;
+
 typedef struct lb_subscription_t {
   const char *symbol;
   uint8_t sub_types;
@@ -2464,6 +2546,255 @@ typedef struct lb_margin_ratio_t {
   const struct lb_decimal_t *fm_factor;
 } lb_margin_ratio_t;
 
+/**
+ * Order detail
+ */
+typedef struct lb_order_history_detail_t {
+  const struct lb_decimal_t *price;
+  int64_t quantity;
+  enum lb_order_status_t status;
+  const char *msg;
+  int64_t time;
+} lb_order_history_detail_t;
+
+/**
+ * Order charge fee
+ */
+typedef struct lb_order_charge_fee_t {
+  /**
+   * Charge code
+   */
+  const char *code;
+  /**
+   * Charge name
+   */
+  const char *name;
+  /**
+   * Charge amount
+   */
+  const struct lb_decimal_t *amount;
+  /**
+   * Charge currency
+   */
+  const char *currency;
+} lb_order_charge_fee_t;
+
+/**
+ * Order charge item
+ */
+typedef struct lb_order_charge_item_t {
+  /**
+   * Charge category code
+   */
+  enum lb_charge_category_code_t code;
+  /**
+   * Charge category name
+   */
+  const char *name;
+  /**
+   * Charge details
+   */
+  const struct lb_order_charge_fee_t *fees;
+  /**
+   * Number of charge details
+   */
+  uintptr_t num_fees;
+} lb_order_charge_item_t;
+
+/**
+ * Order charge detail
+ */
+typedef struct lb_order_charge_detail_t {
+  /**
+   * Total charges amount
+   */
+  const struct lb_decimal_t *total_amount;
+  /**
+   * Settlement currency
+   */
+  const char *currency;
+  /**
+   * Order charge items
+   */
+  const struct lb_order_charge_item_t *items;
+  /**
+   * Number of items
+   */
+  uintptr_t num_items;
+} lb_order_charge_detail_t;
+
+/**
+ * Order detail
+ */
+typedef struct lb_order_detail_t {
+  /**
+   * Order ID
+   */
+  const char *order_id;
+  /**
+   * Order status
+   */
+  enum lb_order_status_t status;
+  /**
+   * Stock name
+   */
+  const char *stock_name;
+  /**
+   * Submitted quantity
+   */
+  int64_t quantity;
+  /**
+   * Executed quantity
+   */
+  int64_t executed_quantity;
+  /**
+   * Submitted price (maybe null)
+   */
+  const struct lb_decimal_t *price;
+  /**
+   * Executed price (maybe null)
+   */
+  const struct lb_decimal_t *executed_price;
+  /**
+   * Submitted time
+   */
+  int64_t submitted_at;
+  /**
+   * Order side
+   */
+  enum lb_order_side_t side;
+  /**
+   * Security code
+   */
+  const char *symbol;
+  /**
+   * Order type
+   */
+  enum lb_order_type_t order_type;
+  /**
+   * Last done (maybe null)
+   */
+  const struct lb_decimal_t *last_done;
+  /**
+   * `LIT` / `MIT` Order Trigger Price (maybe null)
+   */
+  const struct lb_decimal_t *trigger_price;
+  /**
+   * Rejected Message or remark
+   */
+  const char *msg;
+  /**
+   * Order tag
+   */
+  enum lb_order_tag_t tag;
+  /**
+   * Time in force type
+   */
+  enum lb_time_in_force_type_t time_in_force;
+  /**
+   * Long term order expire date (maybe null)
+   */
+  const struct lb_date_t *expire_date;
+  /**
+   * Last updated time (maybe null)
+   */
+  const int64_t *updated_at;
+  /**
+   * Conditional order trigger time (maybe null)
+   */
+  const int64_t *trigger_at;
+  /**
+   * `TSMAMT` / `TSLPAMT` order trailing amount (maybe null)
+   */
+  const struct lb_decimal_t *trailing_amount;
+  /**
+   * `TSMPCT` / `TSLPPCT` order trailing percent (maybe null)
+   */
+  const struct lb_decimal_t *trailing_percent;
+  /**
+   * `TSLPAMT` / `TSLPPCT` order limit offset amount (maybe null)
+   */
+  const struct lb_decimal_t *limit_offset;
+  /**
+   * Conditional order trigger status (maybe null)
+   */
+  const enum lb_trigger_status_t *trigger_status;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Enable or disable outside regular trading hours (maybe null)
+   */
+  const enum lb_outside_rth_t *outside_rth;
+  /**
+   * Remark
+   */
+  const char *remark;
+  /**
+   * Commission-free Status
+   */
+  enum lb_commission_free_status_t free_status;
+  /**
+   * Commission-free amount
+   */
+  const struct lb_decimal_t *free_amount;
+  /**
+   * Commission-free currency
+   */
+  const char *free_currency;
+  /**
+   * Deduction status
+   */
+  enum lb_deduction_status_t deductions_status;
+  /**
+   * Deduction amount
+   */
+  const struct lb_decimal_t *deductions_amount;
+  /**
+   * Deduction currency
+   */
+  const char *deductions_currency;
+  /**
+   * Platform fee deduction status
+   */
+  enum lb_deduction_status_t platform_deducted_status;
+  /**
+   * Platform deduction amount
+   */
+  const struct lb_decimal_t *platform_deducted_amount;
+  /**
+   * Platform deduction currency
+   */
+  const char *platform_deducted_currency;
+  /**
+   * Order history details
+   */
+  const struct lb_order_history_detail_t *history;
+  /**
+   * Number of history
+   */
+  uintptr_t num_history;
+  /**
+   * Order charges
+   */
+  struct lb_order_charge_detail_t charge_detail;
+} lb_order_detail_t;
+
+/**
+ * Options for estimate maximum purchase quantity
+ */
+typedef struct lb_estimate_max_purchase_quantity_response_t {
+  /**
+   * Cash available quantity
+   */
+  int64_t cash_max_qty;
+  /**
+   * Margin available quantity
+   */
+  int64_t margin_max_qty;
+} lb_estimate_max_purchase_quantity_response_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -3027,6 +3358,22 @@ void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
                                    const char *symbol,
                                    lb_async_callback_t callback,
                                    void *userdata);
+
+/**
+ * Get order detail
+ */
+void lb_trade_context_order_detail(const struct lb_trade_context_t *ctx,
+                                   const char *order_id,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
+
+/**
+ * Get order detail
+ */
+void lb_trade_context_estimate_max_purchase_quantity(const struct lb_trade_context_t *ctx,
+                                                     const struct lb_estimate_max_purchase_quantity_options_t *opts,
+                                                     lb_async_callback_t callback,
+                                                     void *userdata);
 
 /**
  * Create a decimal value with a 64 bit `m` representation and corresponding

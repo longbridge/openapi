@@ -42,9 +42,9 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_freeHttpClient
 /*
  * Class:     com_longbridge_SdkNative
  * Method:    httpClientRequest
- * Signature: (JLjava/lang/String;Lcom/longbridge/AsyncCallback;)Ljava/lang/String;
+ * Signature: (JLjava/lang/String;Lcom/longbridge/AsyncCallback;)V
  */
-JNIEXPORT jstring JNICALL Java_com_longbridge_SdkNative_httpClientRequest
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_httpClientRequest
   (JNIEnv *, jclass, jlong, jstring, jobject);
 
 /*
@@ -494,6 +494,22 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextStockPositions
  */
 JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextMarginRatio
   (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextOrderDetail
+ * Signature: (JLjava/lang/String;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextOrderDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    tradeContextEstimateMaxPurchaseQuantity
+ * Signature: (JLcom/longbridge/trade/EstimateMaxPurchaseQuantityOptions;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_tradeContextEstimateMaxPurchaseQuantity
+  (JNIEnv *, jclass, jlong, jobject, jobject);
 
 #ifdef __cplusplus
 }

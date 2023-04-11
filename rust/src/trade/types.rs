@@ -297,6 +297,211 @@ pub struct Order {
     pub remark: String,
 }
 
+/// Commission-free Status
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum CommissionFreeStatus {
+    /// Unknown
+    #[strum(disabled)]
+    Unknown,
+    /// None
+    None,
+    /// Commission-free amount to be calculated
+    Calculated,
+    /// Pending commission-free
+    Pending,
+    /// Commission-free applied
+    Ready,
+}
+
+/// Deduction status
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum DeductionStatus {
+    /// Unknown
+    #[strum(disabled)]
+    Unknown,
+    /// Pending Settlement
+    None,
+    /// Settled with no data
+    #[strum(serialize = "NO_DATA")]
+    NoData,
+    /// Settled and pending distribution
+    #[strum(serialize = "PENDING")]
+    Pending,
+    /// Settled and distributed
+    #[strum(serialize = "DONE")]
+    Done,
+}
+
+/// Charge category code
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum ChargeCategoryCode {
+    /// Unknown
+    #[strum(disabled)]
+    Unknown,
+    /// Broker
+    #[strum(serialize = "BROKER_FEES")]
+    Broker,
+    /// Third
+    #[strum(serialize = "THIRD_FEES")]
+    Third,
+}
+
+/// Order history detail
+#[derive(Debug, Clone, Deserialize)]
+pub struct OrderHistoryDetail {
+    /// Executed price for executed orders, submitted price for expired,
+    /// canceled, rejected orders, etc.
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub price: Decimal,
+    /// Executed quantity for executed orders, remaining quantity for expired,
+    /// canceled, rejected orders, etc.
+    #[serde(with = "serde_utils::int64_str")]
+    pub quantity: i64,
+    /// Order status
+    pub status: OrderStatus,
+    /// Execution or error message
+    pub msg: String,
+    /// Occurrence time
+    #[serde(with = "serde_utils::timestamp")]
+    pub time: OffsetDateTime,
+}
+
+/// Order charge fee
+#[derive(Debug, Clone, Deserialize)]
+pub struct OrderChargeFee {
+    /// Charge code
+    pub code: String,
+    /// Charge name
+    pub name: String,
+    /// Charge amount
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub amount: Decimal,
+    /// Charge currency
+    pub currency: String,
+}
+
+/// Order charge item
+#[derive(Debug, Clone, Deserialize)]
+pub struct OrderChargeItem {
+    /// Charge category code
+    pub code: ChargeCategoryCode,
+    /// Charge category name
+    pub name: String,
+    /// Charge details
+    pub fees: Vec<OrderChargeFee>,
+}
+
+/// Order charge detail
+#[derive(Debug, Clone, Deserialize)]
+pub struct OrderChargeDetail {
+    /// Total charges amount
+    pub total_amount: Decimal,
+    /// Settlement currency
+    pub currency: String,
+    /// Order charge items
+    pub items: Vec<OrderChargeItem>,
+}
+
+/// Order detail
+#[derive(Debug, Clone, Deserialize)]
+pub struct OrderDetail {
+    /// Order ID
+    pub order_id: String,
+    /// Order status
+    pub status: OrderStatus,
+    /// Stock name
+    pub stock_name: String,
+    /// Submitted quantity
+    #[serde(with = "serde_utils::int64_str")]
+    pub quantity: i64,
+    /// Executed quantity
+    #[serde(with = "serde_utils::int64_str")]
+    pub executed_quantity: i64,
+    /// Submitted price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub price: Option<Decimal>,
+    /// Executed price
+    #[serde(with = "serde_utils::decimal_opt_0_is_none")]
+    pub executed_price: Option<Decimal>,
+    /// Submitted time
+    #[serde(with = "serde_utils::timestamp")]
+    pub submitted_at: OffsetDateTime,
+    /// Order side
+    pub side: OrderSide,
+    /// Security code
+    pub symbol: String,
+    /// Order type
+    pub order_type: OrderType,
+    /// Last done
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub last_done: Option<Decimal>,
+    /// `LIT` / `MIT` Order Trigger Price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub trigger_price: Option<Decimal>,
+    /// Rejected Message or remark
+    pub msg: String,
+    /// Order tag
+    pub tag: OrderTag,
+    /// Time in force type
+    pub time_in_force: TimeInForceType,
+    /// Long term order expire date
+    #[serde(with = "serde_utils::date_opt")]
+    pub expire_date: Option<Date>,
+    /// Last updated time
+    #[serde(with = "serde_utils::timestamp_opt")]
+    pub updated_at: Option<OffsetDateTime>,
+    /// Conditional order trigger time
+    #[serde(with = "serde_utils::timestamp_opt")]
+    pub trigger_at: Option<OffsetDateTime>,
+    /// `TSMAMT` / `TSLPAMT` order trailing amount
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub trailing_amount: Option<Decimal>,
+    /// `TSMPCT` / `TSLPPCT` order trailing percent
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub trailing_percent: Option<Decimal>,
+    /// `TSLPAMT` / `TSLPPCT` order limit offset amount
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub limit_offset: Option<Decimal>,
+    /// Conditional order trigger status
+    #[serde(with = "serde_utils::trigger_status")]
+    pub trigger_status: Option<TriggerStatus>,
+    /// Currency
+    pub currency: String,
+    /// Enable or disable outside regular trading hours
+    #[serde(with = "serde_utils::outside_rth")]
+    pub outside_rth: Option<OutsideRTH>,
+    /// Remark
+    pub remark: String,
+    /// Commission-free Status
+    pub free_status: CommissionFreeStatus,
+    /// Commission-free amount
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub free_amount: Option<Decimal>,
+    /// Commission-free currency
+    #[serde(with = "serde_utils::symbol_opt")]
+    pub free_currency: Option<String>,
+    /// Deduction status
+    pub deductions_status: DeductionStatus,
+    /// Deduction amount
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub deductions_amount: Option<Decimal>,
+    /// Deduction currency
+    #[serde(with = "serde_utils::symbol_opt")]
+    pub deductions_currency: Option<String>,
+    /// Platform fee deduction status
+    pub platform_deducted_status: DeductionStatus,
+    /// Platform deduction amount
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub platform_deducted_amount: Option<Decimal>,
+    /// Platform deduction currency
+    #[serde(with = "serde_utils::symbol_opt")]
+    pub platform_deducted_currency: Option<String>,
+    /// Order history details
+    pub history: Vec<OrderHistoryDetail>,
+    /// Order charges
+    pub charge_detail: OrderChargeDetail,
+}
+
 /// Cash info
 #[derive(Debug, Clone, Deserialize)]
 pub struct CashInfo {
@@ -517,7 +722,10 @@ impl_serde_for_enum_string!(
     OrderTag,
     TimeInForceType,
     TriggerStatus,
-    OutsideRTH
+    OutsideRTH,
+    CommissionFreeStatus,
+    DeductionStatus,
+    ChargeCategoryCode
 );
 impl_default_for_enum_string!(
     OrderType,
@@ -527,7 +735,10 @@ impl_default_for_enum_string!(
     OrderTag,
     TimeInForceType,
     TriggerStatus,
-    OutsideRTH
+    OutsideRTH,
+    CommissionFreeStatus,
+    DeductionStatus,
+    ChargeCategoryCode
 );
 
 #[cfg(test)]
@@ -948,5 +1159,76 @@ mod tests {
         assert_eq!(execution.symbol, "700.HK");
         assert_eq!(execution.trade_done_at, datetime!(2022-03-30 11:35:51 +8));
         assert_eq!(execution.trade_id, "693664675163312128-1648611351433741210");
+    }
+
+    #[test]
+    fn order_detail() {
+        let data = r#"
+        {
+            "order_id": "828940451093708800",
+            "status": "FilledStatus",
+            "stock_name": "Apple",
+            "quantity": "10",
+            "executed_quantity": "10",
+            "price": "200.000",
+            "executed_price": "164.660",
+            "submitted_at": "1680863604",
+            "side": "Buy",
+            "symbol": "AAPL.US",
+            "order_type": "LO",
+            "last_done": "164.660",
+            "trigger_price": "0.0000",
+            "msg": "",
+            "tag": "Normal",
+            "time_in_force": "Day",
+            "expire_date": "2023-04-10",
+            "updated_at": "1681113000",
+            "trigger_at": "0",
+            "trailing_amount": "",
+            "trailing_percent": "",
+            "limit_offset": "",
+            "trigger_status": "NOT_USED",
+            "outside_rth": "ANY_TIME",
+            "currency": "USD",
+            "remark": "1680863603.927165",
+            "free_status": "None",
+            "free_amount": "",
+            "free_currency": "",
+            "deductions_status": "NONE",
+            "deductions_amount": "",
+            "deductions_currency": "",
+            "platform_deducted_status": "NONE",
+            "platform_deducted_amount": "",
+            "platform_deducted_currency": "",
+            "history": [{
+                "price": "164.6600",
+                "quantity": "10",
+                "status": "FilledStatus",
+                "msg": "Execution of 10",
+                "time": "1681113000"
+            }, {
+                "price": "200.0000",
+                "quantity": "10",
+                "status": "NewStatus",
+                "msg": "",
+                "time": "1681113000"
+            }],
+            "charge_detail": {
+                "items": [{
+                    "code": "BROKER_FEES",
+                    "name": "Broker Fees",
+                    "fees": []
+                }, {
+                    "code": "THIRD_FEES",
+                    "name": "Third-party Fees",
+                    "fees": []
+                }],
+                "total_amount": "0",
+                "currency": "USD"
+            }
+        }
+        "#;
+
+        _ = serde_json::from_str::<OrderDetail>(data).unwrap();
     }
 }

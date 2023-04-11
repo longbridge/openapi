@@ -484,4 +484,34 @@ public class TradeContext implements AutoCloseable {
             SdkNative.tradeContextMarginRatio(this.raw, symbol, callback);
         });
     }
+
+    /**
+     * Get order detail
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             OrderDetail detail = ctx.getOrderDetail("701276261045858304").get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param symbol Security symbol
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<OrderDetail> getOrderDetail(String orderId)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextOrderDetail(this.raw, orderId, callback);
+        });
+    }
 }
