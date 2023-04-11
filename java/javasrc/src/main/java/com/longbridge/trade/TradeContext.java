@@ -504,7 +504,7 @@ public class TradeContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param symbol Security symbol
+     * @param orderId Order id
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -512,6 +512,22 @@ public class TradeContext implements AutoCloseable {
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextOrderDetail(this.raw, orderId, callback);
+        });
+    }
+
+    /**
+     * Estimating the maximum purchase quantity for Hong Kong and US stocks,
+     * warrants, and options
+     * 
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException
+     */
+    public CompletableFuture<EstimateMaxPurchaseQuantityResponse> getEstimateMaxPurchaseQuantity(
+            EstimateMaxPurchaseQuantityOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextEstimateMaxPurchaseQuantity(this.raw, opts, callback);
         });
     }
 }

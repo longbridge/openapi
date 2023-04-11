@@ -51,7 +51,7 @@ public class HttpClient implements AutoCloseable {
      * @param method      HTTP method, e.g. get, post
      * @param path        Request path
      * @param requestBody Request body, it can be null
-     * @return
+     * @return A Future representing the result of the operation
      * @throws RuntimeException
      */
     public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody)
