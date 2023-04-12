@@ -1,6 +1,6 @@
 [package]
 name = "longbridge-java-macros"
-version = "0.2.55"
+version = "0.2.56"
 edition = "2021"
 
 [lib]
