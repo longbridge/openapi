@@ -4013,7 +4013,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal], currency: Optional[str], order_id: Optional[str]) -> EstimateMaxPurchaseQuantityResponse:
+    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[str] = None, order_id: Optional[str] = None) -> EstimateMaxPurchaseQuantityResponse:
         """
         Estimating the maximum purchase quantity for Hong Kong and US stocks, warrants, and options
 
