@@ -352,9 +352,10 @@ jobs:
       matrix:
         settings:
           - host: ubuntu-latest
+            container: centos:7
             lib_prefix: "lib"
             lib_suffix: ".so"
-            target: x86_64-unknown-linux-musl
+            target: x86_64-unknown-linux-gnu
           - host: windows-latest
             lib_suffix: ".dll"
             target: x86_64-pc-windows-msvc
@@ -367,7 +368,14 @@ jobs:
             lib_suffix: ".dylib"
             target: aarch64-apple-darwin
     runs-on: ${{ matrix.settings.host }}
+    container: ${{ matrix.settings.container }}
     steps:
+      - name: Install Git & Gcc
+        if: ${{ contains(matrix.settings.container, 'centos') }}
+        run: |
+          yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
+          yum install -y git gcc
+
       - uses: actions/checkout@v3
         with:
           submodules: true
@@ -380,17 +388,7 @@ jobs:
           components: rustfmt, clippy
           target: ${{ matrix.settings.target }}
 
-      - name: Build for musl
-        if: ${{ contains(matrix.settings.target, 'musl') }}
-        env:
-          RUSTFLAGS: "-C target-feature=-crt-static"
-        run: |
-          sudo apt-get install -y musl-tools
-          cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
-          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
-
       - name: Build
-        if: ${{ !contains(matrix.settings.target, 'musl') }}
         run: |
           cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
           mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
@@ -428,7 +426,7 @@ jobs:
           mkdir -p javasrc/target/natives/windows_64
           mkdir -p javasrc/target/natives/osx_64
           mkdir -p javasrc/target/natives/osx_arm64
-          mv jnis/longbridge_java-x86_64-unknown-linux-musl.so javasrc/target/natives/linux_64/liblongbridge_java.so
+          mv jnis/longbridge_java-x86_64-unknown-linux-gnu.so javasrc/target/natives/linux_64/liblongbridge_java.so
           mv jnis/longbridge_java-x86_64-pc-windows-msvc.dll javasrc/target/natives/windows_64/longbridge_java.dll
           mv jnis/longbridge_java-x86_64-apple-darwin.dylib javasrc/target/natives/osx_64/liblongbridge_java.dylib
           mv jnis/longbridge_java-aarch64-apple-darwin.dylib javasrc/target/natives/osx_arm64/liblongbridge_java.dylib
