@@ -5,4 +5,10 @@ public enum OrderTag {
     Normal,
     LongTerm,
     Grey,
+    MarginCall,
+    Offline,
+    Creditor,
+    Debtor,
+    NonExercise,
+    AllocatedSub,
 }

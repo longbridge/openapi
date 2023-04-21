@@ -901,6 +901,18 @@ enum class OrderTag
   LongTerm,
   /// Grey Order
   Grey,
+  /// Force Selling
+  MarginCall,
+  /// OTC
+  Offline,
+  /// Option Exercise Long
+  Creditor,
+  /// Option Exercise Short
+  Debtor,
+  /// Wavier Of Option Exercise
+  NonExercise,
+  /// Trade Allocation
+  AllocatedSub,
 };
 
 /// Time in force Type

@@ -158,6 +158,24 @@ pub enum COrderTag {
     /// Grey Order
     #[c(remote = "Grey")]
     OrderTagGrey,
+    /// Force Selling
+    #[c(remote = "MarginCall")]
+    OrderTagMarginCall,
+    /// OTC
+    #[c(remote = "Offline")]
+    OrderTagOffline,
+    /// Option Exercise Long
+    #[c(remote = "Creditor")]
+    OrderTagCreditor,
+    /// Option Exercise Short
+    #[c(remote = "Debtor")]
+    OrderTagDebtor,
+    /// Wavier Of Option Exercise
+    #[c(remote = "NonExercise")]
+    OrderTagNonExercise,
+    /// Trade Allocation
+    #[c(remote = "AllocatedSub")]
+    OrderTagAllocatedSub,
 }
 
 /// Order tag

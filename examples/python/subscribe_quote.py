@@ -1,5 +1,5 @@
 from time import sleep
-from longbridge.openapi import QuoteContext, Config, SubType, PushQuote
+from longbridge.openapi import QuoteContext, Config, SubType, PushQuote, Period, AdjustType
 
 
 def on_quote(symbol: str, event: PushQuote):
@@ -8,8 +8,7 @@ def on_quote(symbol: str, event: PushQuote):
 
 config = Config.from_env()
 ctx = QuoteContext(config)
-ctx.set_on_quote(on_quote)
-
-symbols = ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]
-ctx.subscribe(symbols, [SubType.Quote], True)
-sleep(30)
+candlesticks = ctx.candlesticks(
+    "SPY.US", Period.Min_5, 1000, adjust_type=AdjustType.NoAdjust)
+for candlestick in candlesticks:
+    print(candlestick)

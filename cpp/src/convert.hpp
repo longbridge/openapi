@@ -1035,6 +1035,19 @@ convert(lb_order_tag_t tag)
       return OrderTag::LongTerm;
     case OrderTagGrey:
       return OrderTag::Grey;
+    case OrderTagMarginCall:
+      return OrderTag::Grey;
+    case OrderTagOffline:
+      return OrderTag::Offline;
+    case OrderTagCreditor:
+      return OrderTag::Creditor;
+    case OrderTagDebtor:
+      return OrderTag::Debtor;
+    case OrderTagNonExercise:
+      return OrderTag::NonExercise;
+    case OrderTagAllocatedSub:
+      return OrderTag::AllocatedSub;
+    /// Trade Allocation
     default:
       throw std::invalid_argument("unreachable");
   }

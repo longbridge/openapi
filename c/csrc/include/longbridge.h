@@ -356,6 +356,30 @@ typedef enum lb_order_tag_t {
    * Grey Order
    */
   OrderTagGrey,
+  /**
+   * Force Selling
+   */
+  OrderTagMarginCall,
+  /**
+   * OTC
+   */
+  OrderTagOffline,
+  /**
+   * Option Exercise Long
+   */
+  OrderTagCreditor,
+  /**
+   * Option Exercise Short
+   */
+  OrderTagDebtor,
+  /**
+   * Wavier Of Option Exercise
+   */
+  OrderTagNonExercise,
+  /**
+   * Trade Allocation
+   */
+  OrderTagAllocatedSub,
 } lb_order_tag_t;
 
 /**

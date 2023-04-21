@@ -223,7 +223,18 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longbridge/trade/OrderTag",
     longbridge::trade::OrderTag,
-    [Unknown, Normal, LongTerm, Grey]
+    [
+        Unknown,
+        Normal,
+        LongTerm,
+        Grey,
+        MarginCall,
+        Offline,
+        Creditor,
+        Debtor,
+        NonExercise,
+        AllocatedSub,
+    ]
 );
 
 impl_java_enum!(
