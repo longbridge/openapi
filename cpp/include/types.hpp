@@ -1056,6 +1056,10 @@ struct PushOrderChanged
   std::optional<Decimal> limit_offset;
   /// Account no
   std::string account_no;
+  /// Last share
+  std::optional<Decimal> last_share;
+  /// Last price
+  std::optional<Decimal> last_price;
 };
 
 /// Options for get history orders request

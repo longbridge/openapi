@@ -2723,6 +2723,16 @@ class PushOrderChanged:
     Account no
     """
 
+    last_share: Optional[Decimal]
+    """
+    Last share
+    """
+
+    last_price: Optional[Decimal]
+    """
+    Last price
+    """
+
 
 class TimeInForceType:
     """

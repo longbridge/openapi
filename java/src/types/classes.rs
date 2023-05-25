@@ -361,7 +361,9 @@ impl_java_class!(
         trailing_amount,
         trailing_percent,
         limit_offset,
-        account_no
+        account_no,
+        last_share,
+        last_price
     ]
 );
 

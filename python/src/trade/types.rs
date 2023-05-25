@@ -531,6 +531,12 @@ pub(crate) struct PushOrderChanged {
     limit_offset: Option<PyDecimal>,
     /// Account no
     account_no: String,
+    /// Last share
+    #[py(opt)]
+    last_share: Option<PyDecimal>,
+    /// Last price
+    #[py(opt)]
+    last_price: Option<PyDecimal>,
 }
 
 /// Response for submit order request

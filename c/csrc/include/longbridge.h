@@ -1199,6 +1199,14 @@ typedef struct lb_push_order_changed_t {
    * Account no
    */
   const char *account_no;
+  /**
+   * Last share (maybe null)
+   */
+  const struct lb_decimal_t *last_share;
+  /**
+   * Last price (maybe null)
+   */
+  const struct lb_decimal_t *last_price;
 } lb_push_order_changed_t;
 
 typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*, const struct lb_push_order_changed_t*, void*);

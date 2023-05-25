@@ -79,6 +79,10 @@ pub struct PushOrderChanged {
     pub limit_offset: Option<Decimal>,
     /// Account no
     pub account_no: String,
+    /// Last share
+    pub last_share: Option<Decimal>,
+    /// Last price
+    pub last_price: Option<Decimal>,
 }
 
 /// Push event

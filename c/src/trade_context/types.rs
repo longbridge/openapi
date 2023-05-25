@@ -69,6 +69,10 @@ pub struct CPushOrderChanged {
     pub limit_offset: *const CDecimal,
     /// Account no
     pub account_no: *const c_char,
+    /// Last share (maybe null)
+    pub last_share: *const CDecimal,
+    /// Last price (maybe null)
+    pub last_price: *const CDecimal,
 }
 
 pub struct CPushOrderChangedOwned {
@@ -94,6 +98,8 @@ pub struct CPushOrderChangedOwned {
     trailing_percent: Option<CDecimal>,
     limit_offset: Option<CDecimal>,
     account_no: CString,
+    last_share: Option<CDecimal>,
+    last_price: Option<CDecimal>,
 }
 
 impl From<PushOrderChanged> for CPushOrderChangedOwned {
@@ -121,6 +127,8 @@ impl From<PushOrderChanged> for CPushOrderChangedOwned {
             trailing_percent,
             limit_offset,
             account_no,
+            last_share,
+            last_price,
         } = order_changed;
         CPushOrderChangedOwned {
             side,
@@ -145,6 +153,8 @@ impl From<PushOrderChanged> for CPushOrderChangedOwned {
             trailing_percent: trailing_percent.map(Into::into),
             limit_offset: limit_offset.map(Into::into),
             account_no: account_no.into(),
+            last_share: last_share.map(Into::into),
+            last_price: last_price.map(Into::into),
         }
     }
 }
@@ -176,6 +186,8 @@ impl ToFFI for CPushOrderChangedOwned {
             trailing_percent,
             limit_offset,
             account_no,
+            last_share,
+            last_price,
         } = self;
         CPushOrderChanged {
             side: (*side).into(),
@@ -221,6 +233,14 @@ impl ToFFI for CPushOrderChangedOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             account_no: account_no.to_ffi_type(),
+            last_share: last_share
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            last_price: last_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
         }
     }
 }

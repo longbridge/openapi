@@ -1382,6 +1382,10 @@ convert(const lb_push_order_changed_t* info)
     info->limit_offset ? std::optional{ Decimal(info->limit_offset) }
                        : std::nullopt,
     info->account_no,
+    info->last_share ? std::optional{ Decimal(info->last_share) }
+                     : std::nullopt,
+    info->last_price ? std::optional{ Decimal(info->last_price) }
+                     : std::nullopt,
   };
 }
 

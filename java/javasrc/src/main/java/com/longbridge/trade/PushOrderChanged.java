@@ -26,6 +26,8 @@ public class PushOrderChanged {
     private BigDecimal trailingPercent;
     private BigDecimal limitOffset;
     private String accountNo;
+    private BigDecimal lastShare;
+    private BigDecimal lastPrice;
 
     public OrderSide getSide() {
         return side;
@@ -115,15 +117,24 @@ public class PushOrderChanged {
         return accountNo;
     }
 
+    public BigDecimal getLastPrice() {
+        return lastPrice;
+    }
+
+    public BigDecimal getLastShare() {
+        return lastShare;
+    }
+
     @Override
     public String toString() {
-        return "PushOrderChanged [accountNo=" + accountNo + ", currency=" + currency + ", executedPrice="
-                + executedPrice + ", executedQuantity=" + executedQuantity + ", limitOffset=" + limitOffset + ", msg="
-                + msg + ", orderId=" + orderId + ", orderType=" + orderType + ", side=" + side + ", status=" + status
-                + ", stockName=" + stockName + ", submittedAt=" + submittedAt + ", submittedPrice=" + submittedPrice
-                + ", submittedQuantity=" + submittedQuantity + ", symbol=" + symbol + ", tag=" + tag
-                + ", trailingAmount=" + trailingAmount + ", trailingPercent=" + trailingPercent + ", triggerAt="
-                + triggerAt + ", triggerPrice=" + triggerPrice + ", triggerStatus=" + triggerStatus + ", updatedAt="
-                + updatedAt + "]";
+        return "PushOrderChanged [side=" + side + ", stockName=" + stockName + ", submittedQuantity="
+                + submittedQuantity + ", symbol=" + symbol + ", orderType=" + orderType + ", submittedPrice="
+                + submittedPrice + ", executedQuantity=" + executedQuantity + ", executedPrice=" + executedPrice
+                + ", orderId=" + orderId + ", currency=" + currency + ", status=" + status + ", submittedAt="
+                + submittedAt + ", updatedAt=" + updatedAt + ", triggerPrice=" + triggerPrice + ", msg=" + msg
+                + ", tag=" + tag + ", triggerStatus=" + triggerStatus + ", triggerAt=" + triggerAt + ", trailingAmount="
+                + trailingAmount + ", trailingPercent=" + trailingPercent + ", limitOffset=" + limitOffset
+                + ", accountNo=" + accountNo + ", lastShare=" + lastShare + ", lastPrice=" + lastPrice + "]";
     }
+
 }

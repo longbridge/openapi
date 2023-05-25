@@ -532,6 +532,12 @@ pub struct PushOrderChanged {
     limit_offset: Option<Decimal>,
     /// Account no
     account_no: String,
+    /// Last share
+    #[js(opt)]
+    last_share: Option<Decimal>,
+    /// Last price
+    #[js(opt)]
+    last_price: Option<Decimal>,
 }
 
 /// Response for submit order request
