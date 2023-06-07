@@ -61,7 +61,7 @@ impl HttpClient {
                 let resp = tokio::runtime::Runtime::new()
                     .unwrap()
                     .block_on(req.body(Json(body)).response::<Json<Value>>().send())
-                    .map_err(|err| PyRuntimeError::new_err(err.to_string()))?;
+                    .map_err(|err| ErrorNewType(longbridge::Error::HttpClient(err)))?;
                 Ok(Python::with_gil(|py| pythonize::pythonize(py, &resp.0))
                     .map_err(|err| PyRuntimeError::new_err(err.to_string()))?)
             }
@@ -69,7 +69,7 @@ impl HttpClient {
                 let resp = tokio::runtime::Runtime::new()
                     .unwrap()
                     .block_on(req.response::<Json<Value>>().send())
-                    .map_err(|err| PyRuntimeError::new_err(err.to_string()))?;
+                    .map_err(|err| ErrorNewType(longbridge::Error::HttpClient(err)))?;
                 Ok(Python::with_gil(|py| pythonize::pythonize(py, &resp.0))
                     .map_err(|err| PyRuntimeError::new_err(err.to_string()))?)
             }
