@@ -80,8 +80,10 @@ pub struct PushOrderChanged {
     /// Account no
     pub account_no: String,
     /// Last share
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub last_share: Option<Decimal>,
     /// Last price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub last_price: Option<Decimal>,
 }
 
