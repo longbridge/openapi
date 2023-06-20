@@ -393,7 +393,15 @@ jobs:
           target: ${{ matrix.settings.target }}
 
       - name: Build
+        if: ${{ matrix.settings.container != 'aarch64-unknown-linux-gnu' }}
         run: |
+          cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
+          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+
+      - name: Build with Cross
+        if: ${{ matrix.settings.container == 'aarch64-unknown-linux-gnu' }}
+        run: |
+          cargo install cross
           cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
           mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
