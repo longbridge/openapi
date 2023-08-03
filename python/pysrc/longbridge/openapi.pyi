@@ -1047,7 +1047,7 @@ class SecurityDepth:
     Ask depth
     """
 
-    asks: List[Depth]
+    bids: List[Depth]
     """
     Bid depth
     """
