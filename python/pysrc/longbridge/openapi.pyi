@@ -1431,7 +1431,7 @@ class TradingSessionInfo:
     End trading time
     """
 
-    trade_sessions: Type[TradeSession]
+    trade_session: Type[TradeSession]
     """
     Trading sessions
     """
