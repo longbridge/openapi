@@ -7,9 +7,9 @@ use crate::{
     quote::{
         AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
         IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-        PushEvent, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
-        SecurityStaticInfo, StrikePriceInfo, SubFlags, Subscription, Trade, WarrantQuote,
-        WatchListGroup,
+        PushEvent, RealtimeQuote, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
+        SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
+        SubFlags, Subscription, Trade, WarrantQuote, WatchlistGroup,
     },
     Config, Market, QuoteContext, Result,
 };
@@ -619,7 +619,14 @@ impl QuoteContextSync {
             .call(move |ctx| async move { ctx.capital_distribution(symbol).await })
     }
 
-    /// Get watch list
+    /// Get watchlist
+    #[deprecated = "Use `watchlist` instead"]
+    pub fn watch_list(&self) -> Result<Vec<WatchlistGroup>> {
+        self.rt
+            .call(move |ctx| async move { ctx.watchlist().await })
+    }
+
+    /// Get watchlist
     ///
     /// # Examples
     ///
@@ -632,14 +639,85 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// let resp = ctx.watch_list()?;
+    /// let resp = ctx.watchlist()?;
     /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
     /// ```
-    pub fn watch_list(&self) -> Result<Vec<WatchListGroup>> {
+    pub fn watchlist(&self) -> Result<Vec<WatchlistGroup>> {
         self.rt
-            .call(move |ctx| async move { ctx.watch_list().await })
+            .call(move |ctx| async move { ctx.watchlist().await })
+    }
+
+    /// Create watchlist group
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{blocking::QuoteContextSync, quote::RequestCreateWatchlistGroup, Config};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    ///
+    /// let req = RequestCreateWatchlistGroup::new("Watchlist1").securities(["700.HK", "BABA.US"]);
+    /// let group_id = ctx.create_watchlist_group(req)?;
+    /// println!("{}", group_id);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn create_watchlist_group(&self, req: RequestCreateWatchlistGroup) -> Result<i64> {
+        self.rt
+            .call(move |ctx| async move { ctx.create_watchlist_group(req).await })
+    }
+
+    /// Delete watchlist group
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{blocking::QuoteContextSync, Config};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    ///
+    /// ctx.delete_watchlist_group(10086, true)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn delete_watchlist_group(&self, id: i64, purge: bool) -> Result<()> {
+        self.rt
+            .call(move |ctx| async move { ctx.delete_watchlist_group(id, purge).await })
+    }
+
+    /// Update watchlist group
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{blocking::QuoteContextSync, quote::RequestUpdateWatchlistGroup, Config};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    ///
+    /// let req = RequestUpdateWatchlistGroup::new(10086)
+    ///     .name("Watchlist2")
+    ///     .securities(["700.HK", "BABA.US"]);
+    /// ctx.update_watchlist_group(req)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn update_watchlist_group(&self, req: RequestUpdateWatchlistGroup) -> Result<()> {
+        self.rt
+            .call(move |ctx| async move { ctx.update_watchlist_group(req).await })
     }
 
     /// Get real-time quotes

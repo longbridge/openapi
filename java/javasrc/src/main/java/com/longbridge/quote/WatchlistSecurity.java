@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 
 import com.longbridge.Market;
 
-public class WatchListSecurity {
+public class WatchlistSecurity {
     private String symbol;
     private Market market;
     private String name;
@@ -34,7 +34,7 @@ public class WatchListSecurity {
 
     @Override
     public String toString() {
-        return "WatchListSecurity [market=" + market + ", name=" + name + ", watchedPrice=" + watchedPrice + ", symbol="
+        return "WatchlistSecurity [market=" + market + ", name=" + name + ", watchedPrice=" + watchedPrice + ", symbol="
                 + symbol
                 + ", watchedAt=" + watchedAt + "]";
     }

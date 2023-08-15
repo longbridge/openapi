@@ -26,6 +26,31 @@ export interface ConfigParams {
   /** Language identifier (default: Language.EN) */
   language?: Language
 }
+/** An request to create a watchlist group */
+export interface CreateWatchlistGroup {
+  /** Group name */
+  name: string
+  /** Securities */
+  securities?: Array<string>
+}
+/** An request to delete a watchlist group */
+export interface DeleteWatchlistGroup {
+  /** Group id */
+  id: number
+  /** Move securities in this group to the default group */
+  purge: boolean
+}
+/** An request to update a watchlist group */
+export interface UpdateWatchlistGroup {
+  /** Group id */
+  id: number
+  /** Group name */
+  name?: string
+  /** Securities */
+  securities?: Array<string>
+  /** Securities Update mode */
+  mode: SecuritiesUpdateMode
+}
 /** Derivative type */
 export const enum DerivativeType {
   /** US stock options */
@@ -201,6 +226,15 @@ export const enum SecurityBoard {
   STI = 23,
   /** SG Industry Board */
   SGSector = 24
+}
+/** Securities update mode */
+export const enum SecuritiesUpdateMode {
+  /** Add securities */
+  Add = 0,
+  /** Remove securities */
+  Remove = 1,
+  /** Replace securities */
+  Replace = 2
 }
 /** Options for get cash flow request */
 export interface EstimateMaxPurchaseQuantityOptions {
@@ -1111,7 +1145,13 @@ export class QuoteContext {
    */
   capitalDistribution(symbol: string): Promise<CapitalDistributionResponse>
   /**
-   * Get watch list
+   * Get watchlist
+   *
+   * Deprecated: use `watchlist` instead
+   */
+  watchList(): Promise<Array<WatchlistGroup>>
+  /**
+   * Get watchlist
    *
    * #### Example
    *
@@ -1124,7 +1164,56 @@ export class QuoteContext {
    *   .then((resp) => console.log(resp.toString()))
    * ```
    */
-  watchList(): Promise<Array<WatchListGroup>>
+  watchlist(): Promise<Array<WatchlistGroup>>
+  /**
+   * Create watchlist group
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext } = require("longbridge")
+   *
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config)
+   *   .then((ctx) => {
+   *     ctx.createWatchlistGroup({
+   *       name: "Watchlist1",
+   *       securities: ["700.HK", "BABA.US"],
+   *     })
+   *   .then((group_id) => console.log(group_id));
+   * });
+   */
+  createWatchlistGroup(req: CreateWatchlistGroup): Promise<number>
+  /**
+   * Delete watchlist group
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext } = require("longbridge")
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config)
+   *   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
+   * ```
+   */
+  deleteWatchlistGroup(req: DeleteWatchlistGroup): Promise<void>
+  /**
+   * Update watchlist group
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext } = require("longbridge")
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config)
+   *   .then(ctx => ctx.updateWatchlistGroup({
+   *     id: 10086,
+   *     name: "Watchlist2",
+   *     securities: ["700.HK", "BABA.US"],
+   *   });
+   * ```
+   */
+  updateWatchlistGroup(req: UpdateWatchlistGroup): Promise<void>
   /**
    * Get real-time quote
    *
@@ -1692,18 +1781,18 @@ export class CapitalDistributionResponse {
   /** Outflow capital data */
   get capitalOut(): CapitalDistribution
 }
-/** Watch list group */
-export class WatchListGroup {
+/** Watchlist group */
+export class WatchlistGroup {
   toString(): string
   /** Group id */
   get id(): number
   /** Group name */
   get name(): string
   /** Securities */
-  get securities(): Array<WatchListSecurity>
+  get securities(): Array<WatchlistSecurity>
 }
-/** Watch list security */
-export class WatchListSecurity {
+/** Watchlist security */
+export class WatchlistSecurity {
   toString(): string
   /** Security symbol */
   get symbol(): string

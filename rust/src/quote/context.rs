@@ -3,7 +3,7 @@ use std::{sync::Arc, time::Duration};
 use longbridge_httpcli::{HttpClient, Json, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Date;
 use tokio::sync::{mpsc, oneshot};
 
@@ -13,13 +13,15 @@ use crate::{
         cmd_code,
         core::{Command, Core},
         sub_flags::SubFlags,
+        types::SecuritiesUpdateMode,
         utils::{format_date, parse_date},
         AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
         IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-        PushEvent, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
-        SecurityStaticInfo, StrikePriceInfo, Subscription, Trade, WarrantQuote, WatchListGroup,
+        PushEvent, RealtimeQuote, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
+        SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
+        Subscription, Trade, WarrantQuote, WatchlistGroup,
     },
-    Config, Error, Market, Result,
+    serde_utils, Config, Error, Market, Result,
 };
 
 const PARTICIPANT_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
@@ -961,7 +963,13 @@ impl QuoteContext {
         .try_into()
     }
 
-    /// Get watch list
+    /// Get watchlist
+    #[deprecated(note = "Use `watchlist` instead")]
+    pub async fn watch_list(&self) -> Result<Vec<WatchlistGroup>> {
+        self.watchlist().await
+    }
+
+    /// Get watchlist
     ///
     /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_groups>
     ///
@@ -976,15 +984,15 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// let resp = ctx.watch_list().await?;
+    /// let resp = ctx.watchlist().await?;
     /// println!("{:?}", resp);
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn watch_list(&self) -> Result<Vec<WatchListGroup>> {
+    pub async fn watchlist(&self) -> Result<Vec<WatchlistGroup>> {
         #[derive(Debug, Deserialize)]
         struct Response {
-            groups: Vec<WatchListGroup>,
+            groups: Vec<WatchlistGroup>,
         }
 
         let resp = self
@@ -994,6 +1002,143 @@ impl QuoteContext {
             .send()
             .await?;
         Ok(resp.0.groups)
+    }
+
+    /// Create watchlist group
+    ///
+    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_create_group>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{
+    ///     quote::{QuoteContext, RequestCreateWatchlistGroup},
+    ///     Config,
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    ///
+    /// let req = RequestCreateWatchlistGroup::new("Watchlist1").securities(["700.HK", "BABA.US"]);
+    /// let group_id = ctx.create_watchlist_group(req).await?;
+    /// println!("{}", group_id);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn create_watchlist_group(&self, req: RequestCreateWatchlistGroup) -> Result<i64> {
+        #[derive(Debug, Serialize)]
+        struct RequestCreate {
+            name: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            securities: Option<Vec<String>>,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            #[serde(with = "serde_utils::int64_str")]
+            id: i64,
+        }
+
+        let Json(Response { id }) = self
+            .http_cli
+            .request(Method::POST, "/v1/watchlist/groups")
+            .body(Json(RequestCreate {
+                name: req.name,
+                securities: req.securities,
+            }))
+            .response::<Json<Response>>()
+            .send()
+            .await?;
+
+        Ok(id)
+    }
+
+    /// Delete watchlist group
+    ///
+    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_delete_group>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{quote::QuoteContext, Config};
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    ///
+    /// ctx.delete_watchlist_group(10086, true).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn delete_watchlist_group(&self, id: i64, purge: bool) -> Result<()> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            id: i64,
+            purge: bool,
+        }
+
+        Ok(self
+            .http_cli
+            .request(Method::DELETE, "/v1/watchlist/groups")
+            .query_params(Request { id, purge })
+            .send()
+            .await?)
+    }
+
+    /// Update watchlist group
+    ///
+    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_update_group>
+    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_update_group_securities>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{
+    ///     quote::{QuoteContext, RequestUpdateWatchlistGroup},
+    ///     Config,
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let req = RequestUpdateWatchlistGroup::new(10086)
+    ///     .name("Watchlist2")
+    ///     .securities(["700.HK", "BABA.US"]);
+    /// ctx.update_watchlist_group(req).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn update_watchlist_group(&self, req: RequestUpdateWatchlistGroup) -> Result<()> {
+        #[derive(Debug, Serialize)]
+        struct RequestUpdate {
+            id: i64,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            name: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            securities: Option<Vec<String>>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            mode: Option<SecuritiesUpdateMode>,
+        }
+
+        self.http_cli
+            .request(Method::PUT, "/v1/watchlist/groups")
+            .body(Json(RequestUpdate {
+                id: req.id,
+                name: req.name,
+                mode: req.securities.is_some().then_some(req.mode),
+                securities: req.securities,
+            }))
+            .send()
+            .await?;
+
+        Ok(())
     }
 
     /// Get real-time quotes

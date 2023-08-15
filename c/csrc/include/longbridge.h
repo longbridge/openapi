@@ -37,6 +37,16 @@
 #define LB_DERIVATIVE_TYPE_WARRANT 2
 
 /**
+ * Update name of watchlist group
+ */
+#define LB_WATCHLIST_GROUP_NAME 1
+
+/**
+ * Update securities of watchlist group
+ */
+#define LB_WATCHLIST_GROUP_SECURITIES 2
+
+/**
  * Adjust type
  */
 typedef enum lb_adjust_type_t {
@@ -507,6 +517,24 @@ typedef enum lb_period_t {
    */
   PeriodYear,
 } lb_period_t;
+
+/**
+ * Trade session
+ */
+typedef enum lb_securities_update_mode_t {
+  /**
+   * Add securities
+   */
+  SecuritiesUpdateModeAdd,
+  /**
+   * Remove securities
+   */
+  SecuritiesUpdateModeRemove,
+  /**
+   * Replace securities
+   */
+  SecuritiesUpdateModeReplace,
+} lb_securities_update_mode_t;
 
 /**
  * Adjust type
@@ -1114,6 +1142,54 @@ typedef struct lb_date_t {
   uint8_t month;
   uint8_t day;
 } lb_date_t;
+
+/**
+ * An request to create a watchlist group
+ */
+typedef struct lb_create_watchlist_group_t {
+  /**
+   * Group name
+   */
+  const char *name;
+  /**
+   * Securities
+   */
+  const char *const *securities;
+  /**
+   * Number of securities
+   */
+  uintptr_t num_securities;
+} lb_create_watchlist_group_t;
+
+/**
+ * An request to update a watchlist group
+ */
+typedef struct lb_update_watchlist_group_t {
+  /**
+   * Flags
+   */
+  uint32_t flags;
+  /**
+   * Group id
+   */
+  int64_t id;
+  /**
+   * Group name
+   */
+  const char *name;
+  /**
+   * Securities
+   */
+  const char *const *securities;
+  /**
+   * Number of securities
+   */
+  uintptr_t num_securities;
+  /**
+   * Securities update mode
+   */
+  enum lb_securities_update_mode_t mode;
+} lb_update_watchlist_group_t;
 
 /**
  * Order changed message
@@ -2521,9 +2597,9 @@ typedef struct lb_submit_order_response_t {
 } lb_submit_order_response_t;
 
 /**
- * Watch list security
+ * Watchlist security
  */
-typedef struct lb_watch_list_security_t {
+typedef struct lb_watchlist_security_t {
   /**
    * Security symbol
    */
@@ -2544,12 +2620,12 @@ typedef struct lb_watch_list_security_t {
    * Watched time
    */
   int64_t watched_at;
-} lb_watch_list_security_t;
+} lb_watchlist_security_t;
 
 /**
- * Watch list group
+ * Watchlist group
  */
-typedef struct lb_watch_list_group_t {
+typedef struct lb_watchlist_group_t {
   /**
    * Group id
    */
@@ -2561,12 +2637,12 @@ typedef struct lb_watch_list_group_t {
   /**
    * Securities
    */
-  const struct lb_watch_list_security_t *securities;
+  const struct lb_watchlist_security_t *securities;
   /**
    * Number of securities
    */
   uintptr_t num_securities;
-} lb_watch_list_group_t;
+} lb_watchlist_group_t;
 
 /**
  * Margin ratio
@@ -3184,11 +3260,45 @@ void lb_quote_context_capital_distribution(const struct lb_quote_context_t *ctx,
                                            void *userdata);
 
 /**
- * Get watch list
+ * Get watchlist
+ *
+ * Deprecated, use `lb_quote_context_watchlist` instead.
  */
 void lb_quote_context_watch_list(const struct lb_quote_context_t *ctx,
                                  lb_async_callback_t callback,
                                  void *userdata);
+
+/**
+ * Get watchlist
+ */
+void lb_quote_context_watchlist(const struct lb_quote_context_t *ctx,
+                                lb_async_callback_t callback,
+                                void *userdata);
+
+/**
+ * Create watchlist group
+ */
+void lb_quote_context_create_watchlist_group(const struct lb_quote_context_t *ctx,
+                                             const struct lb_create_watchlist_group_t *req,
+                                             lb_async_callback_t callback,
+                                             void *userdata);
+
+/**
+ * Delete watchlist group
+ */
+void lb_quote_context_delete_watchlist_group(const struct lb_quote_context_t *ctx,
+                                             int64_t id,
+                                             bool purge,
+                                             lb_async_callback_t callback,
+                                             void *userdata);
+
+/**
+ * Create watchlist group
+ */
+void lb_quote_context_update_watchlist_group(const struct lb_quote_context_t *ctx,
+                                             const struct lb_update_watchlist_group_t *req,
+                                             lb_async_callback_t callback,
+                                             void *userdata);
 
 /**
  * Get quote of securities

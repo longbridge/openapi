@@ -1,7 +1,10 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 
 use longbridge::{
-    quote::{PushEvent, PushEventDetail, SubFlags},
+    quote::{
+        PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
+        SubFlags,
+    },
     QuoteContext,
 };
 use parking_lot::Mutex;
@@ -14,13 +17,14 @@ use crate::{
         enum_types::{CAdjustType, CPeriod},
         types::{
             CCandlestickOwned, CCapitalDistributionResponseOwned, CCapitalFlowLineOwned,
-            CIntradayLineOwned, CIssuerInfoOwned, CMarketTradingDaysOwned,
+            CCreateWatchlistGroup, CIntradayLineOwned, CIssuerInfoOwned, CMarketTradingDaysOwned,
             CMarketTradingSessionOwned, COptionQuoteOwned, CParticipantInfoOwned, CPushBrokers,
             CPushBrokersOwned, CPushCandlestick, CPushCandlestickOwned, CPushDepth,
             CPushDepthOwned, CPushQuote, CPushQuoteOwned, CPushTrades, CPushTradesOwned,
             CRealtimeQuoteOwned, CSecurityBrokersOwned, CSecurityDepthOwned, CSecurityQuoteOwned,
             CSecurityStaticInfoOwned, CStrikePriceInfoOwned, CSubscriptionOwned, CTradeOwned,
-            CWarrantQuoteOwned, CWatchListGroupOwned,
+            CUpdateWatchlistGroup, CWarrantQuoteOwned, CWatchlistGroupOwned,
+            LB_WATCHLIST_GROUP_NAME, LB_WATCHLIST_GROUP_SECURITIES,
         },
     },
     types::{cstr_array_to_rust, cstr_to_rust, CCow, CDate, CMarket, CVec, ToFFI},
@@ -705,17 +709,102 @@ pub unsafe extern "C" fn lb_quote_context_capital_distribution(
     });
 }
 
-/// Get watch list
+/// Get watchlist
+///
+/// Deprecated, use `lb_quote_context_watchlist` instead.
 #[no_mangle]
 pub unsafe extern "C" fn lb_quote_context_watch_list(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
+    lb_quote_context_watchlist(ctx, callback, userdata);
+}
+
+/// Get watchlist
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_watchlist(
+    ctx: *const CQuoteContext,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
     let ctx_inner = (*ctx).ctx.clone();
     execute_async(callback, ctx, userdata, async move {
-        let resp: CVec<CWatchListGroupOwned> = ctx_inner.watch_list().await?.into();
+        let resp: CVec<CWatchlistGroupOwned> = ctx_inner.watchlist().await?.into();
         Ok(resp)
+    });
+}
+
+/// Create watchlist group
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_create_watchlist_group(
+    ctx: *const CQuoteContext,
+    req: &CCreateWatchlistGroup,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let name = cstr_to_rust(req.name);
+    let securities = std::slice::from_raw_parts(req.securities, req.num_securities);
+    let securities = (req.num_securities > 0).then(|| {
+        securities
+            .iter()
+            .map(|symbol| cstr_to_rust(*symbol))
+            .collect::<Vec<_>>()
+    });
+    execute_async(callback, ctx, userdata, async move {
+        let group_id = ctx_inner
+            .create_watchlist_group(RequestCreateWatchlistGroup { name, securities })
+            .await?;
+        Ok(group_id)
+    });
+}
+
+/// Delete watchlist group
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_delete_watchlist_group(
+    ctx: *const CQuoteContext,
+    id: i64,
+    purge: bool,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        ctx_inner.delete_watchlist_group(id, purge).await?;
+        Ok(())
+    });
+}
+
+/// Create watchlist group
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_update_watchlist_group(
+    ctx: *const CQuoteContext,
+    req: &CUpdateWatchlistGroup,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let id = req.id;
+    let name = ((req.flags & LB_WATCHLIST_GROUP_NAME) != 0).then(|| cstr_to_rust(req.name));
+    let securities = std::slice::from_raw_parts(req.securities, req.num_securities);
+    let securities = ((req.flags & LB_WATCHLIST_GROUP_SECURITIES) != 0).then(|| {
+        securities
+            .iter()
+            .map(|symbol| cstr_to_rust(*symbol))
+            .collect::<Vec<_>>()
+    });
+    let mode = req.mode;
+    execute_async(callback, ctx, userdata, async move {
+        ctx_inner
+            .update_watchlist_group(RequestUpdateWatchlistGroup {
+                id,
+                name,
+                securities,
+                mode: mode.into(),
+            })
+            .await?;
+        Ok(())
     });
 }
 

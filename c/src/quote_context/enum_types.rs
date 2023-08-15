@@ -269,3 +269,20 @@ pub enum CPeriod {
     #[c(remote = "Year")]
     PeriodYear,
 }
+
+/// Trade session
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::quote::SecuritiesUpdateMode")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CSecuritiesUpdateMode {
+    /// Add securities
+    #[c(remote = "Add")]
+    SecuritiesUpdateModeAdd,
+    /// Remove securities
+    #[c(remote = "Remove")]
+    SecuritiesUpdateModeRemove,
+    /// Replace securities
+    #[c(remote = "Replace")]
+    SecuritiesUpdateModeReplace,
+}

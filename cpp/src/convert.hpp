@@ -33,6 +33,7 @@ using longbridge::quote::PushDepth;
 using longbridge::quote::PushQuote;
 using longbridge::quote::PushTrades;
 using longbridge::quote::RealtimeQuote;
+using longbridge::quote::SecuritiesUpdateMode;
 using longbridge::quote::SecurityBoard;
 using longbridge::quote::SecurityBrokers;
 using longbridge::quote::SecurityDepth;
@@ -48,8 +49,8 @@ using longbridge::quote::TradeStatus;
 using longbridge::quote::TradingSessionInfo;
 using longbridge::quote::WarrantQuote;
 using longbridge::quote::WarrantType;
-using longbridge::quote::WatchListGroup;
-using longbridge::quote::WatchListSecurity;
+using longbridge::quote::WatchlistGroup;
+using longbridge::quote::WatchlistSecurity;
 using longbridge::trade::AccountBalance;
 using longbridge::trade::BalanceType;
 using longbridge::trade::CashFlow;
@@ -1389,10 +1390,10 @@ convert(const lb_push_order_changed_t* info)
   };
 }
 
-inline WatchListSecurity
-convert(const lb_watch_list_security_t* info)
+inline WatchlistSecurity
+convert(const lb_watchlist_security_t* info)
 {
-  return WatchListSecurity{
+  return WatchlistSecurity{
     info->symbol,
     convert(info->market),
     info->name,
@@ -1402,15 +1403,15 @@ convert(const lb_watch_list_security_t* info)
   };
 }
 
-inline WatchListGroup
-convert(const lb_watch_list_group_t* info)
+inline WatchlistGroup
+convert(const lb_watchlist_group_t* info)
 {
-  std::vector<WatchListSecurity> securities;
+  std::vector<WatchlistSecurity> securities;
   std::transform(info->securities,
                  info->securities + info->num_securities,
                  std::back_inserter(securities),
                  [](auto item) { return convert(&item); });
-  return WatchListGroup{ info->id, info->name, securities };
+  return WatchlistGroup{ info->id, info->name, securities };
 }
 
 inline MarginRatio
@@ -1587,6 +1588,21 @@ convert(const lb_order_detail_t* order)
     history,
     convert(&order->charge_detail),
   };
+}
+
+inline lb_securities_update_mode_t
+convert(SecuritiesUpdateMode mode)
+{
+  switch (mode) {
+    case SecuritiesUpdateMode::Add:
+      return SecuritiesUpdateModeAdd;
+    case SecuritiesUpdateMode::Remove:
+      return SecuritiesUpdateModeRemove;
+    case SecuritiesUpdateMode::Replace:
+      return SecuritiesUpdateModeReplace;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
 }
 
 } // namespace convert

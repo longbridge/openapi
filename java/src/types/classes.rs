@@ -298,8 +298,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/quote/WatchListGroup",
-    longbridge::quote::WatchListGroup,
+    "com/longbridge/quote/WatchlistGroup",
+    longbridge::quote::WatchlistGroup,
     [
         id,
         name,
@@ -309,8 +309,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/quote/WatchListSecurity",
-    longbridge::quote::WatchListSecurity,
+    "com/longbridge/quote/WatchlistSecurity",
+    longbridge::quote::WatchlistSecurity,
     [symbol, market, name, watched_price, watched_at]
 );
 

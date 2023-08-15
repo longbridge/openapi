@@ -64,18 +64,22 @@ impl Error {
     /// Consumes this error and returns a simple error
     pub fn into_simple_error(self) -> SimpleError {
         match self {
-            Error::HttpClient(HttpClientError::OpenApi { code, message }) => {
-                SimpleError::Response {
-                    code: code as i64,
-                    message,
-                }
-            }
+            Error::HttpClient(HttpClientError::OpenApi {
+                code,
+                message,
+                trace_id,
+            }) => SimpleError::Response {
+                code: code as i64,
+                message,
+                trace_id,
+            },
             Error::WsClient(WsClientError::ResponseError {
                 detail: Some(detail),
                 ..
             }) => SimpleError::Response {
                 code: detail.code as i64,
                 message: detail.msg,
+                trace_id: String::new(),
             },
             Error::DecodeProtobuf(_)
             | Error::DecodeJSON(_)
@@ -103,6 +107,8 @@ pub enum SimpleError {
         code: i64,
         /// Error message
         message: String,
+        /// Trace id
+        trace_id: String,
     },
     /// Other error
     #[error("other error: {0}")]

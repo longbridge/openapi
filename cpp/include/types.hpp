@@ -714,8 +714,8 @@ struct CapitalDistributionResponse
   CapitalDistribution capital_out;
 };
 
-/// Watch list security
-struct WatchListSecurity
+/// Watchlist security
+struct WatchlistSecurity
 {
   /// Security symbol
   std::string symbol;
@@ -729,15 +729,48 @@ struct WatchListSecurity
   int64_t watched_at;
 };
 
-/// Watch list group
-struct WatchListGroup
+/// Watchlist group
+struct WatchlistGroup
 {
   /// Group id
   int64_t id;
   /// Group name
   std::string name;
   /// Securities
-  std::vector<WatchListSecurity> securities;
+  std::vector<WatchlistSecurity> securities;
+};
+
+/// Securities update mode
+enum class SecuritiesUpdateMode
+{
+  /// Add
+  Add,
+  /// Remove
+  Remove,
+  /// Replace
+  Replace,
+};
+
+/// An request for create watchlist group
+struct CreateWatchlistGroup
+{
+  /// Group name
+  std::string name;
+  /// Securities
+  std::vector<std::string> securities;
+};
+
+/// An request for update watchlist group
+struct UpdateWatchlistGroup
+{
+  /// Group id
+  int64_t id;
+  /// Group name
+  std::optional<std::string> name;
+  /// Securities
+  std::optional<std::vector<std::string>> securities;
+  /// Securities Update Mode
+  SecuritiesUpdateMode mode;
 };
 
 /// Real-time quote

@@ -60,7 +60,8 @@ class HttpClient:
 
                 from longbridge.openapi import HttpClient
 
-                client = HttpClient(http_url, app_key, app_secret, access_token);
+                client = HttpClient(http_url, app_key,
+                                    app_secret, access_token);
 
                 # get
                 resp = client.request("get", "/foo/bar");
@@ -1516,9 +1517,9 @@ class CapitalDistributionResponse:
     """
 
 
-class WatchListSecurity:
+class WatchlistSecurity:
     """
-    Watch list security
+    Watchlist security
     """
 
     symbol: str
@@ -1547,7 +1548,7 @@ class WatchListSecurity:
     """
 
 
-class WatchListGroup:
+class WatchlistGroup:
     id: int
     """
     Group id
@@ -1558,10 +1559,31 @@ class WatchListGroup:
     Group name
     """
 
-    securities: List[WatchListSecurity]
+    securities: List[WatchlistSecurity]
     """
     Securities
     """
+
+
+class SecuritiesUpdateMode:
+    """
+    Securities update mode
+    """
+
+    class Add(SecuritiesUpdateMode):
+        """
+        Add securities
+        """
+
+    class Remove(SecuritiesUpdateMode):
+        """
+        Remove securities
+        """
+
+    class Replace(SecuritiesUpdateMode):
+        """
+        Replace securities
+        """
 
 
 class RealtimeQuote:
@@ -1693,7 +1715,8 @@ class QuoteContext:
                 ctx = QuoteContext(config)
                 ctx.set_on_quote(on_quote)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [
+                              SubType.Quote], is_first_push = True)
                 sleep(30)
         """
 
@@ -1781,7 +1804,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                resp = ctx.static_info(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+                resp = ctx.static_info(
+                    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
                 print(resp)
         """
 
@@ -1980,7 +2004,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                resp = ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust)
+                resp = ctx.candlesticks(
+                    "700.HK", Period.Day, 10, AdjustType.NoAdjust)
                 print(resp)
         """
 
@@ -2026,7 +2051,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                resp = ctx.option_chain_info_by_date("AAPL.US", date(2023, 1, 20))
+                resp = ctx.option_chain_info_by_date(
+                    "AAPL.US", date(2023, 1, 20))
                 print(resp)
         """
 
@@ -2091,7 +2117,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                resp = ctx.trading_days(Market.HK, date(2022, 1, 1), date(2022, 2, 1))
+                resp = ctx.trading_days(
+                    Market.HK, date(2022, 1, 1), date(2022, 2, 1))
                 print(resp)
         """
 
@@ -2139,7 +2166,14 @@ class QuoteContext:
                 print(resp)
         """
 
-    def watch_list(self) -> List[WatchListGroup]:
+    def watch_list(self) -> List[WatchlistGroup]:
+        """
+        Get watch list
+
+        Deprecated: use instead `watchlist`
+        """
+
+    def watchlist(self) -> List[WatchlistGroup]:
         """
         Get watch list
 
@@ -2154,8 +2188,67 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                resp = ctx.watch_list()
+                resp = ctx.watchlist()
                 print(resp)
+        """
+
+    def create_watchlist_group(self, name: str, securities: Optional[List[str]] = None) -> int:
+        """
+        Create watchlist group
+
+        Args:
+            name: Group name
+            securities: Securities
+
+        Returns:
+            Group ID
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+                group_id = ctx.create_watchlist_group(name = "Watchlist1", securities = ["700.HK", "AAPL.US"])
+                print(group_id)
+        """
+
+    def delete_watchlist_group(self, id: int, purge: bool = False):
+        """
+        Delete watchlist group
+
+        Args:
+            id: Group ID
+            purge: Move securities in this group to the default group
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+                ctx.delete_watchlist_group(10086)
+        """
+
+    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]] = None, mode: Optional[Type[SecuritiesUpdateMode]] = None):
+        """
+        Update watchlist group
+
+        Args:
+            id: Group ID
+            name: Group name
+            securities: Securities
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, SecuritiesUpdateMode
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+                ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
         """
 
     def realtime_quote(self, symbols: List[str]) -> List[RealtimeQuote]:
@@ -2179,7 +2272,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [
+                              SubType.Quote], is_first_push = True)
                 sleep(5)
                 resp = ctx.realtime_quote(["700.HK", "AAPL.US"])
                 print(resp)
@@ -2206,7 +2300,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [
+                              SubType.Depth], is_first_push = True)
                 sleep(5)
                 resp = ctx.realtime_depth("700.HK")
                 print(resp)
@@ -2233,7 +2328,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [
+                              SubType.Brokers], is_first_push = True)
                 sleep(5)
                 resp = ctx.realtime_brokers("700.HK")
                 print(resp)
@@ -2261,7 +2357,8 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], is_first_push = False)
+                ctx.subscribe(["700.HK", "AAPL.US"], [
+                              SubType.Trade], is_first_push = False)
                 sleep(5)
                 resp = ctx.realtime_trades("700.HK", 10)
                 print(resp)

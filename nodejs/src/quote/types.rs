@@ -834,25 +834,25 @@ pub struct CapitalDistributionResponse {
     capital_out: CapitalDistribution,
 }
 
-/// Watch list group
+/// Watchlist group
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longbridge::quote::WatchListGroup")]
-pub struct WatchListGroup {
+#[js(remote = "longbridge::quote::WatchlistGroup")]
+pub struct WatchlistGroup {
     /// Group id
     id: i64,
     /// Group name
     name: String,
     /// Securities
     #[js(array)]
-    securities: Vec<WatchListSecurity>,
+    securities: Vec<WatchlistSecurity>,
 }
 
-/// Watch list security
+/// Watchlist security
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longbridge::quote::WatchListSecurity")]
-pub struct WatchListSecurity {
+#[js(remote = "longbridge::quote::WatchlistSecurity")]
+pub struct WatchlistSecurity {
     /// Security symbol
     symbol: String,
     /// Market
@@ -865,4 +865,17 @@ pub struct WatchListSecurity {
     /// Watched time
     #[js(datetime)]
     watched_at: DateTime<Utc>,
+}
+
+/// Securities update mode
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::quote::SecuritiesUpdateMode")]
+pub enum SecuritiesUpdateMode {
+    /// Add securities
+    Add,
+    /// Remove securities
+    Remove,
+    /// Replace securities
+    Replace,
 }

@@ -39,6 +39,8 @@ pub enum HttpClientError {
         code: i32,
         /// Error message
         message: String,
+        /// Trace id
+        trace_id: String,
     },
 
     /// Deserialize response body

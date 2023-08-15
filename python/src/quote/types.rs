@@ -826,22 +826,22 @@ pub(crate) struct CapitalDistributionResponse {
 /// Watch list group
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::WatchListGroup")]
-pub(crate) struct WatchListGroup {
+#[py(remote = "longbridge::quote::WatchlistGroup")]
+pub(crate) struct WatchlistGroup {
     /// Group id
     pub id: i64,
     /// Group name
     pub name: String,
     /// Securities
     #[py(array)]
-    securities: Vec<WatchListSecurity>,
+    securities: Vec<WatchlistSecurity>,
 }
 
 /// Watch list security
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::WatchListSecurity")]
-pub(crate) struct WatchListSecurity {
+#[py(remote = "longbridge::quote::WatchlistSecurity")]
+pub(crate) struct WatchlistSecurity {
     /// Security symbol
     symbol: String,
     /// Market
@@ -853,4 +853,17 @@ pub(crate) struct WatchListSecurity {
     watched_price: Option<PyDecimal>,
     /// Watched time
     watched_at: PyOffsetDateTimeWrapper,
+}
+
+/// Securities update mode
+#[pyclass]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::quote::SecuritiesUpdateMode")]
+pub(crate) enum SecuritiesUpdateMode {
+    /// Add securities
+    Add,
+    /// Remove securities
+    Remove,
+    /// Replace securities
+    Replace,
 }

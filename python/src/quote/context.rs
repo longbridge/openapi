@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use longbridge::blocking::QuoteContextSync;
+use longbridge::{
+    blocking::QuoteContextSync,
+    quote::{RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup},
+};
 use parking_lot::Mutex;
 use pyo3::prelude::*;
 
@@ -12,9 +15,9 @@ use crate::{
         types::{
             AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
             IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo,
-            Period, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
-            SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes, Subscription, Trade,
-            WarrantQuote, WatchListGroup,
+            Period, RealtimeQuote, SecuritiesUpdateMode, SecurityBrokers, SecurityDepth,
+            SecurityQuote, SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes, Subscription,
+            Trade, WarrantQuote, WatchlistGroup,
         },
     },
     time::PyDateWrapper,
@@ -322,13 +325,63 @@ impl QuoteContext {
     }
 
     /// Get watch list
-    fn watch_list(&self) -> PyResult<Vec<WatchListGroup>> {
+    fn watch_list(&self) -> PyResult<Vec<WatchlistGroup>> {
+        self.watchlist()
+    }
+
+    /// Get watch list
+    fn watchlist(&self) -> PyResult<Vec<WatchlistGroup>> {
         self.ctx
-            .watch_list()
+            .watchlist()
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Create watchlist group
+    fn create_watchlist_group(
+        &self,
+        name: String,
+        securities: Option<Vec<String>>,
+    ) -> PyResult<i64> {
+        let mut req = RequestCreateWatchlistGroup::new(name);
+        if let Some(securities) = securities {
+            req = req.securities(securities);
+        }
+        let id = self.ctx.create_watchlist_group(req).map_err(ErrorNewType)?;
+        Ok(id)
+    }
+
+    /// Delete watchlist group
+    #[pyo3(signature=(id, purge = false))]
+    fn delete_watchlist_group(&self, id: i64, purge: bool) -> PyResult<()> {
+        self.ctx
+            .delete_watchlist_group(id, purge)
+            .map_err(ErrorNewType)?;
+        Ok(())
+    }
+
+    /// Update watchlist group
+    fn update_watchlist_group(
+        &self,
+        id: i64,
+        name: Option<String>,
+        securities: Option<Vec<String>>,
+        mode: Option<SecuritiesUpdateMode>,
+    ) -> PyResult<()> {
+        let mut req = RequestUpdateWatchlistGroup::new(id);
+        if let Some(name) = name {
+            req = req.name(name);
+        }
+        if let Some(securities) = securities {
+            req = req.securities(securities);
+        }
+        if let Some(mode) = mode {
+            req = req.mode(mode.into());
+        }
+        self.ctx.update_watchlist_group(req).map_err(ErrorNewType)?;
+        Ok(())
     }
 
     /// Get real-time quote

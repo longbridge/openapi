@@ -738,7 +738,20 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
-     * Get watch list
+     * Get watchlist
+     * 
+     * Deprecated: Use `getWatchlist` instead
+     */
+    @Deprecated
+    public CompletableFuture<WatchlistGroup[]> getWatchList()
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextWatchlist(this.raw, callback);
+        });
+    }
+
+    /**
+     * Get watchlist
      * 
      * <pre>
      * {@code
@@ -748,7 +761,7 @@ public class QuoteContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
-     *             CapitalDistributionResponse resp = ctx.getWatchList().get();
+     *             CapitalDistributionResponse resp = ctx.getWatchlist().get();
      *             System.out.println(resp);
      *         }
      *     }
@@ -759,10 +772,98 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<WatchListGroup[]> getWatchList()
+
+    public CompletableFuture<WatchlistGroup[]> getWatchlist()
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextWatchList(this.raw, callback);
+            SdkNative.quoteContextWatchlist(this.raw, callback);
+        });
+    }
+
+    /**
+     * Create watchlist group
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             CreateWatchlistGroup req = new CreateWatchlistGroup("Watchlist1").setSecurities(String[] { "700.HK", "AAPL.US" });
+     *             Long groupId = ctx.createWatchlistGroup(req).get();
+     *             System.out.println(groupId);
+     *         }
+     *     }
+     * }
+     * </pre>
+     * 
+     * @param req Create watchlist group request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Long> createWatchlistGroup(CreateWatchlistGroup req) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextCreateWatchlistGroup(this.raw, req, callback);
+        });
+    }
+
+    /**
+     * Delete watchlist group
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             DeleteWatchlistGroup req = new DeleteWatchlistGroup(10086);
+     *             ctx.deleteWatchlistGroup(req).get();
+     *         }
+     *     }
+     * }
+     * </pre>
+     * 
+     * @param req Delete watchlist group request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> deleteWatchlistGroup(DeleteWatchlistGroup req) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextDeleteWatchlistGroup(this.raw, req, callback);
+        });
+    }
+
+    /**
+     * Update watchlist group
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             CreateWatchlistGroup req = new UpdateWatchlistGroup(10086)
+     *                 .setName("watchlist2")
+     *                 .setSecurities(String[] { "700.HK", "AAPL.US" });
+     *             ctx.updateWatchlistGroup(req).get();
+     *         }
+     *     }
+     * }
+     * </pre>
+     * 
+     * @param req Update watchlist group request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Long> updateWatchlistGroup(UpdateWatchlistGroup req) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextUpdateWatchlistGroup(this.raw, req, callback);
         });
     }
 

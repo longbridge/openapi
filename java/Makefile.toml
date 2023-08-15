@@ -86,8 +86,11 @@ args = [
   "javasrc/src/main/java/com/longbridge/quote/TradingSessionInfo.java",
   "javasrc/src/main/java/com/longbridge/quote/WarrantQuote.java",
   "javasrc/src/main/java/com/longbridge/quote/WarrantType.java",
-  "javasrc/src/main/java/com/longbridge/quote/WatchListGroup.java",
-  "javasrc/src/main/java/com/longbridge/quote/WatchListSecurity.java",
+  "javasrc/src/main/java/com/longbridge/quote/WatchlistGroup.java",
+  "javasrc/src/main/java/com/longbridge/quote/WatchlistSecurity.java",
+  "javasrc/src/main/java/com/longbridge/quote/CreateWatchlistGroup.java",
+  "javasrc/src/main/java/com/longbridge/quote/DeleteWatchlistGroup.java",
+  "javasrc/src/main/java/com/longbridge/quote/UpdateWatchlistGroup.java",
 
   "javasrc/src/main/java/com/longbridge/trade/AccountBalance.java",
   "javasrc/src/main/java/com/longbridge/trade/BalanceType.java",

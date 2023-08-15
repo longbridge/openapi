@@ -313,11 +313,35 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextCapitalDistribu
 
 /*
  * Class:     com_longbridge_SdkNative
- * Method:    quoteContextWatchList
+ * Method:    quoteContextWatchlist
  * Signature: (JLcom/longbridge/AsyncCallback;)V
  */
-JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextWatchList
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextWatchlist
   (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextCreateWatchlistGroup
+ * Signature: (JLcom/longbridge/quote/CreateWatchlistGroup;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextCreateWatchlistGroup
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextDeleteWatchlistGroup
+ * Signature: (JLcom/longbridge/quote/DeleteWatchlistGroup;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextDeleteWatchlistGroup
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextUpdateWatchlistGroup
+ * Signature: (JLcom/longbridge/quote/UpdateWatchlistGroup;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextUpdateWatchlistGroup
+  (JNIEnv *, jclass, jlong, jobject, jobject);
 
 /*
  * Class:     com_longbridge_SdkNative

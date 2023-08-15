@@ -11,12 +11,13 @@ use crate::{
         push::{
             PushBrokersEvent, PushCandlestickEvent, PushDepthEvent, PushQuoteEvent, PushTradesEvent,
         },
+        requests::{CreateWatchlistGroup, DeleteWatchlistGroup, UpdateWatchlistGroup},
         types::{
             AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
             IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo,
             Period, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
             SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes, Subscription, Trade,
-            WarrantQuote, WatchListGroup,
+            WarrantQuote, WatchlistGroup,
         },
     },
     time::NaiveDate,
@@ -732,7 +733,15 @@ impl QuoteContext {
             .try_into()
     }
 
-    /// Get watch list
+    /// Get watchlist
+    ///
+    /// Deprecated: use `watchlist` instead
+    #[napi]
+    pub async fn watch_list(&self) -> Result<Vec<WatchlistGroup>> {
+        self.watchlist().await
+    }
+
+    /// Get watchlist
     ///
     /// #### Example
     ///
@@ -745,14 +754,81 @@ impl QuoteContext {
     ///   .then((resp) => console.log(resp.toString()))
     /// ```
     #[napi]
-    pub async fn watch_list(&self) -> Result<Vec<WatchListGroup>> {
+    pub async fn watchlist(&self) -> Result<Vec<WatchlistGroup>> {
         self.ctx
-            .watch_list()
+            .watchlist()
             .await
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Create watchlist group
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext } = require("longbridge")
+    ///
+    /// let config = Config.fromEnv();
+    /// QuoteContext.new(config)
+    ///   .then((ctx) => {
+    ///     ctx.createWatchlistGroup({
+    ///       name: "Watchlist1",
+    ///       securities: ["700.HK", "BABA.US"],
+    ///     })
+    ///   .then((group_id) => console.log(group_id));
+    /// });
+    #[napi]
+    pub async fn create_watchlist_group(&self, req: CreateWatchlistGroup) -> Result<i64> {
+        Ok(self
+            .ctx
+            .create_watchlist_group(req.into())
+            .await
+            .map_err(ErrorNewType)?)
+    }
+
+    /// Delete watchlist group
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext } = require("longbridge")
+    /// let config = Config.fromEnv();
+    /// QuoteContext.new(config)
+    ///   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
+    /// ```
+    #[napi]
+    pub async fn delete_watchlist_group(&self, req: DeleteWatchlistGroup) -> Result<()> {
+        Ok(self
+            .ctx
+            .delete_watchlist_group(req.id, req.purge)
+            .await
+            .map_err(ErrorNewType)?)
+    }
+
+    /// Update watchlist group
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext } = require("longbridge")
+    /// let config = Config.fromEnv();
+    /// QuoteContext.new(config)
+    ///   .then(ctx => ctx.updateWatchlistGroup({
+    ///     id: 10086,
+    ///     name: "Watchlist2",
+    ///     securities: ["700.HK", "BABA.US"],
+    ///   });
+    /// ```
+    #[napi]
+    pub async fn update_watchlist_group(&self, req: UpdateWatchlistGroup) -> Result<()> {
+        Ok(self
+            .ctx
+            .update_watchlist_group(req.into())
+            .await
+            .map_err(ErrorNewType)?)
     }
 
     /// Get real-time quote

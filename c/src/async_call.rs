@@ -36,6 +36,19 @@ impl ToAsyncResult for CAsyncResult {
     }
 }
 
+impl ToAsyncResult for i64 {
+    #[inline]
+    fn to_async_result(&self, ctx: *const c_void) -> CAsyncResult {
+        CAsyncResult {
+            ctx,
+            error: std::ptr::null_mut(),
+            data: *self as *mut _,
+            length: 0,
+            userdata: std::ptr::null_mut(),
+        }
+    }
+}
+
 impl<T> ToAsyncResult for *const T {
     #[inline]
     fn to_async_result(&self, ctx: *const c_void) -> CAsyncResult {

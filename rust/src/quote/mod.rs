@@ -20,9 +20,10 @@ pub use types::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
     DerivativeType, IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession,
     OptionDirection, OptionQuote, OptionType, ParticipantInfo, PrePostQuote, RealtimeQuote,
-    SecurityBoard, SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo,
-    StrikePriceInfo, Subscription, Trade, TradeDirection, TradingSessionInfo, WarrantQuote,
-    WarrantType, WatchListGroup, WatchListSecurity,
+    RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, SecuritiesUpdateMode, SecurityBoard,
+    SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
+    Subscription, Trade, TradeDirection, TradingSessionInfo, WarrantQuote, WarrantType,
+    WatchlistGroup, WatchlistSecurity,
 };
 // pub use types::{FilterWarrantExpiryDate,
 // FilterWarrantStatus,Language,SortType};

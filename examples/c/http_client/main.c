@@ -35,7 +35,7 @@ main(int argc, char const* argv[])
   }
 
   lb_http_client_request(
-    http_client, "get", "/v1/trade/execution/today", NULL, on_response, NULL);
+    http_client, "get", "/v1/trade/execution/today", NULL, NULL, on_response, NULL);
   getchar();
   lb_http_client_free(http_client);
   return 0;

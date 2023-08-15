@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, sync::Arc};
+use std::sync::Arc;
 
 use jni::{
     errors::Result,
@@ -181,11 +181,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryE
             if let Some(symbol) = symbol {
                 new_opts = new_opts.symbol(symbol);
             }
-            let start_at: Option<OffsetDateTime> = get_field(env, opts.borrow(), "startAt")?;
+            let start_at: Option<OffsetDateTime> = get_field(env, &opts, "startAt")?;
             if let Some(start_at) = start_at {
                 new_opts = new_opts.start_at(start_at);
             }
-            let end_at: Option<OffsetDateTime> = get_field(env, opts.borrow(), "endAt")?;
+            let end_at: Option<OffsetDateTime> = get_field(env, &opts, "endAt")?;
             if let Some(end_at) = end_at {
                 new_opts = new_opts.end_at(end_at);
             }

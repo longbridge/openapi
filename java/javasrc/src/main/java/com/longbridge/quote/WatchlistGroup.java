@@ -2,10 +2,10 @@ package com.longbridge.quote;
 
 import java.util.Arrays;
 
-public class WatchListGroup {
+public class WatchlistGroup {
     private long id;
     private String name;
-    private WatchListSecurity[] securities;
+    private WatchlistSecurity[] securities;
 
     public long getId() {
         return id;
@@ -15,12 +15,12 @@ public class WatchListGroup {
         return name;
     }
 
-    public WatchListSecurity[] getSecurities() {
+    public WatchlistSecurity[] getSecurities() {
         return securities;
     }
 
     @Override
     public String toString() {
-        return "WatchListGroup [id=" + id + ", name=" + name + ", securities=" + Arrays.toString(securities) + "]";
+        return "WatchlistGroup [id=" + id + ", name=" + name + ", securities=" + Arrays.toString(securities) + "]";
     }
 }

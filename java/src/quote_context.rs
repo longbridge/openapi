@@ -7,7 +7,10 @@ use jni::{
     JNIEnv, JavaVM,
 };
 use longbridge::{
-    quote::{AdjustType, Period, PushEvent, PushEventDetail, SubFlags},
+    quote::{
+        AdjustType, Period, PushEvent, PushEventDetail, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, SecuritiesUpdateMode, SubFlags,
+    },
     Config, Market, QuoteContext,
 };
 use parking_lot::Mutex;
@@ -17,7 +20,7 @@ use crate::{
     async_util,
     error::jni_result,
     init::QUOTE_CONTEXT_CLASS,
-    types::{set_field, FromJValue, IntoJValue, ObjectArray},
+    types::{get_field, set_field, FromJValue, IntoJValue, ObjectArray},
 };
 
 #[derive(Default)]
@@ -684,7 +687,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCapitalD
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWatchList(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWatchlist(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -693,7 +696,81 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWatchLis
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.watch_list().await?))
+            Ok(ObjectArray(context.ctx.watchlist().await?))
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCreateWatchlistGroup(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    req: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let name: String = get_field(env, &req, "name")?;
+        let securities: Option<ObjectArray<String>> = get_field(env, &req, "securities")?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .create_watchlist_group(RequestCreateWatchlistGroup {
+                    name,
+                    securities: securities.map(|securities| securities.0),
+                })
+                .await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextDeleteWatchlistGroup(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    req: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let id: i64 = get_field(env, &req, "id")?;
+        let purge: bool = get_field(env, &req, "purge")?;
+        async_util::execute(env, callback, async move {
+            Ok(context.ctx.delete_watchlist_group(id, purge).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUpdateWatchlistGroup(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    req: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let id: i64 = get_field(env, &req, "id")?;
+        let name: Option<String> = get_field(env, &req, "name")?;
+        let securities: Option<ObjectArray<String>> = get_field(env, &req, "securities")?;
+        let mode: Option<SecuritiesUpdateMode> = get_field(env, &req, "mode")?;
+        let mode = mode.unwrap_or_default();
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .update_watchlist_group(RequestUpdateWatchlistGroup {
+                    id,
+                    name,
+                    securities: securities.map(|securities| securities.0),
+                    mode,
+                })
+                .await?)
         })?;
         Ok(())
     })

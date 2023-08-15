@@ -167,14 +167,32 @@ public:
     const std::string& symbol,
     AsyncCallback<QuoteContext, CapitalDistributionResponse> callback) const;
 
-  /// Get watch list
-  void watch_list(
-    AsyncCallback<QuoteContext, std::vector<WatchListGroup>> callback) const;
+  /// Get watchlist
+  [[deprecated("use `watchlist` instead")]] void watch_list(
+    AsyncCallback<QuoteContext, std::vector<WatchlistGroup>> callback) const;
+
+  /// Get watchlist
+  void watchlist(
+    AsyncCallback<QuoteContext, std::vector<WatchlistGroup>> callback) const;
+
+  /// Create watchlist group
+  void create_watchlist_group(
+    const CreateWatchlistGroup& req,
+    AsyncCallback<QuoteContext, int64_t> callback) const;
+
+  /// Delete watchlist group
+  void delete_watchlist_group(int64_t id,
+                              bool purge,
+                              AsyncCallback<QuoteContext, void> callback) const;
+
+  /// Create watchlist group
+  void update_watchlist_group(const UpdateWatchlistGroup& req,
+                              AsyncCallback<QuoteContext, void> callback) const;
 
   /// Get real-time quotes
   ///
-  /// Get real-time quotes of the subscribed symbols, it always returns the data
-  /// in the local storage.
+  /// Get real-time quotes of the subscribed symbols, it always returns the
+  /// data in the local storage.
   void realtime_quote(
     const std::vector<std::string>& symbols,
     AsyncCallback<QuoteContext, std::vector<RealtimeQuote>> callback) const;

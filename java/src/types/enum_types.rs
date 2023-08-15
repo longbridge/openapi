@@ -184,6 +184,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/quote/SecuritiesUpdateMode",
+    longbridge::quote::SecuritiesUpdateMode,
+    [Add, Remove, Replace]
+);
+
+impl_java_enum!(
     "com/longbridge/trade/OrderSide",
     longbridge::trade::OrderSide,
     [Unknown, Buy, Sell]

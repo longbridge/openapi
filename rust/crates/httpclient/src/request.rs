@@ -267,11 +267,17 @@ where
         tracing::debug!(method = %request.method(), url = %request.url(), "http request");
 
         // send request
-        let (status, text) = tokio::time::timeout(REQUEST_TIMEOUT, async move {
+        let (status, trace_id, text) = tokio::time::timeout(REQUEST_TIMEOUT, async move {
             let resp = http_cli.execute(request).await?;
             let status = resp.status();
+            let trace_id = resp
+                .headers()
+                .get("x-trace-id")
+                .and_then(|value| value.to_str().ok())
+                .unwrap_or_default()
+                .to_string();
             let text = resp.text().await.map_err(HttpClientError::from)?;
-            Ok::<_, HttpClientError>((status, text))
+            Ok::<_, HttpClientError>((status, trace_id, text))
         })
         .await
         .map_err(|_| HttpClientError::RequestTimeout)??;
@@ -283,6 +289,7 @@ where
             Ok(resp) => Err(HttpClientError::OpenApi {
                 code: resp.code,
                 message: resp.message,
+                trace_id,
             }),
             Err(err) if status == StatusCode::OK => {
                 Err(HttpClientError::DeserializeResponseBody(err.to_string()))

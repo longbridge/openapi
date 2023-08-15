@@ -861,33 +861,131 @@ QuoteContext::capital_distribution(
 
 void
 QuoteContext::watch_list(
-  AsyncCallback<QuoteContext, std::vector<WatchListGroup>> callback) const
+  AsyncCallback<QuoteContext, std::vector<WatchlistGroup>> callback) const
 {
-  lb_quote_context_watch_list(
+  watchlist(callback);
+}
+
+void
+QuoteContext::watchlist(
+  AsyncCallback<QuoteContext, std::vector<WatchlistGroup>> callback) const
+{
+  lb_quote_context_watchlist(
     ctx_,
     [](auto res) {
       auto callback_ptr =
-        callback::get_async_callback<QuoteContext, std::vector<WatchListGroup>>(
+        callback::get_async_callback<QuoteContext, std::vector<WatchlistGroup>>(
           res->userdata);
       QuoteContext ctx((const lb_quote_context_t*)res->ctx);
       Status status(res->error);
 
       if (status) {
-        auto rows = (const lb_watch_list_group_t*)res->data;
-        std::vector<WatchListGroup> rows2;
+        auto rows = (const lb_watchlist_group_t*)res->data;
+        std::vector<WatchlistGroup> rows2;
         std::transform(rows,
                        rows + res->length,
                        std::back_inserter(rows2),
                        [](auto row) { return convert(&row); });
 
-        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<WatchListGroup>>(
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<WatchlistGroup>>(
           ctx, std::move(status), &rows2));
       } else {
-        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<WatchListGroup>>(
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<WatchlistGroup>>(
           ctx, std::move(status), nullptr));
       }
     },
-    new AsyncCallback<QuoteContext, std::vector<WatchListGroup>>(callback));
+    new AsyncCallback<QuoteContext, std::vector<WatchlistGroup>>(callback));
+}
+
+void
+QuoteContext::create_watchlist_group(
+  const CreateWatchlistGroup& req,
+  AsyncCallback<QuoteContext, int64_t> callback) const
+{
+  auto c_securities = utils::get_cstring_vector(req.securities);
+  lb_create_watchlist_group_t c_req = {
+    req.name.c_str(),
+    c_securities.data(),
+    c_securities.size(),
+  };
+  lb_quote_context_create_watchlist_group(
+    ctx_,
+    &c_req,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, int64_t>(res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto group_id = (int64_t)res->data;
+        (*callback_ptr)(AsyncResult<QuoteContext, int64_t>(
+          ctx, std::move(status), &group_id));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, int64_t>(ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, int64_t>(callback));
+}
+
+void
+QuoteContext::delete_watchlist_group(
+  int64_t id,
+  bool purge,
+  AsyncCallback<QuoteContext, void> callback) const
+{
+  lb_quote_context_delete_watchlist_group(
+    ctx_,
+    id,
+    purge,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<QuoteContext, void>(
+        QuoteContext((const lb_quote_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<QuoteContext, void>(callback));
+}
+
+void
+QuoteContext::update_watchlist_group(
+  const UpdateWatchlistGroup& req,
+  AsyncCallback<QuoteContext, void> callback) const
+{
+  lb_update_watchlist_group_t c_req = { 0, req.id, nullptr, nullptr, 0 };
+
+  auto c_name = req.name ? std::optional{ req.name->c_str() } : std::nullopt;
+  auto c_securities =
+    req.securities ? std::optional{ utils::get_cstring_vector(*req.securities) }
+                   : std::nullopt;
+
+  if (c_name) {
+    c_req.flags |= LB_WATCHLIST_GROUP_NAME;
+    c_req.name = *c_name;
+  }
+
+  if (c_securities) {
+    c_req.flags |= LB_WATCHLIST_GROUP_SECURITIES;
+    c_req.securities = c_securities->data();
+    c_req.num_securities = c_securities->size();
+    c_req.mode = convert(req.mode);
+  }
+
+  lb_quote_context_update_watchlist_group(
+    ctx_,
+    &c_req,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<QuoteContext, void>(
+        QuoteContext((const lb_quote_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<QuoteContext, void>(callback));
 }
 
 void

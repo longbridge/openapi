@@ -1,7 +1,7 @@
 use longbridge_proto::quote::{self, Period, TradeSession, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive};
 use rust_decimal::Decimal;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
 use time::{Date, OffsetDateTime, Time};
 
@@ -991,9 +991,9 @@ impl TryFrom<quote::CapitalDistributionResponse> for CapitalDistributionResponse
     }
 }
 
-/// Watch list security
+/// Watchlist security
 #[derive(Debug, Clone, Deserialize)]
-pub struct WatchListSecurity {
+pub struct WatchlistSecurity {
     /// Security symbol
     pub symbol: String,
     /// Market
@@ -1008,16 +1008,111 @@ pub struct WatchListSecurity {
     pub watched_at: OffsetDateTime,
 }
 
-/// Watch list group
+/// Watchlist group
 #[derive(Debug, Clone, Deserialize)]
-pub struct WatchListGroup {
+pub struct WatchlistGroup {
     /// Group id
     #[serde(with = "serde_utils::int64_str")]
     pub id: i64,
     /// Group name
     pub name: String,
     /// Securities
-    pub securities: Vec<WatchListSecurity>,
+    pub securities: Vec<WatchlistSecurity>,
 }
 
 impl_default_for_enum_string!(OptionType, OptionDirection, WarrantType, SecurityBoard);
+
+/// An request for create watchlist group
+#[derive(Debug, Clone)]
+pub struct RequestCreateWatchlistGroup {
+    /// Group name
+    pub name: String,
+    /// Securities
+    pub securities: Option<Vec<String>>,
+}
+
+impl RequestCreateWatchlistGroup {
+    /// Create a new request for create watchlist group
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            securities: None,
+        }
+    }
+
+    /// Set securities to the request
+    pub fn securities<I, T>(self, securities: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<String>,
+    {
+        Self {
+            securities: Some(securities.into_iter().map(Into::into).collect()),
+            ..self
+        }
+    }
+}
+
+/// Securities update mode
+#[derive(Debug, Copy, Clone, Default, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum SecuritiesUpdateMode {
+    /// Add securities
+    Add,
+    /// Remove securities
+    Remove,
+    /// Replace securities
+    #[default]
+    Replace,
+}
+
+/// An request for update watchlist group
+#[derive(Debug, Clone)]
+pub struct RequestUpdateWatchlistGroup {
+    /// Group id
+    pub id: i64,
+    /// Group name
+    pub name: Option<String>,
+    /// Securities
+    pub securities: Option<Vec<String>>,
+    /// Securities Update mode
+    pub mode: SecuritiesUpdateMode,
+}
+
+impl RequestUpdateWatchlistGroup {
+    /// Create a new request for update watchlist group
+    #[inline]
+    pub fn new(id: i64) -> Self {
+        Self {
+            id,
+            name: None,
+            securities: None,
+            mode: SecuritiesUpdateMode::default(),
+        }
+    }
+
+    /// Set group name to the request
+    pub fn name(self, name: impl Into<String>) -> Self {
+        Self {
+            name: Some(name.into()),
+            ..self
+        }
+    }
+
+    /// Set securities to the request
+    pub fn securities<I, T>(self, securities: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<String>,
+    {
+        Self {
+            securities: Some(securities.into_iter().map(Into::into).collect()),
+            ..self
+        }
+    }
+
+    /// Set securities update mode to the request
+    pub fn mode(self, mode: SecuritiesUpdateMode) -> Self {
+        Self { mode, ..self }
+    }
+}
