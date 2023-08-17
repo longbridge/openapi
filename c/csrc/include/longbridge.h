@@ -904,7 +904,9 @@ typedef struct lb_push_quote_t {
   enum lb_trade_session_t trade_session;
 } lb_push_quote_t;
 
-typedef void (*lb_quote_callback_t)(const struct lb_quote_context_t*, const struct lb_push_quote_t*, void*);
+typedef void (*lb_quote_callback_t)(const struct lb_quote_context_t*,
+                                    const struct lb_push_quote_t*,
+                                    void*);
 
 /**
  * Depth
@@ -954,7 +956,9 @@ typedef struct lb_push_depth_t {
   uintptr_t num_bids;
 } lb_push_depth_t;
 
-typedef void (*lb_depth_callback_t)(const struct lb_quote_context_t*, const struct lb_push_depth_t*, void*);
+typedef void (*lb_depth_callback_t)(const struct lb_quote_context_t*,
+                                    const struct lb_push_depth_t*,
+                                    void*);
 
 /**
  * Brokers
@@ -1000,7 +1004,9 @@ typedef struct lb_push_brokers_t {
   uintptr_t num_bid_brokers;
 } lb_push_brokers_t;
 
-typedef void (*lb_brokers_callback_t)(const struct lb_quote_context_t*, const struct lb_push_brokers_t*, void*);
+typedef void (*lb_brokers_callback_t)(const struct lb_quote_context_t*,
+                                      const struct lb_push_brokers_t*,
+                                      void*);
 
 /**
  * Trade
@@ -1081,7 +1087,9 @@ typedef struct lb_push_trades_t {
   uintptr_t num_trades;
 } lb_push_trades_t;
 
-typedef void (*lb_trades_callback_t)(const struct lb_quote_context_t*, const struct lb_push_trades_t*, void*);
+typedef void (*lb_trades_callback_t)(const struct lb_quote_context_t*,
+                                     const struct lb_push_trades_t*,
+                                     void*);
 
 /**
  * Candlestick
@@ -1135,7 +1143,9 @@ typedef struct lb_push_candlestick_t {
   struct lb_candlestick_t candlestick;
 } lb_push_candlestick_t;
 
-typedef void (*lb_candlestick_callback_t)(const struct lb_quote_context_t*, const struct lb_push_candlestick_t*, void*);
+typedef void (*lb_candlestick_callback_t)(const struct lb_quote_context_t*,
+                                          const struct lb_push_candlestick_t*,
+                                          void*);
 
 typedef struct lb_date_t {
   int32_t year;
@@ -1293,7 +1303,9 @@ typedef struct lb_push_order_changed_t {
   const struct lb_decimal_t *last_price;
 } lb_push_order_changed_t;
 
-typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*, const struct lb_push_order_changed_t*, void*);
+typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*,
+                                            const struct lb_push_order_changed_t*,
+                                            void*);
 
 /**
  * Options for get histroy executions request

@@ -134,6 +134,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::CapitalDistributionResponse,
         longbridge::quote::WatchlistGroup,
         longbridge::quote::WatchlistSecurity,
+        crate::types::CreateWatchlistGroupResponse,
         longbridge::quote::RealtimeQuote,
         longbridge::trade::PushOrderChanged,
         longbridge::trade::Execution,

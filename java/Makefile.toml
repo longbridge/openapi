@@ -9,7 +9,7 @@ args = [
   "-h",
   "c",
   "-cp",
-  "libs/native-lib-loader-2.4.0.jar:libs/slf4j-api-1.7.30.jar:libs/gson-2.10.1.jar",
+  "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;libs/gson-2.10.1.jar",
   "-sourcepath",
   "javasrc/src/main/java",
   "-d",
@@ -24,7 +24,7 @@ args = [
   "--release",
   "8",
   "-cp",
-  "libs/native-lib-loader-2.4.0.jar:libs/slf4j-api-1.7.30.jar:libs/gson-2.10.1.jar",
+  "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;libs/gson-2.10.1.jar",
   "-sourcepath",
   "javasrc/src/main/java",
   "-d",
@@ -89,6 +89,7 @@ args = [
   "javasrc/src/main/java/com/longbridge/quote/WatchlistGroup.java",
   "javasrc/src/main/java/com/longbridge/quote/WatchlistSecurity.java",
   "javasrc/src/main/java/com/longbridge/quote/CreateWatchlistGroup.java",
+  "javasrc/src/main/java/com/longbridge/quote/CreateWatchlistGroupResponse.java",
   "javasrc/src/main/java/com/longbridge/quote/DeleteWatchlistGroup.java",
   "javasrc/src/main/java/com/longbridge/quote/UpdateWatchlistGroup.java",
 
@@ -146,7 +147,7 @@ command = "java"
 args = [
   "-Djava.library.path=target/debug",
   "-cp",
-  "java/classes:java/libs/native-lib-loader-2.4.0.jar:java/libs/slf4j-api-1.7.30.jar:java/libs/gson-2.10.1.jar",
+  "java/classes;java/libs/native-lib-loader-2.4.0.jar;java/libs/slf4j-api-1.7.30.jar;java/libs/gson-2.10.1.jar",
   "Main",
 ]
 dependencies = ["java", "compile-java-test"]

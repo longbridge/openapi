@@ -314,6 +314,16 @@ impl_java_class!(
     [symbol, market, name, watched_price, watched_at]
 );
 
+pub(crate) struct CreateWatchlistGroupResponse {
+    pub(crate) id: i64,
+}
+
+impl_java_class!(
+    "com/longbridge/quote/CreateWatchlistGroupResponse",
+    CreateWatchlistGroupResponse,
+    [id]
+);
+
 impl_java_class!(
     "com/longbridge/quote/CapitalDistributionResponse",
     longbridge::quote::CapitalDistributionResponse,

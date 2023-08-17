@@ -22,7 +22,8 @@ public class UpdateWatchlistGroup {
         return this;
     }
 
-    public void setMode(SecuritiesUpdateMode mode) {
+    public UpdateWatchlistGroup setMode(SecuritiesUpdateMode mode) {
         this.mode = mode;
+        return this;
     }
 }

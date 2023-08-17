@@ -20,7 +20,9 @@ use crate::{
     async_util,
     error::jni_result,
     init::QUOTE_CONTEXT_CLASS,
-    types::{get_field, set_field, FromJValue, IntoJValue, ObjectArray},
+    types::{
+        get_field, set_field, CreateWatchlistGroupResponse, FromJValue, IntoJValue, ObjectArray,
+    },
 };
 
 #[derive(Default)]
@@ -715,13 +717,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCreateWa
         let name: String = get_field(env, &req, "name")?;
         let securities: Option<ObjectArray<String>> = get_field(env, &req, "securities")?;
         async_util::execute(env, callback, async move {
-            Ok(context
+            let id = context
                 .ctx
                 .create_watchlist_group(RequestCreateWatchlistGroup {
                     name,
                     securities: securities.map(|securities| securities.0),
                 })
-                .await?)
+                .await?;
+            Ok(CreateWatchlistGroupResponse { id })
         })?;
         Ok(())
     })

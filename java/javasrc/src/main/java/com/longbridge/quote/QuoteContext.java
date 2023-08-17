@@ -791,7 +791,7 @@ public class QuoteContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
-     *             CreateWatchlistGroup req = new CreateWatchlistGroup("Watchlist1").setSecurities(String[] { "700.HK", "AAPL.US" });
+     *             CreateWatchlistGroup req = new CreateWatchlistGroup("Watchlist1").setSecurities(new String[] { "700.HK", "AAPL.US" });
      *             Long groupId = ctx.createWatchlistGroup(req).get();
      *             System.out.println(groupId);
      *         }
@@ -806,7 +806,7 @@ public class QuoteContext implements AutoCloseable {
     public CompletableFuture<Long> createWatchlistGroup(CreateWatchlistGroup req) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextCreateWatchlistGroup(this.raw, req, callback);
-        });
+        }).thenApply(resp -> ((CreateWatchlistGroupResponse)resp).id);
     }
 
     /**
@@ -850,7 +850,7 @@ public class QuoteContext implements AutoCloseable {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             CreateWatchlistGroup req = new UpdateWatchlistGroup(10086)
      *                 .setName("watchlist2")
-     *                 .setSecurities(String[] { "700.HK", "AAPL.US" });
+     *                 .setSecurities(new String[] { "700.HK", "AAPL.US" });
      *             ctx.updateWatchlistGroup(req).get();
      *         }
      *     }

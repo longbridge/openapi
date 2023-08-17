@@ -18,7 +18,9 @@ use jni::{
     JNIEnv,
 };
 
-pub(crate) use self::{object_array::ObjectArray, primary_array::PrimaryArray};
+pub(crate) use self::{
+    classes::CreateWatchlistGroupResponse, object_array::ObjectArray, primary_array::PrimaryArray,
+};
 
 pub(crate) trait ClassLoader {
     fn init(env: &mut JNIEnv);
