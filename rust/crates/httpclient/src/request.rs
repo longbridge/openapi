@@ -168,7 +168,7 @@ impl<T, Q, R> RequestBuilder<T, Q, R> {
     #[must_use]
     pub fn query_params<Q2>(self, params: Q2) -> RequestBuilder<T, Q2, R>
     where
-        Q2: Serialize + Send + Sync + 'static,
+        Q2: Serialize + Send + Sync,
     {
         RequestBuilder {
             client: self.client,
@@ -202,7 +202,7 @@ impl<T, Q, R> RequestBuilder<T, Q, R> {
 impl<T, Q, R> RequestBuilder<T, Q, R>
 where
     T: ToPayload,
-    Q: Serialize + Send + 'static,
+    Q: Serialize + Send,
     R: FromPayload,
 {
     async fn do_send(&self) -> HttpClientResult<R> {

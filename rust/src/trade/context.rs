@@ -454,12 +454,17 @@ impl TradeContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
-    /// let resp = ctx.account_balance().await?;
+    /// let resp = ctx.account_balance(None).await?;
     /// println!("{:?}", resp);
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn account_balance(&self) -> Result<Vec<AccountBalance>> {
+    pub async fn account_balance(&self, currency: Option<&str>) -> Result<Vec<AccountBalance>> {
+        #[derive(Debug, Serialize)]
+        struct Request<'a> {
+            currency: Option<&'a str>,
+        }
+
         #[derive(Debug, Deserialize)]
         struct Response {
             list: Vec<AccountBalance>,
@@ -468,6 +473,7 @@ impl TradeContext {
         Ok(self
             .http_cli
             .request(Method::GET, "/v1/asset/account")
+            .query_params(Request { currency })
             .response::<Json<Response>>()
             .send()
             .await?

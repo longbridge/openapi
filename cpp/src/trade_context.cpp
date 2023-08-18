@@ -498,10 +498,44 @@ TradeContext::cancel_order(const std::string& order_id,
 
 void
 TradeContext::account_balance(
+  const std::string& currency,
   AsyncCallback<TradeContext, std::vector<AccountBalance>> callback) const
 {
   lb_trade_context_account_balance(
     ctx_,
+    currency.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, std::vector<AccountBalance>>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto rows = (const lb_account_balance_t*)res->data;
+        std::vector<AccountBalance> rows2;
+        std::transform(rows,
+                       rows + res->length,
+                       std::back_inserter(rows2),
+                       [](auto row) { return convert(&row); });
+
+        (*callback_ptr)(AsyncResult<TradeContext, std::vector<AccountBalance>>(
+          ctx, std::move(status), &rows2));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, std::vector<AccountBalance>>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, std::vector<AccountBalance>>(callback));
+}
+
+void
+TradeContext::account_balance(
+  AsyncCallback<TradeContext, std::vector<AccountBalance>> callback) const
+{
+  lb_trade_context_account_balance(
+    ctx_,
+    nullptr,
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<TradeContext, std::vector<AccountBalance>>(

@@ -442,12 +442,16 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAccountB
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
+    currency: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let currency: Option<String> = FromJValue::from_jvalue(env, currency.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.account_balance().await?))
+            Ok(ObjectArray(
+                context.ctx.account_balance(currency.as_deref()).await?,
+            ))
         })?;
         Ok(())
     })

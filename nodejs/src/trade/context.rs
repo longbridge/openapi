@@ -396,9 +396,9 @@ impl TradeContext {
     ///   });
     /// ```
     #[napi]
-    pub async fn account_balance(&self) -> Result<Vec<AccountBalance>> {
+    pub async fn account_balance(&self, currency: Option<String>) -> Result<Vec<AccountBalance>> {
         self.ctx
-            .account_balance()
+            .account_balance(currency.as_deref())
             .await
             .map_err(ErrorNewType)?
             .into_iter()

@@ -331,6 +331,36 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get account balance with currency
+     * 
+     * <pre>
+     * {@code
+     * import com.longbridge.*;
+     * import com.longbridge.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+     *             AccountBalance[] resp = ctx.getAccountBalance("HKD").get();
+     *             for (AccountBalance obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<AccountBalance[]> getAccountBalance(String currency) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextAccountBalance(this.raw, currency, callback);
+        });
+    }
+
+    /**
      * Get account balance
      * 
      * <pre>
@@ -356,7 +386,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<AccountBalance[]> getAccountBalance() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextAccountBalance(this.raw, callback);
+            SdkNative.tradeContextAccountBalance(this.raw, null, callback);
         });
     }
 

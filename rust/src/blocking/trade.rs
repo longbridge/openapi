@@ -272,14 +272,15 @@ impl TradeContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
-    /// let resp = ctx.account_balance()?;
+    /// let resp = ctx.account_balance(None)?;
     /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
     /// ```
-    pub fn account_balance(&self) -> Result<Vec<AccountBalance>> {
+    pub fn account_balance(&self, currency: Option<&str>) -> Result<Vec<AccountBalance>> {
+        let currency = currency.map(ToString::to_string);
         self.rt
-            .call(move |ctx| async move { ctx.account_balance().await })
+            .call(move |ctx| async move { ctx.account_balance(currency.as_deref()).await })
     }
 
     /// Get cash flow

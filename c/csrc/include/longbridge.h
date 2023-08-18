@@ -3481,6 +3481,7 @@ void lb_trade_context_cancel_order(const struct lb_trade_context_t *ctx,
  * Get account balance
  */
 void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,
+                                      const char *currency,
                                       lb_async_callback_t callback,
                                       void *userdata);
 

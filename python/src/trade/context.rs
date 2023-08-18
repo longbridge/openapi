@@ -302,9 +302,9 @@ impl TradeContext {
     }
 
     /// Get account balance
-    fn account_balance(&self) -> PyResult<Vec<AccountBalance>> {
+    fn account_balance(&self, currency: Option<String>) -> PyResult<Vec<AccountBalance>> {
         self.ctx
-            .account_balance()
+            .account_balance(currency.as_deref())
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)

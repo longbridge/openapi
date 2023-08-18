@@ -4012,9 +4012,12 @@ class TradeContext:
                 ctx.cancel_order("709043056541253632")
         """
 
-    def account_balance(self) -> List[AccountBalance]:
+    def account_balance(self, currency: Optional[str]) -> List[AccountBalance]:
         """
         Get account balance
+
+        Args:
+            currency: Currency
 
         Returns:
             Account list

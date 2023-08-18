@@ -457,12 +457,15 @@ pub unsafe extern "C" fn lb_trade_context_cancel_order(
 #[no_mangle]
 pub unsafe extern "C" fn lb_trade_context_account_balance(
     ctx: *const CTradeContext,
+    currency: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
+    let currency = (!currency.is_null()).then(|| cstr_to_rust(currency));
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CAccountBalanceOwned> = ctx_inner.account_balance().await?.into();
+        let rows: CVec<CAccountBalanceOwned> =
+            ctx_inner.account_balance(currency.as_deref()).await?.into();
         Ok(rows)
     });
 }

@@ -77,6 +77,11 @@ public:
   void cancel_order(const std::string& order_id,
                     AsyncCallback<TradeContext, void> callback) const;
 
+  /// Get account balance with currency
+  void account_balance(
+    const std::string& currency,
+    AsyncCallback<TradeContext, std::vector<AccountBalance>> callback) const;
+
   /// Get account balance
   void account_balance(
     AsyncCallback<TradeContext, std::vector<AccountBalance>> callback) const;
