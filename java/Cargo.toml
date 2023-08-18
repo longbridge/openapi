@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longbridge-java"
-version = "0.2.69"
+version = "0.2.70"
 
 [lib]
 crate-type = ["cdylib"]
