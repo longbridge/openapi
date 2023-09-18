@@ -684,8 +684,6 @@ impl Core {
                             .map(|data| (get_merger_ty(data.board), &mut data.candlesticks))
                         {
                             for (period, candlesticks) in periods {
-                                let prev =
-                                    candlesticks.last().map(|candlestick| (*candlestick).into());
                                 let period2 = match period {
                                     Period::UnknownPeriod => unreachable!(),
                                     Period::OneMinute => longbridge_candlesticks::Period::Min_1,
@@ -711,6 +709,10 @@ impl Core {
                                     if trade.trade_session != TradeSession::NormalTrade {
                                         continue;
                                     }
+
+                                    let prev = candlesticks
+                                        .last()
+                                        .map(|candlestick| (*candlestick).into());
 
                                     let res = merger.merge(
                                         merge_ty,
