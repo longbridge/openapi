@@ -1,6 +1,6 @@
 [package]
 name = "longbridge-python-macros"
-version = "0.2.72"
+version = "0.2.73"
 edition = "2021"
 
 [lib]
