@@ -19,7 +19,9 @@ use jni::{
 };
 
 pub(crate) use self::{
-    classes::CreateWatchlistGroupResponse, object_array::ObjectArray, primary_array::PrimaryArray,
+    classes::{CreateWatchlistGroupResponse, SecurityCalcIndex},
+    object_array::ObjectArray,
+    primary_array::PrimaryArray,
 };
 
 pub(crate) trait ClassLoader {

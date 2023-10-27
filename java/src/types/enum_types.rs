@@ -190,6 +190,53 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/quote/CalcIndex",
+    longbridge::quote::CalcIndex,
+    [
+        LastDone,
+        ChangeValue,
+        ChangeRate,
+        Volume,
+        Turnover,
+        YtdChangeRate,
+        TurnoverRate,
+        TotalMarketValue,
+        CapitalFlow,
+        Amplitude,
+        VolumeRatio,
+        PeTtmRatio,
+        PbRatio,
+        DividendRatioTtm,
+        FiveDayChangeRate,
+        TenDayChangeRate,
+        HalfYearChangeRate,
+        FiveMinutesChangeRate,
+        ExpiryDate,
+        StrikePrice,
+        UpperStrikePrice,
+        LowerStrikePrice,
+        OutstandingQty,
+        OutstandingRatio,
+        Premium,
+        ItmOtm,
+        ImpliedVolatility,
+        WarrantDelta,
+        CallPrice,
+        ToCallPrice,
+        EffectiveLeverage,
+        LeverageRatio,
+        ConversionRatio,
+        BalancePoint,
+        OpenInterest,
+        Delta,
+        Gamma,
+        Theta,
+        Vega,
+        Rho,
+    ]
+);
+
+impl_java_enum!(
     "com/longbridge/trade/OrderSide",
     longbridge::trade::OrderSide,
     [Unknown, Buy, Sell]

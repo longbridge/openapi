@@ -13,11 +13,11 @@ use crate::{
         },
         requests::{CreateWatchlistGroup, DeleteWatchlistGroup, UpdateWatchlistGroup},
         types::{
-            AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
-            IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo,
-            Period, RealtimeQuote, SecurityBrokers, SecurityDepth, SecurityQuote,
-            SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes, Subscription, Trade,
-            WarrantQuote, WatchlistGroup,
+            AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+            IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
+            ParticipantInfo, Period, RealtimeQuote, SecurityBrokers, SecurityCalcIndex,
+            SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes,
+            Subscription, Trade, WarrantQuote, WatchlistGroup,
         },
     },
     time::{NaiveDate, NaiveDatetime},
@@ -783,6 +783,24 @@ impl QuoteContext {
             .await
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    /// Get watchlist
+    ///
+    /// Deprecated: use `watchlist` instead
+    #[napi]
+    pub async fn calc_indexes(
+        &self,
+        symbols: Vec<String>,
+        indexes: Vec<CalcIndex>,
+    ) -> Result<Vec<SecurityCalcIndex>> {
+        self.ctx
+            .calc_indexes(symbols, indexes.into_iter().map(Into::into))
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Get watchlist

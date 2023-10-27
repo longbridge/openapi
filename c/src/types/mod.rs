@@ -24,6 +24,36 @@ pub(crate) trait ToFFI {
     fn to_ffi_type(&self) -> Self::FFIType;
 }
 
+impl ToFFI for f64 {
+    type FFIType = f64;
+
+    #[inline]
+    fn to_ffi_type(&self) -> Self::FFIType {
+        *self
+    }
+}
+
+impl ToFFI for i64 {
+    type FFIType = i64;
+
+    #[inline]
+    fn to_ffi_type(&self) -> Self::FFIType {
+        *self
+    }
+}
+
+impl<T> ToFFI for *const *const T {
+    type FFIType = *const T;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        if self.is_null() {
+            std::ptr::null()
+        } else {
+            unsafe { *(*self) }
+        }
+    }
+}
+
 pub(crate) unsafe fn cstr_to_rust(value: *const c_char) -> String {
     CStr::from_ptr(value as *const c_char)
         .to_str()

@@ -23,7 +23,7 @@ main(int argc, char const* argv[])
   }
 
   http_cli.request(
-    "get", "/v1/trade/execution/today", std::nullopt, [](auto res) {
+    "get", "/v1/trade/execution/today", std::nullopt, std::nullopt, [](auto res) {
       if (!res) {
         std::cout << "failed: " << res.status().message() << std::endl;
         return;

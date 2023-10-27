@@ -8,7 +8,7 @@ use jni::{
 };
 use longbridge::{
     quote::{
-        AdjustType, Period, PushEvent, PushEventDetail, RequestCreateWatchlistGroup,
+        AdjustType, CalcIndex, Period, PushEvent, PushEventDetail, RequestCreateWatchlistGroup,
         RequestUpdateWatchlistGroup, SecuritiesUpdateMode, SubFlags,
     },
     Config, Market, QuoteContext,
@@ -752,6 +752,36 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCapitalD
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             Ok(context.ctx.capital_distribution(symbol).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCalcIndexes(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbols: jobjectArray,
+    indexes: jobjectArray,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbols: ObjectArray<String> =
+            FromJValue::from_jvalue(env, JObject::from_raw(symbols).into())?;
+        let indexes: ObjectArray<CalcIndex> =
+            FromJValue::from_jvalue(env, JObject::from_raw(indexes).into())?;
+        async_util::execute(env, callback, async move {
+            Ok(ObjectArray(
+                context
+                    .ctx
+                    .calc_indexes(symbols.0, indexes.0)
+                    .await?
+                    .into_iter()
+                    .map(crate::types::SecurityCalcIndex::from)
+                    .collect(),
+            ))
         })?;
         Ok(())
     })

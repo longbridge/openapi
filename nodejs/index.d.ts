@@ -236,6 +236,88 @@ export const enum SecuritiesUpdateMode {
   /** Replace securities */
   Replace = 2
 }
+export const enum CalcIndex {
+  /** Latest price */
+  LastDone = 0,
+  /** Change value */
+  ChangeValue = 1,
+  /** Change rate */
+  ChangeRate = 2,
+  /** Volume */
+  Volume = 3,
+  /** Turnover */
+  Turnover = 4,
+  /** Year-to-date change ratio */
+  YtdChangeRate = 5,
+  /** Turnover rate */
+  TurnoverRate = 6,
+  /** Total market value */
+  TotalMarketValue = 7,
+  /** Capital flow */
+  CapitalFlow = 8,
+  /** Amplitude */
+  Amplitude = 9,
+  /** Volume ratio */
+  VolumeRatio = 10,
+  /** PE (TTM) */
+  PeTtmRatio = 11,
+  /** PB */
+  PbRatio = 12,
+  /** Dividend ratio (TTM) */
+  DividendRatioTtm = 13,
+  /** Five days change ratio */
+  FiveDayChangeRate = 14,
+  /** Ten days change ratio */
+  TenDayChangeRate = 15,
+  /** Half year change ratio */
+  HalfYearChangeRate = 16,
+  /** Five minutes change ratio */
+  FiveMinutesChangeRate = 17,
+  /** Expiry date */
+  ExpiryDate = 18,
+  /** Strike price */
+  StrikePrice = 19,
+  /** Upper bound price */
+  UpperStrikePrice = 20,
+  /** Lower bound price */
+  LowerStrikePrice = 21,
+  /** Outstanding quantity */
+  OutstandingQty = 22,
+  /** Outstanding ratio */
+  OutstandingRatio = 23,
+  /** Premium */
+  Premium = 24,
+  /** In/out of the bound */
+  ItmOtm = 25,
+  /** Implied volatility */
+  ImpliedVolatility = 26,
+  /** Warrant delta */
+  WarrantDelta = 27,
+  /** Call price */
+  CallPrice = 28,
+  /** Price interval from the call price */
+  ToCallPrice = 29,
+  /** Effective leverage */
+  EffectiveLeverage = 30,
+  /** Leverage ratio */
+  LeverageRatio = 31,
+  /** Conversion ratio */
+  ConversionRatio = 32,
+  /** Breakeven point */
+  BalancePoint = 33,
+  /** Open interest */
+  OpenInterest = 34,
+  /** Delta */
+  Delta = 35,
+  /** Gamma */
+  Gamma = 36,
+  /** Theta */
+  Theta = 37,
+  /** Vega */
+  Vega = 38,
+  /** Rho */
+  Rho = 39
+}
 /** Options for get cash flow request */
 export interface EstimateMaxPurchaseQuantityOptions {
   symbol: string
@@ -1153,6 +1235,12 @@ export class QuoteContext {
    *
    * Deprecated: use `watchlist` instead
    */
+  calcIndexes(symbols: Array<string>, indexes: Array<CalcIndex>): Promise<Array<SecurityCalcIndex>>
+  /**
+   * Get watchlist
+   *
+   * Deprecated: use `watchlist` instead
+   */
   watchList(): Promise<Array<WatchlistGroup>>
   /**
    * Get watchlist
@@ -1808,6 +1896,92 @@ export class WatchlistSecurity {
   get watchedPrice(): Decimal | null
   /** Watched time */
   get watchedAt(): Date
+}
+/** Security calc index response */
+export class SecurityCalcIndex {
+  toString(): string
+  /** Security code */
+  get symbol(): string
+  /** Latest price */
+  get lastDone(): Decimal | null
+  /** Change value */
+  get changeValue(): Decimal | null
+  /** Change ratio */
+  get changeRate(): number | null
+  /** Volume */
+  get volume(): number | null
+  /** Turnover */
+  get turnover(): Decimal | null
+  /** Year-to-date change ratio */
+  get ytdChangeRate(): number | null
+  /** Turnover rate */
+  get turnoverRate(): number | null
+  /** Total market value */
+  get totalMarketValue(): Decimal | null
+  /** Capital flow */
+  get capitalFlow(): Decimal | null
+  /** Amplitude */
+  get amplitude(): number | null
+  /** Volume ratio */
+  get volumeRatio(): number | null
+  /** PE (TTM) */
+  get peTtmRatio(): number | null
+  /** PB */
+  get pbRatio(): number | null
+  /** Dividend ratio (TTM) */
+  get dividendRatioTtm(): number | null
+  /** Five days change ratio */
+  get fiveDayChangeRate(): number | null
+  /** Ten days change ratio */
+  get tenDayChangeRate(): number | null
+  /** Half year change ratio */
+  get halfYearChangeRate(): number | null
+  /** Five minutes change ratio */
+  get fiveMinutesChangeRate(): number | null
+  /** Expiry date */
+  get expiryDate(): NaiveDate | null
+  /** Strike price */
+  get strikePrice(): Decimal | null
+  /** Upper bound price */
+  get upperStrikePrice(): Decimal | null
+  /** Lower bound price */
+  get lowerStrikePrice(): Decimal | null
+  /** Outstanding quantity */
+  get outstandingQty(): number | null
+  /** Outstanding ratio */
+  get outstandingRatio(): number | null
+  /** Premium */
+  get premium(): number | null
+  /** In/out of the bound */
+  get itmOtm(): number | null
+  /** Implied volatility */
+  get impliedVolatility(): number | null
+  /** Warrant delta */
+  get warrantDelta(): number | null
+  /** Call price */
+  get callPrice(): Decimal | null
+  /** Price interval from the call price */
+  get toCallPrice(): Decimal | null
+  /** Effective leverage */
+  get effectiveLeverage(): number | null
+  /** Leverage ratio */
+  get leverageRatio(): number | null
+  /** Conversion ratio */
+  get conversionRatio(): number | null
+  /** Breakeven point */
+  get balancePoint(): number | null
+  /** Open interest */
+  get openInterest(): number | null
+  /** Delta */
+  get delta(): number | null
+  /** Gamma */
+  get gamma(): number | null
+  /** Theta */
+  get theta(): number | null
+  /** Vega */
+  get vega(): number | null
+  /** Rho */
+  get rho(): number | null
 }
 /** Naive date type */
 export class NaiveDate {

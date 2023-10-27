@@ -34,7 +34,7 @@ on_trade_context_created(const struct lb_async_result_t* res)
     return;
   }
 
-  lb_trade_context_account_balance(res->ctx, on_account_balance, NULL);
+  lb_trade_context_account_balance(res->ctx, NULL, on_account_balance, NULL);
   lb_quote_context_release(res->ctx);
 }
 

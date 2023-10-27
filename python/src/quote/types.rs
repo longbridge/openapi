@@ -867,3 +867,219 @@ pub(crate) enum SecuritiesUpdateMode {
     /// Replace securities
     Replace,
 }
+
+/// Calc index
+#[pyclass]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::quote::CalcIndex")]
+pub(crate) enum CalcIndex {
+    /// Latest price
+    LastDone,
+    /// Change value
+    ChangeValue,
+    /// Change rate
+    ChangeRate,
+    /// Volume
+    Volume,
+    /// Turnover
+    Turnover,
+    /// Year-to-date change ratio
+    YtdChangeRate,
+    /// Turnover rate
+    TurnoverRate,
+    /// Total market value
+    TotalMarketValue,
+    /// Capital flow
+    CapitalFlow,
+    /// Amplitude
+    Amplitude,
+    /// Volume ratio
+    VolumeRatio,
+    /// PE (TTM)
+    PeTtmRatio,
+    /// PB
+    PbRatio,
+    /// Dividend ratio (TTM)
+    DividendRatioTtm,
+    /// Five days change ratio
+    FiveDayChangeRate,
+    /// Ten days change ratio
+    TenDayChangeRate,
+    /// Half year change ratio
+    HalfYearChangeRate,
+    /// Five minutes change ratio
+    FiveMinutesChangeRate,
+    /// Expiry date
+    ExpiryDate,
+    /// Strike price
+    StrikePrice,
+    /// Upper bound price
+    UpperStrikePrice,
+    /// Lower bound price
+    LowerStrikePrice,
+    /// Outstanding quantity
+    OutstandingQty,
+    /// Outstanding ratio
+    OutstandingRatio,
+    /// Premium
+    Premium,
+    /// In/out of the bound
+    ItmOtm,
+    /// Implied volatility
+    ImpliedVolatility,
+    /// Warrant delta
+    WarrantDelta,
+    /// Call price
+    CallPrice,
+    /// Price interval from the call price
+    ToCallPrice,
+    /// Effective leverage
+    EffectiveLeverage,
+    /// Leverage ratio
+    LeverageRatio,
+    /// Conversion ratio
+    ConversionRatio,
+    /// Breakeven point
+    BalancePoint,
+    /// Open interest
+    OpenInterest,
+    /// Delta
+    Delta,
+    /// Gamma
+    Gamma,
+    /// Theta
+    Theta,
+    /// Vega
+    Vega,
+    /// Rho
+    Rho,
+}
+
+/// Security calc index response
+#[pyclass]
+#[derive(PyObject, Debug, Clone)]
+#[py(remote = "longbridge::quote::SecurityCalcIndex")]
+pub(crate) struct SecurityCalcIndex {
+    /// Security code
+    symbol: String,
+    /// Latest price
+    #[py(opt)]
+    last_done: Option<PyDecimal>,
+    /// Change value
+    #[py(opt)]
+    change_value: Option<PyDecimal>,
+    /// Change ratio
+    #[py(opt)]
+    change_rate: Option<f64>,
+    /// Volume
+    #[py(opt)]
+    volume: Option<i64>,
+    /// Turnover
+    #[py(opt)]
+    turnover: Option<PyDecimal>,
+    /// Year-to-date change ratio
+    #[py(opt)]
+    ytd_change_rate: Option<f64>,
+    /// Turnover rate
+    #[py(opt)]
+    turnover_rate: Option<f64>,
+    /// Total market value
+    #[py(opt)]
+    total_market_value: Option<PyDecimal>,
+    /// Capital flow
+    #[py(opt)]
+    capital_flow: Option<PyDecimal>,
+    /// Amplitude
+    #[py(opt)]
+    amplitude: Option<f64>,
+    /// Volume ratio
+    #[py(opt)]
+    volume_ratio: Option<f64>,
+    /// PE (TTM)
+    #[py(opt)]
+    pe_ttm_ratio: Option<f64>,
+    /// PB
+    #[py(opt)]
+    pb_ratio: Option<f64>,
+    /// Dividend ratio (TTM)
+    #[py(opt)]
+    dividend_ratio_ttm: Option<f64>,
+    /// Five days change ratio
+    #[py(opt)]
+    five_day_change_rate: Option<f64>,
+    /// Ten days change ratio
+    #[py(opt)]
+    ten_day_change_rate: Option<f64>,
+    /// Half year change ratio
+    #[py(opt)]
+    half_year_change_rate: Option<f64>,
+    /// Five minutes change ratio
+    #[py(opt)]
+    five_minutes_change_rate: Option<f64>,
+    /// Expiry date
+    #[py(opt)]
+    expiry_date: Option<PyDateWrapper>,
+    /// Strike price
+    #[py(opt)]
+    strike_price: Option<PyDecimal>,
+    /// Upper bound price
+    #[py(opt)]
+    upper_strike_price: Option<PyDecimal>,
+    /// Lower bound price
+    #[py(opt)]
+    lower_strike_price: Option<PyDecimal>,
+    /// Outstanding quantity
+    #[py(opt)]
+    outstanding_qty: Option<i64>,
+    /// Outstanding ratio
+    #[py(opt)]
+    outstanding_ratio: Option<f64>,
+    /// Premium
+    #[py(opt)]
+    premium: Option<f64>,
+    /// In/out of the bound
+    #[py(opt)]
+    itm_otm: Option<f64>,
+    /// Implied volatility
+    #[py(opt)]
+    implied_volatility: Option<f64>,
+    /// Warrant delta
+    #[py(opt)]
+    warrant_delta: Option<f64>,
+    /// Call price
+    #[py(opt)]
+    call_price: Option<PyDecimal>,
+    /// Price interval from the call price
+    #[py(opt)]
+    to_call_price: Option<PyDecimal>,
+    /// Effective leverage
+    #[py(opt)]
+    effective_leverage: Option<f64>,
+    /// Leverage ratio
+    #[py(opt)]
+    leverage_ratio: Option<f64>,
+    /// Conversion ratio
+    #[py(opt)]
+    conversion_ratio: Option<f64>,
+    /// Breakeven point
+    #[py(opt)]
+    balance_point: Option<f64>,
+    /// Open interest
+    #[py(opt)]
+    open_interest: Option<i64>,
+    /// Delta
+    #[py(opt)]
+    delta: Option<f64>,
+    /// Gamma
+    #[py(opt)]
+    gamma: Option<f64>,
+    /// Theta
+    #[py(opt)]
+    theta: Option<f64>,
+    /// Vega
+    #[py(opt)]
+    vega: Option<f64>,
+    /// Rho
+    #[py(opt)]
+    rho: Option<f64>,
+}

@@ -1658,6 +1658,428 @@ class Subscription:
     """
 
 
+class CalcIndex:
+    """
+    Calc index
+    """
+
+    class LastDone(CalcIndex):
+        """
+        Latest price
+        """
+
+    class ChangeValue(CalcIndex):
+        """
+        Change value
+        """
+
+    class ChangeRate(CalcIndex):
+        """
+        Change rate
+        """
+
+    class Volume(CalcIndex):
+        """
+        Volume
+        """
+
+    class Turnover(CalcIndex):
+        """
+        Turnover
+        """
+
+    class YtdChangeRate(CalcIndex):
+        """
+        Year-to-date change ratio
+        """
+
+    class TurnoverRate(CalcIndex):
+        """
+        Turnover rate
+        """
+
+    class TotalMarketValue(CalcIndex):
+        """
+        Total market value
+        """
+
+    class CapitalFlow(CalcIndex):
+        """
+        Capital flow
+        """
+
+    class Amplitude(CalcIndex):
+        """
+        Amplitude
+        """
+
+    class VolumeRatio(CalcIndex):
+        """
+        Volume ratio
+        """
+
+    class PeTtmRatio(CalcIndex):
+        """
+        PE (TTM)
+        """
+
+    class PbRatio(CalcIndex):
+        """
+        PB
+        """
+
+    class DividendRatioTtm(CalcIndex):
+        """
+        Dividend ratio (TTM)
+        """
+
+    class FiveDayChangeRate(CalcIndex):
+        """
+        Five days change ratio
+        """
+
+    class TenDayChangeRate(CalcIndex):
+        """
+        Ten days change ratio
+        """
+
+    class HalfYearChangeRate(CalcIndex):
+        """
+        Half year change ratio
+        """
+
+    class FiveMinutesChangeRate(CalcIndex):
+        """
+        Five minutes change ratio
+        """
+
+    class ExpiryDate(CalcIndex):
+        """
+        Expiry date
+        """
+
+    class StrikePrice(CalcIndex):
+        """
+        Strike price
+        """
+
+    class UpperStrikePrice(CalcIndex):
+        """
+        Upper bound price
+        """
+
+    class LowerStrikePrice(CalcIndex):
+        """
+        Lower bound price
+        """
+
+    class OutstandingQty(CalcIndex):
+        """
+        Outstanding quantity
+        """
+
+    class OutstandingRatio(CalcIndex):
+        """
+        Outstanding ratio
+        """
+
+    class Premium(CalcIndex):
+        """
+        Premium
+        """
+
+    class ItmOtm(CalcIndex):
+        """
+        In/out of the bound
+        """
+
+    class ImpliedVolatility(CalcIndex):
+        """
+        Implied volatility
+        """
+
+    class WarrantDelta(CalcIndex):
+        """
+        Warrant delta
+        """
+
+    class CallPrice(CalcIndex):
+        """
+        Call price
+        """
+
+    class ToCallPrice(CalcIndex):
+        """
+        Price interval from the call price
+        """
+
+    class EffectiveLeverage(CalcIndex):
+        """
+        Effective leverage
+        """
+
+    class LeverageRatio(CalcIndex):
+        """
+        Leverage ratio
+        """
+
+    class ConversionRatio(CalcIndex):
+        """
+        Conversion ratio
+        """
+
+    class BalancePoint(CalcIndex):
+        """
+        Breakeven point
+        """
+
+    class OpenInterest(CalcIndex):
+        """
+        Open interest
+        """
+
+    class Delta(CalcIndex):
+        """
+        Delta
+        """
+
+    class Gamma(CalcIndex):
+        """
+        Gamma
+        """
+
+    class Theta(CalcIndex):
+        """
+        Theta
+        """
+
+    class Vega(CalcIndex):
+        """
+        Vega
+        """
+
+    class Rho(CalcIndex):
+        """
+        Rho
+        """
+
+
+class SecurityCalcIndex:
+    """
+    Security calc index response
+    """
+
+    symbol: str
+    """
+    Security symbol
+    """
+
+    last_done: Optional[Decimal]
+    """
+    Latest price
+    """
+
+    change_value: Optional[Decimal]
+    """
+    Change value
+    """
+
+    change_value: Optional[Decimal]
+    """
+    Change value
+    """
+
+    change_rate: Optional[float]
+    """
+    Change ratio
+    """
+
+    volume: Optional[int]
+    """
+    Volume
+    """
+
+    turnover: Optional[Decimal]
+    """
+    Turnover
+    """
+
+    ytd_change_rate: Optional[float]
+    """
+    Year-to-date change ratio
+    """
+
+    turnover_rate: Optional[float]
+    """
+    turnover_rate
+    """
+
+    total_market_value: Optional[Decimal]
+    """
+    Total market value
+    """
+
+    capital_flow: Optional[Decimal]
+    """
+    Capital flow
+    """
+
+    amplitude: Optional[float]
+    """
+    Amplitude
+    """
+
+    volume_ratio: Optional[float]
+    """
+    Volume ratio
+    """
+
+    pe_ttm_ratio: Optional[float]
+    """
+    PE (TTM)
+    """
+
+    pb_ratio: Optional[float]
+    """
+    PB
+    """
+
+    dividend_ratio_ttm: Optional[float]
+    """
+    Dividend ratio (TTM)
+    """
+
+    five_day_change_rate: Optional[float]
+    """
+    Five days change ratio
+    """
+
+    ten_day_change_rate: Optional[float]
+    """
+    Ten days change ratio
+    """
+
+    half_year_change_rate: Optional[float]
+    """
+    Half year change ratio
+    """
+
+    five_minutes_change_rate: Optional[float]
+    """
+    Five minutes change ratio
+    """
+
+    expiry_date: Optional[date]
+    """
+    Expiry date
+    """
+
+    strike_price: Optional[Decimal]
+    """
+    Strike price
+    """
+
+    upper_strike_price: Optional[Decimal]
+    """
+    Upper bound price
+    """
+
+    lower_strike_price: Optional[Decimal]
+    """
+    Lower bound price
+    """
+
+    outstanding_qty: Optional[int]
+    """
+    Outstanding quantity
+    """
+
+    outstanding_ratio: Optional[float]
+    """
+    Outstanding ratio
+    """
+
+    premium: Optional[float]
+    """
+    Premium
+    """
+
+    itm_otm: Optional[float]
+    """
+    In/out of the bound
+    """
+
+    implied_volatility: Optional[float]
+    """
+    Implied volatility
+    """
+
+    warrant_delta: Optional[float]
+    """
+    Warrant delta
+    """
+
+    call_price: Optional[Decimal]
+    """
+    Call price
+    """
+
+    to_call_price: Optional[Decimal]
+    """
+    Price interval from the call price
+    """
+
+    effective_leverage: Optional[float]
+    """
+    Effective leverage
+    """
+
+    leverage_ratio: Optional[float]
+    """
+    Leverage ratio
+    """
+
+    conversion_ratio: Optional[float]
+    """
+    Conversion ratio
+    """
+
+    balance_point: Optional[float]
+    """
+    Breakeven point
+    """
+
+    open_interest: Optional[int]
+    """
+    Open interest
+    """
+
+    delta: Optional[float]
+    """
+    Delta
+    """
+
+    gamma: Optional[float]
+    """
+    Gamma
+    """
+
+    theta: Optional[float]
+    """
+    Theta
+    """
+
+    vega: Optional[float]
+    """
+    Vega
+    """
+
+    rho: Optional[float]
+    """
+    Rho
+    """
+
+
 class QuoteContext:
     """
     Quote context
@@ -2173,6 +2595,29 @@ class QuoteContext:
                 ctx = QuoteContext(config)
 
                 resp = ctx.capital_distribution("700.HK")
+                print(resp)
+        """
+
+    def calc_indexes(self, symbols: List[str], indexes: List[Type[CalcIndex]]) -> List[SecurityCalcIndex]:
+        """
+        Get calc indexes
+
+        Args:
+            symbols: Security codes
+            indexes: Calc indexes
+
+        Returns:
+            Calc indexes of the symbols
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, CalcIndex
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.calc_indexes(["700.HK", "APPL.US"], [CalcIndex.LastDone, CalcIndex.ChangeRate])
                 print(resp)
         """
 
@@ -3814,7 +4259,7 @@ class TradeContext:
             topics: Topic list
         """
 
-    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[date] = None, end_at: Optional[date] = None) -> List[Execution]:
+    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> List[Execution]:
         """
         Get history executions
 
@@ -3866,7 +4311,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, start_at: Optional[date] = None, end_at: Optional[date] = None) -> List[Order]:
+    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> List[Order]:
         """
         Get history orders
 

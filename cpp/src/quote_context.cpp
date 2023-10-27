@@ -958,6 +958,53 @@ QuoteContext::capital_distribution(
 }
 
 void
+QuoteContext::calc_indexes(
+  const std::vector<std::string>& symbols,
+  const std::vector<CalcIndex>& indexes,
+  AsyncCallback<QuoteContext, std::vector<SecurityCalcIndex>> callback) const
+{
+  auto c_symbols = utils::get_cstring_vector(symbols);
+  std::vector<lb_calc_index_t> c_indexes;
+  std::transform(indexes.cbegin(),
+                 indexes.cend(),
+                 std::back_inserter(c_indexes),
+                 [](auto& index) { return convert(index); });
+
+  lb_quote_context_calc_indexes(
+    ctx_,
+    c_symbols.data(),
+    c_symbols.size(),
+    c_indexes.data(),
+    c_indexes.size(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext,
+                                     std::vector<SecurityCalcIndex>>(
+          res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto rows = (const lb_security_calc_index_t*)res->data;
+        std::vector<SecurityCalcIndex> rows2;
+        std::transform(rows,
+                       rows + res->length,
+                       std::back_inserter(rows2),
+                       [](auto row) { return convert(&row); });
+
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, std::vector<SecurityCalcIndex>>(
+            ctx, std::move(status), &rows2));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, std::vector<SecurityCalcIndex>>(
+            ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, std::vector<SecurityCalcIndex>>(callback));
+}
+
+void
 QuoteContext::watch_list(
   AsyncCallback<QuoteContext, std::vector<WatchlistGroup>> callback) const
 {

@@ -14,17 +14,18 @@ use crate::{
     callback::{CFreeUserDataFunc, Callback},
     config::CConfig,
     quote_context::{
-        enum_types::{CAdjustType, CPeriod},
+        enum_types::{CAdjustType, CCalcIndex, CPeriod},
         types::{
             CCandlestickOwned, CCapitalDistributionResponseOwned, CCapitalFlowLineOwned,
             CCreateWatchlistGroup, CIntradayLineOwned, CIssuerInfoOwned, CMarketTradingDaysOwned,
             CMarketTradingSessionOwned, COptionQuoteOwned, CParticipantInfoOwned, CPushBrokers,
             CPushBrokersOwned, CPushCandlestick, CPushCandlestickOwned, CPushDepth,
             CPushDepthOwned, CPushQuote, CPushQuoteOwned, CPushTrades, CPushTradesOwned,
-            CRealtimeQuoteOwned, CSecurityBrokersOwned, CSecurityDepthOwned, CSecurityQuoteOwned,
-            CSecurityStaticInfoOwned, CStrikePriceInfoOwned, CSubscriptionOwned, CTradeOwned,
-            CUpdateWatchlistGroup, CWarrantQuoteOwned, CWatchlistGroupOwned,
-            LB_WATCHLIST_GROUP_NAME, LB_WATCHLIST_GROUP_SECURITIES,
+            CRealtimeQuoteOwned, CSecurityBrokersOwned, CSecurityCalcIndexOwned,
+            CSecurityDepthOwned, CSecurityQuoteOwned, CSecurityStaticInfoOwned,
+            CStrikePriceInfoOwned, CSubscriptionOwned, CTradeOwned, CUpdateWatchlistGroup,
+            CWarrantQuoteOwned, CWatchlistGroupOwned, LB_WATCHLIST_GROUP_NAME,
+            LB_WATCHLIST_GROUP_SECURITIES,
         },
     },
     types::{cstr_array_to_rust, cstr_to_rust, CCow, CDate, CDateTime, CMarket, CVec, ToFFI},
@@ -769,6 +770,29 @@ pub unsafe extern "C" fn lb_quote_context_capital_distribution(
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CCapitalDistributionResponseOwned> =
             CCow::new(ctx_inner.capital_distribution(symbol).await?);
+        Ok(resp)
+    });
+}
+
+/// Get calc indexes
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_calc_indexes(
+    ctx: *const CQuoteContext,
+    symbols: *const *const c_char,
+    num_symbols: usize,
+    indexes: *const CCalcIndex,
+    num_indexes: usize,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbols = cstr_array_to_rust(symbols, num_symbols);
+    let indexes = std::slice::from_raw_parts(indexes, num_indexes)
+        .into_iter()
+        .map(|index| (*index).into());
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CVec<CSecurityCalcIndexOwned> =
+            ctx_inner.calc_indexes(symbols, indexes).await?.into();
         Ok(resp)
     });
 }

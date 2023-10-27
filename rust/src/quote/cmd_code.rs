@@ -55,6 +55,9 @@ pub(crate) const GET_CAPITAL_FLOW_INTRADAY: u8 = 24;
 /// Get Security Capital Distribution
 pub(crate) const GET_SECURITY_CAPITAL_DISTRIBUTION: u8 = 25;
 
+/// Get Calc indexes
+pub(crate) const GET_CALC_INDEXES: u8 = 26;
+
 /// Get History candlesticks
 pub(crate) const GET_SECURITY_HISTORY_CANDLESTICKS: u8 = 27;
 

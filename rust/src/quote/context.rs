@@ -15,11 +15,12 @@ use crate::{
         sub_flags::SubFlags,
         types::SecuritiesUpdateMode,
         utils::{format_date, parse_date},
-        AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
-        IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-        PushEvent, RealtimeQuote, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
-        SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
-        Subscription, Trade, WarrantQuote, WatchlistGroup,
+        AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+        IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
+        ParticipantInfo, Period, PushEvent, RealtimeQuote, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityQuote, SecurityStaticInfo, StrikePriceInfo, Subscription, Trade, WarrantQuote,
+        WatchlistGroup,
     },
     serde_utils, Config, Error, Market, Result,
 };
@@ -1060,6 +1061,38 @@ impl QuoteContext {
         )
         .await?
         .try_into()
+    }
+
+    /// Get calc indexes
+    pub async fn calc_indexes<I, T, J>(
+        &self,
+        symbols: I,
+        indexes: J,
+    ) -> Result<Vec<SecurityCalcIndex>>
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<String>,
+        J: IntoIterator<Item = CalcIndex>,
+    {
+        let indexes = indexes.into_iter().collect::<Vec<CalcIndex>>();
+        let resp: quote::SecurityCalcQuoteResponse = self
+            .request(
+                cmd_code::GET_CALC_INDEXES,
+                quote::SecurityCalcQuoteRequest {
+                    symbols: symbols.into_iter().map(Into::into).collect(),
+                    calc_index: indexes
+                        .iter()
+                        .map(|i| quote::CalcIndex::from(*i).into())
+                        .collect(),
+                },
+            )
+            .await?;
+
+        Ok(resp
+            .security_calc_index
+            .into_iter()
+            .map(|resp| SecurityCalcIndex::from_proto(resp, &indexes))
+            .collect())
     }
 
     /// Get watchlist

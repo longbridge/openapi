@@ -802,6 +802,178 @@ struct RealtimeQuote
   TradeStatus trade_status;
 };
 
+/// Calc index
+enum class CalcIndex
+{
+  /// Latest price
+  LastDone,
+  /// Change value
+  ChangeValue,
+  /// Change rate
+  ChangeRate,
+  /// Volume
+  Volume,
+  /// Turnover
+  Turnover,
+  /// Year-to-date change ratio
+  YtdChangeRate,
+  /// Turnover rate
+  TurnoverRate,
+  /// Total market value
+  TotalMarketValue,
+  /// Capital flow
+  CapitalFlow,
+  /// Amplitude
+  Amplitude,
+  /// Volume ratio
+  VolumeRatio,
+  /// PE (TTM)
+  PeTtmRatio,
+  /// PB
+  PbRatio,
+  /// Dividend ratio (TTM)
+  DividendRatioTtm,
+  /// Five days change ratio
+  FiveDayChangeRate,
+  /// Ten days change ratio
+  TenDayChangeRate,
+  /// Half year change ratio
+  HalfYearChangeRate,
+  /// Five minutes change ratio
+  FiveMinutesChangeRate,
+  /// Expiry date
+  ExpiryDate,
+  /// Strike price
+  StrikePrice,
+  /// Upper bound price
+  UpperStrikePrice,
+  /// Lower bound price
+  LowerStrikePrice,
+  /// Outstanding quantity
+  OutstandingQty,
+  /// Outstanding ratio
+  OutstandingRatio,
+  /// Premium
+  Premium,
+  /// In/out of the bound
+  ItmOtm,
+  /// Implied volatility
+  ImpliedVolatility,
+  /// Warrant delta
+  WarrantDelta,
+  /// Call price
+  CallPrice,
+  /// Price interval from the call price
+  ToCallPrice,
+  /// Effective leverage
+  EffectiveLeverage,
+  /// Leverage ratio
+  LeverageRatio,
+  /// Conversion ratio
+  ConversionRatio,
+  /// Breakeven point
+  BalancePoint,
+  /// Open interest
+  OpenInterest,
+  /// Delta
+  Delta,
+  /// Gamma
+  Gamma,
+  /// Theta
+  Theta,
+  /// Vega
+  Vega,
+  /// Rho
+  Rho,
+};
+
+/// Security calc index response
+struct SecurityCalcIndex
+{
+  /// Security code
+  std::string symbol;
+  /// Latest price
+  std::optional<Decimal> last_done;
+  /// Change value
+  std::optional<Decimal> change_value;
+  /// Change ratio
+  std::optional<double> change_rate;
+  /// Volume
+  std::optional<int64_t> volume;
+  /// Turnover
+  std::optional<Decimal> turnover;
+  /// Year-to-date change ratio
+  std::optional<double> ytd_change_rate;
+  /// Turnover rate
+  std::optional<double> turnover_rate;
+  /// Total market value
+  std::optional<Decimal> total_market_value;
+  /// Capital flow
+  std::optional<Decimal> capital_flow;
+  /// Amplitude
+  std::optional<double> amplitude;
+  /// Volume ratio
+  std::optional<double> volume_ratio;
+  /// PE (TTM)
+  std::optional<double> pe_ttm_ratio;
+  /// PB
+  std::optional<double> pb_ratio;
+  /// Dividend ratio (TTM)
+  std::optional<double> dividend_ratio_ttm;
+  /// Five days change ratio
+  std::optional<double> five_day_change_rate;
+  /// Ten days change ratio
+  std::optional<double> ten_day_change_rate;
+  /// Half year change ratio
+  std::optional<double> half_year_change_rate;
+  /// Five minutes change ratio
+  std::optional<double> five_minutes_change_rate;
+  /// Expiry date
+  std::optional<Date> expiry_date;
+  /// Strike price
+  std::optional<Decimal> strike_price;
+  /// Upper bound price
+  std::optional<Decimal> upper_strike_price;
+  /// Lower bound price
+  std::optional<Decimal> lower_strike_price;
+  /// Outstanding quantity
+  std::optional<int64_t> outstanding_qty;
+  /// Outstanding ratio
+  std::optional<double> outstanding_ratio;
+  /// Premium
+  std::optional<double> premium;
+  /// In/out of the bound
+  std::optional<double> itm_otm;
+  /// Implied volatility
+  std::optional<double> implied_volatility;
+  /// Warrant delta
+  std::optional<double> warrant_delta;
+  /// Call price
+  std::optional<Decimal> call_price;
+  /// Price interval from the call price
+  std::optional<Decimal> to_call_price;
+  /// Effective leverage
+  std::optional<double> effective_leverage;
+  /// Leverage ratio
+  std::optional<double> leverage_ratio;
+  /// Conversion ratio
+  std::optional<double> conversion_ratio;
+  /// Breakeven point
+  std::optional<double> balance_point;
+  /// Open interest
+  std::optional<int64_t> open_interest;
+  /// Delta
+  std::optional<double> delta;
+  /// Gamma
+  std::optional<double> gamma;
+  /// Theta
+  std::optional<double> theta;
+  /// Vega
+  std::optional<double> vega;
+  /// Rho
+  std::optional<double> rho;
+};
+
 } // namespace quote
 
 namespace trade {

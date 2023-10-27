@@ -186,6 +186,12 @@ public:
     const std::string& symbol,
     AsyncCallback<QuoteContext, CapitalDistributionResponse> callback) const;
 
+  /// Get calc indexes
+  void calc_indexes(
+    const std::vector<std::string>& symbols,
+    const std::vector<CalcIndex>& indexes,
+    AsyncCallback<QuoteContext, std::vector<SecurityCalcIndex>> callback) const;
+
   /// Get watchlist
   [[deprecated("use `watchlist` instead")]] void watch_list(
     AsyncCallback<QuoteContext, std::vector<WatchlistGroup>> callback) const;

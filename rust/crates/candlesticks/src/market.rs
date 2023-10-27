@@ -4,6 +4,7 @@ use time_tz::Tz;
 use crate::Type;
 
 bitflags::bitflags! {
+    #[derive(Debug, Copy, Clone)]
     pub(crate) struct UpdateFields: u32 {
         const PRICE = 0x1;
         const VOLUME = 0x2;

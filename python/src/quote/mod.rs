@@ -36,6 +36,8 @@ pub(crate) fn register_types(parent: &PyModule) -> PyResult<()> {
     parent.add_class::<types::PushBrokers>()?;
     parent.add_class::<types::PushTrades>()?;
     parent.add_class::<types::PushCandlestick>()?;
+    parent.add_class::<types::CalcIndex>()?;
+    parent.add_class::<types::SecurityCalcIndex>()?;
     parent.add_class::<types::WatchlistSecurity>()?;
     parent.add_class::<types::WatchlistGroup>()?;
     parent.add_class::<types::SecuritiesUpdateMode>()?;

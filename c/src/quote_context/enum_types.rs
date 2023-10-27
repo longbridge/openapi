@@ -286,3 +286,130 @@ pub enum CSecuritiesUpdateMode {
     #[c(remote = "Replace")]
     SecuritiesUpdateModeReplace,
 }
+
+/// Calc index
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::quote::CalcIndex")]
+#[repr(C)]
+pub enum CCalcIndex {
+    /// Latest price
+    #[c(remote = "LastDone")]
+    CalcIndexLastDone,
+    /// Change value
+    #[c(remote = "ChangeValue")]
+    CalcIndexChangeValue,
+    /// Change rate
+    #[c(remote = "ChangeRate")]
+    CalcIndexChangeRate,
+    /// Volume
+    #[c(remote = "Volume")]
+    CalcIndexVolume,
+    /// Turnover
+    #[c(remote = "Turnover")]
+    CalcIndexTurnover,
+    /// Year-to-date change ratio
+    #[c(remote = "YtdChangeRate")]
+    CalcIndexYtdChangeRate,
+    /// Turnover rate
+    #[c(remote = "TurnoverRate")]
+    CalcIndexTurnoverRate,
+    /// Total market value
+    #[c(remote = "TotalMarketValue")]
+    CalcIndexTotalMarketValue,
+    /// Capital flow
+    #[c(remote = "CapitalFlow")]
+    CalcIndexCapitalFlow,
+    /// Amplitude
+    #[c(remote = "Amplitude")]
+    CalcIndexAmplitude,
+    /// Volume ratio
+    #[c(remote = "VolumeRatio")]
+    CalcIndexVolumeRatio,
+    /// PE (TTM)
+    #[c(remote = "PeTtmRatio")]
+    CalcIndexPeTtmRatio,
+    /// PB
+    #[c(remote = "PbRatio")]
+    CalcIndexPbRatio,
+    /// Dividend ratio (TTM)
+    #[c(remote = "DividendRatioTtm")]
+    CalcIndexDividendRatioTtm,
+    /// Five days change ratio
+    #[c(remote = "FiveDayChangeRate")]
+    CalcIndexFiveDayChangeRate,
+    /// Ten days change ratio
+    #[c(remote = "TenDayChangeRate")]
+    CalcIndexTenDayChangeRate,
+    /// Half year change ratio
+    #[c(remote = "HalfYearChangeRate")]
+    CalcIndexHalfYearChangeRate,
+    /// Five minutes change ratio
+    #[c(remote = "FiveMinutesChangeRate")]
+    CalcIndexFiveMinutesChangeRate,
+    /// Expiry date
+    #[c(remote = "ExpiryDate")]
+    CalcIndexExpiryDate,
+    /// Strike price
+    #[c(remote = "StrikePrice")]
+    CalcIndexStrikePrice,
+    /// Upper bound price
+    #[c(remote = "UpperStrikePrice")]
+    CalcIndexUpperStrikePrice,
+    /// Lower bound price
+    #[c(remote = "LowerStrikePrice")]
+    CalcIndexLowerStrikePrice,
+    /// Outstanding quantity
+    #[c(remote = "OutstandingQty")]
+    CalcIndexOutstandingQty,
+    /// Outstanding ratio
+    #[c(remote = "OutstandingRatio")]
+    CalcIndexOutstandingRatio,
+    /// Premium
+    #[c(remote = "Premium")]
+    CalcIndexPremium,
+    /// In/out of the bound
+    #[c(remote = "ItmOtm")]
+    CalcIndexItmOtm,
+    /// Implied volatility
+    #[c(remote = "ImpliedVolatility")]
+    CalcIndexImpliedVolatility,
+    /// Warrant delta
+    #[c(remote = "WarrantDelta")]
+    CalcIndexWarrantDelta,
+    /// Call price
+    #[c(remote = "CallPrice")]
+    CalcIndexCallPrice,
+    /// Price interval from the call price
+    #[c(remote = "ToCallPrice")]
+    CalcIndexToCallPrice,
+    /// Effective leverage
+    #[c(remote = "EffectiveLeverage")]
+    CalcIndexEffectiveLeverage,
+    /// Leverage ratio
+    #[c(remote = "LeverageRatio")]
+    CalcIndexLeverageRatio,
+    /// Conversion ratio
+    #[c(remote = "ConversionRatio")]
+    CalcIndexConversionRatio,
+    /// Breakeven point
+    #[c(remote = "BalancePoint")]
+    CalcIndexBalancePoint,
+    /// Open interest
+    #[c(remote = "OpenInterest")]
+    CalcIndexOpenInterest,
+    /// Delta
+    #[c(remote = "Delta")]
+    CalcIndexDelta,
+    /// Gamma
+    #[c(remote = "Gamma")]
+    CalcIndexGamma,
+    /// Theta
+    #[c(remote = "Theta")]
+    CalcIndexTheta,
+    /// Vega
+    #[c(remote = "Vega")]
+    CalcIndexVega,
+    /// Rho
+    #[c(remote = "Rho")]
+    CalcIndexRho,
+}

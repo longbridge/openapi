@@ -738,6 +738,18 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Get security calc indexes
+     * 
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<SecurityCalcIndex[]> getCalcIndexes(String[] symbols, CalcIndex[] indexes) {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextCalcIndexes(this.raw, symbols, indexes, callback);
+        });
+    }
+
+    /**
      * Get watchlist
      * 
      * Deprecated: Use `getWatchlist` instead

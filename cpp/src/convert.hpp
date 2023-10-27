@@ -11,6 +11,7 @@ namespace convert {
 
 using longbridge::quote::AdjustType;
 using longbridge::quote::Brokers;
+using longbridge::quote::CalcIndex;
 using longbridge::quote::Candlestick;
 using longbridge::quote::CapitalDistribution;
 using longbridge::quote::CapitalDistributionResponse;
@@ -36,6 +37,7 @@ using longbridge::quote::RealtimeQuote;
 using longbridge::quote::SecuritiesUpdateMode;
 using longbridge::quote::SecurityBoard;
 using longbridge::quote::SecurityBrokers;
+using longbridge::quote::SecurityCalcIndex;
 using longbridge::quote::SecurityDepth;
 using longbridge::quote::SecurityQuote;
 using longbridge::quote::SecurityStaticInfo;
@@ -1618,6 +1620,168 @@ convert(SecuritiesUpdateMode mode)
     default:
       throw std::invalid_argument("unreachable");
   }
+}
+
+inline lb_calc_index_t
+convert(CalcIndex index)
+{
+  switch (index) {
+    case CalcIndex::LastDone:
+      return CalcIndexLastDone;
+    case CalcIndex::ChangeValue:
+      return CalcIndexChangeValue;
+    case CalcIndex::ChangeRate:
+      return CalcIndexChangeRate;
+    case CalcIndex::Volume:
+      return CalcIndexVolume;
+    case CalcIndex::Turnover:
+      return CalcIndexTurnover;
+    case CalcIndex::YtdChangeRate:
+      return CalcIndexYtdChangeRate;
+    case CalcIndex::TurnoverRate:
+      return CalcIndexTurnoverRate;
+    case CalcIndex::TotalMarketValue:
+      return CalcIndexTotalMarketValue;
+    case CalcIndex::CapitalFlow:
+      return CalcIndexCapitalFlow;
+    case CalcIndex::Amplitude:
+      return CalcIndexAmplitude;
+    case CalcIndex::VolumeRatio:
+      return CalcIndexVolumeRatio;
+    case CalcIndex::PeTtmRatio:
+      return CalcIndexPeTtmRatio;
+    case CalcIndex::PbRatio:
+      return CalcIndexPbRatio;
+    case CalcIndex::DividendRatioTtm:
+      return CalcIndexDividendRatioTtm;
+    case CalcIndex::FiveDayChangeRate:
+      return CalcIndexFiveDayChangeRate;
+    case CalcIndex::TenDayChangeRate:
+      return CalcIndexTenDayChangeRate;
+    case CalcIndex::HalfYearChangeRate:
+      return CalcIndexHalfYearChangeRate;
+    case CalcIndex::FiveMinutesChangeRate:
+      return CalcIndexFiveMinutesChangeRate;
+    case CalcIndex::ExpiryDate:
+      return CalcIndexExpiryDate;
+    case CalcIndex::StrikePrice:
+      return CalcIndexStrikePrice;
+    case CalcIndex::UpperStrikePrice:
+      return CalcIndexUpperStrikePrice;
+    case CalcIndex::LowerStrikePrice:
+      return CalcIndexLowerStrikePrice;
+    case CalcIndex::OutstandingQty:
+      return CalcIndexOutstandingQty;
+    case CalcIndex::OutstandingRatio:
+      return CalcIndexOutstandingRatio;
+    case CalcIndex::Premium:
+      return CalcIndexPremium;
+    case CalcIndex::ItmOtm:
+      return CalcIndexItmOtm;
+    case CalcIndex::ImpliedVolatility:
+      return CalcIndexImpliedVolatility;
+    case CalcIndex::WarrantDelta:
+      return CalcIndexWarrantDelta;
+    case CalcIndex::CallPrice:
+      return CalcIndexCallPrice;
+    case CalcIndex::ToCallPrice:
+      return CalcIndexToCallPrice;
+    case CalcIndex::EffectiveLeverage:
+      return CalcIndexEffectiveLeverage;
+    case CalcIndex::LeverageRatio:
+      return CalcIndexLeverageRatio;
+    case CalcIndex::ConversionRatio:
+      return CalcIndexConversionRatio;
+    case CalcIndex::BalancePoint:
+      return CalcIndexBalancePoint;
+    case CalcIndex::OpenInterest:
+      return CalcIndexOpenInterest;
+    case CalcIndex::Delta:
+      return CalcIndexDelta;
+    case CalcIndex::Gamma:
+      return CalcIndexGamma;
+    case CalcIndex::Theta:
+      return CalcIndexTheta;
+    case CalcIndex::Vega:
+      return CalcIndexVega;
+    case CalcIndex::Rho:
+      return CalcIndexRho;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline SecurityCalcIndex
+convert(const lb_security_calc_index_t* resp)
+{
+  return SecurityCalcIndex{
+    resp->symbol,
+    resp->last_done ? std::optional{ Decimal(resp->last_done) } : std::nullopt,
+    resp->change_value ? std::optional{ Decimal(resp->change_value) }
+                       : std::nullopt,
+    resp->change_rate ? std::optional{ *resp->change_rate } : std::nullopt,
+    resp->volume ? std::optional{ *resp->volume } : std::nullopt,
+    resp->turnover ? std::optional{ Decimal(resp->turnover) } : std::nullopt,
+    resp->ytd_change_rate ? std::optional{ *resp->ytd_change_rate }
+                          : std::nullopt,
+    resp->turnover_rate ? std::optional{ *resp->turnover_rate } : std::nullopt,
+    resp->total_market_value
+      ? std::optional{ Decimal(resp->total_market_value) }
+      : std::nullopt,
+    resp->capital_flow ? std::optional{ Decimal(resp->capital_flow) }
+                       : std::nullopt,
+    resp->amplitude ? std::optional{ *resp->amplitude } : std::nullopt,
+    resp->volume_ratio ? std::optional{ *resp->volume_ratio } : std::nullopt,
+    resp->pe_ttm_ratio ? std::optional{ *resp->pe_ttm_ratio } : std::nullopt,
+    resp->pb_ratio ? std::optional{ *resp->pb_ratio } : std::nullopt,
+    resp->dividend_ratio_ttm ? std::optional{ *resp->dividend_ratio_ttm }
+                             : std::nullopt,
+    resp->five_day_change_rate ? std::optional{ *resp->five_day_change_rate }
+                               : std::nullopt,
+    resp->ten_day_change_rate ? std::optional{ *resp->ten_day_change_rate }
+                              : std::nullopt,
+    resp->half_year_change_rate ? std::optional{ *resp->half_year_change_rate }
+                                : std::nullopt,
+    resp->five_minutes_change_rate
+      ? std::optional{ *resp->five_minutes_change_rate }
+      : std::nullopt,
+    resp->expiry_date ? std::optional{ convert(resp->expiry_date) }
+                      : std::nullopt,
+    resp->strike_price ? std::optional{ Decimal(resp->strike_price) }
+                       : std::nullopt,
+    resp->upper_strike_price
+      ? std::optional{ Decimal(resp->upper_strike_price) }
+      : std::nullopt,
+    resp->lower_strike_price
+      ? std::optional{ Decimal(resp->lower_strike_price) }
+      : std::nullopt,
+    resp->outstanding_qty ? std::optional{ *resp->outstanding_qty }
+                          : std::nullopt,
+    resp->outstanding_ratio ? std::optional{ *resp->outstanding_ratio }
+                            : std::nullopt,
+    resp->premium ? std::optional{ *resp->premium } : std::nullopt,
+    resp->itm_otm ? std::optional{ *resp->itm_otm } : std::nullopt,
+    resp->implied_volatility ? std::optional{ *resp->implied_volatility }
+                             : std::nullopt,
+    resp->warrant_delta ? std::optional{ *resp->warrant_delta } : std::nullopt,
+    resp->call_price ? std::optional{ Decimal(resp->call_price) }
+                     : std::nullopt,
+    resp->to_call_price ? std::optional{ Decimal(resp->to_call_price) }
+                        : std::nullopt,
+    resp->effective_leverage ? std::optional{ *resp->effective_leverage }
+                             : std::nullopt,
+    resp->leverage_ratio ? std::optional{ *resp->leverage_ratio }
+                         : std::nullopt,
+    resp->conversion_ratio ? std::optional{ *resp->conversion_ratio }
+                           : std::nullopt,
+    resp->balance_point ? std::optional{ *resp->balance_point } : std::nullopt,
+    resp->open_interest ? std::optional{ *resp->open_interest } : std::nullopt,
+    resp->delta ? std::optional{ *resp->delta } : std::nullopt,
+    resp->gamma ? std::optional{ *resp->gamma } : std::nullopt,
+    resp->theta ? std::optional{ *resp->theta } : std::nullopt,
+    resp->vega ? std::optional{ *resp->vega } : std::nullopt,
+    resp->rho ? std::optional{ *resp->rho } : std::nullopt,
+  };
 }
 
 } // namespace convert

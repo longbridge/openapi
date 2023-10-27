@@ -5,11 +5,12 @@ use time::{Date, PrimitiveDateTime};
 use crate::{
     blocking::runtime::BlockingRuntime,
     quote::{
-        AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
-        IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-        PushEvent, RealtimeQuote, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
-        SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
-        SubFlags, Subscription, Trade, WarrantQuote, WatchlistGroup,
+        AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+        IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
+        ParticipantInfo, Period, PushEvent, RealtimeQuote, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityQuote, SecurityStaticInfo, StrikePriceInfo, SubFlags, Subscription, Trade,
+        WarrantQuote, WatchlistGroup,
     },
     Config, Market, QuoteContext, Result,
 };
@@ -648,6 +649,19 @@ impl QuoteContextSync {
     ) -> Result<CapitalDistributionResponse> {
         self.rt
             .call(move |ctx| async move { ctx.capital_distribution(symbol).await })
+    }
+
+    /// Get calc indexes
+    pub fn calc_indexes<I, T, J>(&self, symbols: I, indexes: J) -> Result<Vec<SecurityCalcIndex>>
+    where
+        I: IntoIterator<Item = T> + Send + 'static,
+        I::IntoIter: Send + 'static,
+        T: Into<String> + Send + 'static,
+        J: IntoIterator<Item = CalcIndex> + Send + 'static,
+        J::IntoIter: Send + 'static,
+    {
+        self.rt
+            .call(move |ctx| async move { ctx.calc_indexes(symbols, indexes).await })
     }
 
     /// Get watchlist

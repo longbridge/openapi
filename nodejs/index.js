@@ -236,7 +236,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { Config, Decimal, HttpClient, QuoteContext, PushQuoteEvent, PushDepthEvent, PushBrokersEvent, PushTradesEvent, PushCandlestickEvent, Subscription, DerivativeType, TradeStatus, TradeSession, SubType, TradeDirection, OptionType, OptionDirection, WarrantType, Period, AdjustType, SecurityBoard, SecurityStaticInfo, PrePostQuote, SecurityQuote, OptionQuote, WarrantQuote, Depth, SecurityDepth, Brokers, SecurityBrokers, ParticipantInfo, Trade, IntradayLine, Candlestick, StrikePriceInfo, IssuerInfo, TradingSessionInfo, MarketTradingSession, RealtimeQuote, PushQuote, PushDepth, PushBrokers, PushTrades, PushCandlestick, MarketTradingDays, CapitalFlowLine, CapitalDistribution, CapitalDistributionResponse, WatchlistGroup, WatchlistSecurity, SecuritiesUpdateMode, NaiveDate, Time, NaiveDatetime, TradeContext, TopicType, Execution, OrderStatus, OrderSide, OrderType, OrderTag, TimeInForceType, TriggerStatus, OutsideRTH, Order, CommissionFreeStatus, DeductionStatus, ChargeCategoryCode, OrderHistoryDetail, OrderChargeFee, OrderChargeItem, OrderChargeDetail, OrderDetail, PushOrderChanged, SubmitOrderResponse, CashInfo, AccountBalance, BalanceType, CashFlowDirection, CashFlow, FundPositionsResponse, FundPositionChannel, FundPosition, StockPositionsResponse, StockPositionChannel, StockPosition, MarginRatio, EstimateMaxPurchaseQuantityResponse, Market, Language } = nativeBinding
+const { Config, Decimal, HttpClient, QuoteContext, PushQuoteEvent, PushDepthEvent, PushBrokersEvent, PushTradesEvent, PushCandlestickEvent, Subscription, DerivativeType, TradeStatus, TradeSession, SubType, TradeDirection, OptionType, OptionDirection, WarrantType, Period, AdjustType, SecurityBoard, SecurityStaticInfo, PrePostQuote, SecurityQuote, OptionQuote, WarrantQuote, Depth, SecurityDepth, Brokers, SecurityBrokers, ParticipantInfo, Trade, IntradayLine, Candlestick, StrikePriceInfo, IssuerInfo, TradingSessionInfo, MarketTradingSession, RealtimeQuote, PushQuote, PushDepth, PushBrokers, PushTrades, PushCandlestick, MarketTradingDays, CapitalFlowLine, CapitalDistribution, CapitalDistributionResponse, WatchlistGroup, WatchlistSecurity, SecuritiesUpdateMode, CalcIndex, SecurityCalcIndex, NaiveDate, Time, NaiveDatetime, TradeContext, TopicType, Execution, OrderStatus, OrderSide, OrderType, OrderTag, TimeInForceType, TriggerStatus, OutsideRTH, Order, CommissionFreeStatus, DeductionStatus, ChargeCategoryCode, OrderHistoryDetail, OrderChargeFee, OrderChargeItem, OrderChargeDetail, OrderDetail, PushOrderChanged, SubmitOrderResponse, CashInfo, AccountBalance, BalanceType, CashFlowDirection, CashFlow, FundPositionsResponse, FundPositionChannel, FundPosition, StockPositionsResponse, StockPositionChannel, StockPosition, MarginRatio, EstimateMaxPurchaseQuantityResponse, Market, Language } = nativeBinding
 
 module.exports.Config = Config
 module.exports.Decimal = Decimal
@@ -289,6 +289,8 @@ module.exports.CapitalDistributionResponse = CapitalDistributionResponse
 module.exports.WatchlistGroup = WatchlistGroup
 module.exports.WatchlistSecurity = WatchlistSecurity
 module.exports.SecuritiesUpdateMode = SecuritiesUpdateMode
+module.exports.CalcIndex = CalcIndex
+module.exports.SecurityCalcIndex = SecurityCalcIndex
 module.exports.NaiveDate = NaiveDate
 module.exports.Time = Time
 module.exports.NaiveDatetime = NaiveDatetime

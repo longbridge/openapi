@@ -106,6 +106,9 @@ public class SdkNative {
 
         public static native void quoteContextCapitalDistribution(long context, String symbol, AsyncCallback callback);
 
+        public static native void quoteContextCalcIndexes(long context, String[] symbols, CalcIndex[] indexes,
+                        AsyncCallback callback);
+
         public static native void quoteContextWatchlist(long context, AsyncCallback callback);
 
         public static native void quoteContextCreateWatchlistGroup(long context, CreateWatchlistGroup req,

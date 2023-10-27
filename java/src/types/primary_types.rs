@@ -63,3 +63,23 @@ impl IntoJValue for bool {
         Ok(JValueOwned::from(self))
     }
 }
+
+impl JSignature for f64 {
+    fn signature() -> Cow<'static, str> {
+        "D".into()
+    }
+}
+
+impl FromJValue for f64 {
+    #[inline]
+    fn from_jvalue(_env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
+        value.d()
+    }
+}
+
+impl IntoJValue for f64 {
+    #[inline]
+    fn into_jvalue<'a>(self, _env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        Ok(JValueOwned::from(self))
+    }
+}

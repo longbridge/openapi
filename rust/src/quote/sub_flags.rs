@@ -2,6 +2,7 @@ use longbridge_proto::quote::SubType;
 
 bitflags::bitflags! {
     /// Subscription flags
+    #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
     pub struct SubFlags: u8 {
         /// Quote
         const QUOTE = 0x1;

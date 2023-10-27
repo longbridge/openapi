@@ -111,6 +111,8 @@ cpp_compat = true
 "CCreateWatchlistGroup" = "lb_create_watchlist_group_t"
 "CUpdateWatchlistGroup" = "lb_update_watchlist_group_t"
 "CSecuritiesUpdateMode" = "lb_securities_update_mode_t"
+"CCalcIndex" = "lb_calc_index_t"
+"CSecurityCalcIndex" = "lb_security_calc_index_t"
 
 [export]
 include = [
@@ -143,4 +145,5 @@ include = [
     "CMarginRatio",
     "COrderDetail",
     "CEstimateMaxPurchaseQuantityResponse",
+    "CSecurityCalcIndex",
 ]

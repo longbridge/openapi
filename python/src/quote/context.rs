@@ -14,11 +14,11 @@ use crate::{
     quote::{
         push::handle_push_event,
         types::{
-            AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, IntradayLine,
-            IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo,
-            Period, RealtimeQuote, SecuritiesUpdateMode, SecurityBrokers, SecurityDepth,
-            SecurityQuote, SecurityStaticInfo, StrikePriceInfo, SubType, SubTypes, Subscription,
-            Trade, WarrantQuote, WatchlistGroup,
+            AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+            IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
+            ParticipantInfo, Period, RealtimeQuote, SecuritiesUpdateMode, SecurityBrokers,
+            SecurityCalcIndex, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
+            SubType, SubTypes, Subscription, Trade, WarrantQuote, WatchlistGroup,
         },
     },
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
@@ -371,6 +371,20 @@ impl QuoteContext {
             .capital_distribution(symbol)
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    /// Get calc indexes
+    fn calc_indexes(
+        &self,
+        symbols: Vec<String>,
+        indexes: Vec<CalcIndex>,
+    ) -> PyResult<Vec<SecurityCalcIndex>> {
+        self.ctx
+            .calc_indexes(symbols, indexes.into_iter().map(Into::into))
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Get watch list

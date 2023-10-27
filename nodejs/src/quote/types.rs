@@ -879,3 +879,218 @@ pub enum SecuritiesUpdateMode {
     /// Replace securities
     Replace,
 }
+
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::quote::CalcIndex")]
+pub enum CalcIndex {
+    /// Latest price
+    LastDone,
+    /// Change value
+    ChangeValue,
+    /// Change rate
+    ChangeRate,
+    /// Volume
+    Volume,
+    /// Turnover
+    Turnover,
+    /// Year-to-date change ratio
+    YtdChangeRate,
+    /// Turnover rate
+    TurnoverRate,
+    /// Total market value
+    TotalMarketValue,
+    /// Capital flow
+    CapitalFlow,
+    /// Amplitude
+    Amplitude,
+    /// Volume ratio
+    VolumeRatio,
+    /// PE (TTM)
+    PeTtmRatio,
+    /// PB
+    PbRatio,
+    /// Dividend ratio (TTM)
+    DividendRatioTtm,
+    /// Five days change ratio
+    FiveDayChangeRate,
+    /// Ten days change ratio
+    TenDayChangeRate,
+    /// Half year change ratio
+    HalfYearChangeRate,
+    /// Five minutes change ratio
+    FiveMinutesChangeRate,
+    /// Expiry date
+    ExpiryDate,
+    /// Strike price
+    StrikePrice,
+    /// Upper bound price
+    UpperStrikePrice,
+    /// Lower bound price
+    LowerStrikePrice,
+    /// Outstanding quantity
+    OutstandingQty,
+    /// Outstanding ratio
+    OutstandingRatio,
+    /// Premium
+    Premium,
+    /// In/out of the bound
+    ItmOtm,
+    /// Implied volatility
+    ImpliedVolatility,
+    /// Warrant delta
+    WarrantDelta,
+    /// Call price
+    CallPrice,
+    /// Price interval from the call price
+    ToCallPrice,
+    /// Effective leverage
+    EffectiveLeverage,
+    /// Leverage ratio
+    LeverageRatio,
+    /// Conversion ratio
+    ConversionRatio,
+    /// Breakeven point
+    BalancePoint,
+    /// Open interest
+    OpenInterest,
+    /// Delta
+    Delta,
+    /// Gamma
+    Gamma,
+    /// Theta
+    Theta,
+    /// Vega
+    Vega,
+    /// Rho
+    Rho,
+}
+
+/// Security calc index response
+#[napi_derive::napi]
+#[derive(JsObject, Debug, Clone)]
+#[js(remote = "longbridge::quote::SecurityCalcIndex")]
+pub struct SecurityCalcIndex {
+    /// Security code
+    symbol: String,
+    /// Latest price
+    #[js(opt)]
+    last_done: Option<Decimal>,
+    /// Change value
+    #[js(opt)]
+    change_value: Option<Decimal>,
+    /// Change ratio
+    #[js(opt)]
+    change_rate: Option<f64>,
+    /// Volume
+    #[js(opt)]
+    volume: Option<i64>,
+    /// Turnover
+    #[js(opt)]
+    turnover: Option<Decimal>,
+    /// Year-to-date change ratio
+    #[js(opt)]
+    ytd_change_rate: Option<f64>,
+    /// Turnover rate
+    #[js(opt)]
+    turnover_rate: Option<f64>,
+    /// Total market value
+    #[js(opt)]
+    total_market_value: Option<Decimal>,
+    /// Capital flow
+    #[js(opt)]
+    capital_flow: Option<Decimal>,
+    /// Amplitude
+    #[js(opt)]
+    amplitude: Option<f64>,
+    /// Volume ratio
+    #[js(opt)]
+    volume_ratio: Option<f64>,
+    /// PE (TTM)
+    #[js(opt)]
+    pe_ttm_ratio: Option<f64>,
+    /// PB
+    #[js(opt)]
+    pb_ratio: Option<f64>,
+    /// Dividend ratio (TTM)
+    #[js(opt)]
+    dividend_ratio_ttm: Option<f64>,
+    /// Five days change ratio
+    #[js(opt)]
+    five_day_change_rate: Option<f64>,
+    /// Ten days change ratio
+    #[js(opt)]
+    ten_day_change_rate: Option<f64>,
+    /// Half year change ratio
+    #[js(opt)]
+    half_year_change_rate: Option<f64>,
+    /// Five minutes change ratio
+    #[js(opt)]
+    five_minutes_change_rate: Option<f64>,
+    /// Expiry date
+    #[js(opt)]
+    expiry_date: Option<NaiveDate>,
+    /// Strike price
+    #[js(opt)]
+    strike_price: Option<Decimal>,
+    /// Upper bound price
+    #[js(opt)]
+    upper_strike_price: Option<Decimal>,
+    /// Lower bound price
+    #[js(opt)]
+    lower_strike_price: Option<Decimal>,
+    /// Outstanding quantity
+    #[js(opt)]
+    outstanding_qty: Option<i64>,
+    /// Outstanding ratio
+    #[js(opt)]
+    outstanding_ratio: Option<f64>,
+    /// Premium
+    #[js(opt)]
+    premium: Option<f64>,
+    /// In/out of the bound
+    #[js(opt)]
+    itm_otm: Option<f64>,
+    /// Implied volatility
+    #[js(opt)]
+    implied_volatility: Option<f64>,
+    /// Warrant delta
+    #[js(opt)]
+    warrant_delta: Option<f64>,
+    /// Call price
+    #[js(opt)]
+    call_price: Option<Decimal>,
+    /// Price interval from the call price
+    #[js(opt)]
+    to_call_price: Option<Decimal>,
+    /// Effective leverage
+    #[js(opt)]
+    effective_leverage: Option<f64>,
+    /// Leverage ratio
+    #[js(opt)]
+    leverage_ratio: Option<f64>,
+    /// Conversion ratio
+    #[js(opt)]
+    conversion_ratio: Option<f64>,
+    /// Breakeven point
+    #[js(opt)]
+    balance_point: Option<f64>,
+    /// Open interest
+    #[js(opt)]
+    open_interest: Option<i64>,
+    /// Delta
+    #[js(opt)]
+    delta: Option<f64>,
+    /// Gamma
+    #[js(opt)]
+    gamma: Option<f64>,
+    /// Theta
+    #[js(opt)]
+    theta: Option<f64>,
+    /// Vega
+    #[js(opt)]
+    vega: Option<f64>,
+    /// Rho
+    #[js(opt)]
+    rho: Option<f64>,
+}

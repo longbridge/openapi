@@ -83,6 +83,172 @@ typedef enum lb_balance_type_t {
 } lb_balance_type_t;
 
 /**
+ * Calc index
+ */
+typedef enum lb_calc_index_t {
+  /**
+   * Latest price
+   */
+  CalcIndexLastDone,
+  /**
+   * Change value
+   */
+  CalcIndexChangeValue,
+  /**
+   * Change rate
+   */
+  CalcIndexChangeRate,
+  /**
+   * Volume
+   */
+  CalcIndexVolume,
+  /**
+   * Turnover
+   */
+  CalcIndexTurnover,
+  /**
+   * Year-to-date change ratio
+   */
+  CalcIndexYtdChangeRate,
+  /**
+   * Turnover rate
+   */
+  CalcIndexTurnoverRate,
+  /**
+   * Total market value
+   */
+  CalcIndexTotalMarketValue,
+  /**
+   * Capital flow
+   */
+  CalcIndexCapitalFlow,
+  /**
+   * Amplitude
+   */
+  CalcIndexAmplitude,
+  /**
+   * Volume ratio
+   */
+  CalcIndexVolumeRatio,
+  /**
+   * PE (TTM)
+   */
+  CalcIndexPeTtmRatio,
+  /**
+   * PB
+   */
+  CalcIndexPbRatio,
+  /**
+   * Dividend ratio (TTM)
+   */
+  CalcIndexDividendRatioTtm,
+  /**
+   * Five days change ratio
+   */
+  CalcIndexFiveDayChangeRate,
+  /**
+   * Ten days change ratio
+   */
+  CalcIndexTenDayChangeRate,
+  /**
+   * Half year change ratio
+   */
+  CalcIndexHalfYearChangeRate,
+  /**
+   * Five minutes change ratio
+   */
+  CalcIndexFiveMinutesChangeRate,
+  /**
+   * Expiry date
+   */
+  CalcIndexExpiryDate,
+  /**
+   * Strike price
+   */
+  CalcIndexStrikePrice,
+  /**
+   * Upper bound price
+   */
+  CalcIndexUpperStrikePrice,
+  /**
+   * Lower bound price
+   */
+  CalcIndexLowerStrikePrice,
+  /**
+   * Outstanding quantity
+   */
+  CalcIndexOutstandingQty,
+  /**
+   * Outstanding ratio
+   */
+  CalcIndexOutstandingRatio,
+  /**
+   * Premium
+   */
+  CalcIndexPremium,
+  /**
+   * In/out of the bound
+   */
+  CalcIndexItmOtm,
+  /**
+   * Implied volatility
+   */
+  CalcIndexImpliedVolatility,
+  /**
+   * Warrant delta
+   */
+  CalcIndexWarrantDelta,
+  /**
+   * Call price
+   */
+  CalcIndexCallPrice,
+  /**
+   * Price interval from the call price
+   */
+  CalcIndexToCallPrice,
+  /**
+   * Effective leverage
+   */
+  CalcIndexEffectiveLeverage,
+  /**
+   * Leverage ratio
+   */
+  CalcIndexLeverageRatio,
+  /**
+   * Conversion ratio
+   */
+  CalcIndexConversionRatio,
+  /**
+   * Breakeven point
+   */
+  CalcIndexBalancePoint,
+  /**
+   * Open interest
+   */
+  CalcIndexOpenInterest,
+  /**
+   * Delta
+   */
+  CalcIndexDelta,
+  /**
+   * Gamma
+   */
+  CalcIndexGamma,
+  /**
+   * Theta
+   */
+  CalcIndexTheta,
+  /**
+   * Vega
+   */
+  CalcIndexVega,
+  /**
+   * Rho
+   */
+  CalcIndexRho,
+} lb_calc_index_t;
+
+/**
  * Cash flow direction
  */
 typedef enum lb_cash_flow_direction_t {
@@ -2928,6 +3094,176 @@ typedef struct lb_estimate_max_purchase_quantity_response_t {
   int64_t margin_max_qty;
 } lb_estimate_max_purchase_quantity_response_t;
 
+/**
+ * Security calc index response
+ */
+typedef struct lb_security_calc_index_t {
+  /**
+   * Security code
+   */
+  const char *symbol;
+  /**
+   * Latest price
+   */
+  const struct lb_decimal_t *last_done;
+  /**
+   * Change value
+   */
+  const struct lb_decimal_t *change_value;
+  /**
+   * Change ratio
+   */
+  const double *change_rate;
+  /**
+   * Volume
+   */
+  const int64_t *volume;
+  /**
+   * Turnover
+   */
+  const struct lb_decimal_t *turnover;
+  /**
+   * Year-to-date change ratio
+   */
+  const double *ytd_change_rate;
+  /**
+   * Turnover rate
+   */
+  const double *turnover_rate;
+  /**
+   * Total market value
+   */
+  const struct lb_decimal_t *total_market_value;
+  /**
+   * Capital flow
+   */
+  const struct lb_decimal_t *capital_flow;
+  /**
+   * Amplitude
+   */
+  const double *amplitude;
+  /**
+   * Volume ratio
+   */
+  const double *volume_ratio;
+  /**
+   * PE (TTM)
+   */
+  const double *pe_ttm_ratio;
+  /**
+   * PB
+   */
+  const double *pb_ratio;
+  /**
+   * Dividend ratio (TTM)
+   */
+  const double *dividend_ratio_ttm;
+  /**
+   * Five days change ratio
+   */
+  const double *five_day_change_rate;
+  /**
+   * Ten days change ratio
+   */
+  const double *ten_day_change_rate;
+  /**
+   * Half year change ratio
+   */
+  const double *half_year_change_rate;
+  /**
+   * Five minutes change ratio
+   */
+  const double *five_minutes_change_rate;
+  /**
+   * Expiry date
+   */
+  const struct lb_date_t *expiry_date;
+  /**
+   * Strike price
+   */
+  const struct lb_decimal_t *strike_price;
+  /**
+   * Upper bound price
+   */
+  const struct lb_decimal_t *upper_strike_price;
+  /**
+   * Lower bound price
+   */
+  const struct lb_decimal_t *lower_strike_price;
+  /**
+   * Outstanding quantity
+   */
+  const int64_t *outstanding_qty;
+  /**
+   * Outstanding ratio
+   */
+  const double *outstanding_ratio;
+  /**
+   * Premium
+   */
+  const double *premium;
+  /**
+   * In/out of the bound
+   */
+  const double *itm_otm;
+  /**
+   * Implied volatility
+   */
+  const double *implied_volatility;
+  /**
+   * Warrant delta
+   */
+  const double *warrant_delta;
+  /**
+   * Call price
+   */
+  const struct lb_decimal_t *call_price;
+  /**
+   * Price interval from the call price
+   */
+  const struct lb_decimal_t *to_call_price;
+  /**
+   * Effective leverage
+   */
+  const double *effective_leverage;
+  /**
+   * Leverage ratio
+   */
+  const double *leverage_ratio;
+  /**
+   * Conversion ratio
+   */
+  const double *conversion_ratio;
+  /**
+   * Breakeven point
+   */
+  const double *balance_point;
+  /**
+   * Open interest
+   */
+  const int64_t *open_interest;
+  /**
+   * Delta
+   */
+  const double *delta;
+  /**
+   * Gamma
+   */
+  const double *gamma;
+  /**
+   * Theta
+   */
+  const double *theta;
+  /**
+   * Vega
+   */
+  const double *vega;
+  /**
+   * Rho
+   */
+  const double *rho;
+} lb_security_calc_index_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -3300,6 +3636,17 @@ void lb_quote_context_capital_distribution(const struct lb_quote_context_t *ctx,
                                            const char *symbol,
                                            lb_async_callback_t callback,
                                            void *userdata);
+
+/**
+ * Get calc indexes
+ */
+void lb_quote_context_calc_indexes(const struct lb_quote_context_t *ctx,
+                                   const char *const *symbols,
+                                   uintptr_t num_symbols,
+                                   const enum lb_calc_index_t *indexes,
+                                   uintptr_t num_indexes,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
 
 /**
  * Get watchlist

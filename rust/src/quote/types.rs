@@ -144,6 +144,7 @@ impl TryFrom<quote::Trade> for Trade {
 
 bitflags::bitflags! {
     /// Derivative type
+    #[derive(Debug, Copy, Clone)]
     pub struct DerivativeType: u8 {
         /// US stock options
         const OPTION = 0x1;
@@ -1114,5 +1115,352 @@ impl RequestUpdateWatchlistGroup {
     /// Set securities update mode to the request
     pub fn mode(self, mode: SecuritiesUpdateMode) -> Self {
         Self { mode, ..self }
+    }
+}
+
+/// Calc index
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum CalcIndex {
+    /// Latest price
+    LastDone,
+    /// Change value
+    ChangeValue,
+    /// Change rate
+    ChangeRate,
+    /// Volume
+    Volume,
+    /// Turnover
+    Turnover,
+    /// Year-to-date change ratio
+    YtdChangeRate,
+    /// Turnover rate
+    TurnoverRate,
+    /// Total market value
+    TotalMarketValue,
+    /// Capital flow
+    CapitalFlow,
+    /// Amplitude
+    Amplitude,
+    /// Volume ratio
+    VolumeRatio,
+    /// PE (TTM)
+    PeTtmRatio,
+    /// PB
+    PbRatio,
+    /// Dividend ratio (TTM)
+    DividendRatioTtm,
+    /// Five days change ratio
+    FiveDayChangeRate,
+    /// Ten days change ratio
+    TenDayChangeRate,
+    /// Half year change ratio
+    HalfYearChangeRate,
+    /// Five minutes change ratio
+    FiveMinutesChangeRate,
+    /// Expiry date
+    ExpiryDate,
+    /// Strike price
+    StrikePrice,
+    /// Upper bound price
+    UpperStrikePrice,
+    /// Lower bound price
+    LowerStrikePrice,
+    /// Outstanding quantity
+    OutstandingQty,
+    /// Outstanding ratio
+    OutstandingRatio,
+    /// Premium
+    Premium,
+    /// In/out of the bound
+    ItmOtm,
+    /// Implied volatility
+    ImpliedVolatility,
+    /// Warrant delta
+    WarrantDelta,
+    /// Call price
+    CallPrice,
+    /// Price interval from the call price
+    ToCallPrice,
+    /// Effective leverage
+    EffectiveLeverage,
+    /// Leverage ratio
+    LeverageRatio,
+    /// Conversion ratio
+    ConversionRatio,
+    /// Breakeven point
+    BalancePoint,
+    /// Open interest
+    OpenInterest,
+    /// Delta
+    Delta,
+    /// Gamma
+    Gamma,
+    /// Theta
+    Theta,
+    /// Vega
+    Vega,
+    /// Rho
+    Rho,
+}
+
+impl From<CalcIndex> for longbridge_proto::quote::CalcIndex {
+    fn from(value: CalcIndex) -> Self {
+        use longbridge_proto::quote::CalcIndex::*;
+
+        match value {
+            CalcIndex::LastDone => CalcindexLastDone,
+            CalcIndex::ChangeValue => CalcindexChangeVal,
+            CalcIndex::ChangeRate => CalcindexChangeRate,
+            CalcIndex::Volume => CalcindexVolume,
+            CalcIndex::Turnover => CalcindexTurnover,
+            CalcIndex::YtdChangeRate => CalcindexYtdChangeRate,
+            CalcIndex::TurnoverRate => CalcindexTurnoverRate,
+            CalcIndex::TotalMarketValue => CalcindexTotalMarketValue,
+            CalcIndex::CapitalFlow => CalcindexCapitalFlow,
+            CalcIndex::Amplitude => CalcindexAmplitude,
+            CalcIndex::VolumeRatio => CalcindexVolumeRatio,
+            CalcIndex::PeTtmRatio => CalcindexPeTtmRatio,
+            CalcIndex::PbRatio => CalcindexPbRatio,
+            CalcIndex::DividendRatioTtm => CalcindexDividendRatioTtm,
+            CalcIndex::FiveDayChangeRate => CalcindexFiveDayChangeRate,
+            CalcIndex::TenDayChangeRate => CalcindexTenDayChangeRate,
+            CalcIndex::HalfYearChangeRate => CalcindexHalfYearChangeRate,
+            CalcIndex::FiveMinutesChangeRate => CalcindexFiveMinutesChangeRate,
+            CalcIndex::ExpiryDate => CalcindexExpiryDate,
+            CalcIndex::StrikePrice => CalcindexStrikePrice,
+            CalcIndex::UpperStrikePrice => CalcindexUpperStrikePrice,
+            CalcIndex::LowerStrikePrice => CalcindexLowerStrikePrice,
+            CalcIndex::OutstandingQty => CalcindexOutstandingQty,
+            CalcIndex::OutstandingRatio => CalcindexOutstandingRatio,
+            CalcIndex::Premium => CalcindexPremium,
+            CalcIndex::ItmOtm => CalcindexItmOtm,
+            CalcIndex::ImpliedVolatility => CalcindexImpliedVolatility,
+            CalcIndex::WarrantDelta => CalcindexWarrantDelta,
+            CalcIndex::CallPrice => CalcindexCallPrice,
+            CalcIndex::ToCallPrice => CalcindexToCallPrice,
+            CalcIndex::EffectiveLeverage => CalcindexEffectiveLeverage,
+            CalcIndex::LeverageRatio => CalcindexLeverageRatio,
+            CalcIndex::ConversionRatio => CalcindexConversionRatio,
+            CalcIndex::BalancePoint => CalcindexBalancePoint,
+            CalcIndex::OpenInterest => CalcindexOpenInterest,
+            CalcIndex::Delta => CalcindexDelta,
+            CalcIndex::Gamma => CalcindexGamma,
+            CalcIndex::Theta => CalcindexTheta,
+            CalcIndex::Vega => CalcindexVega,
+            CalcIndex::Rho => CalcindexRho,
+        }
+    }
+}
+
+/// Security calc index response
+#[derive(Debug, Clone)]
+pub struct SecurityCalcIndex {
+    /// Security code
+    pub symbol: String,
+    /// Latest price
+    pub last_done: Option<Decimal>,
+    /// Change value
+    pub change_value: Option<Decimal>,
+    /// Change ratio
+    pub change_rate: Option<f64>,
+    /// Volume
+    pub volume: Option<i64>,
+    /// Turnover
+    pub turnover: Option<Decimal>,
+    /// Year-to-date change ratio
+    pub ytd_change_rate: Option<f64>,
+    /// Turnover rate
+    pub turnover_rate: Option<f64>,
+    /// Total market value
+    pub total_market_value: Option<Decimal>,
+    /// Capital flow
+    pub capital_flow: Option<Decimal>,
+    /// Amplitude
+    pub amplitude: Option<f64>,
+    /// Volume ratio
+    pub volume_ratio: Option<f64>,
+    /// PE (TTM)
+    pub pe_ttm_ratio: Option<f64>,
+    /// PB
+    pub pb_ratio: Option<f64>,
+    /// Dividend ratio (TTM)
+    pub dividend_ratio_ttm: Option<f64>,
+    /// Five days change ratio
+    pub five_day_change_rate: Option<f64>,
+    /// Ten days change ratio
+    pub ten_day_change_rate: Option<f64>,
+    /// Half year change ratio
+    pub half_year_change_rate: Option<f64>,
+    /// Five minutes change ratio
+    pub five_minutes_change_rate: Option<f64>,
+    /// Expiry date
+    pub expiry_date: Option<Date>,
+    /// Strike price
+    pub strike_price: Option<Decimal>,
+    /// Upper bound price
+    pub upper_strike_price: Option<Decimal>,
+    /// Lower bound price
+    pub lower_strike_price: Option<Decimal>,
+    /// Outstanding quantity
+    pub outstanding_qty: Option<i64>,
+    /// Outstanding ratio
+    pub outstanding_ratio: Option<f64>,
+    /// Premium
+    pub premium: Option<f64>,
+    /// In/out of the bound
+    pub itm_otm: Option<f64>,
+    /// Implied volatility
+    pub implied_volatility: Option<f64>,
+    /// Warrant delta
+    pub warrant_delta: Option<f64>,
+    /// Call price
+    pub call_price: Option<Decimal>,
+    /// Price interval from the call price
+    pub to_call_price: Option<Decimal>,
+    /// Effective leverage
+    pub effective_leverage: Option<f64>,
+    /// Leverage ratio
+    pub leverage_ratio: Option<f64>,
+    /// Conversion ratio
+    pub conversion_ratio: Option<f64>,
+    /// Breakeven point
+    pub balance_point: Option<f64>,
+    /// Open interest
+    pub open_interest: Option<i64>,
+    /// Delta
+    pub delta: Option<f64>,
+    /// Gamma
+    pub gamma: Option<f64>,
+    /// Theta
+    pub theta: Option<f64>,
+    /// Vega
+    pub vega: Option<f64>,
+    /// Rho
+    pub rho: Option<f64>,
+}
+
+impl SecurityCalcIndex {
+    pub(crate) fn from_proto(
+        resp: longbridge_proto::quote::SecurityCalcIndex,
+        indexes: &[CalcIndex],
+    ) -> Self {
+        let mut output = SecurityCalcIndex {
+            symbol: resp.symbol,
+            last_done: None,
+            change_value: None,
+            change_rate: None,
+            volume: None,
+            turnover: None,
+            ytd_change_rate: None,
+            turnover_rate: None,
+            total_market_value: None,
+            capital_flow: None,
+            amplitude: None,
+            volume_ratio: None,
+            pe_ttm_ratio: None,
+            pb_ratio: None,
+            dividend_ratio_ttm: None,
+            five_day_change_rate: None,
+            ten_day_change_rate: None,
+            half_year_change_rate: None,
+            five_minutes_change_rate: None,
+            expiry_date: None,
+            strike_price: None,
+            upper_strike_price: None,
+            lower_strike_price: None,
+            outstanding_qty: None,
+            outstanding_ratio: None,
+            premium: None,
+            itm_otm: None,
+            implied_volatility: None,
+            warrant_delta: None,
+            call_price: None,
+            to_call_price: None,
+            effective_leverage: None,
+            leverage_ratio: None,
+            conversion_ratio: None,
+            balance_point: None,
+            open_interest: None,
+            delta: None,
+            gamma: None,
+            theta: None,
+            vega: None,
+            rho: None,
+        };
+
+        for index in indexes {
+            match index {
+                CalcIndex::LastDone => output.last_done = resp.last_done.parse().ok(),
+                CalcIndex::ChangeValue => output.change_value = resp.change_val.parse().ok(),
+                CalcIndex::ChangeRate => output.change_rate = resp.change_rate.parse().ok(),
+                CalcIndex::Volume => output.volume = Some(resp.volume),
+                CalcIndex::Turnover => output.turnover = resp.turnover.parse().ok(),
+                CalcIndex::YtdChangeRate => {
+                    output.ytd_change_rate = resp.ytd_change_rate.parse().ok()
+                }
+                CalcIndex::TurnoverRate => output.turnover_rate = resp.turnover_rate.parse().ok(),
+                CalcIndex::TotalMarketValue => {
+                    output.total_market_value = resp.total_market_value.parse().ok()
+                }
+                CalcIndex::CapitalFlow => output.capital_flow = resp.capital_flow.parse().ok(),
+                CalcIndex::Amplitude => output.amplitude = resp.amplitude.parse().ok(),
+                CalcIndex::VolumeRatio => output.volume_ratio = resp.volume_ratio.parse().ok(),
+                CalcIndex::PeTtmRatio => output.pe_ttm_ratio = resp.pe_ttm_ratio.parse().ok(),
+                CalcIndex::PbRatio => output.pb_ratio = resp.pb_ratio.parse().ok(),
+                CalcIndex::DividendRatioTtm => {
+                    output.dividend_ratio_ttm = resp.dividend_ratio_ttm.parse().ok()
+                }
+                CalcIndex::FiveDayChangeRate => {
+                    output.five_day_change_rate = resp.five_day_change_rate.parse().ok()
+                }
+                CalcIndex::TenDayChangeRate => {
+                    output.ten_day_change_rate = resp.ten_day_change_rate.parse().ok()
+                }
+                CalcIndex::HalfYearChangeRate => {
+                    output.half_year_change_rate = resp.half_year_change_rate.parse().ok()
+                }
+                CalcIndex::FiveMinutesChangeRate => {
+                    output.five_minutes_change_rate = resp.five_minutes_change_rate.parse().ok()
+                }
+                CalcIndex::ExpiryDate => output.expiry_date = parse_date(&resp.expiry_date).ok(),
+                CalcIndex::StrikePrice => output.strike_price = resp.strike_price.parse().ok(),
+                CalcIndex::UpperStrikePrice => {
+                    output.upper_strike_price = resp.upper_strike_price.parse().ok()
+                }
+                CalcIndex::LowerStrikePrice => {
+                    output.lower_strike_price = resp.lower_strike_price.parse().ok()
+                }
+                CalcIndex::OutstandingQty => output.outstanding_qty = Some(resp.outstanding_qty),
+                CalcIndex::OutstandingRatio => {
+                    output.outstanding_ratio = resp.outstanding_ratio.parse().ok()
+                }
+                CalcIndex::Premium => output.premium = resp.premium.parse().ok(),
+                CalcIndex::ItmOtm => output.itm_otm = resp.itm_otm.parse().ok(),
+                CalcIndex::ImpliedVolatility => {
+                    output.implied_volatility = resp.implied_volatility.parse().ok()
+                }
+                CalcIndex::WarrantDelta => output.warrant_delta = resp.warrant_delta.parse().ok(),
+                CalcIndex::CallPrice => output.call_price = resp.call_price.parse().ok(),
+                CalcIndex::ToCallPrice => output.to_call_price = resp.to_call_price.parse().ok(),
+                CalcIndex::EffectiveLeverage => {
+                    output.effective_leverage = resp.effective_leverage.parse().ok()
+                }
+                CalcIndex::LeverageRatio => {
+                    output.leverage_ratio = resp.leverage_ratio.parse().ok()
+                }
+                CalcIndex::ConversionRatio => {
+                    output.conversion_ratio = resp.conversion_ratio.parse().ok()
+                }
+                CalcIndex::BalancePoint => output.balance_point = resp.balance_point.parse().ok(),
+                CalcIndex::OpenInterest => output.open_interest = Some(resp.open_interest),
+                CalcIndex::Delta => output.delta = resp.delta.parse().ok(),
+                CalcIndex::Gamma => output.gamma = resp.gamma.parse().ok(),
+                CalcIndex::Theta => output.theta = resp.theta.parse().ok(),
+                CalcIndex::Vega => output.vega = resp.vega.parse().ok(),
+                CalcIndex::Rho => output.rho = resp.rho.parse().ok(),
+            }
+        }
+
+        output
     }
 }

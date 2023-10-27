@@ -87,6 +87,8 @@ args = [
   "javasrc/src/main/java/com/longbridge/quote/WarrantQuote.java",
   "javasrc/src/main/java/com/longbridge/quote/WarrantType.java",
   "javasrc/src/main/java/com/longbridge/quote/WatchlistGroup.java",
+  "javasrc/src/main/java/com/longbridge/quote/CalcIndex.java",
+  "javasrc/src/main/java/com/longbridge/quote/SecurityCalcIndex.java",
   "javasrc/src/main/java/com/longbridge/quote/WatchlistSecurity.java",
   "javasrc/src/main/java/com/longbridge/quote/CreateWatchlistGroup.java",
   "javasrc/src/main/java/com/longbridge/quote/CreateWatchlistGroupResponse.java",

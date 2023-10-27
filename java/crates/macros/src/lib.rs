@@ -258,6 +258,7 @@ pub fn impl_java_enum(input: TokenStream) -> TokenStream {
 
     let class_ref_name = Ident::new(&classname.replace('/', "_"), Span::call_site());
     let def_class_ref = quote! {
+        #[allow(non_upper_case_globals)]
         static #class_ref_name: once_cell::sync::OnceCell<jni::objects::GlobalRef> = once_cell::sync::OnceCell::new();
     };
 

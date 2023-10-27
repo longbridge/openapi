@@ -329,6 +329,14 @@ JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextCapitalDistribu
 
 /*
  * Class:     com_longbridge_SdkNative
+ * Method:    quoteContextCalcIndexes
+ * Signature: (J[Ljava/lang/String;[Lcom/longbridge/quote/CalcIndex;Lcom/longbridge/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longbridge_SdkNative_quoteContextCalcIndexes
+  (JNIEnv *, jclass, jlong, jobjectArray, jobjectArray, jobject);
+
+/*
+ * Class:     com_longbridge_SdkNative
  * Method:    quoteContextWatchlist
  * Signature: (JLcom/longbridge/AsyncCallback;)V
  */
