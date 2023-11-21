@@ -2,7 +2,7 @@
 
 typedef struct lb_error_t lb_error_t;
 
-namespace longbridge {
+namespace longport {
 class Status
 {
 private:
@@ -31,4 +31,4 @@ public:
   const char* message() const;
 };
 
-} // namespace longbridge
+} // namespace longport

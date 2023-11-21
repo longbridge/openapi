@@ -9,11 +9,11 @@ set(SOURCES
     src/trade_context.cpp
 )
 add_library(
-    longbridge_cpp SHARED
+    longport_cpp SHARED
     ${SOURCES}
 )
 if(NOT CMAKE_HOST_LINUX)
-target_link_libraries(longbridge_cpp longbridge-c)
+target_link_libraries(longport_cpp longport-c)
 endif()
 
 add_subdirectory(test)

@@ -1,4 +1,4 @@
-from longbridge.openapi import TradeContext, Config
+from longport.openapi import TradeContext, Config
 
 config = Config.from_env()
 ctx = TradeContext(config)

@@ -1,10 +1,10 @@
 {
-  "name": "longbridge",
+  "name": "longport",
   "version": "0.0.0",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
-    "name": "longbridge",
+    "name": "longport",
     "triples": {
       "additional": [
         "aarch64-apple-darwin"
@@ -12,12 +12,12 @@
     }
   },
   "license": "MIT OR Apache-2.0",
-  "description": "A Node.js library for Longbridge Open API",
+  "description": "A Node.js library for LongPort Open API",
   "repository": {
     "type": "git",
-    "url": "https://github.com/longbridgeapp/openapi-sdk"
+    "url": "https://github.com/longportapp/openapi-sdk"
   },
-  "homepage": "https://open.longbridgeapp.com/en/",
+  "homepage": "https://open.longportapp.com/en/",
   "devDependencies": {
     "@napi-rs/cli": "^2.9.0"
   },

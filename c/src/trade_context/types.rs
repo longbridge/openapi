@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 
-use longbridge::{
+use longport::{
     trade::{
         AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,
         EstimateMaxPurchaseQuantityResponse, Execution, FundPosition, FundPositionChannel,

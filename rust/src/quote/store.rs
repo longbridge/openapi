@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use longbridge_proto::quote::Period;
+use longport_proto::quote::Period;
 
 use crate::quote::{
     push_types::{PushEventDetail, PushQuote},

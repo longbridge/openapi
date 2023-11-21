@@ -1,6 +1,6 @@
 use std::{ffi::c_void, future::Future, sync::Arc};
 
-use longbridge::Result;
+use longport::Result;
 use once_cell::sync::Lazy;
 use tokio::runtime::Runtime;
 

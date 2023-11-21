@@ -4,13 +4,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.longbridgeapp</groupId>
+    <groupId>io.github.longportapp</groupId>
     <artifactId>subscribe_quote</artifactId>
     <version>0.0.1</version>
 
     <dependencies>
         <dependency>
-            <groupId>io.github.longbridgeapp</groupId>
+            <groupId>io.github.longportapp</groupId>
             <artifactId>openapi-sdk</artifactId>
             <version>LATEST</version>
         </dependency>

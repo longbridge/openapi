@@ -1,6 +1,6 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 
-use longbridge::{
+use longport::{
     trade::{
         EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,

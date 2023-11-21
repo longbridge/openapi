@@ -1,4 +1,4 @@
-#include <longbridge.h>
+#include <longport.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <windows.h>
@@ -34,8 +34,13 @@ main(int argc, char const* argv[])
     return -1;
   }
 
-  lb_http_client_request(
-    http_client, "get", "/v1/trade/execution/today", NULL, NULL, on_response, NULL);
+  lb_http_client_request(http_client,
+                         "get",
+                         "/v1/trade/execution/today",
+                         NULL,
+                         NULL,
+                         on_response,
+                         NULL);
   getchar();
   lb_http_client_free(http_client);
   return 0;

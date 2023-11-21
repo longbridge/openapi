@@ -1,12 +1,11 @@
 const {
   Config,
   TradeContext,
-  SubmitOrderOptions,
   Decimal,
   OrderSide,
   TimeInForceType,
   OrderType,
-} = require("longbridge");
+} = require("longport");
 
 let config = Config.fromEnv();
 TradeContext.new(config)

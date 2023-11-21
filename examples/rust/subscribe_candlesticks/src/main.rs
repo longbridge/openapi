@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge::{
+use longport::{
     quote::{Period, QuoteContext},
     Config,
 };

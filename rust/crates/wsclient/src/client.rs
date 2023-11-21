@@ -9,7 +9,7 @@ use futures_util::{
     SinkExt, StreamExt, TryFutureExt,
 };
 use leaky_bucket::RateLimiter;
-use longbridge_proto::control::{AuthRequest, AuthResponse, ReconnectRequest, ReconnectResponse};
+use longport_proto::control::{AuthRequest, AuthResponse, ReconnectRequest, ReconnectResponse};
 use num_enum::IntoPrimitive;
 use prost::Message as _;
 use tokio::{
@@ -35,7 +35,7 @@ const RECONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const COMMAND_CODE_AUTH: u8 = 2;
 const COMMAND_CODE_RECONNECT: u8 = 3;
 
-/// Longbridge websocket protocol version
+/// LongPort websocket protocol version
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum ProtocolVersion {
@@ -43,7 +43,7 @@ pub enum ProtocolVersion {
     Version1 = 1,
 }
 
-/// Longbridge websocket codec type
+/// LongPort websocket codec type
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum CodecType {
@@ -51,7 +51,7 @@ pub enum CodecType {
     Protobuf = 1,
 }
 
-/// Longbridge websocket platform type
+/// LongPort websocket platform type
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum Platform {
@@ -205,8 +205,8 @@ impl<'a> Context<'a> {
                         if status == 0 {
                             let _ = sender.send(Ok(body));
                         } else {
-                            let detail = longbridge_proto::Error::decode(&*body).ok().map(
-                                |longbridge_proto::Error { code, msg }| WsResponseErrorDetail {
+                            let detail = longport_proto::Error::decode(&*body).ok().map(
+                                |longport_proto::Error { code, msg }| WsResponseErrorDetail {
                                     code,
                                     msg,
                                 },
@@ -255,7 +255,7 @@ impl WsSession {
     }
 }
 
-/// Longbridge Websocket client
+/// LongPort Websocket client
 #[derive(Clone)]
 pub struct WsClient {
     command_tx: mpsc::UnboundedSender<Command>,
@@ -279,8 +279,8 @@ impl WsClient {
 
     /// Send an authentication request to get a [`WsSession`]
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/socket-token-api>
-    /// Reference: <https://open.longbridgeapp.com/en/docs/socket/control-command#auth>
+    /// Reference: <https://open.longportapp.com/en/docs/socket-token-api>
+    /// Reference: <https://open.longportapp.com/en/docs/socket/control-command#auth>
     pub async fn request_auth(&self, otp: impl Into<String>) -> WsClientResult<WsSession> {
         let resp: AuthResponse = self
             .request(
@@ -304,7 +304,7 @@ impl WsClient {
 
     /// Send a reconnect request to get a [`WsSession`]
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/socket/control-command#reconnect>
+    /// Reference: <https://open.longportapp.com/en/docs/socket/control-command#reconnect>
     pub async fn request_reconnect(
         &self,
         session_id: impl Into<String>,

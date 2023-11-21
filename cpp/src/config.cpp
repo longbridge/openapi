@@ -1,9 +1,9 @@
 #include "config.hpp"
 #include "callback.hpp"
 #include "convert.hpp"
-#include "longbridge.h"
+#include "longport.h"
 
-namespace longbridge {
+namespace longport {
 
 Config::Config()
 {
@@ -92,4 +92,4 @@ Config::refresh_access_token(int64_t expired_at,
     new AsyncCallback<void*, std::string>(callback));
 }
 
-} // namespace longbridge
+} // namespace longport

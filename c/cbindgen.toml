@@ -1,5 +1,5 @@
 language = "c"
-include_guard = "_LONGBRIDGE_H_"
+include_guard = "_LONGPORT_H_"
 documentation_style = "doxy"
 cpp_compat = true
 

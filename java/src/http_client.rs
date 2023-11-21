@@ -3,7 +3,7 @@ use jni::{
     sys::jlong,
     JNIEnv,
 };
-use longbridge::httpclient::{HttpClient, HttpClientConfig, Json, Method};
+use longport::httpclient::{HttpClient, HttpClientConfig, Json, Method};
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -14,7 +14,7 @@ use crate::{
 };
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newHttpClient(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClient(
     mut env: JNIEnv,
     _class: JClass,
     http_url: JString,
@@ -35,18 +35,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newHttpClient(
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_longbridge_SdkNative_newHttpClientFromEnv(
+pub extern "system" fn Java_com_longport_SdkNative_newHttpClientFromEnv(
     mut env: JNIEnv,
     _class: JClass,
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
-        let config = HttpClient::from_env().map_err(longbridge::Error::HttpClient)?;
+        let config = HttpClient::from_env().map_err(longport::Error::HttpClient)?;
         Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeHttpClient(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_freeHttpClient(
     _env: JNIEnv,
     _class: JClass,
     http_client: i64,
@@ -55,7 +55,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeHttpClient(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_httpClientRequest(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_httpClientRequest(
     mut env: JNIEnv,
     _class: JClass,
     http_client: i64,
@@ -92,11 +92,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_httpClientRequest(
                     .body(Json(req_data))
                     .send()
                     .await
-                    .map_err(|err| JniError::OpenApi(longbridge::Error::HttpClient(err)))?,
+                    .map_err(|err| JniError::OpenApi(longport::Error::HttpClient(err)))?,
                 None => req
                     .send()
                     .await
-                    .map_err(|err| JniError::OpenApi(longbridge::Error::HttpClient(err)))?,
+                    .map_err(|err| JniError::OpenApi(longport::Error::HttpClient(err)))?,
             };
 
             Ok(resp)

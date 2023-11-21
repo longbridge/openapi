@@ -5,7 +5,7 @@
 
 typedef struct lb_decimal_t lb_decimal_t;
 
-namespace longbridge {
+namespace longport {
 
 class Decimal
 {
@@ -123,4 +123,4 @@ public:
   void norm_pdf();
 };
 
-} // namespace longbridge
+} // namespace longport

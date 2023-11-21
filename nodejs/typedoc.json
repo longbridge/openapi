@@ -1,5 +1,5 @@
 {
-    "name": "Longbridge OpenAPI SDK",
-    "disableSources": true,
-    "sort": "source-order"
+  "name": "LongPort OpenAPI SDK",
+  "disableSources": true,
+  "sort": "source-order"
 }

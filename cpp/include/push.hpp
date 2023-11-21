@@ -2,7 +2,7 @@
 
 #include <functional>
 
-namespace longbridge {
+namespace longport {
 
 template<typename Ctx, typename T>
 struct PushEvent

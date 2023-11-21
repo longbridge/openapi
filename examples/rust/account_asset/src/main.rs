@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge::{trade::TradeContext, Config};
+use longport::{trade::TradeContext, Config};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

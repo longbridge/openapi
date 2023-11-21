@@ -1,8 +1,8 @@
 [package]
 edition = "2021"
-name = "longbridge-httpcli"
-version = "0.2.77"
-description = "Longbridge HTTP SDK for Rust"
+name = "longport-httpcli"
+version = "1.0.0"
+description = "LongPort HTTP SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

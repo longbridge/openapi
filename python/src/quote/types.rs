@@ -1,5 +1,5 @@
-use longbridge::quote::SubFlags;
-use longbridge_python_macros::{PyEnum, PyObject};
+use longport::quote::SubFlags;
+use longport_python_macros::{PyEnum, PyObject};
 use pyo3::prelude::*;
 
 use crate::{
@@ -11,7 +11,7 @@ use crate::{
 /// Subscription
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::Subscription")]
+#[py(remote = "longport::quote::Subscription")]
 pub(crate) struct Subscription {
     symbol: String,
     #[py(sub_types)]
@@ -22,7 +22,7 @@ pub(crate) struct Subscription {
 
 #[pyclass]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::TradeStatus")]
+#[py(remote = "longport::quote::TradeStatus")]
 pub(crate) enum TradeStatus {
     /// Normal
     Normal,
@@ -52,7 +52,7 @@ pub(crate) enum TradeStatus {
 /// Trade session
 #[pyclass]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::TradeSession")]
+#[py(remote = "longport::quote::TradeSession")]
 pub(crate) enum TradeSession {
     /// Trading
     #[py(remote = "NormalTrade")]
@@ -121,7 +121,7 @@ impl From<SubFlags> for SubTypes {
 /// Trade direction
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::TradeDirection")]
+#[py(remote = "longport::quote::TradeDirection")]
 pub(crate) enum TradeDirection {
     /// Neutral
     Neutral,
@@ -134,7 +134,7 @@ pub(crate) enum TradeDirection {
 /// Option type
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::OptionType")]
+#[py(remote = "longport::quote::OptionType")]
 pub(crate) enum OptionType {
     /// Unknown
     Unknown,
@@ -147,7 +147,7 @@ pub(crate) enum OptionType {
 /// Option direction
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::OptionDirection")]
+#[py(remote = "longport::quote::OptionDirection")]
 pub(crate) enum OptionDirection {
     /// Unknown
     Unknown,
@@ -160,7 +160,7 @@ pub(crate) enum OptionDirection {
 /// Warrant type
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::WarrantType")]
+#[py(remote = "longport::quote::WarrantType")]
 pub(crate) enum WarrantType {
     /// Unknown
     Unknown,
@@ -180,7 +180,7 @@ pub(crate) enum WarrantType {
 #[pyclass]
 #[allow(non_camel_case_types)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::Period")]
+#[py(remote = "longport::quote::Period")]
 pub(crate) enum Period {
     /// Unknown
     #[py(remote = "UnknownPeriod")]
@@ -213,7 +213,7 @@ pub(crate) enum Period {
 /// Candlestick adjustment type
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::AdjustType")]
+#[py(remote = "longport::quote::AdjustType")]
 pub(crate) enum AdjustType {
     /// Actual
     NoAdjust,
@@ -233,13 +233,13 @@ pub(crate) enum DerivativeType {
 
 struct DerivativeTypes(Vec<DerivativeType>);
 
-impl From<longbridge::quote::DerivativeType> for DerivativeTypes {
-    fn from(ty: longbridge::quote::DerivativeType) -> Self {
+impl From<longport::quote::DerivativeType> for DerivativeTypes {
+    fn from(ty: longport::quote::DerivativeType) -> Self {
         let mut res = Vec::new();
-        if ty.contains(longbridge::quote::DerivativeType::OPTION) {
+        if ty.contains(longport::quote::DerivativeType::OPTION) {
             res.push(DerivativeType::Option);
         }
-        if ty.contains(longbridge::quote::DerivativeType::WARRANT) {
+        if ty.contains(longport::quote::DerivativeType::WARRANT) {
             res.push(DerivativeType::Warrant);
         }
         DerivativeTypes(res)
@@ -249,7 +249,7 @@ impl From<longbridge::quote::DerivativeType> for DerivativeTypes {
 /// Security board
 #[pyclass]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::SecurityBoard")]
+#[py(remote = "longport::quote::SecurityBoard")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum SecurityBoard {
     /// Unknown
@@ -307,7 +307,7 @@ pub enum SecurityBoard {
 /// The basic information of securities
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::SecurityStaticInfo")]
+#[py(remote = "longport::quote::SecurityStaticInfo")]
 pub(crate) struct SecurityStaticInfo {
     /// Security code
     symbol: String,
@@ -347,7 +347,7 @@ pub(crate) struct SecurityStaticInfo {
 /// Quote of US pre/post market
 #[pyclass]
 #[derive(Debug, PyObject, Copy, Clone)]
-#[py(remote = "longbridge::quote::PrePostQuote")]
+#[py(remote = "longport::quote::PrePostQuote")]
 pub(crate) struct PrePostQuote {
     /// Latest price
     last_done: PyDecimal,
@@ -368,7 +368,7 @@ pub(crate) struct PrePostQuote {
 /// Quote of securitity
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::SecurityQuote")]
+#[py(remote = "longport::quote::SecurityQuote")]
 pub(crate) struct SecurityQuote {
     /// Security code
     symbol: String,
@@ -401,7 +401,7 @@ pub(crate) struct SecurityQuote {
 /// Quote of option
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::OptionQuote")]
+#[py(remote = "longport::quote::OptionQuote")]
 pub(crate) struct OptionQuote {
     /// Security code
     symbol: String,
@@ -448,7 +448,7 @@ pub(crate) struct OptionQuote {
 /// Quote of warrant
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::WarrantQuote")]
+#[py(remote = "longport::quote::WarrantQuote")]
 pub(crate) struct WarrantQuote {
     /// Security code
     symbol: String,
@@ -499,7 +499,7 @@ pub(crate) struct WarrantQuote {
 /// Depth
 #[pyclass]
 #[derive(Debug, PyObject, Copy, Clone)]
-#[py(remote = "longbridge::quote::Depth")]
+#[py(remote = "longport::quote::Depth")]
 pub(crate) struct Depth {
     /// Position
     position: i32,
@@ -514,7 +514,7 @@ pub(crate) struct Depth {
 /// Security depth
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::SecurityDepth")]
+#[py(remote = "longport::quote::SecurityDepth")]
 pub(crate) struct SecurityDepth {
     /// Ask depth
     #[py(array)]
@@ -527,7 +527,7 @@ pub(crate) struct SecurityDepth {
 /// Brokers
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::Brokers")]
+#[py(remote = "longport::quote::Brokers")]
 pub(crate) struct Brokers {
     /// Position
     position: i32,
@@ -538,7 +538,7 @@ pub(crate) struct Brokers {
 /// Security brokers
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::SecurityBrokers")]
+#[py(remote = "longport::quote::SecurityBrokers")]
 pub(crate) struct SecurityBrokers {
     /// Ask brokers
     #[py(array)]
@@ -551,7 +551,7 @@ pub(crate) struct SecurityBrokers {
 /// Participant info
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::ParticipantInfo")]
+#[py(remote = "longport::quote::ParticipantInfo")]
 pub(crate) struct ParticipantInfo {
     /// Broker IDs
     broker_ids: Vec<i32>,
@@ -566,7 +566,7 @@ pub(crate) struct ParticipantInfo {
 /// Trade
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::Trade")]
+#[py(remote = "longport::quote::Trade")]
 pub(crate) struct Trade {
     /// Price
     price: PyDecimal,
@@ -585,7 +585,7 @@ pub(crate) struct Trade {
 /// Intraday line
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::IntradayLine")]
+#[py(remote = "longport::quote::IntradayLine")]
 pub(crate) struct IntradayLine {
     /// Close price of the minute
     price: PyDecimal,
@@ -602,7 +602,7 @@ pub(crate) struct IntradayLine {
 /// Candlestick
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::Candlestick")]
+#[py(remote = "longport::quote::Candlestick")]
 pub(crate) struct Candlestick {
     /// Close price
     close: PyDecimal,
@@ -623,7 +623,7 @@ pub(crate) struct Candlestick {
 /// Strike price info
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::StrikePriceInfo")]
+#[py(remote = "longport::quote::StrikePriceInfo")]
 pub(crate) struct StrikePriceInfo {
     /// Strike price
     price: PyDecimal,
@@ -638,7 +638,7 @@ pub(crate) struct StrikePriceInfo {
 /// Issuer info
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::IssuerInfo")]
+#[py(remote = "longport::quote::IssuerInfo")]
 pub(crate) struct IssuerInfo {
     /// Issuer ID
     issuer_id: i32,
@@ -653,7 +653,7 @@ pub(crate) struct IssuerInfo {
 /// The information of trading session
 #[pyclass]
 #[derive(Debug, PyObject, Copy, Clone)]
-#[py(remote = "longbridge::quote::TradingSessionInfo")]
+#[py(remote = "longport::quote::TradingSessionInfo")]
 pub(crate) struct TradingSessionInfo {
     /// Being trading time
     begin_time: PyTimeWrapper,
@@ -666,7 +666,7 @@ pub(crate) struct TradingSessionInfo {
 /// Market trading session
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::MarketTradingSession")]
+#[py(remote = "longport::quote::MarketTradingSession")]
 pub(crate) struct MarketTradingSession {
     /// Market
     market: Market,
@@ -678,7 +678,7 @@ pub(crate) struct MarketTradingSession {
 /// Real-time quote
 #[pyclass]
 #[derive(PyObject, Debug, Clone)]
-#[py(remote = "longbridge::quote::RealtimeQuote")]
+#[py(remote = "longport::quote::RealtimeQuote")]
 pub struct RealtimeQuote {
     /// Security code
     symbol: String,
@@ -703,7 +703,7 @@ pub struct RealtimeQuote {
 /// Push real-time quote
 #[pyclass]
 #[derive(PyObject)]
-#[py(remote = "longbridge::quote::PushQuote")]
+#[py(remote = "longport::quote::PushQuote")]
 #[derive(Debug, Clone)]
 pub struct PushQuote {
     /// Latest price
@@ -729,7 +729,7 @@ pub struct PushQuote {
 /// Push real-time depth
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::PushDepth")]
+#[py(remote = "longport::quote::PushDepth")]
 pub(crate) struct PushDepth {
     /// Ask depth
     #[py(array)]
@@ -742,7 +742,7 @@ pub(crate) struct PushDepth {
 /// Push real-time brokers
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::PushBrokers")]
+#[py(remote = "longport::quote::PushBrokers")]
 pub(crate) struct PushBrokers {
     /// Ask brokers
     #[py(array)]
@@ -755,7 +755,7 @@ pub(crate) struct PushBrokers {
 /// Push real-time trades
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::PushTrades")]
+#[py(remote = "longport::quote::PushTrades")]
 pub(crate) struct PushTrades {
     /// Trades data
     #[py(array)]
@@ -765,7 +765,7 @@ pub(crate) struct PushTrades {
 /// Push candlestick updated event
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::PushCandlestick")]
+#[py(remote = "longport::quote::PushCandlestick")]
 pub struct PushCandlestick {
     /// Period type
     period: Period,
@@ -776,7 +776,7 @@ pub struct PushCandlestick {
 /// Market trading days
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::MarketTradingDays")]
+#[py(remote = "longport::quote::MarketTradingDays")]
 pub(crate) struct MarketTradingDays {
     /// Trading days
     #[py(array)]
@@ -789,7 +789,7 @@ pub(crate) struct MarketTradingDays {
 /// Capital flow line
 #[pyclass]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::CapitalFlowLine")]
+#[py(remote = "longport::quote::CapitalFlowLine")]
 pub(crate) struct CapitalFlowLine {
     /// Inflow capital data
     inflow: PyDecimal,
@@ -800,7 +800,7 @@ pub(crate) struct CapitalFlowLine {
 /// Capital distribution
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::CapitalDistribution")]
+#[py(remote = "longport::quote::CapitalDistribution")]
 pub(crate) struct CapitalDistribution {
     /// Large order
     large: PyDecimal,
@@ -813,7 +813,7 @@ pub(crate) struct CapitalDistribution {
 /// Capital distribution response
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::CapitalDistributionResponse")]
+#[py(remote = "longport::quote::CapitalDistributionResponse")]
 pub(crate) struct CapitalDistributionResponse {
     /// Time
     timestamp: PyOffsetDateTimeWrapper,
@@ -826,7 +826,7 @@ pub(crate) struct CapitalDistributionResponse {
 /// Watch list group
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::WatchlistGroup")]
+#[py(remote = "longport::quote::WatchlistGroup")]
 pub(crate) struct WatchlistGroup {
     /// Group id
     pub id: i64,
@@ -840,7 +840,7 @@ pub(crate) struct WatchlistGroup {
 /// Watch list security
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::quote::WatchlistSecurity")]
+#[py(remote = "longport::quote::WatchlistSecurity")]
 pub(crate) struct WatchlistSecurity {
     /// Security symbol
     symbol: String,
@@ -858,7 +858,7 @@ pub(crate) struct WatchlistSecurity {
 /// Securities update mode
 #[pyclass]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::SecuritiesUpdateMode")]
+#[py(remote = "longport::quote::SecuritiesUpdateMode")]
 pub(crate) enum SecuritiesUpdateMode {
     /// Add securities
     Add,
@@ -871,7 +871,7 @@ pub(crate) enum SecuritiesUpdateMode {
 /// Calc index
 #[pyclass]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::quote::CalcIndex")]
+#[py(remote = "longport::quote::CalcIndex")]
 pub(crate) enum CalcIndex {
     /// Latest price
     LastDone,
@@ -958,7 +958,7 @@ pub(crate) enum CalcIndex {
 /// Security calc index response
 #[pyclass]
 #[derive(PyObject, Debug, Clone)]
-#[py(remote = "longbridge::quote::SecurityCalcIndex")]
+#[py(remote = "longport::quote::SecurityCalcIndex")]
 pub(crate) struct SecurityCalcIndex {
     /// Security code
     symbol: String,

@@ -1,6 +1,6 @@
-import com.longbridge.*;
-import com.longbridge.trade.*;
-import com.longbridge.quote.*;
+import com.longport.*;
+import com.longport.trade.*;
+import com.longport.quote.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 

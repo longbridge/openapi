@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-longbridge = { path = "../../../rust" }
+longport = { path = "../../../rust" }
 tokio = { version = "1.19", features = ["rt-multi-thread", "macros"] }

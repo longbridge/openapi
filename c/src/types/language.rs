@@ -1,8 +1,8 @@
-use longbridge_c_macros::CEnum;
+use longport_c_macros::CEnum;
 
 /// Language identifer
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longbridge::Language")]
+#[c(remote = "longport::Language")]
 #[allow(clippy::enum_variant_names, non_camel_case_types)]
 #[repr(C)]
 pub enum CLanguage {

@@ -1,4 +1,4 @@
-const { HttpClient } = require("longbridge");
+const { HttpClient } = require("longport");
 
 let http_cli = HttpClient.fromEnv();
 http_cli

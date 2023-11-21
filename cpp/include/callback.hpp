@@ -5,7 +5,7 @@
 #include "async_result.hpp"
 #include "push.hpp"
 
-namespace longbridge {
+namespace longport {
 namespace callback {
 
 template<typename Ctx, typename Res>
@@ -24,4 +24,4 @@ get_async_callback(void* p)
 }
 
 } // namespace callback
-} // namespace longbridge
+} // namespace longport

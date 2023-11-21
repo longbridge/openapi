@@ -1,35 +1,35 @@
-# Longbridge OpenAPI SDK for Python
+# LongPort OpenAPI SDK for Python
 
-`longbridge` provides an easy-to-use interface for invokes [`Longbridge OpenAPI`](https://open.longbridgeapp.com/en/).
+`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 ## Quickstart
 
-_Install Longbridge OpenAPI SDK_
+_Install LongPort OpenAPI SDK_
 
 ```bash
-pip install longbridge
+pip install longport
 ```
 
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGBRIDGE_APP_KEY="App Key get from user center"
-export LONGBRIDGE_APP_SECRET="App Secret get from user center"
-export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
+export LONGPORT_APP_KEY="App Key get from user center"
+export LONGPORT_APP_SECRET="App Secret get from user center"
+export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGBRIDGE_APP_KEY "App Key get from user center"
-setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
-setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
+setx LONGPORT_APP_KEY "App Key get from user center"
+setx LONGPORT_APP_SECRET "App Secret get from user center"
+setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
 
 ```python
-from longbridge.openapi import Config, QuoteContext
+from longport.openapi import Config, QuoteContext
 
 # Load configuration from environment variables
 config = Config.from_env()
@@ -46,7 +46,7 @@ print(resp)
 
 ```python
 from time import sleep
-from longbridge.openapi import Config, QuoteContext, SubType, PushQuote
+from longport.openapi import Config, QuoteContext, SubType, PushQuote
 
 # Load configuration from environment variables
 config = Config.from_env()
@@ -70,7 +70,7 @@ sleep(30)
 
 ```python
 from decimal import Decimal
-from longbridge.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType
+from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType
 
 # Load configuration from environment variables
 config = Config.from_env()

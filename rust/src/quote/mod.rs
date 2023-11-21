@@ -11,7 +11,7 @@ mod types;
 mod utils;
 
 pub use context::QuoteContext;
-pub use longbridge_proto::quote::{AdjustType, Period, TradeSession, TradeStatus};
+pub use longport_proto::quote::{AdjustType, Period, TradeSession, TradeStatus};
 pub use push_types::{
     PushBrokers, PushCandlestick, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades,
 };

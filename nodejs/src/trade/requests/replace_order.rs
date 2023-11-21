@@ -23,10 +23,10 @@ pub struct ReplaceOrderOptions {
     pub remark: Option<String>,
 }
 
-impl From<ReplaceOrderOptions> for longbridge::trade::ReplaceOrderOptions {
+impl From<ReplaceOrderOptions> for longport::trade::ReplaceOrderOptions {
     #[inline]
     fn from(opts: ReplaceOrderOptions) -> Self {
-        let mut opts2 = longbridge::trade::ReplaceOrderOptions::new(opts.order_id, opts.quantity);
+        let mut opts2 = longport::trade::ReplaceOrderOptions::new(opts.order_id, opts.quantity);
         if let Some(price) = opts.price {
             opts2 = opts2.price(price.0);
         }

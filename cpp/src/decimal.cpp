@@ -1,7 +1,7 @@
 #include "decimal.hpp"
-#include "longbridge.h"
+#include "longport.h"
 
-namespace longbridge {
+namespace longport {
 
 Decimal::Decimal(const lb_decimal_t* other)
 {
@@ -307,4 +307,4 @@ Decimal::norm_pdf()
   lb_decimal_norm_pdf(value_);
 }
 
-} // namespace longbridge
+} // namespace longport

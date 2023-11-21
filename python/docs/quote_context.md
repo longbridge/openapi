@@ -1,3 +1,3 @@
 # QuoteContext
 
-::: longbridge.openapi.QuoteContext
+::: longport.openapi.QuoteContext

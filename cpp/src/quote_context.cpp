@@ -4,10 +4,10 @@
 #include <algorithm>
 #include <iterator>
 
-namespace longbridge {
+namespace longport {
 namespace quote {
 
-using longbridge::convert::convert;
+using longport::convert::convert;
 
 QuoteContext::QuoteContext()
   : ctx_(nullptr)
@@ -1296,4 +1296,4 @@ QuoteContext::realtime_candlesticks(
 }
 
 } // namespace quote
-} // namespace longbridge
+} // namespace longport

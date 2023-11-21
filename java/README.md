@@ -1,19 +1,19 @@
-# Longbridge OpenAPI SDK for Java
+# LongPort OpenAPI SDK for Java
 
-`longbridge` provides an easy-to-use interface for invokes [`Longbridge OpenAPI`](https://open.longbridgeapp.com/en/).
+`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 ## Quickstart
 
-_Install Longbridge OpenAPI SDK_
+_Install LongPort OpenAPI SDK_
 
-Add `io.github.longbridgeapp:openapi-sdk` to `pom.xml`
+Add `io.github.longportapp:openapi-sdk` to `pom.xml`
 
 ```xml
 <dependencies>
     <dependency>
-        <groupId>io.github.longbridgeapp</groupId>
+        <groupId>io.github.longportapp</groupId>
         <artifactId>openapi-sdk</artifactId>
-        <version>0.2.19</version>
+        <version>1.0.0</version>
     </dependency>
 </dependencies>
 ```
@@ -21,24 +21,24 @@ Add `io.github.longbridgeapp:openapi-sdk` to `pom.xml`
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGBRIDGE_APP_KEY="App Key get from user center"
-export LONGBRIDGE_APP_SECRET="App Secret get from user center"
-export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
+export LONGPORT_APP_KEY="App Key get from user center"
+export LONGPORT_APP_SECRET="App Secret get from user center"
+export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGBRIDGE_APP_KEY "App Key get from user center"
-setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
-setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
+setx LONGPORT_APP_KEY "App Key get from user center"
+setx LONGPORT_APP_SECRET "App Secret get from user center"
+setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
 
 ```java
-import com.longbridge.*;
-import com.longbridge.quote.*;
+import com.longport.*;
+import com.longport.quote.*;
 import java.math.BigDecimal;
 
 class Main {
@@ -56,8 +56,8 @@ class Main {
 ## Quote API _(Subscribe quotes)_
 
 ```java
-import com.longbridge.*;
-import com.longbridge.quote.*;
+import com.longport.*;
+import com.longport.quote.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
@@ -75,8 +75,8 @@ class Main {
 ## Trade API _(Submit order)_
 
 ```java
-import com.longbridge.*;
-import com.longbridge.trade.*;
+import com.longport.*;
+import com.longport.trade.*;
 import java.math.BigDecimal;
 
 public class Main {

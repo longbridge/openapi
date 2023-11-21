@@ -1,5 +1,5 @@
-import com.longbridge.*;
-import com.longbridge.quote.*;
+import com.longport.*;
+import com.longport.quote.*;
 
 class Main {
     public static void main(String[] args) throws Exception {

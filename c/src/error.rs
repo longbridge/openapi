@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 
-use longbridge::Error;
+use longport::Error;
 
 use crate::types::{CString, ToFFI};
 

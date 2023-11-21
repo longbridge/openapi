@@ -10,5 +10,5 @@ fn main() {
         .with_config(Config::from_file("cbindgen.toml").expect("load cbindgen.toml"))
         .generate()
         .expect("Unable to generate bindings")
-        .write_to_file("csrc/include/longbridge.h");
+        .write_to_file("csrc/include/longport.h");
 }

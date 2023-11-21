@@ -1,8 +1,8 @@
 use std::{collections::HashSet, sync::Arc, time::Duration};
 
-use longbridge_httpcli::HttpClient;
-use longbridge_proto::trade::{Sub, SubResponse, Unsub, UnsubResponse};
-use longbridge_wscli::{
+use longport_httpcli::HttpClient;
+use longport_proto::trade::{Sub, SubResponse, Unsub, UnsubResponse};
+use longport_wscli::{
     CodecType, Platform, ProtocolVersion, WsClient, WsClientError, WsEvent, WsSession,
 };
 use tokio::sync::{mpsc, oneshot};

@@ -6,7 +6,7 @@ use jni::{
     sys::jobjectArray,
     JNIEnv, JavaVM,
 };
-use longbridge::{
+use longport::{
     trade::{
         BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
@@ -46,7 +46,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                 env.call_method(
                     handler,
                     "onOrderChanged",
-                    "(Lcom/longbridge/trade/PushOrderChanged;)V",
+                    "(Lcom/longport/trade/PushOrderChanged;)V",
                     &[event.borrow()],
                 )?;
             }
@@ -57,7 +57,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newTradeContext(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_newTradeContext(
     mut env: JNIEnv,
     _class: JClass,
     config: i64,
@@ -101,7 +101,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newTradeContext(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeTradeContext(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_freeTradeContext(
     _env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -110,7 +110,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeTradeContext(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnOrderChanged(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSetOnOrderChanged(
     mut env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -128,7 +128,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnOrd
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubscribe(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubscribe(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -147,7 +147,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubscrib
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUnsubscribe(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextUnsubscribe(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -166,7 +166,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUnsubscr
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryExecutions(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextHistoryExecutions(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -201,7 +201,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryE
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExecutions(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayExecutions(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -232,7 +232,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryOrders(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextHistoryOrders(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -277,7 +277,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryO
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayOrders(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayOrders(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -318,7 +318,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayOrd
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextReplaceOrder(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextReplaceOrder(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -363,7 +363,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextReplaceO
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOrder(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitOrder(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -420,7 +420,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOrder(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCancelOrder(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -438,7 +438,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOr
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAccountBalance(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextAccountBalance(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -458,7 +458,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAccountB
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCashFlow(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCashFlow(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -496,7 +496,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCashFlow
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextFundPositions(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextFundPositions(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -521,7 +521,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextFundPosi
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextStockPositions(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextStockPositions(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -546,7 +546,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextStockPos
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextMarginRatio(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextMarginRatio(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -564,7 +564,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextMarginRa
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDetail(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextOrderDetail(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -582,7 +582,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDet
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimateMaxPurchaseQuantity(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextEstimateMaxPurchaseQuantity(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,

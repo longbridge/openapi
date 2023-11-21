@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![forbid(unsafe_code)]
-#![deny(private_in_public, unreachable_pub)]
+#![deny(unreachable_pub)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
 
@@ -20,7 +20,7 @@ pub mod trade;
 
 pub use config::{Config, Language};
 pub use error::{Error, Result, SimpleError};
-pub use longbridge_httpcli as httpclient;
+pub use longport_httpcli as httpclient;
 pub use quote::QuoteContext;
 pub use rust_decimal::Decimal;
 pub use trade::TradeContext;

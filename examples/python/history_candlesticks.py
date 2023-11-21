@@ -1,5 +1,5 @@
 import datetime
-from longbridge.openapi import QuoteContext, Config, SubType, PushQuote, Period, AdjustType
+from longport.openapi import QuoteContext, Config, SubType, PushQuote, Period, AdjustType
 
 config = Config.from_env()
 ctx = QuoteContext(config)

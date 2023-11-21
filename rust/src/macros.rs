@@ -37,7 +37,7 @@ macro_rules! impl_serde_for_enum_string {
 /// # Examples
 ///
 /// ```
-/// # use longbridge::decimal;
+/// # use longport::decimal;
 /// # use rust_decimal::Decimal;
 ///
 /// assert_eq!(decimal!(1.23), Decimal::try_from(1.23).unwrap());

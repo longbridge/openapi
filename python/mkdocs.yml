@@ -1,4 +1,4 @@
-site_name: Longbridge OpenAPI SDK
+site_name: LongPort OpenAPI SDK
 docs_dir: docs
 
 # theme:
@@ -34,4 +34,3 @@ plugins:
             members_order: source
             show_signature_annotations: true
             separate_signature: true
-            

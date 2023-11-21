@@ -13,9 +13,9 @@ pub struct GetHistoryExecutionsOptions {
     pub end_at: Option<DateTime<Utc>>,
 }
 
-impl From<GetHistoryExecutionsOptions> for longbridge::trade::GetHistoryExecutionsOptions {
+impl From<GetHistoryExecutionsOptions> for longport::trade::GetHistoryExecutionsOptions {
     fn from(opts: GetHistoryExecutionsOptions) -> Self {
-        let mut opts2 = longbridge::trade::GetHistoryExecutionsOptions::new();
+        let mut opts2 = longport::trade::GetHistoryExecutionsOptions::new();
         if let Some(symbol) = opts.symbol {
             opts2 = opts2.symbol(symbol);
         }

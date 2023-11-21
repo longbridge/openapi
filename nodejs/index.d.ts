@@ -11,16 +11,16 @@ export interface ConfigParams {
   appSecret: string
   /** Access Token */
   accessToken: string
-  /** HTTP API url (default: "https://openapi.longbridgeapp.com") */
+  /** HTTP API url (default: "https://openapi.longportapp.com") */
   httpUrl?: string
   /**
    * Websocket url for quote API (default:
-   * "wss://openapi-quote.longbridgeapp.com/v2")
+   * "wss://openapi-quote.longportapp.com/v2")
    */
   quoteWsUrl?: string
   /**
    * Websocket url for trade API (default:
-   * "wss://openapi-trade.longbridgeapp.com/v2")
+   * "wss://openapi-trade.longportapp.com/v2")
    */
   tradeWsUrl?: string
   /** Language identifier (default: Language.EN) */
@@ -645,7 +645,7 @@ export const enum Language {
   /** en */
   EN = 2
 }
-/** Configuration for Longbridge sdk */
+/** Configuration for LongPort sdk */
 export class Config {
   /** Create a new `Config` */
   constructor(params: ConfigParams)
@@ -657,12 +657,12 @@ export class Config {
    *
    * # Variables
    *
-   * - `LONGBRIDGE_APP_KEY` - App key
-   * - `LONGBRIDGE_APP_SECRET` - App secret
-   * - `LONGBRIDGE_ACCESS_TOKEN` - Access token
-   * - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url
-   * - `LONGBRIDGE_QUOTE_WS_URL` - Quote websocket endpoint url
-   * - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url
+   * - `LONGPORT_APP_KEY` - App key
+   * - `LONGPORT_APP_SECRET` - App secret
+   * - `LONGPORT_ACCESS_TOKEN` - Access token
+   * - `LONGPORT_HTTP_URL` - HTTP endpoint url
+   * - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url
+   * - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
    */
   static fromEnv(): Config
   /**
@@ -825,10 +825,10 @@ export class HttpClient {
    *
    * # Variables
    *
-   * - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url
-   * - `LONGBRIDGE_APP_KEY` - App key
-   * - `LONGBRIDGE_APP_SECRET` - App secret
-   * - `LONGBRIDGE_ACCESS_TOKEN` - Access token
+   * - `LONGPORT_HTTP_URL` - HTTP endpoint url
+   * - `LONGPORT_APP_KEY` - App key
+   * - `LONGPORT_APP_SECRET` - App secret
+   * - `LONGPORT_ACCESS_TOKEN` - Access token
    */
   static fromEnv(): HttpClient
   /** Performs a HTTP request */
@@ -868,7 +868,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require("longbridge")
+   * const { Config, QuoteContext, SubType } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -885,7 +885,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require("longbridge")
+   * const { Config, QuoteContext, SubType } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -906,7 +906,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require("longbridge")
+   * const { Config, QuoteContext, SubType } = require("longport")
    *
    * let config = Config.fromEnv();
    * QuoteContext.new(config)
@@ -925,7 +925,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -944,7 +944,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -963,7 +963,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * import { Config, QuoteContext } from 'longbridge'
+   * import { Config, QuoteContext } from 'longport'
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -982,7 +982,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1001,7 +1001,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1016,7 +1016,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1031,7 +1031,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1050,7 +1050,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1069,7 +1069,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1088,7 +1088,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Period, AdjustType } = require("longbridge")
+   * const { Config, QuoteContext, Period, AdjustType } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1111,7 +1111,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1130,7 +1130,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require("longbridge")
+   * const { Config, QuoteContext, NaiveDate } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1149,7 +1149,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require("longbridge")
+   * const { Config, QuoteContext, NaiveDate } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1168,7 +1168,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require("longbridge")
+   * const { Config, QuoteContext, NaiveDate } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1187,7 +1187,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Market, NaiveDate } = require("longbridge")
+   * const { Config, QuoteContext, Market, NaiveDate } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1202,7 +1202,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1221,7 +1221,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1248,7 +1248,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
@@ -1263,7 +1263,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    *
    * let config = Config.fromEnv();
    * QuoteContext.new(config)
@@ -1282,7 +1282,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    * let config = Config.fromEnv();
    * QuoteContext.new(config)
    *   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
@@ -1295,7 +1295,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require("longbridge")
+   * const { Config, QuoteContext } = require("longport")
    * let config = Config.fromEnv();
    * QuoteContext.new(config)
    *   .then(ctx => ctx.updateWatchlistGroup({
@@ -1312,7 +1312,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require("longbridge")
+   * const { Config, QuoteContext, SubType } = require("longport")
    *
    * let config = Config.fromEnv();
    * QuoteContext.new(config).then((ctx) => {
@@ -1335,7 +1335,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require("longbridge")
+   * const { Config, QuoteContext, SubType } = require("longport")
    *
    * let config = Config.fromEnv();
    * QuoteContext.new(config).then((ctx) => {
@@ -1355,7 +1355,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate, SubType } = require("longbridge")
+   * const { Config, QuoteContext, NaiveDate, SubType } = require("longport")
    *
    * let config = Config.fromEnv();
    * QuoteContext.new(config).then((ctx) => {
@@ -1378,7 +1378,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require("longbridge")
+   * const { Config, QuoteContext, SubType } = require("longport")
    *
    * let config = Config.fromEnv();
    * QuoteContext.new(config).then((ctx) => {
@@ -1401,7 +1401,7 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Period } = require("longbridge")
+   * const { Config, QuoteContext, Period } = require("longport")
    *
    * let config = Config.fromEnv();
    * QuoteContext.new(config).then((ctx) => {
@@ -2027,7 +2027,7 @@ export class TradeContext {
    *  TimeInForceType,
    *  OrderType,
    *  TopicType,
-   * } = require("longbridge");
+   * } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2055,7 +2055,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge");
+   * const { Config, TradeContext } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2080,7 +2080,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge");
+   * const { Config, TradeContext } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2105,7 +2105,7 @@ export class TradeContext {
    *   OrderStatus,
    *   OrderSide,
    *   Market,
-   * } = require("longbridge");
+   * } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2139,7 +2139,7 @@ export class TradeContext {
    *   OrderStatus,
    *   OrderSide,
    *   Market,
-   * } = require("longbridge");
+   * } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2165,7 +2165,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, Decimal } = require("longbridge");
+   * const { Config, TradeContext, Decimal } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2197,7 +2197,7 @@ export class TradeContext {
    *   OrderSide,
    *   Decimal,
    *   TimeInForceType,
-   * } = require("longbridge");
+   * } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2221,7 +2221,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge");
+   * const { Config, TradeContext } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config).then((ctx) => ctx.cancelOrder("709043056541253632"));
@@ -2234,7 +2234,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge");
+   * const { Config, TradeContext } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2253,7 +2253,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, GetCashFlowOptions } = require("longbridge");
+   * const { Config, TradeContext, GetCashFlowOptions } = require("longport");
    *
    * let config = Config.fromEnv();
    * TradeContext.new(config)
@@ -2277,7 +2277,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge")
+   * const { Config, TradeContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
@@ -2292,7 +2292,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge")
+   * const { Config, TradeContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
@@ -2307,7 +2307,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge")
+   * const { Config, TradeContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
@@ -2322,7 +2322,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require("longbridge")
+   * const { Config, TradeContext } = require("longport")
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)
@@ -2338,7 +2338,7 @@ export class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, OrderType, OrderSide } = require("longbridge")
+   * const { Config, TradeContext, OrderType, OrderSide } = require("longport")
    *
    * let config = Config.fromEnv()
    * TradeContext.new(config)

@@ -38,10 +38,10 @@ pub struct SubmitOrderOptions {
     pub remark: Option<String>,
 }
 
-impl From<SubmitOrderOptions> for longbridge::trade::SubmitOrderOptions {
+impl From<SubmitOrderOptions> for longport::trade::SubmitOrderOptions {
     #[inline]
     fn from(opts: SubmitOrderOptions) -> Self {
-        let mut opts2 = longbridge::trade::SubmitOrderOptions::new(
+        let mut opts2 = longport::trade::SubmitOrderOptions::new(
             opts.symbol,
             opts.order_type.into(),
             opts.side.into(),

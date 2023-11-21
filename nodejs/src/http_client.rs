@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use longbridge::httpclient::{HttpClient as LbHttpClient, HttpClientConfig, Json, Method};
+use longport::httpclient::{HttpClient as LbHttpClient, HttpClientConfig, Json, Method};
 use napi::{Error, Result};
 use serde_json::Value;
 
@@ -28,10 +28,10 @@ impl HttpClient {
     ///
     /// # Variables
     ///
-    /// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url
-    /// - `LONGBRIDGE_APP_KEY` - App key
-    /// - `LONGBRIDGE_APP_SECRET` - App secret
-    /// - `LONGBRIDGE_ACCESS_TOKEN` - Access token
+    /// - `LONGPORT_HTTP_URL` - HTTP endpoint url
+    /// - `LONGPORT_APP_KEY` - App key
+    /// - `LONGPORT_APP_SECRET` - App secret
+    /// - `LONGPORT_ACCESS_TOKEN` - Access token
     #[napi(factory)]
     pub fn from_env() -> Result<Self> {
         Ok(Self(

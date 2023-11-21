@@ -1,12 +1,12 @@
 #include <iostream>
-#include <longbridge.hpp>
+#include <longport.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-using namespace longbridge;
-using namespace longbridge::quote;
+using namespace longport;
+using namespace longport::quote;
 
 int
 main(int argc, char const* argv[])

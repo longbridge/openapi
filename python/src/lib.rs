@@ -10,7 +10,7 @@ mod types;
 use pyo3::prelude::*;
 
 #[pymodule]
-fn longbridge(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn longport(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     let openapi = PyModule::new(py, "openapi")?;
 
     openapi.add_class::<config::Config>()?;

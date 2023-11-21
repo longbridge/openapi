@@ -1,9 +1,9 @@
 use std::fmt::Display;
 
-use longbridge_httpcli::HttpClientError;
-use longbridge_wscli::WsClientError;
+use longport_httpcli::HttpClientError;
+use longport_wscli::WsClientError;
 
-/// Longbridge OpenAPI SDK error type
+/// LongPort OpenAPI SDK error type
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// Decode Protobuf error
@@ -94,7 +94,7 @@ impl Error {
     }
 }
 
-/// Longbridge OpenAPI SDK result type
+/// LongPort OpenAPI SDK result type
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 /// Simple error type

@@ -12,21 +12,21 @@ pub struct ConfigParams {
     pub app_secret: String,
     /// Access Token
     pub access_token: String,
-    /// HTTP API url (default: "https://openapi.longbridgeapp.com")
+    /// HTTP API url (default: "https://openapi.longportapp.com")
     pub http_url: Option<String>,
     /// Websocket url for quote API (default:
-    /// "wss://openapi-quote.longbridgeapp.com/v2")
+    /// "wss://openapi-quote.longportapp.com/v2")
     pub quote_ws_url: Option<String>,
     /// Websocket url for trade API (default:
-    /// "wss://openapi-trade.longbridgeapp.com/v2")
+    /// "wss://openapi-trade.longportapp.com/v2")
     pub trade_ws_url: Option<String>,
     /// Language identifier (default: Language.EN)
     pub language: Option<Language>,
 }
 
-/// Configuration for Longbridge sdk
+/// Configuration for LongPort sdk
 #[napi_derive::napi]
-pub struct Config(pub(crate) longbridge::Config);
+pub struct Config(pub(crate) longport::Config);
 
 #[napi_derive::napi]
 impl Config {
@@ -34,7 +34,7 @@ impl Config {
     #[napi(constructor)]
     pub fn new(params: ConfigParams) -> Self {
         let mut config =
-            longbridge::Config::new(params.app_key, params.app_secret, params.access_token);
+            longport::Config::new(params.app_key, params.app_secret, params.access_token);
 
         if let Some(http_url) = params.http_url {
             config = config.http_url(http_url);
@@ -62,15 +62,15 @@ impl Config {
     ///
     /// # Variables
     ///
-    /// - `LONGBRIDGE_APP_KEY` - App key
-    /// - `LONGBRIDGE_APP_SECRET` - App secret
-    /// - `LONGBRIDGE_ACCESS_TOKEN` - Access token
-    /// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url
-    /// - `LONGBRIDGE_QUOTE_WS_URL` - Quote websocket endpoint url
-    /// - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url
+    /// - `LONGPORT_APP_KEY` - App key
+    /// - `LONGPORT_APP_SECRET` - App secret
+    /// - `LONGPORT_ACCESS_TOKEN` - Access token
+    /// - `LONGPORT_HTTP_URL` - HTTP endpoint url
+    /// - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url
+    /// - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
     #[napi(factory)]
     pub fn from_env() -> Result<Self> {
-        Ok(Self(longbridge::Config::from_env().map_err(ErrorNewType)?))
+        Ok(Self(longport::Config::from_env().map_err(ErrorNewType)?))
     }
 
     /// Gets a new `access_token`

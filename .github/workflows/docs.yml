@@ -38,7 +38,7 @@ jobs:
           sudo apt-get install -y doxygen
 
       - name: Build Rust docs
-        run: cargo doc -p longbridge --no-deps
+        run: cargo doc -p longport --no-deps
       - name: Build Python wheels
         uses: messense/maturin-action@v1
         with:
@@ -47,8 +47,8 @@ jobs:
           args: -i 3.9 --release --out dist --no-sdist -m python/Cargo.toml
       - name: Install built wheel
         run: |
-          pip install longbridge --no-index --find-links dist --force-reinstall
-          python -c "import longbridge"
+          pip install longport --no-index --find-links dist --force-reinstall
+          python -c "import longport"
 
       - name: Build Python docs
         run: |

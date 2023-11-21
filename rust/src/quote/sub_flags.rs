@@ -1,4 +1,4 @@
-use longbridge_proto::quote::SubType;
+use longport_proto::quote::SubType;
 
 bitflags::bitflags! {
     /// Subscription flags

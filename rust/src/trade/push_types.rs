@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use longbridge_proto::trade::Notification;
+use longport_proto::trade::Notification;
 use prost::Message;
 use rust_decimal::Decimal;
 use serde::Deserialize;

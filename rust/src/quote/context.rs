@@ -1,8 +1,8 @@
 use std::{sync::Arc, time::Duration};
 
-use longbridge_httpcli::{HttpClient, Json, Method};
-use longbridge_proto::quote;
-use longbridge_wscli::WsClientError;
+use longport_httpcli::{HttpClient, Json, Method};
+use longport_proto::quote;
+use longport_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
 use time::{Date, PrimitiveDateTime};
 use tokio::sync::{mpsc, oneshot};
@@ -104,14 +104,14 @@ impl QuoteContext {
 
     /// Subscribe
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/subscribe/subscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/subscribe/subscribe>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, SubFlags},
     ///     Config,
     /// };
@@ -155,14 +155,14 @@ impl QuoteContext {
 
     /// Unsubscribe
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/subscribe/unsubscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/subscribe/unsubscribe>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, SubFlags},
     ///     Config,
     /// };
@@ -203,7 +203,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{Period, QuoteContext},
     ///     Config,
     /// };
@@ -258,7 +258,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, SubFlags},
     ///     Config,
     /// };
@@ -284,14 +284,14 @@ impl QuoteContext {
 
     /// Get basic information of securities
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/static>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/static>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -325,14 +325,14 @@ impl QuoteContext {
 
     /// Get quote of securities
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/quote>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -363,14 +363,14 @@ impl QuoteContext {
 
     /// Get quote of option securities
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/option-quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/option-quote>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -399,14 +399,14 @@ impl QuoteContext {
 
     /// Get quote of warrant securities
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/warrant-quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/warrant-quote>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -435,14 +435,14 @@ impl QuoteContext {
 
     /// Get security depth
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/depth>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/depth>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -478,14 +478,14 @@ impl QuoteContext {
 
     /// Get security brokers
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/brokers>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/brokers>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -513,14 +513,14 @@ impl QuoteContext {
 
     /// Get participants
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/broker-ids>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/broker-ids>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -551,14 +551,14 @@ impl QuoteContext {
 
     /// Get security trades
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/trade>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -589,14 +589,14 @@ impl QuoteContext {
 
     /// Get security intraday lines
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/intraday>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/intraday>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -626,14 +626,14 @@ impl QuoteContext {
 
     /// Get security candlesticks
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/candlestick>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/candlestick>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{AdjustType, Period, QuoteContext},
     ///     Config,
     /// };
@@ -776,14 +776,14 @@ impl QuoteContext {
 
     /// Get option chain expiry date list
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/optionchain-date>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/optionchain-date>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -818,14 +818,14 @@ impl QuoteContext {
 
     /// Get option chain info by date
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/optionchain-date-strike>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/optionchain-date-strike>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     /// use time::macros::date;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -868,14 +868,14 @@ impl QuoteContext {
 
     /// Get warrant issuers
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/issuer>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/issuer>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -901,14 +901,14 @@ impl QuoteContext {
 
     /// Get trading session of the day
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/trade-session>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade-session>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -940,14 +940,14 @@ impl QuoteContext {
     /// The interval must be less than one month, and only the most recent year
     /// is supported.
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/trade-day>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade-day>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config, Market};
+    /// use longport::{quote::QuoteContext, Config, Market};
     /// use time::macros::date;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -999,14 +999,14 @@ impl QuoteContext {
 
     /// Get capital flow intraday
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/capital-flow-intraday>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/capital-flow-intraday>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1032,14 +1032,14 @@ impl QuoteContext {
 
     /// Get capital distribution
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/pull/capital-distribution>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/capital-distribution>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1103,14 +1103,14 @@ impl QuoteContext {
 
     /// Get watchlist
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_groups>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_groups>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1138,14 +1138,14 @@ impl QuoteContext {
 
     /// Create watchlist group
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_create_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_create_group>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, RequestCreateWatchlistGroup},
     ///     Config,
     /// };
@@ -1190,14 +1190,14 @@ impl QuoteContext {
 
     /// Delete watchlist group
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_delete_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_delete_group>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longport::{quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1224,15 +1224,15 @@ impl QuoteContext {
 
     /// Update watchlist group
     ///
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_update_group>
-    /// Reference: <https://open.longbridgeapp.com/en/docs/quote/individual/watchlist_update_group_securities>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_update_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_update_group_securities>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, RequestUpdateWatchlistGroup},
     ///     Config,
     /// };
@@ -1283,7 +1283,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::{sync::Arc, time::Duration};
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, SubFlags},
     ///     Config,
     /// };
@@ -1326,7 +1326,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::{sync::Arc, time::Duration};
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, SubFlags},
     ///     Config,
     /// };
@@ -1365,7 +1365,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::{sync::Arc, time::Duration};
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, SubFlags},
     ///     Config,
     /// };
@@ -1410,7 +1410,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::{sync::Arc, time::Duration};
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{QuoteContext, SubFlags},
     ///     Config,
     /// };
@@ -1449,7 +1449,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::{sync::Arc, time::Duration};
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     quote::{Period, QuoteContext},
     ///     Config,
     /// };

@@ -1,3 +1,3 @@
-# `longbridge-linux-x64-gnu`
+# `longport-linux-x64-gnu`
 
-This is the **x86_64-unknown-linux-gnu** binary for `longbridge`
+This is the **x86_64-unknown-linux-gnu** binary for `longport`

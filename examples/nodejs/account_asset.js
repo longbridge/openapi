@@ -1,4 +1,4 @@
-const { Config, TradeContext } = require("longbridge");
+const { Config, TradeContext } = require("longport");
 
 let config = Config.fromEnv();
 TradeContext.new(config)

@@ -3,7 +3,7 @@ use pyo3::{prelude::*, types::PyType};
 use crate::{error::ErrorNewType, time::PyOffsetDateTimeWrapper, types::Language};
 
 #[pyclass(name = "Config")]
-pub(crate) struct Config(pub(crate) longbridge::Config);
+pub(crate) struct Config(pub(crate) longport::Config);
 
 #[pymethods]
 impl Config {
@@ -12,9 +12,9 @@ impl Config {
         app_key,
         app_secret,
         access_token,
-        http_url = "https://openapi.longbridgeapp.com",
-        quote_ws_url = "wss://openapi-quote.longbridgeapp.com/v2",
-        trade_ws_url = "wss://openapi-trade.longbridgeapp.com/v2",
+        http_url = "https://openapi.longportapp.com",
+        quote_ws_url = "wss://openapi-quote.longportapp.com/v2",
+        trade_ws_url = "wss://openapi-trade.longportapp.com/v2",
         language = Language::EN,
     ))]
     fn py_new(
@@ -27,7 +27,7 @@ impl Config {
         language: Language,
     ) -> Self {
         Self(
-            longbridge::Config::new(app_key, app_secret, access_token)
+            longport::Config::new(app_key, app_secret, access_token)
                 .http_url(http_url)
                 .quote_ws_url(quote_ws_url)
                 .trade_ws_url(trade_ws_url)
@@ -37,7 +37,7 @@ impl Config {
 
     #[classmethod]
     fn from_env(_cls: &PyType) -> PyResult<Self> {
-        Ok(Self(longbridge::Config::from_env().map_err(ErrorNewType)?))
+        Ok(Self(longport::Config::from_env().map_err(ErrorNewType)?))
     }
 
     /// Gets a new `access_token`.

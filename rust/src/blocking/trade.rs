@@ -53,7 +53,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, trade::GetHistoryExecutionsOptions, Config};
+    /// use longport::{blocking::TradeContextSync, trade::GetHistoryExecutionsOptions, Config};
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -83,7 +83,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, trade::GetTodayExecutionsOptions, Config};
+    /// use longport::{blocking::TradeContextSync, trade::GetTodayExecutionsOptions, Config};
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -111,7 +111,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     blocking::TradeContextSync,
     ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus},
     ///     Config, Market,
@@ -149,7 +149,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     blocking::TradeContextSync,
     ///     trade::{GetTodayOrdersOptions, OrderSide, OrderStatus},
     ///     Config, Market,
@@ -184,7 +184,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, decimal, trade::ReplaceOrderOptions, Config};
+    /// use longport::{blocking::TradeContextSync, decimal, trade::ReplaceOrderOptions, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -208,7 +208,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     blocking::TradeContextSync,
     ///     decimal,
     ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
@@ -244,7 +244,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, Config};
+    /// use longport::{blocking::TradeContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -266,7 +266,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, Config};
+    /// use longport::{blocking::TradeContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -290,7 +290,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, trade::GetCashFlowOptions, Config};
+    /// use longport::{blocking::TradeContextSync, trade::GetCashFlowOptions, Config};
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -315,7 +315,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, Config};
+    /// use longport::{blocking::TradeContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -341,7 +341,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, Config};
+    /// use longport::{blocking::TradeContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -367,7 +367,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, Config};
+    /// use longport::{blocking::TradeContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -392,7 +392,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, Config};
+    /// use longport::{blocking::TradeContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);

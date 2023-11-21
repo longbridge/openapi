@@ -3,14 +3,14 @@ use std::{
     sync::Arc,
 };
 
-use longbridge_candlesticks::{IsHalfTradeDay, Type, UpdateAction};
-use longbridge_httpcli::HttpClient;
-use longbridge_proto::quote::{
+use longport_candlesticks::{IsHalfTradeDay, Type, UpdateAction};
+use longport_httpcli::HttpClient;
+use longport_proto::quote::{
     AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
     SecurityCandlestickRequest, SecurityCandlestickResponse, SecurityStaticInfoResponse,
     SubscribeRequest, TradeSession, UnsubscribeRequest,
 };
-use longbridge_wscli::{
+use longport_wscli::{
     CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
 };
 use time::{Date, OffsetDateTime};
@@ -96,8 +96,8 @@ struct CurrentTradeDays {
 
 impl CurrentTradeDays {
     #[inline]
-    fn half_days(&self, market: longbridge_candlesticks::Market) -> HalfDays {
-        use longbridge_candlesticks::Market::*;
+    fn half_days(&self, market: longport_candlesticks::Market) -> HalfDays {
+        use longport_candlesticks::Market::*;
         match market {
             HK => HalfDays(self.half_days.get(&Market::HK)),
             US => HalfDays(self.half_days.get(&Market::US)),
@@ -670,10 +670,10 @@ impl Core {
                     // merge candlesticks
                     let market =
                         get_market_from_symbol(&event.symbol).and_then(|market| match market {
-                            "HK" => Some(longbridge_candlesticks::Market::HK),
-                            "US" => Some(longbridge_candlesticks::Market::US),
-                            "SH" => Some(longbridge_candlesticks::Market::SH),
-                            "SZ" => Some(longbridge_candlesticks::Market::SZ),
+                            "HK" => Some(longport_candlesticks::Market::HK),
+                            "US" => Some(longport_candlesticks::Market::US),
+                            "SH" => Some(longport_candlesticks::Market::SH),
+                            "SZ" => Some(longport_candlesticks::Market::SZ),
                             _ => None,
                         });
                     if let Some(market) = market {
@@ -686,20 +686,18 @@ impl Core {
                             for (period, candlesticks) in periods {
                                 let period2 = match period {
                                     Period::UnknownPeriod => unreachable!(),
-                                    Period::OneMinute => longbridge_candlesticks::Period::Min_1,
-                                    Period::FiveMinute => longbridge_candlesticks::Period::Min_5,
-                                    Period::FifteenMinute => {
-                                        longbridge_candlesticks::Period::Min_15
-                                    }
-                                    Period::ThirtyMinute => longbridge_candlesticks::Period::Min_30,
-                                    Period::SixtyMinute => longbridge_candlesticks::Period::Min_60,
-                                    Period::Day => longbridge_candlesticks::Period::Day,
-                                    Period::Week => longbridge_candlesticks::Period::Week,
-                                    Period::Month => longbridge_candlesticks::Period::Month,
-                                    Period::Year => longbridge_candlesticks::Period::Year,
+                                    Period::OneMinute => longport_candlesticks::Period::Min_1,
+                                    Period::FiveMinute => longport_candlesticks::Period::Min_5,
+                                    Period::FifteenMinute => longport_candlesticks::Period::Min_15,
+                                    Period::ThirtyMinute => longport_candlesticks::Period::Min_30,
+                                    Period::SixtyMinute => longport_candlesticks::Period::Min_60,
+                                    Period::Day => longport_candlesticks::Period::Day,
+                                    Period::Week => longport_candlesticks::Period::Week,
+                                    Period::Month => longport_candlesticks::Period::Month,
+                                    Period::Year => longport_candlesticks::Period::Year,
                                 };
 
-                                let merger = longbridge_candlesticks::Merger::new(
+                                let merger = longport_candlesticks::Merger::new(
                                     market,
                                     period2,
                                     self.current_trade_days.half_days(market),
@@ -717,7 +715,7 @@ impl Core {
                                     let res = merger.merge(
                                         merge_ty,
                                         prev.as_ref(),
-                                        longbridge_candlesticks::Trade {
+                                        longport_candlesticks::Trade {
                                             time: trade.timestamp,
                                             price: trade.price,
                                             volume: trade.volume,

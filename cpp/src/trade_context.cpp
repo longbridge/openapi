@@ -4,10 +4,10 @@
 #include <algorithm>
 #include <iterator>
 
-namespace longbridge {
+namespace longport {
 namespace trade {
 
-using longbridge::convert::convert;
+using longport::convert::convert;
 
 TradeContext::TradeContext()
   : ctx_(nullptr)
@@ -790,4 +790,4 @@ TradeContext::estimate_max_purchase_quantity(
 }
 
 } // namespace trade
-} // namespace longbridge
+} // namespace longport

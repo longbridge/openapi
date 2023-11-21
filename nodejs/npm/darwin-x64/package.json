@@ -1,18 +1,18 @@
 {
-    "name": "longbridge-darwin-x64",
-    "version": "0.0.0",
-    "os": [
-        "darwin"
-    ],
-    "cpu": [
-        "x64"
-    ],
-    "main": "longbridge.darwin-x64.node",
-    "files": [
-        "longbridge.darwin-x64.node"
-    ],
-    "license": "MIT",
-    "engines": {
-        "node": ">= 10"
-    }
+  "name": "longport-darwin-x64",
+  "version": "0.0.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "longport.darwin-x64.node",
+  "files": [
+    "longport.darwin-x64.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  }
 }

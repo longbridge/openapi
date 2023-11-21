@@ -1,4 +1,4 @@
-const { Config, QuoteContext, SubType } = require("longbridge");
+const { Config, QuoteContext, SubType } = require("longport");
 
 let config = Config.fromEnv();
 QuoteContext.new(config).then((ctx) => {

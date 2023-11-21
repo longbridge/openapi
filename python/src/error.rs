@@ -1,8 +1,8 @@
 use pyo3::PyErr;
 
-pyo3::import_exception!(longbridge.openapi, OpenApiException);
+pyo3::import_exception!(longport.openapi, OpenApiException);
 
-pub(crate) struct ErrorNewType(pub(crate) longbridge::Error);
+pub(crate) struct ErrorNewType(pub(crate) longport::Error);
 
 impl std::convert::From<ErrorNewType> for PyErr {
     #[inline]

@@ -1,21 +1,21 @@
 [package]
 edition = "2021"
-name = "longbridge-c"
-version = "0.2.77"
-description = "Longbridge OpenAPI SDK for C"
-homepage = "https://open.longbridgeapp.com/en/"
+name = "longport-c"
+version = "1.0.0"
+description = "LongPort OpenAPI SDK for C"
+homepage = "https://open.longportapp.com/en/"
 readme = "README.md"
-repository = "https://github.com/longbridgeapp/openapi-sdk"
+repository = "https://github.com/longportapp/openapi-sdk"
 license = "MIT OR Apache-2.0"
-keywords = ["longbridge", "openapi", "sdk"]
+keywords = ["longport", "openapi", "sdk"]
 categories = ["api-bindings"]
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-longbridge = { path = "../rust" }
-longbridge-c-macros = { path = "crates/macros" }
+longport = { path = "../rust" }
+longport-c-macros = { path = "crates/macros" }
 
 rust_decimal = { version = "1.23.1", features = ["maths"] }
 tokio = { version = "1.19.2", features = ["rt-multi-thread"] }

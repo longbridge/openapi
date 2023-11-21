@@ -8,7 +8,7 @@
 
 typedef struct lb_trade_context_t lb_trade_context_t;
 
-namespace longbridge {
+namespace longport {
 namespace trade {
 
 /// Trade context
@@ -118,4 +118,4 @@ public:
 };
 
 } // namespace trade
-} // namespace longbridge
+} // namespace longport

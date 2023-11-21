@@ -6,5 +6,5 @@ pub(crate) const UNSUBSCRIBE: u8 = 17;
 
 /// Push Notification
 ///
-/// Reference: <https://open.longbridgeapp.com/en/docs/trade/trade-push#push-notification>
+/// Reference: <https://open.longportapp.com/en/docs/trade/trade-push#push-notification>
 pub(crate) const PUSH_NOTIFICATION: u8 = 18;

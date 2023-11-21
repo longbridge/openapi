@@ -18,10 +18,10 @@ pub struct GetTodayOrdersOptions {
     pub order_id: Option<String>,
 }
 
-impl From<GetTodayOrdersOptions> for longbridge::trade::GetTodayOrdersOptions {
+impl From<GetTodayOrdersOptions> for longport::trade::GetTodayOrdersOptions {
     #[inline]
     fn from(opts: GetTodayOrdersOptions) -> Self {
-        let mut opts2 = longbridge::trade::GetTodayOrdersOptions::new();
+        let mut opts2 = longport::trade::GetTodayOrdersOptions::new();
         if let Some(symbol) = opts.symbol {
             opts2 = opts2.symbol(symbol);
         }

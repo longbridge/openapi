@@ -1,4 +1,4 @@
-use longbridge::quote::{
+use longport::quote::{
     PushBrokers, PushCandlestick, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades,
 };
 use pyo3::prelude::*;

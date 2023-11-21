@@ -1,4 +1,4 @@
-import com.longbridge.HttpClient;
+import com.longport.HttpClient;
 import java.util.HashMap;
 
 class Main {

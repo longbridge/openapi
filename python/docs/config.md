@@ -1,3 +1,3 @@
 # Config
 
-::: longbridge.openapi.Config
+::: longport.openapi.Config

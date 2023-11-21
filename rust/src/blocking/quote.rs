@@ -37,7 +37,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     blocking::QuoteContextSync,
     ///     quote::{PushEvent, SubFlags},
     ///     Config,
@@ -76,7 +76,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::SubFlags, Config};
+    /// use longport::{blocking::QuoteContextSync, quote::SubFlags, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -105,7 +105,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     blocking::QuoteContextSync,
     ///     quote::{Period, PushEvent},
     ///     Config,
@@ -148,7 +148,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::SubFlags, Config};
+    /// use longport::{blocking::QuoteContextSync, quote::SubFlags, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -172,7 +172,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -200,7 +200,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -228,7 +228,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -256,7 +256,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -284,7 +284,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -307,7 +307,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -330,7 +330,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -353,7 +353,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -380,7 +380,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -406,7 +406,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{
+    /// use longport::{
     ///     blocking::QuoteContextSync,
     ///     quote::{AdjustType, Period},
     ///     Config,
@@ -471,7 +471,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -497,7 +497,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -526,7 +526,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -549,7 +549,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -575,7 +575,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config, Market};
+    /// use longport::{blocking::QuoteContextSync, Config, Market};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -604,7 +604,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -631,7 +631,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -678,7 +678,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -701,7 +701,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::RequestCreateWatchlistGroup, Config};
+    /// use longport::{blocking::QuoteContextSync, quote::RequestCreateWatchlistGroup, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -725,7 +725,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, Config};
+    /// use longport::{blocking::QuoteContextSync, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -747,7 +747,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::RequestUpdateWatchlistGroup, Config};
+    /// use longport::{blocking::QuoteContextSync, quote::RequestUpdateWatchlistGroup, Config};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -775,7 +775,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
+    /// use longport::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -809,7 +809,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
+    /// use longport::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -841,7 +841,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
+    /// use longport::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -874,7 +874,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
+    /// use longport::{blocking::QuoteContextSync, quote::SubFlags, Config, Market};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -906,7 +906,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{blocking::QuoteContextSync, quote::Period, Config, Market};
+    /// use longport::{blocking::QuoteContextSync, quote::Period, Config, Market};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);

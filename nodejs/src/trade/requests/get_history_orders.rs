@@ -23,10 +23,10 @@ pub struct GetHistoryOrdersOptions {
     pub end_at: Option<DateTime<Utc>>,
 }
 
-impl From<GetHistoryOrdersOptions> for longbridge::trade::GetHistoryOrdersOptions {
+impl From<GetHistoryOrdersOptions> for longport::trade::GetHistoryOrdersOptions {
     #[inline]
     fn from(opts: GetHistoryOrdersOptions) -> Self {
-        let mut opts2 = longbridge::trade::GetHistoryOrdersOptions::new();
+        let mut opts2 = longport::trade::GetHistoryOrdersOptions::new();
         if let Some(symbol) = opts.symbol {
             opts2 = opts2.symbol(symbol);
         }

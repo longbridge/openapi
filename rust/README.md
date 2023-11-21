@@ -1,11 +1,11 @@
-# Longbridge OpenAPI SDK for Rust
+# LongPort OpenAPI SDK for Rust
 
 <div align="center">
-  <a href="https://crates.io/crates/longbridge">
-    <img src="https://img.shields.io/crates/v/longbridge.svg?style=flat-square"
+  <a href="https://crates.io/crates/longport">
+    <img src="https://img.shields.io/crates/v/longport.svg?style=flat-square"
     alt="Crates.io version" />
   </a>
-  <a href="https://docs.rs/longbridge">
+  <a href="https://docs.rs/longport">
     <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square"
       alt="docs.rs docs" />
   </a>
@@ -20,7 +20,7 @@
 </div>
 
 
-`longbridge` provides an easy-to-use interface for invokes [`Longbridge OpenAPI`](https://open.longbridgeapp.com/en/).
+`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 ## Quickstart
 
@@ -28,23 +28,23 @@ _Add dependencies to `Cargo.toml`_
 
 ```toml
 [dependencies]
-longbridge = "0.1.0"
+longport = "1.0.0"
 ```
 
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGBRIDGE_APP_KEY="App Key get from user center"
-export LONGBRIDGE_APP_SECRET="App Secret get from user center"
-export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
+export LONGPORT_APP_KEY="App Key get from user center"
+export LONGPORT_APP_SECRET="App Secret get from user center"
+export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGBRIDGE_APP_KEY "App Key get from user center"
-setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
-setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
+setx LONGPORT_APP_KEY "App Key get from user center"
+setx LONGPORT_APP_SECRET "App Secret get from user center"
+setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
@@ -52,7 +52,7 @@ setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ```rust,no_run
 use std::sync::Arc;
 
-use longbridge::{
+use longport::{
     decimal,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
     Config, QuoteContext, TradeContext,
@@ -81,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```rust, no_run
 use std::sync::Arc;
 
-use longbridge::{quote::SubFlags, Config, QuoteContext};
+use longport::{quote::SubFlags, Config, QuoteContext};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -108,7 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```rust, no_run
 use std::sync::Arc;
 
-use longbridge::{
+use longport::{
     decimal,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
     Config, TradeContext,
@@ -142,7 +142,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Crate features
 
-To avoid compiling unused dependencies, Longbridge gates certain features, all of which are disabled by default:
+To avoid compiling unused dependencies, longport gates certain features, all of which are disabled by default:
 
 | Feature  | Description                         |
 |----------|-------------------------------------|

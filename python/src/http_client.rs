@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use longbridge::httpclient::{
+use longport::httpclient::{
     HttpClient as LbHttpClient, HttpClientConfig, HttpClientError, Json, Method,
 };
 use pyo3::{exceptions::PyRuntimeError, prelude::*, types::PyType};
@@ -28,7 +28,7 @@ impl HttpClient {
     #[classmethod]
     fn from_env(_cls: &PyType) -> PyResult<Self> {
         Ok(Self(LbHttpClient::from_env().map_err(|err| {
-            ErrorNewType(longbridge::Error::HttpClient(err))
+            ErrorNewType(longport::Error::HttpClient(err))
         })?))
     }
 
@@ -45,7 +45,7 @@ impl HttpClient {
             .map_err(|err| PyRuntimeError::new_err(err.to_string()))?;
         let req = self.0.request(
             method.to_uppercase().parse::<Method>().map_err(|_| {
-                ErrorNewType(longbridge::Error::HttpClient(
+                ErrorNewType(longport::Error::HttpClient(
                     HttpClientError::InvalidRequestMethod,
                 ))
             })?,
@@ -61,7 +61,7 @@ impl HttpClient {
                 let resp = tokio::runtime::Runtime::new()
                     .unwrap()
                     .block_on(req.body(Json(body)).response::<Json<Value>>().send())
-                    .map_err(|err| ErrorNewType(longbridge::Error::HttpClient(err)))?;
+                    .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
                 Ok(Python::with_gil(|py| pythonize::pythonize(py, &resp.0))
                     .map_err(|err| PyRuntimeError::new_err(err.to_string()))?)
             }
@@ -69,7 +69,7 @@ impl HttpClient {
                 let resp = tokio::runtime::Runtime::new()
                     .unwrap()
                     .block_on(req.response::<Json<Value>>().send())
-                    .map_err(|err| ErrorNewType(longbridge::Error::HttpClient(err)))?;
+                    .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
                 Ok(Python::with_gil(|py| pythonize::pythonize(py, &resp.0))
                     .map_err(|err| PyRuntimeError::new_err(err.to_string()))?)
             }

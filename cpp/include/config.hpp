@@ -10,7 +10,7 @@
 
 typedef struct lb_config_t lb_config_t;
 
-namespace longbridge {
+namespace longport {
 
 class Config
 {
@@ -29,11 +29,11 @@ public:
    * @param app_secret App secret
    * @param access_token Access token
    * @param http_url HTTP  endpoint url (Default:
-   * https://openapi.longbridgeapp.com)
+   * https://openapi.portbridgeapp.com)
    * @param quote_ws_url Quote websocket endpoint url (Default:
-   * wss://openapi-quote.longbridgeapp.com/v2)
+   * wss://openapi-quote.longportapp.com/v2)
    * @param trade_ws_url Trade websocket endpoint url (Default:
-   * wss://openapi-trade.longbridgeapp.com/v2)
+   * wss://openapi-trade.longportapp.com/v2)
    * @param language Language identifer (Default: Language::EN)
    */
   Config(const std::string& app_key,
@@ -54,4 +54,4 @@ public:
                             AsyncCallback<void*, std::string> callback);
 };
 
-} // namespace longbridge
+} // namespace longport

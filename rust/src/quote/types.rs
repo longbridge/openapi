@@ -1,4 +1,4 @@
-use longbridge_proto::quote::{self, Period, TradeSession, TradeStatus};
+use longport_proto::quote::{self, Period, TradeSession, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -723,9 +723,9 @@ impl TryFrom<quote::Candlestick> for Candlestick {
     }
 }
 
-impl From<longbridge_candlesticks::Candlestick> for Candlestick {
+impl From<longport_candlesticks::Candlestick> for Candlestick {
     #[inline]
-    fn from(candlestick: longbridge_candlesticks::Candlestick) -> Self {
+    fn from(candlestick: longport_candlesticks::Candlestick) -> Self {
         Self {
             close: candlestick.close,
             open: candlestick.open,
@@ -738,7 +738,7 @@ impl From<longbridge_candlesticks::Candlestick> for Candlestick {
     }
 }
 
-impl From<Candlestick> for longbridge_candlesticks::Candlestick {
+impl From<Candlestick> for longport_candlesticks::Candlestick {
     #[inline]
     fn from(candlestick: Candlestick) -> Self {
         Self {
@@ -1203,9 +1203,9 @@ pub enum CalcIndex {
     Rho,
 }
 
-impl From<CalcIndex> for longbridge_proto::quote::CalcIndex {
+impl From<CalcIndex> for longport_proto::quote::CalcIndex {
     fn from(value: CalcIndex) -> Self {
-        use longbridge_proto::quote::CalcIndex::*;
+        use longport_proto::quote::CalcIndex::*;
 
         match value {
             CalcIndex::LastDone => CalcindexLastDone,
@@ -1341,7 +1341,7 @@ pub struct SecurityCalcIndex {
 
 impl SecurityCalcIndex {
     pub(crate) fn from_proto(
-        resp: longbridge_proto::quote::SecurityCalcIndex,
+        resp: longport_proto::quote::SecurityCalcIndex,
         indexes: &[CalcIndex],
     ) -> Self {
         let mut output = SecurityCalcIndex {

@@ -1,35 +1,35 @@
-# Longbridge OpenAPI SDK for Node.js
+# LongPort OpenAPI SDK for Node.js
 
-`longbridge` provides an easy-to-use interface for invokes [`Longbridge OpenAPI`](https://open.longbridgeapp.com/en/).
+`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 ## Quickstart
 
-_Install Longbridge OpenAPI SDK_
+_Install LongPort OpenAPI SDK_
 
 ```bash
-npm install longbridge
+npm install longport
 ```
 
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGBRIDGE_APP_KEY="App Key get from user center"
-export LONGBRIDGE_APP_SECRET="App Secret get from user center"
-export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
+export LONGPORT_APP_KEY="App Key get from user center"
+export LONGPORT_APP_SECRET="App Secret get from user center"
+export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGBRIDGE_APP_KEY "App Key get from user center"
-setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
-setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
+setx LONGPORT_APP_KEY "App Key get from user center"
+setx LONGPORT_APP_SECRET "App Secret get from user center"
+setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
 
 ```javascript
-const { Config, QuoteContext } = require("longbridge");
+const { Config, QuoteContext } = require("longport");
 
 let config = Config.fromEnv();
 QuoteContext.new(config)
@@ -44,7 +44,7 @@ QuoteContext.new(config)
 ## Quote API _(Subscribe quotes)_
 
 ```javascript
-const { Config, QuoteContext, SubType } = require("longbridge");
+const { Config, QuoteContext, SubType } = require("longport");
 
 let config = Config.fromEnv();
 QuoteContext.new(config).then((ctx) => {
@@ -67,7 +67,7 @@ const {
   OrderSide,
   TimeInForceType,
   OrderType,
-} = require("longbridge");
+} = require("longport");
 
 let config = Config.fromEnv();
 TradeContext.new(config)

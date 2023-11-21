@@ -4,7 +4,7 @@ use std::{
     sync::Arc,
 };
 
-use longbridge::Config;
+use longport::Config;
 use time::OffsetDateTime;
 
 use crate::{
@@ -13,7 +13,7 @@ use crate::{
     types::{CLanguage, CString},
 };
 
-/// Configuration options for Longbridge sdk
+/// Configuration options for LongPort sdk
 pub struct CConfig(pub(crate) Arc<Config>);
 
 /// Create a new `Config` from the given environment variables
@@ -23,14 +23,14 @@ pub struct CConfig(pub(crate) Arc<Config>);
 ///
 /// # Variables
 ///
-/// - `LONGBRIDGE_APP_KEY` - App key
-/// - `LONGBRIDGE_APP_SECRET` - App secret
-/// - `LONGBRIDGE_ACCESS_TOKEN` - Access token
-/// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url (Default: `https://openapi.longbridgeapp.com`)
-/// - `LONGBRIDGE_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
-///   `wss://openapi-quote.longbridgeapp.com/v2`)
-/// - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url (Default:
-///   `wss://openapi-trade.longbridgeapp.com/v2`)
+/// - `LONGPORT_APP_KEY` - App key
+/// - `LONGPORT_APP_SECRET` - App secret
+/// - `LONGPORT_ACCESS_TOKEN` - Access token
+/// - `LONGPORT_HTTP_URL` - HTTP endpoint url (Default: `https://openapi.longportapp.com`)
+/// - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
+///   `wss://openapi-quote.longportapp.com/v2`)
+/// - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url (Default:
+///   `wss://openapi-trade.longportapp.com/v2`)
 #[no_mangle]
 pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_env() {

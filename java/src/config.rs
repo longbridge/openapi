@@ -3,13 +3,13 @@ use jni::{
     sys::jlong,
     JNIEnv,
 };
-use longbridge::{Config, Language};
+use longport::{Config, Language};
 use time::OffsetDateTime;
 
 use crate::{async_util, error::jni_result, types::FromJValue};
 
 #[no_mangle]
-pub extern "system" fn Java_com_longbridge_SdkNative_newConfig(
+pub extern "system" fn Java_com_longport_SdkNative_newConfig(
     mut env: JNIEnv,
     _class: JClass,
     app_key: JString,
@@ -49,7 +49,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_newConfig(
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_longbridge_SdkNative_newConfigFromEnv(
+pub extern "system" fn Java_com_longport_SdkNative_newConfigFromEnv(
     mut env: JNIEnv,
     _class: JClass,
 ) -> jlong {
@@ -60,7 +60,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_newConfigFromEnv(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeConfig(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_freeConfig(
     _env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -69,7 +69,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeConfig(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configRefreshAccessToken(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_configRefreshAccessToken(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,

@@ -1,5 +1,5 @@
 from time import sleep
-from longbridge.openapi import QuoteContext, Config, Period, PushCandlestick
+from longport.openapi import QuoteContext, Config, Period, PushCandlestick
 
 
 def on_candlestick(symbol: str, event: PushCandlestick):

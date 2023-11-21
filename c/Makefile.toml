@@ -1,29 +1,21 @@
 [tasks.c]
 command = "make"
-args = ["cargo-build_longbridge-c"]
+args = ["cargo-build_longport-c"]
 cwd = "cmake.build"
 
 [tasks.c-release]
 command = "make"
-args = ["cargo-build_longbridge-c"]
+args = ["cargo-build_longport-c"]
 cwd = "cmake.build"
 
 [tasks.c.windows]
 command = "msbuild"
-args = [
-    "longbridge.sln",
-    "-p:Configuration=Debug",
-    "/t:cargo-build_longbridge-c",
-]
+args = ["longport.sln", "-p:Configuration=Debug", "/t:cargo-build_longport-c"]
 cwd = "cmake.build"
 
 [tasks.c-release.windows]
 command = "msbuild"
-args = [
-    "longbridge.sln",
-    "-p:Configuration=Release",
-    "/t:cargo-build_longbridge-c",
-]
+args = ["longport.sln", "-p:Configuration=Release", "/t:cargo-build_longport-c"]
 cwd = "cmake.build"
 
 [tasks.c-test]
@@ -33,5 +25,5 @@ cwd = "cmake.build"
 
 [tasks.c-test.windows]
 command = "msbuild"
-args = ["longbridge.sln", "-p:Configuration=Debug", "/t:test-c"]
+args = ["longport.sln", "-p:Configuration=Debug", "/t:test-c"]
 cwd = "cmake.build"

@@ -1,8 +1,8 @@
 [package]
 edition = "2021"
-name = "longbridge-proto"
-version = "0.2.77"
-description = "Longbridge Protocol"
+name = "longport-proto"
+version = "1.0.0"
+description = "LongPort Protocol"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

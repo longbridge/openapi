@@ -44,10 +44,10 @@ jobs:
           components: rustfmt, clippy
 
       - name: Check with clippy
-        run: cargo clippy -p longbridge --all-features
+        run: cargo clippy -p longport --all-features
 
       - name: Test
-        run: cargo test -p longbridge --all-features
+        run: cargo test -p longport --all-features
 
   check-python-sdk:
     needs:
@@ -76,10 +76,10 @@ jobs:
           components: rustfmt, clippy
 
       - name: Check with clippy
-        run: cargo clippy -p longbridge-python --all-features
+        run: cargo clippy -p longport-python --all-features
 
       - name: Test
-        run: cargo test -p longbridge-python --all-features
+        run: cargo test -p longport-python --all-features
 
   check-nodejs-sdk:
     needs:
@@ -136,10 +136,10 @@ jobs:
           target: ${{ matrix.settings.target }}
 
       - name: Check with clippy
-        run: cargo clippy -p longbridge-nodejs --all-features
+        run: cargo clippy -p longport-nodejs --all-features
 
       - name: Test
-        run: cargo test -p longbridge-nodejs --all-features
+        run: cargo test -p longport-nodejs --all-features
 
       - name: Install napi-rs/cli
         run: npm install -g @napi-rs/cli
@@ -179,10 +179,10 @@ jobs:
         run: cargo install cargo-make
 
       - name: Check with clippy
-        run: cargo clippy -p longbridge-java --all-features
+        run: cargo clippy -p longport-java --all-features
 
       - name: Test
-        run: cargo test -p longbridge-java --all-features
+        run: cargo test -p longport-java --all-features
 
       - name: Compile java sources
         working-directory: java/javasrc
@@ -219,7 +219,7 @@ jobs:
         run: cargo install cargo-make
 
       - name: Check with clippy
-        run: cargo clippy -p longbridge-c --all-features
+        run: cargo clippy -p longport-c --all-features
 
       - name: Build with cmake
         run: |

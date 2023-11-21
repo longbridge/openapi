@@ -1,9 +1,9 @@
-use longbridge_nodejs_macros::JsEnum;
+use longport_nodejs_macros::JsEnum;
 use napi::bindgen_prelude::*;
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longbridge::Market")]
+#[js(remote = "longport::Market")]
 pub enum Market {
     /// Unknown
     Unknown,
@@ -20,7 +20,7 @@ pub enum Market {
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
-#[js(remote = "longbridge::Language")]
+#[js(remote = "longport::Language")]
 pub enum Language {
     /// zh-CN
     ZH_CN,

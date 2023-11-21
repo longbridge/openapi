@@ -1,5 +1,5 @@
 from decimal import Decimal
-from longbridge.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType
+from longport.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType
 
 config = Config.from_env()
 ctx = TradeContext(config)

@@ -1,7 +1,7 @@
 #include "status.hpp"
-#include "longbridge.h"
+#include "longport.h"
 
-namespace longbridge {
+namespace longport {
 
 Status::Status()
 {
@@ -64,4 +64,4 @@ Status::message() const
   return err_ ? lb_error_message(err_) : "no error";
 }
 
-} // namespace longbridge
+} // namespace longport

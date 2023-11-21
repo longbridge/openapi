@@ -1,12 +1,12 @@
 [package]
-name = "longbridge-wscli"
-version = "0.2.77"
+name = "longport-wscli"
+version = "1.0.0"
 edition = "2021"
-description = "Longbridge Websocket SDK for Rust"
+description = "LongPort Websocket SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-longbridge-proto = { path = "../proto", version = "0.2.77" }
+longport-proto = { path = "../proto", version = "1.0.0" }
 
 tokio = { version = "1.18.2", features = [
   "time",

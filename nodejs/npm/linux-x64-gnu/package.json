@@ -1,5 +1,5 @@
 {
-  "name": "longbridge-linux-x64-gnu",
+  "name": "longport-linux-x64-gnu",
   "version": "0.0.0",
   "os": [
     "linux"
@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "longbridge.linux-x64-gnu.node",
+  "main": "longport.linux-x64-gnu.node",
   "files": [
-    "longbridge.linux-x64-gnu.node"
+    "longport.linux-x64-gnu.node"
   ],
   "license": "MIT",
   "engines": {

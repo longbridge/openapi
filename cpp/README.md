@@ -1,41 +1,41 @@
-# Longbridge OpenAPI SDK for C++
+# LongPort OpenAPI SDK for C++
 
-`longbridge` provides an easy-to-use interface for invokes [`Longbridge OpenAPI`](https://open.longbridgeapp.com/en/).
+`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 ## Quickstart
 
-_Install Longbridge OpenAPI SDK_
+_Install LongPort OpenAPI SDK_
 
-[`Download C++ SDK`]([`Download C SDK`](https://github.com/longbridgeapp/openapi-sdk/releases))
+[`Download C++ SDK`]([`Download C SDK`](https://github.com/longportapp/openapi-sdk/releases))
 
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGBRIDGE_APP_KEY="App Key get from user center"
-export LONGBRIDGE_APP_SECRET="App Secret get from user center"
-export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
+export LONGPORT_APP_KEY="App Key get from user center"
+export LONGPORT_APP_SECRET="App Secret get from user center"
+export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGBRIDGE_APP_KEY "App Key get from user center"
-setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
-setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
+setx LONGPORT_APP_KEY "App Key get from user center"
+setx LONGPORT_APP_SECRET "App Secret get from user center"
+setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
 
 ```c++
 #include <iostream>
-#include <longbridge.hpp>
+#include <longport.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-using namespace longbridge;
-using namespace longbridge::quote;
+using namespace longport;
+using namespace longport::quote;
 
 int
 main(int argc, char const* argv[])
@@ -90,14 +90,14 @@ main(int argc, char const* argv[])
 
 ```c++
 #include <iostream>
-#include <longbridge.hpp>
+#include <longport.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-using namespace longbridge;
-using namespace longbridge::quote;
+using namespace longport;
+using namespace longport::quote;
 
 int
 main(int argc, char const* argv[])
@@ -156,14 +156,14 @@ main(int argc, char const* argv[])
 
 ```c++
 #include <iostream>
-#include <longbridge.hpp>
+#include <longport.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-using namespace longbridge;
-using namespace longbridge::trade;
+using namespace longport;
+using namespace longport::trade;
 
 int
 main(int argc, char const* argv[])

@@ -1,4 +1,4 @@
-#include <longbridge.h>
+#include <longport.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <windows.h>

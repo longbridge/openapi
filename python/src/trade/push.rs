@@ -1,4 +1,4 @@
-use longbridge::trade::{PushEvent, PushOrderChanged};
+use longport::trade::{PushEvent, PushOrderChanged};
 use pyo3::Python;
 
 use crate::trade::context::Callbacks;

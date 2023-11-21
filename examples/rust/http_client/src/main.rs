@@ -1,4 +1,4 @@
-use longbridge::httpclient::HttpClient;
+use longport::httpclient::HttpClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -1,4 +1,4 @@
-use longbridge_proto::quote::{self, Period, TradeSession, TradeStatus};
+use longport_proto::quote::{self, Period, TradeSession, TradeStatus};
 use prost::Message;
 use rust_decimal::Decimal;
 use time::OffsetDateTime;
