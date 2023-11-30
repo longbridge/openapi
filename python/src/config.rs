@@ -12,27 +12,34 @@ impl Config {
         app_key,
         app_secret,
         access_token,
-        http_url = "https://openapi.longportapp.com",
-        quote_ws_url = "wss://openapi-quote.longportapp.com/v2",
-        trade_ws_url = "wss://openapi-trade.longportapp.com/v2",
-        language = Language::EN,
+        http_url = None,
+        quote_ws_url = None,
+        trade_ws_url = None,
+        language = None,
     ))]
     fn py_new(
         app_key: String,
         app_secret: String,
         access_token: String,
-        http_url: &str,
-        quote_ws_url: &str,
-        trade_ws_url: &str,
-        language: Language,
+        http_url: Option<String>,
+        quote_ws_url: Option<String>,
+        trade_ws_url: Option<String>,
+        language: Option<Language>,
     ) -> Self {
-        Self(
-            longport::Config::new(app_key, app_secret, access_token)
-                .http_url(http_url)
-                .quote_ws_url(quote_ws_url)
-                .trade_ws_url(trade_ws_url)
-                .language(language.into()),
-        )
+        let mut config = longport::Config::new(app_key, app_secret, access_token);
+        if let Some(http_url) = http_url {
+            config = config.http_url(http_url);
+        }
+        if let Some(quote_ws_url) = quote_ws_url {
+            config = config.quote_ws_url(quote_ws_url);
+        }
+        if let Some(trade_ws_url) = trade_ws_url {
+            config = config.trade_ws_url(trade_ws_url);
+        }
+        if let Some(language) = language {
+            config = config.language(language.into());
+        }
+        Self(config)
     }
 
     #[classmethod]

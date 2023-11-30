@@ -1,6 +1,6 @@
 use http::Method;
 pub(crate) use http::{header, HeaderValue, Request};
-use longport_httpcli::{HttpClient, HttpClientConfig, Json};
+use longport_httpcli::{is_cn, HttpClient, HttpClientConfig, Json};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
@@ -9,6 +9,8 @@ use crate::error::Result;
 
 const QUOTE_WS_URL: &str = "wss://openapi-quote.longportapp.com/v2";
 const TRADE_WS_URL: &str = "wss://openapi-trade.longportapp.com/v2";
+const CN_QUOTE_WS_URL: &str = "wss://openapi-quote.longportapp.cn/v2";
+const CN_TRADE_WS_URL: &str = "wss://openapi-trade.longportapp.cn/v2";
 
 /// Language identifier
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -75,26 +77,33 @@ impl Config {
         let _ = dotenv::dotenv();
 
         let http_cli_config = HttpClientConfig::from_env()?;
-        let mut config = Config {
-            http_cli_config,
-            quote_ws_url: QUOTE_WS_URL.to_string(),
-            trade_ws_url: TRADE_WS_URL.to_string(),
-            language: Language::EN,
-        };
-
-        if let Ok(quote_ws_url) = std::env::var("LONGBRIDGE_QUOTE_WS_URL")
+        let quote_ws_url = std::env::var("LONGBRIDGE_QUOTE_WS_URL")
             .or_else(|_| std::env::var("LONGPORT_QUOTE_WS_URL"))
-        {
-            config.quote_ws_url = quote_ws_url;
-        }
-
-        if let Ok(trade_ws_url) = std::env::var("LONGBRIDGE_TRADE_WS_URL")
+            .unwrap_or_else(|_| {
+                if is_cn() {
+                    CN_QUOTE_WS_URL
+                } else {
+                    QUOTE_WS_URL
+                }
+                .to_string()
+            });
+        let trade_ws_url = std::env::var("LONGBRIDGE_TRADE_WS_URL")
             .or_else(|_| std::env::var("LONGPORT_TRADE_WS_URL"))
-        {
-            config.trade_ws_url = trade_ws_url;
-        }
+            .unwrap_or_else(|_| {
+                if is_cn() {
+                    CN_TRADE_WS_URL
+                } else {
+                    TRADE_WS_URL
+                }
+                .to_string()
+            });
 
-        Ok(config)
+        Ok(Config {
+            http_cli_config,
+            quote_ws_url,
+            trade_ws_url,
+            language: Language::EN,
+        })
     }
 
     /// Specifies the url of the OpenAPI server.

@@ -92,10 +92,10 @@ class Config:
         app_key: str,
         app_secret: str,
         access_token: str,
-        http_url: str = "https://openapi.longportapp.com",
-        quote_ws_url: str = "wss://openapi-quote.longportapp.com/v2",
-        trade_ws_url: str = "wss://openapi-trade.longportapp.com/v2",
-        language: Type[Language] = Language.EN,
+        http_url: Optional[str] = None,
+        quote_ws_url: Optional[str] = None,
+        trade_ws_url: Optional[str] = None,
+        language: Optional[Type[Language]] = None,
     ) -> None: ...
 
     @classmethod
