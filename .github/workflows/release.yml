@@ -63,7 +63,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python:
+          - version: "3.7"
+            universal2: false
+          - version: "3.8"
+            universal2: true
+          - version: "3.9"
+            universal2: true
+          - version: "3.10"
+            universal2: true
+          - version: "3.11"
+            universal2: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -71,7 +81,7 @@ jobs:
           submodules: true
       - uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python.version }}
           architecture: x64
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -88,12 +98,12 @@ jobs:
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
       - name: Build wheels - universal2
-        if: ${{ fromJSON(matrix.python-version) >= 3.8 }}
+        if: ${{ matrix.python.universal2 }}
         uses: messense/maturin-action@v1
         with:
           args: -i python --release --universal2 --out dist --no-sdist -m python/Cargo.toml
       - name: Install built wheel - universal2
-        if: ${{ fromJSON(matrix.python-version) >= 3.8 }}
+        if: ${{ matrix.python.universal2 }}
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
       - name: Upload wheels
