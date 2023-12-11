@@ -119,9 +119,12 @@ class Config:
         """
         Gets a new `access_token`
 
-        `expired_at` - The expiration time of the access token, defaults to `90` days.
-        """
+        Args:
+            expired_at: The expiration time of the access token, defaults to `90` days.
 
+        Returns:
+            Access token
+        """
 
 class Language:
     """
