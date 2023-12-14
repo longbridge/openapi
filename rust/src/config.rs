@@ -52,8 +52,18 @@ impl Config {
     ) -> Self {
         Self {
             http_cli_config: HttpClientConfig::new(app_key, app_secret, access_token),
-            quote_ws_url: QUOTE_WS_URL.to_string(),
-            trade_ws_url: TRADE_WS_URL.to_string(),
+            quote_ws_url: if is_cn() {
+                CN_QUOTE_WS_URL
+            } else {
+                QUOTE_WS_URL
+            }
+            .to_string(),
+            trade_ws_url: if is_cn() {
+                CN_TRADE_WS_URL
+            } else {
+                TRADE_WS_URL
+            }
+            .to_string(),
             language: Language::EN,
         }
     }
