@@ -32,8 +32,7 @@ macro_rules! decimal_constants {
         #[napi_derive::napi]
         impl Decimal {
             $(
-            #[napi(factory)]
-            #[napi(js_name = $name)]
+            #[napi(factory, js_name = $name)]
             #[allow(non_snake_case)]
             #[inline]
             pub fn $id() -> Self {

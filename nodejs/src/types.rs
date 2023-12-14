@@ -1,5 +1,4 @@
 use longport_nodejs_macros::JsEnum;
-use napi::bindgen_prelude::*;
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]

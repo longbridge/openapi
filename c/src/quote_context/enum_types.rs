@@ -290,6 +290,7 @@ pub enum CSecuritiesUpdateMode {
 /// Calc index
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longport::quote::CalcIndex")]
+#[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CCalcIndex {
     /// Latest price

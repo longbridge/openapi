@@ -788,7 +788,7 @@ pub unsafe extern "C" fn lb_quote_context_calc_indexes(
     let ctx_inner = (*ctx).ctx.clone();
     let symbols = cstr_array_to_rust(symbols, num_symbols);
     let indexes = std::slice::from_raw_parts(indexes, num_indexes)
-        .into_iter()
+        .iter()
         .map(|index| (*index).into());
     execute_async(callback, ctx, userdata, async move {
         let resp: CVec<CSecurityCalcIndexOwned> =

@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use longport::quote::SubFlags;
 use longport_nodejs_macros::{JsEnum, JsObject};
-use napi::bindgen_prelude::*;
 
 use crate::{
     decimal::Decimal,

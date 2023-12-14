@@ -5,7 +5,7 @@ use time::OffsetDateTime;
 pub(crate) type JsCallback<T> = ThreadsafeFunction<T, ErrorStrategy::CalleeHandled>;
 
 pub(crate) fn to_datetime(time: OffsetDateTime) -> DateTime<Utc> {
-    DateTime::from_utc(
+    DateTime::from_naive_utc_and_offset(
         NaiveDateTime::from_timestamp_opt(time.unix_timestamp(), 0).unwrap(),
         Utc,
     )
