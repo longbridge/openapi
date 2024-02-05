@@ -793,6 +793,35 @@ pub mod security_history_candlestick_request {
         pub end_date: ::prost::alloc::string::String,
     }
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UserQuoteProfileRequest {
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RateLimit {
+    #[prost(enumeration="Command", tag="1")]
+    pub command: i32,
+    #[prost(int32, tag="2")]
+    pub limit: i32,
+    #[prost(int32, tag="3")]
+    pub burst: i32,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UserQuoteProfileResponse {
+    #[prost(int64, tag="1")]
+    pub member_id: i64,
+    /// 行情权限信息
+    #[prost(string, tag="2")]
+    pub quote_level: ::prost::alloc::string::String,
+    /// 订阅数量限制
+    #[prost(int32, tag="3")]
+    pub subscribe_limit: i32,
+    /// 历史 k 线限制
+    #[prost(int32, tag="4")]
+    pub history_candlestick_limit: i32,
+    /// command rate limit
+    #[prost(message, repeated, tag="5")]
+    pub rate_limit: ::prost::alloc::vec::Vec<RateLimit>,
+}
 /// 协议指令定义
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -804,6 +833,8 @@ pub enum Command {
     Auth = 2,
     ///重新连接
     Reconnect = 3,
+    ///查询用户行情信息
+    QueryUserQuoteProfile = 4,
     ///查询连接的已订阅数据
     Subscription = 5,
     ///订阅行情数据

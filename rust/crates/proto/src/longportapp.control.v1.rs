@@ -1,8 +1,8 @@
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Close {
-    #[prost(enumeration = "close::Code", tag = "1")]
+    #[prost(enumeration="close::Code", tag="1")]
     pub code: i32,
-    #[prost(string, tag = "2")]
+    #[prost(string, tag="2")]
     pub reason: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `Close`.
@@ -28,41 +28,41 @@ pub mod close {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Heartbeat {
-    #[prost(int64, tag = "1")]
+    #[prost(int64, tag="1")]
     pub timestamp: i64,
-    #[prost(int32, optional, tag = "2")]
+    #[prost(int32, optional, tag="2")]
     pub heartbeat_id: ::core::option::Option<i32>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AuthRequest {
-    #[prost(string, tag = "1")]
+    #[prost(string, tag="1")]
     pub token: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AuthResponse {
-    #[prost(string, tag = "1")]
+    #[prost(string, tag="1")]
     pub session_id: ::prost::alloc::string::String,
-    #[prost(int64, tag = "2")]
+    #[prost(int64, tag="2")]
     pub expires: i64,
-    #[prost(uint32, tag = "3")]
+    #[prost(uint32, tag="3")]
     pub limit: u32,
-    #[prost(uint32, tag = "4")]
+    #[prost(uint32, tag="4")]
     pub online: u32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReconnectRequest {
-    #[prost(string, tag = "1")]
+    #[prost(string, tag="1")]
     pub session_id: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReconnectResponse {
-    #[prost(string, tag = "1")]
+    #[prost(string, tag="1")]
     pub session_id: ::prost::alloc::string::String,
-    #[prost(int64, tag = "2")]
+    #[prost(int64, tag="2")]
     pub expires: i64,
-    #[prost(uint32, tag = "3")]
+    #[prost(uint32, tag="3")]
     pub limit: u32,
-    #[prost(uint32, tag = "4")]
+    #[prost(uint32, tag="4")]
     pub online: u32,
 }
 /// control command, see document: <https://open.longportapp.com/docs/socket/control-command>

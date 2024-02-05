@@ -60,6 +60,9 @@ pub enum Platform {
 }
 
 enum Command {
+    SetRateLimit {
+        rate_limit: Vec<(u8, RateLimit)>,
+    },
     Request {
         command_code: u8,
         timeout_millis: u16,
@@ -81,6 +84,17 @@ pub struct RateLimit {
     pub refill: usize,
 }
 
+impl From<RateLimit> for RateLimiter {
+    fn from(config: RateLimit) -> Self {
+        RateLimiter::builder()
+            .interval(config.interval)
+            .refill(config.refill)
+            .max(config.max)
+            .initial(config.initial)
+            .build()
+    }
+}
+
 struct Context<'a> {
     request_id: u32,
     inflight_requests: HashMap<u32, oneshot::Sender<WsClientResult<Vec<u8>>>>,
@@ -88,7 +102,7 @@ struct Context<'a> {
     stream: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
     command_rx: &'a mut mpsc::UnboundedReceiver<Command>,
     event_sender: &'a mut mpsc::UnboundedSender<WsEvent>,
-    rate_limiter: Option<RateLimiter>,
+    rate_limiter: HashMap<u8, RateLimiter>,
 }
 
 impl<'a> Context<'a> {
@@ -96,7 +110,7 @@ impl<'a> Context<'a> {
         conn: WebSocketStream<MaybeTlsStream<TcpStream>>,
         command_rx: &'a mut mpsc::UnboundedReceiver<Command>,
         event_sender: &'a mut mpsc::UnboundedSender<WsEvent>,
-        rate_limit: Option<RateLimit>,
+        rate_limit: Vec<(u8, RateLimit)>,
     ) -> Self {
         let (sink, stream) = conn.split();
         Context {
@@ -106,14 +120,10 @@ impl<'a> Context<'a> {
             stream,
             command_rx,
             event_sender,
-            rate_limiter: rate_limit.map(|config| {
-                RateLimiter::builder()
-                    .interval(config.interval)
-                    .refill(config.refill)
-                    .max(config.max)
-                    .initial(config.initial)
-                    .build()
-            }),
+            rate_limiter: rate_limit
+                .into_iter()
+                .map(|(cmd_code, rate_limit)| (cmd_code, rate_limit.into()))
+                .collect(),
         }
     }
 
@@ -161,13 +171,20 @@ impl<'a> Context<'a> {
 
     async fn handle_command(&mut self, command: Command) -> WsClientResult<()> {
         match command {
+            Command::SetRateLimit { rate_limit } => {
+                self.rate_limiter = rate_limit
+                    .into_iter()
+                    .map(|(cmd_code, rate_limit)| (cmd_code, rate_limit.into()))
+                    .collect();
+                Ok(())
+            }
             Command::Request {
                 command_code,
                 timeout_millis: timeout,
                 body,
                 reply_tx,
             } => {
-                if let Some(rate_limiter) = &mut self.rate_limiter {
+                if let Some(rate_limiter) = self.rate_limiter.get_mut(&command_code) {
                     rate_limiter.acquire_one().await;
                 }
 
@@ -269,12 +286,19 @@ impl WsClient {
         codec: CodecType,
         platform: Platform,
         event_sender: mpsc::UnboundedSender<WsEvent>,
-        rate_limit: Option<RateLimit>,
+        rate_limit: Vec<(u8, RateLimit)>,
     ) -> WsClientResult<Self> {
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let conn = do_connect(request, version, codec, platform).await?;
         tokio::spawn(client_loop(conn, command_rx, event_sender, rate_limit));
         Ok(Self { command_tx })
+    }
+
+    /// Set the rate limit
+    pub async fn set_rate_limit(&self, rate_limit: Vec<(u8, RateLimit)>) -> WsClientResult<()> {
+        self.command_tx
+            .send(Command::SetRateLimit { rate_limit })
+            .map_err(|_| WsClientError::ClientClosed)
     }
 
     /// Send an authentication request to get a [`WsSession`]
@@ -401,7 +425,7 @@ async fn client_loop(
     conn: WebSocketStream<MaybeTlsStream<TcpStream>>,
     mut command_tx: mpsc::UnboundedReceiver<Command>,
     mut event_sender: mpsc::UnboundedSender<WsEvent>,
-    rate_limit: Option<RateLimit>,
+    rate_limit: Vec<(u8, RateLimit)>,
 ) {
     let mut ctx = Context::new(conn, &mut command_tx, &mut event_sender, rate_limit);
 

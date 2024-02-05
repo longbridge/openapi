@@ -1,3 +1,6 @@
+/// Query User Quote Profile
+pub(crate) const QUERY_USER_QUOTE_PROFILE: u8 = 4;
+
 /// Subscribe Quote
 pub(crate) const SUBSCRIBE: u8 = 6;
 
