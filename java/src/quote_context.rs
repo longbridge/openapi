@@ -162,6 +162,33 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeQuoteContext(
 }
 
 #[no_mangle]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetMemberId(
+    mut _env: JNIEnv,
+    _class: JClass,
+    ctx: i64,
+) -> i64 {
+    let context = &*(ctx as *const ContextObj);
+    context.ctx.member_id()
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuoteLevel<'a>(
+    mut env: JNIEnv<'a>,
+    _class: JClass<'a>,
+    ctx: i64,
+) -> JObject<'a> {
+    let context = &*(ctx as *const ContextObj);
+    context
+        .ctx
+        .quote_level()
+        .to_string()
+        .into_jvalue(&mut env)
+        .unwrap()
+        .l()
+        .unwrap()
+}
+
+#[no_mangle]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnQuote(
     mut env: JNIEnv,
     _class: JClass,

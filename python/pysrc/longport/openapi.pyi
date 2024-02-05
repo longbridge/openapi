@@ -2093,6 +2093,16 @@ class QuoteContext:
 
     def __init__(self, config: Config) -> None: ...
 
+    def member_id(self) -> int:
+        """
+        Returns the member ID
+        """
+    
+    def quote_level(self) -> str:
+        """
+        Returns the quote level
+        """
+
     def set_on_quote(self, callback: Callable[[str, PushQuote], None]) -> None:
         """
         Set quote callback, after receiving the quote data push, it will call back to this function.

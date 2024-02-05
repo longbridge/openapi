@@ -133,6 +133,8 @@ pub(crate) struct Core {
     subscriptions: HashMap<String, SubFlags>,
     current_trade_days: CurrentTradeDays,
     store: Store,
+    member_id: i64,
+    quote_level: String,
 }
 
 impl Core {
@@ -166,7 +168,7 @@ impl Core {
 
         let session = ws_cli.request_auth(otp).await?;
 
-        // fetch rate limit
+        // fetch user profile
         let resp = ws_cli
             .request::<_, quote::UserQuoteProfileResponse>(
                 cmd_code::QUERY_USER_QUOTE_PROFILE,
@@ -174,6 +176,8 @@ impl Core {
                 quote::UserQuoteProfileRequest {},
             )
             .await?;
+        let member_id = resp.member_id;
+        let quote_level = resp.quote_level;
         let rate_limit: Vec<(u8, RateLimit)> = resp
             .rate_limit
             .iter()
@@ -207,7 +211,19 @@ impl Core {
             subscriptions: HashMap::new(),
             current_trade_days,
             store: Store::default(),
+            member_id,
+            quote_level,
         })
+    }
+
+    #[inline]
+    pub(crate) fn member_id(&self) -> i64 {
+        self.member_id
+    }
+
+    #[inline]
+    pub(crate) fn quote_level(&self) -> &str {
+        &self.quote_level
     }
 
     pub(crate) async fn run(mut self) {

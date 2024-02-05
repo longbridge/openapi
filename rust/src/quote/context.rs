@@ -41,6 +41,8 @@ pub struct QuoteContext {
     cache_option_chain_expiry_date_list: CacheWithKey<String, Vec<Date>>,
     cache_option_chain_strike_info: CacheWithKey<(String, Date), Vec<StrikePriceInfo>>,
     cache_trading_session: Cache<Vec<MarketTradingSession>>,
+    member_id: i64,
+    quote_level: String,
 }
 
 impl QuoteContext {
@@ -51,7 +53,10 @@ impl QuoteContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
-        tokio::spawn(Core::try_new(config, command_rx, push_tx).await?.run());
+        let core = Core::try_new(config, command_rx, push_tx).await?;
+        let member_id = core.member_id();
+        let quote_level = core.quote_level().to_string();
+        tokio::spawn(core.run());
         Ok((
             QuoteContext {
                 http_cli,
@@ -65,9 +70,23 @@ impl QuoteContext {
                     OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT,
                 ),
                 cache_trading_session: Cache::new(TRADING_SESSION_CACHE_TIMEOUT),
+                member_id,
+                quote_level,
             },
             push_rx,
         ))
+    }
+
+    /// Returns the member ID
+    #[inline]
+    pub fn member_id(&self) -> i64 {
+        self.member_id
+    }
+
+    /// Returns the quote level
+    #[inline]
+    pub fn quote_level(&self) -> &str {
+        &self.quote_level
     }
 
     /// Send a raw request

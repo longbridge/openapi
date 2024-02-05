@@ -9,6 +9,7 @@ use longport::{
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_env()?);
     let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
+    println!("{}", ctx.member_id());
     ctx.subscribe(
         ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
         SubFlags::QUOTE,

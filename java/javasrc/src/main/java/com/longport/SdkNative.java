@@ -38,6 +38,10 @@ public class SdkNative {
 
         public static native void freeQuoteContext(long config);
 
+        public static native long quoteContextGetMemberId(long context);
+
+        public static native String quoteContextGetQuoteLevel(long context);
+
         public static native void quoteContextSetOnQuote(long context, QuoteHandler handler);
 
         public static native void quoteContextSetOnDepth(long context, DepthHandler handler);

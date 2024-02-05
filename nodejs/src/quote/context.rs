@@ -131,6 +131,16 @@ impl QuoteContext {
         Ok(QuoteContext { ctx, callbacks })
     }
 
+    /// Returns the member ID
+    pub fn member_id(&self) -> i64 {
+        self.ctx.member_id()
+    }
+
+    /// Returns the quote level
+    pub fn quote_level(&self) -> &str {
+        self.ctx.quote_level()
+    }
+
     /// Set quote callback, after receiving the quote data push, it will call
     /// back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushQuoteEvent) => void")]

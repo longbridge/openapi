@@ -32,6 +32,20 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Returns the member ID
+     */
+    public long getMemberId() {
+        return SdkNative.quoteContextGetMemberId(this.raw);
+    }
+
+    /**
+     * Returns the quote level
+     */
+    public String getQuoteLevel() {
+        return SdkNative.quoteContextGetQuoteLevel(this.raw);
+    }
+
+    /**
      * Set quote callback, after receiving the quote data push, it will call back to
      * this handler.
      * 

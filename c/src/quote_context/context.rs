@@ -1,4 +1,8 @@
-use std::{ffi::c_void, os::raw::c_char, sync::Arc};
+use std::{
+    ffi::{c_void, CString},
+    os::raw::c_char,
+    sync::Arc,
+};
 
 use longport::{
     quote::{
@@ -62,6 +66,7 @@ unsafe impl Send for CQuoteContextState {}
 /// Quote context
 pub struct CQuoteContext {
     ctx: QuoteContext,
+    quote_level: Option<CString>,
     state: Mutex<CQuoteContextState>,
 }
 
@@ -94,7 +99,11 @@ pub unsafe extern "C" fn lb_quote_context_new(
                 callbacks: Callbacks::default(),
                 free_userdata: None,
             });
-            let arc_ctx = Arc::new(CQuoteContext { ctx, state });
+            let arc_ctx = Arc::new(CQuoteContext {
+                ctx,
+                quote_level: None,
+                state,
+            });
             let weak_ctx = Arc::downgrade(&arc_ctx);
             let ctx = Arc::into_raw(arc_ctx);
 
@@ -229,6 +238,24 @@ pub unsafe extern "C" fn lb_quote_context_set_free_userdata_func(
     f: CFreeUserDataFunc,
 ) {
     (*ctx).state.lock().free_userdata = f;
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_member_id(ctx: *const CQuoteContext) -> i64 {
+    (*ctx).ctx.member_id()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_quote_level(ctx: *mut CQuoteContext) -> *const c_char {
+    match &(*ctx).quote_level {
+        Some(quote_level) => quote_level.as_ptr() as *const _,
+        None => {
+            let s = CString::new((*ctx).ctx.quote_level()).unwrap();
+            let p = s.as_ptr();
+            (*ctx).quote_level = Some(s);
+            p as *const _
+        }
+    }
 }
 
 /// Set quote callback, after receiving the quote data push, it will call back

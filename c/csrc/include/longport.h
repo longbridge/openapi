@@ -3380,6 +3380,10 @@ void *lb_quote_context_userdata(const struct lb_quote_context_t *ctx);
 void lb_quote_context_set_free_userdata_func(const struct lb_quote_context_t *ctx,
                                              lb_free_userdata_func_t f);
 
+int64_t lb_quote_context_member_id(const struct lb_quote_context_t *ctx);
+
+const char *lb_quote_context_quote_level(struct lb_quote_context_t *ctx);
+
 /**
  * Set quote callback, after receiving the quote data push, it will call back
  * to this function.

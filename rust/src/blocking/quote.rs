@@ -30,6 +30,17 @@ impl QuoteContextSync {
         Ok(Self { rt })
     }
 
+    /// Returns the member ID
+    pub fn member_id(&self) -> Result<i64> {
+        self.rt.call(|ctx| async move { Ok(ctx.member_id()) })
+    }
+
+    /// Returns the quote level
+    pub fn quote_level(&self) -> Result<String> {
+        self.rt
+            .call(|ctx| async move { Ok(ctx.quote_level().to_string()) })
+    }
+
     /// Subscribe
     ///
     /// # Examples

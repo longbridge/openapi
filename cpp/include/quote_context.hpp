@@ -31,6 +31,12 @@ public:
   static void create(const Config& config,
                      AsyncCallback<QuoteContext, void> callback);
 
+  /// Returns the member id
+  int64_t member_id();
+
+  /// Returns the quote level
+  std::string quote_level();
+
   /// Subscribe
   void subscribe(const std::vector<std::string>& symbols,
                  SubFlags sub_flags,

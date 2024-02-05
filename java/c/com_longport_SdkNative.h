@@ -97,6 +97,22 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeQuoteContext
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    quoteContextGetMemberId
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_quoteContextGetMemberId
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextGetQuoteLevel
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_longport_SdkNative_quoteContextGetQuoteLevel
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    quoteContextSetOnQuote
  * Signature: (JLcom/longport/quote/QuoteHandler;)V
  */

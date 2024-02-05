@@ -55,6 +55,16 @@ impl QuoteContext {
         Ok(Self { ctx, callbacks })
     }
 
+    /// Returns the member ID
+    fn member_id(&self) -> PyResult<i64> {
+        Ok(self.ctx.member_id().map_err(ErrorNewType)?)
+    }
+
+    /// Returns the quote level
+    fn quote_level(&self) -> PyResult<String> {
+        Ok(self.ctx.quote_level().map_err(ErrorNewType)?)
+    }
+
     /// Set quote callback, after receiving the quote data push, it
     /// will call back to this function.
     fn set_on_quote(&self, py: Python<'_>, callback: PyObject) {

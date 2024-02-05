@@ -79,6 +79,18 @@ QuoteContext::create(const Config& config,
     new AsyncCallback<QuoteContext, void>(callback));
 }
 
+int64_t
+QuoteContext::member_id()
+{
+  return lb_quote_context_member_id(ctx_);
+}
+
+std::string
+QuoteContext::quote_level()
+{
+  return lb_quote_context_quote_level(ctx_);
+}
+
 void
 QuoteContext::subscribe(const std::vector<std::string>& symbols,
                         SubFlags sub_flags,
