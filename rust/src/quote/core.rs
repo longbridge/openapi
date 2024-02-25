@@ -24,7 +24,7 @@ use crate::{
         cmd_code,
         store::Store,
         sub_flags::SubFlags,
-        utils::{format_date, get_market_from_symbol, parse_date},
+        utils::{format_date, parse_date},
         Candlestick, PushCandlestick, PushEvent, PushEventDetail, RealtimeQuote, SecurityBoard,
         SecurityBrokers, SecurityDepth, Subscription, Trade,
     },
@@ -471,14 +471,17 @@ impl Core {
 
         for symbol in &symbols {
             let mut st = sub_types;
-            if self
+            if let Some(candlesticks) = self
                 .store
                 .securities
                 .get(symbol)
-                .map(|data| !data.candlesticks.is_empty())
-                .unwrap_or_default()
+                .map(|data| &data.candlesticks)
             {
-                st.remove(SubFlags::TRADE);
+                if candlesticks.contains_key(&Period::Day) {
+                    st.remove(SubFlags::QUOTE);
+                } else if !candlesticks.is_empty() {
+                    st.remove(SubFlags::TRADE);
+                }
             }
             if !st.is_empty() {
                 st_group.entry(st).or_default().push(symbol.as_ref());
@@ -574,21 +577,27 @@ impl Core {
             .map(TryInto::try_into)
             .collect::<Result<Vec<_>>>()?;
 
-        // subscribe trades
+        let sub_flags = if period == Period::Day {
+            SubFlags::QUOTE
+        } else {
+            SubFlags::TRADE
+        };
+
+        // subscribe
         if self
             .subscriptions
             .get(&symbol)
             .copied()
             .unwrap_or_else(SubFlags::empty)
-            .contains(SubFlags::TRADE)
+            .contains(sub_flags)
         {
             return Ok(());
         }
 
         let req = SubscribeRequest {
             symbol: vec![symbol],
-            sub_type: SubFlags::TRADE.into(),
-            is_first_push: false,
+            sub_type: sub_flags.into(),
+            is_first_push: true,
         };
         self.ws_cli.request(cmd_code::SUBSCRIBE, None, req).await?;
 
@@ -600,7 +609,12 @@ impl Core {
         symbol: String,
         period: Period,
     ) -> Result<()> {
-        let mut unsubscribe_trades = false;
+        let mut unsubscribe_quote = false;
+        let unsubscribe_sub_flags = if period == Period::Day {
+            SubFlags::QUOTE
+        } else {
+            SubFlags::TRADE
+        };
 
         if let Some(periods) = self
             .store
@@ -615,20 +629,20 @@ impl Core {
                     .get(&symbol)
                     .copied()
                     .unwrap_or_else(SubFlags::empty)
-                    .contains(SubFlags::TRADE)
+                    .contains(unsubscribe_sub_flags)
             {
-                unsubscribe_trades = true;
+                unsubscribe_quote = true;
             }
         }
 
-        if unsubscribe_trades {
+        if unsubscribe_quote {
             self.ws_cli
                 .request(
                     cmd_code::UNSUBSCRIBE,
                     None,
                     UnsubscribeRequest {
                         symbol: vec![symbol],
-                        sub_type: SubFlags::TRADE.into(),
+                        sub_type: unsubscribe_sub_flags.into(),
                         unsub_all: false,
                     },
                 )
@@ -701,16 +715,11 @@ impl Core {
     async fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
         match PushEvent::parse(command_code, &body) {
             Ok(mut event) => {
+                self.store.handle_push(&mut event);
+
                 if let PushEventDetail::Trade(trades) = &event.detail {
                     // merge candlesticks
-                    let market =
-                        get_market_from_symbol(&event.symbol).and_then(|market| match market {
-                            "HK" => Some(longport_candlesticks::Market::HK),
-                            "US" => Some(longport_candlesticks::Market::US),
-                            "SH" => Some(longport_candlesticks::Market::SH),
-                            "SZ" => Some(longport_candlesticks::Market::SZ),
-                            _ => None,
-                        });
+                    let market = parse_market_from_symbol(&event.symbol);
                     if let Some(market) = market {
                         if let Some((merge_ty, periods)) = self
                             .store
@@ -719,6 +728,10 @@ impl Core {
                             .map(|data| (get_merger_ty(data.board), &mut data.candlesticks))
                         {
                             for (period, candlesticks) in periods {
+                                if period == &Period::Day {
+                                    continue;
+                                }
+
                                 let period2 = match period {
                                     Period::UnknownPeriod => unreachable!(),
                                     Period::OneMinute => longport_candlesticks::Period::Min_1,
@@ -726,7 +739,7 @@ impl Core {
                                     Period::FifteenMinute => longport_candlesticks::Period::Min_15,
                                     Period::ThirtyMinute => longport_candlesticks::Period::Min_30,
                                     Period::SixtyMinute => longport_candlesticks::Period::Min_60,
-                                    Period::Day => longport_candlesticks::Period::Day,
+                                    Period::Day => unreachable!(),
                                     Period::Week => longport_candlesticks::Period::Week,
                                     Period::Month => longport_candlesticks::Period::Month,
                                     Period::Year => longport_candlesticks::Period::Year,
@@ -747,7 +760,7 @@ impl Core {
                                         .last()
                                         .map(|candlestick| (*candlestick).into());
 
-                                    let res = merger.merge(
+                                    let action = merger.merge(
                                         merge_ty,
                                         prev.as_ref(),
                                         longport_candlesticks::Trade {
@@ -757,32 +770,13 @@ impl Core {
                                             trade_type: &trade.trade_type,
                                         },
                                     );
-                                    let candlestick = match res {
-                                        UpdateAction::UpdateLast(candlestick) => {
-                                            let candlestick = candlestick.into();
-                                            *candlesticks.last_mut().unwrap() = candlestick;
-                                            Some(candlestick)
-                                        }
-                                        UpdateAction::AppendNew(candlestick) => {
-                                            let candlestick = candlestick.into();
-                                            candlesticks.push(candlestick);
-                                            if candlesticks.len() > MAX_CANDLESTICKS * 2 {
-                                                candlesticks.drain(..MAX_CANDLESTICKS);
-                                            }
-                                            Some(candlestick)
-                                        }
-                                        UpdateAction::None => None,
-                                    };
-                                    if let Some(candlestick) = candlestick {
-                                        let _ = self.push_tx.send(PushEvent {
-                                            sequence: 0,
-                                            symbol: event.symbol.clone(),
-                                            detail: PushEventDetail::Candlestick(PushCandlestick {
-                                                period: *period,
-                                                candlestick,
-                                            }),
-                                        });
-                                    }
+                                    update_and_push_candlestick(
+                                        candlesticks,
+                                        &event.symbol,
+                                        *period,
+                                        action,
+                                        &mut self.push_tx,
+                                    );
                                 }
                             }
                         }
@@ -796,9 +790,64 @@ impl Core {
                     {
                         return Ok(());
                     }
+                } else if let PushEventDetail::Quote(push_quote) = &event.detail {
+                    if push_quote.trade_session == TradeSession::NormalTrade {
+                        // merge candlesticks
+                        let market = parse_market_from_symbol(&event.symbol);
+                        if let Some(market) = market {
+                            if let Some((merge_ty, quote, candlesticks)) = self
+                                .store
+                                .securities
+                                .get_mut(&event.symbol)
+                                .and_then(|data| {
+                                    Some((
+                                        get_merger_ty(data.board),
+                                        &data.quote,
+                                        data.candlesticks.get_mut(&Period::Day)?,
+                                    ))
+                                })
+                            {
+                                let merger = longport_candlesticks::Merger::new(
+                                    market,
+                                    longport_candlesticks::Period::Day,
+                                    self.current_trade_days.half_days(market),
+                                );
+                                let prev =
+                                    candlesticks.last().map(|candlestick| (*candlestick).into());
+                                let action = merger.merge_by_quote(
+                                    prev.as_ref(),
+                                    merge_ty,
+                                    longport_candlesticks::Quote {
+                                        time: quote.timestamp,
+                                        open: quote.open,
+                                        high: quote.high,
+                                        low: quote.low,
+                                        lastdone: quote.last_done,
+                                        volume: quote.volume,
+                                        turnover: quote.turnover,
+                                    },
+                                );
+                                update_and_push_candlestick(
+                                    candlesticks,
+                                    &event.symbol,
+                                    Period::Day,
+                                    action,
+                                    &mut self.push_tx,
+                                );
+                            }
+                        }
+                    }
+
+                    if !self
+                        .subscriptions
+                        .get(&event.symbol)
+                        .map(|sub_flags| sub_flags.contains(SubFlags::QUOTE))
+                        .unwrap_or_default()
+                    {
+                        return Ok(());
+                    }
                 }
 
-                self.store.handle_push(&mut event);
                 let _ = self.push_tx.send(event);
             }
             Err(err) => {
@@ -922,4 +971,50 @@ async fn fetch_current_trade_days(cli: &WsClient) -> Result<CurrentTradeDays> {
     }
 
     Ok(days)
+}
+
+fn parse_market_from_symbol(symbol: &str) -> Option<longport_candlesticks::Market> {
+    let market = symbol.find('.').map(|idx| &symbol[idx + 1..])?;
+    match market {
+        "HK" => Some(longport_candlesticks::Market::HK),
+        "US" => Some(longport_candlesticks::Market::US),
+        "SH" => Some(longport_candlesticks::Market::SH),
+        "SZ" => Some(longport_candlesticks::Market::SZ),
+        _ => None,
+    }
+}
+
+fn update_and_push_candlestick(
+    candlesticks: &mut Vec<Candlestick>,
+    symbol: &str,
+    period: Period,
+    action: UpdateAction,
+    tx: &mut mpsc::UnboundedSender<PushEvent>,
+) {
+    let candlestick = match action {
+        UpdateAction::UpdateLast(candlestick) => {
+            let candlestick = candlestick.into();
+            *candlesticks.last_mut().unwrap() = candlestick;
+            Some(candlestick)
+        }
+        UpdateAction::AppendNew(candlestick) => {
+            let candlestick = candlestick.into();
+            candlesticks.push(candlestick);
+            if candlesticks.len() > MAX_CANDLESTICKS * 2 {
+                candlesticks.drain(..MAX_CANDLESTICKS);
+            }
+            Some(candlestick)
+        }
+        UpdateAction::None => None,
+    };
+    if let Some(candlestick) = candlestick {
+        let _ = tx.send(PushEvent {
+            sequence: 0,
+            symbol: symbol.to_string(),
+            detail: PushEventDetail::Candlestick(PushCandlestick {
+                period,
+                candlestick,
+            }),
+        });
+    }
 }

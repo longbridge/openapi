@@ -24,6 +24,17 @@ pub struct Trade<'a> {
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub struct Quote {
+    pub time: OffsetDateTime,
+    pub open: Decimal,
+    pub high: Decimal,
+    pub low: Decimal,
+    pub lastdone: Decimal,
+    pub volume: i64,
+    pub turnover: Decimal,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum UpdateAction {
     UpdateLast(Candlestick),
     AppendNew(Candlestick),
@@ -152,6 +163,40 @@ where
     }
 
     #[must_use]
+    pub fn merge_by_quote(
+        &self,
+        prev: Option<&Candlestick>,
+        ty: Type,
+        quote: Quote,
+    ) -> UpdateAction {
+        assert_eq!(self.period, Period::Day);
+        let Merger { market, .. } = self;
+        let tz = market.timezone();
+        let time = self.candlestick_time(ty, quote.time.to_timezone(tz));
+        match prev {
+            Some(prev) if time == prev.time => UpdateAction::UpdateLast(Candlestick {
+                time,
+                open: quote.open,
+                high: quote.high,
+                low: quote.low,
+                close: quote.lastdone,
+                volume: quote.volume,
+                turnover: quote.turnover,
+            }),
+            Some(prev) if time < prev.time => UpdateAction::None,
+            _ => UpdateAction::AppendNew(Candlestick {
+                time,
+                open: quote.open,
+                high: quote.high,
+                low: quote.low,
+                close: quote.lastdone,
+                volume: quote.volume,
+                turnover: quote.turnover,
+            }),
+        }
+    }
+
+    #[must_use]
     pub fn merge(&self, ty: Type, prev: Option<&Candlestick>, trade: Trade<'_>) -> UpdateAction {
         let Merger { market, .. } = self;
         let tz = market.timezone();
@@ -241,6 +286,10 @@ mod tests {
         );
         assert_eq!(
             merger.round_time(datetime!(2022-1-1 16:2:0 UTC), trade_sessions),
+            datetime!(2022-1-1 16:0:0 UTC)
+        );
+        assert_eq!(
+            merger.round_time(datetime!(2022-1-1 20:2:0 UTC), trade_sessions),
             datetime!(2022-1-1 16:0:0 UTC)
         );
     }
