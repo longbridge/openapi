@@ -37,14 +37,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y doxygen
 
-      - name: Build Rust docs
+      - name: Build Rust doc
         run: cargo doc -p longport --no-deps
       - name: Build Python wheels
         uses: PyO3/maturin-action@v1
         with:
           target: "x86_64"
-          manylinux: auto
-          args: -i 3.9 --release --out dist --no-sdist -m python/Cargo.toml
+          args: -i python3.9 --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
