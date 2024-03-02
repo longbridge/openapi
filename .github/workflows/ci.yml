@@ -81,6 +81,16 @@ jobs:
       - name: Test
         run: cargo test -p longport-python --all-features
 
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: -i python --release --out dist --no-sdist -m python/Cargo.toml
+      - name: Install built wheel
+        run: |
+          pip install longport --no-index --find-links dist --force-reinstall
+          python -c "import longport"
+
   check-nodejs-sdk:
     needs:
       - check-format

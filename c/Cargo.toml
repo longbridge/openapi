@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longport-c"
-version = "1.0.11"
+version = "1.0.12"
 description = "LongPort OpenAPI SDK for C"
 homepage = "https://open.longportapp.com/en/"
 readme = "README.md"
