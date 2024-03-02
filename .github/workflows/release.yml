@@ -103,7 +103,7 @@ jobs:
         if: ${{ matrix.python.universal2 }}
         uses: PyO3/maturin-action@v1
         with:
-          args: -i python --release --universal2 --out dist --no-sdist -m python/Cargo.toml
+          args: -i python --release --universal2 --out dist -m python/Cargo.toml
       - name: Install built wheel - universal2
         if: ${{ matrix.python.universal2 }}
         run: |
@@ -140,7 +140,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: -i python --release --out dist --no-sdist -m python/Cargo.toml
+          args: -i python --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
@@ -171,7 +171,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           manylinux: auto
-          args: -i python${{ matrix.python-version }} --release --out dist --no-sdist -m python/Cargo.toml
+          args: -i python${{ matrix.python-version }} --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         if: matrix.target == 'x86_64'
         run: |
@@ -200,7 +200,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           manylinux: 2_28
-          args: -i python${{ matrix.python-version }} --release --out dist --no-sdist -m python/Cargo.toml
+          args: -i python${{ matrix.python-version }} --release --out dist -m python/Cargo.toml
       - uses: uraimo/run-on-arch-action@v2.2.0
         if: matrix.target != 'ppc64'
         name: Install built wheel

@@ -86,7 +86,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           manylinux: auto
-          args: -i python${{ matrix.python-version }} --release --out dist --no-sdist -m python/Cargo.toml
+          args: -i python${{ matrix.python-version }} --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
