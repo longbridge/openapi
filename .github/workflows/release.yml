@@ -92,7 +92,7 @@ jobs:
           profile: minimal
           default: true
       - name: Build wheels - x86_64
-        uses: messense/maturin-action@v1
+        uses: PyO3/maturin-action@v1
         with:
           target: x86_64
           args: -i python --release --out dist -m python/Cargo.toml
@@ -101,7 +101,7 @@ jobs:
           pip install longport --no-index --find-links dist --force-reinstall
       - name: Build wheels - universal2
         if: ${{ matrix.python.universal2 }}
-        uses: messense/maturin-action@v1
+        uses: PyO3/maturin-action@v1
         with:
           args: -i python --release --universal2 --out dist --no-sdist -m python/Cargo.toml
       - name: Install built wheel - universal2
@@ -137,7 +137,7 @@ jobs:
           profile: minimal
           default: true
       - name: Build wheels
-        uses: messense/maturin-action@v1
+        uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: -i python --release --out dist --no-sdist -m python/Cargo.toml
@@ -167,7 +167,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Build wheels
-        uses: messense/maturin-action@v1
+        uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           manylinux: auto
@@ -196,7 +196,7 @@ jobs:
         with:
           submodules: true
       - name: Build wheels
-        uses: messense/maturin-action@v1
+        uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           manylinux: auto

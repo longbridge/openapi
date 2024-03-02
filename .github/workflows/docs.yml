@@ -40,7 +40,7 @@ jobs:
       - name: Build Rust docs
         run: cargo doc -p longport --no-deps
       - name: Build Python wheels
-        uses: messense/maturin-action@v1
+        uses: PyO3/maturin-action@v1
         with:
           target: "x86_64"
           manylinux: auto
