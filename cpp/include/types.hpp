@@ -1535,7 +1535,7 @@ struct StockPosition
   /// Market
   Market market;
   /// Initial position before market opening
-  std::optional<Decimal> init_quantity;
+  std::optional<int64_t> init_quantity;
 };
 
 /// Stock position channel

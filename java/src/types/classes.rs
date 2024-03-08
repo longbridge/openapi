@@ -1,6 +1,6 @@
 use std::borrow::Borrow;
 
-use longport::Decimal;
+use longport::{Decimal, Market};
 use longport_java_macros::impl_java_class;
 use time::Date;
 
@@ -686,18 +686,52 @@ impl_java_class!(
     ]
 );
 
+pub(crate) struct StockPositionsResponse {
+    channels: Vec<StockPositionChannel>,
+}
+
+impl From<longport::trade::StockPositionsResponse> for StockPositionsResponse {
+    fn from(value: longport::trade::StockPositionsResponse) -> Self {
+        Self {
+            channels: value
+                .channels
+                .into_iter()
+                .map(StockPositionChannel::from)
+                .collect(),
+        }
+    }
+}
+
 impl_java_class!(
     "com/longport/trade/StockPositionsResponse",
-    longport::trade::StockPositionsResponse,
+    StockPositionsResponse,
     [
         #[java(objarray)]
         channels
     ]
 );
 
+pub(crate) struct StockPositionChannel {
+    account_channel: String,
+    positions: Vec<StockPosition>,
+}
+
+impl From<longport::trade::StockPositionChannel> for StockPositionChannel {
+    fn from(value: longport::trade::StockPositionChannel) -> Self {
+        Self {
+            account_channel: value.account_channel,
+            positions: value
+                .positions
+                .into_iter()
+                .map(StockPosition::from)
+                .collect(),
+        }
+    }
+}
+
 impl_java_class!(
     "com/longport/trade/StockPositionChannel",
-    longport::trade::StockPositionChannel,
+    StockPositionChannel,
     [
         account_channel,
         #[java(objarray)]
@@ -705,9 +739,35 @@ impl_java_class!(
     ]
 );
 
+pub(crate) struct StockPosition {
+    symbol: String,
+    symbol_name: String,
+    quantity: i64,
+    available_quantity: i64,
+    currency: String,
+    cost_price: Decimal,
+    market: Market,
+    init_quantity: i64,
+}
+
+impl From<longport::trade::StockPosition> for StockPosition {
+    fn from(value: longport::trade::StockPosition) -> Self {
+        Self {
+            symbol: value.symbol,
+            symbol_name: value.symbol_name,
+            quantity: value.quantity,
+            available_quantity: value.available_quantity,
+            currency: value.currency,
+            cost_price: value.cost_price,
+            market: value.market,
+            init_quantity: value.init_quantity.unwrap_or_default(),
+        }
+    }
+}
+
 impl_java_class!(
     "com/longport/trade/StockPosition",
-    longport::trade::StockPosition,
+    StockPosition,
     [
         symbol,
         symbol_name,

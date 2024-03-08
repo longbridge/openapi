@@ -19,7 +19,10 @@ use jni::{
 };
 
 pub(crate) use self::{
-    classes::{CreateWatchlistGroupResponse, SecurityCalcIndex},
+    classes::{
+        CreateWatchlistGroupResponse, SecurityCalcIndex, StockPosition, StockPositionChannel,
+        StockPositionsResponse,
+    },
     object_array::ObjectArray,
     primary_array::PrimaryArray,
 };

@@ -1162,7 +1162,7 @@ pub struct CStockPosition {
     /// Market
     pub market: CMarket,
     /// Initial position before market opening
-    init_quantity: *const CDecimal,
+    init_quantity: *const i64,
 }
 
 pub(crate) struct CStockPositionOwned {
@@ -1182,7 +1182,7 @@ pub(crate) struct CStockPositionOwned {
     /// Market
     market: Market,
     /// Initial position before market opening
-    init_quantity: Option<CDecimal>,
+    init_quantity: Option<i64>,
 }
 
 impl From<StockPosition> for CStockPositionOwned {
@@ -1205,7 +1205,7 @@ impl From<StockPosition> for CStockPositionOwned {
             currency: currency.into(),
             cost_price: cost_price.into(),
             market,
-            init_quantity: init_quantity.map(Into::into),
+            init_quantity,
         }
     }
 }
@@ -1234,7 +1234,7 @@ impl ToFFI for CStockPositionOwned {
             market: (*market).into(),
             init_quantity: init_quantity
                 .as_ref()
-                .map(ToFFI::to_ffi_type)
+                .map(|value| value as *const _)
                 .unwrap_or(std::ptr::null()),
         }
     }

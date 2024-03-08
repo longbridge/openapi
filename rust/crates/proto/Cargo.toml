@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longport-proto"
-version = "1.0.16"
+version = "1.0.17"
 description = "LongPort Protocol"
 license = "MIT OR Apache-2.0"
 

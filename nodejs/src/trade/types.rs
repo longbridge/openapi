@@ -731,7 +731,7 @@ pub struct StockPosition {
     market: Market,
     /// Initial position before market opening
     #[js(opt)]
-    init_quantity: Option<Decimal>,
+    init_quantity: Option<i64>,
 }
 
 /// Margin ratio

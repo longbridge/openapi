@@ -4135,7 +4135,7 @@ class StockPosition:
     Market
     """
 
-    init_quantity: Optional[Decimal]
+    init_quantity: Optional[int]
     """
     Initial position before market opening
     """

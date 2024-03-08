@@ -727,7 +727,7 @@ pub(crate) struct StockPosition {
     market: Market,
     /// Initial position before market opening
     #[py(opt)]
-    pub init_quantity: Option<PyDecimal>,
+    pub init_quantity: Option<i64>,
 }
 
 /// Margin ratio

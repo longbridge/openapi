@@ -539,7 +539,9 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextStockPosit
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.stock_positions(opts).await?)
+            Ok(crate::types::StockPositionsResponse::from(
+                context.ctx.stock_positions(opts).await?,
+            ))
         })?;
         Ok(())
     })

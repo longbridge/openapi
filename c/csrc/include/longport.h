@@ -2738,7 +2738,7 @@ typedef struct lb_stock_position_t {
   /**
    * Initial position before market opening
    */
-  const struct lb_decimal_t *init_quantity;
+  const int64_t *init_quantity;
 } lb_stock_position_t;
 
 /**

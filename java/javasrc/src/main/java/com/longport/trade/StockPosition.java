@@ -12,7 +12,7 @@ public class StockPosition {
     private String currency;
     private BigDecimal costPrice;
     private Market market;
-    private BigDecimal initQuantity;
+    private long initQuantity;
 
     public String getSymbol() {
         return symbol;
@@ -42,7 +42,7 @@ public class StockPosition {
         return market;
     }
 
-    public BigDecimal getInitQuantity() {
+    public long getInitQuantity() {
         return initQuantity;
     }
 
