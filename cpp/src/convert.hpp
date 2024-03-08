@@ -1339,10 +1339,16 @@ inline StockPosition
 convert(const lb_stock_position_t* position)
 {
   return StockPosition{
-    position->symbol,          position->symbol_name,
-    position->quantity,        position->available_quantity,
-    position->currency,        Decimal(position->cost_price),
+    position->symbol,
+    position->symbol_name,
+    position->quantity,
+    position->available_quantity,
+    position->currency,
+    Decimal(position->cost_price),
     convert(position->market),
+    position->init_quantity
+      ? std::optional{ Decimal(position->init_quantity) }
+      : std::nullopt,
   };
 }
 

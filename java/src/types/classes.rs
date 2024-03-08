@@ -715,7 +715,8 @@ impl_java_class!(
         available_quantity,
         currency,
         cost_price,
-        market
+        market,
+        init_quantity
     ]
 );
 

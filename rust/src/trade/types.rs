@@ -713,6 +713,9 @@ pub struct StockPosition {
     pub cost_price: Decimal,
     /// Market
     pub market: Market,
+    /// Initial position before market opening
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub init_quantity: Option<Decimal>,
 }
 
 /// Margin ratio

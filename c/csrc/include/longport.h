@@ -2735,6 +2735,10 @@ typedef struct lb_stock_position_t {
    * Market
    */
   enum lb_market_t market;
+  /**
+   * Initial position before market opening
+   */
+  const struct lb_decimal_t *init_quantity;
 } lb_stock_position_t;
 
 /**

@@ -729,6 +729,9 @@ pub struct StockPosition {
     cost_price: Decimal,
     /// Market
     market: Market,
+    /// Initial position before market opening
+    #[js(opt)]
+    init_quantity: Option<Decimal>,
 }
 
 /// Margin ratio

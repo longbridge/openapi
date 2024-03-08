@@ -4135,6 +4135,11 @@ class StockPosition:
     Market
     """
 
+    init_quantity: Optional[Decimal]
+    """
+    Initial position before market opening
+    """
+
 
 class StockPositionChannel:
     """

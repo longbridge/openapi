@@ -2736,6 +2736,8 @@ export class StockPosition {
   get costPrice(): Decimal
   /** Market */
   get market(): Market
+  /** Initial position before market opening */
+  get initQuantity(): Decimal | null
 }
 /** Margin ratio */
 export class MarginRatio {

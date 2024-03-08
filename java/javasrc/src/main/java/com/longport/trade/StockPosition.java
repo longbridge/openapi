@@ -12,6 +12,7 @@ public class StockPosition {
     private String currency;
     private BigDecimal costPrice;
     private Market market;
+    private BigDecimal initQuantity;
 
     public String getSymbol() {
         return symbol;
@@ -41,10 +42,14 @@ public class StockPosition {
         return market;
     }
 
+    public BigDecimal getInitQuantity() {
+        return initQuantity;
+    }
+
     @Override
     public String toString() {
-        return "StockPosition [availableQuantity=" + availableQuantity + ", costPrice=" + costPrice + ", currency="
-                + currency + ", market=" + market + ", quantity=" + quantity + ", symbol=" + symbol + ", symbolName="
-                + symbolName + "]";
+        return "StockPosition [symbol=" + symbol + ", symbolName=" + symbolName + ", quantity=" + quantity
+                + ", availableQuantity=" + availableQuantity + ", currency=" + currency + ", costPrice=" + costPrice
+                + ", market=" + market + ", initQuantity=" + initQuantity + "]";
     }
 }
