@@ -731,7 +731,7 @@ impl Core {
     async fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
         match PushEvent::parse(command_code, &body) {
             Ok((mut event, tag)) => {
-                if tag == Some(PushQuoteTag::Normal) {
+                if tag != Some(PushQuoteTag::Eod) {
                     if !self.store.handle_push(&mut event) {
                         return Ok(());
                     }
@@ -815,14 +815,13 @@ impl Core {
                         // merge candlesticks
                         let market = parse_market_from_symbol(&event.symbol);
                         if let Some(market) = market {
-                            if let Some((merge_ty, quote, candlesticks)) = self
+                            if let Some((merge_ty, candlesticks)) = self
                                 .store
                                 .securities
                                 .get_mut(&event.symbol)
                                 .and_then(|data| {
                                     Some((
                                         get_merger_ty(data.board),
-                                        &data.quote,
                                         data.candlesticks.get_mut(&Period::Day)?,
                                     ))
                                 })
@@ -838,13 +837,13 @@ impl Core {
                                     prev.as_ref(),
                                     merge_ty,
                                     longport_candlesticks::Quote {
-                                        time: quote.timestamp,
-                                        open: quote.open,
-                                        high: quote.high,
-                                        low: quote.low,
-                                        lastdone: quote.last_done,
-                                        volume: quote.volume,
-                                        turnover: quote.turnover,
+                                        time: push_quote.timestamp,
+                                        open: push_quote.open,
+                                        high: push_quote.high,
+                                        low: push_quote.low,
+                                        lastdone: push_quote.last_done,
+                                        volume: push_quote.volume,
+                                        turnover: push_quote.turnover,
                                     },
                                 );
                                 update_and_push_candlestick(
@@ -866,6 +865,10 @@ impl Core {
                     {
                         return Ok(());
                     }
+                }
+
+                if tag == Some(PushQuoteTag::Eod) {
+                    return Ok(());
                 }
 
                 let _ = self.push_tx.send(event);
