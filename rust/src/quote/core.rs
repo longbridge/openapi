@@ -711,6 +711,8 @@ impl Core {
             }
         }
 
+        tracing::debug!(subscriptions = ?subscriptions, "resubscribe");
+
         for (flags, symbols) in subscriptions {
             self.ws_cli
                 .request(
@@ -724,17 +726,16 @@ impl Core {
                 )
                 .await?;
         }
-
         Ok(())
     }
 
     async fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
         match PushEvent::parse(command_code, &body) {
             Ok((mut event, tag)) => {
+                tracing::debug!(event = ?event, tag = ?tag,"push event");
+
                 if tag != Some(PushQuoteTag::Eod) {
-                    if !self.store.handle_push(&mut event) {
-                        return Ok(());
-                    }
+                    self.store.handle_push(&mut event);
                 }
 
                 if let PushEventDetail::Trade(trades) = &event.detail {

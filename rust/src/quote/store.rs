@@ -10,15 +10,6 @@ use crate::quote::{
 
 const MAX_TRADES: usize = 500;
 
-macro_rules! check_sequence {
-    ($prev:expr, $new:expr) => {
-        if $new != 0 && $new <= $prev {
-            return false;
-        }
-        $prev = $new;
-    };
-}
-
 macro_rules! merge_decimal {
     ($prev:expr, $new:expr, $field:ident) => {
         if !$new.$field.is_zero() {
@@ -41,18 +32,14 @@ macro_rules! merge_i64 {
 
 #[derive(Debug, Default)]
 pub(crate) struct SecuritiesData {
-    pub(crate) quote_sequence: i64,
     pub(crate) quote: PushQuote,
 
-    pub(crate) depth_sequence: i64,
     pub(crate) asks: Vec<Depth>,
     pub(crate) bids: Vec<Depth>,
 
-    pub(crate) brokers_sequence: i64,
     pub(crate) ask_brokers: Vec<Brokers>,
     pub(crate) bid_brokers: Vec<Brokers>,
 
-    pub(crate) trades_sequence: i64,
     pub(crate) trades: Vec<Trade>,
 
     pub(crate) board: SecurityBoard,
@@ -65,30 +52,16 @@ pub(crate) struct Store {
 }
 
 impl Store {
-    pub(crate) fn handle_push(&mut self, event: &mut PushEvent) -> bool {
+    pub(crate) fn handle_push(&mut self, event: &mut PushEvent) {
         let data = self.securities.entry(event.symbol.clone()).or_default();
 
         match &mut event.detail {
-            PushEventDetail::Quote(quote) => {
-                check_sequence!(data.quote_sequence, event.sequence);
-                merge_quote(data, quote);
-            }
-            PushEventDetail::Depth(depth) => {
-                check_sequence!(data.depth_sequence, event.sequence);
-                merge_depth(data, depth);
-            }
-            PushEventDetail::Brokers(brokers) => {
-                check_sequence!(data.brokers_sequence, event.sequence);
-                merge_brokers(data, brokers);
-            }
-            PushEventDetail::Trade(trade) => {
-                check_sequence!(data.trades_sequence, event.sequence);
-                merge_trades(data, trade);
-            }
+            PushEventDetail::Quote(quote) => merge_quote(data, quote),
+            PushEventDetail::Depth(depth) => merge_depth(data, depth),
+            PushEventDetail::Brokers(brokers) => merge_brokers(data, brokers),
+            PushEventDetail::Trade(trade) => merge_trades(data, trade),
             PushEventDetail::Candlestick(_) => unreachable!(),
         }
-
-        true
     }
 }
 

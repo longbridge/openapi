@@ -99,6 +99,7 @@ pub enum PushEventDetail {
 /// Push event
 #[derive(Debug)]
 pub struct PushEvent {
+    #[allow(dead_code)]
     pub(crate) sequence: i64,
     /// Security code
     pub symbol: String,
