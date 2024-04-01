@@ -8,8 +8,9 @@ use jni::{
 };
 use longport::{
     quote::{
-        AdjustType, CalcIndex, Period, PushEvent, PushEventDetail, RequestCreateWatchlistGroup,
-        RequestUpdateWatchlistGroup, SecuritiesUpdateMode, SubFlags,
+        AdjustType, CalcIndex, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, Period,
+        PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
+        SecuritiesUpdateMode, SortOrderType, SubFlags, WarrantSortBy, WarrantStatus, WarrantType,
     },
     Config, Market, QuoteContext,
 };
@@ -22,6 +23,7 @@ use crate::{
     init::QUOTE_CONTEXT_CLASS,
     types::{
         get_field, set_field, CreateWatchlistGroupResponse, FromJValue, IntoJValue, ObjectArray,
+        PrimaryArray,
     },
 };
 
@@ -705,6 +707,48 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantIss
         let context = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(context.ctx.warrant_issuers().await?))
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantList(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let sort_by: WarrantSortBy = get_field(env, &opts, "sortBy")?;
+        let sort_type: SortOrderType = get_field(env, &opts, "sortType")?;
+        let warrant_type: ObjectArray<WarrantType> = get_field(env, &opts, "warrantType")?;
+        let issuer: PrimaryArray<i32> = get_field(env, &opts, "issuer")?;
+        let expiry_date: ObjectArray<FilterWarrantExpiryDate> =
+            get_field(env, &opts, "expiryDate")?;
+        let price_type: ObjectArray<FilterWarrantInOutBoundsType> =
+            get_field(env, &opts, "priceType")?;
+        let status: ObjectArray<WarrantStatus> = get_field(env, &opts, "status")?;
+
+        async_util::execute(env, callback, async move {
+            Ok(ObjectArray(
+                context
+                    .ctx
+                    .warrant_list(
+                        symbol,
+                        sort_by,
+                        sort_type,
+                        Some(&warrant_type.0),
+                        Some(&issuer.0),
+                        Some(&expiry_date.0),
+                        Some(&price_type.0),
+                        Some(&status.0),
+                    )
+                    .await?,
+            ))
         })?;
         Ok(())
     })

@@ -94,6 +94,13 @@ args = [
   "javasrc/src/main/java/com/longport/quote/CreateWatchlistGroupResponse.java",
   "javasrc/src/main/java/com/longport/quote/DeleteWatchlistGroup.java",
   "javasrc/src/main/java/com/longport/quote/UpdateWatchlistGroup.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantStatus.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantSortBy.java",
+  "javasrc/src/main/java/com/longport/quote/SortOrderType.java",
+  "javasrc/src/main/java/com/longport/quote/FilterWarrantInOutBoundsType.java",
+  "javasrc/src/main/java/com/longport/quote/FilterWarrantExpiryDate.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantInfo.java",
+  "javasrc/src/main/java/com/longport/quote/QueryWarrantOptions.java",
 
   "javasrc/src/main/java/com/longport/trade/AccountBalance.java",
   "javasrc/src/main/java/com/longport/trade/BalanceType.java",

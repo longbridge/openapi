@@ -102,6 +102,9 @@ public class SdkNative {
 
         public static native void quoteContextWarrantIssuers(long context, AsyncCallback callback);
 
+        public static native void quoteContextWarrantList(long context, QueryWarrantOptions opts,
+                        AsyncCallback callback);
+
         public static native void quoteContextTradingSession(long context, AsyncCallback callback);
 
         public static native void quoteContextTradingDays(long context, Market market, LocalDate begin, LocalDate end,

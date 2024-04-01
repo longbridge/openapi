@@ -237,6 +237,59 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longport/quote/WarrantStatus",
+    longport::quote::WarrantStatus,
+    [Suspend, PrepareList, Normal]
+);
+
+impl_java_enum!(
+    "com/longport/quote/SortOrderType",
+    longport::quote::SortOrderType,
+    [Ascending, Descending]
+);
+
+impl_java_enum!(
+    "com/longport/quote/WarrantSortBy",
+    longport::quote::WarrantSortBy,
+    [
+        LastDone,
+        ChangeRate,
+        ChangeValue,
+        Volume,
+        Turnover,
+        ExpiryDate,
+        StrikePrice,
+        UpperStrikePrice,
+        LowerStrikePrice,
+        OutstandingQuantity,
+        OutstandingRatio,
+        Premium,
+        ItmOtm,
+        ImpliedVolatility,
+        Delta,
+        CallPrice,
+        ToCallPrice,
+        EffectiveLeverage,
+        LeverageRatio,
+        ConversionRatio,
+        BalancePoint,
+        Status,
+    ]
+);
+
+impl_java_enum!(
+    "com/longport/quote/FilterWarrantExpiryDate",
+    longport::quote::FilterWarrantExpiryDate,
+    [LT_3, Between_3_6, Between_6_12, GT_12]
+);
+
+impl_java_enum!(
+    "com/longport/quote/FilterWarrantInOutBoundsType",
+    longport::quote::FilterWarrantInOutBoundsType,
+    [In, Out]
+);
+
+impl_java_enum!(
     "com/longport/trade/OrderSide",
     longport::trade::OrderSide,
     [Unknown, Buy, Sell]

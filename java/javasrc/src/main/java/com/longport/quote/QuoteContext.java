@@ -655,6 +655,39 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Query warrant list
+     * 
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             QueryWarrantOptions opts = new QueryWarrantOptions("700.HK", WarrantSortBy.LastDone,
+     *                     SortOrderType.Ascending);
+     *             IssuerInfo[] resp = ctx.queryWarrantList(opts).get();
+     *             for (IssuerInfo obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<WarrantInfo[]> queryWarrantList(QueryWarrantOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextWarrantList(this.raw, opts, callback);
+        });
+    }
+
+    /**
      * Get trading session of the day
      * 
      * <pre>

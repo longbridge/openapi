@@ -533,6 +533,38 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longport/quote/WarrantInfo",
+    longport::quote::WarrantInfo,
+    [
+        symbol,
+        warrant_type,
+        name,
+        last_done,
+        change_rate,
+        change_value,
+        volume,
+        turnover,
+        expiry_date,
+        strike_price,
+        upper_strike_price,
+        lower_strike_price,
+        outstanding_qty,
+        outstanding_ratio,
+        premium,
+        itm_otm,
+        implied_volatility,
+        delta,
+        call_price,
+        to_call_price,
+        effective_leverage,
+        leverage_ratio,
+        conversion_ratio,
+        balance_point,
+        status,
+    ]
+);
+
+impl_java_class!(
     "com/longport/trade/PushOrderChanged",
     longport::trade::PushOrderChanged,
     [

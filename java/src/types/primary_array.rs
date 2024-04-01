@@ -20,7 +20,11 @@ impl<T: JSignature> JSignature for PrimaryArray<T> {
 impl FromJValue for PrimaryArray<i32> {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         unsafe {
-            let value = value.l()?.into();
+            let value = value.l()?;
+            if value.is_null() {
+                return Ok(PrimaryArray(Vec::new()));
+            }
+            let value = value.into();
             let array = env.get_array_elements::<jint>(&value, ReleaseMode::CopyBack)?;
             Ok(PrimaryArray(
                 std::slice::from_raw_parts(array.as_ptr(), array.len()).to_vec(),
@@ -40,7 +44,11 @@ impl IntoJValue for PrimaryArray<i32> {
 impl FromJValue for PrimaryArray<i64> {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         unsafe {
-            let value = value.l()?.into();
+            let value = value.l()?;
+            if value.is_null() {
+                return Ok(PrimaryArray(Vec::new()));
+            }
+            let value = value.into();
             let array = env.get_array_elements::<jlong>(&value, ReleaseMode::CopyBack)?;
             Ok(PrimaryArray(
                 std::slice::from_raw_parts(array.as_ptr(), array.len()).to_vec(),
@@ -60,7 +68,11 @@ impl IntoJValue for PrimaryArray<i64> {
 impl FromJValue for PrimaryArray<bool> {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         unsafe {
-            let value = value.l()?.into();
+            let value = value.l()?;
+            if value.is_null() {
+                return Ok(PrimaryArray(Vec::new()));
+            }
+            let value = value.into();
             let array = env.get_array_elements::<jboolean>(&value, ReleaseMode::CopyBack)?;
             Ok(PrimaryArray(
                 std::slice::from_raw_parts(array.as_ptr(), array.len())

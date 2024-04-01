@@ -313,6 +313,14 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextWarrantIssuers
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    quoteContextWarrantList
+ * Signature: (JLcom/longport/quote/QueryWarrantOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextWarrantList
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    quoteContextTradingSession
  * Signature: (JLcom/longport/AsyncCallback;)V
  */
