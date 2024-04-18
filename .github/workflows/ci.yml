@@ -241,6 +241,12 @@ jobs:
   check-ios-cpp-sdk:
     needs:
       - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        target:
+          - aarch64-apple-ios
+          - aarch64-apple-ios-sim
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -256,17 +262,25 @@ jobs:
 
       - name: Install target
         run: |
-          rustup target install aarch64-apple-ios
-          rustup target install aarch64-apple-ios-sim
+          rustup target install ${{ matrix.target }}
 
       - name: Build
         run: |
-          cargo build -p longport-c --target aarch64-apple-ios
-          cargo build -p longport-c --target aarch64-apple-ios-sim
+          cd c && cargo rustc --crate-type=staticlib --target --target ${{ matrix.target }}
 
   check-android-cpp-sdk:
     needs:
       - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - target: armv7-linux-androideabi
+            cc: armv7a-linux-androideabi28-clang
+            ar: llvm-ar
+          - target: aarch64-linux-android
+            cc: aarch64-linux-android28-clang
+            ar: llvm-ar
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -282,8 +296,7 @@ jobs:
 
       - name: Install target
         run: |
-          rustup target install armv7-linux-androideabi
-          rustup target install aarch64-linux-android
+          rustup target install ${{ matrix.settings.target }}
 
       - name: Setup NDK
         uses: nttld/setup-ndk@v1
@@ -294,7 +307,7 @@ jobs:
       - name: Build
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-          CC_armv7-linux-androideabi: armv7a-linux-androideabi28-clang
+          CC: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cc }}
+          AR: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.ar }}
         run: |
-          cargo build -p longport-c --target armv7-linux-androideabi
-          cargo build -p longport-c --target aarch64-linux-android
+          cd c && cargo rustc --crate-type=staticlib --target ${{ matrix.settings.target }}
