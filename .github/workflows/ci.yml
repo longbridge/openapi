@@ -288,9 +288,12 @@ jobs:
       - name: Setup NDK
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r18b
+          ndk-version: r25c
+          add-to-path: false
 
       - name: Build
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
           cargo build -p longport-c --target armv7-linux-androideabi
           cargo build -p longport-c --target aarch64-linux-android
