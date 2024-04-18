@@ -278,7 +278,7 @@ jobs:
         working-directory: cpp
         run: |
           mkdir cmake.build
-          cd cmake.build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../static/toolchains/ios.cmake -DPLATFORM=${{ matrix.settings.platform }} ../static && make
+          cd cmake.build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../static/toolchains/ios.cmake -DPLATFORM=${{ matrix.settings.platform }} -DDENABLE_BITCODE=true ../static && make
 
   check-android-cpp-sdk:
     needs:
