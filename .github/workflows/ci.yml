@@ -287,9 +287,11 @@ jobs:
         settings:
           - target: armv7-linux-androideabi
             cc: armv7a-linux-androideabi28-clang
+            cxx: armv7a-linux-androideabi28-clang++
             ar: llvm-ar
           - target: aarch64-linux-android
             cc: aarch64-linux-android28-clang
+            cxx: aarch64-linux-android28-clang++
             ar: llvm-ar
     runs-on: ubuntu-latest
     steps:
@@ -332,6 +334,7 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           CC: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cc }}
+          CXX: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cxx }}
           AR: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.ar }}
         run: |
           mkdir cmake.build
