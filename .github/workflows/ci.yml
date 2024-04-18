@@ -237,3 +237,55 @@ jobs:
           cargo make cmake
           cargo make c
           cargo make cpp
+
+  check-ios-cpp-sdk:
+    needs:
+      - check-format
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+
+      - name: Install target
+        run: |
+          rustup target install aarch64-apple-ios
+          rustup target install aarch64-apple-ios-sim
+
+      - name: Build
+        run: |
+          cargo build -p longport-c --target aarch64-apple-ios
+          cargo build -p longport-c --target aarch64-apple-ios-sim
+
+  check-android-cpp-sdk:
+    needs:
+      - check-format
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+
+      - name: Install target
+        run: |
+          rustup target install armeabi-v7a-android
+          rustup target install aarch64-linux-android
+
+      - name: Build
+        run: |
+          cargo build -p longport-c --target armeabi-v7a-android
+          cargo build -p longport-c --target aarch64-linux-android
