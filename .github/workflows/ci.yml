@@ -288,8 +288,8 @@ jobs:
       - name: Setup NDK
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r25c
-          add-to-path: false
+          ndk-version: r26d
+          add-to-path: true
 
       - name: Build
         env:
