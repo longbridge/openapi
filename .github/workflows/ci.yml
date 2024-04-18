@@ -299,6 +299,7 @@ jobs:
           rustup target install ${{ matrix.settings.target }}
 
       - name: Setup NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r26d
