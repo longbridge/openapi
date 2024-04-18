@@ -288,7 +288,7 @@ jobs:
       - name: Setup NDK
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r25c
+          ndk-version: r18b
 
       - name: Build
         run: |
