@@ -285,6 +285,11 @@ jobs:
           rustup target install armv7-linux-androideabi
           rustup target install aarch64-linux-android
 
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+
       - name: Build
         run: |
           cargo build -p longport-c --target armv7-linux-androideabi
