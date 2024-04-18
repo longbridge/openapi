@@ -282,10 +282,10 @@ jobs:
 
       - name: Install target
         run: |
-          rustup target install armeabi-v7a-android
+          rustup target install armv7-linux-androideabi
           rustup target install aarch64-linux-android
 
       - name: Build
         run: |
-          cargo build -p longport-c --target armeabi-v7a-android
+          cargo build -p longport-c --target armv7-linux-androideabi
           cargo build -p longport-c --target aarch64-linux-android

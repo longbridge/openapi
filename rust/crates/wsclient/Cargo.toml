@@ -15,7 +15,7 @@ tokio = { version = "1.18.2", features = [
   "sync",
   "net",
 ] }
-tokio-tungstenite = { version = "0.17.1", features = [
+tokio-tungstenite = { version = "0.21.0", features = [
   "rustls-tls-webpki-roots",
 ] }
 thiserror = "1.0.31"

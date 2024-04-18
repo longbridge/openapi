@@ -9,10 +9,7 @@ license = "MIT OR Apache-2.0"
 futures-util = "0.3.21"
 hmac = "0.12.1"
 parking_lot = "0.12.0"
-reqwest = { version = "0.11.10", default-features = false, features = [
-  "rustls-tls",
-  "json",
-] }
+reqwest = { version = "0.12.3", features = ["rustls-tls", "json"] }
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = { version = "1.0.81", features = ["raw_value"] }
 sha1 = "0.10.1"
