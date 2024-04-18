@@ -244,9 +244,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        target:
-          - aarch64-apple-ios
-          - aarch64-apple-ios-sim
+        settings:
+          - target: aarch64-apple-ios
+            platform: OS64
+          - target: aarch64-apple-ios-sim
+            platform: SIMULATOR64
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -262,12 +264,12 @@ jobs:
 
       - name: Install target
         run: |
-          rustup target install ${{ matrix.target }}
+          rustup target install ${{ matrix.settings.target }}
 
       - name: Build C
         working-directory: c
         run: |
-          cargo rustc --crate-type=staticlib --target --target ${{ matrix.target }}
+          cargo rustc --crate-type=staticlib --target --target ${{ matrix.settings.target }}
 
       - name: Get CMake
         uses: lukka/get-cmake@latest
@@ -276,7 +278,7 @@ jobs:
         working-directory: cpp
         run: |
           mkdir cmake.build
-          cd cmake.build && cmake --toolchain ../static/toolchains/ios.cmake ../static && make
+          cd cmake.build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../static/toolchains/ios.cmake -DPLATFORM=${{ matrix.settings.platform }} ../static && make
 
   check-android-cpp-sdk:
     needs:
@@ -338,4 +340,4 @@ jobs:
           AR: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.ar }}
         run: |
           mkdir cmake.build
-          cd cmake.build && cmake ../static && make
+          cd cmake.build && cmake -DCMAKE_BUILD_TYPE=Debug ../static && make
