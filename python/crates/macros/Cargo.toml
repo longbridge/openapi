@@ -1,6 +1,6 @@
 [package]
 name = "longport-python-macros"
-version = "1.0.22"
+version = "1.0.23"
 edition = "2021"
 
 [lib]
