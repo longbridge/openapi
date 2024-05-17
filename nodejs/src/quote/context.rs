@@ -16,10 +16,10 @@ use crate::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
             FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, IntradayLine, IssuerInfo,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-            RealtimeQuote, SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityQuote,
-            SecurityStaticInfo, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
-            Trade, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType,
-            WatchlistGroup,
+            RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+            SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType,
+            StrikePriceInfo, SubType, SubTypes, Subscription, Trade, WarrantInfo, WarrantQuote,
+            WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
         },
     },
     time::{NaiveDate, NaiveDatetime},
@@ -954,6 +954,33 @@ impl QuoteContext {
             .update_watchlist_group(req.into())
             .await
             .map_err(ErrorNewType)?)
+    }
+
+    /// Get security list
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext, Market, SecurityListCategory } = require("longport")
+    ///
+    /// let config = Config.fromEnv();
+    /// QuoteContext.new(config)
+    ///   .then((ctx) => ctx.securityList(Market.US, SecurityListCategory.Overnight))
+    ///   .then((resp) => console.log(resp.toString()));
+    /// ```
+    #[napi]
+    pub async fn security_list(
+        &self,
+        market: Market,
+        category: SecurityListCategory,
+    ) -> Result<Vec<Security>> {
+        self.ctx
+            .security_list(market.into(), category.into())
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Get real-time quote

@@ -393,6 +393,14 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextUpdateWatchlistGr
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    quoteContextSecurityList
+ * Signature: (JLcom/longport/Market;Lcom/longport/quote/SecurityListCategory;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextSecurityList
+  (JNIEnv *, jclass, jlong, jobject, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    quoteContextRealtimeQuote
  * Signature: (J[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
  */

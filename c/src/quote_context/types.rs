@@ -4,7 +4,7 @@ use longport::quote::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
     IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionDirection,
     OptionQuote, OptionType, ParticipantInfo, Period, PrePostQuote, PushBrokers, PushCandlestick,
-    PushDepth, PushQuote, PushTrades, RealtimeQuote, SecurityBoard, SecurityBrokers,
+    PushDepth, PushQuote, PushTrades, RealtimeQuote, Security, SecurityBoard, SecurityBrokers,
     SecurityCalcIndex, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
     Subscription, Trade, TradeDirection, TradeSession, TradeStatus, TradingSessionInfo,
     WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup, WatchlistSecurity,
@@ -2758,6 +2758,63 @@ impl From<WarrantInfo> for CWarrantInfoOwned {
             conversion_ratio: conversion_ratio.map(Into::into),
             balance_point: balance_point.map(Into::into),
             status: status.into(),
+        }
+    }
+}
+
+/// Security
+#[repr(C)]
+pub struct CSecurity {
+    /// Security code
+    pub symbol: *const c_char,
+    /// Security name (zh-CN)
+    pub name_cn: *const c_char,
+    /// Security name (en)
+    pub name_en: *const c_char,
+    /// Security name (zh-HK)
+    pub name_hk: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CSecurityOwned {
+    pub symbol: CString,
+    pub name_cn: CString,
+    pub name_en: CString,
+    pub name_hk: CString,
+}
+
+impl From<Security> for CSecurityOwned {
+    fn from(info: Security) -> Self {
+        let Security {
+            symbol,
+            name_cn,
+            name_en,
+            name_hk,
+        } = info;
+        CSecurityOwned {
+            symbol: symbol.into(),
+            name_cn: name_cn.into(),
+            name_en: name_en.into(),
+            name_hk: name_hk.into(),
+        }
+    }
+}
+
+impl ToFFI for CSecurityOwned {
+    type FFIType = CSecurity;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CSecurityOwned {
+            symbol,
+            name_cn,
+            name_en,
+            name_hk,
+        } = self;
+        CSecurity {
+            symbol: symbol.to_ffi_type(),
+            name_cn: name_cn.to_ffi_type(),
+            name_en: name_en.to_ffi_type(),
+            name_hk: name_hk.to_ffi_type(),
         }
     }
 }

@@ -128,6 +128,10 @@ public class SdkNative {
         public static native void quoteContextUpdateWatchlistGroup(long context, UpdateWatchlistGroup req,
                         AsyncCallback callback);
 
+        public static native void quoteContextSecurityList(long context, Market market,
+                        SecurityListCategory category,
+                        AsyncCallback callback);
+
         public static native void quoteContextRealtimeQuote(long context, String[] symbols, AsyncCallback callback);
 
         public static native void quoteContextRealtimeDepth(long context, String symbol, AsyncCallback callback);

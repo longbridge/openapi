@@ -286,6 +286,19 @@ enum class SecurityBoard
   SGSector,
 };
 
+/// Security
+struct Security
+{
+  /// Security code
+  std::string symbol;
+  /// Security name (zh-CN)
+  std::string name_cn;
+  /// Security name (en)
+  std::string name_en;
+  /// Security name (zh-HK)
+  std::string name_hk;
+};
+
 /// The basic information of securities
 struct SecurityStaticInfo
 {
@@ -1122,6 +1135,13 @@ struct WarrantInfo
   std::optional<Decimal> balance_point;
   /// Status
   WarrantStatus status;
+};
+
+/// Security list category
+enum class SecurityListCategory
+{
+  /// Overnight
+  Overnight,
 };
 
 } // namespace quote

@@ -48,6 +48,8 @@ pub(crate) fn register_types(parent: &PyModule) -> PyResult<()> {
     parent.add_class::<types::WarrantSortBy>()?;
     parent.add_class::<types::FilterWarrantExpiryDate>()?;
     parent.add_class::<types::FilterWarrantInOutBoundsType>()?;
+    parent.add_class::<types::Security>()?;
+    parent.add_class::<types::SecurityListCategory>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     Ok(())

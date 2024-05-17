@@ -8,10 +8,10 @@ use crate::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, IntradayLine, IssuerInfo,
         MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
-        RealtimeQuote, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, SecurityBrokers,
-        SecurityCalcIndex, SecurityDepth, SecurityQuote, SecurityStaticInfo, SortOrderType,
-        StrikePriceInfo, SubFlags, Subscription, Trade, WarrantInfo, WarrantQuote, WarrantSortBy,
-        WarrantStatus, WarrantType, WatchlistGroup,
+        RealtimeQuote, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security,
+        SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
+        SecurityStaticInfo, SortOrderType, StrikePriceInfo, SubFlags, Subscription, Trade,
+        WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
     },
     Config, Market, QuoteContext, Result,
 };
@@ -801,6 +801,16 @@ impl QuoteContextSync {
     pub fn update_watchlist_group(&self, req: RequestUpdateWatchlistGroup) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.update_watchlist_group(req).await })
+    }
+
+    /// Get security list
+    pub fn security_list(
+        &self,
+        market: Market,
+        category: SecurityListCategory,
+    ) -> Result<Vec<Security>> {
+        self.rt
+            .call(move |ctx| async move { ctx.security_list(market, category).await })
     }
 
     /// Get real-time quotes

@@ -21,11 +21,11 @@ pub use types::{
     CapitalFlowLine, Depth, DerivativeType, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
     IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionDirection,
     OptionQuote, OptionType, ParticipantInfo, PrePostQuote, RealtimeQuote,
-    RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, SecuritiesUpdateMode, SecurityBoard,
-    SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityQuote, SecurityStaticInfo,
-    SortOrderType, StrikePriceInfo, Subscription, Trade, TradeDirection, TradingSessionInfo,
-    WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
-    WatchlistSecurity,
+    RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, SecuritiesUpdateMode, Security,
+    SecurityBoard, SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory,
+    SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo, Subscription, Trade,
+    TradeDirection, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
+    WarrantType, WatchlistGroup, WatchlistSecurity,
 };
 // pub use types::{FilterWarrantExpiryDate,
 // FilterWarrantStatus,Language,SortType};

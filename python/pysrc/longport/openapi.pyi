@@ -463,6 +463,40 @@ class SecurityBoard:
         SG Industry Board
         """
 
+class Security:
+    """
+    Security
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    name_cn: str
+    """
+    Security name (zh-CN)
+    """
+
+    name_en: str
+    """
+    Security name (en)
+    """
+
+    name_hk: str
+    """
+    Security name (zh-HK)
+    """
+
+class SecurityListCategory:
+    """
+    Security list category
+    """
+
+    class Overnight(SecurityListCategory):
+        """
+        Overnight
+        """
 
 class SecurityStaticInfo:
     """
@@ -3067,6 +3101,29 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
                 ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
+        """
+
+    def security_list(self, market: Type[Market], category: Type[SecurityListCategory]) -> List[Security]:
+        """
+        Get security list
+
+        Args:
+            market: Market
+            category: Security list category
+
+        Returns:
+            Security list
+
+        Examples:
+            ::
+
+                from longport.openapi import QuoteContext, Config, Market, SecurityListCategory
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.security_list(Market.HK, SecurityListCategory.Overnight)
+                print(resp)
         """
 
     def realtime_quote(self, symbols: List[str]) -> List[RealtimeQuote]:

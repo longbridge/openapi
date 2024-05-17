@@ -119,10 +119,13 @@ cpp_compat = true
 "CFilterWarrantInOutBoundsType" = "lb_filter_warrant_in_out_bounds_type_t"
 "CWarrantStatus" = "lb_warrant_status_t"
 "CWarrantInfo" = "lb_warrant_info_t"
+"CSecurity" = "lb_security_t"
+"CSecurityListCategory" = "lb_security_list_category_t"
 
 [export]
 include = [
     "CSubscription",
+    "CSecurity",
     "CSecurityStaticInfo",
     "CSecurityQuote",
     "COptionQuote",

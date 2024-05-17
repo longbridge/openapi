@@ -1215,6 +1215,41 @@ QuoteContext::update_watchlist_group(
 }
 
 void
+QuoteContext::security_list(
+  Market market,
+  SecurityListCategory category,
+  AsyncCallback<QuoteContext, std::vector<Security>> callback) const
+{
+  lb_quote_context_security_list(
+    ctx_,
+    convert(market),
+    convert(category),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, std::vector<Security>>(
+          res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto rows = (const lb_security_t*)res->data;
+        std::vector<Security> rows2;
+        std::transform(rows,
+                       rows + res->length,
+                       std::back_inserter(rows2),
+                       [](auto row) { return convert(&row); });
+
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<Security>>(
+          ctx, std::move(status), &rows2));
+      } else {
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<Security>>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, std::vector<Security>>(callback));
+}
+
+void
 QuoteContext::realtime_quote(
   const std::vector<std::string>& symbols,
   AsyncCallback<QuoteContext, std::vector<RealtimeQuote>> callback) const

@@ -1259,3 +1259,27 @@ pub(crate) struct SecurityCalcIndex {
     #[py(opt)]
     rho: Option<PyDecimal>,
 }
+
+/// Security list category
+#[pyclass]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::SecurityListCategory")]
+pub(crate) enum SecurityListCategory {
+    /// Overnight
+    Overnight,
+}
+
+/// Security
+#[pyclass]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::Security")]
+pub(crate) struct Security {
+    /// Security code
+    symbol: String,
+    /// Security name (zh-CN)
+    name_cn: String,
+    /// Security name (en)
+    name_en: String,
+    /// Security name (zh-HK)
+    name_hk: String,
+}

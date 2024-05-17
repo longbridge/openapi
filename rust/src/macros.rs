@@ -22,7 +22,21 @@ macro_rules! impl_serde_for_enum_string {
             }
 
             impl ::serde::Serialize for $ty {
-                fn serialize<S: ::serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                fn serialize<S: ::serde::Serializer>(&self, serializer: S) -> ::std::result::Result<S::Ok, S::Error> {
+                    use std::string::ToString;
+                    let value = self.to_string();
+                    ::serde::Serialize::serialize(&value, serializer)
+                }
+            }
+        )*
+    };
+}
+
+macro_rules! impl_serialize_for_enum_string {
+    ($($ty:ty),*) => {
+        $(
+            impl ::serde::Serialize for $ty {
+                fn serialize<S: ::serde::Serializer>(&self, serializer: S) -> ::std::result::Result<S::Ok, S::Error> {
                     use std::string::ToString;
                     let value = self.to_string();
                     ::serde::Serialize::serialize(&value, serializer)

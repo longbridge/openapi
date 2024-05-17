@@ -21,7 +21,8 @@ use crate::{
     quote_context::{
         enum_types::{
             CAdjustType, CCalcIndex, CFilterWarrantExpiryDate, CFilterWarrantInOutBoundsType,
-            CPeriod, CSortOrderType, CWarrantSortBy, CWarrantStatus, CWarrantType,
+            CPeriod, CSecurityListCategory, CSortOrderType, CWarrantSortBy, CWarrantStatus,
+            CWarrantType,
         },
         types::{
             CCandlestickOwned, CCapitalDistributionResponseOwned, CCapitalFlowLineOwned,
@@ -30,7 +31,7 @@ use crate::{
             CPushBrokersOwned, CPushCandlestick, CPushCandlestickOwned, CPushDepth,
             CPushDepthOwned, CPushQuote, CPushQuoteOwned, CPushTrades, CPushTradesOwned,
             CRealtimeQuoteOwned, CSecurityBrokersOwned, CSecurityCalcIndexOwned,
-            CSecurityDepthOwned, CSecurityQuoteOwned, CSecurityStaticInfoOwned,
+            CSecurityDepthOwned, CSecurityOwned, CSecurityQuoteOwned, CSecurityStaticInfoOwned,
             CStrikePriceInfoOwned, CSubscriptionOwned, CTradeOwned, CUpdateWatchlistGroup,
             CWarrantInfoOwned, CWarrantQuoteOwned, CWatchlistGroupOwned, LB_WATCHLIST_GROUP_NAME,
             LB_WATCHLIST_GROUP_SECURITIES,
@@ -1070,6 +1071,26 @@ pub unsafe extern "C" fn lb_quote_context_realtime_candlesticks(
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CCandlestickOwned> = ctx_inner
             .realtime_candlesticks(symbol, period.into(), count)
+            .await?
+            .into();
+        Ok(rows)
+    });
+}
+
+/// Get security list
+/// data in the local storage.
+#[no_mangle]
+pub unsafe extern "C" fn lb_quote_context_security_list(
+    ctx: *const CQuoteContext,
+    market: CMarket,
+    category: CSecurityListCategory,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        let rows: CVec<CSecurityOwned> = ctx_inner
+            .security_list(market.into(), category.into())
             .await?
             .into();
         Ok(rows)

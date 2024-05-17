@@ -950,6 +950,40 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Security list
+     * 
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv();
+     *                 QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             Security[] resp = ctx.securityList(Market.US, SecurityListCategory.Overnight).get();
+     *             for (Security obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param market   Market
+     * @param category Security list category
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Security[]> securityList(Market market, SecurityListCategory category)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextSecurityList(this.raw, market, category, callback);
+        });
+    }
+
+    /**
      * Get real-time quotes
      * <p>
      * Get real-time quotes of the subscribed symbols, it always returns the data in

@@ -98,6 +98,12 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longport/quote/Security",
+    longport::quote::Security,
+    [symbol, name_cn, name_en, name_hk,]
+);
+
+impl_java_class!(
     "com/longport/quote/SecurityStaticInfo",
     longport::quote::SecurityStaticInfo,
     [

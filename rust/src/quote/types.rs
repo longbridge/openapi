@@ -1670,3 +1670,25 @@ impl SecurityCalcIndex {
         output
     }
 }
+
+/// Security list category
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum SecurityListCategory {
+    /// Overnight
+    Overnight,
+}
+
+impl_serialize_for_enum_string!(SecurityListCategory);
+
+/// The basic information of securities
+#[derive(Debug, Deserialize)]
+pub struct Security {
+    /// Security code
+    pub symbol: String,
+    /// Security name (zh-CN)
+    pub name_cn: String,
+    /// Security name (en)
+    pub name_en: String,
+    /// Security name (zh-HK)
+    pub name_hk: String,
+}

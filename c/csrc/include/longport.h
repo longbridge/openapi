@@ -849,6 +849,16 @@ typedef enum lb_security_board_t {
 } lb_security_board_t;
 
 /**
+ * Security list category
+ */
+typedef enum lb_security_list_category_t {
+  /**
+   * Overnight
+   */
+  SecurityListCategoryOvernight,
+} lb_security_list_category_t;
+
+/**
  * Sort order type
  */
 typedef enum lb_sort_order_type_t {
@@ -1927,6 +1937,28 @@ typedef struct lb_subscription_t {
   const enum lb_period_t *candlesticks;
   uintptr_t num_candlesticks;
 } lb_subscription_t;
+
+/**
+ * Security
+ */
+typedef struct lb_security_t {
+  /**
+   * Security code
+   */
+  const char *symbol;
+  /**
+   * Security name (zh-CN)
+   */
+  const char *name_cn;
+  /**
+   * Security name (en)
+   */
+  const char *name_en;
+  /**
+   * Security name (zh-HK)
+   */
+  const char *name_hk;
+} lb_security_t;
 
 /**
  * The basic information of securities
@@ -4053,6 +4085,16 @@ void lb_quote_context_realtime_candlesticks(const struct lb_quote_context_t *ctx
                                             uintptr_t count,
                                             lb_async_callback_t callback,
                                             void *userdata);
+
+/**
+ * Get security list
+ * data in the local storage.
+ */
+void lb_quote_context_security_list(const struct lb_quote_context_t *ctx,
+                                    enum lb_market_t market,
+                                    enum lb_security_list_category_t category,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
 
 void lb_trade_context_new(const struct lb_config_t *config,
                           lb_async_callback_t callback,

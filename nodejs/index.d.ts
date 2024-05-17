@@ -403,6 +403,11 @@ export const enum CalcIndex {
   /** Rho */
   Rho = 39
 }
+/** Security list category */
+export const enum SecurityListCategory {
+  /** Overnight */
+  Overnight = 0
+}
 /** Options for get cash flow request */
 export interface EstimateMaxPurchaseQuantityOptions {
   symbol: string
@@ -1403,6 +1408,21 @@ export class QuoteContext {
    */
   updateWatchlistGroup(req: UpdateWatchlistGroup): Promise<void>
   /**
+   * Get security list
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext, Market, SecurityListCategory } = require("longport")
+   *
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.securityList(Market.US, SecurityListCategory.Overnight))
+   *   .then((resp) => console.log(resp.toString()));
+   * ```
+   */
+  securityList(market: Market, category: SecurityListCategory): Promise<Array<Security>>
+  /**
    * Get real-time quote
    *
    * #### Example
@@ -2134,6 +2154,18 @@ export class SecurityCalcIndex {
   get vega(): Decimal | null
   /** Rho */
   get rho(): Decimal | null
+}
+/** Security */
+export class Security {
+  toString(): string
+  /** Security code */
+  get symbol(): string
+  /** Security name (zh-CN) */
+  get nameCn(): string
+  /** Security name (en) */
+  get nameEn(): string
+  /** Security name (zh-HK) */
+  get nameHk(): string
 }
 /** Naive date type */
 export class NaiveDate {

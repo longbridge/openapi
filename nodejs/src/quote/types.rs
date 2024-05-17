@@ -1269,3 +1269,27 @@ pub struct SecurityCalcIndex {
     #[js(opt)]
     rho: Option<Decimal>,
 }
+
+/// Security list category
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longport::quote::SecurityListCategory")]
+pub enum SecurityListCategory {
+    /// Overnight
+    Overnight,
+}
+
+/// Security
+#[napi_derive::napi]
+#[derive(JsObject, Debug, Clone)]
+#[js(remote = "longport::quote::Security")]
+pub struct Security {
+    /// Security code
+    symbol: String,
+    /// Security name (zh-CN)
+    name_cn: String,
+    /// Security name (en)
+    name_en: String,
+    /// Security name (zh-HK)
+    name_hk: String,
+}

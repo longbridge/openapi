@@ -228,6 +228,12 @@ public:
   void update_watchlist_group(const UpdateWatchlistGroup& req,
                               AsyncCallback<QuoteContext, void> callback) const;
 
+  /// Get security list
+  void security_list(
+    Market market,
+    SecurityListCategory category,
+    AsyncCallback<QuoteContext, std::vector<Security>> callback) const;
+
   /// Get real-time quotes
   ///
   /// Get real-time quotes of the subscribed symbols, it always returns the

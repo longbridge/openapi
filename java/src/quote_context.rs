@@ -10,7 +10,8 @@ use longport::{
     quote::{
         AdjustType, CalcIndex, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, Period,
         PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
-        SecuritiesUpdateMode, SortOrderType, SubFlags, WarrantSortBy, WarrantStatus, WarrantType,
+        SecuritiesUpdateMode, SecurityListCategory, SortOrderType, SubFlags, WarrantSortBy,
+        WarrantStatus, WarrantType,
     },
     Config, Market, QuoteContext,
 };
@@ -1047,6 +1048,28 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeCa
                     .ctx
                     .realtime_candlesticks(symbol, period, count.max(0) as usize)
                     .await?,
+            ))
+        })?;
+        Ok(())
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSecurityList(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    market: JObject,
+    category: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let market: Market = FromJValue::from_jvalue(env, market.into())?;
+        let category: SecurityListCategory = FromJValue::from_jvalue(env, category.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(ObjectArray(
+                context.ctx.security_list(market, category).await?,
             ))
         })?;
         Ok(())

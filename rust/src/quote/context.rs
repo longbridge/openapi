@@ -21,9 +21,9 @@ use crate::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
         ParticipantInfo, Period, PushEvent, RealtimeQuote, RequestCreateWatchlistGroup,
-        RequestUpdateWatchlistGroup, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
-        SecurityQuote, SecurityStaticInfo, StrikePriceInfo, Subscription, Trade, WarrantInfo,
-        WarrantQuote, WarrantType, WatchlistGroup,
+        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityListCategory, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, Subscription,
+        Trade, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
     },
     serde_utils, Config, Error, Language, Market, Result,
 };
@@ -1337,6 +1337,34 @@ impl QuoteContext {
             .await?;
 
         Ok(())
+    }
+
+    /// Get security list
+    pub async fn security_list(
+        &self,
+        market: Market,
+        category: SecurityListCategory,
+    ) -> Result<Vec<Security>> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            market: Market,
+            category: SecurityListCategory,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct Resposne {
+            list: Vec<Security>,
+        }
+
+        Ok(self
+            .http_cli
+            .request(Method::GET, "/v1/quote/get_security_list")
+            .query_params(Request { market, category })
+            .response::<Json<Resposne>>()
+            .send()
+            .await?
+            .0
+            .list)
     }
 
     /// Get real-time quotes
