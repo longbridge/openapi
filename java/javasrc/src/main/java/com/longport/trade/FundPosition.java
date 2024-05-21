@@ -1,11 +1,12 @@
 package com.longport.trade;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 public class FundPosition {
     private String symbol;
     private BigDecimal currentNetAssetValue;
-    private BigDecimal netAssetValueDay;
+    private OffsetDateTime netAssetValueDay;
     private String symbolName;
     private String currency;
     private BigDecimal costNetAssetValue;
@@ -19,7 +20,7 @@ public class FundPosition {
         return currentNetAssetValue;
     }
 
-    public BigDecimal getNetAssetValueDay() {
+    public OffsetDateTime getNetAssetValueDay() {
         return netAssetValueDay;
     }
 
@@ -41,8 +42,9 @@ public class FundPosition {
 
     @Override
     public String toString() {
-        return "FundPosition [costNetAssetValue=" + costNetAssetValue + ", currency=" + currency
-                + ", currentNetAssetValue=" + currentNetAssetValue + ", holdingUnits=" + holdingUnits
-                + ", netAssetValueDay=" + netAssetValueDay + ", symbol=" + symbol + ", symbolName=" + symbolName + "]";
+        return "FundPosition [symbol=" + symbol + ", currentNetAssetValue=" + currentNetAssetValue
+                + ", netAssetValueDay=" + netAssetValueDay + ", symbolName=" + symbolName + ", currency=" + currency
+                + ", costNetAssetValue=" + costNetAssetValue + ", holdingUnits=" + holdingUnits + "]";
     }
+
 }
