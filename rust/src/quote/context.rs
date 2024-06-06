@@ -28,6 +28,7 @@ use crate::{
     serde_utils, Config, Error, Language, Market, Result,
 };
 
+const RETRY_COUNT: usize = 3;
 const PARTICIPANT_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const ISSUER_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const OPTION_CHAIN_EXPIRY_DATE_LIST_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
@@ -97,15 +98,25 @@ impl QuoteContext {
 
     /// Send a raw request
     async fn request_raw(&self, command_code: u8, body: Vec<u8>) -> Result<Vec<u8>> {
-        let (reply_tx, reply_rx) = oneshot::channel();
-        self.command_tx
-            .send(Command::Request {
-                command_code,
-                body,
-                reply_tx,
-            })
-            .map_err(|_| WsClientError::ClientClosed)?;
-        reply_rx.await.map_err(|_| WsClientError::ClientClosed)?
+        for _ in 0..RETRY_COUNT {
+            let (reply_tx, reply_rx) = oneshot::channel();
+            self.command_tx
+                .send(Command::Request {
+                    command_code,
+                    body: body.clone(),
+                    reply_tx,
+                })
+                .map_err(|_| WsClientError::ClientClosed)?;
+            let res = reply_rx.await.map_err(|_| WsClientError::ClientClosed)?;
+
+            match res {
+                Ok(resp) => return Ok(resp),
+                Err(Error::WsClient(WsClientError::Cancelled)) => {}
+                Err(err) => return Err(err.into()),
+            }
+        }
+
+        Err(Error::WsClient(WsClientError::RequestTimeout))
     }
 
     /// Send a request `T` to get a response `R`
