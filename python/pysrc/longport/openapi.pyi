@@ -2809,11 +2809,26 @@ class QuoteContext:
     def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, time: datetime, count: int) -> List[Candlestick]:
         """
         Get security history candlesticks by offset
+
+        Args:
+            symbol: Security code
+            period: Period type
+            adjust_type: Adjust type
+            forward: If `True`, query the latest from the specified time
+            time: Datetime
+            count: Count of candlesticks
         """
 
     def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date], end: Optional[date]) -> List[Candlestick]:
         """
         Get security history candlesticks by date
+
+        Args:
+            symbol: Security code
+            period: Period type
+            adjust_type: Adjust type
+            start: Start date
+            end: End date
         """
 
     def option_chain_expiry_date_list(self, symbol: str) -> List[date]:
