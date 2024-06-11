@@ -4352,6 +4352,13 @@ void lb_decimal_normalize(struct lb_decimal_t *value);
 void lb_decimal_round(struct lb_decimal_t *value);
 
 /**
+ * Returns a new Decimal number with the specified number of decimal points for
+ * fractional portion. Rounding currently follows “Bankers Rounding” rules.
+ * e.g. 6.5 -> 6, 7.5 -> 8
+ */
+void lb_decimal_round_dp(struct lb_decimal_t *value, uint32_t dp);
+
+/**
  * Returns a new Decimal integral with no fractional portion. This is a
  * true truncation whereby no rounding is performed.
  */
@@ -4497,6 +4504,11 @@ void lb_decimal_normal_cdf(struct lb_decimal_t *value);
  * The Probability density function for a Normal distribution.
  */
 void lb_decimal_norm_pdf(struct lb_decimal_t *value);
+
+/**
+ * The Probability density function for a Normal distribution.
+ */
+const char *lb_decimal_to_string(const struct lb_decimal_t *value);
 
 #ifdef __cplusplus
 } // extern "C"

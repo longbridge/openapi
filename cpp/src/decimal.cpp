@@ -28,6 +28,12 @@ Decimal::Decimal(double other)
   value_ = lb_decimal_from_double(other);
 }
 
+Decimal::Decimal(double other, uint32_t dp)
+{
+  value_ = lb_decimal_from_double(other);
+  lb_decimal_round_dp(value_, dp);
+}
+
 Decimal::~Decimal()
 {
   lb_decimal_free(value_);
@@ -236,6 +242,12 @@ Decimal::round()
 }
 
 void
+Decimal::round(uint32_t dp)
+{
+  lb_decimal_round_dp(value_, dp);
+}
+
+void
 Decimal::trunc()
 {
   lb_decimal_trunc(value_);
@@ -305,6 +317,20 @@ void
 Decimal::norm_pdf()
 {
   lb_decimal_norm_pdf(value_);
+}
+
+std::string
+Decimal::to_string() const
+{
+  return lb_decimal_to_string(value_);
+}
+
+std::ostream&
+operator<<(std::ostream& stream, const Decimal& value)
+{
+  auto s = lb_decimal_to_string((const lb_decimal_t*)value);
+  stream << s;
+  return stream;
 }
 
 } // namespace longport

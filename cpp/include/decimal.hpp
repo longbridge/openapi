@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <string>
 #include <utility>
 
@@ -15,9 +16,16 @@ private:
 public:
   Decimal(const lb_decimal_t* other);
   Decimal(const Decimal& other);
+  /// Constructs a new Decimal number from string
   Decimal(const char* str);
+  /// Constructs a new Decimal number from string
   Decimal(const std::string& str);
+  /// Constructs a new Decimal number from double
   Decimal(double other);
+  /// Constructs a new Decimal number with the specified number of decimal
+  /// points for fractional portion. Rounding currently follows “Bankers
+  /// Rounding” rules. e.g. 6.5 -> 6, 7.5 -> 8
+  Decimal(double other, uint32_t dp);
   ~Decimal();
 
   operator const lb_decimal_t*() const;
@@ -77,8 +85,14 @@ public:
   /// `7.5` -> `8`
   void round();
 
-  /// Returns a new Decimal integral with no fractional portion. This is a true
-  /// truncation whereby no rounding is performed.
+  /// Returns a new Decimal number with the specified number of decimal points
+  /// for
+  /// fractional portion. Rounding currently follows “Bankers Rounding” rules.
+  /// e.g. 6.5 -> 6, 7.5 -> 8
+  void round(uint32_t dp);
+
+  /// Returns a new Decimal integral with no fractional portion. This is a
+  /// true truncation whereby no rounding is performed.
   void trunc();
 
   /// Computes the sine of a number (in radians)
@@ -121,6 +135,11 @@ public:
 
   /// The Probability density function for a Normal distribution.
   void norm_pdf();
+
+  std::string to_string() const;
 };
+
+std::ostream&
+operator<<(std::ostream& stream, const Decimal& value);
 
 } // namespace longport

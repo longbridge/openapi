@@ -173,6 +173,15 @@ impl Decimal {
         Self(self.0.round())
     }
 
+    /// Returns a new Decimal number with the specified number of decimal
+    /// points for fractional portion. Rounding currently follows “Bankers
+    /// Rounding” rules. e.g. 6.5 -> 6, 7.5 -> 8
+    #[napi]
+    #[inline]
+    pub fn round_dp(&self, dp: u32) -> Self {
+        Self(self.0.round_dp(dp))
+    }
+
     /// Returns a new Decimal integral with no fractional portion. This is a
     /// true truncation whereby no rounding is performed.
     #[napi]

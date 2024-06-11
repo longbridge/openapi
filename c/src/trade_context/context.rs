@@ -366,19 +366,19 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
     let quantity = (*opts).quantity;
     let mut opts2 = ReplaceOrderOptions::new(order_id, quantity);
     if !(*opts).price.is_null() {
-        opts2 = opts2.price((*(*opts).price).0);
+        opts2 = opts2.price((*(*opts).price).value);
     }
     if !(*opts).trigger_price.is_null() {
-        opts2 = opts2.trigger_price((*(*opts).trigger_price).0);
+        opts2 = opts2.trigger_price((*(*opts).trigger_price).value);
     }
     if !(*opts).limit_offset.is_null() {
-        opts2 = opts2.limit_offset((*(*opts).limit_offset).0);
+        opts2 = opts2.limit_offset((*(*opts).limit_offset).value);
     }
     if !(*opts).trailing_amount.is_null() {
-        opts2 = opts2.trailing_amount((*(*opts).trailing_amount).0);
+        opts2 = opts2.trailing_amount((*(*opts).trailing_amount).value);
     }
     if !(*opts).trailing_percent.is_null() {
-        opts2 = opts2.trailing_percent((*(*opts).trailing_percent).0);
+        opts2 = opts2.trailing_percent((*(*opts).trailing_percent).value);
     }
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
@@ -408,19 +408,19 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     let mut opts2 =
         SubmitOrderOptions::new(symbol, order_type, side, submitted_quantity, time_in_force);
     if !(*opts).submitted_price.is_null() {
-        opts2 = opts2.submitted_price((*(*opts).submitted_price).0);
+        opts2 = opts2.submitted_price((*(*opts).submitted_price).value);
     }
     if !(*opts).trigger_price.is_null() {
-        opts2 = opts2.trigger_price((*(*opts).trigger_price).0);
+        opts2 = opts2.trigger_price((*(*opts).trigger_price).value);
     }
     if !(*opts).limit_offset.is_null() {
-        opts2 = opts2.limit_offset((*(*opts).limit_offset).0);
+        opts2 = opts2.limit_offset((*(*opts).limit_offset).value);
     }
     if !(*opts).trailing_amount.is_null() {
-        opts2 = opts2.trailing_amount((*(*opts).trailing_amount).0);
+        opts2 = opts2.trailing_amount((*(*opts).trailing_amount).value);
     }
     if !(*opts).trailing_percent.is_null() {
-        opts2 = opts2.trailing_percent((*(*opts).trailing_percent).0);
+        opts2 = opts2.trailing_percent((*(*opts).trailing_percent).value);
     }
     if !(*opts).expire_date.is_null() {
         opts2 = opts2.expire_date((*(*opts).expire_date).into());
@@ -593,7 +593,7 @@ pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
     let side = (*opts).side.into();
     let mut opts2 = EstimateMaxPurchaseQuantityOptions::new(symbol, order_type, side);
     if !(*opts).price.is_null() {
-        opts2 = opts2.price((*(*opts).price).0);
+        opts2 = opts2.price((*(*opts).price).value);
     }
     if !(*opts).currency.is_null() {
         opts2 = opts2.currency(cstr_to_rust((*opts).currency));
