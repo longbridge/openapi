@@ -71,10 +71,7 @@ HttpClient::request(
 
       if (status) {
         const lb_http_result_t* result = (const lb_http_result_t*)res->data;
-        HttpResult http_res;
-
-        http_res.response_body = lb_http_result_response_body(result);
-
+        HttpResult http_res(lb_http_result_response_body(result));
         (*callback_ptr)(AsyncResult<void*, HttpResult>(
           nullptr, std::move(status), &http_res));
       } else {

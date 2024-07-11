@@ -14,6 +14,8 @@ namespace longport {
 struct HttpResult
 {
   const char* response_body;
+
+  HttpResult(const char* response_body) {}
 };
 
 class HttpClient
