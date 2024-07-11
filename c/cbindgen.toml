@@ -8,6 +8,7 @@ cpp_compat = true
 "CHeader" = "lb_http_header_t"
 "CHttpResult" = "lb_http_result_t"
 "CLanguage" = "lb_language_t"
+"CPushCandlestickMode" = "lb_push_candlestick_mode_t"
 "CMarket" = "lb_market_t"
 "CDecimal" = "lb_decimal_t"
 "CAsyncCallback" = "lb_async_callback_t"

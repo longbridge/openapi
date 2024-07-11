@@ -27,6 +27,8 @@ export interface ConfigParams {
   language?: Language
   /** Enable overnight (default: false) */
   enableOvernight?: boolean
+  /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
+  pushCandlestickMode?: PushCandlestickMode
 }
 /** An request to create a watchlist group */
 export interface CreateWatchlistGroup {
@@ -737,6 +739,12 @@ export const enum Language {
   /** en */
   EN = 2
 }
+export const enum PushCandlestickMode {
+  /** Realtime mode */
+  Realtime = 0,
+  /** Confirmed mode */
+  Confirmed = 1
+}
 /** Configuration for LongPort sdk */
 export class Config {
   /** Create a new `Config` */
@@ -757,6 +765,8 @@ export class Config {
    * - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
    * - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
    *   `false` (Default: `false`)
+   * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+   *   `realtime`)
    */
   static fromEnv(): Config
   /**
@@ -813,6 +823,12 @@ export class Decimal {
    * `6.5` -> `6`, `7.5` -> `8`
    */
   round(): Decimal
+  /**
+   * Returns a new Decimal number with the specified number of decimal
+   * points for fractional portion. Rounding currently follows “Bankers
+   * Rounding” rules. e.g. 6.5 -> 6, 7.5 -> 8
+   */
+  roundDp(dp: number): Decimal
   /**
    * Returns a new Decimal integral with no fractional portion. This is a
    * true truncation whereby no rounding is performed.

@@ -12,6 +12,7 @@ public class ConfigBuilder {
     private String tradeWsUrl;
     private Language language;
     private boolean enableOvernight;
+    private PushCandlestickMode pushCandlestickMode;
 
     /**
      * Create a `Config` object builder
@@ -75,6 +76,7 @@ public class ConfigBuilder {
      * @return this object
      */
     public ConfigBuilder language(Language language) {
+        this.language = language;
         return this;
     }
 
@@ -89,6 +91,17 @@ public class ConfigBuilder {
     }
 
     /**
+     * Specifies the push candlestick mode
+     * 
+     * @param mode Mode (Default: PushCandlestickMode.Realtime)
+     * @return this object
+     */
+    public ConfigBuilder pushCandlestickMode(PushCandlestickMode mode) {
+        this.pushCandlestickMode = mode;
+        return this;
+    }
+
+    /**
      * Build a Config object
      * 
      * @return Config object
@@ -97,6 +110,6 @@ public class ConfigBuilder {
     public Config build() throws OpenApiException {
         return new Config(
                 SdkNative.newConfig(appKey, appSecret, accessToken, httpUrl, quoteWsUrl, tradeWsUrl, language,
-                        enableOvernight));
+                        enableOvernight, pushCandlestickMode));
     }
 }

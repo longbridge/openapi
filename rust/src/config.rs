@@ -38,6 +38,15 @@ impl Language {
     }
 }
 
+/// Push mode for candlestick
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum PushCandlestickMode {
+    /// Realtime mode
+    Realtime,
+    /// Confirmed mode
+    Confirmed,
+}
+
 /// Configuration options for LongPort sdk
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -46,6 +55,7 @@ pub struct Config {
     pub(crate) trade_ws_url: String,
     pub(crate) language: Language,
     pub(crate) enable_overnight: bool,
+    pub(crate) push_candlestick_mode: PushCandlestickMode,
 }
 
 impl Config {
@@ -71,6 +81,7 @@ impl Config {
             .to_string(),
             language: Language::EN,
             enable_overnight: false,
+            push_candlestick_mode: PushCandlestickMode::Realtime,
         }
     }
 
@@ -91,6 +102,8 @@ impl Config {
     ///   `wss://openapi-trade.longportapp.com/v2`)
     /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
     ///   `false` (Default: `false`)
+    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+    ///   `realtime`)
     pub fn from_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
@@ -119,6 +132,12 @@ impl Config {
             .ok()
             .map(|var| var == "true")
             .unwrap_or_default();
+        let push_candlestick_mode =
+            if std::env::var("LONGPORT_PUSH_CANDLESTICK_MODE").as_deref() == Ok("confirmed") {
+                PushCandlestickMode::Confirmed
+            } else {
+                PushCandlestickMode::Realtime
+            };
 
         Ok(Config {
             http_cli_config,
@@ -126,6 +145,7 @@ impl Config {
             trade_ws_url,
             language: Language::EN,
             enable_overnight,
+            push_candlestick_mode,
         })
     }
 
@@ -179,6 +199,16 @@ impl Config {
     pub fn enable_overnight(self) -> Self {
         Self {
             enable_overnight: true,
+            ..self
+        }
+    }
+
+    /// Specifies the push candlestick mode
+    ///
+    /// Default: `PushCandlestickMode::Realtime`
+    pub fn push_candlestick_mode(self, mode: PushCandlestickMode) -> Self {
+        Self {
+            push_candlestick_mode: mode,
             ..self
         }
     }

@@ -35,6 +35,8 @@ public:
    * @param trade_ws_url Trade websocket endpoint url (Default:
    * wss://openapi-trade.longportapp.com/v2)
    * @param language Language identifer (Default: Language::EN)
+   * @param push_candlestick_mode Push candlestick mode (Default:
+   * PushCandlestickMode::Realtime)
    */
   Config(const std::string& app_key,
          const std::string& app_secret,
@@ -43,7 +45,29 @@ public:
          const std::optional<std::string>& quote_ws_url,
          const std::optional<std::string>& trade_ws_url,
          const std::optional<Language>& language,
-         bool enable_overnight);
+         bool enable_overnight,
+         const std::optional<PushCandlestickMode>& push_candlestick_mode);
+
+  /** Config
+   *
+   * @param app_key App key
+   * @param app_secret App secret
+   * @param access_token Access token
+   */
+  Config(const std::string& app_key,
+         const std::string& app_secret,
+         const std::string& access_token)
+    : Config(app_key,
+             app_secret,
+             access_token,
+             std::nullopt,
+             std::nullopt,
+             std::nullopt,
+             std::nullopt,
+             false,
+             std::nullopt)
+  {
+  }
 
   ~Config();
 
@@ -67,6 +91,8 @@ public:
   ///   `wss://openapi-trade.longportapp.com/v2`)
   /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
   ///   `false` (Default: `false`)
+  /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+  ///   `realtime`)
   static Status from_env(Config& config);
 
   /// Gets a new `access_token`

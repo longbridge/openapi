@@ -10,7 +10,7 @@ use time::OffsetDateTime;
 use crate::{
     async_call::{execute_async, CAsyncCallback},
     error::{set_error, CError},
-    types::{CLanguage, CString},
+    types::{CLanguage, CPushCandlestickMode, CString},
 };
 
 /// Configuration options for LongPort sdk
@@ -33,6 +33,8 @@ pub struct CConfig(pub(crate) Arc<Config>);
 ///   `wss://openapi-trade.longportapp.com/v2`)
 /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or `false`
 ///   (Default: `false`)
+/// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+///   `realtime`)
 #[no_mangle]
 pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_env() {
@@ -57,6 +59,7 @@ pub unsafe extern "C" fn lb_config_new(
     trade_ws_url: *const c_char,
     language: *const CLanguage,
     enable_overight: bool,
+    push_candlestick_mode: *const CPushCandlestickMode,
 ) -> *mut CConfig {
     let app_key = CStr::from_ptr(app_key).to_str().expect("invalid app key");
     let app_secret = CStr::from_ptr(app_secret)
@@ -70,6 +73,7 @@ pub unsafe extern "C" fn lb_config_new(
     if !http_url.is_null() {
         config = config.http_url(CStr::from_ptr(http_url).to_str().expect("invalid http url"));
     }
+
     if !quote_ws_url.is_null() {
         config = config.quote_ws_url(
             CStr::from_ptr(quote_ws_url)
@@ -77,6 +81,7 @@ pub unsafe extern "C" fn lb_config_new(
                 .expect("invalid quote websocket url"),
         );
     }
+
     if !trade_ws_url.is_null() {
         config = config.trade_ws_url(
             CStr::from_ptr(trade_ws_url)
@@ -84,12 +89,17 @@ pub unsafe extern "C" fn lb_config_new(
                 .expect("invalid trade websocket url"),
         );
     }
+
     if !language.is_null() {
         config = config.language((*language).into());
     }
 
     if enable_overight {
         config = config.enable_overnight();
+    }
+
+    if !push_candlestick_mode.is_null() {
+        config = config.push_candlestick_mode((*push_candlestick_mode).into());
     }
 
     Box::into_raw(Box::new(CConfig(Arc::new(config))))

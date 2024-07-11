@@ -31,6 +31,7 @@ add_subdirectory(examples/c/http_client)
 
 add_subdirectory(examples/cpp/submit_order)
 add_subdirectory(examples/cpp/subscribe_quote)
+add_subdirectory(examples/cpp/subscribe_candlesticks)
 add_subdirectory(examples/cpp/get_quote)
 add_subdirectory(examples/cpp/today_orders)
 add_subdirectory(examples/cpp/http_client)

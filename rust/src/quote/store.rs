@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use longport_candlesticks::InputCandlestick;
 use longport_proto::quote::Period;
 
 use crate::quote::{
@@ -30,6 +31,24 @@ macro_rules! merge_i64 {
     };
 }
 
+#[derive(Debug)]
+pub(crate) struct Candlesticks {
+    pub(crate) candlesticks: Vec<Candlestick>,
+    pub(crate) confirmed: bool,
+}
+
+impl Candlesticks {
+    #[inline]
+    pub(crate) fn merge_input(&self) -> InputCandlestick {
+        match (self.candlesticks.last(), self.confirmed) {
+            (None, true) => unreachable!(),
+            (None, false) => InputCandlestick::None,
+            (Some(prev), true) => InputCandlestick::Confirmed((*prev).into()),
+            (Some(prev), false) => InputCandlestick::Normal((*prev).into()),
+        }
+    }
+}
+
 #[derive(Debug, Default)]
 pub(crate) struct SecuritiesData {
     pub(crate) quote: PushQuote,
@@ -43,7 +62,7 @@ pub(crate) struct SecuritiesData {
     pub(crate) trades: Vec<Trade>,
 
     pub(crate) board: SecurityBoard,
-    pub(crate) candlesticks: HashMap<Period, Vec<Candlestick>>,
+    pub(crate) candlesticks: HashMap<Period, Candlesticks>,
 }
 
 #[derive(Debug, Default)]

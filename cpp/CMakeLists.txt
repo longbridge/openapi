@@ -13,7 +13,7 @@ add_library(
     ${SOURCES}
 )
 if(NOT CMAKE_HOST_LINUX)
-target_link_libraries(longport_cpp longport-c)
+target_link_libraries(longport_cpp longport_c)
 endif()
 
 add_subdirectory(test)

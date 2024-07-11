@@ -35,6 +35,8 @@ public class Config implements AutoCloseable {
      * `wss://openapi-trade.longportapp.com/v2`)
      * - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
      * `false` (Default: `false`)
+     * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+     * `realtime`)
      * 
      * @return Config object
      * @throws OpenApiException If an error occurs

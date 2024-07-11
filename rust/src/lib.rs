@@ -18,7 +18,7 @@ pub mod blocking;
 pub mod quote;
 pub mod trade;
 
-pub use config::{Config, Language};
+pub use config::{Config, Language, PushCandlestickMode};
 pub use error::{Error, Result, SimpleError};
 pub use longport_httpcli as httpclient;
 pub use quote::QuoteContext;

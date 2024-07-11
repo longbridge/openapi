@@ -725,6 +725,20 @@ typedef enum lb_period_t {
 } lb_period_t;
 
 /**
+ * Language identifer
+ */
+typedef enum lb_push_candlestick_mode_t {
+  /**
+   * Real-time
+   */
+  PushCandlestickMode_Realtime,
+  /**
+   * Confirmed
+   */
+  PushCandlestickMode_Confirmed,
+} lb_push_candlestick_mode_t;
+
+/**
  * Trade session
  */
 typedef enum lb_securities_update_mode_t {
@@ -3606,6 +3620,8 @@ extern "C" {
  *   `wss://openapi-trade.longportapp.com/v2`)
  * - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or `false`
  *   (Default: `false`)
+ * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+ *   `realtime`)
  */
 struct lb_config_t *lb_config_from_env(struct lb_error_t **error);
 
@@ -3616,7 +3632,8 @@ struct lb_config_t *lb_config_new(const char *app_key,
                                   const char *quote_ws_url,
                                   const char *trade_ws_url,
                                   const enum lb_language_t *language,
-                                  bool enable_overight);
+                                  bool enable_overight,
+                                  const enum lb_push_candlestick_mode_t *push_candlestick_mode);
 
 /**
  * Free the config object

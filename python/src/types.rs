@@ -29,3 +29,14 @@ pub(crate) enum Language {
     /// en
     EN,
 }
+
+#[pyclass]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[allow(non_camel_case_types)]
+#[py(remote = "longport::PushCandlestickMode")]
+pub(crate) enum PushCandlestickMode {
+    /// Realtime mode
+    Realtime,
+    /// Confirmed mode
+    Confirmed,
+}

@@ -28,21 +28,29 @@ Config::Config(const std::string& app_key,
                const std::optional<std::string>& quote_ws_url,
                const std::optional<std::string>& trade_ws_url,
                const std::optional<Language>& language,
-               bool enable_overnight)
+               bool enable_overnight,
+               const std::optional<PushCandlestickMode>& push_candlestick_mode)
 {
   lb_language_t c_language;
   if (language) {
     c_language = convert::convert(*language);
   }
 
-  config_ = lb_config_new(app_key.c_str(),
-                          app_secret.c_str(),
-                          access_token.c_str(),
-                          http_url ? http_url->c_str() : nullptr,
-                          quote_ws_url ? quote_ws_url->c_str() : nullptr,
-                          trade_ws_url ? trade_ws_url->c_str() : nullptr,
-                          language ? &c_language : nullptr,
-                          enable_overnight);
+  lb_push_candlestick_mode_t c_push_candlestick_mode;
+  if (push_candlestick_mode) {
+    c_push_candlestick_mode = convert::convert(*push_candlestick_mode);
+  }
+
+  config_ =
+    lb_config_new(app_key.c_str(),
+                  app_secret.c_str(),
+                  access_token.c_str(),
+                  http_url ? http_url->c_str() : nullptr,
+                  quote_ws_url ? quote_ws_url->c_str() : nullptr,
+                  trade_ws_url ? trade_ws_url->c_str() : nullptr,
+                  language ? &c_language : nullptr,
+                  enable_overnight,
+                  push_candlestick_mode ? &c_push_candlestick_mode : nullptr);
 }
 
 Config::~Config()

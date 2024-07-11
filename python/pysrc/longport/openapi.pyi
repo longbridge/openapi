@@ -72,6 +72,20 @@ class HttpClient:
         """
         ...
 
+class PushCandlestickMode:
+    """
+    Push candlestick mode
+    """
+
+    class Realtime(PushCandlestickMode):
+        """
+        Real-time
+        """
+
+    class Confirmed(PushCandlestickMode):
+        """
+        Confirmed
+        """
 
 class Config:
     """
@@ -86,6 +100,7 @@ class Config:
         trade_ws_url: Websocket url for trade API
         language: Language identifier
         enable_overnight: Enable overnight quote
+        push_candlestick_mode: Push candlestick mode
     """
 
     def __init__(
@@ -98,6 +113,7 @@ class Config:
         trade_ws_url: Optional[str] = None,
         language: Optional[Type[Language]] = None,
         enable_overnight: bool = False,
+        push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime,
     ) -> None: ...
 
     @classmethod

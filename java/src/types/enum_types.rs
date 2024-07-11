@@ -19,6 +19,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longport/PushCandlestickMode",
+    longport::PushCandlestickMode,
+    [Realtime, Confirmed]
+);
+
+impl_java_enum!(
     "com/longport/Market",
     longport::Market,
     [Unknown, US, HK, CN, SG]

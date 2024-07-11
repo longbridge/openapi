@@ -3,7 +3,7 @@ use jni::{
     sys::{jboolean, jlong},
     JNIEnv,
 };
-use longport::{Config, Language};
+use longport::{Config, Language, PushCandlestickMode};
 use time::OffsetDateTime;
 
 use crate::{async_util, error::jni_result, types::FromJValue};
@@ -20,6 +20,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
     trade_ws_url: JString,
     language: JObject,
     enable_overnight: jboolean,
+    push_candlestick_mode: JObject,
 ) -> jlong {
     jni_result(&mut env, 0, |env| {
         let app_key = String::from_jvalue(env, app_key.into())?;
@@ -29,6 +30,8 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
         let quote_ws_url = <Option<String>>::from_jvalue(env, quote_ws_url.into())?;
         let trade_ws_url = <Option<String>>::from_jvalue(env, trade_ws_url.into())?;
         let language = <Option<Language>>::from_jvalue(env, language.into())?;
+        let push_candlestick_mode =
+            <Option<PushCandlestickMode>>::from_jvalue(env, push_candlestick_mode.into())?;
 
         let mut config = Config::new(app_key, app_secret, access_token);
 
@@ -46,6 +49,9 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
         }
         if enable_overnight > 0 {
             config = config.enable_overnight();
+        }
+        if let Some(mode) = push_candlestick_mode {
+            config = config.push_candlestick_mode(mode);
         }
 
         Ok(Box::into_raw(Box::new(config)) as jlong)

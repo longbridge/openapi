@@ -1,6 +1,10 @@
 use pyo3::{prelude::*, types::PyType};
 
-use crate::{error::ErrorNewType, time::PyOffsetDateTimeWrapper, types::Language};
+use crate::{
+    error::ErrorNewType,
+    time::PyOffsetDateTimeWrapper,
+    types::{Language, PushCandlestickMode},
+};
 
 #[pyclass(name = "Config")]
 pub(crate) struct Config(pub(crate) longport::Config);
@@ -17,6 +21,7 @@ impl Config {
         trade_ws_url = None,
         language = None,
         enable_overnight = false,
+        push_candlestick_mode = PushCandlestickMode::Realtime,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn py_new(
@@ -28,6 +33,7 @@ impl Config {
         trade_ws_url: Option<String>,
         language: Option<Language>,
         enable_overnight: bool,
+        push_candlestick_mode: PushCandlestickMode,
     ) -> Self {
         let mut config = longport::Config::new(app_key, app_secret, access_token);
         if let Some(http_url) = http_url {
@@ -45,6 +51,7 @@ impl Config {
         if enable_overnight {
             config = config.enable_overnight();
         }
+        config = config.push_candlestick_mode(push_candlestick_mode.into());
         Self(config)
     }
 

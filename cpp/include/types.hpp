@@ -37,6 +37,15 @@ enum class Language
   EN,
 };
 
+/// Push candlestick mode
+enum class PushCandlestickMode
+{
+  /// Real-time
+  Realtime,
+  /// Confirmed
+  Confirmed,
+};
+
 /// Market
 enum class Market
 {

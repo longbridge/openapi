@@ -21,7 +21,7 @@ Status::Status(lb_error_t* err)
   need_free_ = true;
 }
 
-Status::Status(Status&& status)
+Status::Status(Status&& status) noexcept
 {
   err_ = status.err_;
   need_free_ = status.need_free_;
@@ -51,7 +51,7 @@ Status::is_err() const
 }
 
 /// Returns the error code
-int
+int64_t
 Status::code() const
 {
   return lb_error_code(err_);

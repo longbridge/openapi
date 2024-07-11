@@ -3,7 +3,7 @@ use std::{
     sync::Arc,
 };
 
-use longport_candlesticks::{IsHalfTradeDay, Type, UpdateAction};
+use longport_candlesticks::{IsHalfTradeDay, TickAction, Type, UpdateAction};
 use longport_httpcli::HttpClient;
 use longport_proto::quote::{
     self, AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
@@ -13,6 +13,7 @@ use longport_proto::quote::{
 use longport_wscli::{
     CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
 };
+use rust_decimal::Decimal;
 use time::{Date, OffsetDateTime};
 use tokio::{
     sync::{mpsc, oneshot},
@@ -20,9 +21,10 @@ use tokio::{
 };
 
 use crate::{
+    config::PushCandlestickMode,
     quote::{
         cmd_code,
-        store::Store,
+        store::{Candlesticks, Store},
         sub_flags::SubFlags,
         utils::{format_date, parse_date},
         Candlestick, PushCandlestick, PushEvent, PushEventDetail, RealtimeQuote, SecurityBoard,
@@ -91,6 +93,7 @@ pub(crate) enum Command {
 
 #[derive(Debug, Default)]
 struct CurrentTradeDays {
+    trade_day: HashMap<Market, HashSet<Date>>,
     half_days: HashMap<Market, HashSet<Date>>,
 }
 
@@ -102,7 +105,16 @@ impl CurrentTradeDays {
             HK => HalfDays(self.half_days.get(&Market::HK)),
             US => HalfDays(self.half_days.get(&Market::US)),
             SH | SZ => HalfDays(None),
+            SG => HalfDays(None),
         }
+    }
+
+    fn is_trade_day(&self, market: Market, date: Date) -> bool {
+        self.trade_day
+            .get(&market)
+            .map(|days| days.contains(&date))
+            .or(self.half_days.get(&market).map(|days| days.contains(&date)))
+            .unwrap_or_default()
     }
 }
 
@@ -135,6 +147,7 @@ pub(crate) struct Core {
     store: Store,
     member_id: i64,
     quote_level: String,
+    push_candlestick_mode: PushCandlestickMode,
 }
 
 impl Core {
@@ -196,6 +209,7 @@ impl Core {
         ws_cli.set_rate_limit(rate_limit.clone());
 
         let current_trade_days = fetch_current_trade_days(&ws_cli).await?;
+        let push_candlestick_mode = config.push_candlestick_mode;
 
         Ok(Self {
             config,
@@ -213,6 +227,7 @@ impl Core {
             store: Store::default(),
             member_id,
             quote_level,
+            push_candlestick_mode,
         })
     }
 
@@ -321,6 +336,7 @@ impl Core {
             Instant::now() + Duration::from_secs(60 * 60 * 24),
             Duration::from_secs(60 * 60 * 24),
         );
+        let mut ticker = tokio::time::interval(Duration::from_secs(1));
 
         loop {
             tokio::select! {
@@ -339,6 +355,7 @@ impl Core {
                         }
                     }
                 }
+                _ = ticker.tick() => self.tick(),
                 _ = update_trade_days_interval.tick() => {
                     if let Ok(days) = fetch_current_trade_days(&self.ws_cli).await {
                         self.current_trade_days = days;
@@ -583,11 +600,18 @@ impl Core {
             )
             .await?;
 
-        *security_data.candlesticks.entry(period).or_default() = resp
+        let candlesticks = resp
             .candlesticks
             .into_iter()
             .map(TryInto::try_into)
             .collect::<Result<Vec<_>>>()?;
+        security_data
+            .candlesticks
+            .entry(period)
+            .or_insert_with(|| Candlesticks {
+                candlesticks,
+                confirmed: false,
+            });
 
         let sub_flags = if period == Period::Day {
             SubFlags::QUOTE
@@ -683,7 +707,7 @@ impl Core {
     async fn handle_ws_event(&mut self, event: WsEvent) -> Result<()> {
         match event {
             WsEvent::Error(err) => Err(err.into()),
-            WsEvent::Push { command_code, body } => self.handle_push(command_code, body).await,
+            WsEvent::Push { command_code, body } => self.handle_push(command_code, body),
         }
     }
 
@@ -728,10 +752,64 @@ impl Core {
         Ok(())
     }
 
-    async fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
+    fn tick(&mut self) {
+        let now = OffsetDateTime::now_utc();
+
+        for (symbol, data) in &mut self.store.securities {
+            let ty = get_merger_ty(data.board);
+            let Some(market) = parse_market_from_symbol(symbol) else {
+                continue;
+            };
+
+            if !self
+                .current_trade_days
+                .is_trade_day(market.into(), now.date())
+            {
+                return;
+            }
+
+            for (period, candlesticks) in &mut data.candlesticks {
+                let merger = longport_candlesticks::Merger::new(
+                    market,
+                    convert_period(*period),
+                    self.current_trade_days.half_days(market),
+                );
+                if candlesticks.confirmed {
+                    continue;
+                }
+                let Some(prev_candlestick) = candlesticks.candlesticks.last() else {
+                    continue;
+                };
+                let prev_candlestick = longport_candlesticks::Candlestick::from(*prev_candlestick);
+                let action = match merger.tick(ty, prev_candlestick.time, now) {
+                    TickAction::AppendNew(new_time) => UpdateAction::AppendNew {
+                        confirmed: Some(prev_candlestick),
+                        new: longport_candlesticks::Candlestick {
+                            time: new_time,
+                            volume: 0,
+                            turnover: Decimal::ZERO,
+                            ..prev_candlestick
+                        },
+                    },
+                    TickAction::Confirm => UpdateAction::Confirm(prev_candlestick),
+                    TickAction::None => UpdateAction::None,
+                };
+                update_and_push_candlestick(
+                    candlesticks,
+                    &symbol,
+                    *period,
+                    action,
+                    self.push_candlestick_mode,
+                    &mut self.push_tx,
+                );
+            }
+        }
+    }
+
+    fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
         match PushEvent::parse(command_code, &body) {
             Ok((mut event, tag)) => {
-                tracing::debug!(event = ?event, tag = ?tag,"push event");
+                tracing::debug!(event = ?event, tag = ?tag, "push event");
 
                 if tag != Some(PushQuoteTag::Eod) {
                     self.store.handle_push(&mut event);
@@ -752,22 +830,9 @@ impl Core {
                                     continue;
                                 }
 
-                                let period2 = match period {
-                                    Period::UnknownPeriod => unreachable!(),
-                                    Period::OneMinute => longport_candlesticks::Period::Min_1,
-                                    Period::FiveMinute => longport_candlesticks::Period::Min_5,
-                                    Period::FifteenMinute => longport_candlesticks::Period::Min_15,
-                                    Period::ThirtyMinute => longport_candlesticks::Period::Min_30,
-                                    Period::SixtyMinute => longport_candlesticks::Period::Min_60,
-                                    Period::Day => unreachable!(),
-                                    Period::Week => longport_candlesticks::Period::Week,
-                                    Period::Month => longport_candlesticks::Period::Month,
-                                    Period::Year => longport_candlesticks::Period::Year,
-                                };
-
                                 let merger = longport_candlesticks::Merger::new(
                                     market,
-                                    period2,
+                                    convert_period(*period),
                                     self.current_trade_days.half_days(market),
                                 );
 
@@ -776,13 +841,9 @@ impl Core {
                                         continue;
                                     }
 
-                                    let prev = candlesticks
-                                        .last()
-                                        .map(|candlestick| (*candlestick).into());
-
                                     let action = merger.merge(
                                         merge_ty,
-                                        prev.as_ref(),
+                                        candlesticks.merge_input(),
                                         longport_candlesticks::Trade {
                                             time: trade.timestamp,
                                             price: trade.price,
@@ -795,6 +856,7 @@ impl Core {
                                         &event.symbol,
                                         *period,
                                         action,
+                                        self.push_candlestick_mode,
                                         &mut self.push_tx,
                                     );
                                 }
@@ -831,10 +893,8 @@ impl Core {
                                     longport_candlesticks::Period::Day,
                                     self.current_trade_days.half_days(market),
                                 );
-                                let prev =
-                                    candlesticks.last().map(|candlestick| (*candlestick).into());
                                 let action = merger.merge_by_quote(
-                                    prev.as_ref(),
+                                    candlesticks.merge_input(),
                                     merge_ty,
                                     longport_candlesticks::Quote {
                                         time: push_quote.timestamp,
@@ -851,6 +911,7 @@ impl Core {
                                     &event.symbol,
                                     Period::Day,
                                     action,
+                                    self.push_candlestick_mode,
                                     &mut self.push_tx,
                                 );
                             }
@@ -946,10 +1007,10 @@ impl Core {
             .map(|data| &data.candlesticks)
             .and_then(|periods| periods.get(&period))
             .map(|candlesticks| {
-                let candlesticks = if candlesticks.len() >= count {
-                    &candlesticks[candlesticks.len() - count..]
+                let candlesticks = if candlesticks.candlesticks.len() >= count {
+                    &candlesticks.candlesticks[candlesticks.candlesticks.len() - count..]
                 } else {
-                    candlesticks
+                    &candlesticks.candlesticks
                 };
                 candlesticks.to_vec()
             })
@@ -970,7 +1031,7 @@ async fn fetch_current_trade_days(cli: &WsClient) -> Result<CurrentTradeDays> {
     let begin_day = OffsetDateTime::now_utc().date() - time::Duration::days(1);
     let end_day = begin_day + time::Duration::days(30);
 
-    for market in [Market::HK, Market::US] {
+    for market in [Market::HK, Market::US, Market::SG, Market::CN] {
         let resp = cli
             .request::<_, MarketTradeDayResponse>(
                 cmd_code::GET_TRADING_DAYS,
@@ -982,6 +1043,17 @@ async fn fetch_current_trade_days(cli: &WsClient) -> Result<CurrentTradeDays> {
                 },
             )
             .await?;
+
+        days.trade_day.insert(
+            market,
+            resp.trade_day
+                .iter()
+                .map(|value| {
+                    parse_date(value).map_err(|err| Error::parse_field_error("half_trade_day", err))
+                })
+                .collect::<Result<HashSet<_>>>()?,
+        );
+
         days.half_days.insert(
             market,
             resp.half_trade_day
@@ -1008,28 +1080,43 @@ fn parse_market_from_symbol(symbol: &str) -> Option<longport_candlesticks::Marke
 }
 
 fn update_and_push_candlestick(
-    candlesticks: &mut Vec<Candlestick>,
+    candlesticks: &mut Candlesticks,
     symbol: &str,
     period: Period,
     action: UpdateAction,
+    push_candlestick_mode: PushCandlestickMode,
     tx: &mut mpsc::UnboundedSender<PushEvent>,
 ) {
     let candlestick = match action {
         UpdateAction::UpdateLast(candlestick) => {
-            let candlestick = candlestick.into();
-            *candlesticks.last_mut().unwrap() = candlestick;
-            Some(candlestick)
-        }
-        UpdateAction::AppendNew(candlestick) => {
-            let candlestick = candlestick.into();
-            candlesticks.push(candlestick);
-            if candlesticks.len() > MAX_CANDLESTICKS * 2 {
-                candlesticks.drain(..MAX_CANDLESTICKS);
+            *candlesticks.candlesticks.last_mut().unwrap() = candlestick.into();
+            match push_candlestick_mode {
+                PushCandlestickMode::Realtime => Some(candlestick.into()),
+                PushCandlestickMode::Confirmed => None,
             }
-            Some(candlestick)
+        }
+        UpdateAction::AppendNew { confirmed, new } => {
+            candlesticks.candlesticks.push(new.into());
+            candlesticks.confirmed = false;
+            if candlesticks.candlesticks.len() > MAX_CANDLESTICKS * 2 {
+                candlesticks.candlesticks.drain(..MAX_CANDLESTICKS);
+            }
+
+            match push_candlestick_mode {
+                PushCandlestickMode::Realtime => Some(new.into()),
+                PushCandlestickMode::Confirmed => confirmed.map(Into::into),
+            }
+        }
+        UpdateAction::Confirm(candlestick) => {
+            candlesticks.confirmed = true;
+            match push_candlestick_mode {
+                PushCandlestickMode::Realtime => None,
+                PushCandlestickMode::Confirmed => Some(candlestick.into()),
+            }
         }
         UpdateAction::None => None,
     };
+
     if let Some(candlestick) = candlestick {
         let _ = tx.send(PushEvent {
             sequence: 0,
@@ -1039,5 +1126,21 @@ fn update_and_push_candlestick(
                 candlestick,
             }),
         });
+    }
+}
+
+#[inline]
+fn convert_period(period: Period) -> longport_candlesticks::Period {
+    match period {
+        Period::UnknownPeriod => unreachable!(),
+        Period::OneMinute => longport_candlesticks::Period::Min_1,
+        Period::FiveMinute => longport_candlesticks::Period::Min_5,
+        Period::FifteenMinute => longport_candlesticks::Period::Min_15,
+        Period::ThirtyMinute => longport_candlesticks::Period::Min_30,
+        Period::SixtyMinute => longport_candlesticks::Period::Min_60,
+        Period::Day => longport_candlesticks::Period::Day,
+        Period::Week => longport_candlesticks::Period::Week,
+        Period::Month => longport_candlesticks::Period::Month,
+        Period::Year => longport_candlesticks::Period::Year,
     }
 }

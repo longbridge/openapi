@@ -139,6 +139,7 @@ impl<'a> Context<'a> {
                     match item.transpose()? {
                         Some(msg) => {
                             if msg.is_ping() {
+                                tracing::debug!("ping");
                                 ping_time = Instant::now();
                             }
                             self.handle_message(msg).await?;
@@ -154,6 +155,7 @@ impl<'a> Context<'a> {
                 }
                 _ = checkout_timeout.tick() => {
                     if (Instant::now() - ping_time) > HEARTBEAT_TIMEOUT {
+                        tracing::error!("heartbeat timeout");
                         return Err(WsClientError::ConnectionClosed { reason: None });
                     }
                 }

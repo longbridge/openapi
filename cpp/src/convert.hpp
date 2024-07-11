@@ -112,6 +112,19 @@ convert(Language language)
   }
 }
 
+inline lb_push_candlestick_mode_t
+convert(PushCandlestickMode mode)
+{
+  switch (mode) {
+    case PushCandlestickMode::Realtime:
+      return PushCandlestickMode_Realtime;
+    case PushCandlestickMode::Confirmed:
+      return PushCandlestickMode_Confirmed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
 inline Market
 convert(lb_market_t market)
 {

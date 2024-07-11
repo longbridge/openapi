@@ -28,3 +28,13 @@ pub enum Language {
     /// en
     EN,
 }
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longport::PushCandlestickMode")]
+pub enum PushCandlestickMode {
+    /// Realtime mode
+    Realtime,
+    /// Confirmed mode
+    Confirmed,
+}

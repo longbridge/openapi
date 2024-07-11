@@ -1,7 +1,11 @@
 use chrono::{DateTime, Utc};
 use napi::Result;
 
-use crate::{error::ErrorNewType, types::Language, utils::from_datetime};
+use crate::{
+    error::ErrorNewType,
+    types::{Language, PushCandlestickMode},
+    utils::from_datetime,
+};
 
 /// Configuration parameters
 #[napi_derive::napi(object)]
@@ -24,6 +28,8 @@ pub struct ConfigParams {
     pub language: Option<Language>,
     /// Enable overnight (default: false)
     pub enable_overnight: Option<bool>,
+    /// Push candlesticks mode (default: PushCandlestickMode.Realtime)
+    pub push_candlestick_mode: Option<PushCandlestickMode>,
 }
 
 /// Configuration for LongPort sdk
@@ -58,6 +64,10 @@ impl Config {
             config = config.enable_overnight();
         }
 
+        if let Some(mode) = params.push_candlestick_mode {
+            config = config.push_candlestick_mode(mode.into());
+        }
+
         Self(config)
     }
 
@@ -76,6 +86,8 @@ impl Config {
     /// - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
     /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
     ///   `false` (Default: `false`)
+    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+    ///   `realtime`)
     #[napi(factory)]
     pub fn from_env() -> Result<Self> {
         Ok(Self(longport::Config::from_env().map_err(ErrorNewType)?))

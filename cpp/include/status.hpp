@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 typedef struct lb_error_t lb_error_t;
 
 namespace longport {
@@ -13,7 +15,7 @@ public:
   Status();
   Status(const lb_error_t* err);
   Status(lb_error_t* err);
-  Status(Status&& status);
+  Status(Status&& status) noexcept;
   ~Status();
 
   inline operator bool() { return is_ok(); }
@@ -25,7 +27,7 @@ public:
   bool is_err() const;
 
   /// Returns the error code
-  int code() const;
+  int64_t code() const;
 
   /// Returns the error message
   const char* message() const;

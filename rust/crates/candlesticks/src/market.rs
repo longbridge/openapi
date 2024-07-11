@@ -17,6 +17,7 @@ pub enum Market {
     US,
     SH,
     SZ,
+    SG,
 }
 
 impl Market {
@@ -28,6 +29,7 @@ impl Market {
             Market::HK => db::asia::HONG_KONG,
             Market::US => db::america::NEW_YORK,
             Market::SH | Market::SZ => db::asia::SHANGHAI,
+            Market::SG => db::asia::SINGAPORE,
         }
     }
 
@@ -66,6 +68,7 @@ impl Market {
                 _ => UpdateFields::empty(),
             },
             Market::SH | Market::SZ => UpdateFields::all(),
+            Market::SG => UpdateFields::all(),
         }
     }
 
@@ -82,6 +85,10 @@ impl Market {
                 (time!(9:30:00), time!(11:30:00)),
                 (time!(13:00:00), time!(15:00:00)),
             ],
+            (Market::SG, _) => &[
+                (time!(9:00:00), time!(12:30:00)),
+                (time!(14:00:00), time!(17:00:00)),
+            ],
         }
     }
 
@@ -92,6 +99,7 @@ impl Market {
             (Market::US, Type::USOQ) => &[(time!(9:30:00), time!(13:00:00))],
             (Market::US, _) => &[(time!(9:30:00), time!(13:00:00))],
             (Market::SH | Market::SZ, _) => unreachable!("does not supported"),
+            (Market::SG, _) => unreachable!("does not supported"),
         }
     }
 
@@ -102,6 +110,7 @@ impl Market {
             Market::US => volume,
             Market::SH => volume * 100,
             Market::SZ => volume * 100,
+            Market::SG => volume,
         }
     }
 }

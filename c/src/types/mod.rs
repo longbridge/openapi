@@ -5,6 +5,7 @@ mod decimal;
 mod language;
 mod market;
 mod option;
+mod push_candlestick_mode;
 mod string;
 
 use std::{ffi::CStr, os::raw::c_char};
@@ -16,6 +17,7 @@ pub(crate) use decimal::CDecimal;
 pub(crate) use language::CLanguage;
 pub(crate) use market::CMarket;
 pub(crate) use option::COption;
+pub(crate) use push_candlestick_mode::CPushCandlestickMode;
 pub(crate) use string::CString;
 
 pub(crate) trait ToFFI {
