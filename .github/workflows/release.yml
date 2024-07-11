@@ -202,7 +202,6 @@ jobs:
           manylinux: 2_28
           args: -i python${{ matrix.python-version }} --release --out dist -m python/Cargo.toml
       - uses: uraimo/run-on-arch-action@v2.2.0
-        if: matrix.target != 'ppc64'
         name: Install built wheel
         with:
           arch: ${{ matrix.target }}
