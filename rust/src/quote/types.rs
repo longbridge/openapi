@@ -27,7 +27,7 @@ pub struct Depth {
     /// Position
     pub position: i32,
     /// Price
-    pub price: Decimal,
+    pub price: Option<Decimal>,
     /// Volume
     pub volume: i64,
     /// Number of orders
@@ -40,7 +40,7 @@ impl TryFrom<quote::Depth> for Depth {
     fn try_from(depth: quote::Depth) -> Result<Self> {
         Ok(Self {
             position: depth.position,
-            price: depth.price.parse().unwrap_or_default(),
+            price: depth.price.parse().ok(),
             volume: depth.volume,
             order_num: depth.order_num,
         })

@@ -514,7 +514,8 @@ pub struct Depth {
     /// Position
     position: i32,
     /// Price
-    price: Decimal,
+    #[js(opt)]
+    price: Option<Decimal>,
     /// Volume
     volume: i64,
     /// Number of orders

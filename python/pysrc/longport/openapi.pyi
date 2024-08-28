@@ -1083,7 +1083,7 @@ class Depth:
     Position
     """
 
-    price: Decimal
+    price: Optional[Decimal]
     """
     Price
     """

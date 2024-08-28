@@ -522,7 +522,7 @@ convert(const lb_depth_t* depth)
 {
   return Depth{
     depth->position,
-    Decimal(depth->price),
+    depth->price ? std::optional{ Decimal(depth->price) } : std::nullopt,
     depth->volume,
     depth->order_num,
   };

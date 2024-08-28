@@ -15,7 +15,10 @@ struct HttpResult
 {
   const char* response_body;
 
-  HttpResult(const char* response_body) {}
+  HttpResult(const char* response_body)
+    : response_body(response_body)
+  {
+  }
 };
 
 class HttpClient

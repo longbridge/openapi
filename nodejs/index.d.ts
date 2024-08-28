@@ -1765,7 +1765,7 @@ export class Depth {
   /** Position */
   get position(): number
   /** Price */
-  get price(): Decimal
+  get price(): Decimal | null
   /** Volume */
   get volume(): number
   /** Number of orders */

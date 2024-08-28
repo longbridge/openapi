@@ -510,7 +510,8 @@ pub(crate) struct Depth {
     /// Position
     position: i32,
     /// Price
-    price: PyDecimal,
+    #[py(opt)]
+    price: Option<PyDecimal>,
     /// Volume
     volume: i64,
     /// Number of orders

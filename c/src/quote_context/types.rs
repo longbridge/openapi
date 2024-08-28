@@ -132,7 +132,7 @@ pub struct CDepth {
 #[derive(Debug)]
 pub(crate) struct CDepthOwned {
     position: i32,
-    price: CDecimal,
+    price: COption<CDecimal>,
     volume: i64,
     order_num: i64,
 }
@@ -166,7 +166,7 @@ impl ToFFI for CDepthOwned {
         } = self;
         CDepth {
             position: *position,
-            price,
+            price: price.to_ffi_type().to_ffi_type(),
             volume: *volume,
             order_num: *order_num,
         }

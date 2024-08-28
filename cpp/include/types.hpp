@@ -202,7 +202,7 @@ struct Depth
   /// Position
   int32_t position;
   /// Price
-  Decimal price;
+  std::optional<Decimal> price;
   /// Volume
   int64_t volume;
   /// Number of orders
