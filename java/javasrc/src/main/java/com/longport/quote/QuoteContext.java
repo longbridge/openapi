@@ -33,6 +33,8 @@ public class QuoteContext implements AutoCloseable {
 
     /**
      * Returns the member ID
+     * 
+     * @return Member ID
      */
     public long getMemberId() {
         return SdkNative.quoteContextGetMemberId(this.raw);
@@ -40,6 +42,8 @@ public class QuoteContext implements AutoCloseable {
 
     /**
      * Returns the quote level
+     * 
+     * @return Quote level
      */
     public String getQuoteLevel() {
         return SdkNative.quoteContextGetQuoteLevel(this.raw);
@@ -677,6 +681,7 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
+     * @param opts Query options
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -789,6 +794,12 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get history candlesticks by offset
      * 
+     * @param symbol     Security symbol
+     * @param period     Candlestick period
+     * @param adjustType Adjustment type
+     * @param forward    Forward or backward
+     * @param datetime   From datetime
+     * @param count      Count of candlesticks
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -804,6 +815,11 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get history candlesticks by date
      * 
+     * @param symbol     Security symbol
+     * @param period     Candlestick period
+     * @param adjustType Adjustment type
+     * @param start      Start date
+     * @param end        End date
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -818,6 +834,8 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get security calc indexes
      * 
+     * @param symbols Security symbols
+     * @param indexes Calc indexes
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */

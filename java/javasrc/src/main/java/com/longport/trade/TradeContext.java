@@ -351,6 +351,7 @@ public class TradeContext implements AutoCloseable {
      * }
      * </pre>
      * 
+     * @param currency Currency
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
@@ -551,7 +552,7 @@ public class TradeContext implements AutoCloseable {
      * 
      * @param opts Options for this request
      * @return A Future representing the result of the operation
-     * @throws OpenApiException
+     * @throws OpenApiException If an error occurs
      */
     public CompletableFuture<EstimateMaxPurchaseQuantityResponse> getEstimateMaxPurchaseQuantity(
             EstimateMaxPurchaseQuantityOptions opts)

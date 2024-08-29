@@ -80,7 +80,7 @@ jobs:
           mv -f target/doc gh-pages/rust
           mv -f python/site gh-pages/python
           mv -f nodejs/docs gh-pages/nodejs
-          mv -f java/javasrc/target/site/apidocs gh-pages/java
+          mv -f java/javasrc/target/reports/apidocs gh-pages/java
           mv -f c/html gh-pages/c
           mv -f cpp/html gh-pages/cpp
           cp .github/misc/templates/docs.html gh-pages/index.html
