@@ -145,7 +145,7 @@ jobs:
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
       - name: Upload wheels
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
@@ -184,7 +184,7 @@ jobs:
           pip install longport --no-index --find-links dist --force-reinstall
           python -c "import longport"
       - name: Upload wheels
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
@@ -218,7 +218,7 @@ jobs:
           pip install longport --no-index --find-links dist --force-reinstall
           python -c "import longport"
       - name: Upload wheels
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
@@ -265,7 +265,7 @@ jobs:
             venv/bin/pip install longport --no-index --find-links /artifacts --force-reinstall
             venv/bin/python -c 'import longport'
       - name: Upload wheels
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
