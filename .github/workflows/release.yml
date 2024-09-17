@@ -111,7 +111,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-macos-${{ matrix.python.version }}
           path: dist
 
   build-python-sdk-windows:
@@ -148,7 +148,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-windows-${{ matrix.target }}-${{ matrix.python-version }}
           path: dist
 
   build-python-sdk-linux:
@@ -180,7 +180,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-linux-${{ matrix.target }}-${{ matrix.python-version }}
           path: dist
 
   build-python-sdk-linux-cross:
@@ -225,7 +225,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-linux-${{ matrix.target }}-${{ matrix.python-version }}
           path: dist
 
   publish-python-sdk:
@@ -243,8 +243,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: wheels
           path: dist
+          merge-multiple: true
       - uses: actions/setup-python@v5
         with:
           python-version: 3.7
@@ -257,19 +257,22 @@ jobs:
       matrix:
         settings:
           - host: macos-13
-            architecture: x64
+            architecture: macos-x64
             build: |
               npm run build
               strip -x *.node
+            artifact-name: macos
 
           - host: windows-latest
             build: npm run build
             architecture: x64
+            artifact-name: windows
 
           - host: ubuntu-latest
             build: |
               npm run build
               strip *.node
+            artifact-name: linux-x64
 
           - host: macos-13
             target: aarch64-apple-darwin
@@ -281,6 +284,7 @@ jobs:
               export CFLAGS="-isysroot $SYSROOT -isystem $SYSROOT";
               yarn build --target aarch64-apple-darwin
               strip -x *.node
+            artifact-name: macos-aarch64
 
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -316,7 +320,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bindings
+          name: bindings-${{ matrix.settings.artifact-name }}
           path: nodejs/longport.*.node
 
   publish-nodejs-sdk:
@@ -338,8 +342,8 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: bindings
           path: ./nodejs/artifacts
+          merge-multiple: true
       - name: Move artifacts
         run: napi artifacts
         working-directory: ./nodejs
@@ -414,7 +418,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jnis
+          name: jnis-${{ matrix.settings.target }}
           path: longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
   publish-java-sdk:
@@ -434,8 +438,8 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: jnis
           path: ./java/jnis
+          merge-multiple: true
 
       - name: Copy jnis
         working-directory: java
@@ -480,13 +484,13 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: include
+          name: include-c
           path: c/csrc/include
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: include
+          name: include-cpp
           path: cpp/include
 
   build-cpp-sdk-debug:
@@ -567,7 +571,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: libs
+          name: libs-debug-${{ matrix.settings.target }}
           path: dist/lib
 
   build-cpp-sdk-release:
@@ -648,7 +652,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: libs
+          name: libs-release-${{ matrix.settings.target }}
           path: dist/lib
 
   build-ios-cpp-sdk:
@@ -718,7 +722,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: libs
+          name: libs-ios-${{ matrix.settings.build-type }}-${{ matrix.settings.target }}
           path: dist/lib
 
   build-android-cpp-sdk:
@@ -812,7 +816,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: libs
+          name: libs-android-${{ matrix.settings.build-type }}-${{ matrix.settings.target }}
           path: dist/lib
 
   publish-cpp-sdk:
@@ -828,14 +832,14 @@ jobs:
       - name: Download includes
         uses: actions/download-artifact@v4
         with:
-          name: libs
           path: ./sdk/libs
+          merge-multiple: true
 
       - name: Download includes
         uses: actions/download-artifact@v4
         with:
-          name: include
           path: ./sdk/include
+          merge-multiple: true
 
       - name: Get Version
         run: echo SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' c/Cargo.toml) >> $GITHUB_ENV
