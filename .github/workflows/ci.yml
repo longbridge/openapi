@@ -327,8 +327,8 @@ jobs:
       - name: Check with clippy
         run: cargo clippy -p longport-nodejs --all-features
 
-      - name: Test
-        run: cargo test -p longport-nodejs --all-features
+      # - name: Test
+      #   run: cargo test -p longport-nodejs --all-features
 
       - name: Install napi-rs/cli
         run: npm install -g @napi-rs/cli

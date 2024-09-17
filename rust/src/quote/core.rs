@@ -471,7 +471,9 @@ impl Core {
             sub_type: sub_types.into(),
             is_first_push,
         };
-        self.ws_cli.request(cmd_code::SUBSCRIBE, None, req).await?;
+        self.ws_cli
+            .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
+            .await?;
 
         // update subscriptions
         for symbol in symbols {
@@ -528,7 +530,7 @@ impl Core {
 
         for req in requests {
             self.ws_cli
-                .request(cmd_code::UNSUBSCRIBE, None, req)
+                .request::<_, ()>(cmd_code::UNSUBSCRIBE, None, req)
                 .await?;
         }
 
@@ -635,7 +637,9 @@ impl Core {
             sub_type: sub_flags.into(),
             is_first_push: true,
         };
-        self.ws_cli.request(cmd_code::SUBSCRIBE, None, req).await?;
+        self.ws_cli
+            .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
+            .await?;
 
         Ok(())
     }
@@ -671,7 +675,7 @@ impl Core {
                     .contains(unsubscribe_sub_flags)
             {
                 self.ws_cli
-                    .request(
+                    .request::<_, ()>(
                         cmd_code::UNSUBSCRIBE,
                         None,
                         UnsubscribeRequest {
@@ -738,7 +742,7 @@ impl Core {
 
         for (flags, symbols) in subscriptions {
             self.ws_cli
-                .request(
+                .request::<_, ()>(
                     cmd_code::SUBSCRIBE,
                     None,
                     SubscribeRequest {
