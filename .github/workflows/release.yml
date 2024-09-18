@@ -258,7 +258,7 @@ jobs:
       matrix:
         settings:
           - host: macos-13
-            architecture: macos-x64
+            architecture: x64
             build: |
               npm run build
               strip -x *.node
