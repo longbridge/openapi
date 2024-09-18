@@ -244,6 +244,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: dist
+          pattern: wheels-*
           merge-multiple: true
       - uses: actions/setup-python@v5
         with:
@@ -343,6 +344,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./nodejs/artifacts
+          pattern: bindings-*
           merge-multiple: true
       - name: Move artifacts
         run: napi artifacts
@@ -439,6 +441,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./java/jnis
+          pattern: jnis-*
           merge-multiple: true
 
       - name: Copy jnis
@@ -833,12 +836,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./sdk/libs
+          pattern: libs-*
           merge-multiple: true
 
       - name: Download includes
         uses: actions/download-artifact@v4
         with:
           path: ./sdk/include
+          pattern: include-*
           merge-multiple: true
 
       - name: Get Version
