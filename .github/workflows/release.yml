@@ -5,59 +5,6 @@ on:
       - release
 
 jobs:
-  publish-rust-sdk:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      max-parallel: 1
-      matrix:
-        package:
-          - name: longport-proto
-            registryName: longport-proto
-            path: rust/crates/proto
-          - name: longport-httpcli
-            registryName: longport-httpcli
-            path: rust/crates/httpclient
-          - name: longport-wscli
-            registryName: longport-wscli
-            path: rust/crates/wsclient
-          - name: longport-candlesticks
-            registryName: longport-candlesticks
-            path: rust/crates/candlesticks
-          - name: longport
-            registryName: longport
-            path: rust
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: get version
-        working-directory: ${{ matrix.package.path }}
-        run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
-      - name: check published version
-        run: echo PUBLISHED_VERSION=$(cargo search ${{ matrix.package.registryName }} --limit 1 | sed -nE 's/^[^"]*"//; s/".*//1p' -) >> $GITHUB_ENV
-      - name: cargo login
-        if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
-        run: cargo login ${{ secrets.CRATES_TOKEN }}
-      - name: cargo package
-        if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
-        working-directory: ${{ matrix.package.path }}
-        run: |
-          cargo package
-          echo "We will publish:" $PACKAGE_VERSION
-          echo "This is current latest:" $PUBLISHED_VERSION
-      - name: Publish ${{ matrix.package.name }}
-        if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
-        working-directory: ${{ matrix.package.path }}
-        run: |
-          echo "# Cargo Publish"
-          cargo publish --no-verify
-
   build-python-sdk-macos:
     runs-on: macos-13
     strategy:
@@ -228,30 +175,6 @@ jobs:
           name: wheels-linux-${{ matrix.target }}-${{ matrix.python-version }}
           path: dist
 
-  publish-python-sdk:
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/longport
-    permissions:
-      id-token: write
-    needs:
-      - build-python-sdk-macos
-      - build-python-sdk-windows
-      - build-python-sdk-linux
-      - build-python-sdk-linux-cross
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: dist
-          pattern: wheels-*
-          merge-multiple: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.7
-      - name: Publish to PyPi
-        uses: pypa/gh-action-pypi-publish@release/v1
-
   build-nodejs-sdk:
     strategy:
       fail-fast: true
@@ -324,43 +247,6 @@ jobs:
           name: bindings-${{ matrix.settings.artifact-name }}
           path: nodejs/longport.*.node
 
-  publish-nodejs-sdk:
-    runs-on: ubuntu-latest
-    needs:
-      - build-nodejs-sdk
-    steps:
-      - uses: actions/checkout@v3
-      - name: Update versions
-        run: node ./.github/misc/update_jssdk_version.mjs $(sed -nE 's/^\s*version = "(.*?)"/\1/p' nodejs/Cargo.toml)
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          check-latest: true
-      - name: Install napi-rs/cli
-        run: npm install -g @napi-rs/cli
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./nodejs/artifacts
-          pattern: bindings-*
-          merge-multiple: true
-      - name: Move artifacts
-        run: napi artifacts
-        working-directory: ./nodejs
-      - name: List packages
-        run: ls -R ./npm
-        shell: bash
-        working-directory: ./nodejs
-      - name: Publish
-        run: |
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-          npm publish --access public
-        working-directory: ./nodejs
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
   build-java-jni:
     strategy:
       fail-fast: true
@@ -422,60 +308,6 @@ jobs:
         with:
           name: jnis-${{ matrix.settings.target }}
           path: longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
-
-  publish-java-sdk:
-    runs-on: ubuntu-latest
-    needs: build-java-jni
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-
-      - name: Install JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "8"
-          distribution: "temurin"
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./java/jnis
-          pattern: jnis-*
-          merge-multiple: true
-
-      - name: Copy jnis
-        working-directory: java
-        run: |
-          mkdir -p javasrc/target/natives/linux_64
-          mkdir -p javasrc/target/natives/linux_arm64
-          mkdir -p javasrc/target/natives/windows_64
-          mkdir -p javasrc/target/natives/osx_64
-          mkdir -p javasrc/target/natives/osx_arm64
-          mv jnis/longport_java-x86_64-unknown-linux-gnu.so javasrc/target/natives/linux_64/liblongport_java.so
-          mv jnis/longport_java-aarch64-unknown-linux-gnu.so javasrc/target/natives/linux_arm64/liblongport_java.so
-          mv jnis/longport_java-x86_64-pc-windows-msvc.dll javasrc/target/natives/windows_64/longport_java.dll
-          mv jnis/longport_java-x86_64-apple-darwin.dylib javasrc/target/natives/osx_64/liblongport_java.dylib
-          mv jnis/longport_java-aarch64-apple-darwin.dylib javasrc/target/natives/osx_arm64/liblongport_java.dylib
-
-      - name: Get version
-        working-directory: java
-        run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
-
-      - name: Update version
-        working-directory: java/javasrc
-        run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
-
-      - name: Publish maven package
-        uses: samuelmeuli/action-maven-publish@v1
-        with:
-          directory: java/javasrc
-          maven_profiles: release
-          maven_goals_phases: deploy
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          nexus_username: ${{ secrets.OSSRH_USERNAME }}
-          nexus_password: ${{ secrets.OSSRH_PASSWORD }}
 
   copy-cpp-headers:
     runs-on: ubuntu-latest
@@ -822,12 +654,80 @@ jobs:
           name: libs-android-${{ matrix.settings.build-type }}-${{ matrix.settings.target }}
           path: dist/lib
 
-  publish-cpp-sdk:
+  build:
     needs:
+      - build-python-sdk-macos
+      - build-python-sdk-windows
+      - build-python-sdk-linux
+      - build-python-sdk-linux-cross
+      - build-nodejs-sdk
+      - build-java-jni
       - build-cpp-sdk-debug
       - build-cpp-sdk-release
       - build-ios-cpp-sdk
       - build-android-cpp-sdk
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All builds are done"
+
+  publish-rust-sdk:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        package:
+          - name: longport-proto
+            registryName: longport-proto
+            path: rust/crates/proto
+          - name: longport-httpcli
+            registryName: longport-httpcli
+            path: rust/crates/httpclient
+          - name: longport-wscli
+            registryName: longport-wscli
+            path: rust/crates/wsclient
+          - name: longport-candlesticks
+            registryName: longport-candlesticks
+            path: rust/crates/candlesticks
+          - name: longport
+            registryName: longport
+            path: rust
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: get version
+        working-directory: ${{ matrix.package.path }}
+        run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
+      - name: check published version
+        run: echo PUBLISHED_VERSION=$(cargo search ${{ matrix.package.registryName }} --limit 1 | sed -nE 's/^[^"]*"//; s/".*//1p' -) >> $GITHUB_ENV
+      - name: cargo login
+        if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
+        run: cargo login ${{ secrets.CRATES_TOKEN }}
+      - name: cargo package
+        if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
+        working-directory: ${{ matrix.package.path }}
+        run: |
+          cargo package
+          echo "We will publish:" $PACKAGE_VERSION
+          echo "This is current latest:" $PUBLISHED_VERSION
+      - name: Publish ${{ matrix.package.name }}
+        if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
+        working-directory: ${{ matrix.package.path }}
+        run: |
+          echo "# Cargo Publish"
+          cargo publish --no-verify
+
+  publish-cpp-sdk:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -865,3 +765,115 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_SECRET }}
         run: |
           aws --region=${{ secrets.PROD_HK_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
+
+  publish-python-sdk:
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/longport
+    permissions:
+      id-token: write
+    needs:
+      - build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: wheels-*
+          merge-multiple: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.7
+      - name: Publish to PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  publish-nodejs-sdk:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update versions
+        run: node ./.github/misc/update_jssdk_version.mjs $(sed -nE 's/^\s*version = "(.*?)"/\1/p' nodejs/Cargo.toml)
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          check-latest: true
+      - name: Install napi-rs/cli
+        run: npm install -g @napi-rs/cli
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./nodejs/artifacts
+          pattern: bindings-*
+          merge-multiple: true
+      - name: Move artifacts
+        run: napi artifacts
+        working-directory: ./nodejs
+      - name: List packages
+        run: ls -R ./npm
+        shell: bash
+        working-directory: ./nodejs
+      - name: Publish
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          npm publish --access public
+        working-directory: ./nodejs
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-java-sdk:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "8"
+          distribution: "temurin"
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./java/jnis
+          pattern: jnis-*
+          merge-multiple: true
+
+      - name: Copy jnis
+        working-directory: java
+        run: |
+          mkdir -p javasrc/target/natives/linux_64
+          mkdir -p javasrc/target/natives/linux_arm64
+          mkdir -p javasrc/target/natives/windows_64
+          mkdir -p javasrc/target/natives/osx_64
+          mkdir -p javasrc/target/natives/osx_arm64
+          mv jnis/longport_java-x86_64-unknown-linux-gnu.so javasrc/target/natives/linux_64/liblongport_java.so
+          mv jnis/longport_java-aarch64-unknown-linux-gnu.so javasrc/target/natives/linux_arm64/liblongport_java.so
+          mv jnis/longport_java-x86_64-pc-windows-msvc.dll javasrc/target/natives/windows_64/longport_java.dll
+          mv jnis/longport_java-x86_64-apple-darwin.dylib javasrc/target/natives/osx_64/liblongport_java.dylib
+          mv jnis/longport_java-aarch64-apple-darwin.dylib javasrc/target/natives/osx_arm64/liblongport_java.dylib
+
+      - name: Get version
+        working-directory: java
+        run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
+
+      - name: Update version
+        working-directory: java/javasrc
+        run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
+
+      - name: Publish maven package
+        uses: samuelmeuli/action-maven-publish@v1
+        with:
+          directory: java/javasrc
+          maven_profiles: release
+          maven_goals_phases: deploy
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          nexus_username: ${{ secrets.OSSRH_USERNAME }}
+          nexus_password: ${{ secrets.OSSRH_PASSWORD }}
