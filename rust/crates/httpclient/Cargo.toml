@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longport-httpcli"
-version = "1.0.38"
+version = "1.0.39"
 description = "LongPort HTTP SDK for Rust"
 license = "MIT OR Apache-2.0"
 
