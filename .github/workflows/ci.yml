@@ -355,7 +355,10 @@ jobs:
           run: ${{ matrix.settings.build }}
 
       - name: Move artifacts
-        run: yarn artifacts
+        run: |
+          mkdir -p artifacts
+          mv longport.*.node artifacts/
+          yarn artifacts
         working-directory: ./nodejs
 
       - name: List packages
