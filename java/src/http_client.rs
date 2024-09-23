@@ -6,6 +6,7 @@ use jni::{
 use longport::httpclient::{HttpClient, HttpClientConfig, Json, Method};
 use serde::Deserialize;
 use serde_json::Value;
+use std::collections::HashMap;
 
 use crate::{
     async_util,
@@ -67,6 +68,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_httpClientRequest(
         method: String,
         path: String,
         data: Option<Value>,
+        headers: Option<HashMap<String, String>>,
     }
 
     jni_result(&mut env, (), |env| {
@@ -76,7 +78,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_httpClientRequest(
             serde_json::from_str(&request).map_err(|err| JniError::Other(err.to_string()))?;
 
         async_util::execute(env, callback, async move {
-            let req = http_client
+            let mut req = http_client
                 .request(
                     request
                         .method
@@ -86,6 +88,12 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_httpClientRequest(
                     request.path,
                 )
                 .response::<String>();
+
+            if let Some(headers) = request.headers {
+                for (key, value) in headers {
+                    req = req.header(&key, &value);
+                }
+            }
 
             let resp = match request.data {
                 Some(req_data) => req
