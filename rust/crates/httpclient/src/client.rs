@@ -47,7 +47,7 @@ impl HttpClient {
         let key = key.try_into();
         let value = value.try_into();
         if let (Ok(key), Ok(value)) = (key, value) {
-            self.default_headers.append(key, value);
+            self.default_headers.insert(key, value);
         }
         self
     }

@@ -1,9 +1,10 @@
+use std::collections::HashMap;
+
 use jni::{
     objects::{JClass, JObject, JString},
     sys::jlong,
     JNIEnv,
 };
-use std::collections::HashMap;
 use longport::httpclient::{HttpClient, HttpClientConfig, Json, Method};
 use serde::Deserialize;
 use serde_json::Value;
