@@ -14,6 +14,7 @@ pub struct EstimateMaxPurchaseQuantityOptions {
     pub price: Option<ClassInstance<Decimal>>,
     pub currency: Option<String>,
     pub order_id: Option<String>,
+    pub fractional_shares: bool,
 }
 
 impl From<EstimateMaxPurchaseQuantityOptions>
@@ -34,6 +35,9 @@ impl From<EstimateMaxPurchaseQuantityOptions>
         }
         if let Some(order_id) = opts.order_id {
             opts2 = opts2.order_id(order_id);
+        }
+        if opts.fractional_shares {
+            opts2 = opts2.fractional_shares();
         }
         opts2
     }

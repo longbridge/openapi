@@ -1941,6 +1941,7 @@ pub struct CEstimateMaxPurchaseQuantityOptions {
     pub side: COrderSide,
     pub currency: *const c_char,
     pub order_id: *const c_char,
+    pub fractional_shares: bool,
 }
 
 /// Options for estimate maximum purchase quantity

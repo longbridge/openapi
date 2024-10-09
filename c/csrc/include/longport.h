@@ -1943,6 +1943,7 @@ typedef struct lb_estimate_max_purchase_quantity_options_t {
   enum lb_order_side_t side;
   const char *currency;
   const char *order_id;
+  bool fractional_shares;
 } lb_estimate_max_purchase_quantity_options_t;
 
 typedef struct lb_subscription_t {

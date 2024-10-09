@@ -32,6 +32,7 @@ impl HttpClient {
         })?))
     }
 
+    #[pyo3(signature = (method, path, headers=None, body=None))]
     fn request(
         &self,
         method: String,
@@ -40,7 +41,7 @@ impl HttpClient {
         body: Option<Bound<PyAny>>,
     ) -> PyResult<PyObject> {
         let body = body
-            .map(pythonize::depythonize_bound::<Value>)
+            .map(|body| pythonize::depythonize::<Value>(&body))
             .transpose()
             .map_err(|err| PyRuntimeError::new_err(err.to_string()))?;
         let req = self.0.request(
@@ -62,16 +63,22 @@ impl HttpClient {
                     .unwrap()
                     .block_on(req.body(Json(body)).response::<Json<Value>>().send())
                     .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
-                Ok(Python::with_gil(|py| pythonize::pythonize(py, &resp.0))
-                    .map_err(|err| PyRuntimeError::new_err(err.to_string()))?)
+                Python::with_gil(|py| {
+                    Ok(pythonize::pythonize(py, &resp.0)
+                        .map_err(|err| PyRuntimeError::new_err(err.to_string()))?
+                        .into())
+                })
             }
             None => {
                 let resp = tokio::runtime::Runtime::new()
                     .unwrap()
                     .block_on(req.response::<Json<Value>>().send())
                     .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
-                Ok(Python::with_gil(|py| pythonize::pythonize(py, &resp.0))
-                    .map_err(|err| PyRuntimeError::new_err(err.to_string()))?)
+                Python::with_gil(|py| {
+                    Ok(pythonize::pythonize(py, &resp.0)
+                        .map_err(|err| PyRuntimeError::new_err(err.to_string()))?
+                        .into())
+                })
             }
         }
     }

@@ -12,15 +12,15 @@ LongPort OpenAPI provides programmatic quote trading interfaces for investors wi
 
 **This repo contains the following main components:**
 
-| Name                        | Document                                                                  | Description                               |
-|-----------------------------|---------------------------------------------------------------------------|-------------------------------------------|
-| [Rust](rust/README.md)      | [Doc](https://longportapp.github.io/openapi-sdk/rust/longport/index.html) | LongPort OpenAPI for Rust `(>= 1.56.1)`   |
-| [Python](python/README.md)  | [Doc](https://longportapp.github.io/openapi-sdk/python/index.html)        | LongPort OpenAPI for Python 3 `(>= 3.7)`  |
-| [Node.js](nodejs/README.md) | [Doc](https://longportapp.github.io/openapi-sdk/nodejs/index.html)        | LongPort OpenAPI for Node.js `(>= 10)`    |
-| [Java](java/README.md)      | [Doc](https://longportapp.github.io/openapi-sdk/java/index.html)          | LongPort OpenAPI for Java `(>= 1.8)`      |
-| [C](c/README.md)            | [Doc](https://longportapp.github.io/openapi-sdk/c/index.html)             | LongPort OpenAPI for C `(>= C99)`         |
-| [C++](cpp/README.md)        | [Doc](https://longportapp.github.io/openapi-sdk/cpp/index.html)           | LongPort OpenAPI for C++`(>= C++17)`      |
-| Go                          |                                                                           | https://github.com/longportapp/openapi-go |
+| Name                        | Document                                                                     | Description                               |
+|-----------------------------|------------------------------------------------------------------------------|-------------------------------------------|
+| [Rust](rust/README.md)      | [Doc](https://longportapp.github.io/openapi-sdk/v2/rust/longport/index.html) | LongPort OpenAPI for Rust `(>= 1.56.1)`   |
+| [Python](python/README.md)  | [Doc](https://longportapp.github.io/openapi-sdk/v2/python/index.html)        | LongPort OpenAPI for Python 3 `(>= 3.7)`  |
+| [Node.js](nodejs/README.md) | [Doc](https://longportapp.github.io/openapi-sdk/v2/nodejs/index.html)        | LongPort OpenAPI for Node.js `(>= 10)`    |
+| [Java](java/README.md)      | [Doc](https://longportapp.github.io/openapi-sdk/v2/java/index.html)          | LongPort OpenAPI for Java `(>= 1.8)`      |
+| [C](c/README.md)            | [Doc](https://longportapp.github.io/openapi-sdk/v2/c/index.html)             | LongPort OpenAPI for C `(>= C99)`         |
+| [C++](cpp/README.md)        | [Doc](https://longportapp.github.io/openapi-sdk/v2/cpp/index.html)           | LongPort OpenAPI for C++`(>= C++17)`      |
+| Go                          |                                                                              | https://github.com/longportapp/openapi-go |
 
 ## SDK Documenation
 

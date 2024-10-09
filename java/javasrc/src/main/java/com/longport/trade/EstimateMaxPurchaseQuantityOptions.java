@@ -10,6 +10,7 @@ public class EstimateMaxPurchaseQuantityOptions {
     private BigDecimal price;
     private String currency;
     private String orderId;
+    private boolean fractionalShares;
 
     public EstimateMaxPurchaseQuantityOptions(String symbol, OrderType orderType, OrderSide side) {
         this.symbol = symbol;
@@ -29,6 +30,11 @@ public class EstimateMaxPurchaseQuantityOptions {
 
     public EstimateMaxPurchaseQuantityOptions setOrderId(String orderId) {
         this.orderId = orderId;
+        return this;
+    }
+
+    public EstimateMaxPurchaseQuantityOptions fractionalShares() {
+        this.fractionalShares = true;
         return this;
     }
 }

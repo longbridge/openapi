@@ -5128,7 +5128,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[str] = None, order_id: Optional[str] = None) -> EstimateMaxPurchaseQuantityResponse:
+    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[str] = None, order_id: Optional[str] = None, fractional_shares: bool = False) -> EstimateMaxPurchaseQuantityResponse:
         """
         Estimating the maximum purchase quantity for Hong Kong and US stocks, warrants, and options
 
@@ -5139,6 +5139,7 @@ class TradeContext:
             price: Estimated order price,
             currency: Settlement currency
             order_id: Order ID, required when estimating the maximum purchase quantity for a modified order
+            fractional_shares: Get the maximum fractional share buying power
 
         Returns:
             Response

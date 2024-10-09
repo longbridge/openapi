@@ -15,6 +15,7 @@ pub struct EstimateMaxPurchaseQuantityOptions {
     currency: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     order_id: Option<String>,
+    fractional_shares: bool,
 }
 
 impl EstimateMaxPurchaseQuantityOptions {
@@ -28,6 +29,7 @@ impl EstimateMaxPurchaseQuantityOptions {
             side,
             currency: None,
             order_id: None,
+            fractional_shares: false,
         }
     }
 
@@ -57,6 +59,14 @@ impl EstimateMaxPurchaseQuantityOptions {
     pub fn order_id(self, order_id: impl Into<String>) -> Self {
         Self {
             order_id: Some(order_id.into()),
+            ..self
+        }
+    }
+
+    /// Get the maximum fractional share buying power
+    pub fn fractional_shares(self) -> Self {
+        Self {
+            fractional_shares: true,
             ..self
         }
     }

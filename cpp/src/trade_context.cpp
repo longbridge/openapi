@@ -756,6 +756,7 @@ TradeContext::estimate_max_purchase_quantity(
     convert(opts.side),
     opts.currency ? opts.currency->c_str() : nullptr,
     opts.order_id ? opts.order_id->c_str() : nullptr,
+    opts.fractional_shares,
   };
 
   lb_trade_context_estimate_max_purchase_quantity(

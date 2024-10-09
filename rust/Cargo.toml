@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longport"
-version = "1.0.42"
+version = "2.0.0"
 description = "LongPort OpenAPI SDK for Rust"
 homepage = "https://open.longportapp.com/en/"
 readme = "README.md"
@@ -14,10 +14,10 @@ categories = ["api-bindings"]
 blocking = ["flume"]
 
 [dependencies]
-longport-wscli = { path = "crates/wsclient", version = "1.0.42" }
-longport-httpcli = { path = "crates/httpclient", version = "1.0.42" }
-longport-proto = { path = "crates/proto", version = "1.0.42" }
-longport-candlesticks = { path = "crates/candlesticks", version = "1.0.42" }
+longport-wscli = { path = "crates/wsclient", version = "2.0.0" }
+longport-httpcli = { path = "crates/httpclient", version = "2.0.0" }
+longport-proto = { path = "crates/proto", version = "2.0.0" }
+longport-candlesticks = { path = "crates/candlesticks", version = "2.0.0" }
 
 tokio = { version = "1.18.2", features = [
   "time",

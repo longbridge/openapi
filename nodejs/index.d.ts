@@ -418,6 +418,7 @@ export interface EstimateMaxPurchaseQuantityOptions {
   price?: Decimal
   currency?: string
   orderId?: string
+  fractionalShares: boolean
 }
 /** Options for get cash flow request */
 export interface GetCashFlowOptions {

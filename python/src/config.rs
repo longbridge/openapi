@@ -64,6 +64,7 @@ impl Config {
     ///
     /// `expired_at` - The expiration time of the access token, defaults to `90`
     /// days.
+    #[pyo3(signature = (expired_at = None))]
     pub fn refresh_access_token(
         &self,
         expired_at: Option<PyOffsetDateTimeWrapper>,

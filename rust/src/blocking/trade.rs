@@ -190,7 +190,8 @@ impl TradeContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
-    /// let opts = ReplaceOrderOptions::new("709043056541253632", 100).price(decimal!(300i32));
+    /// let opts =
+    ///     ReplaceOrderOptions::new("709043056541253632", decimal!(100)).price(decimal!(300i32));
     /// let resp = ctx.replace_order(opts)?;
     /// println!("{:?}", resp);
     /// # Ok(())
@@ -223,7 +224,7 @@ impl TradeContextSync {
     ///     "700.HK",
     ///     OrderType::LO,
     ///     OrderSide::Buy,
-    ///     200,
+    ///     decimal!(200),
     ///     TimeInForceType::Day,
     /// )
     /// .submitted_price(decimal!(50i32));

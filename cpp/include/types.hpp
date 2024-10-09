@@ -1940,6 +1940,8 @@ struct EstimateMaxPurchaseQuantityOptions
   /// Order ID, required when estimating the maximum purchase quantity for a
   /// modified order
   std::optional<std::string> order_id;
+  /// Get the maximum fractional share buying power
+  bool fractional_shares;
 };
 
 /// Response for estimate maximum purchase quantity

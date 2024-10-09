@@ -607,6 +607,9 @@ pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
     if !(*opts).order_id.is_null() {
         opts2 = opts2.order_id(cstr_to_rust((*opts).order_id));
     }
+    if (*opts).fractional_shares {
+        opts2 = opts2.fractional_shares();
+    }
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CEstimateMaxPurchaseQuantityResponseOwned> =
             CCow::new(ctx_inner.estimate_max_purchase_quantity(opts2).await?);

@@ -20,7 +20,7 @@ pub(crate) struct Subscription {
     candlesticks: Vec<Period>,
 }
 
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::TradeStatus")]
 pub(crate) enum TradeStatus {
@@ -50,7 +50,7 @@ pub(crate) enum TradeStatus {
 }
 
 /// Trade session
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::TradeSession")]
 pub(crate) enum TradeSession {
@@ -69,7 +69,7 @@ pub(crate) enum TradeSession {
 }
 
 /// Quote type of subscription
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 pub(crate) enum SubType {
     /// Quote
@@ -122,7 +122,7 @@ impl From<SubFlags> for SubTypes {
 }
 
 /// Trade direction
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::TradeDirection")]
 pub(crate) enum TradeDirection {
@@ -135,7 +135,7 @@ pub(crate) enum TradeDirection {
 }
 
 /// Option type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::OptionType")]
 pub(crate) enum OptionType {
@@ -148,7 +148,7 @@ pub(crate) enum OptionType {
 }
 
 /// Option direction
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::OptionDirection")]
 pub(crate) enum OptionDirection {
@@ -161,7 +161,7 @@ pub(crate) enum OptionDirection {
 }
 
 /// Warrant type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::WarrantType")]
 pub(crate) enum WarrantType {
@@ -180,7 +180,7 @@ pub(crate) enum WarrantType {
 }
 
 /// Candlestick period
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[allow(non_camel_case_types)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::Period")]
@@ -214,7 +214,7 @@ pub(crate) enum Period {
 }
 
 /// Candlestick adjustment type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::AdjustType")]
 pub(crate) enum AdjustType {
@@ -225,7 +225,7 @@ pub(crate) enum AdjustType {
 }
 
 /// Derivative type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 pub(crate) enum DerivativeType {
     /// US stock options
@@ -250,7 +250,7 @@ impl From<longport::quote::DerivativeType> for DerivativeTypes {
 }
 
 /// Security board
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::SecurityBoard")]
 #[allow(clippy::upper_case_acronyms)]
@@ -658,7 +658,7 @@ pub(crate) struct IssuerInfo {
 }
 
 /// Sort order type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::SortOrderType")]
 pub enum SortOrderType {
@@ -669,7 +669,7 @@ pub enum SortOrderType {
 }
 
 /// Warrant sort by
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::WarrantSortBy")]
 pub enum WarrantSortBy {
@@ -720,7 +720,7 @@ pub enum WarrantSortBy {
 }
 
 /// Filter warrant expiry date type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::FilterWarrantExpiryDate")]
 #[allow(non_camel_case_types)]
@@ -736,7 +736,7 @@ pub enum FilterWarrantExpiryDate {
 }
 
 /// Filter warrant in/out of the bounds type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::FilterWarrantInOutBoundsType")]
 pub enum FilterWarrantInOutBoundsType {
@@ -815,7 +815,7 @@ pub(crate) struct WarrantInfo {
 }
 
 /// Warrant status
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::WarrantStatus")]
 pub enum WarrantStatus {
@@ -1033,7 +1033,7 @@ pub(crate) struct WatchlistSecurity {
 }
 
 /// Securities update mode
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::SecuritiesUpdateMode")]
 pub(crate) enum SecuritiesUpdateMode {
@@ -1046,7 +1046,7 @@ pub(crate) enum SecuritiesUpdateMode {
 }
 
 /// Calc index
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::CalcIndex")]
 pub(crate) enum CalcIndex {
@@ -1262,7 +1262,7 @@ pub(crate) struct SecurityCalcIndex {
 }
 
 /// Security list category
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::SecurityListCategory")]
 pub(crate) enum SecurityListCategory {

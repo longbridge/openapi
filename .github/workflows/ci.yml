@@ -57,7 +57,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-13]
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -109,6 +109,8 @@ jobs:
             universal2: true
           - version: "3.12"
             universal2: true
+          - version: "3.13"
+            universal2: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -154,7 +156,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         target: [x64, x86]
     steps:
       - name: Checkout
@@ -193,7 +195,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         target: [x86_64, i686]
     steps:
       - name: Checkout
@@ -227,7 +229,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         target: [aarch64]
     steps:
       - name: Checkout
@@ -240,11 +242,12 @@ jobs:
           target: ${{ matrix.target }}
           manylinux: 2_28
           args: -i python${{ matrix.python-version }} --out dist -m python/Cargo.toml
-      - uses: uraimo/run-on-arch-action@v2.2.0
+      - uses: uraimo/run-on-arch-action@v2
         name: Install built wheel
         with:
-          arch: ${{ matrix.target }}
-          distro: ubuntu20.04
+          arch: none
+          distro: none
+          base_image: "--platform=linux/aarch64 ubuntu:20.04"
           githubToken: ${{ github.token }}
           dockerRunArgs: |
             --volume "${PWD}/dist:/artifacts"

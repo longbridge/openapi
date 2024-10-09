@@ -609,6 +609,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextEstimateMa
         if let Some(order_id) = order_id {
             new_opts = new_opts.order_id(order_id);
         }
+        let fractional_shares: bool = get_field(env, &opts, "fractionalShares")?;
+        if fractional_shares {
+            new_opts = new_opts.fractional_shares();
+        }
         async_util::execute(env, callback, async move {
             Ok(context.ctx.estimate_max_purchase_quantity(new_opts).await?)
         })?;

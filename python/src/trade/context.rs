@@ -81,6 +81,7 @@ impl TradeContext {
     }
 
     /// Get history executions
+    #[pyo3(signature = (symbol = None, start_at = None, end_at = None))]
     fn history_executions(
         &self,
         symbol: Option<String>,
@@ -108,6 +109,7 @@ impl TradeContext {
     }
 
     /// Get today executions
+    #[pyo3(signature = (symbol = None, order_id = None))]
     fn today_executions(
         &self,
         symbol: Option<String>,
@@ -131,6 +133,7 @@ impl TradeContext {
     }
 
     /// Get history orders
+    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, start_at = None, end_at = None))]
     fn history_orders(
         &self,
         symbol: Option<String>,
@@ -168,6 +171,7 @@ impl TradeContext {
     }
 
     /// Get today orders
+    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, order_id = None))]
     fn today_orders(
         &self,
         symbol: Option<String>,
@@ -201,6 +205,7 @@ impl TradeContext {
     }
 
     /// Replace order
+    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, remark = None))]
     #[allow(clippy::too_many_arguments)]
     fn replace_order(
         &self,
@@ -239,6 +244,7 @@ impl TradeContext {
     }
 
     /// Submit order
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, remark = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -302,6 +308,7 @@ impl TradeContext {
     }
 
     /// Get account balance
+    #[pyo3(signature = (currency = None))]
     fn account_balance(&self, currency: Option<String>) -> PyResult<Vec<AccountBalance>> {
         self.ctx
             .account_balance(currency.as_deref())
@@ -312,6 +319,7 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    #[pyo3(signature = (start_at, end_at, business_type = None, symbol = None, page = None, size = None))]
     fn cash_flow(
         &self,
         start_at: PyOffsetDateTimeWrapper,
@@ -345,6 +353,7 @@ impl TradeContext {
     }
 
     /// Get fund positions
+    #[pyo3(signature = (symbols = None))]
     fn fund_positions(&self, symbols: Option<Vec<String>>) -> PyResult<FundPositionsResponse> {
         self.ctx
             .fund_positions(GetFundPositionsOptions::new().symbols(symbols.unwrap_or_default()))
@@ -353,6 +362,7 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    #[pyo3(signature = (symbols = None))]
     fn stock_positions(&self, symbols: Option<Vec<String>>) -> PyResult<StockPositionsResponse> {
         self.ctx
             .stock_positions(GetStockPositionsOptions::new().symbols(symbols.unwrap_or_default()))
@@ -378,6 +388,8 @@ impl TradeContext {
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
     /// warrants, and options
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (symbol, order_type, side, price, currency = None, order_id = None, fractional_shares = false))]
     pub fn estimate_max_purchase_quantity(
         &self,
         symbol: String,
@@ -386,6 +398,7 @@ impl TradeContext {
         price: Option<PyDecimal>,
         currency: Option<String>,
         order_id: Option<String>,
+        fractional_shares: bool,
     ) -> PyResult<EstimateMaxPurchaseQuantityResponse> {
         let mut opts =
             EstimateMaxPurchaseQuantityOptions::new(symbol, order_type.into(), side.into());
@@ -398,6 +411,9 @@ impl TradeContext {
         }
         if let Some(order_id) = order_id {
             opts = opts.order_id(order_id);
+        }
+        if fractional_shares {
+            opts = opts.fractional_shares();
         }
 
         self.ctx

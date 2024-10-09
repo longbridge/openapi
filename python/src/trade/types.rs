@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// Topic type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::TopicType")]
 pub(crate) enum TopicType {
@@ -35,7 +35,7 @@ pub(crate) struct Execution {
     price: PyDecimal,
 }
 
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::OrderStatus")]
 pub(crate) enum OrderStatus {
@@ -77,7 +77,7 @@ pub(crate) enum OrderStatus {
     PartialWithdrawal,
 }
 
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::OrderSide")]
 pub(crate) enum OrderSide {
@@ -89,7 +89,7 @@ pub(crate) enum OrderSide {
     Sell,
 }
 
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::OrderType")]
 #[allow(clippy::upper_case_acronyms)]
@@ -125,7 +125,7 @@ pub(crate) enum OrderType {
 }
 
 /// Order tag
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::OrderTag")]
 pub(crate) enum OrderTag {
@@ -152,7 +152,7 @@ pub(crate) enum OrderTag {
 }
 
 /// Time in force type
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::TimeInForceType")]
 pub(crate) enum TimeInForceType {
@@ -167,7 +167,7 @@ pub(crate) enum TimeInForceType {
 }
 
 /// Trigger status
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::TriggerStatus")]
 pub(crate) enum TriggerStatus {
@@ -182,7 +182,7 @@ pub(crate) enum TriggerStatus {
 }
 
 /// Enable or disable outside regular trading hours
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::OutsideRTH")]
 pub(crate) enum OutsideRTH {
@@ -268,7 +268,7 @@ pub(crate) struct Order {
 }
 
 /// Commission-free Status
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::CommissionFreeStatus")]
 pub(crate) enum CommissionFreeStatus {
@@ -286,7 +286,7 @@ pub(crate) enum CommissionFreeStatus {
 }
 
 /// Deduction status
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::DeductionStatus")]
 pub(crate) enum DeductionStatus {
@@ -304,7 +304,7 @@ pub(crate) enum DeductionStatus {
 }
 
 /// Charge category code
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::ChargeCategoryCode")]
 pub(crate) enum ChargeCategoryCode {
@@ -599,7 +599,7 @@ pub(crate) struct AccountBalance {
     pub buy_power: PyDecimal,
 }
 
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::BalanceType")]
 pub(crate) enum BalanceType {
@@ -613,7 +613,7 @@ pub(crate) enum BalanceType {
     Fund,
 }
 
-#[pyclass]
+#[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::trade::CashFlowDirection")]
 pub(crate) enum CashFlowDirection {

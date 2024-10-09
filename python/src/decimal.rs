@@ -37,7 +37,7 @@ impl From<PyDecimal> for Decimal {
 }
 
 impl<'py> FromPyObject<'py> for PyDecimal {
-    fn extract(ob: &'py PyAny) -> PyResult<Self> {
+    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
         if let Ok(value) = ob.extract::<f64>() {
             // convert from PyFloat
             Ok(Self(Decimal::try_from(value).map_err(|err| {
@@ -52,10 +52,10 @@ impl<'py> FromPyObject<'py> for PyDecimal {
                 let decimal_type = DECIMAL_TYPE
                     .downcast_bound::<PyType>(py)
                     .expect("decimal type");
-                if ob.is_instance(decimal_type.as_gil_ref())? {
+                if ob.is_instance(decimal_type)? {
                     let value = ob
                         .str()
-                        .and_then(|value| value.to_str())
+                        .and_then(|value| Ok(value.to_str()?.to_string()))
                         .expect("decimal str");
                     Ok(Self(value.parse().expect("valid decimal")))
                 } else {

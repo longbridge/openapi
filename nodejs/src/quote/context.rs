@@ -150,7 +150,7 @@ impl QuoteContext {
     pub fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
         self.ctx
             .quote_package_details()
-            .into_iter()
+            .iter()
             .cloned()
             .map(TryInto::try_into)
             .collect()

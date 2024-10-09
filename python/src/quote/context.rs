@@ -298,6 +298,7 @@ impl QuoteContext {
     }
 
     /// Get security history candlesticks by offset
+    #[pyo3(signature = (symbol, period, adjust_type, start = None, end = None))]
     fn history_candlesticks_by_date(
         &self,
         symbol: String,
@@ -356,6 +357,7 @@ impl QuoteContext {
     }
 
     /// Query warrant list
+    #[pyo3(signature = (symbol, sort_by, sort_order, warrant_type = None, issuer = None, expiry_date = None, price_type = None, status = None))]
     #[allow(clippy::too_many_arguments)]
     fn warrant_list(
         &self,
@@ -459,6 +461,7 @@ impl QuoteContext {
     }
 
     /// Create watchlist group
+    #[pyo3(signature = (name, securities = None))]
     fn create_watchlist_group(
         &self,
         name: String,
@@ -482,6 +485,7 @@ impl QuoteContext {
     }
 
     /// Update watchlist group
+    #[pyo3(signature = (id, name = None, securities = None, mode = None))]
     fn update_watchlist_group(
         &self,
         id: i64,
