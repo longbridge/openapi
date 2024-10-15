@@ -3,12 +3,13 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main-v1
+      - main-v2
   pull_request: {}
 
 jobs:
   check-format:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,7 +30,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -55,7 +56,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-13]
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -188,7 +189,7 @@ jobs:
   build-python-sdk-linux:
     needs:
       - check-python-sdk
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
       matrix:
@@ -222,7 +223,7 @@ jobs:
   build-python-sdk-linux-cross:
     needs:
       - check-python-sdk
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
       matrix:
@@ -273,13 +274,13 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             build: |
               yarn build:debug
               strip -x *.node
 
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
             build: |
               yarn build:debug --target aarch64-unknown-linux-gnu
@@ -295,7 +296,7 @@ jobs:
             build: yarn build:debug
             architecture: x64
 
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             build: |
               yarn build:debug
               strip *.node
@@ -372,7 +373,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-13]
         java-version: ["8"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -409,7 +410,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -499,7 +500,7 @@ jobs:
             cc: aarch64-linux-android28-clang
             cxx: aarch64-linux-android28-clang++
             ar: llvm-ar
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:

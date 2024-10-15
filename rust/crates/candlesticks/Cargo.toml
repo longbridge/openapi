@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "longport-candlesticks"
-version = "1.0.40"
+version = "1.0.41"
 description = "LongPort candlestick utils for Rust"
 license = "MIT OR Apache-2.0"
 

@@ -2,7 +2,8 @@ name: Release
 on:
   push:
     branches:
-      - release
+      - release-v1
+      - release-v2
 
 jobs:
   build-python-sdk-macos:
@@ -99,7 +100,7 @@ jobs:
           path: dist
 
   build-python-sdk-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
       matrix:
@@ -131,7 +132,7 @@ jobs:
           path: dist
 
   build-python-sdk-linux-cross:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
       matrix:
@@ -180,14 +181,14 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             build: |
               yarn build
               strip -x *.node
             artifact-name: linux-x64-musl
 
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
             build: |
               rustup target add aarch64-unknown-linux-gnu
@@ -195,7 +196,7 @@ jobs:
               aarch64-unknown-linux-gnu-strip *.node
             artifact-name: linux-aarch64
 
-          #   - host: ubuntu-latest
+          #   - host: ubuntu-22.04
           #     docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
           #     build: |
           #       rustup target add aarch64-unknown-linux-musl
@@ -215,7 +216,7 @@ jobs:
             architecture: x64
             artifact-name: windows
 
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             build: |
               yarn build
               strip *.node
@@ -284,12 +285,12 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             lib_prefix: "lib"
             lib_suffix: ".so"
             target: x86_64-unknown-linux-gnu
             cross: true
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             lib_prefix: "lib"
             lib_suffix: ".so"
             target: aarch64-unknown-linux-gnu
@@ -342,7 +343,7 @@ jobs:
           path: longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
   copy-cpp-headers:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -367,7 +368,7 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             platform: x86_64_linux
             dylib_ext: so
@@ -448,7 +449,7 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-latest
+          - host: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             platform: x86_64_linux
             dylib_ext: so
@@ -627,7 +628,7 @@ jobs:
             build-type: Release
             target-dir: release
             cargo-args: -r
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -698,14 +699,14 @@ jobs:
       - build-cpp-sdk-release
       - build-ios-cpp-sdk
       - build-android-cpp-sdk
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - run: echo "All builds are done"
 
   publish-rust-sdk:
     needs:
       - build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
       max-parallel: 1
@@ -760,7 +761,7 @@ jobs:
   publish-cpp-sdk:
     needs:
       - build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
 
@@ -799,7 +800,7 @@ jobs:
           aws --region=${{ secrets.PROD_HK_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
 
   publish-python-sdk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     environment:
       name: pypi
       url: https://pypi.org/p/longport
@@ -820,7 +821,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
 
   publish-nodejs-sdk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - build
     steps:
@@ -856,7 +857,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-java-sdk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build
     steps:
       - uses: actions/checkout@v3
