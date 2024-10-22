@@ -2600,7 +2600,7 @@ class QuoteContext:
                 ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
         """
 
-    def subscribe_candlesticks(self, symbol: str, period: Type[Period]) -> None:
+    def subscribe_candlesticks(self, symbol: str, period: Type[Period]) -> List[Candlestick]:
         """
         Subscribe security candlesticks
 

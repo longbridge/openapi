@@ -59,7 +59,7 @@ pub(crate) enum Command {
     SubscribeCandlesticks {
         symbol: String,
         period: Period,
-        reply_tx: oneshot::Sender<Result<()>>,
+        reply_tx: oneshot::Sender<Result<Vec<Candlestick>>>,
     },
     UnsubscribeCandlesticks {
         symbol: String,
@@ -619,15 +619,16 @@ impl Core {
         &mut self,
         symbol: String,
         period: Period,
-    ) -> Result<()> {
-        if self
+    ) -> Result<Vec<Candlestick>> {
+        if let Some(candlesticks) = self
             .store
             .securities
             .get(&symbol)
-            .map(|data| data.candlesticks.contains_key(&period))
-            .unwrap_or_default()
+            .map(|data| data.candlesticks.get(&period))
         {
-            return Ok(());
+            return Ok(candlesticks
+                .map(|candlesticks| candlesticks.candlesticks.clone())
+                .unwrap_or_default());
         }
 
         let security_data = self.store.securities.entry(symbol.clone()).or_default();
@@ -675,7 +676,7 @@ impl Core {
             .candlesticks
             .entry(period)
             .or_insert_with(|| Candlesticks {
-                candlesticks,
+                candlesticks: candlesticks.clone(),
                 confirmed: false,
             });
 
@@ -693,7 +694,7 @@ impl Core {
             .unwrap_or_else(SubFlags::empty)
             .contains(sub_flags)
         {
-            return Ok(());
+            return Ok(candlesticks);
         }
 
         let req = SubscribeRequest {
@@ -705,7 +706,7 @@ impl Core {
             .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
             .await?;
 
-        Ok(())
+        Ok(candlesticks)
     }
 
     async fn handle_unsubscribe_candlesticks(

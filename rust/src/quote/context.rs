@@ -266,7 +266,11 @@ impl QuoteContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
+    pub async fn subscribe_candlesticks<T>(
+        &self,
+        symbol: T,
+        period: Period,
+    ) -> Result<Vec<Candlestick>>
     where
         T: AsRef<str>,
     {

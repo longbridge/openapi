@@ -178,7 +178,7 @@ void
 QuoteContext::subscribe_candlesticks(
   const std::string& symbol,
   Period period,
-  AsyncCallback<QuoteContext, void> callback) const
+  AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const
 {
   lb_quote_context_subscribe_candlesticks(
     ctx_,
@@ -186,13 +186,27 @@ QuoteContext::subscribe_candlesticks(
     convert(period),
     [](auto res) {
       auto callback_ptr =
-        callback::get_async_callback<QuoteContext, void>(res->userdata);
-      (*callback_ptr)(AsyncResult<QuoteContext, void>(
-        QuoteContext((const lb_quote_context_t*)res->ctx),
-        Status(res->error),
-        nullptr));
+        callback::get_async_callback<QuoteContext, std::vector<Candlestick>>(
+          res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto rows = (const lb_candlestick_t*)res->data;
+        std::vector<Candlestick> rows2;
+        std::transform(rows,
+                       rows + res->length,
+                       std::back_inserter(rows2),
+                       [](auto row) { return convert(&row); });
+
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<Candlestick>>(
+          ctx, std::move(status), &rows2));
+      } else {
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<Candlestick>>(
+          ctx, std::move(status), nullptr));
+      }
     },
-    new AsyncCallback<QuoteContext, void>(callback));
+    new AsyncCallback<QuoteContext, std::vector<Candlestick>>(callback));
 }
 
 void

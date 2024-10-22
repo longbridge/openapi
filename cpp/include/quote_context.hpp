@@ -55,9 +55,10 @@ public:
                    AsyncCallback<QuoteContext, void> callback) const;
 
   /// Subscribe security candlesticks
-  void subscribe_candlesticks(const std::string& symbol,
-                              Period period,
-                              AsyncCallback<QuoteContext, void> callback) const;
+  void subscribe_candlesticks(
+    const std::string& symbol,
+    Period period,
+    AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
 
   /// Unsubscribe security candlesticks
   void unsubscribe_candlesticks(

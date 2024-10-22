@@ -143,7 +143,7 @@ impl QuoteContextSync {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<()>
+    pub fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<Vec<Candlestick>>
     where
         T: AsRef<str> + Send + 'static,
     {

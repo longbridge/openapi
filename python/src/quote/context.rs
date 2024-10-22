@@ -151,11 +151,13 @@ impl QuoteContext {
     }
 
     /// Subscribe security candlesticks
-    fn subscribe_candlesticks(&self, symbol: String, period: Period) -> PyResult<()> {
+    fn subscribe_candlesticks(&self, symbol: String, period: Period) -> PyResult<Vec<Candlestick>> {
         self.ctx
             .subscribe_candlesticks(symbol, period.into())
-            .map_err(ErrorNewType)?;
-        Ok(())
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Subscribe security candlesticks

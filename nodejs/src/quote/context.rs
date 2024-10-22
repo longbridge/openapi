@@ -254,12 +254,18 @@ impl QuoteContext {
 
     /// Subscribe security candlesticks
     #[napi]
-    pub async fn subscribe_candlesticks(&self, symbol: String, period: Period) -> Result<()> {
+    pub async fn subscribe_candlesticks(
+        &self,
+        symbol: String,
+        period: Period,
+    ) -> Result<Vec<Candlestick>> {
         self.ctx
             .subscribe_candlesticks(symbol, period.into())
             .await
-            .map_err(ErrorNewType)?;
-        Ok(())
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Unsubscribe security candlesticks

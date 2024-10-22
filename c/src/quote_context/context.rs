@@ -409,9 +409,11 @@ pub unsafe extern "C" fn lb_quote_context_subscribe_candlesticks(
     let ctx_inner = (*ctx).ctx.clone();
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
-        ctx_inner
+        let rows: CVec<CCandlestickOwned> = ctx_inner
             .subscribe_candlesticks(symbol, period.into())
-            .await
+            .await?
+            .into();
+        Ok(rows)
     });
 }
 

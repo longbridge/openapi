@@ -1015,7 +1015,7 @@ export class QuoteContext {
    */
   unsubscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
   /** Subscribe security candlesticks */
-  subscribeCandlesticks(symbol: string, period: Period): Promise<void>
+  subscribeCandlesticks(symbol: string, period: Period): Promise<Array<Candlestick>>
   /** Unsubscribe security candlesticks */
   unsubscribeCandlesticks(symbol: string, period: Period): Promise<void>
   /**

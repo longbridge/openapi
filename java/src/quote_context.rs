@@ -355,7 +355,9 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribeC
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let period: Period = FromJValue::from_jvalue(env, period.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.subscribe_candlesticks(symbol, period).await?)
+            Ok(ObjectArray(
+                context.ctx.subscribe_candlesticks(symbol, period).await?,
+            ))
         })?;
         Ok(())
     })

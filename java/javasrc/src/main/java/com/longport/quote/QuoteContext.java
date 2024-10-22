@@ -48,7 +48,7 @@ public class QuoteContext implements AutoCloseable {
     public String getQuoteLevel() {
         return SdkNative.quoteContextGetQuoteLevel(this.raw);
     }
-    
+
     /**
      * Returns the quote package details
      * 
@@ -206,7 +206,8 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> subscribeCandlesticks(String symbol, Period period) throws OpenApiException {
+    public CompletableFuture<Candlestick[]> subscribeCandlesticks(String symbol, Period period)
+            throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextSubscribeCandlesticks(this.raw, symbol, period, callback);
         });
