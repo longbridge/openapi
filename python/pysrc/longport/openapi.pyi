@@ -661,7 +661,7 @@ class TradeStatus:
         Warrant To BeListed
         """
 
-    class SuspendTrade(TradeStatus):
+    class Suspend(TradeStatus):
         """
         Suspend
         """
