@@ -5,7 +5,7 @@ use std::{
 
 use comfy_table::Table;
 use itertools::Itertools;
-use longport_candlesticks::{IsHalfTradeDay, TickAction, Type, UpdateAction};
+use longport_candlesticks::UpdateAction;
 use longport_httpcli::HttpClient;
 use longport_proto::quote::{
     self, AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
@@ -15,7 +15,6 @@ use longport_proto::quote::{
 use longport_wscli::{
     CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
 };
-use rust_decimal::Decimal;
 use time::{Date, OffsetDateTime};
 use tokio::{
     sync::{mpsc, oneshot},
@@ -30,8 +29,8 @@ use crate::{
         sub_flags::SubFlags,
         types::QuotePackageDetail,
         utils::{format_date, parse_date},
-        Candlestick, PushCandlestick, PushEvent, PushEventDetail, RealtimeQuote, SecurityBoard,
-        SecurityBrokers, SecurityDepth, Subscription, Trade,
+        Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, PushTrades,
+        RealtimeQuote, SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade,
     },
     Config, Error, Market, Result,
 };
@@ -95,38 +94,29 @@ pub(crate) enum Command {
 }
 
 #[derive(Debug, Default)]
-struct CurrentTradeDays {
-    trade_day: HashMap<Market, HashSet<Date>>,
+struct TradingDays {
+    normal_days: HashMap<Market, HashSet<Date>>,
     half_days: HashMap<Market, HashSet<Date>>,
 }
 
-impl CurrentTradeDays {
+impl TradingDays {
     #[inline]
-    fn half_days(&self, market: longport_candlesticks::Market) -> HalfDays {
-        use longport_candlesticks::Market::*;
-        match market {
-            HK => HalfDays(self.half_days.get(&Market::HK)),
-            US => HalfDays(self.half_days.get(&Market::US)),
-            SH | SZ => HalfDays(None),
-            SG => HalfDays(None),
-        }
+    fn normal_days(&self, market: Market) -> Days {
+        Days(self.normal_days.get(&market))
     }
 
-    fn is_trade_day(&self, market: Market, date: Date) -> bool {
-        self.trade_day
-            .get(&market)
-            .map(|days| days.contains(&date))
-            .or(self.half_days.get(&market).map(|days| days.contains(&date)))
-            .unwrap_or_default()
+    #[inline]
+    fn half_days(&self, market: Market) -> Days {
+        Days(self.half_days.get(&market))
     }
 }
 
 #[derive(Debug, Copy, Clone)]
-struct HalfDays<'a>(Option<&'a HashSet<Date>>);
+struct Days<'a>(Option<&'a HashSet<Date>>);
 
-impl<'a> IsHalfTradeDay for HalfDays<'a> {
+impl<'a> longport_candlesticks::Days for Days<'a> {
     #[inline]
-    fn is_half(&self, date: Date) -> bool {
+    fn contains(&self, date: Date) -> bool {
         match self.0 {
             Some(days) => days.contains(&date),
             None => false,
@@ -153,7 +143,7 @@ pub(crate) struct Core {
     session: Option<WsSession>,
     close: bool,
     subscriptions: HashMap<String, SubFlags>,
-    current_trade_days: CurrentTradeDays,
+    trading_days: TradingDays,
     store: Store,
     member_id: i64,
     quote_level: String,
@@ -249,7 +239,7 @@ impl Core {
             .collect();
         ws_cli.set_rate_limit(rate_limit.clone());
 
-        let current_trade_days = fetch_current_trade_days(&ws_cli).await?;
+        let current_trade_days = fetch_trading_days(&ws_cli).await?;
         let push_candlestick_mode = config.push_candlestick_mode;
 
         let mut table = Table::new();
@@ -284,7 +274,7 @@ impl Core {
             session: Some(session),
             close: false,
             subscriptions: HashMap::new(),
-            current_trade_days,
+            trading_days: current_trade_days,
             store: Store::default(),
             member_id,
             quote_level,
@@ -399,7 +389,7 @@ impl Core {
 
     #[tracing::instrument(level = "debug", skip(self))]
     async fn main_loop(&mut self) -> Result<()> {
-        let mut update_trade_days_interval = tokio::time::interval_at(
+        let mut update_trading_days_interval = tokio::time::interval_at(
             Instant::now() + Duration::from_secs(60 * 60 * 24),
             Duration::from_secs(60 * 60 * 24),
         );
@@ -423,9 +413,9 @@ impl Core {
                     }
                 }
                 _ = ticker.tick() => self.tick(),
-                _ = update_trade_days_interval.tick() => {
-                    if let Ok(days) = fetch_current_trade_days(&self.ws_cli).await {
-                        self.current_trade_days = days;
+                _ = update_trading_days_interval.tick() => {
+                    if let Ok(days) = fetch_trading_days(&self.ws_cli).await {
+                        self.trading_days = days;
                     }
                 }
             }
@@ -827,45 +817,22 @@ impl Core {
     fn tick(&mut self) {
         let now = OffsetDateTime::now_utc();
 
-        for (symbol, data) in &mut self.store.securities {
-            let ty = get_merger_ty(data.board);
-            let Some(market) = parse_market_from_symbol(symbol) else {
+        for (symbol, security_data) in &mut self.store.securities {
+            let Some(market_type) = parse_market_from_symbol(symbol) else {
                 continue;
             };
+            let normal_days = self.trading_days.normal_days(market_type);
+            let half_days = self.trading_days.half_days(market_type);
 
-            if !self
-                .current_trade_days
-                .is_trade_day(market.into(), now.date())
-            {
-                return;
-            }
-
-            for (period, candlesticks) in &mut data.candlesticks {
-                let merger = longport_candlesticks::Merger::new(
-                    market,
-                    convert_period(*period),
-                    self.current_trade_days.half_days(market),
+            for (period, candlesticks) in &mut security_data.candlesticks {
+                let action = candlesticks.tick(
+                    market_type,
+                    normal_days,
+                    half_days,
+                    security_data.board,
+                    *period,
+                    now,
                 );
-                if candlesticks.confirmed {
-                    continue;
-                }
-                let Some(prev_candlestick) = candlesticks.candlesticks.last() else {
-                    continue;
-                };
-                let prev_candlestick = longport_candlesticks::Candlestick::from(*prev_candlestick);
-                let action = match merger.tick(ty, prev_candlestick.time, now) {
-                    TickAction::AppendNew(new_time) => UpdateAction::AppendNew {
-                        confirmed: Some(prev_candlestick),
-                        new: longport_candlesticks::Candlestick {
-                            time: new_time,
-                            volume: 0,
-                            turnover: Decimal::ZERO,
-                            ..prev_candlestick
-                        },
-                    },
-                    TickAction::Confirm => UpdateAction::Confirm(prev_candlestick),
-                    TickAction::None => UpdateAction::None,
-                };
                 update_and_push_candlestick(
                     candlesticks,
                     symbol,
@@ -876,6 +843,77 @@ impl Core {
                 );
             }
         }
+    }
+
+    fn merge_trades(&mut self, symbol: &str, trades: &PushTrades) {
+        let Some(market_type) = parse_market_from_symbol(symbol) else {
+            return;
+        };
+        let Some(security_data) = self.store.securities.get_mut(symbol) else {
+            return;
+        };
+        let half_days = self.trading_days.half_days(market_type);
+
+        for (period, candlesticks) in &mut security_data.candlesticks {
+            if period == &Period::Day {
+                continue;
+            }
+
+            for trade in &trades.trades {
+                if trade.trade_session != TradeSession::NormalTrade {
+                    continue;
+                }
+
+                let action = candlesticks.merge_trade(
+                    market_type,
+                    half_days,
+                    security_data.board,
+                    *period,
+                    trade,
+                );
+                update_and_push_candlestick(
+                    candlesticks,
+                    symbol,
+                    *period,
+                    action,
+                    self.push_candlestick_mode,
+                    &mut self.push_tx,
+                );
+            }
+        }
+    }
+
+    fn merge_quote(&mut self, symbol: &str, push_quote: &PushQuote) {
+        if push_quote.trade_session != TradeSession::NormalTrade {
+            return;
+        }
+
+        let Some(market_type) = parse_market_from_symbol(symbol) else {
+            return;
+        };
+        let Some(security_data) = self.store.securities.get_mut(symbol) else {
+            return;
+        };
+        let half_days = self.trading_days.half_days(market_type);
+        let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) else {
+            return;
+        };
+
+        let action = candlesticks.merge_quote(
+            market_type,
+            half_days,
+            security_data.board,
+            Period::Day,
+            push_quote,
+        );
+        update_and_push_candlestick(
+            candlesticks,
+            symbol,
+            Period::Day,
+            action,
+            self.push_candlestick_mode,
+            &mut self.push_tx,
+        )
     }
 
     fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
@@ -889,52 +927,7 @@ impl Core {
 
                 if let PushEventDetail::Trade(trades) = &event.detail {
                     // merge candlesticks
-                    let market = parse_market_from_symbol(&event.symbol);
-                    if let Some(market) = market {
-                        if let Some((merge_ty, periods)) = self
-                            .store
-                            .securities
-                            .get_mut(&event.symbol)
-                            .map(|data| (get_merger_ty(data.board), &mut data.candlesticks))
-                        {
-                            for (period, candlesticks) in periods {
-                                if period == &Period::Day {
-                                    continue;
-                                }
-
-                                let merger = longport_candlesticks::Merger::new(
-                                    market,
-                                    convert_period(*period),
-                                    self.current_trade_days.half_days(market),
-                                );
-
-                                for trade in &trades.trades {
-                                    if trade.trade_session != TradeSession::NormalTrade {
-                                        continue;
-                                    }
-
-                                    let action = merger.merge(
-                                        merge_ty,
-                                        candlesticks.merge_input(),
-                                        longport_candlesticks::Trade {
-                                            time: trade.timestamp,
-                                            price: trade.price,
-                                            volume: trade.volume,
-                                            trade_type: &trade.trade_type,
-                                        },
-                                    );
-                                    update_and_push_candlestick(
-                                        candlesticks,
-                                        &event.symbol,
-                                        *period,
-                                        action,
-                                        self.push_candlestick_mode,
-                                        &mut self.push_tx,
-                                    );
-                                }
-                            }
-                        }
-                    }
+                    self.merge_trades(&event.symbol, trades);
 
                     if !self
                         .subscriptions
@@ -945,50 +938,7 @@ impl Core {
                         return Ok(());
                     }
                 } else if let PushEventDetail::Quote(push_quote) = &event.detail {
-                    if push_quote.trade_session == TradeSession::NormalTrade {
-                        // merge candlesticks
-                        let market = parse_market_from_symbol(&event.symbol);
-                        if let Some(market) = market {
-                            if let Some((merge_ty, candlesticks)) = self
-                                .store
-                                .securities
-                                .get_mut(&event.symbol)
-                                .and_then(|data| {
-                                    Some((
-                                        get_merger_ty(data.board),
-                                        data.candlesticks.get_mut(&Period::Day)?,
-                                    ))
-                                })
-                            {
-                                let merger = longport_candlesticks::Merger::new(
-                                    market,
-                                    longport_candlesticks::Period::Day,
-                                    self.current_trade_days.half_days(market),
-                                );
-                                let action = merger.merge_by_quote(
-                                    candlesticks.merge_input(),
-                                    merge_ty,
-                                    longport_candlesticks::Quote {
-                                        time: push_quote.timestamp,
-                                        open: push_quote.open,
-                                        high: push_quote.high,
-                                        low: push_quote.low,
-                                        lastdone: push_quote.last_done,
-                                        volume: push_quote.volume,
-                                        turnover: push_quote.turnover,
-                                    },
-                                );
-                                update_and_push_candlestick(
-                                    candlesticks,
-                                    &event.symbol,
-                                    Period::Day,
-                                    action,
-                                    self.push_candlestick_mode,
-                                    &mut self.push_tx,
-                                );
-                            }
-                        }
-                    }
+                    self.merge_quote(&event.symbol, push_quote);
 
                     if !self
                         .subscriptions
@@ -1090,17 +1040,9 @@ impl Core {
     }
 }
 
-#[inline]
-fn get_merger_ty(board: SecurityBoard) -> Type {
-    match board {
-        SecurityBoard::USOptionS => Type::USOQ,
-        _ => Type::Normal,
-    }
-}
-
-async fn fetch_current_trade_days(cli: &WsClient) -> Result<CurrentTradeDays> {
-    let mut days = CurrentTradeDays::default();
-    let begin_day = OffsetDateTime::now_utc().date() - time::Duration::days(1);
+async fn fetch_trading_days(cli: &WsClient) -> Result<TradingDays> {
+    let mut days = TradingDays::default();
+    let begin_day = OffsetDateTime::now_utc().date() - time::Duration::days(5);
     let end_day = begin_day + time::Duration::days(30);
 
     for market in [Market::HK, Market::US, Market::SG, Market::CN] {
@@ -1116,7 +1058,7 @@ async fn fetch_current_trade_days(cli: &WsClient) -> Result<CurrentTradeDays> {
             )
             .await?;
 
-        days.trade_day.insert(
+        days.normal_days.insert(
             market,
             resp.trade_day
                 .iter()
@@ -1138,17 +1080,6 @@ async fn fetch_current_trade_days(cli: &WsClient) -> Result<CurrentTradeDays> {
     }
 
     Ok(days)
-}
-
-fn parse_market_from_symbol(symbol: &str) -> Option<longport_candlesticks::Market> {
-    let market = symbol.find('.').map(|idx| &symbol[idx + 1..])?;
-    match market {
-        "HK" => Some(longport_candlesticks::Market::HK),
-        "US" => Some(longport_candlesticks::Market::US),
-        "SH" => Some(longport_candlesticks::Market::SH),
-        "SZ" => Some(longport_candlesticks::Market::SZ),
-        _ => None,
-    }
 }
 
 fn update_and_push_candlestick(
@@ -1201,18 +1132,13 @@ fn update_and_push_candlestick(
     }
 }
 
-#[inline]
-fn convert_period(period: Period) -> longport_candlesticks::Period {
-    match period {
-        Period::UnknownPeriod => unreachable!(),
-        Period::OneMinute => longport_candlesticks::Period::Min_1,
-        Period::FiveMinute => longport_candlesticks::Period::Min_5,
-        Period::FifteenMinute => longport_candlesticks::Period::Min_15,
-        Period::ThirtyMinute => longport_candlesticks::Period::Min_30,
-        Period::SixtyMinute => longport_candlesticks::Period::Min_60,
-        Period::Day => longport_candlesticks::Period::Day,
-        Period::Week => longport_candlesticks::Period::Week,
-        Period::Month => longport_candlesticks::Period::Month,
-        Period::Year => longport_candlesticks::Period::Year,
-    }
+fn parse_market_from_symbol(symbol: &str) -> Option<Market> {
+    let market = symbol.find('.').map(|idx| &symbol[idx + 1..])?;
+    Some(match market {
+        "US" => Market::US,
+        "HK" => Market::HK,
+        "SG" => Market::SG,
+        "SH" | "SZ" => Market::CN,
+        _ => return None,
+    })
 }

@@ -1,12 +1,16 @@
 use std::collections::HashMap;
 
-use longport_candlesticks::InputCandlestick;
+use longport_candlesticks::{Days, InputCandlestick, UpdateAction, UpdateFields};
 use longport_proto::quote::Period;
+use time::OffsetDateTime;
 
-use crate::quote::{
-    push_types::{PushEventDetail, PushQuote},
-    Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
-    Trade,
+use crate::{
+    quote::{
+        push_types::{PushEventDetail, PushQuote},
+        Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
+        Trade,
+    },
+    Market,
 };
 
 const MAX_TRADES: usize = 500;
@@ -39,13 +43,130 @@ pub(crate) struct Candlesticks {
 
 impl Candlesticks {
     #[inline]
-    pub(crate) fn merge_input(&self) -> InputCandlestick {
+    fn merge_input(&self) -> InputCandlestick {
         match (self.candlesticks.last(), self.confirmed) {
             (None, true) => unreachable!(),
             (None, false) => InputCandlestick::None,
             (Some(prev), true) => InputCandlestick::Confirmed((*prev).into()),
             (Some(prev), false) => InputCandlestick::Normal((*prev).into()),
         }
+    }
+
+    pub(crate) fn merge_quote<H>(
+        &mut self,
+        market_type: Market,
+        half_days: H,
+        board: SecurityBoard,
+        period: Period,
+        push_quote: &PushQuote,
+    ) -> UpdateAction
+    where
+        H: Days,
+    {
+        let Some(market) = get_market(market_type, board) else {
+            return UpdateAction::None;
+        };
+        let period = convert_period(period);
+
+        market.merge_quote(
+            half_days,
+            period,
+            self.merge_input(),
+            longport_candlesticks::Quote {
+                time: push_quote.timestamp,
+                open: push_quote.open,
+                high: push_quote.high,
+                low: push_quote.low,
+                last_done: push_quote.last_done,
+                volume: push_quote.volume,
+                turnover: push_quote.turnover,
+            },
+        )
+    }
+
+    pub(crate) fn merge_trade<H>(
+        &mut self,
+        market_type: Market,
+        half_days: H,
+        board: SecurityBoard,
+        period: Period,
+        trade: &Trade,
+    ) -> UpdateAction
+    where
+        H: Days,
+    {
+        let Some(market) = get_market(market_type, board) else {
+            return UpdateAction::None;
+        };
+        let period = convert_period(period);
+        let trade_type = trade.trade_type.as_str();
+        let update_fields = match market_type {
+            Market::Unknown => unreachable!(),
+            Market::HK => match trade_type {
+                "" => UpdateFields::all(),
+                "D" => UpdateFields::VOLUME,
+                "M" => UpdateFields::VOLUME,
+                "P" => UpdateFields::VOLUME,
+                "U" => UpdateFields::all(),
+                "X" => UpdateFields::VOLUME,
+                "Y" => UpdateFields::VOLUME,
+                _ => UpdateFields::empty(),
+            },
+            Market::US => match trade_type {
+                "" => UpdateFields::all(),
+                "A" => UpdateFields::all(),
+                "B" => UpdateFields::all(),
+                "C" => UpdateFields::VOLUME,
+                "D" => UpdateFields::all(),
+                "E" => UpdateFields::all(),
+                "F" => UpdateFields::all(),
+                "G" => UpdateFields::all(),
+                "H" => UpdateFields::VOLUME,
+                "I" => UpdateFields::VOLUME,
+                "K" => UpdateFields::all(),
+                "L" => UpdateFields::all(),
+                "P" => UpdateFields::all(),
+                "S" => UpdateFields::all(),
+                "V" => UpdateFields::VOLUME,
+                "W" => UpdateFields::VOLUME,
+                "X" => UpdateFields::all(),
+                "1" => UpdateFields::all(),
+                _ => UpdateFields::empty(),
+            },
+            Market::CN | Market::SG => UpdateFields::all(),
+        };
+
+        market.merge_trade(
+            half_days,
+            period,
+            self.merge_input(),
+            longport_candlesticks::Trade {
+                time: trade.timestamp,
+                price: trade.price,
+                volume: trade.volume,
+                update_fields,
+            },
+        )
+    }
+
+    pub(crate) fn tick<N, H>(
+        &mut self,
+        market_type: Market,
+        normal_days: N,
+        half_days: H,
+        board: SecurityBoard,
+        period: Period,
+        now: OffsetDateTime,
+    ) -> UpdateAction
+    where
+        N: Days,
+        H: Days,
+    {
+        let Some(market) = get_market(market_type, board) else {
+            return UpdateAction::None;
+        };
+        let period = convert_period(period);
+        market.tick(normal_days, half_days, period, self.merge_input(), now)
     }
 }
 
@@ -132,5 +253,38 @@ where
             Ok(index) => elements[index] = v,
             Err(index) => elements.insert(index, v),
         }
+    }
+}
+
+fn get_market(
+    market: Market,
+    board: SecurityBoard,
+) -> Option<&'static longport_candlesticks::Market> {
+    use longport_candlesticks::markets::*;
+
+    Some(match market {
+        Market::US if board == SecurityBoard::USOptionS => &US_OPTION,
+        Market::US => &US,
+        Market::HK => &HK,
+        Market::SG => &SG,
+        Market::CN => &CN,
+        Market::Unknown => return None,
+    })
+}
+
+fn convert_period(period: Period) -> longport_candlesticks::Period {
+    use longport_candlesticks::Period::*;
+
+    match period {
+        Period::UnknownPeriod => unreachable!(),
+        Period::OneMinute => Min_1,
+        Period::FiveMinute => Min_5,
+        Period::FifteenMinute => Min_15,
+        Period::ThirtyMinute => Min_30,
+        Period::SixtyMinute => Min_60,
+        Period::Day => Day,
+        Period::Week => Week,
+        Period::Month => Month,
+        Period::Year => Year,
     }
 }

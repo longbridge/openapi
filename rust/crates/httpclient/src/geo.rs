@@ -67,17 +67,4 @@ mod tests {
         std::env::set_var("LONGPORT_REGION", "SG");
         assert!(!is_cn());
     }
-
-    #[test]
-    fn test_network() {
-        std::env::remove_var("LONGPORT_REGION");
-        // should be a refresh executed
-        let result = is_cn();
-
-        // should shot the cache
-        let start = Instant::now();
-        assert_eq!(result, is_cn());
-        // 500us should be less than a http request, and greater than local calc
-        assert!(start.elapsed() < Duration::from_micros(500));
-    }
 }

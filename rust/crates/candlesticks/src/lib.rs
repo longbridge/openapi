@@ -1,9 +1,10 @@
+mod candlestick;
+mod find_session;
 mod market;
-mod merger;
+pub mod markets;
+pub mod testutil;
 mod types;
 
-pub use market::Market;
-pub use merger::{
-    Candlestick, InputCandlestick, IsHalfTradeDay, Merger, Quote, TickAction, Trade, UpdateAction,
-};
-pub use types::{Period, Type};
+pub use candlestick::Candlestick;
+pub use market::{Days, InputCandlestick, Market, UpdateAction, UpdateFields};
+pub use types::{Period, Quote, Trade};

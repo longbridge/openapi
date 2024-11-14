@@ -8,5 +8,5 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 bitflags = "2.4.1"
 rust_decimal = "1.25.0"
-time = { version = "0.3.10", features = ["macros"] }
-time-tz = "1.0.2"
+time = { version = "0.3.36", features = ["macros"] }
+time-tz = "2.0.0"

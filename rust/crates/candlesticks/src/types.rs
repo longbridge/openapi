@@ -1,3 +1,8 @@
+use rust_decimal::Decimal;
+use time::OffsetDateTime;
+
+use crate::UpdateFields;
+
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
 pub enum Period {
@@ -26,7 +31,20 @@ impl Period {
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum Type {
-    Normal,
-    USOQ,
+pub struct Trade {
+    pub time: OffsetDateTime,
+    pub price: Decimal,
+    pub volume: i64,
+    pub update_fields: UpdateFields,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub struct Quote {
+    pub time: OffsetDateTime,
+    pub open: Decimal,
+    pub high: Decimal,
+    pub low: Decimal,
+    pub last_done: Decimal,
+    pub volume: i64,
+    pub turnover: Decimal,
 }
