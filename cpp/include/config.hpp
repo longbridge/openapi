@@ -41,33 +41,14 @@ public:
   Config(const std::string& app_key,
          const std::string& app_secret,
          const std::string& access_token,
-         const std::optional<std::string>& http_url,
-         const std::optional<std::string>& quote_ws_url,
-         const std::optional<std::string>& trade_ws_url,
-         const std::optional<Language>& language,
-         bool enable_overnight,
-         const std::optional<PushCandlestickMode>& push_candlestick_mode);
-
-  /** Config
-   *
-   * @param app_key App key
-   * @param app_secret App secret
-   * @param access_token Access token
-   */
-  Config(const std::string& app_key,
-         const std::string& app_secret,
-         const std::string& access_token)
-    : Config(app_key,
-             app_secret,
-             access_token,
-             std::nullopt,
-             std::nullopt,
-             std::nullopt,
-             std::nullopt,
-             false,
-             std::nullopt)
-  {
-  }
+         const std::optional<std::string>& http_url = std::nullopt,
+         const std::optional<std::string>& quote_ws_url = std::nullopt,
+         const std::optional<std::string>& trade_ws_url = std::nullopt,
+         const std::optional<Language>& language = std::nullopt,
+         bool enable_overnight = false,
+         const std::optional<PushCandlestickMode>& push_candlestick_mode =
+           std::nullopt,
+         bool enable_print_quote_packages = true);
 
   ~Config();
 
@@ -93,6 +74,8 @@ public:
   ///   `false` (Default: `false`)
   /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
   ///   `realtime`)
+  /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+  ///   `true` or `false` (Default: `true`)
   static Status from_env(Config& config);
 
   /// Gets a new `access_token`

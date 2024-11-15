@@ -29,7 +29,8 @@ Config::Config(const std::string& app_key,
                const std::optional<std::string>& trade_ws_url,
                const std::optional<Language>& language,
                bool enable_overnight,
-               const std::optional<PushCandlestickMode>& push_candlestick_mode)
+               const std::optional<PushCandlestickMode>& push_candlestick_mode,
+               bool enable_print_quote_packages)
 {
   lb_language_t c_language;
   if (language) {
@@ -50,7 +51,8 @@ Config::Config(const std::string& app_key,
                   trade_ws_url ? trade_ws_url->c_str() : nullptr,
                   language ? &c_language : nullptr,
                   enable_overnight,
-                  push_candlestick_mode ? &c_push_candlestick_mode : nullptr);
+                  push_candlestick_mode ? &c_push_candlestick_mode : nullptr,
+                  enable_print_quote_packages);
 }
 
 Config::~Config()

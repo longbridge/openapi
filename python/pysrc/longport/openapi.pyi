@@ -103,6 +103,7 @@ class Config:
         language: Language identifier
         enable_overnight: Enable overnight quote
         push_candlestick_mode: Push candlestick mode
+        enable_print_quote_packages: Enable printing the opened quote packages when connected to the server
     """
 
     def __init__(

@@ -13,6 +13,7 @@ public class ConfigBuilder {
     private Language language;
     private boolean enableOvernight;
     private PushCandlestickMode pushCandlestickMode;
+    private boolean enablePrintQuotePackages;
 
     /**
      * Create a `Config` object builder
@@ -25,6 +26,7 @@ public class ConfigBuilder {
         this.appKey = appKey;
         this.appSecret = appSecret;
         this.accessToken = accessToken;
+        this.enablePrintQuotePackages = true;
     }
 
     /**
@@ -102,6 +104,16 @@ public class ConfigBuilder {
     }
 
     /**
+     * Don't print quote packages when connected to the server
+     * 
+     * @return this object
+     */
+    public ConfigBuilder dontPrintQuotePackages() {
+        this.enablePrintQuotePackages = false;
+        return this;
+    }
+
+    /**
      * Build a Config object
      * 
      * @return Config object
@@ -110,6 +122,6 @@ public class ConfigBuilder {
     public Config build() throws OpenApiException {
         return new Config(
                 SdkNative.newConfig(appKey, appSecret, accessToken, httpUrl, quoteWsUrl, tradeWsUrl, language,
-                        enableOvernight, pushCandlestickMode));
+                        enableOvernight, pushCandlestickMode, enablePrintQuotePackages));
     }
 }

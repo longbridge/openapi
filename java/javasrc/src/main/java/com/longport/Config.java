@@ -37,6 +37,8 @@ public class Config implements AutoCloseable {
      * `false` (Default: `false`)
      * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
      * `realtime`)
+     * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+     * `true` or `false` (Default: `true`)
      * 
      * @return Config object
      * @throws OpenApiException If an error occurs

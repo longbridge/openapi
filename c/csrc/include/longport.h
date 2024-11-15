@@ -3653,6 +3653,8 @@ extern "C" {
  *   (Default: `false`)
  * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
  *   `realtime`)
+ * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+ *   `true` or `false` (Default: `true`)
  */
 struct lb_config_t *lb_config_from_env(struct lb_error_t **error);
 
@@ -3664,7 +3666,8 @@ struct lb_config_t *lb_config_new(const char *app_key,
                                   const char *trade_ws_url,
                                   const enum lb_language_t *language,
                                   bool enable_overight,
-                                  const enum lb_push_candlestick_mode_t *push_candlestick_mode);
+                                  const enum lb_push_candlestick_mode_t *push_candlestick_mode,
+                                  bool enable_print_quote_packages);
 
 /**
  * Free the config object

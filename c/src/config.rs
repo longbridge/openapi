@@ -35,6 +35,8 @@ pub struct CConfig(pub(crate) Arc<Config>);
 ///   (Default: `false`)
 /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
 ///   `realtime`)
+/// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+///   `true` or `false` (Default: `true`)
 #[no_mangle]
 pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_env() {
@@ -60,6 +62,7 @@ pub unsafe extern "C" fn lb_config_new(
     language: *const CLanguage,
     enable_overight: bool,
     push_candlestick_mode: *const CPushCandlestickMode,
+    enable_print_quote_packages: bool,
 ) -> *mut CConfig {
     let app_key = CStr::from_ptr(app_key).to_str().expect("invalid app key");
     let app_secret = CStr::from_ptr(app_secret)
@@ -100,6 +103,10 @@ pub unsafe extern "C" fn lb_config_new(
 
     if !push_candlestick_mode.is_null() {
         config = config.push_candlestick_mode((*push_candlestick_mode).into());
+    }
+
+    if !enable_print_quote_packages {
+        config = config.dont_print_quote_packages();
     }
 
     Box::into_raw(Box::new(CConfig(Arc::new(config))))

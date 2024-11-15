@@ -29,6 +29,11 @@ export interface ConfigParams {
   enableOvernight?: boolean
   /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
   pushCandlestickMode?: PushCandlestickMode
+  /**
+   * Enable printing the opened quote packages when connected to the server
+   * (default: true)
+   */
+  enablePrintQuotePackages: boolean
 }
 /** An request to create a watchlist group */
 export interface CreateWatchlistGroup {
@@ -768,6 +773,8 @@ export class Config {
    *   `false` (Default: `false`)
    * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
    *   `realtime`)
+   * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+   *   `true` or `false` (Default: `true`)
    */
   static fromEnv(): Config
   /**

@@ -30,6 +30,9 @@ pub struct ConfigParams {
     pub enable_overnight: Option<bool>,
     /// Push candlesticks mode (default: PushCandlestickMode.Realtime)
     pub push_candlestick_mode: Option<PushCandlestickMode>,
+    /// Enable printing the opened quote packages when connected to the server
+    /// (default: true)
+    pub enable_print_quote_packages: bool,
 }
 
 /// Configuration for LongPort sdk
@@ -68,6 +71,10 @@ impl Config {
             config = config.push_candlestick_mode(mode.into());
         }
 
+        if let Some(false) = params.enable_overnight {
+            config = config.dont_print_quote_packages();
+        }
+
         Self(config)
     }
 
@@ -88,6 +95,8 @@ impl Config {
     ///   `false` (Default: `false`)
     /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
     ///   `realtime`)
+    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+    ///   `true` or `false` (Default: `true`)
     #[napi(factory)]
     pub fn from_env() -> Result<Self> {
         Ok(Self(longport::Config::from_env().map_err(ErrorNewType)?))

@@ -50,10 +50,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_httpClientRequest
 /*
  * Class:     com_longport_SdkNative
  * Method:    newConfig
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/longport/Language;ZLcom/longport/PushCandlestickMode;)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/longport/Language;ZLcom/longport/PushCandlestickMode;Z)J
  */
 JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newConfig
-  (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jstring, jobject, jboolean, jobject);
+  (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jstring, jobject, jboolean, jobject, jboolean);
 
 /*
  * Class:     com_longport_SdkNative

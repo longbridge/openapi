@@ -21,6 +21,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
     language: JObject,
     enable_overnight: jboolean,
     push_candlestick_mode: JObject,
+    enable_print_quote_packages: jboolean,
 ) -> jlong {
     jni_result(&mut env, 0, |env| {
         let app_key = String::from_jvalue(env, app_key.into())?;
@@ -52,6 +53,9 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
         }
         if let Some(mode) = push_candlestick_mode {
             config = config.push_candlestick_mode(mode);
+        }
+        if enable_print_quote_packages == 0 {
+            config = config.dont_print_quote_packages();
         }
 
         Ok(Box::into_raw(Box::new(config)) as jlong)

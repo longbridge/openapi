@@ -267,7 +267,10 @@ impl Core {
                 table.add_row(vec![market_packages.market, market_packages.warning]);
             }
         }
-        println!("{}", table);
+
+        if config.enable_print_quote_packages {
+            println!("{}", table);
+        }
 
         Ok(Self {
             config,

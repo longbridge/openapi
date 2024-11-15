@@ -65,6 +65,7 @@ pub struct Config {
     pub(crate) language: Language,
     pub(crate) enable_overnight: bool,
     pub(crate) push_candlestick_mode: PushCandlestickMode,
+    pub(crate) enable_print_quote_packages: bool,
 }
 
 impl Config {
@@ -91,6 +92,7 @@ impl Config {
             language: Language::EN,
             enable_overnight: false,
             push_candlestick_mode: PushCandlestickMode::Realtime,
+            enable_print_quote_packages: true,
         }
     }
 
@@ -113,6 +115,8 @@ impl Config {
     ///   `false` (Default: `false`)
     /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
     ///   `realtime`)
+    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+    ///   `true` or `false` (Default: `true`)
     pub fn from_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
@@ -147,6 +151,10 @@ impl Config {
             } else {
                 PushCandlestickMode::Realtime
             };
+        let enable_print_quote_packages = std::env::var("LONGPORT_PRINT_QUOTE_PACKAGES")
+            .as_deref()
+            .unwrap_or("true")
+            == "true";
 
         Ok(Config {
             http_cli_config,
@@ -155,6 +163,7 @@ impl Config {
             language: Language::EN,
             enable_overnight,
             push_candlestick_mode,
+            enable_print_quote_packages,
         })
     }
 
@@ -218,6 +227,14 @@ impl Config {
     pub fn push_candlestick_mode(self, mode: PushCandlestickMode) -> Self {
         Self {
             push_candlestick_mode: mode,
+            ..self
+        }
+    }
+
+    /// Disable printing the opened quote packages when connected to the server.
+    pub fn dont_print_quote_packages(self) -> Self {
+        Self {
+            enable_print_quote_packages: false,
             ..self
         }
     }

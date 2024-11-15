@@ -22,6 +22,7 @@ impl Config {
         language = None,
         enable_overnight = false,
         push_candlestick_mode = PushCandlestickMode::Realtime,
+        enable_print_quote_packages = true,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn py_new(
@@ -34,8 +35,10 @@ impl Config {
         language: Option<Language>,
         enable_overnight: bool,
         push_candlestick_mode: PushCandlestickMode,
+        enable_print_quote_packages: bool,
     ) -> Self {
         let mut config = longport::Config::new(app_key, app_secret, access_token);
+
         if let Some(http_url) = http_url {
             config = config.http_url(http_url);
         }
@@ -51,6 +54,10 @@ impl Config {
         if enable_overnight {
             config = config.enable_overnight();
         }
+        if !enable_print_quote_packages {
+            config = config.dont_print_quote_packages();
+        }
+
         config = config.push_candlestick_mode(push_candlestick_mode.into());
         Self(config)
     }
