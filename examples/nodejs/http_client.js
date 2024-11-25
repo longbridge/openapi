@@ -1,6 +1,9 @@
 const { HttpClient } = require("longport");
 
-let http_cli = HttpClient.fromEnv();
-http_cli
-  .request("get", "/v1/trade/execution/today")
-  .then((resp) => console.log(resp));
+async function main() {
+  let cli = HttpClient.fromEnv();
+  let resp = await cli.request("get", "/v1/trade/execution/today");
+  console.log(resp);
+}
+
+Promise.all([main()]).catch((err) => console.error(err));

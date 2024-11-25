@@ -1,11 +1,12 @@
 const { Config, QuoteContext, SubType } = require("longport");
 
-let config = Config.fromEnv();
-QuoteContext.new(config).then((ctx) => {
-  ctx.setOnQuote((_, event) => console.log(event.toString()));
-  ctx.subscribe(
-    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
-    [SubType.Quote],
-    true
-  );
-});
+let globalCtx;
+
+async function main() {
+  let config = Config.fromEnv();
+  globalCtx = await QuoteContext.new(config);
+  globalCtx.setOnQuote((_, event) => console.log(event.toString()));
+  globalCtx.subscribe(["TSLA.US"], [SubType.Quote], true);
+}
+
+Promise.all([main()]).catch((err) => console.error(err));

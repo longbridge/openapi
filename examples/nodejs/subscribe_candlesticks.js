@@ -1,7 +1,12 @@
 const { Config, QuoteContext, Period } = require("longport");
 
-let config = Config.fromEnv();
-QuoteContext.new(config).then((ctx) => {
-  ctx.setOnCandlestick((_, event) => console.log(event.toString()));
-  ctx.subscribeCandlesticks("AAPL.US", Period.Min_1);
-});
+let globalCtx;
+
+async function main() {
+  let config = Config.fromEnv();
+  globalCtx = await QuoteContext.new(config);
+  globalCtx.setOnCandlestick((_, event) => console.log(event.toString()));
+  globalCtx.subscribeCandlesticks("AAPL.US", Period.Min_1);
+}
+
+Promise.all([main()]).catch((err) => console.error(err));

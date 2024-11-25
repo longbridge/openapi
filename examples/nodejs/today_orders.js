@@ -1,10 +1,12 @@
 const { Config, TradeContext } = require("longport");
 
-let config = Config.fromEnv();
-TradeContext.new(config)
-  .then((ctx) => ctx.todayOrders())
-  .then((resp) => {
-    for (let obj of resp) {
-      console.log(obj.toString());
-    }
-  });
+async function main() {
+  let config = Config.fromEnv();
+  let ctx = await TradeContext.new(config);
+  let resp = await ctx.todayOrders();
+  for (let obj of resp) {
+    console.log(obj.toString());
+  }
+}
+
+Promise.all([main()]).catch((err) => console.error(err));
