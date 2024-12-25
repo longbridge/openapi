@@ -39,6 +39,17 @@ Decimal::~Decimal()
   lb_decimal_free(value_);
 }
 
+Decimal& 
+Decimal::operator=(const Decimal& other)
+{
+  if (this == &other) {
+      return *this;
+  }
+  lb_decimal_free(value_);
+  value_ = lb_decimal_clone(other);   
+  return *this;
+}
+
 Decimal::operator const lb_decimal_t*() const
 {
   return value_;
@@ -120,7 +131,7 @@ Decimal::operator%(const Decimal& other) const
 Decimal&
 Decimal::operator%=(const Decimal& other)
 {
-  lb_decimal_div(value_, other);
+  lb_decimal_rem(value_, other);
   return *this;
 }
 

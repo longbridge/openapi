@@ -29,6 +29,8 @@ public:
   Decimal(double other, uint32_t dp);
   ~Decimal();
 
+  Decimal& operator=(const Decimal& ctx);
+
   operator const lb_decimal_t*() const;
   operator lb_decimal_t*();
   operator double() const;
