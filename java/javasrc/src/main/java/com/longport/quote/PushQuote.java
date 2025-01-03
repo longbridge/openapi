@@ -13,6 +13,8 @@ public class PushQuote {
     private BigDecimal turnover;
     private TradeStatus tradeStatus;
     private TradeSession tradeSession;
+    private long currentVolume;
+    private BigDecimal currentTurnover;
 
     public BigDecimal getLastDone() {
         return lastDone;
@@ -50,11 +52,20 @@ public class PushQuote {
         return tradeSession;
     }
 
+    public long getCurrentVolume() {
+        return currentVolume;
+    }
+
+    public BigDecimal getCurrentTurnover() {
+        return currentTurnover;
+    }
+
     @Override
     public String toString() {
-        return "PushQuote [high=" + high + ", lastDone=" + lastDone + ", low=" + low + ", open=" + open + ", timestamp="
-                + timestamp + ", tradeSession=" + tradeSession + ", tradeStatus=" + tradeStatus + ", turnover="
-                + turnover + ", volume=" + volume + "]";
+        return "PushQuote [lastDone=" + lastDone + ", open=" + open + ", high=" + high + ", low=" + low + ", timestamp="
+                + timestamp + ", volume=" + volume + ", turnover=" + turnover + ", tradeStatus=" + tradeStatus
+                + ", tradeSession=" + tradeSession + ", currentVolume=" + currentVolume + ", currentTurnover="
+                + currentTurnover + "]";
     }
 
 }

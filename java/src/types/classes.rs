@@ -56,7 +56,9 @@ impl_java_class!(
         volume,
         turnover,
         trade_status,
-        trade_session
+        trade_session,
+        current_volume,
+        current_turnover
     ]
 );
 

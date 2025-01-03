@@ -41,6 +41,10 @@ pub struct CPushQuote {
     pub trade_status: CTradeStatus,
     /// Trade session
     pub trade_session: CTradeSession,
+    /// Increase volume between pushes
+    pub current_volume: i64,
+    /// Increase turnover between pushes
+    pub current_turnover: *const CDecimal,
 }
 
 #[derive(Debug)]
@@ -55,6 +59,8 @@ pub(crate) struct CPushQuoteOwned {
     turnover: CDecimal,
     trade_status: TradeStatus,
     trade_session: TradeSession,
+    current_volume: i64,
+    current_turnover: CDecimal,
 }
 
 impl From<(String, PushQuote)> for CPushQuoteOwned {
@@ -69,6 +75,8 @@ impl From<(String, PushQuote)> for CPushQuoteOwned {
             turnover,
             trade_status,
             trade_session,
+            current_volume,
+            current_turnover,
         } = quote;
         CPushQuoteOwned {
             symbol: symbol.into(),
@@ -81,6 +89,8 @@ impl From<(String, PushQuote)> for CPushQuoteOwned {
             turnover: turnover.into(),
             trade_status,
             trade_session,
+            current_volume,
+            current_turnover: current_turnover.into(),
         }
     }
 }
@@ -100,6 +110,8 @@ impl ToFFI for CPushQuoteOwned {
             turnover,
             trade_status,
             trade_session,
+            current_volume,
+            current_turnover,
         } = self;
         CPushQuote {
             symbol: symbol.to_ffi_type(),
@@ -112,6 +124,8 @@ impl ToFFI for CPushQuoteOwned {
             turnover,
             trade_status: (*trade_status).into(),
             trade_session: (*trade_session).into(),
+            current_volume: *current_volume,
+            current_turnover,
         }
     }
 }

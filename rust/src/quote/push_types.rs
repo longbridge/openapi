@@ -29,6 +29,10 @@ pub struct PushQuote {
     pub trade_status: TradeStatus,
     /// Trade session
     pub trade_session: TradeSession,
+    /// Increase volume between pushes
+    pub current_volume: i64,
+    /// Increase turnover between pushes
+    pub current_turnover: Decimal,
 }
 
 impl Default for PushQuote {
@@ -43,6 +47,8 @@ impl Default for PushQuote {
             turnover: Default::default(),
             trade_status: Default::default(),
             trade_session: Default::default(),
+            current_volume: Default::default(),
+            current_turnover: Default::default(),
         }
     }
 }
@@ -143,6 +149,8 @@ fn parse_push_quote(data: &[u8]) -> Result<(PushEvent, PushQuoteTag)> {
                 turnover: push_quote.turnover.parse().unwrap_or_default(),
                 trade_status: TradeStatus::try_from(push_quote.trade_status).unwrap_or_default(),
                 trade_session: TradeSession::try_from(push_quote.trade_session).unwrap_or_default(),
+                current_volume: push_quote.current_volume,
+                current_turnover: push_quote.current_turnover.parse().unwrap_or_default(),
             }),
         },
         PushQuoteTag::try_from(push_quote.tag).unwrap_or_default(),

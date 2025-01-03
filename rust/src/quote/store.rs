@@ -217,6 +217,8 @@ fn merge_quote(data: &mut SecuritiesData, quote: &mut PushQuote) {
         turnover: merge_decimal!(prev_quote, quote, turnover),
         trade_status: quote.trade_status,
         trade_session: quote.trade_session,
+        current_volume: quote.current_volume,
+        current_turnover: quote.current_turnover,
     };
     data.quote = new_quote.clone();
     *quote = new_quote;

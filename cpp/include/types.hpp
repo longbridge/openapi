@@ -213,6 +213,10 @@ struct PushQuote
   TradeStatus trade_status;
   /// Trade session
   TradeSession trade_session;
+  /// Increase volume between pushes
+  int64_t current_volume;
+  /// Increase turnover between pushes
+  Decimal urrent_turnover;
 };
 
 struct Depth

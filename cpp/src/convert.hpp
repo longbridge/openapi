@@ -549,6 +549,8 @@ convert(const lb_push_quote_t* info)
     Decimal(info->turnover),
     convert(info->trade_status),
     convert(info->trade_session),
+    info->current_volume,
+    Decimal(info->current_turnover),
   };
 }
 

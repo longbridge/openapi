@@ -252,6 +252,16 @@ class PushQuote:
     Trade session
     """
 
+    current_volume: int
+    """
+    Increase volume between pushes
+    """
+
+    current_turnover: Decimal
+    """
+    Increase turnover between pushes
+    """
+
 
 class PushDepth:
     """

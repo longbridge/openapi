@@ -1298,6 +1298,14 @@ typedef struct lb_push_quote_t {
    * Trade session
    */
   enum lb_trade_session_t trade_session;
+  /**
+   * Increase volume between pushes
+   */
+  int64_t current_volume;
+  /**
+   * Increase turnover between pushes
+   */
+  const struct lb_decimal_t *current_turnover;
 } lb_push_quote_t;
 
 typedef void (*lb_quote_callback_t)(const struct lb_quote_context_t*,

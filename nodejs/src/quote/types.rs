@@ -963,6 +963,10 @@ pub struct PushQuote {
     trade_status: TradeStatus,
     /// Trade session
     trade_session: TradeSession,
+    /// Increase volume between pushes
+    current_volume: i64,
+    /// Increase turnover between pushes
+    current_turnover: Decimal,
 }
 
 /// Push real-time depth
