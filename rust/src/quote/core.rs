@@ -114,7 +114,7 @@ impl TradingDays {
 #[derive(Debug, Copy, Clone)]
 struct Days<'a>(Option<&'a HashSet<Date>>);
 
-impl<'a> longport_candlesticks::Days for Days<'a> {
+impl longport_candlesticks::Days for Days<'_> {
     #[inline]
     fn contains(&self, date: Date) -> bool {
         match self.0 {

@@ -1,4 +1,7 @@
-use std::fmt::{self, Debug};
+use std::{
+    convert::Infallible,
+    fmt::{self, Debug},
+};
 
 use once_cell::sync::Lazy;
 use pyo3::{exceptions::PyBaseException, prelude::*, types::PyType};
@@ -6,9 +9,9 @@ use rust_decimal::Decimal;
 
 static DECIMAL_TYPE: Lazy<PyObject> = Lazy::new(|| {
     Python::with_gil(|py| {
-        let decimal_module = py.import_bound("decimal")?;
+        let decimal_module = py.import("decimal")?;
         let decimal_type = decimal_module.getattr("Decimal")?;
-        Ok::<_, PyErr>(decimal_type.to_object(py))
+        Ok::<_, PyErr>(decimal_type.into_pyobject(py)?.unbind())
     })
     .expect("import decimal")
 });
@@ -66,11 +69,15 @@ impl<'py> FromPyObject<'py> for PyDecimal {
     }
 }
 
-impl IntoPy<PyObject> for PyDecimal {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        DECIMAL_TYPE
+impl<'py> IntoPyObject<'py> for PyDecimal {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = Infallible;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        Ok(DECIMAL_TYPE
             .call1(py, (self.0.to_string(),))
             .expect("new decimal")
-            .to_object(py)
+            .into_bound(py))
     }
 }

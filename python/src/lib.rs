@@ -11,7 +11,7 @@ use pyo3::prelude::*;
 
 #[pymodule]
 fn longport(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
-    let openapi = PyModule::new_bound(py, "openapi")?;
+    let openapi = PyModule::new(py, "openapi")?;
 
     openapi.add_class::<config::Config>()?;
     openapi.add_class::<types::Language>()?;

@@ -52,7 +52,7 @@ async fn ping() -> Option<String> {
 
 /// do the best to guess whether the access point is in China Mainland or not
 pub fn is_cn() -> bool {
-    region().map_or(false, |region| region.eq_ignore_ascii_case("CN"))
+    region().is_some_and(|region| region.eq_ignore_ascii_case("CN"))
 }
 
 #[cfg(test)]

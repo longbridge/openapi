@@ -53,7 +53,7 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
         let name = field_ident.to_string();
 
         set_dictitem.push(quote! {
-            d.set_item(#name, self.#field_ident.clone().into_py(py))?;
+            d.set_item(#name, self.#field_ident.clone().into_pyobject(py)?)?;
         });
         fields.push(field_ident);
         getters.push(quote! {

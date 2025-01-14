@@ -97,7 +97,7 @@ struct ValueWriter<'a, W> {
     first: bool,
 }
 
-impl<'a, W: Write> ValueWriter<'a, W> {
+impl<W: Write> ValueWriter<'_, W> {
     fn add_pair(&mut self, key: &str, value: &str) -> Result<(), QsError> {
         write!(
             self.writer,
@@ -263,7 +263,7 @@ struct QsSeqSerializer<'a, 'b, W> {
     writer: &'a mut ValueWriter<'b, W>,
 }
 
-impl<'a, 'b, W: Write> SerializeSeq for QsSeqSerializer<'a, 'b, W> {
+impl<W: Write> SerializeSeq for QsSeqSerializer<'_, '_, W> {
     type Ok = ();
     type Error = QsError;
 
@@ -285,7 +285,7 @@ struct QsTupleSerializer<'a, 'b, W> {
     writer: &'a mut ValueWriter<'b, W>,
 }
 
-impl<'a, 'b, W: Write> SerializeTuple for QsTupleSerializer<'a, 'b, W> {
+impl<W: Write> SerializeTuple for QsTupleSerializer<'_, '_, W> {
     type Ok = ();
     type Error = QsError;
 
@@ -448,7 +448,7 @@ struct QsTuplePairSerializer<'a, 'b, W> {
     key: Option<String>,
 }
 
-impl<'a, 'b, W: Write> SerializeTuple for QsTuplePairSerializer<'a, 'b, W> {
+impl<W: Write> SerializeTuple for QsTuplePairSerializer<'_, '_, W> {
     type Ok = ();
     type Error = QsError;
 
@@ -475,7 +475,7 @@ struct QsStructSerializer<'a, 'b, W> {
     writer: &'a mut ValueWriter<'b, W>,
 }
 
-impl<'a, 'b, W: Write> SerializeStruct for QsStructSerializer<'a, 'b, W> {
+impl<W: Write> SerializeStruct for QsStructSerializer<'_, '_, W> {
     type Ok = ();
     type Error = QsError;
 
@@ -500,7 +500,7 @@ struct QsMapSerializer<'a, 'b, W> {
     key: Option<String>,
 }
 
-impl<'a, 'b, W: Write> SerializeMap for QsMapSerializer<'a, 'b, W> {
+impl<W: Write> SerializeMap for QsMapSerializer<'_, '_, W> {
     type Ok = ();
     type Error = QsError;
 

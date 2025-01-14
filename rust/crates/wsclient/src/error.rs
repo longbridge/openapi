@@ -49,8 +49,8 @@ pub enum WsClientError {
     /// Client is closed
     #[error("Client is closed")]
     ClientClosed,
-    /// The server responded a status code not equal to `0`
 
+    /// The server responded a status code not equal to `0`
     #[error("response error: {status}: detail:{detail:?}")]
     ResponseError {
         /// Status code

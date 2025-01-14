@@ -44,11 +44,12 @@ impl From<OffsetDateTime> for PyOffsetDateTimeWrapper {
     }
 }
 
-impl IntoPy<PyObject> for PyOffsetDateTimeWrapper {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        PyDateTime::from_timestamp_bound(py, self.0.unix_timestamp() as f64, None)
-            .unwrap()
-            .into_py(py)
+impl<'py> IntoPyObject<'py> for PyOffsetDateTimeWrapper {
+    type Target = PyDateTime;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        PyDateTime::from_timestamp(py, self.0.unix_timestamp() as f64, None)
     }
 }
 
@@ -80,11 +81,12 @@ impl From<PyDateWrapper> for Date {
     }
 }
 
-impl IntoPy<PyObject> for PyDateWrapper {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        PyDate::new_bound(py, self.0.year(), self.0.month() as u8, self.0.day())
-            .unwrap()
-            .into_py(py)
+impl<'py> IntoPyObject<'py> for PyDateWrapper {
+    type Target = PyDate;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        PyDate::new(py, self.0.year(), self.0.month() as u8, self.0.day())
     }
 }
 
@@ -122,10 +124,11 @@ impl From<Time> for PyTimeWrapper {
     }
 }
 
-impl IntoPy<PyObject> for PyTimeWrapper {
-    fn into_py(self, py: Python<'_>) -> PyObject {
-        PyTime::new_bound(py, self.0.hour(), self.0.minute(), self.0.second(), 0, None)
-            .expect("valid time")
-            .into_py(py)
+impl<'py> IntoPyObject<'py> for PyTimeWrapper {
+    type Target = PyTime;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
+        PyTime::new(py, self.0.hour(), self.0.minute(), self.0.second(), 0, None)
     }
 }

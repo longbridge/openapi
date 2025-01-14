@@ -43,7 +43,7 @@ flume = { version = "0.10.12", optional = true }
 thiserror = "1.0.31"
 strum = "0.24.0"
 strum_macros = "0.24.0"
-serde = "1.0.137"
+serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
 dotenv = "0.15.0"
 http = "1.1.0"
