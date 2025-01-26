@@ -1,4 +1,10 @@
-use std::{convert::Infallible, error::Error, marker::PhantomData, time::Duration};
+use std::{
+    convert::Infallible,
+    error::Error,
+    fmt::Debug,
+    marker::PhantomData,
+    time::{Duration, Instant},
+};
 
 use reqwest::{
     header::{HeaderMap, HeaderName, HeaderValue},
@@ -7,10 +13,14 @@ use reqwest::{
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crate::{
+    is_cn,
     signature::{signature, SignatureParams},
     timestamp::Timestamp,
     HttpClient, HttpClientError, HttpClientResult,
 };
+
+const HTTP_URL: &str = "https://openapi.longportapp.com";
+const HTTP_URL_CN: &str = "https://openapi.longportapp.cn";
 
 const USER_AGENT: &str = "openapi-sdk";
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
@@ -19,6 +29,7 @@ const RETRY_INITIAL_DELAY: Duration = Duration::from_millis(100);
 const RETRY_FACTOR: f32 = 2.0;
 
 /// A JSON payload
+#[derive(Debug)]
 pub struct Json<T>(pub T);
 
 /// Represents a type that can parse from payload
@@ -31,7 +42,7 @@ pub trait FromPayload: Sized + Send + Sync + 'static {
 }
 
 /// Represents a type that can convert to payload
-pub trait ToPayload: Sized + Send + Sync + 'static {
+pub trait ToPayload: Debug + Sized + Send + Sync + 'static {
     /// A error type
     type Err: Error;
 
@@ -53,7 +64,7 @@ where
 
 impl<T> ToPayload for Json<T>
 where
-    T: Serialize + Send + Sync + 'static,
+    T: Debug + Serialize + Send + Sync + 'static,
 {
     type Err = serde_json::Error;
 
@@ -205,6 +216,18 @@ where
     Q: Serialize + Send,
     R: FromPayload,
 {
+    async fn http_url(&self) -> &str {
+        if let Some(url) = self.client.config.http_url.as_deref() {
+            return url;
+        }
+
+        if is_cn().await {
+            HTTP_URL_CN
+        } else {
+            HTTP_URL
+        }
+    }
+
     async fn do_send(&self) -> HttpClientResult<R> {
         let HttpClient {
             http_cli,
@@ -222,11 +245,9 @@ where
         let access_token_value = HeaderValue::from_str(&config.access_token)
             .map_err(|_| HttpClientError::InvalidAccessToken)?;
 
+        let url = self.http_url().await;
         let mut request_builder = http_cli
-            .request(
-                self.method.clone(),
-                format!("{}{}", config.http_url, self.path),
-            )
+            .request(self.method.clone(), format!("{}{}", url, self.path))
             .headers(default_headers.clone())
             .headers(self.headers.clone())
             .header("User-Agent", USER_AGENT)
@@ -264,7 +285,13 @@ where
             HeaderValue::from_maybe_shared(sign).expect("valid signature"),
         );
 
-        tracing::debug!(method = %request.method(), url = %request.url(), "http request");
+        if let Some(body) = &self.body {
+            tracing::info!(method = %request.method(), url = %request.url(), body = ?body, "http request");
+        } else {
+            tracing::info!(method = %request.method(), url = %request.url(), "http request");
+        }
+
+        let s = Instant::now();
 
         // send request
         let (status, trace_id, text) = tokio::time::timeout(REQUEST_TIMEOUT, async move {
@@ -282,7 +309,7 @@ where
         .await
         .map_err(|_| HttpClientError::RequestTimeout)??;
 
-        tracing::debug!(body = text.as_str(), "http response");
+        tracing::info!(duration = ?s.elapsed(), body = %text.as_str(), "http response");
 
         let resp = match serde_json::from_str::<OpenApiResponse>(&text) {
             Ok(resp) if resp.code == 0 => resp.data.ok_or(HttpClientError::UnexpectedResponse),
@@ -302,7 +329,6 @@ where
     }
 
     /// Send request and get the response
-    #[tracing::instrument(level = "debug", skip(self))]
     pub async fn send(self) -> HttpClientResult<R> {
         match self.do_send().await {
             Ok(resp) => Ok(resp),

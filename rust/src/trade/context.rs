@@ -5,6 +5,7 @@ use longport_wscli::WsClientError;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{mpsc, oneshot};
+use tracing::{instrument::WithSubscriber, Subscriber};
 
 use crate::{
     trade::{
@@ -42,6 +43,7 @@ pub struct EstimateMaxPurchaseQuantityResponse {
 pub struct TradeContext {
     command_tx: mpsc::UnboundedSender<Command>,
     http_cli: HttpClient,
+    log_subscriber: Arc<dyn Subscriber + Send + Sync>,
 }
 
 impl TradeContext {
@@ -49,17 +51,29 @@ impl TradeContext {
     pub async fn try_new(
         config: Arc<Config>,
     ) -> Result<(Self, mpsc::UnboundedReceiver<PushEvent>)> {
+        let log_subscriber = config.create_log_subscriber("trade");
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
-        tokio::spawn(Core::try_new(config, command_rx, push_tx).await?.run());
+        let core = Core::try_new(config, command_rx, push_tx)
+            .with_subscriber(log_subscriber.clone())
+            .await?;
+        tokio::spawn(core.run().with_subscriber(log_subscriber.clone()));
+
         Ok((
             TradeContext {
                 http_cli,
                 command_tx,
+                log_subscriber,
             },
             push_rx,
         ))
+    }
+
+    /// Returns the log subscriber
+    #[inline]
+    pub fn log_subscriber(&self) -> Arc<dyn Subscriber + Send + Sync> {
+        self.log_subscriber.clone()
     }
 
     /// Subscribe
@@ -173,6 +187,7 @@ impl TradeContext {
             .query_params(options.into().unwrap_or_default())
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0
             .trades)
@@ -217,6 +232,7 @@ impl TradeContext {
             .query_params(options.into().unwrap_or_default())
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0
             .trades)
@@ -268,6 +284,7 @@ impl TradeContext {
             .query_params(options.into().unwrap_or_default())
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0
             .orders)
@@ -316,6 +333,7 @@ impl TradeContext {
             .query_params(options.into().unwrap_or_default())
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0
             .orders)
@@ -354,6 +372,7 @@ impl TradeContext {
             .body(Json(options))
             .response::<Json<EmptyResponse>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await
             .map(|_| ())?)
     }
@@ -397,6 +416,7 @@ impl TradeContext {
             .body(Json(options))
             .response::<Json<_>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0;
         _ = self.command_tx.send(Command::SubmittedOrder {
@@ -438,6 +458,7 @@ impl TradeContext {
                 order_id: order_id.into(),
             })
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await
             .map(|_| ())?)
     }
@@ -479,6 +500,7 @@ impl TradeContext {
             .query_params(Request { currency })
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0
             .list)
@@ -521,6 +543,7 @@ impl TradeContext {
             .query_params(options)
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0
             .list)
@@ -556,6 +579,7 @@ impl TradeContext {
             .query_params(opts.into().unwrap_or_default())
             .response::<Json<FundPositionsResponse>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0)
     }
@@ -590,6 +614,7 @@ impl TradeContext {
             .query_params(opts.into().unwrap_or_default())
             .response::<Json<StockPositionsResponse>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0)
     }
@@ -628,6 +653,7 @@ impl TradeContext {
             })
             .response::<Json<MarginRatio>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0)
     }
@@ -670,6 +696,7 @@ impl TradeContext {
                 order_id: order_id.into(),
             })
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0)
     }
@@ -716,6 +743,7 @@ impl TradeContext {
             .query_params(opts)
             .response::<Json<EstimateMaxPurchaseQuantityResponse>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?
             .0)
     }

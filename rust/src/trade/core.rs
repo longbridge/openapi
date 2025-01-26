@@ -60,14 +60,11 @@ impl Core {
 
         let (event_tx, event_rx) = mpsc::unbounded_channel();
 
-        tracing::debug!(
-            url = config.trade_ws_url.as_str(),
-            "connecting to trade server",
-        );
+        tracing::info!("connecting to trade server");
+        let (url, res) = config.create_trade_ws_request().await;
+        let request = res.map_err(WsClientError::from)?;
         let ws_cli = WsClient::open(
-            config
-                .create_trade_ws_request()
-                .map_err(WsClientError::from)?,
+            request,
             ProtocolVersion::Version1,
             CodecType::Protobuf,
             Platform::OpenAPI,
@@ -76,7 +73,7 @@ impl Core {
         )
         .await?;
 
-        tracing::debug!(url = config.trade_ws_url.as_str(), "trade server connected");
+        tracing::info!(url = url, "trade server connected");
 
         let session = ws_cli.request_auth(otp, Default::default()).await?;
 
@@ -106,13 +103,12 @@ impl Core {
                 // reconnect
                 tokio::time::sleep(RECONNECT_DELAY).await;
 
-                tracing::debug!(
-                    url = self.config.trade_ws_url.as_str(),
-                    "connecting to trade server",
-                );
+                tracing::info!("connecting to trade server");
+                let (url, res) = self.config.create_trade_ws_request().await;
+                let request = res.expect("BUG: failed to create trade ws request");
 
                 match WsClient::open(
-                    self.config.create_trade_ws_request().unwrap(),
+                    request,
                     ProtocolVersion::Version1,
                     CodecType::Protobuf,
                     Platform::OpenAPI,
@@ -128,10 +124,7 @@ impl Core {
                     }
                 }
 
-                tracing::debug!(
-                    url = self.config.trade_ws_url.as_str(),
-                    "trade server connected"
-                );
+                tracing::info!(url = url, "trade server connected");
 
                 // request new session
                 match &self.session {
@@ -180,7 +173,6 @@ impl Core {
         }
     }
 
-    #[tracing::instrument(level = "debug", skip(self))]
     async fn main_loop(&mut self) -> Result<()> {
         let mut tick = tokio::time::interval(Duration::from_millis(500));
 

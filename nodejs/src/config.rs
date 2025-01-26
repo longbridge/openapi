@@ -33,6 +33,8 @@ pub struct ConfigParams {
     /// Enable printing the opened quote packages when connected to the server
     /// (default: true)
     pub enable_print_quote_packages: bool,
+    /// Set the path of the log files (Default: `no logs`)
+    pub log_path: Option<String>,
 }
 
 /// Configuration for LongPort sdk
@@ -73,6 +75,10 @@ impl Config {
 
         if let Some(false) = params.enable_overnight {
             config = config.dont_print_quote_packages();
+        }
+
+        if let Some(log_path) = params.log_path {
+            config = config.log_path(log_path);
         }
 
         Self(config)

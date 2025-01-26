@@ -22,6 +22,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
     enable_overnight: jboolean,
     push_candlestick_mode: JObject,
     enable_print_quote_packages: jboolean,
+    log_path: JString,
 ) -> jlong {
     jni_result(&mut env, 0, |env| {
         let app_key = String::from_jvalue(env, app_key.into())?;
@@ -33,6 +34,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
         let language = <Option<Language>>::from_jvalue(env, language.into())?;
         let push_candlestick_mode =
             <Option<PushCandlestickMode>>::from_jvalue(env, push_candlestick_mode.into())?;
+        let log_path = <Option<String>>::from_jvalue(env, log_path.into())?;
 
         let mut config = Config::new(app_key, app_secret, access_token);
 
@@ -56,6 +58,9 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
         }
         if enable_print_quote_packages == 0 {
             config = config.dont_print_quote_packages();
+        }
+        if let Some(log_path) = log_path {
+            config = config.log_path(log_path);
         }
 
         Ok(Box::into_raw(Box::new(config)) as jlong)

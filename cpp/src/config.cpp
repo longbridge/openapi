@@ -30,7 +30,8 @@ Config::Config(const std::string& app_key,
                const std::optional<Language>& language,
                bool enable_overnight,
                const std::optional<PushCandlestickMode>& push_candlestick_mode,
-               bool enable_print_quote_packages)
+               bool enable_print_quote_packages,
+               const std::optional<std::string>& log_path)
 {
   lb_language_t c_language;
   if (language) {
@@ -52,7 +53,8 @@ Config::Config(const std::string& app_key,
                   language ? &c_language : nullptr,
                   enable_overnight,
                   push_candlestick_mode ? &c_push_candlestick_mode : nullptr,
-                  enable_print_quote_packages);
+                  enable_print_quote_packages,
+                  log_path ? log_path->c_str() : nullptr);
 }
 
 Config::~Config()

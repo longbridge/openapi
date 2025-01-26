@@ -26,7 +26,7 @@ public class SdkNative {
 
         public static native long newConfig(String appKey, String appSecret, String accessToken, String httpUrl,
                         String quoteWsUrl, String tradeWsUrl, Language language, boolean enableOvernight,
-                        PushCandlestickMode mode, boolean enablePrintQuotePackages);
+                        PushCandlestickMode mode, boolean enablePrintQuotePackages, String logPath);
 
         public static native long newConfigFromEnv();
 

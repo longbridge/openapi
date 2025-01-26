@@ -1,4 +1,4 @@
-use std::{ffi::c_void, os::raw::c_char, sync::Arc};
+use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 
 use longport::{
     trade::{
@@ -98,12 +98,24 @@ pub unsafe extern "C" fn lb_trade_context_new(
                     match event {
                         PushEvent::OrderChanged(order_changed) => {
                             if let Some(callback) = &state.callbacks.order_changed {
+                                let log_subscriber = ctx.ctx.log_subscriber();
+                                let _guard =
+                                    tracing::dispatcher::set_default(&log_subscriber.into());
+
+                                let s = Instant::now();
+                                tracing::info!("begin call on_order_changed callback");
+
                                 let order_changed_owned: CPushOrderChangedOwned =
                                     order_changed.into();
                                 (callback.f)(
                                     Arc::as_ptr(&ctx),
                                     &order_changed_owned.to_ffi_type(),
                                     callback.userdata,
+                                );
+
+                                tracing::info!(
+                                    duration = ?s.elapsed(),
+                                    "after call on_order_changed callback"
                                 );
                             }
                         }

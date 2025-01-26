@@ -104,6 +104,7 @@ class Config:
         enable_overnight: Enable overnight quote
         push_candlestick_mode: Push candlestick mode
         enable_print_quote_packages: Enable printing the opened quote packages when connected to the server
+        log_path: Set the path of the log files
     """
 
     def __init__(
@@ -118,6 +119,7 @@ class Config:
         enable_overnight: bool = False,
         push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime,
         enable_print_quote_packages: bool = True,
+        log_path: Optional[str] = None,
     ) -> None: ...
 
     @classmethod
@@ -136,6 +138,9 @@ class Config:
         - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url
         - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
         - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or `false` (Default: `false`)
+        - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default: `realtime`)
+        - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected, `true` or `false` (Default: `true`)
+        - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
         """
 
     def refresh_access_token(self, expired_at: Optional[datetime] = None) -> str:

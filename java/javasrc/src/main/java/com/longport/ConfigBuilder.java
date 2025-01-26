@@ -14,6 +14,7 @@ public class ConfigBuilder {
     private boolean enableOvernight;
     private PushCandlestickMode pushCandlestickMode;
     private boolean enablePrintQuotePackages;
+    private String logPath;
 
     /**
      * Create a `Config` object builder
@@ -114,6 +115,17 @@ public class ConfigBuilder {
     }
 
     /**
+     * Set the path of the log files.
+     * 
+     * @param path The path of the log files (Default: `no logs`)
+     * @return this object
+     */
+    public ConfigBuilder logPath(String path) {
+        this.logPath = path;
+        return this;
+    }
+
+    /**
      * Build a Config object
      * 
      * @return Config object
@@ -122,6 +134,6 @@ public class ConfigBuilder {
     public Config build() throws OpenApiException {
         return new Config(
                 SdkNative.newConfig(appKey, appSecret, accessToken, httpUrl, quoteWsUrl, tradeWsUrl, language,
-                        enableOvernight, pushCandlestickMode, enablePrintQuotePackages));
+                        enableOvernight, pushCandlestickMode, enablePrintQuotePackages, logPath));
     }
 }

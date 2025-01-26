@@ -2,6 +2,7 @@ use std::{
     ffi::{c_void, CString},
     os::raw::c_char,
     sync::Arc,
+    time::Instant,
 };
 
 use longport::{
@@ -127,11 +128,23 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             ..
                         } => {
                             if let Some(callback) = &state.callbacks.quote {
+                                let log_subscriber = ctx.ctx.log_subscriber();
+                                let _guard =
+                                    tracing::dispatcher::set_default(&log_subscriber.into());
+
+                                let s = Instant::now();
+                                tracing::info!("begin call on_quote callback");
+
                                 let quote_owned: CPushQuoteOwned = (symbol, quote).into();
                                 (callback.f)(
                                     Arc::as_ptr(&ctx),
                                     &quote_owned.to_ffi_type(),
                                     callback.userdata,
+                                );
+
+                                tracing::info!(
+                                    duration = ?s.elapsed(),
+                                    "after call on_quote callback"
                                 );
                             }
                         }
@@ -141,11 +154,23 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             ..
                         } => {
                             if let Some(callback) = &state.callbacks.depth {
+                                let log_subscriber = ctx.ctx.log_subscriber();
+                                let _guard =
+                                    tracing::dispatcher::set_default(&log_subscriber.into());
+
+                                let s = Instant::now();
+                                tracing::info!("begin call on_depth callback");
+
                                 let depth_owned: CPushDepthOwned = (symbol, depth).into();
                                 (callback.f)(
                                     Arc::as_ptr(&ctx),
                                     &depth_owned.to_ffi_type(),
                                     callback.userdata,
+                                );
+
+                                tracing::info!(
+                                    duration = ?s.elapsed(),
+                                    "after call on_depth callback"
                                 );
                             }
                         }
@@ -155,11 +180,23 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             ..
                         } => {
                             if let Some(callback) = &state.callbacks.brokers {
+                                let log_subscriber = ctx.ctx.log_subscriber();
+                                let _guard =
+                                    tracing::dispatcher::set_default(&log_subscriber.into());
+
+                                let s = Instant::now();
+                                tracing::info!("begin call on_brokers callback");
+
                                 let brokers_owned: CPushBrokersOwned = (symbol, brokers).into();
                                 (callback.f)(
                                     Arc::as_ptr(&ctx),
                                     &brokers_owned.to_ffi_type(),
                                     callback.userdata,
+                                );
+
+                                tracing::info!(
+                                    duration = ?s.elapsed(),
+                                    "after call on_brokers callback"
                                 );
                             }
                         }
@@ -169,11 +206,23 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             ..
                         } => {
                             if let Some(callback) = &state.callbacks.trades {
+                                let log_subscriber = ctx.ctx.log_subscriber();
+                                let _guard =
+                                    tracing::dispatcher::set_default(&log_subscriber.into());
+
+                                let s = Instant::now();
+                                tracing::info!("begin call on_trades callback");
+
                                 let trades_owned: CPushTradesOwned = (symbol, trades).into();
                                 (callback.f)(
                                     Arc::as_ptr(&ctx),
                                     &trades_owned.to_ffi_type(),
                                     callback.userdata,
+                                );
+
+                                tracing::info!(
+                                    duration = ?s.elapsed(),
+                                    "after call on_trades callback"
                                 );
                             }
                         }
@@ -183,12 +232,24 @@ pub unsafe extern "C" fn lb_quote_context_new(
                             ..
                         } => {
                             if let Some(callback) = &state.callbacks.candlestick {
+                                let log_subscriber = ctx.ctx.log_subscriber();
+                                let _guard =
+                                    tracing::dispatcher::set_default(&log_subscriber.into());
+
+                                let s = Instant::now();
+                                tracing::info!("begin call on_candlestick callback");
+
                                 let candlestick_owned: CPushCandlestickOwned =
                                     (symbol, candlestick).into();
                                 (callback.f)(
                                     Arc::as_ptr(&ctx),
                                     &candlestick_owned.to_ffi_type(),
                                     callback.userdata,
+                                );
+
+                                tracing::info!(
+                                    duration = ?s.elapsed(),
+                                    "after call on_candlestick callback"
                                 );
                             }
                         }

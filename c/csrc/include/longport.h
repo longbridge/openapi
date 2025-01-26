@@ -3703,6 +3703,7 @@ extern "C" {
  *   `realtime`)
  * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
  *   `true` or `false` (Default: `true`)
+ * - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
  */
 struct lb_config_t *lb_config_from_env(struct lb_error_t **error);
 
@@ -3715,7 +3716,8 @@ struct lb_config_t *lb_config_new(const char *app_key,
                                   const enum lb_language_t *language,
                                   bool enable_overight,
                                   const enum lb_push_candlestick_mode_t *push_candlestick_mode,
-                                  bool enable_print_quote_packages);
+                                  bool enable_print_quote_packages,
+                                  const char *log_path);
 
 /**
  * Free the config object

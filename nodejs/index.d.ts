@@ -34,6 +34,8 @@ export interface ConfigParams {
    * (default: true)
    */
   enablePrintQuotePackages: boolean
+  /** Set the path of the log files (Default: `no logs`) */
+  logPath?: string
 }
 /** An request to create a watchlist group */
 export interface CreateWatchlistGroup {
@@ -2048,6 +2050,10 @@ export class PushQuote {
   get tradeStatus(): TradeStatus
   /** Trade session */
   get tradeSession(): TradeSession
+  /** Increase volume between pushes */
+  get currentVolume(): number
+  /** Increase turnover between pushes */
+  get currentTurnover(): Decimal
 }
 /** Push real-time depth */
 export class PushDepth {

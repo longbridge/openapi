@@ -155,7 +155,7 @@ impl<'a> Context<'a> {
                 }
                 _ = checkout_timeout.tick() => {
                     if (Instant::now() - ping_time) > HEARTBEAT_TIMEOUT {
-                        tracing::error!("heartbeat timeout");
+                        tracing::info!("heartbeat timeout");
                         return Err(WsClientError::ConnectionClosed { reason: None });
                     }
                 }
@@ -180,7 +180,8 @@ impl<'a> Context<'a> {
                         body,
                         signature: None,
                     }
-                    .encode(),
+                    .encode()
+                    .into(),
                 );
                 self.inflight_requests.insert(request_id, reply_tx);
                 self.sink.send(msg).await?;
@@ -227,7 +228,7 @@ impl<'a> Context<'a> {
                 return Err(WsClientError::ConnectionClosed {
                     reason: Some(WsCloseReason {
                         code: close_frame.code,
-                        message: close_frame.reason.into_owned(),
+                        message: close_frame.reason.to_string(),
                     }),
                 });
             }

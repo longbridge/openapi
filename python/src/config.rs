@@ -23,6 +23,7 @@ impl Config {
         enable_overnight = false,
         push_candlestick_mode = PushCandlestickMode::Realtime,
         enable_print_quote_packages = true,
+        log_path = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn py_new(
@@ -36,6 +37,7 @@ impl Config {
         enable_overnight: bool,
         push_candlestick_mode: PushCandlestickMode,
         enable_print_quote_packages: bool,
+        log_path: Option<String>,
     ) -> Self {
         let mut config = longport::Config::new(app_key, app_secret, access_token);
 
@@ -59,6 +61,11 @@ impl Config {
         }
 
         config = config.push_candlestick_mode(push_candlestick_mode.into());
+
+        if let Some(log_path) = log_path {
+            config = config.log_path(log_path);
+        }
+
         Self(config)
     }
 

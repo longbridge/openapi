@@ -39,6 +39,7 @@ public class Config implements AutoCloseable {
      * `realtime`)
      * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
      * `true` or `false` (Default: `true`)
+     * - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
      * 
      * @return Config object
      * @throws OpenApiException If an error occurs

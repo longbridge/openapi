@@ -162,14 +162,12 @@ impl Core {
 
         let (event_tx, event_rx) = mpsc::unbounded_channel();
 
-        tracing::debug!(
-            url = config.quote_ws_url.as_str(),
-            "connecting to quote server",
-        );
+        tracing::info!("connecting to quote server");
+        let (url, res) = config.create_quote_ws_request().await;
+        let request = res.map_err(WsClientError::from)?;
+
         let mut ws_cli = WsClient::open(
-            config
-                .create_quote_ws_request()
-                .map_err(WsClientError::from)?,
+            request,
             ProtocolVersion::Version1,
             CodecType::Protobuf,
             Platform::OpenAPI,
@@ -178,7 +176,7 @@ impl Core {
         )
         .await?;
 
-        tracing::debug!(url = config.quote_ws_url.as_str(), "quote server connected");
+        tracing::info!(url = url, "quote server connected");
 
         let session = ws_cli.request_auth(otp, config.create_metadata()).await?;
 
@@ -188,7 +186,7 @@ impl Core {
                 cmd_code::QUERY_USER_QUOTE_PROFILE,
                 None,
                 quote::UserQuoteProfileRequest {
-                    language: config.language.to_string(),
+                    language: config.language.unwrap_or_default().to_string(),
                 },
             )
             .await?;
@@ -240,7 +238,7 @@ impl Core {
         ws_cli.set_rate_limit(rate_limit.clone());
 
         let current_trade_days = fetch_trading_days(&ws_cli).await?;
-        let push_candlestick_mode = config.push_candlestick_mode;
+        let push_candlestick_mode = config.push_candlestick_mode.unwrap_or_default();
 
         let mut table = Table::new();
         for market_packages in quote_package_details_by_market {
@@ -309,13 +307,12 @@ impl Core {
                 // reconnect
                 tokio::time::sleep(RECONNECT_DELAY).await;
 
-                tracing::debug!(
-                    url = self.config.quote_ws_url.as_str(),
-                    "connecting to quote server",
-                );
+                tracing::info!("connecting to quote server");
+                let (url, res) = self.config.create_quote_ws_request().await;
+                let request = res.expect("BUG: failed to create quote ws request");
 
                 match WsClient::open(
-                    self.config.create_quote_ws_request().unwrap(),
+                    request,
                     ProtocolVersion::Version1,
                     CodecType::Protobuf,
                     Platform::OpenAPI,
@@ -331,10 +328,7 @@ impl Core {
                     }
                 }
 
-                tracing::debug!(
-                    url = self.config.quote_ws_url.as_str(),
-                    "quote server connected"
-                );
+                tracing::info!(url = url, "quote server connected");
 
                 // request new session
                 match &self.session {
@@ -387,7 +381,6 @@ impl Core {
         }
     }
 
-    #[tracing::instrument(level = "debug", skip(self))]
     async fn main_loop(&mut self) -> Result<()> {
         let mut update_trading_days_interval = tokio::time::interval_at(
             Instant::now() + Duration::from_secs(60 * 60 * 24),
@@ -520,7 +513,7 @@ impl Core {
         sub_types: SubFlags,
         is_first_push: bool,
     ) -> Result<()> {
-        tracing::debug!(symbols = ?symbols, sub_types = ?sub_types, "subscribe");
+        tracing::info!(symbols = ?symbols, sub_types = ?sub_types, "subscribe");
 
         // send request
         let req = SubscribeRequest {
@@ -548,7 +541,7 @@ impl Core {
         symbols: Vec<String>,
         sub_types: SubFlags,
     ) -> Result<()> {
-        tracing::debug!(symbols = ?symbols, sub_types = ?sub_types, "unsubscribe");
+        tracing::info!(symbols = ?symbols, sub_types = ?sub_types, "unsubscribe");
 
         // send requests
         let mut st_group: HashMap<SubFlags, Vec<&str>> = HashMap::new();
@@ -796,7 +789,7 @@ impl Core {
             }
         }
 
-        tracing::debug!(subscriptions = ?subscriptions, "resubscribe");
+        tracing::info!(subscriptions = ?subscriptions, "resubscribe");
 
         for (flags, symbols) in subscriptions {
             self.ws_cli
@@ -919,7 +912,7 @@ impl Core {
     fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
         match PushEvent::parse(command_code, &body) {
             Ok((mut event, tag)) => {
-                tracing::debug!(event = ?event, tag = ?tag, "push event");
+                tracing::info!(event = ?event, tag = ?tag, "push event");
 
                 if tag != Some(PushQuoteTag::Eod) {
                     self.store.handle_push(&mut event);

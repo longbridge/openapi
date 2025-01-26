@@ -37,6 +37,7 @@ pub struct CConfig(pub(crate) Arc<Config>);
 ///   `realtime`)
 /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
 ///   `true` or `false` (Default: `true`)
+/// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
 #[no_mangle]
 pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_env() {
@@ -63,6 +64,7 @@ pub unsafe extern "C" fn lb_config_new(
     enable_overight: bool,
     push_candlestick_mode: *const CPushCandlestickMode,
     enable_print_quote_packages: bool,
+    log_path: *const c_char,
 ) -> *mut CConfig {
     let app_key = CStr::from_ptr(app_key).to_str().expect("invalid app key");
     let app_secret = CStr::from_ptr(app_secret)
@@ -107,6 +109,10 @@ pub unsafe extern "C" fn lb_config_new(
 
     if !enable_print_quote_packages {
         config = config.dont_print_quote_packages();
+    }
+
+    if !log_path.is_null() {
+        config = config.log_path(CStr::from_ptr(log_path).to_str().expect("invalid log path"));
     }
 
     Box::into_raw(Box::new(CConfig(Arc::new(config))))

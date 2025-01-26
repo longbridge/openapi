@@ -6,6 +6,7 @@ use longport_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
 use time::{Date, PrimitiveDateTime};
 use tokio::sync::{mpsc, oneshot};
+use tracing::{instrument::WithSubscriber, Subscriber};
 
 use crate::{
     quote::{
@@ -50,6 +51,7 @@ pub struct QuoteContext {
     member_id: i64,
     quote_level: String,
     quote_package_details: Vec<QuotePackageDetail>,
+    log_subscriber: Arc<dyn Subscriber + Send + Sync>,
 }
 
 impl QuoteContext {
@@ -57,15 +59,19 @@ impl QuoteContext {
     pub async fn try_new(
         config: Arc<Config>,
     ) -> Result<(Self, mpsc::UnboundedReceiver<PushEvent>)> {
-        let language = config.language;
+        let log_subscriber = config.create_log_subscriber("quote");
+        let language = config.language.unwrap_or_default();
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
-        let core = Core::try_new(config, command_rx, push_tx).await?;
+        let core = Core::try_new(config, command_rx, push_tx)
+            .with_subscriber(log_subscriber.clone())
+            .await?;
         let member_id = core.member_id();
         let quote_level = core.quote_level().to_string();
         let quote_package_details = core.quote_package_details().to_vec();
-        tokio::spawn(core.run());
+        tokio::spawn(core.run().with_subscriber(log_subscriber.clone()));
+
         Ok((
             QuoteContext {
                 language,
@@ -83,9 +89,16 @@ impl QuoteContext {
                 member_id,
                 quote_level,
                 quote_package_details,
+                log_subscriber,
             },
             push_rx,
         ))
+    }
+
+    /// Returns the log subscriber
+    #[inline]
+    pub fn log_subscriber(&self) -> Arc<dyn Subscriber + Send + Sync> {
+        self.log_subscriber.clone()
     }
 
     /// Returns the member ID
@@ -1229,6 +1242,7 @@ impl QuoteContext {
             .request(Method::GET, "/v1/watchlist/groups")
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?;
         Ok(resp.0.groups)
     }
@@ -1280,6 +1294,7 @@ impl QuoteContext {
             }))
             .response::<Json<Response>>()
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?;
 
         Ok(id)
@@ -1316,6 +1331,7 @@ impl QuoteContext {
             .request(Method::DELETE, "/v1/watchlist/groups")
             .query_params(Request { id, purge })
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?)
     }
 
@@ -1365,6 +1381,7 @@ impl QuoteContext {
                 securities: req.securities,
             }))
             .send()
+            .with_subscriber(self.log_subscriber.clone())
             .await?;
 
         Ok(())

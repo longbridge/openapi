@@ -37,6 +37,8 @@ public:
    * @param language Language identifer (Default: Language::EN)
    * @param push_candlestick_mode Push candlestick mode (Default:
    * PushCandlestickMode::Realtime)
+   * @param enable_print_quote_packages Print quote packages when connected
+   * (Default: true)
    */
   Config(const std::string& app_key,
          const std::string& app_secret,
@@ -48,7 +50,8 @@ public:
          bool enable_overnight = false,
          const std::optional<PushCandlestickMode>& push_candlestick_mode =
            std::nullopt,
-         bool enable_print_quote_packages = true);
+         bool enable_print_quote_packages = true,
+         const std::optional<std::string>& log_path = std::nullopt);
 
   ~Config();
 
@@ -76,6 +79,7 @@ public:
   ///   `realtime`)
   /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
   ///   `true` or `false` (Default: `true`)
+  /// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
   static Status from_env(Config& config);
 
   /// Gets a new `access_token`
