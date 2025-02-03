@@ -1,12 +1,12 @@
 [package]
 name = "longport-wscli"
-version = "2.1.8"
+version = "2.1.9"
 edition = "2021"
 description = "LongPort Websocket SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-longport-proto = { path = "../proto", version = "2.1.8" }
+longport-proto = { path = "../proto", version = "2.1.9" }
 
 tokio = { version = "1.18.2", features = [
   "time",
