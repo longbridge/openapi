@@ -20,7 +20,7 @@ jobs:
           components: rust-docs
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.9"
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -45,7 +45,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: "x86_64"
-          args: -i python3.13 --out dist -m python/Cargo.toml
+          args: -i python3.9 --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
