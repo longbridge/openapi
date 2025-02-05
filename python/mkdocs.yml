@@ -1,15 +1,12 @@
 site_name: LongPort OpenAPI SDK
 docs_dir: docs
 
-# theme:
-#   name: readthedocs
+theme:
+  name: readthedocs
 
 nav:
   - Index: index.md
   - Code Reference:
-      - Config: config.md
-      - QuoteContext: quote_context.md
-      - TradeContext: trade_context.md
       - All: reference_all.md
 
 markdown_extensions:
@@ -24,11 +21,10 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          import:
+          inventories:
             - https://docs.python.org/3/objects.inv
-          selection:
+          options:
             docstring_style: google
-          rendering:
             show_source: false
             show_if_no_docstring: true
             members_order: source

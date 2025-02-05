@@ -1,3 +1,0 @@
-# Config
-
-::: longport.openapi.Config

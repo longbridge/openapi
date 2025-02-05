@@ -1,3 +1,0 @@
-# TradeContext
-
-::: longport.openapi.TradeContext

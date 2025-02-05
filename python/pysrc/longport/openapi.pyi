@@ -5178,7 +5178,7 @@ class TradeContext:
         Get order detail
 
         Args:
-            order id: Order id
+            order_id: Order id
 
         Returns:
             Order detail

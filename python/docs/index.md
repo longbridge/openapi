@@ -4,15 +4,15 @@
 
 ## References
 
-- [Config](https://longportapp.github.io/openapi-sdk/python/config/)
+- [Config](reference_all.md#longport.openapi.Config)
 
   The configuration of the SDK.
    
-- [QuoteContext](https://longportapp.github.io/openapi-sdk/python/quote_context/)
+- [QuoteContext](reference_all.md#longport.openapi.QuoteContext)
 
   The Quote API part of the SDK, e.g.: get basic information of securities, subscribe quotes...
 
-- [TradeContext](https://longportapp.github.io/openapi-sdk/python/trade_context/)
+- [TradeContext](reference_all.md#longport.openapi.TradeContext)
 
   The Trade API part of the SDK, e.g.: submit order, get order status...
   
