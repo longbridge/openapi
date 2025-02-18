@@ -8,6 +8,7 @@ use tokio::sync::{mpsc, oneshot};
 use tracing::{dispatcher, instrument::WithSubscriber, Subscriber};
 
 use crate::{
+    serde_utils,
     trade::{
         core::{Command, Core},
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
@@ -33,8 +34,10 @@ pub struct SubmitOrderResponse {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EstimateMaxPurchaseQuantityResponse {
     /// Cash available quantity
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub cash_max_qty: Decimal,
     /// Margin available quantity
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub margin_max_qty: Decimal,
 }
 
