@@ -2,7 +2,7 @@ use rust_decimal::{prelude::FromPrimitive, Decimal};
 use time::{Date, Month, OffsetDateTime, Time};
 use time_tz::PrimitiveDateTimeExt;
 
-use crate::{Candlestick, Days, InputCandlestick, Market, Period, UpdateAction};
+use crate::{Candlestick, Market, Period, TradeSessionType};
 
 pub struct TestCandlestickTime<'a> {
     market: &'a Market,
@@ -16,10 +16,11 @@ impl<'a> TestCandlestickTime<'a> {
     }
 
     #[track_caller]
-    pub fn check_time(&self, input: Time, expected: impl Into<Option<Time>>) {
+    pub fn check_time(&self, ts: TradeSessionType, input: Time, expected: impl Into<Option<Time>>) {
         let date = Date::from_calendar_date(2024, Month::January, 1).unwrap();
         assert_eq!(
             self.market.candlestick_time(
+                ts,
                 false,
                 self.period,
                 date.with_time(input)
@@ -36,44 +37,13 @@ impl<'a> TestCandlestickTime<'a> {
     #[track_caller]
     pub fn check_datetime(
         &self,
+        ts: TradeSessionType,
         input: OffsetDateTime,
         expected: impl Into<Option<OffsetDateTime>>,
     ) {
         assert_eq!(
-            self.market.candlestick_time(false, self.period, input),
+            self.market.candlestick_time(ts, false, self.period, input),
             expected.into()
-        );
-    }
-
-    #[track_caller]
-    pub fn check_tick(
-        &self,
-        input: InputCandlestick,
-        current: OffsetDateTime,
-        expected: UpdateAction,
-    ) {
-        assert_eq!(
-            self.market.tick(true, false, self.period, input, current),
-            expected
-        );
-    }
-
-    #[track_caller]
-    pub fn check_tick_with_trading_days<N, H>(
-        &self,
-        normal_days: N,
-        half_days: H,
-        input: InputCandlestick,
-        current: OffsetDateTime,
-        expected: UpdateAction,
-    ) where
-        N: Days,
-        H: Days,
-    {
-        assert_eq!(
-            self.market
-                .tick(normal_days, half_days, self.period, input, current),
-            expected
         );
     }
 }

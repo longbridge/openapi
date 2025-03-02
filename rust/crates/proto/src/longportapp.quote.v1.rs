@@ -354,6 +354,8 @@ pub struct SecurityCandlestickRequest {
     pub count: i32,
     #[prost(enumeration = "AdjustType", tag = "4")]
     pub adjust_type: i32,
+    #[prost(int32, tag = "5")]
+    pub trade_session: i32,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -380,6 +382,8 @@ pub struct Candlestick {
     pub turnover: ::prost::alloc::string::String,
     #[prost(int64, tag = "7")]
     pub timestamp: i64,
+    #[prost(enumeration = "TradeSession", tag = "8")]
+    pub trade_session: i32,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -848,6 +852,8 @@ pub struct SecurityHistoryCandlestickRequest {
     pub date_request: ::core::option::Option<
         security_history_candlestick_request::DateQuery,
     >,
+    #[prost(int32, tag = "7")]
+    pub trade_session: i32,
 }
 /// Nested message and enum types in `SecurityHistoryCandlestickRequest`.
 pub mod security_history_candlestick_request {

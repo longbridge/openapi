@@ -36,19 +36,19 @@ impl ToFFI for CDecimal {
 
 /// Create a decimal value with a 64 bit `m` representation and corresponding
 /// `e` scale.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn lb_decimal_new(num: i64, scale: u32) -> *mut CDecimal {
     Box::into_raw(Box::new(Decimal::new(num, scale).into()))
 }
 
 /// Clone the decimal value
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_clone(value: *const CDecimal) -> *mut CDecimal {
     Box::into_raw(Box::new((*value).value.into()))
 }
 
 /// Create a decimal value from string
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_from_str(value: *const c_char) -> *mut CDecimal {
     match CStr::from_ptr(value)
         .to_str()
@@ -61,7 +61,7 @@ pub unsafe extern "C" fn lb_decimal_from_str(value: *const c_char) -> *mut CDeci
 }
 
 /// Create a decimal value from double
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn lb_decimal_from_double(value: f64) -> *mut CDecimal {
     match Decimal::from_f64_retain(value) {
         Some(value) => Box::into_raw(Box::new(value.into())),
@@ -70,64 +70,64 @@ pub extern "C" fn lb_decimal_from_double(value: f64) -> *mut CDecimal {
 }
 
 /// Free the decimal value
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_free(value: *mut CDecimal) {
     let _ = Box::from_raw(value);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_to_double(value: *const CDecimal) -> f64 {
     (*value).value.to_f64().unwrap_or_default()
 }
 
 /// Computes the absolute value.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_abs(value: *mut CDecimal) {
     let new_value = (*value).value.abs();
     (*value).value = new_value;
 }
 
 /// Returns the smallest integer greater than or equal to a number.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_ceil(value: *mut CDecimal) {
     let new_value = (*value).value.ceil();
     (*value).value = new_value;
 }
 
 /// Returns the largest integer less than or equal to a number.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_floor(value: *mut CDecimal) {
     let new_value = (*value).value.floor();
     (*value).value = new_value;
 }
 
 /// Returns a new Decimal representing the fractional portion of the number.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_fract(value: *mut CDecimal) {
     let new_value = (*value).value.fract();
     (*value).value = new_value;
 }
 
 /// Returns `true` if the decimal is negative.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_is_negative(value: *const CDecimal) -> bool {
     (*value).value.is_sign_negative()
 }
 
 /// Returns `true` if the decimal is positive.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_is_positive(value: *const CDecimal) -> bool {
     (*value).value.is_sign_positive()
 }
 
 /// Returns `true` if this Decimal number is equivalent to zero.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_is_zero(value: *const CDecimal) -> bool {
     (*value).value.is_zero()
 }
 
 /// Returns the maximum of the two numbers.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_max(a: *const CDecimal, b: *const CDecimal) -> *const CDecimal {
     if (*a).value > (*b).value {
         a
@@ -137,7 +137,7 @@ pub unsafe extern "C" fn lb_decimal_max(a: *const CDecimal, b: *const CDecimal) 
 }
 
 /// Returns the minimum of the two numbers.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_min(a: *const CDecimal, b: *const CDecimal) -> *const CDecimal {
     if (*a).value < (*b).value {
         a
@@ -147,7 +147,7 @@ pub unsafe extern "C" fn lb_decimal_min(a: *const CDecimal, b: *const CDecimal) 
 }
 
 /// Strips any trailing zero’s from a Decimal and converts `-0` to `0`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_normalize(value: *mut CDecimal) {
     let new_value = (*value).value.normalize();
     (*value).value = new_value;
@@ -156,7 +156,7 @@ pub unsafe extern "C" fn lb_decimal_normalize(value: *mut CDecimal) {
 /// Returns a new Decimal number with no fractional portion (i.e. an
 /// integer). Rounding currently follows “Bankers Rounding” rules. e.g.
 /// `6.5` -> `6`, `7.5` -> `8`
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_round(value: *mut CDecimal) {
     let new_value = (*value).value.round();
     (*value).value = new_value;
@@ -165,7 +165,7 @@ pub unsafe extern "C" fn lb_decimal_round(value: *mut CDecimal) {
 /// Returns a new Decimal number with the specified number of decimal points for
 /// fractional portion. Rounding currently follows “Bankers Rounding” rules.
 /// e.g. 6.5 -> 6, 7.5 -> 8
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_round_dp(value: *mut CDecimal, dp: u32) {
     let new_value = (*value).value.round_dp(dp);
     (*value).value = new_value;
@@ -173,49 +173,49 @@ pub unsafe extern "C" fn lb_decimal_round_dp(value: *mut CDecimal, dp: u32) {
 
 /// Returns a new Decimal integral with no fractional portion. This is a
 /// true truncation whereby no rounding is performed.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_trunc(value: *mut CDecimal) {
     let new_value = (*value).value.trunc();
     (*value).value = new_value;
 }
 
 /// Performs the `+` operation.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_add(a: *mut CDecimal, b: *const CDecimal) {
     let new_value = (*a).value + (*b).value;
     (*a).value = new_value;
 }
 
 /// Performs the `-` operation.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_sub(a: *mut CDecimal, b: *const CDecimal) {
     let new_value = (*a).value - (*b).value;
     (*a).value = new_value;
 }
 
 /// Performs the `*` operation.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_mul(a: *mut CDecimal, b: *const CDecimal) {
     let new_value = (*a).value * (*b).value;
     (*a).value = new_value;
 }
 
 /// Performs the `/` operation.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_div(a: *mut CDecimal, b: *const CDecimal) {
     let new_value = (*a).value / (*b).value;
     (*a).value = new_value;
 }
 
 /// Performs the `%` operation.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_rem(a: *mut CDecimal, b: *const CDecimal) {
     let new_value = (*a).value % (*b).value;
     (*a).value = new_value;
 }
 
 /// Performs the unary `-` operation.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_neg(value: *mut CDecimal) {
     let new_value = -(*value).value;
     (*value).value = new_value;
@@ -223,35 +223,35 @@ pub unsafe extern "C" fn lb_decimal_neg(value: *mut CDecimal) {
 
 /// Returns `true` if the value of this Decimal is greater than the value of
 /// `x`, otherwise returns `false`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_gt(a: *const CDecimal, b: *const CDecimal) -> bool {
     (*a).value > (*b).value
 }
 
 /// Returns `true` if the value of this Decimal is greater than or equal to
 /// the value of `x`, otherwise returns `false`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_gte(a: *const CDecimal, b: *const CDecimal) -> bool {
     (*a).value >= (*b).value
 }
 
 /// Returns `true` if the value of this Decimal equals the value of `x`,
 /// otherwise returns `false`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_eq(a: *const CDecimal, b: *const CDecimal) -> bool {
     (*a).value == (*b).value
 }
 
 /// Returns `true` if the value of this Decimal is less than the value of
 /// `x`, otherwise returns `false`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_lt(a: *const CDecimal, b: *const CDecimal) -> bool {
     (*a).value < (*b).value
 }
 
 /// Returns `true` if the value of this Decimal is less than or equal to the
 /// value of `x`, otherwise returns `false`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_lte(a: *const CDecimal, b: *const CDecimal) -> bool {
     (*a).value <= (*b).value
 }
@@ -265,7 +265,7 @@ pub unsafe extern "C" fn lb_decimal_lte(a: *const CDecimal, b: *const CDecimal) 
 /// `x`.
 ///
 /// Returns `0` if the value of this Decimal equals the value of `x`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_cmp(a: *const CDecimal, b: *const CDecimal) -> i32 {
     match (*a).value.cmp(&(*b).value) {
         Ordering::Less => -1,
@@ -275,14 +275,14 @@ pub unsafe extern "C" fn lb_decimal_cmp(a: *const CDecimal, b: *const CDecimal) 
 }
 
 /// Computes the sine of a number (in radians)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_sin(value: *mut CDecimal) {
     let new_value = (*value).value.checked_sin().expect("overflowed");
     (*value).value = new_value;
 }
 
 /// Computes the cosine of a number (in radians)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_cos(value: *mut CDecimal) {
     let new_value = (*value).value.checked_cos().expect("overflowed");
     (*value).value = new_value;
@@ -290,14 +290,14 @@ pub unsafe extern "C" fn lb_decimal_cos(value: *mut CDecimal) {
 
 /// Computes the tangent of a number (in radians). Panics upon overflow or
 /// upon approaching a limit.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_tan(value: *mut CDecimal) {
     let new_value = (*value).value.checked_tan().expect("overflowed");
     (*value).value = new_value;
 }
 
 /// The square root of a Decimal. Uses a standard Babylonian method.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_sqrt(value: *mut CDecimal) {
     let new_value = (*value).value.sqrt().expect("overflowed");
     (*value).value = new_value;
@@ -305,7 +305,7 @@ pub unsafe extern "C" fn lb_decimal_sqrt(value: *mut CDecimal) {
 
 /// Raise self to the given Decimal exponent: x<sup>y</sup>. If `exp` is not
 /// whole then the approximation e<sup>y*ln(x)</sup> is used.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_pow(value: *mut CDecimal, exp: *const CDecimal) {
     let new_value = (*value)
         .value
@@ -316,14 +316,14 @@ pub unsafe extern "C" fn lb_decimal_pow(value: *mut CDecimal, exp: *const CDecim
 
 /// Calculates the natural logarithm for a Decimal calculated using Taylor’s
 /// series.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_ln(value: *mut CDecimal) {
     let new_value = (*value).value.checked_ln().expect("overflowed");
     (*value).value = new_value;
 }
 
 /// Calculates the base 10 logarithm of a specified Decimal number.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_log10(value: *mut CDecimal) {
     let new_value = (*value).value.checked_log10().expect("overflowed");
     (*value).value = new_value;
@@ -331,7 +331,7 @@ pub unsafe extern "C" fn lb_decimal_log10(value: *mut CDecimal) {
 
 /// The estimated exponential function, ex. Stops calculating when it is
 /// within tolerance of roughly `0.0000002`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_exp(value: *mut CDecimal) {
     let new_value = (*value).value.checked_exp().expect("overflowed");
     (*value).value = new_value;
@@ -341,7 +341,7 @@ pub unsafe extern "C" fn lb_decimal_exp(value: *mut CDecimal) {
 /// provided as a hint as to when to stop calculating. A larger
 /// tolerance will cause the number to stop calculating sooner at the
 /// potential cost of a slightly less accurate result.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_exp_with_tolerance(
     value: *mut CDecimal,
     tolerance: *const CDecimal,
@@ -354,28 +354,28 @@ pub unsafe extern "C" fn lb_decimal_exp_with_tolerance(
 }
 
 /// Abramowitz Approximation of Error Function from [wikipedia](https://en.wikipedia.org/wiki/Error_function#Numerical_approximations)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_erf(value: *mut CDecimal) {
     let new_value = (*value).value.erf();
     (*value).value = new_value;
 }
 
 /// The Cumulative distribution function for a Normal distribution
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_normal_cdf(value: *mut CDecimal) {
     let new_value = (*value).value.norm_cdf();
     (*value).value = new_value;
 }
 
 /// The Probability density function for a Normal distribution.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_norm_pdf(value: *mut CDecimal) {
     let new_value = (*value).value.norm_pdf();
     (*value).value = new_value;
 }
 
 /// The Probability density function for a Normal distribution.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_to_string(value: *const CDecimal) -> *const c_char {
     *(*value).value_str.get() = CString::new((*value).value.to_string()).unwrap();
     (*(*value).value_str.get()).as_ptr()

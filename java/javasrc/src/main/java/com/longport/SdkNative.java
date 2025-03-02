@@ -62,7 +62,7 @@ public class SdkNative {
                         AsyncCallback callback);
 
         public static native void quoteContextSubscribeCandlesticks(long context, String symbol, Period period,
-                        AsyncCallback callback);
+                        TradeSessions tradeSessions, AsyncCallback callback);
 
         public static native void quoteContextUnsubscribeCandlesticks(long context, String symbol, Period period,
                         AsyncCallback callback);
@@ -88,14 +88,15 @@ public class SdkNative {
         public static native void quoteContextIntraday(long context, String symbol, AsyncCallback callback);
 
         public static native void quoteContextCandlesticks(long context, String symbol, Period period, int count,
-                        AdjustType adjustType, AsyncCallback callback);
+                        AdjustType adjustType, TradeSessions tradeSessions, AsyncCallback callback);
 
         public static native void quoteContextHistoryCandlesticksByOffset(long context, String symbol, Period period,
                         AdjustType adjustType, boolean forward, LocalDateTime datetime, int count,
-                        AsyncCallback callback);
+                        TradeSessions tradeSessions, AsyncCallback callback);
 
         public static native void quoteContextHistoryCandlesticksByDate(long context, String symbol, Period period,
-                        AdjustType adjustType, LocalDate start, LocalDate end, AsyncCallback callback);
+                        AdjustType adjustType, LocalDate start, LocalDate end, TradeSessions tradeSessions,
+                        AsyncCallback callback);
 
         public static native void quoteContextOptionChainExpiryDateList(long context, String symbol,
                         AsyncCallback callback);

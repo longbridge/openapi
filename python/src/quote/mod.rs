@@ -50,6 +50,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::FilterWarrantInOutBoundsType>()?;
     parent.add_class::<types::Security>()?;
     parent.add_class::<types::SecurityListCategory>()?;
+    parent.add_class::<types::TradeSessions>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     Ok(())

@@ -20,7 +20,7 @@ impl From<Error> for CError {
 }
 
 /// Free the error object
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_error_free(error: *mut CError) {
     let _ = Box::from_raw(error);
 }
@@ -34,12 +34,12 @@ pub(crate) unsafe fn set_error(error: *mut *mut CError, err: Option<Error>) {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_error_message(error: *const CError) -> *const c_char {
     (*error).message.to_ffi_type()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_error_code(error: *const CError) -> i64 {
     (*error).code
 }

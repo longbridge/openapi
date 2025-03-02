@@ -1,5 +1,5 @@
 from time import sleep
-from longport.openapi import QuoteContext, Config, Period, PushCandlestick
+from longport.openapi import QuoteContext, Config, Period, PushCandlestick, TradeSessions
 
 
 def on_candlestick(symbol: str, event: PushCandlestick):
@@ -10,5 +10,5 @@ config = Config.from_env()
 ctx = QuoteContext(config)
 ctx.set_on_candlestick(on_candlestick)
 
-ctx.subscribe_candlesticks("AAPL.US", Period.Min_1)
+ctx.subscribe_candlesticks("AAPL.US", Period.Min_1, TradeSessions.Normal)
 sleep(30)

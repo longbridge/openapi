@@ -17,7 +17,7 @@ use crate::{
 pub struct CHttpClient(HttpClient);
 
 /// Create a HTTP client
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_client_new(
     http_url: *const c_char,
     app_key: *const c_char,
@@ -39,7 +39,7 @@ pub unsafe extern "C" fn lb_http_client_new(
 }
 
 /// Free the http client
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_client_free(http_client: *mut CHttpClient) {
     let _ = Box::from_raw(http_client);
 }
@@ -55,7 +55,7 @@ pub unsafe extern "C" fn lb_http_client_free(http_client: *mut CHttpClient) {
 /// - `LONGPORT_APP_KEY` - App key
 /// - `LONGPORT_APP_SECRET` - App secret
 /// - `LONGPORT_ACCESS_TOKEN` - Access token
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_client_from_env(error: *mut *mut CError) -> *mut CHttpClient {
     match HttpClient::from_env() {
         Ok(http_client) => {
@@ -81,7 +81,7 @@ pub struct CHeader {
 }
 
 /// Performs a HTTP request
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_client_request(
     http_client: *mut CHttpClient,
     method: *const c_char,
@@ -148,12 +148,12 @@ pub unsafe extern "C" fn lb_http_client_request(
 }
 
 /// Free the HTTP result
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_result_free(http_result: *mut CHttpResult) {
     let _ = Box::from_raw(http_result);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_result_response_body(
     http_result: *const CHttpResult,
 ) -> *const c_char {

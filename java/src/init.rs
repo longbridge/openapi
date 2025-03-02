@@ -51,7 +51,7 @@ macro_rules! init_class_by_classloader {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
     mut env: JNIEnv<'a>,
     _class: JClass<'a>,
@@ -97,6 +97,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::quote::SecuritiesUpdateMode,
         longport::quote::CalcIndex,
         longport::quote::SecurityListCategory,
+        longport::quote::TradeSessions,
         longport::trade::OrderSide,
         longport::trade::OrderType,
         longport::trade::OrderStatus,

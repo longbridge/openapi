@@ -593,3 +593,16 @@ pub enum CSecurityListCategory {
     #[c(remote = "Overnight")]
     SecurityListCategoryOvernight,
 }
+
+/// Trade sessions
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longport::quote::TradeSessions")]
+#[repr(C)]
+pub enum CTradeSessions {
+    /// Normal trade session
+    #[c(remote = "Normal")]
+    TradeSessionsNormal = 0,
+    /// All trade sessions
+    #[c(remote = "All")]
+    TradeSessionsAll = 100,
+}

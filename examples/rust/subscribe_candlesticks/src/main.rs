@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use longport::{
-    quote::{Period, QuoteContext},
-    Config, PushCandlestickMode,
+    quote::{Period, QuoteContext, TradeSessions},
+    Config,
 };
 use tracing_subscriber::EnvFilter;
 
@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_env()?);
     let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
     println!("member id: {}", ctx.member_id());
-    ctx.subscribe_candlesticks("700.HK", Period::OneMinute)
+    ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::All)
         .await?;
 
     while let Some(event) = receiver.recv().await {

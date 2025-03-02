@@ -53,7 +53,7 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
             _ => {
                 return Error::new_spanned(&expr, "missing remote type")
                     .to_compile_error()
-                    .into()
+                    .into();
             }
         }
     };
@@ -77,7 +77,7 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
                         _ => {
                             return Error::new_spanned(elem, "invalid field")
                                 .to_compile_error()
-                                .into()
+                                .into();
                         }
                     }
                 }
@@ -85,7 +85,7 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
             _ => {
                 return Error::new_spanned(&expr, "missing field list")
                     .to_compile_error()
-                    .into()
+                    .into();
             }
         }
 
@@ -101,7 +101,7 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
             None => {
                 return Error::new_spanned(field, "invalid field")
                     .to_compile_error()
-                    .into()
+                    .into();
             }
         };
         let java_field = ident.to_string().to_camel_case();
@@ -196,7 +196,7 @@ pub fn impl_java_enum(input: TokenStream) -> TokenStream {
             _ => {
                 return Error::new_spanned(&expr, "missing remote type")
                     .to_compile_error()
-                    .into()
+                    .into();
             }
         }
     };
@@ -220,7 +220,7 @@ pub fn impl_java_enum(input: TokenStream) -> TokenStream {
                         _ => {
                             return Error::new_spanned(elem, "invalid enum item")
                                 .to_compile_error()
-                                .into()
+                                .into();
                         }
                     }
                 }
@@ -228,7 +228,7 @@ pub fn impl_java_enum(input: TokenStream) -> TokenStream {
             _ => {
                 return Error::new_spanned(&expr, "missing enum items")
                     .to_compile_error()
-                    .into()
+                    .into();
             }
         }
 

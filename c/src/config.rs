@@ -38,7 +38,7 @@ pub struct CConfig(pub(crate) Arc<Config>);
 /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
 ///   `true` or `false` (Default: `true`)
 /// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_env() {
         Ok(config) => {
@@ -52,7 +52,7 @@ pub unsafe extern "C" fn lb_config_from_env(error: *mut *mut CError) -> *mut CCo
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_new(
     app_key: *const c_char,
     app_secret: *const c_char,
@@ -119,13 +119,13 @@ pub unsafe extern "C" fn lb_config_new(
 }
 
 /// Free the config object
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_free(config: *mut CConfig) {
     let _ = Box::from_raw(config);
 }
 
 /// Gets a new `access_token`
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_refresh_access_token(
     config: *mut CConfig,
     expired_at: i64,

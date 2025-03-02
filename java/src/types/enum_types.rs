@@ -320,6 +320,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longport/quote/TradeSessions",
+    longport::quote::TradeSessions,
+    [Normal, All]
+);
+
+impl_java_enum!(
     "com/longport/trade/OrderSide",
     longport::trade::OrderSide,
     [Unknown, Buy, Sell]

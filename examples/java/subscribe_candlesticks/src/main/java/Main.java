@@ -7,7 +7,7 @@ class Main {
             ctx.setOnCandlestick((symbol, event) -> {
                 System.out.printf("%s\t%s\n", symbol, event);
             });
-            ctx.subscribeCandlesticks("AAPL.US", Period.Min_1).get();
+            ctx.subscribeCandlesticks("AAPL.US", Period.Min_1, TradeSessions.Normal).get();
             Thread.sleep(30000);
         }
     }

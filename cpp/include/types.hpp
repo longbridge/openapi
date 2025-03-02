@@ -565,6 +565,8 @@ struct PushCandlestick
 {
   /// Security code
   std::string symbol;
+  /// Trade session
+  TradeSession trade_session;
   /// Period type
   Period period;
   /// Candlestick
@@ -1190,6 +1192,15 @@ struct QuotePackageDetail
   int64_t start_at;
   /// End at
   int64_t end_at;
+};
+
+/// Trade sessions
+enum class TradeSessions
+{
+  /// Normal trade session
+  Normal,
+  /// All trade sessions
+  All,
 };
 
 } // namespace quote

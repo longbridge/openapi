@@ -2,8 +2,7 @@ name: Release
 on:
   push:
     branches:
-      - release-v1
-      - release-v2
+      - release
 
 jobs:
   build-python-sdk-macos:

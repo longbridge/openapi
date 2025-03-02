@@ -435,6 +435,13 @@ export const enum SecurityListCategory {
   /** Overnight */
   Overnight = 0
 }
+/** Trade sessions */
+export const enum TradeSessions {
+  /** Normal trade session */
+  Normal = 0,
+  /** All trade sessions */
+  All = 1
+}
 /** Options for get cash flow request */
 export interface EstimateMaxPurchaseQuantityOptions {
   symbol: string
@@ -1042,7 +1049,7 @@ export class QuoteContext {
    */
   unsubscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
   /** Subscribe security candlesticks */
-  subscribeCandlesticks(symbol: string, period: Period): Promise<Array<Candlestick>>
+  subscribeCandlesticks(symbol: string, period: Period, tradeSessions: TradeSessions): Promise<Array<Candlestick>>
   /** Unsubscribe security candlesticks */
   unsubscribeCandlesticks(symbol: string, period: Period): Promise<void>
   /**
@@ -1233,11 +1240,11 @@ export class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Period, AdjustType } = require("longport")
+   * const { Config, QuoteContext, Period, AdjustType, TradeSessions } = require("longport")
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
-   *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust))
+   *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Normal))
    *   .then((resp) => {
    *     for (let obj of resp) {
    *       console.log(obj.toString());
@@ -1245,11 +1252,11 @@ export class QuoteContext {
    *   })
    * ```
    */
-  candlesticks(symbol: string, period: Period, count: number, adjustType: AdjustType): Promise<Array<Candlestick>>
+  candlesticks(symbol: string, period: Period, count: number, adjustType: AdjustType, tradeSessions: TradeSessions): Promise<Array<Candlestick>>
   /** Get security history candlesticks by offset */
-  historyCandlesticksByOffset(symbol: string, period: Period, adjustType: AdjustType, forward: boolean, datetime: NaiveDatetime | undefined | null, count: number): Promise<Array<Candlestick>>
+  historyCandlesticksByOffset(symbol: string, period: Period, adjustType: AdjustType, forward: boolean, datetime: NaiveDatetime | undefined | null, count: number, tradeSessions: TradeSessions): Promise<Array<Candlestick>>
   /** Get security history candlesticks by date */
-  historyCandlesticksByDate(symbol: string, period: Period, adjustType: AdjustType, start?: NaiveDate | undefined | null, end?: NaiveDate | undefined | null): Promise<Array<Candlestick>>
+  historyCandlesticksByDate(symbol: string, period: Period, adjustType: AdjustType, start: NaiveDate | undefined | null, end: NaiveDate | undefined | null, tradeSessions: TradeSessions): Promise<Array<Candlestick>>
   /**
    * Get option chain expiry date list
    *
@@ -2084,6 +2091,8 @@ export class PushTrades {
 export class PushCandlestick {
   toString(): string
   toJSON(): any
+  /** Trade session */
+  get tradeSession(): TradeSession
   /** Period type */
   get period(): Period
   /** Candlestick */

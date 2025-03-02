@@ -10,8 +10,8 @@ use longport::{
     quote::{
         AdjustType, CalcIndex, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, Period,
         PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
-        SecuritiesUpdateMode, SecurityListCategory, SortOrderType, SubFlags, WarrantSortBy,
-        WarrantStatus, WarrantType,
+        SecuritiesUpdateMode, SecurityListCategory, SortOrderType, SubFlags, TradeSessions,
+        WarrantSortBy, WarrantStatus, WarrantType,
     },
     Config, Market, QuoteContext,
 };
@@ -111,7 +111,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
     Ok(())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_newQuoteContext(
     mut env: JNIEnv,
     _class: JClass,
@@ -155,7 +155,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newQuoteContext(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_freeQuoteContext(
     _env: JNIEnv,
     _class: JClass,
@@ -164,7 +164,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeQuoteContext(
     let _ = Box::from_raw(ctx as *mut ContextObj);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetMemberId(
     mut _env: JNIEnv,
     _class: JClass,
@@ -174,7 +174,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetMemberI
     context.ctx.member_id()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuoteLevel<'a>(
     mut env: JNIEnv<'a>,
     _class: JClass<'a>,
@@ -191,7 +191,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuoteLe
         .unwrap()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuotePackageDetails<'a>(
     mut env: JNIEnv<'a>,
     _class: JClass<'a>,
@@ -205,7 +205,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuotePa
         .unwrap()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnQuote(
     mut env: JNIEnv,
     _class: JClass,
@@ -223,7 +223,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnQuote
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnDepth(
     mut env: JNIEnv,
     _class: JClass,
@@ -241,7 +241,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnDepth
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnBrokers(
     mut env: JNIEnv,
     _class: JClass,
@@ -259,7 +259,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnBroke
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnTrades(
     mut env: JNIEnv,
     _class: JClass,
@@ -277,7 +277,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnTrade
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnCandlestick(
     mut env: JNIEnv,
     _class: JClass,
@@ -295,7 +295,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnCandl
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribe(
     mut env: JNIEnv,
     _class: JClass,
@@ -320,7 +320,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribe(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscribe(
     mut env: JNIEnv,
     _class: JClass,
@@ -341,29 +341,34 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscrib
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribeCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
     symbol: JString,
     period: JObject,
+    trade_sessions: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let period: Period = FromJValue::from_jvalue(env, period.into())?;
+        let trade_sessions: TradeSessions = FromJValue::from_jvalue(env, trade_sessions.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
-                context.ctx.subscribe_candlesticks(symbol, period).await?,
+                context
+                    .ctx
+                    .subscribe_candlesticks(symbol, period, trade_sessions)
+                    .await?,
             ))
         })?;
         Ok(())
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscribeCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
@@ -383,7 +388,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscrib
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscriptions(
     mut env: JNIEnv,
     _class: JClass,
@@ -400,7 +405,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscripti
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextStaticInfo(
     mut env: JNIEnv,
     _class: JClass,
@@ -420,7 +425,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextStaticInfo
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextQuote(
     mut env: JNIEnv,
     _class: JClass,
@@ -440,7 +445,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextQuote(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionQuote(
     mut env: JNIEnv,
     _class: JClass,
@@ -460,7 +465,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionQuot
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantQuote(
     mut env: JNIEnv,
     _class: JClass,
@@ -480,7 +485,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantQuo
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDepth(
     mut env: JNIEnv,
     _class: JClass,
@@ -498,7 +503,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDepth(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextBrokers(
     mut env: JNIEnv,
     _class: JClass,
@@ -516,7 +521,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextBrokers(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextParticipants(
     mut env: JNIEnv,
     _class: JClass,
@@ -532,7 +537,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextParticipan
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTrades(
     mut env: JNIEnv,
     _class: JClass,
@@ -553,7 +558,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTrades(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextIntraday(
     mut env: JNIEnv,
     _class: JClass,
@@ -571,7 +576,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextIntraday(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
@@ -580,6 +585,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCandlestic
     period: JObject,
     count: i32,
     adjust_type: JObject,
+    trade_sessions: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -587,11 +593,18 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCandlestic
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let period: Period = FromJValue::from_jvalue(env, period.into())?;
         let adjust_type: AdjustType = FromJValue::from_jvalue(env, adjust_type.into())?;
+        let trade_sessions: TradeSessions = FromJValue::from_jvalue(env, trade_sessions.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
                 context
                     .ctx
-                    .candlesticks(symbol, period, count.max(0) as usize, adjust_type)
+                    .candlesticks(
+                        symbol,
+                        period,
+                        count.max(0) as usize,
+                        adjust_type,
+                        trade_sessions,
+                    )
                     .await?,
             ))
         })?;
@@ -599,7 +612,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCandlestic
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCandlesticksByOffset(
     mut env: JNIEnv,
     _class: JClass,
@@ -610,6 +623,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
     forward: jboolean,
     datetime: JObject,
     count: i32,
+    trade_sessions: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -617,6 +631,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let period: Period = FromJValue::from_jvalue(env, period.into())?;
         let adjust_type: AdjustType = FromJValue::from_jvalue(env, adjust_type.into())?;
+        let trade_sessions: TradeSessions = FromJValue::from_jvalue(env, trade_sessions.into())?;
         let datetime: Option<PrimitiveDateTime> = FromJValue::from_jvalue(env, datetime.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
@@ -629,6 +644,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
                         forward > 0,
                         datetime,
                         count as usize,
+                        trade_sessions,
                     )
                     .await?,
             ))
@@ -637,7 +653,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCandlesticksByDate(
     mut env: JNIEnv,
     _class: JClass,
@@ -647,6 +663,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
     adjust_type: JObject,
     start: JObject,
     end: JObject,
+    trade_sessions: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -656,11 +673,19 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
         let adjust_type: AdjustType = FromJValue::from_jvalue(env, adjust_type.into())?;
         let start: Option<Date> = FromJValue::from_jvalue(env, start.into())?;
         let end: Option<Date> = FromJValue::from_jvalue(env, end.into())?;
+        let trade_sessions: TradeSessions = FromJValue::from_jvalue(env, trade_sessions.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
                 context
                     .ctx
-                    .history_candlesticks_by_date(symbol, period, adjust_type, start, end)
+                    .history_candlesticks_by_date(
+                        symbol,
+                        period,
+                        adjust_type,
+                        start,
+                        end,
+                        trade_sessions,
+                    )
                     .await?,
             ))
         })?;
@@ -668,7 +693,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChainExpiryDateList(
     mut env: JNIEnv,
     _class: JClass,
@@ -688,7 +713,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChai
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChainInfoByDate(
     mut env: JNIEnv,
     _class: JClass,
@@ -713,7 +738,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChai
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantIssuers(
     mut env: JNIEnv,
     _class: JClass,
@@ -729,7 +754,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantIss
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantList(
     mut env: JNIEnv,
     _class: JClass,
@@ -771,7 +796,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantLis
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingSession(
     mut env: JNIEnv,
     _class: JClass,
@@ -787,7 +812,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingSes
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingDays(
     mut env: JNIEnv,
     _class: JClass,
@@ -809,7 +834,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingDay
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalFlow(
     mut env: JNIEnv,
     _class: JClass,
@@ -827,7 +852,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalFlo
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalDistribution(
     mut env: JNIEnv,
     _class: JClass,
@@ -845,7 +870,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalDis
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCalcIndexes(
     mut env: JNIEnv,
     _class: JClass,
@@ -875,7 +900,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCalcIndexe
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWatchlist(
     mut env: JNIEnv,
     _class: JClass,
@@ -891,7 +916,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWatchlist(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCreateWatchlistGroup(
     mut env: JNIEnv,
     _class: JClass,
@@ -917,7 +942,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCreateWatc
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDeleteWatchlistGroup(
     mut env: JNIEnv,
     _class: JClass,
@@ -936,7 +961,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDeleteWatc
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUpdateWatchlistGroup(
     mut env: JNIEnv,
     _class: JClass,
@@ -966,7 +991,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUpdateWatc
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeQuote(
     mut env: JNIEnv,
     _class: JClass,
@@ -984,7 +1009,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeQu
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeDepth(
     mut env: JNIEnv,
     _class: JClass,
@@ -1002,7 +1027,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeDe
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeBrokers(
     mut env: JNIEnv,
     _class: JClass,
@@ -1020,7 +1045,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeBr
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeTrades(
     mut env: JNIEnv,
     _class: JClass,
@@ -1044,7 +1069,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeTr
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
@@ -1070,7 +1095,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeCa
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSecurityList(
     mut env: JNIEnv,
     _class: JClass,

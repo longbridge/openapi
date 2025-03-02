@@ -1,29 +1,28 @@
 use rust_decimal::Decimal;
 use time::OffsetDateTime;
 
-use crate::UpdateFields;
-
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
+#[repr(u8)]
 pub enum Period {
-    Min_1,
-    Min_2,
-    Min_3,
-    Min_5,
-    Min_10,
-    Min_15,
-    Min_20,
-    Min_30,
-    Min_45,
-    Min_60,
-    Min_120,
-    Min_180,
-    Min_240,
-    Day,
-    Week,
-    Month,
-    Quarter,
-    Year,
+    Min_1 = 0,
+    Min_2 = 1,
+    Min_3 = 2,
+    Min_5 = 3,
+    Min_10 = 4,
+    Min_15 = 5,
+    Min_20 = 6,
+    Min_30 = 7,
+    Min_45 = 8,
+    Min_60 = 9,
+    Min_120 = 10,
+    Min_180 = 11,
+    Min_240 = 12,
+    Day = 100,
+    Week = 101,
+    Month = 102,
+    Quarter = 103,
+    Year = 104,
 }
 
 impl Period {
@@ -46,14 +45,11 @@ impl Period {
             _ => unreachable!(),
         }
     }
-}
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub struct Trade {
-    pub time: OffsetDateTime,
-    pub price: Decimal,
-    pub volume: i64,
-    pub update_fields: UpdateFields,
+    #[inline]
+    pub(crate) fn is_minute(&self) -> bool {
+        (*self as u8) < 100
+    }
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -65,4 +61,6 @@ pub struct Quote {
     pub last_done: Decimal,
     pub volume: i64,
     pub turnover: Decimal,
+    pub current_volume: i64,
+    pub current_turnover: Decimal,
 }

@@ -1744,3 +1744,23 @@ impl TryFrom<quote::user_quote_level_detail::PackageDetail> for QuotePackageDeta
         })
     }
 }
+
+/// Trade sessions
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(i32)]
+pub enum TradeSessions {
+    /// Normal trade session
+    Normal = 0,
+    /// All trade sessions
+    All = 100,
+}
+
+impl TradeSessions {
+    #[inline]
+    pub(crate) fn contains(&self, session: TradeSession) -> bool {
+        match self {
+            TradeSessions::Normal => session == TradeSession::NormalTrade,
+            TradeSessions::All => true,
+        }
+    }
+}

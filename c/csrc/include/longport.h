@@ -995,6 +995,20 @@ typedef enum lb_trade_session_t {
 } lb_trade_session_t;
 
 /**
+ * Trade sessions
+ */
+typedef enum lb_trade_sessions_t {
+  /**
+   * Normal trade session
+   */
+  TradeSessionsNormal = 0,
+  /**
+   * All trade sessions
+   */
+  TradeSessionsAll = 100,
+} lb_trade_sessions_t;
+
+/**
  * Trade status
  */
 typedef enum lb_trade_status_t {
@@ -1537,6 +1551,10 @@ typedef struct lb_push_candlestick_t {
    * Security code
    */
   const char *symbol;
+  /**
+   * Trade session
+   */
+  enum lb_trade_session_t trade_session;
   /**
    * Period type
    */
@@ -3881,6 +3899,7 @@ void lb_quote_context_unsubscribe(const struct lb_quote_context_t *ctx,
 void lb_quote_context_subscribe_candlesticks(const struct lb_quote_context_t *ctx,
                                              const char *symbol,
                                              enum lb_period_t period,
+                                             enum lb_trade_sessions_t trade_sessions,
                                              lb_async_callback_t callback,
                                              void *userdata);
 
@@ -3984,6 +4003,7 @@ void lb_quote_context_candlesticks(const struct lb_quote_context_t *ctx,
                                    enum lb_period_t period,
                                    uintptr_t count,
                                    enum lb_adjust_type_t adjust_type,
+                                   enum lb_trade_sessions_t trade_sessions,
                                    lb_async_callback_t callback,
                                    void *userdata);
 
@@ -3997,6 +4017,7 @@ void lb_quote_context_history_candlesticks_by_offset(const struct lb_quote_conte
                                                      bool forward,
                                                      const struct lb_datetime_t *time,
                                                      uintptr_t count,
+                                                     enum lb_trade_sessions_t trade_sessions,
                                                      lb_async_callback_t callback,
                                                      void *userdata);
 
@@ -4009,6 +4030,7 @@ void lb_quote_context_history_candlesticks_by_date(const struct lb_quote_context
                                                    enum lb_adjust_type_t adjust_type,
                                                    const struct lb_date_t *start,
                                                    const struct lb_date_t *end,
+                                                   enum lb_trade_sessions_t trade_sessions,
                                                    lb_async_callback_t callback,
                                                    void *userdata);
 
@@ -4616,7 +4638,7 @@ void lb_decimal_norm_pdf(struct lb_decimal_t *value);
 const char *lb_decimal_to_string(const struct lb_decimal_t *value);
 
 #ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
+}  // extern "C"
+#endif  // __cplusplus
 
-#endif /* _LONGPORT_H_ */
+#endif  /* _LONGPORT_H_ */

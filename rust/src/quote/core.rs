@@ -5,7 +5,7 @@ use std::{
 
 use comfy_table::Table;
 use itertools::Itertools;
-use longport_candlesticks::UpdateAction;
+use longport_candlesticks::{TradeSessionType, UpdateAction};
 use longport_httpcli::HttpClient;
 use longport_proto::quote::{
     self, AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
@@ -16,6 +16,7 @@ use longport_wscli::{
     CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
 };
 use time::{Date, OffsetDateTime};
+use time_tz::OffsetDateTimeExt;
 use tokio::{
     sync::{mpsc, oneshot},
     time::{Duration, Instant},
@@ -25,18 +26,17 @@ use crate::{
     config::PushCandlestickMode,
     quote::{
         cmd_code,
-        store::{Candlesticks, Store},
+        store::{get_market, Candlesticks, Store, TailCandlestick},
         sub_flags::SubFlags,
         types::QuotePackageDetail,
-        utils::{format_date, parse_date},
-        Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, PushTrades,
-        RealtimeQuote, SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade,
+        utils::{convert_trade_session, format_date, parse_date},
+        Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, RealtimeQuote,
+        SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade, TradeSessions,
     },
     Config, Error, Market, Result,
 };
 
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);
-const MAX_CANDLESTICKS: usize = 500;
 
 pub(crate) enum Command {
     Request {
@@ -58,6 +58,7 @@ pub(crate) enum Command {
     SubscribeCandlesticks {
         symbol: String,
         period: Period,
+        trade_sessions: TradeSessions,
         reply_tx: oneshot::Sender<Result<Vec<Candlestick>>>,
     },
     UnsubscribeCandlesticks {
@@ -100,11 +101,6 @@ struct TradingDays {
 }
 
 impl TradingDays {
-    #[inline]
-    fn normal_days(&self, market: Market) -> Days {
-        Days(self.normal_days.get(&market))
-    }
-
     #[inline]
     fn half_days(&self, market: Market) -> Days {
         Days(self.half_days.get(&market))
@@ -393,7 +389,6 @@ impl Core {
             Instant::now() + Duration::from_secs(60 * 60 * 24),
             Duration::from_secs(60 * 60 * 24),
         );
-        let mut ticker = tokio::time::interval(Duration::from_secs(1));
 
         loop {
             tokio::select! {
@@ -412,7 +407,6 @@ impl Core {
                         }
                     }
                 }
-                _ = ticker.tick() => self.tick(),
                 _ = update_trading_days_interval.tick() => {
                     if let Ok(days) = fetch_trading_days(&self.ws_cli).await {
                         self.trading_days = days;
@@ -452,9 +446,13 @@ impl Core {
             Command::SubscribeCandlesticks {
                 symbol,
                 period,
+                trade_sessions,
                 reply_tx,
             } => {
-                let _ = reply_tx.send(self.handle_subscribe_candlesticks(symbol, period).await);
+                let _ = reply_tx.send(
+                    self.handle_subscribe_candlesticks(symbol, period, trade_sessions)
+                        .await,
+                );
                 Ok(())
             }
             Command::UnsubscribeCandlesticks {
@@ -559,12 +557,8 @@ impl Core {
                 .get(symbol)
                 .map(|data| &data.candlesticks)
             {
-                for period in candlesticks.keys() {
-                    if period == &Period::Day {
-                        st.remove(SubFlags::QUOTE);
-                    } else {
-                        st.remove(SubFlags::TRADE);
-                    }
+                if !candlesticks.is_empty() {
+                    st.remove(SubFlags::QUOTE);
                 }
             }
 
@@ -609,16 +603,19 @@ impl Core {
         &mut self,
         symbol: String,
         period: Period,
+        trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
         tracing::info!(symbol = symbol, period = ?period, "subscribe candlesticks");
 
         if let Some(candlesticks) = self
             .store
             .securities
-            .get(&symbol)
-            .and_then(|data| data.candlesticks.get(&period))
+            .get_mut(&symbol)
+            .and_then(|data| data.candlesticks.get_mut(&period))
+            .filter(|candlesticks| candlesticks.trade_sessions == trade_sessions)
         {
-            tracing::info!(symbol = symbol, period = ?period, "subscribed, returns candlesticks in memory");
+            candlesticks.trade_sessions = trade_sessions;
+            tracing::info!(symbol = symbol, period = ?period, trade_sessions = ?trade_sessions, "subscribed, returns candlesticks in memory");
             return Ok(candlesticks.candlesticks.clone());
         }
 
@@ -647,6 +644,12 @@ impl Core {
 
         tracing::info!(symbol = symbol, board = ?security_data.board, "got the symbol board");
 
+        let Some(market) = parse_market_from_symbol(&symbol)
+            .and_then(|market| get_market(market, security_data.board))
+        else {
+            return Err(Error::UnknownMarket { symbol });
+        };
+
         // pull candlesticks
         tracing::info!(symbol = symbol, period = ?period, "pull history candlesticks");
         let resp: SecurityCandlestickResponse = self
@@ -659,29 +662,48 @@ impl Core {
                     period: period.into(),
                     count: 1000,
                     adjust_type: AdjustType::NoAdjust.into(),
+                    trade_session: trade_sessions as i32,
                 },
             )
             .await?;
         tracing::info!(symbol = symbol, period = ?period, len = resp.candlesticks.len(), "got history candlesticks");
 
-        let candlesticks = resp
-            .candlesticks
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect::<Result<Vec<_>>>()?;
+        let mut candlesticks = vec![];
+        let mut tails = HashMap::new();
+
+        for candlestick in resp.candlesticks {
+            let time = OffsetDateTime::from_unix_timestamp(candlestick.timestamp)
+                .map_err(|err| Error::parse_field_error("timestamp", err))?
+                .to_timezone(market.timezone);
+            let ts = match market.candlestick_trade_session(time) {
+                Some(ts) => ts,
+                None => {
+                    tracing::error!(
+                        symbol = symbol,
+                        time = time
+                            .format(&time::format_description::well_known::Rfc3339)
+                            .unwrap(),
+                        "unknown trade session"
+                    );
+                    return Err(Error::UnknownTradeSession { symbol, time });
+                }
+            };
+            let candlestick = candlestick.try_into()?;
+            let index = candlesticks.len();
+            candlesticks.push(candlestick);
+            tails.insert(ts, TailCandlestick { index, candlestick });
+        }
+
+        tracing::info!(symbol = symbol, period = ?period, count = candlesticks.len(), tails = ?tails, "candlesticks loaded");
+
         security_data
             .candlesticks
             .entry(period)
             .or_insert_with(|| Candlesticks {
+                trade_sessions,
                 candlesticks: candlesticks.clone(),
-                confirmed: false,
+                tails,
             });
-
-        let sub_flags = if period == Period::Day {
-            SubFlags::QUOTE
-        } else {
-            SubFlags::TRADE
-        };
 
         // subscribe
         if self
@@ -689,23 +711,23 @@ impl Core {
             .get(&symbol)
             .copied()
             .unwrap_or_else(SubFlags::empty)
-            .contains(sub_flags)
+            .contains(SubFlags::QUOTE)
         {
             return Ok(candlesticks);
         }
 
-        tracing::info!(symbol = symbol, period = ?period, sub_flags = ?sub_flags, "subscribe for candlesticks");
+        tracing::info!(symbol = symbol, period = ?period, "subscribe quote for candlesticks");
 
         let req = SubscribeRequest {
             symbol: vec![symbol.clone()],
-            sub_type: sub_flags.into(),
+            sub_type: SubFlags::QUOTE.into(),
             is_first_push: true,
         };
         self.ws_cli
             .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
             .await?;
 
-        tracing::info!(symbol = symbol, period = ?period, sub_flags = ?sub_flags, "subscribed for candlesticks");
+        tracing::info!(symbol = symbol, period = ?period, "subscribed quote for candlesticks");
         Ok(candlesticks)
     }
 
@@ -714,12 +736,6 @@ impl Core {
         symbol: String,
         period: Period,
     ) -> Result<()> {
-        let mut unsubscribe_sub_flags = if period == Period::Day {
-            SubFlags::QUOTE
-        } else {
-            SubFlags::TRADE
-        };
-
         if let Some(periods) = self
             .store
             .securities
@@ -728,29 +744,22 @@ impl Core {
         {
             periods.remove(&period);
 
-            for period in periods.keys() {
-                if period == &Period::Day {
-                    unsubscribe_sub_flags.remove(SubFlags::QUOTE);
-                } else {
-                    unsubscribe_sub_flags.remove(SubFlags::TRADE);
-                }
-            }
-
-            if !unsubscribe_sub_flags.is_empty()
+            if periods.is_empty()
                 && !self
                     .subscriptions
                     .get(&symbol)
                     .copied()
                     .unwrap_or_else(SubFlags::empty)
-                    .contains(unsubscribe_sub_flags)
+                    .contains(SubFlags::QUOTE)
             {
+                tracing::info!(symbol = symbol, "unsubscribe quote for candlesticks");
                 self.ws_cli
                     .request::<_, ()>(
                         cmd_code::UNSUBSCRIBE,
                         None,
                         UnsubscribeRequest {
                             symbol: vec![symbol],
-                            sub_type: unsubscribe_sub_flags.into(),
+                            sub_type: SubFlags::QUOTE.into(),
                             unsub_all: false,
                         },
                     )
@@ -796,13 +805,9 @@ impl Core {
         }
 
         for (symbol, data) in &self.store.securities {
-            for period in data.candlesticks.keys() {
+            if !data.candlesticks.is_empty() {
                 subscriptions
-                    .entry(if *period == Period::Day {
-                        SubFlags::QUOTE
-                    } else {
-                        SubFlags::TRADE
-                    })
+                    .entry(SubFlags::QUOTE)
                     .or_default()
                     .insert(symbol.clone());
             }
@@ -826,38 +831,7 @@ impl Core {
         Ok(())
     }
 
-    fn tick(&mut self) {
-        let now = OffsetDateTime::now_utc();
-
-        for (symbol, security_data) in &mut self.store.securities {
-            let Some(market_type) = parse_market_from_symbol(symbol) else {
-                continue;
-            };
-            let normal_days = self.trading_days.normal_days(market_type);
-            let half_days = self.trading_days.half_days(market_type);
-
-            for (period, candlesticks) in &mut security_data.candlesticks {
-                let action = candlesticks.tick(
-                    market_type,
-                    normal_days,
-                    half_days,
-                    security_data.board,
-                    *period,
-                    now,
-                );
-                update_and_push_candlestick(
-                    candlesticks,
-                    symbol,
-                    *period,
-                    action,
-                    self.push_candlestick_mode,
-                    &mut self.push_tx,
-                );
-            }
-        }
-    }
-
-    fn merge_trades(&mut self, symbol: &str, trades: &PushTrades) {
+    fn merge_candlesticks_by_quote(&mut self, symbol: &str, push_quote: &PushQuote) {
         let Some(market_type) = parse_market_from_symbol(symbol) else {
             return;
         };
@@ -865,67 +839,32 @@ impl Core {
             return;
         };
         let half_days = self.trading_days.half_days(market_type);
+        let ts = convert_trade_session(push_quote.trade_session);
 
         for (period, candlesticks) in &mut security_data.candlesticks {
-            if period == &Period::Day {
+            if *period >= Period::Day && !ts.is_normal() {
                 continue;
             }
 
-            for trade in &trades.trades {
-                if trade.trade_session != TradeSession::NormalTrade {
-                    continue;
-                }
-
-                let action = candlesticks.merge_trade(
-                    market_type,
-                    half_days,
-                    security_data.board,
-                    *period,
-                    trade,
-                );
-                update_and_push_candlestick(
-                    candlesticks,
-                    symbol,
-                    *period,
-                    action,
-                    self.push_candlestick_mode,
-                    &mut self.push_tx,
-                );
-            }
+            let action = candlesticks.merge_quote(
+                ts,
+                market_type,
+                half_days,
+                security_data.board,
+                *period,
+                push_quote,
+            );
+            update_and_push_candlestick(
+                candlesticks,
+                ts,
+                push_quote.trade_session,
+                symbol,
+                *period,
+                action,
+                self.push_candlestick_mode,
+                &mut self.push_tx,
+            )
         }
-    }
-
-    fn merge_quote(&mut self, symbol: &str, push_quote: &PushQuote) {
-        if push_quote.trade_session != TradeSession::NormalTrade {
-            return;
-        }
-
-        let Some(market_type) = parse_market_from_symbol(symbol) else {
-            return;
-        };
-        let Some(security_data) = self.store.securities.get_mut(symbol) else {
-            return;
-        };
-        let half_days = self.trading_days.half_days(market_type);
-        let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) else {
-            return;
-        };
-
-        let action = candlesticks.merge_quote(
-            market_type,
-            half_days,
-            security_data.board,
-            Period::Day,
-            push_quote,
-        );
-        update_and_push_candlestick(
-            candlesticks,
-            symbol,
-            Period::Day,
-            action,
-            self.push_candlestick_mode,
-            &mut self.push_tx,
-        )
     }
 
     fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
@@ -937,20 +876,8 @@ impl Core {
                     self.store.handle_push(&mut event);
                 }
 
-                if let PushEventDetail::Trade(trades) = &event.detail {
-                    // merge candlesticks
-                    self.merge_trades(&event.symbol, trades);
-
-                    if !self
-                        .subscriptions
-                        .get(&event.symbol)
-                        .map(|sub_flags| sub_flags.contains(SubFlags::TRADE))
-                        .unwrap_or_default()
-                    {
-                        return Ok(());
-                    }
-                } else if let PushEventDetail::Quote(push_quote) = &event.detail {
-                    self.merge_quote(&event.symbol, push_quote);
+                if let PushEventDetail::Quote(push_quote) = &event.detail {
+                    self.merge_candlesticks_by_quote(&event.symbol, push_quote);
 
                     if !self
                         .subscriptions
@@ -1096,6 +1023,8 @@ async fn fetch_trading_days(cli: &WsClient) -> Result<TradingDays> {
 
 fn update_and_push_candlestick(
     candlesticks: &mut Candlesticks,
+    ts: TradeSessionType,
+    ts1: TradeSession,
     symbol: &str,
     period: Period,
     action: UpdateAction,
@@ -1106,17 +1035,39 @@ fn update_and_push_candlestick(
 
     match action {
         UpdateAction::UpdateLast(candlestick) => {
-            *candlesticks.candlesticks.last_mut().unwrap() = candlestick.into();
+            let tail = candlesticks.tails.get_mut(&ts).unwrap();
+            candlesticks.candlesticks[tail.index] = candlestick.into();
+            tail.candlestick = candlestick.into();
+
             if push_candlestick_mode == PushCandlestickMode::Realtime {
                 push_candlesticks.push((candlestick.into(), false));
             }
         }
         UpdateAction::AppendNew { confirmed, new } => {
-            candlesticks.candlesticks.push(new.into());
-            candlesticks.confirmed = false;
-            if candlesticks.candlesticks.len() > MAX_CANDLESTICKS * 2 {
-                candlesticks.candlesticks.drain(..MAX_CANDLESTICKS);
+            let index = if let Some(tail) = candlesticks.tails.get_mut(&ts) {
+                candlesticks.candlesticks.insert(tail.index + 1, new.into());
+                tail.index += 1;
+                tail.candlestick = new.into();
+                tail.index
+            } else {
+                let index = candlesticks.insert_candlestick_by_time(new.into());
+                candlesticks.tails.insert(
+                    ts,
+                    TailCandlestick {
+                        index,
+                        candlestick: new.into(),
+                    },
+                );
+                index
+            };
+
+            for tail in candlesticks.tails.values_mut() {
+                if tail.index > index {
+                    tail.index += 1;
+                }
             }
+
+            candlesticks.check_and_remove();
 
             match push_candlestick_mode {
                 PushCandlestickMode::Realtime => {
@@ -1132,32 +1083,30 @@ fn update_and_push_candlestick(
                 }
             }
         }
-        UpdateAction::Confirm(candlestick) => {
-            candlesticks.confirmed = true;
-            if push_candlestick_mode == PushCandlestickMode::Confirmed {
-                push_candlesticks.push((candlestick.into(), true));
-            }
-        }
         UpdateAction::None => {}
     };
 
     for (candlestick, is_confirmed) in push_candlesticks {
-        tracing::info!(
-            symbol = symbol,
-            period = ?period,
-            is_confirmed = is_confirmed,
-            candlestick = ?candlestick,
-            "push candlestick"
-        );
-        let _ = tx.send(PushEvent {
-            sequence: 0,
-            symbol: symbol.to_string(),
-            detail: PushEventDetail::Candlestick(PushCandlestick {
-                period,
-                candlestick,
-                is_confirmed,
-            }),
-        });
+        if candlesticks.trade_sessions.contains(ts1) {
+            tracing::info!(
+                symbol = symbol,
+                period = ?period,
+                is_confirmed = is_confirmed,
+                candlestick = ?candlestick,
+                trade_session = ?ts,
+                "push candlestick"
+            );
+            let _ = tx.send(PushEvent {
+                sequence: 0,
+                symbol: symbol.to_string(),
+                detail: PushEventDetail::Candlestick(PushCandlestick {
+                    trade_session: ts1,
+                    period,
+                    candlestick,
+                    is_confirmed,
+                }),
+            });
+        }
     }
 }
 

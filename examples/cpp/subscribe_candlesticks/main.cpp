@@ -47,13 +47,14 @@ main(int argc, char const* argv[])
                 << std::endl;
     });
 
-    res.context().subscribe_candlesticks("AAPL.US", Period::Min1, [](auto res) {
-      if (!res) {
-        std::cout << "failed to subscribe quote: " << res.status().message()
-                  << std::endl;
-        return;
-      }
-    });
+    res.context().subscribe_candlesticks(
+      "AAPL.US", Period::Min1, TradeSessions::All, [](auto res) {
+        if (!res) {
+          std::cout << "failed to subscribe quote: " << res.status().message()
+                    << std::endl;
+          return;
+        }
+      });
   });
 
   std::cin.get();

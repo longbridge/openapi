@@ -193,7 +193,7 @@ public class QuoteContext implements AutoCloseable {
      *             ctx.setOnCandlestick((symbol, event) -> {
      *                 System.out.printf("%s\t%s\n", symbol, event);
      *             });
-     *             ctx.subscribeCandlesticks("700.HK", Period.Min_1).get();
+     *             ctx.subscribeCandlesticks("700.HK", Period.Min_1, TradeSessions.Normal).get();
      *             Thread.sleep(30000);
      *         }
      *     }
@@ -201,15 +201,17 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param symbol Security symbol
-     * @param period Period type
+     * @param symbol        Security symbol
+     * @param period        Period type
+     * @param tradeSessions Trade sessions
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Candlestick[]> subscribeCandlesticks(String symbol, Period period)
+    public CompletableFuture<Candlestick[]> subscribeCandlesticks(String symbol, Period period,
+            TradeSessions tradeSessions)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextSubscribeCandlesticks(this.raw, symbol, period, callback);
+            SdkNative.quoteContextSubscribeCandlesticks(this.raw, symbol, period, tradeSessions, callback);
         });
     }
 
@@ -547,7 +549,8 @@ public class QuoteContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
-     *             Candlestick[] resp = ctx.getCandlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust).get();
+     *             Candlestick[] resp = ctx
+     *                     .getCandlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Normal).get();
      *             for (Candlestick obj : resp) {
      *                 System.out.println(obj);
      *             }
@@ -557,17 +560,18 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param symbol     Security symbol
-     * @param period     Candlestick period
-     * @param count      Count of candlesticks
-     * @param adjustType Adjustment type
+     * @param symbol        Security symbol
+     * @param period        Candlestick period
+     * @param count         Count of candlesticks
+     * @param adjustType    Adjustment type
+     * @param tradeSessions Trade sessions
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
     public CompletableFuture<Candlestick[]> getCandlesticks(String symbol, Period period, int count,
-            AdjustType adjustType) throws OpenApiException {
+            AdjustType adjustType, TradeSessions tradeSessions) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextCandlesticks(this.raw, symbol, period, count, adjustType, callback);
+            SdkNative.quoteContextCandlesticks(this.raw, symbol, period, count, adjustType, tradeSessions, callback);
         });
     }
 
@@ -804,40 +808,43 @@ public class QuoteContext implements AutoCloseable {
     /**
      * Get history candlesticks by offset
      * 
-     * @param symbol     Security symbol
-     * @param period     Candlestick period
-     * @param adjustType Adjustment type
-     * @param forward    Forward or backward
-     * @param datetime   From datetime
-     * @param count      Count of candlesticks
+     * @param symbol        Security symbol
+     * @param period        Candlestick period
+     * @param adjustType    Adjustment type
+     * @param forward       Forward or backward
+     * @param datetime      From datetime
+     * @param count         Count of candlesticks
+     * @param tradeSessions Trade sessions
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
     public CompletableFuture<Candlestick[]> getHistoryCandlesticksByOffset(String symbol, Period period,
-            AdjustType adjustType, boolean forward, LocalDateTime datetime, int count)
+            AdjustType adjustType, boolean forward, LocalDateTime datetime, int count, TradeSessions tradeSessions)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextHistoryCandlesticksByOffset(this.raw, symbol, period, adjustType, forward, datetime,
-                    count, callback);
+                    count, tradeSessions, callback);
         });
     }
 
     /**
      * Get history candlesticks by date
      * 
-     * @param symbol     Security symbol
-     * @param period     Candlestick period
-     * @param adjustType Adjustment type
-     * @param start      Start date
-     * @param end        End date
+     * @param symbol        Security symbol
+     * @param period        Candlestick period
+     * @param adjustType    Adjustment type
+     * @param start         Start date
+     * @param end           End date
+     * @param tradeSessions Trade sessions
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
     public CompletableFuture<Candlestick[]> getHistoryCandlesticksByDate(String symbol, Period period,
-            AdjustType adjustType, LocalDate start, LocalDate end)
+            AdjustType adjustType, LocalDate start, LocalDate end, TradeSessions tradeSessions)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextHistoryCandlesticksByDate(this.raw, symbol, period, adjustType, start, end, callback);
+            SdkNative.quoteContextHistoryCandlesticksByDate(this.raw, symbol, period, adjustType, start, end,
+                    tradeSessions, callback);
         });
     }
 

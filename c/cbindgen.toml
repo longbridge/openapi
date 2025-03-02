@@ -123,6 +123,7 @@ cpp_compat = true
 "CSecurity" = "lb_security_t"
 "CSecurityListCategory" = "lb_security_list_category_t"
 "CQuotePackageDetail" = "lb_quote_package_detail_t"
+"CTradeSessions" = "lb_trade_sessions_t"
 
 [export]
 include = [

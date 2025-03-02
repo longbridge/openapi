@@ -11,8 +11,8 @@ use crate::{
         QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
         RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
         SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo,
-        SubFlags, Subscription, Trade, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
-        WarrantType, WatchlistGroup,
+        SubFlags, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
+        WarrantStatus, WarrantType, WatchlistGroup,
     },
     Config, Market, QuoteContext, Result,
 };
@@ -126,7 +126,7 @@ impl QuoteContextSync {
     ///
     /// use longport::{
     ///     blocking::QuoteContextSync,
-    ///     quote::{Period, PushEvent},
+    ///     quote::{Period, PushEvent, TradeSessions},
     ///     Config,
     /// };
     ///
@@ -138,17 +138,24 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
     ///
-    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute)?;
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Normal)?;
     /// sleep(Duration::from_secs(30));
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subscribe_candlesticks<T>(&self, symbol: T, period: Period) -> Result<Vec<Candlestick>>
+    pub fn subscribe_candlesticks<T>(
+        &self,
+        symbol: T,
+        period: Period,
+        trade_sessions: TradeSessions,
+    ) -> Result<Vec<Candlestick>>
     where
         T: AsRef<str> + Send + 'static,
     {
-        self.rt
-            .call(move |ctx| async move { ctx.subscribe_candlesticks(symbol, period).await })
+        self.rt.call(move |ctx| async move {
+            ctx.subscribe_candlesticks(symbol, period, trade_sessions)
+                .await
+        })
     }
 
     /// Unsubscribe security candlesticks
@@ -427,7 +434,7 @@ impl QuoteContextSync {
     ///
     /// use longport::{
     ///     blocking::QuoteContextSync,
-    ///     quote::{AdjustType, Period},
+    ///     quote::{AdjustType, Period, TradeSessions},
     ///     Config,
     /// };
     ///
@@ -435,7 +442,13 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// let resp = ctx.candlesticks("700.HK", Period::Day, 10, AdjustType::NoAdjust)?;
+    /// let resp = ctx.candlesticks(
+    ///     "700.HK",
+    ///     Period::Day,
+    ///     10,
+    ///     AdjustType::NoAdjust,
+    ///     TradeSessions::Normal,
+    /// )?;
     /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
@@ -446,9 +459,11 @@ impl QuoteContextSync {
         period: Period,
         count: usize,
         adjust_type: AdjustType,
+        trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
         self.rt.call(move |ctx| async move {
-            ctx.candlesticks(symbol, period, count, adjust_type).await
+            ctx.candlesticks(symbol, period, count, adjust_type, trade_sessions)
+                .await
         })
     }
 
@@ -461,10 +476,19 @@ impl QuoteContextSync {
         forward: bool,
         time: Option<PrimitiveDateTime>,
         count: usize,
+        trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
         self.rt.call(move |ctx| async move {
-            ctx.history_candlesticks_by_offset(symbol, period, adjust_type, forward, time, count)
-                .await
+            ctx.history_candlesticks_by_offset(
+                symbol,
+                period,
+                adjust_type,
+                forward,
+                time,
+                count,
+                trade_sessions,
+            )
+            .await
         })
     }
 
@@ -476,10 +500,18 @@ impl QuoteContextSync {
         adjust_type: AdjustType,
         start: Option<Date>,
         end: Option<Date>,
+        trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
         self.rt.call(move |ctx| async move {
-            ctx.history_candlesticks_by_date(symbol, period, adjust_type, start, end)
-                .await
+            ctx.history_candlesticks_by_date(
+                symbol,
+                period,
+                adjust_type,
+                start,
+                end,
+                trade_sessions,
+            )
+            .await
         })
     }
 
@@ -961,13 +993,17 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longport::{blocking::QuoteContextSync, quote::Period, Config, Market};
+    /// use longport::{
+    ///     blocking::QuoteContextSync,
+    ///     quote::{Period, TradeSessions},
+    ///     Config, Market,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute)?;
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Normal)?;
     /// sleep(Duration::from_secs(5));
     ///
     /// let resp = ctx.realtime_candlesticks("AAPL.US", Period::OneMinute, 10)?;

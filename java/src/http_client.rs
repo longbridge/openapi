@@ -15,7 +15,7 @@ use crate::{
     types::FromJValue,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClient(
     mut env: JNIEnv,
     _class: JClass,
@@ -36,7 +36,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClient(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_longport_SdkNative_newHttpClientFromEnv(
     mut env: JNIEnv,
     _class: JClass,
@@ -47,7 +47,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newHttpClientFromEnv(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_freeHttpClient(
     _env: JNIEnv,
     _class: JClass,
@@ -56,7 +56,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeHttpClient(
     let _ = Box::from_raw(http_client as *mut HttpClient);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_httpClientRequest(
     mut env: JNIEnv,
     _class: JClass,

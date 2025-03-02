@@ -1010,6 +1010,8 @@ pub struct PushTrades {
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longport::quote::PushCandlestick")]
 pub struct PushCandlestick {
+    /// Trade session
+    trade_session: TradeSession,
     /// Period type
     period: Period,
     /// Candlestick
@@ -1371,4 +1373,15 @@ pub struct QuotePackageDetail {
     /// End time
     #[js(datetime)]
     end_at: DateTime<Utc>,
+}
+
+/// Trade sessions
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[js(remote = "longport::quote::TradeSessions")]
+pub enum TradeSessions {
+    /// Normal trade session
+    Normal,
+    /// All trade sessions
+    All,
 }

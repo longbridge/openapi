@@ -1,4 +1,6 @@
-use time::{Duration, Time};
+use time::Time;
+
+use crate::TradeSession;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum FindSessionResult {
@@ -11,18 +13,37 @@ pub(crate) trait FindSession {
     fn find_session(&self, time: Time) -> FindSessionResult;
 }
 
-impl FindSession for &[(Time, Time, Duration)] {
+impl FindSession for &[TradeSession] {
     fn find_session(&self, time: Time) -> FindSessionResult {
         let trade_sessions = self;
 
-        for (idx, (start, end, _)) in trade_sessions.iter().enumerate() {
-            if time < *start {
+        for (
+            idx,
+            TradeSession {
+                start,
+                end,
+                inclusive,
+                ..
+            },
+        ) in trade_sessions.iter().enumerate()
+        {
+            if !*inclusive {
+                if time < *start {
+                    if idx == 0 {
+                        return FindSessionResult::BeforeFirst;
+                    } else {
+                        return FindSessionResult::After(idx - 1);
+                    }
+                } else if time < *end {
+                    return FindSessionResult::Between(idx);
+                }
+            } else if time < *start {
                 if idx == 0 {
                     return FindSessionResult::BeforeFirst;
                 } else {
                     return FindSessionResult::After(idx - 1);
                 }
-            } else if time < *end {
+            } else if time <= *end {
                 return FindSessionResult::Between(idx);
             }
         }
@@ -39,9 +60,9 @@ mod tests {
 
     #[test]
     fn test_find_session() {
-        let sessions: &[(Time, Time, Duration)] = &[
-            (time!(9:30:00), time!(11:30:00), Duration::ZERO),
-            (time!(13:00:00), time!(15:00:00), Duration::ZERO),
+        let sessions: &[TradeSession] = &[
+            TradeSession::new(time!(9:30:00), time!(11:30:00)),
+            TradeSession::new(time!(13:00:00), time!(15:00:00)),
         ];
 
         assert_eq!(

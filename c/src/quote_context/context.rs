@@ -22,8 +22,8 @@ use crate::{
     quote_context::{
         enum_types::{
             CAdjustType, CCalcIndex, CFilterWarrantExpiryDate, CFilterWarrantInOutBoundsType,
-            CPeriod, CSecurityListCategory, CSortOrderType, CWarrantSortBy, CWarrantStatus,
-            CWarrantType,
+            CPeriod, CSecurityListCategory, CSortOrderType, CTradeSessions, CWarrantSortBy,
+            CWarrantStatus, CWarrantType,
         },
         types::{
             CCandlestickOwned, CCapitalDistributionResponseOwned, CCapitalFlowLineOwned,
@@ -85,7 +85,7 @@ impl Drop for CQuoteContext {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_new(
     config: *const CConfig,
     callback: CAsyncCallback,
@@ -268,24 +268,24 @@ pub unsafe extern "C" fn lb_quote_context_new(
     );
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_retain(ctx: *const CQuoteContext) {
     Arc::increment_strong_count(ctx);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_release(ctx: *const CQuoteContext) {
     let _ = Arc::from_raw(ctx);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_ref_count(ctx: *const CQuoteContext) -> usize {
     Arc::increment_strong_count(ctx);
     let ctx = Arc::from_raw(ctx);
     Arc::strong_count(&ctx)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_set_userdata(
     ctx: *const CQuoteContext,
     userdata: *mut c_void,
@@ -293,12 +293,12 @@ pub unsafe extern "C" fn lb_quote_context_set_userdata(
     (*ctx).state.lock().userdata = userdata;
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_userdata(ctx: *const CQuoteContext) -> *mut c_void {
     (*ctx).state.lock().userdata
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_set_free_userdata_func(
     ctx: *const CQuoteContext,
     f: CFreeUserDataFunc,
@@ -306,12 +306,12 @@ pub unsafe extern "C" fn lb_quote_context_set_free_userdata_func(
     (*ctx).state.lock().free_userdata = f;
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_member_id(ctx: *const CQuoteContext) -> i64 {
     (*ctx).ctx.member_id()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_quote_level(ctx: *const CQuoteContext) -> *const c_char {
     let quote_level = (*ctx)
         .quote_level
@@ -319,7 +319,7 @@ pub unsafe extern "C" fn lb_quote_context_quote_level(ctx: *const CQuoteContext)
     quote_level.as_ptr() as *const _
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_quote_package_details(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
@@ -335,7 +335,7 @@ pub unsafe extern "C" fn lb_quote_context_quote_package_details(
 
 /// Set quote callback, after receiving the quote data push, it will call back
 /// to this function.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_set_on_quote(
     ctx: *const CQuoteContext,
     callback: COnQuoteCallback,
@@ -351,7 +351,7 @@ pub unsafe extern "C" fn lb_quote_context_set_on_quote(
 
 /// Set depth callback, after receiving the depth data push, it will call
 /// back to this function.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_set_on_depth(
     ctx: *const CQuoteContext,
     callback: COnDepthCallback,
@@ -367,7 +367,7 @@ pub unsafe extern "C" fn lb_quote_context_set_on_depth(
 
 /// Set brokers callback, after receiving the brokers data push, it will
 /// call back to this function.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_set_on_brokers(
     ctx: *const CQuoteContext,
     callback: COnBrokersCallback,
@@ -383,7 +383,7 @@ pub unsafe extern "C" fn lb_quote_context_set_on_brokers(
 
 /// Set trades callback, after receiving the trades data push, it will call
 /// back to this function.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_set_on_trades(
     ctx: *const CQuoteContext,
     callback: COnTradesCallback,
@@ -399,7 +399,7 @@ pub unsafe extern "C" fn lb_quote_context_set_on_trades(
 
 /// Set candlestick callback, after receiving the trades data push, it will
 /// call back to this function.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_set_on_candlestick(
     ctx: *const CQuoteContext,
     callback: COnCandlestickCallback,
@@ -413,7 +413,7 @@ pub unsafe extern "C" fn lb_quote_context_set_on_candlestick(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_subscribe(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -437,7 +437,7 @@ pub unsafe extern "C" fn lb_quote_context_subscribe(
 }
 
 /// Unsubscribe
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_unsubscribe(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -459,11 +459,12 @@ pub unsafe extern "C" fn lb_quote_context_unsubscribe(
 }
 
 /// Subscribe security candlesticks
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_subscribe_candlesticks(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
     period: CPeriod,
+    trade_sessions: CTradeSessions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -471,7 +472,7 @@ pub unsafe extern "C" fn lb_quote_context_subscribe_candlesticks(
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CCandlestickOwned> = ctx_inner
-            .subscribe_candlesticks(symbol, period.into())
+            .subscribe_candlesticks(symbol, period.into(), trade_sessions.into())
             .await?
             .into();
         Ok(rows)
@@ -479,7 +480,7 @@ pub unsafe extern "C" fn lb_quote_context_subscribe_candlesticks(
 }
 
 /// Unsubscribe security candlesticks
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_unsubscribe_candlesticks(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -497,7 +498,7 @@ pub unsafe extern "C" fn lb_quote_context_unsubscribe_candlesticks(
 }
 
 /// Get subscription information
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_subscrptions(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
@@ -511,7 +512,7 @@ pub unsafe extern "C" fn lb_quote_context_subscrptions(
 }
 
 /// Get basic information of securities
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_static_info(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -528,7 +529,7 @@ pub unsafe extern "C" fn lb_quote_context_static_info(
 }
 
 /// Get quote of securities
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_quote(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -545,7 +546,7 @@ pub unsafe extern "C" fn lb_quote_context_quote(
 }
 
 /// Get quote of option securities
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_option_quote(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -562,7 +563,7 @@ pub unsafe extern "C" fn lb_quote_context_option_quote(
 }
 
 /// Get quote of warrant securities
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_warrant_quote(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -579,7 +580,7 @@ pub unsafe extern "C" fn lb_quote_context_warrant_quote(
 }
 
 /// Get security depth
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_depth(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -600,7 +601,7 @@ pub unsafe extern "C" fn lb_quote_context_depth(
 }
 
 /// Get security brokers
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_brokers(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -621,7 +622,7 @@ pub unsafe extern "C" fn lb_quote_context_brokers(
 }
 
 /// Get participants
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_participants(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
@@ -635,7 +636,7 @@ pub unsafe extern "C" fn lb_quote_context_participants(
 }
 
 /// Get security trades
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_trades(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -652,7 +653,7 @@ pub unsafe extern "C" fn lb_quote_context_trades(
 }
 
 /// Get security intraday lines
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_intraday(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -668,13 +669,14 @@ pub unsafe extern "C" fn lb_quote_context_intraday(
 }
 
 /// Get security candlesticks
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_candlesticks(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
     period: CPeriod,
     count: usize,
     adjust_type: CAdjustType,
+    trade_sessions: CTradeSessions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -682,7 +684,13 @@ pub unsafe extern "C" fn lb_quote_context_candlesticks(
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CCandlestickOwned> = ctx_inner
-            .candlesticks(symbol, period.into(), count, adjust_type.into())
+            .candlesticks(
+                symbol,
+                period.into(),
+                count,
+                adjust_type.into(),
+                trade_sessions.into(),
+            )
             .await?
             .into();
         Ok(rows)
@@ -690,7 +698,7 @@ pub unsafe extern "C" fn lb_quote_context_candlesticks(
 }
 
 /// Get security history candlesticks by offset
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_offset(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -699,6 +707,7 @@ pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_offset(
     forward: bool,
     time: *const CDateTime,
     count: usize,
+    trade_sessions: CTradeSessions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -718,6 +727,7 @@ pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_offset(
                 forward,
                 time,
                 count,
+                trade_sessions.into(),
             )
             .await?
             .into();
@@ -726,7 +736,7 @@ pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_offset(
 }
 
 /// Get security history candlesticks by date
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_date(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -734,6 +744,7 @@ pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_date(
     adjust_type: CAdjustType,
     start: *const CDate,
     end: *const CDate,
+    trade_sessions: CTradeSessions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -751,7 +762,14 @@ pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_date(
     };
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CCandlestickOwned> = ctx_inner
-            .history_candlesticks_by_date(symbol, period.into(), adjust_type.into(), start, end)
+            .history_candlesticks_by_date(
+                symbol,
+                period.into(),
+                adjust_type.into(),
+                start,
+                end,
+                trade_sessions.into(),
+            )
             .await?
             .into();
         Ok(rows)
@@ -759,7 +777,7 @@ pub unsafe extern "C" fn lb_quote_context_history_candlesticks_by_date(
 }
 
 /// Get option chain expiry date list
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_option_chain_expiry_date_list(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -778,7 +796,7 @@ pub unsafe extern "C" fn lb_quote_context_option_chain_expiry_date_list(
 }
 
 /// Get option chain info by date
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_option_chain_info_by_date(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -799,7 +817,7 @@ pub unsafe extern "C" fn lb_quote_context_option_chain_info_by_date(
 }
 
 /// Get warrant issuers
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_warrant_issuers(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
@@ -813,7 +831,7 @@ pub unsafe extern "C" fn lb_quote_context_warrant_issuers(
 }
 
 /// Query warrant list
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_warrant_list(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -876,7 +894,7 @@ pub unsafe extern "C" fn lb_quote_context_warrant_list(
 }
 
 /// Get trading session of the day
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_trading_session(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
@@ -890,7 +908,7 @@ pub unsafe extern "C" fn lb_quote_context_trading_session(
 }
 
 /// Get market trading days
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_trading_days(
     ctx: *const CQuoteContext,
     market: CMarket,
@@ -914,7 +932,7 @@ pub unsafe extern "C" fn lb_quote_context_trading_days(
 }
 
 /// Get capital flow intraday
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_capital_flow(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -930,7 +948,7 @@ pub unsafe extern "C" fn lb_quote_context_capital_flow(
 }
 
 /// Get capital distribution
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_capital_distribution(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -947,7 +965,7 @@ pub unsafe extern "C" fn lb_quote_context_capital_distribution(
 }
 
 /// Get calc indexes
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_calc_indexes(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -970,7 +988,7 @@ pub unsafe extern "C" fn lb_quote_context_calc_indexes(
 }
 
 /// Get watchlist
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_watchlist(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
@@ -984,7 +1002,7 @@ pub unsafe extern "C" fn lb_quote_context_watchlist(
 }
 
 /// Create watchlist group
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_create_watchlist_group(
     ctx: *const CQuoteContext,
     req: &CCreateWatchlistGroup,
@@ -1009,7 +1027,7 @@ pub unsafe extern "C" fn lb_quote_context_create_watchlist_group(
 }
 
 /// Delete watchlist group
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_delete_watchlist_group(
     ctx: *const CQuoteContext,
     id: i64,
@@ -1025,7 +1043,7 @@ pub unsafe extern "C" fn lb_quote_context_delete_watchlist_group(
 }
 
 /// Create watchlist group
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_update_watchlist_group(
     ctx: *const CQuoteContext,
     req: &CUpdateWatchlistGroup,
@@ -1060,7 +1078,7 @@ pub unsafe extern "C" fn lb_quote_context_update_watchlist_group(
 ///
 /// Get real-time quotes of the subscribed symbols, it always returns the data
 /// in the local storage.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_realtime_quote(
     ctx: *const CQuoteContext,
     symbols: *const *const c_char,
@@ -1080,7 +1098,7 @@ pub unsafe extern "C" fn lb_quote_context_realtime_quote(
 ///
 /// Get real-time depth of the subscribed symbols, it always returns the data in
 /// the local storage.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_realtime_depth(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -1099,7 +1117,7 @@ pub unsafe extern "C" fn lb_quote_context_realtime_depth(
 ///
 /// Get real-time trades of the subscribed symbols, it always returns the data
 /// in the local storage.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_realtime_trades(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -1119,7 +1137,7 @@ pub unsafe extern "C" fn lb_quote_context_realtime_trades(
 ///
 /// Get real-time broker queue of the subscribed symbols, it always returns the
 /// data in the local storage.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_realtime_brokers(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -1139,7 +1157,7 @@ pub unsafe extern "C" fn lb_quote_context_realtime_brokers(
 ///
 /// Get real-time candlesticks of the subscribed symbols, it always returns the
 /// data in the local storage.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_realtime_candlesticks(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
@@ -1161,7 +1179,7 @@ pub unsafe extern "C" fn lb_quote_context_realtime_candlesticks(
 
 /// Get security list
 /// data in the local storage.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_security_list(
     ctx: *const CQuoteContext,
     market: CMarket,

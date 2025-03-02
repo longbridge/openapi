@@ -2,8 +2,7 @@ name: Docs
 on:
   push:
     branches:
-      - main-v1
-      - main-v2
+      - release
 
 jobs:
   build-api-docs:
@@ -74,24 +73,21 @@ jobs:
         working-directory: ./cpp
         run: doxygen
 
-      - name: Doc version
-        run: echo DOC_VERSION=$(echo ${{ github.ref }} | sed 's/^refs\/heads\/main-//') >> $GITHUB_ENV
-
       - name: Copy to gh-pages
         run: |
-          mkdir -p gh-pages/$DOC_VERSION
-          mv -f target/doc gh-pages/$DOC_VERSION/rust
-          mv -f python/site gh-pages/$DOC_VERSION/python
-          mv -f nodejs/docs gh-pages/$DOC_VERSION/nodejs
-          mv -f java/javasrc/target/reports/apidocs gh-pages/$DOC_VERSION/java
-          mv -f c/html gh-pages/$DOC_VERSION/c
-          mv -f cpp/html gh-pages/$DOC_VERSION/cpp
+          mkdir -p gh-pages
+          mv -f target/doc gh-pages/rust
+          mv -f python/site gh-pages/python
+          mv -f nodejs/docs gh-pages/nodejs
+          mv -f java/javasrc/target/reports/apidocs gh-pages/java
+          mv -f c/html gh-pages/c
+          mv -f cpp/html gh-pages/cpp
           cp .github/misc/templates/docs.html gh-pages/index.html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v2.5.1
         with:
           emptyCommits: true
-          keepFiles: true
+          keepFiles: false
         env:
           ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           PUBLISH_BRANCH: gh-pages

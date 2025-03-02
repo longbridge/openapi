@@ -53,6 +53,7 @@ using longport::quote::Subscription;
 using longport::quote::Trade;
 using longport::quote::TradeDirection;
 using longport::quote::TradeSession;
+using longport::quote::TradeSessions;
 using longport::quote::TradeStatus;
 using longport::quote::TradingSessionInfo;
 using longport::quote::WarrantInfo;
@@ -661,9 +662,8 @@ inline PushCandlestick
 convert(const lb_push_candlestick_t* info)
 {
   return PushCandlestick{
-    info->symbol,
-    convert(info->period),
-    convert(&info->candlestick),
+    info->symbol,          convert(info->trade_session),
+    convert(info->period), convert(&info->candlestick),
     info->is_confirmed,
   };
 }
@@ -2085,6 +2085,19 @@ convert(const lb_quote_package_detail_t* detail)
     detail->key,      detail->name,   detail->description,
     detail->start_at, detail->end_at,
   };
+}
+
+inline lb_trade_sessions_t
+convert(TradeSessions ts)
+{
+  switch (ts) {
+    case TradeSessions::Normal:
+      return TradeSessionsNormal;
+    case TradeSessions::All:
+      return TradeSessionsAll;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
 }
 
 } // namespace convert

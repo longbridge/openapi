@@ -24,6 +24,6 @@ pub use types::{
     RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, SecuritiesUpdateMode, Security,
     SecurityBoard, SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory,
     SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo, Subscription, Trade,
-    TradeDirection, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
-    WarrantType, WatchlistGroup, WatchlistSecurity,
+    TradeDirection, TradeSessions, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantSortBy,
+    WarrantStatus, WarrantType, WatchlistGroup, WatchlistSecurity,
 };

@@ -1,19 +1,19 @@
 use std::collections::HashMap;
 
-use longport_candlesticks::{Days, InputCandlestick, UpdateAction, UpdateFields};
+use longport_candlesticks::{Days, TradeSessionType, UpdateAction};
 use longport_proto::quote::Period;
-use time::OffsetDateTime;
 
 use crate::{
     quote::{
         push_types::{PushEventDetail, PushQuote},
         Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
-        Trade,
+        Trade, TradeSessions,
     },
     Market,
 };
 
 const MAX_TRADES: usize = 500;
+const MAX_CANDLESTICKS: usize = 500;
 
 macro_rules! merge_decimal {
     ($prev:expr, $new:expr, $field:ident) => {
@@ -36,24 +36,44 @@ macro_rules! merge_i64 {
 }
 
 #[derive(Debug)]
+pub(crate) struct TailCandlestick {
+    pub(crate) index: usize,
+    pub(crate) candlestick: Candlestick,
+}
+
+#[derive(Debug)]
 pub(crate) struct Candlesticks {
+    pub(crate) trade_sessions: TradeSessions,
     pub(crate) candlesticks: Vec<Candlestick>,
-    pub(crate) confirmed: bool,
+    pub(crate) tails: HashMap<TradeSessionType, TailCandlestick>,
 }
 
 impl Candlesticks {
     #[inline]
-    fn merge_input(&self) -> InputCandlestick {
-        match (self.candlesticks.last(), self.confirmed) {
-            (None, true) => unreachable!(),
-            (None, false) => InputCandlestick::None,
-            (Some(prev), true) => InputCandlestick::Confirmed((*prev).into()),
-            (Some(prev), false) => InputCandlestick::Normal((*prev).into()),
+    fn merge_input(&self, ts: TradeSessionType) -> Option<longport_candlesticks::Candlestick> {
+        self.tails.get(&ts).map(|tail| tail.candlestick.into())
+    }
+
+    pub(crate) fn insert_candlestick_by_time(&mut self, candlestick: Candlestick) -> usize {
+        let timestamp = candlestick.timestamp;
+        match self
+            .candlesticks
+            .binary_search_by_key(&timestamp, |c| c.timestamp)
+        {
+            Ok(index) => {
+                self.candlesticks[index] = candlestick;
+                index
+            }
+            Err(index) => {
+                self.candlesticks.insert(index, candlestick);
+                index
+            }
         }
     }
 
     pub(crate) fn merge_quote<H>(
         &mut self,
+        ts: TradeSessionType,
         market_type: Market,
         half_days: H,
         board: SecurityBoard,
@@ -69,9 +89,10 @@ impl Candlesticks {
         let period = convert_period(period);
 
         market.merge_quote(
+            ts,
             half_days,
             period,
-            self.merge_input(),
+            self.merge_input(ts),
             longport_candlesticks::Quote {
                 time: push_quote.timestamp,
                 open: push_quote.open,
@@ -80,93 +101,33 @@ impl Candlesticks {
                 last_done: push_quote.last_done,
                 volume: push_quote.volume,
                 turnover: push_quote.turnover,
+                current_volume: push_quote.current_volume,
+                current_turnover: push_quote.current_turnover,
             },
         )
     }
 
-    pub(crate) fn merge_trade<H>(
-        &mut self,
-        market_type: Market,
-        half_days: H,
-        board: SecurityBoard,
-        period: Period,
-        trade: &Trade,
-    ) -> UpdateAction
-    where
-        H: Days,
-    {
-        let Some(market) = get_market(market_type, board) else {
-            return UpdateAction::None;
-        };
-        let period = convert_period(period);
-        let trade_type = trade.trade_type.as_str();
-        let update_fields = match market_type {
-            Market::Unknown => unreachable!(),
-            Market::HK => match trade_type {
-                "" => UpdateFields::all(),
-                "D" => UpdateFields::VOLUME,
-                "M" => UpdateFields::VOLUME,
-                "P" => UpdateFields::VOLUME,
-                "U" => UpdateFields::all(),
-                "X" => UpdateFields::VOLUME,
-                "Y" => UpdateFields::VOLUME,
-                _ => UpdateFields::empty(),
-            },
-            Market::US => match trade_type {
-                "" => UpdateFields::all(),
-                "A" => UpdateFields::all(),
-                "B" => UpdateFields::all(),
-                "C" => UpdateFields::VOLUME,
-                "D" => UpdateFields::all(),
-                "E" => UpdateFields::all(),
-                "F" => UpdateFields::all(),
-                "G" => UpdateFields::VOLUME,
-                "H" => UpdateFields::VOLUME,
-                "I" => UpdateFields::VOLUME,
-                "K" => UpdateFields::all(),
-                "M" => UpdateFields::empty(),
-                "P" => UpdateFields::empty(),
-                "S" => UpdateFields::all(),
-                "V" => UpdateFields::VOLUME,
-                "W" => UpdateFields::VOLUME,
-                "X" => UpdateFields::all(),
-                "1" => UpdateFields::all(),
-                _ => UpdateFields::empty(),
-            },
-            Market::CN | Market::SG => UpdateFields::all(),
-        };
+    pub(crate) fn check_and_remove(&mut self) {
+        if self.candlesticks.len() <= MAX_CANDLESTICKS * 2 {
+            return;
+        }
 
-        market.merge_trade(
-            half_days,
-            period,
-            self.merge_input(),
-            longport_candlesticks::Trade {
-                time: trade.timestamp,
-                price: trade.price,
-                volume: trade.volume,
-                update_fields,
-            },
-        )
-    }
+        let remove_count = self.candlesticks.len() - MAX_CANDLESTICKS;
+        let mut remove_tails = vec![];
 
-    pub(crate) fn tick<N, H>(
-        &mut self,
-        market_type: Market,
-        normal_days: N,
-        half_days: H,
-        board: SecurityBoard,
-        period: Period,
-        now: OffsetDateTime,
-    ) -> UpdateAction
-    where
-        N: Days,
-        H: Days,
-    {
-        let Some(market) = get_market(market_type, board) else {
-            return UpdateAction::None;
-        };
-        let period = convert_period(period);
-        market.tick(normal_days, half_days, period, self.merge_input(), now)
+        for (ts, tail) in &mut self.tails {
+            if tail.index >= remove_count {
+                tail.index -= remove_count;
+            } else {
+                remove_tails.push(*ts);
+            }
+        }
+
+        for ts in remove_tails {
+            self.tails.remove(&ts);
+        }
+
+        self.candlesticks.drain(..remove_count);
     }
 }
 
@@ -258,7 +219,7 @@ where
     }
 }
 
-fn get_market(
+pub(crate) fn get_market(
     market: Market,
     board: SecurityBoard,
 ) -> Option<&'static longport_candlesticks::Market> {

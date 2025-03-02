@@ -178,12 +178,14 @@ void
 QuoteContext::subscribe_candlesticks(
   const std::string& symbol,
   Period period,
+  TradeSessions trade_sessions,
   AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const
 {
   lb_quote_context_subscribe_candlesticks(
     ctx_,
     symbol.c_str(),
     convert(period),
+    convert(trade_sessions),
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext, std::vector<Candlestick>>(
@@ -653,6 +655,7 @@ QuoteContext::candlesticks(
   Period period,
   uintptr_t count,
   AdjustType adjust_type,
+  TradeSessions trade_sessions,
   AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const
 {
   lb_quote_context_candlesticks(
@@ -661,6 +664,7 @@ QuoteContext::candlesticks(
     convert(period),
     count,
     convert(adjust_type),
+    convert(trade_sessions),
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext, std::vector<Candlestick>>(
@@ -694,6 +698,7 @@ QuoteContext::history_candlesticks_by_offset(
   bool forward,
   std::optional<DateTime> datetime,
   uintptr_t count,
+  TradeSessions tradeSessions,
   AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const
 {
   lb_datetime_t ctime;
@@ -712,6 +717,7 @@ QuoteContext::history_candlesticks_by_offset(
     forward,
     ctime_ptr,
     count,
+    convert(tradeSessions),
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext, std::vector<Candlestick>>(
@@ -744,6 +750,7 @@ QuoteContext::history_candlesticks_by_date(
   AdjustType adjust_type,
   std::optional<Date> start,
   std::optional<Date> end,
+  TradeSessions trade_sessions,
   AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const
 {
   lb_date_t cstart, cend;
@@ -767,6 +774,7 @@ QuoteContext::history_candlesticks_by_date(
     convert(adjust_type),
     cstart_ptr,
     cend_ptr,
+    convert(trade_sessions),
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext, std::vector<Candlestick>>(

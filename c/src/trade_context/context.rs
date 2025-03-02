@@ -63,7 +63,7 @@ impl Drop for CTradeContext {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_new(
     config: *const CConfig,
     callback: CAsyncCallback,
@@ -134,24 +134,24 @@ pub unsafe extern "C" fn lb_trade_context_new(
     );
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_retain(ctx: *const CTradeContext) {
     Arc::increment_strong_count(ctx);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_release(ctx: *const CTradeContext) {
     let _ = Arc::from_raw(ctx);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_ref_count(ctx: *const CTradeContext) -> usize {
     Arc::increment_strong_count(ctx);
     let ctx = Arc::from_raw(ctx);
     Arc::strong_count(&ctx)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_set_userdata(
     ctx: *const CTradeContext,
     userdata: *mut c_void,
@@ -159,12 +159,12 @@ pub unsafe extern "C" fn lb_trade_context_set_userdata(
     (*ctx).state.lock().userdata = userdata;
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_userdata(ctx: *const CTradeContext) -> *mut c_void {
     (*ctx).state.lock().userdata
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_set_free_userdata_func(
     ctx: *const CTradeContext,
     f: CFreeUserDataFunc,
@@ -174,7 +174,7 @@ pub unsafe extern "C" fn lb_trade_context_set_free_userdata_func(
 
 /// Set order changed callback, after receiving the order changed event, it will
 /// call back to this function.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_set_on_order_changed(
     ctx: *const CTradeContext,
     callback: COnOrderChangedCallback,
@@ -188,7 +188,7 @@ pub unsafe extern "C" fn lb_trade_context_set_on_order_changed(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_subscribe(
     ctx: *const CTradeContext,
     topics: *const CTopicType,
@@ -207,7 +207,7 @@ pub unsafe extern "C" fn lb_trade_context_subscribe(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_unsubscribe(
     ctx: *const CTradeContext,
     topics: *const CTopicType,
@@ -229,7 +229,7 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
 /// Get history executions
 ///
 /// @param[in] opts Options for get histroy executions request (can be null)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_history_executions(
     ctx: *const CTradeContext,
     opts: *const CGetHistoryExecutionsOptions,
@@ -262,7 +262,7 @@ pub unsafe extern "C" fn lb_trade_context_history_executions(
 /// Get today executions
 ///
 /// @param[in] opts Options for get today executions request (can be null)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_today_executions(
     ctx: *const CTradeContext,
     opts: *const CGetTodayExecutionsOptions,
@@ -288,7 +288,7 @@ pub unsafe extern "C" fn lb_trade_context_today_executions(
 /// Get history orders
 ///
 /// @param[in] opts Options for get history orders request (can be null)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_history_orders(
     ctx: *const CTradeContext,
     opts: *const CGetHistoryOrdersOptions,
@@ -331,7 +331,7 @@ pub unsafe extern "C" fn lb_trade_context_history_orders(
 /// Get today orders
 ///
 /// @param[in] opts Options for get today orders request (can be null)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_today_orders(
     ctx: *const CTradeContext,
     opts: *const CGetTodayOrdersOptions,
@@ -367,7 +367,7 @@ pub unsafe extern "C" fn lb_trade_context_today_orders(
 /// Replace order
 ///
 /// @param[in] opts Options for replace order request
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_replace_order(
     ctx: *const CTradeContext,
     opts: *const CReplaceOrderOptions,
@@ -405,7 +405,7 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
 /// Submit order
 ///
 /// @param[in] opts Options for submit order request
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_submit_order(
     ctx: *const CTradeContext,
     opts: *const CSubmitOrderOptions,
@@ -456,7 +456,7 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
 }
 
 /// Cancel order
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_cancel_order(
     ctx: *const CTradeContext,
     order_id: *const c_char,
@@ -472,7 +472,7 @@ pub unsafe extern "C" fn lb_trade_context_cancel_order(
 }
 
 /// Get account balance
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_account_balance(
     ctx: *const CTradeContext,
     currency: *const c_char,
@@ -491,7 +491,7 @@ pub unsafe extern "C" fn lb_trade_context_account_balance(
 /// Get cash flow
 ///
 /// @param[in] opts Options for get cash flow request
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_cash_flow(
     ctx: *const CTradeContext,
     opts: *const CGetCashFlowOptions,
@@ -524,7 +524,7 @@ pub unsafe extern "C" fn lb_trade_context_cash_flow(
 /// Get fund positions
 ///
 /// @param[in] opts Options for get fund positions request
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_fund_positions(
     ctx: *const CTradeContext,
     opts: *const CGetFundPositionsOptions,
@@ -546,7 +546,7 @@ pub unsafe extern "C" fn lb_trade_context_fund_positions(
 /// Get stock positions
 ///
 /// @param[in] opts Options for get stock positions request
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_stock_positions(
     ctx: *const CTradeContext,
     opts: *const CGetStockPositionsOptions,
@@ -566,7 +566,7 @@ pub unsafe extern "C" fn lb_trade_context_stock_positions(
 }
 
 /// Get margin ratio
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_margin_ratio(
     ctx: *const CTradeContext,
     symbol: *const c_char,
@@ -582,7 +582,7 @@ pub unsafe extern "C" fn lb_trade_context_margin_ratio(
 }
 
 /// Get order detail
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_order_detail(
     ctx: *const CTradeContext,
     order_id: *const c_char,
@@ -598,7 +598,7 @@ pub unsafe extern "C" fn lb_trade_context_order_detail(
 }
 
 /// Get order detail
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
     ctx: *const CTradeContext,
     opts: *const CEstimateMaxPurchaseQuantityOptions,

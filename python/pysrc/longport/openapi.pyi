@@ -313,6 +313,11 @@ class PushTrades:
 
 class PushCandlestick:
     """
+    Trade session
+    """
+    trade_session: TradeSession
+
+    """
     Candlestick updated event
     """
 
@@ -2576,6 +2581,22 @@ class QuotePackageDetail:
     """
 
 
+class TradeSessions:
+    """
+    Trade sessions
+    """
+
+    class Normal(TradeSessions):
+        """
+        Normal trade session
+        """
+
+    class All(TradeSessions):
+        """
+        All trade sessions
+        """
+
+
 class QuoteContext:
     """
     Quote context
@@ -2672,18 +2693,19 @@ class QuoteContext:
                 ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
         """
 
-    def subscribe_candlesticks(self, symbol: str, period: Type[Period]) -> List[Candlestick]:
+    def subscribe_candlesticks(self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
         """
         Subscribe security candlesticks
 
         Args:
             symbol: Security code
             period: Period type
+            trade_sessions: Trade sessions
 
         Examples:
             ::
 
-                from longport.openapi import QuoteContext, Config, PushCandlestick
+                from longport.openapi import QuoteContext, Config, PushCandlestick, TradeSessions
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
@@ -2691,7 +2713,7 @@ class QuoteContext:
                     print(symbol, event)
 
                 ctx.set_on_candlestick(on_candlestick)
-                ctx.subscribe_candlesticks("700.HK", Period.Min_1)
+                ctx.subscribe_candlesticks("700.HK", Period.Min_1, TradeSessions.Normal)
                 sleep(30)
         """
 
@@ -2917,7 +2939,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType]) -> List[Candlestick]:
+    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType], trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
         """
         Get security candlesticks
 
@@ -2926,6 +2948,7 @@ class QuoteContext:
             period: Candlestick period
             count: Count of cancdlestick (Maximum is `1000`)
             adjust_type: Adjustment type
+            trade_sessions: Trade sessions
 
         Returns:
             Candlesticks
@@ -2933,17 +2956,17 @@ class QuoteContext:
         Examples:
             ::
 
-                from longport.openapi import QuoteContext, Config, Period, AdjustType
+                from longport.openapi import QuoteContext, Config, Period, AdjustType, TradeSessions
 
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.candlesticks(
-                    "700.HK", Period.Day, 10, AdjustType.NoAdjust)
+                    "700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Normal)
                 print(resp)
         """
 
-    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int, time: Optional[datetime] = None) -> List[Candlestick]:
+    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int, time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
         """
         Get security history candlesticks by offset
 
@@ -2954,9 +2977,10 @@ class QuoteContext:
             forward: If `True`, query the latest from the specified time
             count: Count of candlesticks
             time: Datetime
+            trade_sessions: Trade sessions
         """
 
-    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date], end: Optional[date]) -> List[Candlestick]:
+    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date], end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
         """
         Get security history candlesticks by date
 
@@ -2966,6 +2990,7 @@ class QuoteContext:
             adjust_type: Adjust type
             start: Start date
             end: End date
+            trade_sessions: Trade sessions
         """
 
     def option_chain_expiry_date_list(self, symbol: str) -> List[date]:

@@ -20,8 +20,8 @@ use crate::{
             QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security, SecurityBrokers,
             SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
             SecurityStaticInfo, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
-            Trade, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType,
-            WatchlistGroup,
+            Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
+            WarrantType, WatchlistGroup,
         },
     },
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
@@ -151,9 +151,15 @@ impl QuoteContext {
     }
 
     /// Subscribe security candlesticks
-    fn subscribe_candlesticks(&self, symbol: String, period: Period) -> PyResult<Vec<Candlestick>> {
+    #[pyo3(signature = (symbol, period, trade_sessions = TradeSessions::Normal))]
+    fn subscribe_candlesticks(
+        &self,
+        symbol: String,
+        period: Period,
+        trade_sessions: TradeSessions,
+    ) -> PyResult<Vec<Candlestick>> {
         self.ctx
-            .subscribe_candlesticks(symbol, period.into())
+            .subscribe_candlesticks(symbol, period.into(), trade_sessions.into())
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -259,15 +265,23 @@ impl QuoteContext {
     }
 
     /// Get security candlesticks
+    #[pyo3(signature = (symbol, period, count, adjust_type, trade_sessions = TradeSessions::Normal))]
     fn candlesticks(
         &self,
         symbol: String,
         period: Period,
         count: usize,
         adjust_type: AdjustType,
+        trade_sessions: TradeSessions,
     ) -> PyResult<Vec<Candlestick>> {
         self.ctx
-            .candlesticks(symbol, period.into(), count, adjust_type.into())
+            .candlesticks(
+                symbol,
+                period.into(),
+                count,
+                adjust_type.into(),
+                trade_sessions.into(),
+            )
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -275,7 +289,7 @@ impl QuoteContext {
     }
 
     /// Get security history candlesticks by offset
-    #[pyo3(signature = (symbol, period, adjust_type, forward, count, time = None))]
+    #[pyo3(signature = (symbol, period, adjust_type, forward, count, time = None, trade_sessions = TradeSessions::Normal))]
     fn history_candlesticks_by_offset(
         &self,
         symbol: String,
@@ -284,6 +298,7 @@ impl QuoteContext {
         forward: bool,
         count: usize,
         time: Option<PyOffsetDateTimeWrapper>,
+        trade_sessions: TradeSessions,
     ) -> PyResult<Vec<Candlestick>> {
         self.ctx
             .history_candlesticks_by_offset(
@@ -293,6 +308,7 @@ impl QuoteContext {
                 forward,
                 time.map(|time| PrimitiveDateTime::new(time.0.date(), time.0.time())),
                 count,
+                trade_sessions.into(),
             )
             .map_err(ErrorNewType)?
             .into_iter()
@@ -301,7 +317,7 @@ impl QuoteContext {
     }
 
     /// Get security history candlesticks by offset
-    #[pyo3(signature = (symbol, period, adjust_type, start = None, end = None))]
+    #[pyo3(signature = (symbol, period, adjust_type, start = None, end = None,trade_sessions = TradeSessions::Normal))]
     fn history_candlesticks_by_date(
         &self,
         symbol: String,
@@ -309,6 +325,7 @@ impl QuoteContext {
         adjust_type: AdjustType,
         start: Option<PyDateWrapper>,
         end: Option<PyDateWrapper>,
+        trade_sessions: TradeSessions,
     ) -> PyResult<Vec<Candlestick>> {
         self.ctx
             .history_candlesticks_by_date(
@@ -317,6 +334,7 @@ impl QuoteContext {
                 adjust_type.into(),
                 start.map(|d| d.0),
                 end.map(|d| d.0),
+                trade_sessions.into(),
             )
             .map_err(ErrorNewType)?
             .into_iter()

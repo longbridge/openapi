@@ -8,7 +8,7 @@ use time::OffsetDateTime;
 
 use crate::{async_util, error::jni_result, types::FromJValue};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_longport_SdkNative_newConfig(
     mut env: JNIEnv,
     _class: JClass,
@@ -67,7 +67,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_longport_SdkNative_newConfigFromEnv(
     mut env: JNIEnv,
     _class: JClass,
@@ -78,7 +78,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfigFromEnv(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_freeConfig(
     _env: JNIEnv,
     _class: JClass,
@@ -87,7 +87,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeConfig(
     let _ = Box::from_raw(config as *mut Config);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_configRefreshAccessToken(
     mut env: JNIEnv,
     _class: JClass,

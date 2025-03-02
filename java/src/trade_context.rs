@@ -56,7 +56,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
     Ok(())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_newTradeContext(
     mut env: JNIEnv,
     _class: JClass,
@@ -100,7 +100,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newTradeContext(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_freeTradeContext(
     _env: JNIEnv,
     _class: JClass,
@@ -109,7 +109,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeTradeContext(
     let _ = Box::from_raw(ctx as *mut ContextObj);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSetOnOrderChanged(
     mut env: JNIEnv,
     _class: JClass,
@@ -127,7 +127,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSetOnOrder
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubscribe(
     mut env: JNIEnv,
     _class: JClass,
@@ -146,7 +146,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubscribe(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextUnsubscribe(
     mut env: JNIEnv,
     _class: JClass,
@@ -165,7 +165,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextUnsubscrib
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextHistoryExecutions(
     mut env: JNIEnv,
     _class: JClass,
@@ -200,7 +200,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextHistoryExe
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayExecutions(
     mut env: JNIEnv,
     _class: JClass,
@@ -231,7 +231,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayExecu
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextHistoryOrders(
     mut env: JNIEnv,
     _class: JClass,
@@ -276,7 +276,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextHistoryOrd
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayOrders(
     mut env: JNIEnv,
     _class: JClass,
@@ -317,7 +317,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayOrder
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextReplaceOrder(
     mut env: JNIEnv,
     _class: JClass,
@@ -362,7 +362,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextReplaceOrd
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitOrder(
     mut env: JNIEnv,
     _class: JClass,
@@ -419,7 +419,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitOrde
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCancelOrder(
     mut env: JNIEnv,
     _class: JClass,
@@ -437,7 +437,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCancelOrde
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextAccountBalance(
     mut env: JNIEnv,
     _class: JClass,
@@ -457,7 +457,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextAccountBal
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCashFlow(
     mut env: JNIEnv,
     _class: JClass,
@@ -495,7 +495,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCashFlow(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextFundPositions(
     mut env: JNIEnv,
     _class: JClass,
@@ -520,7 +520,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextFundPositi
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextStockPositions(
     mut env: JNIEnv,
     _class: JClass,
@@ -547,7 +547,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextStockPosit
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextMarginRatio(
     mut env: JNIEnv,
     _class: JClass,
@@ -565,7 +565,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextMarginRati
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextOrderDetail(
     mut env: JNIEnv,
     _class: JClass,
@@ -583,7 +583,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextOrderDetai
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextEstimateMaxPurchaseQuantity(
     mut env: JNIEnv,
     _class: JClass,

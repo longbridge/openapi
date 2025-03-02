@@ -3,8 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main-v1
-      - main-v2
+      - main
   pull_request: {}
 
 jobs:
@@ -242,7 +241,7 @@ jobs:
           target: ${{ matrix.target }}
           manylinux: 2_28
           args: -i python${{ matrix.python-version }} --out dist -m python/Cargo.toml
-      - uses: uraimo/run-on-arch-action@v2
+      - uses: uraimo/run-on-arch-action@v3
         name: Install built wheel
         with:
           arch: none

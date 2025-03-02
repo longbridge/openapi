@@ -1,6 +1,6 @@
 [package]
 name = "longport-nodejs-macros"
-version = "2.1.12"
+version = "3.0.0"
 edition = "2021"
 
 [lib]

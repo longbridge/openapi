@@ -1,0 +1,82 @@
+name: Docs
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  rust:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rust-docs
+      - name: Build Rust doc
+        run: cargo doc -p longport --no-deps
+
+  nodejs:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          check-latest: true
+      - name: Build Node.js docs
+        run: |
+          npm install -g typedoc
+          typedoc
+        working-directory: ./nodejs
+
+  java:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "temurin"
+      - name: Build Java docs
+        working-directory: ./java/javasrc
+        run: mvn javadoc:javadoc
+
+  c:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+      - name: Build C docs
+        working-directory: ./c
+        run: doxygen
+
+  cpp:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+      - name: Build C++ docs
+        working-directory: ./cpp
+        run: doxygen

@@ -332,6 +332,7 @@ pub enum DeductionStatus {
     #[strum(disabled)]
     Unknown,
     /// Pending Settlement
+    #[strum(serialize = "NONE")]
     None,
     /// Settled with no data
     #[strum(serialize = "NO_DATA")]

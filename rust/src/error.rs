@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use longport_httpcli::HttpClientError;
 use longport_wscli::WsClientError;
+use time::OffsetDateTime;
 
 /// LongPort OpenAPI SDK error type
 #[derive(Debug, thiserror::Error)]
@@ -36,6 +37,22 @@ pub enum Error {
     InvalidSecuritySymbol {
         /// Security symbol
         symbol: String,
+    },
+
+    /// Unknown market
+    #[error("unknown market: {symbol}")]
+    UnknownMarket {
+        /// Security symbol
+        symbol: String,
+    },
+
+    /// Unknown trade session
+    #[error("unknown trade session: {symbol}, time={time}")]
+    UnknownTradeSession {
+        /// Security symbol
+        symbol: String,
+        /// time
+        time: OffsetDateTime,
     },
 
     /// HTTP client error
@@ -95,6 +112,8 @@ impl Error {
             Error::DecodeProtobuf(_)
             | Error::DecodeJSON(_)
             | Error::InvalidSecuritySymbol { .. }
+            | Error::UnknownMarket { .. }
+            | Error::UnknownTradeSession { .. }
             | Error::ParseField { .. }
             | Error::UnknownCommand(_)
             | Error::HttpClient(_)

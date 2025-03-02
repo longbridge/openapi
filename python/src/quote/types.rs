@@ -975,6 +975,8 @@ pub(crate) struct PushTrades {
 #[derive(Debug, PyObject)]
 #[py(remote = "longport::quote::PushCandlestick")]
 pub struct PushCandlestick {
+    /// Trade Session
+    trade_session: TradeSession,
     /// Period type
     period: Period,
     /// Candlestick
@@ -1333,4 +1335,12 @@ pub(crate) struct QuotePackageDetail {
     pub start_at: PyOffsetDateTimeWrapper,
     /// End time
     pub end_at: PyOffsetDateTimeWrapper,
+}
+
+#[pyclass(eq, eq_int)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::TradeSessions")]
+pub(crate) enum TradeSessions {
+    Normal,
+    All,
 }
