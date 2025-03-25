@@ -17,7 +17,7 @@ on_quote(const struct lb_async_result_t* res)
   lb_security_quote_t* data = (lb_security_quote_t*)res->data;
   for (int i = 0; i < res->length; i++) {
     const lb_security_quote_t* quote = &data[i];
-    printf("%s timestamp=%ld last_done=%f open=%f high=%f low=%f volume=%ld "
+    printf("%s timestamp=%lld last_done=%f open=%f high=%f low=%f volume=%lld "
            "turnover=%f\n",
            quote->symbol,
            quote->timestamp,

@@ -1,12 +1,13 @@
 use std::collections::HashSet;
 
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use time::{macros::time, Date, Duration, OffsetDateTime, Time, Weekday};
 use time_tz::{OffsetDateTimeExt, PrimitiveDateTimeExt, Tz};
 
 use crate::{
     candlestick::Candlestick,
     find_session::{FindSession, FindSessionResult},
-    Period, Quote,
+    Period, Quote, Trade, UpdateFields,
 };
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -181,6 +182,88 @@ impl Market {
     }
 
     #[must_use]
+    pub fn merge_trade<H>(
+        &self,
+        ts: TradeSessionType,
+        half_days: H,
+        period: Period,
+        input: Option<Candlestick>,
+        trade: Trade,
+    ) -> UpdateAction
+    where
+        H: Days,
+    {
+        debug_assert!(period != Period::Day);
+
+        let Some(time) =
+            self.candlestick_time(ts, half_days, period, trade.time.to_timezone(self.timezone))
+        else {
+            return UpdateAction::None;
+        };
+
+        match input {
+            Some(prev) if time == prev.time => {
+                let mut candlestick = prev;
+
+                if trade.update_fields.contains(UpdateFields::PRICE) {
+                    candlestick.high = candlestick.high.max(trade.price);
+                    candlestick.low = candlestick.low.min(trade.price);
+                    candlestick.close = trade.price;
+                }
+
+                if trade.update_fields.contains(UpdateFields::VOLUME) {
+                    candlestick.volume += trade.volume;
+                    candlestick.turnover += trade.price
+                        * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default();
+                }
+
+                UpdateAction::UpdateLast(candlestick)
+            }
+            None => {
+                if trade.update_fields.contains(UpdateFields::PRICE) {
+                    let new_candlestick = Candlestick {
+                        time: time.to_timezone(time_tz::timezones::db::UTC),
+                        open: trade.price,
+                        high: trade.price,
+                        low: trade.price,
+                        close: trade.price,
+                        volume: trade.volume,
+                        turnover: trade.price
+                            * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default(),
+                    };
+                    UpdateAction::AppendNew {
+                        confirmed: None,
+                        new: new_candlestick,
+                    }
+                } else {
+                    UpdateAction::None
+                }
+            }
+            Some(prev) if time > prev.time => {
+                if trade.update_fields.contains(UpdateFields::PRICE) {
+                    let new_candlestick = Candlestick {
+                        time: time.to_timezone(time_tz::timezones::db::UTC),
+                        open: trade.price,
+                        high: trade.price,
+                        low: trade.price,
+                        close: trade.price,
+                        volume: trade.volume,
+                        turnover: trade.price
+                            * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default(),
+                    };
+                    UpdateAction::AppendNew {
+                        confirmed: Some(prev),
+                        new: new_candlestick,
+                    }
+                } else {
+                    UpdateAction::None
+                }
+            }
+            _ => UpdateAction::None,
+        }
+    }
+
+    #[must_use]
     pub fn merge_quote<H>(
         &self,
         ts: TradeSessionType,
@@ -192,15 +275,27 @@ impl Market {
     where
         H: Days,
     {
+        debug_assert!(period == Period::Day);
+
         let tz = self.timezone;
         let Some(time) = self.candlestick_time(ts, half_days, period, quote.time.to_timezone(tz))
         else {
             return UpdateAction::None;
         };
 
-        if period == Period::Day {
-            match input {
-                Some(prev) if time == prev.time => UpdateAction::UpdateLast(Candlestick {
+        match input {
+            Some(prev) if time == prev.time => UpdateAction::UpdateLast(Candlestick {
+                time: time.to_timezone(time_tz::timezones::db::UTC),
+                open: quote.open,
+                high: quote.high,
+                low: quote.low,
+                close: quote.last_done,
+                volume: quote.volume,
+                turnover: quote.turnover,
+            }),
+            None => UpdateAction::AppendNew {
+                confirmed: None,
+                new: Candlestick {
                     time: time.to_timezone(time_tz::timezones::db::UTC),
                     open: quote.open,
                     high: quote.high,
@@ -208,70 +303,21 @@ impl Market {
                     close: quote.last_done,
                     volume: quote.volume,
                     turnover: quote.turnover,
-                }),
-                None => UpdateAction::AppendNew {
-                    confirmed: None,
-                    new: Candlestick {
-                        time: time.to_timezone(time_tz::timezones::db::UTC),
-                        open: quote.open,
-                        high: quote.high,
-                        low: quote.low,
-                        close: quote.last_done,
-                        volume: quote.volume,
-                        turnover: quote.turnover,
-                    },
                 },
-                Some(prev) if time > prev.time => UpdateAction::AppendNew {
-                    confirmed: Some(prev),
-                    new: Candlestick {
-                        time: time.to_timezone(time_tz::timezones::db::UTC),
-                        open: quote.open,
-                        high: quote.high,
-                        low: quote.low,
-                        close: quote.last_done,
-                        volume: quote.volume,
-                        turnover: quote.turnover,
-                    },
-                },
-                _ => UpdateAction::None,
-            }
-        } else {
-            match input {
-                Some(prev) if time == prev.time => UpdateAction::UpdateLast(Candlestick {
+            },
+            Some(prev) if time > prev.time => UpdateAction::AppendNew {
+                confirmed: Some(prev),
+                new: Candlestick {
                     time: time.to_timezone(time_tz::timezones::db::UTC),
-                    open: prev.open,
-                    high: prev.high.max(quote.high),
-                    low: prev.low.min(quote.low),
+                    open: quote.open,
+                    high: quote.high,
+                    low: quote.low,
                     close: quote.last_done,
-                    volume: prev.volume + quote.current_volume,
-                    turnover: prev.turnover + quote.current_turnover,
-                }),
-                None => UpdateAction::AppendNew {
-                    confirmed: None,
-                    new: Candlestick {
-                        time: time.to_timezone(time_tz::timezones::db::UTC),
-                        open: quote.last_done,
-                        high: quote.last_done,
-                        low: quote.last_done,
-                        close: quote.last_done,
-                        volume: quote.current_volume,
-                        turnover: quote.current_turnover,
-                    },
+                    volume: quote.volume,
+                    turnover: quote.turnover,
                 },
-                Some(prev) if time > prev.time => UpdateAction::AppendNew {
-                    confirmed: Some(prev),
-                    new: Candlestick {
-                        time: time.to_timezone(time_tz::timezones::db::UTC),
-                        open: quote.last_done,
-                        high: quote.last_done,
-                        low: quote.last_done,
-                        close: quote.last_done,
-                        volume: quote.current_volume,
-                        turnover: quote.current_turnover,
-                    },
-                },
-                _ => UpdateAction::None,
-            }
+            },
+            _ => UpdateAction::None,
         }
     }
 

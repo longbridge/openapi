@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use longport_candlesticks::{Days, TradeSessionType, UpdateAction};
+use longport_candlesticks::{Days, TradeSessionType, UpdateAction, UpdateFields};
 use longport_proto::quote::Period;
 
 use crate::{
@@ -71,6 +71,74 @@ impl Candlesticks {
         }
     }
 
+    pub(crate) fn merge_trade<H>(
+        &mut self,
+        ts: TradeSessionType,
+        market_type: Market,
+        half_days: H,
+        board: SecurityBoard,
+        period: Period,
+        trade: &Trade,
+    ) -> UpdateAction
+    where
+        H: Days,
+    {
+        let Some(market) = get_market(market_type, board) else {
+            return UpdateAction::None;
+        };
+        let period = convert_period(period);
+
+        let trade_type = trade.trade_type.as_str();
+        let update_fields = match market_type {
+            Market::Unknown => unreachable!(),
+            Market::HK => match trade_type {
+                "" => UpdateFields::all(),
+                "D" => UpdateFields::VOLUME,
+                "M" => UpdateFields::VOLUME,
+                "P" => UpdateFields::VOLUME,
+                "U" => UpdateFields::all(),
+                "X" => UpdateFields::VOLUME,
+                "Y" => UpdateFields::VOLUME,
+                _ => UpdateFields::empty(),
+            },
+            Market::US => match trade_type {
+                "" => UpdateFields::all(),
+                "A" => UpdateFields::all(),
+                "B" => UpdateFields::all(),
+                "C" => UpdateFields::VOLUME,
+                "D" => UpdateFields::all(),
+                "E" => UpdateFields::all(),
+                "F" => UpdateFields::all(),
+                "G" => UpdateFields::VOLUME,
+                "H" => UpdateFields::VOLUME,
+                "I" => UpdateFields::VOLUME,
+                "K" => UpdateFields::all(),
+                "M" => UpdateFields::empty(),
+                "P" => UpdateFields::empty(),
+                "S" => UpdateFields::all(),
+                "V" => UpdateFields::VOLUME,
+                "W" => UpdateFields::VOLUME,
+                "X" => UpdateFields::all(),
+                "1" => UpdateFields::all(),
+                _ => UpdateFields::empty(),
+            },
+            Market::CN | Market::SG => UpdateFields::all(),
+        };
+
+        market.merge_trade(
+            ts,
+            half_days,
+            period,
+            self.merge_input(ts),
+            longport_candlesticks::Trade {
+                time: trade.timestamp,
+                price: trade.price,
+                volume: trade.volume,
+                update_fields,
+            },
+        )
+    }
+
     pub(crate) fn merge_quote<H>(
         &mut self,
         ts: TradeSessionType,
@@ -83,6 +151,8 @@ impl Candlesticks {
     where
         H: Days,
     {
+        debug_assert!(period == Period::Day);
+
         let Some(market) = get_market(market_type, board) else {
             return UpdateAction::None;
         };
@@ -101,8 +171,6 @@ impl Candlesticks {
                 last_done: push_quote.last_done,
                 volume: push_quote.volume,
                 turnover: push_quote.turnover,
-                current_volume: push_quote.current_volume,
-                current_turnover: push_quote.current_turnover,
             },
         )
     }

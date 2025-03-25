@@ -61,6 +61,20 @@ pub struct Quote {
     pub last_done: Decimal,
     pub volume: i64,
     pub turnover: Decimal,
-    pub current_volume: i64,
-    pub current_turnover: Decimal,
+}
+
+bitflags::bitflags! {
+    #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+    pub struct UpdateFields: u32 {
+        const PRICE = 0x1;
+        const VOLUME = 0x2;
+    }
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub struct Trade {
+    pub time: OffsetDateTime,
+    pub price: Decimal,
+    pub volume: i64,
+    pub update_fields: UpdateFields,
 }

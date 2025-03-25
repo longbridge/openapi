@@ -30,8 +30,9 @@ use crate::{
         sub_flags::SubFlags,
         types::QuotePackageDetail,
         utils::{convert_trade_session, format_date, parse_date},
-        Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, RealtimeQuote,
-        SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade, TradeSessions,
+        Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, PushTrades,
+        RealtimeQuote, SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade,
+        TradeSessions,
     },
     Config, Error, Market, Result,
 };
@@ -558,7 +559,7 @@ impl Core {
                 .map(|data| &data.candlesticks)
             {
                 if !candlesticks.is_empty() {
-                    st.remove(SubFlags::QUOTE);
+                    st.remove(SubFlags::QUOTE | SubFlags::TRADE);
                 }
             }
 
@@ -711,7 +712,7 @@ impl Core {
             .get(&symbol)
             .copied()
             .unwrap_or_else(SubFlags::empty)
-            .contains(SubFlags::QUOTE)
+            .contains(SubFlags::QUOTE | SubFlags::TRADE)
         {
             return Ok(candlesticks);
         }
@@ -720,7 +721,7 @@ impl Core {
 
         let req = SubscribeRequest {
             symbol: vec![symbol.clone()],
-            sub_type: SubFlags::QUOTE.into(),
+            sub_type: (SubFlags::QUOTE | SubFlags::TRADE).into(),
             is_first_push: true,
         };
         self.ws_cli
@@ -744,14 +745,13 @@ impl Core {
         {
             periods.remove(&period);
 
-            if periods.is_empty()
-                && !self
-                    .subscriptions
-                    .get(&symbol)
-                    .copied()
-                    .unwrap_or_else(SubFlags::empty)
-                    .contains(SubFlags::QUOTE)
-            {
+            let sub_flags = self
+                .subscriptions
+                .get(&symbol)
+                .copied()
+                .unwrap_or_else(SubFlags::empty);
+
+            if periods.is_empty() && !sub_flags.intersects(SubFlags::QUOTE | SubFlags::TRADE) {
                 tracing::info!(symbol = symbol, "unsubscribe quote for candlesticks");
                 self.ws_cli
                     .request::<_, ()>(
@@ -759,7 +759,7 @@ impl Core {
                         None,
                         UnsubscribeRequest {
                             symbol: vec![symbol],
-                            sub_type: SubFlags::QUOTE.into(),
+                            sub_type: (SubFlags::QUOTE | SubFlags::TRADE).into(),
                             unsub_all: false,
                         },
                     )
@@ -807,7 +807,7 @@ impl Core {
         for (symbol, data) in &self.store.securities {
             if !data.candlesticks.is_empty() {
                 subscriptions
-                    .entry(SubFlags::QUOTE)
+                    .entry(SubFlags::QUOTE | SubFlags::TRADE)
                     .or_default()
                     .insert(symbol.clone());
             }
@@ -832,6 +832,10 @@ impl Core {
     }
 
     fn merge_candlesticks_by_quote(&mut self, symbol: &str, push_quote: &PushQuote) {
+        if push_quote.trade_session != TradeSession::NormalTrade {
+            return;
+        }
+
         let Some(market_type) = parse_market_from_symbol(symbol) else {
             return;
         };
@@ -839,19 +843,15 @@ impl Core {
             return;
         };
         let half_days = self.trading_days.half_days(market_type);
-        let ts = convert_trade_session(push_quote.trade_session);
 
-        for (period, candlesticks) in &mut security_data.candlesticks {
-            if *period >= Period::Day && !ts.is_normal() {
-                continue;
-            }
-
+        if let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) {
+            let ts = convert_trade_session(push_quote.trade_session);
             let action = candlesticks.merge_quote(
                 ts,
                 market_type,
                 half_days,
                 security_data.board,
-                *period,
+                Period::Day,
                 push_quote,
             );
             update_and_push_candlestick(
@@ -859,11 +859,50 @@ impl Core {
                 ts,
                 push_quote.trade_session,
                 symbol,
-                *period,
+                Period::Day,
                 action,
                 self.push_candlestick_mode,
                 &mut self.push_tx,
-            )
+            );
+        }
+    }
+
+    fn merge_candlesticks_by_trades(&mut self, symbol: &str, push_trades: &PushTrades) {
+        let Some(market_type) = parse_market_from_symbol(symbol) else {
+            return;
+        };
+        let Some(security_data) = self.store.securities.get_mut(symbol) else {
+            return;
+        };
+        let half_days = self.trading_days.half_days(market_type);
+
+        for trade in &push_trades.trades {
+            let ts = convert_trade_session(trade.trade_session);
+
+            for (period, candlesticks) in &mut security_data.candlesticks {
+                if *period >= Period::Day && !ts.is_normal() {
+                    continue;
+                }
+
+                let action = candlesticks.merge_trade(
+                    ts,
+                    market_type,
+                    half_days,
+                    security_data.board,
+                    *period,
+                    trade,
+                );
+                update_and_push_candlestick(
+                    candlesticks,
+                    ts,
+                    trade.trade_session,
+                    symbol,
+                    *period,
+                    action,
+                    self.push_candlestick_mode,
+                    &mut self.push_tx,
+                );
+            }
         }
     }
 
@@ -883,6 +922,17 @@ impl Core {
                         .subscriptions
                         .get(&event.symbol)
                         .map(|sub_flags| sub_flags.contains(SubFlags::QUOTE))
+                        .unwrap_or_default()
+                    {
+                        return Ok(());
+                    }
+                } else if let PushEventDetail::Trade(trades) = &event.detail {
+                    self.merge_candlesticks_by_trades(&event.symbol, trades);
+
+                    if !self
+                        .subscriptions
+                        .get(&event.symbol)
+                        .map(|sub_flags| sub_flags.contains(SubFlags::TRADE))
                         .unwrap_or_default()
                     {
                         return Ok(());

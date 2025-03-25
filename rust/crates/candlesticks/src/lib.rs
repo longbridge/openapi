@@ -10,4 +10,4 @@ pub use market::{
     Days, Market, TradeSession, TradeSessionType, UpdateAction, TRADE_SESSION_NORMAL,
     TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST, TRADE_SESSION_PRE,
 };
-pub use types::{Period, Quote};
+pub use types::{Period, Quote, Trade, UpdateFields};
