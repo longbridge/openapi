@@ -25,7 +25,6 @@ jobs:
             This issue was closed due to inactivity. If you still encounter this issue, please open a new issue and link to this issue.
           days-before-stale: 120
           days-before-close: 14
-          any-of-issue-labels: ""
           operations-per-run: 1000
           ascending: true
           enable-statistics: true
