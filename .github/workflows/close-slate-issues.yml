@@ -1,0 +1,32 @@
+name: "Close Stale Issues"
+on:
+  schedule:
+    - cron: "12 3 * * 1"
+  workflow_dispatch:
+
+jobs:
+  stale:
+    if: github.repository_owner == 'longportapp'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: >
+            Hi,
+
+            我们正在努力清理问题，并关闭可能不再相关的旧问题。如果你依然还有类似的问题，请通过评论此问题让我们知道，我们会重新开启。如果您无法重现，请随时自行关闭问题，我们也有定期任务清理 14 天之前的旧问题。
+
+            We are actively cleaning up issues and closing those that may no longer be relevant. If you still have similar issues, please comment on this issue to reopen it. If you cannot reproduce the issue, please close it yourself, and we also have a scheduled task to clean up issues older than 14 days.
+
+            Thank you!
+          close-issue-message: >
+            由于没有活动，此问题已关闭。如果您仍遇到此问题，请打开一个新问题并附上此问题的链接。
+            This issue was closed due to inactivity. If you still encounter this issue, please open a new issue and link to this issue.
+          days-before-stale: 120
+          days-before-close: 14
+          any-of-issue-labels: ""
+          operations-per-run: 1000
+          ascending: true
+          enable-statistics: true
+          stale-issue-label: "stale"
