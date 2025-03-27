@@ -313,11 +313,6 @@ class PushTrades:
 
 class PushCandlestick:
     """
-    Trade session
-    """
-    trade_session: TradeSession
-
-    """
     Candlestick updated event
     """
 

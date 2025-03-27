@@ -1556,10 +1556,6 @@ typedef struct lb_push_candlestick_t {
    */
   const char *symbol;
   /**
-   * Trade session
-   */
-  enum lb_trade_session_t trade_session;
-  /**
    * Period type
    */
   enum lb_period_t period;

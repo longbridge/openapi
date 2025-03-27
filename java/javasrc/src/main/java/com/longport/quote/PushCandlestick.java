@@ -1,14 +1,9 @@
 package com.longport.quote;
 
 public class PushCandlestick {
-    private TradeSession tradeSession;
     private Period period;
     private Candlestick candlestick;
     private boolean isConfirmed;
-
-    public TradeSession getTradeSession() {
-        return tradeSession;
-    }
 
     public Period getPeriod() {
         return period;
@@ -24,7 +19,7 @@ public class PushCandlestick {
 
     @Override
     public String toString() {
-        return "PushCandlestick [tradeSession=" + tradeSession + ", period=" + period + ", candlestick=" + candlestick
+        return "PushCandlestick [period=" + period + ", candlestick=" + candlestick
                 + ", isConfirmed=" + isConfirmed + "]";
     }
 

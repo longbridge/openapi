@@ -81,8 +81,6 @@ pub struct PushTrades {
 /// Candlestick updated message
 #[derive(Debug, Copy, Clone)]
 pub struct PushCandlestick {
-    /// Trade session
-    pub trade_session: TradeSession,
     /// Period type
     pub period: Period,
     /// Candlestick

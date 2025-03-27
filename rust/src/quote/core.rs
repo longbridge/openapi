@@ -1153,7 +1153,6 @@ fn update_and_push_candlestick(
                 sequence: 0,
                 symbol: symbol.to_string(),
                 detail: PushEventDetail::Candlestick(PushCandlestick {
-                    trade_session: ts1,
                     period,
                     candlestick,
                     is_confirmed,

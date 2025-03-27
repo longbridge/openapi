@@ -662,8 +662,9 @@ inline PushCandlestick
 convert(const lb_push_candlestick_t* info)
 {
   return PushCandlestick{
-    info->symbol,          convert(info->trade_session),
-    convert(info->period), convert(&info->candlestick),
+    info->symbol,
+    convert(info->period),
+    convert(&info->candlestick),
     info->is_confirmed,
   };
 }

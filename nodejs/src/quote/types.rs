@@ -1012,8 +1012,6 @@ pub struct PushTrades {
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longport::quote::PushCandlestick")]
 pub struct PushCandlestick {
-    /// Trade session
-    trade_session: TradeSession,
     /// Period type
     period: Period,
     /// Candlestick

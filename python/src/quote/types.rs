@@ -977,8 +977,6 @@ pub(crate) struct PushTrades {
 #[derive(Debug, PyObject)]
 #[py(remote = "longport::quote::PushCandlestick")]
 pub struct PushCandlestick {
-    /// Trade Session
-    trade_session: TradeSession,
     /// Period type
     period: Period,
     /// Candlestick

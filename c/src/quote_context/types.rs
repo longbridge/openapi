@@ -548,8 +548,6 @@ impl ToFFI for CCandlestickOwned {
 pub struct CPushCandlestick {
     /// Security code
     pub symbol: *const c_char,
-    /// Trade session
-    pub trade_session: CTradeSession,
     /// Period type
     pub period: CPeriod,
     /// Candlestick
@@ -560,7 +558,6 @@ pub struct CPushCandlestick {
 
 pub(crate) struct CPushCandlestickOwned {
     symbol: CString,
-    trade_session: CTradeSession,
     period: Period,
     candlestick: CCandlestickOwned,
     is_confirmed: bool,
@@ -569,14 +566,12 @@ pub(crate) struct CPushCandlestickOwned {
 impl From<(String, PushCandlestick)> for CPushCandlestickOwned {
     fn from((symbol, candlestick): (String, PushCandlestick)) -> Self {
         let PushCandlestick {
-            trade_session,
             period,
             candlestick,
             is_confirmed,
         } = candlestick;
         CPushCandlestickOwned {
             symbol: symbol.into(),
-            trade_session: trade_session.into(),
             period,
             candlestick: candlestick.into(),
             is_confirmed,
@@ -590,14 +585,12 @@ impl ToFFI for CPushCandlestickOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         let CPushCandlestickOwned {
             symbol,
-            trade_session,
             period,
             candlestick,
             is_confirmed,
         } = self;
         CPushCandlestick {
             symbol: symbol.to_ffi_type(),
-            trade_session: *trade_session,
             period: (*period).into(),
             candlestick: candlestick.to_ffi_type(),
             is_confirmed: *is_confirmed,

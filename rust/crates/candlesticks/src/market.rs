@@ -240,23 +240,32 @@ impl Market {
                 }
             }
             Some(prev) if time > prev.time => {
+                let mut new_candlestick = Candlestick {
+                    time: time.to_timezone(time_tz::timezones::db::UTC),
+                    open: prev.close,
+                    high: prev.close,
+                    low: prev.close,
+                    close: prev.close,
+                    volume: 0,
+                    turnover: Decimal::ZERO,
+                };
+
                 if trade.update_fields.contains(UpdateFields::PRICE) {
-                    let new_candlestick = Candlestick {
-                        time: time.to_timezone(time_tz::timezones::db::UTC),
-                        open: trade.price,
-                        high: trade.price,
-                        low: trade.price,
-                        close: trade.price,
-                        volume: trade.volume,
-                        turnover: trade.price
-                            * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default(),
-                    };
-                    UpdateAction::AppendNew {
-                        confirmed: Some(prev),
-                        new: new_candlestick,
-                    }
-                } else {
-                    UpdateAction::None
+                    new_candlestick.open = trade.price;
+                    new_candlestick.high = trade.price;
+                    new_candlestick.low = trade.price;
+                    new_candlestick.close = trade.price;
+                }
+
+                if trade.update_fields.contains(UpdateFields::VOLUME) {
+                    new_candlestick.volume = trade.volume;
+                    new_candlestick.turnover = trade.price
+                        * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default();
+                }
+
+                UpdateAction::AppendNew {
+                    confirmed: Some(prev),
+                    new: new_candlestick,
                 }
             }
             _ => UpdateAction::None,

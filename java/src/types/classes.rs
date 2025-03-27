@@ -96,7 +96,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longport/quote/PushCandlestick",
     longport::quote::PushCandlestick,
-    [trade_session, period, candlestick, is_confirmed]
+    [period, candlestick, is_confirmed]
 );
 
 impl_java_class!(

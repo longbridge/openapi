@@ -567,8 +567,6 @@ struct PushCandlestick
 {
   /// Security code
   std::string symbol;
-  /// Trade session
-  TradeSession trade_session;
   /// Period type
   Period period;
   /// Candlestick
