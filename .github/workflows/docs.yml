@@ -76,6 +76,12 @@ jobs:
       - name: Copy to gh-pages
         run: |
           mkdir -p gh-pages
+          zip -r gh-pages/rust.zip target/doc
+          zip -r gh-pages/python.zip python/site
+          zip -r gh-pages/nodejs.zip nodejs/docs
+          zip -r gh-pages/java.zip java/javasrc/target/reports/apidocs
+          zip -r gh-pages/c.zip c/html
+          zip -r gh-pages/cpp.zip cpp/html
           mv -f target/doc gh-pages/rust
           mv -f python/site gh-pages/python
           mv -f nodejs/docs gh-pages/nodejs
