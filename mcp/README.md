@@ -1,6 +1,6 @@
 # LongPort MCP
 
-`LongPort-MCP` is an [MCP](https://modelcontextprotocol.io/introduction) server implementation for LongPort OpenAPI
+A [MCP](https://modelcontextprotocol.io/introduction) server implementation for [LongPort OpenAPI](https://open.longportapp.com), provides real-time stock market data, provides AI access analysis and trading capabilities through MCP.
 
 ## Features
 
@@ -12,7 +12,7 @@
 
 ### Download the binary
 
-Download the latest binary from the [release page](https://github.com/longportapp/openapi/releases/tag/longport-mcp-0.1.0)
+Download the latest binary from the [Releases](https://github.com/longportapp/openapi/releases/tag/longport-mcp-0.1.0) page.
 
 ## Running on Cursor
 
