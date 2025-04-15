@@ -4,8 +4,8 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
 use syn::{
-    parse::Parser, punctuated::Punctuated, token::Comma, Error, Expr, ExprArray, ExprLit, ExprPath,
-    Ident, Lit, Path,
+    Error, Expr, ExprArray, ExprLit, ExprPath, Ident, Lit, Path, parse::Parser,
+    punctuated::Punctuated, token::Comma,
 };
 
 #[derive(FromMeta, Debug, Default)]

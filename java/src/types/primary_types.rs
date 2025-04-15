@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use jni::{errors::Result, objects::JValueOwned, JNIEnv};
+use jni::{JNIEnv, errors::Result, objects::JValueOwned};
 
 use crate::types::{FromJValue, IntoJValue, JSignature};
 

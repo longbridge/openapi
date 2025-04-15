@@ -6,8 +6,9 @@ use strum_macros::{Display, EnumString};
 use time::{Date, OffsetDateTime, Time};
 
 use crate::{
-    quote::{utils::parse_date, SubFlags},
-    serde_utils, Error, Market, Result,
+    Error, Market, Result,
+    quote::{SubFlags, utils::parse_date},
+    serde_utils,
 };
 
 /// Subscription

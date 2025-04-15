@@ -1,22 +1,22 @@
 use std::{
-    ffi::{c_void, CString},
+    ffi::{CString, c_void},
     os::raw::c_char,
     sync::Arc,
     time::Instant,
 };
 
 use longport::{
+    QuoteContext,
     quote::{
         PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
         SubFlags,
     },
-    QuoteContext,
 };
 use once_cell::sync::OnceCell;
 use parking_lot::Mutex;
 
 use crate::{
-    async_call::{execute_async, CAsyncCallback, CAsyncResult},
+    async_call::{CAsyncCallback, CAsyncResult, execute_async},
     callback::{CFreeUserDataFunc, Callback},
     config::CConfig,
     quote_context::{
@@ -38,7 +38,7 @@ use crate::{
             LB_WATCHLIST_GROUP_NAME, LB_WATCHLIST_GROUP_SECURITIES,
         },
     },
-    types::{cstr_array_to_rust, cstr_to_rust, CCow, CDate, CDateTime, CMarket, CVec, ToFFI},
+    types::{CCow, CDate, CDateTime, CMarket, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
 };
 
 pub type COnQuoteCallback = extern "C" fn(*const CQuoteContext, *const CPushQuote, *mut c_void);

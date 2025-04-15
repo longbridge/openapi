@@ -6,13 +6,13 @@ use std::{
 };
 
 use http::Method;
-pub(crate) use http::{header, HeaderValue, Request};
-use longport_httpcli::{is_cn, HttpClient, HttpClientConfig, Json};
+pub(crate) use http::{HeaderValue, Request, header};
+use longport_httpcli::{HttpClient, HttpClientConfig, Json, is_cn};
 use num_enum::IntoPrimitive;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
-use tracing::{subscriber::NoSubscriber, Level, Subscriber};
+use tracing::{Level, Subscriber, subscriber::NoSubscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 

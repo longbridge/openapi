@@ -1,7 +1,7 @@
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JString, JValueOwned},
-    JNIEnv,
 };
 
 use crate::{

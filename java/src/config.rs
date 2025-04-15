@@ -1,7 +1,7 @@
 use jni::{
+    JNIEnv,
     objects::{JClass, JObject, JString},
     sys::{jboolean, jlong},
-    JNIEnv,
 };
 use longport::{Config, Language, PushCandlestickMode};
 use time::OffsetDateTime;

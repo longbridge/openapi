@@ -1,4 +1,4 @@
-use rust_decimal::{prelude::FromPrimitive, Decimal};
+use rust_decimal::{Decimal, prelude::FromPrimitive};
 use time::{Date, Month, OffsetDateTime, Time};
 use time_tz::PrimitiveDateTimeExt;
 

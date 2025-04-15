@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longport::quote::PushEventDetail;
-use napi::{threadsafe_function::ThreadsafeFunctionCallMode, JsFunction, Result};
+use napi::{JsFunction, Result, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
 use crate::{

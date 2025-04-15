@@ -1,13 +1,13 @@
 use std::collections::HashSet;
 
-use rust_decimal::{prelude::FromPrimitive, Decimal};
-use time::{macros::time, Date, Duration, OffsetDateTime, Time, Weekday};
+use rust_decimal::{Decimal, prelude::FromPrimitive};
+use time::{Date, Duration, OffsetDateTime, Time, Weekday, macros::time};
 use time_tz::{OffsetDateTimeExt, PrimitiveDateTimeExt, Tz};
 
 use crate::{
+    Period, Quote, Trade, UpdateFields,
     candlestick::Candlestick,
     find_session::{FindSession, FindSessionResult},
-    Period, Quote, Trade, UpdateFields,
 };
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]

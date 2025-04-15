@@ -1,7 +1,7 @@
 use longport_candlesticks::{
+    Period, TRADE_SESSION_NORMAL, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_PRE,
     markets::{US, US_OPTION},
     testutil::TestCandlestickTime,
-    Period, TRADE_SESSION_NORMAL, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_PRE,
 };
 use time::macros::time;
 

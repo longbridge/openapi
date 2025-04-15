@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longport::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
-use napi::{threadsafe_function::ThreadsafeFunctionCallMode, Env, JsFunction, JsObject, Result};
+use napi::{Env, JsFunction, JsObject, Result, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
 use crate::{

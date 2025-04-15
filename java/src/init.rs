@@ -1,7 +1,7 @@
 use jni::{
+    JNIEnv,
     descriptors::Desc,
     objects::{GlobalRef, JClass, JValue},
-    JNIEnv,
 };
 use once_cell::sync::OnceCell;
 

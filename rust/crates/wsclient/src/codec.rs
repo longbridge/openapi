@@ -1,6 +1,6 @@
 use std::io::{Cursor, Read};
 
-use byteorder::{ReadBytesExt, WriteBytesExt, BE};
+use byteorder::{BE, ReadBytesExt, WriteBytesExt};
 use flate2::read::GzDecoder;
 
 use crate::{WsClientError, WsClientResult};

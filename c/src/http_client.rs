@@ -1,16 +1,16 @@
 use std::{
     collections::HashMap,
-    ffi::{c_char, c_void, CStr, CString},
+    ffi::{CStr, CString, c_char, c_void},
 };
 
 use longport::{
-    httpclient::{HttpClient, HttpClientConfig, HttpClientError},
     Error,
+    httpclient::{HttpClient, HttpClientConfig, HttpClientError},
 };
 
 use crate::{
-    async_call::{execute_async, CAsyncCallback},
-    error::{set_error, CError},
+    async_call::{CAsyncCallback, execute_async},
+    error::{CError, set_error},
 };
 
 /// A HTTP client for LongPort OpenApi

@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JObject, JValueOwned},
-    JNIEnv,
 };
 
 use crate::types::{ClassLoader, FromJValue, IntoJValue, JSignature};

@@ -1,9 +1,9 @@
 use std::future::Future;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JObject, JValue},
-    JNIEnv,
 };
 use once_cell::sync::Lazy;
 use tokio::runtime::Runtime;

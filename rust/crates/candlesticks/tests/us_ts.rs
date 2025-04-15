@@ -1,6 +1,6 @@
 use longport_candlesticks::{
-    markets::US, TRADE_SESSION_NORMAL, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST,
-    TRADE_SESSION_PRE,
+    TRADE_SESSION_NORMAL, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST, TRADE_SESSION_PRE,
+    markets::US,
 };
 use time::macros::datetime;
 

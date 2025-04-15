@@ -3,7 +3,7 @@ mod jsenum;
 mod jsobject;
 
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, DeriveInput};
+use syn::{DeriveInput, parse_macro_input};
 
 #[proc_macro_derive(JsObject, attributes(js))]
 pub fn derive_pyobject(input: TokenStream) -> TokenStream {

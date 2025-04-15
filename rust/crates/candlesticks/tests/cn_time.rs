@@ -1,5 +1,5 @@
 use longport_candlesticks::{
-    markets::CN, testutil::TestCandlestickTime, Period, TRADE_SESSION_NORMAL,
+    Period, TRADE_SESSION_NORMAL, markets::CN, testutil::TestCandlestickTime,
 };
 use time::macros::{datetime, time};
 

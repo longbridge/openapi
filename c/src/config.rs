@@ -1,5 +1,5 @@
 use std::{
-    ffi::{c_void, CStr},
+    ffi::{CStr, c_void},
     os::raw::c_char,
     sync::Arc,
 };
@@ -8,8 +8,8 @@ use longport::Config;
 use time::OffsetDateTime;
 
 use crate::{
-    async_call::{execute_async, CAsyncCallback},
-    error::{set_error, CError},
+    async_call::{CAsyncCallback, execute_async},
+    error::{CError, set_error},
     types::{CLanguage, CPushCandlestickMode, CString},
 };
 

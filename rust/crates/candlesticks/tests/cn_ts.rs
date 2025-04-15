@@ -1,4 +1,4 @@
-use longport_candlesticks::{markets::CN, TRADE_SESSION_NORMAL};
+use longport_candlesticks::{TRADE_SESSION_NORMAL, markets::CN};
 use time::macros::datetime;
 
 #[test]

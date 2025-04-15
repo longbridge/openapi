@@ -4,8 +4,8 @@ use std::{path::PathBuf, sync::Arc};
 
 use clap::Parser;
 use longport::{Config, QuoteContext, TradeContext};
-use poem::{listener::TcpListener, middleware::Cors, EndpointExt, Route, Server};
-use poem_mcpserver::{sse::sse_endpoint, stdio::stdio, McpServer};
+use poem::{EndpointExt, Route, Server, listener::TcpListener, middleware::Cors};
+use poem_mcpserver::{McpServer, sse::sse_endpoint, stdio::stdio};
 use server::Longport;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 

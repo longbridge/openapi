@@ -1,9 +1,9 @@
 use std::fmt::Display;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JObject, JThrowable, JValue},
-    JNIEnv,
 };
 
 use crate::init::{LONG_CLASS, OPENAPI_EXCEPTION_CLASS};

@@ -23,18 +23,17 @@ use tokio::{
 };
 
 use crate::{
+    Config, Error, Market, Result,
     config::PushCandlestickMode,
     quote::{
-        cmd_code,
-        store::{get_market, Candlesticks, Store, TailCandlestick},
+        Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, PushTrades,
+        RealtimeQuote, SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade,
+        TradeSessions, cmd_code,
+        store::{Candlesticks, Store, TailCandlestick, get_market},
         sub_flags::SubFlags,
         types::QuotePackageDetail,
         utils::{convert_trade_session, format_date, parse_date},
-        Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, PushTrades,
-        RealtimeQuote, SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade,
-        TradeSessions,
     },
-    Config, Error, Market, Result,
 };
 
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);

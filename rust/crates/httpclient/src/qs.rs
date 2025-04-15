@@ -1,9 +1,9 @@
 use std::{borrow::Cow, fmt::Display, io::Write};
 
-use percent_encoding::{percent_encode, AsciiSet, NON_ALPHANUMERIC};
+use percent_encoding::{AsciiSet, NON_ALPHANUMERIC, percent_encode};
 use serde::{
-    ser::{Impossible, SerializeMap, SerializeSeq, SerializeStruct, SerializeTuple},
     Serialize, Serializer,
+    ser::{Impossible, SerializeMap, SerializeSeq, SerializeStruct, SerializeTuple},
 };
 
 const QS_ENCODE_SET: &AsciiSet = &NON_ALPHANUMERIC

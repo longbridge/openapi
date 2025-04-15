@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use jni::{
+    JNIEnv, JavaVM,
     errors::Result,
     objects::{GlobalRef, JClass, JObject, JString, JValueOwned},
     sys::jobjectArray,
-    JNIEnv, JavaVM,
 };
 use longport::{
+    Config, Decimal, Market, TradeContext,
     trade::{
         BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
@@ -14,7 +15,6 @@ use longport::{
         OrderStatus, OrderType, OutsideRTH, PushEvent, ReplaceOrderOptions, SubmitOrderOptions,
         TimeInForceType, TopicType,
     },
-    Config, Decimal, Market, TradeContext,
 };
 use parking_lot::Mutex;
 use time::{Date, OffsetDateTime};
@@ -23,7 +23,7 @@ use crate::{
     async_util,
     error::jni_result,
     init::TRADE_CONTEXT_CLASS,
-    types::{get_field, set_field, FromJValue, IntoJValue, ObjectArray},
+    types::{FromJValue, IntoJValue, ObjectArray, get_field, set_field},
 };
 
 #[derive(Default)]

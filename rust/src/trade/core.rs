@@ -15,8 +15,8 @@ use tokio::{
 };
 
 use crate::{
-    trade::{cmd_code, PushEvent, PushOrderChanged, TopicType},
     Config, Result,
+    trade::{PushEvent, PushOrderChanged, TopicType, cmd_code},
 };
 
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);

@@ -1,17 +1,17 @@
 use std::collections::HashMap;
 
 use longport_candlesticks::{
-    Days, TradeSessionType, UpdateAction, UpdateFields, TRADE_SESSION_POST, TRADE_SESSION_PRE,
+    Days, TRADE_SESSION_POST, TRADE_SESSION_PRE, TradeSessionType, UpdateAction, UpdateFields,
 };
 use longport_proto::quote::Period;
 
 use crate::{
+    Market,
     quote::{
-        push_types::{PushEventDetail, PushQuote},
         Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
         Trade, TradeSessions,
+        push_types::{PushEventDetail, PushQuote},
     },
-    Market,
 };
 
 const MAX_TRADES: usize = 500;

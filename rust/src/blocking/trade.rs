@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
+    Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
@@ -10,7 +11,6 @@ use crate::{
         Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
         SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
     },
-    Config, Result,
 };
 
 /// Trade context
@@ -83,7 +83,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, trade::GetTodayExecutionsOptions, Config};
+    /// use longport::{Config, blocking::TradeContextSync, trade::GetTodayExecutionsOptions};
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -150,9 +150,9 @@ impl TradeContextSync {
     /// use std::sync::Arc;
     ///
     /// use longport::{
+    ///     Config, Market,
     ///     blocking::TradeContextSync,
     ///     trade::{GetTodayOrdersOptions, OrderSide, OrderStatus},
-    ///     Config, Market,
     /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -184,7 +184,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, decimal, trade::ReplaceOrderOptions, Config};
+    /// use longport::{Config, blocking::TradeContextSync, decimal, trade::ReplaceOrderOptions};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -210,10 +210,10 @@ impl TradeContextSync {
     /// use std::sync::Arc;
     ///
     /// use longport::{
+    ///     Config,
     ///     blocking::TradeContextSync,
     ///     decimal,
     ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
-    ///     Config,
     /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -245,7 +245,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, Config};
+    /// use longport::{Config, blocking::TradeContextSync};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -267,7 +267,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, Config};
+    /// use longport::{Config, blocking::TradeContextSync};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -316,7 +316,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, Config};
+    /// use longport::{Config, blocking::TradeContextSync};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -342,7 +342,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, Config};
+    /// use longport::{Config, blocking::TradeContextSync};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -368,7 +368,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, Config};
+    /// use longport::{Config, blocking::TradeContextSync};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
@@ -393,7 +393,7 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{blocking::TradeContextSync, Config};
+    /// use longport::{Config, blocking::TradeContextSync};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);

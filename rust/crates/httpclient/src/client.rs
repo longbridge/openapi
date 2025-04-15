@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use reqwest::{
-    header::{HeaderMap, HeaderName, HeaderValue},
     Client, Method,
+    header::{HeaderMap, HeaderName, HeaderValue},
 };
 use serde::Deserialize;
 

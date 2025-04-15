@@ -12,10 +12,10 @@ mod sub_flags;
 use std::borrow::Cow;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{GlobalRef, JObject, JValueOwned},
     strings::JNIString,
-    JNIEnv,
 };
 
 pub(crate) use self::{

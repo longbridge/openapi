@@ -1,7 +1,7 @@
-use time::{macros::time, Duration};
+use time::{Duration, macros::time};
 use time_tz::timezones::db;
 
-use crate::{market::Market, TradeSession};
+use crate::{TradeSession, market::Market};
 
 pub const HK: Market = Market {
     timezone: db::asia::HONG_KONG,

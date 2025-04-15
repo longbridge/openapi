@@ -6,10 +6,18 @@ use longport_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
 use time::{Date, PrimitiveDateTime};
 use tokio::sync::{mpsc, oneshot};
-use tracing::{dispatcher, instrument::WithSubscriber, Subscriber};
+use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{
+    Config, Error, Language, Market, Result,
     quote::{
+        AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+        IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
+        ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
+        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
+        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
+        StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote,
+        WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core},
@@ -19,15 +27,8 @@ use crate::{
             SortOrderType, WarrantSortBy, WarrantStatus,
         },
         utils::{format_date, parse_date},
-        AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-        IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
-        ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
-        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
-        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote,
-        WarrantType, WatchlistGroup,
     },
-    serde_utils, Config, Error, Language, Market, Result,
+    serde_utils,
 };
 
 const RETRY_COUNT: usize = 3;
@@ -197,8 +198,8 @@ impl QuoteContext {
     /// use std::sync::Arc;
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, SubFlags},
     ///     Config,
+    ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -249,8 +250,8 @@ impl QuoteContext {
     /// use std::sync::Arc;
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, SubFlags},
     ///     Config,
+    ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -291,8 +292,8 @@ impl QuoteContext {
     /// use std::sync::Arc;
     ///
     /// use longport::{
-    ///     quote::{Period, QuoteContext, TradeSessions},
     ///     Config,
+    ///     quote::{Period, QuoteContext, TradeSessions},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -354,8 +355,8 @@ impl QuoteContext {
     /// use std::sync::Arc;
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, SubFlags},
     ///     Config,
+    ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -387,7 +388,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -428,7 +429,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -466,7 +467,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -502,7 +503,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -538,7 +539,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -581,7 +582,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -616,7 +617,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -655,7 +656,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -693,7 +694,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -731,8 +732,8 @@ impl QuoteContext {
     /// use std::sync::Arc;
     ///
     /// use longport::{
-    ///     quote::{AdjustType, Period, QuoteContext, TradeSessions},
     ///     Config,
+    ///     quote::{AdjustType, Period, QuoteContext, TradeSessions},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -899,7 +900,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -942,7 +943,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     /// use time::macros::date;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -993,7 +994,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1074,7 +1075,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1114,7 +1115,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config, Market};
+    /// use longport::{Config, Market, quote::QuoteContext};
     /// use time::macros::date;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -1271,7 +1272,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1309,8 +1310,8 @@ impl QuoteContext {
     /// use std::sync::Arc;
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, RequestCreateWatchlistGroup},
     ///     Config,
+    ///     quote::{QuoteContext, RequestCreateWatchlistGroup},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -1362,7 +1363,7 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{quote::QuoteContext, Config};
+    /// use longport::{Config, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -1400,8 +1401,8 @@ impl QuoteContext {
     /// use std::sync::Arc;
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, RequestUpdateWatchlistGroup},
     ///     Config,
+    ///     quote::{QuoteContext, RequestUpdateWatchlistGroup},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -1483,8 +1484,8 @@ impl QuoteContext {
     /// use std::{sync::Arc, time::Duration};
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, SubFlags},
     ///     Config,
+    ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -1527,8 +1528,8 @@ impl QuoteContext {
     /// use std::{sync::Arc, time::Duration};
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, SubFlags},
     ///     Config,
+    ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -1567,8 +1568,8 @@ impl QuoteContext {
     /// use std::{sync::Arc, time::Duration};
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, SubFlags},
     ///     Config,
+    ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -1613,8 +1614,8 @@ impl QuoteContext {
     /// use std::{sync::Arc, time::Duration};
     ///
     /// use longport::{
-    ///     quote::{QuoteContext, SubFlags},
     ///     Config,
+    ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -1653,8 +1654,8 @@ impl QuoteContext {
     /// use std::{sync::Arc, time::Duration};
     ///
     /// use longport::{
-    ///     quote::{Period, QuoteContext, TradeSessions},
     ///     Config,
+    ///     quote::{Period, QuoteContext, TradeSessions},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
