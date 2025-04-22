@@ -1,4 +1,4 @@
-name: MCP
+name: Release MCP
 
 on:
   push:
@@ -60,7 +60,8 @@ jobs:
       - name: Archive artifact
         if: ${{ !contains(matrix.settings.target, 'windows') }}
         run: |
-          zip -j longport-mcp-${{ matrix.settings.target }}.zip target/${{ matrix.settings.target }}/release/${{ matrix.settings.bin }}${{ matrix.settings.bin_suffix }}
+          cd target/${{ matrix.settings.target }}/release
+          tar -czvf longport-mcp-${{ matrix.settings.target }}.tar.gz ${{ matrix.settings.bin }}${{ matrix.settings.bin_suffix }}
 
       - name: Archive artifact(Windows)
         if: ${{ contains(matrix.settings.target, 'windows') }}
@@ -71,4 +72,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: longport-mcp-${{ matrix.settings.target }}
-          path: longport-mcp-${{ matrix.settings.target }}.zip
+          path: |
+            longport-mcp-*.tar.gz
+            longport-mcp-*.zip

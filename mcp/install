@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -u
+
+repo='longportapp/openapi'
+app_name='LongPort MCP'
+bin_name='longport-mcp'
+tmpdir=.tmp_install
+
+if [[ ${OS:-} = Windows_NT ]]; then
+    echo 'error: Please install using Windows Subsystem for Linux'
+    exit 1
+fi
+
+# Check if unzip is installed
+type unzip > /dev/null || { echo "unzip: not found"; exit 1; }
+
+type curl > /dev/null || { echo "curl: not found"; exit 1; }
+
+# Reset
+Color_Off=''
+Color_Red=''
+Color_Green=''
+Color_Dim=''
+
+if [[ -t 1 ]]; then
+    # Reset
+    Color_Off='\033[0m' # Text Reset
+
+    # Regular Colors
+    Color_Red='\033[0;31m'   # Red
+    Color_Green='\033[0;32m' # Green
+    Color_Dim='\033[0;2m'    # White
+fi
+
+error() {
+    echo -e "${Color_Red}$@ ${Color_Off}" >&2
+    exit 1
+}
+
+info() {
+    echo -e "${Color_Dim}$@ ${Color_Off}"
+}
+
+success() {
+    echo -e "${Color_Green}$@ ${Color_Off}"
+}
+
+# request github api, and check if the response is ok
+fetch_github_api() {
+  url="$1"
+  body=$(curl "$url")
+  # Show API Rate limit error if body contains "API rate limit exceeded"
+  if echo "$body" | grep -q "API rate limit exceeded"; then
+    error "$url\nGitHub API rate limit exceeded.\n----------------------------------\n$body\n"
+    exit 1
+  fi
+  echo "$body"
+}
+
+get_mcp_release() {
+  fetch_github_api "https://api.github.com/repos/$repo/releases" | # Get latest release from GitHub api
+    grep '"tag_name":' |                                               # Get tag line
+    sed -E 's/.*"([^"]+)".*/\1/' |                                       # Pluck JSON value
+    grep "longport-mcp" | head -n 1
+}
+
+get_version() {
+  version="latest"
+
+  # if version is empty, exit
+  if test -z "$version"; then
+    error "Fetch version failed, please check your network."
+    exit 1
+  fi
+}
+
+get_platform() {
+  platform="$(uname | tr "[A-Z]" "[a-z]")"  # Linux => linux
+  platform_suffix=""
+  if [ "$platform" = "darwin" ]; then
+    platform_suffix="apple-darwin"
+  fi
+
+  if [ "$platform" = "linux" ]; then
+    platform_suffix="unknown-linux-gnu"
+  fi
+
+  if [ "$platform" = "windows" ]; then
+    platform_suffix="pc-windows-msvc"
+  fi
+}
+
+get_arch() {
+  arch="$(uname -m)"
+
+  if [ "$arch" = "x86_64" ]; then
+    arch="x86_64"
+  elif [ "$arch" = "arm64" ]; then
+    arch="aarch64"
+  fi
+}
+
+install() {
+  name_suffix="$arch-$platform_suffix"
+  info "Downloading $bin_name@$version ($name_suffix)..."
+  if [ "$version" = "latest" ]; then
+    download_url=https://github.com/$repo/releases/latest/download/$bin_name-$name_suffix.zip
+  else
+    download_url=https://github.com/$repo/releases/download/$version/$bin_name-$name_suffix.zip
+  fi
+
+  mkdir -p $tmpdir && cd $tmpdir
+  if ! curl --fail --progress-bar -Lo $bin_name.zip $download_url; then
+    error "${Color_Red}Download failed, please check your network.\n${download_url}${Color_Off}"
+    exit 1
+  fi
+
+  ls -lha $bin_name.zip
+  mkdir -p out
+  unzip $bin_name.zip -d ./out && rm $bin_name.zip
+  ls -lh out
+  sudo cp ./out/$bin_name /usr/local/bin/
+  cd .. && rm -Rf $tmpdir
+}
+
+
+get_version $@
+get_platform $@
+get_arch $@
+install $@
+
+# Test install
+if [ -x "$(command -v $bin_name)" ]; then
+  info ""
+  success "$app_name was installed successfully to \`/usr/local/bin/$bin_name\`."
+  info "Run \`$bin_name -h\` to get help."
+  info ""
+else
+  error "${Color_Red}$bin_name is not installed${Color_Off}"
+fi
