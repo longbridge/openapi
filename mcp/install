@@ -104,20 +104,19 @@ install() {
   name_suffix="$arch-$platform_suffix"
   info "Downloading $bin_name@$version ($name_suffix)..."
   if [ "$version" = "latest" ]; then
-    download_url=https://github.com/$repo/releases/latest/download/$bin_name-$name_suffix.zip
+    download_url=https://github.com/$repo/releases/latest/download/$bin_name-$name_suffix.tar.gz
   else
-    download_url=https://github.com/$repo/releases/download/$version/$bin_name-$name_suffix.zip
+    download_url=https://github.com/$repo/releases/download/$version/$bin_name-$name_suffix.tar.gz
   fi
 
   mkdir -p $tmpdir && cd $tmpdir
-  if ! curl --fail --progress-bar -Lo $bin_name.zip $download_url; then
+  if ! curl --fail --progress-bar -Lo $bin_name.tar.gz $download_url; then
     error "${Color_Red}Download failed, please check your network.\n${download_url}${Color_Off}"
     exit 1
   fi
 
-  ls -lha $bin_name.zip
   mkdir -p out
-  unzip $bin_name.zip -d ./out && rm $bin_name.zip
+  tar -xzf $bin_name.tar.gz -C ./out && rm $bin_name.tar.gz
   ls -lh out
   sudo cp ./out/$bin_name /usr/local/bin/
   cd .. && rm -Rf $tmpdir

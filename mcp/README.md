@@ -10,7 +10,15 @@ A [MCP](https://modelcontextprotocol.io/introduction) server implementation for 
 
 ## Installation
 
-### Download the binary
+## macOS or Linux
+
+Run script to install:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/longportapp/openapi/refs/heads/main/mcp/install | bash
+```
+
+## Windows
 
 Download the latest binary from the [Releases](https://github.com/longportapp/openapi/releases/tag/longport-mcp-0.1.0) page.
 
@@ -22,9 +30,9 @@ To configure LongPort MCP in Cursor:
 - Go to Features > MCP Servers
 - Click `+ Add New MCP Server`
 - Enter the following:
-    - Name: `longport-mcp` (or your preferred name)
-    - Type: `command`
-    - Command: `env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp`
+  - Name: `longport-mcp` (or your preferred name)
+  - Type: `command`
+  - Command: `env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp`
 
 If you are using Windows, replace command with `cmd /c "set LONGPORT_APP_KEY=your-app-key && set LONGPORT_APP_SECRET=your-app-secret && set LONGPORT_ACCESS_TOKEN=your-access-token && longport-mcp"`
 
@@ -35,9 +43,9 @@ To configure LongPort MCP in Cherry Studio:
 - Go to Settings > MCP Servers
 - Click `+ Add Server`
 - Enter the following:
-    - Name: `longport-mcp` (or your preferred name)
-    - Type: `STDIO`
-    - Command: `env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp`
+  - Name: `longport-mcp` (or your preferred name)
+  - Type: `STDIO`
+  - Command: `env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp`
 
 If you are using Windows, replace command with `cmd /c "set LONGPORT_APP_KEY=your-app-key && set LONGPORT_APP_SECRET=your-app-secret && set LONGPORT_ACCESS_TOKEN=your-access-token && longport-mcp"`
 
