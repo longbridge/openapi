@@ -2139,7 +2139,6 @@ convert(const lb_history_market_temperature_response_t* resp)
                  resp->records + resp->num_records,
                  std::back_inserter(records),
                  [](auto item) { return convert(&item); });
-  std::vector<MarketTemperature> records;
   return HistoryMarketTemperatureResponse{ convert(resp->granularity),
                                            records };
 }
