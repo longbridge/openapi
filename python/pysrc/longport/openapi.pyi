@@ -3376,6 +3376,53 @@ class QuoteContext:
                 print(resp)
         """
 
+    def market_temperature(self, market: Type[Market]) -> MarketTemperature:
+        """
+        Get current market temperature
+
+        Args:
+            market: Market
+
+        Returns:
+            Market temperature
+
+        Examples:
+            ::
+
+                from longport.openapi import QuoteContext, Config, Market
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.market_temperature(Market.HK)
+                print(resp)
+        """
+
+    def history_market_temperature(self, market: Type[Market], start: date, end: date):
+        """
+        Get historical market temperature
+
+        Args:
+            market: Market
+            start: Start date
+            end: End date
+
+        Returns:
+            History market temperature
+
+        Examples:
+            ::
+
+                from datetime import date
+                from longport.openapi import QuoteContext, Config, Market
+
+                config = Config.from_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.history_market_temperature(Market.HK, date(2023, 1, 1), date(2023, 1, 31))
+                print(resp)
+        """
+
     def realtime_quote(self, symbols: List[str]) -> List[RealtimeQuote]:
         """
         Get real-time quote
