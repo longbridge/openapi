@@ -1773,6 +1773,7 @@ pub struct MarketTemperature {
     /// Temperature value
     pub temperature: i32,
     /// Temperature description
+    #[serde(default)]
     pub description: String,
     /// Market valuation
     pub valuation: i32,
