@@ -25,27 +25,19 @@ LongPort OpenAPI provides programmatic quote trading interfaces for investors wi
 
 ## Environment Variables
 
-- `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en` (Default: `en`)
-
-- `LONGPORT_APP_KEY` - App key
-
-- `LONGPORT_APP_SECRET` - App secret
-
-- `LONGPORT_ACCESS_TOKEN` - Access token
-
-- `LONGPORT_HTTP_URL` - HTTP endpoint url (Default: `https://openapi.longportapp.com`)
-
-- `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url (Default: `wss://openapi-quote.longportapp.com/v2`)
-
-- `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url (Default: `wss://openapi-trade.longportapp.com/v2`)
-
-- `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or `false` (Default: `false`)
-
-- `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default: `realtime`)
-
-- `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected, `true` or `false` (Default: `true`)
-
-- `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
+| Name                           | Description                                                                      |
+|--------------------------------|----------------------------------------------------------------------------------|
+| LONGPORT_LANGUAGE              | Language identifier, `zh-CN`, `zh-HK` or `en` (Default: `en`)                    |
+| LONGPORT_APP_KEY               | App key                                                                          |
+| LONGPORT_APP_SECRET            | App secret                                                                       |
+| LONGPORT_ACCESS_TOKEN          | Access token                                                                     |
+| LONGPORT_HTTP_URL              | HTTP endpoint url (Default: `https://openapi.longportapp.com`)                   |
+| LONGPORT_QUOTE_WS_URL          | Quote websocket endpoint url (Default: `wss://openapi-quote.longportapp.com/v2`) |
+| LONGPORT_TRADE_WS_URL          | Trade websocket endpoint url (Default: `wss://openapi-trade.longportapp.com/v2`) |
+| LONGPORT_ENABLE_OVERNIGHT      | Enable overnight quote, `true` or `false` (Default: `false`)                     |
+| LONGPORT_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                  |
+| LONGPORT_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)         |
+| LONGPORT_LOG_PATH              | Set the path of the log files (Default: `no logs`)                               |
 
 ## SDK Documenation
 
