@@ -20,6 +20,11 @@ struct Cli {
     /// Log directory
     #[clap(long)]
     log_dir: Option<PathBuf>,
+    /// Read-only mode
+    ///
+    /// This mode is used to prevent submitting orders to the exchange.
+    #[clap(long, default_value_t = false)]
+    readonly: bool,
 }
 
 #[tokio::main]
@@ -43,10 +48,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let (quote_context, _) = QuoteContext::try_new(config.clone()).await?;
     let (trade_context, _) = TradeContext::try_new(config.clone()).await?;
+    let readonly = cli.readonly;
 
     if !cli.http {
         tracing::info!("Starting MCP server with stdio transport");
-        let server = McpServer::new().tools(Longport::new(quote_context, trade_context));
+        let server = create_mcp_server(quote_context, trade_context, readonly);
         stdio(server).await?;
     } else {
         tracing::info!(
@@ -58,8 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .at(
                 "/",
                 streamable_http::endpoint(move |_| {
-                    let tools = Longport::new(quote_context.clone(), trade_context.clone());
-                    McpServer::new().tools(tools)
+                    create_mcp_server(quote_context.clone(), trade_context.clone(), readonly)
                 }),
             )
             .with(Cors::new());
@@ -67,4 +72,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+fn create_mcp_server(
+    quote_context: QuoteContext,
+    trade_context: TradeContext,
+    readonly: bool,
+) -> McpServer<Longport> {
+    let mut server = McpServer::new().tools(Longport::new(quote_context, trade_context));
+    if readonly {
+        server = server.disable_tools(["submit_order"]);
+    }
+    server
 }
