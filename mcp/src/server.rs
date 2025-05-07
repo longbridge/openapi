@@ -10,7 +10,11 @@ use poem_mcpserver::{
     Tools,
     content::{IntoContent, IntoContents, Json, Text},
 };
-use time::{Date, OffsetDateTime, macros::format_description};
+use time::{
+    Date, OffsetDateTime, format_description::BorrowedFormatItem, macros::format_description,
+};
+
+const DATE_FORMAT: &[BorrowedFormatItem] = format_description!("[year]-[month]-[day]");
 
 pub(crate) struct Longport {
     quote_context: QuoteContext,
@@ -164,17 +168,16 @@ impl Longport {
         /// End date of the trading days. (Format: "yyyy-mm-dd")
         end_date: String,
     ) -> Result<impl IntoContents, Error> {
-        let date_format = format_description!("[year]-[month]-[day]");
         let market = market.parse::<Market>().map_err(|err| Error::ParseField {
             name: "market",
             error: err.to_string(),
         })?;
         let start_date =
-            Date::parse(&start_date, date_format).map_err(|err| Error::ParseField {
+            Date::parse(&start_date, DATE_FORMAT).map_err(|err| Error::ParseField {
                 name: "start_date",
                 error: err.to_string(),
             })?;
-        let end_date = Date::parse(&end_date, date_format).map_err(|err| Error::ParseField {
+        let end_date = Date::parse(&end_date, DATE_FORMAT).map_err(|err| Error::ParseField {
             name: "end_date",
             error: err.to_string(),
         })?;
@@ -239,6 +242,50 @@ impl Longport {
     /// Returns the capital distribution of the security.
     async fn capital_distribution(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.capital_distribution(symbol).await?))
+    }
+
+    /// Returns the market temperature of the specified market.
+    async fn current_market_temperature(
+        &self,
+        /// Market code. (e.g. "HK", "US", "CN", "SG")
+        market: String,
+    ) -> Result<impl IntoContents, Error> {
+        let market = market.parse::<Market>().map_err(|err| Error::ParseField {
+            name: "market",
+            error: err.to_string(),
+        })?;
+        Ok(Json(self.quote_context.market_temperature(market).await?))
+    }
+
+    /// Returns the historical market temperature of the specified market.
+    ///
+    /// includes the `start` and `end` dates.
+    async fn history_market_temperature(
+        &self,
+        /// Market code. (e.g. "HK", "US", "CN", "SG")
+        market: String,
+        /// format: "yyyy-mm-dd"
+        start: String,
+        /// format: "yyyy-mm-dd"
+        end: String,
+    ) -> Result<impl IntoContents, Error> {
+        let market = market.parse::<Market>().map_err(|err| Error::ParseField {
+            name: "market",
+            error: err.to_string(),
+        })?;
+        let start = Date::parse(&start, DATE_FORMAT).map_err(|err| Error::ParseField {
+            name: "start",
+            error: err.to_string(),
+        })?;
+        let end = Date::parse(&end, DATE_FORMAT).map_err(|err| Error::ParseField {
+            name: "end",
+            error: err.to_string(),
+        })?;
+        Ok(Json(
+            self.quote_context
+                .history_market_temperature(market, start, end)
+                .await?,
+        ))
     }
 
     /// Get the account balance.
