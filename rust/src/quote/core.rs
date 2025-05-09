@@ -844,7 +844,7 @@ impl Core {
         let half_days = self.trading_days.half_days(market_type);
 
         if let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) {
-            let ts = convert_trade_session(push_quote.trade_session.into());
+            let ts = convert_trade_session(push_quote.trade_session);
             let action = candlesticks.merge_quote(
                 ts,
                 market_type,
@@ -894,7 +894,7 @@ impl Core {
                 update_and_push_candlestick(
                     candlesticks,
                     ts,
-                    trade.trade_session.into(),
+                    trade.trade_session,
                     symbol,
                     *period,
                     action,

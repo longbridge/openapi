@@ -610,6 +610,7 @@ pub enum CTradeSessions {
 /// Data granularity
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longport::quote::Granularity")]
+#[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CGranularity {
     /// Unknown
