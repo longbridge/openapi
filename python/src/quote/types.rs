@@ -105,13 +105,13 @@ impl From<SubFlags> for SubTypes {
             res.push(SubType::Quote);
         }
         if flags.contains(SubFlags::DEPTH) {
-            res.push(SubType::Quote);
+            res.push(SubType::Depth);
         }
         if flags.contains(SubFlags::BROKER) {
-            res.push(SubType::Quote);
+            res.push(SubType::Brokers);
         }
         if flags.contains(SubFlags::TRADE) {
-            res.push(SubType::Quote);
+            res.push(SubType::Trade);
         }
         SubTypes(res)
     }

@@ -770,20 +770,35 @@ impl Core {
     }
 
     async fn handle_subscriptions(&mut self) -> Vec<Subscription> {
-        self.subscriptions
-            .iter()
-            .map(|(symbol, sub_flags)| Subscription {
-                symbol: symbol.clone(),
-                sub_types: *sub_flags,
-                candlesticks: self
-                    .store
-                    .securities
-                    .get(symbol)
-                    .map(|data| &data.candlesticks)
-                    .map(|periods| periods.keys().copied().collect())
-                    .unwrap_or_default(),
-            })
-            .collect()
+        let mut subscriptions = HashMap::new();
+
+        for (symbol, sub_flags) in &self.subscriptions {
+            if sub_flags.is_empty() {
+                continue;
+            }
+
+            subscriptions.insert(
+                symbol.clone(),
+                Subscription {
+                    symbol: symbol.clone(),
+                    sub_types: *sub_flags,
+                    candlesticks: vec![],
+                },
+            );
+        }
+
+        for (symbol, data) in &self.store.securities {
+            subscriptions
+                .entry(symbol.clone())
+                .or_insert_with(|| Subscription {
+                    symbol: symbol.clone(),
+                    sub_types: SubFlags::empty(),
+                    candlesticks: vec![],
+                })
+                .candlesticks = data.candlesticks.keys().copied().collect();
+        }
+
+        subscriptions.into_values().collect()
     }
 
     async fn handle_ws_event(&mut self, event: WsEvent) -> Result<()> {
