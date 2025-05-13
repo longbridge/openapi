@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add support extended hours candlesticks
 - add market temperature api
 - add support use environment variable `LONGPORT_LANGUAGE` to set the response language
-- java: add `QuoteContext.getCapitalDistribution` method
+- java-sdk: add `QuoteContext.getCapitalDistribution` method
 - fix [#208](https://github.com/longportapp/openapi/issues/208)
 
 # [2.1.8] 2025-01-27
