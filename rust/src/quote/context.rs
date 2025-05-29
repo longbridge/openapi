@@ -1538,13 +1538,13 @@ impl QuoteContext {
         &self,
         market: Market,
         start_date: Date,
-        end: Date,
+        end_date: Date,
     ) -> Result<HistoryMarketTemperatureResponse> {
         #[derive(Debug, Serialize)]
         struct Request {
             market: Market,
             start_date: String,
-            end: String,
+            end_date: String,
         }
 
         Ok(self
@@ -1554,7 +1554,7 @@ impl QuoteContext {
             .query_params(Request {
                 market,
                 start_date: format_date(start_date),
-                end: format_date(end),
+                end_date: format_date(end_date),
             })
             .response::<Json<HistoryMarketTemperatureResponse>>()
             .send()
