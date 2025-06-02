@@ -1,6 +1,6 @@
 from datetime import datetime, date, time
 from decimal import Decimal
-from typing import Any, Callable, List, Mapping, Optional, Type, Protocol
+from typing import Any, Callable, List, Optional, Type
 
 
 class OpenApiException(Exception):
@@ -37,7 +37,7 @@ class HttpClient:
                  app_secret: str, access_token: str) -> None: ...
 
     @classmethod
-    def from_env(cls: Type) -> HttpClient:
+    def from_env(cls: Type[HttpClient]) -> HttpClient:
         """
         Create a new `HttpClient` from the given environment variables
 
@@ -123,7 +123,7 @@ class Config:
     ) -> None: ...
 
     @classmethod
-    def from_env(cls: Type) -> Config:
+    def from_env(cls: Type[Config]) -> Config:
         """
         Create a new `Config` from the given environment variables
 
@@ -2355,11 +2355,6 @@ class SecurityCalcIndex:
     Change value
     """
 
-    change_value: Optional[Decimal]
-    """
-    Change value
-    """
-
     change_rate: Optional[Decimal]
     """
     Change ratio
@@ -3399,7 +3394,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def history_market_temperature(self, market: Type[Market], start: date, end: date):
+    def history_market_temperature(self, market: Type[Market], start: date, end: date) -> HistoryMarketTemperatureResponse:
         """
         Get historical market temperature
 
