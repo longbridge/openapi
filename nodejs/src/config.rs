@@ -72,7 +72,7 @@ impl Config {
         if let Some(mode) = params.push_candlestick_mode {
             config = config.push_candlestick_mode(mode.into());
         }
-        
+
         if !params.enable_print_quote_packages {
             config = config.dont_print_quote_packages();
         }
