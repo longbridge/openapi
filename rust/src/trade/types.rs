@@ -986,7 +986,13 @@ mod tests {
                 "net_assets": "11111.12",
                 "init_margin": "2222.23",
                 "maintenance_margin": "3333.45",
-                "buy_power": "1234.67"
+                "buy_power": "1234.67",
+                "frozen_transaction_fees": [
+                    {
+                        "currency": "HKD",
+                        "frozen_transaction_fee": "123"
+                    }
+                ]
               }
             ]
           }"#;
@@ -1026,6 +1032,15 @@ mod tests {
         assert_eq!(cash_info.frozen_cash, "28723.76".parse().unwrap());
         assert_eq!(cash_info.settling_cash, "-276806.51".parse().unwrap());
         assert_eq!(cash_info.currency, "USD");
+
+        assert_eq!(balance.frozen_transaction_fees.len(), 1);
+
+        let frozen_transaction_fee = &balance.frozen_transaction_fees[0];
+        assert_eq!(frozen_transaction_fee.currency, "HKD");
+        assert_eq!(
+            frozen_transaction_fee.frozen_transaction_fee,
+            "123".parse().unwrap()
+        );
     }
 
     #[test]
