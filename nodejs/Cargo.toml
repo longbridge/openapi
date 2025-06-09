@@ -1,7 +1,7 @@
 [package]
 edition.workspace = true
 name = "longport-nodejs"
-version = "3.0.6"
+version = "3.0.7"
 
 [lib]
 crate-type = ["cdylib"]
