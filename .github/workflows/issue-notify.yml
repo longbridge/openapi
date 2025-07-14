@@ -17,7 +17,7 @@ jobs:
               ${{ github.event.issue.title }} #${{ github.event.issue.number }}
 
               ${{ github.event.issue.html_url }}
-            link: ${{ github.event.issue.html_url }}
+            url: ${{ github.event.issue.html_url }}
       - uses: foxundermoon/feishu-action@v2
         with:
           url: ${{ secrets.FEISHU_WEBHOOK_URL }}
