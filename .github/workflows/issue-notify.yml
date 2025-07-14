@@ -7,6 +7,12 @@ jobs:
   notify:
     runs-on: ubuntu-22.04
     steps:
+      - name: Send GitHub Action data to a Slack workflow
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          payload-delimiter: "_"
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
       - uses: foxundermoon/feishu-action@v2
         with:
           url: ${{ secrets.FEISHU_WEBHOOK_URL }}
