@@ -10,9 +10,13 @@ jobs:
       - name: Send GitHub Action data to a Slack workflow
         uses: slackapi/slack-github-action@v2.1.1
         with:
-          payload-delimiter: "_"
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: webhook-trigger
+          payload: |
+            text: |
+              ${{ github.event.issue.title }} #${{ github.event.issue.number }}
+
+              ${{ github.event.issue.html_url }}
       - uses: foxundermoon/feishu-action@v2
         with:
           url: ${{ secrets.FEISHU_WEBHOOK_URL }}
