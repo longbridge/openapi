@@ -672,23 +672,8 @@ impl Core {
         let mut tails = HashMap::new();
 
         for candlestick in resp.candlesticks {
-            let time = OffsetDateTime::from_unix_timestamp(candlestick.timestamp)
-                .map_err(|err| Error::parse_field_error("timestamp", err))?
-                .to_timezone(market.timezone);
-            let ts = match market.candlestick_trade_session(time) {
-                Some(ts) => ts,
-                None => {
-                    tracing::error!(
-                        symbol = symbol,
-                        time = time
-                            .format(&time::format_description::well_known::Rfc3339)
-                            .unwrap(),
-                        "unknown trade session"
-                    );
-                    return Err(Error::UnknownTradeSession { symbol, time });
-                }
-            };
-            let candlestick = candlestick.try_into()?;
+            let candlestick: Candlestick = candlestick.try_into()?;
+            let ts = convert_trade_session(candlestick.trade_session);
             let index = candlesticks.len();
             candlesticks.push(candlestick);
             tails.insert(ts, TailCandlestick { index, candlestick });
