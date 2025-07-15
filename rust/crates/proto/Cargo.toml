@@ -1,7 +1,7 @@
 [package]
 edition.workspace = true
 name = "longport-proto"
-version = "3.0.7"
+version = "3.0.8"
 description = "LongPort Protocol"
 license = "MIT OR Apache-2.0"
 
