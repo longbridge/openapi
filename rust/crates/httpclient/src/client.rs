@@ -78,7 +78,6 @@ impl HttpClient {
             .send()
             .await?
             .0;
-        dbg!(&resp);
         tracing::info!(limit = resp.limit, online = resp.online, "create otp");
 
         if resp.online >= resp.limit {
