@@ -49,4 +49,6 @@ pub trait CandlestickType {
 
     fn turnover(&self) -> Self::TurnoverType;
     fn set_turnover(&mut self, turnover: Self::TurnoverType);
+
+    fn trade_session(&self) -> Self::TradeSessionType;
 }

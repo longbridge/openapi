@@ -369,6 +369,82 @@ impl Market {
         }
     }
 
+    #[must_use]
+    pub fn merge_candlestick<H, C>(
+        &self,
+        period: Period,
+        input: Option<C>,
+        candlestick: &C,
+    ) -> UpdateAction<C>
+    where
+        H: Days,
+        C: CandlestickType,
+        C::PriceType: PartialOrd,
+        C::VolumeType: Add<Output = C::VolumeType>,
+        C::TurnoverType: Add<Output = C::TurnoverType>,
+    {
+        let Some(time) = self.candlestick_time(
+            candlestick.trade_session(),
+            false,
+            period,
+            candlestick.time(),
+        ) else {
+            return UpdateAction::None;
+        };
+
+        match input {
+            Some(prev) if time == prev.time() => {
+                let mut res_candlestick = prev;
+
+                res_candlestick.set_high(if candlestick.high() > res_candlestick.high() {
+                    candlestick.high()
+                } else {
+                    res_candlestick.high()
+                });
+
+                res_candlestick.set_low(if candlestick.low() < res_candlestick.low() {
+                    candlestick.low()
+                } else {
+                    res_candlestick.low()
+                });
+
+                res_candlestick.set_close(candlestick.close());
+
+                res_candlestick.set_volume(candlestick.volume() + res_candlestick.volume());
+                res_candlestick.set_turnover(candlestick.turnover() + res_candlestick.turnover());
+
+                UpdateAction::UpdateLast(res_candlestick)
+            }
+            None => UpdateAction::AppendNew {
+                confirmed: None,
+                new: C::new(CandlestickComponents {
+                    time: time.to_timezone(time_tz::timezones::db::UTC),
+                    open: candlestick.open(),
+                    high: candlestick.high(),
+                    low: candlestick.low(),
+                    close: candlestick.close(),
+                    volume: candlestick.volume(),
+                    turnover: candlestick.turnover(),
+                    trade_session: candlestick.trade_session(),
+                }),
+            },
+            Some(prev) if time > prev.time() => UpdateAction::AppendNew {
+                confirmed: Some(prev),
+                new: C::new(CandlestickComponents {
+                    time: time.to_timezone(time_tz::timezones::db::UTC),
+                    open: candlestick.open(),
+                    high: candlestick.high(),
+                    low: candlestick.low(),
+                    close: candlestick.close(),
+                    volume: candlestick.volume(),
+                    turnover: candlestick.turnover(),
+                    trade_session: candlestick.trade_session(),
+                }),
+            },
+            _ => UpdateAction::None,
+        }
+    }
+
     pub fn candlestick_trade_session(
         &self,
         candlestick_time: OffsetDateTime,

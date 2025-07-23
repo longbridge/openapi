@@ -910,6 +910,11 @@ impl longport_candlesticks::CandlestickType for Candlestick {
     fn set_turnover(&mut self, turnover: Self::TurnoverType) {
         self.turnover = turnover;
     }
+
+    #[inline]
+    fn trade_session(&self) -> Self::TradeSessionType {
+        self.trade_session
+    }
 }
 
 /// Strike price info
