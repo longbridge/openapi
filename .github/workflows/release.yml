@@ -260,7 +260,7 @@ jobs:
         uses: actions/setup-node@v3
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: 16
+          node-version: 20
           check-latest: true
           architecture: ${{ matrix.settings.architecture }}
 
@@ -847,7 +847,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
           check-latest: true
       - name: Install napi-rs/cli
         run: npm install -g @napi-rs/cli
