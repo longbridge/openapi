@@ -6,14 +6,13 @@ dependencies = ["install-maturin"]
 
 [tasks.install-maturin]
 command = "pip"
-#args = ["install", "maturin>=1.0,<2.0"]
-args = ["install", "maturin==1.7.4"]
+args = ["install", "maturin>=1.0,<2.0"]
 
 [tasks.install-python-sdk.windows]
 command = "pip"
 args = [
     "install",
-    "target/wheels/longport-3.0.5-cp311-cp311-win_amd64.whl",
+    "target/wheels/longport-3.0.9-cp311-cp311-win_amd64.whl",
     "-I",
 ]
 dependencies = ["python"]
