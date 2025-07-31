@@ -189,6 +189,7 @@ impl longport_candlesticks::TradeType for Trade {
     type PriceType = Decimal;
     type VolumeType = i64;
     type TurnoverType = Decimal;
+    type TradeSessionType = TradeSession;
 
     #[inline]
     fn time(&self) -> OffsetDateTime {
@@ -208,6 +209,11 @@ impl longport_candlesticks::TradeType for Trade {
     #[inline]
     fn turnover(&self, lot_size: i32) -> Self::TurnoverType {
         self.price * Decimal::from(self.volume * lot_size as i64)
+    }
+
+    #[inline]
+    fn trade_session(&self) -> TradeSession {
+        self.trade_session
     }
 }
 

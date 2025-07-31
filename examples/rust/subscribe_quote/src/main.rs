@@ -21,7 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .await?;
     while let Some(event) = receiver.recv().await {
-        println!("{:?}", event);
+        println!("{event:?}");
     }
     Ok(())
 }

@@ -1,5 +1,7 @@
 use time::OffsetDateTime;
 
+use crate::TradeSessionType;
+
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
 #[repr(u8)]
@@ -55,6 +57,7 @@ pub trait QuoteType {
     type PriceType;
     type VolumeType;
     type TurnoverType;
+    type TradeSessionType;
 
     fn time(&self) -> OffsetDateTime;
     fn open(&self) -> Self::PriceType;
@@ -63,6 +66,7 @@ pub trait QuoteType {
     fn last_done(&self) -> Self::PriceType;
     fn volume(&self) -> Self::VolumeType;
     fn turnover(&self) -> Self::TurnoverType;
+    fn trade_session(&self) -> Self::TradeSessionType;
 }
 
 bitflags::bitflags! {
@@ -77,9 +81,11 @@ pub trait TradeType {
     type PriceType;
     type VolumeType;
     type TurnoverType;
+    type TradeSessionType: TradeSessionType;
 
     fn time(&self) -> OffsetDateTime;
     fn price(&self) -> Self::PriceType;
     fn volume(&self) -> Self::VolumeType;
     fn turnover(&self, lot_size: i32) -> Self::TurnoverType;
+    fn trade_session(&self) -> Self::TradeSessionType;
 }

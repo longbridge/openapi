@@ -252,7 +252,7 @@ impl Core {
         }
 
         if config.enable_print_quote_packages {
-            println!("{}", table);
+            println!("{table}");
         }
 
         tracing::info!(
@@ -840,7 +840,6 @@ impl Core {
 
         if let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) {
             let action = candlesticks.merge_quote(
-                push_quote.trade_session,
                 market_type,
                 half_days,
                 security_data.board,
@@ -875,7 +874,6 @@ impl Core {
                 }
 
                 let action = candlesticks.merge_trade(
-                    trade.trade_session,
                     market_type,
                     half_days,
                     security_data.board,

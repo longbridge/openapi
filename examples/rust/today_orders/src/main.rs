@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let resp = ctx.today_orders(None).await?;
     for obj in resp {
-        println!("{:?}", obj);
+        println!("{obj:?}");
     }
     Ok(())
 }

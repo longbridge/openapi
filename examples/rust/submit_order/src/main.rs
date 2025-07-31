@@ -25,6 +25,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .submitted_price(decimal!(50i32));
     let resp = ctx.submit_order(opts).await?;
-    println!("{:?}", resp);
+    println!("{resp:?}");
     Ok(())
 }

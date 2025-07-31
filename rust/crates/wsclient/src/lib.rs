@@ -4,6 +4,7 @@
 #![deny(unreachable_pub)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
+#![allow(clippy::result_large_err)]
 
 mod client;
 mod codec;

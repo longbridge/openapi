@@ -13,6 +13,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .response::<String>()
         .send()
         .await?;
-    println!("{}", resp);
+    println!("{resp}");
     Ok(())
 }

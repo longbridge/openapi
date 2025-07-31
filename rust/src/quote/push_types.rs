@@ -57,6 +57,7 @@ impl longport_candlesticks::QuoteType for PushQuote {
     type PriceType = Decimal;
     type VolumeType = i64;
     type TurnoverType = Decimal;
+    type TradeSessionType = TradeSession;
 
     #[inline]
     fn time(&self) -> OffsetDateTime {
@@ -91,6 +92,11 @@ impl longport_candlesticks::QuoteType for PushQuote {
     #[inline]
     fn turnover(&self) -> Self::TurnoverType {
         self.turnover
+    }
+
+    #[inline]
+    fn trade_session(&self) -> Self::TradeSessionType {
+        self.trade_session
     }
 }
 

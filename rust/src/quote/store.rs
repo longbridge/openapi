@@ -73,7 +73,6 @@ impl Candlesticks {
 
     pub(crate) fn merge_trade<H>(
         &mut self,
-        ts: TradeSession,
         market_type: Market,
         half_days: H,
         board: SecurityBoard,
@@ -86,6 +85,7 @@ impl Candlesticks {
         let Some(market) = get_market(market_type, board) else {
             return UpdateAction::None;
         };
+        let ts = trade.trade_session;
         let period = convert_period(period);
 
         let trade_type = trade.trade_type.as_str();
@@ -130,7 +130,6 @@ impl Candlesticks {
         };
 
         market.merge_trade(
-            ts,
             half_days,
             period,
             self.merge_input(ts),
@@ -141,7 +140,6 @@ impl Candlesticks {
 
     pub(crate) fn merge_quote<H>(
         &mut self,
-        ts: TradeSession,
         market_type: Market,
         half_days: H,
         board: SecurityBoard,
@@ -156,9 +154,9 @@ impl Candlesticks {
         let Some(market) = get_market(market_type, board) else {
             return UpdateAction::None;
         };
+        let ts = push_quote.trade_session;
         let period = convert_period(period);
-
-        market.merge_quote(ts, half_days, period, self.merge_input(ts), push_quote)
+        market.merge_quote(half_days, period, self.merge_input(ts), push_quote)
     }
 
     pub(crate) fn check_and_remove(&mut self) {

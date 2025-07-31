@@ -13,6 +13,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (ctx, _) = TradeContext::try_new(config).await?;
 
     let resp = ctx.account_balance(None).await?;
-    println!("{:?}", resp);
+    println!("{resp:?}");
     Ok(())
 }
