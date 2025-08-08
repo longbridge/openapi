@@ -37,12 +37,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
-          target: ${{ matrix.settings.target }}
+          targets: ${{ matrix.settings.target }}
 
       - name: Build
         if: ${{ !matrix.settings.cross }}

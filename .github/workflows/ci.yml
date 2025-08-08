@@ -15,10 +15,9 @@ jobs:
           submodules: true
 
       # Use nightly Rust to check the format
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-          override: true
           components: rustfmt, clippy
       - name: Check format
         run: cargo fmt --all -- --check
@@ -37,10 +36,9 @@ jobs:
           submodules: true
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
 
       - name: Check with clippy
@@ -69,10 +67,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
 
       - name: Check with clippy
@@ -120,11 +117,9 @@ jobs:
           python-version: ${{ matrix.python.version }}
           architecture: x64
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          profile: minimal
-          default: true
       - name: Build wheels - x86_64
         uses: PyO3/maturin-action@v1
         with:
@@ -167,11 +162,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.target }}
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          profile: minimal
-          default: true
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -344,13 +337,12 @@ jobs:
           architecture: ${{ matrix.settings.architecture }}
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.settings.docker }}
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
-          target: ${{ matrix.settings.target }}
+          targets: ${{ matrix.settings.target }}
 
       - name: Check with clippy
         run: cargo clippy -p longport-nodejs --all-features
@@ -405,10 +397,9 @@ jobs:
           distribution: "temurin"
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
 
       - name: Install cargo make
@@ -439,10 +430,9 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
 
       - name: Get CMake
@@ -478,10 +468,9 @@ jobs:
           submodules: true
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
 
       - name: Install target
@@ -524,10 +513,9 @@ jobs:
           submodules: true
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
 
       - name: Install target
