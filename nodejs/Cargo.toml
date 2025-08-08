@@ -1,28 +1,29 @@
 [package]
 edition.workspace = true
 name = "longport-nodejs"
-version = "3.0.11"
+version = "3.0.12"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-longport = { path = "../rust" }
+longport.workspace = true
 longport-nodejs-macros = { path = "crates/macros" }
 
-napi = { version = "2.16.10", default-features = false, features = [
+napi = { workspace = true, features = [
     "napi4",
+    "tokio_rt",
     "chrono_date",
     "async",
     "serde-json",
 ] }
-napi-derive = "2.16.8"
-rust_decimal = { version = "1.23.1", features = ["maths"] }
-chrono = "0.4.19"
-time = { version = "0.3.9", features = ["macros", "formatting"] }
-tokio = { version = "1.18.2", features = ["rt", "time"] }
-parking_lot = "0.12.1"
-serde_json = "1.0.93"
+napi-derive.workspace = true
+rust_decimal = { workspace = true, features = ["maths"] }
+chrono.workspace = true
+time = { workspace = true, features = ["macros", "formatting"] }
+tokio = { workspace = true, features = ["rt", "time"] }
+parking_lot.workspace = true
+serde_json.workspace = true
 
 [build-dependencies]
-napi-build = "2.0.0"
+napi-build.workspace = true

@@ -1,25 +1,26 @@
+use std::sync::OnceLock;
+
 use jni::{
     JNIEnv,
     descriptors::Desc,
     objects::{GlobalRef, JClass, JValue},
 };
-use once_cell::sync::OnceCell;
 
 use crate::types::ClassLoader;
 
-pub(crate) static LONG_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static STRING_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static DECIMAL_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static TIME_INSTANT_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static TIME_OFFSETDATETIME_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static TIME_LOCALDATE_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static TIME_LOCALTIME_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static TIME_LOCALDATETIME_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static TIME_ZONE_ID: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static QUOTE_CONTEXT_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static TRADE_CONTEXT_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static DERIVATIVE_TYPE_CLASS: OnceCell<GlobalRef> = OnceCell::new();
-pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceCell<GlobalRef> = OnceCell::new();
+pub(crate) static LONG_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static STRING_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DECIMAL_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static TIME_INSTANT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static TIME_OFFSETDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static TIME_LOCALDATE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static TIME_LOCALTIME_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static TIME_LOCALDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static TIME_ZONE_ID: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static QUOTE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static TRADE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DERIVATIVE_TYPE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 
 fn init_timezone_id(env: &mut JNIEnv) {
     let utc = env.new_string("UTC").unwrap();

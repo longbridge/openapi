@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longport::quote::PushEventDetail;
-use napi::{JsFunction, Result, threadsafe_function::ThreadsafeFunctionCallMode};
+use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
 use crate::{
@@ -160,45 +160,65 @@ impl QuoteContext {
     /// Set quote callback, after receiving the quote data push, it will call
     /// back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushQuoteEvent) => void")]
-    pub fn set_on_quote(&self, callback: JsFunction) -> Result<()> {
-        self.callbacks.lock().quote =
-            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
+    pub fn set_on_quote(&self, callback: Function<PushQuoteEvent, ()>) -> Result<()> {
+        self.callbacks.lock().quote = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
         Ok(())
     }
 
     /// Set depth callback, after receiving the depth data push, it will call
     /// back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushDepthEvent) => void")]
-    pub fn set_on_depth(&self, callback: JsFunction) -> Result<()> {
-        self.callbacks.lock().depth =
-            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
+    pub fn set_on_depth(&self, callback: Function<PushDepthEvent, ()>) -> Result<()> {
+        self.callbacks.lock().depth = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
         Ok(())
     }
 
     /// Set brokers callback, after receiving the brokers data push, it will
     /// call back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushBrokersEvent) => void")]
-    pub fn set_on_brokers(&self, callback: JsFunction) -> Result<()> {
-        self.callbacks.lock().brokers =
-            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
+    pub fn set_on_brokers(&self, callback: Function<PushBrokersEvent, ()>) -> Result<()> {
+        self.callbacks.lock().brokers = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
         Ok(())
     }
 
     /// Set trades callback, after receiving the trades data push, it will call
     /// back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushTradesEvent) => void")]
-    pub fn set_on_trades(&self, callback: JsFunction) -> Result<()> {
-        self.callbacks.lock().trades =
-            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
+    pub fn set_on_trades(&self, callback: Function<PushTradesEvent, ()>) -> Result<()> {
+        self.callbacks.lock().trades = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
         Ok(())
     }
 
     /// Set candlestick callback, after receiving the trades data push, it will
     /// call back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushCandlestickEvent) => void")]
-    pub fn set_on_candlestick(&self, callback: JsFunction) -> Result<()> {
-        self.callbacks.lock().candlestick =
-            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
+    pub fn set_on_candlestick(&self, callback: Function<PushCandlestickEvent, ()>) -> Result<()> {
+        self.callbacks.lock().candlestick = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
         Ok(())
     }
 

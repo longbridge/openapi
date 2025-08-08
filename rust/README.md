@@ -13,9 +13,9 @@
     <img src="https://img.shields.io/badge/unsafe-forbidden-success.svg?style=flat-square"
       alt="Unsafe Rust forbidden" />
   </a>
-  <a href="https://blog.rust-lang.org/2021/11/01/Rust-1.56.1.html">
-    <img src="https://img.shields.io/badge/rustc-1.56.1+-ab6000.svg"
-      alt="rustc 1.56.1+" />
+  <a href="https://blog.rust-lang.org/2021/11/01/Rust-1.89.0.html">
+    <img src="https://img.shields.io/badge/rustc-1.89.0+-ab6000.svg"
+      alt="rustc 1.89.0+" />
   </a>
 </div>
 

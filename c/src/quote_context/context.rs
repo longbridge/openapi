@@ -1,7 +1,7 @@
 use std::{
     ffi::{CString, c_void},
     os::raw::c_char,
-    sync::Arc,
+    sync::{Arc, OnceLock},
     time::Instant,
 };
 
@@ -12,7 +12,6 @@ use longport::{
         SubFlags,
     },
 };
-use once_cell::sync::OnceCell;
 use parking_lot::Mutex;
 
 use crate::{
@@ -73,7 +72,7 @@ unsafe impl Send for CQuoteContextState {}
 /// Quote context
 pub struct CQuoteContext {
     ctx: QuoteContext,
-    quote_level: OnceCell<CString>,
+    quote_level: OnceLock<CString>,
     state: Mutex<CQuoteContextState>,
 }
 
@@ -108,7 +107,7 @@ pub unsafe extern "C" fn lb_quote_context_new(
             });
             let arc_ctx = Arc::new(CQuoteContext {
                 ctx,
-                quote_level: OnceCell::new(),
+                quote_level: OnceLock::new(),
                 state,
             });
             let weak_ctx = Arc::downgrade(&arc_ctx);

@@ -1,13 +1,13 @@
 use std::{
     convert::Infallible,
     fmt::{self, Debug},
+    sync::LazyLock,
 };
 
-use once_cell::sync::Lazy;
 use pyo3::{exceptions::PyBaseException, prelude::*, types::PyType};
 use rust_decimal::Decimal;
 
-static DECIMAL_TYPE: Lazy<PyObject> = Lazy::new(|| {
+static DECIMAL_TYPE: LazyLock<PyObject> = LazyLock::new(|| {
     Python::with_gil(|py| {
         let decimal_module = py.import("decimal")?;
         let decimal_type = decimal_module.getattr("Decimal")?;

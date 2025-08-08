@@ -272,16 +272,16 @@ jobs:
           - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build:debug
               strip -x *.node
 
           - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               rustup target add aarch64-unknown-linux-gnu
               yarn build:debug --target aarch64-unknown-linux-gnu
               aarch64-unknown-linux-gnu-strip *.node
@@ -289,22 +289,22 @@ jobs:
           - host: macos-13
             architecture: x64
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build:debug
               strip -x *.node
 
           - host: windows-latest
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build:debug
             architecture: x64
 
           - host: ubuntu-22.04
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build:debug
               strip *.node
 
@@ -316,8 +316,8 @@ jobs:
               export CXX=$(xcrun -f clang++);
               SYSROOT=$(xcrun --sdk macosx --show-sdk-path);
               export CFLAGS="-isysroot $SYSROOT -isystem $SYSROOT";
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               rustup target add aarch64-apple-darwin
               yarn build:debug --target aarch64-apple-darwin
               strip -x *.node

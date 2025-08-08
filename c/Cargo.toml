@@ -1,7 +1,7 @@
 [package]
 edition.workspace = true
 name = "longport-c"
-version = "3.0.11"
+version.workspace = true
 description = "LongPort OpenAPI SDK for C"
 homepage = "https://open.longportapp.com/en/"
 readme = "README.md"
@@ -14,15 +14,14 @@ categories = ["api-bindings"]
 crate-type = ["cdylib"]
 
 [dependencies]
-longport = { path = "../rust" }
+longport.workspace = true
 longport-c-macros = { path = "crates/macros" }
 
-rust_decimal = { version = "1.23.1", features = ["maths"] }
-tokio = { version = "1.19.2", features = ["rt-multi-thread"] }
-once_cell = "1.12.0"
-parking_lot = "0.12.1"
-time = "0.3.9"
-tracing = "0.1.34"
+rust_decimal = { workspace = true, features = ["maths"] }
+tokio = { workspace = true, features = ["rt-multi-thread"] }
+parking_lot.workspace = true
+time.workspace = true
+tracing.workspace = true
 
 [build-dependencies]
-cbindgen = "0.28.0"
+cbindgen.workspace = true

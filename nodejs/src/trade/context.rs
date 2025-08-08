@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longport::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
-use napi::{Env, JsFunction, JsObject, Result, threadsafe_function::ThreadsafeFunctionCallMode};
+use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
 use crate::{
@@ -70,9 +70,13 @@ impl TradeContext {
     /// Set order changed callback, after receiving the order changed event, it
     /// will call back to this function.
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void")]
-    pub fn set_on_order_changed(&self, callback: JsFunction) -> Result<()> {
-        self.callbacks.lock().order_changed =
-            Some(callback.create_threadsafe_function(32, |ctx| Ok(vec![ctx.value]))?);
+    pub fn set_on_order_changed(&self, callback: Function<PushOrderChanged, ()>) -> Result<()> {
+        self.callbacks.lock().order_changed = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
         Ok(())
     }
 
@@ -93,8 +97,8 @@ impl TradeContext {
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
-    ///   .then((ctx) => {`
-    ///     ctx.setOnQuote((_, event) => console.log(event.toString()));
+    ///   .then((ctx) => {
+    ///     ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
     ///     ctx.subscribe([TopicType.Private]);
     ///     return ctx.submitOrder({
     ///       symbol: "700.HK",
@@ -299,19 +303,18 @@ impl TradeContext {
     ///     }
     ///   });
     /// ```
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn replace_order(&self, env: Env, opts: ReplaceOrderOptions) -> Result<JsObject> {
-        let opts: longport::trade::ReplaceOrderOptions = opts.into();
+    #[napi]
+    pub fn replace_order<'env>(
+        &self,
+        env: &'env Env,
+        opts: ReplaceOrderOptions<'env>,
+    ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = self.ctx.clone();
-        env.execute_tokio_future(
-            async move {
-                ctx.replace_order(opts)
-                    .await
-                    .map_err(ErrorNewType)
-                    .map_err(napi::Error::from)
-            },
-            |_, _| Ok(()),
-        )
+        let opts = longport::trade::ReplaceOrderOptions::from(opts);
+        env.spawn_future(async move {
+            ctx.replace_order(opts).await.map_err(ErrorNewType)?;
+            Ok(())
+        })
     }
 
     /// Submit order
@@ -342,21 +345,18 @@ impl TradeContext {
     ///   )
     ///   .then((resp) => console.log(resp.toString()));
     /// ```
-    #[napi(ts_return_type = "Promise<SubmitOrderResponse>")]
-    pub fn submit_order(&self, env: Env, opts: SubmitOrderOptions) -> Result<JsObject> {
-        let opts: longport::trade::SubmitOrderOptions = opts.into();
+    #[napi]
+    pub fn submit_order<'env>(
+        &self,
+        env: &'env Env,
+        opts: SubmitOrderOptions<'env>,
+    ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
         let ctx = self.ctx.clone();
-        env.execute_tokio_future(
-            async move {
-                let res = ctx
-                    .submit_order(opts)
-                    .await
-                    .map_err(ErrorNewType)
-                    .map_err(napi::Error::from)?;
-                res.try_into()
-            },
-            |_, res: SubmitOrderResponse| Ok(res),
-        )
+        let opts = longport::trade::SubmitOrderOptions::from(opts);
+        env.spawn_future(async move {
+            let res = ctx.submit_order(opts).await.map_err(ErrorNewType)?;
+            SubmitOrderResponse::try_from(res)
+        })
     }
 
     /// Cancel order
@@ -544,24 +544,20 @@ impl TradeContext {
     ///   }))
     ///   .then((resp) => console.log(resp))
     /// ```
-    #[napi(ts_return_type = "Promise<EstimateMaxPurchaseQuantityResponse>")]
-    pub fn estimate_max_purchase_quantity(
+    #[napi]
+    pub fn estimate_max_purchase_quantity<'env>(
         &self,
-        env: Env,
-        opts: EstimateMaxPurchaseQuantityOptions,
-    ) -> Result<JsObject> {
-        let opts: longport::trade::EstimateMaxPurchaseQuantityOptions = opts.into();
+        env: &'env Env,
+        opts: EstimateMaxPurchaseQuantityOptions<'env>,
+    ) -> Result<PromiseRaw<'env, EstimateMaxPurchaseQuantityResponse>> {
         let ctx = self.ctx.clone();
-        env.execute_tokio_future(
-            async move {
-                let res = ctx
-                    .estimate_max_purchase_quantity(opts)
-                    .await
-                    .map_err(ErrorNewType)
-                    .map_err(napi::Error::from)?;
-                res.try_into()
-            },
-            |_, res: EstimateMaxPurchaseQuantityResponse| Ok(res),
-        )
+        let opts = longport::trade::EstimateMaxPurchaseQuantityOptions::from(opts);
+        env.spawn_future(async move {
+            let res = ctx
+                .estimate_max_purchase_quantity(opts)
+                .await
+                .map_err(ErrorNewType)?;
+            EstimateMaxPurchaseQuantityResponse::try_from(res)
+        })
     }
 }

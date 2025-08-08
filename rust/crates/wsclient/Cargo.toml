@@ -1,29 +1,21 @@
 [package]
 name = "longport-wscli"
-version = "3.0.11"
+version = "3.0.12"
 edition.workspace = true
 description = "LongPort Websocket SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-longport-proto = { path = "../proto", version = "3.0.11" }
+longport-proto.workspace = true
 
-tokio = { version = "1.18.2", features = [
-  "time",
-  "rt",
-  "macros",
-  "sync",
-  "net",
-] }
-tokio-tungstenite = { version = "0.26.1", features = [
-  "rustls-tls-webpki-roots",
-] }
-thiserror = "1.0.31"
-futures-util = "0.3.21"
-prost = "0.13.3"
-byteorder = "1.4.3"
-num_enum = "0.5.7"
-url = "2.2.2"
-flate2 = "1.0.23"
-leaky-bucket = "1.0.1"
-tracing = { version = "0.1.34", features = ["attributes"] }
+tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
+tokio-tungstenite = { workspace = true, features = ["rustls-tls-webpki-roots"] }
+thiserror.workspace = true
+futures-util.workspace = true
+prost.workspace = true
+byteorder.workspace = true
+num_enum.workspace = true
+url.workspace = true
+flate2.workspace = true
+leaky-bucket.workspace = true
+tracing = { workspace = true, features = ["attributes"] }

@@ -182,8 +182,8 @@ jobs:
           - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build
               strip -x *.node
             artifact-name: linux-x64-musl
@@ -191,8 +191,8 @@ jobs:
           - host: ubuntu-22.04
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               rustup target add aarch64-unknown-linux-gnu
               yarn build --target aarch64-unknown-linux-gnu
               aarch64-unknown-linux-gnu-strip *.node
@@ -209,24 +209,24 @@ jobs:
           - host: macos-13
             architecture: x64
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build
               strip -x *.node
             artifact-name: macos
 
           - host: windows-latest
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build
             architecture: x64
             artifact-name: windows
 
           - host: ubuntu-22.04
             build: |
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               yarn build
               strip *.node
             artifact-name: linux-x64
@@ -239,8 +239,8 @@ jobs:
               export CXX=$(xcrun -f clang++);
               SYSROOT=$(xcrun --sdk macosx --show-sdk-path);
               export CFLAGS="-isysroot $SYSROOT -isystem $SYSROOT";
-              rustup install 1.85.0
-              rustup default 1.85.0
+              rustup install 1.89.0
+              rustup default 1.89.0
               rustup target add aarch64-apple-darwin
               yarn build --target aarch64-apple-darwin
               strip -x *.node

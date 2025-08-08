@@ -1,9 +1,9 @@
 use chrono::{DateTime, TimeZone, Utc};
-use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
+use napi::threadsafe_function::ThreadsafeFunction;
 use serde_json::Value;
 use time::OffsetDateTime;
 
-pub(crate) type JsCallback<T> = ThreadsafeFunction<T, ErrorStrategy::CalleeHandled>;
+pub(crate) type JsCallback<T> = ThreadsafeFunction<T, ()>;
 
 pub(crate) fn to_datetime(time: OffsetDateTime) -> DateTime<Utc> {
     DateTime::from_timestamp(time.unix_timestamp(), 0).unwrap()

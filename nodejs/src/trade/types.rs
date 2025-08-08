@@ -5,7 +5,7 @@ use crate::{decimal::Decimal, time::NaiveDate, types::Market};
 
 /// Topic type
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::TopicType")]
 pub enum TopicType {
     /// Private notification for trade
@@ -33,7 +33,7 @@ pub struct Execution {
 }
 
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::OrderStatus")]
 pub enum OrderStatus {
     /// Unknown
@@ -75,7 +75,7 @@ pub enum OrderStatus {
 }
 
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::OrderSide")]
 pub enum OrderSide {
     /// Unknown
@@ -87,7 +87,7 @@ pub enum OrderSide {
 }
 
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::OrderType")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum OrderType {
@@ -123,7 +123,7 @@ pub enum OrderType {
 
 /// Order tag
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::OrderTag")]
 pub enum OrderTag {
     /// Unknown
@@ -150,7 +150,7 @@ pub enum OrderTag {
 
 /// Time in force type
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::TimeInForceType")]
 pub enum TimeInForceType {
     /// Unknown
@@ -165,7 +165,7 @@ pub enum TimeInForceType {
 
 /// Trigger status
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::TriggerStatus")]
 pub enum TriggerStatus {
     /// Unknown
@@ -180,7 +180,7 @@ pub enum TriggerStatus {
 
 /// Enable or disable outside regular trading hours
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::OutsideRTH")]
 pub enum OutsideRTH {
     /// Unknown
@@ -267,7 +267,7 @@ pub struct Order {
 
 /// Commission-free Status
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::CommissionFreeStatus")]
 pub enum CommissionFreeStatus {
     /// Unknown
@@ -284,7 +284,7 @@ pub enum CommissionFreeStatus {
 
 /// Deduction status
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::DeductionStatus")]
 pub enum DeductionStatus {
     /// Unknown
@@ -301,7 +301,7 @@ pub enum DeductionStatus {
 
 /// Charge category code
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::ChargeCategoryCode")]
 pub enum ChargeCategoryCode {
     /// Unknown
@@ -614,7 +614,7 @@ pub struct AccountBalance {
 }
 
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::BalanceType")]
 pub enum BalanceType {
     /// Unknown
@@ -628,7 +628,7 @@ pub enum BalanceType {
 }
 
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::trade::CashFlowDirection")]
 pub enum CashFlowDirection {
     /// Unknown

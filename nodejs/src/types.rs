@@ -1,7 +1,7 @@
 use longport_nodejs_macros::JsEnum;
 
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::Market")]
 pub enum Market {
     /// Unknown

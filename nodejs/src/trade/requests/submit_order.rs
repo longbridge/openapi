@@ -8,7 +8,7 @@ use crate::{
 
 /// Options for submit order request
 #[napi_derive::napi(object)]
-pub struct SubmitOrderOptions {
+pub struct SubmitOrderOptions<'env> {
     /// Security code
     pub symbol: String,
     /// Order type
@@ -16,31 +16,31 @@ pub struct SubmitOrderOptions {
     /// Order side
     pub side: OrderSide,
     /// Submitted quantity
-    pub submitted_quantity: ClassInstance<Decimal>,
+    pub submitted_quantity: ClassInstance<'env, Decimal>,
     /// Time in force type
     pub time_in_force: TimeInForceType,
     /// Submitted price
-    pub submitted_price: Option<ClassInstance<Decimal>>,
+    pub submitted_price: Option<ClassInstance<'env, Decimal>>,
     /// Trigger price (`LIT` / `MIT` Required)
-    pub trigger_price: Option<ClassInstance<Decimal>>,
+    pub trigger_price: Option<ClassInstance<'env, Decimal>>,
     /// Limit offset amount (`TSLPAMT` / `TSLPPCT` Required)
-    pub limit_offset: Option<ClassInstance<Decimal>>,
+    pub limit_offset: Option<ClassInstance<'env, Decimal>>,
     /// Trailing amount (`TSLPAMT` / `TSMAMT` Required)
-    pub trailing_amount: Option<ClassInstance<Decimal>>,
+    pub trailing_amount: Option<ClassInstance<'env, Decimal>>,
     /// Trailing percent (`TSLPPCT` / `TSMAPCT` Required)
-    pub trailing_percent: Option<ClassInstance<Decimal>>,
+    pub trailing_percent: Option<ClassInstance<'env, Decimal>>,
     /// Long term order expire date (Required when `time_in_force` is
     /// `GoodTilDate`)
-    pub expire_date: Option<ClassInstance<NaiveDate>>,
+    pub expire_date: Option<ClassInstance<'env, NaiveDate>>,
     /// Enable or disable outside regular trading hours
     pub outside_rth: Option<OutsideRTH>,
     /// Remark (Maximum 64 characters)
     pub remark: Option<String>,
 }
 
-impl From<SubmitOrderOptions> for longport::trade::SubmitOrderOptions {
+impl<'env> From<SubmitOrderOptions<'env>> for longport::trade::SubmitOrderOptions {
     #[inline]
-    fn from(opts: SubmitOrderOptions) -> Self {
+    fn from(opts: SubmitOrderOptions<'env>) -> Self {
         let mut opts2 = longport::trade::SubmitOrderOptions::new(
             opts.symbol,
             opts.order_type.into(),

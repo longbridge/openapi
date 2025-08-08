@@ -1,12 +1,15 @@
-use std::{ffi::c_void, future::Future, sync::Arc};
+use std::{
+    ffi::c_void,
+    future::Future,
+    sync::{Arc, LazyLock},
+};
 
 use longport::Result;
-use once_cell::sync::Lazy;
 use tokio::runtime::Runtime;
 
 use crate::error::CError;
 
-static RUNTIME: Lazy<Runtime> = Lazy::new(|| {
+static RUNTIME: LazyLock<Runtime> = LazyLock::new(|| {
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()

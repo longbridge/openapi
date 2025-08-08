@@ -23,7 +23,7 @@ pub struct Subscription {
 
 /// Derivative type
 #[napi_derive::napi]
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
 pub enum DerivativeType {
     /// US stock options
     Option,
@@ -59,7 +59,7 @@ impl From<longport::quote::DerivativeType> for DerivativeTypes {
 }
 
 #[napi_derive::napi]
-#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::TradeStatus")]
 pub enum TradeStatus {
     /// Normal
@@ -89,7 +89,7 @@ pub enum TradeStatus {
 
 /// Trade session
 #[napi_derive::napi]
-#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::TradeSession")]
 pub enum TradeSession {
     /// Intraday
@@ -104,7 +104,7 @@ pub enum TradeSession {
 
 /// Quote type of subscription
 #[napi_derive::napi]
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
 pub enum SubType {
     /// Quote
     Quote,
@@ -171,7 +171,7 @@ impl From<SubFlags> for SubTypes {
 
 /// Trade direction
 #[napi_derive::napi]
-#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::TradeDirection")]
 pub enum TradeDirection {
     /// Neutral
@@ -184,7 +184,7 @@ pub enum TradeDirection {
 
 /// Option type
 #[napi_derive::napi]
-#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::OptionType")]
 pub enum OptionType {
     /// Unknown
@@ -197,7 +197,7 @@ pub enum OptionType {
 
 /// Option direction
 #[napi_derive::napi]
-#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::OptionDirection")]
 pub enum OptionDirection {
     /// Unknown
@@ -210,7 +210,7 @@ pub enum OptionDirection {
 
 /// Warrant type
 #[napi_derive::napi]
-#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::WarrantType")]
 pub enum WarrantType {
     /// Unknown
@@ -230,7 +230,7 @@ pub enum WarrantType {
 /// Candlestick period
 #[napi_derive::napi]
 #[allow(non_camel_case_types)]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::Period")]
 pub enum Period {
     /// Unknown
@@ -301,7 +301,7 @@ pub enum AdjustType {
 
 /// Security board
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::SecurityBoard")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum SecurityBoard {
@@ -875,7 +875,7 @@ pub struct WarrantInfo {
 
 /// Warrant status
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::WarrantStatus")]
 pub enum WarrantStatus {
     /// Suspend
@@ -1402,7 +1402,7 @@ pub struct MarketTemperature {
 
 /// Data granularity
 #[napi_derive::napi]
-#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::Granularity")]
 pub enum Granularity {
     /// Unknown

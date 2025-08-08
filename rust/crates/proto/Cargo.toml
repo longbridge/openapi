@@ -1,10 +1,10 @@
 [package]
 edition.workspace = true
 name = "longport-proto"
-version = "3.0.11"
+version = "3.0.12"
 description = "LongPort Protocol"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-prost = "0.13.3"
-serde = { version = "1.0.137", features = ["derive"] }
+prost.workspace = true
+serde = { workspace = true, features = ["derive"] }

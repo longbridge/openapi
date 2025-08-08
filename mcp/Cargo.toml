@@ -1,21 +1,20 @@
 [package]
 name = "longport-mcp"
-version = "3.0.11"
+version.workspace = true
 edition.workspace = true
 
 [dependencies]
-poem-mcpserver = { version = "0.2.3", features = ["streamable-http"] }
-poem-mcpserver-macros = { version = "0.2.3" }
-poem = { version = "3.1.9", features = ["sse"] }
-poem-derive = { version = "3.1.9" }
-serde = { version = "1.0.219", features = ["derive"] }
-schemars = { version = "0.8.22", features = ["chrono", "rust_decimal"] }
-longport = { path = "../rust" }
-tokio = { version = "1.44.1", features = ["macros", "rt-multi-thread", "sync"] }
-clap = { version = "4.5.32", features = ["derive"] }
-dotenvy = "0.15.7"
-time = { version = "0.3.39", features = ["formatting", "parsing"] }
-tracing-subscriber = "0.3.19"
-serde_json = "1.0.140"
-tracing-appender = "0.2.3"
-tracing = "0.1.41"
+longport.workspace = true
+
+poem-mcpserver = { workspace = true, features = ["streamable-http"] }
+poem = { workspace = true, features = ["sse"] }
+serde = { workspace = true, features = ["derive"] }
+schemars = { workspace = true, features = ["rust_decimal1"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync"] }
+clap = { workspace = true, features = ["derive"] }
+dotenvy.workspace = true
+time = { workspace = true, features = ["formatting", "parsing"] }
+tracing-subscriber.workspace = true
+serde_json.workspace = true
+tracing-appender.workspace = true
+tracing.workspace = true

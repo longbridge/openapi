@@ -1,14 +1,13 @@
-use std::future::Future;
+use std::{future::Future, sync::LazyLock};
 
 use jni::{
     JNIEnv,
     errors::Result,
     objects::{JObject, JValue},
 };
-use once_cell::sync::Lazy;
 use tokio::runtime::Runtime;
 
-static RUNTIME: Lazy<Runtime> = Lazy::new(|| {
+static RUNTIME: LazyLock<Runtime> = LazyLock::new(|| {
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()

@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    fmt::Debug,
     str::FromStr,
     sync::Arc,
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
@@ -389,8 +390,8 @@ impl WsClient {
         req: T,
     ) -> WsClientResult<R>
     where
-        T: prost::Message,
-        R: prost::Message + Default,
+        T: prost::Message + Debug,
+        R: prost::Message + Default + Debug,
     {
         tracing::info!(message = ?req, "ws request");
         let resp = self

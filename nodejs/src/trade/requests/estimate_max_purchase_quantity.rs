@@ -7,17 +7,17 @@ use crate::{
 
 /// Options for get cash flow request
 #[napi_derive::napi(object)]
-pub struct EstimateMaxPurchaseQuantityOptions {
+pub struct EstimateMaxPurchaseQuantityOptions<'env> {
     pub symbol: String,
     pub order_type: OrderType,
     pub side: OrderSide,
-    pub price: Option<ClassInstance<Decimal>>,
+    pub price: Option<ClassInstance<'env, Decimal>>,
     pub currency: Option<String>,
     pub order_id: Option<String>,
     pub fractional_shares: bool,
 }
 
-impl From<EstimateMaxPurchaseQuantityOptions>
+impl<'env> From<EstimateMaxPurchaseQuantityOptions<'env>>
     for longport::trade::EstimateMaxPurchaseQuantityOptions
 {
     #[inline]

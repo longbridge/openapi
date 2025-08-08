@@ -1,13 +1,13 @@
 [package]
 edition.workspace = true
 name = "longport-candlesticks"
-version = "3.0.11"
+version = "3.0.12"
 description = "LongPort candlestick utils for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-bitflags = "2.4.1"
-rust_decimal = "1.25.0"
-time = { version = "0.3.36", features = ["macros"] }
-time-tz = "2.0.0"
-num-traits = "0.2.19"
+bitflags.workspace = true
+rust_decimal.workspace = true
+time = { workspace = true, features = ["macros"] }
+time-tz.workspace = true
+num-traits.workspace = true

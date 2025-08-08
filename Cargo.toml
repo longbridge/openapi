@@ -1,7 +1,72 @@
 [workspace]
-package.edition = "2024"
 resolver = "3"
 members = ["rust", "python", "nodejs", "java", "c", "mcp"]
 
+[workspace.package]
+version = "3.0.12"
+edition = "2024"
+
 [profile.release]
 lto = true
+
+[workspace.dependencies]
+longport-wscli = { path = "rust/crates/wsclient", version = "3.0.12" }
+longport-httpcli = { path = "rust/crates/httpclient", version = "3.0.12" }
+longport-proto = { path = "rust/crates/proto", version = "3.0.12" }
+longport-candlesticks = { path = "rust/crates/candlesticks", version = "3.0.12" }
+longport = { path = "rust", version = "3.0.12" }
+
+tokio = "1.47.1"
+tokio-tungstenite = "0.27.0"
+rust_decimal = "1.37.2"
+num_enum = "0.7.4"
+prost = "0.14.1"
+tracing = "0.1.41"
+bitflags = "2.9.2"
+futures-util = "0.3.31"
+time = "0.3.41"
+flume = "0.11.1"
+thiserror = "2.0.15"
+strum = "0.27.2"
+strum_macros = "0.27.2"
+serde = "1.0.219"
+serde_json = "1.0.142"
+dotenv = "0.15.0"
+http = "1.3.1"
+comfy-table = "7.1.4"
+itertools = "0.14.0"
+tracing-subscriber = "0.3.19"
+tracing-appender = "0.2.3"
+time-tz = "2.0.0"
+num-traits = "0.2.19"
+reqwest = { version = "0.12.23", default-features = false }
+parking_lot = "0.12.4"
+hmac = "0.12.1"
+sha1 = "0.10.6"
+sha2 = "0.10.9"
+percent-encoding = "2.3.1"
+byteorder = "1.5.0"
+url = "2.5.4"
+flate2 = "1.1.2"
+leaky-bucket = "1.1.2"
+pyo3 = "0.25.1"
+pythonize = "0.25.0"
+pyo3-build-config = "0.25.1"
+napi = { version = "3.2.4", default-features = false }
+napi-derive = "3.2.4"
+napi-build = "2.2.3"
+chrono = "0.4.41"
+poem-mcpserver = "0.2.5"
+poem-mcpserver-macros = "0.2.5"
+poem = "3.1.12"
+schemars = "1.0.4"
+clap = "4.5.45"
+dotenvy = "0.15.7"
+jni = "0.21.1"
+proc-macro2 = "1.0.101"
+quote = "1.0.40"
+syn = "2.0.106"
+darling = "0.21.2"
+convert_case = "0.8.0"
+Inflector = "0.11.4"
+cbindgen = "0.29.0"
