@@ -52,13 +52,11 @@ impl TradeContext {
                     let callbacks = callbacks.lock();
                     match msg {
                         PushEvent::OrderChanged(order_changed) => {
-                            if let Some(callback) = &callbacks.order_changed {
-                                if let Ok(order_changed) = order_changed.try_into() {
-                                    callback.call(
-                                        Ok(order_changed),
-                                        ThreadsafeFunctionCallMode::Blocking,
-                                    );
-                                }
+                            if let Some(callback) = &callbacks.order_changed
+                                && let Ok(order_changed) = order_changed.try_into()
+                            {
+                                callback
+                                    .call(Ok(order_changed), ThreadsafeFunctionCallMode::Blocking);
                             }
                         }
                     }

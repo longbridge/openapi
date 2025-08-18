@@ -36,7 +36,7 @@ impl serde::ser::Error for QsError {
     }
 }
 
-fn replace_space(input: &str) -> Cow<str> {
+fn replace_space(input: &str) -> Cow<'_, str> {
     match input.as_bytes().iter().position(|&b| b == b' ') {
         None => Cow::Borrowed(input),
         Some(first_position) => {

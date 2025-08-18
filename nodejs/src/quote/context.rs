@@ -62,68 +62,68 @@ impl QuoteContext {
                     let callbacks = callbacks.lock();
                     match msg.detail {
                         PushEventDetail::Quote(quote) => {
-                            if let Some(callback) = &callbacks.quote {
-                                if let Ok(quote) = quote.try_into() {
-                                    callback.call(
-                                        Ok(PushQuoteEvent {
-                                            symbol: msg.symbol,
-                                            data: quote,
-                                        }),
-                                        ThreadsafeFunctionCallMode::Blocking,
-                                    );
-                                }
+                            if let Some(callback) = &callbacks.quote
+                                && let Ok(quote) = quote.try_into()
+                            {
+                                callback.call(
+                                    Ok(PushQuoteEvent {
+                                        symbol: msg.symbol,
+                                        data: quote,
+                                    }),
+                                    ThreadsafeFunctionCallMode::Blocking,
+                                );
                             }
                         }
                         PushEventDetail::Depth(depth) => {
-                            if let Some(callback) = &callbacks.depth {
-                                if let Ok(depth) = depth.try_into() {
-                                    callback.call(
-                                        Ok(PushDepthEvent {
-                                            symbol: msg.symbol,
-                                            data: depth,
-                                        }),
-                                        ThreadsafeFunctionCallMode::Blocking,
-                                    );
-                                }
+                            if let Some(callback) = &callbacks.depth
+                                && let Ok(depth) = depth.try_into()
+                            {
+                                callback.call(
+                                    Ok(PushDepthEvent {
+                                        symbol: msg.symbol,
+                                        data: depth,
+                                    }),
+                                    ThreadsafeFunctionCallMode::Blocking,
+                                );
                             }
                         }
                         PushEventDetail::Brokers(brokers) => {
-                            if let Some(callback) = &callbacks.brokers {
-                                if let Ok(brokers) = brokers.try_into() {
-                                    callback.call(
-                                        Ok(PushBrokersEvent {
-                                            symbol: msg.symbol,
-                                            data: brokers,
-                                        }),
-                                        ThreadsafeFunctionCallMode::Blocking,
-                                    );
-                                }
+                            if let Some(callback) = &callbacks.brokers
+                                && let Ok(brokers) = brokers.try_into()
+                            {
+                                callback.call(
+                                    Ok(PushBrokersEvent {
+                                        symbol: msg.symbol,
+                                        data: brokers,
+                                    }),
+                                    ThreadsafeFunctionCallMode::Blocking,
+                                );
                             }
                         }
                         PushEventDetail::Trade(trades) => {
-                            if let Some(callback) = &callbacks.trades {
-                                if let Ok(trades) = trades.try_into() {
-                                    callback.call(
-                                        Ok(PushTradesEvent {
-                                            symbol: msg.symbol,
-                                            data: trades,
-                                        }),
-                                        ThreadsafeFunctionCallMode::Blocking,
-                                    );
-                                }
+                            if let Some(callback) = &callbacks.trades
+                                && let Ok(trades) = trades.try_into()
+                            {
+                                callback.call(
+                                    Ok(PushTradesEvent {
+                                        symbol: msg.symbol,
+                                        data: trades,
+                                    }),
+                                    ThreadsafeFunctionCallMode::Blocking,
+                                );
                             }
                         }
                         PushEventDetail::Candlestick(candlestick) => {
-                            if let Some(callback) = &callbacks.candlestick {
-                                if let Ok(candlestick) = candlestick.try_into() {
-                                    callback.call(
-                                        Ok(PushCandlestickEvent {
-                                            symbol: msg.symbol,
-                                            data: candlestick,
-                                        }),
-                                        ThreadsafeFunctionCallMode::Blocking,
-                                    );
-                                }
+                            if let Some(callback) = &callbacks.candlestick
+                                && let Ok(candlestick) = candlestick.try_into()
+                            {
+                                callback.call(
+                                    Ok(PushCandlestickEvent {
+                                        symbol: msg.symbol,
+                                        data: candlestick,
+                                    }),
+                                    ThreadsafeFunctionCallMode::Blocking,
+                                );
                             }
                         }
                     }

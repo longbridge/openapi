@@ -101,7 +101,7 @@ struct TradingDays {
 
 impl TradingDays {
     #[inline]
-    fn half_days(&self, market: Market) -> Days {
+    fn half_days(&self, market: Market) -> Days<'_> {
         Days(self.half_days.get(&market))
     }
 }
@@ -555,10 +555,9 @@ impl Core {
                 .securities
                 .get(symbol)
                 .map(|data| &data.candlesticks)
+                && !candlesticks.is_empty()
             {
-                if !candlesticks.is_empty() {
-                    st.remove(SubFlags::QUOTE | SubFlags::TRADE);
-                }
+                st.remove(SubFlags::QUOTE | SubFlags::TRADE);
             }
 
             if !st.is_empty() {
