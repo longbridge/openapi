@@ -7,7 +7,7 @@ use crate::{
     Market,
     quote::{
         Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
-        Trade, TradeSession, TradeSessions,
+        Trade, TradeDirection, TradeSession, TradeSessions,
         push_types::{PushEventDetail, PushQuote},
     },
 };
@@ -138,7 +138,7 @@ impl Candlesticks {
         )
     }
 
-    pub(crate) fn merge_quote<H>(
+    pub(crate) fn merge_quote_day<H>(
         &mut self,
         market_type: Market,
         half_days: H,
@@ -156,7 +156,39 @@ impl Candlesticks {
         };
         let ts = push_quote.trade_session;
         let period = convert_period(period);
-        market.merge_quote(half_days, period, self.merge_input(ts), push_quote)
+        market.merge_quote_day(half_days, period, self.merge_input(ts), push_quote)
+    }
+
+    pub(crate) fn merge_quote<H>(
+        &mut self,
+        market_type: Market,
+        half_days: H,
+        board: SecurityBoard,
+        period: Period,
+        push_quote: &PushQuote,
+    ) -> UpdateAction<Candlestick>
+    where
+        H: Days,
+    {
+        let Some(market) = get_market(market_type, board) else {
+            return UpdateAction::None;
+        };
+        let ts = push_quote.trade_session;
+        let period = convert_period(period);
+        market.merge_trade(
+            half_days,
+            period,
+            self.merge_input(ts),
+            &Trade {
+                price: push_quote.last_done,
+                volume: push_quote.current_volume,
+                timestamp: push_quote.timestamp,
+                trade_type: String::new(),
+                direction: TradeDirection::Neutral,
+                trade_session: push_quote.trade_session,
+            },
+            UpdateFields::all(),
+        )
     }
 
     pub(crate) fn check_and_remove(&mut self) {

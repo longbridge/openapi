@@ -5,7 +5,7 @@ use std::{
 
 use comfy_table::Table;
 use itertools::Itertools;
-use longport_candlesticks::{TradeSessionType, UpdateAction};
+use longport_candlesticks::UpdateAction;
 use longport_httpcli::HttpClient;
 use longport_proto::quote::{
     self, AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
@@ -621,7 +621,7 @@ impl Core {
         tracing::info!(symbol = symbol, "fetch symbol board");
 
         let security_data = self.store.securities.entry(symbol.clone()).or_default();
-        if security_data.board != SecurityBoard::Unknown {
+        if security_data.board == SecurityBoard::Unknown {
             // update board
             let resp: SecurityStaticInfoResponse = self
                 .ws_cli
@@ -826,35 +826,53 @@ impl Core {
     }
 
     fn merge_candlesticks_by_quote(&mut self, symbol: &str, push_quote: &PushQuote) {
-        if push_quote.trade_session != TradeSession::Intraday {
-            return;
-        }
-
         let Some(market_type) = parse_market_from_symbol(symbol) else {
             return;
         };
         let Some(security_data) = self.store.securities.get_mut(symbol) else {
             return;
         };
+
+        if push_quote.trade_session != TradeSession::Intraday {
+            return;
+        }
+
         let half_days = self.trading_days.half_days(market_type);
 
-        if let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) {
-            let action = candlesticks.merge_quote(
-                market_type,
-                half_days,
-                security_data.board,
-                Period::Day,
-                push_quote,
-            );
-            update_and_push_candlestick(
-                candlesticks,
-                push_quote.trade_session,
-                symbol,
-                Period::Day,
-                action,
-                self.push_candlestick_mode,
-                &mut self.push_tx,
-            );
+        for (period, candlesticks) in &mut security_data.candlesticks {
+            let mtype = merge_type(security_data.board, push_quote.trade_session, *period);
+
+            let action = if mtype == MergeType::QuoteDay {
+                Some(candlesticks.merge_quote_day(
+                    market_type,
+                    half_days,
+                    security_data.board,
+                    *period,
+                    push_quote,
+                ))
+            } else if mtype == MergeType::Quote {
+                Some(candlesticks.merge_quote(
+                    market_type,
+                    half_days,
+                    security_data.board,
+                    *period,
+                    push_quote,
+                ))
+            } else {
+                None
+            };
+
+            if let Some(action) = action {
+                update_and_push_candlestick(
+                    candlesticks,
+                    push_quote.trade_session,
+                    symbol,
+                    *period,
+                    action,
+                    self.push_candlestick_mode,
+                    &mut self.push_tx,
+                );
+            }
         }
     }
 
@@ -865,11 +883,13 @@ impl Core {
         let Some(security_data) = self.store.securities.get_mut(symbol) else {
             return;
         };
+
         let half_days = self.trading_days.half_days(market_type);
 
         for trade in &push_trades.trades {
             for (period, candlesticks) in &mut security_data.candlesticks {
-                if *period >= Period::Day && !trade.trade_session.is_intraday() {
+                if merge_type(security_data.board, trade.trade_session, *period) != MergeType::Trade
+                {
                     continue;
                 }
 
@@ -1013,6 +1033,31 @@ impl Core {
                 candlesticks.to_vec()
             })
             .unwrap_or_default()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MergeType {
+    Trade,
+    QuoteDay,
+    Quote,
+}
+
+fn merge_type(board: SecurityBoard, trade_session: TradeSession, period: Period) -> MergeType {
+    use Period::*;
+    use SecurityBoard::*;
+    use TradeSession::*;
+
+    match (board, trade_session, period) {
+        (USDJI | USNSDQ | USSector | HKHS | HKSector | CNIX | CNSector | STI | SGSector, _, _) => {
+            if period == Day && trade_session == Intraday {
+                MergeType::QuoteDay
+            } else {
+                MergeType::Quote
+            }
+        }
+        (_, _, Day) if trade_session == Intraday => MergeType::QuoteDay,
+        _ => MergeType::Trade,
     }
 }
 
@@ -1165,5 +1210,26 @@ mod tests {
     fn test_parse_market_from_symbol() {
         assert_eq!(parse_market_from_symbol("AAPL.US"), Some(Market::US));
         assert_eq!(parse_market_from_symbol("BRK.A.US"), Some(Market::US));
+    }
+
+    #[test]
+    fn test_merge_type() {
+        use Period::*;
+        use SecurityBoard::*;
+        use TradeSession::*;
+
+        assert_eq!(merge_type(USDJI, Intraday, Day), MergeType::QuoteDay);
+        assert_eq!(merge_type(USDJI, Overnight, Day), MergeType::Quote);
+        assert_eq!(merge_type(USDJI, Intraday, OneMinute), MergeType::Quote);
+        assert_eq!(merge_type(USDJI, Overnight, OneMinute), MergeType::Quote);
+        assert_eq!(merge_type(USDJI, Intraday, Week), MergeType::Quote);
+        assert_eq!(merge_type(USDJI, Overnight, Week), MergeType::Quote);
+
+        assert_eq!(merge_type(USMain, Intraday, Day), MergeType::QuoteDay);
+        assert_eq!(merge_type(USMain, Overnight, Day), MergeType::Trade);
+        assert_eq!(merge_type(USMain, Intraday, OneMinute), MergeType::Trade);
+        assert_eq!(merge_type(USMain, Intraday, OneMinute), MergeType::Trade);
+        assert_eq!(merge_type(USMain, Overnight, Week), MergeType::Trade);
+        assert_eq!(merge_type(USMain, Overnight, Week), MergeType::Trade);
     }
 }

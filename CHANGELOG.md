@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add `trade_session` for query all session intraday.
 - add `Market.Crypto`.
+- fix subscription index K-line.
 
 # [3.0.10] 2025-07-27
 
