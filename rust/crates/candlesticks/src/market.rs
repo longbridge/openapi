@@ -129,7 +129,10 @@ impl Market {
     {
         use Period::*;
 
-        assert!(ts.is_intraday() || (!ts.is_intraday() && period.is_minute()));
+        if !ts.is_intraday() && !period.is_minute() {
+            return None;
+        }
+
         let ts = ts.kind();
 
         let t = t.to_timezone(self.timezone);
@@ -212,7 +215,6 @@ impl Market {
     {
         let trade_session = trade.trade_session();
 
-        debug_assert!(period != Period::Day);
         if let Some(input_trade_session) = input.as_ref().map(|c| c.trade_session()) {
             debug_assert!(input_trade_session == trade_session);
         }
@@ -308,36 +310,24 @@ impl Market {
     }
 
     #[must_use]
-    pub fn merge_quote_day<H, TS, C, Q, P, V, R>(
-        &self,
-        half_days: H,
-        period: Period,
-        input: Option<C>,
-        quote: &Q,
-    ) -> UpdateAction<C>
+    pub fn merge_quote_day<TS, C, Q, P, V, R>(&self, input: Option<C>, quote: &Q) -> UpdateAction<C>
     where
-        H: Days,
         TS: TradeSessionType + Eq,
         C: CandlestickType<PriceType = P, VolumeType = V, TurnoverType = R, TradeSessionType = TS>,
         Q: QuoteType<PriceType = P, VolumeType = V, TurnoverType = R, TradeSessionType = TS>,
     {
-        debug_assert_eq!(period, Period::Day);
-
         let trade_session = quote.trade_session();
+
+        if !trade_session.is_intraday() {
+            return UpdateAction::None;
+        }
 
         if let Some(input_trade_session) = input.as_ref().map(|c| c.trade_session()) {
             debug_assert!(input_trade_session == trade_session);
         }
 
         let tz = self.timezone;
-        let Some(time) = self.candlestick_time(
-            trade_session,
-            half_days,
-            period,
-            quote.time().to_timezone(tz),
-        ) else {
-            return UpdateAction::None;
-        };
+        let time = quote.time().to_timezone(tz).replace_time(Time::MIDNIGHT);
 
         match input {
             Some(prev) if time == prev.time() => {

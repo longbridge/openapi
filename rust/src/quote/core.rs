@@ -5,7 +5,7 @@ use std::{
 
 use comfy_table::Table;
 use itertools::Itertools;
-use longport_candlesticks::UpdateAction;
+use longport_candlesticks::{TradeSessionType, UpdateAction};
 use longport_httpcli::HttpClient;
 use longport_proto::quote::{
     self, AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
@@ -839,16 +839,13 @@ impl Core {
         let half_days = self.trading_days.half_days(market_type);
 
         for (period, candlesticks) in &mut security_data.candlesticks {
-            let mtype = merge_type(security_data.board, push_quote.trade_session, *period);
+            let Some(mtype) = merge_type(security_data.board, push_quote.trade_session, *period)
+            else {
+                continue;
+            };
 
             let action = if mtype == MergeType::QuoteDay {
-                Some(candlesticks.merge_quote_day(
-                    market_type,
-                    half_days,
-                    security_data.board,
-                    *period,
-                    push_quote,
-                ))
+                Some(candlesticks.merge_quote_day(market_type, security_data.board, push_quote))
             } else if mtype == MergeType::Quote {
                 Some(candlesticks.merge_quote(
                     market_type,
@@ -887,7 +884,8 @@ impl Core {
 
         for trade in &push_trades.trades {
             for (period, candlesticks) in &mut security_data.candlesticks {
-                if merge_type(security_data.board, trade.trade_session, *period) != MergeType::Trade
+                if merge_type(security_data.board, trade.trade_session, *period)
+                    != Some(MergeType::Trade)
                 {
                     continue;
                 }
@@ -1042,12 +1040,20 @@ enum MergeType {
     Quote,
 }
 
-fn merge_type(board: SecurityBoard, trade_session: TradeSession, period: Period) -> MergeType {
+fn merge_type(
+    board: SecurityBoard,
+    trade_session: TradeSession,
+    period: Period,
+) -> Option<MergeType> {
     use Period::*;
     use SecurityBoard::*;
     use TradeSession::*;
 
-    match (board, trade_session, period) {
+    if !trade_session.is_intraday() && period >= Day {
+        return None;
+    }
+
+    Some(match (board, trade_session, period) {
         (USDJI | USNSDQ | USSector | HKHS | HKSector | CNIX | CNSector | STI | SGSector, _, _) => {
             if period == Day && trade_session == Intraday {
                 MergeType::QuoteDay
@@ -1057,7 +1063,7 @@ fn merge_type(board: SecurityBoard, trade_session: TradeSession, period: Period)
         }
         (_, _, Day) if trade_session == Intraday => MergeType::QuoteDay,
         _ => MergeType::Trade,
-    }
+    })
 }
 
 async fn fetch_trading_days(cli: &WsClient) -> Result<TradingDays> {
@@ -1217,18 +1223,30 @@ mod tests {
         use SecurityBoard::*;
         use TradeSession::*;
 
-        assert_eq!(merge_type(USDJI, Intraday, Day), MergeType::QuoteDay);
-        assert_eq!(merge_type(USDJI, Overnight, Day), MergeType::Quote);
-        assert_eq!(merge_type(USDJI, Intraday, OneMinute), MergeType::Quote);
-        assert_eq!(merge_type(USDJI, Overnight, OneMinute), MergeType::Quote);
-        assert_eq!(merge_type(USDJI, Intraday, Week), MergeType::Quote);
-        assert_eq!(merge_type(USDJI, Overnight, Week), MergeType::Quote);
+        assert_eq!(merge_type(USDJI, Intraday, Day), Some(MergeType::QuoteDay));
+        assert_eq!(merge_type(USDJI, Overnight, Day), None);
+        assert_eq!(
+            merge_type(USDJI, Intraday, OneMinute),
+            Some(MergeType::Quote)
+        );
+        assert_eq!(
+            merge_type(USDJI, Overnight, OneMinute),
+            Some(MergeType::Quote)
+        );
+        assert_eq!(merge_type(USDJI, Intraday, Week), Some(MergeType::Quote));
+        assert_eq!(merge_type(USDJI, Overnight, Week), None);
 
-        assert_eq!(merge_type(USMain, Intraday, Day), MergeType::QuoteDay);
-        assert_eq!(merge_type(USMain, Overnight, Day), MergeType::Trade);
-        assert_eq!(merge_type(USMain, Intraday, OneMinute), MergeType::Trade);
-        assert_eq!(merge_type(USMain, Intraday, OneMinute), MergeType::Trade);
-        assert_eq!(merge_type(USMain, Overnight, Week), MergeType::Trade);
-        assert_eq!(merge_type(USMain, Overnight, Week), MergeType::Trade);
+        assert_eq!(merge_type(USMain, Intraday, Day), Some(MergeType::QuoteDay));
+        assert_eq!(merge_type(USMain, Overnight, Day), None);
+        assert_eq!(
+            merge_type(USMain, Intraday, OneMinute),
+            Some(MergeType::Trade)
+        );
+        assert_eq!(
+            merge_type(USMain, Overnight, OneMinute),
+            Some(MergeType::Trade)
+        );
+        assert_eq!(merge_type(USMain, Intraday, Week), Some(MergeType::Trade));
+        assert_eq!(merge_type(USMain, Overnight, Week), None);
     }
 }

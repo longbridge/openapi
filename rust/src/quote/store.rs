@@ -138,25 +138,17 @@ impl Candlesticks {
         )
     }
 
-    pub(crate) fn merge_quote_day<H>(
+    pub(crate) fn merge_quote_day(
         &mut self,
         market_type: Market,
-        half_days: H,
         board: SecurityBoard,
-        period: Period,
         push_quote: &PushQuote,
-    ) -> UpdateAction<Candlestick>
-    where
-        H: Days,
-    {
-        debug_assert!(period == Period::Day);
-
+    ) -> UpdateAction<Candlestick> {
         let Some(market) = get_market(market_type, board) else {
             return UpdateAction::None;
         };
         let ts = push_quote.trade_session;
-        let period = convert_period(period);
-        market.merge_quote_day(half_days, period, self.merge_input(ts), push_quote)
+        market.merge_quote_day(self.merge_input(ts), push_quote)
     }
 
     pub(crate) fn merge_quote<H>(
