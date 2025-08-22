@@ -742,7 +742,6 @@ jobs:
         with:
           toolchain: stable
       - name: get version
-        working-directory: ${{ matrix.package.path }}
         run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
       - name: check published version
         run: echo PUBLISHED_VERSION=$(cargo search ${{ matrix.package.registryName }} --limit 1 | sed -nE 's/^[^"]*"//; s/".*//1p' -) >> $GITHUB_ENV
@@ -785,7 +784,7 @@ jobs:
           merge-multiple: true
 
       - name: Get Version
-        run: echo SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' c/Cargo.toml) >> $GITHUB_ENV
+        run: echo SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
 
       - name: Package
         run: tar czvf openapi-cpp-sdk-$SDK_VERSION.tar.gz ./sdk
@@ -924,7 +923,6 @@ jobs:
           mv jnis/longport_java-aarch64-apple-darwin.dylib javasrc/target/natives/osx_arm64/liblongport_java.dylib
 
       - name: Get version
-        working-directory: java
         run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
 
       - name: Update version
