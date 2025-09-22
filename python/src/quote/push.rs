@@ -19,7 +19,7 @@ pub(crate) fn handle_push_event(callbacks: &Callbacks, event: PushEvent) {
 
 fn handle_quote(callbacks: &Callbacks, symbol: String, quote: PushQuote) {
     if let Some(callback) = &callbacks.quote {
-        let _ = Python::with_gil(|py| {
+        let _ = Python::attach(|py| {
             callback.call(
                 py,
                 (symbol, crate::quote::types::PushQuote::try_from(quote)?),
@@ -31,7 +31,7 @@ fn handle_quote(callbacks: &Callbacks, symbol: String, quote: PushQuote) {
 
 fn handle_depth(callbacks: &Callbacks, symbol: String, depth: PushDepth) {
     if let Some(callback) = &callbacks.depth {
-        let _ = Python::with_gil(|py| {
+        let _ = Python::attach(|py| {
             callback.call(
                 py,
                 (symbol, crate::quote::types::PushDepth::try_from(depth)?),
@@ -43,7 +43,7 @@ fn handle_depth(callbacks: &Callbacks, symbol: String, depth: PushDepth) {
 
 fn handle_brokers(callbacks: &Callbacks, symbol: String, brokers: PushBrokers) {
     if let Some(callback) = &callbacks.brokers {
-        let _ = Python::with_gil(|py| {
+        let _ = Python::attach(|py| {
             callback.call(
                 py,
                 (symbol, crate::quote::types::PushBrokers::try_from(brokers)?),
@@ -55,7 +55,7 @@ fn handle_brokers(callbacks: &Callbacks, symbol: String, brokers: PushBrokers) {
 
 fn handle_trades(callbacks: &Callbacks, symbol: String, trades: PushTrades) {
     if let Some(callback) = &callbacks.trades {
-        let _ = Python::with_gil(|py| {
+        let _ = Python::attach(|py| {
             callback.call(
                 py,
                 (symbol, crate::quote::types::PushTrades::try_from(trades)?),
@@ -67,7 +67,7 @@ fn handle_trades(callbacks: &Callbacks, symbol: String, trades: PushTrades) {
 
 fn handle_candlesticks(callbacks: &Callbacks, symbol: String, candlestick: PushCandlestick) {
     if let Some(callback) = &callbacks.candlestick {
-        let _ = Python::with_gil(|py| {
+        let _ = Python::attach(|py| {
             callback.call(
                 py,
                 (

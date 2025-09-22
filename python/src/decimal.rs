@@ -7,8 +7,8 @@ use std::{
 use pyo3::{exceptions::PyBaseException, prelude::*, types::PyType};
 use rust_decimal::Decimal;
 
-static DECIMAL_TYPE: LazyLock<PyObject> = LazyLock::new(|| {
-    Python::with_gil(|py| {
+static DECIMAL_TYPE: LazyLock<Py<PyAny>> = LazyLock::new(|| {
+    Python::attach(|py| {
         let decimal_module = py.import("decimal")?;
         let decimal_type = decimal_module.getattr("Decimal")?;
         Ok::<_, PyErr>(decimal_type.into_pyobject(py)?.unbind())
@@ -51,7 +51,7 @@ impl<'py> FromPyObject<'py> for PyDecimal {
             Ok(Self(Decimal::from(value)))
         } else {
             // convert from decimal.Decimal
-            Python::with_gil(|py| {
+            Python::attach(|py| {
                 let decimal_type = DECIMAL_TYPE
                     .downcast_bound::<PyType>(py)
                     .expect("decimal type");

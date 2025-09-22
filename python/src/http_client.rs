@@ -39,7 +39,7 @@ impl HttpClient {
         path: String,
         headers: Option<HashMap<String, String>>,
         body: Option<Bound<PyAny>>,
-    ) -> PyResult<PyObject> {
+    ) -> PyResult<Py<PyAny>> {
         let body = body
             .map(|body| pythonize::depythonize::<Value>(&body))
             .transpose()
@@ -63,7 +63,7 @@ impl HttpClient {
                     .unwrap()
                     .block_on(req.body(Json(body)).response::<Json<Value>>().send())
                     .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
-                Python::with_gil(|py| {
+                Python::attach(|py| {
                     Ok(pythonize::pythonize(py, &resp.0)
                         .map_err(|err| PyRuntimeError::new_err(err.to_string()))?
                         .into())
@@ -74,7 +74,7 @@ impl HttpClient {
                     .unwrap()
                     .block_on(req.response::<Json<Value>>().send())
                     .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
-                Python::with_gil(|py| {
+                Python::attach(|py| {
                     Ok(pythonize::pythonize(py, &resp.0)
                         .map_err(|err| PyRuntimeError::new_err(err.to_string()))?
                         .into())

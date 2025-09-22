@@ -9,7 +9,7 @@ use longport::{
     },
 };
 use parking_lot::Mutex;
-use pyo3::{PyObject, PyResult, Python, pyclass, pymethods};
+use pyo3::{Py, PyAny, PyResult, Python, pyclass, pymethods};
 
 use crate::{
     config::Config,
@@ -30,7 +30,7 @@ use crate::{
 
 #[derive(Debug, Default)]
 pub(crate) struct Callbacks {
-    pub(crate) order_changed: Option<PyObject>,
+    pub(crate) order_changed: Option<Py<PyAny>>,
 }
 
 #[pyclass]
@@ -56,7 +56,7 @@ impl TradeContext {
 
     /// Set order changed callback, after receiving the order changed event, it
     /// will call back to this function.
-    fn set_on_order_changed(&self, py: Python<'_>, callback: PyObject) {
+    fn set_on_order_changed(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().order_changed = None;
         } else {

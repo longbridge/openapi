@@ -19,7 +19,10 @@ longport = { workspace = true, features = ["blocking"] }
 longport-python-macros = { path = "crates/macros" }
 
 parking_lot.workspace = true
-pyo3 = { workspace = true, features = ["extension-module"] }
+pyo3 = { workspace = true, features = [
+    "extension-module",
+    "experimental-async",
+] }
 pythonize.workspace = true
 rust_decimal.workspace = true
 serde_json.workspace = true

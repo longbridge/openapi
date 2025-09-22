@@ -31,11 +31,11 @@ use crate::{
 
 #[derive(Debug, Default)]
 pub(crate) struct Callbacks {
-    pub(crate) quote: Option<PyObject>,
-    pub(crate) depth: Option<PyObject>,
-    pub(crate) brokers: Option<PyObject>,
-    pub(crate) trades: Option<PyObject>,
-    pub(crate) candlestick: Option<PyObject>,
+    pub(crate) quote: Option<Py<PyAny>>,
+    pub(crate) depth: Option<Py<PyAny>>,
+    pub(crate) brokers: Option<Py<PyAny>>,
+    pub(crate) trades: Option<Py<PyAny>>,
+    pub(crate) candlestick: Option<Py<PyAny>>,
 }
 
 #[pyclass]
@@ -81,7 +81,7 @@ impl QuoteContext {
 
     /// Set quote callback, after receiving the quote data push, it
     /// will call back to this function.
-    fn set_on_quote(&self, py: Python<'_>, callback: PyObject) {
+    fn set_on_quote(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().quote = None;
         } else {
@@ -91,7 +91,7 @@ impl QuoteContext {
 
     /// Set depth callback, after receiving the depth data push, it
     /// will call back to this function.
-    fn set_on_depth(&self, py: Python<'_>, callback: PyObject) {
+    fn set_on_depth(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().depth = None;
         } else {
@@ -101,7 +101,7 @@ impl QuoteContext {
 
     /// Set brokers callback, after receiving the brokers data push, it
     /// will call back to this function.
-    fn set_on_brokers(&self, py: Python<'_>, callback: PyObject) {
+    fn set_on_brokers(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().brokers = None;
         } else {
@@ -111,7 +111,7 @@ impl QuoteContext {
 
     /// Set trades callback, after receiving the trades data push, it
     /// will call back to this function.
-    fn set_on_trades(&self, py: Python<'_>, callback: PyObject) {
+    fn set_on_trades(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().trades = None;
         } else {
@@ -121,7 +121,7 @@ impl QuoteContext {
 
     /// Set candlestick callback, after receiving the candlestick updated event,
     /// it will call back to this function.
-    fn set_on_candlestick(&self, py: Python<'_>, callback: PyObject) {
+    fn set_on_candlestick(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().candlestick = None;
         } else {
