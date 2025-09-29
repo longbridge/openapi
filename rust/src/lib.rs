@@ -20,7 +20,7 @@ pub mod quote;
 pub mod trade;
 
 pub use config::{Config, Language, PushCandlestickMode};
-pub use error::{Error, Result, SimpleError};
+pub use error::{Error, Result, SimpleError, SimpleErrorKind};
 pub use longport_httpcli as httpclient;
 pub use longport_wscli as wsclient;
 pub use quote::QuoteContext;

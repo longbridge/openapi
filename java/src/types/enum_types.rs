@@ -13,6 +13,12 @@ use crate::{
 };
 
 impl_java_enum!(
+    "com/longport/ErrorKind",
+    longport::SimpleErrorKind,
+    [Http, OpenApi, Other]
+);
+
+impl_java_enum!(
     "com/longport/Language",
     longport::Language,
     [ZH_CN, ZH_HK, EN]

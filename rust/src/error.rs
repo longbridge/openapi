@@ -96,15 +96,24 @@ impl Error {
                 code,
                 message,
                 trace_id,
-            }) => SimpleError::Response {
+            }) => SimpleError::OpenApi {
                 code: code as i64,
                 message,
                 trace_id,
             },
+            Error::HttpClient(HttpClientError::Http(err)) => {
+                if let Some(status) = err.0.status() {
+                    SimpleError::Http {
+                        status_code: status.as_u16(),
+                    }
+                } else {
+                    SimpleError::Other(err.to_string())
+                }
+            }
             Error::WsClient(WsClientError::ResponseError {
                 detail: Some(detail),
                 ..
-            }) => SimpleError::Response {
+            }) => SimpleError::OpenApi {
                 code: detail.code as i64,
                 message: detail.msg,
                 trace_id: String::new(),
@@ -130,9 +139,15 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 /// Simple error type
 #[derive(Debug, thiserror::Error)]
 pub enum SimpleError {
-    /// Response error
-    #[error("response error: code={code} message={message}")]
-    Response {
+    /// Http error
+    #[error("http error: status_code={status_code}")]
+    Http {
+        /// HTTP status code
+        status_code: u16,
+    },
+    /// OpenAPI error
+    #[error("openapi error: code={code} message={message}")]
+    OpenApi {
         /// Error code
         code: i64,
         /// Error message
@@ -152,11 +167,32 @@ impl From<Error> for SimpleError {
     }
 }
 
+/// Simple error kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SimpleErrorKind {
+    /// HTTP error
+    Http,
+    /// OpenAPI error
+    OpenApi,
+    /// Other error
+    Other,
+}
+
 impl SimpleError {
+    /// Returns the kind of this error
+    pub fn kind(&self) -> SimpleErrorKind {
+        match self {
+            SimpleError::Http { .. } => SimpleErrorKind::Http,
+            SimpleError::OpenApi { .. } => SimpleErrorKind::OpenApi,
+            SimpleError::Other(_) => SimpleErrorKind::Other,
+        }
+    }
+
     /// Returns the error code
     pub fn code(&self) -> Option<i64> {
         match self {
-            SimpleError::Response { code, .. } => Some(*code),
+            SimpleError::Http { status_code } => Some(*status_code as i64),
+            SimpleError::OpenApi { code, .. } => Some(*code),
             SimpleError::Other(_) => None,
         }
     }
@@ -164,7 +200,8 @@ impl SimpleError {
     /// Returns the trace id
     pub fn trace_id(&self) -> Option<&str> {
         match self {
-            SimpleError::Response { trace_id, .. } => Some(trace_id),
+            SimpleError::Http { .. } => None,
+            SimpleError::OpenApi { trace_id, .. } => Some(trace_id),
             SimpleError::Other(_) => None,
         }
     }
@@ -172,7 +209,8 @@ impl SimpleError {
     /// Returns the error message
     pub fn message(&self) -> &str {
         match self {
-            SimpleError::Response { message, .. } => message.as_str(),
+            SimpleError::Http { .. } => "bad status code",
+            SimpleError::OpenApi { message, .. } => message.as_str(),
             SimpleError::Other(message) => message.as_str(),
         }
     }

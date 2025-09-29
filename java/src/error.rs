@@ -6,7 +6,10 @@ use jni::{
     objects::{JObject, JThrowable, JValue},
 };
 
-use crate::init::{LONG_CLASS, OPENAPI_EXCEPTION_CLASS};
+use crate::{
+    init::{LONG_CLASS, OPENAPI_EXCEPTION_CLASS},
+    types::IntoJValue,
+};
 
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum JniError {
@@ -44,6 +47,7 @@ impl JniError {
         let exception_cls = OPENAPI_EXCEPTION_CLASS.get().unwrap();
         let err = err.into_simple_error();
 
+        let kind = err.kind().into_jvalue(env)?;
         let code = match err.code() {
             Some(code) => {
                 env.new_object(LONG_CLASS.get().unwrap(), "(J)V", &[JValue::from(code)])?
@@ -54,8 +58,8 @@ impl JniError {
 
         env.new_object(
             exception_cls,
-            "(Ljava/lang/Long;Ljava/lang/String;)V",
-            &[JValue::from(&code), JValue::from(&message)],
+            "(Lcom/longport/ErrorKind;Ljava/lang/Long;Ljava/lang/String;)V",
+            &[kind.borrow(), JValue::from(&code), JValue::from(&message)],
         )
     }
 

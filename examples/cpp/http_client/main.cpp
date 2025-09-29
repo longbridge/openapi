@@ -18,7 +18,7 @@ main(int argc, char const* argv[])
   Status status = http_cli.from_env();
   if (!status) {
     std::cout << "failed to load configuration from environment: "
-              << status.message() << std::endl;
+              << *status.message() << std::endl;
     return -1;
   }
 
@@ -28,7 +28,7 @@ main(int argc, char const* argv[])
                    std::nullopt,
                    [](auto res) {
                      if (!res) {
-                       std::cout << "failed: " << res.status().message()
+                       std::cout << "failed: " << *res.status().message()
                                  << std::endl;
                        return;
                      }

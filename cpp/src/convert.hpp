@@ -9,6 +9,7 @@
 namespace longport {
 namespace convert {
 
+using longport::ErrorKind;
 using longport::quote::AdjustType;
 using longport::quote::Brokers;
 using longport::quote::CalcIndex;
@@ -113,6 +114,21 @@ convert(Language language)
       return Language_ZH_HK;
     case Language::EN:
       return Language_EN;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline ErrorKind
+convert(lb_error_kind_t kind)
+{
+  switch (kind) {
+    case ErrorKindHttp:
+      return ErrorKind::Http;
+    case ErrorKindOpenApi:
+      return ErrorKind::OpenApi;
+    case ErrorKindOther:
+      return ErrorKind::Other;
     default:
       throw std::invalid_argument("unreachable");
   }

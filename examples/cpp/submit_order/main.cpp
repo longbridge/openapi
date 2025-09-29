@@ -19,13 +19,13 @@ main(int argc, char const* argv[])
   Status status = Config::from_env(config);
   if (!status) {
     std::cout << "failed to load configuration from environment: "
-              << status.message() << std::endl;
+              << *status.message() << std::endl;
     return -1;
   }
 
   TradeContext::create(config, [](auto res) {
     if (!res) {
-      std::cout << "failed to create trade context: " << res.status().message()
+      std::cout << "failed to create trade context: " << *res.status().message()
                 << std::endl;
       return;
     }
@@ -39,7 +39,7 @@ main(int argc, char const* argv[])
     };
     res.context().submit_order(opts, [](auto res) {
       if (!res) {
-        std::cout << "failed to submit order: " << res.status().message()
+        std::cout << "failed to submit order: " << *res.status().message()
                   << std::endl;
         return;
       }

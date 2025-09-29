@@ -18,6 +18,7 @@ fn longport(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     openapi.add_class::<types::Market>()?;
     openapi.add_class::<types::PushCandlestickMode>()?;
     openapi.add_class::<http_client::HttpClient>()?;
+    openapi.add_class::<error::ErrorKind>()?;
     quote::register_types(&openapi)?;
     trade::register_types(&openapi)?;
 

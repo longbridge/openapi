@@ -337,6 +337,24 @@ typedef enum lb_deduction_status_t {
 } lb_deduction_status_t;
 
 /**
+ * Error kind
+ */
+typedef enum lb_error_kind_t {
+  /**
+   * HTTP error
+   */
+  ErrorKindHttp,
+  /**
+   * OpenAPI error
+   */
+  ErrorKindOpenApi,
+  /**
+   * Other error
+   */
+  ErrorKindOther,
+} lb_error_kind_t;
+
+/**
  * Filter warrant expiry date type
  */
 typedef enum lb_filter_warrant_expiry_date_t {
@@ -3849,6 +3867,8 @@ void lb_error_free(struct lb_error_t *error);
 const char *lb_error_message(const struct lb_error_t *error);
 
 int64_t lb_error_code(const struct lb_error_t *error);
+
+enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
 
 /**
  * Create a HTTP client

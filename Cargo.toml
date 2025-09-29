@@ -3,7 +3,7 @@ resolver = "3"
 members = ["rust", "python", "nodejs", "java", "c", "mcp"]
 
 [workspace.package]
-version = "3.0.14"
+version = "3.0.15"
 edition = "2024"
 
 [profile.release]
@@ -52,8 +52,8 @@ leaky-bucket = "1.1.2"
 pyo3 = "0.26.0"
 pythonize = "0.26.0"
 pyo3-build-config = "0.26.0"
-napi = { version = "3.2.4", default-features = false }
-napi-derive = "3.2.4"
+napi = { version = "3.2.5", default-features = false }
+napi-derive = "3.2.5"
 napi-build = "2.2.3"
 chrono = "0.4.41"
 poem-mcpserver = "0.2.5"

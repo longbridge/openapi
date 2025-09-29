@@ -19,7 +19,7 @@ main(int argc, char const* argv[])
   Status status = Config::from_env(config);
   if (!status) {
     std::cout << "failed to load configuration from environment: "
-              << status.message() << std::endl;
+              << *status.message() << std::endl;
     return -1;
   }
 
@@ -27,7 +27,7 @@ main(int argc, char const* argv[])
 
   QuoteContext::create(config, [&](auto res) {
     if (!res) {
-      std::cout << "failed to create quote context: " << res.status().message()
+      std::cout << "failed to create quote context: " << *res.status().message()
                 << std::endl;
       return;
     }
@@ -49,7 +49,7 @@ main(int argc, char const* argv[])
 
     res.context().subscribe(symbols, SubFlags::QUOTE(), true, [](auto res) {
       if (!res) {
-        std::cout << "failed to subscribe quote: " << res.status().message()
+        std::cout << "failed to subscribe quote: " << *res.status().message()
                   << std::endl;
         return;
       }

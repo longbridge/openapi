@@ -1,4 +1,5 @@
 #include "status.hpp"
+#include "convert.hpp"
 #include "longport.h"
 
 namespace longport {
@@ -50,18 +51,24 @@ Status::is_err() const
   return err_ != nullptr;
 }
 
-/// Returns the error code
-int64_t
-Status::code() const
+std::optional<ErrorKind>
+Status::kind() const
 {
-  return lb_error_code(err_);
+  return err_ ? std::make_optional(
+                  convert::convert(lb_error_kind(err_)))
+              : std::nullopt;
 }
 
-/// Returns the error message
-const char*
+std::optional<int64_t>
+Status::code() const
+{
+  return err_ ? std::make_optional(lb_error_code(err_)) : std::nullopt;
+}
+
+std::optional<const char*>
 Status::message() const
 {
-  return err_ ? lb_error_message(err_) : "no error";
+  return err_ ? std::make_optional(lb_error_message(err_)) : std::nullopt;
 }
 
 } // namespace longport

@@ -13,12 +13,12 @@ main()
 
   if (!status) {
     std::cout << "failed to load configuration from environment: "
-              << status.message() << std::endl;
+              << *status.message() << std::endl;
     return -1;
   }
   QuoteContext::create(config, [&](auto res) {
     if (!res) {
-      std::cout << "failed to create quote context: " << res.status().message()
+      std::cout << "failed to create quote context: " << *res.status().message()
                 << std::endl;
       return;
     }
@@ -39,7 +39,7 @@ main()
       [&](auto res) {
         if (!res) {
           std::cout << "failed to request history candlesticks: "
-                    << res.status().message() << std::endl;
+                    << *res.status().message() << std::endl;
           return;
         }
 

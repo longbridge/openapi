@@ -1,12 +1,18 @@
 package com.longport;
 
 public class OpenApiException extends Exception {
+    private ErrorKind kind;
     private Long code;
     private String message;
 
-    public OpenApiException(Long code, String message) {
+    public OpenApiException(ErrorKind kind, Long code, String message) {
+        this.kind = kind;
         this.code = code;
         this.message = message;
+    }
+
+    public ErrorKind getKind() {
+        return kind;
     }
 
     public Long getCode() {
@@ -19,6 +25,6 @@ public class OpenApiException extends Exception {
 
     @Override
     public String toString() {
-        return "OpenApiException [code=" + code + ", message=" + message + "]";
+        return "OpenApiException [kind=" + kind + ", code=" + code + ", message=" + message + "]";
     }
 }

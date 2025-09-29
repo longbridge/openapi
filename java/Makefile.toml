@@ -28,6 +28,7 @@ args = [
   "-d",
   "classes",
 
+  "javasrc/src/main/java/com/longport/ErrorKind.java",
   "javasrc/src/main/java/com/longport/AsyncCallback.java",
   "javasrc/src/main/java/com/longport/Config.java",
   "javasrc/src/main/java/com/longport/ConfigBuilder.java",

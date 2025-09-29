@@ -1,10 +1,19 @@
 #pragma once
 
+#include <optional>
 #include <stdint.h>
 
 typedef struct lb_error_t lb_error_t;
 
 namespace longport {
+
+enum class ErrorKind
+{
+  Http,
+  OpenApi,
+  Other,
+};
+
 class Status
 {
 private:
@@ -26,11 +35,14 @@ public:
   /// Returns `true` if an errors occurs
   bool is_err() const;
 
-  /// Returns the error code
-  int64_t code() const;
+  /// Returns the error kind if an error occurs
+  std::optional<ErrorKind> kind() const;
 
-  /// Returns the error message
-  const char* message() const;
+  /// Returns the error code if an error occurs
+  std::optional<int64_t> code() const;
+
+  /// Returns the error message if an error occurs
+  std::optional<const char*> message() const;
 };
 
 } // namespace longport

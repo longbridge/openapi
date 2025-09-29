@@ -3,12 +3,38 @@ from decimal import Decimal
 from typing import Any, Callable, List, Optional, Type
 
 
+class ErrorKind:
+    """
+    Error kind
+    """
+
+    class Http(ErrorKind):
+        """
+        HTTP error
+        """
+
+    class OpenApi(ErrorKind):
+        """
+        OpenApi error
+        """
+
+    class Other(ErrorKind):
+        """
+        Other error
+        """
+
+
 class OpenApiException(Exception):
     """
     OpenAPI exception
     """
 
-    code: Optional[int]
+    kind: ErrorKind
+    """
+    Error kind
+    """
+
+    code: int
     """
     Error code
     """

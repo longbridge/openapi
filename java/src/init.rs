@@ -78,6 +78,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
     // enum types
     init_class_by_classloader!(
         env,
+        longport::SimpleErrorKind,
         longport::Language,
         longport::PushCandlestickMode,
         longport::Market,

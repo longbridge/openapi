@@ -13,6 +13,7 @@ cpp_compat = true
 "CDecimal" = "lb_decimal_t"
 "CAsyncCallback" = "lb_async_callback_t"
 "CAsyncResult" = "lb_async_result_t"
+"CErrorKind" = "lb_error_kind_t"
 "CError" = "lb_error_t"
 "CConfig" = "lb_config_t"
 "CSubscription" = "lb_subscription_t"

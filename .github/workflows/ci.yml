@@ -239,13 +239,13 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: "--platform=linux/aarch64 ubuntu:20.04"
+          base_image: "--platform=linux/aarch64 ubuntu:22.04"
           githubToken: ${{ github.token }}
           dockerRunArgs: |
             --volume "${PWD}/dist:/artifacts"
           install: |
             apt-get update
-            apt-get install -y --no-install-recommends python3 python3-venv software-properties-common
+            apt-get install -y --no-install-recommends python3 python3-venv software-properties-common gnupg
             add-apt-repository ppa:deadsnakes/ppa
             apt-get update
             apt-get install -y curl python${{ matrix.python-version }}-venv
