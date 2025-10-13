@@ -151,7 +151,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: "--platform=linux/aarch64 ubuntu:20.04"
+          base_image: "--platform=linux/aarch64 ubuntu:22.04"
           githubToken: ${{ github.token }}
           dockerRunArgs: |
             --volume "${PWD}/dist:/artifacts"
