@@ -333,6 +333,10 @@ convert(lb_security_board_t ty)
       return SecurityBoard::STI;
     case SecurityBoardSGSector:
       return SecurityBoard::SGSector;
+    case SecurityBoardSPXIndex:
+      return SecurityBoard::SPXIndex;
+    case SecurityBoardVIXIndex:
+      return SecurityBoard::VIXIndex;
     default:
       throw std::invalid_argument("unreachable");
   }

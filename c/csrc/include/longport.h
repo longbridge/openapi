@@ -940,6 +940,14 @@ typedef enum lb_security_board_t {
    * SG Industry Board
    */
   SecurityBoardSGSector,
+  /**
+   * S&P 500 Index
+   */
+  SecurityBoardSPXIndex,
+  /**
+   * CBOE Volatility Index
+   */
+  SecurityBoardVIXIndex,
 } lb_security_board_t;
 
 /**

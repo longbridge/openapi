@@ -355,6 +355,10 @@ pub enum SecurityBoard {
     STI,
     /// SG Industry Board
     SGSector,
+    /// S&P 500 Index
+    SPXIndex,
+    /// CBOE Volatility Index
+    VIXIndex,
 }
 
 /// The basic information of securities

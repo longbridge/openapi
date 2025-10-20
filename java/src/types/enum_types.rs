@@ -210,6 +210,8 @@ impl_java_enum!(
         SGMain,
         STI,
         SGSector,
+        SPXIndex,
+        VIXIndex,
     ]
 );
 

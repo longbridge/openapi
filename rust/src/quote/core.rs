@@ -1054,7 +1054,12 @@ fn merge_type(
     }
 
     Some(match (board, trade_session, period) {
-        (USDJI | USNSDQ | USSector | HKHS | HKSector | CNIX | CNSector | STI | SGSector, _, _) => {
+        (
+            USDJI | USNSDQ | USSector | HKHS | HKSector | CNIX | CNSector | STI | SGSector
+            | SPXIndex | VIXIndex,
+            _,
+            _,
+        ) => {
             if period == Day && trade_session == Intraday {
                 MergeType::QuoteDay
             } else {

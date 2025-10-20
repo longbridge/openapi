@@ -233,6 +233,12 @@ pub enum CSecurityBoard {
     /// SG Industry Board
     #[c(remote = "SGSector")]
     SecurityBoardSGSector,
+    /// S&P 500 Index
+    #[c(remote = "SPXIndex")]
+    SecurityBoardSPXIndex,
+    /// CBOE Volatility Index
+    #[c(remote = "VIXIndex")]
+    SecurityBoardVIXIndex,
 }
 
 /// Candlestick period

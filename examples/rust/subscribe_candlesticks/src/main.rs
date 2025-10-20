@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_env()?);
     let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
     println!("member id: {}", ctx.member_id());
-    ctx.subscribe_candlesticks("HSI.HK", Period::OneMinute, TradeSessions::All)
+    ctx.subscribe_candlesticks(".SPX.US", Period::OneMinute, TradeSessions::All)
         .await?;
 
     while let Some(event) = receiver.recv().await {
