@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # [3.0.18] 2025-11-13
 
 - add `US_VIX` market definition.
+- python: add support Python `3.14`.
 
 # [3.0.17] 2025-10-22
 

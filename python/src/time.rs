@@ -17,8 +17,10 @@ impl Debug for PyOffsetDateTimeWrapper {
     }
 }
 
-impl<'py> FromPyObject<'py> for PyOffsetDateTimeWrapper {
-    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+impl<'a, 'py> FromPyObject<'a, 'py> for PyOffsetDateTimeWrapper {
+    type Error = PyErr;
+
+    fn extract(ob: Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
         let date: Bound<PyDateTime> = ob.extract()?;
         let year = date.get_year();
         let month = date.get_month();
@@ -90,8 +92,10 @@ impl<'py> IntoPyObject<'py> for PyDateWrapper {
     }
 }
 
-impl<'py> FromPyObject<'py> for PyDateWrapper {
-    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+impl<'a, 'py> FromPyObject<'a, 'py> for PyDateWrapper {
+    type Error = PyErr;
+
+    fn extract(ob: Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
         let date: Bound<PyDate> = ob.extract()?;
         let year = date.get_year();
         let month = date.get_month();

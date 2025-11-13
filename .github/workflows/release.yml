@@ -25,6 +25,8 @@ jobs:
             universal2: true
           - version: "3.13"
             universal2: true
+          - version: "3.14"
+            universal2: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,7 +68,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version:
+          ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         target: [x64, x86]
     steps:
       - name: Checkout
@@ -101,7 +104,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version:
+          ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         target: [x86_64, i686]
     steps:
       - name: Checkout
@@ -133,7 +137,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version:
+          ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         target: [aarch64]
     steps:
       - name: Checkout
