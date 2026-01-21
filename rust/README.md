@@ -20,7 +20,24 @@
 </div>
 
 
-`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+
+## Documentation
+
+- SDK docs: https://longportapp.github.io/openapi/rust/longport/index.html
+- crates.io: https://crates.io/crates/longport
+- LongPort OpenAPI: https://open.longportapp.com/en/
+
+## Examples
+
+Runnable examples live in `examples/rust/`:
+
+- `examples/rust/account_asset/src/main.rs`
+- `examples/rust/http_client/src/main.rs`
+- `examples/rust/subscribe_quote/src/main.rs`
+- `examples/rust/subscribe_candlesticks/src/main.rs`
+- `examples/rust/submit_order/src/main.rs`
+- `examples/rust/today_orders/src/main.rs`
 
 ## Quickstart
 
@@ -140,6 +157,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+## Troubleshooting
+
+- Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
+- If you don't see push events, keep the process alive (receiver loop / `sleep`).
+- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+
 ## Crate features
 
 To avoid compiling unused dependencies, longport gates certain features, all of which are disabled by default:
@@ -152,5 +175,5 @@ To avoid compiling unused dependencies, longport gates certain features, all of 
 
 Licensed under either of
 
-* Apache License, Version 2.0,([LICENSE-APACHE](./LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-* MIT license ([LICENSE-MIT](./LICENSE-MIT) or <http://opensource.org/licenses/MIT>) at your option.
+* Apache License, Version 2.0,([LICENSE-APACHE](../LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+* MIT license ([LICENSE-MIT](../LICENSE-MIT) or <http://opensource.org/licenses/MIT>) at your option.

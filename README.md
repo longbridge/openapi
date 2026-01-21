@@ -39,9 +39,78 @@ LongPort OpenAPI provides programmatic quote trading interfaces for investors wi
 | LONGPORT_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)         |
 | LONGPORT_LOG_PATH              | Set the path of the log files (Default: `no logs`)                               |
 
-## SDK Documenation
+## Quickstart
+
+- Pick a language SDK and follow its README for install + first request:
+  - Rust: `rust/README.md`
+  - Python: `python/README.md`
+  - Node.js: `nodejs/README.md`
+  - Java: `java/README.md`
+  - C: `c/README.md`
+  - C++: `cpp/README.md`
+  - Go: https://github.com/longportapp/openapi-go
+- Full reference docs: https://longportapp.github.io/openapi
+
+## SDK Documentation
 
 https://longportapp.github.io/openapi
+
+## Troubleshooting
+
+- Environment variables not taking effect
+  - macOS/Linux: `export ...` only affects the current shell session.
+  - Windows: `setx ...` requires opening a new terminal/session to take effect.
+- Authentication errors (401/403)
+  - Verify `LONGPORT_APP_KEY`, `LONGPORT_APP_SECRET`, `LONGPORT_ACCESS_TOKEN` are correct and not expired.
+  - Ensure your OpenAPI app has the required permissions.
+- Network / connection errors
+  - Check firewall/proxy rules for HTTPS/WSS.
+  - If you use a custom endpoint, set `LONGPORT_HTTP_URL`, `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`.
+- Quote subscription exits immediately
+  - Keep the process running (event loop / sleep / blocking receive loop), otherwise you will not see push events.
+- Debugging
+  - Enable logs via `LONGPORT_LOG_PATH`.
+  - If quotes connect but look empty, keep `LONGPORT_PRINT_QUOTE_PACKAGES=true` to confirm opened quote packages.
+
+## Minimal Verification
+
+If you're not sure whether your environment / credentials are correct, start with the built-in HTTP client examples.
+
+- Python:
+
+  ```bash
+  python examples/python/http_client.py
+  ```
+
+- Node.js:
+
+  ```bash
+  node examples/nodejs/http_client.js
+  ```
+
+- Rust:
+
+  ```bash
+  cargo run --manifest-path examples/rust/Cargo.toml -p http_client
+  ```
+
+- Java (from the example module directory):
+
+  ```bash
+  cd examples/java/http_client
+  mvn -q -DskipTests package
+  mvn -q -DskipTests exec:java
+  ```
+
+- C/C++:
+  - Use the sources in `examples/c/http_client/main.c` and `examples/cpp/http_client/main.cpp`.
+  - Build instructions depend on your toolchain; see the corresponding language SDK README.
+
+Expected results:
+
+- If credentials are valid and network is reachable, the HTTP call returns JSON.
+- If it returns 401/403, check your `LONGPORT_APP_KEY`, `LONGPORT_APP_SECRET`, `LONGPORT_ACCESS_TOKEN`.
+- If it times out / cannot connect, check proxy/firewall and your endpoint env vars.
 
 ## Resources
 

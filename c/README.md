@@ -1,6 +1,22 @@
 # LongPort OpenAPI SDK for C
 
-`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+
+## Documentation
+
+- SDK docs: https://longportapp.github.io/openapi/c/index.html
+- LongPort OpenAPI: https://open.longportapp.com/en/
+
+## Examples
+
+Runnable examples live in `examples/c/`:
+
+- `examples/c/account_asset/main.c`
+- `examples/c/get_quote/main.c`
+- `examples/c/http_client/main.c`
+- `examples/c/subscribe_quote/main.c`
+- `examples/c/submit_order/main.c`
+- `examples/c/today_orders/main.c`
 
 ## Quickstart
 
@@ -44,8 +60,7 @@ on_quote(const struct lb_async_result_t* res)
   }
 
   lb_security_quote_t* data = (lb_security_quote_t*)res->data;
-  fop(int i = 0; i < res->length; i++)
-  {
+  for (int i = 0; i < res->length; i++) {
     const lb_security_quote_t* quote = &data[i];
     printf("%s timestamp=%ld last_done=%f open=%f high=%f low=%f volume=%ld "
            "turnover=%f\n",
@@ -72,7 +87,7 @@ on_quote_context_created(const struct lb_async_result_t* res)
   *((const lb_quote_context_t**)res->userdata) = res->ctx;
 
   const char* symbols[] = { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" };
-  lb_quote_context_quote(res->ctx, symbols, on_quote, NULL);
+  lb_quote_context_quote(res->ctx, symbols, 4, on_quote, NULL);
 }
 
 int
@@ -150,7 +165,7 @@ on_quote_context_created(const struct lb_async_result_t* res)
 
   const char* symbols[] = { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" };
   lb_quote_context_subscribe(
-    res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, true, on_subscrbe, NULL);
+    res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, on_subscrbe, NULL);
 }
 
 int
@@ -212,12 +227,18 @@ on_trade_context_created(const struct lb_async_result_t* res)
   *((const lb_quote_context_t**)res->userdata) = res->ctx;
 
   lb_decimal_t* submitted_price = lb_decimal_from_double(50.0);
+  lb_decimal_t* submitted_quantity = lb_decimal_from_double(200.0);
   lb_submit_order_options_t opts = {
-    "700.HK", OrderTypeLO, OrderSideBuy, 200,  TimeInForceDay, submitted_price,
-    NULL,     NULL,        NULL,         NULL, NULL,           NULL,
+    "700.HK",       OrderTypeLO,
+    OrderSideBuy,   submitted_quantity,
+    TimeInForceDay, submitted_price,
+    NULL,           NULL,
+    NULL,           NULL,
+    NULL,           NULL,
     NULL,
   };
   lb_decimal_free(submitted_price);
+  lb_decimal_free(submitted_quantity);
   lb_trade_context_submit_order(res->ctx, &opts, on_submit_order, NULL);
 }
 
@@ -245,9 +266,16 @@ main(int argc, char const* argv[])
 }
 ```
 
+## Troubleshooting
+
+- Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
+- If you don't see callbacks, keep the process alive (examples use `getchar()`).
+- If building on Linux/macOS, ensure `ncurses` is installed (examples link it on non-Windows).
+- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+
 ## License
 
 Licensed under either of
 
-* Apache License, Version 2.0,([LICENSE-APACHE](./LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](./LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.
+* Apache License, Version 2.0,([LICENSE-APACHE](../LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](../LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.

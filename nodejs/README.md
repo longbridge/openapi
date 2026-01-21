@@ -1,6 +1,22 @@
 # LongPort OpenAPI SDK for Node.js
 
-`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+
+## Documentation
+
+- SDK docs: https://longportapp.github.io/openapi/nodejs/index.html
+- LongPort OpenAPI: https://open.longportapp.com/en/
+
+## Examples
+
+Runnable examples live in `examples/nodejs/`:
+
+- `examples/nodejs/account_asset.js`
+- `examples/nodejs/http_client.js`
+- `examples/nodejs/subscribe_candlesticks.js`
+- `examples/nodejs/subscribe_quote.js`
+- `examples/nodejs/submit_order.js`
+- `examples/nodejs/today_orders.js`
 
 ## Quickstart
 
@@ -84,9 +100,15 @@ TradeContext.new(config)
   .then((resp) => console.log(resp.toString()));
 ```
 
+## Troubleshooting
+
+- Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
+- If the script exits, you won't receive push events; keep Node running.
+- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+
 ## License
 
 Licensed under either of
 
-* Apache License, Version 2.0,([LICENSE-APACHE](./LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](./LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.
+* Apache License, Version 2.0,([LICENSE-APACHE](../LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](../LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.

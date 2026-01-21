@@ -1,12 +1,29 @@
 # LongPort OpenAPI SDK for C++
 
-`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+
+## Documentation
+
+- SDK docs: https://longportapp.github.io/openapi/cpp/index.html
+- LongPort OpenAPI: https://open.longportapp.com/en/
+
+## Examples
+
+Runnable examples live in `examples/cpp/`:
+
+- `examples/cpp/get_quote/main.cpp`
+- `examples/cpp/history_candlesticks_by_offset/main.cpp`
+- `examples/cpp/http_client/main.cpp`
+- `examples/cpp/subscribe_candlesticks/main.cpp`
+- `examples/cpp/subscribe_quote/main.cpp`
+- `examples/cpp/submit_order/main.cpp`
+- `examples/cpp/today_orders/main.cpp`
 
 ## Quickstart
 
 _Install LongPort OpenAPI SDK_
 
-[`Download C++ SDK`]([`Download C SDK`](https://github.com/longportapp/openapi/releases))
+[`Download C++ SDK`](https://github.com/longportapp/openapi/releases)
 
 _Setting environment variables(MacOS/Linux)_
 
@@ -209,9 +226,16 @@ main(int argc, char const* argv[])
 }
 ```
 
+## Troubleshooting
+
+- Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
+- If you don't see push events, keep the process alive (examples use `std::cin.get()`).
+- If building on Linux/macOS, ensure `ncurses` is installed (examples link it on non-Windows).
+- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+
 ## License
 
 Licensed under either of
 
-* Apache License, Version 2.0,([LICENSE-APACHE](./LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](./LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.
+* Apache License, Version 2.0,([LICENSE-APACHE](../LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](../LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.

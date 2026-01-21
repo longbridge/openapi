@@ -2,6 +2,11 @@
 
 A [MCP](https://modelcontextprotocol.io/introduction) server implementation for [LongPort OpenAPI](https://open.longportapp.com), provides real-time stock market data, provides AI access analysis and trading capabilities through MCP.
 
+## Documentation
+
+- LongPort OpenAPI: https://open.longportapp.com/en/
+- SDK docs: https://longportapp.github.io/openapi
+
 ## Features
 
 - Trading - Create, amend, cancel orders, query today’s/past orders and transaction details, etc.

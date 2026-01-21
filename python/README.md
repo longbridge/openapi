@@ -1,6 +1,23 @@
 # LongPort OpenAPI SDK for Python
 
-`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+
+## Documentation
+
+- SDK docs: https://longportapp.github.io/openapi/python/index.html
+- LongPort OpenAPI: https://open.longportapp.com/en/
+
+## Examples
+
+Runnable examples live in `examples/python/`:
+
+- `examples/python/account_asset.py`
+- `examples/python/history_candlesticks.py`
+- `examples/python/http_client.py`
+- `examples/python/subscribe_candlesticks.py`
+- `examples/python/subscribe_quote.py`
+- `examples/python/submit_order.py`
+- `examples/python/today_orders.py`
 
 ## References
 
@@ -98,9 +115,15 @@ resp = ctx.submit_order("700.HK", OrderType.LO, OrderSide.Buy, Decimal(
 print(resp)
 ```
 
+## Troubleshooting
+
+- Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
+- If the program exits, you won't receive push events; keep the process alive (e.g. `sleep(...)`).
+- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+
 ## License
 
 Licensed under either of
 
-* Apache License, Version 2.0,([LICENSE-APACHE](./LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](./LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.
+* Apache License, Version 2.0,([LICENSE-APACHE](../LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](../LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.

@@ -1,6 +1,21 @@
 # LongPort OpenAPI SDK for Java
 
-`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+
+## Documentation
+
+- SDK docs: https://longportapp.github.io/openapi/java/index.html
+- LongPort OpenAPI: https://open.longportapp.com/en/
+
+## Examples
+
+Runnable examples live in `examples/java/`:
+
+- `examples/java/account_asset/src/main/java/main.java`
+- `examples/java/history_candlesticks/src/main/java/Main.java`
+- `examples/java/subscribe_quote/src/main/java/Main.java`
+- `examples/java/submit_order/src/main/java/Main.java`
+- `examples/java/today_orders/src/main/java/main.java`
 
 ## Quickstart
 
@@ -94,9 +109,15 @@ public class Main {
 }
 ```
 
+## Troubleshooting
+
+- Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
+- If you don't see push events, ensure the program keeps running (e.g. `Thread.sleep(...)`).
+- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+
 ## License
 
 Licensed under either of
 
-* Apache License, Version 2.0,([LICENSE-APACHE](./LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](./LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.
+* Apache License, Version 2.0,([LICENSE-APACHE](../LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](../LICENSE-MIT) or http://opensource.org/licenses/MIT) at your option.
