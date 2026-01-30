@@ -23,7 +23,7 @@ use crate::{
     async_util,
     error::jni_result,
     init::TRADE_CONTEXT_CLASS,
-    types::{FromJValue, IntoJValue, ObjectArray, get_field, set_field},
+    types::{FromJValue, IntoJValue, JavaInteger, ObjectArray, get_field, set_field},
 };
 
 #[derive(Default)]
@@ -350,13 +350,13 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextReplaceOrd
         if let Some(trailing_percent) = trailing_percent {
             new_opts = new_opts.trailing_percent(trailing_percent);
         }
-        let limit_depth_level: Option<i32> = get_field(env, &opts, "limitDepthLevel")?;
+        let limit_depth_level: Option<JavaInteger> = get_field(env, &opts, "limitDepthLevel")?;
         if let Some(limit_depth_level) = limit_depth_level {
-            new_opts = new_opts.limit_depth_level(limit_depth_level);
+            new_opts = new_opts.limit_depth_level(limit_depth_level.into());
         }
-        let trigger_count: Option<i32> = get_field(env, &opts, "triggerCount")?;
+        let trigger_count: Option<JavaInteger> = get_field(env, &opts, "triggerCount")?;
         if let Some(trigger_count) = trigger_count {
-            new_opts = new_opts.trigger_count(trigger_count);
+            new_opts = new_opts.trigger_count(trigger_count.into());
         }
         let monitor_price: Option<Decimal> = get_field(env, &opts, "monitorPrice")?;
         if let Some(monitor_price) = monitor_price {
@@ -419,13 +419,13 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitOrde
         if let Some(outside_rth) = outside_rth {
             new_opts = new_opts.outside_rth(outside_rth);
         }
-        let limit_depth_level: Option<i32> = get_field(env, &opts, "limitDepthLevel")?;
+        let limit_depth_level: Option<JavaInteger> = get_field(env, &opts, "limitDepthLevel")?;
         if let Some(limit_depth_level) = limit_depth_level {
-            new_opts = new_opts.limit_depth_level(limit_depth_level);
+            new_opts = new_opts.limit_depth_level(limit_depth_level.into());
         }
-        let trigger_count: Option<i32> = get_field(env, &opts, "triggerCount")?;
+        let trigger_count: Option<JavaInteger> = get_field(env, &opts, "triggerCount")?;
         if let Some(trigger_count) = trigger_count {
-            new_opts = new_opts.trigger_count(trigger_count);
+            new_opts = new_opts.trigger_count(trigger_count.into());
         }
         let monitor_price: Option<Decimal> = get_field(env, &opts, "monitorPrice")?;
         if let Some(monitor_price) = monitor_price {

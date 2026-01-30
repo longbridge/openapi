@@ -123,7 +123,7 @@ impl_java_class!(
         eps_ttm,
         bps,
         dividend_yield,
-        #[java(derivative_types)]
+        #[java(set_as = crate::types::enum_types::DerivativeTypes)]
         stock_derivatives,
         board,
     ]
@@ -652,7 +652,9 @@ impl_java_class!(
         trigger_status,
         currency,
         outside_rth,
+        #[java(set_as_opt = crate::types::JavaInteger)]
         limit_depth_level,
+        #[java(set_as_opt = crate::types::JavaInteger)]
         trigger_count,
         monitor_price,
         remark
@@ -915,7 +917,9 @@ impl_java_class!(
         trigger_status,
         currency,
         outside_rth,
+        #[java(set_as_opt = crate::types::JavaInteger)]
         limit_depth_level,
+        #[java(set_as_opt = crate::types::JavaInteger)]
         trigger_count,
         monitor_price,
         remark,

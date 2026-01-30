@@ -14,8 +14,14 @@ struct FieldArgs {
     objarray: bool,
     #[darling(default)]
     priarray: bool,
+    /// Rust type used for set_field: must implement IntoJValue and
+    /// From<FieldType>.
     #[darling(default)]
-    derivative_types: bool,
+    set_as: Option<Path>,
+    /// Like set_as but for Option<T> fields: wrapper type with
+    /// From<Option<FieldType>>.
+    #[darling(default)]
+    set_as_opt: Option<Path>,
 }
 
 #[derive(FromMeta, Debug, Default)]
@@ -122,9 +128,15 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
         };
         let java_field = ident.to_string().to_camel_case();
 
-        if args.derivative_types {
+        if let Some(set_type) = args.set_as_opt.as_ref() {
+            // Option<T> field: pass ident.map(set_type::from) as Option<set_type>, which
+            // implements IntoJValue
             set_fields.push(quote! {
-                crate::types::set_field(env, &obj, #java_field, crate::types::enum_types::DerivativeTypes::from(#ident))?;
+                crate::types::set_field(env, &obj, #java_field, #ident.map(#set_type::from))?;
+            });
+        } else if let Some(set_type) = args.set_as.as_ref() {
+            set_fields.push(quote! {
+                crate::types::set_field(env, &obj, #java_field, #set_type::from(#ident))?;
             });
         } else if args.objarray {
             set_fields.push(quote! {
