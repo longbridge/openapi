@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # [3.0.22]
 
 - python: add asyncio support for quote, trade, and HTTP client; existing sync API unchanged.
+- rust: fix incorrect field mapping in `WarrantInfo` for warrant filter API.
 
 # [3.0.21]
 
