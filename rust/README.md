@@ -48,7 +48,79 @@ _Add dependencies to `Cargo.toml`_
 longport = "1.0.0"
 ```
 
-_Setting environment variables(MacOS/Linux)_
+### Authentication
+
+LongPort OpenAPI supports two authentication methods:
+
+#### 1. OAuth 2.0 (Recommended)
+
+OAuth 2.0 is the modern authentication method that uses Bearer tokens without requiring HMAC signatures.
+
+**Step 1: Register OAuth Client**
+
+First, register an OAuth client to get your `client_id`:
+
+```bash
+curl -X POST https://openapi.longportapp.com/v1/oauth2/client/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Application",
+    "redirect_uris": ["http://localhost:60355/callback"],
+    "grant_types": ["authorization_code", "refresh_token"]
+  }'
+```
+
+Response:
+```json
+{
+  "client_id": "your-client-id-here",
+  "client_secret": null,
+  "name": "My Application",
+  "redirect_uris": ["http://localhost:60355/callback"]
+}
+```
+
+Save the `client_id` for use in your application.
+
+**Step 2: Authorize and Get Token** (requires `oauth` feature)
+
+```rust
+use std::sync::Arc;
+use longport::{Config, oauth::OAuth};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Start OAuth authorization flow
+    let oauth = OAuth::new("your-client-id");
+    let token = oauth.authorize().await?;
+
+    // Save token securely for future use
+    // (e.g., encrypted file, secure keychain)
+
+    // Create config with OAuth token
+    let config = Arc::new(Config::from_oauth(
+        oauth.client_id(),
+        &token.access_token
+    ));
+
+    // Use config to create contexts...
+    Ok(())
+}
+```
+
+**Benefits:**
+- More secure (no shared secret)
+- Simpler integration (no signature calculation)
+- Token-based authentication
+- Better suited for modern applications
+
+**Note:** OAuth tokens should be stored securely in your application (e.g., encrypted file, secure keychain), **not in environment variables** for security reasons.
+
+#### 2. Legacy API Key (Environment Variables)
+
+For backward compatibility, you can still use the traditional API key method:
+
+_Setting environment variables (MacOS/Linux)_
 
 ```bash
 export LONGPORT_APP_KEY="App Key get from user center"
@@ -56,7 +128,7 @@ export LONGPORT_APP_SECRET="App Secret get from user center"
 export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 ```
 
-_Setting environment variables(Windows)_
+_Setting environment variables (Windows)_
 
 ```powershell
 setx LONGPORT_APP_KEY "App Key get from user center"
@@ -66,14 +138,38 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 
 ## Quote API _(Get basic information of securities)_
 
+**Using OAuth 2.0 (Recommended):**
+
 ```rust,no_run
 use std::sync::Arc;
+use longport::{Config, QuoteContext};
 
-use longport::{
-    decimal,
-    trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
-    Config, QuoteContext, TradeContext,
-};
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create config with OAuth 2.0
+    let config = Arc::new(Config::from_oauth(
+        "your-oauth-client-id",
+        "your-oauth-access-token"
+    ));
+
+    // Create a context for quote APIs
+    let (ctx, _) = QuoteContext::try_new(config.clone()).await?;
+
+    // Get basic information of securities
+    let resp = ctx
+        .quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+        .await?;
+    println!("{:?}", resp);
+
+    Ok(())
+}
+```
+
+**Using legacy API key (environment variables):**
+
+```rust,no_run
+use std::sync::Arc;
+use longport::{Config, QuoteContext};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -167,9 +263,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 To avoid compiling unused dependencies, longport gates certain features, all of which are disabled by default:
 
-| Feature  | Description                         |
-|----------|-------------------------------------|
-| blocking | Provides the `blocking` client API. |
+| Feature  | Description                                              |
+|----------|----------------------------------------------------------|
+| blocking | Provides the `blocking` client API.                     |
+| oauth    | Provides OAuth 2.0 authorization flow support.          |
+
+**Enable OAuth feature in `Cargo.toml`:**
+
+```toml
+[dependencies]
+longport = { version = "1.0.0", features = ["oauth"] }
+```
 
 ## License
 
