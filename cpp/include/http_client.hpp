@@ -29,6 +29,7 @@ private:
 public:
   HttpClient();
   HttpClient(HttpClient&) = delete;
+  HttpClient(HttpClient&&) noexcept;
   ~HttpClient();
 
   /**
