@@ -69,7 +69,6 @@ pub enum Error {
     Blocking(#[from] crate::blocking::BlockingError),
 
     /// OAuth error
-    #[cfg(feature = "oauth")]
     #[error("oauth error: {0}")]
     OAuth(String),
 }
@@ -134,7 +133,6 @@ impl Error {
             | Error::WsClient(_) => SimpleError::Other(self.to_string()),
             #[cfg(feature = "blocking")]
             Error::Blocking(_) => SimpleError::Other(self.to_string()),
-            #[cfg(feature = "oauth")]
             Error::OAuth(_) => SimpleError::Other(self.to_string()),
         }
     }

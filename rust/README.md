@@ -82,7 +82,7 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize and Get Token** (requires `oauth` feature)
+**Step 2: Authorize and Get Token**
 
 ```rust
 use std::sync::Arc;
@@ -263,17 +263,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 To avoid compiling unused dependencies, longport gates certain features, all of which are disabled by default:
 
-| Feature  | Description                                              |
-|----------|----------------------------------------------------------|
-| blocking | Provides the `blocking` client API.                     |
-| oauth    | Provides OAuth 2.0 authorization flow support.          |
-
-**Enable OAuth feature in `Cargo.toml`:**
-
-```toml
-[dependencies]
-longport = { version = "1.0.0", features = ["oauth"] }
-```
+| Feature  | Description                         |
+|----------|-------------------------------------|
+| blocking | Provides the `blocking` client API. |
 
 ## License
 

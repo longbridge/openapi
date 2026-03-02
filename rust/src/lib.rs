@@ -17,10 +17,7 @@ mod types;
 #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
 pub mod blocking;
 
-#[cfg(feature = "oauth")]
-#[cfg_attr(docsrs, doc(cfg(feature = "oauth")))]
 pub mod oauth;
-
 pub mod quote;
 pub mod trade;
 
