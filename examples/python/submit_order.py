@@ -1,15 +1,24 @@
+import asyncio
 from decimal import Decimal
 
 from longport.openapi import (
     TradeContext,
     Config,
+    OAuth,
     OrderSide,
     OrderType,
     TimeInForceType,
     OutsideRTH,
 )
 
-config = Config.from_env()
+
+async def get_config() -> Config:
+    oauth = OAuth("your-client-id")
+    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    return Config.from_oauth("your-client-id", token.access_token)
+
+
+config = asyncio.run(get_config())
 ctx = TradeContext(config)
 
 resp = ctx.submit_order(

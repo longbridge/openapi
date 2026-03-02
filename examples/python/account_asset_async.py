@@ -1,11 +1,12 @@
-"""Get account balance (async). Use asyncio with AsyncTradeContext."""
 import asyncio
 
-from longport.openapi import AsyncTradeContext, Config
+from longport.openapi import AsyncTradeContext, Config, OAuth
 
 
 async def main() -> None:
-    config = Config.from_env()
+    oauth = OAuth("your-client-id")
+    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    config = Config.from_oauth("your-client-id", token.access_token)
     ctx = await AsyncTradeContext.create(config)
     resp = await ctx.account_balance()
     print(resp)

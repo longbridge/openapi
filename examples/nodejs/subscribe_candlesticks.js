@@ -1,9 +1,13 @@
-const { Config, QuoteContext, Period, TradeSessions } = require("longport");
+const { Config, QuoteContext, Period, TradeSessions, OAuth } = require("longport");
 
 let globalCtx;
 
 async function main() {
-  let config = Config.fromEnv();
+  const oauth = new OAuth("your-client-id");
+  const token = await oauth.authorize((url) => {
+    console.log(url);
+  });
+  let config = Config.fromOauth("your-client-id", token.accessToken);
   globalCtx = await QuoteContext.new(config);
   globalCtx.setOnCandlestick((_, event) => console.log(event.toString()));
   globalCtx.subscribeCandlesticks(

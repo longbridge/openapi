@@ -15,37 +15,51 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  Config config;
-  Status status = Config::from_env(config);
-  if (!status) {
-    std::cout << "failed to load configuration from environment: "
-              << *status.message() << std::endl;
-    return -1;
-  }
+  const std::string client_id = "your-client-id";
+  OAuth oauth(client_id);
 
-  TradeContext::create(config, [](auto res) {
-    if (!res) {
-      std::cout << "failed to create trade context: " << *res.status().message()
-                << std::endl;
-      return;
-    }
-
-    SubmitOrderOptions opts{
-      "700.HK",     OrderType::LO,        OrderSide::Buy,
-      Decimal(200), TimeInForceType::Day, Decimal(50.0),
-      std::nullopt, std::nullopt,         std::nullopt,
-      std::nullopt, std::nullopt,         std::nullopt,
-      std::nullopt,
-    };
-    res.context().submit_order(opts, [](auto res) {
+  oauth.authorize(
+    [](const std::string& url) { std::cout << url << std::endl; },
+    [client_id](auto res) {
       if (!res) {
-        std::cout << "failed to submit order: " << *res.status().message()
+        std::cout << "authorization failed: " << *res.status().message()
                   << std::endl;
         return;
       }
-      std::cout << "order id: " << res->order_id << std::endl;
+
+      Config config;
+      Status status =
+        Config::from_oauth(client_id, res->access_token(), config);
+      if (!status) {
+        std::cout << "failed to create config: " << *status.message()
+                  << std::endl;
+        return;
+      }
+
+      TradeContext::create(config, [](auto res) {
+        if (!res) {
+          std::cout << "failed to create trade context: "
+                    << *res.status().message() << std::endl;
+          return;
+        }
+
+        SubmitOrderOptions opts{
+          "700.HK",     OrderType::LO,        OrderSide::Buy,
+          Decimal(200), TimeInForceType::Day, Decimal(50.0),
+          std::nullopt, std::nullopt,         std::nullopt,
+          std::nullopt, std::nullopt,         std::nullopt,
+          std::nullopt,
+        };
+        res.context().submit_order(opts, [](auto res) {
+          if (!res) {
+            std::cout << "failed to submit order: " << *res.status().message()
+                      << std::endl;
+            return;
+          }
+          std::cout << "order id: " << res->order_id << std::endl;
+        });
+      });
     });
-  });
 
   std::cin.get();
   return 0;

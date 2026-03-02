@@ -5,6 +5,7 @@ import datetime
 from longport.openapi import (
     AsyncQuoteContext,
     Config,
+    OAuth,
     Period,
     AdjustType,
     TradeSessions,
@@ -12,7 +13,9 @@ from longport.openapi import (
 
 
 async def main() -> None:
-    config = Config.from_env()
+    oauth = OAuth("your-client-id")
+    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    config = Config.from_oauth("your-client-id", token.access_token)
     ctx = await AsyncQuoteContext.create(config)
 
     # get candlesticks by offset

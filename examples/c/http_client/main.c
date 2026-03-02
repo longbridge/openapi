@@ -6,6 +6,8 @@
 #include <curses.h>
 #endif
 
+static const char* CLIENT_ID = "your-client-id";
+
 void
 on_response(const struct lb_async_result_t* res)
 {
@@ -18,21 +20,25 @@ on_response(const struct lb_async_result_t* res)
   printf("%s\n", lb_http_result_response_body(resp));
 }
 
-int
-main(int argc, char const* argv[])
+void
+on_open_url(const char* url, void* userdata)
 {
-#ifdef WIN32
-  SetConsoleOutputCP(CP_UTF8);
-#endif
+  printf("%s\n", url);
+}
 
-  lb_error_t* err = NULL;
-  lb_http_client_t* http_client = lb_http_client_from_env(&err);
-  if (err) {
-    printf("failed to create http client from environment: %s\n",
-           lb_error_message(err));
-    lb_error_free(err);
-    return -1;
+void
+on_oauth_authorize(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    printf("authorization failed: %s\n", lb_error_message(res->error));
+    return;
   }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  const char* access_token = lb_oauth_token_get_access_token(token);
+
+  lb_http_client_t* http_client =
+    lb_http_client_new("https://openapi.longportapp.com", "", "", access_token);
 
   lb_http_client_request(http_client,
                          "get",
@@ -43,5 +49,17 @@ main(int argc, char const* argv[])
                          NULL);
   getchar();
   lb_http_client_free(http_client);
+}
+
+int
+main(int argc, char const* argv[])
+{
+#ifdef WIN32
+  SetConsoleOutputCP(CP_UTF8);
+#endif
+
+  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, NULL);
+  lb_oauth_free(oauth);
   return 0;
 }
