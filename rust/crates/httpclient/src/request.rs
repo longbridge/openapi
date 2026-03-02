@@ -267,7 +267,7 @@ where
             request.url_mut().set_query(Some(&query_string));
         }
 
-        // signature the request
+        // Generate signature (None for OAuth 2.0, Some for legacy mode)
         let sign = signature(SignatureParams {
             request: &request,
             app_key: &config.app_key,
@@ -275,10 +275,14 @@ where
             app_secret: &config.app_secret,
             timestamp,
         });
-        request.headers_mut().insert(
-            "X-Api-Signature",
-            HeaderValue::from_maybe_shared(sign).expect("valid signature"),
-        );
+
+        // Only set X-Api-Signature header in legacy mode
+        if let Some(signature_value) = sign {
+            request.headers_mut().insert(
+                "X-Api-Signature",
+                HeaderValue::from_maybe_shared(signature_value).expect("valid signature"),
+            );
+        }
 
         if let Some(body) = &self.body {
             tracing::info!(method = %request.method(), url = %request.url(), body = ?body, "http request");

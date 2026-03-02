@@ -47,6 +47,10 @@ itertools.workspace = true
 tracing-subscriber.workspace = true
 tracing-appender.workspace = true
 time-tz.workspace = true
+oauth2.workspace = true
+open.workspace = true
+anyhow = "1.0"
+url.workspace = true
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["rt-multi-thread"] }
