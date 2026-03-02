@@ -74,6 +74,33 @@ impl Config {
         Ok(Self(longport::Config::from_env().map_err(ErrorNewType)?))
     }
 
+    /// Create a new `Config` for OAuth 2.0 authentication
+    ///
+    /// OAuth 2.0 is the recommended authentication method that uses Bearer tokens
+    /// and does not require app_secret or HMAC signatures.
+    ///
+    /// # Arguments
+    ///
+    /// * `client_id` - OAuth 2.0 client ID
+    /// * `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+    ///
+    /// # Example
+    ///
+    /// ```python
+    /// from longport.openapi import Config
+    ///
+    /// # Create config with OAuth 2.0
+    /// config = Config.from_oauth(
+    ///     client_id="your-oauth-client-id",
+    ///     access_token="your-oauth-access-token"
+    /// )
+    /// ```
+    #[classmethod]
+    #[pyo3(signature = (client_id, access_token))]
+    fn from_oauth(_cls: Bound<PyType>, client_id: String, access_token: String) -> Self {
+        Self(longport::Config::from_oauth(client_id, access_token))
+    }
+
     /// Gets a new `access_token`.
     ///
     /// `expired_at` - The expiration time of the access token, defaults to `90`

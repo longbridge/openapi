@@ -30,6 +30,8 @@ public class SdkNative {
 
         public static native long newConfigFromEnv();
 
+        public static native long newConfigFromOauth(String clientId, String accessToken);
+
         public static native void configRefreshAccessToken(long config, OffsetDateTime expired_at,
                         AsyncCallback callback);
 

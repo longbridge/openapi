@@ -84,7 +84,7 @@ Save the `client_id` for use in your application.
 
 **Step 2: Authorize and Get Token**
 
-```rust
+```rust,no_run
 use std::sync::Arc;
 use longport::{Config, oauth::OAuth};
 

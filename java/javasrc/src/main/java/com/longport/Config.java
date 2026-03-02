@@ -21,9 +21,9 @@ public class Config implements AutoCloseable {
      * <p>
      * It first gets the environment variables from the .env file in the current
      * directory.
-     * 
+     *
      * # Variables
-     * 
+     *
      * - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
      * (Default: `en`)
      * - `LONGPORT_APP_KEY` - App key
@@ -42,12 +42,27 @@ public class Config implements AutoCloseable {
      * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
      * `true` or `false` (Default: `true`)
      * - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
-     * 
+     *
      * @return Config object
      * @throws OpenApiException If an error occurs
      */
     public static Config fromEnv() throws OpenApiException {
         return new Config(SdkNative.newConfigFromEnv());
+    }
+
+    /**
+     * Create a new `Config` for OAuth 2.0 authentication
+     * <p>
+     * OAuth 2.0 is the recommended authentication method that uses Bearer tokens
+     * and does not require app_secret or HMAC signatures.
+     *
+     * @param clientId OAuth 2.0 client ID
+     * @param accessToken OAuth 2.0 access token (Bearer prefix is optional)
+     * @return Config object
+     * @throws OpenApiException If an error occurs
+     */
+    public static Config fromOauth(String clientId, String accessToken) throws OpenApiException {
+        return new Config(SdkNative.newConfigFromOauth(clientId, accessToken));
     }
 
     /**

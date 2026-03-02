@@ -121,19 +121,20 @@ impl Config {
     ///
     /// # Example
     ///
-    /// ```no_run
+    /// ```rust,no_run
     /// use std::sync::Arc;
     /// use longport::Config;
     ///
-    /// # tokio_test::block_on(async {
-    /// let config = Arc::new(Config::from_oauth(
-    ///     "your-client-id",
-    ///     "your-oauth-access-token"
-    /// ));
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let config = Arc::new(Config::from_oauth(
+    ///         "your-client-id",
+    ///         "your-oauth-access-token"
+    ///     ));
     ///
-    /// let (ctx, receiver) = longport::quote::QuoteContext::try_new(config).await?;
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
+    ///     let (ctx, receiver) = longport::quote::QuoteContext::try_new(config).await?;
+    ///     Ok(())
+    /// }
     /// ```
     pub fn from_oauth(client_id: impl Into<String>, access_token: impl Into<String>) -> Self {
         Self {
