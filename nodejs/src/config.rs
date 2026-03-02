@@ -112,8 +112,8 @@ impl Config {
 
     /// Create a new `Config` for OAuth 2.0 authentication
     ///
-    /// OAuth 2.0 is the recommended authentication method that uses Bearer tokens
-    /// and does not require app_secret or HMAC signatures.
+    /// OAuth 2.0 is the recommended authentication method that uses Bearer
+    /// tokens and does not require app_secret or HMAC signatures.
     ///
     /// # Arguments
     ///

@@ -27,16 +27,16 @@
 //! }
 //! ```
 
-use std::io::{BufRead, BufReader, Write};
-use std::net::TcpListener;
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::{
+    io::{BufRead, BufReader, Write},
+    net::TcpListener,
+    sync::{Arc, Mutex},
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 
-use oauth2::basic::BasicClient;
-use oauth2::reqwest::async_http_client;
 use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
-    Scope, TokenResponse, TokenUrl,
+    Scope, TokenResponse, TokenUrl, basic::BasicClient, reqwest::async_http_client,
 };
 use serde::{Deserialize, Serialize};
 use tokio::time::timeout;
@@ -107,7 +107,8 @@ impl OAuth {
     ///
     /// # Arguments
     ///
-    /// * `client_id` - OAuth 2.0 client ID obtained from LongPort developer portal
+    /// * `client_id` - OAuth 2.0 client ID obtained from LongPort developer
+    ///   portal
     pub fn new(client_id: impl Into<String>) -> Self {
         Self {
             client_id: client_id.into(),

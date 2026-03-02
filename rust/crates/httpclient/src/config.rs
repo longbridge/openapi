@@ -30,7 +30,8 @@ impl HttpClientConfig {
 
     /// Create a new `HttpClientConfig` for OAuth 2.0
     ///
-    /// OAuth 2.0 mode uses Bearer token authentication and does not require app_secret.
+    /// OAuth 2.0 mode uses Bearer token authentication and does not require
+    /// app_secret.
     ///
     /// # Arguments
     ///
@@ -42,10 +43,7 @@ impl HttpClientConfig {
     /// ```no_run
     /// use longport_httpcli::HttpClientConfig;
     ///
-    /// let config = HttpClientConfig::from_oauth(
-    ///     "your-client-id",
-    ///     "Bearer your-access-token"
-    /// );
+    /// let config = HttpClientConfig::from_oauth("your-client-id", "Bearer your-access-token");
     /// ```
     pub fn from_oauth(client_id: impl Into<String>, access_token: impl Into<String>) -> Self {
         let access_token = access_token.into();
