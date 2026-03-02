@@ -8,4 +8,5 @@ members = [
     "today_orders",
     "subscribe_candlesticks",
     "http_client",
+    "oauth",
 ]
