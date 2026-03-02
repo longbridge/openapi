@@ -119,3 +119,73 @@ impl HttpClientConfig {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_httpclient_config_from_oauth() {
+        let config = HttpClientConfig::from_oauth("test-client-id", "test-access-token");
+
+        assert_eq!(config.app_key, "test-client-id");
+        assert_eq!(config.access_token, "Bearer test-access-token");
+        assert_eq!(config.app_secret, "");
+        assert!(config.is_oauth2());
+    }
+
+    #[test]
+    fn test_httpclient_config_from_oauth_with_bearer_prefix() {
+        let config = HttpClientConfig::from_oauth("test-client-id", "Bearer already-has-prefix");
+
+        assert_eq!(config.app_key, "test-client-id");
+        assert_eq!(config.access_token, "Bearer already-has-prefix");
+        assert!(config.is_oauth2());
+    }
+
+    #[test]
+    fn test_httpclient_config_is_oauth2_with_bearer_token() {
+        let config = HttpClientConfig {
+            http_url: None,
+            app_key: "client-id".to_string(),
+            app_secret: String::new(),
+            access_token: "Bearer token123".to_string(),
+        };
+
+        assert!(config.is_oauth2());
+    }
+
+    #[test]
+    fn test_httpclient_config_is_oauth2_with_empty_secret() {
+        let config = HttpClientConfig {
+            http_url: None,
+            app_key: "app-key".to_string(),
+            app_secret: String::new(),
+            access_token: "regular-token".to_string(),
+        };
+
+        assert!(config.is_oauth2());
+    }
+
+    #[test]
+    fn test_httpclient_config_is_not_oauth2_legacy_mode() {
+        let config = HttpClientConfig {
+            http_url: None,
+            app_key: "app-key".to_string(),
+            app_secret: "app-secret".to_string(),
+            access_token: "access-token".to_string(),
+        };
+
+        assert!(!config.is_oauth2());
+    }
+
+    #[test]
+    fn test_httpclient_config_new() {
+        let config = HttpClientConfig::new("app-key", "app-secret", "access-token");
+
+        assert_eq!(config.app_key, "app-key");
+        assert_eq!(config.app_secret, "app-secret");
+        assert_eq!(config.access_token, "access-token");
+        assert_eq!(config.http_url, None);
+    }
+}

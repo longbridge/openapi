@@ -434,3 +434,38 @@ impl Config {
         internal_create_log_subscriber(self, path).unwrap_or_else(|| Arc::new(NoSubscriber::new()))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config_from_oauth() {
+        let config = Config::from_oauth("test-client-id", "test-access-token");
+
+        // Test that Config was created with OAuth settings
+        // We can't access private fields directly, but we can verify the config works
+        assert_eq!(config.language, Language::EN);
+    }
+
+    #[test]
+    fn test_config_from_oauth_with_bearer_prefix() {
+        let _config = Config::from_oauth("test-client-id", "Bearer already-has-prefix");
+
+        // Config should be created successfully
+        // Actual OAuth logic tested in httpclient crate
+    }
+
+    #[test]
+    fn test_config_default_values() {
+        let config = Config::from_oauth("client-id", "token");
+
+        assert_eq!(config.language, Language::EN);
+        assert_eq!(config.quote_ws_url, None);
+        assert_eq!(config.trade_ws_url, None);
+        assert_eq!(config.enable_overnight, None);
+        assert_eq!(config.push_candlestick_mode, None);
+        assert!(config.enable_print_quote_packages);
+        assert_eq!(config.log_path, None);
+    }
+}

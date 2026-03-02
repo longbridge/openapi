@@ -355,3 +355,130 @@ impl OAuth {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_oauth_token_not_expired() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now + 7200, // expires in 2 hours
+        };
+
+        assert!(!token.is_expired());
+    }
+
+    #[test]
+    fn test_oauth_token_expired() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now - 1, // expired 1 second ago
+        };
+
+        assert!(token.is_expired());
+    }
+
+    #[test]
+    fn test_oauth_token_expires_soon() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Token expires in 30 minutes
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now + 1800,
+        };
+
+        assert!(token.expires_soon());
+    }
+
+    #[test]
+    fn test_oauth_token_not_expires_soon() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Token expires in 2 hours
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now + 7200,
+        };
+
+        assert!(!token.expires_soon());
+    }
+
+    #[test]
+    fn test_oauth_token_serialization() {
+        let token = OAuthToken {
+            access_token: "test_access_token".to_string(),
+            refresh_token: Some("test_refresh_token".to_string()),
+            expires_at: 1234567890,
+        };
+
+        let json = serde_json::to_string(&token).unwrap();
+        let deserialized: OAuthToken = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(token.access_token, deserialized.access_token);
+        assert_eq!(token.refresh_token, deserialized.refresh_token);
+        assert_eq!(token.expires_at, deserialized.expires_at);
+    }
+
+    #[test]
+    fn test_oauth_token_serialization_without_refresh() {
+        let token = OAuthToken {
+            access_token: "test_access_token".to_string(),
+            refresh_token: None,
+            expires_at: 1234567890,
+        };
+
+        let json = serde_json::to_string(&token).unwrap();
+        let deserialized: OAuthToken = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(token.access_token, deserialized.access_token);
+        assert_eq!(token.refresh_token, deserialized.refresh_token);
+        assert_eq!(token.expires_at, deserialized.expires_at);
+    }
+
+    #[test]
+    fn test_oauth_new() {
+        let oauth = OAuth::new("test-client-id");
+        assert_eq!(oauth.client_id(), "test-client-id");
+        assert_eq!(oauth.callback_port, DEFAULT_CALLBACK_PORT);
+    }
+
+    #[test]
+    fn test_oauth_custom_callback_port() {
+        let oauth = OAuth::new("test-client-id").callback_port(8080);
+        assert_eq!(oauth.client_id(), "test-client-id");
+        assert_eq!(oauth.callback_port, 8080);
+    }
+
+    #[test]
+    fn test_oauth_create_client() {
+        let oauth = OAuth::new("test-client-id");
+        let client = oauth.create_oauth_client("http://localhost:60355/callback");
+
+        // Client should be created successfully
+        // We can't easily test the internal state, but we can verify it doesn't panic
+        drop(client);
+    }
+}
