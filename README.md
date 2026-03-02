@@ -20,7 +20,7 @@ LongPort OpenAPI provides programmatic quote trading interfaces for investors wi
 | [Java](java/README.md)      | [Doc](https://longportapp.github.io/openapi/java/index.html)          | LongPort OpenAPI for Java `(>= 11)`               |
 | [C](c/README.md)            | [Doc](https://longportapp.github.io/openapi/c/index.html)             | LongPort OpenAPI for C `(>= C99)`                 |
 | [C++](cpp/README.md)        | [Doc](https://longportapp.github.io/openapi/cpp/index.html)           | LongPort OpenAPI for C++`(>= C++17)`              |
-| Go                          |                                                                       | https://github.com/longportapp/openapi-go         |
+| Go                          |                                                                       | https://github.com/longbridge/openapi-go         |
 | [MCP](mcp/README.md)        |                                                                       | An MCP server implementation for LongPort OpenAPI |
 
 ## Environment Variables
@@ -114,8 +114,8 @@ Expected results:
 
 ## Resources
 
-- [LongPort OpenAPI](https://open.longportapp.com/en/)
-- [LongPort OpenAPI Docs](https://open.longportapp.com/en/docs)
+- [LongPort OpenAPI](https://open.longbridge.com/en/)
+- [LongPort OpenAPI Docs](https://open.longbridge.com/en/docs)
 
 ## License
 
