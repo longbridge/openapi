@@ -111,8 +111,8 @@ impl Config {
 
     /// Create a new `Config` for OAuth 2.0 authentication
     ///
-    /// OAuth 2.0 is the recommended authentication method that uses Bearer tokens
-    /// and does not require app_secret or HMAC signatures.
+    /// OAuth 2.0 is the recommended authentication method that uses Bearer
+    /// tokens and does not require app_secret or HMAC signatures.
     ///
     /// # Arguments
     ///
@@ -123,13 +123,14 @@ impl Config {
     ///
     /// ```rust,no_run
     /// use std::sync::Arc;
+    ///
     /// use longport::Config;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let config = Arc::new(Config::from_oauth(
     ///         "your-client-id",
-    ///         "your-oauth-access-token"
+    ///         "your-oauth-access-token",
     ///     ));
     ///
     ///     let (ctx, receiver) = longport::quote::QuoteContext::try_new(config).await?;
@@ -177,8 +178,9 @@ impl Config {
     ///
     /// # Note
     ///
-    /// For OAuth 2.0 authentication, use [`from_oauth`](Config::from_oauth) instead.
-    /// OAuth tokens should not be stored in environment variables for security reasons.
+    /// For OAuth 2.0 authentication, use [`from_oauth`](Config::from_oauth)
+    /// instead. OAuth tokens should not be stored in environment variables
+    /// for security reasons.
     pub fn from_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 

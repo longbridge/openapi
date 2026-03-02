@@ -1,14 +1,17 @@
 //! OAuth 2.0 authentication support for LongPort OpenAPI
 //!
-//! This module provides utilities for performing OAuth 2.0 authorization code flow
-//! to obtain access tokens for API authentication.
+//! This module provides utilities for performing OAuth 2.0 authorization code
+//! flow to obtain access tokens for API authentication.
 //!
 //! # Example
 //!
 //! ```no_run
-//! use longport::oauth::{OAuth, OAuthToken};
-//! use longport::Config;
 //! use std::sync::Arc;
+//!
+//! use longport::{
+//!     Config,
+//!     oauth::{OAuth, OAuthToken},
+//! };
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,10 +20,7 @@
 //!     let token = oauth.authorize().await?;
 //!
 //!     // Create config with OAuth token
-//!     let config = Arc::new(Config::from_oauth(
-//!         oauth.client_id(),
-//!         &token.access_token
-//!     ));
+//!     let config = Arc::new(Config::from_oauth(oauth.client_id(), &token.access_token));
 //!
 //!     // Use config to create contexts...
 //!     Ok(())

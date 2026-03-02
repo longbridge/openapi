@@ -82,8 +82,9 @@ impl HttpClientConfig {
     ///
     /// # Note
     ///
-    /// For OAuth 2.0 authentication, use [`from_oauth`](HttpClientConfig::from_oauth) instead.
-    /// OAuth tokens should not be stored in environment variables for security reasons.
+    /// For OAuth 2.0 authentication, use
+    /// [`from_oauth`](HttpClientConfig::from_oauth) instead. OAuth tokens
+    /// should not be stored in environment variables for security reasons.
     pub fn from_env() -> Result<Self, HttpClientError> {
         let _ = dotenv::dotenv();
 
