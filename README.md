@@ -48,7 +48,7 @@ LongPort OpenAPI provides programmatic quote trading interfaces for investors wi
   - Java: `java/README.md`
   - C: `c/README.md`
   - C++: `cpp/README.md`
-  - Go: https://github.com/longportapp/openapi-go
+  - Go: https://github.com/longbridge/openapi-go
 - Full reference docs: https://longportapp.github.io/openapi
 
 ## SDK Documentation
