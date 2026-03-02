@@ -48,7 +48,6 @@ tracing-subscriber.workspace = true
 tracing-appender.workspace = true
 time-tz.workspace = true
 oauth2.workspace = true
-open.workspace = true
 anyhow = "1.0"
 url.workspace = true
 

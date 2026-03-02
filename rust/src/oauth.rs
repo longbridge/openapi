@@ -16,7 +16,11 @@
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     // Start OAuth authorization flow
-//!     let oauth = OAuth::new("your-client-id");
+//!     let oauth = OAuth::new("your-client-id")
+//!         .on_open_url(|url| {
+//!             // Open the URL however you like, e.g. print it or launch a browser
+//!             println!("Please visit: {url}");
+//!         });
 //!     let token = oauth.authorize().await?;
 //!
 //!     // Create config with OAuth token
@@ -35,8 +39,8 @@ use std::{
 };
 
 use oauth2::{
-    AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
-    Scope, TokenResponse, TokenUrl, basic::BasicClient, reqwest::async_http_client,
+    basic::BasicClient, reqwest::async_http_client, AuthUrl, AuthorizationCode, ClientId,
+    CsrfToken, RedirectUrl, RefreshToken, RevocationUrl, Scope, TokenResponse, TokenUrl,
 };
 use serde::{Deserialize, Serialize};
 use tokio::time::timeout;
@@ -100,6 +104,7 @@ impl OAuthToken {
 pub struct OAuth {
     client_id: String,
     callback_port: u16,
+    open_url: Option<Box<dyn Fn(&str) + Send + Sync>>,
 }
 
 impl OAuth {
@@ -113,12 +118,26 @@ impl OAuth {
         Self {
             client_id: client_id.into(),
             callback_port: DEFAULT_CALLBACK_PORT,
+            open_url: None,
         }
     }
 
     /// Set custom callback port (default: 60355)
     pub fn callback_port(mut self, port: u16) -> Self {
         self.callback_port = port;
+        self
+    }
+
+    /// Set a callback to handle the authorization URL
+    ///
+    /// The callback receives the authorization URL as a `&str`. Use this to
+    /// open the URL in a browser, print it, or handle it in any other way
+    /// appropriate for your application.
+    ///
+    /// If not set, the URL is silently discarded (useful for testing or when
+    /// you retrieve the URL through other means).
+    pub fn on_open_url(mut self, f: impl Fn(&str) + Send + Sync + 'static) -> Self {
+        self.open_url = Some(Box::new(f));
         self
     }
 
@@ -131,7 +150,9 @@ impl OAuth {
     ///
     /// This will:
     /// 1. Start a local HTTP server to receive the callback
-    /// 2. Open the user's browser to the authorization page
+    /// 2. Invoke the [`on_open_url`](OAuth::on_open_url) callback with the
+    ///    authorization URL, so the caller can open it in a browser or handle
+    ///    it in any other way
     /// 3. Wait for the user to authorize and receive the authorization code
     /// 4. Exchange the code for an access token
     ///
@@ -167,13 +188,10 @@ impl OAuth {
             .url();
 
         tracing::info!("Starting OAuth authorization flow");
-        println!("Opening browser for LongPort OpenAPI authorization...");
-        println!("If the browser doesn't open, please visit:");
-        println!("{auth_url}");
 
-        // Try to open browser
-        if let Err(e) = open::that(auth_url.as_str()) {
-            tracing::warn!("Failed to open browser: {e}");
+        // Invoke caller-supplied callback with the authorization URL
+        if let Some(open_url) = &self.open_url {
+            open_url(auth_url.as_str());
         }
 
         // Start local callback server and wait for authorization code

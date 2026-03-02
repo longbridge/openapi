@@ -91,7 +91,11 @@ use longport::{Config, oauth::OAuth};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Start OAuth authorization flow
-    let oauth = OAuth::new("your-client-id");
+    let oauth = OAuth::new("your-client-id")
+        .on_open_url(|url| {
+            // Open the URL however you like, e.g. print it or launch a browser
+            println!("Please visit: {url}");
+        });
     let token = oauth.authorize().await?;
 
     // Save token securely for future use
