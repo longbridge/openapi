@@ -57,6 +57,16 @@ public:
 
   operator const lb_config_t*() const;
 
+  /// Create a new `Config` for OAuth 2.0 authentication
+  ///
+  /// OAuth 2.0 is the recommended authentication method that uses Bearer tokens
+  /// and does not require app_secret or HMAC signatures.
+  ///
+  /// @param client_id OAuth 2.0 client ID
+  /// @param access_token OAuth 2.0 access token (Bearer prefix is optional)
+  static Config from_oauth(const std::string& client_id,
+                           const std::string& access_token);
+
   /// Create a new `Config` from the given environment variables
   ///
   /// It first gets the environment variables from the `.env` file in the

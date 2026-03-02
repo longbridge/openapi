@@ -81,6 +81,12 @@ Config::from_env(Config& config)
   return status;
 }
 
+Config
+Config::from_oauth(const std::string& client_id, const std::string& access_token)
+{
+  return Config(lb_config_from_oauth(client_id.c_str(), access_token.c_str()));
+}
+
 void
 Config::refresh_access_token(int64_t expired_at,
                              AsyncCallback<void*, std::string> callback)

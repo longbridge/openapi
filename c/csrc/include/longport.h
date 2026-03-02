@@ -3903,6 +3903,19 @@ struct lb_config_t *lb_config_new(const char *app_key,
                                   const char *log_path);
 
 /**
+ * Create a new `Config` for OAuth 2.0 authentication
+ *
+ * OAuth 2.0 is the recommended authentication method that uses Bearer tokens
+ * and does not require app_secret or HMAC signatures.
+ *
+ * # Arguments
+ *
+ * - `client_id` - OAuth 2.0 client ID
+ * - `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+ */
+struct lb_config_t *lb_config_from_oauth(const char *client_id, const char *access_token);
+
+/**
  * Free the config object
  */
 void lb_config_free(struct lb_config_t *config);

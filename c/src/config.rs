@@ -1,5 +1,5 @@
 use std::{
-    ffi::{CStr, c_void},
+    ffi::{c_void, CStr},
     os::raw::c_char,
     sync::Arc,
 };
@@ -8,8 +8,8 @@ use longport::Config;
 use time::OffsetDateTime;
 
 use crate::{
-    async_call::{CAsyncCallback, execute_async},
-    error::{CError, set_error},
+    async_call::{execute_async, CAsyncCallback},
+    error::{set_error, CError},
     types::{CLanguage, CPushCandlestickMode, CString},
 };
 
@@ -117,6 +117,30 @@ pub unsafe extern "C" fn lb_config_new(
         config = config.log_path(CStr::from_ptr(log_path).to_str().expect("invalid log path"));
     }
 
+    Box::into_raw(Box::new(CConfig(Arc::new(config))))
+}
+
+/// Create a new `Config` for OAuth 2.0 authentication
+///
+/// OAuth 2.0 is the recommended authentication method that uses Bearer tokens
+/// and does not require app_secret or HMAC signatures.
+///
+/// # Arguments
+///
+/// - `client_id` - OAuth 2.0 client ID
+/// - `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_config_from_oauth(
+    client_id: *const c_char,
+    access_token: *const c_char,
+) -> *mut CConfig {
+    let client_id = CStr::from_ptr(client_id)
+        .to_str()
+        .expect("invalid client id");
+    let access_token = CStr::from_ptr(access_token)
+        .to_str()
+        .expect("invalid access token");
+    let config = Config::from_oauth(client_id, access_token);
     Box::into_raw(Box::new(CConfig(Arc::new(config))))
 }
 
