@@ -20,6 +20,8 @@ public class SdkNative {
 
         public static native long newHttpClientFromEnv();
 
+        public static native long newHttpClientFromOauth(String clientId, String accessToken);
+
         public static native void freeHttpClient(long httpClient);
 
         public static native void httpClientRequest(long httpClient, String request, AsyncCallback callback);

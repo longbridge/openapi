@@ -47,6 +47,15 @@ public:
   Status from_env();
 
   /**
+   * Create a new `HttpClient` from an OAuth 2.0 access token
+   *
+   * @param client_id   OAuth client ID
+   * @param access_token OAuth access token
+   */
+  static HttpClient from_oauth(const std::string& client_id,
+                               const std::string& access_token);
+
+  /**
    * Performs a HTTP request
    */
   void request(const std::string& method,

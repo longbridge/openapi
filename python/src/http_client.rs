@@ -46,6 +46,14 @@ impl HttpClient {
         })?)))
     }
 
+    #[classmethod]
+    fn from_oauth(_cls: Bound<PyType>, client_id: String, access_token: String) -> Self {
+        Self(Arc::new(LbHttpClient::new(HttpClientConfig::from_oauth(
+            client_id,
+            access_token,
+        ))))
+    }
+
     #[pyo3(signature = (method, path, headers=None, body=None))]
     fn request(
         &self,

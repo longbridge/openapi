@@ -26,10 +26,7 @@ main(int argc, char const* argv[])
         return;
       }
 
-      HttpClient http_cli("https://openapi.longportapp.com",
-                          "",
-                          "",
-                          res->access_token());
+      HttpClient http_cli = HttpClient::from_oauth(client_id, res->access_token());
 
       http_cli.request("get",
                        "/v1/trade/execution/today",

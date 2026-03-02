@@ -3981,6 +3981,11 @@ void lb_http_client_free(struct lb_http_client_t *http_client);
 struct lb_http_client_t *lb_http_client_from_env(struct lb_error_t **error);
 
 /**
+ * Create a new `HttpClient` from an OAuth 2.0 access token
+ */
+struct lb_http_client_t *lb_http_client_from_oauth(const char *client_id, const char *access_token);
+
+/**
  * Performs a HTTP request
  */
 void lb_http_client_request(struct lb_http_client_t *http_client,

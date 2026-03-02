@@ -77,6 +77,16 @@ class HttpClient:
         - `LONGPORT_ACCESS_TOKEN` - Access token
         """
 
+    @classmethod
+    def from_oauth(cls: Type[HttpClient], client_id: str, access_token: str) -> HttpClient:
+        """
+        Create a new `HttpClient` from an OAuth 2.0 access token
+
+        Args:
+            client_id: OAuth client ID
+            access_token: OAuth access token (with or without "Bearer " prefix)
+        """
+
     def request(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Any:
         """
         Performs a HTTP reqest

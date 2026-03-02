@@ -38,7 +38,7 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   const char* access_token = lb_oauth_token_get_access_token(token);
 
   lb_http_client_t* http_client =
-    lb_http_client_new("https://openapi.longportapp.com", "", "", access_token);
+    lb_http_client_from_oauth(CLIENT_ID, access_token);
 
   lb_http_client_request(http_client,
                          "get",

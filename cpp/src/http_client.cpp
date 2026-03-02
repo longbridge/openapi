@@ -41,6 +41,16 @@ HttpClient::from_env()
   return status;
 }
 
+HttpClient
+HttpClient::from_oauth(const std::string& client_id,
+                       const std::string& access_token)
+{
+  HttpClient client;
+  client.http_client_ =
+    lb_http_client_from_oauth(client_id.c_str(), access_token.c_str());
+  return client;
+}
+
 void
 HttpClient::request(
   const std::string& method,

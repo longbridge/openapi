@@ -39,6 +39,15 @@ impl HttpClient {
         ))
     }
 
+    /// Create a new `HttpClient` from an OAuth 2.0 access token
+    #[napi(factory)]
+    pub fn from_oauth(client_id: String, access_token: String) -> Self {
+        Self(LbHttpClient::new(HttpClientConfig::from_oauth(
+            client_id,
+            access_token,
+        )))
+    }
+
     /// Performs a HTTP request
     #[napi]
     pub async fn request(

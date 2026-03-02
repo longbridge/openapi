@@ -5,12 +5,7 @@ async function main() {
   const token = await oauth.authorize((url) => {
     console.log(url);
   });
-  let cli = new HttpClient(
-    "https://openapi.longportapp.com",
-    "",
-    "",
-    token.accessToken
-  );
+  let cli = HttpClient.fromOauth(oauth.clientId, token.accessToken);
   let resp = await cli.request("get", "/v1/trade/execution/today");
   console.log(resp);
 }

@@ -69,6 +69,23 @@ pub unsafe extern "C" fn lb_http_client_from_env(error: *mut *mut CError) -> *mu
     }
 }
 
+/// Create a new `HttpClient` from an OAuth 2.0 access token
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_http_client_from_oauth(
+    client_id: *const c_char,
+    access_token: *const c_char,
+) -> *mut CHttpClient {
+    let client_id = CStr::from_ptr(client_id)
+        .to_str()
+        .expect("invalid client id");
+    let access_token = CStr::from_ptr(access_token)
+        .to_str()
+        .expect("invalid access token");
+    Box::leak(Box::new(CHttpClient(HttpClient::new(
+        HttpClientConfig::from_oauth(client_id, access_token),
+    ))))
+}
+
 pub struct CHttpResult {
     response_body: CString,
 }
