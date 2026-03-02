@@ -48,6 +48,7 @@ tracing-subscriber.workspace = true
 tracing-appender.workspace = true
 time-tz.workspace = true
 oauth2.workspace = true
+poem.workspace = true
 anyhow = "1.0"
 url.workspace = true
 

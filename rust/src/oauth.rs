@@ -31,19 +31,15 @@
 //! }
 //! ```
 
-use std::{
-    io::{BufRead, BufReader, Write},
-    net::TcpListener,
-    sync::{Arc, Mutex},
-    time::{Duration, SystemTime, UNIX_EPOCH},
-};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use oauth2::{
     basic::BasicClient, reqwest::async_http_client, AuthUrl, AuthorizationCode, ClientId,
     CsrfToken, RedirectUrl, RefreshToken, RevocationUrl, Scope, TokenResponse, TokenUrl,
 };
+use poem::{handler, listener::TcpAcceptor, web::Query, EndpointExt, Route, Server};
 use serde::{Deserialize, Serialize};
-use tokio::time::timeout;
+use tokio::{sync::oneshot, time::timeout};
 
 use crate::error::{Error, Result};
 
@@ -253,125 +249,105 @@ impl OAuth {
         .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/oauth2/revoke")).unwrap())
     }
 
-    fn bind_callback_server(&self) -> Result<TcpListener> {
-        TcpListener::bind(format!("127.0.0.1:{}", self.callback_port))
+    fn bind_callback_server(&self) -> Result<std::net::TcpListener> {
+        std::net::TcpListener::bind(format!("127.0.0.1:{}", self.callback_port))
             .map_err(|e| Error::OAuth(format!("Failed to bind callback server: {}", e)))
     }
 
-    async fn wait_for_callback(listener: TcpListener) -> Result<(String, String)> {
+    async fn wait_for_callback(listener: std::net::TcpListener) -> Result<(String, String)> {
         let addr = listener
             .local_addr()
             .map_err(|e| Error::OAuth(format!("Failed to get local address: {}", e)))?;
         tracing::debug!("Callback server listening on {addr}");
 
-        let code = Arc::new(Mutex::new(None));
-        let state = Arc::new(Mutex::new(None));
-        let error = Arc::new(Mutex::new(None));
+        #[derive(Deserialize)]
+        struct CallbackParams {
+            code: Option<String>,
+            state: Option<String>,
+            error: Option<String>,
+        }
 
-        let code_clone = Arc::clone(&code);
-        let state_clone = Arc::clone(&state);
-        let error_clone = Arc::clone(&error);
+        const STYLE: &str = "<style>html { \
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, \
+            sans-serif; font-size: 16px; color: #e0e0e0; background: #202020; \
+            padding: 2rem; text-align: center; } </style>";
 
-        let server_task = tokio::task::spawn_blocking(move || {
-            for stream in listener.incoming() {
-                let mut stream = match stream {
-                    Ok(s) => s,
-                    Err(e) => {
-                        tracing::error!("Failed to accept connection: {e}");
-                        continue;
-                    }
-                };
+        let (tx, rx) = oneshot::channel::<std::result::Result<(String, String), String>>();
+        let tx = std::sync::Arc::new(tokio::sync::Mutex::new(Some(tx)));
 
-                let mut reader = BufReader::new(&stream);
-                let mut request_line = String::new();
-                if reader.read_line(&mut request_line).is_err() {
-                    continue;
-                }
+        #[handler]
+        async fn callback(
+            Query(params): Query<CallbackParams>,
+            tx: poem::web::Data<
+                &std::sync::Arc<
+                    tokio::sync::Mutex<
+                        Option<oneshot::Sender<std::result::Result<(String, String), String>>>,
+                    >,
+                >,
+            >,
+        ) -> poem::Response {
+            let result = if let Some(err) = params.error {
+                Err(err)
+            } else if let (Some(code), Some(state)) = (params.code, params.state) {
+                Ok((code, state))
+            } else {
+                Err("Missing authorization code or state".to_string())
+            };
 
-                tracing::debug!("Received callback: {request_line}");
+            let (status, body) = match &result {
+                Ok(_) => (
+                    poem::http::StatusCode::OK,
+                    format!(
+                        "<html><body>{STYLE}<h1>✓ Authorization Successful!</h1>\
+                         <p>You can close this window and return to the terminal.</p></body></html>"
+                    ),
+                ),
+                Err(err) => (
+                    poem::http::StatusCode::BAD_REQUEST,
+                    format!(
+                        "<html><body>{STYLE}<h1>Authorization Failed</h1>\
+                         <p>Error: {err}</p></body></html>"
+                    ),
+                ),
+            };
 
-                // Parse callback URL parameters
-                if let Some(url_part) = request_line.split_whitespace().nth(1) {
-                    if let Ok(url) = url::Url::parse(&format!("http://localhost{url_part}")) {
-                        let mut received_code = None;
-                        let mut received_state = None;
-                        let mut received_error = None;
-
-                        for (key, value) in url.query_pairs() {
-                            match key.as_ref() {
-                                "code" => received_code = Some(value.to_string()),
-                                "state" => received_state = Some(value.to_string()),
-                                "error" => received_error = Some(value.to_string()),
-                                _ => {}
-                            }
-                        }
-
-                        const STYLE: &str = "<style>html { \
-                            font-family: system-ui, -apple-system, BlinkMacSystemFont, \
-                            sans-serif; font-size: 16px; color: #e0e0e0; background: #202020; \
-                            padding: 2rem; text-align: center; } </style>";
-
-                        // Send HTML response to browser
-                        let response = if let Some(err) = &received_error {
-                            format!(
-                                "HTTP/1.1 400 Bad Request\r\n\
-                                 Content-Type: text/html; charset=utf-8\r\n\
-                                 \r\n\
-                                 <html><body>{STYLE}<h1>Authorization Failed</h1>\
-                                 <p>Error: {err}</p></body></html>"
-                            )
-                        } else if received_code.is_some() && received_state.is_some() {
-                            *code_clone.lock().unwrap() = received_code;
-                            *state_clone.lock().unwrap() = received_state;
-                            format!(
-                                "HTTP/1.1 200 OK\r\n\
-                                 Content-Type: text/html; charset=utf-8\r\n\
-                                 \r\n\
-                                 <html><body>{STYLE}<h1>✓ Authorization Successful!</h1>\
-                                 <p>You can close this window and return to the terminal.</p></body></html>"
-                            )
-                        } else {
-                            format!(
-                                "HTTP/1.1 400 Bad Request\r\n\
-                                 Content-Type: text/html; charset=utf-8\r\n\
-                                 \r\n\
-                                 <html><body>{STYLE}<h1>Missing Parameters</h1>\
-                                 <p>Authorization code or state not received</p></body></html>"
-                            )
-                        };
-
-                        let _ = stream.write_all(response.as_bytes());
-                        let _ = stream.flush();
-
-                        if received_error.is_some() {
-                            *error_clone.lock().unwrap() = received_error;
-                        }
-
-                        // Exit after first valid request
-                        break;
-                    }
-                }
+            if let Some(sender) = tx.lock().await.take() {
+                let _ = sender.send(result);
             }
-        });
 
-        // Wait for callback with timeout
-        match timeout(AUTH_TIMEOUT, server_task).await {
-            Ok(Ok(())) => {
-                if let Some(err) = error.lock().unwrap().take() {
-                    Err(Error::OAuth(format!("OAuth authorization failed: {err}")))
-                } else if let (Some(code_str), Some(state_str)) =
-                    (code.lock().unwrap().take(), state.lock().unwrap().take())
-                {
-                    Ok((code_str, state_str))
-                } else {
-                    Err(Error::OAuth("No authorization code received".to_string()))
-                }
-            }
-            Ok(Err(e)) => Err(Error::OAuth(format!("Callback server error: {e}"))),
+            poem::Response::builder()
+                .status(status)
+                .content_type("text/html; charset=utf-8")
+                .body(body)
+        }
+
+        let app = Route::new().at("/callback", poem::get(callback)).data(tx);
+
+        let acceptor = TcpAcceptor::from_std(listener)
+            .map_err(|e| Error::OAuth(format!("Failed to create poem acceptor: {e}")))?;
+
+        let server_task = tokio::spawn(
+            Server::new_with_acceptor(acceptor).run_with_graceful_shutdown(
+                app,
+                async move {
+                    futures_util::future::pending::<()>().await;
+                },
+                None,
+            ),
+        );
+
+        let result = match timeout(AUTH_TIMEOUT, rx).await {
+            Ok(Ok(r)) => r.map_err(|e| Error::OAuth(format!("OAuth authorization failed: {e}"))),
+            Ok(Err(_)) => Err(Error::OAuth(
+                "Callback channel closed unexpectedly".to_string(),
+            )),
             Err(_) => Err(Error::OAuth(
                 "Authorization timeout - no response received within 5 minutes".to_string(),
             )),
-        }
+        };
+
+        server_task.abort();
+        result
     }
 }
 
