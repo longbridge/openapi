@@ -146,6 +146,63 @@ class PushCandlestickMode:
         """
 
 
+class OAuthToken:
+    """
+    OAuth 2.0 access token
+    """
+
+    access_token: str
+    """The access token for API authentication"""
+
+    refresh_token: Optional[str]
+    """Refresh token, or ``None`` if not provided by the server"""
+
+    expires_at: int
+    """Unix timestamp when the token expires"""
+
+    def is_expired(self) -> bool:
+        """Returns ``True`` if the token has expired"""
+
+    def expires_soon(self) -> bool:
+        """Returns ``True`` if the token will expire within 1 hour"""
+
+
+class OAuth:
+    """
+    OAuth 2.0 client for LongPort OpenAPI
+
+    Args:
+        client_id: OAuth 2.0 client ID from the LongPort developer portal
+    """
+
+    def __init__(self, client_id: str) -> None: ...
+
+    async def authorize(self, on_open_url: Callable[[str], None]) -> OAuthToken:
+        """
+        Start the OAuth 2.0 authorization flow
+
+        Starts a local HTTP server, calls ``on_open_url`` with the authorization
+        URL, then waits for the redirect and exchanges the code for a token.
+
+        Args:
+            on_open_url: Callable that receives the authorization URL as a string.
+
+        Returns:
+            OAuthToken with ``access_token``, ``refresh_token`` (optional), and ``expires_at``
+        """
+
+    async def refresh(self, refresh_token: str) -> OAuthToken:
+        """
+        Refresh an access token using a refresh token
+
+        Args:
+            refresh_token: Refresh token from a previous authorization
+
+        Returns:
+            New OAuthToken with a fresh access token
+        """
+
+
 class Config:
     """
     Configuration options for LongPort sdk
@@ -199,6 +256,22 @@ class Config:
         - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default: `realtime`)
         - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected, `true` or `false` (Default: `true`)
         - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
+        """
+
+    @classmethod
+    def from_oauth(cls: Type[Config], client_id: str, access_token: str) -> Config:
+        """
+        Create a new ``Config`` for OAuth 2.0 authentication
+
+        OAuth 2.0 is the recommended authentication method that uses Bearer
+        tokens and does not require app_secret or HMAC signatures.
+
+        Args:
+            client_id: OAuth 2.0 client ID
+            access_token: OAuth 2.0 access token (Bearer prefix is optional)
+
+        Returns:
+            Config object
         """
 
     def refresh_access_token(self, expired_at: Optional[datetime] = None) -> str:

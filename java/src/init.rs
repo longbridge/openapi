@@ -1,9 +1,9 @@
 use std::sync::OnceLock;
 
 use jni::{
-    JNIEnv,
     descriptors::Desc,
     objects::{GlobalRef, JClass, JValue},
+    JNIEnv,
 };
 
 use crate::types::ClassLoader;
@@ -20,6 +20,7 @@ pub(crate) static TIME_LOCALDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new(
 pub(crate) static TIME_ZONE_ID: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static QUOTE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TRADE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static OAUTH_TOKEN_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DERIVATIVE_TYPE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 
@@ -72,7 +73,8 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         (DERIVATIVE_TYPE_CLASS, "com/longport/quote/DerivativeType"),
         (OPENAPI_EXCEPTION_CLASS, "com/longport/OpenApiException"),
         (QUOTE_CONTEXT_CLASS, "com/longport/quote/QuoteContext"),
-        (TRADE_CONTEXT_CLASS, "com/longport/trade/TradeContext")
+        (TRADE_CONTEXT_CLASS, "com/longport/trade/TradeContext"),
+        (OAUTH_TOKEN_CLASS, "com/longport/OAuthToken")
     );
 
     init_timezone_id(&mut env);

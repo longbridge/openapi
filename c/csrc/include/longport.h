@@ -1291,6 +1291,19 @@ typedef struct lb_http_client_t lb_http_client_t;
 typedef struct lb_http_result_t lb_http_result_t;
 
 /**
+ * OAuth 2.0 client — owns the Rust `OAuth` instance
+ */
+typedef struct lb_oauth_t lb_oauth_t;
+
+/**
+ * OAuth 2.0 access token (opaque handle)
+ *
+ * Callers must never dereference or inspect the struct layout.
+ * Always free with `lb_oauth_token_free`.
+ */
+typedef struct lb_oauth_token_t lb_oauth_token_t;
+
+/**
  * Quote context
  */
 typedef struct lb_quote_context_t lb_quote_context_t;
@@ -3984,6 +3997,87 @@ void lb_http_client_request(struct lb_http_client_t *http_client,
 void lb_http_result_free(struct lb_http_result_t *http_result);
 
 const char *lb_http_result_response_body(const struct lb_http_result_t *http_result);
+
+/**
+ * Create a new OAuth 2.0 client
+ *
+ * @param client_id  OAuth 2.0 client ID from the LongPort developer portal
+ * @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
+ */
+struct lb_oauth_t *lb_oauth_new(const char *client_id);
+
+/**
+ * Free an OAuth 2.0 client object
+ */
+void lb_oauth_free(struct lb_oauth_t *oauth);
+
+/**
+ * Free a `lb_oauth_token_t` returned by `lb_oauth_authorize` or `lb_oauth_refresh`
+ */
+void lb_oauth_token_free(struct lb_oauth_token_t *token);
+
+/**
+ * Returns the access token string.
+ *
+ * The returned pointer is valid until `lb_oauth_token_free` is called.
+ * Do not free the returned pointer.
+ */
+const char *lb_oauth_token_get_access_token(const struct lb_oauth_token_t *token);
+
+/**
+ * Returns the refresh token string, or null if not provided.
+ *
+ * The returned pointer is valid until `lb_oauth_token_free` is called.
+ * Do not free the returned pointer.
+ */
+const char *lb_oauth_token_get_refresh_token(const struct lb_oauth_token_t *token);
+
+/**
+ * Returns the Unix timestamp (seconds since epoch) when the token expires
+ */
+uint64_t lb_oauth_token_get_expires_at(const struct lb_oauth_token_t *token);
+
+/**
+ * Returns true if the token has already expired
+ */
+bool lb_oauth_token_is_expired(const struct lb_oauth_token_t *token);
+
+/**
+ * Returns true if the token will expire within 1 hour
+ */
+bool lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
+
+/**
+ * Start the OAuth 2.0 authorization flow (async)
+ *
+ * Starts a local HTTP server (OS-assigned port), calls `open_url_callback`
+ * with the authorization URL so the caller can open it in a browser, then
+ * waits for the redirect and exchanges the authorization code for a token.
+ *
+ * @param oauth              OAuth client
+ * @param open_url_callback  Called with the authorization URL and `open_url_userdata`
+ * @param open_url_userdata  Opaque pointer forwarded to `open_url_callback`
+ * @param callback           Async completion callback; `data` is `*mut lb_oauth_token_t` on success
+ * @param userdata           Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_authorize(const struct lb_oauth_t *oauth,
+                        void (*open_url_callback)(const char*, void*),
+                        void *open_url_userdata,
+                        lb_async_callback_t callback,
+                        void *userdata);
+
+/**
+ * Refresh an OAuth 2.0 access token (async)
+ *
+ * @param oauth          OAuth client (provides client_id)
+ * @param token          Existing token whose refresh token is used
+ * @param callback       Async completion callback; `data` is `*mut lb_oauth_token_t` on success
+ * @param userdata       Opaque pointer forwarded to `callback`
+ */
+void lb_oauth_refresh(const struct lb_oauth_t *oauth,
+                      const struct lb_oauth_token_t *token,
+                      lb_async_callback_t callback,
+                      void *userdata);
 
 void lb_quote_context_new(const struct lb_config_t *config,
                           lb_async_callback_t callback,

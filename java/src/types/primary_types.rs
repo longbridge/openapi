@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use jni::{JNIEnv, errors::Result, objects::JValueOwned};
+use jni::{errors::Result, objects::JValueOwned, JNIEnv};
 
 use crate::{
     init::INTEGER_CLASS,
