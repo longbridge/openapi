@@ -1,0 +1,485 @@
+//! OAuth 2.0 authentication support for LongPort OpenAPI
+//!
+//! This module provides utilities for performing OAuth 2.0 authorization code
+//! flow to obtain access tokens for API authentication.
+//!
+//! # Example
+//!
+//! ```no_run
+//! use std::sync::Arc;
+//!
+//! use longport::{
+//!     Config,
+//!     oauth::{OAuth, OAuthToken},
+//! };
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     // Start OAuth authorization flow
+//!     let oauth = OAuth::new("your-client-id");
+//!     let token = oauth.authorize().await?;
+//!
+//!     // Create config with OAuth token
+//!     let config = Arc::new(Config::from_oauth(oauth.client_id(), &token.access_token));
+//!
+//!     // Use config to create contexts...
+//!     Ok(())
+//! }
+//! ```
+
+use std::{
+    io::{BufRead, BufReader, Write},
+    net::TcpListener,
+    sync::{Arc, Mutex},
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
+
+use oauth2::{
+    AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
+    Scope, TokenResponse, TokenUrl, basic::BasicClient, reqwest::async_http_client,
+};
+use serde::{Deserialize, Serialize};
+use tokio::time::timeout;
+
+use crate::error::{Error, Result};
+
+const AUTH_TIMEOUT: Duration = Duration::from_secs(300); // 5 minutes
+const OAUTH_BASE_URL: &str = "https://openapi.longportapp.com";
+const DEFAULT_CALLBACK_PORT: u16 = 60355;
+
+/// OAuth 2.0 access token with expiration and refresh information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OAuthToken {
+    /// The access token for API authentication
+    pub access_token: String,
+    /// Optional refresh token for obtaining new access tokens
+    pub refresh_token: Option<String>,
+    /// Unix timestamp when the token expires
+    pub expires_at: u64,
+}
+
+impl OAuthToken {
+    fn from_oauth2_response<TT, T>(token_response: &T) -> Self
+    where
+        TT: oauth2::TokenType,
+        T: TokenResponse<TT>,
+    {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        let expires_in = token_response.expires_in().map_or(3600, |d| d.as_secs());
+
+        Self {
+            access_token: token_response.access_token().secret().clone(),
+            refresh_token: token_response.refresh_token().map(|t| t.secret().clone()),
+            expires_at: now + expires_in,
+        }
+    }
+
+    /// Check if the token has expired
+    pub fn is_expired(&self) -> bool {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        now >= self.expires_at
+    }
+
+    /// Check if the token will expire soon (within 1 hour)
+    pub fn expires_soon(&self) -> bool {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        self.expires_at.saturating_sub(now) < 3600
+    }
+}
+
+/// OAuth 2.0 client for LongPort OpenAPI
+pub struct OAuth {
+    client_id: String,
+    callback_port: u16,
+}
+
+impl OAuth {
+    /// Create a new OAuth client
+    ///
+    /// # Arguments
+    ///
+    /// * `client_id` - OAuth 2.0 client ID obtained from LongPort developer
+    ///   portal
+    pub fn new(client_id: impl Into<String>) -> Self {
+        Self {
+            client_id: client_id.into(),
+            callback_port: DEFAULT_CALLBACK_PORT,
+        }
+    }
+
+    /// Set custom callback port (default: 60355)
+    pub fn callback_port(mut self, port: u16) -> Self {
+        self.callback_port = port;
+        self
+    }
+
+    /// Get the client ID
+    pub fn client_id(&self) -> &str {
+        &self.client_id
+    }
+
+    /// Start the OAuth 2.0 authorization flow
+    ///
+    /// This will:
+    /// 1. Start a local HTTP server to receive the callback
+    /// 2. Open the user's browser to the authorization page
+    /// 3. Wait for the user to authorize and receive the authorization code
+    /// 4. Exchange the code for an access token
+    ///
+    /// # Returns
+    ///
+    /// An [`OAuthToken`] containing the access token and expiration information
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The callback server cannot be started
+    /// - The user denies authorization
+    /// - The authorization times out (5 minutes)
+    /// - Token exchange fails
+    pub async fn authorize(&self) -> Result<OAuthToken> {
+        // Bind callback server first to get the actual port
+        let listener = self.bind_callback_server()?;
+        let port = listener
+            .local_addr()
+            .map_err(|e| Error::OAuth(format!("Failed to get local address: {}", e)))?
+            .port();
+        let redirect_uri = format!("http://localhost:{port}/callback");
+
+        tracing::debug!("Callback server listening on port {port}");
+        tracing::debug!("Redirect URI: {redirect_uri}");
+
+        let client = self.create_oauth_client(&redirect_uri);
+
+        // Generate authorization URL
+        let (auth_url, csrf_token) = client
+            .authorize_url(CsrfToken::new_random)
+            .add_scope(Scope::new(String::new()))
+            .url();
+
+        tracing::info!("Starting OAuth authorization flow");
+        println!("Opening browser for LongPort OpenAPI authorization...");
+        println!("If the browser doesn't open, please visit:");
+        println!("{auth_url}");
+
+        // Try to open browser
+        if let Err(e) = open::that(auth_url.as_str()) {
+            tracing::warn!("Failed to open browser: {e}");
+        }
+
+        // Start local callback server and wait for authorization code
+        let (code, state) = Self::wait_for_callback(listener).await?;
+
+        // Verify CSRF token
+        if state != *csrf_token.secret() {
+            return Err(Error::OAuth("CSRF token mismatch".to_string()));
+        }
+
+        // Exchange code for token
+        tracing::debug!("Exchanging authorization code for token");
+        let token_response = client
+            .exchange_code(AuthorizationCode::new(code))
+            .request_async(async_http_client)
+            .await
+            .map_err(|e| Error::OAuth(format!("Failed to exchange code for token: {}", e)))?;
+
+        Ok(OAuthToken::from_oauth2_response(&token_response))
+    }
+
+    /// Refresh an access token using a refresh token
+    ///
+    /// # Arguments
+    ///
+    /// * `refresh_token` - The refresh token from a previous authorization
+    ///
+    /// # Returns
+    ///
+    /// A new [`OAuthToken`] with a fresh access token
+    pub async fn refresh(&self, refresh_token: &str) -> Result<OAuthToken> {
+        tracing::debug!("Refreshing OAuth token");
+
+        let client = self.create_oauth_client("http://localhost:60355/callback");
+        let token_response = client
+            .exchange_refresh_token(&RefreshToken::new(refresh_token.to_string()))
+            .request_async(async_http_client)
+            .await
+            .map_err(|e| Error::OAuth(format!("Failed to refresh token: {}", e)))?;
+
+        let mut new_token = OAuthToken::from_oauth2_response(&token_response);
+
+        // Preserve refresh token if not returned
+        if new_token.refresh_token.is_none() {
+            new_token.refresh_token = Some(refresh_token.to_string());
+        }
+
+        Ok(new_token)
+    }
+
+    fn create_oauth_client(&self, redirect_uri: &str) -> BasicClient {
+        BasicClient::new(
+            ClientId::new(self.client_id.clone()),
+            None, // No client secret for public clients
+            AuthUrl::new(format!("{OAUTH_BASE_URL}/oauth2/authorize")).unwrap(),
+            Some(TokenUrl::new(format!("{OAUTH_BASE_URL}/oauth2/token")).unwrap()),
+        )
+        .set_redirect_uri(RedirectUrl::new(redirect_uri.to_string()).unwrap())
+        .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/oauth2/revoke")).unwrap())
+    }
+
+    fn bind_callback_server(&self) -> Result<TcpListener> {
+        TcpListener::bind(format!("127.0.0.1:{}", self.callback_port))
+            .map_err(|e| Error::OAuth(format!("Failed to bind callback server: {}", e)))
+    }
+
+    async fn wait_for_callback(listener: TcpListener) -> Result<(String, String)> {
+        let addr = listener
+            .local_addr()
+            .map_err(|e| Error::OAuth(format!("Failed to get local address: {}", e)))?;
+        tracing::debug!("Callback server listening on {addr}");
+
+        let code = Arc::new(Mutex::new(None));
+        let state = Arc::new(Mutex::new(None));
+        let error = Arc::new(Mutex::new(None));
+
+        let code_clone = Arc::clone(&code);
+        let state_clone = Arc::clone(&state);
+        let error_clone = Arc::clone(&error);
+
+        let server_task = tokio::task::spawn_blocking(move || {
+            for stream in listener.incoming() {
+                let mut stream = match stream {
+                    Ok(s) => s,
+                    Err(e) => {
+                        tracing::error!("Failed to accept connection: {e}");
+                        continue;
+                    }
+                };
+
+                let mut reader = BufReader::new(&stream);
+                let mut request_line = String::new();
+                if reader.read_line(&mut request_line).is_err() {
+                    continue;
+                }
+
+                tracing::debug!("Received callback: {request_line}");
+
+                // Parse callback URL parameters
+                if let Some(url_part) = request_line.split_whitespace().nth(1) {
+                    if let Ok(url) = url::Url::parse(&format!("http://localhost{url_part}")) {
+                        let mut received_code = None;
+                        let mut received_state = None;
+                        let mut received_error = None;
+
+                        for (key, value) in url.query_pairs() {
+                            match key.as_ref() {
+                                "code" => received_code = Some(value.to_string()),
+                                "state" => received_state = Some(value.to_string()),
+                                "error" => received_error = Some(value.to_string()),
+                                _ => {}
+                            }
+                        }
+
+                        const STYLE: &str = "<style>html { \
+                            font-family: system-ui, -apple-system, BlinkMacSystemFont, \
+                            sans-serif; font-size: 16px; color: #e0e0e0; background: #202020; \
+                            padding: 2rem; text-align: center; } </style>";
+
+                        // Send HTML response to browser
+                        let response = if let Some(err) = &received_error {
+                            format!(
+                                "HTTP/1.1 400 Bad Request\r\n\
+                                 Content-Type: text/html; charset=utf-8\r\n\
+                                 \r\n\
+                                 <html><body>{STYLE}<h1>Authorization Failed</h1>\
+                                 <p>Error: {err}</p></body></html>"
+                            )
+                        } else if received_code.is_some() && received_state.is_some() {
+                            *code_clone.lock().unwrap() = received_code;
+                            *state_clone.lock().unwrap() = received_state;
+                            format!(
+                                "HTTP/1.1 200 OK\r\n\
+                                 Content-Type: text/html; charset=utf-8\r\n\
+                                 \r\n\
+                                 <html><body>{STYLE}<h1>✓ Authorization Successful!</h1>\
+                                 <p>You can close this window and return to the terminal.</p></body></html>"
+                            )
+                        } else {
+                            format!(
+                                "HTTP/1.1 400 Bad Request\r\n\
+                                 Content-Type: text/html; charset=utf-8\r\n\
+                                 \r\n\
+                                 <html><body>{STYLE}<h1>Missing Parameters</h1>\
+                                 <p>Authorization code or state not received</p></body></html>"
+                            )
+                        };
+
+                        let _ = stream.write_all(response.as_bytes());
+                        let _ = stream.flush();
+
+                        if received_error.is_some() {
+                            *error_clone.lock().unwrap() = received_error;
+                        }
+
+                        // Exit after first valid request
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Wait for callback with timeout
+        match timeout(AUTH_TIMEOUT, server_task).await {
+            Ok(Ok(())) => {
+                if let Some(err) = error.lock().unwrap().take() {
+                    Err(Error::OAuth(format!("OAuth authorization failed: {err}")))
+                } else if let (Some(code_str), Some(state_str)) =
+                    (code.lock().unwrap().take(), state.lock().unwrap().take())
+                {
+                    Ok((code_str, state_str))
+                } else {
+                    Err(Error::OAuth("No authorization code received".to_string()))
+                }
+            }
+            Ok(Err(e)) => Err(Error::OAuth(format!("Callback server error: {e}"))),
+            Err(_) => Err(Error::OAuth(
+                "Authorization timeout - no response received within 5 minutes".to_string(),
+            )),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_oauth_token_not_expired() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now + 7200, // expires in 2 hours
+        };
+
+        assert!(!token.is_expired());
+    }
+
+    #[test]
+    fn test_oauth_token_expired() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now - 1, // expired 1 second ago
+        };
+
+        assert!(token.is_expired());
+    }
+
+    #[test]
+    fn test_oauth_token_expires_soon() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Token expires in 30 minutes
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now + 1800,
+        };
+
+        assert!(token.expires_soon());
+    }
+
+    #[test]
+    fn test_oauth_token_not_expires_soon() {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Token expires in 2 hours
+        let token = OAuthToken {
+            access_token: "test_token".to_string(),
+            refresh_token: Some("refresh_token".to_string()),
+            expires_at: now + 7200,
+        };
+
+        assert!(!token.expires_soon());
+    }
+
+    #[test]
+    fn test_oauth_token_serialization() {
+        let token = OAuthToken {
+            access_token: "test_access_token".to_string(),
+            refresh_token: Some("test_refresh_token".to_string()),
+            expires_at: 1234567890,
+        };
+
+        let json = serde_json::to_string(&token).unwrap();
+        let deserialized: OAuthToken = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(token.access_token, deserialized.access_token);
+        assert_eq!(token.refresh_token, deserialized.refresh_token);
+        assert_eq!(token.expires_at, deserialized.expires_at);
+    }
+
+    #[test]
+    fn test_oauth_token_serialization_without_refresh() {
+        let token = OAuthToken {
+            access_token: "test_access_token".to_string(),
+            refresh_token: None,
+            expires_at: 1234567890,
+        };
+
+        let json = serde_json::to_string(&token).unwrap();
+        let deserialized: OAuthToken = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(token.access_token, deserialized.access_token);
+        assert_eq!(token.refresh_token, deserialized.refresh_token);
+        assert_eq!(token.expires_at, deserialized.expires_at);
+    }
+
+    #[test]
+    fn test_oauth_new() {
+        let oauth = OAuth::new("test-client-id");
+        assert_eq!(oauth.client_id(), "test-client-id");
+        assert_eq!(oauth.callback_port, DEFAULT_CALLBACK_PORT);
+    }
+
+    #[test]
+    fn test_oauth_custom_callback_port() {
+        let oauth = OAuth::new("test-client-id").callback_port(8080);
+        assert_eq!(oauth.client_id(), "test-client-id");
+        assert_eq!(oauth.callback_port, 8080);
+    }
+
+    #[test]
+    fn test_oauth_create_client() {
+        let oauth = OAuth::new("test-client-id");
+        let client = oauth.create_oauth_client("http://localhost:60355/callback");
+
+        // Client should be created successfully
+        // We can't easily test the internal state, but we can verify it doesn't panic
+        drop(client);
+    }
+}

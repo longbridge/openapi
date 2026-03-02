@@ -109,6 +109,47 @@ impl Config {
         }
     }
 
+    /// Create a new `Config` for OAuth 2.0 authentication
+    ///
+    /// OAuth 2.0 is the recommended authentication method that uses Bearer
+    /// tokens and does not require app_secret or HMAC signatures.
+    ///
+    /// # Arguments
+    ///
+    /// * `client_id` - OAuth 2.0 client ID
+    /// * `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::Config;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let config = Arc::new(Config::from_oauth(
+    ///         "your-client-id",
+    ///         "your-oauth-access-token",
+    ///     ));
+    ///
+    ///     let (ctx, receiver) = longport::quote::QuoteContext::try_new(config).await?;
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn from_oauth(client_id: impl Into<String>, access_token: impl Into<String>) -> Self {
+        Self {
+            http_cli_config: HttpClientConfig::from_oauth(client_id, access_token),
+            quote_ws_url: None,
+            trade_ws_url: None,
+            language: Language::EN,
+            enable_overnight: None,
+            push_candlestick_mode: None,
+            enable_print_quote_packages: true,
+            log_path: None,
+        }
+    }
+
     /// Create a new `Config` from the given environment variables
     ///
     /// It first gets the environment variables from the `.env` file in the
@@ -116,11 +157,11 @@ impl Config {
     ///
     /// # Variables
     ///
-    /// - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
-    ///   (Default: `en`)
     /// - `LONGPORT_APP_KEY` - App key
     /// - `LONGPORT_APP_SECRET` - App secret
     /// - `LONGPORT_ACCESS_TOKEN` - Access token
+    /// - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
+    ///   (Default: `en`)
     /// - `LONGPORT_HTTP_URL` - HTTP endpoint url (Default: `https://openapi.longportapp.com`)
     /// - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
     ///   `wss://openapi-quote.longportapp.com/v2`)
@@ -134,6 +175,12 @@ impl Config {
     ///   `true` or `false` (Default: `true`)
     /// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no
     ///   logs`)
+    ///
+    /// # Note
+    ///
+    /// For OAuth 2.0 authentication, use [`from_oauth`](Config::from_oauth)
+    /// instead. OAuth tokens should not be stored in environment variables
+    /// for security reasons.
     pub fn from_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
@@ -388,5 +435,40 @@ impl Config {
         }
 
         internal_create_log_subscriber(self, path).unwrap_or_else(|| Arc::new(NoSubscriber::new()))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config_from_oauth() {
+        let config = Config::from_oauth("test-client-id", "test-access-token");
+
+        // Test that Config was created with OAuth settings
+        // We can't access private fields directly, but we can verify the config works
+        assert_eq!(config.language, Language::EN);
+    }
+
+    #[test]
+    fn test_config_from_oauth_with_bearer_prefix() {
+        let _config = Config::from_oauth("test-client-id", "Bearer already-has-prefix");
+
+        // Config should be created successfully
+        // Actual OAuth logic tested in httpclient crate
+    }
+
+    #[test]
+    fn test_config_default_values() {
+        let config = Config::from_oauth("client-id", "token");
+
+        assert_eq!(config.language, Language::EN);
+        assert_eq!(config.quote_ws_url, None);
+        assert_eq!(config.trade_ws_url, None);
+        assert_eq!(config.enable_overnight, None);
+        assert_eq!(config.push_candlestick_mode, None);
+        assert!(config.enable_print_quote_packages);
+        assert_eq!(config.log_path, None);
     }
 }

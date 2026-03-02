@@ -11,7 +11,21 @@ pub(crate) struct SignatureParams<'a> {
     pub(crate) timestamp: Timestamp,
 }
 
-pub(crate) fn signature(params: SignatureParams<'_>) -> String {
+pub(crate) fn signature(params: SignatureParams<'_>) -> Option<String> {
+    // OAuth 2.0 mode: skip HMAC signature generation
+    // Detected by Bearer token prefix or empty app_secret
+    let is_oauth2 = params
+        .access_token
+        .map(|token| token.starts_with("Bearer "))
+        .unwrap_or(false)
+        || params.app_secret.is_empty();
+
+    if is_oauth2 {
+        // OAuth 2.0 uses Bearer token authentication, no signature needed
+        return None;
+    }
+
+    // Legacy mode: generate HMAC-SHA256 signature
     let method = params.request.method().as_str();
 
     let (signed_headers, signed_values) = match params.access_token {
@@ -44,7 +58,9 @@ pub(crate) fn signature(params: SignatureParams<'_>) -> String {
     let str_to_sign = format!("HMAC-SHA256|{}", sha1(str_to_sign.as_bytes()));
     let signature = hmac_sha256(&str_to_sign, params.app_secret);
 
-    format!("HMAC-SHA256 SignedHeaders={signed_headers}, Signature={signature}")
+    Some(format!(
+        "HMAC-SHA256 SignedHeaders={signed_headers}, Signature={signature}"
+    ))
 }
 
 fn sha1(data: &[u8]) -> String {
