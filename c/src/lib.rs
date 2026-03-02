@@ -5,6 +5,7 @@ mod callback;
 mod config;
 mod error;
 mod http_client;
+mod oauth;
 mod quote_context;
 mod trade_context;
 mod types;

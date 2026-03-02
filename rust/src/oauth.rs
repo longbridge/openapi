@@ -16,12 +16,11 @@
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     // Start OAuth authorization flow
-//!     let oauth = OAuth::new("your-client-id")
-//!         .on_open_url(|url| {
-//!             // Open the URL however you like, e.g. print it or launch a browser
-//!             println!("Please visit: {url}");
-//!         });
-//!     let token = oauth.authorize().await?;
+//!     let oauth = OAuth::new("your-client-id");
+//!     let token = oauth.authorize(|url| {
+//!         // Open the URL however you like, e.g. print it or launch a browser
+//!         println!("Please visit: {url}");
+//!     }).await?;
 //!
 //!     // Create config with OAuth token
 //!     let config = Arc::new(Config::from_oauth(oauth.client_id(), &token.access_token));
@@ -45,7 +44,6 @@ use crate::error::{Error, Result};
 
 const AUTH_TIMEOUT: Duration = Duration::from_secs(300); // 5 minutes
 const OAUTH_BASE_URL: &str = "https://openapi.longportapp.com";
-const DEFAULT_CALLBACK_PORT: u16 = 60355;
 
 /// OAuth 2.0 access token with expiration and refresh information
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -99,8 +97,6 @@ impl OAuthToken {
 /// OAuth 2.0 client for LongPort OpenAPI
 pub struct OAuth {
     client_id: String,
-    callback_port: u16,
-    open_url: Option<Box<dyn Fn(&str) + Send + Sync>>,
 }
 
 impl OAuth {
@@ -113,28 +109,7 @@ impl OAuth {
     pub fn new(client_id: impl Into<String>) -> Self {
         Self {
             client_id: client_id.into(),
-            callback_port: DEFAULT_CALLBACK_PORT,
-            open_url: None,
         }
-    }
-
-    /// Set custom callback port (default: 60355)
-    pub fn callback_port(mut self, port: u16) -> Self {
-        self.callback_port = port;
-        self
-    }
-
-    /// Set a callback to handle the authorization URL
-    ///
-    /// The callback receives the authorization URL as a `&str`. Use this to
-    /// open the URL in a browser, print it, or handle it in any other way
-    /// appropriate for your application.
-    ///
-    /// If not set, the URL is silently discarded (useful for testing or when
-    /// you retrieve the URL through other means).
-    pub fn on_open_url(mut self, f: impl Fn(&str) + Send + Sync + 'static) -> Self {
-        self.open_url = Some(Box::new(f));
-        self
     }
 
     /// Get the client ID
@@ -146,9 +121,8 @@ impl OAuth {
     ///
     /// This will:
     /// 1. Start a local HTTP server to receive the callback
-    /// 2. Invoke the [`on_open_url`](OAuth::on_open_url) callback with the
-    ///    authorization URL, so the caller can open it in a browser or handle
-    ///    it in any other way
+    /// 2. Invoke `open_url` with the authorization URL, so the caller can open
+    ///    it in a browser or handle it in any other way
     /// 3. Wait for the user to authorize and receive the authorization code
     /// 4. Exchange the code for an access token
     ///
@@ -163,9 +137,9 @@ impl OAuth {
     /// - The user denies authorization
     /// - The authorization times out (5 minutes)
     /// - Token exchange fails
-    pub async fn authorize(&self) -> Result<OAuthToken> {
+    pub async fn authorize(&self, open_url: impl Fn(&str)) -> Result<OAuthToken> {
         // Bind callback server first to get the actual port
-        let listener = self.bind_callback_server()?;
+        let listener = Self::bind_callback_server()?;
         let port = listener
             .local_addr()
             .map_err(|e| Error::OAuth(format!("Failed to get local address: {}", e)))?
@@ -185,10 +159,7 @@ impl OAuth {
 
         tracing::info!("Starting OAuth authorization flow");
 
-        // Invoke caller-supplied callback with the authorization URL
-        if let Some(open_url) = &self.open_url {
-            open_url(auth_url.as_str());
-        }
+        open_url(auth_url.as_str());
 
         // Start local callback server and wait for authorization code
         let (code, state) = Self::wait_for_callback(listener).await?;
@@ -249,8 +220,8 @@ impl OAuth {
         .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/oauth2/revoke")).unwrap())
     }
 
-    fn bind_callback_server(&self) -> Result<std::net::TcpListener> {
-        std::net::TcpListener::bind(format!("127.0.0.1:{}", self.callback_port))
+    fn bind_callback_server() -> Result<std::net::TcpListener> {
+        std::net::TcpListener::bind("127.0.0.1:0")
             .map_err(|e| Error::OAuth(format!("Failed to bind callback server: {}", e)))
     }
 

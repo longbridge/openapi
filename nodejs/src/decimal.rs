@@ -5,8 +5,8 @@ use std::{
 
 use napi::{Either, Error, Result};
 use rust_decimal::{
-    MathematicalOps,
     prelude::{FromPrimitive, ToPrimitive},
+    MathematicalOps,
 };
 use serde_json::Value;
 

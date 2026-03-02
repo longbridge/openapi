@@ -2,6 +2,7 @@ mod config;
 mod decimal;
 mod error;
 mod http_client;
+mod oauth;
 mod quote;
 mod time;
 mod trade;
@@ -14,6 +15,8 @@ fn longport(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     let openapi = PyModule::new(py, "openapi")?;
 
     openapi.add_class::<config::Config>()?;
+    openapi.add_class::<oauth::OAuth>()?;
+    openapi.add_class::<oauth::OAuthToken>()?;
     openapi.add_class::<types::Language>()?;
     openapi.add_class::<types::Market>()?;
     openapi.add_class::<types::PushCandlestickMode>()?;

@@ -5,7 +5,7 @@ use std::{
     os::raw::c_char,
 };
 
-use rust_decimal::{Decimal, MathematicalOps, prelude::ToPrimitive};
+use rust_decimal::{prelude::ToPrimitive, Decimal, MathematicalOps};
 
 use crate::types::ToFFI;
 
@@ -129,13 +129,21 @@ pub unsafe extern "C" fn lb_decimal_is_zero(value: *const CDecimal) -> bool {
 /// Returns the maximum of the two numbers.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_max(a: *const CDecimal, b: *const CDecimal) -> *const CDecimal {
-    if (*a).value > (*b).value { a } else { b }
+    if (*a).value > (*b).value {
+        a
+    } else {
+        b
+    }
 }
 
 /// Returns the minimum of the two numbers.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_decimal_min(a: *const CDecimal, b: *const CDecimal) -> *const CDecimal {
-    if (*a).value < (*b).value { a } else { b }
+    if (*a).value < (*b).value {
+        a
+    } else {
+        b
+    }
 }
 
 /// Strips any trailing zero’s from a Decimal and converts `-0` to `0`.

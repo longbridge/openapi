@@ -9,7 +9,7 @@ use longport::{
     },
 };
 use parking_lot::Mutex;
-use pyo3::{Py, PyAny, PyResult, Python, pyclass, pymethods};
+use pyo3::{pyclass, pymethods, Py, PyAny, PyResult, Python};
 
 use crate::{
     config::Config,

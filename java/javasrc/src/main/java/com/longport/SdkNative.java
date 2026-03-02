@@ -37,6 +37,23 @@ public class SdkNative {
 
         public static native void freeConfig(long config);
 
+        public static native long newOAuth(String clientId);
+
+        public static native void freeOAuth(long oauth);
+
+        public static native void freeOAuthToken(long oauthToken);
+
+        public static native String oauthTokenGetAccessToken(long oauthToken);
+
+        public static native String oauthTokenGetRefreshToken(long oauthToken);
+
+        public static native long oauthTokenGetExpiresAt(long oauthToken);
+
+        public static native void oauthAuthorize(long oauth, java.util.function.Consumer<String> openUrlCallback,
+                        AsyncCallback callback);
+
+        public static native void oauthRefresh(long oauth, String refreshToken, AsyncCallback callback);
+
         public static native void newQuoteContext(long config, AsyncCallback callback);
 
         public static native void freeQuoteContext(long config);
