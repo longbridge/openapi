@@ -29,6 +29,12 @@ HttpClient::~HttpClient()
   }
 }
 
+HttpClient::HttpClient(HttpClient&& other) noexcept
+  : http_client_(other.http_client_)
+{
+  other.http_client_ = nullptr;
+}
+
 Status
 HttpClient::from_env()
 {

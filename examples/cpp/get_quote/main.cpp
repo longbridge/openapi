@@ -27,14 +27,7 @@ main(int argc, char const* argv[])
         return;
       }
 
-      Config config;
-      Status status =
-        Config::from_oauth(client_id, res->access_token(), config);
-      if (!status) {
-        std::cout << "failed to create config: " << *status.message()
-                  << std::endl;
-        return;
-      }
+      Config config = Config::from_oauth(client_id, res->access_token());
 
       QuoteContext::create(config, [](auto res) {
         if (!res) {

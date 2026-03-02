@@ -20,14 +20,7 @@ main()
         return;
       }
 
-      longport::Config config;
-      longport::Status status =
-        longport::Config::from_oauth(client_id, res->access_token(), config);
-      if (!status) {
-        std::cout << "failed to create config: " << *status.message()
-                  << std::endl;
-        return;
-      }
+      longport::Config config = longport::Config::from_oauth(client_id, res->access_token());
 
       QuoteContext::create(config, [&](auto res) {
         if (!res) {
