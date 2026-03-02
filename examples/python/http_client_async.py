@@ -1,11 +1,18 @@
 """HTTP client (async). Use asyncio with HttpClient.request_async."""
 import asyncio
 
-from longport.openapi import HttpClient
+from longport.openapi import HttpClient, OAuth
 
 
 async def main() -> None:
-    http_cli = HttpClient.from_env()
+    oauth = OAuth("your-client-id")
+    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    http_cli = HttpClient(
+        "https://openapi.longportapp.com",
+        "",
+        "",
+        token.access_token,
+    )
     resp = await http_cli.request_async(
         "get",
         "/v1/trade/execution/today",

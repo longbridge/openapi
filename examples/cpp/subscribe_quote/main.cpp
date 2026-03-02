@@ -15,46 +15,61 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  Config config;
-  Status status = Config::from_env(config);
-  if (!status) {
-    std::cout << "failed to load configuration from environment: "
-              << *status.message() << std::endl;
-    return -1;
-  }
+  const std::string client_id = "your-client-id";
+  OAuth oauth(client_id);
 
   QuoteContext ctx;
 
-  QuoteContext::create(config, [&](auto res) {
-    if (!res) {
-      std::cout << "failed to create quote context: " << *res.status().message()
-                << std::endl;
-      return;
-    }
-
-    ctx = res.context();
-
-    res.context().set_on_quote([](auto event) {
-      std::cout << event->symbol << " timestamp=" << event->timestamp
-                << " last_done=" << (double)event->last_done
-                << " open=" << (double)event->open
-                << " high=" << (double)event->high
-                << " low=" << (double)event->low << " volume=" << event->volume
-                << " turnover=" << (double)event->turnover << std::endl;
-    });
-
-    std::vector<std::string> symbols = {
-      "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-    };
-
-    res.context().subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
+  oauth.authorize(
+    [](const std::string& url) { std::cout << url << std::endl; },
+    [client_id, &ctx](auto res) {
       if (!res) {
-        std::cout << "failed to subscribe quote: " << *res.status().message()
+        std::cout << "authorization failed: " << *res.status().message()
                   << std::endl;
         return;
       }
+
+      Config config;
+      Status status =
+        Config::from_oauth(client_id, res->access_token(), config);
+      if (!status) {
+        std::cout << "failed to create config: " << *status.message()
+                  << std::endl;
+        return;
+      }
+
+      QuoteContext::create(config, [&](auto res) {
+        if (!res) {
+          std::cout << "failed to create quote context: "
+                    << *res.status().message() << std::endl;
+          return;
+        }
+
+        ctx = res.context();
+
+        res.context().set_on_quote([](auto event) {
+          std::cout << event->symbol << " timestamp=" << event->timestamp
+                    << " last_done=" << (double)event->last_done
+                    << " open=" << (double)event->open
+                    << " high=" << (double)event->high
+                    << " low=" << (double)event->low
+                    << " volume=" << event->volume
+                    << " turnover=" << (double)event->turnover << std::endl;
+        });
+
+        std::vector<std::string> symbols = {
+          "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+        };
+
+        res.context().subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
+          if (!res) {
+            std::cout << "failed to subscribe quote: "
+                      << *res.status().message() << std::endl;
+            return;
+          }
+        });
+      });
     });
-  });
 
   std::cin.get();
   return 0;

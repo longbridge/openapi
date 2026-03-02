@@ -5,10 +5,15 @@ const {
   OrderSide,
   TimeInForceType,
   OrderType,
+  OAuth,
 } = require("longport");
 
 async function main() {
-  let config = Config.fromEnv();
+  const oauth = new OAuth("your-client-id");
+  const token = await oauth.authorize((url) => {
+    console.log(url);
+  });
+  let config = Config.fromOauth("your-client-id", token.accessToken);
   let ctx = await TradeContext.new(config);
   let resp = await ctx.submitOrder({
     symbol: "700.HK",

@@ -1,4 +1,7 @@
-use longport::httpclient::HttpClient;
+use longport::{
+    httpclient::{HttpClient, HttpClientConfig},
+    oauth::OAuth,
+};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -7,7 +10,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    let http_cli = HttpClient::from_env()?;
+    let oauth = OAuth::new("your-client-id");
+    let token = oauth
+        .authorize(|url| println!("Open this URL to authorize: {url}"))
+        .await?;
+
+    let http_cli = HttpClient::new(HttpClientConfig::from_oauth(
+        oauth.client_id(),
+        &token.access_token,
+    ));
     let resp = http_cli
         .request("GET".parse()?, "/v1/trade/execution/today")
         .response::<String>()

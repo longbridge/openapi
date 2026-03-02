@@ -6,6 +6,8 @@
 #include <curses.h>
 #endif
 
+static const char* CLIENT_ID = "your-client-id";
+
 void
 on_quote(const struct lb_quote_context_t* ctx,
          const struct lb_push_quote_t* quote,
@@ -49,6 +51,31 @@ on_quote_context_created(const struct lb_async_result_t* res)
     res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, on_subscrbe, NULL);
 }
 
+void
+on_open_url(const char* url, void* userdata)
+{
+  printf("%s\n", url);
+}
+
+void
+on_oauth_authorize(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    printf("authorization failed: %s\n", lb_error_message(res->error));
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  const char* access_token = lb_oauth_token_get_access_token(token);
+
+  lb_config_t* config = lb_config_from_oauth(CLIENT_ID, access_token);
+
+  const lb_quote_context_t** ctx =
+    (const lb_quote_context_t**)res->userdata;
+  lb_quote_context_new(config, on_quote_context_created, ctx);
+  lb_config_free(config);
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -56,18 +83,11 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  lb_error_t* err = NULL;
-  lb_config_t* config = lb_config_from_env(&err);
-  if (err) {
-    printf("failed to load configuration from environment: %s\n",
-           lb_error_message(err));
-    lb_error_free(err);
-    return -1;
-  }
-
   const lb_quote_context_t* ctx = NULL;
-  lb_quote_context_new(config, on_quote_context_created, &ctx);
+  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
   getchar();
   lb_quote_context_release(ctx);
+  lb_oauth_free(oauth);
   return 0;
 }

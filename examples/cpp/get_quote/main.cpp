@@ -15,42 +15,57 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  Config config;
-  Status status = Config::from_env(config);
-  if (!status) {
-    std::cout << "failed to load configuration from environment: "
-              << *status.message() << std::endl;
-    return -1;
-  }
+  const std::string client_id = "your-client-id";
+  OAuth oauth(client_id);
 
-  QuoteContext::create(config, [](auto res) {
-    if (!res) {
-      std::cout << "failed to create quote context: " << *res.status().message()
-                << std::endl;
-      return;
-    }
-
-    std::vector<std::string> symbols = {
-      "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-    };
-    res.context().quote(symbols, [](auto res) {
+  oauth.authorize(
+    [](const std::string& url) { std::cout << url << std::endl; },
+    [client_id](auto res) {
       if (!res) {
-        std::cout << "failed to get quote: " << *res.status().message()
+        std::cout << "authorization failed: " << *res.status().message()
                   << std::endl;
         return;
       }
 
-      for (auto it = res->cbegin(); it != res->cend(); ++it) {
-        std::cout << it->symbol << " timestamp=" << it->timestamp
-                  << " last_done=" << (double)it->last_done
-                  << " prev_close=" << (double)it->prev_close
-                  << " open=" << (double)it->open
-                  << " high=" << (double)it->high << " low=" << (double)it->low
-                  << " volume=" << it->volume
-                  << " turnover=" << (double)it->turnover << std::endl;
+      Config config;
+      Status status =
+        Config::from_oauth(client_id, res->access_token(), config);
+      if (!status) {
+        std::cout << "failed to create config: " << *status.message()
+                  << std::endl;
+        return;
       }
+
+      QuoteContext::create(config, [](auto res) {
+        if (!res) {
+          std::cout << "failed to create quote context: "
+                    << *res.status().message() << std::endl;
+          return;
+        }
+
+        std::vector<std::string> symbols = {
+          "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+        };
+        res.context().quote(symbols, [](auto res) {
+          if (!res) {
+            std::cout << "failed to get quote: " << *res.status().message()
+                      << std::endl;
+            return;
+          }
+
+          for (auto it = res->cbegin(); it != res->cend(); ++it) {
+            std::cout << it->symbol << " timestamp=" << it->timestamp
+                      << " last_done=" << (double)it->last_done
+                      << " prev_close=" << (double)it->prev_close
+                      << " open=" << (double)it->open
+                      << " high=" << (double)it->high
+                      << " low=" << (double)it->low
+                      << " volume=" << it->volume
+                      << " turnover=" << (double)it->turnover << std::endl;
+          }
+        });
+      });
     });
-  });
 
   std::cin.get();
   return 0;

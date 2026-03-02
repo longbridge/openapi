@@ -14,26 +14,36 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  HttpClient http_cli;
-  Status status = http_cli.from_env();
-  if (!status) {
-    std::cout << "failed to load configuration from environment: "
-              << *status.message() << std::endl;
-    return -1;
-  }
+  const std::string client_id = "your-client-id";
+  OAuth oauth(client_id);
 
-  http_cli.request("get",
-                   "/v1/trade/execution/today",
-                   std::nullopt,
-                   std::nullopt,
-                   [](auto res) {
-                     if (!res) {
-                       std::cout << "failed: " << *res.status().message()
-                                 << std::endl;
-                       return;
-                     }
-                     std::cout << res->response_body << std::endl;
-                   });
+  oauth.authorize(
+    [](const std::string& url) { std::cout << url << std::endl; },
+    [client_id](auto res) {
+      if (!res) {
+        std::cout << "authorization failed: " << *res.status().message()
+                  << std::endl;
+        return;
+      }
+
+      HttpClient http_cli("https://openapi.longportapp.com",
+                          "",
+                          "",
+                          res->access_token());
+
+      http_cli.request("get",
+                       "/v1/trade/execution/today",
+                       std::nullopt,
+                       std::nullopt,
+                       [](auto res) {
+                         if (!res) {
+                           std::cout << "failed: " << *res.status().message()
+                                     << std::endl;
+                           return;
+                         }
+                         std::cout << res->response_body << std::endl;
+                       });
+    });
 
   std::cin.get();
   return 0;

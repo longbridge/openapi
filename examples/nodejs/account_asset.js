@@ -1,7 +1,11 @@
-const { Config, TradeContext } = require("longport");
+const { Config, TradeContext, OAuth } = require("longport");
 
 async function main() {
-  let config = Config.fromEnv();
+  const oauth = new OAuth("your-client-id");
+  const token = await oauth.authorize((url) => {
+    console.log(url);
+  });
+  let config = Config.fromOauth("your-client-id", token.accessToken);
   let ctx = await TradeContext.new(config);
   let resp = await ctx.accountBalance();
   for (let obj of resp) {
