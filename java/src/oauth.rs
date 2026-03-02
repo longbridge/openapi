@@ -135,15 +135,15 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthAuthorize(
         async_util::execute(env, callback, async move {
             let token = OAuth::new(client_id)
                 .authorize(move |url| {
-                    if let Ok(mut env) = jvm.attach_current_thread() {
-                        if let Ok(j_url) = env.new_string(url) {
-                            let _ = env.call_method(
-                                open_url_callback.as_obj(),
-                                "accept",
-                                "(Ljava/lang/Object;)V",
-                                &[jni::objects::JValue::from(&j_url)],
-                            );
-                        }
+                    if let Ok(mut env) = jvm.attach_current_thread()
+                        && let Ok(j_url) = env.new_string(url)
+                    {
+                        let _ = env.call_method(
+                            open_url_callback.as_obj(),
+                            "accept",
+                            "(Ljava/lang/Object;)V",
+                            &[jni::objects::JValue::from(&j_url)],
+                        );
                     }
                 })
                 .await?;

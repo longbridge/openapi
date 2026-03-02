@@ -94,6 +94,10 @@ impl OAuthToken {
     }
 }
 
+type CallbackTx = std::sync::Arc<
+    tokio::sync::Mutex<Option<oneshot::Sender<std::result::Result<(String, String), String>>>>,
+>;
+
 /// OAuth 2.0 client for LongPort OpenAPI
 pub struct OAuth {
     client_id: String,
@@ -249,13 +253,7 @@ impl OAuth {
         #[handler]
         async fn callback(
             Query(params): Query<CallbackParams>,
-            tx: poem::web::Data<
-                &std::sync::Arc<
-                    tokio::sync::Mutex<
-                        Option<oneshot::Sender<std::result::Result<(String, String), String>>>,
-                    >,
-                >,
-            >,
+            tx: poem::web::Data<&CallbackTx>,
         ) -> poem::Response {
             let result = if let Some(err) = params.error {
                 Err(err)
