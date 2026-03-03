@@ -1,0 +1,19 @@
+[package]
+edition.workspace = true
+name = "longport-oauth"
+version.workspace = true
+description = "LongPort OpenAPI OAuth 2.0 client for Rust"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+futures-util.workspace = true
+oauth2.workspace = true
+poem.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["rt", "time", "sync", "net"] }
+tracing.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }

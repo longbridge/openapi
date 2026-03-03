@@ -14,6 +14,7 @@ longport-wscli = { path = "rust/crates/wsclient", version = "3.0.22" }
 longport-httpcli = { path = "rust/crates/httpclient", version = "3.0.22" }
 longport-proto = { path = "rust/crates/proto", version = "3.0.22" }
 longport-candlesticks = { path = "rust/crates/candlesticks", version = "3.0.22" }
+longport-oauth = { path = "rust/crates/oauth", version = "3.0.22" }
 longport = { path = "rust", version = "3.0.22" }
 
 tokio = "1.47.1"

@@ -1,17 +1,12 @@
 //! OAuth 2.0 authentication support for LongPort OpenAPI
 //!
-//! This module provides utilities for performing OAuth 2.0 authorization code
+//! This crate provides utilities for performing OAuth 2.0 authorization code
 //! flow to obtain access tokens for API authentication.
 //!
 //! # Example
 //!
 //! ```no_run
-//! use std::sync::Arc;
-//!
-//! use longport::{
-//!     Config,
-//!     oauth::{OAuth, OAuthToken},
-//! };
+//! use longport_oauth::{OAuth, OAuthToken};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -22,13 +17,14 @@
 //!         println!("Please visit: {url}");
 //!     }).await?;
 //!
-//!     // Create config with OAuth token
-//!     let config = Arc::new(Config::from_oauth(oauth.client_id(), &token.access_token));
-//!
-//!     // Use config to create contexts...
+//!     println!("Access token: {}", token.access_token);
 //!     Ok(())
 //! }
 //! ```
+
+#![forbid(unsafe_code)]
+#![deny(unreachable_pub)]
+#![warn(missing_docs)]
 
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -40,10 +36,19 @@ use poem::{handler, listener::TcpAcceptor, web::Query, EndpointExt, Route, Serve
 use serde::{Deserialize, Serialize};
 use tokio::{sync::oneshot, time::timeout};
 
-use crate::error::{Error, Result};
-
 const AUTH_TIMEOUT: Duration = Duration::from_secs(300); // 5 minutes
 const OAUTH_BASE_URL: &str = "https://openapi.longportapp.com";
+
+/// Error type for OAuth operations
+#[derive(Debug, thiserror::Error)]
+pub enum OAuthError {
+    /// OAuth flow error
+    #[error("oauth error: {0}")]
+    OAuth(String),
+}
+
+/// Result type for OAuth operations
+pub type OAuthResult<T> = std::result::Result<T, OAuthError>;
 
 /// OAuth 2.0 access token with expiration and refresh information
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -141,12 +146,12 @@ impl OAuth {
     /// - The user denies authorization
     /// - The authorization times out (5 minutes)
     /// - Token exchange fails
-    pub async fn authorize(&self, open_url: impl Fn(&str)) -> Result<OAuthToken> {
+    pub async fn authorize(&self, open_url: impl Fn(&str)) -> OAuthResult<OAuthToken> {
         // Bind callback server first to get the actual port
         let listener = Self::bind_callback_server()?;
         let port = listener
             .local_addr()
-            .map_err(|e| Error::OAuth(format!("Failed to get local address: {}", e)))?
+            .map_err(|e| OAuthError::OAuth(format!("Failed to get local address: {}", e)))?
             .port();
         let redirect_uri = format!("http://localhost:{port}/callback");
 
@@ -170,7 +175,7 @@ impl OAuth {
 
         // Verify CSRF token
         if state != *csrf_token.secret() {
-            return Err(Error::OAuth("CSRF token mismatch".to_string()));
+            return Err(OAuthError::OAuth("CSRF token mismatch".to_string()));
         }
 
         // Exchange code for token
@@ -179,7 +184,7 @@ impl OAuth {
             .exchange_code(AuthorizationCode::new(code))
             .request_async(async_http_client)
             .await
-            .map_err(|e| Error::OAuth(format!("Failed to exchange code for token: {}", e)))?;
+            .map_err(|e| OAuthError::OAuth(format!("Failed to exchange code for token: {}", e)))?;
 
         Ok(OAuthToken::from_oauth2_response(&token_response))
     }
@@ -193,7 +198,7 @@ impl OAuth {
     /// # Returns
     ///
     /// A new [`OAuthToken`] with a fresh access token
-    pub async fn refresh(&self, refresh_token: &str) -> Result<OAuthToken> {
+    pub async fn refresh(&self, refresh_token: &str) -> OAuthResult<OAuthToken> {
         tracing::debug!("Refreshing OAuth token");
 
         let client = self.create_oauth_client("http://localhost:60355/callback");
@@ -201,7 +206,7 @@ impl OAuth {
             .exchange_refresh_token(&RefreshToken::new(refresh_token.to_string()))
             .request_async(async_http_client)
             .await
-            .map_err(|e| Error::OAuth(format!("Failed to refresh token: {}", e)))?;
+            .map_err(|e| OAuthError::OAuth(format!("Failed to refresh token: {}", e)))?;
 
         let mut new_token = OAuthToken::from_oauth2_response(&token_response);
 
@@ -224,15 +229,15 @@ impl OAuth {
         .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/oauth2/revoke")).unwrap())
     }
 
-    fn bind_callback_server() -> Result<std::net::TcpListener> {
+    fn bind_callback_server() -> OAuthResult<std::net::TcpListener> {
         std::net::TcpListener::bind("127.0.0.1:0")
-            .map_err(|e| Error::OAuth(format!("Failed to bind callback server: {}", e)))
+            .map_err(|e| OAuthError::OAuth(format!("Failed to bind callback server: {}", e)))
     }
 
-    async fn wait_for_callback(listener: std::net::TcpListener) -> Result<(String, String)> {
+    async fn wait_for_callback(listener: std::net::TcpListener) -> OAuthResult<(String, String)> {
         let addr = listener
             .local_addr()
-            .map_err(|e| Error::OAuth(format!("Failed to get local address: {}", e)))?;
+            .map_err(|e| OAuthError::OAuth(format!("Failed to get local address: {}", e)))?;
         tracing::debug!("Callback server listening on {addr}");
 
         #[derive(Deserialize)]
@@ -293,7 +298,7 @@ impl OAuth {
         let app = Route::new().at("/callback", poem::get(callback)).data(tx);
 
         let acceptor = TcpAcceptor::from_std(listener)
-            .map_err(|e| Error::OAuth(format!("Failed to create poem acceptor: {e}")))?;
+            .map_err(|e| OAuthError::OAuth(format!("Failed to create poem acceptor: {e}")))?;
 
         let server_task = tokio::spawn(
             Server::new_with_acceptor(acceptor).run_with_graceful_shutdown(
@@ -306,11 +311,13 @@ impl OAuth {
         );
 
         let result = match timeout(AUTH_TIMEOUT, rx).await {
-            Ok(Ok(r)) => r.map_err(|e| Error::OAuth(format!("OAuth authorization failed: {e}"))),
-            Ok(Err(_)) => Err(Error::OAuth(
+            Ok(Ok(r)) => {
+                r.map_err(|e| OAuthError::OAuth(format!("OAuth authorization failed: {e}")))
+            }
+            Ok(Err(_)) => Err(OAuthError::OAuth(
                 "Callback channel closed unexpectedly".to_string(),
             )),
-            Err(_) => Err(Error::OAuth(
+            Err(_) => Err(OAuthError::OAuth(
                 "Authorization timeout - no response received within 5 minutes".to_string(),
             )),
         };
@@ -426,14 +433,6 @@ mod tests {
     fn test_oauth_new() {
         let oauth = OAuth::new("test-client-id");
         assert_eq!(oauth.client_id(), "test-client-id");
-        assert_eq!(oauth.callback_port, DEFAULT_CALLBACK_PORT);
-    }
-
-    #[test]
-    fn test_oauth_custom_callback_port() {
-        let oauth = OAuth::new("test-client-id").callback_port(8080);
-        assert_eq!(oauth.client_id(), "test-client-id");
-        assert_eq!(oauth.callback_port, 8080);
     }
 
     #[test]

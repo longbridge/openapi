@@ -18,6 +18,7 @@ longport-wscli.workspace = true
 longport-httpcli.workspace = true
 longport-proto.workspace = true
 longport-candlesticks.workspace = true
+longport-oauth.workspace = true
 
 tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
 tokio-tungstenite.workspace = true
@@ -47,8 +48,6 @@ itertools.workspace = true
 tracing-subscriber.workspace = true
 tracing-appender.workspace = true
 time-tz.workspace = true
-oauth2.workspace = true
-poem.workspace = true
 anyhow = "1.0"
 url.workspace = true
 
