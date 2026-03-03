@@ -9,7 +9,7 @@ A [MCP](https://modelcontextprotocol.io/introduction) server implementation for 
 
 ## Features
 
-- Trading - Create, amend, cancel orders, query today’s/past orders and transaction details, etc.
+- Trading - Create, amend, cancel orders, query today's/past orders and transaction details, etc.
 - Quotes - Real-time quotes, acquisition of historical quotes, etc.
 - Portfolio - Real-time query of the account assets, positions, funds
 
@@ -85,16 +85,76 @@ To configure LongPort MCP in Cherry Studio:
 
 If you are using Windows, replace command with `cmd /c "set LONGPORT_APP_KEY=your-app-key && set LONGPORT_APP_SECRET=your-app-secret && set LONGPORT_ACCESS_TOKEN=your-access-token && longport-mcp"`
 
-## Running as a SSE server
+## Running as an HTTP server
 
 ```bash
-env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp --sse
+env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp --http
 ```
 
 Default bind address is `127.0.0.1:8000`, you can change it by using the `--bind` flag:
 
 ```bash
-longport-mcp --sse --bind 127.0.0.1:3000
+longport-mcp --http --bind 127.0.0.1:3000
+```
+
+## Running with OAuth 2.0 authentication
+
+The `--oauth` flag enables OAuth 2.0 Bearer token authentication for the HTTP transport.  In this mode:
+
+- The server does **not** require `LONGPORT_APP_KEY` / `LONGPORT_APP_SECRET` / `LONGPORT_ACCESS_TOKEN` environment variables.
+- Each request must carry a valid `Authorization: Bearer <access_token>` header.
+- The access token must be a LongPort OAuth 2.0 access token obtained via the authorization code flow.
+- Each MCP session operates under the requesting user's own LongPort credentials.
+
+```bash
+longport-mcp --oauth
+```
+
+With a custom bind address:
+
+```bash
+longport-mcp --oauth --bind 0.0.0.0:8080
+```
+
+### OAuth 2.0 discovery
+
+When running with `--oauth`, the server exposes an RFC 8414 discovery document at:
+
+```
+GET /.well-known/oauth-authorization-server
+```
+
+This allows AI clients that implement OAuth 2.0 dynamic discovery (e.g. Claude Desktop, Cursor) to automatically configure themselves without manual credential entry.
+
+Example response:
+
+```json
+{
+  "issuer": "http://127.0.0.1:8000",
+  "authorization_endpoint": "https://openapi.longbridgeapp.com/oauth2/authorize",
+  "token_endpoint": "https://openapi.longbridgeapp.com/oauth2/token",
+  "revocation_endpoint": "https://openapi.longbridgeapp.com/oauth2/revoke",
+  "response_types_supported": ["code"],
+  "grant_types_supported": ["authorization_code", "refresh_token"],
+  "code_challenge_methods_supported": ["S256"]
+}
+```
+
+### Obtaining an OAuth 2.0 access token
+
+Use the `longport-oauth` crate or the LongPort developer portal to initiate the authorization code flow.  Once you have an access token, configure your MCP client:
+
+```json
+{
+  "mcpServers": {
+    "longport-mcp": {
+      "url": "http://127.0.0.1:8000",
+      "headers": {
+        "Authorization": "Bearer your-oauth-access-token"
+      }
+    }
+  }
+}
 ```
 
 ## Configuration
