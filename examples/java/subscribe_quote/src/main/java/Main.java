@@ -10,7 +10,7 @@ class Main {
             ctx.setOnQuote((symbol, event) -> {
                 System.out.printf("%s\t%s\n", symbol, event);
             });
-            ctx.subscribe(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" }, SubFlags.Quote, true).get();
+            ctx.subscribe(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" }, SubFlags.Quote).get();
             Thread.sleep(30000);
         }
     }
