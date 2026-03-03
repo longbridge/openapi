@@ -82,7 +82,7 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize and Get Token**
+**Step 2: Authorize, Refresh, and Get Token**
 
 ```rust,no_run
 use std::sync::Arc;
@@ -90,10 +90,38 @@ use longport::{Config, oauth::{OAuth, OAuthToken}};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Try to load a previously saved token; fall back to browser authorization
     let token = match OAuthToken::load() {
+        Ok(token) if token.is_expired() => {
+            // Token has expired — re-authorize
+            let oauth = OAuth::new("your-client-id");
+            let token = oauth.authorize(|url| {
+                println!("Open this URL to authorize: {url}");
+            }).await?;
+            token.save()?;
+            token
+        }
+        Ok(token) if token.expires_soon() => {
+            // Token will expire soon — refresh it
+            let oauth = OAuth::new("your-client-id");
+            match oauth.refresh(&token).await {
+                Ok(new_token) => {
+                    new_token.save()?;
+                    new_token
+                }
+                Err(_) => {
+                    // Refresh failed — fall back to re-authorization
+                    let oauth = OAuth::new("your-client-id");
+                    let token = oauth.authorize(|url| {
+                        println!("Open this URL to authorize: {url}");
+                    }).await?;
+                    token.save()?;
+                    token
+                }
+            }
+        }
         Ok(token) => token,
         Err(_) => {
+            // No saved token — start authorization flow
             let oauth = OAuth::new("your-client-id");
             let token = oauth.authorize(|url| {
                 println!("Open this URL to authorize: {url}");
@@ -147,18 +175,36 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 use std::sync::Arc;
 use longport::{Config, QuoteContext, oauth::{OAuth, OAuthToken}};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create config with OAuth 2.0
-    let token = match OAuthToken::load() {
-        Ok(token) => token,
+async fn get_token() -> Result<OAuthToken, Box<dyn std::error::Error>> {
+    match OAuthToken::load() {
+        Ok(token) if token.is_expired() => {
+            let oauth = OAuth::new("your-client-id");
+            let token = oauth.authorize(|url| println!("Open this URL to authorize: {url}")).await?;
+            token.save()?;
+            Ok(token)
+        }
+        Ok(token) if token.expires_soon() => {
+            let oauth = OAuth::new("your-client-id");
+            let token = oauth.refresh(&token).await.or_else(|_| async {
+                let oauth = OAuth::new("your-client-id");
+                oauth.authorize(|url| println!("Open this URL to authorize: {url}")).await
+            }).await?;
+            token.save()?;
+            Ok(token)
+        }
+        Ok(token) => Ok(token),
         Err(_) => {
             let oauth = OAuth::new("your-client-id");
             let token = oauth.authorize(|url| println!("Open this URL to authorize: {url}")).await?;
             token.save()?;
-            token
+            Ok(token)
         }
-    };
+    }
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let token = get_token().await?;
     let config = Arc::new(Config::from_oauth(&token));
 
     // Create a context for quote APIs

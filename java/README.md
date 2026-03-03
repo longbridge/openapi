@@ -67,22 +67,44 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize and Get Token**
+**Step 2: Authorize, Refresh, and Get Token**
 
 ```java
 import com.longport.*;
 
 class Main {
-    public static void main(String[] args) throws Exception {
-        OAuthToken token;
+    static OAuthToken getToken() throws Exception {
+        OAuthToken token = null;
         try {
             token = OAuthToken.load().get();
         } catch (Exception e) {
+            // no saved token
+        }
+
+        if (token == null || token.isExpired()) {
+            // No saved token or token has expired — re-authorize
             try (OAuth oauth = new OAuth("your-client-id")) {
                 token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
             }
             token.save().get();
+        } else if (token.expiresSoon()) {
+            // Token will expire soon — refresh it
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                try {
+                    token = oauth.refresh(token).get();
+                    token.save().get();
+                } catch (Exception e) {
+                    // Refresh failed — fall back to re-authorization
+                    token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+                    token.save().get();
+                }
+            }
         }
+        return token;
+    }
+
+    public static void main(String[] args) throws Exception {
+        OAuthToken token = getToken();
         Config config = Config.fromOAuth(token);
         // Use config to create contexts...
     }
@@ -115,17 +137,30 @@ import com.longport.quote.*;
 import java.math.BigDecimal;
 
 class Main {
-    public static void main(String[] args) throws Exception {
-        OAuthToken token;
-        try {
-            token = OAuthToken.load().get();
-        } catch (Exception e) {
+    static OAuthToken getToken() throws Exception {
+        OAuthToken token = null;
+        try { token = OAuthToken.load().get(); } catch (Exception e) {}
+        if (token == null || token.isExpired()) {
             try (OAuth oauth = new OAuth("your-client-id")) {
                 token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
             }
             token.save().get();
+        } else if (token.expiresSoon()) {
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                try {
+                    token = oauth.refresh(token).get(); token.save().get();
+                } catch (Exception e) {
+                    token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+                    token.save().get();
+                }
+            }
         }
-        try (Config config = Config.fromOAuth(token); QuoteContext ctx = QuoteContext.create(config).get()) {
+        return token;
+    }
+
+    public static void main(String[] args) throws Exception {
+        try (Config config = Config.fromOAuth(getToken());
+             QuoteContext ctx = QuoteContext.create(config).get()) {
             SecurityQuote[] resp = ctx.getQuote(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" }).get();
             for (SecurityQuote obj : resp) {
                 System.out.println(obj);
@@ -142,17 +177,30 @@ import com.longport.*;
 import com.longport.quote.*;
 
 class Main {
-    public static void main(String[] args) throws Exception {
-        OAuthToken token;
-        try {
-            token = OAuthToken.load().get();
-        } catch (Exception e) {
+    static OAuthToken getToken() throws Exception {
+        OAuthToken token = null;
+        try { token = OAuthToken.load().get(); } catch (Exception e) {}
+        if (token == null || token.isExpired()) {
             try (OAuth oauth = new OAuth("your-client-id")) {
                 token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
             }
             token.save().get();
+        } else if (token.expiresSoon()) {
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                try {
+                    token = oauth.refresh(token).get(); token.save().get();
+                } catch (Exception e) {
+                    token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+                    token.save().get();
+                }
+            }
         }
-        try (Config config = Config.fromOAuth(token); QuoteContext ctx = QuoteContext.create(config).get()) {
+        return token;
+    }
+
+    public static void main(String[] args) throws Exception {
+        try (Config config = Config.fromOAuth(getToken());
+             QuoteContext ctx = QuoteContext.create(config).get()) {
             ctx.setOnQuote((symbol, quote) -> {
                 System.out.printf("%s\t%s\n", symbol, quote);
             });
@@ -171,17 +219,30 @@ import com.longport.trade.*;
 import java.math.BigDecimal;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
-        OAuthToken token;
-        try {
-            token = OAuthToken.load().get();
-        } catch (Exception e) {
+    static OAuthToken getToken() throws Exception {
+        OAuthToken token = null;
+        try { token = OAuthToken.load().get(); } catch (Exception e) {}
+        if (token == null || token.isExpired()) {
             try (OAuth oauth = new OAuth("your-client-id")) {
                 token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
             }
             token.save().get();
+        } else if (token.expiresSoon()) {
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                try {
+                    token = oauth.refresh(token).get(); token.save().get();
+                } catch (Exception e) {
+                    token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+                    token.save().get();
+                }
+            }
         }
-        try (Config config = Config.fromOAuth(token); TradeContext ctx = TradeContext.create(config).get()) {
+        return token;
+    }
+
+    public static void main(String[] args) throws Exception {
+        try (Config config = Config.fromOAuth(getToken());
+             TradeContext ctx = TradeContext.create(config).get()) {
             SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
                     OrderType.LO,
                     OrderSide.Buy,

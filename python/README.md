@@ -87,21 +87,37 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize and Get Token**
+**Step 2: Authorize, Refresh, and Get Token**
 
 ```python
 from longport.openapi import Config, OAuth, OAuthToken
 
-# Try to load a previously saved token; fall back to browser authorization
-try:
-    token = OAuthToken.load()
-except Exception:
-    oauth = OAuth("your-client-id")
-    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-    token.save()
+def get_token() -> OAuthToken:
+    try:
+        token = OAuthToken.load()
+    except Exception:
+        token = None
+
+    if token is None or token.is_expired():
+        # No saved token or token has expired — re-authorize
+        oauth = OAuth("your-client-id")
+        token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+        token.save()
+    elif token.expires_soon():
+        # Token will expire soon — refresh it
+        try:
+            oauth = OAuth("your-client-id")
+            token = oauth.refresh(token)
+            token.save()
+        except Exception:
+            # Refresh failed — fall back to re-authorization
+            oauth = OAuth("your-client-id")
+            token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+            token.save()
+    return token
 
 # Create config with OAuth token
-config = Config.from_oauth(token)
+config = Config.from_oauth(get_token())
 ```
 
 #### 2. Legacy API Key (Environment Variables)
@@ -127,14 +143,26 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```python
 from longport.openapi import Config, QuoteContext, OAuth, OAuthToken
 
-# Authenticate with OAuth 2.0
-try:
-    token = OAuthToken.load()
-except Exception:
+def get_token() -> OAuthToken:
+    try:
+        token = OAuthToken.load()
+        if token.is_expired():
+            raise Exception("expired")
+        if token.expires_soon():
+            try:
+                return OAuth("your-client-id").refresh(token)
+            except Exception:
+                pass
+        else:
+            return token
+    except Exception:
+        pass
     oauth = OAuth("your-client-id")
     token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
     token.save()
-config = Config.from_oauth(token)
+    return token
+
+config = Config.from_oauth(get_token())
 
 # Create a context for quote APIs
 ctx = QuoteContext(config)
@@ -150,14 +178,26 @@ print(resp)
 from time import sleep
 from longport.openapi import Config, QuoteContext, SubType, PushQuote, OAuth, OAuthToken
 
-# Authenticate with OAuth 2.0
-try:
-    token = OAuthToken.load()
-except Exception:
+def get_token() -> OAuthToken:
+    try:
+        token = OAuthToken.load()
+        if token.is_expired():
+            raise Exception("expired")
+        if token.expires_soon():
+            try:
+                return OAuth("your-client-id").refresh(token)
+            except Exception:
+                pass
+        else:
+            return token
+    except Exception:
+        pass
     oauth = OAuth("your-client-id")
     token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
     token.save()
-config = Config.from_oauth(token)
+    return token
+
+config = Config.from_oauth(get_token())
 
 # A callback to receive quote data
 def on_quote(symbol: str, event: PushQuote):
@@ -180,14 +220,26 @@ sleep(30)
 from decimal import Decimal
 from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuth, OAuthToken
 
-# Authenticate with OAuth 2.0
-try:
-    token = OAuthToken.load()
-except Exception:
+def get_token() -> OAuthToken:
+    try:
+        token = OAuthToken.load()
+        if token.is_expired():
+            raise Exception("expired")
+        if token.expires_soon():
+            try:
+                return OAuth("your-client-id").refresh(token)
+            except Exception:
+                pass
+        else:
+            return token
+    except Exception:
+        pass
     oauth = OAuth("your-client-id")
     token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
     token.save()
-config = Config.from_oauth(token)
+    return token
+
+config = Config.from_oauth(get_token())
 
 # Create a context for trade APIs
 ctx = TradeContext(config)
@@ -217,13 +269,30 @@ from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAut
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)
 
-async def main():
+async def get_token() -> OAuthToken:
     try:
         token = OAuthToken.load()
+        if token.is_expired():
+            raise Exception("expired")
+        if token.expires_soon():
+            try:
+                oauth = OAuth("your-client-id")
+                token = await oauth.refresh_async(token)
+                token.save()
+                return token
+            except Exception:
+                pass
+        else:
+            return token
     except Exception:
-        oauth = OAuth("your-client-id")
-        token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-        token.save()
+        pass
+    oauth = OAuth("your-client-id")
+    token = await oauth.authorize_async(lambda url: print(f"Open this URL to authorize: {url}"))
+    token.save()
+    return token
+
+async def main():
+    token = await get_token()
     config = Config.from_oauth(token)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)

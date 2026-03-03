@@ -58,11 +58,13 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize and Get Token**
+**Step 2: Authorize, Refresh, and Get Token**
 
 ```c
 #include <longport.h>
 #include <stdio.h>
+
+static const char* CLIENT_ID = "your-client-id";
 
 void
 on_open_url(const char* url, void* userdata)
@@ -88,23 +90,55 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   lb_config_free(config);
 }
 
+void
+on_oauth_refresh(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    /* Refresh failed — fall back to re-authorization */
+    lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, NULL);
+    lb_oauth_free(oauth);
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
+
+  lb_config_t* config = lb_config_from_oauth(token);
+  // Use config to create contexts...
+  lb_config_free(config);
+}
+
 int
 main(int argc, char const* argv[])
 {
   lb_error_t* load_err = NULL;
   lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
-  if (token) {
+  lb_error_free(load_err);
+
+  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+
+  if (token && !lb_oauth_token_is_expired(token) && !lb_oauth_token_expires_soon(token)) {
+    /* Token is valid — use it directly */
     lb_config_t* config = lb_config_from_oauth(token);
     // Use config to create contexts...
     lb_config_free(config);
     lb_oauth_token_free(token);
+  } else if (token && lb_oauth_token_expires_soon(token)) {
+    /* Token will expire soon — refresh it */
+    lb_oauth_refresh(oauth, token, on_oauth_refresh, NULL);
+    lb_oauth_token_free(token);
+    getchar();
   } else {
-    lb_error_free(load_err);
-    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+    /* No token or expired — re-authorize */
+    if (token) lb_oauth_token_free(token);
     lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, NULL);
     getchar();
-    lb_oauth_free(oauth);
   }
+
+  lb_oauth_free(oauth);
   return 0;
 }
 ```
@@ -138,6 +172,8 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 #include <curses.h>
 #endif
 
+static const char* CLIENT_ID = "your-client-id";
+
 void
 on_quote(const struct lb_async_result_t* res)
 {
@@ -149,7 +185,7 @@ on_quote(const struct lb_async_result_t* res)
   lb_security_quote_t* data = (lb_security_quote_t*)res->data;
   for (int i = 0; i < res->length; i++) {
     const lb_security_quote_t* quote = &data[i];
-    printf("%s timestamp=%ld last_done=%f open=%f high=%f low=%f volume=%ld "
+    printf("%s timestamp=%lld last_done=%f open=%f high=%f low=%f volume=%lld "
            "turnover=%f\n",
            quote->symbol,
            quote->timestamp,
@@ -207,6 +243,26 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   proceed(token, (const lb_quote_context_t**)res->userdata);
 }
 
+void
+on_oauth_refresh(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    /* Refresh failed — fall back to re-authorization */
+    lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize,
+                       res->userdata);
+    lb_oauth_free(oauth);
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
+
+  proceed(token, (const lb_quote_context_t**)res->userdata);
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -217,17 +273,27 @@ main(int argc, char const* argv[])
   const lb_quote_context_t* ctx = NULL;
   lb_error_t* load_err = NULL;
   lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
-  if (token) {
+  lb_error_free(load_err);
+
+  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+
+  if (token && !lb_oauth_token_is_expired(token) &&
+      !lb_oauth_token_expires_soon(token)) {
+    /* Token is valid — use it directly */
     proceed(token, &ctx);
     lb_oauth_token_free(token);
-    getchar();
+  } else if (token && lb_oauth_token_expires_soon(token)) {
+    /* Token will expire soon — refresh it */
+    lb_oauth_refresh(oauth, token, on_oauth_refresh, &ctx);
+    lb_oauth_token_free(token);
   } else {
-    lb_error_free(load_err);
-    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+    /* No token or expired — re-authorize */
+    if (token) lb_oauth_token_free(token);
     lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
-    getchar();
-    lb_oauth_free(oauth);
   }
+
+  lb_oauth_free(oauth);
+  getchar();
   lb_quote_context_release(ctx);
   return 0;
 }
@@ -244,12 +310,14 @@ main(int argc, char const* argv[])
 #include <curses.h>
 #endif
 
+static const char* CLIENT_ID = "your-client-id";
+
 void
 on_quote(const struct lb_quote_context_t* ctx,
          const struct lb_push_quote_t* quote,
          void* userdata)
 {
-  printf("%s timestamp=%ld last_done=%f open=%f high=%f low=%f volume=%ld "
+  printf("%s timestamp=%lld last_done=%f open=%f high=%f low=%f volume=%lld "
          "turnover=%f\n",
          quote->symbol,
          quote->timestamp,
@@ -317,6 +385,26 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   proceed(token, (const lb_quote_context_t**)res->userdata);
 }
 
+void
+on_oauth_refresh(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    /* Refresh failed — fall back to re-authorization */
+    lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize,
+                       res->userdata);
+    lb_oauth_free(oauth);
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
+
+  proceed(token, (const lb_quote_context_t**)res->userdata);
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -327,17 +415,27 @@ main(int argc, char const* argv[])
   const lb_quote_context_t* ctx = NULL;
   lb_error_t* load_err = NULL;
   lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
-  if (token) {
+  lb_error_free(load_err);
+
+  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+
+  if (token && !lb_oauth_token_is_expired(token) &&
+      !lb_oauth_token_expires_soon(token)) {
+    /* Token is valid — use it directly */
     proceed(token, &ctx);
     lb_oauth_token_free(token);
-    getchar();
+  } else if (token && lb_oauth_token_expires_soon(token)) {
+    /* Token will expire soon — refresh it */
+    lb_oauth_refresh(oauth, token, on_oauth_refresh, &ctx);
+    lb_oauth_token_free(token);
   } else {
-    lb_error_free(load_err);
-    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+    /* No token or expired — re-authorize */
+    if (token) lb_oauth_token_free(token);
     lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
-    getchar();
-    lb_oauth_free(oauth);
   }
+
+  lb_oauth_free(oauth);
+  getchar();
   lb_quote_context_release(ctx);
   return 0;
 }
@@ -353,6 +451,8 @@ main(int argc, char const* argv[])
 #else
 #include <curses.h>
 #endif
+
+static const char* CLIENT_ID = "your-client-id";
 
 void
 on_submit_order(const struct lb_async_result_t* res)
@@ -375,7 +475,7 @@ on_trade_context_created(const struct lb_async_result_t* res)
     return;
   }
 
-  *((const lb_quote_context_t**)res->userdata) = res->ctx;
+  *((const lb_trade_context_t**)res->userdata) = res->ctx;
 
   lb_decimal_t* submitted_price = lb_decimal_from_double(50.0);
   lb_decimal_t* submitted_quantity = lb_decimal_from_double(200.0);
@@ -423,6 +523,26 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   proceed(token, (const lb_trade_context_t**)res->userdata);
 }
 
+void
+on_oauth_refresh(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    /* Refresh failed — fall back to re-authorization */
+    lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize,
+                       res->userdata);
+    lb_oauth_free(oauth);
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
+
+  proceed(token, (const lb_trade_context_t**)res->userdata);
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -433,17 +553,28 @@ main(int argc, char const* argv[])
   const lb_trade_context_t* ctx = NULL;
   lb_error_t* load_err = NULL;
   lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
-  if (token) {
+  lb_error_free(load_err);
+
+  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+
+  if (token && !lb_oauth_token_is_expired(token) &&
+      !lb_oauth_token_expires_soon(token)) {
+    /* Token is valid — use it directly */
     proceed(token, &ctx);
     lb_oauth_token_free(token);
-    getchar();
+  } else if (token && lb_oauth_token_expires_soon(token)) {
+    /* Token will expire soon — refresh it */
+    lb_oauth_refresh(oauth, token, on_oauth_refresh, &ctx);
+    lb_oauth_token_free(token);
   } else {
-    lb_error_free(load_err);
-    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
-    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, (void*)&ctx);
-    getchar();
-    lb_oauth_free(oauth);
+    /* No token or expired — re-authorize */
+    if (token) lb_oauth_token_free(token);
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize,
+                       (void*)&ctx);
   }
+
+  lb_oauth_free(oauth);
+  getchar();
   lb_trade_context_release(ctx);
   return 0;
 }
