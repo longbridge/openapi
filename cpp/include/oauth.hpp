@@ -42,33 +42,31 @@ public:
 
   /// Load a token from the default path (`~/.longbridge-openapi/token`)
   ///
-  /// @param error  On failure, filled with an error message; otherwise empty.
-  /// @return Loaded token, or a null-state token on failure (check error)
-  static OAuthToken load(std::string& error);
+  /// @param out_token  On success, receives the loaded token.
+  /// @return Status indicating success or failure
+  static Status load(OAuthToken& out_token);
 
   /// Load a token from an explicit file path
   ///
-  /// @param path   Path to the token JSON file
-  /// @param error  On failure, filled with an error message; otherwise empty.
-  /// @return Loaded token, or a null-state token on failure (check error)
-  static OAuthToken load_from_path(const std::string& path, std::string& error);
+  /// @param path       Path to the token JSON file
+  /// @param out_token  On success, receives the loaded token.
+  /// @return Status indicating success or failure
+  static Status load_from_path(const std::string& path, OAuthToken& out_token);
 
   /// Save the token to the default path (`~/.longbridge-openapi/token`)
   ///
   /// The parent directory is created automatically if it does not exist.
   ///
-  /// @param error  On failure, filled with an error message; otherwise empty.
-  /// @return true on success, false on failure
-  bool save(std::string& error) const;
+  /// @return Status indicating success or failure
+  Status save() const;
 
   /// Save the token to an explicit file path
   ///
   /// The parent directory is created automatically if it does not exist.
   ///
-  /// @param path   Destination path for the token JSON file
-  /// @param error  On failure, filled with an error message; otherwise empty.
-  /// @return true on success, false on failure
-  bool save_to_path(const std::string& path, std::string& error) const;
+  /// @param path  Destination path for the token JSON file
+  /// @return Status indicating success or failure
+  Status save_to_path(const std::string& path) const;
 };
 
 /// OAuth 2.0 client for LongPort OpenAPI
