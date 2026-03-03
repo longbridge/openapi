@@ -21,6 +21,7 @@ private:
   lb_oauth_token_t* token_;
 
 public:
+  OAuthToken() : token_(nullptr) {}
   explicit OAuthToken(lb_oauth_token_t* token) : token_(token) {}
 
   OAuthToken(const OAuthToken&) = delete;
