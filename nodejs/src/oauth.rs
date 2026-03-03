@@ -21,6 +21,49 @@ impl OAuthToken {
     pub fn expires_soon(&self) -> bool {
         self.0.expires_soon()
     }
+
+    /// Load a token from the default path (`~/.longbridge-openapi/token`)
+    ///
+    /// @returns OAuthToken loaded from disk
+    #[napi(factory)]
+    pub fn load() -> Result<Self> {
+        CoreOAuthToken::load()
+            .map(OAuthToken)
+            .map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    /// Load a token from an explicit file path
+    ///
+    /// @param path  Path to the token JSON file
+    /// @returns OAuthToken loaded from disk
+    #[napi(factory)]
+    pub fn load_from_path(path: String) -> Result<Self> {
+        CoreOAuthToken::load_from_path(path)
+            .map(OAuthToken)
+            .map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    /// Save the token to the default path (`~/.longbridge-openapi/token`)
+    ///
+    /// The parent directory is created automatically if it does not exist.
+    #[napi]
+    pub fn save(&self) -> Result<()> {
+        self.0
+            .save()
+            .map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    /// Save the token to an explicit file path
+    ///
+    /// The parent directory is created automatically if it does not exist.
+    ///
+    /// @param path  Destination path for the token JSON file
+    #[napi]
+    pub fn save_to_path(&self, path: String) -> Result<()> {
+        self.0
+            .save_to_path(path)
+            .map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
 }
 
 /// OAuth 2.0 client for LongPort OpenAPI

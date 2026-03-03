@@ -27,13 +27,69 @@ OAuthToken::~OAuthToken()
 bool
 OAuthToken::is_expired() const
 {
-  return lb_oauth_token_is_expired(token_) != 0;
+  return lb_oauth_token_is_expired(token_);
 }
 
 bool
 OAuthToken::expires_soon() const
 {
-  return lb_oauth_token_expires_soon(token_) != 0;
+  return lb_oauth_token_expires_soon(token_);
+}
+
+OAuthToken
+OAuthToken::load(std::string& error)
+{
+  lb_error_t* err = nullptr;
+  lb_oauth_token_t* token = lb_oauth_token_load(&err);
+  if (!token) {
+    error = lb_error_message(err);
+    lb_error_free(err);
+    return OAuthToken(nullptr);
+  }
+  error.clear();
+  return OAuthToken(token);
+}
+
+OAuthToken
+OAuthToken::load_from_path(const std::string& path, std::string& error)
+{
+  lb_error_t* err = nullptr;
+  lb_oauth_token_t* token = lb_oauth_token_load_from_path(path.c_str(), &err);
+  if (!token) {
+    error = lb_error_message(err);
+    lb_error_free(err);
+    return OAuthToken(nullptr);
+  }
+  error.clear();
+  return OAuthToken(token);
+}
+
+bool
+OAuthToken::save(std::string& error) const
+{
+  lb_error_t* err = nullptr;
+  bool ok = lb_oauth_token_save(token_, &err);
+  if (!ok) {
+    error = lb_error_message(err);
+    lb_error_free(err);
+  } else {
+    error.clear();
+  }
+  return ok;
+}
+
+bool
+OAuthToken::save_to_path(const std::string& path, std::string& error) const
+{
+  lb_error_t* err = nullptr;
+  bool ok = lb_oauth_token_save_to_path(token_, path.c_str(), &err);
+  if (!ok) {
+    error = lb_error_message(err);
+    lb_error_free(err);
+  } else {
+    error.clear();
+  }
+  return ok;
 }
 
 // ── OAuth ────────────────────────────────────────────────────────────────────

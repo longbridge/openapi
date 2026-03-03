@@ -1,5 +1,7 @@
 package com.longport;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * OAuth 2.0 access token (opaque native handle)
  *
@@ -36,6 +38,58 @@ public class OAuthToken implements AutoCloseable {
      */
     public boolean expiresSoon() {
         return SdkNative.oauthTokenExpiresSoon(this.raw);
+    }
+
+    /**
+     * Load a token from the default path ({@code ~/.longbridge-openapi/token})
+     *
+     * @return CompletableFuture that resolves to an {@link OAuthToken}
+     */
+    public static CompletableFuture<OAuthToken> load() {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.oauthTokenLoad(callback);
+        });
+    }
+
+    /**
+     * Load a token from an explicit file path
+     *
+     * @param path Path to the token JSON file
+     * @return CompletableFuture that resolves to an {@link OAuthToken}
+     */
+    public static CompletableFuture<OAuthToken> loadFromPath(String path) {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.oauthTokenLoadFromPath(path, callback);
+        });
+    }
+
+    /**
+     * Save the token to the default path ({@code ~/.longbridge-openapi/token})
+     *
+     * <p>
+     * The parent directory is created automatically if it does not exist.
+     *
+     * @return CompletableFuture that completes when the file is written
+     */
+    public CompletableFuture<Void> save() {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.oauthTokenSave(this.raw, callback);
+        });
+    }
+
+    /**
+     * Save the token to an explicit file path
+     *
+     * <p>
+     * The parent directory is created automatically if it does not exist.
+     *
+     * @param path Destination path for the token JSON file
+     * @return CompletableFuture that completes when the file is written
+     */
+    public CompletableFuture<Void> saveToPath(String path) {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.oauthTokenSaveToPath(this.raw, path, callback);
+        });
     }
 
     @Override

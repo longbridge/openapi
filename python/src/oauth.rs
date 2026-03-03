@@ -1,5 +1,11 @@
-use longport::oauth::{OAuth as CoreOAuth, OAuthToken as CoreOAuthToken};
-use pyo3::{exceptions::PyRuntimeError, prelude::*};
+use longport::oauth::{OAuth as CoreOAuth, OAuthError, OAuthToken as CoreOAuthToken};
+use pyo3::prelude::*;
+
+use crate::error::ErrorNewType;
+
+fn oauth_err(e: OAuthError) -> PyErr {
+    ErrorNewType(longport::Error::OAuth(e.to_string())).into()
+}
 
 /// OAuth 2.0 access token
 #[pyclass(name = "OAuthToken")]
@@ -15,6 +21,38 @@ impl OAuthToken {
     /// Returns `True` if the token will expire within 1 hour
     fn expires_soon(&self) -> bool {
         self.0.expires_soon()
+    }
+
+    /// Load a token from the default path (`~/.longbridge-openapi/token`)
+    #[staticmethod]
+    fn load() -> PyResult<Self> {
+        CoreOAuthToken::load().map(OAuthToken).map_err(oauth_err)
+    }
+
+    /// Load a token from an explicit file path
+    ///
+    /// Args:
+    ///     path: Path to the token JSON file
+    #[staticmethod]
+    fn load_from_path(path: String) -> PyResult<Self> {
+        CoreOAuthToken::load_from_path(path)
+            .map(OAuthToken)
+            .map_err(oauth_err)
+    }
+
+    /// Save the token to the default path (`~/.longbridge-openapi/token`)
+    fn save(&self) -> PyResult<()> {
+        self.0.save().map_err(oauth_err)
+    }
+
+    /// Save the token to an explicit file path
+    ///
+    /// The parent directory is created automatically if it does not exist.
+    ///
+    /// Args:
+    ///     path: Destination path for the token JSON file
+    fn save_to_path(&self, path: String) -> PyResult<()> {
+        self.0.save_to_path(path).map_err(oauth_err)
     }
 }
 
@@ -76,7 +114,7 @@ impl OAuth {
                     })
                     .await
                     .map(OAuthToken)
-                    .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+                    .map_err(oauth_err)
             })
     }
 
@@ -97,7 +135,7 @@ impl OAuth {
                     .refresh(&inner_token)
                     .await
                     .map(OAuthToken)
-                    .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+                    .map_err(oauth_err)
             })
     }
 }
@@ -160,7 +198,7 @@ impl AsyncOAuth {
                     });
                 })
                 .await
-                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+                .map_err(oauth_err)?;
             Ok(OAuthToken(token))
         })
     }
@@ -176,10 +214,7 @@ impl AsyncOAuth {
         let inner = self.inner.clone();
         let inner_token = token.0.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let new_token = inner
-                .refresh(&inner_token)
-                .await
-                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+            let new_token = inner.refresh(&inner_token).await.map_err(oauth_err)?;
             Ok(OAuthToken(new_token))
         })
     }

@@ -59,16 +59,16 @@ pub unsafe extern "C" fn lb_oauth_token_free(token: *mut COAuthToken) {
     }
 }
 
-/// Returns non-zero if the token has expired
+/// Returns true if the token has expired
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_oauth_token_is_expired(token: *const COAuthToken) -> i32 {
-    (*token).0.is_expired() as i32
+pub unsafe extern "C" fn lb_oauth_token_is_expired(token: *const COAuthToken) -> bool {
+    (*token).0.is_expired()
 }
 
-/// Returns non-zero if the token will expire within 1 hour
+/// Returns true if the token will expire within 1 hour
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_oauth_token_expires_soon(token: *const COAuthToken) -> i32 {
-    (*token).0.expires_soon() as i32
+pub unsafe extern "C" fn lb_oauth_token_expires_soon(token: *const COAuthToken) -> bool {
+    (*token).0.expires_soon()
 }
 
 /// Start the OAuth 2.0 authorization flow (async)
@@ -131,4 +131,108 @@ pub unsafe extern "C" fn lb_oauth_refresh(
             .map_err(|e| longport::Error::OAuth(e.to_string()))?;
         Ok(into_token_ptr(new_token))
     });
+}
+
+/// Load a token from the default path (`~/.longbridge-openapi/token`)
+///
+/// @param error  If non-null and the call fails, receives an owned
+///               `lb_error_t*` that the caller must free with `lb_error_free`
+/// @return `lb_oauth_token_t*` on success, null on failure
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_token_load(
+    error: *mut *mut crate::error::CError,
+) -> *mut COAuthToken {
+    match longport::oauth::OAuthToken::load() {
+        Ok(token) => {
+            crate::error::set_error(error, None);
+            into_token_ptr(token)
+        }
+        Err(e) => {
+            crate::error::set_error(error, Some(longport::Error::OAuth(e.to_string())));
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Load a token from an explicit file path
+///
+/// @param path   NUL-terminated path to the token JSON file
+/// @param error  If non-null and the call fails, receives an owned
+///               `lb_error_t*` that the caller must free with `lb_error_free`
+/// @return `lb_oauth_token_t*` on success, null on failure
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_token_load_from_path(
+    path: *const c_char,
+    error: *mut *mut crate::error::CError,
+) -> *mut COAuthToken {
+    let path = std::ffi::CStr::from_ptr(path)
+        .to_str()
+        .expect("invalid path")
+        .to_string();
+    match longport::oauth::OAuthToken::load_from_path(path) {
+        Ok(token) => {
+            crate::error::set_error(error, None);
+            into_token_ptr(token)
+        }
+        Err(e) => {
+            crate::error::set_error(error, Some(longport::Error::OAuth(e.to_string())));
+            std::ptr::null_mut()
+        }
+    }
+}
+
+/// Save a token to the default path (`~/.longbridge-openapi/token`)
+///
+/// The parent directory is created automatically if it does not exist.
+///
+/// @param token  Token to save
+/// @param error  If non-null and the call fails, receives an owned
+///               `lb_error_t*` that the caller must free with `lb_error_free`
+/// @return `true` on success, `false` on failure
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_token_save(
+    token: *const COAuthToken,
+    error: *mut *mut crate::error::CError,
+) -> bool {
+    match (*token).0.save() {
+        Ok(()) => {
+            crate::error::set_error(error, None);
+            true
+        }
+        Err(e) => {
+            crate::error::set_error(error, Some(longport::Error::OAuth(e.to_string())));
+            false
+        }
+    }
+}
+
+/// Save a token to an explicit file path
+///
+/// The parent directory is created automatically if it does not exist.
+///
+/// @param token  Token to save
+/// @param path   NUL-terminated destination path for the token JSON file
+/// @param error  If non-null and the call fails, receives an owned
+///               `lb_error_t*` that the caller must free with `lb_error_free`
+/// @return `true` on success, `false` on failure
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_token_save_to_path(
+    token: *const COAuthToken,
+    path: *const c_char,
+    error: *mut *mut crate::error::CError,
+) -> bool {
+    let path = std::ffi::CStr::from_ptr(path)
+        .to_str()
+        .expect("invalid path")
+        .to_string();
+    match (*token).0.save_to_path(path) {
+        Ok(()) => {
+            crate::error::set_error(error, None);
+            true
+        }
+        Err(e) => {
+            crate::error::set_error(error, Some(longport::Error::OAuth(e.to_string())));
+            false
+        }
+    }
 }
