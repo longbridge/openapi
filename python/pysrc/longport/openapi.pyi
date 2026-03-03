@@ -169,7 +169,10 @@ class OAuthToken:
 
 class OAuth:
     """
-    OAuth 2.0 client for LongPort OpenAPI
+    Synchronous OAuth 2.0 client for LongPort OpenAPI.
+
+    Blocks the calling thread while waiting for browser authorization.
+    Use :class:`AsyncOAuth` instead if you need a non-blocking, awaitable interface.
 
     Args:
         client_id: OAuth 2.0 client ID from the LongPort developer portal
@@ -177,12 +180,21 @@ class OAuth:
 
     def __init__(self, client_id: str) -> None: ...
 
-    async def authorize(self, on_open_url: Callable[[str], None]) -> OAuthToken:
+    def set_callback_port(self, callback_port: int) -> None:
         """
-        Start the OAuth 2.0 authorization flow
+        Set the callback port
+
+        Args:
+            callback_port: TCP port for the local callback server (default 60355).
+                Must match one of the redirect URIs registered for the client.
+        """
+
+    def authorize(self, on_open_url: Callable[[str], None]) -> OAuthToken:
+        """
+        Start the OAuth 2.0 authorization flow (blocking)
 
         Starts a local HTTP server, calls ``on_open_url`` with the authorization
-        URL, then waits for the redirect and exchanges the code for a token.
+        URL, then blocks until the redirect arrives and exchanges the code for a token.
 
         Args:
             on_open_url: Callable that receives the authorization URL as a string.
@@ -191,12 +203,60 @@ class OAuth:
             OAuthToken that can be passed to :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`
         """
 
-    async def refresh(self, refresh_token: str) -> OAuthToken:
+    def refresh(self, token: OAuthToken) -> OAuthToken:
         """
-        Refresh an access token using a refresh token
+        Refresh an access token using an existing OAuthToken (blocking)
 
         Args:
-            refresh_token: Refresh token from a previous authorization
+            token: Existing OAuthToken whose refresh token is used
+
+        Returns:
+            New OAuthToken with a fresh access token
+        """
+
+
+class AsyncOAuth:
+    """
+    Asynchronous OAuth 2.0 client for LongPort OpenAPI.
+
+    Returns awaitables; must be used inside an ``asyncio`` event loop.
+    Use :class:`OAuth` instead for a plain blocking interface.
+
+    Args:
+        client_id: OAuth 2.0 client ID from the LongPort developer portal
+    """
+
+    def __init__(self, client_id: str) -> None: ...
+
+    def set_callback_port(self, callback_port: int) -> None:
+        """
+        Set the callback port
+
+        Args:
+            callback_port: TCP port for the local callback server (default 60355).
+                Must match one of the redirect URIs registered for the client.
+        """
+
+    async def authorize(self, on_open_url: Callable[[str], None]) -> OAuthToken:
+        """
+        Start the OAuth 2.0 authorization flow (async)
+
+        Starts a local HTTP server, calls ``on_open_url`` with the authorization
+        URL, then awaits the redirect and exchanges the code for a token.
+
+        Args:
+            on_open_url: Callable that receives the authorization URL as a string.
+
+        Returns:
+            OAuthToken that can be passed to :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`
+        """
+
+    async def refresh(self, token: OAuthToken) -> OAuthToken:
+        """
+        Refresh an access token using an existing OAuthToken (async)
+
+        Args:
+            token: Existing OAuthToken whose refresh token is used
 
         Returns:
             New OAuthToken with a fresh access token
