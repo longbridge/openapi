@@ -54,12 +54,46 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
+  const std::string client_id = "your-client-id";
+
   OAuthToken token;
   Status load_status = OAuthToken::load(token);
-  if (load_status) {
+  if (load_status && !token.is_expired() && !token.expires_soon()) {
     run(token);
+  } else if (load_status && token.expires_soon()) {
+    OAuth oauth(client_id);
+    oauth.refresh(token, [client_id](auto res) {
+      if (!res) {
+        std::cout << "refresh failed, re-authorizing: "
+                  << *res.status().message() << std::endl;
+        OAuth oauth2(client_id);
+        oauth2.authorize(
+          [](const std::string& url) {
+            std::cout << "Open this URL to authorize: " << url << std::endl;
+          },
+          [](auto res) {
+            if (!res) {
+              std::cout << "authorization failed: "
+                        << *res.status().message() << std::endl;
+              return;
+            }
+            Status save_status = res->save();
+            if (!save_status) {
+              std::cout << "failed to save token: "
+                        << *save_status.message() << std::endl;
+            }
+            run(*res);
+          });
+        return;
+      }
+      Status save_status = res->save();
+      if (!save_status) {
+        std::cout << "failed to save token: " << *save_status.message()
+                  << std::endl;
+      }
+      run(*res);
+    });
   } else {
-    const std::string client_id = "your-client-id";
     OAuth oauth(client_id);
     oauth.authorize(
       [](const std::string& url) {

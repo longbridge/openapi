@@ -59,7 +59,7 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize and Get Token**
+**Step 2: Authorize, Refresh, and Get Token**
 
 ```c++
 #include <iostream>
@@ -68,7 +68,7 @@ Save the `client_id` for use in your application.
 using namespace longport;
 
 static void
-run(OAuthToken token)
+run(const OAuthToken& token)
 {
   Config config = Config::from_oauth(token);
   // Use config to create contexts...
@@ -80,8 +80,39 @@ main(int argc, char const* argv[])
   OAuthToken token;
   Status load_status = OAuthToken::load(token);
   if (load_status) {
-    run(std::move(token));
+    if (token.is_expired()) {
+      // Token has expired — re-authorize
+      OAuth oauth("your-client-id");
+      oauth.authorize(
+        [](const std::string& url) {
+          std::cout << "Open this URL to authorize: " << url << std::endl;
+        },
+        [](auto res) {
+          if (!res) {
+            std::cout << "authorization failed: " << *res.status().message()
+                      << std::endl;
+            return;
+          }
+          res->save();
+          run(*res);
+        });
+    } else if (token.expires_soon()) {
+      // Token will expire soon — refresh it
+      OAuth oauth("your-client-id");
+      oauth.refresh(token, [](auto res) {
+        if (!res) {
+          std::cout << "refresh failed: " << *res.status().message()
+                    << std::endl;
+          return;
+        }
+        res->save();
+        run(*res);
+      });
+    } else {
+      run(token);
+    }
   } else {
+    // No saved token — start authorization flow
     OAuth oauth("your-client-id");
     oauth.authorize(
       [](const std::string& url) {
@@ -94,7 +125,7 @@ main(int argc, char const* argv[])
           return;
         }
         res->save();
-        run(*res.operator->());
+        run(*res);
       });
   }
 
@@ -135,7 +166,7 @@ using namespace longport;
 using namespace longport::quote;
 
 static void
-run(OAuthToken token)
+run(const OAuthToken& token)
 {
   Config config = Config::from_oauth(token);
 
@@ -170,6 +201,25 @@ run(OAuthToken token)
   });
 }
 
+static void
+authorize_and_run(const std::string& client_id)
+{
+  OAuth oauth(client_id);
+  oauth.authorize(
+    [](const std::string& url) {
+      std::cout << "Open this URL to authorize: " << url << std::endl;
+    },
+    [](auto res) {
+      if (!res) {
+        std::cout << "authorization failed: " << *res.status().message()
+                  << std::endl;
+        return;
+      }
+      res->save();
+      run(*res);
+    });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -177,25 +227,29 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
+  const std::string client_id = "your-client-id";
   OAuthToken token;
   Status load_status = OAuthToken::load(token);
   if (load_status) {
-    run(std::move(token));
-  } else {
-    OAuth oauth("your-client-id");
-    oauth.authorize(
-      [](const std::string& url) {
-        std::cout << "Open this URL to authorize: " << url << std::endl;
-      },
-      [](auto res) {
+    if (token.is_expired()) {
+      authorize_and_run(client_id);
+    } else if (token.expires_soon()) {
+      OAuth oauth(client_id);
+      oauth.refresh(token, [&client_id](auto res) {
         if (!res) {
-          std::cout << "authorization failed: " << *res.status().message()
+          std::cout << "refresh failed: " << *res.status().message()
                     << std::endl;
+          authorize_and_run(client_id);
           return;
         }
         res->save();
-        run(*res.operator->());
+        run(*res);
       });
+    } else {
+      run(token);
+    }
+  } else {
+    authorize_and_run(client_id);
   }
 
   std::cin.get();
@@ -217,7 +271,7 @@ using namespace longport;
 using namespace longport::quote;
 
 static void
-run(OAuthToken token)
+run(const OAuthToken& token)
 {
   Config config = Config::from_oauth(token);
 
@@ -242,7 +296,7 @@ run(OAuthToken token)
       "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
     };
 
-    res.context().subscribe(symbols, SubFlags::QUOTE(), true, [](auto res) {
+    res.context().subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
       if (!res) {
         std::cout << "failed to subscribe quote: "
                   << *res.status().message() << std::endl;
@@ -252,6 +306,25 @@ run(OAuthToken token)
   });
 }
 
+static void
+authorize_and_run(const std::string& client_id)
+{
+  OAuth oauth(client_id);
+  oauth.authorize(
+    [](const std::string& url) {
+      std::cout << "Open this URL to authorize: " << url << std::endl;
+    },
+    [](auto res) {
+      if (!res) {
+        std::cout << "authorization failed: " << *res.status().message()
+                  << std::endl;
+        return;
+      }
+      res->save();
+      run(*res);
+    });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -259,25 +332,29 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
+  const std::string client_id = "your-client-id";
   OAuthToken token;
   Status load_status = OAuthToken::load(token);
   if (load_status) {
-    run(std::move(token));
-  } else {
-    OAuth oauth("your-client-id");
-    oauth.authorize(
-      [](const std::string& url) {
-        std::cout << "Open this URL to authorize: " << url << std::endl;
-      },
-      [](auto res) {
+    if (token.is_expired()) {
+      authorize_and_run(client_id);
+    } else if (token.expires_soon()) {
+      OAuth oauth(client_id);
+      oauth.refresh(token, [&client_id](auto res) {
         if (!res) {
-          std::cout << "authorization failed: " << *res.status().message()
+          std::cout << "refresh failed: " << *res.status().message()
                     << std::endl;
+          authorize_and_run(client_id);
           return;
         }
         res->save();
-        run(*res.operator->());
+        run(*res);
       });
+    } else {
+      run(token);
+    }
+  } else {
+    authorize_and_run(client_id);
   }
 
   std::cin.get();
@@ -299,7 +376,7 @@ using namespace longport;
 using namespace longport::trade;
 
 static void
-run(OAuthToken token)
+run(const OAuthToken& token)
 {
   Config config = Config::from_oauth(token);
 
@@ -312,7 +389,7 @@ run(OAuthToken token)
 
     SubmitOrderOptions opts{
       "700.HK",     OrderType::LO,        OrderSide::Buy,
-      200,          TimeInForceType::Day, Decimal(50.0),
+      Decimal(200), TimeInForceType::Day, Decimal(50.0),
       std::nullopt, std::nullopt,         std::nullopt,
       std::nullopt, std::nullopt,         std::nullopt,
       std::nullopt,
@@ -328,6 +405,25 @@ run(OAuthToken token)
   });
 }
 
+static void
+authorize_and_run(const std::string& client_id)
+{
+  OAuth oauth(client_id);
+  oauth.authorize(
+    [](const std::string& url) {
+      std::cout << "Open this URL to authorize: " << url << std::endl;
+    },
+    [](auto res) {
+      if (!res) {
+        std::cout << "authorization failed: " << *res.status().message()
+                  << std::endl;
+        return;
+      }
+      res->save();
+      run(*res);
+    });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -335,25 +431,29 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
+  const std::string client_id = "your-client-id";
   OAuthToken token;
   Status load_status = OAuthToken::load(token);
   if (load_status) {
-    run(std::move(token));
-  } else {
-    OAuth oauth("your-client-id");
-    oauth.authorize(
-      [](const std::string& url) {
-        std::cout << "Open this URL to authorize: " << url << std::endl;
-      },
-      [](auto res) {
+    if (token.is_expired()) {
+      authorize_and_run(client_id);
+    } else if (token.expires_soon()) {
+      OAuth oauth(client_id);
+      oauth.refresh(token, [&client_id](auto res) {
         if (!res) {
-          std::cout << "authorization failed: " << *res.status().message()
+          std::cout << "refresh failed: " << *res.status().message()
                     << std::endl;
+          authorize_and_run(client_id);
           return;
         }
         res->save();
-        run(*res.operator->());
+        run(*res);
       });
+    } else {
+      run(token);
+    }
+  } else {
+    authorize_and_run(client_id);
   }
 
   std::cin.get();

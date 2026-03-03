@@ -13,14 +13,32 @@ from longport.openapi import (
 )
 
 
-async def get_config() -> Config:
+async def get_token() -> OAuthToken:
+    client_id = "your-client-id"
     try:
         token = OAuthToken.load()
+        if token.is_expired():
+            raise Exception("token expired")
+        if token.expires_soon():
+            oauth = OAuth(client_id)
+            try:
+                token = await oauth.refresh(token)
+                token.save()
+                return token
+            except Exception:
+                pass  # fall through to re-authorize
+        else:
+            return token
     except Exception:
-        oauth = OAuth("your-client-id")
-        token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-        token.save()
-    return Config.from_oauth(token)
+        pass
+    oauth = OAuth(client_id)
+    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    token.save()
+    return token
+
+
+async def get_config() -> Config:
+    return Config.from_oauth(await get_token())
 
 
 config = asyncio.run(get_config())

@@ -60,22 +60,44 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize and Get Token**
+**Step 2: Authorize, Refresh, and Get Token**
 
 ```javascript
 const { Config, OAuth, OAuthToken } = require("longport");
 
-async function main() {
+async function getToken() {
   let token;
   try {
     token = OAuthToken.load();
-  } catch (_) {
+  } catch (_) {}
+
+  if (!token || token.isExpired()) {
+    // No saved token or token has expired — re-authorize
     const oauth = new OAuth("your-client-id");
     token = await oauth.authorize((url) => {
       console.log("Open this URL to authorize: " + url);
     });
     token.save();
+  } else if (token.expiresSoon()) {
+    // Token will expire soon — refresh it
+    try {
+      const oauth = new OAuth("your-client-id");
+      token = await oauth.refresh(token);
+      token.save();
+    } catch (_) {
+      // Refresh failed — fall back to re-authorization
+      const oauth = new OAuth("your-client-id");
+      token = await oauth.authorize((url) => {
+        console.log("Open this URL to authorize: " + url);
+      });
+      token.save();
+    }
   }
+  return token;
+}
+
+async function main() {
+  const token = await getToken();
   const config = Config.fromOAuth(token);
   // Use config to create contexts...
 }
@@ -106,18 +128,27 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```javascript
 const { Config, QuoteContext, OAuth, OAuthToken } = require("longport");
 
-async function main() {
+async function getToken() {
   let token;
-  try {
-    token = OAuthToken.load();
-  } catch (_) {
+  try { token = OAuthToken.load(); } catch (_) {}
+  if (!token || token.isExpired()) {
     const oauth = new OAuth("your-client-id");
-    token = await oauth.authorize((url) => {
-      console.log("Open this URL to authorize: " + url);
-    });
+    token = await oauth.authorize((url) => console.log("Open this URL to authorize: " + url));
     token.save();
+  } else if (token.expiresSoon()) {
+    try {
+      token = await new OAuth("your-client-id").refresh(token);
+      token.save();
+    } catch (_) {
+      token = await new OAuth("your-client-id").authorize((url) => console.log("Open this URL to authorize: " + url));
+      token.save();
+    }
   }
-  const config = Config.fromOAuth(token);
+  return token;
+}
+
+async function main() {
+  const config = Config.fromOAuth(await getToken());
   const ctx = await QuoteContext.new(config);
   const resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]);
   for (let obj of resp) {
@@ -133,18 +164,27 @@ main();
 ```javascript
 const { Config, QuoteContext, SubType, OAuth, OAuthToken } = require("longport");
 
-async function main() {
+async function getToken() {
   let token;
-  try {
-    token = OAuthToken.load();
-  } catch (_) {
+  try { token = OAuthToken.load(); } catch (_) {}
+  if (!token || token.isExpired()) {
     const oauth = new OAuth("your-client-id");
-    token = await oauth.authorize((url) => {
-      console.log("Open this URL to authorize: " + url);
-    });
+    token = await oauth.authorize((url) => console.log("Open this URL to authorize: " + url));
     token.save();
+  } else if (token.expiresSoon()) {
+    try {
+      token = await new OAuth("your-client-id").refresh(token);
+      token.save();
+    } catch (_) {
+      token = await new OAuth("your-client-id").authorize((url) => console.log("Open this URL to authorize: " + url));
+      token.save();
+    }
   }
-  const config = Config.fromOAuth(token);
+  return token;
+}
+
+async function main() {
+  const config = Config.fromOAuth(await getToken());
   const ctx = await QuoteContext.new(config);
   ctx.setOnQuote((_, event) => console.log(event.toString()));
   await ctx.subscribe(
@@ -171,18 +211,27 @@ const {
   OAuthToken,
 } = require("longport");
 
-async function main() {
+async function getToken() {
   let token;
-  try {
-    token = OAuthToken.load();
-  } catch (_) {
+  try { token = OAuthToken.load(); } catch (_) {}
+  if (!token || token.isExpired()) {
     const oauth = new OAuth("your-client-id");
-    token = await oauth.authorize((url) => {
-      console.log("Open this URL to authorize: " + url);
-    });
+    token = await oauth.authorize((url) => console.log("Open this URL to authorize: " + url));
     token.save();
+  } else if (token.expiresSoon()) {
+    try {
+      token = await new OAuth("your-client-id").refresh(token);
+      token.save();
+    } catch (_) {
+      token = await new OAuth("your-client-id").authorize((url) => console.log("Open this URL to authorize: " + url));
+      token.save();
+    }
   }
-  const config = Config.fromOAuth(token);
+  return token;
+}
+
+async function main() {
+  const config = Config.fromOAuth(await getToken());
   const ctx = await TradeContext.new(config);
   const resp = await ctx.submitOrder({
     symbol: "700.HK",
