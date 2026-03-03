@@ -4039,14 +4039,14 @@ void lb_oauth_free(struct lb_oauth_t *oauth);
 void lb_oauth_token_free(struct lb_oauth_token_t *token);
 
 /**
- * Returns non-zero if the token has expired
+ * Returns true if the token has expired
  */
-int32_t lb_oauth_token_is_expired(const struct lb_oauth_token_t *token);
+bool lb_oauth_token_is_expired(const struct lb_oauth_token_t *token);
 
 /**
- * Returns non-zero if the token will expire within 1 hour
+ * Returns true if the token will expire within 1 hour
  */
-int32_t lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
+bool lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
 
 /**
  * Start the OAuth 2.0 authorization flow (async)
@@ -4082,6 +4082,52 @@ void lb_oauth_refresh(const struct lb_oauth_t *oauth,
                       const struct lb_oauth_token_t *token,
                       lb_async_callback_t callback,
                       void *userdata);
+
+/**
+ * Load a token from the default path (`~/.longbridge-openapi/token`)
+ *
+ * @param error  If non-null and the call fails, receives an owned
+ *               `lb_error_t*` that the caller must free with `lb_error_free`
+ * @return `lb_oauth_token_t*` on success, null on failure
+ */
+struct lb_oauth_token_t *lb_oauth_token_load(struct lb_error_t **error);
+
+/**
+ * Load a token from an explicit file path
+ *
+ * @param path   NUL-terminated path to the token JSON file
+ * @param error  If non-null and the call fails, receives an owned
+ *               `lb_error_t*` that the caller must free with `lb_error_free`
+ * @return `lb_oauth_token_t*` on success, null on failure
+ */
+struct lb_oauth_token_t *lb_oauth_token_load_from_path(const char *path, struct lb_error_t **error);
+
+/**
+ * Save a token to the default path (`~/.longbridge-openapi/token`)
+ *
+ * The parent directory is created automatically if it does not exist.
+ *
+ * @param token  Token to save
+ * @param error  If non-null and the call fails, receives an owned
+ *               `lb_error_t*` that the caller must free with `lb_error_free`
+ * @return `true` on success, `false` on failure
+ */
+bool lb_oauth_token_save(const struct lb_oauth_token_t *token, struct lb_error_t **error);
+
+/**
+ * Save a token to an explicit file path
+ *
+ * The parent directory is created automatically if it does not exist.
+ *
+ * @param token  Token to save
+ * @param path   NUL-terminated destination path for the token JSON file
+ * @param error  If non-null and the call fails, receives an owned
+ *               `lb_error_t*` that the caller must free with `lb_error_free`
+ * @return `true` on success, `false` on failure
+ */
+bool lb_oauth_token_save_to_path(const struct lb_oauth_token_t *token,
+                                 const char *path,
+                                 struct lb_error_t **error);
 
 void lb_quote_context_new(const struct lb_config_t *config,
                           lb_async_callback_t callback,

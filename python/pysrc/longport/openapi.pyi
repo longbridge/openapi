@@ -166,6 +166,56 @@ class OAuthToken:
     def expires_soon(self) -> bool:
         """Returns ``True`` if the token will expire within 1 hour"""
 
+    @staticmethod
+    def load() -> OAuthToken:
+        """
+        Load a token from the default path (``~/.longbridge-openapi/token``)
+
+        Returns:
+            OAuthToken loaded from disk
+
+        Raises:
+            RuntimeError: If the file cannot be read or parsed
+        """
+
+    @staticmethod
+    def load_from_path(path: str) -> OAuthToken:
+        """
+        Load a token from an explicit file path
+
+        Args:
+            path: Path to the token JSON file
+
+        Returns:
+            OAuthToken loaded from disk
+
+        Raises:
+            RuntimeError: If the file cannot be read or parsed
+        """
+
+    def save(self) -> None:
+        """
+        Save the token to the default path (``~/.longbridge-openapi/token``)
+
+        The parent directory is created automatically if it does not exist.
+
+        Raises:
+            RuntimeError: If the file cannot be written
+        """
+
+    def save_to_path(self, path: str) -> None:
+        """
+        Save the token to an explicit file path
+
+        The parent directory is created automatically if it does not exist.
+
+        Args:
+            path: Destination path for the token JSON file
+
+        Raises:
+            RuntimeError: If the file cannot be written
+        """
+
 
 class OAuth:
     """

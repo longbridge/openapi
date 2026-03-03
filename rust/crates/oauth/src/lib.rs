@@ -35,7 +35,10 @@
 #![deny(unreachable_pub)]
 #![warn(missing_docs)]
 
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::{
+    path::{Path, PathBuf},
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 
 use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
@@ -113,6 +116,62 @@ impl OAuthToken {
             .unwrap()
             .as_secs();
         self.expires_at.saturating_sub(now) < 3600
+    }
+
+    fn default_path() -> OAuthResult<PathBuf> {
+        // Prefer $HOME on Unix; fall back to $USERPROFILE on Windows
+        let home = std::env::var_os("HOME")
+            .or_else(|| std::env::var_os("USERPROFILE"))
+            .map(PathBuf::from)
+            .ok_or_else(|| OAuthError::OAuth("Cannot determine home directory".to_string()))?;
+        Ok(home.join(".longbridge-openapi").join("token"))
+    }
+
+    /// Load a token from the default path (`~/.longbridge-openapi/token`)
+    pub fn load() -> OAuthResult<Self> {
+        Self::load_from_path(Self::default_path()?)
+    }
+
+    /// Load a token from an explicit file path
+    pub fn load_from_path(path: impl AsRef<Path>) -> OAuthResult<Self> {
+        let path = path.as_ref();
+        let data = std::fs::read_to_string(path).map_err(|e| {
+            OAuthError::OAuth(format!("Failed to read token file {}: {e}", path.display()))
+        })?;
+        serde_json::from_str(&data).map_err(|e| {
+            OAuthError::OAuth(format!(
+                "Failed to parse token file {}: {e}",
+                path.display()
+            ))
+        })
+    }
+
+    /// Save the token to the default path (`~/.longbridge-openapi/token`)
+    pub fn save(&self) -> OAuthResult<()> {
+        self.save_to_path(Self::default_path()?)
+    }
+
+    /// Save the token to an explicit file path
+    ///
+    /// The parent directory is created automatically if it does not exist.
+    pub fn save_to_path(&self, path: impl AsRef<Path>) -> OAuthResult<()> {
+        let path = path.as_ref();
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                OAuthError::OAuth(format!(
+                    "Failed to create directory {}: {e}",
+                    parent.display()
+                ))
+            })?;
+        }
+        let data = serde_json::to_string_pretty(self)
+            .map_err(|e| OAuthError::OAuth(format!("Failed to serialize token: {e}")))?;
+        std::fs::write(path, data).map_err(|e| {
+            OAuthError::OAuth(format!(
+                "Failed to write token file {}: {e}",
+                path.display()
+            ))
+        })
     }
 }
 

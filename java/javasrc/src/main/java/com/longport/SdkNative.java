@@ -51,6 +51,14 @@ public class SdkNative {
 
         public static native boolean oauthTokenExpiresSoon(long oauthToken);
 
+        public static native void oauthTokenLoad(AsyncCallback callback);
+
+        public static native void oauthTokenLoadFromPath(String path, AsyncCallback callback);
+
+        public static native void oauthTokenSave(long oauthToken, AsyncCallback callback);
+
+        public static native void oauthTokenSaveToPath(long oauthToken, String path, AsyncCallback callback);
+
         public static native void oauthAuthorize(long oauth, java.util.function.Consumer<String> openUrlCallback,
                         AsyncCallback callback);
 

@@ -104,6 +104,88 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenExpiresSoon(
     token.expires_soon()
 }
 
+/// Load a token from the default path (`~/.longbridge-openapi/token`).
+///
+/// On success the async `callback` receives a `com/longport/OAuthToken`.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenLoad(
+    mut env: JNIEnv,
+    _class: JClass,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        async_util::execute(env, callback, async move {
+            let token = longport::oauth::OAuthToken::load()?;
+            Ok(into_token_ptr(token))
+        })?;
+        Ok(())
+    })
+}
+
+/// Load a token from an explicit file path.
+///
+/// On success the async `callback` receives a `com/longport/OAuthToken`.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenLoadFromPath(
+    mut env: JNIEnv,
+    _class: JClass,
+    path: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        use crate::types::FromJValue;
+        let path = String::from_jvalue(env, path.into())?;
+        async_util::execute(env, callback, async move {
+            let token = longport::oauth::OAuthToken::load_from_path(path)?;
+            Ok(into_token_ptr(token))
+        })?;
+        Ok(())
+    })
+}
+
+/// Save the token to the default path (`~/.longbridge-openapi/token`).
+///
+/// On success the async `callback` receives `null`.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenSave(
+    mut env: JNIEnv,
+    _class: JClass,
+    token: jlong,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let existing_token = (*(token as *const longport::oauth::OAuthToken)).clone();
+        async_util::execute(env, callback, async move {
+            existing_token.save()?;
+            Ok(())
+        })?;
+        Ok(())
+    })
+}
+
+/// Save the token to an explicit file path.
+///
+/// On success the async `callback` receives `null`.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenSaveToPath(
+    mut env: JNIEnv,
+    _class: JClass,
+    token: jlong,
+    path: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        use crate::types::FromJValue;
+        let path = String::from_jvalue(env, path.into())?;
+        let existing_token = (*(token as *const longport::oauth::OAuthToken)).clone();
+        async_util::execute(env, callback, async move {
+            existing_token.save_to_path(path)?;
+            Ok(())
+        })?;
+        Ok(())
+    })
+}
+
 // ── OAuth native methods
 // ──────────────────────────────────────────────────────
 
