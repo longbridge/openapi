@@ -39,7 +39,7 @@ OAuth 2.0 is the modern authentication method that uses Bearer tokens without re
 First, register an OAuth client to get your `client_id`:
 
 ```bash
-curl -X POST https://openapi.longportapp.com/v1/oauth2/client/register \
+curl -X POST https://openapi.longbridgeapp.com/oauth2/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "My Application",

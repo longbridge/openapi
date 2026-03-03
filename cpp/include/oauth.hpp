@@ -48,10 +48,17 @@ private:
   lb_oauth_t* oauth_;
 
 public:
-  /// Create a new OAuth 2.0 client
+  /// Create a new OAuth 2.0 client with the default callback port (60355)
   ///
   /// @param client_id  OAuth 2.0 client ID from the LongPort developer portal
   OAuth(const std::string& client_id);
+
+  /// Create a new OAuth 2.0 client with a custom callback port
+  ///
+  /// @param client_id     OAuth 2.0 client ID from the LongPort developer portal
+  /// @param callback_port TCP port for the local callback server. Must match
+  ///                      one of the redirect URIs registered for the client.
+  OAuth(const std::string& client_id, uint16_t callback_port);
 
   OAuth(const OAuth&) = delete;
   OAuth(OAuth&& other);

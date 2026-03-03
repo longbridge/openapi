@@ -33,7 +33,10 @@ pub struct OAuth {
 impl OAuth {
     /// Create a new OAuth 2.0 client
     ///
-    /// @param clientId  OAuth 2.0 client ID from the LongPort developer portal
+    /// @param clientId      OAuth 2.0 client ID from the LongPort developer
+    /// portal @param callbackPort  TCP port for the local callback server
+    /// (default 60355).                       Must match one of the
+    /// redirect URIs registered for the client.
     ///
     /// @example
     /// ```javascript
@@ -46,9 +49,9 @@ impl OAuth {
     /// console.log(token.accessToken);
     /// ```
     #[napi(constructor)]
-    pub fn new(client_id: String) -> Self {
+    pub fn new(client_id: String, callback_port: Option<u16>) -> Self {
         Self {
-            inner: CoreOAuth::new(client_id),
+            inner: CoreOAuth::with_callback_port(client_id, callback_port.unwrap_or(60355)),
         }
     }
 
@@ -67,8 +70,9 @@ impl OAuth {
         on_open_url: ThreadsafeFunction<String, ()>,
     ) -> Result<OAuthToken> {
         let client_id = self.inner.client_id().to_string();
+        let callback_port = self.inner.callback_port();
 
-        let token = CoreOAuth::new(client_id)
+        let token = CoreOAuth::with_callback_port(client_id, callback_port)
             .authorize(move |url| {
                 on_open_url.call(Ok(url.to_string()), ThreadsafeFunctionCallMode::NonBlocking);
             })
@@ -85,7 +89,8 @@ impl OAuth {
     #[napi]
     pub async fn refresh(&self, token: &OAuthToken) -> Result<OAuthToken> {
         let client_id = self.inner.client_id().to_string();
-        let new_token = CoreOAuth::new(client_id)
+        let callback_port = self.inner.callback_port();
+        let new_token = CoreOAuth::with_callback_port(client_id, callback_port)
             .refresh(&token.0)
             .await
             .map_err(|e| napi::Error::from_reason(e.to_string()))?;

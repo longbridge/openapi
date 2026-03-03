@@ -19,7 +19,7 @@ pub struct COAuth {
     inner: OAuth,
 }
 
-/// Create a new OAuth 2.0 client
+/// Create a new OAuth 2.0 client with the default callback port (60355)
 ///
 /// @param client_id  OAuth 2.0 client ID from the LongPort developer portal
 /// @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
@@ -31,6 +31,26 @@ pub unsafe extern "C" fn lb_oauth_new(client_id: *const c_char) -> *mut COAuth {
         .to_string();
     Box::into_raw(Box::new(COAuth {
         inner: OAuth::new(client_id),
+    }))
+}
+
+/// Create a new OAuth 2.0 client with a custom callback port
+///
+/// @param client_id     OAuth 2.0 client ID from the LongPort developer portal
+/// @param callback_port TCP port for the local callback server. Must match one
+///                      of the redirect URIs registered for the client.
+/// @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_new_with_port(
+    client_id: *const c_char,
+    callback_port: u16,
+) -> *mut COAuth {
+    let client_id = std::ffi::CStr::from_ptr(client_id)
+        .to_str()
+        .expect("invalid client_id")
+        .to_string();
+    Box::into_raw(Box::new(COAuth {
+        inner: OAuth::with_callback_port(client_id, callback_port),
     }))
 }
 
@@ -83,10 +103,11 @@ pub unsafe extern "C" fn lb_oauth_authorize(
 ) {
     let oauth = &*oauth;
     let client_id = oauth.inner.client_id().to_string();
+    let callback_port = oauth.inner.callback_port();
     let open_url_userdata_usize = open_url_userdata as usize;
 
     execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
-        let token = OAuth::new(client_id)
+        let token = OAuth::with_callback_port(client_id, callback_port)
             .authorize(move |url| {
                 let c_url = std::ffi::CString::new(url).unwrap_or_default();
                 open_url_callback(c_url.as_ptr(), open_url_userdata_usize as *mut c_void);
@@ -112,10 +133,11 @@ pub unsafe extern "C" fn lb_oauth_refresh(
     userdata: *mut c_void,
 ) {
     let client_id = (*oauth).inner.client_id().to_string();
+    let callback_port = (*oauth).inner.callback_port();
     let existing_token = (*token).0.clone();
 
     execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
-        let new_token = OAuth::new(client_id)
+        let new_token = OAuth::with_callback_port(client_id, callback_port)
             .refresh(&existing_token)
             .await
             .map_err(|e| longport::Error::OAuth(e.to_string()))?;
