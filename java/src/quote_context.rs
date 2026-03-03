@@ -1,19 +1,19 @@
 use std::sync::Arc;
 
 use jni::{
+    JNIEnv, JavaVM,
     errors::Result,
     objects::{GlobalRef, JClass, JObject, JString, JValueOwned},
     sys::{jboolean, jobjectArray},
-    JNIEnv, JavaVM,
 };
 use longport::{
+    Config, Market, QuoteContext,
     quote::{
         AdjustType, CalcIndex, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, Period,
         PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
         SecuritiesUpdateMode, SecurityListCategory, SortOrderType, SubFlags, TradeSessions,
         WarrantSortBy, WarrantStatus, WarrantType,
     },
-    Config, Market, QuoteContext,
 };
 use parking_lot::Mutex;
 use time::{Date, PrimitiveDateTime};
@@ -23,8 +23,8 @@ use crate::{
     error::jni_result,
     init::QUOTE_CONTEXT_CLASS,
     types::{
-        get_field, set_field, CreateWatchlistGroupResponse, FromJValue, IntoJValue, ObjectArray,
-        PrimaryArray,
+        CreateWatchlistGroupResponse, FromJValue, IntoJValue, ObjectArray, PrimaryArray, get_field,
+        set_field,
     },
 };
 

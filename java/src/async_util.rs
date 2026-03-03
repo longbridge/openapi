@@ -1,9 +1,9 @@
 use std::{future::Future, sync::LazyLock};
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JObject, JValue},
-    JNIEnv,
 };
 use tokio::runtime::Runtime;
 

@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 use jni::{
+    JNIEnv,
     objects::{JClass, JObject, JString},
     sys::jlong,
-    JNIEnv,
 };
 use longport::httpclient::{HttpClient, HttpClientConfig, Json, Method};
 use serde::Deserialize;
@@ -11,7 +11,7 @@ use serde_json::Value;
 
 use crate::{
     async_util,
-    error::{jni_result, JniError},
+    error::{JniError, jni_result},
     types::FromJValue,
 };
 

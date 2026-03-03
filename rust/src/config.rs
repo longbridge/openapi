@@ -7,18 +7,18 @@ use std::{
 };
 
 use http::Method;
-pub(crate) use http::{header, HeaderValue, Request};
-use longport_httpcli::{is_cn, HttpClient, HttpClientConfig, Json};
+pub(crate) use http::{HeaderValue, Request, header};
+use longport_httpcli::{HttpClient, HttpClientConfig, Json, is_cn};
+use longport_oauth::OAuthToken;
 use num_enum::IntoPrimitive;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
-use tracing::{subscriber::NoSubscriber, Level, Subscriber};
+use tracing::{Level, Subscriber, subscriber::NoSubscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
 use crate::error::Result;
-use longport_oauth::OAuthToken;
 
 const DEFAULT_QUOTE_WS_URL: &str = "wss://openapi-quote.longportapp.com/v2";
 const DEFAULT_TRADE_WS_URL: &str = "wss://openapi-trade.longportapp.com/v2";
@@ -114,14 +114,15 @@ impl Config {
     ///
     /// # Arguments
     ///
-    /// * `token` - [`OAuthToken`] obtained from [`longport::oauth::OAuth::authorize`]
+    /// * `token` - [`OAuthToken`] obtained from
+    ///   [`longport::oauth::OAuth::authorize`]
     ///
     /// # Example
     ///
     /// ```rust,no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{oauth::OAuth, Config};
+    /// use longport::{Config, oauth::OAuth};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

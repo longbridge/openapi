@@ -16,4 +16,8 @@ public enum ErrorKind {
      * Other error
      */
     Other,
+    /**
+     * OAuth error
+     */
+    OAuth,
 }

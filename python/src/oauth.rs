@@ -40,15 +40,17 @@ impl OAuth {
     /// Start the OAuth 2.0 authorization flow
     ///
     /// Starts a local HTTP server, calls `on_open_url` with the authorization
-    /// URL, then waits for the redirect and exchanges the authorization code for
-    /// a token.
+    /// URL, then waits for the redirect and exchanges the authorization code
+    /// for a token.
     ///
     /// Args:
-    ///     on_open_url: Callable that receives the authorization URL as a string.
-    ///                  Use it to open the URL in a browser or print it.
+    ///     on_open_url: Callable that receives the authorization URL as a
+    /// string.                  Use it to open the URL in a browser or
+    /// print it.
     ///
     /// Returns:
-    ///     OAuthToken that can be passed to Config.from_oauth or HttpClient.from_oauth
+    ///     OAuthToken that can be passed to Config.from_oauth or
+    /// HttpClient.from_oauth
     fn authorize<'py>(
         &self,
         py: Python<'py>,

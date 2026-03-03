@@ -54,12 +54,13 @@ impl OAuth {
 
     /// Start the OAuth 2.0 authorization flow
     ///
-    /// Starts a local HTTP server, calls `onOpenUrl` with the authorization URL,
-    /// then waits for the redirect and exchanges the code for a token.
+    /// Starts a local HTTP server, calls `onOpenUrl` with the authorization
+    /// URL, then waits for the redirect and exchanges the code for a token.
     ///
-    /// @param onOpenUrl  Called with the authorization URL; open it in a browser
-    ///                   or print it however you like
-    /// @returns OAuthToken that can be passed to `Config.fromOAuth` or `HttpClient.fromOAuth`
+    /// @param onOpenUrl  Called with the authorization URL; open it in a
+    /// browser                   or print it however you like
+    /// @returns OAuthToken that can be passed to `Config.fromOAuth` or
+    /// `HttpClient.fromOAuth`
     #[napi]
     pub async fn authorize(
         &self,

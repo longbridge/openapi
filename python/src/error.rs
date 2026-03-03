@@ -1,5 +1,5 @@
 use longport_python_macros::PyEnum;
-use pyo3::{pyclass, PyErr};
+use pyo3::{PyErr, pyclass};
 
 pyo3::import_exception!(longport.openapi, OpenApiException);
 
@@ -28,4 +28,6 @@ pub(crate) enum ErrorKind {
     OpenApi,
     /// Other error
     Other,
+    /// OAuth error
+    OAuth,
 }

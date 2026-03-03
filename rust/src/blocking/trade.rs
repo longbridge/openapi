@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
+    Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
@@ -10,7 +11,6 @@ use crate::{
         Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
         SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
     },
-    Config, Result,
 };
 
 /// Trade context

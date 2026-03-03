@@ -1,6 +1,7 @@
 use std::os::raw::c_char;
 
 use longport::{
+    Market,
     trade::{
         AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,
         EstimateMaxPurchaseQuantityResponse, Execution, FrozenTransactionFee, FundPosition,
@@ -9,7 +10,6 @@ use longport::{
         OrderTag, OrderType, PushOrderChanged, StockPosition, StockPositionChannel,
         StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
     },
-    Market,
 };
 use time::OffsetDateTime;
 

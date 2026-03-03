@@ -1,10 +1,10 @@
 use std::borrow::Cow;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JValueOwned, ReleaseMode},
     sys::{jboolean, jint, jlong},
-    JNIEnv,
 };
 
 use crate::types::{FromJValue, IntoJValue, JSignature};

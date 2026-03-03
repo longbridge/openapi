@@ -40,7 +40,8 @@ pub unsafe extern "C" fn lb_oauth_free(oauth: *mut COAuth) {
     drop(Box::from_raw(oauth));
 }
 
-/// Free a `lb_oauth_token_t` returned by `lb_oauth_authorize` or `lb_oauth_refresh`
+/// Free a `lb_oauth_token_t` returned by `lb_oauth_authorize` or
+/// `lb_oauth_refresh`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_oauth_token_free(token: *mut COAuthToken) {
     if !token.is_null() {
@@ -67,10 +68,11 @@ pub unsafe extern "C" fn lb_oauth_token_expires_soon(token: *const COAuthToken) 
 /// waits for the redirect and exchanges the authorization code for a token.
 ///
 /// @param oauth              OAuth client
-/// @param open_url_callback  Called with the authorization URL and `open_url_userdata`
-/// @param open_url_userdata  Opaque pointer forwarded to `open_url_callback`
-/// @param callback           Async completion callback; `data` is `*mut lb_oauth_token_t` on success
-/// @param userdata           Opaque pointer forwarded to `callback`
+/// @param open_url_callback  Called with the authorization URL and
+/// `open_url_userdata` @param open_url_userdata  Opaque pointer forwarded to
+/// `open_url_callback` @param callback           Async completion callback;
+/// `data` is `*mut lb_oauth_token_t` on success @param userdata
+/// Opaque pointer forwarded to `callback`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_oauth_authorize(
     oauth: *const COAuth,
@@ -99,8 +101,9 @@ pub unsafe extern "C" fn lb_oauth_authorize(
 ///
 /// @param oauth          OAuth client (provides client_id)
 /// @param token          Existing token whose refresh token is used
-/// @param callback       Async completion callback; `data` is `*mut lb_oauth_token_t` on success
-/// @param userdata       Opaque pointer forwarded to `callback`
+/// @param callback       Async completion callback; `data` is `*mut
+/// lb_oauth_token_t` on success @param userdata       Opaque pointer forwarded
+/// to `callback`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_oauth_refresh(
     oauth: *const COAuth,

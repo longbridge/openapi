@@ -1,5 +1,5 @@
 use std::{
-    ffi::{c_void, CStr},
+    ffi::{CStr, c_void},
     os::raw::c_char,
     sync::Arc,
 };
@@ -8,8 +8,8 @@ use longport::Config;
 use time::OffsetDateTime;
 
 use crate::{
-    async_call::{execute_async, CAsyncCallback},
-    error::{set_error, CError},
+    async_call::{CAsyncCallback, execute_async},
+    error::{CError, set_error},
     oauth::COAuthToken,
     types::{CLanguage, CPushCandlestickMode, CString},
 };
@@ -128,7 +128,8 @@ pub unsafe extern "C" fn lb_config_new(
 ///
 /// # Arguments
 ///
-/// - `token` - OAuth 2.0 token obtained from `lb_oauth_authorize` or `lb_oauth_refresh`
+/// - `token` - OAuth 2.0 token obtained from `lb_oauth_authorize` or
+///   `lb_oauth_refresh`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_from_oauth(token: *const COAuthToken) -> *mut CConfig {
     let config = Config::from_oauth(&(*token).0);

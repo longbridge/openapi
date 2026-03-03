@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longport::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
-use napi::{bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode, Result};
+use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
 use crate::{

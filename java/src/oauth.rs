@@ -1,14 +1,14 @@
 use jni::{
+    JNIEnv,
     objects::{JClass, JObject, JString},
     sys::jlong,
-    JNIEnv,
 };
-
 use longport::oauth::OAuth;
 
 use crate::{async_util, error::jni_result, types::set_field};
 
-// ── OAuthToken native handle ──────────────────────────────────────────────────
+// ── OAuthToken native handle
+// ──────────────────────────────────────────────────
 
 struct OAuthTokenPtr(*mut longport::oauth::OAuthToken);
 
@@ -27,7 +27,8 @@ fn into_token_ptr(token: longport::oauth::OAuthToken) -> OAuthTokenPtr {
     OAuthTokenPtr(Box::into_raw(Box::new(token)))
 }
 
-// ── OAuth native handle ───────────────────────────────────────────────────────
+// ── OAuth native handle
+// ───────────────────────────────────────────────────────
 
 /// Create a new OAuth 2.0 client, returning an opaque pointer stored as `long`
 /// in `com.longport.OAuth.raw`.
@@ -54,7 +55,8 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeOAuth(
     drop(Box::from_raw(oauth as *mut OAuth));
 }
 
-// ── OAuthToken native methods ─────────────────────────────────────────────────
+// ── OAuthToken native methods
+// ─────────────────────────────────────────────────
 
 /// Free an OAuthToken pointer.
 #[unsafe(no_mangle)]
@@ -88,7 +90,8 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenExpiresSoon(
     token.expires_soon()
 }
 
-// ── OAuth native methods ──────────────────────────────────────────────────────
+// ── OAuth native methods
+// ──────────────────────────────────────────────────────
 
 /// Start the OAuth 2.0 authorization flow (async).
 ///

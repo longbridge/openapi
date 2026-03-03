@@ -1,19 +1,19 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 
 use longport::{
+    TradeContext,
     trade::{
         EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
         GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent, ReplaceOrderOptions,
         SubmitOrderOptions,
     },
-    TradeContext,
 };
 use parking_lot::Mutex;
 use time::OffsetDateTime;
 
 use crate::{
-    async_call::{execute_async, CAsyncCallback, CAsyncResult},
+    async_call::{CAsyncCallback, CAsyncResult, execute_async},
     callback::{CFreeUserDataFunc, Callback},
     config::CConfig,
     trade_context::{
@@ -29,7 +29,7 @@ use crate::{
             CSubmitOrderResponseOwned,
         },
     },
-    types::{cstr_array_to_rust, cstr_to_rust, CCow, CVec, ToFFI},
+    types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
 };
 
 pub type COnOrderChangedCallback =

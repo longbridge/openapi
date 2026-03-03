@@ -1,16 +1,16 @@
 use std::{
     collections::HashMap,
-    ffi::{c_char, c_void, CStr, CString},
+    ffi::{CStr, CString, c_char, c_void},
 };
 
 use longport::{
-    httpclient::{HttpClient, HttpClientConfig, HttpClientError},
     Error,
+    httpclient::{HttpClient, HttpClientConfig, HttpClientError},
 };
 
 use crate::{
-    async_call::{execute_async, CAsyncCallback},
-    error::{set_error, CError},
+    async_call::{CAsyncCallback, execute_async},
+    error::{CError, set_error},
     oauth::COAuthToken,
 };
 
@@ -72,7 +72,8 @@ pub unsafe extern "C" fn lb_http_client_from_env(error: *mut *mut CError) -> *mu
 
 /// Create a new `HttpClient` from an OAuth 2.0 access token
 ///
-/// @param token - OAuth 2.0 token obtained from `lb_oauth_authorize` or `lb_oauth_refresh`
+/// @param token - OAuth 2.0 token obtained from `lb_oauth_authorize` or
+/// `lb_oauth_refresh`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_client_from_oauth(token: *const COAuthToken) -> *mut CHttpClient {
     Box::leak(Box::new(CHttpClient(HttpClient::new(

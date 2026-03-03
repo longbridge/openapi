@@ -12,10 +12,12 @@
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     // Start OAuth authorization flow
 //!     let oauth = OAuth::new("your-client-id");
-//!     let token = oauth.authorize(|url| {
-//!         // Open the URL however you like, e.g. print it or launch a browser
-//!         println!("Please visit: {url}");
-//!     }).await?;
+//!     let token = oauth
+//!         .authorize(|url| {
+//!             // Open the URL however you like, e.g. print it or launch a browser
+//!             println!("Please visit: {url}");
+//!         })
+//!         .await?;
 //!
 //!     println!("Access token: {}", token.access_token);
 //!     Ok(())
@@ -29,10 +31,10 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use oauth2::{
-    basic::BasicClient, reqwest::async_http_client, AuthUrl, AuthorizationCode, ClientId,
-    CsrfToken, RedirectUrl, RefreshToken, RevocationUrl, Scope, TokenResponse, TokenUrl,
+    AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
+    Scope, TokenResponse, TokenUrl, basic::BasicClient, reqwest::async_http_client,
 };
-use poem::{handler, listener::TcpAcceptor, web::Query, EndpointExt, Route, Server};
+use poem::{EndpointExt, Route, Server, handler, listener::TcpAcceptor, web::Query};
 use serde::{Deserialize, Serialize};
 use tokio::{sync::oneshot, time::timeout};
 

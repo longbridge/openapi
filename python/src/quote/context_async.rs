@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use longport::{
-    quote::{RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup},
     QuoteContext,
+    quote::{RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup},
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};

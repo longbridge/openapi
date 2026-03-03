@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JObject, JValueOwned},
-    JNIEnv,
 };
 use longport_java_macros::impl_java_enum;
 
@@ -15,7 +15,7 @@ use crate::{
 impl_java_enum!(
     "com/longport/ErrorKind",
     longport::SimpleErrorKind,
-    [Http, OpenApi, Other]
+    [Http, OpenApi, Other, OAuth]
 );
 
 impl_java_enum!(
@@ -348,7 +348,9 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longport/trade/OrderType",
     longport::trade::OrderType,
-    [Unknown, LO, ELO, MO, AO, ALO, ODD, LIT, MIT, TSLPAMT, TSLPPCT, TSMAMT, TSMPCT, SLO]
+    [
+        Unknown, LO, ELO, MO, AO, ALO, ODD, LIT, MIT, TSLPAMT, TSLPPCT, TSMAMT, TSMPCT, SLO
+    ]
 );
 
 impl_java_enum!(

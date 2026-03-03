@@ -4,8 +4,8 @@ use rust_decimal::Decimal;
 use time::OffsetDateTime;
 
 use crate::{
-    quote::{cmd_code, Brokers, Candlestick, Depth, Trade, TradeSession},
     Error, Result,
+    quote::{Brokers, Candlestick, Depth, Trade, TradeSession, cmd_code},
 };
 
 /// Quote message

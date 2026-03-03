@@ -1,9 +1,9 @@
 use std::fmt::Display;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JObject, JThrowable, JValue},
-    JNIEnv,
 };
 
 use crate::{

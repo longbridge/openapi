@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use serde::{de::Error as _, ser::Error as _, Deserialize, Deserializer, Serializer};
+use serde::{Deserialize, Deserializer, Serializer, de::Error as _, ser::Error as _};
 use time::{Date, OffsetDateTime};
 
 pub(crate) mod date_opt {
@@ -235,11 +235,7 @@ pub(crate) mod decimal_opt_0_is_none {
     {
         let value = String::deserialize(deserializer)?;
         let n = value.parse::<Decimal>().map_err(D::Error::custom)?;
-        if !n.is_zero() {
-            Ok(Some(n))
-        } else {
-            Ok(None)
-        }
+        if !n.is_zero() { Ok(Some(n)) } else { Ok(None) }
     }
 }
 

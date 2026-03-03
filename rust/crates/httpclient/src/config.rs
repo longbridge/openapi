@@ -1,5 +1,6 @@
-use crate::HttpClientError;
 use longport_oauth::OAuthToken;
+
+use crate::HttpClientError;
 
 /// Configuration options for Http client
 #[derive(Debug, Clone)]
@@ -36,7 +37,8 @@ impl HttpClientConfig {
     ///
     /// # Arguments
     ///
-    /// * `token` - OAuth 2.0 token obtained from [`longport_oauth::OAuth::authorize`]
+    /// * `token` - OAuth 2.0 token obtained from
+    ///   [`longport_oauth::OAuth::authorize`]
     pub fn from_oauth(token: &OAuthToken) -> Self {
         Self {
             http_url: None,

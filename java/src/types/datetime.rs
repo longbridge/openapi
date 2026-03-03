@@ -1,18 +1,18 @@
 use std::borrow::Cow;
 
 use jni::{
+    JNIEnv,
     errors::Result,
     objects::{JValue, JValueOwned},
-    JNIEnv,
 };
 use time::{Date, Month, OffsetDateTime, PrimitiveDateTime, Time};
 
 use crate::{
     init::{
-        TIME_INSTANT_CLASS, TIME_LOCALDATETIME_CLASS, TIME_LOCALDATE_CLASS, TIME_LOCALTIME_CLASS,
+        TIME_INSTANT_CLASS, TIME_LOCALDATE_CLASS, TIME_LOCALDATETIME_CLASS, TIME_LOCALTIME_CLASS,
         TIME_OFFSETDATETIME_CLASS, TIME_ZONE_ID,
     },
-    types::{get_field, ClassLoader, FromJValue, IntoJValue, JSignature},
+    types::{ClassLoader, FromJValue, IntoJValue, JSignature, get_field},
 };
 
 impl ClassLoader for OffsetDateTime {

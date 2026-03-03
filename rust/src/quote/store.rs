@@ -4,12 +4,12 @@ use longport_candlesticks::{Days, UpdateAction, UpdateFields};
 use longport_proto::quote::Period;
 
 use crate::{
+    Market,
     quote::{
-        push_types::{PushEventDetail, PushQuote},
         Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
         Trade, TradeSession, TradeSessions,
+        push_types::{PushEventDetail, PushQuote},
     },
-    Market,
 };
 
 const MAX_TRADES: usize = 500;

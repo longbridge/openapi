@@ -1,9 +1,9 @@
 use std::sync::OnceLock;
 
 use jni::{
+    JNIEnv,
     descriptors::Desc,
     objects::{GlobalRef, JClass, JValue},
-    JNIEnv,
 };
 
 use crate::types::ClassLoader;

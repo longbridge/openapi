@@ -1,8 +1,8 @@
 use serde::Serialize;
 
 use crate::{
-    trade::{OrderSide, OrderStatus},
     Market,
+    trade::{OrderSide, OrderStatus},
 };
 
 /// Options for get today orders request
