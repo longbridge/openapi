@@ -33,7 +33,9 @@ impl HttpClientConfig {
     /// Create a new `HttpClientConfig` for OAuth 2.0
     ///
     /// OAuth 2.0 mode uses Bearer token authentication and does not require
-    /// app_secret.
+    /// `app_secret`.  The `access_token` field is stored with the `"Bearer "`
+    /// prefix so that downstream components can distinguish OAuth 2.0 mode
+    /// from the legacy HMAC-SHA256 mode.
     ///
     /// # Arguments
     ///
@@ -48,13 +50,20 @@ impl HttpClientConfig {
         }
     }
 
-    /// Check if this config is using OAuth 2.0 mode
+    /// Returns `true` when this config is operating in OAuth 2.0 Bearer token
+    /// mode.
     ///
-    /// OAuth 2.0 mode is detected when:
-    /// 1. access_token starts with "Bearer "
-    /// 2. app_secret is empty
+    /// OAuth 2.0 mode is detected by the presence of the `"Bearer "` prefix in
+    /// `access_token`.  This prefix is set unconditionally by
+    /// [`HttpClientConfig::from_oauth`] and is not present in tokens
+    /// constructed via [`HttpClientConfig::new`] or
+    /// [`HttpClientConfig::from_env`].
+    ///
+    /// Do **not** use `app_secret.is_empty()` as a proxy for OAuth 2.0 mode:
+    /// an empty secret may occur in misconfigured legacy setups and would
+    /// produce false positives.
     pub fn is_oauth2(&self) -> bool {
-        self.access_token.starts_with("Bearer ") || self.app_secret.is_empty()
+        self.access_token.starts_with("Bearer ")
     }
 
     /// Create a new `HttpClientConfig` from the given environment variables
@@ -109,79 +118,122 @@ impl HttpClientConfig {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_httpclient_config_from_oauth() {
-        let token = longport_oauth::OAuthToken {
-            client_id: "test-client-id".to_string(),
-            access_token: "test-access-token".to_string(),
-            refresh_token: None,
-            expires_at: u64::MAX,
-        };
-        let config = HttpClientConfig::from_oauth(&token);
+    // --- from_oauth ----------------------------------------------------------
 
+    #[test]
+    fn test_from_oauth_sets_app_key_to_client_id() {
+        let token = make_token("test-client-id", "test-access-token");
+        let config = HttpClientConfig::from_oauth(&token);
         assert_eq!(config.app_key, "test-client-id");
-        assert_eq!(config.access_token, "Bearer test-access-token");
-        assert_eq!(config.app_secret, "");
-        assert!(config.is_oauth2());
     }
 
     #[test]
-    fn test_httpclient_config_from_oauth_adds_bearer_prefix() {
-        let token = longport_oauth::OAuthToken {
-            client_id: "test-client-id".to_string(),
-            access_token: "my-token".to_string(),
-            refresh_token: None,
-            expires_at: u64::MAX,
-        };
+    fn test_from_oauth_prefixes_access_token_with_bearer() {
+        let token = make_token("client-id", "my-token");
         let config = HttpClientConfig::from_oauth(&token);
-
         assert_eq!(config.access_token, "Bearer my-token");
-        assert!(config.is_oauth2());
     }
 
     #[test]
-    fn test_httpclient_config_is_oauth2_with_bearer_token() {
+    fn test_from_oauth_clears_app_secret() {
+        let token = make_token("client-id", "my-token");
+        let config = HttpClientConfig::from_oauth(&token);
+        assert_eq!(config.app_secret, "");
+    }
+
+    #[test]
+    fn test_from_oauth_is_oauth2_true() {
+        let token = make_token("client-id", "my-token");
+        let config = HttpClientConfig::from_oauth(&token);
+        assert!(config.is_oauth2());
+    }
+
+    // --- is_oauth2 -----------------------------------------------------------
+
+    #[test]
+    fn test_is_oauth2_true_when_bearer_prefix_present() {
         let config = HttpClientConfig {
             http_url: None,
             app_key: "client-id".to_string(),
             app_secret: String::new(),
             access_token: "Bearer token123".to_string(),
         };
-
         assert!(config.is_oauth2());
     }
 
     #[test]
-    fn test_httpclient_config_is_oauth2_with_empty_secret() {
+    fn test_is_oauth2_false_when_no_bearer_prefix_even_with_empty_secret() {
+        // An empty app_secret alone must NOT indicate OAuth 2.0 mode.
         let config = HttpClientConfig {
             http_url: None,
             app_key: "app-key".to_string(),
             app_secret: String::new(),
             access_token: "regular-token".to_string(),
         };
-
-        assert!(config.is_oauth2());
+        assert!(!config.is_oauth2());
     }
 
     #[test]
-    fn test_httpclient_config_is_not_oauth2_legacy_mode() {
+    fn test_is_oauth2_false_in_legacy_mode() {
         let config = HttpClientConfig {
             http_url: None,
             app_key: "app-key".to_string(),
             app_secret: "app-secret".to_string(),
             access_token: "access-token".to_string(),
         };
-
         assert!(!config.is_oauth2());
     }
 
     #[test]
-    fn test_httpclient_config_new() {
-        let config = HttpClientConfig::new("app-key", "app-secret", "access-token");
+    fn test_is_oauth2_false_for_lowercase_bearer_prefix() {
+        // The prefix must be exactly "Bearer " (capital B) as written by
+        // from_oauth.  Lowercase "bearer " is a different string.
+        let config = HttpClientConfig {
+            http_url: None,
+            app_key: "client-id".to_string(),
+            app_secret: String::new(),
+            access_token: "bearer lowercase-token".to_string(),
+        };
+        assert!(!config.is_oauth2());
+    }
 
+    // --- new -----------------------------------------------------------------
+
+    #[test]
+    fn test_new_stores_all_fields() {
+        let config = HttpClientConfig::new("app-key", "app-secret", "access-token");
         assert_eq!(config.app_key, "app-key");
         assert_eq!(config.app_secret, "app-secret");
         assert_eq!(config.access_token, "access-token");
         assert_eq!(config.http_url, None);
+    }
+
+    #[test]
+    fn test_new_is_not_oauth2() {
+        let config = HttpClientConfig::new("app-key", "app-secret", "access-token");
+        assert!(!config.is_oauth2());
+    }
+
+    // --- http_url builder ----------------------------------------------------
+
+    #[test]
+    fn test_http_url_builder_sets_url() {
+        let config = HttpClientConfig::new("k", "s", "t")
+            .http_url("https://custom.api.example.com");
+        assert_eq!(
+            config.http_url.as_deref(),
+            Some("https://custom.api.example.com")
+        );
+    }
+
+    // --- helpers -------------------------------------------------------------
+
+    fn make_token(client_id: &str, access_token: &str) -> OAuthToken {
+        OAuthToken {
+            client_id: client_id.to_string(),
+            access_token: access_token.to_string(),
+            refresh_token: None,
+            expires_at: u64::MAX,
+        }
     }
 }
