@@ -129,6 +129,8 @@ convert(lb_error_kind_t kind)
       return ErrorKind::OpenApi;
     case ErrorKindOther:
       return ErrorKind::Other;
+    case ErrorKindOAuth:
+      return ErrorKind::OAuth;
     default:
       throw std::invalid_argument("unreachable");
   }

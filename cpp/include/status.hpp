@@ -12,6 +12,7 @@ enum class ErrorKind
   Http,
   OpenApi,
   Other,
+  OAuth,
 };
 
 class Status
