@@ -4,7 +4,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use strum_macros::{Display, EnumString};
 use time::{Date, OffsetDateTime};
 
-use crate::{Market, serde_utils};
+use crate::{serde_utils, Market};
 
 /// Order type
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]

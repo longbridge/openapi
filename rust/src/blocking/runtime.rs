@@ -1,9 +1,9 @@
 use std::{sync::Arc, thread};
 
-use futures_util::{Future, future::BoxFuture};
+use futures_util::{future::BoxFuture, Future};
 use tokio::sync::mpsc;
 
-use crate::{Result, blocking::BlockingError};
+use crate::{blocking::BlockingError, Result};
 
 const THREAD_NAME: &str = "longport-sync-runtime";
 

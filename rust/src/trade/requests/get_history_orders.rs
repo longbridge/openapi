@@ -2,8 +2,9 @@ use serde::Serialize;
 use time::OffsetDateTime;
 
 use crate::{
-    Market, serde_utils,
+    serde_utils,
     trade::{OrderSide, OrderStatus},
+    Market,
 };
 
 /// Options for get history orders request
