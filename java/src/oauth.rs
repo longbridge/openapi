@@ -6,11 +6,7 @@ use jni::{
 
 use longport::oauth::OAuth;
 
-use crate::{
-    async_util,
-    error::jni_result,
-    types::{set_field, IntoJValue},
-};
+use crate::{async_util, error::jni_result, types::set_field};
 
 // ── OAuthToken native handle ──────────────────────────────────────────────────
 
@@ -70,46 +66,26 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeOAuthToken(
     drop(Box::from_raw(token as *mut longport::oauth::OAuthToken));
 }
 
-/// Returns the access token string.
+/// Returns true if the token has expired.
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenGetAccessToken<'a>(
-    mut env: JNIEnv<'a>,
-    _class: JClass<'a>,
-    token: jlong,
-) -> JObject<'a> {
-    let token = &*(token as *const longport::oauth::OAuthToken);
-    token
-        .access_token
-        .clone()
-        .into_jvalue(&mut env)
-        .unwrap()
-        .l()
-        .unwrap()
-}
-
-/// Returns the refresh token string, or null if not provided.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenGetRefreshToken<'a>(
-    mut env: JNIEnv<'a>,
-    _class: JClass<'a>,
-    token: jlong,
-) -> JObject<'a> {
-    let token = &*(token as *const longport::oauth::OAuthToken);
-    match &token.refresh_token {
-        Some(s) => s.clone().into_jvalue(&mut env).unwrap().l().unwrap(),
-        None => JObject::null(),
-    }
-}
-
-/// Returns the Unix timestamp when the token expires.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenGetExpiresAt(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenIsExpired(
     _env: JNIEnv,
     _class: JClass,
     token: jlong,
-) -> jlong {
+) -> bool {
     let token = &*(token as *const longport::oauth::OAuthToken);
-    token.expires_at as jlong
+    token.is_expired()
+}
+
+/// Returns true if the token will expire within 1 hour.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenExpiresSoon(
+    _env: JNIEnv,
+    _class: JClass,
+    token: jlong,
+) -> bool {
+    let token = &*(token as *const longport::oauth::OAuthToken);
+    token.expires_soon()
 }
 
 // ── OAuth native methods ──────────────────────────────────────────────────────
@@ -161,17 +137,16 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthRefresh(
     mut env: JNIEnv,
     _class: JClass,
     oauth: jlong,
-    refresh_token: JString,
+    token: jlong,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        use crate::types::FromJValue;
         let client_id = (*(oauth as *const OAuth)).client_id().to_string();
-        let refresh_token = String::from_jvalue(env, refresh_token.into())?;
+        let existing_token = (*(token as *const longport::oauth::OAuthToken)).clone();
 
         async_util::execute(env, callback, async move {
-            let token = OAuth::new(client_id).refresh(&refresh_token).await?;
-            Ok(into_token_ptr(token))
+            let new_token = OAuth::new(client_id).refresh(&existing_token).await?;
+            Ok(into_token_ptr(new_token))
         })?;
         Ok(())
     })

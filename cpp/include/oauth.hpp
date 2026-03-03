@@ -34,15 +34,6 @@ public:
   /// The underlying C token pointer (non-owning)
   const lb_oauth_token_t* get() const { return token_; }
 
-  /// The access token string
-  const char* access_token() const;
-
-  /// The refresh token string, or nullptr if not provided
-  const char* refresh_token() const;
-
-  /// Unix timestamp when the token expires
-  uint64_t expires_at() const;
-
   /// Returns true if the token has expired
   bool is_expired() const;
 

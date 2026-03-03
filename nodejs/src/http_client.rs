@@ -4,6 +4,8 @@ use longport::httpclient::{HttpClient as LbHttpClient, HttpClientConfig, Json, M
 use napi::{Error, Result};
 use serde_json::Value;
 
+use crate::oauth::OAuthToken;
+
 #[napi_derive::napi]
 pub struct HttpClient(LbHttpClient);
 
@@ -39,13 +41,10 @@ impl HttpClient {
         ))
     }
 
-    /// Create a new `HttpClient` from an OAuth 2.0 access token
+    /// Create a new `HttpClient` from an OAuthToken
     #[napi(factory)]
-    pub fn from_oauth(client_id: String, access_token: String) -> Self {
-        Self(LbHttpClient::new(HttpClientConfig::from_oauth(
-            client_id,
-            access_token,
-        )))
+    pub fn from_oauth(token: &OAuthToken) -> Self {
+        Self(LbHttpClient::new(HttpClientConfig::from_oauth(&token.0)))
     }
 
     /// Performs a HTTP request

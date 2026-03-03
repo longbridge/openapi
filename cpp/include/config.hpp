@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "async_result.hpp"
+#include "oauth.hpp"
 #include "status.hpp"
 #include "types.hpp"
 
@@ -62,10 +63,8 @@ public:
   /// OAuth 2.0 is the recommended authentication method that uses Bearer tokens
   /// and does not require app_secret or HMAC signatures.
   ///
-  /// @param client_id OAuth 2.0 client ID
-  /// @param access_token OAuth 2.0 access token (Bearer prefix is optional)
-  static Config from_oauth(const std::string& client_id,
-                           const std::string& access_token);
+  /// @param token OAuth 2.0 token obtained from `OAuth::authorize` or `OAuth::refresh`
+  static Config from_oauth(const OAuthToken& token);
 
   /// Create a new `Config` from the given environment variables
   ///

@@ -2,6 +2,7 @@
 #include "callback.hpp"
 #include "convert.hpp"
 #include "longport.h"
+#include "oauth.hpp"
 
 namespace longport {
 
@@ -82,9 +83,9 @@ Config::from_env(Config& config)
 }
 
 Config
-Config::from_oauth(const std::string& client_id, const std::string& access_token)
+Config::from_oauth(const OAuthToken& token)
 {
-  return Config(lb_config_from_oauth(client_id.c_str(), access_token.c_str()));
+  return Config(lb_config_from_oauth(token.get()));
 }
 
 void

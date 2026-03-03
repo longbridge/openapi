@@ -5,6 +5,7 @@
 #include <string>
 
 #include "async_result.hpp"
+#include "oauth.hpp"
 #include "status.hpp"
 
 typedef struct lb_http_client_t lb_http_client_t;
@@ -48,13 +49,11 @@ public:
   Status from_env();
 
   /**
-   * Create a new `HttpClient` from an OAuth 2.0 access token
+   * Create a new `HttpClient` from an OAuthToken
    *
-   * @param client_id   OAuth client ID
-   * @param access_token OAuth access token
+   * @param token  OAuthToken returned by OAuth::authorize or OAuth::refresh
    */
-  static HttpClient from_oauth(const std::string& client_id,
-                               const std::string& access_token);
+  static HttpClient from_oauth(const OAuthToken& token);
 
   /**
    * Performs a HTTP request

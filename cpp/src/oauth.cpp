@@ -24,34 +24,16 @@ OAuthToken::~OAuthToken()
     lb_oauth_token_free(token_);
 }
 
-const char*
-OAuthToken::access_token() const
-{
-  return lb_oauth_token_get_access_token(token_);
-}
-
-const char*
-OAuthToken::refresh_token() const
-{
-  return lb_oauth_token_get_refresh_token(token_);
-}
-
-uint64_t
-OAuthToken::expires_at() const
-{
-  return lb_oauth_token_get_expires_at(token_);
-}
-
 bool
 OAuthToken::is_expired() const
 {
-  return lb_oauth_token_is_expired(token_);
+  return lb_oauth_token_is_expired(token_) != 0;
 }
 
 bool
 OAuthToken::expires_soon() const
 {
-  return lb_oauth_token_expires_soon(token_);
+  return lb_oauth_token_expires_soon(token_) != 0;
 }
 
 // ── OAuth ────────────────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@ use pyo3::{prelude::*, types::PyType};
 
 use crate::{
     error::ErrorNewType,
+    oauth::OAuthToken,
     time::PyOffsetDateTimeWrapper,
     types::{Language, PushCandlestickMode},
 };
@@ -79,26 +80,17 @@ impl Config {
     /// OAuth 2.0 is the recommended authentication method that uses Bearer
     /// tokens and does not require app_secret or HMAC signatures.
     ///
-    /// # Arguments
-    ///
-    /// * `client_id` - OAuth 2.0 client ID
-    /// * `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
-    ///
     /// # Example
     ///
     /// ```python
-    /// from longport.openapi import Config
+    /// from longport.openapi import Config, OAuth
     ///
-    /// # Create config with OAuth 2.0
-    /// config = Config.from_oauth(
-    ///     client_id="your-oauth-client-id",
-    ///     access_token="your-oauth-access-token"
-    /// )
+    /// # Obtain a token via OAuth flow, then:
+    /// # config = Config.from_oauth(token)
     /// ```
     #[classmethod]
-    #[pyo3(signature = (client_id, access_token))]
-    fn from_oauth(_cls: Bound<PyType>, client_id: String, access_token: String) -> Self {
-        Self(longport::Config::from_oauth(client_id, access_token))
+    fn from_oauth(_cls: Bound<PyType>, token: &OAuthToken) -> Self {
+        Self(longport::Config::from_oauth(&token.0))
     }
 
     /// Gets a new `access_token`.

@@ -6,7 +6,7 @@ use longport::httpclient::{
 use pyo3::{conversion::IntoPyObject, exceptions::PyRuntimeError, prelude::*, types::PyType};
 use serde_json::Value;
 
-use crate::error::ErrorNewType;
+use crate::{error::ErrorNewType, oauth::OAuthToken};
 
 /// Wrapper so we can return JSON from async and convert to Python via
 /// IntoPyObject.
@@ -47,10 +47,9 @@ impl HttpClient {
     }
 
     #[classmethod]
-    fn from_oauth(_cls: Bound<PyType>, client_id: String, access_token: String) -> Self {
+    fn from_oauth(_cls: Bound<PyType>, token: &OAuthToken) -> Self {
         Self(Arc::new(LbHttpClient::new(HttpClientConfig::from_oauth(
-            client_id,
-            access_token,
+            &token.0,
         ))))
     }
 

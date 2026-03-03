@@ -4,32 +4,12 @@ use napi::{
     threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode},
 };
 
-use crate::error::ErrorNewType;
-
 /// OAuth 2.0 access token
 #[napi_derive::napi]
-pub struct OAuthToken(CoreOAuthToken);
+pub struct OAuthToken(pub(crate) CoreOAuthToken);
 
 #[napi_derive::napi]
 impl OAuthToken {
-    /// The access token for API authentication
-    #[napi(getter)]
-    pub fn access_token(&self) -> &str {
-        &self.0.access_token
-    }
-
-    /// Refresh token, or `null` if not provided by the server
-    #[napi(getter)]
-    pub fn refresh_token(&self) -> Option<&str> {
-        self.0.refresh_token.as_deref()
-    }
-
-    /// Unix timestamp (seconds) when the token expires
-    #[napi(getter)]
-    pub fn expires_at(&self) -> u32 {
-        self.0.expires_at as u32
-    }
-
     /// Returns `true` if the token has expired
     #[napi]
     pub fn is_expired(&self) -> bool {
@@ -79,7 +59,7 @@ impl OAuth {
     ///
     /// @param onOpenUrl  Called with the authorization URL; open it in a browser
     ///                   or print it however you like
-    /// @returns OAuthToken containing `accessToken`, `refreshToken`, and `expiresAt`
+    /// @returns OAuthToken that can be passed to `Config.fromOauth` or `HttpClient.fromOauth`
     #[napi]
     pub async fn authorize(
         &self,
@@ -92,22 +72,22 @@ impl OAuth {
                 on_open_url.call(Ok(url.to_string()), ThreadsafeFunctionCallMode::NonBlocking);
             })
             .await
-            .map_err(ErrorNewType)?;
+            .map_err(|e| napi::Error::from_reason(e.to_string()))?;
 
         Ok(OAuthToken(token))
     }
 
-    /// Refresh an access token using a refresh token
+    /// Refresh an access token using an existing OAuthToken
     ///
-    /// @param refreshToken  Refresh token from a previous authorization
+    /// @param token  Existing OAuthToken whose refresh token is used
     /// @returns New OAuthToken with a fresh access token
     #[napi]
-    pub async fn refresh(&self, refresh_token: String) -> Result<OAuthToken> {
+    pub async fn refresh(&self, token: &OAuthToken) -> Result<OAuthToken> {
         let client_id = self.inner.client_id().to_string();
-        let token = CoreOAuth::new(client_id)
-            .refresh(&refresh_token)
+        let new_token = CoreOAuth::new(client_id)
+            .refresh(&token.0)
             .await
-            .map_err(ErrorNewType)?;
-        Ok(OAuthToken(token))
+            .map_err(|e| napi::Error::from_reason(e.to_string()))?;
+        Ok(OAuthToken(new_token))
     }
 }

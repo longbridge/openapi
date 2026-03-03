@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * try (OAuthToken token = oauth.authorize(url -> {
  *     System.out.println("Open this URL: " + url);
  * }).get()) {
- *     Config config = Config.fromOauth(token.getAccessToken());
+ *     Config config = Config.fromOauth(token);
  * }
  * }</pre>
  */
@@ -49,14 +49,14 @@ public class OAuth implements AutoCloseable {
     }
 
     /**
-     * Refresh an access token using a refresh token
+     * Refresh an access token using an existing OAuthToken
      *
-     * @param refreshToken Refresh token from a previous authorization
+     * @param token Existing OAuthToken whose refresh token is used
      * @return CompletableFuture that resolves to a new {@link OAuthToken}
      */
-    public CompletableFuture<OAuthToken> refresh(String refreshToken) {
+    public CompletableFuture<OAuthToken> refresh(OAuthToken token) {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.oauthRefresh(this.raw, refreshToken, callback);
+            SdkNative.oauthRefresh(this.raw, token.raw, callback);
         });
     }
 

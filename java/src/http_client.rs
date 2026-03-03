@@ -51,13 +51,11 @@ pub extern "system" fn Java_com_longport_SdkNative_newHttpClientFromEnv(
 pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClientFromOauth(
     mut env: JNIEnv,
     _class: JClass,
-    client_id: JString,
-    access_token: JString,
+    token: jlong,
 ) -> jlong {
-    jni_result(&mut env, 0, |env| {
-        let client_id = String::from_jvalue(env, client_id.into())?;
-        let access_token = String::from_jvalue(env, access_token.into())?;
-        let http_cli = HttpClient::new(HttpClientConfig::from_oauth(client_id, access_token));
+    jni_result(&mut env, 0, |_env| {
+        let token = &*(token as *const longport::oauth::OAuthToken);
+        let http_cli = HttpClient::new(HttpClientConfig::from_oauth(token));
         Ok(Box::into_raw(Box::new(http_cli)) as jlong)
     })
 }

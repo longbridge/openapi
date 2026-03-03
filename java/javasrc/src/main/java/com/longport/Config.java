@@ -56,13 +56,12 @@ public class Config implements AutoCloseable {
      * OAuth 2.0 is the recommended authentication method that uses Bearer tokens
      * and does not require app_secret or HMAC signatures.
      *
-     * @param clientId OAuth 2.0 client ID
-     * @param accessToken OAuth 2.0 access token (Bearer prefix is optional)
+     * @param token OAuthToken returned by {@link OAuth#authorize} or {@link OAuth#refresh}
      * @return Config object
      * @throws OpenApiException If an error occurs
      */
-    public static Config fromOauth(String clientId, String accessToken) throws OpenApiException {
-        return new Config(SdkNative.newConfigFromOauth(clientId, accessToken));
+    public static Config fromOauth(OAuthToken token) throws OpenApiException {
+        return new Config(SdkNative.newConfigFromOauth(token.raw));
     }
 
     /**

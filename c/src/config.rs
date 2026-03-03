@@ -10,6 +10,7 @@ use time::OffsetDateTime;
 use crate::{
     async_call::{execute_async, CAsyncCallback},
     error::{set_error, CError},
+    oauth::COAuthToken,
     types::{CLanguage, CPushCandlestickMode, CString},
 };
 
@@ -127,20 +128,10 @@ pub unsafe extern "C" fn lb_config_new(
 ///
 /// # Arguments
 ///
-/// - `client_id` - OAuth 2.0 client ID
-/// - `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+/// - `token` - OAuth 2.0 token obtained from `lb_oauth_authorize` or `lb_oauth_refresh`
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_config_from_oauth(
-    client_id: *const c_char,
-    access_token: *const c_char,
-) -> *mut CConfig {
-    let client_id = CStr::from_ptr(client_id)
-        .to_str()
-        .expect("invalid client id");
-    let access_token = CStr::from_ptr(access_token)
-        .to_str()
-        .expect("invalid access token");
-    let config = Config::from_oauth(client_id, access_token);
+pub unsafe extern "C" fn lb_config_from_oauth(token: *const COAuthToken) -> *mut CConfig {
+    let config = Config::from_oauth(&(*token).0);
     Box::into_raw(Box::new(CConfig(Arc::new(config))))
 }
 

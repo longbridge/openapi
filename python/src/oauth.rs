@@ -1,7 +1,5 @@
 use longport::oauth::{OAuth as CoreOAuth, OAuthToken as CoreOAuthToken};
-use pyo3::prelude::*;
-
-use crate::error::ErrorNewType;
+use pyo3::{exceptions::PyRuntimeError, prelude::*};
 
 /// OAuth 2.0 access token
 #[pyclass(name = "OAuthToken")]
@@ -9,24 +7,6 @@ pub(crate) struct OAuthToken(pub(crate) CoreOAuthToken);
 
 #[pymethods]
 impl OAuthToken {
-    /// The access token for API authentication
-    #[getter]
-    fn access_token(&self) -> &str {
-        &self.0.access_token
-    }
-
-    /// Refresh token, or `None` if not provided by the server
-    #[getter]
-    fn refresh_token(&self) -> Option<&str> {
-        self.0.refresh_token.as_deref()
-    }
-
-    /// Unix timestamp when the token expires
-    #[getter]
-    fn expires_at(&self) -> u64 {
-        self.0.expires_at
-    }
-
     /// Returns `True` if the token has expired
     fn is_expired(&self) -> bool {
         self.0.is_expired()
@@ -50,20 +30,6 @@ impl OAuth {
     ///
     /// Args:
     ///     client_id: OAuth 2.0 client ID from the LongPort developer portal
-    ///
-    /// Example:
-    ///
-    /// ```python
-    /// import asyncio
-    /// from longport.openapi import OAuth
-    ///
-    /// async def main():
-    ///     oauth = OAuth("your-client-id")
-    ///     token = await oauth.authorize(lambda url: print(f"Open: {url}"))
-    ///     print(token.access_token)
-    ///
-    /// asyncio.run(main())
-    /// ```
     #[new]
     fn py_new(client_id: String) -> Self {
         Self {
@@ -82,7 +48,7 @@ impl OAuth {
     ///                  Use it to open the URL in a browser or print it.
     ///
     /// Returns:
-    ///     OAuthToken with access_token, refresh_token (optional), and expires_at
+    ///     OAuthToken that can be passed to Config.from_oauth or HttpClient.from_oauth
     fn authorize<'py>(
         &self,
         py: Python<'py>,
@@ -98,27 +64,28 @@ impl OAuth {
                     });
                 })
                 .await
-                .map_err(ErrorNewType)?;
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
             Ok(OAuthToken(token))
         })
     }
 
-    /// Refresh an access token using a refresh token
+    /// Refresh an access token using an existing OAuthToken
     ///
     /// Args:
-    ///     refresh_token: Refresh token from a previous authorization
+    ///     token: Existing OAuthToken whose refresh token is used
     ///
     /// Returns:
     ///     New OAuthToken with a fresh access token
-    fn refresh<'py>(&self, py: Python<'py>, refresh_token: String) -> PyResult<Bound<'py, PyAny>> {
+    fn refresh<'py>(&self, py: Python<'py>, token: &OAuthToken) -> PyResult<Bound<'py, PyAny>> {
         let client_id = self.inner.client_id().to_string();
+        let inner_token = token.0.clone();
 
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let token = CoreOAuth::new(client_id)
-                .refresh(&refresh_token)
+            let new_token = CoreOAuth::new(client_id)
+                .refresh(&inner_token)
                 .await
-                .map_err(ErrorNewType)?;
-            Ok(OAuthToken(token))
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+            Ok(OAuthToken(new_token))
         })
     }
 }

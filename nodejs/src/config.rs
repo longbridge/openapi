@@ -3,6 +3,7 @@ use napi::Result;
 
 use crate::{
     error::ErrorNewType,
+    oauth::OAuthToken,
     types::{Language, PushCandlestickMode},
     utils::from_datetime,
 };
@@ -115,25 +116,17 @@ impl Config {
     /// OAuth 2.0 is the recommended authentication method that uses Bearer
     /// tokens and does not require app_secret or HMAC signatures.
     ///
-    /// # Arguments
-    ///
-    /// * `client_id` - OAuth 2.0 client ID
-    /// * `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
-    ///
     /// # Example
     ///
     /// ```javascript
-    /// const { Config } = require('longport');
+    /// const { Config, OAuth } = require('longport');
     ///
-    /// // Create config with OAuth 2.0
-    /// const config = Config.fromOauth(
-    ///   'your-oauth-client-id',
-    ///   'your-oauth-access-token'
-    /// );
+    /// // Obtain a token via OAuth flow, then:
+    /// // const config = Config.fromOauth(token);
     /// ```
     #[napi(factory)]
-    pub fn from_oauth(client_id: String, access_token: String) -> Self {
-        Self(longport::Config::from_oauth(client_id, access_token))
+    pub fn from_oauth(token: &OAuthToken) -> Self {
+        Self(longport::Config::from_oauth(&token.0))
     }
 
     /// Gets a new `access_token`

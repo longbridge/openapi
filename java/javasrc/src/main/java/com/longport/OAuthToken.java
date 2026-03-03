@@ -21,39 +21,12 @@ public class OAuthToken implements AutoCloseable {
     }
 
     /**
-     * The access token for API authentication
-     *
-     * @return access token string
-     */
-    public String getAccessToken() {
-        return SdkNative.oauthTokenGetAccessToken(this.raw);
-    }
-
-    /**
-     * Refresh token, or {@code null} if not provided by the server
-     *
-     * @return refresh token string, or {@code null}
-     */
-    public String getRefreshToken() {
-        return SdkNative.oauthTokenGetRefreshToken(this.raw);
-    }
-
-    /**
-     * Unix timestamp (seconds) when the token expires
-     *
-     * @return expiry time as a Unix timestamp
-     */
-    public long getExpiresAt() {
-        return SdkNative.oauthTokenGetExpiresAt(this.raw);
-    }
-
-    /**
      * Returns {@code true} if the token has expired
      *
      * @return whether the token has expired
      */
     public boolean isExpired() {
-        return System.currentTimeMillis() / 1000L >= getExpiresAt();
+        return SdkNative.oauthTokenIsExpired(this.raw);
     }
 
     /**
@@ -62,9 +35,7 @@ public class OAuthToken implements AutoCloseable {
      * @return whether the token expires soon
      */
     public boolean expiresSoon() {
-        long now = System.currentTimeMillis() / 1000L;
-        long expiresAt = getExpiresAt();
-        return expiresAt <= now || (expiresAt - now) < 3600;
+        return SdkNative.oauthTokenExpiresSoon(this.raw);
     }
 
     @Override
@@ -74,7 +45,6 @@ public class OAuthToken implements AutoCloseable {
 
     @Override
     public String toString() {
-        return "OAuthToken{accessToken='" + getAccessToken() + "', refreshToken='" + getRefreshToken()
-                + "', expiresAt=" + getExpiresAt() + "}";
+        return "OAuthToken{expired=" + isExpired() + ", expiresSoon=" + expiresSoon() + "}";
     }
 }

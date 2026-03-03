@@ -78,13 +78,12 @@ class HttpClient:
         """
 
     @classmethod
-    def from_oauth(cls: Type[HttpClient], client_id: str, access_token: str) -> HttpClient:
+    def from_oauth(cls: Type[HttpClient], token: OAuthToken) -> HttpClient:
         """
-        Create a new `HttpClient` from an OAuth 2.0 access token
+        Create a new `HttpClient` from an OAuthToken
 
         Args:
-            client_id: OAuth client ID
-            access_token: OAuth access token (with or without "Bearer " prefix)
+            token: OAuthToken returned by :meth:`OAuth.authorize` or :meth:`OAuth.refresh`
         """
 
     def request(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Any:
@@ -161,15 +160,6 @@ class OAuthToken:
     OAuth 2.0 access token
     """
 
-    access_token: str
-    """The access token for API authentication"""
-
-    refresh_token: Optional[str]
-    """Refresh token, or ``None`` if not provided by the server"""
-
-    expires_at: int
-    """Unix timestamp when the token expires"""
-
     def is_expired(self) -> bool:
         """Returns ``True`` if the token has expired"""
 
@@ -198,7 +188,7 @@ class OAuth:
             on_open_url: Callable that receives the authorization URL as a string.
 
         Returns:
-            OAuthToken with ``access_token``, ``refresh_token`` (optional), and ``expires_at``
+            OAuthToken that can be passed to :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`
         """
 
     async def refresh(self, refresh_token: str) -> OAuthToken:
@@ -269,7 +259,7 @@ class Config:
         """
 
     @classmethod
-    def from_oauth(cls: Type[Config], client_id: str, access_token: str) -> Config:
+    def from_oauth(cls: Type[Config], token: OAuthToken) -> Config:
         """
         Create a new ``Config`` for OAuth 2.0 authentication
 
@@ -277,8 +267,7 @@ class Config:
         tokens and does not require app_secret or HMAC signatures.
 
         Args:
-            client_id: OAuth 2.0 client ID
-            access_token: OAuth 2.0 access token (Bearer prefix is optional)
+            token: OAuthToken returned by :meth:`OAuth.authorize` or :meth:`OAuth.refresh`
 
         Returns:
             Config object

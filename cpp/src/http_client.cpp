@@ -3,6 +3,7 @@
 #include "callback.hpp"
 #include "http_client.hpp"
 #include "longport.h"
+#include "oauth.hpp"
 
 namespace longport {
 
@@ -48,12 +49,10 @@ HttpClient::from_env()
 }
 
 HttpClient
-HttpClient::from_oauth(const std::string& client_id,
-                       const std::string& access_token)
+HttpClient::from_oauth(const OAuthToken& token)
 {
   HttpClient client;
-  client.http_client_ =
-    lb_http_client_from_oauth(client_id.c_str(), access_token.c_str());
+  client.http_client_ = lb_http_client_from_oauth(token.get());
   return client;
 }
 

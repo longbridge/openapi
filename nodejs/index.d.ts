@@ -168,24 +168,16 @@ export declare class Config {
    * OAuth 2.0 is the recommended authentication method that uses Bearer
    * tokens and does not require app_secret or HMAC signatures.
    *
-   * # Arguments
-   *
-   * * `client_id` - OAuth 2.0 client ID
-   * * `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
-   *
    * # Example
    *
    * ```javascript
-   * const { Config } = require('longport');
+   * const { Config, OAuth } = require('longport');
    *
-   * // Create config with OAuth 2.0
-   * const config = Config.fromOauth(
-   *   'your-oauth-client-id',
-   *   'your-oauth-access-token'
-   * );
+   * // Obtain a token via OAuth flow, then:
+   * // const config = Config.fromOauth(token);
    * ```
    */
-  static fromOauth(clientId: string, accessToken: string): Config
+  static fromOauth(token: OAuthToken): Config
   /**
    * Gets a new `access_token`
    *
@@ -461,8 +453,8 @@ export declare class HttpClient {
    * - `LONGPORT_ACCESS_TOKEN` - Access token
    */
   static fromEnv(): HttpClient
-  /** Create a new `HttpClient` from an OAuth 2.0 access token */
-  static fromOauth(clientId: string, accessToken: string): HttpClient
+  /** Create a new `HttpClient` from an OAuthToken */
+  static fromOauth(token: OAuthToken): HttpClient
   /** Performs a HTTP request */
   request(method: string, path: string, headers?: Record<string, string> | undefined | null, body?: any | undefined | null): Promise<any>
 }
@@ -591,26 +583,20 @@ export declare class OAuth {
    *
    * @param onOpenUrl  Called with the authorization URL; open it in a browser
    *                   or print it however you like
-   * @returns OAuthToken containing `accessToken`, `refreshToken`, and `expiresAt`
+   * @returns OAuthToken that can be passed to `Config.fromOauth` or `HttpClient.fromOauth`
    */
   authorize(onOpenUrl: ((err: Error | null, arg: string) => void)): Promise<OAuthToken>
   /**
-   * Refresh an access token using a refresh token
+   * Refresh an access token using an existing OAuthToken
    *
-   * @param refreshToken  Refresh token from a previous authorization
+   * @param token  Existing OAuthToken whose refresh token is used
    * @returns New OAuthToken with a fresh access token
    */
-  refresh(refreshToken: string): Promise<OAuthToken>
+  refresh(token: OAuthToken): Promise<OAuthToken>
 }
 
 /** OAuth 2.0 access token */
 export declare class OAuthToken {
-  /** The access token for API authentication */
-  get accessToken(): string
-  /** Refresh token, or `null` if not provided by the server */
-  get refreshToken(): string | null
-  /** Unix timestamp (seconds) when the token expires */
-  get expiresAt(): number
   /** Returns `true` if the token has expired */
   isExpired(): boolean
   /** Returns `true` if the token will expire within 1 hour */

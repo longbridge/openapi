@@ -3923,10 +3923,9 @@ struct lb_config_t *lb_config_new(const char *app_key,
  *
  * # Arguments
  *
- * - `client_id` - OAuth 2.0 client ID
- * - `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+ * - `token` - OAuth 2.0 token obtained from `lb_oauth_authorize` or `lb_oauth_refresh`
  */
-struct lb_config_t *lb_config_from_oauth(const char *client_id, const char *access_token);
+struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_token_t *token);
 
 /**
  * Free the config object
@@ -3982,8 +3981,10 @@ struct lb_http_client_t *lb_http_client_from_env(struct lb_error_t **error);
 
 /**
  * Create a new `HttpClient` from an OAuth 2.0 access token
+ *
+ * @param token - OAuth 2.0 token obtained from `lb_oauth_authorize` or `lb_oauth_refresh`
  */
-struct lb_http_client_t *lb_http_client_from_oauth(const char *client_id, const char *access_token);
+struct lb_http_client_t *lb_http_client_from_oauth(const struct lb_oauth_token_t *token);
 
 /**
  * Performs a HTTP request
@@ -4022,35 +4023,14 @@ void lb_oauth_free(struct lb_oauth_t *oauth);
 void lb_oauth_token_free(struct lb_oauth_token_t *token);
 
 /**
- * Returns the access token string.
- *
- * The returned pointer is valid until `lb_oauth_token_free` is called.
- * Do not free the returned pointer.
+ * Returns non-zero if the token has expired
  */
-const char *lb_oauth_token_get_access_token(const struct lb_oauth_token_t *token);
+int32_t lb_oauth_token_is_expired(const struct lb_oauth_token_t *token);
 
 /**
- * Returns the refresh token string, or null if not provided.
- *
- * The returned pointer is valid until `lb_oauth_token_free` is called.
- * Do not free the returned pointer.
+ * Returns non-zero if the token will expire within 1 hour
  */
-const char *lb_oauth_token_get_refresh_token(const struct lb_oauth_token_t *token);
-
-/**
- * Returns the Unix timestamp (seconds since epoch) when the token expires
- */
-uint64_t lb_oauth_token_get_expires_at(const struct lb_oauth_token_t *token);
-
-/**
- * Returns true if the token has already expired
- */
-bool lb_oauth_token_is_expired(const struct lb_oauth_token_t *token);
-
-/**
- * Returns true if the token will expire within 1 hour
- */
-bool lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
+int32_t lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
 
 /**
  * Start the OAuth 2.0 authorization flow (async)

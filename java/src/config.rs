@@ -79,16 +79,14 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfigFromEnv(
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_com_longport_SdkNative_newConfigFromOauth(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_newConfigFromOauth(
     mut env: JNIEnv,
     _class: JClass,
-    client_id: JString,
-    access_token: JString,
+    token: jlong,
 ) -> jlong {
-    jni_result(&mut env, 0, |env| {
-        let client_id = String::from_jvalue(env, client_id.into())?;
-        let access_token = String::from_jvalue(env, access_token.into())?;
-        let config = Config::from_oauth(client_id, access_token);
+    jni_result(&mut env, 0, |_env| {
+        let token = &*(token as *const longport::oauth::OAuthToken);
+        let config = Config::from_oauth(token);
         Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }

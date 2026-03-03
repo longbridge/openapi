@@ -44,14 +44,13 @@ public class HttpClient implements AutoCloseable {
     }
 
     /**
-     * Create a new `HttpClient` from an OAuth 2.0 access token
+     * Create a new `HttpClient` from an OAuthToken
      *
-     * @param clientId    OAuth client ID
-     * @param accessToken OAuth access token
+     * @param token OAuthToken returned by {@link OAuth#authorize} or {@link OAuth#refresh}
      * @return HttpClient object
      */
-    public static HttpClient fromOauth(String clientId, String accessToken) {
-        return new HttpClient(SdkNative.newHttpClientFromOauth(clientId, accessToken));
+    public static HttpClient fromOauth(OAuthToken token) {
+        return new HttpClient(SdkNative.newHttpClientFromOauth(token.raw));
     }
 
     /**

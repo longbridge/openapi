@@ -20,7 +20,7 @@ public class SdkNative {
 
         public static native long newHttpClientFromEnv();
 
-        public static native long newHttpClientFromOauth(String clientId, String accessToken);
+        public static native long newHttpClientFromOauth(long oauthToken);
 
         public static native void freeHttpClient(long httpClient);
 
@@ -32,7 +32,7 @@ public class SdkNative {
 
         public static native long newConfigFromEnv();
 
-        public static native long newConfigFromOauth(String clientId, String accessToken);
+        public static native long newConfigFromOauth(long oauthToken);
 
         public static native void configRefreshAccessToken(long config, OffsetDateTime expired_at,
                         AsyncCallback callback);
@@ -45,16 +45,14 @@ public class SdkNative {
 
         public static native void freeOAuthToken(long oauthToken);
 
-        public static native String oauthTokenGetAccessToken(long oauthToken);
+        public static native boolean oauthTokenIsExpired(long oauthToken);
 
-        public static native String oauthTokenGetRefreshToken(long oauthToken);
-
-        public static native long oauthTokenGetExpiresAt(long oauthToken);
+        public static native boolean oauthTokenExpiresSoon(long oauthToken);
 
         public static native void oauthAuthorize(long oauth, java.util.function.Consumer<String> openUrlCallback,
                         AsyncCallback callback);
 
-        public static native void oauthRefresh(long oauth, String refreshToken, AsyncCallback callback);
+        public static native void oauthRefresh(long oauth, long oauthToken, AsyncCallback callback);
 
         public static native void newQuoteContext(long config, AsyncCallback callback);
 

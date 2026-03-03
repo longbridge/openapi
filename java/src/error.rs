@@ -21,6 +21,12 @@ pub(crate) enum JniError {
     Other(String),
 }
 
+impl From<longport::oauth::OAuthError> for JniError {
+    fn from(e: longport::oauth::OAuthError) -> Self {
+        JniError::Other(e.to_string())
+    }
+}
+
 impl JniError {
     fn into_runtime_error_object<'a>(
         env: &mut JNIEnv<'a>,
