@@ -20,6 +20,9 @@ pub enum CErrorKind {
     /// Other error
     #[c(remote = "Other")]
     ErrorKindOther,
+    /// OAuth error
+    #[c(remote = "OAuth")]
+    ErrorKindOAuth,
 }
 
 pub struct CError {
