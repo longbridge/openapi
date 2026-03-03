@@ -134,60 +134,6 @@ export declare class CashInfo {
   get currency(): string
 }
 
-/** OAuth 2.0 access token */
-export declare class OAuthToken {
-  /** The access token for API authentication */
-  get accessToken(): string
-  /** Refresh token, or `null` if not provided by the server */
-  get refreshToken(): string | null
-  /** Unix timestamp (seconds) when the token expires */
-  get expiresAt(): number
-  /** Returns `true` if the token has expired */
-  isExpired(): boolean
-  /** Returns `true` if the token will expire within 1 hour */
-  expiresSoon(): boolean
-}
-
-/**
- * OAuth 2.0 client for LongPort OpenAPI
- *
- * @example
- * ```javascript
- * const { OAuth } = require('longport');
- *
- * const oauth = new OAuth('your-client-id');
- * const token = await oauth.authorize((url) => {
- *   console.log('Open this URL:', url);
- * });
- * console.log(token.accessToken);
- * ```
- */
-export declare class OAuth {
-  /**
-   * Create a new OAuth 2.0 client
-   *
-   * @param clientId     OAuth 2.0 client ID from the LongPort developer portal
-   */
-  constructor(clientId: string)
-  /**
-   * Start the OAuth 2.0 authorization flow
-   *
-   * Starts a local HTTP server, calls `onOpenUrl` with the authorization URL,
-   * then waits for the redirect and exchanges the code for a token.
-   *
-   * @param onOpenUrl  Called with the authorization URL
-   * @returns OAuthToken containing `accessToken`, `refreshToken`, and `expiresAt`
-   */
-  authorize(onOpenUrl: (url: string) => void): Promise<OAuthToken>
-  /**
-   * Refresh an access token using a refresh token
-   *
-   * @param refreshToken  Refresh token from a previous authorization
-   * @returns New OAuthToken with a fresh access token
-   */
-  refresh(refreshToken: string): Promise<OAuthToken>
-}
-
 /** Configuration for LongPort sdk */
 export declare class Config {
   /** Create a new `Config` */
@@ -222,13 +168,21 @@ export declare class Config {
    * OAuth 2.0 is the recommended authentication method that uses Bearer
    * tokens and does not require app_secret or HMAC signatures.
    *
-   * @param clientId    OAuth 2.0 client ID
-   * @param accessToken OAuth 2.0 access token (Bearer prefix is optional)
+   * # Arguments
    *
-   * @example
+   * * `client_id` - OAuth 2.0 client ID
+   * * `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+   *
+   * # Example
+   *
    * ```javascript
    * const { Config } = require('longport');
-   * const config = Config.fromOauth('your-oauth-client-id', 'your-oauth-access-token');
+   *
+   * // Create config with OAuth 2.0
+   * const config = Config.fromOauth(
+   *   'your-oauth-client-id',
+   *   'your-oauth-access-token'
+   * );
    * ```
    */
   static fromOauth(clientId: string, accessToken: string): Config
@@ -507,6 +461,8 @@ export declare class HttpClient {
    * - `LONGPORT_ACCESS_TOKEN` - Access token
    */
   static fromEnv(): HttpClient
+  /** Create a new `HttpClient` from an OAuth 2.0 access token */
+  static fromOauth(clientId: string, accessToken: string): HttpClient
   /** Performs a HTTP request */
   request(method: string, path: string, headers?: Record<string, string> | undefined | null, body?: any | undefined | null): Promise<any>
 }
@@ -606,6 +562,59 @@ export declare class NaiveDatetime {
   get time(): Time
   toString(): string
   toJSON(): any
+}
+
+/** OAuth 2.0 client for LongPort OpenAPI */
+export declare class OAuth {
+  /**
+   * Create a new OAuth 2.0 client
+   *
+   * @param clientId  OAuth 2.0 client ID from the LongPort developer portal
+   *
+   * @example
+   * ```javascript
+   * const { OAuth } = require('longport');
+   *
+   * const oauth = new OAuth('your-client-id');
+   * const token = await oauth.authorize((url) => {
+   *   console.log('Open:', url);
+   * });
+   * console.log(token.accessToken);
+   * ```
+   */
+  constructor(clientId: string)
+  /**
+   * Start the OAuth 2.0 authorization flow
+   *
+   * Starts a local HTTP server, calls `onOpenUrl` with the authorization URL,
+   * then waits for the redirect and exchanges the code for a token.
+   *
+   * @param onOpenUrl  Called with the authorization URL; open it in a browser
+   *                   or print it however you like
+   * @returns OAuthToken containing `accessToken`, `refreshToken`, and `expiresAt`
+   */
+  authorize(onOpenUrl: ((err: Error | null, arg: string) => void)): Promise<OAuthToken>
+  /**
+   * Refresh an access token using a refresh token
+   *
+   * @param refreshToken  Refresh token from a previous authorization
+   * @returns New OAuthToken with a fresh access token
+   */
+  refresh(refreshToken: string): Promise<OAuthToken>
+}
+
+/** OAuth 2.0 access token */
+export declare class OAuthToken {
+  /** The access token for API authentication */
+  get accessToken(): string
+  /** Refresh token, or `null` if not provided by the server */
+  get refreshToken(): string | null
+  /** Unix timestamp (seconds) when the token expires */
+  get expiresAt(): number
+  /** Returns `true` if the token has expired */
+  isExpired(): boolean
+  /** Returns `true` if the token will expire within 1 hour */
+  expiresSoon(): boolean
 }
 
 /** Quote of option */
