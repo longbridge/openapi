@@ -38,7 +38,7 @@ struct Cli {
     /// Every request to the MCP HTTP endpoint must carry a valid
     /// `Authorization: Bearer <access_token>` header.  The token must be a
     /// LongPort OAuth 2.0 access token obtained via the authorization code
-    /// flow.
+    /// flow (see `longport-oauth` crate or the LongPort developer portal).
     ///
     /// Implies --http.  Environment variables LONGPORT_APP_KEY /
     /// LONGPORT_APP_SECRET / LONGPORT_ACCESS_TOKEN are not required because
@@ -109,7 +109,7 @@ async fn run_stdio(readonly: bool) -> Result<(), Box<dyn std::error::Error>> {
 
 /// Run with Streamable-HTTP transport, credentials from environment variables.
 ///
-/// No OAuth enforcement: credentials are shared across all sessions.
+/// All sessions share the same LongPort credentials.  No OAuth enforcement.
 async fn run_http_env(bind: String, readonly: bool) -> Result<(), Box<dyn std::error::Error>> {
     tracing::info!(
         bind = %bind,
@@ -142,23 +142,21 @@ async fn run_http_env(bind: String, readonly: bool) -> Result<(), Box<dyn std::e
 ///
 /// Authentication flow per request:
 /// 1. [`BearerAuthMiddleware`] validates the `Authorization: Bearer <token>`
-///    header by calling the LongPort userinfo endpoint.
-/// 2. On success it injects [`AuthenticatedContext`] into request extensions.
-/// 3. The `streamable_http` endpoint factory retrieves the context, constructs
-///    a per-session [`Config`] from the token, and creates fresh
-///    [`QuoteContext`] / [`TradeContext`] instances.
+///    header against the LongPort userinfo endpoint.
+/// 2. On success, it injects [`AuthenticatedContext`] into request extensions.
+/// 3. The `streamable_http` endpoint factory reads the context, constructs a
+///    per-session [`Config`] from the verified token, and creates fresh
+///    [`QuoteContext`] / [`TradeContext`] instances for that session.
 ///
-/// The `/.well-known/oauth-authorization-server` route serves RFC 8414
-/// discovery metadata, allowing MCP clients to auto-discover the
-/// authorization server without manual configuration.
+/// The `/.well-known/oauth-authorization-server` route (RFC 8414) is exempt
+/// from authentication and allows AI clients to auto-discover the
+/// authorization server.
 async fn run_http_oauth(bind: String, readonly: bool) -> Result<(), Box<dyn std::error::Error>> {
     tracing::info!(
         bind = %bind,
         "Starting MCP server with Streamable-HTTP transport and OAuth 2.0 enforcement"
     );
 
-    // Derive the public base URL. For wildcard binds, substitute localhost so
-    // the discovery document resolves correctly in local environments.
     let base_url = derive_public_base_url(&bind);
 
     let listener = TcpListener::bind(&bind);
@@ -190,23 +188,23 @@ async fn run_http_oauth(bind: String, readonly: bool) -> Result<(), Box<dyn std:
 /// Build a per-session MCP server from the [`AuthenticatedContext`] injected
 /// by [`BearerAuthMiddleware`].
 ///
-/// Returns a future that resolves to `McpServer<Longport>`.  Runs inside the
-/// `streamable_http::endpoint` factory closure so it executes for every new
-/// MCP session.
+/// This function is called by the `streamable_http::endpoint` factory for
+/// every new MCP session.  It constructs a fresh pair of
+/// [`QuoteContext`] / [`TradeContext`] bound to the request's Bearer token.
 async fn build_oauth_mcp_server_from_request(
     req: &Request,
     readonly: bool,
 ) -> Result<McpServer<Longport>, Box<dyn std::error::Error + Send + Sync>> {
-    // The BearerAuthMiddleware already validated the token and injected this
-    // context.  Its absence indicates a programming error — the middleware was
+    // BearerAuthMiddleware already validated the token and injected this
+    // context.  Its absence is a programming error — the middleware was
     // bypassed or not registered.
     let auth_ctx = req
         .extensions()
         .get::<AuthenticatedContext>()
         .cloned()
-        .ok_or("BearerAuthMiddleware did not inject AuthenticatedContext")?;
+        .ok_or("BearerAuthMiddleware did not inject AuthenticatedContext — possible middleware misconfiguration")?;
 
-    let config = Arc::new(auth_ctx.config().dont_print_quote_packages());
+    let config = Arc::new(auth_ctx.build_config().dont_print_quote_packages());
     let (quote_ctx, _) = QuoteContext::try_new(config.clone()).await?;
     let (trade_ctx, _) = TradeContext::try_new(config).await?;
 
@@ -219,6 +217,8 @@ async fn build_oauth_mcp_server_from_request(
 
 /// Serve RFC 8414 Authorization Server Metadata at
 /// `/.well-known/oauth-authorization-server`.
+///
+/// This endpoint is intentionally unauthenticated per RFC 8414 §3.
 #[handler]
 async fn oauth_metadata_handler(base_url: Data<&String>) -> Response {
     let metadata = AuthorizationServerMetadata::new(base_url.0.as_str());
@@ -242,10 +242,9 @@ async fn oauth_metadata_handler(base_url: Data<&String>) -> Response {
 
 /// Derive a public HTTP base URL from a TCP bind address.
 ///
-/// For wildcard binds (`0.0.0.0:PORT` or `[::]:PORT`) substitute `localhost`
-/// so that the RFC 8414 discovery document remains usable in local dev
-/// environments.
-fn derive_public_base_url(bind: &str) -> String {
+/// For wildcard binds (`0.0.0.0:PORT` or `[::]:PORT`) substitutes `localhost`
+/// so that the RFC 8414 discovery document is usable in local dev environments.
+pub(crate) fn derive_public_base_url(bind: &str) -> String {
     if bind.starts_with("0.0.0.0:") || bind.starts_with("[::]:") {
         let port = bind.rsplit(':').next().unwrap_or("8000");
         format!("http://localhost:{port}")
@@ -280,25 +279,33 @@ mod tests {
 
     #[test]
     fn test_derive_public_base_url_wildcard_ipv4() {
-        let url = derive_public_base_url("0.0.0.0:8000");
-        assert_eq!(url, "http://localhost:8000");
+        assert_eq!(
+            derive_public_base_url("0.0.0.0:8000"),
+            "http://localhost:8000"
+        );
     }
 
     #[test]
     fn test_derive_public_base_url_wildcard_ipv6() {
-        let url = derive_public_base_url("[::]:9000");
-        assert_eq!(url, "http://localhost:9000");
+        assert_eq!(
+            derive_public_base_url("[::]:9000"),
+            "http://localhost:9000"
+        );
     }
 
     #[test]
     fn test_derive_public_base_url_specific_address() {
-        let url = derive_public_base_url("127.0.0.1:8000");
-        assert_eq!(url, "http://127.0.0.1:8000");
+        assert_eq!(
+            derive_public_base_url("127.0.0.1:8000"),
+            "http://127.0.0.1:8000"
+        );
     }
 
     #[test]
     fn test_derive_public_base_url_named_host() {
-        let url = derive_public_base_url("mcp.example.com:443");
-        assert_eq!(url, "http://mcp.example.com:443");
+        assert_eq!(
+            derive_public_base_url("mcp.example.com:443"),
+            "http://mcp.example.com:443"
+        );
     }
 }
