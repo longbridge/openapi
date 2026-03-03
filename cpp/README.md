@@ -33,6 +33,34 @@ LongPort OpenAPI supports two authentication methods:
 
 OAuth 2.0 is the modern authentication method that uses Bearer tokens without requiring HMAC signatures.
 
+**Step 1: Register OAuth Client**
+
+First, register an OAuth client to get your `client_id`:
+
+```bash
+curl -X POST https://openapi.longportapp.com/v1/oauth2/client/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Application",
+    "redirect_uris": ["http://localhost:60355/callback"],
+    "grant_types": ["authorization_code", "refresh_token"]
+  }'
+```
+
+Response:
+```json
+{
+  "client_id": "your-client-id-here",
+  "client_secret": null,
+  "name": "My Application",
+  "redirect_uris": ["http://localhost:60355/callback"]
+}
+```
+
+Save the `client_id` for use in your application.
+
+**Step 2: Authorize and Get Token**
+
 ```c++
 #include <iostream>
 #include <longport.hpp>
