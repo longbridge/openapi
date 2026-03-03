@@ -34,24 +34,14 @@ pub unsafe extern "C" fn lb_oauth_new(client_id: *const c_char) -> *mut COAuth {
     }))
 }
 
-/// Create a new OAuth 2.0 client with a custom callback port
+/// Set the callback port on an existing OAuth 2.0 client
 ///
-/// @param client_id     OAuth 2.0 client ID from the LongPort developer portal
-/// @param callback_port TCP port for the local callback server. Must match one
-///                      of the redirect URIs registered for the client.
-/// @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
+/// @param oauth          OAuth client
+/// @param callback_port  TCP port for the local callback server. Must match one
+///                       of the redirect URIs registered for the client.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_oauth_new_with_port(
-    client_id: *const c_char,
-    callback_port: u16,
-) -> *mut COAuth {
-    let client_id = std::ffi::CStr::from_ptr(client_id)
-        .to_str()
-        .expect("invalid client_id")
-        .to_string();
-    Box::into_raw(Box::new(COAuth {
-        inner: OAuth::with_callback_port(client_id, callback_port),
-    }))
+pub unsafe extern "C" fn lb_oauth_set_callback_port(oauth: *mut COAuth, callback_port: u16) {
+    (*oauth).inner.set_callback_port(callback_port);
 }
 
 /// Free an OAuth 2.0 client object
@@ -83,16 +73,17 @@ pub unsafe extern "C" fn lb_oauth_token_expires_soon(token: *const COAuthToken) 
 
 /// Start the OAuth 2.0 authorization flow (async)
 ///
-/// Starts a local HTTP server (OS-assigned port), calls `open_url_callback`
-/// with the authorization URL so the caller can open it in a browser, then
-/// waits for the redirect and exchanges the authorization code for a token.
+/// Starts a local HTTP server, calls `open_url_callback` with the
+/// authorization URL so the caller can open it in a browser, then waits for
+/// the redirect and exchanges the authorization code for a token.
 ///
 /// @param oauth              OAuth client
 /// @param open_url_callback  Called with the authorization URL and
-/// `open_url_userdata` @param open_url_userdata  Opaque pointer forwarded to
-/// `open_url_callback` @param callback           Async completion callback;
-/// `data` is `*mut lb_oauth_token_t` on success @param userdata
-/// Opaque pointer forwarded to `callback`
+///                           `open_url_userdata`
+/// @param open_url_userdata  Opaque pointer forwarded to `open_url_callback`
+/// @param callback           Async completion callback; `data` is
+///                           `*mut lb_oauth_token_t` on success
+/// @param userdata           Opaque pointer forwarded to `callback`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_oauth_authorize(
     oauth: *const COAuth,
@@ -101,13 +92,11 @@ pub unsafe extern "C" fn lb_oauth_authorize(
     callback: crate::async_call::CAsyncCallback,
     userdata: *mut c_void,
 ) {
-    let oauth = &*oauth;
-    let client_id = oauth.inner.client_id().to_string();
-    let callback_port = oauth.inner.callback_port();
+    let inner = (*oauth).inner.clone();
     let open_url_userdata_usize = open_url_userdata as usize;
 
     execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
-        let token = OAuth::with_callback_port(client_id, callback_port)
+        let token = inner
             .authorize(move |url| {
                 let c_url = std::ffi::CString::new(url).unwrap_or_default();
                 open_url_callback(c_url.as_ptr(), open_url_userdata_usize as *mut c_void);
@@ -120,11 +109,11 @@ pub unsafe extern "C" fn lb_oauth_authorize(
 
 /// Refresh an OAuth 2.0 access token (async)
 ///
-/// @param oauth          OAuth client (provides client_id)
+/// @param oauth          OAuth client
 /// @param token          Existing token whose refresh token is used
-/// @param callback       Async completion callback; `data` is `*mut
-/// lb_oauth_token_t` on success @param userdata       Opaque pointer forwarded
-/// to `callback`
+/// @param callback       Async completion callback; `data` is
+///                       `*mut lb_oauth_token_t` on success
+/// @param userdata       Opaque pointer forwarded to `callback`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_oauth_refresh(
     oauth: *const COAuth,
@@ -132,12 +121,11 @@ pub unsafe extern "C" fn lb_oauth_refresh(
     callback: crate::async_call::CAsyncCallback,
     userdata: *mut c_void,
 ) {
-    let client_id = (*oauth).inner.client_id().to_string();
-    let callback_port = (*oauth).inner.callback_port();
+    let inner = (*oauth).inner.clone();
     let existing_token = (*token).0.clone();
 
     execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
-        let new_token = OAuth::with_callback_port(client_id, callback_port)
+        let new_token = inner
             .refresh(&existing_token)
             .await
             .map_err(|e| longport::Error::OAuth(e.to_string()))?;

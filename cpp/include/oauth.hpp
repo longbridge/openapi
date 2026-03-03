@@ -53,16 +53,16 @@ public:
   /// @param client_id  OAuth 2.0 client ID from the LongPort developer portal
   OAuth(const std::string& client_id);
 
-  /// Create a new OAuth 2.0 client with a custom callback port
-  ///
-  /// @param client_id     OAuth 2.0 client ID from the LongPort developer portal
-  /// @param callback_port TCP port for the local callback server. Must match
-  ///                      one of the redirect URIs registered for the client.
-  OAuth(const std::string& client_id, uint16_t callback_port);
-
   OAuth(const OAuth&) = delete;
   OAuth(OAuth&& other);
   ~OAuth();
+
+  /// Set the callback port
+  ///
+  /// @param callback_port  TCP port for the local callback server (default
+  ///                       60355). Must match one of the redirect URIs
+  ///                       registered for the client.
+  void set_callback_port(uint16_t callback_port);
 
   /// Start the OAuth 2.0 authorization flow (async)
   ///

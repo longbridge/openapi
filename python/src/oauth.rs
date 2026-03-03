@@ -30,15 +30,21 @@ impl OAuth {
     ///
     /// Args:
     ///     client_id: OAuth 2.0 client ID from the LongPort developer portal
-    ///     callback_port: TCP port for the local callback server (default
-    /// 60355).                     Must match one of the redirect URIs
-    /// registered for the client.
     #[new]
-    #[pyo3(signature = (client_id, callback_port = 60355))]
-    fn py_new(client_id: String, callback_port: u16) -> Self {
+    fn py_new(client_id: String) -> Self {
         Self {
-            inner: CoreOAuth::with_callback_port(client_id, callback_port),
+            inner: CoreOAuth::new(client_id),
         }
+    }
+
+    /// Set the callback port
+    ///
+    /// Args:
+    ///     callback_port: TCP port for the local callback server (default
+    ///         60355). Must match one of the redirect URIs registered for
+    ///         the client.
+    fn set_callback_port(&mut self, callback_port: u16) {
+        self.inner.set_callback_port(callback_port);
     }
 
     /// Start the OAuth 2.0 authorization flow
@@ -49,22 +55,19 @@ impl OAuth {
     ///
     /// Args:
     ///     on_open_url: Callable that receives the authorization URL as a
-    /// string.                  Use it to open the URL in a browser or
-    /// print it.
+    ///         string. Use it to open the URL in a browser or print it.
     ///
     /// Returns:
     ///     OAuthToken that can be passed to Config.from_oauth or
-    /// HttpClient.from_oauth
+    ///     HttpClient.from_oauth
     fn authorize<'py>(
         &self,
         py: Python<'py>,
         on_open_url: Py<PyAny>,
     ) -> PyResult<Bound<'py, PyAny>> {
-        let client_id = self.inner.client_id().to_string();
-        let callback_port = self.inner.callback_port();
-
+        let inner = self.inner.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let token = CoreOAuth::with_callback_port(client_id, callback_port)
+            let token = inner
                 .authorize(move |url| {
                     Python::attach(|py| {
                         let _ = on_open_url.call1(py, (url,));
@@ -84,12 +87,10 @@ impl OAuth {
     /// Returns:
     ///     New OAuthToken with a fresh access token
     fn refresh<'py>(&self, py: Python<'py>, token: &OAuthToken) -> PyResult<Bound<'py, PyAny>> {
-        let client_id = self.inner.client_id().to_string();
-        let callback_port = self.inner.callback_port();
+        let inner = self.inner.clone();
         let inner_token = token.0.clone();
-
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let new_token = CoreOAuth::with_callback_port(client_id, callback_port)
+            let new_token = inner
                 .refresh(&inner_token)
                 .await
                 .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;

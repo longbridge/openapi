@@ -33,10 +33,7 @@ pub struct OAuth {
 impl OAuth {
     /// Create a new OAuth 2.0 client
     ///
-    /// @param clientId      OAuth 2.0 client ID from the LongPort developer
-    /// portal @param callbackPort  TCP port for the local callback server
-    /// (default 60355).                       Must match one of the
-    /// redirect URIs registered for the client.
+    /// @param clientId  OAuth 2.0 client ID from the LongPort developer portal
     ///
     /// @example
     /// ```javascript
@@ -49,10 +46,19 @@ impl OAuth {
     /// console.log(token.accessToken);
     /// ```
     #[napi(constructor)]
-    pub fn new(client_id: String, callback_port: Option<u16>) -> Self {
+    pub fn new(client_id: String) -> Self {
         Self {
-            inner: CoreOAuth::with_callback_port(client_id, callback_port.unwrap_or(60355)),
+            inner: CoreOAuth::new(client_id),
         }
+    }
+
+    /// Set the callback port
+    ///
+    /// @param callbackPort  TCP port for the local callback server (default
+    ///   60355). Must match one of the redirect URIs registered for the client.
+    #[napi]
+    pub fn set_callback_port(&mut self, callback_port: u16) {
+        self.inner.set_callback_port(callback_port);
     }
 
     /// Start the OAuth 2.0 authorization flow
@@ -61,24 +67,21 @@ impl OAuth {
     /// URL, then waits for the redirect and exchanges the code for a token.
     ///
     /// @param onOpenUrl  Called with the authorization URL; open it in a
-    /// browser                   or print it however you like
+    ///   browser or print it however you like
     /// @returns OAuthToken that can be passed to `Config.fromOAuth` or
-    /// `HttpClient.fromOAuth`
+    ///   `HttpClient.fromOAuth`
     #[napi]
     pub async fn authorize(
         &self,
         on_open_url: ThreadsafeFunction<String, ()>,
     ) -> Result<OAuthToken> {
-        let client_id = self.inner.client_id().to_string();
-        let callback_port = self.inner.callback_port();
-
-        let token = CoreOAuth::with_callback_port(client_id, callback_port)
+        let token = self
+            .inner
             .authorize(move |url| {
                 on_open_url.call(Ok(url.to_string()), ThreadsafeFunctionCallMode::NonBlocking);
             })
             .await
             .map_err(|e| napi::Error::from_reason(e.to_string()))?;
-
         Ok(OAuthToken(token))
     }
 
@@ -88,9 +91,8 @@ impl OAuth {
     /// @returns New OAuthToken with a fresh access token
     #[napi]
     pub async fn refresh(&self, token: &OAuthToken) -> Result<OAuthToken> {
-        let client_id = self.inner.client_id().to_string();
-        let callback_port = self.inner.callback_port();
-        let new_token = CoreOAuth::with_callback_port(client_id, callback_port)
+        let new_token = self
+            .inner
             .refresh(&token.0)
             .await
             .map_err(|e| napi::Error::from_reason(e.to_string()))?;

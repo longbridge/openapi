@@ -39,9 +39,11 @@ public class SdkNative {
 
         public static native void freeConfig(long config);
 
-        public static native long newOAuth(String clientId, int callbackPort);
+        public static native long newOAuth(String clientId);
 
         public static native void freeOAuth(long oauth);
+
+        public static native void oauthSetCallbackPort(long oauth, int callbackPort);
 
         public static native void freeOAuthToken(long oauthToken);
 

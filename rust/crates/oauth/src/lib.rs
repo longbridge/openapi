@@ -21,8 +21,9 @@
 //!
 //!     println!("Access token: {}", token.access_token);
 //!
-//!     // Or specify a custom callback port
-//!     let oauth2 = OAuth::new("your-client-id").with_callback_port(8080);
+//!     // Or specify a custom callback port via set_callback_port
+//!     let mut oauth2 = OAuth::new("your-client-id");
+//!     oauth2.set_callback_port(8080);
 //!     let _token2 = oauth2
 //!         .authorize(|url| println!("Please visit: {url}"))
 //!         .await?;
@@ -37,10 +38,10 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use oauth2::{
-    basic::BasicClient, reqwest::async_http_client, AuthUrl, AuthorizationCode, ClientId,
-    CsrfToken, RedirectUrl, RefreshToken, RevocationUrl, Scope, TokenResponse, TokenUrl,
+    AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
+    Scope, TokenResponse, TokenUrl, basic::BasicClient, reqwest::async_http_client,
 };
-use poem::{handler, listener::TcpAcceptor, web::Query, EndpointExt, Route, Server};
+use poem::{EndpointExt, Route, Server, handler, listener::TcpAcceptor, web::Query};
 use serde::{Deserialize, Serialize};
 use tokio::{sync::oneshot, time::timeout};
 
@@ -116,6 +117,7 @@ type CallbackTx = std::sync::Arc<
 >;
 
 /// OAuth 2.0 client for LongPort OpenAPI
+#[derive(Clone)]
 pub struct OAuth {
     client_id: String,
     callback_port: u16,
@@ -135,18 +137,15 @@ impl OAuth {
         }
     }
 
-    /// Set a custom callback port (builder method)
+    /// Set the callback port
     ///
     /// # Arguments
     ///
     /// * `callback_port` - TCP port for the local callback server (e.g. 8080).
     ///   This port must match one of the redirect URIs registered for the
     ///   client. Defaults to `60355` when using [`OAuth::new`].
-    pub fn with_callback_port(self, callback_port: u16) -> Self {
-        Self {
-            callback_port,
-            ..self
-        }
+    pub fn set_callback_port(&mut self, callback_port: u16) {
+        self.callback_port = callback_port;
     }
 
     /// Get the client ID
@@ -496,10 +495,11 @@ mod tests {
     }
 
     #[test]
-    fn test_oauth_with_callback_port() {
-        let oauth = OAuth::new("test-client-id").with_callback_port(8080);
-        assert_eq!(oauth.client_id(), "test-client-id");
-        assert_eq!(oauth.callback_port(), 8080);
+    fn test_oauth_set_callback_port() {
+        let mut oauth = OAuth::new("test-client-id");
+        assert_eq!(oauth.callback_port(), DEFAULT_CALLBACK_PORT);
+        oauth.set_callback_port(9090);
+        assert_eq!(oauth.callback_port(), 9090);
     }
 
     #[test]
