@@ -94,6 +94,10 @@ typedef enum lb_error_kind_t {
    * Other error
    */
   ErrorKindOther,
+  /**
+   * OAuth error
+   */
+  ErrorKindOAuth,
 } lb_error_kind_t;
 
 /**

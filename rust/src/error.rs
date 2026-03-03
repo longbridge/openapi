@@ -133,7 +133,7 @@ impl Error {
             | Error::WsClient(_) => SimpleError::Other(self.to_string()),
             #[cfg(feature = "blocking")]
             Error::Blocking(_) => SimpleError::Other(self.to_string()),
-            Error::OAuth(_) => SimpleError::Other(self.to_string()),
+            Error::OAuth(msg) => SimpleError::OAuth(msg),
         }
     }
 }
@@ -163,6 +163,9 @@ pub enum SimpleError {
     /// Other error
     #[error("other error: {0}")]
     Other(String),
+    /// OAuth error
+    #[error("oauth error: {0}")]
+    OAuth(String),
 }
 
 impl From<Error> for SimpleError {
@@ -181,6 +184,8 @@ pub enum SimpleErrorKind {
     OpenApi,
     /// Other error
     Other,
+    /// OAuth error
+    OAuth,
 }
 
 impl SimpleError {
@@ -190,6 +195,7 @@ impl SimpleError {
             SimpleError::Http { .. } => SimpleErrorKind::Http,
             SimpleError::OpenApi { .. } => SimpleErrorKind::OpenApi,
             SimpleError::Other(_) => SimpleErrorKind::Other,
+            SimpleError::OAuth(_) => SimpleErrorKind::OAuth,
         }
     }
 
@@ -199,6 +205,7 @@ impl SimpleError {
             SimpleError::Http { status_code } => Some(*status_code as i64),
             SimpleError::OpenApi { code, .. } => Some(*code),
             SimpleError::Other(_) => None,
+            SimpleError::OAuth(_) => None,
         }
     }
 
@@ -208,6 +215,7 @@ impl SimpleError {
             SimpleError::Http { .. } => None,
             SimpleError::OpenApi { trace_id, .. } => Some(trace_id),
             SimpleError::Other(_) => None,
+            SimpleError::OAuth(_) => None,
         }
     }
 
@@ -217,6 +225,7 @@ impl SimpleError {
             SimpleError::Http { .. } => "bad status code",
             SimpleError::OpenApi { message, .. } => message.as_str(),
             SimpleError::Other(message) => message.as_str(),
+            SimpleError::OAuth(message) => message.as_str(),
         }
     }
 }
