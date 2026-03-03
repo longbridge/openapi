@@ -135,7 +135,7 @@ impl Config {
     /// ```
     pub fn from_oauth(token: &OAuthToken) -> Self {
         Self {
-            http_cli_config: HttpClientConfig::from_oauth(&token.client_id, &token.access_token),
+            http_cli_config: HttpClientConfig::from_oauth(token),
             quote_ws_url: None,
             trade_ws_url: None,
             language: Language::EN,
