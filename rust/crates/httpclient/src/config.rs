@@ -36,29 +36,13 @@ impl HttpClientConfig {
     /// # Arguments
     ///
     /// * `client_id` - OAuth 2.0 client ID (used as app_key)
-    /// * `access_token` - OAuth 2.0 access token (should start with "Bearer ")
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use longport_httpcli::HttpClientConfig;
-    ///
-    /// let config = HttpClientConfig::from_oauth("your-client-id", "Bearer your-access-token");
-    /// ```
-    pub fn from_oauth(client_id: impl Into<String>, access_token: impl Into<String>) -> Self {
-        let access_token = access_token.into();
-        // Ensure Bearer prefix
-        let bearer_token = if access_token.starts_with("Bearer ") {
-            access_token
-        } else {
-            format!("Bearer {}", access_token)
-        };
-
+    /// * `access_token` - OAuth 2.0 access token (raw, without Bearer prefix)
+    pub fn from_oauth(client_id: impl Into<String>, access_token: impl AsRef<str>) -> Self {
         Self {
             http_url: None,
             app_key: client_id.into(),
             app_secret: String::new(), // Not used in OAuth 2.0 mode
-            access_token: bearer_token,
+            access_token: format!("Bearer {}", access_token.as_ref()),
         }
     }
 
@@ -134,11 +118,10 @@ mod tests {
     }
 
     #[test]
-    fn test_httpclient_config_from_oauth_with_bearer_prefix() {
-        let config = HttpClientConfig::from_oauth("test-client-id", "Bearer already-has-prefix");
+    fn test_httpclient_config_from_oauth_adds_bearer_prefix() {
+        let config = HttpClientConfig::from_oauth("test-client-id", "my-token");
 
-        assert_eq!(config.app_key, "test-client-id");
-        assert_eq!(config.access_token, "Bearer already-has-prefix");
+        assert_eq!(config.access_token, "Bearer my-token");
         assert!(config.is_oauth2());
     }
 
