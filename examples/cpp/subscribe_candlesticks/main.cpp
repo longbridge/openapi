@@ -11,7 +11,7 @@ using namespace longport::quote;
 static QuoteContext g_ctx;
 
 static void
-run(OAuthToken token)
+run(const OAuthToken& token)
 {
   Config config = Config::from_oauth(token);
 
@@ -57,7 +57,7 @@ main(int argc, char const* argv[])
   OAuthToken token;
   Status load_status = OAuthToken::load(token);
   if (load_status) {
-    run(std::move(token));
+    run(token);
   } else {
     const std::string client_id = "your-client-id";
     OAuth oauth(client_id);
@@ -76,7 +76,7 @@ main(int argc, char const* argv[])
           std::cout << "failed to save token: "
                     << *save_status.message() << std::endl;
         }
-        run(std::move(*res));
+        run(*res.operator->());
       });
   }
 
