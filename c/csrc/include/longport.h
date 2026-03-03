@@ -3927,7 +3927,8 @@ struct lb_config_t *lb_config_new(const char *app_key,
  *
  * # Arguments
  *
- * - `token` - OAuth 2.0 token obtained from `lb_oauth_authorize` or `lb_oauth_refresh`
+ * - `token` - OAuth 2.0 token obtained from `lb_oauth_authorize` or
+ *   `lb_oauth_refresh`
  */
 struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_token_t *token);
 
@@ -3986,7 +3987,8 @@ struct lb_http_client_t *lb_http_client_from_env(struct lb_error_t **error);
 /**
  * Create a new `HttpClient` from an OAuth 2.0 access token
  *
- * @param token - OAuth 2.0 token obtained from `lb_oauth_authorize` or `lb_oauth_refresh`
+ * @param token - OAuth 2.0 token obtained from `lb_oauth_authorize` or
+ * `lb_oauth_refresh`
  */
 struct lb_http_client_t *lb_http_client_from_oauth(const struct lb_oauth_token_t *token);
 
@@ -4009,7 +4011,7 @@ void lb_http_result_free(struct lb_http_result_t *http_result);
 const char *lb_http_result_response_body(const struct lb_http_result_t *http_result);
 
 /**
- * Create a new OAuth 2.0 client
+ * Create a new OAuth 2.0 client with the default callback port (60355)
  *
  * @param client_id  OAuth 2.0 client ID from the LongPort developer portal
  * @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
@@ -4017,12 +4019,23 @@ const char *lb_http_result_response_body(const struct lb_http_result_t *http_res
 struct lb_oauth_t *lb_oauth_new(const char *client_id);
 
 /**
+ * Create a new OAuth 2.0 client with a custom callback port
+ *
+ * @param client_id     OAuth 2.0 client ID from the LongPort developer portal
+ * @param callback_port TCP port for the local callback server. Must match one
+ *                      of the redirect URIs registered for the client.
+ * @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
+ */
+struct lb_oauth_t *lb_oauth_new_with_port(const char *client_id, uint16_t callback_port);
+
+/**
  * Free an OAuth 2.0 client object
  */
 void lb_oauth_free(struct lb_oauth_t *oauth);
 
 /**
- * Free a `lb_oauth_token_t` returned by `lb_oauth_authorize` or `lb_oauth_refresh`
+ * Free a `lb_oauth_token_t` returned by `lb_oauth_authorize` or
+ * `lb_oauth_refresh`
  */
 void lb_oauth_token_free(struct lb_oauth_token_t *token);
 
@@ -4044,10 +4057,11 @@ int32_t lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
  * waits for the redirect and exchanges the authorization code for a token.
  *
  * @param oauth              OAuth client
- * @param open_url_callback  Called with the authorization URL and `open_url_userdata`
- * @param open_url_userdata  Opaque pointer forwarded to `open_url_callback`
- * @param callback           Async completion callback; `data` is `*mut lb_oauth_token_t` on success
- * @param userdata           Opaque pointer forwarded to `callback`
+ * @param open_url_callback  Called with the authorization URL and
+ * `open_url_userdata` @param open_url_userdata  Opaque pointer forwarded to
+ * `open_url_callback` @param callback           Async completion callback;
+ * `data` is `*mut lb_oauth_token_t` on success @param userdata
+ * Opaque pointer forwarded to `callback`
  */
 void lb_oauth_authorize(const struct lb_oauth_t *oauth,
                         void (*open_url_callback)(const char*, void*),
@@ -4060,8 +4074,9 @@ void lb_oauth_authorize(const struct lb_oauth_t *oauth,
  *
  * @param oauth          OAuth client (provides client_id)
  * @param token          Existing token whose refresh token is used
- * @param callback       Async completion callback; `data` is `*mut lb_oauth_token_t` on success
- * @param userdata       Opaque pointer forwarded to `callback`
+ * @param callback       Async completion callback; `data` is `*mut
+ * lb_oauth_token_t` on success @param userdata       Opaque pointer forwarded
+ * to `callback`
  */
 void lb_oauth_refresh(const struct lb_oauth_t *oauth,
                       const struct lb_oauth_token_t *token,

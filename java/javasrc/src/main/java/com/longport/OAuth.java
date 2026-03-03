@@ -23,12 +23,23 @@ public class OAuth implements AutoCloseable {
     private long raw;
 
     /**
-     * Create a new OAuth 2.0 client
+     * Create a new OAuth 2.0 client with the default callback port (60355)
      *
      * @param clientId OAuth 2.0 client ID from the LongPort developer portal
      */
     public OAuth(String clientId) {
-        this.raw = SdkNative.newOAuth(clientId);
+        this.raw = SdkNative.newOAuth(clientId, 60355);
+    }
+
+    /**
+     * Create a new OAuth 2.0 client with a custom callback port
+     *
+     * @param clientId     OAuth 2.0 client ID from the LongPort developer portal
+     * @param callbackPort TCP port for the local callback server. Must match one
+     *                     of the redirect URIs registered for the client.
+     */
+    public OAuth(String clientId, int callbackPort) {
+        this.raw = SdkNative.newOAuth(clientId, callbackPort);
     }
 
     /**

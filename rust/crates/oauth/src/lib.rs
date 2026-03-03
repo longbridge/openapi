@@ -10,7 +10,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     // Start OAuth authorization flow
+//!     // Start OAuth authorization flow (default callback port 60355)
 //!     let oauth = OAuth::new("your-client-id");
 //!     let token = oauth
 //!         .authorize(|url| {
@@ -20,6 +20,12 @@
 //!         .await?;
 //!
 //!     println!("Access token: {}", token.access_token);
+//!
+//!     // Or specify a custom callback port
+//!     let oauth2 = OAuth::new("your-client-id").with_callback_port(8080);
+//!     let _token2 = oauth2
+//!         .authorize(|url| println!("Please visit: {url}"))
+//!         .await?;
 //!     Ok(())
 //! }
 //! ```
@@ -31,15 +37,16 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use oauth2::{
-    AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
-    Scope, TokenResponse, TokenUrl, basic::BasicClient, reqwest::async_http_client,
+    basic::BasicClient, reqwest::async_http_client, AuthUrl, AuthorizationCode, ClientId,
+    CsrfToken, RedirectUrl, RefreshToken, RevocationUrl, Scope, TokenResponse, TokenUrl,
 };
-use poem::{EndpointExt, Route, Server, handler, listener::TcpAcceptor, web::Query};
+use poem::{handler, listener::TcpAcceptor, web::Query, EndpointExt, Route, Server};
 use serde::{Deserialize, Serialize};
 use tokio::{sync::oneshot, time::timeout};
 
 const AUTH_TIMEOUT: Duration = Duration::from_secs(300); // 5 minutes
-const OAUTH_BASE_URL: &str = "https://openapi.longportapp.com";
+const OAUTH_BASE_URL: &str = "https://openapi.longbridgeapp.com/oauth2";
+const DEFAULT_CALLBACK_PORT: u16 = 60355;
 
 /// Error type for OAuth operations
 #[derive(Debug, thiserror::Error)]
@@ -111,10 +118,11 @@ type CallbackTx = std::sync::Arc<
 /// OAuth 2.0 client for LongPort OpenAPI
 pub struct OAuth {
     client_id: String,
+    callback_port: u16,
 }
 
 impl OAuth {
-    /// Create a new OAuth client
+    /// Create a new OAuth client with the default callback port (60355)
     ///
     /// # Arguments
     ///
@@ -123,12 +131,32 @@ impl OAuth {
     pub fn new(client_id: impl Into<String>) -> Self {
         Self {
             client_id: client_id.into(),
+            callback_port: DEFAULT_CALLBACK_PORT,
+        }
+    }
+
+    /// Set a custom callback port (builder method)
+    ///
+    /// # Arguments
+    ///
+    /// * `callback_port` - TCP port for the local callback server (e.g. 8080).
+    ///   This port must match one of the redirect URIs registered for the
+    ///   client. Defaults to `60355` when using [`OAuth::new`].
+    pub fn with_callback_port(self, callback_port: u16) -> Self {
+        Self {
+            callback_port,
+            ..self
         }
     }
 
     /// Get the client ID
     pub fn client_id(&self) -> &str {
         &self.client_id
+    }
+
+    /// Get the callback port
+    pub fn callback_port(&self) -> u16 {
+        self.callback_port
     }
 
     /// Start the OAuth 2.0 authorization flow
@@ -152,18 +180,21 @@ impl OAuth {
     /// - The authorization times out (5 minutes)
     /// - Token exchange fails
     pub async fn authorize(&self, open_url: impl Fn(&str)) -> OAuthResult<OAuthToken> {
-        // Bind callback server first to get the actual port
-        let listener = Self::bind_callback_server()?;
+        // Bind callback server on the configured port
+        let listener = Self::bind_callback_server(self.callback_port)?;
         let port = listener
             .local_addr()
             .map_err(|e| OAuthError::OAuth(format!("Failed to get local address: {}", e)))?
             .port();
-        let redirect_uri = format!("http://localhost:{port}/callback");
 
         tracing::debug!("Callback server listening on port {port}");
-        tracing::debug!("Redirect URI: {redirect_uri}");
+        tracing::debug!(
+            "Redirect URI: http://localhost:{}/callback",
+            self.callback_port
+        );
 
-        let client = self.create_oauth_client(&redirect_uri);
+        let client =
+            self.create_oauth_client(&format!("http://localhost:{}/callback", self.callback_port));
 
         // Generate authorization URL
         let (auth_url, csrf_token) = client
@@ -215,7 +246,8 @@ impl OAuth {
 
         tracing::debug!("Refreshing OAuth token");
 
-        let client = self.create_oauth_client("http://localhost:60355/callback");
+        let client =
+            self.create_oauth_client(&format!("http://localhost:{}/callback", self.callback_port));
         let token_response = client
             .exchange_refresh_token(&RefreshToken::new(refresh_token.to_string()))
             .request_async(async_http_client)
@@ -237,16 +269,20 @@ impl OAuth {
         BasicClient::new(
             ClientId::new(self.client_id.clone()),
             None, // No client secret for public clients
-            AuthUrl::new(format!("{OAUTH_BASE_URL}/oauth2/authorize")).unwrap(),
-            Some(TokenUrl::new(format!("{OAUTH_BASE_URL}/oauth2/token")).unwrap()),
+            AuthUrl::new(format!("{OAUTH_BASE_URL}/authorize")).unwrap(),
+            Some(TokenUrl::new(format!("{OAUTH_BASE_URL}/token")).unwrap()),
         )
         .set_redirect_uri(RedirectUrl::new(redirect_uri.to_string()).unwrap())
-        .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/oauth2/revoke")).unwrap())
+        .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/revoke")).unwrap())
     }
 
-    fn bind_callback_server() -> OAuthResult<std::net::TcpListener> {
-        std::net::TcpListener::bind("127.0.0.1:0")
-            .map_err(|e| OAuthError::OAuth(format!("Failed to bind callback server: {}", e)))
+    fn bind_callback_server(port: u16) -> OAuthResult<std::net::TcpListener> {
+        std::net::TcpListener::bind(format!("127.0.0.1:{port}")).map_err(|e| {
+            OAuthError::OAuth(format!(
+                "Failed to bind callback server on port {port}: {}",
+                e
+            ))
+        })
     }
 
     async fn wait_for_callback(listener: std::net::TcpListener) -> OAuthResult<(String, String)> {
@@ -456,6 +492,14 @@ mod tests {
     fn test_oauth_new() {
         let oauth = OAuth::new("test-client-id");
         assert_eq!(oauth.client_id(), "test-client-id");
+        assert_eq!(oauth.callback_port(), DEFAULT_CALLBACK_PORT);
+    }
+
+    #[test]
+    fn test_oauth_with_callback_port() {
+        let oauth = OAuth::new("test-client-id").with_callback_port(8080);
+        assert_eq!(oauth.client_id(), "test-client-id");
+        assert_eq!(oauth.callback_port(), 8080);
     }
 
     #[test]
