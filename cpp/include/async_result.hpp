@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <type_traits>
 
 #include "status.hpp"
 
@@ -24,6 +25,14 @@ public:
 
   inline operator bool() { return status_.is_ok(); }
   inline const T* operator->() const { return data_; }
+
+  template<typename U = T,
+           typename std::enable_if<!std::is_void<U>::value, int>::type = 0>
+  inline const U& operator*() const
+  {
+    return *data_;
+  }
+
   inline const Status& status() const { return status_; }
 
   inline const Ctx& context() { return ctx_; }

@@ -67,7 +67,7 @@ main(int argc, char const* argv[])
           std::cout << "failed to save token: "
                     << *save_status.message() << std::endl;
         }
-        run(*res.operator->());
+        run(*res);
       });
   }
 

@@ -75,7 +75,7 @@ main()
           std::cout << "failed to save token: "
                     << *save_status.message() << std::endl;
         }
-        run(*res.operator->());
+        run(*res);
       });
   }
 
