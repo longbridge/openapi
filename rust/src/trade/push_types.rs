@@ -8,8 +8,9 @@ use strum_macros::{Display, EnumString};
 use time::OffsetDateTime;
 
 use crate::{
-    Error, Result, serde_utils,
-    trade::{OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus, cmd_code},
+    serde_utils,
+    trade::{cmd_code, OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus},
+    Error, Result,
 };
 
 /// Topic type

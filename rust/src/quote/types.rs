@@ -7,9 +7,8 @@ use strum_macros::{Display, EnumString};
 use time::{Date, OffsetDateTime, Time};
 
 use crate::{
-    Error, Market, Result,
-    quote::{SubFlags, utils::parse_date},
-    serde_utils,
+    quote::{utils::parse_date, SubFlags},
+    serde_utils, Error, Market, Result,
 };
 
 /// Trade session type
@@ -1994,7 +1993,7 @@ impl_default_for_enum_string!(
 mod tests {
     use serde::Deserialize;
 
-    use crate::{Market, quote::WatchlistGroup};
+    use crate::{quote::WatchlistGroup, Market};
 
     #[test]
     fn watch_list() {
