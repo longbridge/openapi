@@ -161,17 +161,33 @@ async fn run_http_oauth(bind: String, readonly: bool) -> Result<(), Box<dyn std:
 
     let listener = TcpListener::bind(&bind);
     let app = Route::new()
-        // RFC 8414 discovery endpoint — intentionally unauthenticated.
+        // RFC 8414 discovery endpoint — intentionally unauthenticated (RFC 8414 §3).
         .at(
             "/.well-known/oauth-authorization-server",
             poem::get(oauth_metadata_handler),
         )
         .data(base_url)
         // MCP endpoint — every request must carry a valid Bearer token.
+        // BearerAuthMiddleware has already validated the token and injected
+        // AuthenticatedContext by the time this factory is called.
         .at(
             "/",
             streamable_http::endpoint(move |req: &Request| {
-                build_oauth_mcp_server_from_request(req, readonly)
+                // Clone the context out of the request before the async block so
+                // the future does not borrow `req`.
+                let auth_ctx = req.extensions().get::<AuthenticatedContext>().cloned();
+                async move {
+                    let auth_ctx = auth_ctx.ok_or(
+                        "BearerAuthMiddleware did not inject AuthenticatedContext",
+                    )?;
+                    let config =
+                        Arc::new(auth_ctx.build_config().dont_print_quote_packages());
+                    let (quote_ctx, _) = QuoteContext::try_new(config.clone()).await?;
+                    let (trade_ctx, _) = TradeContext::try_new(config).await?;
+                    Ok::<McpServer<Longport>, Box<dyn std::error::Error + Send + Sync>>(
+                        build_mcp_server(quote_ctx, trade_ctx, readonly),
+                    )
+                }
             }),
         )
         .with(BearerAuthMiddleware)
@@ -179,36 +195,6 @@ async fn run_http_oauth(bind: String, readonly: bool) -> Result<(), Box<dyn std:
 
     Server::new(listener).run(app).await?;
     Ok(())
-}
-
-// ---------------------------------------------------------------------------
-// OAuth MCP session factory
-// ---------------------------------------------------------------------------
-
-/// Build a per-session MCP server from the [`AuthenticatedContext`] injected
-/// by [`BearerAuthMiddleware`].
-///
-/// This function is called by the `streamable_http::endpoint` factory for
-/// every new MCP session.  It constructs a fresh pair of
-/// [`QuoteContext`] / [`TradeContext`] bound to the request's Bearer token.
-async fn build_oauth_mcp_server_from_request(
-    req: &Request,
-    readonly: bool,
-) -> Result<McpServer<Longport>, Box<dyn std::error::Error + Send + Sync>> {
-    // BearerAuthMiddleware already validated the token and injected this
-    // context.  Its absence is a programming error — the middleware was
-    // bypassed or not registered.
-    let auth_ctx = req
-        .extensions()
-        .get::<AuthenticatedContext>()
-        .cloned()
-        .ok_or("BearerAuthMiddleware did not inject AuthenticatedContext — possible middleware misconfiguration")?;
-
-    let config = Arc::new(auth_ctx.build_config().dont_print_quote_packages());
-    let (quote_ctx, _) = QuoteContext::try_new(config.clone()).await?;
-    let (trade_ctx, _) = TradeContext::try_new(config).await?;
-
-    Ok(build_mcp_server(quote_ctx, trade_ctx, readonly))
 }
 
 // ---------------------------------------------------------------------------
@@ -294,7 +280,7 @@ mod tests {
     }
 
     #[test]
-    fn test_derive_public_base_url_specific_address() {
+    fn test_derive_public_base_url_loopback() {
         assert_eq!(
             derive_public_base_url("127.0.0.1:8000"),
             "http://127.0.0.1:8000"
@@ -306,6 +292,14 @@ mod tests {
         assert_eq!(
             derive_public_base_url("mcp.example.com:443"),
             "http://mcp.example.com:443"
+        );
+    }
+
+    #[test]
+    fn test_derive_public_base_url_wildcard_preserves_port() {
+        assert_eq!(
+            derive_public_base_url("0.0.0.0:3333"),
+            "http://localhost:3333"
         );
     }
 }
