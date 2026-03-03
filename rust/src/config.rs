@@ -18,6 +18,7 @@ use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
 use crate::error::Result;
+use longport_oauth::OAuthToken;
 
 const DEFAULT_QUOTE_WS_URL: &str = "wss://openapi-quote.longportapp.com/v2";
 const DEFAULT_TRADE_WS_URL: &str = "wss://openapi-trade.longportapp.com/v2";
@@ -111,35 +112,30 @@ impl Config {
 
     /// Create a new `Config` for OAuth 2.0 authentication
     ///
-    /// OAuth 2.0 is the recommended authentication method that uses Bearer
-    /// tokens and does not require app_secret or HMAC signatures.
-    ///
     /// # Arguments
     ///
-    /// * `client_id` - OAuth 2.0 client ID
-    /// * `access_token` - OAuth 2.0 access token (Bearer prefix is optional)
+    /// * `token` - [`OAuthToken`] obtained from [`longport::oauth::OAuth::authorize`]
     ///
     /// # Example
     ///
     /// ```rust,no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::Config;
+    /// use longport::{oauth::OAuth, Config};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let config = Arc::new(Config::from_oauth(
-    ///         "your-client-id",
-    ///         "your-oauth-access-token",
-    ///     ));
+    ///     let oauth = OAuth::new("your-client-id");
+    ///     let token = oauth.authorize(|url| println!("Visit: {url}")).await?;
+    ///     let config = Arc::new(Config::from_oauth(&token));
     ///
     ///     let (ctx, receiver) = longport::quote::QuoteContext::try_new(config).await?;
     ///     Ok(())
     /// }
     /// ```
-    pub fn from_oauth(client_id: impl Into<String>, access_token: impl Into<String>) -> Self {
+    pub fn from_oauth(token: &OAuthToken) -> Self {
         Self {
-            http_cli_config: HttpClientConfig::from_oauth(client_id, access_token),
+            http_cli_config: HttpClientConfig::from_oauth(&token.client_id, &token.access_token),
             quote_ws_url: None,
             trade_ws_url: None,
             language: Language::EN,
@@ -444,24 +440,25 @@ mod tests {
 
     #[test]
     fn test_config_from_oauth() {
-        let config = Config::from_oauth("test-client-id", "test-access-token");
-
-        // Test that Config was created with OAuth settings
-        // We can't access private fields directly, but we can verify the config works
+        let token = OAuthToken {
+            client_id: "test-client-id".to_string(),
+            access_token: "test-access-token".to_string(),
+            refresh_token: None,
+            expires_at: u64::MAX,
+        };
+        let config = Config::from_oauth(&token);
         assert_eq!(config.language, Language::EN);
     }
 
     #[test]
-    fn test_config_from_oauth_with_bearer_prefix() {
-        let _config = Config::from_oauth("test-client-id", "Bearer already-has-prefix");
-
-        // Config should be created successfully
-        // Actual OAuth logic tested in httpclient crate
-    }
-
-    #[test]
     fn test_config_default_values() {
-        let config = Config::from_oauth("client-id", "token");
+        let token = OAuthToken {
+            client_id: "client-id".to_string(),
+            access_token: "token".to_string(),
+            refresh_token: None,
+            expires_at: u64::MAX,
+        };
+        let config = Config::from_oauth(&token);
 
         assert_eq!(config.language, Language::EN);
         assert_eq!(config.quote_ws_url, None);

@@ -101,10 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // (e.g., encrypted file, secure keychain)
 
     // Create config with OAuth token
-    let config = Arc::new(Config::from_oauth(
-        oauth.client_id(),
-        &token.access_token
-    ));
+    let config = Arc::new(Config::from_oauth(&token));
 
     // Use config to create contexts...
     Ok(())
@@ -145,15 +142,14 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, QuoteContext};
+use longport::{Config, QuoteContext, oauth::OAuth};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create config with OAuth 2.0
-    let config = Arc::new(Config::from_oauth(
-        "your-oauth-client-id",
-        "your-oauth-access-token"
-    ));
+    let oauth = OAuth::new("your-oauth-client-id");
+    let token = oauth.authorize(|url| println!("Visit: {url}")).await?;
+    let config = Arc::new(Config::from_oauth(&token));
 
     // Create a context for quote APIs
     let (ctx, _) = QuoteContext::try_new(config.clone()).await?;

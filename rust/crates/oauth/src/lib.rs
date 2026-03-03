@@ -53,6 +53,8 @@ pub type OAuthResult<T> = std::result::Result<T, OAuthError>;
 /// OAuth 2.0 access token with expiration and refresh information
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OAuthToken {
+    /// The OAuth 2.0 client ID associated with this token
+    pub client_id: String,
     /// The access token for API authentication
     pub access_token: String,
     /// Optional refresh token for obtaining new access tokens
@@ -62,7 +64,7 @@ pub struct OAuthToken {
 }
 
 impl OAuthToken {
-    fn from_oauth2_response<TT, T>(token_response: &T) -> Self
+    fn from_oauth2_response<TT, T>(client_id: String, token_response: &T) -> Self
     where
         TT: oauth2::TokenType,
         T: TokenResponse<TT>,
@@ -74,6 +76,7 @@ impl OAuthToken {
         let expires_in = token_response.expires_in().map_or(3600, |d| d.as_secs());
 
         Self {
+            client_id,
             access_token: token_response.access_token().secret().clone(),
             refresh_token: token_response.refresh_token().map(|t| t.secret().clone()),
             expires_at: now + expires_in,
@@ -186,19 +189,28 @@ impl OAuth {
             .await
             .map_err(|e| OAuthError::OAuth(format!("Failed to exchange code for token: {}", e)))?;
 
-        Ok(OAuthToken::from_oauth2_response(&token_response))
+        Ok(OAuthToken::from_oauth2_response(
+            self.client_id.clone(),
+            &token_response,
+        ))
     }
 
     /// Refresh an access token using a refresh token
     ///
     /// # Arguments
     ///
-    /// * `refresh_token` - The refresh token from a previous authorization
+    /// * `token` - The [`OAuthToken`] from a previous authorization (must
+    ///   contain a refresh token)
     ///
     /// # Returns
     ///
     /// A new [`OAuthToken`] with a fresh access token
-    pub async fn refresh(&self, refresh_token: &str) -> OAuthResult<OAuthToken> {
+    pub async fn refresh(&self, token: &OAuthToken) -> OAuthResult<OAuthToken> {
+        let refresh_token = token
+            .refresh_token
+            .as_deref()
+            .ok_or_else(|| OAuthError::OAuth("No refresh token available".to_string()))?;
+
         tracing::debug!("Refreshing OAuth token");
 
         let client = self.create_oauth_client("http://localhost:60355/callback");
@@ -208,7 +220,8 @@ impl OAuth {
             .await
             .map_err(|e| OAuthError::OAuth(format!("Failed to refresh token: {}", e)))?;
 
-        let mut new_token = OAuthToken::from_oauth2_response(&token_response);
+        let mut new_token =
+            OAuthToken::from_oauth2_response(self.client_id.clone(), &token_response);
 
         // Preserve refresh token if not returned
         if new_token.refresh_token.is_none() {
@@ -339,6 +352,7 @@ mod tests {
             .as_secs();
 
         let token = OAuthToken {
+            client_id: "test-client".to_string(),
             access_token: "test_token".to_string(),
             refresh_token: Some("refresh_token".to_string()),
             expires_at: now + 7200, // expires in 2 hours
@@ -355,6 +369,7 @@ mod tests {
             .as_secs();
 
         let token = OAuthToken {
+            client_id: "test-client".to_string(),
             access_token: "test_token".to_string(),
             refresh_token: Some("refresh_token".to_string()),
             expires_at: now - 1, // expired 1 second ago
@@ -372,6 +387,7 @@ mod tests {
 
         // Token expires in 30 minutes
         let token = OAuthToken {
+            client_id: "test-client".to_string(),
             access_token: "test_token".to_string(),
             refresh_token: Some("refresh_token".to_string()),
             expires_at: now + 1800,
@@ -389,6 +405,7 @@ mod tests {
 
         // Token expires in 2 hours
         let token = OAuthToken {
+            client_id: "test-client".to_string(),
             access_token: "test_token".to_string(),
             refresh_token: Some("refresh_token".to_string()),
             expires_at: now + 7200,
@@ -400,6 +417,7 @@ mod tests {
     #[test]
     fn test_oauth_token_serialization() {
         let token = OAuthToken {
+            client_id: "test-client".to_string(),
             access_token: "test_access_token".to_string(),
             refresh_token: Some("test_refresh_token".to_string()),
             expires_at: 1234567890,
@@ -408,6 +426,7 @@ mod tests {
         let json = serde_json::to_string(&token).unwrap();
         let deserialized: OAuthToken = serde_json::from_str(&json).unwrap();
 
+        assert_eq!(token.client_id, deserialized.client_id);
         assert_eq!(token.access_token, deserialized.access_token);
         assert_eq!(token.refresh_token, deserialized.refresh_token);
         assert_eq!(token.expires_at, deserialized.expires_at);
@@ -416,6 +435,7 @@ mod tests {
     #[test]
     fn test_oauth_token_serialization_without_refresh() {
         let token = OAuthToken {
+            client_id: "test-client".to_string(),
             access_token: "test_access_token".to_string(),
             refresh_token: None,
             expires_at: 1234567890,
@@ -424,6 +444,7 @@ mod tests {
         let json = serde_json::to_string(&token).unwrap();
         let deserialized: OAuthToken = serde_json::from_str(&json).unwrap();
 
+        assert_eq!(token.client_id, deserialized.client_id);
         assert_eq!(token.access_token, deserialized.access_token);
         assert_eq!(token.refresh_token, deserialized.refresh_token);
         assert_eq!(token.expires_at, deserialized.expires_at);
