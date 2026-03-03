@@ -37,17 +37,11 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newOAuth(
     mut env: JNIEnv,
     _class: JClass,
     client_id: JString,
-    callback_port: jint,
 ) -> jlong {
     jni_result(&mut env, 0, |env| {
         use crate::types::FromJValue;
         let client_id = String::from_jvalue(env, client_id.into())?;
-        let port = if callback_port <= 0 {
-            60355u16
-        } else {
-            callback_port as u16
-        };
-        Ok(Box::into_raw(Box::new(OAuth::with_callback_port(client_id, port))) as jlong)
+        Ok(Box::into_raw(Box::new(OAuth::new(client_id))) as jlong)
     })
 }
 
@@ -59,6 +53,20 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeOAuth(
     oauth: jlong,
 ) {
     drop(Box::from_raw(oauth as *mut OAuth));
+}
+
+/// Set the callback port on an existing OAuth client.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthSetCallbackPort(
+    _env: JNIEnv,
+    _class: JClass,
+    oauth: jlong,
+    callback_port: jint,
+) {
+    if callback_port > 0 {
+        let oauth = &mut *(oauth as *mut OAuth);
+        oauth.set_callback_port(callback_port as u16);
+    }
 }
 
 // ── OAuthToken native methods
@@ -113,13 +121,12 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthAuthorize(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let client_id = (*(oauth as *const OAuth)).client_id().to_string();
-        let callback_port = (*(oauth as *const OAuth)).callback_port();
+        let inner = (*(oauth as *const OAuth)).clone();
         let jvm = env.get_java_vm()?;
         let open_url_callback = env.new_global_ref(open_url_callback)?;
 
         async_util::execute(env, callback, async move {
-            let token = OAuth::with_callback_port(client_id, callback_port)
+            let token = inner
                 .authorize(move |url| {
                     if let Ok(mut env) = jvm.attach_current_thread()
                         && let Ok(j_url) = env.new_string(url)
@@ -151,14 +158,11 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthRefresh(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let client_id = (*(oauth as *const OAuth)).client_id().to_string();
-        let callback_port = (*(oauth as *const OAuth)).callback_port();
+        let inner = (*(oauth as *const OAuth)).clone();
         let existing_token = (*(token as *const longport::oauth::OAuthToken)).clone();
 
         async_util::execute(env, callback, async move {
-            let new_token = OAuth::with_callback_port(client_id, callback_port)
-                .refresh(&existing_token)
-                .await?;
+            let new_token = inner.refresh(&existing_token).await?;
             Ok(into_token_ptr(new_token))
         })?;
         Ok(())

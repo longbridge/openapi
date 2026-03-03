@@ -4019,14 +4019,13 @@ const char *lb_http_result_response_body(const struct lb_http_result_t *http_res
 struct lb_oauth_t *lb_oauth_new(const char *client_id);
 
 /**
- * Create a new OAuth 2.0 client with a custom callback port
+ * Set the callback port on an existing OAuth 2.0 client
  *
- * @param client_id     OAuth 2.0 client ID from the LongPort developer portal
- * @param callback_port TCP port for the local callback server. Must match one
- *                      of the redirect URIs registered for the client.
- * @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
+ * @param oauth          OAuth client
+ * @param callback_port  TCP port for the local callback server. Must match one
+ *                       of the redirect URIs registered for the client.
  */
-struct lb_oauth_t *lb_oauth_new_with_port(const char *client_id, uint16_t callback_port);
+void lb_oauth_set_callback_port(struct lb_oauth_t *oauth, uint16_t callback_port);
 
 /**
  * Free an OAuth 2.0 client object
@@ -4052,16 +4051,17 @@ int32_t lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
 /**
  * Start the OAuth 2.0 authorization flow (async)
  *
- * Starts a local HTTP server (OS-assigned port), calls `open_url_callback`
- * with the authorization URL so the caller can open it in a browser, then
- * waits for the redirect and exchanges the authorization code for a token.
+ * Starts a local HTTP server, calls `open_url_callback` with the
+ * authorization URL so the caller can open it in a browser, then waits for
+ * the redirect and exchanges the authorization code for a token.
  *
  * @param oauth              OAuth client
  * @param open_url_callback  Called with the authorization URL and
- * `open_url_userdata` @param open_url_userdata  Opaque pointer forwarded to
- * `open_url_callback` @param callback           Async completion callback;
- * `data` is `*mut lb_oauth_token_t` on success @param userdata
- * Opaque pointer forwarded to `callback`
+ *                           `open_url_userdata`
+ * @param open_url_userdata  Opaque pointer forwarded to `open_url_callback`
+ * @param callback           Async completion callback; `data` is
+ *                           `*mut lb_oauth_token_t` on success
+ * @param userdata           Opaque pointer forwarded to `callback`
  */
 void lb_oauth_authorize(const struct lb_oauth_t *oauth,
                         void (*open_url_callback)(const char*, void*),
@@ -4072,11 +4072,11 @@ void lb_oauth_authorize(const struct lb_oauth_t *oauth,
 /**
  * Refresh an OAuth 2.0 access token (async)
  *
- * @param oauth          OAuth client (provides client_id)
+ * @param oauth          OAuth client
  * @param token          Existing token whose refresh token is used
- * @param callback       Async completion callback; `data` is `*mut
- * lb_oauth_token_t` on success @param userdata       Opaque pointer forwarded
- * to `callback`
+ * @param callback       Async completion callback; `data` is
+ *                       `*mut lb_oauth_token_t` on success
+ * @param userdata       Opaque pointer forwarded to `callback`
  */
 void lb_oauth_refresh(const struct lb_oauth_t *oauth,
                       const struct lb_oauth_token_t *token,

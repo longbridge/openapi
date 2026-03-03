@@ -43,9 +43,10 @@ OAuth::OAuth(const std::string& client_id)
   oauth_ = lb_oauth_new(client_id.c_str());
 }
 
-OAuth::OAuth(const std::string& client_id, uint16_t callback_port)
+void
+OAuth::set_callback_port(uint16_t callback_port)
 {
-  oauth_ = lb_oauth_new_with_port(client_id.c_str(), callback_port);
+  lb_oauth_set_callback_port(oauth_, callback_port);
 }
 
 OAuth::OAuth(OAuth&& other)
