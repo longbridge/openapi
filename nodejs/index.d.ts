@@ -174,10 +174,10 @@ export declare class Config {
    * const { Config, OAuth } = require('longport');
    *
    * // Obtain a token via OAuth flow, then:
-   * // const config = Config.fromOauth(token);
+   * // const config = Config.fromOAuth(token);
    * ```
    */
-  static fromOauth(token: OAuthToken): Config
+  static fromOAuth(token: OAuthToken): Config
   /**
    * Gets a new `access_token`
    *
@@ -454,7 +454,7 @@ export declare class HttpClient {
    */
   static fromEnv(): HttpClient
   /** Create a new `HttpClient` from an OAuthToken */
-  static fromOauth(token: OAuthToken): HttpClient
+  static fromOAuth(token: OAuthToken): HttpClient
   /** Performs a HTTP request */
   request(method: string, path: string, headers?: Record<string, string> | undefined | null, body?: any | undefined | null): Promise<any>
 }
@@ -583,7 +583,7 @@ export declare class OAuth {
    *
    * @param onOpenUrl  Called with the authorization URL; open it in a browser
    *                   or print it however you like
-   * @returns OAuthToken that can be passed to `Config.fromOauth` or `HttpClient.fromOauth`
+   * @returns OAuthToken that can be passed to `Config.fromOAuth` or `HttpClient.fromOAuth`
    */
   authorize(onOpenUrl: ((err: Error | null, arg: string) => void)): Promise<OAuthToken>
   /**

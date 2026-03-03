@@ -56,9 +56,8 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   }
 
   const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
-  const char* access_token = lb_oauth_token_get_access_token(token);
 
-  lb_config_t* config = lb_config_from_oauth(CLIENT_ID, access_token);
+  lb_config_t* config = lb_config_from_oauth(token);
 
   const lb_trade_context_t** ctx =
     (const lb_trade_context_t**)res->userdata;

@@ -24,6 +24,51 @@ _Install LongPort OpenAPI SDK_
 
 [`Download C SDK`](https://github.com/longportapp/openapi/releases)
 
+### Authentication
+
+LongPort OpenAPI supports two authentication methods:
+
+#### 1. OAuth 2.0 (Recommended)
+
+OAuth 2.0 is the modern authentication method that uses Bearer tokens without requiring HMAC signatures.
+
+```c
+#include <longport.h>
+#include <stdio.h>
+
+void
+on_open_url(const char* url, void* userdata)
+{
+  printf("%s\n", url);
+}
+
+void
+on_oauth_authorize(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    printf("authorization failed: %s\n", lb_error_message(res->error));
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_config_t* config = lb_config_from_oauth(token);
+  // Use config to create contexts...
+  lb_config_free(config);
+}
+
+int
+main(int argc, char const* argv[])
+{
+  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, NULL);
+  getchar();
+  lb_oauth_free(oauth);
+  return 0;
+}
+```
+
+#### 2. Legacy API Key (Environment Variables)
+
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
@@ -90,6 +135,29 @@ on_quote_context_created(const struct lb_async_result_t* res)
   lb_quote_context_quote(res->ctx, symbols, 4, on_quote, NULL);
 }
 
+void
+on_open_url(const char* url, void* userdata)
+{
+  printf("%s\n", url);
+}
+
+void
+on_oauth_authorize(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    printf("authorization failed: %s\n", lb_error_message(res->error));
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_config_t* config = lb_config_from_oauth(token);
+
+  const lb_quote_context_t** ctx =
+    (const lb_quote_context_t**)res->userdata;
+  lb_quote_context_new(config, on_quote_context_created, ctx);
+  lb_config_free(config);
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -97,19 +165,12 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  lb_error_t* err = NULL;
-  lb_config_t* config = lb_config_from_env(&err);
-  if (err) {
-    printf("failed to load configuration from environment: %s\n",
-           lb_error_message(err));
-    lb_error_free(err);
-    return -1;
-  }
-
   const lb_quote_context_t* ctx = NULL;
-  lb_quote_context_new(config, on_quote_context_created, &ctx);
+  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
   getchar();
   lb_quote_context_release(ctx);
+  lb_oauth_free(oauth);
   return 0;
 }
 ```
@@ -168,6 +229,29 @@ on_quote_context_created(const struct lb_async_result_t* res)
     res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, on_subscrbe, NULL);
 }
 
+void
+on_open_url(const char* url, void* userdata)
+{
+  printf("%s\n", url);
+}
+
+void
+on_oauth_authorize(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    printf("authorization failed: %s\n", lb_error_message(res->error));
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_config_t* config = lb_config_from_oauth(token);
+
+  const lb_quote_context_t** ctx =
+    (const lb_quote_context_t**)res->userdata;
+  lb_quote_context_new(config, on_quote_context_created, ctx);
+  lb_config_free(config);
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -175,19 +259,12 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  lb_error_t* err = NULL;
-  lb_config_t* config = lb_config_from_env(&err);
-  if (err) {
-    printf("failed to load configuration from environment: %s\n",
-           lb_error_message(err));
-    lb_error_free(err);
-    return -1;
-  }
-
   const lb_quote_context_t* ctx = NULL;
-  lb_quote_context_new(config, on_quote_context_created, &ctx);
+  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
   getchar();
   lb_quote_context_release(ctx);
+  lb_oauth_free(oauth);
   return 0;
 }
 ```
@@ -242,6 +319,29 @@ on_trade_context_created(const struct lb_async_result_t* res)
   lb_trade_context_submit_order(res->ctx, &opts, on_submit_order, NULL);
 }
 
+void
+on_open_url(const char* url, void* userdata)
+{
+  printf("%s\n", url);
+}
+
+void
+on_oauth_authorize(const struct lb_async_result_t* res)
+{
+  if (res->error) {
+    printf("authorization failed: %s\n", lb_error_message(res->error));
+    return;
+  }
+
+  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_config_t* config = lb_config_from_oauth(token);
+
+  const lb_trade_context_t** ctx =
+    (const lb_trade_context_t**)res->userdata;
+  lb_trade_context_new(config, on_trade_context_created, ctx);
+  lb_config_free(config);
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -249,19 +349,12 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  lb_error_t* err = NULL;
-  lb_config_t* config = lb_config_from_env(&err);
-  if (err) {
-    printf("failed to load configuration from environment: %s\n",
-           lb_error_message(err));
-    lb_error_free(err);
-    return -1;
-  }
-
   const lb_trade_context_t* ctx = NULL;
-  lb_trade_context_new(config, on_trade_context_created, (void*)&ctx);
+  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, (void*)&ctx);
   getchar();
   lb_trade_context_release(ctx);
+  lb_oauth_free(oauth);
   return 0;
 }
 ```

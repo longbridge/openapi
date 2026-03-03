@@ -5,7 +5,7 @@ class Main {
     public static void main(String[] args) throws Exception {
         try (OAuth oauth = new OAuth("your-client-id");
              OAuthToken token = oauth.authorize(url -> System.out.println(url)).get();
-             Config config = Config.fromOauth("your-client-id", token.getAccessToken());
+             Config config = Config.fromOAuth(token);
              QuoteContext ctx = QuoteContext.create(config).get()) {
             ctx.setOnCandlestick((symbol, event) -> {
                 System.out.printf("%s\t%s\n", symbol, event);

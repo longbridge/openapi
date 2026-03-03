@@ -7,7 +7,7 @@ async function main() {
   const token = await oauth.authorize((url) => {
     console.log(url);
   });
-  let config = Config.fromOauth("your-client-id", token.accessToken);
+  let config = Config.fromOAuth(token);
   globalCtx = await QuoteContext.new(config);
   globalCtx.setOnCandlestick((_, event) => console.log(event.toString()));
   globalCtx.subscribeCandlesticks(

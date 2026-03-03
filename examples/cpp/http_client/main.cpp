@@ -19,14 +19,14 @@ main(int argc, char const* argv[])
 
   oauth.authorize(
     [](const std::string& url) { std::cout << url << std::endl; },
-    [client_id](auto res) {
+    [](auto res) {
       if (!res) {
         std::cout << "authorization failed: " << *res.status().message()
                   << std::endl;
         return;
       }
 
-      HttpClient http_cli = HttpClient::from_oauth(client_id, res->access_token());
+      HttpClient http_cli = HttpClient::from_oauth(*res.operator->());
 
       http_cli.request("get",
                        "/v1/trade/execution/today",

@@ -42,7 +42,7 @@ impl HttpClient {
     }
 
     /// Create a new `HttpClient` from an OAuthToken
-    #[napi(factory)]
+    #[napi(factory, js_name = "fromOAuth")]
     pub fn from_oauth(token: &OAuthToken) -> Self {
         Self(LbHttpClient::new(HttpClientConfig::from_oauth(&token.0)))
     }

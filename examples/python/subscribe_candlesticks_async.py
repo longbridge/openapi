@@ -17,7 +17,7 @@ def on_candlestick(symbol: str, event: PushCandlestick) -> None:
 async def main() -> None:
     oauth = OAuth("your-client-id")
     token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-    config = Config.from_oauth("your-client-id", token.access_token)
+    config = Config.from_oauth(token)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_candlestick(on_candlestick)
     await ctx.subscribe_candlesticks(

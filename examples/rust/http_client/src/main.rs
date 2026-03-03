@@ -15,10 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .authorize(|url| println!("Open this URL to authorize: {url}"))
         .await?;
 
-    let http_cli = HttpClient::new(HttpClientConfig::from_oauth(
-        oauth.client_id(),
-        &token.access_token,
-    ));
+    let http_cli = HttpClient::new(HttpClientConfig::from_oauth(&token));
     let resp = http_cli
         .request("GET".parse()?, "/v1/trade/execution/today")
         .response::<String>()

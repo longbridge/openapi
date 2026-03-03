@@ -49,7 +49,7 @@ public class HttpClient implements AutoCloseable {
      * @param token OAuthToken returned by {@link OAuth#authorize} or {@link OAuth#refresh}
      * @return HttpClient object
      */
-    public static HttpClient fromOauth(OAuthToken token) {
+    public static HttpClient fromOAuth(OAuthToken token) {
         return new HttpClient(SdkNative.newHttpClientFromOauth(token.raw));
     }
 
