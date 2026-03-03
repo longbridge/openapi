@@ -41,7 +41,11 @@ use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
     Scope, TokenResponse, TokenUrl, basic::BasicClient, reqwest::async_http_client,
 };
-use poem::{EndpointExt, Route, Server, handler, listener::TcpAcceptor, web::Query};
+use poem::{
+    EndpointExt, Route, Server, handler,
+    listener::{Acceptor, Listener, TcpListener},
+    web::Query,
+};
 use serde::{Deserialize, Serialize};
 use tokio::{sync::oneshot, time::timeout};
 
@@ -179,21 +183,27 @@ impl OAuth {
     /// - The authorization times out (5 minutes)
     /// - Token exchange fails
     pub async fn authorize(&self, open_url: impl Fn(&str)) -> OAuthResult<OAuthToken> {
-        // Bind callback server on the configured port
-        let listener = Self::bind_callback_server(self.callback_port)?;
-        let port = listener
+        // Bind callback server on the configured port via poem's TcpListener
+        let acceptor = TcpListener::bind(format!("127.0.0.1:{}", self.callback_port))
+            .into_acceptor()
+            .await
+            .map_err(|e| {
+                OAuthError::OAuth(format!(
+                    "Failed to bind callback server on port {}: {}",
+                    self.callback_port, e
+                ))
+            })?;
+        let port = acceptor
             .local_addr()
-            .map_err(|e| OAuthError::OAuth(format!("Failed to get local address: {}", e)))?
-            .port();
+            .into_iter()
+            .next()
+            .and_then(|a| a.as_socket_addr().map(|s| s.port()))
+            .ok_or_else(|| OAuthError::OAuth("Failed to get local address".to_string()))?;
 
         tracing::debug!("Callback server listening on port {port}");
-        tracing::debug!(
-            "Redirect URI: http://localhost:{}/callback",
-            self.callback_port
-        );
+        tracing::debug!("Redirect URI: http://localhost:{port}/callback");
 
-        let client =
-            self.create_oauth_client(&format!("http://localhost:{}/callback", self.callback_port));
+        let client = self.create_oauth_client(&format!("http://localhost:{port}/callback"));
 
         // Generate authorization URL
         let (auth_url, csrf_token) = client
@@ -206,7 +216,7 @@ impl OAuth {
         open_url(auth_url.as_str());
 
         // Start local callback server and wait for authorization code
-        let (code, state) = Self::wait_for_callback(listener).await?;
+        let (code, state) = Self::wait_for_callback(acceptor).await?;
 
         // Verify CSRF token
         if state != *csrf_token.secret() {
@@ -275,21 +285,9 @@ impl OAuth {
         .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/revoke")).unwrap())
     }
 
-    fn bind_callback_server(port: u16) -> OAuthResult<std::net::TcpListener> {
-        std::net::TcpListener::bind(format!("127.0.0.1:{port}")).map_err(|e| {
-            OAuthError::OAuth(format!(
-                "Failed to bind callback server on port {port}: {}",
-                e
-            ))
-        })
-    }
-
-    async fn wait_for_callback(listener: std::net::TcpListener) -> OAuthResult<(String, String)> {
-        let addr = listener
-            .local_addr()
-            .map_err(|e| OAuthError::OAuth(format!("Failed to get local address: {}", e)))?;
-        tracing::debug!("Callback server listening on {addr}");
-
+    async fn wait_for_callback(
+        acceptor: poem::listener::TcpAcceptor,
+    ) -> OAuthResult<(String, String)> {
         #[derive(Deserialize)]
         struct CallbackParams {
             code: Option<String>,
@@ -346,9 +344,6 @@ impl OAuth {
         }
 
         let app = Route::new().at("/callback", poem::get(callback)).data(tx);
-
-        let acceptor = TcpAcceptor::from_std(listener)
-            .map_err(|e| OAuthError::OAuth(format!("Failed to create poem acceptor: {e}")))?;
 
         let server_task = tokio::spawn(
             Server::new_with_acceptor(acceptor).run_with_graceful_shutdown(
