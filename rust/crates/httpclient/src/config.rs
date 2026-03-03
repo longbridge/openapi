@@ -1,4 +1,5 @@
 use crate::HttpClientError;
+use longport_oauth::OAuthToken;
 
 /// Configuration options for Http client
 #[derive(Debug, Clone)]
@@ -35,14 +36,13 @@ impl HttpClientConfig {
     ///
     /// # Arguments
     ///
-    /// * `client_id` - OAuth 2.0 client ID (used as app_key)
-    /// * `access_token` - OAuth 2.0 access token (raw, without Bearer prefix)
-    pub fn from_oauth(client_id: impl Into<String>, access_token: impl AsRef<str>) -> Self {
+    /// * `token` - OAuth 2.0 token obtained from [`longport_oauth::OAuth::authorize`]
+    pub fn from_oauth(token: &OAuthToken) -> Self {
         Self {
             http_url: None,
-            app_key: client_id.into(),
+            app_key: token.client_id.clone(),
             app_secret: String::new(), // Not used in OAuth 2.0 mode
-            access_token: format!("Bearer {}", access_token.as_ref()),
+            access_token: format!("Bearer {}", token.access_token),
         }
     }
 
@@ -109,7 +109,13 @@ mod tests {
 
     #[test]
     fn test_httpclient_config_from_oauth() {
-        let config = HttpClientConfig::from_oauth("test-client-id", "test-access-token");
+        let token = longport_oauth::OAuthToken {
+            client_id: "test-client-id".to_string(),
+            access_token: "test-access-token".to_string(),
+            refresh_token: None,
+            expires_at: u64::MAX,
+        };
+        let config = HttpClientConfig::from_oauth(&token);
 
         assert_eq!(config.app_key, "test-client-id");
         assert_eq!(config.access_token, "Bearer test-access-token");
@@ -119,7 +125,13 @@ mod tests {
 
     #[test]
     fn test_httpclient_config_from_oauth_adds_bearer_prefix() {
-        let config = HttpClientConfig::from_oauth("test-client-id", "my-token");
+        let token = longport_oauth::OAuthToken {
+            client_id: "test-client-id".to_string(),
+            access_token: "my-token".to_string(),
+            refresh_token: None,
+            expires_at: u64::MAX,
+        };
+        let config = HttpClientConfig::from_oauth(&token);
 
         assert_eq!(config.access_token, "Bearer my-token");
         assert!(config.is_oauth2());
