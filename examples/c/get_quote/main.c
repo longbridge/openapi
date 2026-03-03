@@ -48,9 +48,17 @@ on_quote_context_created(const struct lb_async_result_t* res)
 }
 
 void
+proceed(const lb_oauth_token_t* token, const lb_quote_context_t** ctx)
+{
+  lb_config_t* config = lb_config_from_oauth(token);
+  lb_quote_context_new(config, on_quote_context_created, ctx);
+  lb_config_free(config);
+}
+
+void
 on_open_url(const char* url, void* userdata)
 {
-  printf("%s\n", url);
+  printf("Open this URL to authorize: %s\n", url);
 }
 
 void
@@ -63,12 +71,14 @@ on_oauth_authorize(const struct lb_async_result_t* res)
 
   const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
 
-  lb_config_t* config = lb_config_from_oauth(token);
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  if (save_err) {
+    printf("failed to save token: %s\n", lb_error_message(save_err));
+    lb_error_free(save_err);
+  }
 
-  const lb_quote_context_t** ctx =
-    (const lb_quote_context_t**)res->userdata;
-  lb_quote_context_new(config, on_quote_context_created, ctx);
-  lb_config_free(config);
+  proceed(token, (const lb_quote_context_t**)res->userdata);
 }
 
 int
@@ -79,10 +89,20 @@ main(int argc, char const* argv[])
 #endif
 
   const lb_quote_context_t* ctx = NULL;
-  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
-  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
+
+  lb_error_t* load_err = NULL;
+  lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
+  if (token) {
+    proceed(token, &ctx);
+    lb_oauth_token_free(token);
+  } else {
+    lb_error_free(load_err);
+    lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
+    lb_oauth_free(oauth);
+  }
+
   getchar();
   lb_quote_context_release(ctx);
-  lb_oauth_free(oauth);
   return 0;
 }

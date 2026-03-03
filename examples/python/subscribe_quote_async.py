@@ -1,7 +1,7 @@
 """Subscribe quote (async). Use asyncio with AsyncQuoteContext."""
 import asyncio
 
-from longport.openapi import AsyncQuoteContext, Config, OAuth, SubType, PushQuote
+from longport.openapi import AsyncQuoteContext, Config, OAuth, OAuthToken, SubType, PushQuote
 
 
 def on_quote(symbol: str, event: PushQuote) -> None:
@@ -9,8 +9,12 @@ def on_quote(symbol: str, event: PushQuote) -> None:
 
 
 async def main() -> None:
-    oauth = OAuth("your-client-id")
-    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    try:
+        token = OAuthToken.load()
+    except Exception:
+        oauth = OAuth("your-client-id")
+        token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+        token.save()
     config = Config.from_oauth(token)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)

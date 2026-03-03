@@ -74,8 +74,15 @@ import com.longport.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
-        OAuth oauth = new OAuth("your-client-id");
-        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        OAuthToken token;
+        try {
+            token = OAuthToken.load().get();
+        } catch (Exception e) {
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+            }
+            token.save().get();
+        }
         Config config = Config.fromOAuth(token);
         // Use config to create contexts...
     }
@@ -109,8 +116,15 @@ import java.math.BigDecimal;
 
 class Main {
     public static void main(String[] args) throws Exception {
-        OAuth oauth = new OAuth("your-client-id");
-        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        OAuthToken token;
+        try {
+            token = OAuthToken.load().get();
+        } catch (Exception e) {
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+            }
+            token.save().get();
+        }
         try (Config config = Config.fromOAuth(token); QuoteContext ctx = QuoteContext.create(config).get()) {
             SecurityQuote[] resp = ctx.getQuote(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" }).get();
             for (SecurityQuote obj : resp) {
@@ -129,8 +143,15 @@ import com.longport.quote.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
-        OAuth oauth = new OAuth("your-client-id");
-        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        OAuthToken token;
+        try {
+            token = OAuthToken.load().get();
+        } catch (Exception e) {
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+            }
+            token.save().get();
+        }
         try (Config config = Config.fromOAuth(token); QuoteContext ctx = QuoteContext.create(config).get()) {
             ctx.setOnQuote((symbol, quote) -> {
                 System.out.printf("%s\t%s\n", symbol, quote);
@@ -151,8 +172,15 @@ import java.math.BigDecimal;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        OAuth oauth = new OAuth("your-client-id");
-        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        OAuthToken token;
+        try {
+            token = OAuthToken.load().get();
+        } catch (Exception e) {
+            try (OAuth oauth = new OAuth("your-client-id")) {
+                token = oauth.authorize(url -> System.out.println("Open this URL to authorize: " + url)).get();
+            }
+            token.save().get();
+        }
         try (Config config = Config.fromOAuth(token); TradeContext ctx = TradeContext.create(config).get()) {
             SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
                     OrderType.LO,

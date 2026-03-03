@@ -6,13 +6,20 @@ const {
   TimeInForceType,
   OrderType,
   OAuth,
+  OAuthToken,
 } = require("longport");
 
 async function main() {
-  const oauth = new OAuth("your-client-id");
-  const token = await oauth.authorize((url) => {
-    console.log(url);
-  });
+  let token;
+  try {
+    token = OAuthToken.load();
+  } catch (_) {
+    const oauth = new OAuth("your-client-id");
+    token = await oauth.authorize((url) => {
+      console.log("Open this URL to authorize: " + url);
+    });
+    token.save();
+  }
   let config = Config.fromOAuth(token);
   let ctx = await TradeContext.new(config);
   let resp = await ctx.submitOrder({

@@ -90,11 +90,15 @@ Save the `client_id` for use in your application.
 **Step 2: Authorize and Get Token**
 
 ```python
-from longport.openapi import Config, OAuth
+from longport.openapi import Config, OAuth, OAuthToken
 
-# Start OAuth 2.0 authorization flow
-oauth = OAuth("your-client-id")
-token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+# Try to load a previously saved token; fall back to browser authorization
+try:
+    token = OAuthToken.load()
+except Exception:
+    oauth = OAuth("your-client-id")
+    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    token.save()
 
 # Create config with OAuth token
 config = Config.from_oauth(token)
@@ -121,11 +125,15 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ## Quote API _(Get basic information of securities)_
 
 ```python
-from longport.openapi import Config, QuoteContext, OAuth
+from longport.openapi import Config, QuoteContext, OAuth, OAuthToken
 
 # Authenticate with OAuth 2.0
-oauth = OAuth("your-client-id")
-token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+try:
+    token = OAuthToken.load()
+except Exception:
+    oauth = OAuth("your-client-id")
+    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    token.save()
 config = Config.from_oauth(token)
 
 # Create a context for quote APIs
@@ -140,11 +148,15 @@ print(resp)
 
 ```python
 from time import sleep
-from longport.openapi import Config, QuoteContext, SubType, PushQuote, OAuth
+from longport.openapi import Config, QuoteContext, SubType, PushQuote, OAuth, OAuthToken
 
 # Authenticate with OAuth 2.0
-oauth = OAuth("your-client-id")
-token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+try:
+    token = OAuthToken.load()
+except Exception:
+    oauth = OAuth("your-client-id")
+    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    token.save()
 config = Config.from_oauth(token)
 
 # A callback to receive quote data
@@ -166,11 +178,15 @@ sleep(30)
 
 ```python
 from decimal import Decimal
-from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuth
+from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuth, OAuthToken
 
 # Authenticate with OAuth 2.0
-oauth = OAuth("your-client-id")
-token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+try:
+    token = OAuthToken.load()
+except Exception:
+    oauth = OAuth("your-client-id")
+    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    token.save()
 config = Config.from_oauth(token)
 
 # Create a context for trade APIs
@@ -196,14 +212,18 @@ Example (async quote):
 
 ```python
 import asyncio
-from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuth
+from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuth, OAuthToken
 
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)
 
 async def main():
-    oauth = OAuth("your-client-id")
-    token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+    try:
+        token = OAuthToken.load()
+    except Exception:
+        oauth = OAuth("your-client-id")
+        token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+        token.save()
     config = Config.from_oauth(token)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)

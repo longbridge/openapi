@@ -67,7 +67,7 @@ Save the `client_id` for use in your application.
 void
 on_open_url(const char* url, void* userdata)
 {
-  printf("%s\n", url);
+  printf("Open this URL to authorize: %s\n", url);
 }
 
 void
@@ -79,6 +79,10 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   }
 
   const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
+
   lb_config_t* config = lb_config_from_oauth(token);
   // Use config to create contexts...
   lb_config_free(config);
@@ -87,10 +91,20 @@ on_oauth_authorize(const struct lb_async_result_t* res)
 int
 main(int argc, char const* argv[])
 {
-  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
-  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, NULL);
-  getchar();
-  lb_oauth_free(oauth);
+  lb_error_t* load_err = NULL;
+  lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
+  if (token) {
+    lb_config_t* config = lb_config_from_oauth(token);
+    // Use config to create contexts...
+    lb_config_free(config);
+    lb_oauth_token_free(token);
+  } else {
+    lb_error_free(load_err);
+    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, NULL);
+    getchar();
+    lb_oauth_free(oauth);
+  }
   return 0;
 }
 ```
@@ -163,10 +177,18 @@ on_quote_context_created(const struct lb_async_result_t* res)
   lb_quote_context_quote(res->ctx, symbols, 4, on_quote, NULL);
 }
 
+static void
+proceed(const lb_oauth_token_t* token, const lb_quote_context_t** ctx)
+{
+  lb_config_t* config = lb_config_from_oauth(token);
+  lb_quote_context_new(config, on_quote_context_created, (void*)ctx);
+  lb_config_free(config);
+}
+
 void
 on_open_url(const char* url, void* userdata)
 {
-  printf("%s\n", url);
+  printf("Open this URL to authorize: %s\n", url);
 }
 
 void
@@ -178,12 +200,11 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   }
 
   const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
-  lb_config_t* config = lb_config_from_oauth(token);
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
 
-  const lb_quote_context_t** ctx =
-    (const lb_quote_context_t**)res->userdata;
-  lb_quote_context_new(config, on_quote_context_created, ctx);
-  lb_config_free(config);
+  proceed(token, (const lb_quote_context_t**)res->userdata);
 }
 
 int
@@ -194,11 +215,20 @@ main(int argc, char const* argv[])
 #endif
 
   const lb_quote_context_t* ctx = NULL;
-  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
-  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
-  getchar();
+  lb_error_t* load_err = NULL;
+  lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
+  if (token) {
+    proceed(token, &ctx);
+    lb_oauth_token_free(token);
+    getchar();
+  } else {
+    lb_error_free(load_err);
+    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
+    getchar();
+    lb_oauth_free(oauth);
+  }
   lb_quote_context_release(ctx);
-  lb_oauth_free(oauth);
   return 0;
 }
 ```
@@ -257,10 +287,18 @@ on_quote_context_created(const struct lb_async_result_t* res)
     res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, on_subscrbe, NULL);
 }
 
+static void
+proceed(const lb_oauth_token_t* token, const lb_quote_context_t** ctx)
+{
+  lb_config_t* config = lb_config_from_oauth(token);
+  lb_quote_context_new(config, on_quote_context_created, (void*)ctx);
+  lb_config_free(config);
+}
+
 void
 on_open_url(const char* url, void* userdata)
 {
-  printf("%s\n", url);
+  printf("Open this URL to authorize: %s\n", url);
 }
 
 void
@@ -272,12 +310,11 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   }
 
   const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
-  lb_config_t* config = lb_config_from_oauth(token);
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
 
-  const lb_quote_context_t** ctx =
-    (const lb_quote_context_t**)res->userdata;
-  lb_quote_context_new(config, on_quote_context_created, ctx);
-  lb_config_free(config);
+  proceed(token, (const lb_quote_context_t**)res->userdata);
 }
 
 int
@@ -288,11 +325,20 @@ main(int argc, char const* argv[])
 #endif
 
   const lb_quote_context_t* ctx = NULL;
-  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
-  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
-  getchar();
+  lb_error_t* load_err = NULL;
+  lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
+  if (token) {
+    proceed(token, &ctx);
+    lb_oauth_token_free(token);
+    getchar();
+  } else {
+    lb_error_free(load_err);
+    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
+    getchar();
+    lb_oauth_free(oauth);
+  }
   lb_quote_context_release(ctx);
-  lb_oauth_free(oauth);
   return 0;
 }
 ```
@@ -347,10 +393,18 @@ on_trade_context_created(const struct lb_async_result_t* res)
   lb_trade_context_submit_order(res->ctx, &opts, on_submit_order, NULL);
 }
 
+static void
+proceed(const lb_oauth_token_t* token, const lb_trade_context_t** ctx)
+{
+  lb_config_t* config = lb_config_from_oauth(token);
+  lb_trade_context_new(config, on_trade_context_created, (void*)ctx);
+  lb_config_free(config);
+}
+
 void
 on_open_url(const char* url, void* userdata)
 {
-  printf("%s\n", url);
+  printf("Open this URL to authorize: %s\n", url);
 }
 
 void
@@ -362,12 +416,11 @@ on_oauth_authorize(const struct lb_async_result_t* res)
   }
 
   const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
-  lb_config_t* config = lb_config_from_oauth(token);
+  lb_error_t* save_err = NULL;
+  lb_oauth_token_save(token, &save_err);
+  lb_error_free(save_err);
 
-  const lb_trade_context_t** ctx =
-    (const lb_trade_context_t**)res->userdata;
-  lb_trade_context_new(config, on_trade_context_created, ctx);
-  lb_config_free(config);
+  proceed(token, (const lb_trade_context_t**)res->userdata);
 }
 
 int
@@ -378,11 +431,20 @@ main(int argc, char const* argv[])
 #endif
 
   const lb_trade_context_t* ctx = NULL;
-  lb_oauth_t* oauth = lb_oauth_new("your-client-id");
-  lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, (void*)&ctx);
-  getchar();
+  lb_error_t* load_err = NULL;
+  lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
+  if (token) {
+    proceed(token, &ctx);
+    lb_oauth_token_free(token);
+    getchar();
+  } else {
+    lb_error_free(load_err);
+    lb_oauth_t* oauth = lb_oauth_new("your-client-id");
+    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, (void*)&ctx);
+    getchar();
+    lb_oauth_free(oauth);
+  }
   lb_trade_context_release(ctx);
-  lb_oauth_free(oauth);
   return 0;
 }
 ```

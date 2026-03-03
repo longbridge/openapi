@@ -5,6 +5,7 @@ from longport.openapi import (
     QuoteContext,
     Config,
     OAuth,
+    OAuthToken,
     Period,
     PushCandlestick,
     TradeSessions,
@@ -16,8 +17,12 @@ def on_candlestick(symbol: str, event: PushCandlestick):
 
 
 async def get_config() -> Config:
-    oauth = OAuth("your-client-id")
-    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    try:
+        token = OAuthToken.load()
+    except Exception:
+        oauth = OAuth("your-client-id")
+        token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+        token.save()
     return Config.from_oauth(token)
 
 
