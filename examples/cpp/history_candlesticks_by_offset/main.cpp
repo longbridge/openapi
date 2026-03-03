@@ -53,9 +53,9 @@ run(OAuthToken token)
 int
 main()
 {
-  std::string err;
-  OAuthToken token = OAuthToken::load(err);
-  if (err.empty()) {
+  OAuthToken token;
+  Status load_status = OAuthToken::load(token);
+  if (load_status) {
     run(std::move(token));
   } else {
     const std::string client_id = "your-client-id";
@@ -70,10 +70,10 @@ main()
                     << std::endl;
           return;
         }
-        std::string save_err;
-        res->save(save_err);
-        if (!save_err.empty()) {
-          std::cout << "failed to save token: " << save_err << std::endl;
+        Status save_status = res->save();
+        if (!save_status) {
+          std::cout << "failed to save token: "
+                    << *save_status.message() << std::endl;
         }
         run(std::move(*res));
       });

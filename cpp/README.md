@@ -77,9 +77,9 @@ run(OAuthToken token)
 int
 main(int argc, char const* argv[])
 {
-  std::string err;
-  OAuthToken token = OAuthToken::load(err);
-  if (err.empty()) {
+  OAuthToken token;
+  Status load_status = OAuthToken::load(token);
+  if (load_status) {
     run(std::move(token));
   } else {
     OAuth oauth("your-client-id");
@@ -93,8 +93,7 @@ main(int argc, char const* argv[])
                     << std::endl;
           return;
         }
-        std::string save_err;
-        res->save(save_err);
+        res->save();
         run(*res.operator->());
       });
   }
@@ -178,9 +177,9 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  std::string err;
-  OAuthToken token = OAuthToken::load(err);
-  if (err.empty()) {
+  OAuthToken token;
+  Status load_status = OAuthToken::load(token);
+  if (load_status) {
     run(std::move(token));
   } else {
     OAuth oauth("your-client-id");
@@ -194,8 +193,7 @@ main(int argc, char const* argv[])
                     << std::endl;
           return;
         }
-        std::string save_err;
-        res->save(save_err);
+        res->save();
         run(*res.operator->());
       });
   }
@@ -261,9 +259,9 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  std::string err;
-  OAuthToken token = OAuthToken::load(err);
-  if (err.empty()) {
+  OAuthToken token;
+  Status load_status = OAuthToken::load(token);
+  if (load_status) {
     run(std::move(token));
   } else {
     OAuth oauth("your-client-id");
@@ -277,8 +275,7 @@ main(int argc, char const* argv[])
                     << std::endl;
           return;
         }
-        std::string save_err;
-        res->save(save_err);
+        res->save();
         run(*res.operator->());
       });
   }
@@ -338,9 +335,9 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  std::string err;
-  OAuthToken token = OAuthToken::load(err);
-  if (err.empty()) {
+  OAuthToken token;
+  Status load_status = OAuthToken::load(token);
+  if (load_status) {
     run(std::move(token));
   } else {
     OAuth oauth("your-client-id");
@@ -354,8 +351,7 @@ main(int argc, char const* argv[])
                     << std::endl;
           return;
         }
-        std::string save_err;
-        res->save(save_err);
+        res->save();
         run(*res.operator->());
       });
   }
