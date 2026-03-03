@@ -53,6 +53,27 @@ _Install LongPort OpenAPI SDK_
 pip install longport
 ```
 
+### Authentication
+
+LongPort OpenAPI supports two authentication methods:
+
+#### 1. OAuth 2.0 (Recommended)
+
+OAuth 2.0 is the modern authentication method that uses Bearer tokens without requiring HMAC signatures.
+
+```python
+from longport.openapi import Config, OAuth
+
+# Start OAuth 2.0 authorization flow
+oauth = OAuth("your-client-id")
+token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+
+# Create config with OAuth token
+config = Config.from_oauth(token)
+```
+
+#### 2. Legacy API Key (Environment Variables)
+
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
@@ -72,10 +93,12 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ## Quote API _(Get basic information of securities)_
 
 ```python
-from longport.openapi import Config, QuoteContext
+from longport.openapi import Config, QuoteContext, OAuth
 
-# Load configuration from environment variables
-config = Config.from_env()
+# Authenticate with OAuth 2.0
+oauth = OAuth("your-client-id")
+token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+config = Config.from_oauth(token)
 
 # Create a context for quote APIs
 ctx = QuoteContext(config)
@@ -89,10 +112,12 @@ print(resp)
 
 ```python
 from time import sleep
-from longport.openapi import Config, QuoteContext, SubType, PushQuote
+from longport.openapi import Config, QuoteContext, SubType, PushQuote, OAuth
 
-# Load configuration from environment variables
-config = Config.from_env()
+# Authenticate with OAuth 2.0
+oauth = OAuth("your-client-id")
+token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+config = Config.from_oauth(token)
 
 # A callback to receive quote data
 def on_quote(symbol: str, event: PushQuote):
@@ -113,10 +138,12 @@ sleep(30)
 
 ```python
 from decimal import Decimal
-from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType
+from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuth
 
-# Load configuration from environment variables
-config = Config.from_env()
+# Authenticate with OAuth 2.0
+oauth = OAuth("your-client-id")
+token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+config = Config.from_oauth(token)
 
 # Create a context for trade APIs
 ctx = TradeContext(config)
@@ -131,7 +158,7 @@ print(resp)
 
 **Note:** The async API is currently in an early experience stage; we welcome feedback.
 
-The SDK provides async contexts and an async HTTP client for use with Python’s `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API and may be invoked from internal threads.
+The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API and may be invoked from internal threads.
 
 - **Async quote**: create with `ctx = await AsyncQuoteContext.create(config)`, then e.g. `await ctx.quote(["700.HK"])`, `await ctx.subscribe(...)`.
 - **Async trade**: create with `ctx = await AsyncTradeContext.create(config)`, then e.g. `await ctx.today_orders()`, `await ctx.submit_order(...)`.
@@ -141,13 +168,15 @@ Example (async quote):
 
 ```python
 import asyncio
-from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote
+from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuth
 
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)
 
 async def main():
-    config = Config.from_env()
+    oauth = OAuth("your-client-id")
+    token = oauth.authorize(lambda url: print(f"Please visit: {url}"))
+    config = Config.from_oauth(token)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])

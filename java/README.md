@@ -33,6 +33,29 @@ Add `io.github.longportapp:openapi-sdk` to `pom.xml`
 </dependencies>
 ```
 
+### Authentication
+
+LongPort OpenAPI supports two authentication methods:
+
+#### 1. OAuth 2.0 (Recommended)
+
+OAuth 2.0 is the modern authentication method that uses Bearer tokens without requiring HMAC signatures.
+
+```java
+import com.longport.*;
+
+class Main {
+    public static void main(String[] args) throws Exception {
+        OAuth oauth = new OAuth("your-client-id");
+        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        Config config = Config.fromOAuth(token);
+        // Use config to create contexts...
+    }
+}
+```
+
+#### 2. Legacy API Key (Environment Variables)
+
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
@@ -58,7 +81,9 @@ import java.math.BigDecimal;
 
 class Main {
     public static void main(String[] args) throws Exception {
-        try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+        OAuth oauth = new OAuth("your-client-id");
+        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        try (Config config = Config.fromOAuth(token); QuoteContext ctx = QuoteContext.create(config).get()) {
             SecurityQuote[] resp = ctx.getQuote(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" }).get();
             for (SecurityQuote obj : resp) {
                 System.out.println(obj);
@@ -76,7 +101,9 @@ import com.longport.quote.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
-        try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+        OAuth oauth = new OAuth("your-client-id");
+        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        try (Config config = Config.fromOAuth(token); QuoteContext ctx = QuoteContext.create(config).get()) {
             ctx.setOnQuote((symbol, quote) -> {
                 System.out.printf("%s\t%s\n", symbol, quote);
             });
@@ -96,7 +123,9 @@ import java.math.BigDecimal;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        try (Config config = Config.fromEnv(); TradeContext ctx = TradeContext.create(config).get()) {
+        OAuth oauth = new OAuth("your-client-id");
+        OAuthToken token = oauth.authorize(url -> System.out.println("Please visit: " + url)).get();
+        try (Config config = Config.fromOAuth(token); TradeContext ctx = TradeContext.create(config).get()) {
             SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
                     OrderType.LO,
                     OrderSide.Buy,

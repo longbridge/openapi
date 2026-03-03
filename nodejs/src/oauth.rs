@@ -59,7 +59,7 @@ impl OAuth {
     ///
     /// @param onOpenUrl  Called with the authorization URL; open it in a browser
     ///                   or print it however you like
-    /// @returns OAuthToken that can be passed to `Config.fromOauth` or `HttpClient.fromOauth`
+    /// @returns OAuthToken that can be passed to `Config.fromOAuth` or `HttpClient.fromOAuth`
     #[napi]
     pub async fn authorize(
         &self,

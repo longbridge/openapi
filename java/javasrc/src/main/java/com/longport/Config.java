@@ -60,7 +60,7 @@ public class Config implements AutoCloseable {
      * @return Config object
      * @throws OpenApiException If an error occurs
      */
-    public static Config fromOauth(OAuthToken token) throws OpenApiException {
+    public static Config fromOAuth(OAuthToken token) throws OpenApiException {
         return new Config(SdkNative.newConfigFromOauth(token.raw));
     }
 

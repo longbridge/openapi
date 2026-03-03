@@ -26,6 +26,29 @@ _Install LongPort OpenAPI SDK_
 npm install longport
 ```
 
+### Authentication
+
+LongPort OpenAPI supports two authentication methods:
+
+#### 1. OAuth 2.0 (Recommended)
+
+OAuth 2.0 is the modern authentication method that uses Bearer tokens without requiring HMAC signatures.
+
+```javascript
+const { Config, OAuth } = require("longport");
+
+const oauth = new OAuth("your-client-id");
+oauth.authorize(
+  (url) => console.log("Please visit:", url),
+  (token) => {
+    const config = Config.fromOAuth(token);
+    // Use config to create contexts...
+  }
+);
+```
+
+#### 2. Legacy API Key (Environment Variables)
+
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
@@ -45,32 +68,44 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ## Quote API _(Get basic information of securities)_
 
 ```javascript
-const { Config, QuoteContext } = require("longport");
+const { Config, QuoteContext, OAuth } = require("longport");
 
-let config = Config.fromEnv();
-QuoteContext.new(config)
-    .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
-    .then((resp) => {
+const oauth = new OAuth("your-client-id");
+oauth.authorize(
+  (url) => console.log("Please visit:", url),
+  (token) => {
+    let config = Config.fromOAuth(token);
+    QuoteContext.new(config)
+      .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
+      .then((resp) => {
         for (let obj of resp) {
-            console.log(obj.toString())
+          console.log(obj.toString());
         }
-    });
+      });
+  }
+);
 ```
 
 ## Quote API _(Subscribe quotes)_
 
 ```javascript
-const { Config, QuoteContext, SubType } = require("longport");
+const { Config, QuoteContext, SubType, OAuth } = require("longport");
 
-let config = Config.fromEnv();
-QuoteContext.new(config).then((ctx) => {
-  ctx.setOnQuote((_, event) => console.log(event.toString()));
-  ctx.subscribe(
-    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
-    [SubType.Quote],
-    true
-  );
-});
+const oauth = new OAuth("your-client-id");
+oauth.authorize(
+  (url) => console.log("Please visit:", url),
+  (token) => {
+    let config = Config.fromOAuth(token);
+    QuoteContext.new(config).then((ctx) => {
+      ctx.setOnQuote((_, event) => console.log(event.toString()));
+      ctx.subscribe(
+        ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
+        [SubType.Quote],
+        true
+      );
+    });
+  }
+);
 ```
 
 ## Trade API _(Submit order)_
@@ -83,21 +118,28 @@ const {
   OrderSide,
   TimeInForceType,
   OrderType,
+  OAuth,
 } = require("longport");
 
-let config = Config.fromEnv();
-TradeContext.new(config)
-  .then((ctx) =>
-    ctx.submitOrder({
-      symbol: "700.HK",
-      orderType: OrderType.LO,
-      side: OrderSide.Buy,
-      timeInForce: TimeInForceType.Day,
-      submittedPrice: new Decimal("50"),
-      submittedQuantity: 200,
-    })
-  )
-  .then((resp) => console.log(resp.toString()));
+const oauth = new OAuth("your-client-id");
+oauth.authorize(
+  (url) => console.log("Please visit:", url),
+  (token) => {
+    let config = Config.fromOAuth(token);
+    TradeContext.new(config)
+      .then((ctx) =>
+        ctx.submitOrder({
+          symbol: "700.HK",
+          orderType: OrderType.LO,
+          side: OrderSide.Buy,
+          timeInForce: TimeInForceType.Day,
+          submittedPrice: new Decimal("50"),
+          submittedQuantity: 200,
+        })
+      )
+      .then((resp) => console.log(resp.toString()));
+  }
+);
 ```
 
 ## Troubleshooting

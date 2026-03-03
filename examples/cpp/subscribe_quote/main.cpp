@@ -22,14 +22,14 @@ main(int argc, char const* argv[])
 
   oauth.authorize(
     [](const std::string& url) { std::cout << url << std::endl; },
-    [client_id, &ctx](auto res) {
+    [&ctx](auto res) {
       if (!res) {
         std::cout << "authorization failed: " << *res.status().message()
                   << std::endl;
         return;
       }
 
-      Config config = Config::from_oauth(client_id, res->access_token());
+      Config config = Config::from_oauth(*res.operator->());
 
       QuoteContext::create(config, [&](auto res) {
         if (!res) {

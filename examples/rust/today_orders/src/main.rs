@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .authorize(|url| println!("Open this URL to authorize: {url}"))
         .await?;
 
-    let config = Arc::new(Config::from_oauth(oauth.client_id(), &token.access_token));
+    let config = Arc::new(Config::from_oauth(&token));
     let (ctx, _) = TradeContext::try_new(config).await?;
 
     let resp = ctx.today_orders(None).await?;

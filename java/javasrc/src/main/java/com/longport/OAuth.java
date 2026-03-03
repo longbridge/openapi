@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * try (OAuthToken token = oauth.authorize(url -> {
  *     System.out.println("Open this URL: " + url);
  * }).get()) {
- *     Config config = Config.fromOauth(token);
+ *     Config config = Config.fromOAuth(token);
  * }
  * }</pre>
  */

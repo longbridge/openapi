@@ -122,9 +122,9 @@ impl Config {
     /// const { Config, OAuth } = require('longport');
     ///
     /// // Obtain a token via OAuth flow, then:
-    /// // const config = Config.fromOauth(token);
+    /// // const config = Config.fromOAuth(token);
     /// ```
-    #[napi(factory)]
+    #[napi(factory, js_name = "fromOAuth")]
     pub fn from_oauth(token: &OAuthToken) -> Self {
         Self(longport::Config::from_oauth(&token.0))
     }

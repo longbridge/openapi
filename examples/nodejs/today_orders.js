@@ -5,7 +5,7 @@ async function main() {
   const token = await oauth.authorize((url) => {
     console.log(url);
   });
-  let config = Config.fromOauth("your-client-id", token.accessToken);
+  let config = Config.fromOAuth(token);
   let ctx = await TradeContext.new(config);
   let resp = await ctx.todayOrders();
   for (let obj of resp) {
