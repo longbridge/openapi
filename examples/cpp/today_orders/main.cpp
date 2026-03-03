@@ -8,6 +8,34 @@
 using namespace longport;
 using namespace longport::trade;
 
+static void
+run(OAuthToken token)
+{
+  Config config = Config::from_oauth(token);
+
+  TradeContext::create(config, [](auto res) {
+    if (!res) {
+      std::cout << "failed to create trade context: "
+                << *res.status().message() << std::endl;
+      return;
+    }
+
+    res.context().today_orders(std::nullopt, [](auto res) {
+      if (!res) {
+        std::cout << "failed to get today orders: "
+                  << *res.status().message() << std::endl;
+        return;
+      }
+
+      for (auto it = res->cbegin(); it != res->cend(); ++it) {
+        std::cout << "order_id=" << it->order_id
+                  << " quantity=" << it->quantity
+                  << " submitted_at=" << it->submitted_at << std::endl;
+      }
+    });
+  });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -15,42 +43,31 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  const std::string client_id = "your-client-id";
-  OAuth oauth(client_id);
-
-  oauth.authorize(
-    [](const std::string& url) { std::cout << url << std::endl; },
-    [](auto res) {
-      if (!res) {
-        std::cout << "authorization failed: " << *res.status().message()
-                  << std::endl;
-        return;
-      }
-
-      Config config = Config::from_oauth(*res.operator->());
-
-      TradeContext::create(config, [](auto res) {
+  std::string err;
+  OAuthToken token = OAuthToken::load(err);
+  if (err.empty()) {
+    run(std::move(token));
+  } else {
+    const std::string client_id = "your-client-id";
+    OAuth oauth(client_id);
+    oauth.authorize(
+      [](const std::string& url) {
+        std::cout << "Open this URL to authorize: " << url << std::endl;
+      },
+      [](auto res) {
         if (!res) {
-          std::cout << "failed to create trade context: "
-                    << *res.status().message() << std::endl;
+          std::cout << "authorization failed: " << *res.status().message()
+                    << std::endl;
           return;
         }
-
-        res.context().today_orders(std::nullopt, [](auto res) {
-          if (!res) {
-            std::cout << "failed to get today orders: "
-                      << *res.status().message() << std::endl;
-            return;
-          }
-
-          for (auto it = res->cbegin(); it != res->cend(); ++it) {
-            std::cout << "order_id=" << it->order_id
-                      << " quantity=" << it->quantity
-                      << " submitted_at=" << it->submitted_at << std::endl;
-          }
-        });
+        std::string save_err;
+        res->save(save_err);
+        if (!save_err.empty()) {
+          std::cout << "failed to save token: " << save_err << std::endl;
+        }
+        run(std::move(*res));
       });
-    });
+  }
 
   std::cin.get();
   return 0;

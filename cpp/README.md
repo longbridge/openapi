@@ -67,23 +67,37 @@ Save the `client_id` for use in your application.
 
 using namespace longport;
 
+static void
+run(OAuthToken token)
+{
+  Config config = Config::from_oauth(token);
+  // Use config to create contexts...
+}
+
 int
 main(int argc, char const* argv[])
 {
-  OAuth oauth("your-client-id");
-
-  oauth.authorize(
-    [](const std::string& url) { std::cout << url << std::endl; },
-    [](auto res) {
-      if (!res) {
-        std::cout << "authorization failed: " << *res.status().message()
-                  << std::endl;
-        return;
-      }
-
-      Config config = Config::from_oauth(*res.operator->());
-      // Use config to create contexts...
-    });
+  std::string err;
+  OAuthToken token = OAuthToken::load(err);
+  if (err.empty()) {
+    run(std::move(token));
+  } else {
+    OAuth oauth("your-client-id");
+    oauth.authorize(
+      [](const std::string& url) {
+        std::cout << "Open this URL to authorize: " << url << std::endl;
+      },
+      [](auto res) {
+        if (!res) {
+          std::cout << "authorization failed: " << *res.status().message()
+                    << std::endl;
+          return;
+        }
+        std::string save_err;
+        res->save(save_err);
+        run(*res.operator->());
+      });
+  }
 
   std::cin.get();
   return 0;
@@ -121,6 +135,42 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 using namespace longport;
 using namespace longport::quote;
 
+static void
+run(OAuthToken token)
+{
+  Config config = Config::from_oauth(token);
+
+  QuoteContext::create(config, [](auto res) {
+    if (!res) {
+      std::cout << "failed to create quote context: "
+                << *res.status().message() << std::endl;
+      return;
+    }
+
+    std::vector<std::string> symbols = {
+      "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+    };
+    res.context().quote(symbols, [](auto res) {
+      if (!res) {
+        std::cout << "failed to get quote: " << *res.status().message()
+                  << std::endl;
+        return;
+      }
+
+      for (auto it = res->cbegin(); it != res->cend(); ++it) {
+        std::cout << it->symbol << " timestamp=" << it->timestamp
+                  << " last_done=" << (double)it->last_done
+                  << " prev_close=" << (double)it->prev_close
+                  << " open=" << (double)it->open
+                  << " high=" << (double)it->high
+                  << " low=" << (double)it->low
+                  << " volume=" << it->volume
+                  << " turnover=" << it->turnover << std::endl;
+      }
+    });
+  });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -128,49 +178,27 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  OAuth oauth("your-client-id");
-
-  oauth.authorize(
-    [](const std::string& url) { std::cout << url << std::endl; },
-    [](auto res) {
-      if (!res) {
-        std::cout << "authorization failed: " << *res.status().message()
-                  << std::endl;
-        return;
-      }
-
-      Config config = Config::from_oauth(*res.operator->());
-
-      QuoteContext::create(config, [](auto res) {
+  std::string err;
+  OAuthToken token = OAuthToken::load(err);
+  if (err.empty()) {
+    run(std::move(token));
+  } else {
+    OAuth oauth("your-client-id");
+    oauth.authorize(
+      [](const std::string& url) {
+        std::cout << "Open this URL to authorize: " << url << std::endl;
+      },
+      [](auto res) {
         if (!res) {
-          std::cout << "failed to create quote context: "
-                    << *res.status().message() << std::endl;
+          std::cout << "authorization failed: " << *res.status().message()
+                    << std::endl;
           return;
         }
-
-        std::vector<std::string> symbols = {
-          "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-        };
-        res.context().quote(symbols, [](auto res) {
-          if (!res) {
-            std::cout << "failed to get quote: " << *res.status().message()
-                      << std::endl;
-            return;
-          }
-
-          for (auto it = res->cbegin(); it != res->cend(); ++it) {
-            std::cout << it->symbol << " timestamp=" << it->timestamp
-                      << " last_done=" << (double)it->last_done
-                      << " prev_close=" << (double)it->prev_close
-                      << " open=" << (double)it->open
-                      << " high=" << (double)it->high
-                      << " low=" << (double)it->low
-                      << " volume=" << it->volume
-                      << " turnover=" << it->turnover << std::endl;
-          }
-        });
+        std::string save_err;
+        res->save(save_err);
+        run(*res.operator->());
       });
-    });
+  }
 
   std::cin.get();
   return 0;
@@ -190,6 +218,42 @@ main(int argc, char const* argv[])
 using namespace longport;
 using namespace longport::quote;
 
+static void
+run(OAuthToken token)
+{
+  Config config = Config::from_oauth(token);
+
+  QuoteContext::create(config, [](auto res) {
+    if (!res) {
+      std::cout << "failed to create quote context: "
+                << *res.status().message() << std::endl;
+      return;
+    }
+
+    res.context().set_on_quote([](auto event) {
+      std::cout << event->symbol << " timestamp=" << event->timestamp
+                << " last_done=" << (double)event->last_done
+                << " open=" << (double)event->open
+                << " high=" << (double)event->high
+                << " low=" << (double)event->low
+                << " volume=" << event->volume
+                << " turnover=" << event->turnover << std::endl;
+    });
+
+    std::vector<std::string> symbols = {
+      "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+    };
+
+    res.context().subscribe(symbols, SubFlags::QUOTE(), true, [](auto res) {
+      if (!res) {
+        std::cout << "failed to subscribe quote: "
+                  << *res.status().message() << std::endl;
+        return;
+      }
+    });
+  });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -197,53 +261,27 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  OAuth oauth("your-client-id");
-
-  QuoteContext ctx;
-
-  oauth.authorize(
-    [](const std::string& url) { std::cout << url << std::endl; },
-    [&ctx](auto res) {
-      if (!res) {
-        std::cout << "authorization failed: " << *res.status().message()
-                  << std::endl;
-        return;
-      }
-
-      Config config = Config::from_oauth(*res.operator->());
-
-      QuoteContext::create(config, [&](auto res) {
+  std::string err;
+  OAuthToken token = OAuthToken::load(err);
+  if (err.empty()) {
+    run(std::move(token));
+  } else {
+    OAuth oauth("your-client-id");
+    oauth.authorize(
+      [](const std::string& url) {
+        std::cout << "Open this URL to authorize: " << url << std::endl;
+      },
+      [](auto res) {
         if (!res) {
-          std::cout << "failed to create quote context: "
-                    << *res.status().message() << std::endl;
+          std::cout << "authorization failed: " << *res.status().message()
+                    << std::endl;
           return;
         }
-
-        ctx = res.context();
-
-        res.context().set_on_quote([](auto event) {
-          std::cout << event->symbol << " timestamp=" << event->timestamp
-                    << " last_done=" << (double)event->last_done
-                    << " open=" << (double)event->open
-                    << " high=" << (double)event->high
-                    << " low=" << (double)event->low
-                    << " volume=" << event->volume
-                    << " turnover=" << event->turnover << std::endl;
-        });
-
-        std::vector<std::string> symbols = {
-          "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-        };
-
-        res.context().subscribe(symbols, SubFlags::QUOTE(), true, [](auto res) {
-          if (!res) {
-            std::cout << "failed to subscribe quote: "
-                      << *res.status().message() << std::endl;
-            return;
-          }
-        });
+        std::string save_err;
+        res->save(save_err);
+        run(*res.operator->());
       });
-    });
+  }
 
   std::cin.get();
   return 0;
@@ -263,6 +301,36 @@ main(int argc, char const* argv[])
 using namespace longport;
 using namespace longport::trade;
 
+static void
+run(OAuthToken token)
+{
+  Config config = Config::from_oauth(token);
+
+  TradeContext::create(config, [](auto res) {
+    if (!res) {
+      std::cout << "failed to create trade context: "
+                << *res.status().message() << std::endl;
+      return;
+    }
+
+    SubmitOrderOptions opts{
+      "700.HK",     OrderType::LO,        OrderSide::Buy,
+      200,          TimeInForceType::Day, Decimal(50.0),
+      std::nullopt, std::nullopt,         std::nullopt,
+      std::nullopt, std::nullopt,         std::nullopt,
+      std::nullopt,
+    };
+    res.context().submit_order(opts, [](auto res) {
+      if (!res) {
+        std::cout << "failed to submit order: " << *res.status().message()
+                  << std::endl;
+        return;
+      }
+      std::cout << "order id: " << res->order_id << std::endl;
+    });
+  });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -270,43 +338,27 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  OAuth oauth("your-client-id");
-
-  oauth.authorize(
-    [](const std::string& url) { std::cout << url << std::endl; },
-    [](auto res) {
-      if (!res) {
-        std::cout << "authorization failed: " << *res.status().message()
-                  << std::endl;
-        return;
-      }
-
-      Config config = Config::from_oauth(*res.operator->());
-
-      TradeContext::create(config, [](auto res) {
+  std::string err;
+  OAuthToken token = OAuthToken::load(err);
+  if (err.empty()) {
+    run(std::move(token));
+  } else {
+    OAuth oauth("your-client-id");
+    oauth.authorize(
+      [](const std::string& url) {
+        std::cout << "Open this URL to authorize: " << url << std::endl;
+      },
+      [](auto res) {
         if (!res) {
-          std::cout << "failed to create trade context: "
-                    << *res.status().message() << std::endl;
+          std::cout << "authorization failed: " << *res.status().message()
+                    << std::endl;
           return;
         }
-
-        SubmitOrderOptions opts{
-          "700.HK",     OrderType::LO,        OrderSide::Buy,
-          200,          TimeInForceType::Day, Decimal(50.0),
-          std::nullopt, std::nullopt,         std::nullopt,
-          std::nullopt, std::nullopt,         std::nullopt,
-          std::nullopt,
-        };
-        res.context().submit_order(opts, [](auto res) {
-          if (!res) {
-            std::cout << "failed to submit order: " << *res.status().message()
-                      << std::endl;
-            return;
-          }
-          std::cout << "order id: " << res->order_id << std::endl;
-        });
+        std::string save_err;
+        res->save(save_err);
+        run(*res.operator->());
       });
-    });
+  }
 
   std::cin.get();
   return 0;

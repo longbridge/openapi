@@ -63,16 +63,24 @@ Save the `client_id` for use in your application.
 **Step 2: Authorize and Get Token**
 
 ```javascript
-const { Config, OAuth } = require("longport");
+const { Config, OAuth, OAuthToken } = require("longport");
 
-const oauth = new OAuth("your-client-id");
-oauth.authorize(
-  (url) => console.log("Please visit:", url),
-  (token) => {
-    const config = Config.fromOAuth(token);
-    // Use config to create contexts...
+async function main() {
+  let token;
+  try {
+    token = OAuthToken.load();
+  } catch (_) {
+    const oauth = new OAuth("your-client-id");
+    token = await oauth.authorize((url) => {
+      console.log("Open this URL to authorize: " + url);
+    });
+    token.save();
   }
-);
+  const config = Config.fromOAuth(token);
+  // Use config to create contexts...
+}
+
+main();
 ```
 
 #### 2. Legacy API Key (Environment Variables)
@@ -96,44 +104,57 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ## Quote API _(Get basic information of securities)_
 
 ```javascript
-const { Config, QuoteContext, OAuth } = require("longport");
+const { Config, QuoteContext, OAuth, OAuthToken } = require("longport");
 
-const oauth = new OAuth("your-client-id");
-oauth.authorize(
-  (url) => console.log("Please visit:", url),
-  (token) => {
-    let config = Config.fromOAuth(token);
-    QuoteContext.new(config)
-      .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
-      .then((resp) => {
-        for (let obj of resp) {
-          console.log(obj.toString());
-        }
-      });
+async function main() {
+  let token;
+  try {
+    token = OAuthToken.load();
+  } catch (_) {
+    const oauth = new OAuth("your-client-id");
+    token = await oauth.authorize((url) => {
+      console.log("Open this URL to authorize: " + url);
+    });
+    token.save();
   }
-);
+  const config = Config.fromOAuth(token);
+  const ctx = await QuoteContext.new(config);
+  const resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]);
+  for (let obj of resp) {
+    console.log(obj.toString());
+  }
+}
+
+main();
 ```
 
 ## Quote API _(Subscribe quotes)_
 
 ```javascript
-const { Config, QuoteContext, SubType, OAuth } = require("longport");
+const { Config, QuoteContext, SubType, OAuth, OAuthToken } = require("longport");
 
-const oauth = new OAuth("your-client-id");
-oauth.authorize(
-  (url) => console.log("Please visit:", url),
-  (token) => {
-    let config = Config.fromOAuth(token);
-    QuoteContext.new(config).then((ctx) => {
-      ctx.setOnQuote((_, event) => console.log(event.toString()));
-      ctx.subscribe(
-        ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
-        [SubType.Quote],
-        true
-      );
+async function main() {
+  let token;
+  try {
+    token = OAuthToken.load();
+  } catch (_) {
+    const oauth = new OAuth("your-client-id");
+    token = await oauth.authorize((url) => {
+      console.log("Open this URL to authorize: " + url);
     });
+    token.save();
   }
-);
+  const config = Config.fromOAuth(token);
+  const ctx = await QuoteContext.new(config);
+  ctx.setOnQuote((_, event) => console.log(event.toString()));
+  await ctx.subscribe(
+    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
+    [SubType.Quote],
+    true
+  );
+}
+
+main();
 ```
 
 ## Trade API _(Submit order)_
@@ -147,27 +168,34 @@ const {
   TimeInForceType,
   OrderType,
   OAuth,
+  OAuthToken,
 } = require("longport");
 
-const oauth = new OAuth("your-client-id");
-oauth.authorize(
-  (url) => console.log("Please visit:", url),
-  (token) => {
-    let config = Config.fromOAuth(token);
-    TradeContext.new(config)
-      .then((ctx) =>
-        ctx.submitOrder({
-          symbol: "700.HK",
-          orderType: OrderType.LO,
-          side: OrderSide.Buy,
-          timeInForce: TimeInForceType.Day,
-          submittedPrice: new Decimal("50"),
-          submittedQuantity: 200,
-        })
-      )
-      .then((resp) => console.log(resp.toString()));
+async function main() {
+  let token;
+  try {
+    token = OAuthToken.load();
+  } catch (_) {
+    const oauth = new OAuth("your-client-id");
+    token = await oauth.authorize((url) => {
+      console.log("Open this URL to authorize: " + url);
+    });
+    token.save();
   }
-);
+  const config = Config.fromOAuth(token);
+  const ctx = await TradeContext.new(config);
+  const resp = await ctx.submitOrder({
+    symbol: "700.HK",
+    orderType: OrderType.LO,
+    side: OrderSide.Buy,
+    timeInForce: TimeInForceType.Day,
+    submittedPrice: new Decimal("50"),
+    submittedQuantity: 200,
+  });
+  console.log(resp.toString());
+}
+
+main();
 ```
 
 ## Troubleshooting

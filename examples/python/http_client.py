@@ -1,11 +1,15 @@
 import asyncio
 
-from longport.openapi import HttpClient, OAuth
+from longport.openapi import HttpClient, OAuth, OAuthToken
 
 
 async def get_http_client() -> HttpClient:
-    oauth = OAuth("your-client-id")
-    token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+    try:
+        token = OAuthToken.load()
+    except Exception:
+        oauth = OAuth("your-client-id")
+        token = await oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
+        token.save()
     return HttpClient.from_oauth(token)
 
 

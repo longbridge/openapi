@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longport::{
-    oauth::OAuth,
+    oauth::{OAuth, OAuthToken},
     quote::{Period, QuoteContext, TradeSessions},
     Config,
 };
@@ -13,10 +13,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    let oauth = OAuth::new("your-client-id");
-    let token = oauth
-        .authorize(|url| println!("Open this URL to authorize: {url}"))
-        .await?;
+    let token = match OAuthToken::load() {
+        Ok(token) => token,
+        Err(_) => {
+            let oauth = OAuth::new("your-client-id");
+            let token = oauth
+                .authorize(|url| println!("Open this URL to authorize: {url}"))
+                .await?;
+            token.save()?;
+            token
+        }
+    };
 
     let config = Arc::new(Config::from_oauth(&token));
     let (ctx, mut receiver) = QuoteContext::try_new(config).await?;

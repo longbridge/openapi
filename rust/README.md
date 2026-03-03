@@ -86,19 +86,22 @@ Save the `client_id` for use in your application.
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, oauth::OAuth};
+use longport::{Config, oauth::{OAuth, OAuthToken}};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Start OAuth authorization flow
-    let oauth = OAuth::new("your-client-id");
-    let token = oauth.authorize(|url| {
-        // Open the URL however you like, e.g. print it or launch a browser
-        println!("Please visit: {url}");
-    }).await?;
-
-    // Save token securely for future use
-    // (e.g., encrypted file, secure keychain)
+    // Try to load a previously saved token; fall back to browser authorization
+    let token = match OAuthToken::load() {
+        Ok(token) => token,
+        Err(_) => {
+            let oauth = OAuth::new("your-client-id");
+            let token = oauth.authorize(|url| {
+                println!("Open this URL to authorize: {url}");
+            }).await?;
+            token.save()?;
+            token
+        }
+    };
 
     // Create config with OAuth token
     let config = Arc::new(Config::from_oauth(&token));
@@ -142,13 +145,20 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, QuoteContext, oauth::OAuth};
+use longport::{Config, QuoteContext, oauth::{OAuth, OAuthToken}};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create config with OAuth 2.0
-    let oauth = OAuth::new("your-oauth-client-id");
-    let token = oauth.authorize(|url| println!("Visit: {url}")).await?;
+    let token = match OAuthToken::load() {
+        Ok(token) => token,
+        Err(_) => {
+            let oauth = OAuth::new("your-client-id");
+            let token = oauth.authorize(|url| println!("Open this URL to authorize: {url}")).await?;
+            token.save()?;
+            token
+        }
+    };
     let config = Arc::new(Config::from_oauth(&token));
 
     // Create a context for quote APIs

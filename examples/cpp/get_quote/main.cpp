@@ -8,6 +8,42 @@
 using namespace longport;
 using namespace longport::quote;
 
+static void
+run(OAuthToken token)
+{
+  Config config = Config::from_oauth(token);
+
+  QuoteContext::create(config, [](auto res) {
+    if (!res) {
+      std::cout << "failed to create quote context: "
+                << *res.status().message() << std::endl;
+      return;
+    }
+
+    std::vector<std::string> symbols = {
+      "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+    };
+    res.context().quote(symbols, [](auto res) {
+      if (!res) {
+        std::cout << "failed to get quote: " << *res.status().message()
+                  << std::endl;
+        return;
+      }
+
+      for (auto it = res->cbegin(); it != res->cend(); ++it) {
+        std::cout << it->symbol << " timestamp=" << it->timestamp
+                  << " last_done=" << (double)it->last_done
+                  << " prev_close=" << (double)it->prev_close
+                  << " open=" << (double)it->open
+                  << " high=" << (double)it->high
+                  << " low=" << (double)it->low
+                  << " volume=" << it->volume
+                  << " turnover=" << (double)it->turnover << std::endl;
+      }
+    });
+  });
+}
+
 int
 main(int argc, char const* argv[])
 {
@@ -15,50 +51,31 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  const std::string client_id = "your-client-id";
-  OAuth oauth(client_id);
-
-  oauth.authorize(
-    [](const std::string& url) { std::cout << url << std::endl; },
-    [](auto res) {
-      if (!res) {
-        std::cout << "authorization failed: " << *res.status().message()
-                  << std::endl;
-        return;
-      }
-
-      Config config = Config::from_oauth(*res.operator->());
-
-      QuoteContext::create(config, [](auto res) {
+  std::string err;
+  OAuthToken token = OAuthToken::load(err);
+  if (err.empty()) {
+    run(std::move(token));
+  } else {
+    const std::string client_id = "your-client-id";
+    OAuth oauth(client_id);
+    oauth.authorize(
+      [](const std::string& url) {
+        std::cout << "Open this URL to authorize: " << url << std::endl;
+      },
+      [](auto res) {
         if (!res) {
-          std::cout << "failed to create quote context: "
-                    << *res.status().message() << std::endl;
+          std::cout << "authorization failed: " << *res.status().message()
+                    << std::endl;
           return;
         }
-
-        std::vector<std::string> symbols = {
-          "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-        };
-        res.context().quote(symbols, [](auto res) {
-          if (!res) {
-            std::cout << "failed to get quote: " << *res.status().message()
-                      << std::endl;
-            return;
-          }
-
-          for (auto it = res->cbegin(); it != res->cend(); ++it) {
-            std::cout << it->symbol << " timestamp=" << it->timestamp
-                      << " last_done=" << (double)it->last_done
-                      << " prev_close=" << (double)it->prev_close
-                      << " open=" << (double)it->open
-                      << " high=" << (double)it->high
-                      << " low=" << (double)it->low
-                      << " volume=" << it->volume
-                      << " turnover=" << (double)it->turnover << std::endl;
-          }
-        });
+        std::string save_err;
+        res->save(save_err);
+        if (!save_err.empty()) {
+          std::cout << "failed to save token: " << save_err << std::endl;
+        }
+        run(std::move(*res));
       });
-    });
+  }
 
   std::cin.get();
   return 0;
