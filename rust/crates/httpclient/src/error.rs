@@ -23,7 +23,7 @@ pub enum HttpClientError {
     #[error("missing environment variable: {name}")]
     MissingEnvVar {
         /// Variable name
-        name: &'static str,
+        name: String,
     },
 
     /// Unexpected response

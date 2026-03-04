@@ -6,8 +6,12 @@ thread_local! {
 }
 
 async fn region() -> Option<String> {
-    // check user defined REGION
-    if let Ok(region) = std::env::var("LONGPORT_REGION") {
+    // check user defined REGION (LONGBRIDGE_REGION takes precedence,
+    // LONGPORT_REGION is legacy)
+    let user_region = std::env::var("LONGBRIDGE_REGION")
+        .ok()
+        .or_else(|| std::env::var("LONGPORT_REGION").ok());
+    if let Some(region) = user_region {
         return Some(region);
     }
 

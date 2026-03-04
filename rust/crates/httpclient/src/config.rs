@@ -2,6 +2,22 @@ use longport_oauth::OAuth;
 
 use crate::HttpClientError;
 
+/// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
+/// to the legacy `LONGPORT_<suffix>` name.  Returns `None` if neither is set.
+fn env_var(suffix: &str) -> Option<String> {
+    std::env::var(format!("LONGBRIDGE_{suffix}"))
+        .ok()
+        .or_else(|| std::env::var(format!("LONGPORT_{suffix}")).ok())
+}
+
+/// Like [`env_var`] but returns an error (using the new `LONGBRIDGE_` name)
+/// when neither variable is set.
+fn env_var_required(suffix: &str) -> Result<String, HttpClientError> {
+    env_var(suffix).ok_or_else(|| HttpClientError::MissingEnvVar {
+        name: format!("LONGBRIDGE_{suffix}"),
+    })
+}
+
 /// Authentication configuration
 #[derive(Debug, Clone)]
 pub enum AuthConfig {
@@ -30,7 +46,7 @@ pub struct HttpClientConfig {
 impl HttpClientConfig {
     /// Create a new `HttpClientConfig` using API Key authentication.
     ///
-    /// `LONGPORT_HTTP_URL` is read from the environment (or `.env` file) and
+    /// `LONGBRIDGE_HTTP_URL` is read from the environment (or `.env` file) and
     /// applied automatically if set.
     ///
     /// # Arguments
@@ -45,7 +61,7 @@ impl HttpClientConfig {
     ) -> Self {
         let _ = dotenv::dotenv();
         Self {
-            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
+            http_url: env_var("HTTP_URL"),
             auth: AuthConfig::ApiKey {
                 app_key: app_key.into(),
                 app_secret: app_secret.into(),
@@ -56,7 +72,7 @@ impl HttpClientConfig {
 
     /// Create a new `HttpClientConfig` for OAuth 2.0 authentication.
     ///
-    /// `LONGPORT_HTTP_URL` is read from the environment (or `.env` file) and
+    /// `LONGBRIDGE_HTTP_URL` is read from the environment (or `.env` file) and
     /// applied automatically if set.
     ///
     /// The [`OAuth`] client handles token lifecycle automatically, including
@@ -69,7 +85,7 @@ impl HttpClientConfig {
     pub fn from_oauth(oauth: OAuth) -> Self {
         let _ = dotenv::dotenv();
         Self {
-            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
+            http_url: env_var("HTTP_URL"),
             auth: AuthConfig::OAuth(oauth),
         }
     }
@@ -79,10 +95,10 @@ impl HttpClientConfig {
     ///
     /// # Variables
     ///
-    /// - `LONGPORT_APP_KEY` - App key (required)
-    /// - `LONGPORT_APP_SECRET` - App secret (required)
-    /// - `LONGPORT_ACCESS_TOKEN` - Access token (required)
-    /// - `LONGPORT_HTTP_URL` - HTTP endpoint URL (optional)
+    /// - `LONGBRIDGE_APP_KEY` - App key (required)
+    /// - `LONGBRIDGE_APP_SECRET` - App secret (required)
+    /// - `LONGBRIDGE_ACCESS_TOKEN` - Access token (required)
+    /// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint URL (optional)
     ///
     /// # Note
     ///
@@ -91,21 +107,12 @@ impl HttpClientConfig {
     pub fn from_apikey_env() -> Result<Self, HttpClientError> {
         let _ = dotenv::dotenv();
 
-        let app_key =
-            std::env::var("LONGPORT_APP_KEY").map_err(|_| HttpClientError::MissingEnvVar {
-                name: "LONGPORT_APP_KEY",
-            })?;
-        let app_secret =
-            std::env::var("LONGPORT_APP_SECRET").map_err(|_| HttpClientError::MissingEnvVar {
-                name: "LONGPORT_APP_SECRET",
-            })?;
-        let access_token =
-            std::env::var("LONGPORT_ACCESS_TOKEN").map_err(|_| HttpClientError::MissingEnvVar {
-                name: "LONGPORT_ACCESS_TOKEN",
-            })?;
+        let app_key = env_var_required("APP_KEY")?;
+        let app_secret = env_var_required("APP_SECRET")?;
+        let access_token = env_var_required("ACCESS_TOKEN")?;
 
         Ok(Self {
-            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
+            http_url: env_var("HTTP_URL"),
             auth: AuthConfig::ApiKey {
                 app_key,
                 app_secret,

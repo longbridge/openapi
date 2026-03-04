@@ -129,6 +129,14 @@ pub struct Config {
     pub(crate) log_path: Option<PathBuf>,
 }
 
+/// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
+/// to the legacy `LONGPORT_<suffix>` name.  Returns `None` if neither is set.
+fn env_var(suffix: &str) -> Option<String> {
+    std::env::var(format!("LONGBRIDGE_{suffix}"))
+        .ok()
+        .or_else(|| std::env::var(format!("LONGPORT_{suffix}")).ok())
+}
+
 /// Non-credential environment variables shared by `from_apikey` and
 /// `from_oauth`.  Callers must have already invoked `dotenv::dotenv()`.
 struct ConfigExtras {
@@ -144,32 +152,25 @@ struct ConfigExtras {
 
 impl ConfigExtras {
     fn from_env() -> Self {
-        let language = std::env::var("LONGPORT_LANGUAGE")
-            .ok()
+        let language = env_var("LANGUAGE")
             .and_then(|v| v.parse::<Language>().ok())
             .unwrap_or(Language::EN);
-        let enable_overnight = std::env::var("LONGPORT_ENABLE_OVERNIGHT")
-            .map(|v| v == "true")
-            .ok();
-        let push_candlestick_mode = std::env::var("LONGPORT_PUSH_CANDLESTICK_MODE")
-            .map(|v| match v.as_str() {
-                "confirmed" => PushCandlestickMode::Confirmed,
-                _ => PushCandlestickMode::Realtime,
-            })
-            .ok();
-        let enable_print_quote_packages = std::env::var("LONGPORT_PRINT_QUOTE_PACKAGES")
-            .as_deref()
-            .unwrap_or("true")
-            == "true";
+        let enable_overnight = env_var("ENABLE_OVERNIGHT").map(|v| v == "true");
+        let push_candlestick_mode = env_var("PUSH_CANDLESTICK_MODE").map(|v| match v.as_str() {
+            "confirmed" => PushCandlestickMode::Confirmed,
+            _ => PushCandlestickMode::Realtime,
+        });
+        let enable_print_quote_packages =
+            env_var("PRINT_QUOTE_PACKAGES").as_deref().unwrap_or("true") == "true";
         Self {
-            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
-            quote_ws_url: std::env::var("LONGPORT_QUOTE_WS_URL").ok(),
-            trade_ws_url: std::env::var("LONGPORT_TRADE_WS_URL").ok(),
+            http_url: env_var("HTTP_URL"),
+            quote_ws_url: env_var("QUOTE_WS_URL"),
+            trade_ws_url: env_var("TRADE_WS_URL"),
             language,
             enable_overnight,
             push_candlestick_mode,
             enable_print_quote_packages,
-            log_path: std::env::var("LONGPORT_LOG_PATH").ok().map(PathBuf::from),
+            log_path: env_var("LOG_PATH").map(PathBuf::from),
         }
     }
 }
@@ -288,19 +289,18 @@ impl Config {
     pub fn from_apikey_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
-        let app_key = std::env::var("LONGPORT_APP_KEY").map_err(|_| {
+        let app_key =
+            env_var("APP_KEY").ok_or_else(|| longport_httpcli::HttpClientError::MissingEnvVar {
+                name: "LONGBRIDGE_APP_KEY".to_string(),
+            })?;
+        let app_secret = env_var("APP_SECRET").ok_or_else(|| {
             longport_httpcli::HttpClientError::MissingEnvVar {
-                name: "LONGPORT_APP_KEY",
+                name: "LONGBRIDGE_APP_SECRET".to_string(),
             }
         })?;
-        let app_secret = std::env::var("LONGPORT_APP_SECRET").map_err(|_| {
+        let access_token = env_var("ACCESS_TOKEN").ok_or_else(|| {
             longport_httpcli::HttpClientError::MissingEnvVar {
-                name: "LONGPORT_APP_SECRET",
-            }
-        })?;
-        let access_token = std::env::var("LONGPORT_ACCESS_TOKEN").map_err(|_| {
-            longport_httpcli::HttpClientError::MissingEnvVar {
-                name: "LONGPORT_ACCESS_TOKEN",
+                name: "LONGBRIDGE_ACCESS_TOKEN".to_string(),
             }
         })?;
         let extras = ConfigExtras::from_env();
