@@ -36,15 +36,15 @@ public:
   /**
    * Create a new `HttpClient` for API Key authentication
    *
-   * @param http_url    HTTP endpoint url
-   * @param app_key     App key
-   * @param app_secret  App secret
+   * @param app_key      App key
+   * @param app_secret   App secret
    * @param access_token Access token
+   * @param http_url     HTTP endpoint url (default: https://openapi.longportapp.com)
    */
-  static HttpClient from_apikey(const std::string& http_url,
-                                const std::string& app_key,
+  static HttpClient from_apikey(const std::string& app_key,
                                 const std::string& app_secret,
-                                const std::string& access_token);
+                                const std::string& access_token,
+                                const std::optional<std::string>& http_url = std::nullopt);
 
   /**
    * Create a new `HttpClient` from environment variables (API Key mode)
@@ -56,9 +56,11 @@ public:
   /**
    * Create a new `HttpClient` from an OAuth 2.0 client
    *
-   * @param oauth  OAuth 2.0 client obtained from `OAuthBuilder::build`
+   * @param oauth     OAuth 2.0 client obtained from `OAuthBuilder::build`
+   * @param http_url  HTTP endpoint url (default: https://openapi.longportapp.com)
    */
-  static HttpClient from_oauth(const OAuth& oauth);
+  static HttpClient from_oauth(const OAuth& oauth,
+                               const std::optional<std::string>& http_url = std::nullopt);
 
   /**
    * Performs a HTTP request

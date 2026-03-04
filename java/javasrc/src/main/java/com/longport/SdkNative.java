@@ -16,11 +16,12 @@ import java.time.LocalDateTime;
 public class SdkNative {
         static native void init();
 
-        public static native long newHttpClient(String httpUrl, String appKey, String appSecret, String accessToken);
+        public static native long newHttpClientFromApikey(String appKey, String appSecret, String accessToken,
+                        String httpUrl);
 
-        public static native long newHttpClientFromEnv();
+        public static native long newHttpClientFromApikeyEnv();
 
-        public static native long newHttpClientFromOauth(long oauthToken);
+        public static native long newHttpClientFromOauth(long oauthToken, String httpUrl);
 
         public static native void freeHttpClient(long httpClient);
 

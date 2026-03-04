@@ -66,56 +66,56 @@ Config::from_oauth(const OAuth& oauth)
 Config&
 Config::set_http_url(const std::string& url)
 {
-  config_ = lb_config_set_http_url(config_, url.c_str());
+  lb_config_set_http_url(config_, url.c_str());
   return *this;
 }
 
 Config&
 Config::set_quote_ws_url(const std::string& url)
 {
-  config_ = lb_config_set_quote_ws_url(config_, url.c_str());
+  lb_config_set_quote_ws_url(config_, url.c_str());
   return *this;
 }
 
 Config&
 Config::set_trade_ws_url(const std::string& url)
 {
-  config_ = lb_config_set_trade_ws_url(config_, url.c_str());
+  lb_config_set_trade_ws_url(config_, url.c_str());
   return *this;
 }
 
 Config&
 Config::set_language(Language language)
 {
-  config_ = lb_config_set_language(config_, convert::convert(language));
+  lb_config_set_language(config_, convert::convert(language));
   return *this;
 }
 
 Config&
 Config::enable_overnight()
 {
-  config_ = lb_config_enable_overnight(config_);
+  lb_config_enable_overnight(config_);
   return *this;
 }
 
 Config&
 Config::set_push_candlestick_mode(PushCandlestickMode mode)
 {
-  config_ = lb_config_set_push_candlestick_mode(config_, convert::convert(mode));
+  lb_config_set_push_candlestick_mode(config_, convert::convert(mode));
   return *this;
 }
 
 Config&
 Config::disable_print_quote_packages()
 {
-  config_ = lb_config_disable_print_quote_packages(config_);
+  lb_config_disable_print_quote_packages(config_);
   return *this;
 }
 
 Config&
 Config::set_log_path(const std::string& path)
 {
-  config_ = lb_config_set_log_path(config_, path.c_str());
+  lb_config_set_log_path(config_, path.c_str());
   return *this;
 }
 

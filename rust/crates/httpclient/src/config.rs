@@ -35,7 +35,7 @@ impl HttpClientConfig {
     /// * `app_key` - Application key
     /// * `app_secret` - Application secret (used for request signing)
     /// * `access_token` - Access token
-    pub fn new(
+    pub fn from_apikey(
         app_key: impl Into<String>,
         app_secret: impl Into<String>,
         access_token: impl Into<String>,
@@ -81,7 +81,7 @@ impl HttpClientConfig {
     /// For OAuth 2.0 authentication, use
     /// [`from_oauth`](HttpClientConfig::from_oauth) instead. OAuth tokens
     /// should not be stored in environment variables for security reasons.
-    pub fn from_env() -> Result<Self, HttpClientError> {
+    pub fn from_apikey_env() -> Result<Self, HttpClientError> {
         let _ = dotenv::dotenv();
 
         let app_key =
@@ -97,7 +97,7 @@ impl HttpClientConfig {
                 name: "LONGPORT_ACCESS_TOKEN",
             })?;
 
-        let mut config = Self::new(app_key, app_secret, access_token);
+        let mut config = Self::from_apikey(app_key, app_secret, access_token);
         config.http_url = std::env::var("LONGPORT_HTTP_URL").ok();
         Ok(config)
     }
@@ -121,7 +121,7 @@ mod tests {
 
     #[test]
     fn test_httpclient_config_new() {
-        let config = HttpClientConfig::new("app-key", "app-secret", "access-token");
+        let config = HttpClientConfig::from_apikey("app-key", "app-secret", "access-token");
 
         match &config.auth {
             AuthConfig::ApiKey {
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn test_httpclient_config_http_url() {
-        let config = HttpClientConfig::new("app-key", "app-secret", "access-token")
+        let config = HttpClientConfig::from_apikey("app-key", "app-secret", "access-token")
             .http_url("https://custom.example.com");
 
         assert_eq!(

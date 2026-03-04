@@ -42,7 +42,7 @@ impl HttpClient {
         access_token: String,
         http_url: Option<String>,
     ) -> Self {
-        let mut config = HttpClientConfig::new(app_key, app_secret, access_token);
+        let mut config = HttpClientConfig::from_apikey(app_key, app_secret, access_token);
         if let Some(url) = http_url {
             config = config.http_url(url);
         }
@@ -56,9 +56,10 @@ impl HttpClient {
     /// ``LONGPORT_APP_SECRET``, ``LONGPORT_ACCESS_TOKEN``
     #[classmethod]
     fn from_apikey_env(_cls: Bound<PyType>) -> PyResult<Self> {
-        Ok(Self(Arc::new(LbHttpClient::from_env().map_err(|err| {
-            ErrorNewType(longport::Error::HttpClient(err))
-        })?)))
+        Ok(Self(Arc::new(LbHttpClient::new(
+            longport::httpclient::HttpClientConfig::from_apikey_env()
+                .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?,
+        ))))
     }
 
     /// Create a new ``HttpClient`` from an OAuth handle.

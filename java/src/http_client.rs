@@ -16,33 +16,36 @@ use crate::{
 };
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClient(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClientFromApikey(
     mut env: JNIEnv,
     _class: JClass,
-    http_url: JString,
     app_key: JString,
     app_secret: JString,
     access_token: JString,
+    http_url: JString,
 ) -> jlong {
     jni_result(&mut env, 0, |env| {
-        let http_url = String::from_jvalue(env, http_url.into())?;
         let app_key = String::from_jvalue(env, app_key.into())?;
         let app_secret = String::from_jvalue(env, app_secret.into())?;
         let access_token = String::from_jvalue(env, access_token.into())?;
-        let http_cli = HttpClient::new(
-            HttpClientConfig::new(app_key, app_secret, access_token).http_url(http_url),
-        );
-        Ok(Box::into_raw(Box::new(http_cli)) as jlong)
+        let mut config = HttpClientConfig::from_apikey(app_key, app_secret, access_token);
+        if !http_url.is_null() {
+            config = config.http_url(String::from_jvalue(env, http_url.into())?);
+        }
+        Ok(Box::into_raw(Box::new(HttpClient::new(config))) as jlong)
     })
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_com_longport_SdkNative_newHttpClientFromEnv(
+pub extern "system" fn Java_com_longport_SdkNative_newHttpClientFromApikeyEnv(
     mut env: JNIEnv,
     _class: JClass,
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
-        let config = HttpClient::from_env().map_err(longport::Error::HttpClient)?;
+        let config = HttpClient::new(
+            longport::httpclient::HttpClientConfig::from_apikey_env()
+                .map_err(longport::Error::HttpClient)?,
+        );
         Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
@@ -52,11 +55,15 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClientFromOauth
     mut env: JNIEnv,
     _class: JClass,
     oauth: jlong,
+    http_url: JString,
 ) -> jlong {
-    jni_result(&mut env, 0, |_env| {
+    jni_result(&mut env, 0, |env| {
         let oauth = &*(oauth as *const longport::oauth::OAuth);
-        let http_cli = HttpClient::new(HttpClientConfig::from_oauth(oauth.clone()));
-        Ok(Box::into_raw(Box::new(http_cli)) as jlong)
+        let mut config = HttpClientConfig::from_oauth(oauth.clone());
+        if !http_url.is_null() {
+            config = config.http_url(String::from_jvalue(env, http_url.into())?);
+        }
+        Ok(Box::into_raw(Box::new(HttpClient::new(config))) as jlong)
     })
 }
 

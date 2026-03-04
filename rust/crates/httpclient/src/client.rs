@@ -25,18 +25,6 @@ impl HttpClient {
         }
     }
 
-    /// Create a new `HttpClient` from the given environment variables
-    ///
-    /// # Variables
-    ///
-    /// - LONGPORT_APP_KEY
-    /// - LONGPORT_APP_SECRET
-    /// - LONGPORT_ACCESS_TOKEN
-    /// - LONGPORT_HTTP_URL
-    pub fn from_env() -> Result<Self, HttpClientError> {
-        Ok(Self::new(HttpClientConfig::from_env()?))
-    }
-
     /// Set the default header
     pub fn header<K, V>(mut self, key: K, value: V) -> Self
     where

@@ -17,6 +17,9 @@ Build the native `.node` binary from the `nodejs/` directory:
 npm run build:debug
 ```
 
+`nodejs/index.d.ts` and `nodejs/index.js` are **auto-generated** by
+`npm run build:debug` — never edit them by hand.
+
 ## After modifying the C SDK (`c/`)
 
 `c/csrc/include/longport.h` is **auto-generated** by `cbindgen` during the

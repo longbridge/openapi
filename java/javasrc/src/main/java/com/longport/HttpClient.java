@@ -14,8 +14,30 @@ public class HttpClient implements AutoCloseable {
         this.raw = raw;
     }
 
-    public HttpClient(String httpUrl, String appKey, String appSecret, String accessToken) {
-        this.raw = SdkNative.newHttpClient(httpUrl, appKey, appSecret, accessToken);
+    /**
+     * Create a new {@code HttpClient} using API Key authentication.
+     *
+     * @param appKey      App key
+     * @param appSecret   App secret
+     * @param accessToken Access token
+     * @return HttpClient object
+     */
+    public static HttpClient fromApikey(String appKey, String appSecret, String accessToken) {
+        return new HttpClient(SdkNative.newHttpClientFromApikey(appKey, appSecret, accessToken, null));
+    }
+
+    /**
+     * Create a new {@code HttpClient} using API Key authentication with a custom
+     * HTTP endpoint URL.
+     *
+     * @param appKey      App key
+     * @param appSecret   App secret
+     * @param accessToken Access token
+     * @param httpUrl     HTTP endpoint URL
+     * @return HttpClient object
+     */
+    public static HttpClient fromApikey(String appKey, String appSecret, String accessToken, String httpUrl) {
+        return new HttpClient(SdkNative.newHttpClientFromApikey(appKey, appSecret, accessToken, httpUrl));
     }
 
     @Override
@@ -39,8 +61,18 @@ public class HttpClient implements AutoCloseable {
      * @return Config object
      * @throws OpenApiException If an error occurs
      */
-    public static HttpClient fromEnv() throws OpenApiException {
-        return new HttpClient(SdkNative.newHttpClientFromEnv());
+    /**
+     * Create a new {@code HttpClient} from environment variables (API Key
+     * authentication).
+     * <p>
+     * Variables: {@code LONGPORT_HTTP_URL}, {@code LONGPORT_APP_KEY},
+     * {@code LONGPORT_APP_SECRET}, {@code LONGPORT_ACCESS_TOKEN}
+     *
+     * @return HttpClient object
+     * @throws OpenApiException If an error occurs
+     */
+    public static HttpClient fromApikeyEnv() throws OpenApiException {
+        return new HttpClient(SdkNative.newHttpClientFromApikeyEnv());
     }
 
     /**
@@ -50,7 +82,19 @@ public class HttpClient implements AutoCloseable {
      * @return HttpClient object
      */
     public static HttpClient fromOAuth(OAuth oauth) {
-        return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw()));
+        return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), null));
+    }
+
+    /**
+     * Create a new {@code HttpClient} from an OAuth handle with a custom HTTP
+     * endpoint URL.
+     *
+     * @param oauth   OAuth handle returned by {@link OAuthBuilder#build}
+     * @param httpUrl HTTP endpoint URL
+     * @return HttpClient object
+     */
+    public static HttpClient fromOAuth(OAuth oauth, String httpUrl) {
+        return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), httpUrl));
     }
 
     /**

@@ -3913,73 +3913,63 @@ struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_t *oauth);
  *
  * @param config   Config object
  * @param http_url HTTP endpoint URL (e.g. `https://openapi.longportapp.com`)
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_set_http_url(struct lb_config_t *config, const char *http_url);
+void lb_config_set_http_url(struct lb_config_t *config, const char *http_url);
 
 /**
  * Set the Quote WebSocket endpoint URL
  *
  * @param config        Config object
  * @param quote_ws_url  Quote WebSocket URL
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_set_quote_ws_url(struct lb_config_t *config,
-                                               const char *quote_ws_url);
+void lb_config_set_quote_ws_url(struct lb_config_t *config, const char *quote_ws_url);
 
 /**
  * Set the Trade WebSocket endpoint URL
  *
  * @param config        Config object
  * @param trade_ws_url  Trade WebSocket URL
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_set_trade_ws_url(struct lb_config_t *config,
-                                               const char *trade_ws_url);
+void lb_config_set_trade_ws_url(struct lb_config_t *config, const char *trade_ws_url);
 
 /**
  * Set the language identifier
  *
  * @param config    Config object
  * @param language  Language identifier
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_set_language(struct lb_config_t *config, enum lb_language_t language);
+void lb_config_set_language(struct lb_config_t *config, enum lb_language_t language);
 
 /**
  * Enable overnight quote
  *
  * @param config  Config object
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_enable_overnight(struct lb_config_t *config);
+void lb_config_enable_overnight(struct lb_config_t *config);
 
 /**
  * Set the push candlestick mode
  *
  * @param config  Config object
  * @param mode    Push candlestick mode
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_set_push_candlestick_mode(struct lb_config_t *config,
-                                                        enum lb_push_candlestick_mode_t mode);
+void lb_config_set_push_candlestick_mode(struct lb_config_t *config,
+                                         enum lb_push_candlestick_mode_t mode);
 
 /**
  * Disable printing of quote packages on connection
  *
  * @param config  Config object
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_disable_print_quote_packages(struct lb_config_t *config);
+void lb_config_disable_print_quote_packages(struct lb_config_t *config);
 
 /**
  * Set the log file path
  *
  * @param config    Config object
  * @param log_path  Path for log files
- * @return the same `config` pointer (for chaining)
  */
-struct lb_config_t *lb_config_set_log_path(struct lb_config_t *config, const char *log_path);
+void lb_config_set_log_path(struct lb_config_t *config, const char *log_path);
 
 /**
  * Free the config object
@@ -3999,6 +3989,11 @@ enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
 
 /**
  * Create a HTTP client using API Key authentication
+ *
+ * @param http_url     HTTP endpoint URL, or NULL to use the default
+ * @param app_key      App key
+ * @param app_secret   App secret
+ * @param access_token Access token
  */
 struct lb_http_client_t *lb_http_client_from_apikey(const char *http_url,
                                                     const char *app_key,
@@ -4027,9 +4022,11 @@ struct lb_http_client_t *lb_http_client_from_apikey_env(struct lb_error_t **erro
 /**
  * Create a new `HttpClient` from an OAuth 2.0 client
  *
- * @param oauth  OAuth 2.0 client obtained from `lb_oauth_new`
+ * @param oauth     OAuth 2.0 client obtained from `lb_oauth_new`
+ * @param http_url  HTTP endpoint URL, or NULL to use the default
  */
-struct lb_http_client_t *lb_http_client_from_oauth(const struct lb_oauth_t *oauth);
+struct lb_http_client_t *lb_http_client_from_oauth(const struct lb_oauth_t *oauth,
+                                                   const char *http_url);
 
 /**
  * Performs a HTTP request

@@ -11,22 +11,29 @@ pub struct HttpClient(LbHttpClient);
 
 #[napi_derive::napi]
 impl HttpClient {
-    #[napi(constructor)]
-    pub fn new(
-        http_url: String,
+    /// Create a new `HttpClient` using API Key authentication
+    ///
+    /// @param appKey      App key
+    /// @param appSecret   App secret
+    /// @param accessToken Access token
+    /// @param httpUrl     HTTP endpoint url (default: `https://openapi.longportapp.com`)
+    #[napi(factory, js_name = "fromApikey")]
+    pub fn from_apikey(
         app_key: String,
         app_secret: String,
         access_token: String,
-    ) -> Result<Self> {
-        Ok(Self(LbHttpClient::new(
-            HttpClientConfig::new(app_key, app_secret, access_token).http_url(http_url),
-        )))
+        http_url: Option<String>,
+    ) -> Self {
+        let mut config = HttpClientConfig::from_apikey(app_key, app_secret, access_token);
+        if let Some(url) = http_url {
+            config = config.http_url(url);
+        }
+        Self(LbHttpClient::new(config))
     }
 
-    /// Create a new `HttpClient` from the given environment variables
+    /// Create a new `HttpClient` from environment variables (API Key mode)
     ///
-    /// It first gets the environment variables from the `.env` file in the
-    /// current directory.
+    /// It first reads the `.env` file in the current directory.
     ///
     /// # Variables
     ///
@@ -34,21 +41,25 @@ impl HttpClient {
     /// - `LONGPORT_APP_KEY` - App key
     /// - `LONGPORT_APP_SECRET` - App secret
     /// - `LONGPORT_ACCESS_TOKEN` - Access token
-    #[napi(factory)]
-    pub fn from_env() -> Result<Self> {
-        Ok(Self(
-            LbHttpClient::from_env().map_err(|err| Error::from_reason(err.to_string()))?,
-        ))
+    #[napi(factory, js_name = "fromApikeyEnv")]
+    pub fn from_apikey_env() -> Result<Self> {
+        Ok(Self(LbHttpClient::new(
+            HttpClientConfig::from_apikey_env()
+                .map_err(|err| Error::from_reason(err.to_string()))?,
+        )))
     }
 
     /// Create a new `HttpClient` from an OAuth handle
     ///
-    /// @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
+    /// @param oauth    OAuth handle obtained from `OAuthBuilder.build(...)`
+    /// @param httpUrl  HTTP endpoint url (default: `https://openapi.longportapp.com`)
     #[napi(factory, js_name = "fromOAuth")]
-    pub fn from_oauth(oauth: &OAuth) -> Self {
-        Self(LbHttpClient::new(HttpClientConfig::from_oauth(
-            oauth.0.clone(),
-        )))
+    pub fn from_oauth(oauth: &OAuth, http_url: Option<String>) -> Self {
+        let mut config = HttpClientConfig::from_oauth(oauth.0.clone());
+        if let Some(url) = http_url {
+            config = config.http_url(url);
+        }
+        Self(LbHttpClient::new(config))
     }
 
     /// Performs a HTTP request

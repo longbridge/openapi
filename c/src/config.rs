@@ -78,114 +78,87 @@ pub unsafe extern "C" fn lb_config_from_oauth(oauth: *const COAuth) -> *mut CCon
 ///
 /// @param config   Config object
 /// @param http_url HTTP endpoint URL (e.g. `https://openapi.longportapp.com`)
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_config_set_http_url(
-    config: *mut CConfig,
-    http_url: *const c_char,
-) -> *mut CConfig {
+pub unsafe extern "C" fn lb_config_set_http_url(config: *mut CConfig, http_url: *const c_char) {
     let url = CStr::from_ptr(http_url).to_str().expect("invalid http_url");
     (*config).0.set_http_url(url);
-    config
 }
 
 /// Set the Quote WebSocket endpoint URL
 ///
 /// @param config        Config object
 /// @param quote_ws_url  Quote WebSocket URL
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_set_quote_ws_url(
     config: *mut CConfig,
     quote_ws_url: *const c_char,
-) -> *mut CConfig {
+) {
     let url = CStr::from_ptr(quote_ws_url)
         .to_str()
         .expect("invalid quote_ws_url");
     (*config).0.set_quote_ws_url(url);
-    config
 }
 
 /// Set the Trade WebSocket endpoint URL
 ///
 /// @param config        Config object
 /// @param trade_ws_url  Trade WebSocket URL
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_set_trade_ws_url(
     config: *mut CConfig,
     trade_ws_url: *const c_char,
-) -> *mut CConfig {
+) {
     let url = CStr::from_ptr(trade_ws_url)
         .to_str()
         .expect("invalid trade_ws_url");
     (*config).0.set_trade_ws_url(url);
-    config
 }
 
 /// Set the language identifier
 ///
 /// @param config    Config object
 /// @param language  Language identifier
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_config_set_language(
-    config: *mut CConfig,
-    language: CLanguage,
-) -> *mut CConfig {
+pub unsafe extern "C" fn lb_config_set_language(config: *mut CConfig, language: CLanguage) {
     (*config).0.set_language(language.into());
-    config
 }
 
 /// Enable overnight quote
 ///
 /// @param config  Config object
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_config_enable_overnight(config: *mut CConfig) -> *mut CConfig {
+pub unsafe extern "C" fn lb_config_enable_overnight(config: *mut CConfig) {
     (*config).0.set_enable_overnight();
-    config
 }
 
 /// Set the push candlestick mode
 ///
 /// @param config  Config object
 /// @param mode    Push candlestick mode
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_set_push_candlestick_mode(
     config: *mut CConfig,
     mode: CPushCandlestickMode,
-) -> *mut CConfig {
+) {
     (*config).0.set_push_candlestick_mode(mode.into());
-    config
 }
 
 /// Disable printing of quote packages on connection
 ///
 /// @param config  Config object
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_config_disable_print_quote_packages(
-    config: *mut CConfig,
-) -> *mut CConfig {
+pub unsafe extern "C" fn lb_config_disable_print_quote_packages(config: *mut CConfig) {
     (*config).0.set_dont_print_quote_packages();
-    config
 }
 
 /// Set the log file path
 ///
 /// @param config    Config object
 /// @param log_path  Path for log files
-/// @return the same `config` pointer (for chaining)
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_config_set_log_path(
-    config: *mut CConfig,
-    log_path: *const c_char,
-) -> *mut CConfig {
+pub unsafe extern "C" fn lb_config_set_log_path(config: *mut CConfig, log_path: *const c_char) {
     let path = CStr::from_ptr(log_path).to_str().expect("invalid log_path");
     (*config).0.set_log_path(path);
-    config
 }
 
 /// Free the config object

@@ -370,7 +370,7 @@ impl Config {
                 app_key,
                 app_secret,
                 access_token,
-            } => HttpClientConfig::new(app_key, app_secret, access_token),
+            } => HttpClientConfig::from_apikey(app_key, app_secret, access_token),
             AuthMode::OAuth(oauth) => HttpClientConfig::from_oauth(oauth.clone()),
         };
         if let Some(url) = &self.http_url {

@@ -36,7 +36,7 @@ on_oauth_ready(const struct lb_async_result_t* res)
   }
 
   const lb_oauth_t* oauth = (const lb_oauth_t*)res->data;
-  lb_http_client_t* http_client = lb_http_client_from_oauth(oauth);
+  lb_http_client_t* http_client = lb_http_client_from_oauth(oauth, NULL);
   lb_oauth_free((lb_oauth_t*)oauth);
   lb_http_client_request(http_client,
                          "get",

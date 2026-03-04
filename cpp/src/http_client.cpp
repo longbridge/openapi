@@ -26,16 +26,17 @@ HttpClient::HttpClient(HttpClient&& other) noexcept
 }
 
 HttpClient
-HttpClient::from_apikey(const std::string& http_url,
-                        const std::string& app_key,
+HttpClient::from_apikey(const std::string& app_key,
                         const std::string& app_secret,
-                        const std::string& access_token)
+                        const std::string& access_token,
+                        const std::optional<std::string>& http_url)
 {
   HttpClient client;
-  client.http_client_ = lb_http_client_from_apikey(http_url.c_str(),
-                                                   app_key.c_str(),
-                                                   app_secret.c_str(),
-                                                   access_token.c_str());
+  client.http_client_ =
+    lb_http_client_from_apikey(http_url ? http_url->c_str() : nullptr,
+                               app_key.c_str(),
+                               app_secret.c_str(),
+                               access_token.c_str());
   return client;
 }
 
@@ -54,10 +55,11 @@ HttpClient::from_apikey_env(Status& status)
 }
 
 HttpClient
-HttpClient::from_oauth(const OAuth& oauth)
+HttpClient::from_oauth(const OAuth& oauth, const std::optional<std::string>& http_url)
 {
   HttpClient client;
-  client.http_client_ = lb_http_client_from_oauth(oauth);
+  client.http_client_ =
+    lb_http_client_from_oauth(oauth, http_url ? http_url->c_str() : nullptr);
   return client;
 }
 

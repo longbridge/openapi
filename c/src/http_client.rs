@@ -18,6 +18,11 @@ use crate::{
 pub struct CHttpClient(HttpClient);
 
 /// Create a HTTP client using API Key authentication
+///
+/// @param http_url     HTTP endpoint URL, or NULL to use the default
+/// @param app_key      App key
+/// @param app_secret   App secret
+/// @param access_token Access token
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_client_from_apikey(
     http_url: *const c_char,
@@ -25,7 +30,6 @@ pub unsafe extern "C" fn lb_http_client_from_apikey(
     app_secret: *const c_char,
     access_token: *const c_char,
 ) -> *mut CHttpClient {
-    let http_url = CStr::from_ptr(http_url).to_str().expect("invalid http url");
     let app_key = CStr::from_ptr(app_key).to_str().expect("invalid app key");
     let app_secret = CStr::from_ptr(app_secret)
         .to_str()
@@ -33,10 +37,11 @@ pub unsafe extern "C" fn lb_http_client_from_apikey(
     let access_token = CStr::from_ptr(access_token)
         .to_str()
         .expect("invalid access token");
-
-    Box::leak(Box::new(CHttpClient(HttpClient::new(
-        HttpClientConfig::new(app_key, app_secret, access_token).http_url(http_url),
-    ))))
+    let mut config = HttpClientConfig::from_apikey(app_key, app_secret, access_token);
+    if !http_url.is_null() {
+        config = config.http_url(CStr::from_ptr(http_url).to_str().expect("invalid http url"));
+    }
+    Box::leak(Box::new(CHttpClient(HttpClient::new(config))))
 }
 
 /// Free the http client
@@ -59,10 +64,10 @@ pub unsafe extern "C" fn lb_http_client_free(http_client: *mut CHttpClient) {
 pub unsafe extern "C" fn lb_http_client_from_apikey_env(
     error: *mut *mut CError,
 ) -> *mut CHttpClient {
-    match HttpClient::from_env() {
-        Ok(http_client) => {
+    match HttpClientConfig::from_apikey_env() {
+        Ok(config) => {
             set_error(error, None);
-            Box::into_raw(Box::new(CHttpClient(http_client)))
+            Box::into_raw(Box::new(CHttpClient(HttpClient::new(config))))
         }
         Err(err) => {
             set_error(error, Some(Error::HttpClient(err)));
@@ -73,12 +78,18 @@ pub unsafe extern "C" fn lb_http_client_from_apikey_env(
 
 /// Create a new `HttpClient` from an OAuth 2.0 client
 ///
-/// @param oauth  OAuth 2.0 client obtained from `lb_oauth_new`
+/// @param oauth     OAuth 2.0 client obtained from `lb_oauth_new`
+/// @param http_url  HTTP endpoint URL, or NULL to use the default
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_http_client_from_oauth(oauth: *const COAuth) -> *mut CHttpClient {
-    Box::leak(Box::new(CHttpClient(HttpClient::new(
-        HttpClientConfig::from_oauth((*oauth).inner.clone()),
-    ))))
+pub unsafe extern "C" fn lb_http_client_from_oauth(
+    oauth: *const COAuth,
+    http_url: *const c_char,
+) -> *mut CHttpClient {
+    let mut config = HttpClientConfig::from_oauth((*oauth).inner.clone());
+    if !http_url.is_null() {
+        config = config.http_url(CStr::from_ptr(http_url).to_str().expect("invalid http url"));
+    }
+    Box::leak(Box::new(CHttpClient(HttpClient::new(config))))
 }
 
 pub struct CHttpResult {
