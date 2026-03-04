@@ -26,6 +26,7 @@ public:
   Status(const lb_error_t* err);
   Status(lb_error_t* err);
   Status(Status&& status) noexcept;
+  Status& operator=(Status&& status) noexcept;
   ~Status();
 
   inline operator bool() { return is_ok(); }

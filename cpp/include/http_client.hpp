@@ -34,26 +34,31 @@ public:
   ~HttpClient();
 
   /**
-   * HttpClient
+   * Create a new `HttpClient` for API Key authentication
    *
-   * @param http_url HTTP endpoint url
-   * @param app_key App key
-   * @param app_secret App secret
+   * @param http_url    HTTP endpoint url
+   * @param app_key     App key
+   * @param app_secret  App secret
    * @param access_token Access token
    */
-  HttpClient(const std::string& http_url,
-             const std::string& app_key,
-             const std::string& app_secret,
-             const std::string& access_token);
-
-  Status from_env();
+  static HttpClient from_apikey(const std::string& http_url,
+                                const std::string& app_key,
+                                const std::string& app_secret,
+                                const std::string& access_token);
 
   /**
-   * Create a new `HttpClient` from an OAuthToken
+   * Create a new `HttpClient` from environment variables (API Key mode)
    *
-   * @param token  OAuthToken returned by OAuth::authorize or OAuth::refresh
+   * @param status  Out-param; set to the error if creation fails
    */
-  static HttpClient from_oauth(const OAuthToken& token);
+  static HttpClient from_apikey_env(Status& status);
+
+  /**
+   * Create a new `HttpClient` from an OAuth 2.0 client
+   *
+   * @param oauth  OAuth 2.0 client obtained from `OAuthBuilder::build`
+   */
+  static HttpClient from_oauth(const OAuth& oauth);
 
   /**
    * Performs a HTTP request

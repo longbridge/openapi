@@ -63,62 +63,25 @@ on_trade_context_created(const struct lb_async_result_t* res)
 }
 
 void
-proceed(const lb_oauth_token_t* token, const lb_trade_context_t** ctx)
-{
-  lb_config_t* config = lb_config_from_oauth(token);
-  lb_trade_context_new(config, on_trade_context_created, ctx);
-  lb_config_free(config);
-}
-
-void
 on_open_url(const char* url, void* userdata)
 {
+  (void)userdata;
   printf("Open this URL to authorize: %s\n", url);
 }
 
 void
-on_oauth_authorize(const struct lb_async_result_t* res)
+on_oauth_ready(const struct lb_async_result_t* res)
 {
   if (res->error) {
-    printf("authorization failed: %s\n", lb_error_message(res->error));
+    printf("OAuth failed: %s\n", lb_error_message(res->error));
     return;
   }
 
-  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
-
-  lb_error_t* save_err = NULL;
-  lb_oauth_token_save(token, &save_err);
-  if (save_err) {
-    printf("failed to save token: %s\n", lb_error_message(save_err));
-    lb_error_free(save_err);
-  }
-
-  proceed(token, (const lb_trade_context_t**)res->userdata);
-}
-
-void
-on_oauth_refresh(const struct lb_async_result_t* res)
-{
-  if (res->error) {
-    printf("refresh failed, re-authorizing: %s\n",
-           lb_error_message(res->error));
-    lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
-    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize,
-                       res->userdata);
-    lb_oauth_free(oauth);
-    return;
-  }
-
-  const lb_oauth_token_t* token = (const lb_oauth_token_t*)res->data;
-
-  lb_error_t* save_err = NULL;
-  lb_oauth_token_save(token, &save_err);
-  if (save_err) {
-    printf("failed to save token: %s\n", lb_error_message(save_err));
-    lb_error_free(save_err);
-  }
-
-  proceed(token, (const lb_trade_context_t**)res->userdata);
+  const lb_oauth_t* oauth = (const lb_oauth_t*)res->data;
+  lb_config_t* config = lb_config_from_oauth(oauth);
+  lb_oauth_free((lb_oauth_t*)oauth);
+  lb_trade_context_new(config, on_trade_context_created, res->userdata);
+  lb_config_free(config);
 }
 
 int
@@ -130,24 +93,7 @@ main(int argc, char const* argv[])
 
   const lb_trade_context_t* ctx = NULL;
 
-  lb_error_t* load_err = NULL;
-  lb_oauth_token_t* token = lb_oauth_token_load(&load_err);
-  lb_oauth_t* oauth = lb_oauth_new(CLIENT_ID);
-
-  if (token && !lb_oauth_token_is_expired(token) &&
-      !lb_oauth_token_expires_soon(token)) {
-    proceed(token, &ctx);
-    lb_oauth_token_free(token);
-  } else if (token && lb_oauth_token_expires_soon(token)) {
-    lb_oauth_refresh(oauth, token, on_oauth_refresh, &ctx);
-    lb_oauth_token_free(token);
-  } else {
-    if (token) lb_oauth_token_free(token);
-    lb_error_free(load_err);
-    lb_oauth_authorize(oauth, on_open_url, NULL, on_oauth_authorize, &ctx);
-  }
-
-  lb_oauth_free(oauth);
+  lb_oauth_new(CLIENT_ID, 0, on_open_url, NULL, on_oauth_ready, &ctx);
 
   getchar();
   lb_trade_context_release(ctx);

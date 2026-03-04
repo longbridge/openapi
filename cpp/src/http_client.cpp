@@ -12,17 +12,6 @@ HttpClient::HttpClient()
 {
 }
 
-HttpClient::HttpClient(const std::string& http_url,
-                       const std::string& app_key,
-                       const std::string& app_secret,
-                       const std::string& access_token)
-{
-  http_client_ = lb_http_client_new(http_url.c_str(),
-                                    app_key.c_str(),
-                                    app_secret.c_str(),
-                                    access_token.c_str());
-}
-
 HttpClient::~HttpClient()
 {
   if (http_client_) {
@@ -36,23 +25,39 @@ HttpClient::HttpClient(HttpClient&& other) noexcept
   other.http_client_ = nullptr;
 }
 
-Status
-HttpClient::from_env()
+HttpClient
+HttpClient::from_apikey(const std::string& http_url,
+                        const std::string& app_key,
+                        const std::string& app_secret,
+                        const std::string& access_token)
 {
-  lb_error_t* err = nullptr;
-  lb_http_client_t* http_client_ptr = lb_http_client_from_env(&err);
-  Status status(err);
-  if (status.is_ok()) {
-    http_client_ = http_client_ptr;
-  }
-  return status;
+  HttpClient client;
+  client.http_client_ = lb_http_client_from_apikey(http_url.c_str(),
+                                                   app_key.c_str(),
+                                                   app_secret.c_str(),
+                                                   access_token.c_str());
+  return client;
 }
 
 HttpClient
-HttpClient::from_oauth(const OAuthToken& token)
+HttpClient::from_apikey_env(Status& status)
+{
+  lb_error_t* err = nullptr;
+  lb_http_client_t* http_client_ptr = lb_http_client_from_apikey_env(&err);
+  status = std::move(Status(err));
+  if (status.is_ok()) {
+    HttpClient client;
+    client.http_client_ = http_client_ptr;
+    return client;
+  }
+  return HttpClient();
+}
+
+HttpClient
+HttpClient::from_oauth(const OAuth& oauth)
 {
   HttpClient client;
-  client.http_client_ = lb_http_client_from_oauth(token.get());
+  client.http_client_ = lb_http_client_from_oauth(oauth);
   return client;
 }
 

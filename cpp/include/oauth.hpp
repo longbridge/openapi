@@ -8,106 +8,53 @@
 #include "status.hpp"
 
 typedef struct lb_oauth_t lb_oauth_t;
-typedef struct lb_oauth_token_t lb_oauth_token_t;
 
 namespace longport {
 
-/// OAuth 2.0 access token
+/// OAuth 2.0 client (opaque handle)
 ///
-/// Owns the underlying `lb_oauth_token_t*`; freed on destruction.
-class OAuthToken
-{
-private:
-  lb_oauth_token_t* token_;
-
-public:
-  OAuthToken() : token_(nullptr) {}
-  explicit OAuthToken(lb_oauth_token_t* token) : token_(token) {}
-
-  OAuthToken(const OAuthToken&) = delete;
-  OAuthToken& operator=(const OAuthToken&) = delete;
-
-  OAuthToken(OAuthToken&& other) : token_(other.token_) { other.token_ = nullptr; }
-  OAuthToken& operator=(OAuthToken&& other);
-
-  ~OAuthToken();
-
-  /// The underlying C token pointer (non-owning)
-  const lb_oauth_token_t* get() const { return token_; }
-
-  /// Returns true if the token has expired
-  bool is_expired() const;
-
-  /// Returns true if the token will expire within 1 hour
-  bool expires_soon() const;
-
-  /// Load a token from the default path (`~/.longbridge-openapi/token`)
-  ///
-  /// @param out_token  On success, receives the loaded token.
-  /// @return Status indicating success or failure
-  static Status load(OAuthToken& out_token);
-
-  /// Load a token from an explicit file path
-  ///
-  /// @param path       Path to the token JSON file
-  /// @param out_token  On success, receives the loaded token.
-  /// @return Status indicating success or failure
-  static Status load_from_path(const std::string& path, OAuthToken& out_token);
-
-  /// Save the token to the default path (`~/.longbridge-openapi/token`)
-  ///
-  /// The parent directory is created automatically if it does not exist.
-  ///
-  /// @return Status indicating success or failure
-  Status save() const;
-
-  /// Save the token to an explicit file path
-  ///
-  /// The parent directory is created automatically if it does not exist.
-  ///
-  /// @param path  Destination path for the token JSON file
-  /// @return Status indicating success or failure
-  Status save_to_path(const std::string& path) const;
-};
-
-/// OAuth 2.0 client for LongPort OpenAPI
+/// Copyable: copy increments the internal Arc reference count via
+/// `lb_oauth_clone`. Always freed on destruction via `lb_oauth_free`.
 class OAuth
 {
 private:
   lb_oauth_t* oauth_;
 
 public:
-  /// Create a new OAuth 2.0 client with the default callback port (60355)
-  ///
-  /// @param client_id  OAuth 2.0 client ID from the LongPort developer portal
-  OAuth(const std::string& client_id);
-
-  OAuth(const OAuth&) = delete;
+  explicit OAuth(lb_oauth_t* oauth);
+  OAuth(const OAuth& other);
   OAuth(OAuth&& other);
+  OAuth& operator=(const OAuth& other);
+  OAuth& operator=(OAuth&& other);
   ~OAuth();
 
-  /// Set the callback port
-  ///
-  /// @param callback_port  TCP port for the local callback server (default
-  ///                       60355). Must match one of the redirect URIs
-  ///                       registered for the client.
-  void set_callback_port(uint16_t callback_port);
+  operator const lb_oauth_t*() const { return oauth_; }
+};
 
-  /// Start the OAuth 2.0 authorization flow (async)
-  ///
-  /// The `open_url` callback is invoked with the authorization URL so the
-  /// caller can open it in a browser or handle it in any other way.
-  ///
-  /// @param open_url  Called with the authorization URL
-  /// @param callback  Invoked on completion; result data is `OAuthToken*`
-  void authorize(std::function<void(const std::string&)> open_url,
-                 AsyncCallback<void*, OAuthToken> callback);
+/// Builder for constructing an OAuth 2.0 client
+///
+/// Tries to load an existing token from
+/// `~/.longbridge-openapi/tokens/<client_id>`. If the token is missing or
+/// expired, starts a local callback server and calls `open_url` so the caller
+/// can open the authorization URL in a browser.
+class OAuthBuilder
+{
+private:
+  std::string client_id_;
+  uint16_t callback_port_;
 
-  /// Refresh an access token (async)
+public:
+  /// @param client_id     OAuth 2.0 client ID from the LongPort developer portal
+  /// @param callback_port Local callback server port; pass 0 to use the
+  ///                      default (60355)
+  OAuthBuilder(const std::string& client_id, uint16_t callback_port = 0);
+
+  /// Asynchronously build an OAuth 2.0 client
   ///
-  /// @param token     Existing token whose refresh_token field is used
-  /// @param callback  Invoked on completion; result data is `OAuthToken*`
-  void refresh(const OAuthToken& token, AsyncCallback<void*, OAuthToken> callback);
+  /// @param open_url  Called with the authorization URL during the auth flow
+  /// @param callback  Invoked on completion; result data is `OAuth*`
+  void build(std::function<void(const std::string&)> open_url,
+             AsyncCallback<void*, OAuth> callback);
 };
 
 } // namespace longport

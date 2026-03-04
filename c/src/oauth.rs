@@ -60,6 +60,17 @@ pub unsafe extern "C" fn lb_oauth_new(
     });
 }
 
+/// Clone an OAuth 2.0 client object
+///
+/// Increments the internal Arc reference count; the returned pointer must be
+/// freed independently with `lb_oauth_free`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_oauth_clone(oauth: *const COAuth) -> *mut COAuth {
+    Box::into_raw(Box::new(COAuth {
+        inner: (*oauth).inner.clone(),
+    }))
+}
+
 /// Free an OAuth 2.0 client object
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_oauth_free(oauth: *mut COAuth) {

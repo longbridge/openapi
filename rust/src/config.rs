@@ -424,62 +424,6 @@ impl Config {
         }
     }
 
-    /// Gets a new `access_token`
-    ///
-    /// `expired_at` - The expiration time of the access token, defaults to `90`
-    /// days.
-    ///
-    /// Reference: <https://open.longportapp.com/en/docs/refresh-token-api>
-    pub async fn refresh_access_token(&self, expired_at: Option<OffsetDateTime>) -> Result<String> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            expired_at: String,
-        }
-
-        #[derive(Debug, Deserialize)]
-        struct Response {
-            token: String,
-        }
-
-        let request = Request {
-            expired_at: expired_at
-                .unwrap_or_else(|| OffsetDateTime::now_utc() + time::Duration::days(90))
-                .format(&time::format_description::well_known::Rfc3339)
-                .unwrap(),
-        };
-
-        let new_token = self
-            .create_http_client()
-            .request(Method::GET, "/v1/token/refresh")
-            .query_params(request)
-            .response::<Json<Response>>()
-            .send()
-            .await?
-            .0
-            .token;
-        Ok(new_token)
-    }
-
-    /// Gets a new `access_token`, and also replaces the `access_token` in
-    /// `Config`.
-    ///
-    /// `expired_at` - The expiration time of the access token, defaults to `90`
-    /// days.
-    ///
-    /// Reference: <https://open.longportapp.com/en/docs/refresh-token-api>
-    #[cfg(feature = "blocking")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
-    pub fn refresh_access_token_blocking(
-        &self,
-        expired_at: Option<OffsetDateTime>,
-    ) -> Result<String> {
-        tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .expect("create tokio runtime")
-            .block_on(self.refresh_access_token(expired_at))
-    }
-
     /// Specifies the path of the log file
     ///
     /// Default: `None`

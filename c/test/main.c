@@ -46,7 +46,7 @@ main(int argc, char const* argv[])
 #endif
 
   lb_error_t* err = NULL;
-  lb_config_t* config = lb_config_from_env(&err);
+  lb_config_t* config = lb_config_from_apikey_env(&err);
   if (err) {
     printf("failed to load configuration from environment: %s\n",
            lb_error_message(err));

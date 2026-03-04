@@ -14,8 +14,8 @@ main(int argc, char const* argv[])
   SetConsoleOutputCP(CP_UTF8);
 #endif
 
-  Config config;
-  Status status = Config::from_env(config);
+  Status status;
+  Config config = Config::from_apikey_env(status);
   if (!status) {
     std::cout << "failed to load configuration from environment: "
               << *status.message() << std::endl;

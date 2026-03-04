@@ -30,6 +30,21 @@ Status::Status(Status&& status) noexcept
   status.need_free_ = false;
 }
 
+Status&
+Status::operator=(Status&& status) noexcept
+{
+  if (this != &status) {
+    if (err_ && need_free_) {
+      lb_error_free((lb_error_t*)err_);
+    }
+    err_ = status.err_;
+    need_free_ = status.need_free_;
+    status.err_ = nullptr;
+    status.need_free_ = false;
+  }
+  return *this;
+}
+
 Status::~Status()
 {
   if (err_ && need_free_) {

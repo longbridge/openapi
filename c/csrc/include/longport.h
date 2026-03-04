@@ -1312,6 +1312,14 @@ typedef struct lb_quote_context_t lb_quote_context_t;
  */
 typedef struct lb_trade_context_t lb_trade_context_t;
 
+/**
+ * HTTP Header
+ */
+typedef struct lb_http_header_t {
+  const char *name;
+  const char *value;
+} lb_http_header_t;
+
 typedef struct lb_async_result_t {
   const void *ctx;
   const struct lb_error_t *error;
@@ -1321,14 +1329,6 @@ typedef struct lb_async_result_t {
 } lb_async_result_t;
 
 typedef void (*lb_async_callback_t)(const struct lb_async_result_t*);
-
-/**
- * HTTP Header
- */
-typedef struct lb_http_header_t {
-  const char *name;
-  const char *value;
-} lb_http_header_t;
 
 typedef void (*lb_free_userdata_func_t)(void*);
 
@@ -3933,6 +3933,10 @@ struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
 /**
  * Create a new `Config` for OAuth 2.0 authentication
  *
+ * This function does **not** take ownership of `oauth`. The caller is
+ * responsible for freeing `oauth` with `lb_oauth_free` after this call
+ * returns.
+ *
  * @param oauth  OAuth 2.0 client obtained from `lb_oauth_new`
  */
 struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_t *oauth);
@@ -3941,14 +3945,6 @@ struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_t *oauth);
  * Free the config object
  */
 void lb_config_free(struct lb_config_t *config);
-
-/**
- * Gets a new `access_token`
- */
-void lb_config_refresh_access_token(struct lb_config_t *config,
-                                    int64_t expired_at,
-                                    lb_async_callback_t callback,
-                                    void *userdata);
 
 /**
  * Free the error object
@@ -4038,6 +4034,14 @@ void lb_oauth_new(const char *client_id,
                   void *open_url_userdata,
                   lb_async_callback_t callback,
                   void *userdata);
+
+/**
+ * Clone an OAuth 2.0 client object
+ *
+ * Increments the internal Arc reference count; the returned pointer must be
+ * freed independently with `lb_oauth_free`.
+ */
+struct lb_oauth_t *lb_oauth_clone(const struct lb_oauth_t *oauth);
 
 /**
  * Free an OAuth 2.0 client object

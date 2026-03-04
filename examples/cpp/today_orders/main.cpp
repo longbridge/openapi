@@ -9,9 +9,9 @@ using namespace longport;
 using namespace longport::trade;
 
 static void
-run(const OAuthToken& token)
+run(const OAuth& oauth)
 {
-  Config config = Config::from_oauth(token);
+  Config config = Config::from_oauth(oauth);
 
   TradeContext::create(config, [](auto res) {
     if (!res) {
@@ -45,63 +45,18 @@ main(int argc, char const* argv[])
 
   const std::string client_id = "your-client-id";
 
-  OAuthToken token;
-  Status load_status = OAuthToken::load(token);
-  if (load_status && !token.is_expired() && !token.expires_soon()) {
-    run(token);
-  } else if (load_status && token.expires_soon()) {
-    OAuth oauth(client_id);
-    oauth.refresh(token, [client_id](auto res) {
+  OAuthBuilder(client_id).build(
+    [](const std::string& url) {
+      std::cout << "Open this URL to authorize: " << url << std::endl;
+    },
+    [](auto res) {
       if (!res) {
-        std::cout << "refresh failed, re-authorizing: "
-                  << *res.status().message() << std::endl;
-        OAuth oauth2(client_id);
-        oauth2.authorize(
-          [](const std::string& url) {
-            std::cout << "Open this URL to authorize: " << url << std::endl;
-          },
-          [](auto res) {
-            if (!res) {
-              std::cout << "authorization failed: "
-                        << *res.status().message() << std::endl;
-              return;
-            }
-            Status save_status = res->save();
-            if (!save_status) {
-              std::cout << "failed to save token: "
-                        << *save_status.message() << std::endl;
-            }
-            run(*res);
-          });
-        return;
-      }
-      Status save_status = res->save();
-      if (!save_status) {
-        std::cout << "failed to save token: " << *save_status.message()
+        std::cout << "authorization failed: " << *res.status().message()
                   << std::endl;
+        return;
       }
       run(*res);
     });
-  } else {
-    OAuth oauth(client_id);
-    oauth.authorize(
-      [](const std::string& url) {
-        std::cout << "Open this URL to authorize: " << url << std::endl;
-      },
-      [](auto res) {
-        if (!res) {
-          std::cout << "authorization failed: " << *res.status().message()
-                    << std::endl;
-          return;
-        }
-        Status save_status = res->save();
-        if (!save_status) {
-          std::cout << "failed to save token: "
-                    << *save_status.message() << std::endl;
-        }
-        run(*res);
-      });
-  }
 
   std::cin.get();
   return 0;
