@@ -14,6 +14,19 @@ public class Config implements AutoCloseable {
     }
 
     /**
+     * Create a new {@code Config} from API key credentials.
+     *
+     * @param appKey      App key
+     * @param appSecret   App secret
+     * @param accessToken Access token
+     * @return Config object
+     * @throws OpenApiException If an error occurs
+     */
+    public static Config fromApikey(String appKey, String appSecret, String accessToken) throws OpenApiException {
+        return new Config(SdkNative.newConfigFromApikey(appKey, appSecret, accessToken));
+    }
+
+    /**
      * Create a new {@code Config} from the given environment variables
      * <p>
      * It first gets the environment variables from the .env file in the current
@@ -45,8 +58,8 @@ public class Config implements AutoCloseable {
      * @return Config object
      * @throws OpenApiException If an error occurs
      */
-    public static Config fromEnv() throws OpenApiException {
-        return new Config(SdkNative.newConfigFromEnv());
+    public static Config fromApikeyEnv() throws OpenApiException {
+        return new Config(SdkNative.newConfigFromApikeyEnv());
     }
 
     /**
@@ -61,6 +74,98 @@ public class Config implements AutoCloseable {
      */
     public static Config fromOAuth(OAuth oauth) throws OpenApiException {
         return new Config(SdkNative.newConfigFromOauth(oauth.getRaw()));
+    }
+
+    /**
+     * Set the HTTP endpoint URL.
+     * <p>
+     * NOTE: Usually you don't need to change it.
+     *
+     * @param httpUrl OpenAPI endpoint (Default: {@code https://openapi.longportapp.com})
+     * @return this object
+     */
+    public Config httpUrl(String httpUrl) {
+        this.raw = SdkNative.configSetHttpUrl(this.raw, httpUrl);
+        return this;
+    }
+
+    /**
+     * Set the quote websocket endpoint URL.
+     * <p>
+     * NOTE: Usually you don't need to change it.
+     *
+     * @param quoteWsUrl OpenAPI quote websocket endpoint
+     * @return this object
+     */
+    public Config quoteWebsocketUrl(String quoteWsUrl) {
+        this.raw = SdkNative.configSetQuoteWsUrl(this.raw, quoteWsUrl);
+        return this;
+    }
+
+    /**
+     * Set the trade websocket endpoint URL.
+     * <p>
+     * NOTE: Usually you don't need to change it.
+     *
+     * @param tradeWsUrl OpenAPI trade websocket endpoint
+     * @return this object
+     */
+    public Config tradeWebsocketUrl(String tradeWsUrl) {
+        this.raw = SdkNative.configSetTradeWsUrl(this.raw, tradeWsUrl);
+        return this;
+    }
+
+    /**
+     * Set the language identifier.
+     *
+     * @param language Language identifier (Default: {@link Language#EN})
+     * @return this object
+     */
+    public Config language(Language language) {
+        this.raw = SdkNative.configSetLanguage(this.raw, language);
+        return this;
+    }
+
+    /**
+     * Enable overnight quote.
+     *
+     * @return this object
+     */
+    public Config enableOvernight() {
+        this.raw = SdkNative.configSetEnableOvernight(this.raw);
+        return this;
+    }
+
+    /**
+     * Set the push candlestick mode.
+     *
+     * @param mode Mode (Default: {@link PushCandlestickMode#Realtime})
+     * @return this object
+     */
+    public Config pushCandlestickMode(PushCandlestickMode mode) {
+        this.raw = SdkNative.configSetPushCandlestickMode(this.raw, mode);
+        return this;
+    }
+
+    /**
+     * Disable printing quote packages when connected to the server.
+     *
+     * @return this object
+     */
+    public Config disablePrintQuotePackages() {
+        this.raw = SdkNative.configSetEnablePrintQuotePackages(this.raw, false);
+        return this;
+    }
+
+    /**
+     * Set the path of the log files.
+     *
+     * @param path The path of the log files (Default: no logs)
+     * @return this object
+     */
+    public Config logPath(String path) {
+        this.raw = SdkNative.configSetLogPath(this.raw, path);
+        return this;
     }
 
     /**

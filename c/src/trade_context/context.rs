@@ -69,7 +69,7 @@ pub unsafe extern "C" fn lb_trade_context_new(
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
-    let config = (*config).0.clone();
+    let config = std::sync::Arc::new((*config).0.clone());
     let userdata_pointer = userdata as usize;
 
     execute_async(

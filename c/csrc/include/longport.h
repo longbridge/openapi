@@ -3877,69 +3877,109 @@ extern "C" {
 /**
  * Create a new `Config` using API Key authentication
  *
- * @param app_key                     App key
- * @param app_secret                  App secret
- * @param access_token                Access token
- * @param http_url                    HTTP endpoint url (nullable; uses default
- *                                    if null)
- * @param quote_ws_url                Quote websocket endpoint url (nullable)
- * @param trade_ws_url                Trade websocket endpoint url (nullable)
- * @param language                    Language identifier (nullable; defaults to
- *                                    `en`)
- * @param enable_overnight            Enable overnight quote
- * @param push_candlestick_mode       Push candlestick mode (nullable)
- * @param enable_print_quote_packages Print quote packages when connected
- * @param log_path                    Log file path (nullable; no logs if null)
+ * @param app_key       App key
+ * @param app_secret    App secret
+ * @param access_token  Access token
  */
 struct lb_config_t *lb_config_from_apikey(const char *app_key,
                                           const char *app_secret,
-                                          const char *access_token,
-                                          const char *http_url,
-                                          const char *quote_ws_url,
-                                          const char *trade_ws_url,
-                                          const enum lb_language_t *language,
-                                          bool enable_overnight,
-                                          const enum lb_push_candlestick_mode_t *push_candlestick_mode,
-                                          bool enable_print_quote_packages,
-                                          const char *log_path);
+                                          const char *access_token);
 
 /**
  * Create a new `Config` from environment variables (API Key mode)
  *
  * It first reads the `.env` file in the current directory.
  *
- * # Variables
- *
- * - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
- *   (Default: `en`)
- * - `LONGPORT_APP_KEY` - App key
- * - `LONGPORT_APP_SECRET` - App secret
- * - `LONGPORT_ACCESS_TOKEN` - Access token
- * - `LONGPORT_HTTP_URL` - HTTP endpoint url (Default: `https://openapi.longportapp.com`)
- * - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
- *   `wss://openapi-quote.longportapp.com/v2`)
- * - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url (Default:
- *   `wss://openapi-trade.longportapp.com/v2`)
- * - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or `false`
- *   (Default: `false`)
- * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
- *   `realtime`)
- * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
- *   `true` or `false` (Default: `true`)
- * - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
+ * Variables: `LONGPORT_APP_KEY`, `LONGPORT_APP_SECRET`,
+ * `LONGPORT_ACCESS_TOKEN`, `LONGPORT_HTTP_URL`, `LONGPORT_QUOTE_WS_URL`,
+ * `LONGPORT_TRADE_WS_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_ENABLE_OVERNIGHT`,
+ * `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+ * `LONGPORT_LOG_PATH`
  */
 struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
 
 /**
  * Create a new `Config` for OAuth 2.0 authentication
  *
- * This function does **not** take ownership of `oauth`. The caller is
- * responsible for freeing `oauth` with `lb_oauth_free` after this call
- * returns.
+ * Does **not** take ownership of `oauth`. The caller must free `oauth` with
+ * `lb_oauth_free` after this call returns.
  *
  * @param oauth  OAuth 2.0 client obtained from `lb_oauth_new`
  */
 struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_t *oauth);
+
+/**
+ * Set the HTTP endpoint URL
+ *
+ * @param config   Config object
+ * @param http_url HTTP endpoint URL (e.g. `https://openapi.longportapp.com`)
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_set_http_url(struct lb_config_t *config, const char *http_url);
+
+/**
+ * Set the Quote WebSocket endpoint URL
+ *
+ * @param config        Config object
+ * @param quote_ws_url  Quote WebSocket URL
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_set_quote_ws_url(struct lb_config_t *config,
+                                               const char *quote_ws_url);
+
+/**
+ * Set the Trade WebSocket endpoint URL
+ *
+ * @param config        Config object
+ * @param trade_ws_url  Trade WebSocket URL
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_set_trade_ws_url(struct lb_config_t *config,
+                                               const char *trade_ws_url);
+
+/**
+ * Set the language identifier
+ *
+ * @param config    Config object
+ * @param language  Language identifier
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_set_language(struct lb_config_t *config, enum lb_language_t language);
+
+/**
+ * Enable overnight quote
+ *
+ * @param config  Config object
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_enable_overnight(struct lb_config_t *config);
+
+/**
+ * Set the push candlestick mode
+ *
+ * @param config  Config object
+ * @param mode    Push candlestick mode
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_set_push_candlestick_mode(struct lb_config_t *config,
+                                                        enum lb_push_candlestick_mode_t mode);
+
+/**
+ * Disable printing of quote packages on connection
+ *
+ * @param config  Config object
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_disable_print_quote_packages(struct lb_config_t *config);
+
+/**
+ * Set the log file path
+ *
+ * @param config    Config object
+ * @param log_path  Path for log files
+ * @return the same `config` pointer (for chaining)
+ */
+struct lb_config_t *lb_config_set_log_path(struct lb_config_t *config, const char *log_path);
 
 /**
  * Free the config object

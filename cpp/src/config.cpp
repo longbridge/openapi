@@ -37,39 +37,10 @@ Config::operator const lb_config_t*() const
 Config
 Config::from_apikey(const std::string& app_key,
                     const std::string& app_secret,
-                    const std::string& access_token,
-                    const std::optional<std::string>& http_url,
-                    const std::optional<std::string>& quote_ws_url,
-                    const std::optional<std::string>& trade_ws_url,
-                    const std::optional<Language>& language,
-                    bool enable_overnight,
-                    const std::optional<PushCandlestickMode>& push_candlestick_mode,
-                    bool enable_print_quote_packages,
-                    const std::optional<std::string>& log_path)
+                    const std::string& access_token)
 {
-  lb_language_t c_language;
-  if (language) {
-    c_language = convert::convert(*language);
-  }
-
-  lb_push_candlestick_mode_t c_push_candlestick_mode;
-  if (push_candlestick_mode) {
-    c_push_candlestick_mode = convert::convert(*push_candlestick_mode);
-  }
-
-  return Config(
-    lb_config_from_apikey(app_key.c_str(),
-                          app_secret.c_str(),
-                          access_token.c_str(),
-                          http_url ? http_url->c_str() : nullptr,
-                          quote_ws_url ? quote_ws_url->c_str() : nullptr,
-                          trade_ws_url ? trade_ws_url->c_str() : nullptr,
-                          language ? &c_language : nullptr,
-                          enable_overnight,
-                          push_candlestick_mode ? &c_push_candlestick_mode
-                                                : nullptr,
-                          enable_print_quote_packages,
-                          log_path ? log_path->c_str() : nullptr));
+  return Config(lb_config_from_apikey(
+    app_key.c_str(), app_secret.c_str(), access_token.c_str()));
 }
 
 Config
@@ -88,6 +59,64 @@ Config
 Config::from_oauth(const OAuth& oauth)
 {
   return Config(lb_config_from_oauth(oauth));
+}
+
+// ── Chainable setters ─────────────────────────────────────────────────────────
+
+Config&
+Config::set_http_url(const std::string& url)
+{
+  config_ = lb_config_set_http_url(config_, url.c_str());
+  return *this;
+}
+
+Config&
+Config::set_quote_ws_url(const std::string& url)
+{
+  config_ = lb_config_set_quote_ws_url(config_, url.c_str());
+  return *this;
+}
+
+Config&
+Config::set_trade_ws_url(const std::string& url)
+{
+  config_ = lb_config_set_trade_ws_url(config_, url.c_str());
+  return *this;
+}
+
+Config&
+Config::set_language(Language language)
+{
+  config_ = lb_config_set_language(config_, convert::convert(language));
+  return *this;
+}
+
+Config&
+Config::enable_overnight()
+{
+  config_ = lb_config_enable_overnight(config_);
+  return *this;
+}
+
+Config&
+Config::set_push_candlestick_mode(PushCandlestickMode mode)
+{
+  config_ = lb_config_set_push_candlestick_mode(config_, convert::convert(mode));
+  return *this;
+}
+
+Config&
+Config::disable_print_quote_packages()
+{
+  config_ = lb_config_disable_print_quote_packages(config_);
+  return *this;
+}
+
+Config&
+Config::set_log_path(const std::string& path)
+{
+  config_ = lb_config_set_log_path(config_, path.c_str());
+  return *this;
 }
 
 } // namespace longport

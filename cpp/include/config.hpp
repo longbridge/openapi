@@ -1,6 +1,5 @@
 #pragma once
 
-#include <optional>
 #include <string>
 #include <utility>
 
@@ -30,70 +29,52 @@ public:
 
   /// Create a new `Config` for API Key authentication
   ///
-  /// @param app_key   App key
-  /// @param app_secret App secret
-  /// @param access_token Access token
-  /// @param http_url HTTP endpoint url (Default:
-  /// https://openapi.portbridgeapp.com)
-  /// @param quote_ws_url Quote websocket endpoint url (Default:
-  /// wss://openapi-quote.longportapp.com/v2)
-  /// @param trade_ws_url Trade websocket endpoint url (Default:
-  /// wss://openapi-trade.longportapp.com/v2)
-  /// @param language Language identifer (Default: Language::EN)
-  /// @param enable_overnight Enable overnight quote (Default: false)
-  /// @param push_candlestick_mode Push candlestick mode (Default:
-  /// PushCandlestickMode::Realtime)
-  /// @param enable_print_quote_packages Print quote packages when connected
-  /// (Default: true)
-  /// @param log_path Path for log files (Default: no logs)
-  static Config from_apikey(
-    const std::string& app_key,
-    const std::string& app_secret,
-    const std::string& access_token,
-    const std::optional<std::string>& http_url = std::nullopt,
-    const std::optional<std::string>& quote_ws_url = std::nullopt,
-    const std::optional<std::string>& trade_ws_url = std::nullopt,
-    const std::optional<Language>& language = std::nullopt,
-    bool enable_overnight = false,
-    const std::optional<PushCandlestickMode>& push_candlestick_mode =
-      std::nullopt,
-    bool enable_print_quote_packages = true,
-    const std::optional<std::string>& log_path = std::nullopt);
+  /// @param app_key       App key
+  /// @param app_secret    App secret
+  /// @param access_token  Access token
+  static Config from_apikey(const std::string& app_key,
+                            const std::string& app_secret,
+                            const std::string& access_token);
 
   /// Create a new `Config` from environment variables (API Key mode)
   ///
-  /// It first gets the environment variables from the `.env` file in the
-  /// current directory.
-  ///
-  /// # Variables
-  ///
-  /// - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
-  ///   (Default: `en`)
-  /// - `LONGPORT_APP_KEY` - App key
-  /// - `LONGPORT_APP_SECRET` - App secret
-  /// - `LONGPORT_ACCESS_TOKEN` - Access token
-  /// - `LONGPORT_HTTP_URL` - HTTP endpoint url (Default:
-  /// `https://openapi.longportapp.com`)
-  /// - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
-  ///   `wss://openapi-quote.longportapp.com/v2`)
-  /// - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url (Default:
-  ///   `wss://openapi-trade.longportapp.com/v2`)
-  /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
-  ///   `false` (Default: `false`)
-  /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
-  ///   `realtime`)
-  /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
-  ///   `true` or `false` (Default: `true`)
-  /// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
+  /// Variables: `LONGPORT_APP_KEY`, `LONGPORT_APP_SECRET`,
+  /// `LONGPORT_ACCESS_TOKEN`, `LONGPORT_HTTP_URL`, `LONGPORT_QUOTE_WS_URL`,
+  /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_ENABLE_OVERNIGHT`,
+  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+  /// `LONGPORT_LOG_PATH`
   static Config from_apikey_env(Status& status);
 
   /// Create a new `Config` for OAuth 2.0 authentication
   ///
-  /// OAuth 2.0 is the recommended authentication method that uses Bearer tokens
-  /// and does not require app_secret or HMAC signatures.
-  ///
   /// @param oauth OAuth 2.0 client obtained from `OAuthBuilder::build`
   static Config from_oauth(const OAuth& oauth);
+
+  // ── Chainable setters ──────────────────────────────────────────────────────
+
+  /// Set the HTTP endpoint URL
+  Config& set_http_url(const std::string& url);
+
+  /// Set the Quote WebSocket endpoint URL
+  Config& set_quote_ws_url(const std::string& url);
+
+  /// Set the Trade WebSocket endpoint URL
+  Config& set_trade_ws_url(const std::string& url);
+
+  /// Set the language identifier
+  Config& set_language(Language language);
+
+  /// Enable overnight quote
+  Config& enable_overnight();
+
+  /// Set the push candlestick mode
+  Config& set_push_candlestick_mode(PushCandlestickMode mode);
+
+  /// Disable printing of quote packages on connection
+  Config& disable_print_quote_packages();
+
+  /// Set the log file path
+  Config& set_log_path(const std::string& path);
 };
 
 } // namespace longport

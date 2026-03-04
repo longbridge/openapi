@@ -26,13 +26,27 @@ public class SdkNative {
 
         public static native void httpClientRequest(long httpClient, String request, AsyncCallback callback);
 
-        public static native long newConfig(String appKey, String appSecret, String accessToken, String httpUrl,
-                        String quoteWsUrl, String tradeWsUrl, Language language, boolean enableOvernight,
-                        PushCandlestickMode mode, boolean enablePrintQuotePackages, String logPath);
+        public static native long newConfigFromApikey(String appKey, String appSecret, String accessToken);
 
-        public static native long newConfigFromEnv();
+        public static native long newConfigFromApikeyEnv();
 
         public static native long newConfigFromOauth(long oauth);
+
+        public static native long configSetHttpUrl(long config, String httpUrl);
+
+        public static native long configSetQuoteWsUrl(long config, String quoteWsUrl);
+
+        public static native long configSetTradeWsUrl(long config, String tradeWsUrl);
+
+        public static native long configSetLanguage(long config, Language language);
+
+        public static native long configSetEnableOvernight(long config);
+
+        public static native long configSetPushCandlestickMode(long config, PushCandlestickMode mode);
+
+        public static native long configSetEnablePrintQuotePackages(long config, boolean enable);
+
+        public static native long configSetLogPath(long config, String logPath);
 
         public static native void freeConfig(long config);
 

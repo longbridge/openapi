@@ -7,14 +7,14 @@ use std::{
 };
 
 use http::Method;
-pub(crate) use http::{header, HeaderValue, Request};
-use longport_httpcli::{is_cn, HttpClient, HttpClientConfig, Json};
+pub(crate) use http::{HeaderValue, Request, header};
+use longport_httpcli::{HttpClient, HttpClientConfig, Json, is_cn};
 use longport_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
-use tracing::{subscriber::NoSubscriber, Level, Subscriber};
+use tracing::{Level, Subscriber, subscriber::NoSubscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
@@ -430,6 +430,46 @@ impl Config {
     pub fn log_path(mut self, path: impl Into<PathBuf>) -> Self {
         self.log_path = Some(path.into());
         self
+    }
+
+    /// Set the HTTP endpoint URL in place.
+    pub fn set_http_url(&mut self, url: impl Into<String>) {
+        self.http_url = Some(url.into());
+    }
+
+    /// Set the quote websocket endpoint URL in place.
+    pub fn set_quote_ws_url(&mut self, url: impl Into<String>) {
+        self.quote_ws_url = Some(url.into());
+    }
+
+    /// Set the trade websocket endpoint URL in place.
+    pub fn set_trade_ws_url(&mut self, url: impl Into<String>) {
+        self.trade_ws_url = Some(url.into());
+    }
+
+    /// Set the language in place.
+    pub fn set_language(&mut self, language: Language) {
+        self.language = language;
+    }
+
+    /// Enable overnight quote in place.
+    pub fn set_enable_overnight(&mut self) {
+        self.enable_overnight = Some(true);
+    }
+
+    /// Set the push candlestick mode in place.
+    pub fn set_push_candlestick_mode(&mut self, mode: PushCandlestickMode) {
+        self.push_candlestick_mode = Some(mode);
+    }
+
+    /// Disable printing quote packages in place.
+    pub fn set_dont_print_quote_packages(&mut self) {
+        self.enable_print_quote_packages = false;
+    }
+
+    /// Set the log path in place.
+    pub fn set_log_path(&mut self, path: impl Into<PathBuf>) {
+        self.log_path = Some(path.into());
     }
 
     pub(crate) fn create_log_subscriber(

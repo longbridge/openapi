@@ -2,7 +2,7 @@ use std::{ffi::c_void, os::raw::c_char};
 
 use longport::oauth::{OAuth, OAuthBuilder};
 
-use crate::async_call::{execute_async, CAsyncCallback};
+use crate::async_call::{CAsyncCallback, execute_async};
 
 /// OAuth 2.0 client — owns the Rust `OAuth` instance (opaque handle)
 ///
