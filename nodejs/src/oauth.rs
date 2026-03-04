@@ -32,7 +32,7 @@ impl OAuth {
     ///
     /// @param clientId      OAuth 2.0 client ID from the Longbridge developer
     /// portal @param onOpenUrl     Called with the authorization URL; open
-    /// it in a                      browser or print it however you like
+    /// it in a browser or print it however you like
     /// @param callbackPort  TCP port for the local callback server
     ///                      (default: 60355). Must match one of the redirect
     ///                      URIs registered for the client.
