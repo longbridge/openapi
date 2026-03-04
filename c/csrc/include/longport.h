@@ -1295,17 +1295,12 @@ typedef struct lb_http_client_t lb_http_client_t;
 typedef struct lb_http_result_t lb_http_result_t;
 
 /**
- * OAuth 2.0 client — owns the Rust `OAuth` instance
- */
-typedef struct lb_oauth_t lb_oauth_t;
-
-/**
- * OAuth 2.0 access token (opaque handle)
+ * OAuth 2.0 client — owns the Rust `OAuth` instance (opaque handle)
  *
  * Callers must never dereference or inspect the struct layout.
- * Always free with `lb_oauth_token_free`.
+ * Always free with `lb_oauth_free`.
  */
-typedef struct lb_oauth_token_t lb_oauth_token_t;
+typedef struct lb_oauth_t lb_oauth_t;
 
 /**
  * Quote context
@@ -3880,10 +3875,38 @@ extern "C" {
 #endif // __cplusplus
 
 /**
- * Create a new `Config` from the given environment variables
+ * Create a new `Config` using API Key authentication
  *
- * It first gets the environment variables from the `.env` file in the
- * current directory.
+ * @param app_key                     App key
+ * @param app_secret                  App secret
+ * @param access_token                Access token
+ * @param http_url                    HTTP endpoint url (nullable; uses default
+ *                                    if null)
+ * @param quote_ws_url                Quote websocket endpoint url (nullable)
+ * @param trade_ws_url                Trade websocket endpoint url (nullable)
+ * @param language                    Language identifier (nullable; defaults to
+ *                                    `en`)
+ * @param enable_overnight            Enable overnight quote
+ * @param push_candlestick_mode       Push candlestick mode (nullable)
+ * @param enable_print_quote_packages Print quote packages when connected
+ * @param log_path                    Log file path (nullable; no logs if null)
+ */
+struct lb_config_t *lb_config_from_apikey(const char *app_key,
+                                          const char *app_secret,
+                                          const char *access_token,
+                                          const char *http_url,
+                                          const char *quote_ws_url,
+                                          const char *trade_ws_url,
+                                          const enum lb_language_t *language,
+                                          bool enable_overnight,
+                                          const enum lb_push_candlestick_mode_t *push_candlestick_mode,
+                                          bool enable_print_quote_packages,
+                                          const char *log_path);
+
+/**
+ * Create a new `Config` from environment variables (API Key mode)
+ *
+ * It first reads the `.env` file in the current directory.
  *
  * # Variables
  *
@@ -3905,32 +3928,14 @@ extern "C" {
  *   `true` or `false` (Default: `true`)
  * - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
  */
-struct lb_config_t *lb_config_from_env(struct lb_error_t **error);
-
-struct lb_config_t *lb_config_new(const char *app_key,
-                                  const char *app_secret,
-                                  const char *access_token,
-                                  const char *http_url,
-                                  const char *quote_ws_url,
-                                  const char *trade_ws_url,
-                                  const enum lb_language_t *language,
-                                  bool enable_overight,
-                                  const enum lb_push_candlestick_mode_t *push_candlestick_mode,
-                                  bool enable_print_quote_packages,
-                                  const char *log_path);
+struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
 
 /**
  * Create a new `Config` for OAuth 2.0 authentication
  *
- * OAuth 2.0 is the recommended authentication method that uses Bearer tokens
- * and does not require app_secret or HMAC signatures.
- *
- * # Arguments
- *
- * - `token` - OAuth 2.0 token obtained from `lb_oauth_authorize` or
- *   `lb_oauth_refresh`
+ * @param oauth  OAuth 2.0 client obtained from `lb_oauth_new`
  */
-struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_token_t *token);
+struct lb_config_t *lb_config_from_oauth(const struct lb_oauth_t *oauth);
 
 /**
  * Free the config object
@@ -3957,12 +3962,12 @@ int64_t lb_error_code(const struct lb_error_t *error);
 enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
 
 /**
- * Create a HTTP client
+ * Create a HTTP client using API Key authentication
  */
-struct lb_http_client_t *lb_http_client_new(const char *http_url,
-                                            const char *app_key,
-                                            const char *app_secret,
-                                            const char *access_token);
+struct lb_http_client_t *lb_http_client_from_apikey(const char *http_url,
+                                                    const char *app_key,
+                                                    const char *app_secret,
+                                                    const char *access_token);
 
 /**
  * Free the http client
@@ -3970,10 +3975,9 @@ struct lb_http_client_t *lb_http_client_new(const char *http_url,
 void lb_http_client_free(struct lb_http_client_t *http_client);
 
 /**
- * Create a new `HttpClient` from the given environment variables
+ * Create a new `HttpClient` from environment variables (API Key mode)
  *
- * It first gets the environment variables from the `.env` file in the
- * current directory.
+ * It first reads the `.env` file in the current directory.
  *
  * # Variables
  *
@@ -3982,15 +3986,14 @@ void lb_http_client_free(struct lb_http_client_t *http_client);
  * - `LONGPORT_APP_SECRET` - App secret
  * - `LONGPORT_ACCESS_TOKEN` - Access token
  */
-struct lb_http_client_t *lb_http_client_from_env(struct lb_error_t **error);
+struct lb_http_client_t *lb_http_client_from_apikey_env(struct lb_error_t **error);
 
 /**
- * Create a new `HttpClient` from an OAuth 2.0 access token
+ * Create a new `HttpClient` from an OAuth 2.0 client
  *
- * @param token - OAuth 2.0 token obtained from `lb_oauth_authorize` or
- * `lb_oauth_refresh`
+ * @param oauth  OAuth 2.0 client obtained from `lb_oauth_new`
  */
-struct lb_http_client_t *lb_http_client_from_oauth(const struct lb_oauth_token_t *token);
+struct lb_http_client_t *lb_http_client_from_oauth(const struct lb_oauth_t *oauth);
 
 /**
  * Performs a HTTP request
@@ -4011,123 +4014,35 @@ void lb_http_result_free(struct lb_http_result_t *http_result);
 const char *lb_http_result_response_body(const struct lb_http_result_t *http_result);
 
 /**
- * Create a new OAuth 2.0 client with the default callback port (60355)
+ * Asynchronously build an OAuth 2.0 client.
  *
- * @param client_id  OAuth 2.0 client ID from the LongPort developer portal
- * @return Pointer to a new `lb_oauth_t`; free with `lb_oauth_free`
- */
-struct lb_oauth_t *lb_oauth_new(const char *client_id);
-
-/**
- * Set the callback port on an existing OAuth 2.0 client
+ * Tries to load an existing token from
+ * `~/.longbridge-openapi/tokens/<client_id>`. If the token is missing or
+ * expired, starts a local callback server and calls `open_url_callback` so
+ * the caller can open the authorization URL in a browser.
  *
- * @param oauth          OAuth client
- * @param callback_port  TCP port for the local callback server. Must match one
- *                       of the redirect URIs registered for the client.
+ * @param client_id          NUL-terminated OAuth 2.0 client ID
+ * @param callback_port      Local callback server port; pass 0 to use the
+ *                           default (60355)
+ * @param open_url_callback  Called with the authorization URL and
+ *                           `open_url_userdata` during the auth flow
+ * @param open_url_userdata  Opaque pointer forwarded to `open_url_callback`
+ * @param callback           Async completion callback; `data` is
+ *                           `*mut LbOAuth` on success (free with
+ *                           `lb_oauth_free`)
+ * @param userdata           Opaque pointer forwarded to `callback`
  */
-void lb_oauth_set_callback_port(struct lb_oauth_t *oauth, uint16_t callback_port);
+void lb_oauth_new(const char *client_id,
+                  uint16_t callback_port,
+                  void (*open_url_callback)(const char*, void*),
+                  void *open_url_userdata,
+                  lb_async_callback_t callback,
+                  void *userdata);
 
 /**
  * Free an OAuth 2.0 client object
  */
 void lb_oauth_free(struct lb_oauth_t *oauth);
-
-/**
- * Free a `lb_oauth_token_t` returned by `lb_oauth_authorize` or
- * `lb_oauth_refresh`
- */
-void lb_oauth_token_free(struct lb_oauth_token_t *token);
-
-/**
- * Returns true if the token has expired
- */
-bool lb_oauth_token_is_expired(const struct lb_oauth_token_t *token);
-
-/**
- * Returns true if the token will expire within 1 hour
- */
-bool lb_oauth_token_expires_soon(const struct lb_oauth_token_t *token);
-
-/**
- * Start the OAuth 2.0 authorization flow (async)
- *
- * Starts a local HTTP server, calls `open_url_callback` with the
- * authorization URL so the caller can open it in a browser, then waits for
- * the redirect and exchanges the authorization code for a token.
- *
- * @param oauth              OAuth client
- * @param open_url_callback  Called with the authorization URL and
- *                           `open_url_userdata`
- * @param open_url_userdata  Opaque pointer forwarded to `open_url_callback`
- * @param callback           Async completion callback; `data` is
- *                           `*mut lb_oauth_token_t` on success
- * @param userdata           Opaque pointer forwarded to `callback`
- */
-void lb_oauth_authorize(const struct lb_oauth_t *oauth,
-                        void (*open_url_callback)(const char*, void*),
-                        void *open_url_userdata,
-                        lb_async_callback_t callback,
-                        void *userdata);
-
-/**
- * Refresh an OAuth 2.0 access token (async)
- *
- * @param oauth          OAuth client
- * @param token          Existing token whose refresh token is used
- * @param callback       Async completion callback; `data` is
- *                       `*mut lb_oauth_token_t` on success
- * @param userdata       Opaque pointer forwarded to `callback`
- */
-void lb_oauth_refresh(const struct lb_oauth_t *oauth,
-                      const struct lb_oauth_token_t *token,
-                      lb_async_callback_t callback,
-                      void *userdata);
-
-/**
- * Load a token from the default path (`~/.longbridge-openapi/token`)
- *
- * @param error  If non-null and the call fails, receives an owned
- *               `lb_error_t*` that the caller must free with `lb_error_free`
- * @return `lb_oauth_token_t*` on success, null on failure
- */
-struct lb_oauth_token_t *lb_oauth_token_load(struct lb_error_t **error);
-
-/**
- * Load a token from an explicit file path
- *
- * @param path   NUL-terminated path to the token JSON file
- * @param error  If non-null and the call fails, receives an owned
- *               `lb_error_t*` that the caller must free with `lb_error_free`
- * @return `lb_oauth_token_t*` on success, null on failure
- */
-struct lb_oauth_token_t *lb_oauth_token_load_from_path(const char *path, struct lb_error_t **error);
-
-/**
- * Save a token to the default path (`~/.longbridge-openapi/token`)
- *
- * The parent directory is created automatically if it does not exist.
- *
- * @param token  Token to save
- * @param error  If non-null and the call fails, receives an owned
- *               `lb_error_t*` that the caller must free with `lb_error_free`
- * @return `true` on success, `false` on failure
- */
-bool lb_oauth_token_save(const struct lb_oauth_token_t *token, struct lb_error_t **error);
-
-/**
- * Save a token to an explicit file path
- *
- * The parent directory is created automatically if it does not exist.
- *
- * @param token  Token to save
- * @param path   NUL-terminated destination path for the token JSON file
- * @param error  If non-null and the call fails, receives an owned
- *               `lb_error_t*` that the caller must free with `lb_error_free`
- * @return `true` on success, `false` on failure
- */
-bool lb_oauth_token_save_to_path(const struct lb_oauth_token_t *token,
-                                 const char *path,
-                                 struct lb_error_t **error);
 
 void lb_quote_context_new(const struct lb_config_t *config,
                           lb_async_callback_t callback,

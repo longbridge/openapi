@@ -4,8 +4,8 @@ use std::{path::PathBuf, sync::Arc};
 
 use clap::Parser;
 use longport::{Config, QuoteContext, TradeContext};
-use poem::{EndpointExt, Route, Server, listener::TcpListener, middleware::Cors};
-use poem_mcpserver::{McpServer, stdio::stdio, streamable_http};
+use poem::{listener::TcpListener, middleware::Cors, EndpointExt, Route, Server};
+use poem_mcpserver::{stdio::stdio, streamable_http, McpServer};
 use server::Longport;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 
@@ -42,7 +42,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let config = Arc::new(
-        Config::from_env()
+        Config::from_apikey_env()
             .inspect_err(|err| tracing::error!(error = %err, "failed to load config"))?
             .dont_print_quote_packages(),
     );

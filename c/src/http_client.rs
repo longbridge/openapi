@@ -1,25 +1,25 @@
 use std::{
     collections::HashMap,
-    ffi::{CStr, CString, c_char, c_void},
+    ffi::{c_char, c_void, CStr, CString},
 };
 
 use longport::{
-    Error,
     httpclient::{HttpClient, HttpClientConfig, HttpClientError},
+    Error,
 };
 
 use crate::{
-    async_call::{CAsyncCallback, execute_async},
-    error::{CError, set_error},
-    oauth::COAuthToken,
+    async_call::{execute_async, CAsyncCallback},
+    error::{set_error, CError},
+    oauth::COAuth,
 };
 
 /// A HTTP client for LongPort OpenApi
 pub struct CHttpClient(HttpClient);
 
-/// Create a HTTP client
+/// Create a HTTP client using API Key authentication
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_http_client_new(
+pub unsafe extern "C" fn lb_http_client_from_apikey(
     http_url: *const c_char,
     app_key: *const c_char,
     app_secret: *const c_char,
@@ -45,10 +45,9 @@ pub unsafe extern "C" fn lb_http_client_free(http_client: *mut CHttpClient) {
     let _ = Box::from_raw(http_client);
 }
 
-/// Create a new `HttpClient` from the given environment variables
+/// Create a new `HttpClient` from environment variables (API Key mode)
 ///
-/// It first gets the environment variables from the `.env` file in the
-/// current directory.
+/// It first reads the `.env` file in the current directory.
 ///
 /// # Variables
 ///
@@ -57,7 +56,9 @@ pub unsafe extern "C" fn lb_http_client_free(http_client: *mut CHttpClient) {
 /// - `LONGPORT_APP_SECRET` - App secret
 /// - `LONGPORT_ACCESS_TOKEN` - Access token
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_http_client_from_env(error: *mut *mut CError) -> *mut CHttpClient {
+pub unsafe extern "C" fn lb_http_client_from_apikey_env(
+    error: *mut *mut CError,
+) -> *mut CHttpClient {
     match HttpClient::from_env() {
         Ok(http_client) => {
             set_error(error, None);
@@ -70,14 +71,13 @@ pub unsafe extern "C" fn lb_http_client_from_env(error: *mut *mut CError) -> *mu
     }
 }
 
-/// Create a new `HttpClient` from an OAuth 2.0 access token
+/// Create a new `HttpClient` from an OAuth 2.0 client
 ///
-/// @param token - OAuth 2.0 token obtained from `lb_oauth_authorize` or
-/// `lb_oauth_refresh`
+/// @param oauth  OAuth 2.0 client obtained from `lb_oauth_new`
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_http_client_from_oauth(token: *const COAuthToken) -> *mut CHttpClient {
+pub unsafe extern "C" fn lb_http_client_from_oauth(oauth: *const COAuth) -> *mut CHttpClient {
     Box::leak(Box::new(CHttpClient(HttpClient::new(
-        HttpClientConfig::from_oauth(&(*token).0),
+        HttpClientConfig::from_oauth((*oauth).inner.clone()),
     ))))
 }
 

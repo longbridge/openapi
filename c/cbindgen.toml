@@ -130,7 +130,6 @@ cpp_compat = true
 "CMarketTemperature" = "lb_market_temperature_t"
 "CHistoryMarketTemperatureResponse" = "lb_history_market_temperature_response_t"
 "COAuth" = "lb_oauth_t"
-"COAuthToken" = "lb_oauth_token_t"
 
 [export]
 include = [
@@ -171,5 +170,4 @@ include = [
     "CMarketTemperature",
     "CHistoryMarketTemperatureResponse",
     "COAuth",
-    "COAuthToken",
 ]
