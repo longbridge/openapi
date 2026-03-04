@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [4.0.0]
+
+- Add OAuth 2.0 authentication support across all language bindings (Rust, C, C++, Java, Python, Node.js).
+  - New `OAuthBuilder` / `OAuth` types: use `OAuthBuilder` to run the browser-based authorization flow; the resulting `OAuth` handle is passed to `Config::from_oauth()`.
+  - Tokens are automatically persisted to `~/.longbridge-openapi/tokens/<client_id>` and reused on subsequent runs; the browser authorization flow is only triggered when no valid token exists.
+
+- **Breaking** (Rust):
+  - `Config::new` → `Config::from_apikey`
+  - `Config::from_env` → `Config::from_apikey_env`
+  - `Config::refresh_access_token` and `Config::refresh_access_token_blocking` removed
+
+- **Breaking** (C/C++):
+  - `lb_config_new` → `lb_config_from_apikey`
+  - `lb_config_from_env` → `lb_config_from_apikey_env`
+  - `lb_config_refresh_access_token` removed
+  - `lb_http_client_new` → `lb_http_client_from_apikey`
+  - `lb_http_client_from_env` → `lb_http_client_from_apikey_env`
+
+- **Breaking** (Java):
+  - `Config.fromEnv()` → `Config.fromApikeyEnv()`
+  - `Config.refreshAccessToken()` removed
+
+- **Breaking** (Python):
+  - `Config.from_env()` → `Config.from_apikey_env()`
+  - `Config.refresh_access_token()` removed
+  - `HttpClient.from_env()` → `HttpClient.from_apikey_env()`
+
+- **Breaking** (Node.js):
+  - `Config.fromEnv()` → `Config.fromApikeyEnv()`
+
 # [3.0.22]
 
 - python: add asyncio support for quote, trade, and HTTP client; existing sync API unchanged.

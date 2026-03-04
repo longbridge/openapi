@@ -3,19 +3,19 @@ resolver = "3"
 members = ["rust", "python", "nodejs", "java", "c", "mcp"]
 
 [workspace.package]
-version = "3.0.22"
+version = "4.0.0"
 edition = "2024"
 
 [profile.release]
 lto = true
 
 [workspace.dependencies]
-longport-wscli = { path = "rust/crates/wsclient", version = "3.0.22" }
-longport-httpcli = { path = "rust/crates/httpclient", version = "3.0.22" }
-longport-proto = { path = "rust/crates/proto", version = "3.0.22" }
-longport-candlesticks = { path = "rust/crates/candlesticks", version = "3.0.22" }
-longport-oauth = { path = "rust/crates/oauth", version = "3.0.22" }
-longport = { path = "rust", version = "3.0.22" }
+longport-wscli = { path = "rust/crates/wsclient", version = "4.0.0" }
+longport-httpcli = { path = "rust/crates/httpclient", version = "4.0.0" }
+longport-proto = { path = "rust/crates/proto", version = "4.0.0" }
+longport-candlesticks = { path = "rust/crates/candlesticks", version = "4.0.0" }
+longport-oauth = { path = "rust/crates/oauth", version = "4.0.0" }
+longport = { path = "rust", version = "4.0.0" }
 
 tokio = "1.47.1"
 tokio-tungstenite = "0.27.0"
