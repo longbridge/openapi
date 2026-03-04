@@ -59,6 +59,7 @@ impl QuoteContextSync {
     /// use longbridge::{
     ///     Config,
     ///     blocking::QuoteContextSync,
+    ///     oauth::OAuthBuilder,
     ///     quote::{PushEvent, SubFlags},
     /// };
     ///
@@ -67,7 +68,9 @@ impl QuoteContextSync {
     /// }
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
@@ -93,10 +96,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync, quote::SubFlags};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::SubFlags};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
@@ -125,6 +130,7 @@ impl QuoteContextSync {
     /// use longbridge::{
     ///     Config,
     ///     blocking::QuoteContextSync,
+    ///     oauth::OAuthBuilder,
     ///     quote::{Period, PushEvent, TradeSessions},
     /// };
     ///
@@ -133,7 +139,9 @@ impl QuoteContextSync {
     /// }
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)?;
@@ -172,10 +180,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync, quote::SubFlags};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::SubFlags};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
@@ -196,10 +206,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.static_info(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])?;
@@ -224,10 +236,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])?;
@@ -252,10 +266,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.option_quote(["AAPL230317P160000.US"])?;
@@ -280,10 +296,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.warrant_quote(["21125.HK"])?;
@@ -308,10 +326,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.depth("700.HK")?;
@@ -331,10 +351,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.brokers("700.HK")?;
@@ -354,10 +376,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.participants()?;
@@ -377,10 +401,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.trades("700.HK", 10)?;
@@ -404,10 +430,14 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync, quote::TradeSessions};
+    /// use longbridge::{
+    ///     Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::TradeSessions,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.intraday("700.HK", TradeSessions::Intraday)?;
@@ -434,11 +464,14 @@ impl QuoteContextSync {
     /// use longbridge::{
     ///     Config,
     ///     blocking::QuoteContextSync,
+    ///     oauth::OAuthBuilder,
     ///     quote::{AdjustType, Period, TradeSessions},
     /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.candlesticks(
@@ -522,10 +555,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.option_chain_expiry_date_list("AAPL.US")?;
@@ -548,11 +583,13 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20))?;
@@ -577,10 +614,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.warrant_issuers()?;
@@ -633,10 +672,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.trading_session()?;
@@ -659,11 +700,13 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, Market, blocking::QuoteContextSync};
+    /// use longbridge::{Config, Market, blocking::QuoteContextSync, oauth::OAuthBuilder};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.trading_days(Market::HK, date!(2022 - 01 - 20), date!(2022 - 02 - 20))?;
@@ -688,11 +731,13 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.capital_flow("700.HK")?;
@@ -715,11 +760,13 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.capital_distribution("700.HK")?;
@@ -755,10 +802,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.watchlist()?;
@@ -778,10 +827,14 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync, quote::RequestCreateWatchlistGroup};
+    /// use longbridge::{
+    ///     Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::RequestCreateWatchlistGroup,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let req = RequestCreateWatchlistGroup::new("Watchlist1").securities(["700.HK", "BABA.US"]);
@@ -802,10 +855,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync};
+    /// use longbridge::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.delete_watchlist_group(10086, true)?;
@@ -824,10 +879,14 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::QuoteContextSync, quote::RequestUpdateWatchlistGroup};
+    /// use longbridge::{
+    ///     Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::RequestUpdateWatchlistGroup,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let req = RequestUpdateWatchlistGroup::new(10086)
@@ -860,10 +919,12 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, Market, blocking::QuoteContextSync};
+    /// use longbridge::{Config, Market, blocking::QuoteContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.market_temperature(Market::HK)?;
@@ -883,11 +944,13 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, Market, blocking::QuoteContextSync};
+    /// use longbridge::{Config, Market, blocking::QuoteContextSync, oauth::OAuthBuilder};
     /// use time::macros::date;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// let resp =
@@ -918,10 +981,14 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{Config, Market, blocking::QuoteContextSync, quote::SubFlags};
+    /// use longbridge::{
+    ///     Config, Market, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::SubFlags,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
@@ -952,10 +1019,14 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{Config, Market, blocking::QuoteContextSync, quote::SubFlags};
+    /// use longbridge::{
+    ///     Config, Market, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::SubFlags,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH)?;
@@ -984,10 +1055,14 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{Config, Market, blocking::QuoteContextSync, quote::SubFlags};
+    /// use longbridge::{
+    ///     Config, Market, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::SubFlags,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE)?;
@@ -1017,10 +1092,14 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::{sync::Arc, thread::sleep, time::Duration};
     ///
-    /// use longbridge::{Config, Market, blocking::QuoteContextSync, quote::SubFlags};
+    /// use longbridge::{
+    ///     Config, Market, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::SubFlags,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER)?;
@@ -1052,11 +1131,14 @@ impl QuoteContextSync {
     /// use longbridge::{
     ///     Config, Market,
     ///     blocking::QuoteContextSync,
+    ///     oauth::OAuthBuilder,
     ///     quote::{Period, TradeSessions},
     /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)?;

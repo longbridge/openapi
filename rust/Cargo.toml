@@ -11,7 +11,7 @@ keywords = ["longbridge", "openapi", "sdk"]
 categories = ["api-bindings"]
 
 [features]
-blocking = ["flume"]
+blocking = ["flume", "longbridge-oauth/blocking"]
 
 [dependencies]
 longbridge-wscli.workspace = true

@@ -5,6 +5,9 @@ version.workspace = true
 description = "Longbridge OpenAPI OAuth 2.0 client for Rust"
 license = "MIT OR Apache-2.0"
 
+[features]
+blocking = ["tokio/rt-multi-thread"]
+
 [dependencies]
 futures-util.workspace = true
 oauth2.workspace = true

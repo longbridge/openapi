@@ -108,11 +108,15 @@ impl TradeContext {
     ///
     /// use longbridge::{
     ///     Config, decimal,
+    ///     oauth::OAuthBuilder,
     ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType, TradeContext},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, mut receiver) = TradeContext::try_new(config).await?;
     ///
     /// let opts = SubmitOrderOptions::new(
@@ -176,13 +180,17 @@ impl TradeContext {
     /// use std::sync::Arc;
     ///
     /// use longbridge::{
+    ///     oauth::OAuthBuilder,
     ///     trade::{GetHistoryExecutionsOptions, TradeContext},
     ///     Config,
     /// };
     /// use time::macros::datetime;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let opts = GetHistoryExecutionsOptions::new()
@@ -227,11 +235,15 @@ impl TradeContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     trade::{GetTodayExecutionsOptions, TradeContext},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let opts = GetTodayExecutionsOptions::new().symbol("700.HK");
@@ -272,13 +284,17 @@ impl TradeContext {
     /// use std::sync::Arc;
     ///
     /// use longbridge::{
+    ///     oauth::OAuthBuilder,
     ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus, TradeContext},
     ///     Config, Market,
     /// };
     /// use time::macros::datetime;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let opts = GetHistoryOrdersOptions::new()
@@ -326,11 +342,15 @@ impl TradeContext {
     ///
     /// use longbridge::{
     ///     Config, Market,
+    ///     oauth::OAuthBuilder,
     ///     trade::{GetTodayOrdersOptions, OrderSide, OrderStatus, TradeContext},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let opts = GetTodayOrdersOptions::new()
@@ -376,11 +396,15 @@ impl TradeContext {
     ///
     /// use longbridge::{
     ///     Config, decimal,
+    ///     oauth::OAuthBuilder,
     ///     trade::{ReplaceOrderOptions, TradeContext},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let opts =
@@ -414,11 +438,15 @@ impl TradeContext {
     ///
     /// use longbridge::{
     ///     Config, decimal,
+    ///     oauth::OAuthBuilder,
     ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType, TradeContext},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let opts = SubmitOrderOptions::new(
@@ -460,10 +488,13 @@ impl TradeContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, trade::TradeContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// ctx.cancel_order("709043056541253632").await?;
@@ -499,10 +530,13 @@ impl TradeContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, trade::TradeContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let resp = ctx.account_balance(None).await?;
@@ -544,13 +578,17 @@ impl TradeContext {
     /// use std::sync::Arc;
     ///
     /// use longbridge::{
+    ///     oauth::OAuthBuilder,
     ///     trade::{GetCashFlowOptions, TradeContext},
     ///     Config,
     /// };
     /// use time::macros::datetime;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let opts = GetCashFlowOptions::new(datetime!(2022-05-09 0:00 UTC), datetime!(2022-05-12 0:00 UTC));
@@ -587,10 +625,13 @@ impl TradeContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, trade::TradeContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let resp = ctx.fund_positions(None).await?;
@@ -623,10 +664,13 @@ impl TradeContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, trade::TradeContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let resp = ctx.stock_positions(None).await?;
@@ -659,10 +703,13 @@ impl TradeContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, trade::TradeContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let resp = ctx.margin_ratio("700.HK").await?;
@@ -701,12 +748,16 @@ impl TradeContext {
     ///
     /// use longbridge::{
     ///     Config, Market,
+    ///     oauth::OAuthBuilder,
     ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus, TradeContext},
     /// };
     /// use time::macros::datetime;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let resp = ctx.order_detail("701276261045858304").await?;
@@ -747,12 +798,16 @@ impl TradeContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     trade::{EstimateMaxPurchaseQuantityOptions, OrderSide, OrderType, TradeContext},
     /// };
     /// use time::macros::datetime;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = TradeContext::try_new(config).await?;
     ///
     /// let resp = ctx

@@ -53,11 +53,13 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, trade::GetHistoryExecutionsOptions, Config};
+    /// use longbridge::{oauth::OAuthBuilder, blocking::TradeContextSync, trade::GetHistoryExecutionsOptions, Config};
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts = GetHistoryExecutionsOptions::new().symbol("700.HK")
@@ -83,11 +85,15 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync, trade::GetTodayExecutionsOptions};
+    /// use longbridge::{
+    ///     Config, blocking::TradeContextSync, oauth::OAuthBuilder, trade::GetTodayExecutionsOptions,
+    /// };
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts = GetTodayExecutionsOptions::new().symbol("700.HK");
@@ -112,6 +118,7 @@ impl TradeContextSync {
     /// use std::sync::Arc;
     ///
     /// use longbridge::{
+    ///     oauth::OAuthBuilder,
     ///     blocking::TradeContextSync,
     ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus},
     ///     Config, Market,
@@ -119,7 +126,9 @@ impl TradeContextSync {
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts = GetHistoryOrdersOptions::new()
@@ -152,11 +161,14 @@ impl TradeContextSync {
     /// use longbridge::{
     ///     Config, Market,
     ///     blocking::TradeContextSync,
+    ///     oauth::OAuthBuilder,
     ///     trade::{GetTodayOrdersOptions, OrderSide, OrderStatus},
     /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts = GetTodayOrdersOptions::new()
@@ -184,10 +196,15 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync, decimal, trade::ReplaceOrderOptions};
+    /// use longbridge::{
+    ///     Config, blocking::TradeContextSync, decimal, oauth::OAuthBuilder,
+    ///     trade::ReplaceOrderOptions,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts =
@@ -213,11 +230,14 @@ impl TradeContextSync {
     ///     Config,
     ///     blocking::TradeContextSync,
     ///     decimal,
+    ///     oauth::OAuthBuilder,
     ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
     /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts = SubmitOrderOptions::new(
@@ -245,10 +265,12 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync};
+    /// use longbridge::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// ctx.cancel_order("709043056541253632")?;
@@ -267,10 +289,12 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync};
+    /// use longbridge::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.account_balance(None)?;
@@ -291,11 +315,13 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{blocking::TradeContextSync, trade::GetCashFlowOptions, Config};
+    /// use longbridge::{oauth::OAuthBuilder, blocking::TradeContextSync, trade::GetCashFlowOptions, Config};
     /// use time::macros::datetime;
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let opts = GetCashFlowOptions::new(datetime!(2022-05-09 0:00 UTC), datetime!(2022-05-12 0:00 UTC));
@@ -316,10 +342,12 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync};
+    /// use longbridge::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.fund_positions(None)?;
@@ -342,10 +370,12 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync};
+    /// use longbridge::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.stock_positions(None)?;
@@ -368,10 +398,12 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync};
+    /// use longbridge::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.margin_ratio("700.HK")?;
@@ -393,10 +425,12 @@ impl TradeContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, blocking::TradeContextSync};
+    /// use longbridge::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = TradeContextSync::try_new(config, |_| ())?;
     ///
     /// let resp = ctx.order_detail("701276261045858304")?;

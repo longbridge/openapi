@@ -199,11 +199,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
@@ -245,11 +249,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
@@ -287,11 +295,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{Period, QuoteContext, TradeSessions},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)
@@ -350,11 +362,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
@@ -382,10 +398,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx
@@ -423,10 +442,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx
@@ -461,10 +483,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.option_quote(["AAPL230317P160000.US"]).await?;
@@ -497,10 +522,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.warrant_quote(["21125.HK"]).await?;
@@ -533,10 +561,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.depth("700.HK").await?;
@@ -576,10 +607,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.brokers("700.HK").await?;
@@ -611,10 +645,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.participants().await?;
@@ -650,10 +687,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.trades("700.HK", 10).await?;
@@ -690,11 +730,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, TradeSessions},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.intraday("700.HK", TradeSessions::Intraday).await?;
@@ -735,11 +779,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{AdjustType, Period, QuoteContext, TradeSessions},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx
@@ -902,10 +950,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.option_chain_expiry_date_list("AAPL.US").await?;
@@ -945,11 +996,14 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     /// use time::macros::date;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx
@@ -996,10 +1050,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.warrant_issuers().await?;
@@ -1077,10 +1134,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.trading_session().await?;
@@ -1117,11 +1177,14 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, Market, quote::QuoteContext};
+    /// use longbridge::{Config, Market, oauth::OAuthBuilder, quote::QuoteContext};
     /// use time::macros::date;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx
@@ -1176,10 +1239,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longbridge::{oauth::OAuthBuilder, quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.capital_flow("700.HK").await?;
@@ -1209,10 +1275,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{quote::QuoteContext, Config};
+    /// use longbridge::{oauth::OAuthBuilder, quote::QuoteContext, Config};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.capital_distribution("700.HK").await?;
@@ -1274,10 +1343,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.watchlist().await?;
@@ -1313,11 +1385,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, RequestCreateWatchlistGroup},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let req = RequestCreateWatchlistGroup::new("Watchlist1").securities(["700.HK", "BABA.US"]);
@@ -1365,10 +1441,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, quote::QuoteContext};
+    /// use longbridge::{Config, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.delete_watchlist_group(10086, true).await?;
@@ -1404,11 +1483,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, RequestUpdateWatchlistGroup},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     /// let req = RequestUpdateWatchlistGroup::new(10086)
     ///     .name("Watchlist2")
@@ -1488,10 +1571,13 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, Market, quote::QuoteContext};
+    /// use longbridge::{Config, Market, oauth::OAuthBuilder, quote::QuoteContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx.market_temperature(Market::HK).await?;
@@ -1526,11 +1612,14 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longbridge::{Config, Market, quote::QuoteContext};
+    /// use longbridge::{Config, Market, oauth::OAuthBuilder, quote::QuoteContext};
     /// use time::macros::date;
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// let resp = ctx
@@ -1581,11 +1670,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
@@ -1625,11 +1718,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH)
@@ -1665,11 +1762,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE)
@@ -1711,11 +1812,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{QuoteContext, SubFlags},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER)
@@ -1751,11 +1856,15 @@ impl QuoteContext {
     ///
     /// use longbridge::{
     ///     Config,
+    ///     oauth::OAuthBuilder,
     ///     quote::{Period, QuoteContext, TradeSessions},
     /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-    /// let config = Arc::new(Config::from_env()?);
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)

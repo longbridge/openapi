@@ -341,6 +341,40 @@ impl OAuthBuilder {
         self
     }
 
+    /// Synchronously build the [`OAuth`] client.
+    ///
+    /// This is the blocking equivalent of [`build`](OAuthBuilder::build).  It
+    /// spins up a temporary single-threaded Tokio runtime internally so it can
+    /// be called from a non-async context such as a blocking application or a
+    /// doc-test `fn main()`.
+    ///
+    /// First tries to load an existing token from
+    /// `~/.longbridge-openapi/tokens/<client_id>`.  If no valid token is found
+    /// the full browser-based authorization flow is started and `open_url` is
+    /// called with the authorization URL.  The resulting token is persisted for
+    /// future use.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use longbridge_oauth::OAuthBuilder;
+    ///
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let oauth =
+    ///         OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    ///     println!("client_id: {}", oauth.client_id());
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(feature = "blocking")]
+    pub fn build_blocking(self, open_url: impl Fn(&str)) -> OAuthResult<OAuth> {
+        tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .map_err(|e| OAuthError::OAuth(format!("Failed to create Tokio runtime: {e}")))?
+            .block_on(self.build(open_url))
+    }
+
     /// Asynchronously build the [`OAuth`] client.
     ///
     /// First tries to load an existing token from
