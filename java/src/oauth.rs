@@ -3,213 +3,41 @@ use jni::{
     objects::{JClass, JObject, JString},
     sys::{jint, jlong},
 };
-use longport::oauth::OAuth;
+use longport::oauth::{OAuth, OAuthBuilder};
 
-use crate::{async_util, error::jni_result, types::set_field};
-
-// ── OAuthToken native handle
-// ──────────────────────────────────────────────────
-
-struct OAuthTokenPtr(*mut longport::oauth::OAuthToken);
-
-impl crate::types::IntoJValue for OAuthTokenPtr {
-    fn into_jvalue<'a>(
-        self,
-        env: &mut JNIEnv<'a>,
-    ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
-        let obj = env.new_object(crate::init::OAUTH_TOKEN_CLASS.get().unwrap(), "()V", &[])?;
-        set_field(env, &obj, "raw", self.0 as i64)?;
-        Ok(jni::objects::JValueOwned::from(obj))
-    }
-}
-
-fn into_token_ptr(token: longport::oauth::OAuthToken) -> OAuthTokenPtr {
-    OAuthTokenPtr(Box::into_raw(Box::new(token)))
-}
+use crate::{async_util, error::jni_result};
 
 // ── OAuth native handle
 // ───────────────────────────────────────────────────────
 
-/// Create a new OAuth 2.0 client, returning an opaque pointer stored as `long`
-/// in `com.longport.OAuth.raw`.
+/// Asynchronously build an OAuth client via OAuthBuilder.
+///
+/// `callback_port == 0` means "use the default (60355)".
+/// `openUrlCallback` must be a `java.util.function.Consumer<String>`.
+/// On success the async `callback` receives a heap-allocated `*mut OAuth`
+/// cast to `jlong`; the caller is responsible for calling `freeOAuth`.
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_newOAuth(
+pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthBuild(
     mut env: JNIEnv,
     _class: JClass,
     client_id: JString,
-) -> jlong {
-    jni_result(&mut env, 0, |env| {
-        use crate::types::FromJValue;
-        let client_id = String::from_jvalue(env, client_id.into())?;
-        Ok(Box::into_raw(Box::new(OAuth::new(client_id))) as jlong)
-    })
-}
-
-/// Free an OAuth pointer.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_freeOAuth(
-    _env: JNIEnv,
-    _class: JClass,
-    oauth: jlong,
-) {
-    drop(Box::from_raw(oauth as *mut OAuth));
-}
-
-/// Set the callback port on an existing OAuth client.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthSetCallbackPort(
-    _env: JNIEnv,
-    _class: JClass,
-    oauth: jlong,
     callback_port: jint,
-) {
-    if callback_port > 0 {
-        let oauth = &mut *(oauth as *mut OAuth);
-        oauth.set_callback_port(callback_port as u16);
-    }
-}
-
-// ── OAuthToken native methods
-// ─────────────────────────────────────────────────
-
-/// Free an OAuthToken pointer.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_freeOAuthToken(
-    _env: JNIEnv,
-    _class: JClass,
-    token: jlong,
-) {
-    drop(Box::from_raw(token as *mut longport::oauth::OAuthToken));
-}
-
-/// Returns true if the token has expired.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenIsExpired(
-    _env: JNIEnv,
-    _class: JClass,
-    token: jlong,
-) -> bool {
-    let token = &*(token as *const longport::oauth::OAuthToken);
-    token.is_expired()
-}
-
-/// Returns true if the token will expire within 1 hour.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenExpiresSoon(
-    _env: JNIEnv,
-    _class: JClass,
-    token: jlong,
-) -> bool {
-    let token = &*(token as *const longport::oauth::OAuthToken);
-    token.expires_soon()
-}
-
-/// Load a token from the default path (`~/.longbridge-openapi/token`).
-///
-/// On success the async `callback` receives a `com/longport/OAuthToken`.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenLoad(
-    mut env: JNIEnv,
-    _class: JClass,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        async_util::execute(env, callback, async move {
-            let token = longport::oauth::OAuthToken::load()?;
-            Ok(into_token_ptr(token))
-        })?;
-        Ok(())
-    })
-}
-
-/// Load a token from an explicit file path.
-///
-/// On success the async `callback` receives a `com/longport/OAuthToken`.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenLoadFromPath(
-    mut env: JNIEnv,
-    _class: JClass,
-    path: JString,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        use crate::types::FromJValue;
-        let path = String::from_jvalue(env, path.into())?;
-        async_util::execute(env, callback, async move {
-            let token = longport::oauth::OAuthToken::load_from_path(path)?;
-            Ok(into_token_ptr(token))
-        })?;
-        Ok(())
-    })
-}
-
-/// Save the token to the default path (`~/.longbridge-openapi/token`).
-///
-/// On success the async `callback` receives `null`.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenSave(
-    mut env: JNIEnv,
-    _class: JClass,
-    token: jlong,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let existing_token = (*(token as *const longport::oauth::OAuthToken)).clone();
-        async_util::execute(env, callback, async move {
-            existing_token.save()?;
-            Ok(())
-        })?;
-        Ok(())
-    })
-}
-
-/// Save the token to an explicit file path.
-///
-/// On success the async `callback` receives `null`.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthTokenSaveToPath(
-    mut env: JNIEnv,
-    _class: JClass,
-    token: jlong,
-    path: JString,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        use crate::types::FromJValue;
-        let path = String::from_jvalue(env, path.into())?;
-        let existing_token = (*(token as *const longport::oauth::OAuthToken)).clone();
-        async_util::execute(env, callback, async move {
-            existing_token.save_to_path(path)?;
-            Ok(())
-        })?;
-        Ok(())
-    })
-}
-
-// ── OAuth native methods
-// ──────────────────────────────────────────────────────
-
-/// Start the OAuth 2.0 authorization flow (async).
-///
-/// `openUrlCallback` must be a `java.util.function.Consumer<String>` — its
-/// `accept(String)` method is called with the authorization URL.
-/// On success the async `callback` receives a `com/longport/OAuthToken` object.
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthAuthorize(
-    mut env: JNIEnv,
-    _class: JClass,
-    oauth: jlong,
     open_url_callback: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let inner = (*(oauth as *const OAuth)).clone();
+        use crate::types::FromJValue;
+        let client_id = String::from_jvalue(env, client_id.into())?;
         let jvm = env.get_java_vm()?;
         let open_url_callback = env.new_global_ref(open_url_callback)?;
 
         async_util::execute(env, callback, async move {
-            let token = inner
-                .authorize(move |url| {
+            let mut builder = OAuthBuilder::new(client_id);
+            if callback_port > 0 {
+                builder = builder.callback_port(callback_port as u16);
+            }
+            let oauth = builder
+                .build(move |url| {
                     if let Ok(mut env) = jvm.attach_current_thread()
                         && let Ok(j_url) = env.new_string(url)
                     {
@@ -221,32 +49,20 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthAuthorize(
                         );
                     }
                 })
-                .await?;
-            Ok(into_token_ptr(token))
+                .await
+                .map_err(|e| crate::error::JniError::Other(e.to_string()))?;
+            Ok(Box::into_raw(Box::new(oauth)) as jlong)
         })?;
         Ok(())
     })
 }
 
-/// Refresh an access token (async).
-///
-/// On success the async `callback` receives a new `com/longport/OAuthToken`.
+/// Free an OAuth pointer.
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthRefresh(
-    mut env: JNIEnv,
+pub unsafe extern "system" fn Java_com_longport_SdkNative_freeOAuth(
+    _env: JNIEnv,
     _class: JClass,
     oauth: jlong,
-    token: jlong,
-    callback: JObject,
 ) {
-    jni_result(&mut env, (), |env| {
-        let inner = (*(oauth as *const OAuth)).clone();
-        let existing_token = (*(token as *const longport::oauth::OAuthToken)).clone();
-
-        async_util::execute(env, callback, async move {
-            let new_token = inner.refresh(&existing_token).await?;
-            Ok(into_token_ptr(new_token))
-        })?;
-        Ok(())
-    })
+    drop(Box::from_raw(oauth as *mut OAuth));
 }

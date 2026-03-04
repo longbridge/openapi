@@ -4,9 +4,8 @@ use jni::{
     sys::{jboolean, jlong},
 };
 use longport::{Config, Language, PushCandlestickMode};
-use time::OffsetDateTime;
 
-use crate::{async_util, error::jni_result, types::FromJValue};
+use crate::{error::jni_result, types::FromJValue};
 
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_com_longport_SdkNative_newConfig(
@@ -36,7 +35,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfig(
             <Option<PushCandlestickMode>>::from_jvalue(env, push_candlestick_mode.into())?;
         let log_path = <Option<String>>::from_jvalue(env, log_path.into())?;
 
-        let mut config = Config::new(app_key, app_secret, access_token);
+        let mut config = Config::from_apikey(app_key, app_secret, access_token);
 
         if let Some(http_url) = http_url {
             config = config.http_url(http_url);
@@ -73,7 +72,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfigFromEnv(
     _class: JClass,
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
-        let config = Config::from_env()?;
+        let config = Config::from_apikey_env()?;
         Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
@@ -82,11 +81,11 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfigFromEnv(
 pub unsafe extern "system" fn Java_com_longport_SdkNative_newConfigFromOauth(
     mut env: JNIEnv,
     _class: JClass,
-    token: jlong,
+    oauth: jlong,
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
-        let token = &*(token as *const longport::oauth::OAuthToken);
-        let config = Config::from_oauth(token);
+        let oauth = &*(oauth as *const longport::oauth::OAuth);
+        let config = Config::from_oauth(oauth.clone());
         Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
@@ -98,23 +97,4 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeConfig(
     config: jlong,
 ) {
     let _ = Box::from_raw(config as *mut Config);
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configRefreshAccessToken(
-    mut env: JNIEnv,
-    _class: JClass,
-    config: jlong,
-    expired_at: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let config = &*(config as *const Config);
-        let expired_at: Option<OffsetDateTime> = FromJValue::from_jvalue(env, expired_at.into())?;
-        async_util::execute(env, callback, async move {
-            let token = config.refresh_access_token(expired_at).await?;
-            Ok(token)
-        })?;
-        Ok(())
-    })
 }

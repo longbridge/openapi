@@ -1,8 +1,5 @@
 package com.longport;
 
-import java.time.OffsetDateTime;
-import java.util.concurrent.CompletableFuture;
-
 /**
  * Configuration options for LongPort sdk
  */
@@ -17,31 +14,33 @@ public class Config implements AutoCloseable {
     }
 
     /**
-     * Create a new `Config` from the given environment variables
+     * Create a new {@code Config} from the given environment variables
      * <p>
      * It first gets the environment variables from the .env file in the current
      * directory.
      *
-     * # Variables
-     *
-     * - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
-     * (Default: `en`)
-     * - `LONGPORT_APP_KEY` - App key
-     * - `LONGPORT_APP_SECRET` - App secret
-     * - `LONGPORT_ACCESS_TOKEN` - Access token
-     * - `LONGPORT_HTTP_URL` - HTTP endpoint url (Default:
-     * `https://openapi.longportapp.com`)
-     * - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
-     * `wss://openapi-quote.longportapp.com/v2`)
-     * - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url (Default:
-     * `wss://openapi-trade.longportapp.com/v2`)
-     * - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
-     * `false` (Default: `false`)
-     * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
-     * `realtime`)
-     * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
-     * `true` or `false` (Default: `true`)
-     * - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
+     * <h4>Variables</h4>
+     * <ul>
+     * <li>{@code LONGPORT_LANGUAGE} - Language identifier, {@code zh-CN},
+     * {@code zh-HK} or {@code en} (Default: {@code en})</li>
+     * <li>{@code LONGPORT_APP_KEY} - App key</li>
+     * <li>{@code LONGPORT_APP_SECRET} - App secret</li>
+     * <li>{@code LONGPORT_ACCESS_TOKEN} - Access token</li>
+     * <li>{@code LONGPORT_HTTP_URL} - HTTP endpoint url (Default:
+     * {@code https://openapi.longportapp.com})</li>
+     * <li>{@code LONGPORT_QUOTE_WS_URL} - Quote websocket endpoint url (Default:
+     * {@code wss://openapi-quote.longportapp.com/v2})</li>
+     * <li>{@code LONGPORT_TRADE_WS_URL} - Trade websocket endpoint url (Default:
+     * {@code wss://openapi-trade.longportapp.com/v2})</li>
+     * <li>{@code LONGPORT_ENABLE_OVERNIGHT} - Enable overnight quote, {@code true}
+     * or {@code false} (Default: {@code false})</li>
+     * <li>{@code LONGPORT_PUSH_CANDLESTICK_MODE} - {@code realtime} or
+     * {@code confirmed} (Default: {@code realtime})</li>
+     * <li>{@code LONGPORT_PRINT_QUOTE_PACKAGES} - Print quote packages when
+     * connected, {@code true} or {@code false} (Default: {@code true})</li>
+     * <li>{@code LONGPORT_LOG_PATH} - Set the path of the log files (Default: no
+     * logs)</li>
+     * </ul>
      *
      * @return Config object
      * @throws OpenApiException If an error occurs
@@ -51,17 +50,17 @@ public class Config implements AutoCloseable {
     }
 
     /**
-     * Create a new `Config` for OAuth 2.0 authentication
+     * Create a new {@code Config} for OAuth 2.0 authentication.
      * <p>
-     * OAuth 2.0 is the recommended authentication method that uses Bearer tokens
-     * and does not require app_secret or HMAC signatures.
+     * OAuth 2.0 is the recommended authentication method. Obtain an {@link OAuth}
+     * instance via {@link OAuthBuilder#build}.
      *
-     * @param token OAuthToken returned by {@link OAuth#authorize} or {@link OAuth#refresh}
+     * @param oauth OAuth handle returned by {@link OAuthBuilder#build}
      * @return Config object
      * @throws OpenApiException If an error occurs
      */
-    public static Config fromOAuth(OAuthToken token) throws OpenApiException {
-        return new Config(SdkNative.newConfigFromOauth(token.raw));
+    public static Config fromOAuth(OAuth oauth) throws OpenApiException {
+        return new Config(SdkNative.newConfigFromOauth(oauth.getRaw()));
     }
 
     /**
@@ -75,11 +74,5 @@ public class Config implements AutoCloseable {
     @Override
     public void close() throws Exception {
         SdkNative.freeConfig(this.raw);
-    }
-
-    public CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) throws OpenApiException {
-        return AsyncCallback.executeTask((callback) -> {
-            SdkNative.configRefreshAccessToken(this.raw, expiredAt, callback);
-        });
     }
 }

@@ -3,32 +3,13 @@ import com.longport.trade.*;
 import java.math.BigDecimal;
 
 public class Main {
-    static OAuthToken getToken() throws Exception {
-        String clientId = "your-client-id";
-        try {
-            OAuthToken token = OAuthToken.load().get();
-            if (token.isExpired()) throw new Exception("token expired");
-            if (token.expiresSoon()) {
-                try (OAuth oauth = new OAuth(clientId)) {
-                    OAuthToken newToken = oauth.refresh(token).get();
-                    newToken.save().get();
-                    return newToken;
-                } catch (Exception e) { /* fall through */ }
-            } else {
-                return token;
-            }
-        } catch (Exception e) { /* fall through */ }
-        try (OAuth oauth = new OAuth(clientId)) {
-            OAuthToken token = oauth.authorize(url -> System.out.println(url)).get();
-            token.save().get();
-            return token;
-        }
-    }
-
     public static void main(String[] args) throws Exception {
-        OAuthToken token = getToken();
-        try (token;
-             Config config = Config.fromOAuth(token);
+        String clientId = "your-client-id";
+        OAuth oauth = new OAuthBuilder(clientId)
+                .build(url -> System.out.println("Open to authorize: " + url))
+                .get();
+        try (oauth;
+             Config config = Config.fromOAuth(oauth);
              TradeContext ctx = TradeContext.create(config).get()) {
             SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
                     OrderType.LO,

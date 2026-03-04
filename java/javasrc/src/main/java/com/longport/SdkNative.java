@@ -2,12 +2,12 @@ package com.longport;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.function.Consumer;
 import org.scijava.nativelib.NativeLoader;
 
 import com.longport.quote.*;
 import com.longport.trade.*;
 
-import java.time.OffsetDateTime;
 import java.time.LocalDateTime;
 
 /**
@@ -32,37 +32,14 @@ public class SdkNative {
 
         public static native long newConfigFromEnv();
 
-        public static native long newConfigFromOauth(long oauthToken);
-
-        public static native void configRefreshAccessToken(long config, OffsetDateTime expired_at,
-                        AsyncCallback callback);
+        public static native long newConfigFromOauth(long oauth);
 
         public static native void freeConfig(long config);
 
-        public static native long newOAuth(String clientId);
+        public static native void oauthBuild(String clientId, int callbackPort,
+                        Consumer<String> openUrlCallback, AsyncCallback callback);
 
         public static native void freeOAuth(long oauth);
-
-        public static native void oauthSetCallbackPort(long oauth, int callbackPort);
-
-        public static native void freeOAuthToken(long oauthToken);
-
-        public static native boolean oauthTokenIsExpired(long oauthToken);
-
-        public static native boolean oauthTokenExpiresSoon(long oauthToken);
-
-        public static native void oauthTokenLoad(AsyncCallback callback);
-
-        public static native void oauthTokenLoadFromPath(String path, AsyncCallback callback);
-
-        public static native void oauthTokenSave(long oauthToken, AsyncCallback callback);
-
-        public static native void oauthTokenSaveToPath(long oauthToken, String path, AsyncCallback callback);
-
-        public static native void oauthAuthorize(long oauth, java.util.function.Consumer<String> openUrlCallback,
-                        AsyncCallback callback);
-
-        public static native void oauthRefresh(long oauth, long oauthToken, AsyncCallback callback);
 
         public static native void newQuoteContext(long config, AsyncCallback callback);
 
