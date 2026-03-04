@@ -59,7 +59,7 @@ impl HttpClient {
     /// `LONGBRIDGE_HTTP_URL` is read from the environment automatically.
     /// Passing `httpUrl` overrides that value.
     ///
-    /// @param oauth    OAuth handle obtained from `OAuthBuilder.build(...)`
+    /// @param oauth    OAuth handle obtained from `OAuth.build(...)`
     /// @param httpUrl  HTTP endpoint url override (reads `LONGBRIDGE_HTTP_URL`
     ///                 from env if omitted; falls back to
     ///                 `https://openapi.longbridge.com`)

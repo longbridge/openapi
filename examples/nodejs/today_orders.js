@@ -1,7 +1,7 @@
-const { Config, TradeContext, OAuthBuilder } = require('longbridge');
+const { Config, TradeContext, OAuth } = require('longbridge');
 
 async function main() {
-  const oauth = await OAuthBuilder.build("your-client-id", (url) => {
+  const oauth = await OAuth.build("your-client-id", (url) => {
     console.log("Open this URL to authorize: " + url);
   });
   let config = Config.fromOAuth(oauth);

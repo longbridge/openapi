@@ -76,7 +76,7 @@ Save the `client_id` for use in your application.
 
 **Step 2: Build an OAuth client and create Config**
 
-`OAuthBuilder.build()` loads a cached token from
+`OAuth.build()` loads a cached token from
 `~/.longbridge-openapi/tokens/<client_id>`
 (`%USERPROFILE%\.longbridge-openapi\tokens\<client_id>` on Windows) if one
 exists and is still valid, or starts the browser authorization flow
@@ -84,10 +84,10 @@ automatically.  The token is persisted to the same path after a successful
 authorization or refresh.
 
 ```javascript
-const { OAuthBuilder, Config } = require('longbridge');
+const { OAuth, Config } = require('longbridge');
 
 async function main() {
-  const oauth = await OAuthBuilder.build(
+  const oauth = await OAuth.build(
     "your-client-id",
     (url) => console.log("Open this URL to authorize: " + url)
   );
@@ -126,10 +126,10 @@ const config = Config.fromApikeyEnv();
 ## Quote API _(Get basic information of securities)_
 
 ```javascript
-const { OAuthBuilder, Config, QuoteContext } = require('longbridge');
+const { OAuth, Config, QuoteContext } = require('longbridge');
 
 async function main() {
-  const oauth = await OAuthBuilder.build(
+  const oauth = await OAuth.build(
     "your-client-id",
     (url) => console.log("Open this URL to authorize: " + url)
   );
@@ -147,10 +147,10 @@ main();
 ## Quote API _(Subscribe quotes)_
 
 ```javascript
-const { OAuthBuilder, Config, QuoteContext, SubType } = require('longbridge');
+const { OAuth, Config, QuoteContext, SubType } = require('longbridge');
 
 async function main() {
-  const oauth = await OAuthBuilder.build(
+  const oauth = await OAuth.build(
     "your-client-id",
     (url) => console.log("Open this URL to authorize: " + url)
   );
@@ -160,7 +160,6 @@ async function main() {
   await ctx.subscribe(
     ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
     [SubType.Quote],
-    true
   );
 }
 
@@ -171,7 +170,7 @@ main();
 
 ```javascript
 const {
-  OAuthBuilder,
+  OAuth,
   Config,
   TradeContext,
   Decimal,
@@ -181,7 +180,7 @@ const {
 } = require('longbridge');
 
 async function main() {
-  const oauth = await OAuthBuilder.build(
+  const oauth = await OAuth.build(
     "your-client-id",
     (url) => console.log("Open this URL to authorize: " + url)
   );
@@ -193,7 +192,7 @@ async function main() {
     side: OrderSide.Buy,
     timeInForce: TimeInForceType.Day,
     submittedPrice: new Decimal("50"),
-    submittedQuantity: 200,
+    submittedQuantity: new Decimal(200),
   });
   console.log(resp.toString());
 }

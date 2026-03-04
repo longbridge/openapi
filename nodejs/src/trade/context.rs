@@ -95,7 +95,7 @@ impl TradeContext {
     ///  TopicType,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) => {
     ///     ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
@@ -137,7 +137,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) =>
     ///     ctx.historyExecutions({
@@ -173,7 +173,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) => ctx.todayExecutions({ symbol: "700.HK" }))
     ///   .then((resp) => {
@@ -209,7 +209,7 @@ impl TradeContext {
     ///   Market,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) =>
     ///     ctx.historyOrders({
@@ -254,7 +254,7 @@ impl TradeContext {
     ///   Market,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) =>
     ///     ctx.todayOrders({
@@ -288,7 +288,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext, Decimal } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) =>
     ///     ctx.replaceOrder({
@@ -331,7 +331,7 @@ impl TradeContext {
     ///   TimeInForceType,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) =>
     ///     ctx.submitOrder({
@@ -366,7 +366,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config).then((ctx) => ctx.cancelOrder("709043056541253632"));
     /// ```
     #[napi]
@@ -385,7 +385,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) => ctx.accountBalance())
     ///   .then((resp) => {
@@ -412,7 +412,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext, GetCashFlowOptions } = require('longbridge');
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// TradeContext.new(config)
     ///   .then((ctx) =>
     ///     ctx.cashFlow({
@@ -444,7 +444,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// TradeContext.new(config)
     ///   .then((ctx) => ctx.fundPositions())
     ///   .then((resp) => console.log(resp))
@@ -468,7 +468,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// TradeContext.new(config)
     ///   .then((ctx) => ctx.stockPositions())
     ///   .then((resp) => console.log(resp))
@@ -492,7 +492,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// TradeContext.new(config)
     ///   .then((ctx) => ctx.marginRatio("700.HK"))
     ///   .then((resp) => console.log(resp))
@@ -513,7 +513,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// TradeContext.new(config)
     ///   .then((ctx) => ctx.orderDetail("701276261045858304"))
     ///   .then((resp) => console.log(resp))
@@ -535,7 +535,7 @@ impl TradeContext {
     /// ```javascript
     /// const { Config, TradeContext, OrderType, OrderSide } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// TradeContext.new(config)
     ///   .then((ctx) => ctx.estimateMaxPurchaseQuantity({
     ///     symbol: "700.HK",

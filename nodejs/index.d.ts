@@ -201,14 +201,14 @@ export declare class Config {
    * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
-   * @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
+   * @param oauth  OAuth handle obtained from `OAuth.build(...)`
    * @param extra  Optional extra parameters (override env variables)
    *
    * @example
    * ```javascript
-   * const { OAuthBuilder, Config } = require('longbridge');
+   * const { OAuth, Config } = require('longbridge');
    *
-   * const oauth = await OAuthBuilder.build('your-client-id', (url) => {
+   * const oauth = await OAuth.build('your-client-id', (url) => {
    *   console.log('Open:', url);
    * });
    * const config = Config.fromOAuth(oauth);
@@ -501,7 +501,7 @@ export declare class HttpClient {
    * `LONGBRIDGE_HTTP_URL` is read from the environment automatically.
    * Passing `httpUrl` overrides that value.
    *
-   * @param oauth    OAuth handle obtained from `OAuthBuilder.build(...)`
+   * @param oauth    OAuth handle obtained from `OAuth.build(...)`
    * @param httpUrl  HTTP endpoint url override (reads `LONGBRIDGE_HTTP_URL`
    *                 from env if omitted; falls back to
    *                 `https://openapi.longbridge.com`)
@@ -611,27 +611,20 @@ export declare class NaiveDatetime {
 /**
  * OAuth 2.0 client handle for Longbridge OpenAPI
  *
- * Obtain an instance via `OAuthBuilder.build(...)`.
+ * Obtain an instance via `OAuth.build(...)`.
  * Pass it to `Config.fromOAuth(...)` or `HttpClient.fromOAuth(...)`.
- */
-export declare class OAuth {
-
-}
-
-/**
- * Builder that performs the OAuth 2.0 authorization flow
  *
  * @example
  * ```javascript
- * const { OAuthBuilder, Config } = require('longbridge');
+ * const { OAuth, Config } = require('longbridge');
  *
- * const oauth = await OAuthBuilder.build('your-client-id', (url) => {
+ * const oauth = await OAuth.build('your-client-id', (url) => {
  *   console.log('Open:', url);
  * });
  * const config = Config.fromOAuth(oauth);
  * ```
  */
-export declare class OAuthBuilder {
+export declare class OAuth {
   /**
    * Build an OAuth 2.0 client.
    *
@@ -640,16 +633,16 @@ export declare class OAuthBuilder {
    * the browser authorization flow is started and `onOpenUrl` is called
    * with the authorization URL.
    *
-   * @param clientId      OAuth 2.0 client ID from the Longbridge developer
-   * portal @param onOpenUrl     Called with the authorization URL; open
-   * it in a                      browser or print it however you like
+   * @param clientId      OAuth 2.0 client ID from the Longbridge developer portal
+   * @param onOpenUrl     Called with the authorization URL; open it in a
+   *                      browser or print it however you like
    * @param callbackPort  TCP port for the local callback server
    *                      (default: 60355). Must match one of the redirect
    *                      URIs registered for the client.
    * @returns OAuth handle that can be passed to `Config.fromOAuth` or
    *          `HttpClient.fromOAuth`
    */
-  static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuthBuilder>
+  static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
 }
 
 /** Quote of option */
@@ -1138,7 +1131,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     ctx.setOnQuote((_, event) => console.log(event.toString()));
@@ -1155,11 +1148,11 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => {
-   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
-   *       .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true)))
+   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+   *       .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote]))
    *   })
    * ```
    */
@@ -1176,11 +1169,11 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     return ctx
-   *       .subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+   *       .subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
    *       .then(() => ctx.subscriptions());
    *   })
    *   .then((resp) => console.log(resp.toString()));
@@ -1195,7 +1188,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
    *   .then((resp) => {
@@ -1214,7 +1207,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
    *   .then((resp) => {
@@ -1233,7 +1226,7 @@ export declare class QuoteContext {
    * ```javascript
    * import { Config, QuoteContext } from 'longbridge'
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.optionQuote(["AAPL230317P160000.US"]))
    *   .then((resp) => {
@@ -1252,7 +1245,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.warrantQuote(["21125.HK"]))
    *   .then((resp) => {
@@ -1271,7 +1264,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.depth("700.HK"))
    *   .then((resp) => console.log(resp.toString()))
@@ -1286,7 +1279,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.brokers("700.HK"))
    *   .then((resp) => console.log(resp.toString()))
@@ -1301,7 +1294,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.participants())
    *   .then((resp) => {
@@ -1320,7 +1313,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.trades("700.HK", 10))
    *   .then((resp) => {
@@ -1339,7 +1332,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, TradeSessions } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.intraday("700.HK", TradeSessions.Intraday))
    *   .then((resp) => {
@@ -1358,7 +1351,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Period, AdjustType, TradeSessions } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday))
    *   .then((resp) => {
@@ -1381,7 +1374,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.optionChainExpiryDateList("AAPL.US"))
    *   .then((resp) => {
@@ -1400,7 +1393,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20)))
    *   .then((resp) => {
@@ -1419,7 +1412,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.warrantIssuers())
    *   .then((resp) => {
@@ -1436,7 +1429,7 @@ export declare class QuoteContext {
    * #### Example
    * ```javascript
    * const { Config, QuoteContext, WarrantSortBy, SortOrderType } = require('longbridge')
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *  .then((ctx) => ctx.warrantList("700.HK", WarrantSortBy.LastDone, SortOrderType.Asc))
    * .then((resp) => {
@@ -1455,7 +1448,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.tradingSession())
    *   .then((resp) => {
@@ -1474,7 +1467,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20)))
    *   .then((resp) => console.log(resp.toString()))
@@ -1489,7 +1482,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.capitalFlow("700.HK"))
    *   .then((resp) => {
@@ -1508,7 +1501,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.capitalDistribution("700.HK"))
    *   .then((resp) => console.log(resp.toString()))
@@ -1525,7 +1518,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.watchList())
    *   .then((resp) => console.log(resp.toString()))
@@ -1540,7 +1533,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     ctx.createWatchlistGroup({
@@ -1558,7 +1551,7 @@ export declare class QuoteContext {
    *
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config)
    *   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
    * ```
@@ -1571,7 +1564,7 @@ export declare class QuoteContext {
    *
    * ```javascript
    * const { Config, QuoteContext } = require('longbridge')
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config)
    *   .then(ctx => ctx.updateWatchlistGroup({
    *     id: 10086,
@@ -1589,7 +1582,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.securityList(Market.US, SecurityListCategory.Overnight))
    *   .then((resp) => console.log(resp.toString()));
@@ -1604,7 +1597,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.marketTemperature(Market.HK))
    *   .then((resp) => console.log(resp.toString()));
@@ -1619,7 +1612,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20)))
    *   .then((resp) => console.log(resp.toString()));
@@ -1634,9 +1627,9 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true).then(() => {
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]).then(() => {
    *     setTimeout(() => {
    *       ctx.realtimeQuote(["700.HK", "AAPL.US"]).then((resp) => {
    *         for (let obj of resp) {
@@ -1657,9 +1650,9 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], true);
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth]);
    *   setTimeout(
    *     () =>
    *       ctx.realtimeDepth("700.HK").then((resp) => console.log(resp.toString())),
@@ -1677,9 +1670,9 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], true).then(() => {
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers]).then(() => {
    *     setTimeout(
    *       () =>
    *         ctx
@@ -1700,9 +1693,9 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], false).then(() => {
+   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade]).then(() => {
    *     setTimeout(() => {
    *       ctx.realtimeTrades("700.HK", 10).then((resp) => {
    *         for (let obj of resp) {
@@ -1723,7 +1716,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Period } = require('longbridge')
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * QuoteContext.new(config).then((ctx) => {
    *   ctx.subscribeCandlesticks("700.HK", Period.Min_1).then(() => {
    *     setTimeout(() => {
@@ -2096,7 +2089,7 @@ export declare class TradeContext {
    *  TopicType,
    * } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) => {
    *     ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
@@ -2124,7 +2117,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.historyExecutions({
@@ -2149,7 +2142,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) => ctx.todayExecutions({ symbol: "700.HK" }))
    *   .then((resp) => {
@@ -2174,7 +2167,7 @@ export declare class TradeContext {
    *   Market,
    * } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.historyOrders({
@@ -2208,7 +2201,7 @@ export declare class TradeContext {
    *   Market,
    * } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.todayOrders({
@@ -2234,7 +2227,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext, Decimal } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.replaceOrder({
@@ -2266,7 +2259,7 @@ export declare class TradeContext {
    *   TimeInForceType,
    * } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.submitOrder({
@@ -2290,7 +2283,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config).then((ctx) => ctx.cancelOrder("709043056541253632"));
    * ```
    */
@@ -2303,7 +2296,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) => ctx.accountBalance())
    *   .then((resp) => {
@@ -2322,7 +2315,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext, GetCashFlowOptions } = require('longbridge');
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApiKeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.cashFlow({
@@ -2346,7 +2339,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.fundPositions())
    *   .then((resp) => console.log(resp))
@@ -2361,7 +2354,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.stockPositions())
    *   .then((resp) => console.log(resp))
@@ -2376,7 +2369,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.marginRatio("700.HK"))
    *   .then((resp) => console.log(resp))
@@ -2391,7 +2384,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.orderDetail("701276261045858304"))
    *   .then((resp) => console.log(resp))
@@ -2407,7 +2400,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext, OrderType, OrderSide } = require('longbridge')
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApiKeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.estimateMaxPurchaseQuantity({
    *     symbol: "700.HK",

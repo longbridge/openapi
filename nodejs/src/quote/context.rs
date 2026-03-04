@@ -229,7 +229,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => {
     ///     ctx.setOnQuote((_, event) => console.log(event.toString()));
@@ -252,11 +252,11 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => {
-    ///     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
-    ///       .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote], true)))
+    ///     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+    ///       .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote]))
     ///   })
     /// ```
     #[napi]
@@ -302,11 +302,11 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config)
     ///   .then((ctx) => {
     ///     return ctx
-    ///       .subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
+    ///       .subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
     ///       .then(() => ctx.subscriptions());
     ///   })
     ///   .then((resp) => console.log(resp.toString()));
@@ -329,7 +329,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
     ///   .then((resp) => {
@@ -356,7 +356,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
     ///   .then((resp) => {
@@ -383,7 +383,7 @@ impl QuoteContext {
     /// ```javascript
     /// import { Config, QuoteContext } from 'longbridge'
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.optionQuote(["AAPL230317P160000.US"]))
     ///   .then((resp) => {
@@ -410,7 +410,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.warrantQuote(["21125.HK"]))
     ///   .then((resp) => {
@@ -437,7 +437,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.depth("700.HK"))
     ///   .then((resp) => console.log(resp.toString()))
@@ -458,7 +458,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.brokers("700.HK"))
     ///   .then((resp) => console.log(resp.toString()))
@@ -479,7 +479,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.participants())
     ///   .then((resp) => {
@@ -506,7 +506,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.trades("700.HK", 10))
     ///   .then((resp) => {
@@ -533,7 +533,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, TradeSessions } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.intraday("700.HK", TradeSessions.Intraday))
     ///   .then((resp) => {
@@ -564,7 +564,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, Period, AdjustType, TradeSessions } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday))
     ///   .then((resp) => {
@@ -661,7 +661,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.optionChainExpiryDateList("AAPL.US"))
     ///   .then((resp) => {
@@ -689,7 +689,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20)))
     ///   .then((resp) => {
@@ -720,7 +720,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.warrantIssuers())
     ///   .then((resp) => {
@@ -745,7 +745,7 @@ impl QuoteContext {
     /// #### Example
     /// ```javascript
     /// const { Config, QuoteContext, WarrantSortBy, SortOrderType } = require('longbridge')
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///  .then((ctx) => ctx.warrantList("700.HK", WarrantSortBy.LastDone, SortOrderType.Asc))
     /// .then((resp) => {
@@ -800,7 +800,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.tradingSession())
     ///   .then((resp) => {
@@ -827,7 +827,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20)))
     ///   .then((resp) => console.log(resp.toString()))
@@ -853,7 +853,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.capitalFlow("700.HK"))
     ///   .then((resp) => {
@@ -880,7 +880,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.capitalDistribution("700.HK"))
     ///   .then((resp) => console.log(resp.toString()))
@@ -920,7 +920,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv()
+    /// let config = Config.fromApiKeyEnv()
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.watchList())
     ///   .then((resp) => console.log(resp.toString()))
@@ -943,7 +943,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config)
     ///   .then((ctx) => {
     ///     ctx.createWatchlistGroup({
@@ -967,7 +967,7 @@ impl QuoteContext {
     ///
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config)
     ///   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
     /// ```
@@ -986,7 +986,7 @@ impl QuoteContext {
     ///
     /// ```javascript
     /// const { Config, QuoteContext } = require('longbridge')
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config)
     ///   .then(ctx => ctx.updateWatchlistGroup({
     ///     id: 10086,
@@ -1010,7 +1010,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.securityList(Market.US, SecurityListCategory.Overnight))
     ///   .then((resp) => console.log(resp.toString()));
@@ -1037,7 +1037,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, Market } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.marketTemperature(Market.HK))
     ///   .then((resp) => console.log(resp.toString()));
@@ -1058,7 +1058,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config)
     ///   .then((ctx) => ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20)))
     ///   .then((resp) => console.log(resp.toString()));
@@ -1084,9 +1084,9 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config).then((ctx) => {
-    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true).then(() => {
+    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]).then(() => {
     ///     setTimeout(() => {
     ///       ctx.realtimeQuote(["700.HK", "AAPL.US"]).then((resp) => {
     ///         for (let obj of resp) {
@@ -1115,9 +1115,9 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config).then((ctx) => {
-    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], true);
+    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth]);
     ///   setTimeout(
     ///     () =>
     ///       ctx.realtimeDepth("700.HK").then((resp) => console.log(resp.toString())),
@@ -1141,9 +1141,9 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config).then((ctx) => {
-    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], true).then(() => {
+    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers]).then(() => {
     ///     setTimeout(
     ///       () =>
     ///         ctx
@@ -1170,9 +1170,9 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config).then((ctx) => {
-    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], false).then(() => {
+    ///   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade]).then(() => {
     ///     setTimeout(() => {
     ///       ctx.realtimeTrades("700.HK", 10).then((resp) => {
     ///         for (let obj of resp) {
@@ -1201,7 +1201,7 @@ impl QuoteContext {
     /// ```javascript
     /// const { Config, QuoteContext, Period } = require('longbridge')
     ///
-    /// let config = Config.fromEnv();
+    /// let config = Config.fromApiKeyEnv();
     /// QuoteContext.new(config).then((ctx) => {
     ///   ctx.subscribeCandlesticks("700.HK", Period.Min_1).then(() => {
     ///     setTimeout(() => {

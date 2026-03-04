@@ -32,7 +32,22 @@ _Install Longbridge OpenAPI SDK_
 pip install longbridge
 ```
 
-_Setting environment variables(MacOS/Linux)_
+### Authentication
+
+#### OAuth 2.0 (Recommended)
+
+```python
+from longbridge.openapi import OAuthBuilder, Config
+
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
+```
+
+#### Legacy API Key (Environment Variables)
+
+_macOS/Linux_
 
 ```bash
 export LONGBRIDGE_APP_KEY="App Key get from user center"
@@ -40,7 +55,7 @@ export LONGBRIDGE_APP_SECRET="App Secret get from user center"
 export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
 ```
 
-_Setting environment variables(Windows)_
+_Windows_
 
 ```powershell
 setx LONGBRIDGE_APP_KEY "App Key get from user center"
@@ -48,13 +63,21 @@ setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
 setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ```
 
+```python
+from longbridge.openapi import Config
+
+config = Config.from_apikey_env()
+```
+
 ## Quote API _(Get basic information of securities)_
 
 ```python
-from longbridge.openapi import Config, QuoteContext
+from longbridge.openapi import Config, QuoteContext, OAuthBuilder
 
-# Load configuration from environment variables
-config = Config.from_env()
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # Create a context for quote APIs
 ctx = QuoteContext(config)
@@ -68,10 +91,12 @@ print(resp)
 
 ```python
 from time import sleep
-from longbridge.openapi import Config, QuoteContext, SubType, PushQuote
+from longbridge.openapi import Config, QuoteContext, SubType, PushQuote, OAuthBuilder
 
-# Load configuration from environment variables
-config = Config.from_env()
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # A callback to receive quote data
 def on_quote(symbol: str, event: PushQuote):
@@ -82,9 +107,9 @@ ctx = QuoteContext(config)
 ctx.set_on_quote(on_quote)
 
 # Subscribe
-resp = ctx.subscribe(["700.HK"], [SubType.Quote], is_first_push=True)
+ctx.subscribe(["700.HK"], [SubType.Quote])
 
-# Receive push duration to 30 seconds
+# Receive push for 30 seconds
 sleep(30)
 ```
 
@@ -92,17 +117,23 @@ sleep(30)
 
 ```python
 from decimal import Decimal
-from longbridge.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType
+from longbridge.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuthBuilder
 
-# Load configuration from environment variables
-config = Config.from_env()
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # Create a context for trade APIs
 ctx = TradeContext(config)
 
 # Submit order
-resp = ctx.submit_order("700.HK", OrderType.LO, OrderSide.Buy, Decimal(
-    "500"), TimeInForceType.Day, submitted_price=Decimal("50"), remark="Hello from Python SDK")
+resp = ctx.submit_order(
+    "700.HK", OrderType.LO, OrderSide.Buy,
+    Decimal("500"), TimeInForceType.Day,
+    submitted_price=Decimal("50"),
+    remark="Hello from Python SDK",
+)
 print(resp)
 ```
 
@@ -112,13 +143,16 @@ The SDK provides async contexts and an async HTTP client for use with Python's `
 
 ```python
 import asyncio
-from longbridge.openapi import Config, AsyncQuoteContext, SubType, PushQuote
+from longbridge.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuthBuilder
 
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)
 
 async def main():
-    config = Config.from_env()
+    oauth = await OAuthBuilder("your-client-id").build_async(
+        lambda url: print(f"Open this URL to authorize: {url}")
+    )
+    config = Config.from_oauth(oauth)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])

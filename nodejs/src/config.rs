@@ -146,14 +146,14 @@ impl Config {
     /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
     /// set in `extra` override the corresponding environment variables.
     ///
-    /// @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
+    /// @param oauth  OAuth handle obtained from `OAuth.build(...)`
     /// @param extra  Optional extra parameters (override env variables)
     ///
     /// @example
     /// ```javascript
-    /// const { OAuthBuilder, Config } = require('longbridge');
+    /// const { OAuth, Config } = require('longbridge');
     ///
-    /// const oauth = await OAuthBuilder.build('your-client-id', (url) => {
+    /// const oauth = await OAuth.build('your-client-id', (url) => {
     ///   console.log('Open:', url);
     /// });
     /// const config = Config.fromOAuth(oauth);

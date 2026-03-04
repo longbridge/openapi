@@ -198,7 +198,7 @@ ctx = QuoteContext(config)
 ctx.set_on_quote(on_quote)
 
 # Subscribe
-ctx.subscribe(["700.HK"], [SubType.Quote], is_first_push=True)
+ctx.subscribe(["700.HK"], [SubType.Quote])
 
 # Receive push for 30 seconds
 sleep(30)

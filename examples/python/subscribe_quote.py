@@ -16,6 +16,5 @@ ctx.set_on_quote(on_quote)
 ctx.subscribe(
     ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
     [SubType.Quote],
-    is_first_push=True,
 )
 sleep(10)

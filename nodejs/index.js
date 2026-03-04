@@ -421,7 +421,6 @@ module.exports.MarketTradingSession = nativeBinding.MarketTradingSession
 module.exports.NaiveDate = nativeBinding.NaiveDate
 module.exports.NaiveDatetime = nativeBinding.NaiveDatetime
 module.exports.OAuth = nativeBinding.OAuth
-module.exports.OAuthBuilder = nativeBinding.OAuthBuilder
 module.exports.OptionQuote = nativeBinding.OptionQuote
 module.exports.Order = nativeBinding.Order
 module.exports.OrderChargeDetail = nativeBinding.OrderChargeDetail
