@@ -116,9 +116,10 @@ class HttpClient:
         Examples:
             ::
 
-                from longbridge.openapi import HttpClient
+                from longbridge.openapi import OAuthBuilder, HttpClient
 
-                client = HttpClient.from_apikey(app_key, app_secret, access_token)
+                oauth = OAuthBuilder("your-client-id").build(lambda url: print("Visit:", url))
+                client = HttpClient.from_oauth(oauth)
 
                 # get
                 resp = client.request("get", "/foo/bar")
@@ -146,10 +147,13 @@ class HttpClient:
             ::
 
                 import asyncio
-                from longbridge.openapi import HttpClient
+                from longbridge.openapi import OAuthBuilder, HttpClient
 
                 async def main():
-                    http_cli = HttpClient.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    http_cli = HttpClient.from_oauth(oauth)
                     resp = await http_cli.request_async(
                         "get",
                         "/v1/trade/execution/today",
