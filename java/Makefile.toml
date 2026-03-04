@@ -31,12 +31,13 @@ args = [
   "javasrc/src/main/java/com/longport/ErrorKind.java",
   "javasrc/src/main/java/com/longport/AsyncCallback.java",
   "javasrc/src/main/java/com/longport/Config.java",
-  "javasrc/src/main/java/com/longport/ConfigBuilder.java",
   "javasrc/src/main/java/com/longport/Language.java",
   "javasrc/src/main/java/com/longport/Market.java",
+  "javasrc/src/main/java/com/longport/OAuth.java",
+  "javasrc/src/main/java/com/longport/OAuthBuilder.java",
   "javasrc/src/main/java/com/longport/OpenApiException.java",
+  "javasrc/src/main/java/com/longport/PushCandlestickMode.java",
   "javasrc/src/main/java/com/longport/SdkNative.java",
-  "javasrc/src/main/java/com/longport/AsyncCallback.java",
 
   "javasrc/src/main/java/com/longport/HttpClient.java",
 
