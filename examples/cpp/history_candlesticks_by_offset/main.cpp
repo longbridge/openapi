@@ -1,14 +1,14 @@
 #include <iostream>
 
-#include "longport.hpp"
+#include "longbridge.hpp"
 
-using namespace longport;
-using namespace longport::quote;
+using namespace longbridge;
+using namespace longbridge::quote;
 
 static void
 run(const OAuth& oauth)
 {
-  longport::Config config = longport::Config::from_oauth(oauth);
+  longbridge::Config config = longbridge::Config::from_oauth(oauth);
 
   QuoteContext::create(config, [](auto res) {
     if (!res) {

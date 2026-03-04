@@ -1,9 +1,9 @@
-use longport_python_macros::PyEnum;
+use longbridge_python_macros::PyEnum;
 use pyo3::{PyErr, pyclass};
 
-pyo3::import_exception!(longport.openapi, OpenApiException);
+pyo3::import_exception!(longbridge.openapi, OpenApiException);
 
-pub(crate) struct ErrorNewType(pub(crate) longport::Error);
+pub(crate) struct ErrorNewType(pub(crate) longbridge::Error);
 
 impl std::convert::From<ErrorNewType> for PyErr {
     #[inline]
@@ -20,7 +20,7 @@ impl std::convert::From<ErrorNewType> for PyErr {
 
 #[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longport::SimpleErrorKind")]
+#[py(remote = "longbridge::SimpleErrorKind")]
 pub(crate) enum ErrorKind {
     /// HTTP error
     Http,

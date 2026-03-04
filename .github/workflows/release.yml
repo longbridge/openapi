@@ -37,7 +37,7 @@ jobs:
           args: -i python --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
-          pip install longport --no-index --find-links dist --force-reinstall
+          pip install longbridge --no-index --find-links dist --force-reinstall
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.host }}
-          path: nodejs/longport.*.node
+          path: nodejs/longbridge.*.node
 
   build-java-jni:
     strategy:
@@ -135,8 +135,8 @@ jobs:
       - name: Build
         if: ${{ !startsWith(matrix.settings.host, 'ubuntu') }}
         run: |
-          cargo build -p longport-java --release --target ${{ matrix.settings.target }}
-          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longport_java${{ matrix.settings.lib_suffix }} longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+          cargo build -p longbridge-java --release --target ${{ matrix.settings.target }}
+          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
       - name: Install latest cross binary
         if: ${{ startsWith(matrix.settings.host, 'ubuntu') }}
@@ -145,14 +145,14 @@ jobs:
       - name: Build with Cross
         if: ${{ startsWith(matrix.settings.host, 'ubuntu') }}
         run: |
-          cross build -p longport-java --release --target ${{ matrix.settings.target }}
-          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longport_java${{ matrix.settings.lib_suffix }} longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+          cross build -p longbridge-java --release --target ${{ matrix.settings.target }}
+          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longbridge_java${{ matrix.settings.lib_suffix }} longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: jnis-${{ matrix.settings.target }}
-          path: longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+          path: longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
   copy-cpp-headers:
     runs-on: ubuntu-24.04
@@ -239,17 +239,17 @@ jobs:
         if: ${{ matrix.settings.host == 'windows-latest' }}
         run: |
           md dist\lib\${{ matrix.settings.platform }}\debug
-          copy cmake.build\x64\Debug\cargo\build\${{ matrix.settings.target }}\debug\longport_c.dll dist\lib\${{ matrix.settings.platform }}\debug
-          copy cmake.build\x64\Debug\cargo\build\${{ matrix.settings.target }}\debug\longport_c.dll.lib dist\lib\${{ matrix.settings.platform }}\debug\longport_c.lib
-          copy cmake.build\Debug\longport_cpp.dll dist\lib\${{ matrix.settings.platform }}\debug
-          copy cmake.build\cpp\Debug\longport_cpp.lib dist\lib\${{ matrix.settings.platform }}\debug
+          copy cmake.build\x64\Debug\cargo\build\${{ matrix.settings.target }}\debug\longbridge_c.dll dist\lib\${{ matrix.settings.platform }}\debug
+          copy cmake.build\x64\Debug\cargo\build\${{ matrix.settings.target }}\debug\longbridge_c.dll.lib dist\lib\${{ matrix.settings.platform }}\debug\longbridge_c.lib
+          copy cmake.build\Debug\longbridge_cpp.dll dist\lib\${{ matrix.settings.platform }}\debug
+          copy cmake.build\cpp\Debug\longbridge_cpp.lib dist\lib\${{ matrix.settings.platform }}\debug
 
       - name: Copy files
         if: ${{ matrix.settings.host != 'windows-latest' }}
         run: |
           mkdir -p dist/lib/${{ matrix.settings.platform }}/debug
-          cp cmake.build/cargo/build/${{ matrix.settings.target }}/debug/liblongport_c.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/debug
-          cp cmake.build/liblongport_cpp.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/debug
+          cp cmake.build/cargo/build/${{ matrix.settings.target }}/debug/liblongbridge_c.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/debug
+          cp cmake.build/liblongbridge_cpp.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/debug
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -323,17 +323,17 @@ jobs:
         if: ${{ matrix.settings.host == 'windows-latest' }}
         run: |
           md dist\lib\${{ matrix.settings.platform }}\release
-          copy cmake.build\x64\Release\cargo\build\${{ matrix.settings.target }}\release\longport_c.dll dist\lib\${{ matrix.settings.platform }}\release
-          copy cmake.build\x64\Release\cargo\build\${{ matrix.settings.target }}\release\longport_c.dll.lib dist\lib\${{ matrix.settings.platform }}\release\longport_c.lib
-          copy cmake.build\Release\longport_cpp.dll dist\lib\${{ matrix.settings.platform }}\release
-          copy cmake.build\cpp\Release\longport_cpp.lib dist\lib\${{ matrix.settings.platform }}\release
+          copy cmake.build\x64\Release\cargo\build\${{ matrix.settings.target }}\release\longbridge_c.dll dist\lib\${{ matrix.settings.platform }}\release
+          copy cmake.build\x64\Release\cargo\build\${{ matrix.settings.target }}\release\longbridge_c.dll.lib dist\lib\${{ matrix.settings.platform }}\release\longbridge_c.lib
+          copy cmake.build\Release\longbridge_cpp.dll dist\lib\${{ matrix.settings.platform }}\release
+          copy cmake.build\cpp\Release\longbridge_cpp.lib dist\lib\${{ matrix.settings.platform }}\release
 
       - name: Copy files
         if: ${{ matrix.settings.host != 'windows-latest' }}
         run: |
           mkdir -p dist/lib/${{ matrix.settings.platform }}/release
-          cp cmake.build/cargo/build/${{ matrix.settings.target }}/release/liblongport_c.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/release
-          cp cmake.build/liblongport_cpp.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/release
+          cp cmake.build/cargo/build/${{ matrix.settings.target }}/release/liblongbridge_c.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/release
+          cp cmake.build/liblongbridge_cpp.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -401,8 +401,8 @@ jobs:
       - name: Copy files
         run: |
           mkdir -p dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
-          cp target/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}/liblongport_c.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
-          cp cpp/cmake.build/liblongport_cpp.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp target/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}/liblongbridge_c.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp cpp/cmake.build/liblongbridge_cpp.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -494,8 +494,8 @@ jobs:
       - name: Copy files
         run: |
           mkdir -p dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
-          cp target/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}/liblongport_c.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
-          cp cpp/cmake.build/liblongport_cpp.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp target/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}/liblongbridge_c.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp cpp/cmake.build/liblongbridge_cpp.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -525,20 +525,20 @@ jobs:
       max-parallel: 1
       matrix:
         package:
-          - name: longport-proto
-            registryName: longport-proto
+          - name: longbridge-proto
+            registryName: longbridge-proto
             path: rust/crates/proto
-          - name: longport-httpcli
-            registryName: longport-httpcli
+          - name: longbridge-httpcli
+            registryName: longbridge-httpcli
             path: rust/crates/httpclient
-          - name: longport-wscli
-            registryName: longport-wscli
+          - name: longbridge-wscli
+            registryName: longbridge-wscli
             path: rust/crates/wsclient
-          - name: longport-candlesticks
-            registryName: longport-candlesticks
+          - name: longbridge-candlesticks
+            registryName: longbridge-candlesticks
             path: rust/crates/candlesticks
-          - name: longport
-            registryName: longport
+          - name: longbridge
+            registryName: longbridge
             path: rust
     steps:
       - name: Checkout
@@ -614,7 +614,7 @@ jobs:
     runs-on: ubuntu-24.04
     environment:
       name: pypi
-      url: https://pypi.org/p/longport
+      url: https://pypi.org/p/longbridge
     permissions:
       id-token: write
     needs:
@@ -723,11 +723,11 @@ jobs:
           mkdir -p javasrc/target/natives/windows_64
           mkdir -p javasrc/target/natives/osx_64
           mkdir -p javasrc/target/natives/osx_arm64
-          mv jnis/longport_java-x86_64-unknown-linux-gnu.so javasrc/target/natives/linux_64/liblongport_java.so
-          mv jnis/longport_java-aarch64-unknown-linux-gnu.so javasrc/target/natives/linux_arm64/liblongport_java.so
-          mv jnis/longport_java-x86_64-pc-windows-msvc.dll javasrc/target/natives/windows_64/longport_java.dll
-          mv jnis/longport_java-x86_64-apple-darwin.dylib javasrc/target/natives/osx_64/liblongport_java.dylib
-          mv jnis/longport_java-aarch64-apple-darwin.dylib javasrc/target/natives/osx_arm64/liblongport_java.dylib
+          mv jnis/longbridge_java-x86_64-unknown-linux-gnu.so javasrc/target/natives/linux_64/liblongbridge_java.so
+          mv jnis/longbridge_java-aarch64-unknown-linux-gnu.so javasrc/target/natives/linux_arm64/liblongbridge_java.so
+          mv jnis/longbridge_java-x86_64-pc-windows-msvc.dll javasrc/target/natives/windows_64/longbridge_java.dll
+          mv jnis/longbridge_java-x86_64-apple-darwin.dylib javasrc/target/natives/osx_64/liblongbridge_java.dylib
+          mv jnis/longbridge_java-aarch64-apple-darwin.dylib javasrc/target/natives/osx_arm64/liblongbridge_java.dylib
 
       - name: Get version
         run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV

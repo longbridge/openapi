@@ -1,6 +1,6 @@
 use std::{ffi::c_void, os::raw::c_char};
 
-use longport::oauth::{OAuth, OAuthBuilder};
+use longbridge::oauth::{OAuth, OAuthBuilder};
 
 use crate::async_call::{CAsyncCallback, execute_async};
 
@@ -55,7 +55,7 @@ pub unsafe extern "C" fn lb_oauth_new(
                 open_url_callback(c_url.as_ptr(), open_url_userdata_usize as *mut c_void);
             })
             .await
-            .map_err(|e| longport::Error::OAuth(e.to_string()))?;
+            .map_err(|e| longbridge::Error::OAuth(e.to_string()))?;
         Ok(Box::into_raw(Box::new(COAuth { inner: oauth })))
     });
 }

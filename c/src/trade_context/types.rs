@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 
-use longport::{
+use longbridge::{
     Market,
     trade::{
         AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,

@@ -3,7 +3,7 @@ use std::{
     ffi::{CStr, CString, c_char, c_void},
 };
 
-use longport::{
+use longbridge::{
     Error,
     httpclient::{HttpClient, HttpClientConfig, HttpClientError},
 };
@@ -14,7 +14,7 @@ use crate::{
     oauth::COAuth,
 };
 
-/// A HTTP client for LongPort OpenApi
+/// A HTTP client for Longbridge OpenAPI
 pub struct CHttpClient(HttpClient);
 
 /// Create a HTTP client using API Key authentication
@@ -56,10 +56,10 @@ pub unsafe extern "C" fn lb_http_client_free(http_client: *mut CHttpClient) {
 ///
 /// # Variables
 ///
-/// - `LONGPORT_HTTP_URL` - HTTP endpoint url
-/// - `LONGPORT_APP_KEY` - App key
-/// - `LONGPORT_APP_SECRET` - App secret
-/// - `LONGPORT_ACCESS_TOKEN` - Access token
+/// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url
+/// - `LONGBRIDGE_APP_KEY` - App key
+/// - `LONGBRIDGE_APP_SECRET` - App secret
+/// - `LONGBRIDGE_ACCESS_TOKEN` - Access token
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_http_client_from_apikey_env(
     error: *mut *mut CError,

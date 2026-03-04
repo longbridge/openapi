@@ -1,8 +1,8 @@
-use longport_c_macros::CEnum;
+use longbridge_c_macros::CEnum;
 
 /// Market type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::Market")]
+#[c(remote = "longbridge::Market")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CMarket {

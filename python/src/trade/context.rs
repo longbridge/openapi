@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport::{
+use longbridge::{
     blocking::TradeContextSync,
     trade::{
         EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,

@@ -1,6 +1,6 @@
 from time import sleep
 
-from longport.openapi import QuoteContext, Config, OAuthBuilder, SubType, PushQuote
+from longbridge.openapi import QuoteContext, Config, OAuthBuilder, SubType, PushQuote
 
 
 def on_quote(symbol: str, event: PushQuote):

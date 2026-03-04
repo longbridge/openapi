@@ -1,10 +1,10 @@
 use std::fmt::Display;
 
-use longport_httpcli::HttpClientError;
-use longport_wscli::WsClientError;
+use longbridge_httpcli::HttpClientError;
+use longbridge_wscli::WsClientError;
 use time::OffsetDateTime;
 
-/// LongPort OpenAPI SDK error type
+/// Longbridge OpenAPI SDK error type
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// Decode Protobuf error
@@ -138,7 +138,7 @@ impl Error {
     }
 }
 
-/// LongPort OpenAPI SDK result type
+/// Longbridge OpenAPI SDK result type
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 /// Simple error type

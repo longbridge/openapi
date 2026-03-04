@@ -1,12 +1,12 @@
 #include <iostream>
-#include <longport.hpp>
+#include <longbridge.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-using namespace longport;
-using namespace longport::quote;
+using namespace longbridge;
+using namespace longbridge::quote;
 
 static QuoteContext g_ctx;
 

@@ -3,10 +3,10 @@ mod server;
 use std::{path::PathBuf, sync::Arc};
 
 use clap::Parser;
-use longport::{Config, QuoteContext, TradeContext};
+use longbridge::{Config, QuoteContext, TradeContext};
 use poem::{EndpointExt, Route, Server, listener::TcpListener, middleware::Cors};
 use poem_mcpserver::{McpServer, stdio::stdio, streamable_http};
-use server::Longport;
+use server::Longbridge;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 
 #[derive(Parser)]
@@ -34,7 +34,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     if let Some(log_dir) = cli.log_dir {
-        let file_appender = RollingFileAppender::new(Rotation::DAILY, log_dir, "longport-mcp.log");
+        let file_appender =
+            RollingFileAppender::new(Rotation::DAILY, log_dir, "longbridge-mcp.log");
         tracing_subscriber::fmt()
             .with_writer(file_appender)
             .with_ansi(false)
@@ -78,8 +79,8 @@ fn create_mcp_server(
     quote_context: QuoteContext,
     trade_context: TradeContext,
     readonly: bool,
-) -> McpServer<Longport> {
-    let mut server = McpServer::new().tools(Longport::new(quote_context, trade_context));
+) -> McpServer<Longbridge> {
+    let mut server = McpServer::new().tools(Longbridge::new(quote_context, trade_context));
     if readonly {
         server = server.disable_tools(["submit_order"]);
     }

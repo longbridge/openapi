@@ -1,6 +1,6 @@
 import datetime
 
-from longport.openapi import (
+from longbridge.openapi import (
     QuoteContext,
     Config,
     OAuthBuilder,

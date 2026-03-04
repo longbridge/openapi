@@ -8,7 +8,7 @@ use serde::Deserialize;
 
 use crate::{HttpClientConfig, HttpClientError, HttpClientResult, Json, RequestBuilder};
 
-/// LongPort HTTP client
+/// Longbridge HTTP client
 pub struct HttpClient {
     pub(crate) http_cli: Client,
     pub(crate) config: Arc<HttpClientConfig>,
@@ -51,7 +51,7 @@ impl HttpClient {
 
     /// Get the socket OTP(One Time Password)
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/socket-token-api>
+    /// Reference: <https://open.longbridge.com/en/docs/socket-token-api>
     pub async fn get_otp(&self) -> HttpClientResult<String> {
         #[derive(Debug, Deserialize)]
         struct Response {

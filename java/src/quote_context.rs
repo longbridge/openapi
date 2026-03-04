@@ -6,7 +6,7 @@ use jni::{
     objects::{GlobalRef, JClass, JObject, JString, JValueOwned},
     sys::{jboolean, jobjectArray},
 };
-use longport::{
+use longbridge::{
     Config, Market, QuoteContext,
     quote::{
         AdjustType, CalcIndex, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, Period,
@@ -53,7 +53,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                 env.call_method(
                     handler,
                     "onQuote",
-                    "(Ljava/lang/String;Lcom/longport/quote/PushQuote;)V",
+                    "(Ljava/lang/String;Lcom/longbridge/quote/PushQuote;)V",
                     &[symbol.borrow(), event.borrow()],
                 )?;
             }
@@ -65,7 +65,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                 env.call_method(
                     handler,
                     "onDepth",
-                    "(Ljava/lang/String;Lcom/longport/quote/PushDepth;)V",
+                    "(Ljava/lang/String;Lcom/longbridge/quote/PushDepth;)V",
                     &[symbol.borrow(), event.borrow()],
                 )?;
             }
@@ -77,7 +77,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                 env.call_method(
                     handler,
                     "onBrokers",
-                    "(Ljava/lang/String;Lcom/longport/quote/PushBrokers;)V",
+                    "(Ljava/lang/String;Lcom/longbridge/quote/PushBrokers;)V",
                     &[symbol.borrow(), event.borrow()],
                 )?;
             }
@@ -89,7 +89,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                 env.call_method(
                     handler,
                     "onTrades",
-                    "(Ljava/lang/String;Lcom/longport/quote/PushTrades;)V",
+                    "(Ljava/lang/String;Lcom/longbridge/quote/PushTrades;)V",
                     &[symbol.borrow(), event.borrow()],
                 )?;
             }
@@ -101,7 +101,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                 env.call_method(
                     handler,
                     "onCandlestick",
-                    "(Ljava/lang/String;Lcom/longport/quote/PushCandlestick;)V",
+                    "(Ljava/lang/String;Lcom/longbridge/quote/PushCandlestick;)V",
                     &[symbol.borrow(), event.borrow()],
                 )?;
             }
@@ -112,7 +112,7 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_newQuoteContext(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newQuoteContext(
     mut env: JNIEnv,
     _class: JClass,
     config: i64,
@@ -156,7 +156,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newQuoteContext(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_freeQuoteContext(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeQuoteContext(
     _env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -165,7 +165,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeQuoteContext(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetMemberId(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetMemberId(
     mut _env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -175,7 +175,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetMemberI
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuoteLevel<'a>(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetQuoteLevel<'a>(
     mut env: JNIEnv<'a>,
     _class: JClass<'a>,
     ctx: i64,
@@ -192,7 +192,9 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuoteLe
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuotePackageDetails<'a>(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetQuotePackageDetails<
+    'a,
+>(
     mut env: JNIEnv<'a>,
     _class: JClass<'a>,
     ctx: i64,
@@ -206,7 +208,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextGetQuotePa
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnQuote(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSetOnQuote(
     mut env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -224,7 +226,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnQuote
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnDepth(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSetOnDepth(
     mut env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -242,7 +244,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnDepth
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnBrokers(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSetOnBrokers(
     mut env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -260,7 +262,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnBroke
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnTrades(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSetOnTrades(
     mut env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -278,7 +280,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnTrade
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnCandlestick(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSetOnCandlestick(
     mut env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -296,7 +298,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSetOnCandl
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribe(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSubscribe(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -317,7 +319,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribe(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscribe(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUnsubscribe(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -338,7 +340,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscrib
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribeCandlesticks(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSubscribeCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -365,7 +367,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribeC
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscribeCandlesticks(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUnsubscribeCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -385,7 +387,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUnsubscrib
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscriptions(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSubscriptions(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -402,7 +404,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscripti
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextStaticInfo(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextStaticInfo(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -422,7 +424,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextStaticInfo
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextQuote(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextQuote(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -442,7 +444,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextQuote(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionQuote(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionQuote(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -462,7 +464,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionQuot
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantQuote(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWarrantQuote(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -482,7 +484,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantQuo
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDepth(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextDepth(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -500,7 +502,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDepth(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextBrokers(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextBrokers(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -518,7 +520,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextBrokers(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextParticipants(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextParticipants(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -534,7 +536,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextParticipan
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTrades(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextTrades(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -555,7 +557,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTrades(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextIntraday(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextIntraday(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -577,7 +579,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextIntraday(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCandlesticks(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -613,7 +615,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCandlestic
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCandlesticksByOffset(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextHistoryCandlesticksByOffset(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -654,7 +656,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCandlesticksByDate(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextHistoryCandlesticksByDate(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -694,7 +696,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryCan
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChainExpiryDateList(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionChainExpiryDateList(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -714,7 +716,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChai
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChainInfoByDate(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionChainInfoByDate(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -739,7 +741,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChai
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantIssuers(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWarrantIssuers(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -755,7 +757,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantIss
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantList(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWarrantList(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -797,7 +799,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWarrantLis
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingSession(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextTradingSession(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -813,7 +815,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingSes
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingDays(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextTradingDays(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -835,7 +837,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextTradingDay
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalFlow(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCapitalFlow(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -853,7 +855,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalFlo
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalDistribution(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCapitalDistribution(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -871,7 +873,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCapitalDis
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCalcIndexes(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCalcIndexes(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -901,7 +903,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCalcIndexe
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWatchlist(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextWatchlist(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -917,7 +919,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextWatchlist(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCreateWatchlistGroup(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextCreateWatchlistGroup(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -943,7 +945,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextCreateWatc
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDeleteWatchlistGroup(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextDeleteWatchlistGroup(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -962,7 +964,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextDeleteWatc
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUpdateWatchlistGroup(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUpdateWatchlistGroup(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -992,7 +994,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUpdateWatc
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeQuote(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeQuote(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -1010,7 +1012,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeQu
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeDepth(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeDepth(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -1028,7 +1030,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeDe
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeBrokers(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeBrokers(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -1046,7 +1048,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeBr
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeTrades(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeTrades(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -1070,7 +1072,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeTr
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeCandlesticks(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeCandlesticks(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -1096,7 +1098,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextRealtimeCa
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSecurityList(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSecurityList(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -1118,7 +1120,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSecurityLi
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextMarketTemperature(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextMarketTemperature(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -1136,7 +1138,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextMarketTemp
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryMarketTemperature(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextHistoryMarketTemperature(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,

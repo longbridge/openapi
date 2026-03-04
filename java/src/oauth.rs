@@ -3,7 +3,7 @@ use jni::{
     objects::{JClass, JObject, JString},
     sys::{jint, jlong},
 };
-use longport::oauth::{OAuth, OAuthBuilder};
+use longbridge::oauth::{OAuth, OAuthBuilder};
 
 use crate::{async_util, error::jni_result, types::JavaLong};
 
@@ -17,7 +17,7 @@ use crate::{async_util, error::jni_result, types::JavaLong};
 /// On success the async `callback` receives a heap-allocated `*mut OAuth`
 /// cast to `jlong`; the caller is responsible for calling `freeOAuth`.
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthBuild(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthBuild(
     mut env: JNIEnv,
     _class: JClass,
     client_id: JString,
@@ -59,7 +59,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthBuild(
 
 /// Free an OAuth pointer.
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_freeOAuth(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeOAuth(
     _env: JNIEnv,
     _class: JClass,
     oauth: jlong,

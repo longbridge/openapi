@@ -1,5 +1,5 @@
 [project]
-name = "longport"
+name = "longbridge"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -7,9 +7,9 @@ classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
 ]
-description = "A Python library for LongPort Open API"
+description = "A Python library for Longbridge Open API"
 readme = "README.md"
-repository = "https://github.com/longportapp/openapi"
+repository = "https://github.com/longbridge/openapi"
 requires-python = ">=3.8"
 dependencies = []
 
@@ -21,10 +21,10 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [project.urls]
-homepage = "https://open.longportapp.com/en/"
-documentation = "https://open.longportapp.com/en/docs"
-repository = "https://github.com/longportapp/openapi"
-changelog = "https://github.com/longportapp/openapi/blob/master/python/CHANGELOG.md"
+homepage = "https://open.longbridge.com/en/"
+documentation = "https://open.longbridge.com/en/docs"
+repository = "https://github.com/longbridge/openapi"
+changelog = "https://github.com/longbridge/openapi/blob/master/python/CHANGELOG.md"
 
 [tool.maturin]
 python-source = "pysrc"

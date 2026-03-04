@@ -1,3 +1,3 @@
-# `longport-darwin-arm64`
+# `longbridge-darwin-arm64`
 
-This is the **aarch64-apple-darwin** binary for `longport`
+This is the **aarch64-apple-darwin** binary for `longbridge`

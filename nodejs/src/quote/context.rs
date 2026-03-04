@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport::quote::PushEventDetail;
+use longbridge::quote::PushEventDetail;
 use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
@@ -41,7 +41,7 @@ struct Callbacks {
 #[napi_derive::napi]
 #[derive(Clone)]
 pub struct QuoteContext {
-    ctx: longport::quote::QuoteContext,
+    ctx: longbridge::quote::QuoteContext,
     callbacks: Arc<Mutex<Callbacks>>,
 }
 
@@ -51,7 +51,7 @@ impl QuoteContext {
     pub async fn new(config: &Config) -> Result<QuoteContext> {
         let callbacks = Arc::new(Mutex::new(Callbacks::default()));
         let (ctx, mut receiver) =
-            longport::quote::QuoteContext::try_new(Arc::new(config.0.clone()))
+            longbridge::quote::QuoteContext::try_new(Arc::new(config.0.clone()))
                 .await
                 .map_err(ErrorNewType)?;
 
@@ -227,7 +227,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, SubType } = require("longport")
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -250,7 +250,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, SubType } = require("longport")
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -300,7 +300,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, SubType } = require("longport")
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config)
@@ -327,7 +327,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -354,7 +354,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -381,7 +381,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// import { Config, QuoteContext } from 'longport'
+    /// import { Config, QuoteContext } from 'longbridge'
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -408,7 +408,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -435,7 +435,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -456,7 +456,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -477,7 +477,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -504,7 +504,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -531,7 +531,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, TradeSessions } = require("longport")
+    /// const { Config, QuoteContext, TradeSessions } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -562,7 +562,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, Period, AdjustType, TradeSessions } = require("longport")
+    /// const { Config, QuoteContext, Period, AdjustType, TradeSessions } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -659,7 +659,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -687,7 +687,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, NaiveDate } = require("longport")
+    /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -718,7 +718,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, NaiveDate } = require("longport")
+    /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -744,7 +744,7 @@ impl QuoteContext {
     ///
     /// #### Example
     /// ```javascript
-    /// const { Config, QuoteContext, WarrantSortBy, SortOrderType } = require("longport")
+    /// const { Config, QuoteContext, WarrantSortBy, SortOrderType } = require('longbridge')
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
     ///  .then((ctx) => ctx.warrantList("700.HK", WarrantSortBy.LastDone, SortOrderType.Asc))
@@ -767,13 +767,13 @@ impl QuoteContext {
         price_type: Option<Vec<FilterWarrantInOutBoundsType>>,
         status: Option<Vec<WarrantStatus>>,
     ) -> Result<Vec<WarrantInfo>> {
-        let warrant_type: Option<Vec<longport::quote::WarrantType>> =
+        let warrant_type: Option<Vec<longbridge::quote::WarrantType>> =
             warrant_type.map(|v| v.into_iter().map(Into::into).collect());
-        let expiry_date: Option<Vec<longport::quote::FilterWarrantExpiryDate>> =
+        let expiry_date: Option<Vec<longbridge::quote::FilterWarrantExpiryDate>> =
             expiry_date.map(|v| v.into_iter().map(Into::into).collect());
-        let price_type: Option<Vec<longport::quote::FilterWarrantInOutBoundsType>> =
+        let price_type: Option<Vec<longbridge::quote::FilterWarrantInOutBoundsType>> =
             price_type.map(|v| v.into_iter().map(Into::into).collect());
-        let status: Option<Vec<longport::quote::WarrantStatus>> =
+        let status: Option<Vec<longbridge::quote::WarrantStatus>> =
             status.map(|v| v.into_iter().map(Into::into).collect());
         self.ctx
             .warrant_list(
@@ -798,7 +798,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, NaiveDate } = require("longport")
+    /// const { Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -825,7 +825,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, Market, NaiveDate } = require("longport")
+    /// const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -851,7 +851,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -878,7 +878,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -918,7 +918,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
@@ -941,7 +941,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config)
@@ -966,7 +966,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config)
     ///   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
@@ -985,7 +985,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext } = require('longbridge')
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config)
     ///   .then(ctx => ctx.updateWatchlistGroup({
@@ -1008,7 +1008,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, Market, SecurityListCategory } = require("longport")
+    /// const { Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config)
@@ -1035,7 +1035,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, Market } = require("longport")
+    /// const { Config, QuoteContext, Market } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config)
@@ -1056,7 +1056,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, Market, NaiveDate } = require("longport")
+    /// const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config)
@@ -1082,7 +1082,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, SubType } = require("longport")
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config).then((ctx) => {
@@ -1113,7 +1113,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, SubType } = require("longport")
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config).then((ctx) => {
@@ -1139,7 +1139,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, NaiveDate, SubType } = require("longport")
+    /// const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config).then((ctx) => {
@@ -1168,7 +1168,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, SubType } = require("longport")
+    /// const { Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config).then((ctx) => {
@@ -1199,7 +1199,7 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext, Period } = require("longport")
+    /// const { Config, QuoteContext, Period } = require('longbridge')
     ///
     /// let config = Config.fromEnv();
     /// QuoteContext.new(config).then((ctx) => {

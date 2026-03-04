@@ -1,8 +1,8 @@
-use longport_c_macros::CEnum;
+use longbridge_c_macros::CEnum;
 
 /// Topic type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::TopicType")]
+#[c(remote = "longbridge::trade::TopicType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CTopicType {
@@ -13,7 +13,7 @@ pub enum CTopicType {
 
 /// Order side
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::OrderSide")]
+#[c(remote = "longbridge::trade::OrderSide")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum COrderSide {
@@ -30,7 +30,7 @@ pub enum COrderSide {
 
 /// Order type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::OrderType")]
+#[c(remote = "longbridge::trade::OrderType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum COrderType {
@@ -80,7 +80,7 @@ pub enum COrderType {
 
 /// Order status
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::OrderStatus")]
+#[c(remote = "longbridge::trade::OrderStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum COrderStatus {
@@ -142,7 +142,7 @@ pub enum COrderStatus {
 
 /// Order tag
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::OrderTag")]
+#[c(remote = "longbridge::trade::OrderTag")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum COrderTag {
@@ -180,7 +180,7 @@ pub enum COrderTag {
 
 /// Order tag
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::TriggerStatus")]
+#[c(remote = "longbridge::trade::TriggerStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CTriggerStatus {
@@ -200,7 +200,7 @@ pub enum CTriggerStatus {
 
 /// Enable or disable outside regular trading hours
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::OutsideRTH")]
+#[c(remote = "longbridge::trade::OutsideRTH")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum COutsideRTH {
@@ -220,7 +220,7 @@ pub enum COutsideRTH {
 
 /// Time in force Type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::TimeInForceType")]
+#[c(remote = "longbridge::trade::TimeInForceType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CTimeInForceType {
@@ -240,7 +240,7 @@ pub enum CTimeInForceType {
 
 /// Cash flow direction
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::CashFlowDirection ")]
+#[c(remote = "longbridge::trade::CashFlowDirection ")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CCashFlowDirection {
@@ -257,7 +257,7 @@ pub enum CCashFlowDirection {
 
 /// Balance type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::BalanceType")]
+#[c(remote = "longbridge::trade::BalanceType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CBalanceType {
@@ -277,7 +277,7 @@ pub enum CBalanceType {
 
 /// Commission-free Status
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::CommissionFreeStatus")]
+#[c(remote = "longbridge::trade::CommissionFreeStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CCommissionFreeStatus {
@@ -300,7 +300,7 @@ pub enum CCommissionFreeStatus {
 
 /// Deduction status
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::DeductionStatus")]
+#[c(remote = "longbridge::trade::DeductionStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CDeductionStatus {
@@ -323,7 +323,7 @@ pub enum CDeductionStatus {
 
 /// Charge category code
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::trade::ChargeCategoryCode")]
+#[c(remote = "longbridge::trade::ChargeCategoryCode")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CChargeCategoryCode {

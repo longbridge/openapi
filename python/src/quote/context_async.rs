@@ -1,8 +1,8 @@
-//! Async quote context backed by longport's native async API.
+//! Async quote context backed by longbridge's native async API.
 
 use std::sync::Arc;
 
-use longport::{
+use longbridge::{
     QuoteContext,
     quote::{RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup},
 };
@@ -139,7 +139,7 @@ impl AsyncQuoteContext {
         sub_types: Vec<SubType>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
-        let sub_flags = longport::quote::SubFlags::from(SubTypes(sub_types));
+        let sub_flags = longbridge::quote::SubFlags::from(SubTypes(sub_types));
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             ctx.subscribe(symbols, sub_flags)
                 .await
@@ -157,7 +157,7 @@ impl AsyncQuoteContext {
         sub_types: Vec<SubType>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
-        let sub_flags = longport::quote::SubFlags::from(SubTypes(sub_types));
+        let sub_flags = longbridge::quote::SubFlags::from(SubTypes(sub_types));
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             ctx.unsubscribe(symbols, sub_flags)
                 .await
@@ -499,13 +499,13 @@ impl AsyncQuoteContext {
         status: Option<Vec<WarrantStatus>>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
-        let warrant_type: Option<Vec<longport::quote::WarrantType>> =
+        let warrant_type: Option<Vec<longbridge::quote::WarrantType>> =
             warrant_type.map(|v| v.into_iter().map(Into::into).collect());
-        let expiry_date: Option<Vec<longport::quote::FilterWarrantExpiryDate>> =
+        let expiry_date: Option<Vec<longbridge::quote::FilterWarrantExpiryDate>> =
             expiry_date.map(|v| v.into_iter().map(Into::into).collect());
-        let price_type: Option<Vec<longport::quote::FilterWarrantInOutBoundsType>> =
+        let price_type: Option<Vec<longbridge::quote::FilterWarrantInOutBoundsType>> =
             price_type.map(|v| v.into_iter().map(Into::into).collect());
-        let status: Option<Vec<longport::quote::WarrantStatus>> =
+        let status: Option<Vec<longbridge::quote::WarrantStatus>> =
             status.map(|v| v.into_iter().map(Into::into).collect());
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx

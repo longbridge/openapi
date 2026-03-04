@@ -1,6 +1,6 @@
 """Subscribe candlesticks (async). Use asyncio with AsyncQuoteContext."""
 import asyncio
-from longport.openapi import (
+from longbridge.openapi import (
     AsyncQuoteContext,
     Config,
     OAuthBuilder,

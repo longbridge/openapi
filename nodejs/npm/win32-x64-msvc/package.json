@@ -1,5 +1,5 @@
 {
-  "name": "longport-win32-x64-msvc",
+  "name": "longbridge-win32-x64-msvc",
   "version": "0.0.0",
   "os": [
     "win32"
@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "longport.win32-x64-msvc.node",
+  "main": "longbridge.win32-x64-msvc.node",
   "files": [
-    "longport.win32-x64-msvc.node"
+    "longbridge.win32-x64-msvc.node"
   ],
   "license": "MIT",
   "engines": {

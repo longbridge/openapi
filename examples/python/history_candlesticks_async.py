@@ -2,7 +2,7 @@
 import asyncio
 import datetime
 
-from longport.openapi import (
+from longbridge.openapi import (
     AsyncQuoteContext,
     Config,
     OAuthBuilder,

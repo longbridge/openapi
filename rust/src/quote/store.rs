@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use longport_candlesticks::{Days, UpdateAction, UpdateFields};
-use longport_proto::quote::Period;
+use longbridge_candlesticks::{Days, UpdateAction, UpdateFields};
+use longbridge_proto::quote::Period;
 
 use crate::{
     Market,
@@ -291,8 +291,8 @@ where
 pub(crate) fn get_market(
     market: Market,
     board: SecurityBoard,
-) -> Option<&'static longport_candlesticks::Market> {
-    use longport_candlesticks::markets::*;
+) -> Option<&'static longbridge_candlesticks::Market> {
+    use longbridge_candlesticks::markets::*;
 
     Some(match market {
         Market::US if board == SecurityBoard::USOptionS => &US_OPTION,
@@ -305,8 +305,8 @@ pub(crate) fn get_market(
     })
 }
 
-fn convert_period(period: Period) -> longport_candlesticks::Period {
-    use longport_candlesticks::Period::*;
+fn convert_period(period: Period) -> longbridge_candlesticks::Period {
+    use longbridge_candlesticks::Period::*;
 
     match period {
         Period::UnknownPeriod => unreachable!(),

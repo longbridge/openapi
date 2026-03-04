@@ -11,7 +11,7 @@ on:
 
 jobs:
   stale:
-    if: github.repository_owner == 'longportapp'
+    if: github.repository_owner == 'longbridge'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v9

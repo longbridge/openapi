@@ -1,4 +1,4 @@
-use longport::{
+use longbridge::{
     Decimal, Error, Market, QuoteContext, TradeContext,
     quote::{
         AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
@@ -22,12 +22,12 @@ use time::{
 
 const DATE_FORMAT: &[BorrowedFormatItem] = format_description!("[year]-[month]-[day]");
 
-pub(crate) struct Longport {
+pub(crate) struct Longbridge {
     quote_context: QuoteContext,
     trade_context: TradeContext,
 }
 
-impl Longport {
+impl Longbridge {
     #[inline]
     pub(crate) fn new(quote_context: QuoteContext, trade_context: TradeContext) -> Self {
         Self {
@@ -37,9 +37,9 @@ impl Longport {
     }
 }
 
-/// LongPort OpenAPI SDK.
+/// Longbridge OpenAPI SDK.
 #[Tools]
-impl Longport {
+impl Longbridge {
     /// Get current time.
     async fn now(&self) -> Text<String> {
         Text(

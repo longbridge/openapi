@@ -1,5 +1,5 @@
 [package]
-name = "longport-nodejs-macros"
+name = "longbridge-nodejs-macros"
 version.workspace = true
 edition.workspace = true
 

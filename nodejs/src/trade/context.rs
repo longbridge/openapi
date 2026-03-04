@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
+use longbridge::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
 use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
@@ -31,7 +31,7 @@ struct Callbacks {
 #[napi_derive::napi]
 #[derive(Clone)]
 pub struct TradeContext {
-    ctx: longport::trade::TradeContext,
+    ctx: longbridge::trade::TradeContext,
     callbacks: Arc<Mutex<Callbacks>>,
 }
 
@@ -41,7 +41,7 @@ impl TradeContext {
     pub async fn new(config: &Config) -> Result<TradeContext> {
         let callbacks = Arc::new(Mutex::new(Callbacks::default()));
         let (ctx, mut receiver) =
-            longport::trade::TradeContext::try_new(Arc::new(config.0.clone()))
+            longbridge::trade::TradeContext::try_new(Arc::new(config.0.clone()))
                 .await
                 .map_err(ErrorNewType)?;
 
@@ -93,7 +93,7 @@ impl TradeContext {
     ///  TimeInForceType,
     ///  OrderType,
     ///  TopicType,
-    /// } = require("longport");
+    /// } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -135,7 +135,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport");
+    /// const { Config, TradeContext } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -171,7 +171,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport");
+    /// const { Config, TradeContext } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -207,7 +207,7 @@ impl TradeContext {
     ///   OrderStatus,
     ///   OrderSide,
     ///   Market,
-    /// } = require("longport");
+    /// } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -252,7 +252,7 @@ impl TradeContext {
     ///   OrderStatus,
     ///   OrderSide,
     ///   Market,
-    /// } = require("longport");
+    /// } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -286,7 +286,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, Decimal } = require("longport");
+    /// const { Config, TradeContext, Decimal } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -310,7 +310,7 @@ impl TradeContext {
         opts: ReplaceOrderOptions<'env>,
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = self.ctx.clone();
-        let opts = longport::trade::ReplaceOrderOptions::from(opts);
+        let opts = longbridge::trade::ReplaceOrderOptions::from(opts);
         env.spawn_future(async move {
             ctx.replace_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
@@ -329,7 +329,7 @@ impl TradeContext {
     ///   OrderSide,
     ///   Decimal,
     ///   TimeInForceType,
-    /// } = require("longport");
+    /// } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -352,7 +352,7 @@ impl TradeContext {
         opts: SubmitOrderOptions<'env>,
     ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
         let ctx = self.ctx.clone();
-        let opts = longport::trade::SubmitOrderOptions::from(opts);
+        let opts = longbridge::trade::SubmitOrderOptions::from(opts);
         env.spawn_future(async move {
             let res = ctx.submit_order(opts).await.map_err(ErrorNewType)?;
             SubmitOrderResponse::try_from(res)
@@ -364,7 +364,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport");
+    /// const { Config, TradeContext } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config).then((ctx) => ctx.cancelOrder("709043056541253632"));
@@ -383,7 +383,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport");
+    /// const { Config, TradeContext } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -410,7 +410,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, GetCashFlowOptions } = require("longport");
+    /// const { Config, TradeContext, GetCashFlowOptions } = require('longbridge');
     ///
     /// let config = Config.fromEnv();
     /// TradeContext.new(config)
@@ -442,7 +442,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport")
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// TradeContext.new(config)
@@ -466,7 +466,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport")
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// TradeContext.new(config)
@@ -490,7 +490,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport")
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// TradeContext.new(config)
@@ -511,7 +511,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require("longport")
+    /// const { Config, TradeContext } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// TradeContext.new(config)
@@ -533,7 +533,7 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, OrderType, OrderSide } = require("longport")
+    /// const { Config, TradeContext, OrderType, OrderSide } = require('longbridge')
     ///
     /// let config = Config.fromEnv()
     /// TradeContext.new(config)
@@ -551,7 +551,7 @@ impl TradeContext {
         opts: EstimateMaxPurchaseQuantityOptions<'env>,
     ) -> Result<PromiseRaw<'env, EstimateMaxPurchaseQuantityResponse>> {
         let ctx = self.ctx.clone();
-        let opts = longport::trade::EstimateMaxPurchaseQuantityOptions::from(opts);
+        let opts = longbridge::trade::EstimateMaxPurchaseQuantityOptions::from(opts);
         env.spawn_future(async move {
             let res = ctx
                 .estimate_max_purchase_quantity(opts)

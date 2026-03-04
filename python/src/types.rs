@@ -1,9 +1,9 @@
-use longport_python_macros::PyEnum;
+use longbridge_python_macros::PyEnum;
 use pyo3::prelude::*;
 
 #[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longport::Market")]
+#[py(remote = "longbridge::Market")]
 pub(crate) enum Market {
     /// Unknown
     Unknown,
@@ -22,7 +22,7 @@ pub(crate) enum Market {
 #[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
-#[py(remote = "longport::Language")]
+#[py(remote = "longbridge::Language")]
 pub(crate) enum Language {
     /// zh-CN
     ZH_CN,
@@ -35,7 +35,7 @@ pub(crate) enum Language {
 #[pyclass(eq, eq_int)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
-#[py(remote = "longport::PushCandlestickMode")]
+#[py(remote = "longbridge::PushCandlestickMode")]
 pub(crate) enum PushCandlestickMode {
     /// Realtime mode
     Realtime,

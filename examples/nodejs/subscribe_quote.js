@@ -1,4 +1,4 @@
-const { Config, QuoteContext, SubType, OAuthBuilder } = require("longport");
+const { Config, QuoteContext, SubType, OAuthBuilder } = require('longbridge');
 
 let globalCtx;
 

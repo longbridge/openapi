@@ -17,7 +17,7 @@ jobs:
           toolchain: stable
           components: rust-docs
       - name: Build Rust doc
-        run: cargo doc -p longport --no-deps
+        run: cargo doc -p longbridge --no-deps
 
   nodejs:
     runs-on: ubuntu-22.04

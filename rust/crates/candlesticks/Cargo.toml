@@ -1,8 +1,8 @@
 [package]
 edition.workspace = true
-name = "longport-candlesticks"
+name = "longbridge-candlesticks"
 version.workspace = true
-description = "LongPort candlestick utils for Rust"
+description = "Longbridge candlestick utils for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

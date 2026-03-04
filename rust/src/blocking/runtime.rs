@@ -5,7 +5,7 @@ use tokio::sync::mpsc;
 
 use crate::{Result, blocking::BlockingError};
 
-const THREAD_NAME: &str = "longport-sync-runtime";
+const THREAD_NAME: &str = "longbridge-sync-runtime";
 
 type ExecFn<Ctx> = Box<dyn FnOnce(Arc<Ctx>) -> BoxFuture<'static, ()> + Send + 'static>;
 

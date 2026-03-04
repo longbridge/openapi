@@ -1,8 +1,8 @@
-use longport_c_macros::CEnum;
+use longbridge_c_macros::CEnum;
 
 /// Language identifer
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::PushCandlestickMode")]
+#[c(remote = "longbridge::PushCandlestickMode")]
 #[allow(clippy::enum_variant_names, non_camel_case_types)]
 #[repr(C)]
 pub enum CPushCandlestickMode {

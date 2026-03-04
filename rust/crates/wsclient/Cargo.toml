@@ -1,12 +1,12 @@
 [package]
-name = "longport-wscli"
+name = "longbridge-wscli"
 version.workspace = true
 edition.workspace = true
-description = "LongPort Websocket SDK for Rust"
+description = "Longbridge Websocket SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-longport-proto.workspace = true
+longbridge-proto.workspace = true
 
 tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
 tokio-tungstenite = { workspace = true, features = ["rustls-tls-webpki-roots"] }

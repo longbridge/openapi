@@ -16,13 +16,13 @@ pub(crate) enum JniError {
     #[error(transparent)]
     Jni(#[from] jni::errors::Error),
     #[error(transparent)]
-    OpenApi(#[from] longport::Error),
+    OpenApi(#[from] longbridge::Error),
     #[error("{0}")]
     Other(String),
 }
 
-impl From<longport::oauth::OAuthError> for JniError {
-    fn from(e: longport::oauth::OAuthError) -> Self {
+impl From<longbridge::oauth::OAuthError> for JniError {
+    fn from(e: longbridge::oauth::OAuthError) -> Self {
         JniError::Other(e.to_string())
     }
 }
@@ -48,7 +48,7 @@ impl JniError {
 
     fn into_openapi_error_object<'a>(
         env: &mut JNIEnv<'a>,
-        err: longport::Error,
+        err: longbridge::Error,
     ) -> Result<JObject<'a>> {
         let exception_cls = OPENAPI_EXCEPTION_CLASS.get().unwrap();
         let err = err.into_simple_error();
@@ -64,12 +64,12 @@ impl JniError {
 
         env.new_object(
             exception_cls,
-            "(Lcom/longport/ErrorKind;Ljava/lang/Long;Ljava/lang/String;)V",
+            "(Lcom/longbridge/ErrorKind;Ljava/lang/Long;Ljava/lang/String;)V",
             &[kind.borrow(), JValue::from(&code), JValue::from(&message)],
         )
     }
 
-    fn throw_openapi_error(env: &mut JNIEnv, err: longport::Error) -> Result<()> {
+    fn throw_openapi_error(env: &mut JNIEnv, err: longbridge::Error) -> Result<()> {
         let err = JThrowable::from(Self::into_openapi_error_object(env, err)?);
         env.throw(err)?;
         Ok(())

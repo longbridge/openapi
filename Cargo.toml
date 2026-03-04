@@ -10,12 +10,12 @@ edition = "2024"
 lto = true
 
 [workspace.dependencies]
-longport-wscli = { path = "rust/crates/wsclient", version = "4.0.0" }
-longport-httpcli = { path = "rust/crates/httpclient", version = "4.0.0" }
-longport-proto = { path = "rust/crates/proto", version = "4.0.0" }
-longport-candlesticks = { path = "rust/crates/candlesticks", version = "4.0.0" }
-longport-oauth = { path = "rust/crates/oauth", version = "4.0.0" }
-longport = { path = "rust", version = "4.0.0" }
+longbridge-wscli = { path = "rust/crates/wsclient", version = "4.0.0" }
+longbridge-httpcli = { path = "rust/crates/httpclient", version = "4.0.0" }
+longbridge-proto = { path = "rust/crates/proto", version = "4.0.0" }
+longbridge-candlesticks = { path = "rust/crates/candlesticks", version = "4.0.0" }
+longbridge-oauth = { path = "rust/crates/oauth", version = "4.0.0" }
+longbridge = { path = "rust", version = "4.0.0" }
 
 tokio = "1.47.1"
 tokio-tungstenite = "0.27.0"

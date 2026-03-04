@@ -1,6 +1,6 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 
-use longport::{
+use longbridge::{
     TradeContext,
     trade::{
         EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,

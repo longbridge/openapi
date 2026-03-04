@@ -2,7 +2,7 @@
 import asyncio
 from decimal import Decimal
 
-from longport.openapi import (
+from longbridge.openapi import (
     AsyncTradeContext,
     Config,
     OAuthBuilder,

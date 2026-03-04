@@ -1,6 +1,6 @@
 use std::{ffi::CStr, os::raw::c_char, ptr};
 
-use longport::Config;
+use longbridge::Config;
 
 use crate::{
     error::{CError, set_error},
@@ -8,16 +8,16 @@ use crate::{
     types::{CLanguage, CPushCandlestickMode},
 };
 
-/// Configuration options for LongPort sdk
+/// Configuration options for Longbridge SDK
 pub struct CConfig(pub(crate) Config);
 
 /// Create a new `Config` using API Key authentication
 ///
 /// Optional environment variables are read automatically:
-/// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
-/// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-/// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-/// `LONGPORT_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
+/// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
+/// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
+/// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+/// `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
 /// to override any of these values after construction.
 ///
 /// @param app_key       App key
@@ -44,11 +44,11 @@ pub unsafe extern "C" fn lb_config_from_apikey(
 ///
 /// It first reads the `.env` file in the current directory.
 ///
-/// Variables: `LONGPORT_APP_KEY`, `LONGPORT_APP_SECRET`,
-/// `LONGPORT_ACCESS_TOKEN`, `LONGPORT_HTTP_URL`, `LONGPORT_QUOTE_WS_URL`,
-/// `LONGPORT_TRADE_WS_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_ENABLE_OVERNIGHT`,
-/// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-/// `LONGPORT_LOG_PATH`
+/// Variables: `LONGBRIDGE_APP_KEY`, `LONGBRIDGE_APP_SECRET`,
+/// `LONGBRIDGE_ACCESS_TOKEN`, `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`,
+/// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_LANGUAGE`,
+/// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
+/// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_from_apikey_env(error: *mut *mut CError) -> *mut CConfig {
     match Config::from_apikey_env() {
@@ -66,10 +66,10 @@ pub unsafe extern "C" fn lb_config_from_apikey_env(error: *mut *mut CError) -> *
 /// Create a new `Config` for OAuth 2.0 authentication
 ///
 /// Optional environment variables are read automatically:
-/// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
-/// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-/// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-/// `LONGPORT_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
+/// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
+/// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
+/// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+/// `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
 /// to override any of these values after construction.
 ///
 /// Does **not** take ownership of `oauth`. The caller must free `oauth` with
@@ -91,7 +91,7 @@ pub unsafe extern "C" fn lb_config_from_oauth(oauth: *const COAuth) -> *mut CCon
 /// Set the HTTP endpoint URL
 ///
 /// @param config   Config object
-/// @param http_url HTTP endpoint URL (e.g. `https://openapi.longportapp.com`)
+/// @param http_url HTTP endpoint URL (e.g. `https://openapi.longbridge.com`)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_set_http_url(config: *mut CConfig, http_url: *const c_char) {
     let url = CStr::from_ptr(http_url).to_str().expect("invalid http_url");

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace longport {
+namespace longbridge {
 namespace utils {
 
 inline std::vector<const char*>
@@ -20,4 +20,4 @@ get_cstring_vector(const std::vector<std::string>& values)
 }
 
 } // namespace utils
-} // namespace longport
+} // namespace longbridge

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport::{
+use longbridge::{
     oauth::OAuthBuilder,
     quote::{QuoteContext, SubFlags},
     Config,

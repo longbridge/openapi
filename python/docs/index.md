@@ -1,57 +1,57 @@
-# LongPort OpenAPI SDK for Python
+# Longbridge OpenAPI SDK for Python
 
-`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longbridge` provides an easy-to-use interface for invokes [`Longbridge OpenAPI`](https://open.longbridge.com/en/).
 
 ## References
 
-- [Config](reference_all.md#longport.openapi.Config)
+- [Config](reference_all.md#longbridge.openapi.Config)
 
   The configuration of the SDK.
    
-- [QuoteContext](reference_all.md#longport.openapi.QuoteContext)
+- [QuoteContext](reference_all.md#longbridge.openapi.QuoteContext)
 
   The Quote API part of the SDK, e.g.: get basic information of securities, subscribe quotes...
 
-- [TradeContext](reference_all.md#longport.openapi.TradeContext)
+- [TradeContext](reference_all.md#longbridge.openapi.TradeContext)
 
   The Trade API part of the SDK, e.g.: submit order, get order status...
 
-- [AsyncQuoteContext](reference_all.md#longport.openapi.AsyncQuoteContext)
+- [AsyncQuoteContext](reference_all.md#longbridge.openapi.AsyncQuoteContext)
 
   Async quote API for use with asyncio; create via `AsyncQuoteContext.create(config)` and await in asyncio.
 
-- [AsyncTradeContext](reference_all.md#longport.openapi.AsyncTradeContext)
+- [AsyncTradeContext](reference_all.md#longbridge.openapi.AsyncTradeContext)
 
   Async trade API for use with asyncio; create via `AsyncTradeContext.create(config)` and await in asyncio.
   
 ## Quickstart
 
-_Install LongPort OpenAPI SDK_
+_Install Longbridge OpenAPI SDK_
 
 ```bash
-pip install longport
+pip install longbridge
 ```
 
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGPORT_APP_KEY="App Key get from user center"
-export LONGPORT_APP_SECRET="App Secret get from user center"
-export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
+export LONGBRIDGE_APP_KEY="App Key get from user center"
+export LONGBRIDGE_APP_SECRET="App Secret get from user center"
+export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGPORT_APP_KEY "App Key get from user center"
-setx LONGPORT_APP_SECRET "App Secret get from user center"
-setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
+setx LONGBRIDGE_APP_KEY "App Key get from user center"
+setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
+setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
 
 ```python
-from longport.openapi import Config, QuoteContext
+from longbridge.openapi import Config, QuoteContext
 
 # Load configuration from environment variables
 config = Config.from_env()
@@ -68,7 +68,7 @@ print(resp)
 
 ```python
 from time import sleep
-from longport.openapi import Config, QuoteContext, SubType, PushQuote
+from longbridge.openapi import Config, QuoteContext, SubType, PushQuote
 
 # Load configuration from environment variables
 config = Config.from_env()
@@ -92,7 +92,7 @@ sleep(30)
 
 ```python
 from decimal import Decimal
-from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType
+from longbridge.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType
 
 # Load configuration from environment variables
 config = Config.from_env()
@@ -112,7 +112,7 @@ The SDK provides async contexts and an async HTTP client for use with Python's `
 
 ```python
 import asyncio
-from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote
+from longbridge.openapi import Config, AsyncQuoteContext, SubType, PushQuote
 
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)

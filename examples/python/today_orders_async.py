@@ -1,7 +1,7 @@
 """Get today orders (async). Use asyncio with AsyncTradeContext."""
 import asyncio
 
-from longport.openapi import AsyncTradeContext, Config, OAuthBuilder
+from longbridge.openapi import AsyncTradeContext, Config, OAuthBuilder
 
 
 async def main() -> None:

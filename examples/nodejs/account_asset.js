@@ -1,4 +1,4 @@
-const { Config, TradeContext, OAuthBuilder } = require("longport");
+const { Config, TradeContext, OAuthBuilder } = require('longbridge');
 
 async function main() {
   const oauth = await OAuthBuilder.build("your-client-id", (url) => {

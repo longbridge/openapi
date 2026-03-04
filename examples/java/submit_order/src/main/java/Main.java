@@ -1,5 +1,5 @@
-import com.longport.*;
-import com.longport.trade.*;
+import com.longbridge.*;
+import com.longbridge.trade.*;
 import java.math.BigDecimal;
 
 public class Main {

@@ -1,7 +1,7 @@
 #include "decimal.hpp"
-#include "longport.h"
+#include "longbridge.h"
 
-namespace longport {
+namespace longbridge {
 
 Decimal::Decimal(const lb_decimal_t* other)
 {
@@ -344,4 +344,4 @@ operator<<(std::ostream& stream, const Decimal& value)
   return stream;
 }
 
-} // namespace longport
+} // namespace longbridge

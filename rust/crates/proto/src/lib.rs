@@ -1,12 +1,12 @@
-#[path = "longportapp.control.v1.rs"]
+#[path = "longbridge.control.v1.rs"]
 #[rustfmt::skip]
 pub mod control;
 
-#[path = "longportapp.quote.v1.rs"]
+#[path = "longbridge.quote.v1.rs"]
 #[rustfmt::skip]
 pub mod quote;
 
-#[path = "longportapp.trade.v1.rs"]
+#[path = "longbridge.trade.v1.rs"]
 #[rustfmt::skip]
 pub mod trade;
 

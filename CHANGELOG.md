@@ -72,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [3.0.13] 2025-08-22
 
-- fix [#298](https://github.com/longportapp/openapi/issues/298)
+- fix [#298](https://github.com/longbridge/openapi/issues/298)
 
 # [3.0.12] 2025-08-08
 
@@ -95,11 +95,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # [3.0.7] 2025-06-09
 
 - add `AccountBalance.frozen_transaction_fees`
-- fix(nodejs): correct condition for disabling quote package printing [#230](https://github.com/longportapp/openapi/pull/230)
+- fix(nodejs): correct condition for disabling quote package printing [#230](https://github.com/longbridge/openapi/pull/230)
 
 # [3.0.6] 2025-06-02
 
-- fix: Add missing types register [#226](https://github.com/longportapp/openapi/pull/226)
+- fix: Add missing types register [#226](https://github.com/longbridge/openapi/pull/226)
 
 # [3.0.4] 2025-05-15
 
@@ -108,19 +108,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [3.0.3] 2025-05-14
 
-- fix [#213](https://github.com/longportapp/openapi/issues/213)
+- fix [#213](https://github.com/longbridge/openapi/issues/213)
 
 # [3.0.1] 2025-05-13
 
-- fix [#212](https://github.com/longportapp/openapi/issues/212)
+- fix [#212](https://github.com/longbridge/openapi/issues/212)
 
 # [3.0.0] 2025-05-13
 
 - add support extended hours candlesticks
 - add market temperature api
-- add support use environment variable `LONGPORT_LANGUAGE` to set the response language
+- add support use environment variable `LONGBRIDGE_LANGUAGE` to set the response language
 - java-sdk: add `QuoteContext.getCapitalDistribution` method
-- fix [#208](https://github.com/longportapp/openapi/issues/208)
+- fix [#208](https://github.com/longbridge/openapi/issues/208)
 
 # [2.1.8] 2025-01-27
 
@@ -145,7 +145,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [2.0.4] 2024-11-15
 
-- Add `LONGPORT_PRINT_QUOTE_PACKAGES` environment variable to enable printing the opened quote packages when connected to the server, default is `true`.
+- Add `LONGBRIDGE_PRINT_QUOTE_PACKAGES` environment variable to enable printing the opened quote packages when connected to the server, default is `true`.
 
 # [2.0.3] 2024-11-14
 

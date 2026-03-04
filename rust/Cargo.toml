@@ -1,24 +1,24 @@
 [package]
 edition.workspace = true
-name = "longport"
+name = "longbridge"
 version.workspace = true
-description = "LongPort OpenAPI SDK for Rust"
-homepage = "https://open.longportapp.com/en/"
+description = "Longbridge OpenAPI SDK for Rust"
+homepage = "https://open.longbridge.com/en/"
 readme = "README.md"
-repository = "https://github.com/longportapp/openapi"
+repository = "https://github.com/longbridge/openapi"
 license = "MIT OR Apache-2.0"
-keywords = ["longport", "openapi", "sdk"]
+keywords = ["longbridge", "openapi", "sdk"]
 categories = ["api-bindings"]
 
 [features]
 blocking = ["flume"]
 
 [dependencies]
-longport-wscli.workspace = true
-longport-httpcli.workspace = true
-longport-proto.workspace = true
-longport-candlesticks.workspace = true
-longport-oauth.workspace = true
+longbridge-wscli.workspace = true
+longbridge-httpcli.workspace = true
+longbridge-proto.workspace = true
+longbridge-candlesticks.workspace = true
+longbridge-oauth.workspace = true
 
 tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
 tokio-tungstenite.workspace = true

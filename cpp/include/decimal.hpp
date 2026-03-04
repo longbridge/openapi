@@ -7,7 +7,7 @@
 
 typedef struct lb_decimal_t lb_decimal_t;
 
-namespace longport {
+namespace longbridge {
 
 class Decimal
 {
@@ -145,4 +145,4 @@ public:
 std::ostream&
 operator<<(std::ostream& stream, const Decimal& value);
 
-} // namespace longport
+} // namespace longbridge

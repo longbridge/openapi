@@ -5,14 +5,14 @@ use std::{
 
 use comfy_table::Table;
 use itertools::Itertools;
-use longport_candlesticks::{TradeSessionType, UpdateAction};
-use longport_httpcli::HttpClient;
-use longport_proto::quote::{
+use longbridge_candlesticks::{TradeSessionType, UpdateAction};
+use longbridge_httpcli::HttpClient;
+use longbridge_proto::quote::{
     self, AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
     PushQuoteTag, SecurityCandlestickRequest, SecurityCandlestickResponse,
     SecurityStaticInfoResponse, SubscribeRequest, UnsubscribeRequest,
 };
-use longport_wscli::{
+use longbridge_wscli::{
     CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
 };
 use time::{Date, OffsetDateTime};
@@ -108,7 +108,7 @@ impl TradingDays {
 #[derive(Debug, Copy, Clone)]
 struct Days<'a>(Option<&'a HashSet<Date>>);
 
-impl longport_candlesticks::Days for Days<'_> {
+impl longbridge_candlesticks::Days for Days<'_> {
     #[inline]
     fn contains(&self, date: Date) -> bool {
         match self.0 {

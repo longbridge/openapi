@@ -1,3 +1,3 @@
-# `longport-linux-arm64-gnu`
+# `longbridge-linux-arm64-gnu`
 
-This is the **aarch64-unknown-linux-gnu** binary for `longport`
+This is the **aarch64-unknown-linux-gnu** binary for `longbridge`

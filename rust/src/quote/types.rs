@@ -1,5 +1,5 @@
-use longport_candlesticks::CandlestickComponents;
-use longport_proto::quote::{self, Period, TradeStatus};
+use longbridge_candlesticks::CandlestickComponents;
+use longbridge_proto::quote::{self, Period, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -26,26 +26,26 @@ pub enum TradeSession {
     Overnight,
 }
 
-impl longport_candlesticks::TradeSessionType for TradeSession {
+impl longbridge_candlesticks::TradeSessionType for TradeSession {
     #[inline]
-    fn kind(&self) -> longport_candlesticks::TradeSessionKind {
+    fn kind(&self) -> longbridge_candlesticks::TradeSessionKind {
         match self {
-            TradeSession::Intraday => longport_candlesticks::TRADE_SESSION_INTRADAY,
-            TradeSession::Pre => longport_candlesticks::TRADE_SESSION_PRE,
-            TradeSession::Post => longport_candlesticks::TRADE_SESSION_POST,
-            TradeSession::Overnight => longport_candlesticks::TRADE_SESSION_OVERNIGHT,
+            TradeSession::Intraday => longbridge_candlesticks::TRADE_SESSION_INTRADAY,
+            TradeSession::Pre => longbridge_candlesticks::TRADE_SESSION_PRE,
+            TradeSession::Post => longbridge_candlesticks::TRADE_SESSION_POST,
+            TradeSession::Overnight => longbridge_candlesticks::TRADE_SESSION_OVERNIGHT,
         }
     }
 }
 
-impl From<longport_proto::quote::TradeSession> for TradeSession {
+impl From<longbridge_proto::quote::TradeSession> for TradeSession {
     #[inline]
-    fn from(value: longport_proto::quote::TradeSession) -> Self {
+    fn from(value: longbridge_proto::quote::TradeSession) -> Self {
         match value {
-            longport_proto::quote::TradeSession::NormalTrade => Self::Intraday,
-            longport_proto::quote::TradeSession::PreTrade => Self::Pre,
-            longport_proto::quote::TradeSession::PostTrade => Self::Post,
-            longport_proto::quote::TradeSession::OvernightTrade => Self::Overnight,
+            longbridge_proto::quote::TradeSession::NormalTrade => Self::Intraday,
+            longbridge_proto::quote::TradeSession::PreTrade => Self::Pre,
+            longbridge_proto::quote::TradeSession::PostTrade => Self::Post,
+            longbridge_proto::quote::TradeSession::OvernightTrade => Self::Overnight,
         }
     }
 }
@@ -178,14 +178,14 @@ impl TryFrom<quote::Trade> for Trade {
                 .map_err(|err| Error::parse_field_error("timestamp", err))?,
             trade_type: trade.trade_type,
             direction: trade.direction.into(),
-            trade_session: longport_proto::quote::TradeSession::try_from(trade.trade_session)
+            trade_session: longbridge_proto::quote::TradeSession::try_from(trade.trade_session)
                 .unwrap_or_default()
                 .into(),
         })
     }
 }
 
-impl longport_candlesticks::TradeType for Trade {
+impl longbridge_candlesticks::TradeType for Trade {
     type PriceType = Decimal;
     type VolumeType = i64;
     type TurnoverType = Decimal;
@@ -818,7 +818,7 @@ impl TryFrom<quote::Candlestick> for Candlestick {
             turnover: value.turnover.parse().unwrap_or_default(),
             timestamp: OffsetDateTime::from_unix_timestamp(value.timestamp)
                 .map_err(|err| Error::parse_field_error("timestamp", err))?,
-            trade_session: longport_proto::quote::TradeSession::try_from(value.trade_session)
+            trade_session: longbridge_proto::quote::TradeSession::try_from(value.trade_session)
                 .map_err(|err| Error::parse_field_error("trade_session", err))?
                 .into(),
             open_updated: true,
@@ -826,7 +826,7 @@ impl TryFrom<quote::Candlestick> for Candlestick {
     }
 }
 
-impl longport_candlesticks::CandlestickType for Candlestick {
+impl longbridge_candlesticks::CandlestickType for Candlestick {
     type PriceType = Decimal;
     type VolumeType = i64;
     type TurnoverType = Decimal;
@@ -1270,7 +1270,7 @@ impl TryFrom<quote::TradePeriod> for TradingSessionInfo {
                 .map_err(|err| Error::parse_field_error("beg_time", err))?,
             end_time: parse_time(value.end_time)
                 .map_err(|err| Error::parse_field_error("end_time", err))?,
-            trade_session: longport_proto::quote::TradeSession::try_from(value.trade_session)
+            trade_session: longbridge_proto::quote::TradeSession::try_from(value.trade_session)
                 .unwrap_or_default()
                 .into(),
         })
@@ -1598,9 +1598,9 @@ pub enum CalcIndex {
     Rho,
 }
 
-impl From<CalcIndex> for longport_proto::quote::CalcIndex {
+impl From<CalcIndex> for longbridge_proto::quote::CalcIndex {
     fn from(value: CalcIndex) -> Self {
-        use longport_proto::quote::CalcIndex::*;
+        use longbridge_proto::quote::CalcIndex::*;
 
         match value {
             CalcIndex::LastDone => CalcindexLastDone,
@@ -1736,7 +1736,7 @@ pub struct SecurityCalcIndex {
 
 impl SecurityCalcIndex {
     pub(crate) fn from_proto(
-        resp: longport_proto::quote::SecurityCalcIndex,
+        resp: longbridge_proto::quote::SecurityCalcIndex,
         indexes: &[CalcIndex],
     ) -> Self {
         let mut output = SecurityCalcIndex {

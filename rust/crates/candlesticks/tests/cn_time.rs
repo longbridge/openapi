@@ -1,4 +1,4 @@
-use longport_candlesticks::{
+use longbridge_candlesticks::{
     Period, TRADE_SESSION_INTRADAY, markets::CN, testutil::TestCandlestickTime,
 };
 use time::macros::{datetime, time};

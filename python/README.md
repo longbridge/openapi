@@ -1,11 +1,11 @@
-# LongPort OpenAPI SDK for Python
+# Longbridge OpenAPI SDK for Python
 
-`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longbridge` provides an easy-to-use interface for invoking [`Longbridge OpenAPI`](https://open.longbridge.com/en/).
 
 ## Documentation
 
-- SDK docs: https://longportapp.github.io/openapi/python/index.html
-- LongPort OpenAPI: https://open.longportapp.com/en/
+- SDK docs: https://longbridge.github.io/openapi/python/index.html
+- Longbridge OpenAPI: https://open.longbridge.com/en/
 
 ## Examples
 
@@ -33,29 +33,29 @@ Runnable examples live in `examples/python/`, grouped as follows.
 
 ## References
 
-- [Config](https://longportapp.github.io/openapi/python/config/)
+- [Config](https://longbridge.github.io/openapi/python/config/)
 
   The configuration of the SDK.
    
-- [QuoteContext](https://longportapp.github.io/openapi/python/quote_context/)
+- [QuoteContext](https://longbridge.github.io/openapi/python/quote_context/)
 
   The Quote API part of the SDK, e.g.: get basic information of securities, subscribe quotes...
 
-- [TradeContext](https://longportapp.github.io/openapi/python/trade_context/)
+- [TradeContext](https://longbridge.github.io/openapi/python/trade_context/)
 
   The Trade API part of the SDK, e.g.: submit order, get order status...
 
 ## Quickstart
 
-_Install LongPort OpenAPI SDK_
+_Install Longbridge OpenAPI SDK_
 
 ```bash
-pip install longport
+pip install longbridge
 ```
 
 ### Authentication
 
-LongPort OpenAPI supports two authentication methods:
+Longbridge OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
@@ -111,7 +111,7 @@ automatically.  The token is persisted to the same path after a successful
 authorization or refresh.
 
 ```python
-from longport.openapi import OAuthBuilder, Config
+from longbridge.openapi import OAuthBuilder, Config
 
 oauth = OAuthBuilder("your-client-id").build(
     lambda url: print(f"Open this URL to authorize: {url}")
@@ -123,7 +123,7 @@ For async code use `build_async`:
 
 ```python
 import asyncio
-from longport.openapi import OAuthBuilder, Config
+from longbridge.openapi import OAuthBuilder, Config
 
 async def main():
     oauth = await OAuthBuilder("your-client-id").build_async(
@@ -139,23 +139,23 @@ asyncio.run(main())
 _Setting environment variables (macOS/Linux)_
 
 ```bash
-export LONGPORT_APP_KEY="App Key get from user center"
-export LONGPORT_APP_SECRET="App Secret get from user center"
-export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
+export LONGBRIDGE_APP_KEY="App Key get from user center"
+export LONGBRIDGE_APP_SECRET="App Secret get from user center"
+export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables (Windows)_
 
 ```powershell
-setx LONGPORT_APP_KEY "App Key get from user center"
-setx LONGPORT_APP_SECRET "App Secret get from user center"
-setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
+setx LONGBRIDGE_APP_KEY "App Key get from user center"
+setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
+setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 Then create a config from the environment:
 
 ```python
-from longport.openapi import Config
+from longbridge.openapi import Config
 
 config = Config.from_apikey_env()
 ```
@@ -163,7 +163,7 @@ config = Config.from_apikey_env()
 ## Quote API _(Get basic information of securities)_
 
 ```python
-from longport.openapi import Config, QuoteContext, OAuthBuilder
+from longbridge.openapi import Config, QuoteContext, OAuthBuilder
 
 oauth = OAuthBuilder("your-client-id").build(
     lambda url: print(f"Open this URL to authorize: {url}")
@@ -182,7 +182,7 @@ print(resp)
 
 ```python
 from time import sleep
-from longport.openapi import Config, QuoteContext, SubType, PushQuote, OAuthBuilder
+from longbridge.openapi import Config, QuoteContext, SubType, PushQuote, OAuthBuilder
 
 oauth = OAuthBuilder("your-client-id").build(
     lambda url: print(f"Open this URL to authorize: {url}")
@@ -208,7 +208,7 @@ sleep(30)
 
 ```python
 from decimal import Decimal
-from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuthBuilder
+from longbridge.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuthBuilder
 
 oauth = OAuthBuilder("your-client-id").build(
     lambda url: print(f"Open this URL to authorize: {url}")
@@ -240,7 +240,7 @@ Example (async quote):
 
 ```python
 import asyncio
-from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuthBuilder
+from longbridge.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuthBuilder
 
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)
@@ -266,7 +266,7 @@ See the `*_async.py` examples in `examples/python/` for full async flows.
 
 - Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
 - If the program exits, you won't receive push events; keep the process alive (e.g. `sleep(...)`).
-- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+- For debugging, set `LONGBRIDGE_LOG_PATH` to enable SDK logs.
 
 ## License
 

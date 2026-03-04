@@ -1,7 +1,7 @@
 """Subscribe quote (async). Use asyncio with AsyncQuoteContext."""
 import asyncio
 
-from longport.openapi import AsyncQuoteContext, Config, OAuthBuilder, SubType, PushQuote
+from longbridge.openapi import AsyncQuoteContext, Config, OAuthBuilder, SubType, PushQuote
 
 
 def on_quote(symbol: str, event: PushQuote) -> None:

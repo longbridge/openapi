@@ -1,11 +1,11 @@
-# LongPort OpenAPI SDK for C
+# Longbridge OpenAPI SDK for C
 
-`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longbridge` provides an easy-to-use interface for invoking [`Longbridge OpenAPI`](https://open.longbridge.com/en/).
 
 ## Documentation
 
-- SDK docs: https://longportapp.github.io/openapi/c/index.html
-- LongPort OpenAPI: https://open.longportapp.com/en/
+- SDK docs: https://longbridge.github.io/openapi/c/index.html
+- Longbridge OpenAPI: https://open.longbridge.com/en/
 
 ## Examples
 
@@ -20,13 +20,13 @@ Runnable examples live in `examples/c/`:
 
 ## Quickstart
 
-_Install LongPort OpenAPI SDK_
+_Install Longbridge OpenAPI SDK_
 
-[`Download C SDK`](https://github.com/longportapp/openapi/releases)
+[`Download C SDK`](https://github.com/longbridge/openapi/releases)
 
 ### Authentication
 
-LongPort OpenAPI supports two authentication methods:
+Longbridge OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
@@ -82,7 +82,7 @@ authorization or refresh.  The resulting `lb_oauth_t*` handle is passed
 directly to `lb_config_from_oauth`.
 
 ```c
-#include <longport.h>
+#include <longbridge.h>
 #include <stdio.h>
 
 static void
@@ -120,23 +120,23 @@ main(int argc, char const* argv[])
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGPORT_APP_KEY="App Key get from user center"
-export LONGPORT_APP_SECRET="App Secret get from user center"
-export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
+export LONGBRIDGE_APP_KEY="App Key get from user center"
+export LONGBRIDGE_APP_SECRET="App Secret get from user center"
+export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGPORT_APP_KEY "App Key get from user center"
-setx LONGPORT_APP_SECRET "App Secret get from user center"
-setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
+setx LONGBRIDGE_APP_KEY "App Key get from user center"
+setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
+setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
 
 ```c
-#include <longport.h>
+#include <longbridge.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <windows.h>
@@ -215,7 +215,7 @@ main(int argc, char const* argv[])
 ## Quote API _(Subscribe quotes)_
 
 ```c
-#include <longport.h>
+#include <longbridge.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <windows.h>
@@ -297,7 +297,7 @@ main(int argc, char const* argv[])
 ## Trade API _(Submit order)_
 
 ```c
-#include <longport.h>
+#include <longbridge.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <windows.h>
@@ -378,7 +378,7 @@ main(int argc, char const* argv[])
 - Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
 - If you don't see callbacks, keep the process alive (examples use `getchar()`).
 - If building on Linux/macOS, ensure `ncurses` is installed (examples link it on non-Windows).
-- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+- For debugging, set `LONGBRIDGE_LOG_PATH` to enable SDK logs.
 
 ## License
 

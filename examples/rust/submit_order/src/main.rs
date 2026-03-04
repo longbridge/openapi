@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport::{
+use longbridge::{
     decimal,
     oauth::OAuthBuilder,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType, TradeContext},

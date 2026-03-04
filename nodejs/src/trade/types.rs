@@ -1,12 +1,12 @@
 use chrono::{DateTime, Utc};
-use longport_nodejs_macros::{JsEnum, JsObject};
+use longbridge_nodejs_macros::{JsEnum, JsObject};
 
 use crate::{decimal::Decimal, time::NaiveDate, types::Market};
 
 /// Topic type
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::TopicType")]
+#[js(remote = "longbridge::trade::TopicType")]
 pub enum TopicType {
     /// Private notification for trade
     Private,
@@ -15,7 +15,7 @@ pub enum TopicType {
 /// Trade
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::Execution")]
+#[js(remote = "longbridge::trade::Execution")]
 pub struct Execution {
     /// Order ID
     order_id: String,
@@ -34,7 +34,7 @@ pub struct Execution {
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::OrderStatus")]
+#[js(remote = "longbridge::trade::OrderStatus")]
 pub enum OrderStatus {
     /// Unknown
     Unknown,
@@ -76,7 +76,7 @@ pub enum OrderStatus {
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::OrderSide")]
+#[js(remote = "longbridge::trade::OrderSide")]
 pub enum OrderSide {
     /// Unknown
     Unknown,
@@ -88,7 +88,7 @@ pub enum OrderSide {
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::OrderType")]
+#[js(remote = "longbridge::trade::OrderType")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum OrderType {
     /// Unknown
@@ -124,7 +124,7 @@ pub enum OrderType {
 /// Order tag
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::OrderTag")]
+#[js(remote = "longbridge::trade::OrderTag")]
 pub enum OrderTag {
     /// Unknown
     Unknown,
@@ -151,7 +151,7 @@ pub enum OrderTag {
 /// Time in force type
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::TimeInForceType")]
+#[js(remote = "longbridge::trade::TimeInForceType")]
 pub enum TimeInForceType {
     /// Unknown
     Unknown,
@@ -166,7 +166,7 @@ pub enum TimeInForceType {
 /// Trigger status
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::TriggerStatus")]
+#[js(remote = "longbridge::trade::TriggerStatus")]
 pub enum TriggerStatus {
     /// Unknown
     Unknown,
@@ -181,7 +181,7 @@ pub enum TriggerStatus {
 /// Enable or disable outside regular trading hours
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::OutsideRTH")]
+#[js(remote = "longbridge::trade::OutsideRTH")]
 pub enum OutsideRTH {
     /// Unknown
     Unknown,
@@ -196,7 +196,7 @@ pub enum OutsideRTH {
 /// Order
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::Order")]
+#[js(remote = "longbridge::trade::Order")]
 pub struct Order {
     /// Order ID
     order_id: String,
@@ -277,7 +277,7 @@ pub struct Order {
 /// Commission-free Status
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::CommissionFreeStatus")]
+#[js(remote = "longbridge::trade::CommissionFreeStatus")]
 pub enum CommissionFreeStatus {
     /// Unknown
     Unknown,
@@ -294,7 +294,7 @@ pub enum CommissionFreeStatus {
 /// Deduction status
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::DeductionStatus")]
+#[js(remote = "longbridge::trade::DeductionStatus")]
 pub enum DeductionStatus {
     /// Unknown
     Unknown,
@@ -311,7 +311,7 @@ pub enum DeductionStatus {
 /// Charge category code
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::ChargeCategoryCode")]
+#[js(remote = "longbridge::trade::ChargeCategoryCode")]
 pub enum ChargeCategoryCode {
     /// Unknown
     Unknown,
@@ -324,7 +324,7 @@ pub enum ChargeCategoryCode {
 /// Order history detail
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::OrderHistoryDetail")]
+#[js(remote = "longbridge::trade::OrderHistoryDetail")]
 pub struct OrderHistoryDetail {
     /// Executed price for executed orders, submitted price for expired,
     /// canceled, rejected orders, etc.
@@ -344,7 +344,7 @@ pub struct OrderHistoryDetail {
 /// Order charge fee
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::OrderChargeFee")]
+#[js(remote = "longbridge::trade::OrderChargeFee")]
 pub struct OrderChargeFee {
     /// Charge code
     code: String,
@@ -359,7 +359,7 @@ pub struct OrderChargeFee {
 /// Order charge item
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::OrderChargeItem")]
+#[js(remote = "longbridge::trade::OrderChargeItem")]
 pub struct OrderChargeItem {
     /// Charge category code
     code: ChargeCategoryCode,
@@ -373,7 +373,7 @@ pub struct OrderChargeItem {
 /// Order charge detail
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::OrderChargeDetail")]
+#[js(remote = "longbridge::trade::OrderChargeDetail")]
 pub struct OrderChargeDetail {
     /// Total charges amount
     total_amount: Decimal,
@@ -387,7 +387,7 @@ pub struct OrderChargeDetail {
 /// Order detail
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::OrderDetail")]
+#[js(remote = "longbridge::trade::OrderDetail")]
 pub struct OrderDetail {
     /// Order ID
     order_id: String,
@@ -496,7 +496,7 @@ pub struct OrderDetail {
 /// Order changed message
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::PushOrderChanged")]
+#[js(remote = "longbridge::trade::PushOrderChanged")]
 pub struct PushOrderChanged {
     /// Order side
     side: OrderSide,
@@ -564,7 +564,7 @@ pub struct PushOrderChanged {
 /// Response for submit order request
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::SubmitOrderResponse")]
+#[js(remote = "longbridge::trade::SubmitOrderResponse")]
 pub struct SubmitOrderResponse {
     /// Order id
     order_id: String,
@@ -573,7 +573,7 @@ pub struct SubmitOrderResponse {
 /// Account balance
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::CashInfo")]
+#[js(remote = "longbridge::trade::CashInfo")]
 pub struct CashInfo {
     /// Withdraw cash
     withdraw_cash: Decimal,
@@ -590,7 +590,7 @@ pub struct CashInfo {
 /// Frozen transaction fee
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::FrozenTransactionFee")]
+#[js(remote = "longbridge::trade::FrozenTransactionFee")]
 pub struct FrozenTransactionFee {
     /// Currency
     currency: String,
@@ -601,7 +601,7 @@ pub struct FrozenTransactionFee {
 /// Account balance
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::AccountBalance")]
+#[js(remote = "longbridge::trade::AccountBalance")]
 pub struct AccountBalance {
     /// Total cash
     total_cash: Decimal,
@@ -633,7 +633,7 @@ pub struct AccountBalance {
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::BalanceType")]
+#[js(remote = "longbridge::trade::BalanceType")]
 pub enum BalanceType {
     /// Unknown
     Unknown,
@@ -647,7 +647,7 @@ pub enum BalanceType {
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::trade::CashFlowDirection")]
+#[js(remote = "longbridge::trade::CashFlowDirection")]
 pub enum CashFlowDirection {
     /// Unknown
     Unknown,
@@ -660,7 +660,7 @@ pub enum CashFlowDirection {
 /// Account balance
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::CashFlow")]
+#[js(remote = "longbridge::trade::CashFlow")]
 pub struct CashFlow {
     /// Cash flow name
     transaction_flow_name: String,
@@ -684,7 +684,7 @@ pub struct CashFlow {
 /// Fund positions response
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::trade::FundPositionsResponse")]
+#[js(remote = "longbridge::trade::FundPositionsResponse")]
 pub struct FundPositionsResponse {
     /// Channels
     #[js(array)]
@@ -694,7 +694,7 @@ pub struct FundPositionsResponse {
 /// Fund position channel
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::FundPositionChannel")]
+#[js(remote = "longbridge::trade::FundPositionChannel")]
 pub struct FundPositionChannel {
     /// Account type
     account_channel: String,
@@ -706,7 +706,7 @@ pub struct FundPositionChannel {
 /// Fund position
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::FundPosition")]
+#[js(remote = "longbridge::trade::FundPosition")]
 pub struct FundPosition {
     /// Fund ISIN code
     symbol: String,
@@ -728,7 +728,7 @@ pub struct FundPosition {
 /// Stock positions response
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::StockPositionsResponse")]
+#[js(remote = "longbridge::trade::StockPositionsResponse")]
 pub struct StockPositionsResponse {
     /// Channels
     #[js(array)]
@@ -738,7 +738,7 @@ pub struct StockPositionsResponse {
 /// Stock position channel
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::StockPositionChannel")]
+#[js(remote = "longbridge::trade::StockPositionChannel")]
 pub struct StockPositionChannel {
     /// Account type
     account_channel: String,
@@ -750,7 +750,7 @@ pub struct StockPositionChannel {
 /// Stock position
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::StockPosition")]
+#[js(remote = "longbridge::trade::StockPosition")]
 pub struct StockPosition {
     /// Stock code
     symbol: String,
@@ -775,7 +775,7 @@ pub struct StockPosition {
 /// Margin ratio
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::MarginRatio")]
+#[js(remote = "longbridge::trade::MarginRatio")]
 pub struct MarginRatio {
     /// Initial margin ratio
     im_factor: Decimal,
@@ -788,7 +788,7 @@ pub struct MarginRatio {
 /// Response for estimate maximum purchase quantity
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::trade::EstimateMaxPurchaseQuantityResponse")]
+#[js(remote = "longbridge::trade::EstimateMaxPurchaseQuantityResponse")]
 pub struct EstimateMaxPurchaseQuantityResponse {
     /// Cash available quantity
     cash_max_qty: Decimal,

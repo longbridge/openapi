@@ -2,10 +2,10 @@
 
 #include "callback.hpp"
 #include "http_client.hpp"
-#include "longport.h"
+#include "longbridge.h"
 #include "oauth.hpp"
 
-namespace longport {
+namespace longbridge {
 
 HttpClient::HttpClient()
   : http_client_(nullptr)
@@ -104,4 +104,4 @@ HttpClient::request(
     new AsyncCallback<void*, HttpResult>(callback));
 }
 
-} // namespace longport
+} // namespace longbridge

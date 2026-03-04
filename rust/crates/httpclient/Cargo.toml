@@ -1,12 +1,12 @@
 [package]
 edition.workspace = true
-name = "longport-httpcli"
+name = "longbridge-httpcli"
 version.workspace = true
-description = "LongPort HTTP SDK for Rust"
+description = "Longbridge HTTP SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-longport-oauth.workspace = true
+longbridge-oauth.workspace = true
 futures-util.workspace = true
 hmac.workspace = true
 parking_lot.workspace = true

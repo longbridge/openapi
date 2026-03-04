@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport::{oauth::OAuthBuilder, trade::TradeContext, Config};
+use longbridge::{oauth::OAuthBuilder, trade::TradeContext, Config};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]

@@ -11,7 +11,7 @@ use futures_util::{
     stream::{SplitSink, SplitStream},
 };
 use leaky_bucket::RateLimiter;
-use longport_proto::control::{AuthRequest, AuthResponse, ReconnectRequest, ReconnectResponse};
+use longbridge_proto::control::{AuthRequest, AuthResponse, ReconnectRequest, ReconnectResponse};
 use num_enum::IntoPrimitive;
 use prost::Message as _;
 use tokio::{
@@ -37,7 +37,7 @@ const RECONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const COMMAND_CODE_AUTH: u8 = 2;
 const COMMAND_CODE_RECONNECT: u8 = 3;
 
-/// LongPort websocket protocol version
+/// Longbridge websocket protocol version
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum ProtocolVersion {
@@ -45,7 +45,7 @@ pub enum ProtocolVersion {
     Version1 = 1,
 }
 
-/// LongPort websocket codec type
+/// Longbridge websocket codec type
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum CodecType {
@@ -53,7 +53,7 @@ pub enum CodecType {
     Protobuf = 1,
 }
 
-/// LongPort websocket platform type
+/// Longbridge websocket platform type
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum Platform {
@@ -207,8 +207,8 @@ impl<'a> Context<'a> {
                         if status == 0 {
                             let _ = sender.send(Ok(body));
                         } else {
-                            let detail = longport_proto::Error::decode(&*body).ok().map(
-                                |longport_proto::Error { code, msg }| WsResponseErrorDetail {
+                            let detail = longbridge_proto::Error::decode(&*body).ok().map(
+                                |longbridge_proto::Error { code, msg }| WsResponseErrorDetail {
                                     code,
                                     msg,
                                 },
@@ -257,7 +257,7 @@ impl WsSession {
     }
 }
 
-/// LongPort Websocket client
+/// Longbridge Websocket client
 pub struct WsClient {
     command_tx: mpsc::UnboundedSender<Command>,
     rate_limit: Arc<HashMap<u8, RateLimiter>>,
@@ -299,8 +299,8 @@ impl WsClient {
 
     /// Send an authentication request to get a [`WsSession`]
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/socket-token-api>
-    /// Reference: <https://open.longportapp.com/en/docs/socket/control-command#auth>
+    /// Reference: <https://open.longbridge.com/en/docs/socket-token-api>
+    /// Reference: <https://open.longbridge.com/en/docs/socket/control-command#auth>
     pub async fn request_auth(
         &self,
         otp: impl Into<String>,
@@ -331,7 +331,7 @@ impl WsClient {
 
     /// Send a reconnect request to get a [`WsSession`]
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/socket/control-command#reconnect>
+    /// Reference: <https://open.longbridge.com/en/docs/socket/control-command#reconnect>
     pub async fn request_reconnect(
         &self,
         session_id: impl Into<String>,

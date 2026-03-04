@@ -1,11 +1,11 @@
 #include <iostream>
-#include <longport.hpp>
+#include <longbridge.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-using namespace longport;
+using namespace longbridge;
 
 int
 main(int argc, char const* argv[])

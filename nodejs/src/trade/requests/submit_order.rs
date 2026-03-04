@@ -44,10 +44,10 @@ pub struct SubmitOrderOptions<'env> {
     pub remark: Option<String>,
 }
 
-impl<'env> From<SubmitOrderOptions<'env>> for longport::trade::SubmitOrderOptions {
+impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
     #[inline]
     fn from(opts: SubmitOrderOptions<'env>) -> Self {
-        let mut opts2 = longport::trade::SubmitOrderOptions::new(
+        let mut opts2 = longbridge::trade::SubmitOrderOptions::new(
             opts.symbol,
             opts.order_type.into(),
             opts.side.into(),

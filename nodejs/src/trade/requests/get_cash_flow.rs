@@ -19,10 +19,10 @@ pub struct GetCashFlowOptions {
     pub size: Option<i64>,
 }
 
-impl From<GetCashFlowOptions> for longport::trade::GetCashFlowOptions {
+impl From<GetCashFlowOptions> for longbridge::trade::GetCashFlowOptions {
     #[inline]
     fn from(opts: GetCashFlowOptions) -> Self {
-        let mut opts2 = longport::trade::GetCashFlowOptions::new(
+        let mut opts2 = longbridge::trade::GetCashFlowOptions::new(
             from_datetime(opts.start_at),
             from_datetime(opts.end_at),
         );

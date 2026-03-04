@@ -1,8 +1,8 @@
-use longport_nodejs_macros::JsEnum;
+use longbridge_nodejs_macros::JsEnum;
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::Market")]
+#[js(remote = "longbridge::Market")]
 pub enum Market {
     /// Unknown
     Unknown,
@@ -21,7 +21,7 @@ pub enum Market {
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
-#[js(remote = "longport::Language")]
+#[js(remote = "longbridge::Language")]
 pub enum Language {
     /// zh-CN
     ZH_CN,
@@ -33,7 +33,7 @@ pub enum Language {
 
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longport::PushCandlestickMode")]
+#[js(remote = "longbridge::PushCandlestickMode")]
 pub enum PushCandlestickMode {
     /// Realtime mode
     Realtime,

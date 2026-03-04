@@ -16,21 +16,21 @@ jobs:
           - host: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             cross: true
-            bin: longport-mcp
+            bin: longbridge-mcp
           - host: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             cross: true
-            bin: longport-mcp
+            bin: longbridge-mcp
           - host: windows-latest
             target: x86_64-pc-windows-msvc
-            bin: longport-mcp
+            bin: longbridge-mcp
             bin_suffix: .exe
           - host: macos-latest
             target: x86_64-apple-darwin
-            bin: longport-mcp
+            bin: longbridge-mcp
           - host: macos-latest
             target: aarch64-apple-darwin
-            bin: longport-mcp
+            bin: longbridge-mcp
     runs-on: ${{ matrix.settings.host }}
     steps:
       - name: Checkout code
@@ -46,7 +46,7 @@ jobs:
       - name: Build
         if: ${{ !matrix.settings.cross }}
         run: |
-          cargo build --release -p longport-mcp --target ${{ matrix.settings.target }}
+          cargo build --release -p longbridge-mcp --target ${{ matrix.settings.target }}
 
       - name: Install latest cross binary
         if: ${{ matrix.settings.cross }}
@@ -55,28 +55,28 @@ jobs:
       - name: Build with Cross
         if: ${{ matrix.settings.cross }}
         run: |
-          cross build --release -p longport-mcp --target ${{ matrix.settings.target }}
+          cross build --release -p longbridge-mcp --target ${{ matrix.settings.target }}
 
       - name: Archive artifact
         if: ${{ !contains(matrix.settings.target, 'windows') }}
         run: |
           mkdir dist/
           cd target/${{ matrix.settings.target }}/release
-          tar czvf longport-mcp-${{ matrix.settings.target }}.tar.gz longport-mcp
+          tar czvf longbridge-mcp-${{ matrix.settings.target }}.tar.gz longbridge-mcp
           cd ../../..
-          mv target/${{ matrix.settings.target }}/release/longport-mcp-${{ matrix.settings.target }}.tar.gz dist/
+          mv target/${{ matrix.settings.target }}/release/longbridge-mcp-${{ matrix.settings.target }}.tar.gz dist/
 
       - name: Archive artifact (Windows)
         if: ${{ contains(matrix.settings.target, 'windows') }}
         run: |
           mkdir dist/
           cd target/${{ matrix.settings.target }}/release
-          Compress-Archive -Path longport-mcp.exe -DestinationPath longport-mcp-${{ matrix.settings.target }}.zip
+          Compress-Archive -Path longbridge-mcp.exe -DestinationPath longbridge-mcp-${{ matrix.settings.target }}.zip
           cd ../../..
-          mv target/${{ matrix.settings.target }}/release/longport-mcp-${{ matrix.settings.target }}.zip dist/
+          mv target/${{ matrix.settings.target }}/release/longbridge-mcp-${{ matrix.settings.target }}.zip dist/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: longport-mcp-${{ matrix.settings.target }}
+          name: longbridge-mcp-${{ matrix.settings.target }}
           path: dist/

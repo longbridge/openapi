@@ -1,4 +1,4 @@
-use longport::{
+use longbridge::{
     httpclient::{HttpClient, HttpClientConfig},
     oauth::OAuthBuilder,
 };

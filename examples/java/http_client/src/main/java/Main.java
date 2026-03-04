@@ -1,4 +1,4 @@
-import com.longport.*;
+import com.longbridge.*;
 import java.util.HashMap;
 
 class Main {

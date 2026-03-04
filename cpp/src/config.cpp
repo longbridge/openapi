@@ -1,10 +1,10 @@
 #include "config.hpp"
 #include "callback.hpp"
 #include "convert.hpp"
-#include "longport.h"
+#include "longbridge.h"
 #include "oauth.hpp"
 
-namespace longport {
+namespace longbridge {
 
 Config::Config()
 {
@@ -119,4 +119,4 @@ Config::set_log_path(const std::string& path)
   return *this;
 }
 
-} // namespace longport
+} // namespace longbridge

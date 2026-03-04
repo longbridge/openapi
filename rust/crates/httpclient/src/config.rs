@@ -1,13 +1,13 @@
-use longport_oauth::OAuth;
+use longbridge_oauth::OAuth;
 
 use crate::HttpClientError;
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
-/// to the legacy `LONGPORT_<suffix>` name.  Returns `None` if neither is set.
+/// to the legacy `LONGBRIDGE_<suffix>` name.  Returns `None` if neither is set.
 fn env_var(suffix: &str) -> Option<String> {
     std::env::var(format!("LONGBRIDGE_{suffix}"))
         .ok()
-        .or_else(|| std::env::var(format!("LONGPORT_{suffix}")).ok())
+        .or_else(|| std::env::var(format!("LONGBRIDGE_{suffix}")).ok())
 }
 
 /// Like [`env_var`] but returns an error (using the new `LONGBRIDGE_` name)
@@ -81,7 +81,7 @@ impl HttpClientConfig {
     /// # Arguments
     ///
     /// * `oauth` - An [`OAuth`] client obtained from
-    ///   [`longport_oauth::OAuthBuilder`]
+    ///   [`longbridge_oauth::OAuthBuilder`]
     pub fn from_oauth(oauth: OAuth) -> Self {
         let _ = dotenv::dotenv();
         Self {
@@ -123,7 +123,7 @@ impl HttpClientConfig {
 
     /// Specifies the url of the OpenAPI server.
     ///
-    /// Default: <https://openapi.longportapp.com>
+    /// Default: <https://openapi.longbridge.com>
     /// NOTE: Usually you don't need to change it.
     #[must_use]
     pub fn http_url(self, url: impl Into<String>) -> Self {

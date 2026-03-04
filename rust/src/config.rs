@@ -7,8 +7,8 @@ use std::{
 };
 
 pub(crate) use http::{HeaderValue, Request, header};
-use longport_httpcli::{HttpClient, HttpClientConfig, is_cn};
-use longport_oauth::OAuth;
+use longbridge_httpcli::{HttpClient, HttpClientConfig, is_cn};
+use longbridge_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tracing::{Level, Subscriber, subscriber::NoSubscriber};
@@ -17,10 +17,10 @@ use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
 use crate::error::Result;
 
-const DEFAULT_QUOTE_WS_URL: &str = "wss://openapi-quote.longportapp.com/v2";
-const DEFAULT_TRADE_WS_URL: &str = "wss://openapi-trade.longportapp.com/v2";
-const DEFAULT_QUOTE_WS_URL_CN: &str = "wss://openapi-quote.longportapp.cn/v2";
-const DEFAULT_TRADE_WS_URL_CN: &str = "wss://openapi-trade.longportapp.cn/v2";
+const DEFAULT_QUOTE_WS_URL: &str = "wss://openapi-quote.longbridge.com/v2";
+const DEFAULT_TRADE_WS_URL: &str = "wss://openapi-trade.longbridge.com/v2";
+const DEFAULT_QUOTE_WS_URL_CN: &str = "wss://openapi-quote.longbridge.cn/v2";
+const DEFAULT_TRADE_WS_URL_CN: &str = "wss://openapi-trade.longbridge.cn/v2";
 
 /// Language identifier
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, IntoPrimitive)]
@@ -115,7 +115,7 @@ impl fmt::Debug for AuthMode {
     }
 }
 
-/// Configuration options for LongPort sdk
+/// Configuration options for Longbridge SDK
 #[derive(Debug, Clone)]
 pub struct Config {
     pub(crate) auth: AuthMode,
@@ -130,11 +130,11 @@ pub struct Config {
 }
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
-/// to the legacy `LONGPORT_<suffix>` name.  Returns `None` if neither is set.
+/// to the legacy `LONGBRIDGE_<suffix>` name.  Returns `None` if neither is set.
 fn env_var(suffix: &str) -> Option<String> {
     std::env::var(format!("LONGBRIDGE_{suffix}"))
         .ok()
-        .or_else(|| std::env::var(format!("LONGPORT_{suffix}")).ok())
+        .or_else(|| std::env::var(format!("LONGBRIDGE_{suffix}")).ok())
 }
 
 /// Non-credential environment variables shared by `from_apikey` and
@@ -178,14 +178,15 @@ impl ConfigExtras {
 impl Config {
     /// Create a new `Config` using API Key authentication.
     ///
-    /// All optional environment variables (`LONGPORT_HTTP_URL`,
-    /// `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
-    /// `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
-    /// `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`) are read from the
-    /// environment (or `.env` file) and applied automatically if set.
+    /// All optional environment variables (`LONGBRIDGE_HTTP_URL`,
+    /// `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
+    /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
+    /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
+    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`) are read from
+    /// the environment (or `.env` file) and applied automatically if set.
     ///
     /// For OAuth 2.0, use [`Config::from_oauth`] together with
-    /// [`longport::oauth::OAuthBuilder`] instead.
+    /// [`longbridge::oauth::OAuthBuilder`] instead.
     pub fn from_apikey(
         app_key: impl Into<String>,
         app_secret: impl Into<String>,
@@ -212,23 +213,24 @@ impl Config {
 
     /// Create a new `Config` for OAuth 2.0 authentication.
     ///
-    /// All optional environment variables (`LONGPORT_HTTP_URL`,
-    /// `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
-    /// `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
-    /// `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`) are read from the
-    /// environment (or `.env` file) and applied automatically if set.
+    /// All optional environment variables (`LONGBRIDGE_HTTP_URL`,
+    /// `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
+    /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
+    /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
+    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`) are read from
+    /// the environment (or `.env` file) and applied automatically if set.
     ///
     /// # Arguments
     ///
     /// * `oauth` - An [`OAuth`] client obtained from
-    ///   [`longport::oauth::OAuthBuilder`].
+    ///   [`longbridge::oauth::OAuthBuilder`].
     ///
     /// # Example
     ///
     /// ```rust,no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, oauth::OAuthBuilder};
+    /// use longbridge::{Config, oauth::OAuthBuilder};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -237,7 +239,7 @@ impl Config {
     ///         .await?;
     ///     let config = Arc::new(Config::from_oauth(oauth));
     ///
-    ///     let (ctx, receiver) = longport::quote::QuoteContext::try_new(config).await?;
+    ///     let (ctx, receiver) = longbridge::quote::QuoteContext::try_new(config).await?;
     ///     Ok(())
     /// }
     /// ```
@@ -265,41 +267,42 @@ impl Config {
     ///
     /// # Variables
     ///
-    /// - `LONGPORT_APP_KEY` - App key
-    /// - `LONGPORT_APP_SECRET` - App secret
-    /// - `LONGPORT_ACCESS_TOKEN` - Access token
-    /// - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
+    /// - `LONGBRIDGE_APP_KEY` - App key
+    /// - `LONGBRIDGE_APP_SECRET` - App secret
+    /// - `LONGBRIDGE_ACCESS_TOKEN` - Access token
+    /// - `LONGBRIDGE_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
     ///   (Default: `en`)
-    /// - `LONGPORT_HTTP_URL` - HTTP endpoint url (Default: `https://openapi.longportapp.com`)
-    /// - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
-    ///   `wss://openapi-quote.longportapp.com/v2`)
-    /// - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url (Default:
-    ///   `wss://openapi-trade.longportapp.com/v2`)
-    /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
+    /// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url (Default: `https://openapi.longbridge.com`)
+    /// - `LONGBRIDGE_QUOTE_WS_URL` - Quote websocket endpoint url (Default:
+    ///   `wss://openapi-quote.longbridge.com/v2`)
+    /// - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url (Default:
+    ///   `wss://openapi-trade.longbridge.com/v2`)
+    /// - `LONGBRIDGE_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
     ///   `false` (Default: `false`)
-    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
-    ///   `realtime`)
-    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
-    ///   `true` or `false` (Default: `true`)
-    /// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no
+    /// - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
+    ///   (Default: `realtime`)
+    /// - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
+    ///   connected, `true` or `false` (Default: `true`)
+    /// - `LONGBRIDGE_LOG_PATH` - Set the path of the log files (Default: `no
     ///   logs`)
     ///
     /// For OAuth 2.0 authentication use [`from_oauth`](Config::from_oauth)
-    /// together with [`OAuthBuilder`](longport_oauth::OAuthBuilder).
+    /// together with [`OAuthBuilder`](longbridge_oauth::OAuthBuilder).
     pub fn from_apikey_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
-        let app_key =
-            env_var("APP_KEY").ok_or_else(|| longport_httpcli::HttpClientError::MissingEnvVar {
+        let app_key = env_var("APP_KEY").ok_or_else(|| {
+            longbridge_httpcli::HttpClientError::MissingEnvVar {
                 name: "LONGBRIDGE_APP_KEY".to_string(),
-            })?;
+            }
+        })?;
         let app_secret = env_var("APP_SECRET").ok_or_else(|| {
-            longport_httpcli::HttpClientError::MissingEnvVar {
+            longbridge_httpcli::HttpClientError::MissingEnvVar {
                 name: "LONGBRIDGE_APP_SECRET".to_string(),
             }
         })?;
         let access_token = env_var("ACCESS_TOKEN").ok_or_else(|| {
-            longport_httpcli::HttpClientError::MissingEnvVar {
+            longbridge_httpcli::HttpClientError::MissingEnvVar {
                 name: "LONGBRIDGE_ACCESS_TOKEN".to_string(),
             }
         })?;
@@ -324,7 +327,7 @@ impl Config {
 
     /// Specifies the url of the OpenAPI server.
     ///
-    /// Default: `https://openapi.longportapp.com`
+    /// Default: `https://openapi.longbridge.com`
     ///
     /// NOTE: Usually you don't need to change it.
     #[must_use]
@@ -335,7 +338,7 @@ impl Config {
 
     /// Specifies the url of the OpenAPI quote websocket server.
     ///
-    /// Default: `wss://openapi-quote.longportapp.com`
+    /// Default: `wss://openapi-quote.longbridge.com`
     ///
     /// NOTE: Usually you don't need to change it.
     #[must_use]
@@ -348,7 +351,7 @@ impl Config {
 
     /// Specifies the url of the OpenAPI trade websocket server.
     ///
-    /// Default: `wss://openapi-trade.longportapp.com/v2`
+    /// Default: `wss://openapi-trade.longbridge.com/v2`
     ///
     /// NOTE: Usually you don't need to change it.
     #[must_use]
@@ -529,7 +532,7 @@ impl Config {
                     .with_writer(appender)
                     .with_ansi(false)
                     .finish()
-                    .with(Targets::new().with_targets([("longport", Level::INFO)])),
+                    .with(Targets::new().with_targets([("longbridge", Level::INFO)])),
             ))
         }
 

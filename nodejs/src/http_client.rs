@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use longport::httpclient::{HttpClient as LbHttpClient, HttpClientConfig, Json, Method};
+use longbridge::httpclient::{HttpClient as LbHttpClient, HttpClientConfig, Json, Method};
 use napi::{Error, Result};
 use serde_json::Value;
 
@@ -13,15 +13,15 @@ pub struct HttpClient(LbHttpClient);
 impl HttpClient {
     /// Create a new `HttpClient` using API Key authentication
     ///
-    /// `LONGPORT_HTTP_URL` is read from the environment automatically.
+    /// `LONGBRIDGE_HTTP_URL` is read from the environment automatically.
     /// Passing `httpUrl` overrides that value.
     ///
     /// @param appKey      App key
     /// @param appSecret   App secret
     /// @param accessToken Access token
-    /// @param httpUrl     HTTP endpoint url override (reads `LONGPORT_HTTP_URL`
-    ///                    from env if omitted; falls back to
-    ///                    `https://openapi.longportapp.com`)
+    /// @param httpUrl     HTTP endpoint url override (reads
+    /// `LONGBRIDGE_HTTP_URL`                    from env if omitted; falls
+    /// back to                    `https://openapi.longbridge.com`)
     #[napi(factory, js_name = "fromApikey")]
     pub fn from_apikey(
         app_key: String,
@@ -42,10 +42,10 @@ impl HttpClient {
     ///
     /// # Variables
     ///
-    /// - `LONGPORT_HTTP_URL` - HTTP endpoint url
-    /// - `LONGPORT_APP_KEY` - App key
-    /// - `LONGPORT_APP_SECRET` - App secret
-    /// - `LONGPORT_ACCESS_TOKEN` - Access token
+    /// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url
+    /// - `LONGBRIDGE_APP_KEY` - App key
+    /// - `LONGBRIDGE_APP_SECRET` - App secret
+    /// - `LONGBRIDGE_ACCESS_TOKEN` - Access token
     #[napi(factory, js_name = "fromApikeyEnv")]
     pub fn from_apikey_env() -> Result<Self> {
         Ok(Self(LbHttpClient::new(
@@ -56,13 +56,13 @@ impl HttpClient {
 
     /// Create a new `HttpClient` from an OAuth handle
     ///
-    /// `LONGPORT_HTTP_URL` is read from the environment automatically.
+    /// `LONGBRIDGE_HTTP_URL` is read from the environment automatically.
     /// Passing `httpUrl` overrides that value.
     ///
     /// @param oauth    OAuth handle obtained from `OAuthBuilder.build(...)`
-    /// @param httpUrl  HTTP endpoint url override (reads `LONGPORT_HTTP_URL`
+    /// @param httpUrl  HTTP endpoint url override (reads `LONGBRIDGE_HTTP_URL`
     ///                 from env if omitted; falls back to
-    ///                 `https://openapi.longportapp.com`)
+    ///                 `https://openapi.longbridge.com`)
     #[napi(factory, js_name = "fromOAuth")]
     pub fn from_oauth(oauth: &OAuth, http_url: Option<String>) -> Self {
         let mut config = HttpClientConfig::from_oauth(oauth.0.clone());

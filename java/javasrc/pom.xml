@@ -4,25 +4,25 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.github.longportapp</groupId>
+  <groupId>io.github.longbridge</groupId>
   <artifactId>openapi-sdk</artifactId>
   <version>0.0.1</version>
-  <name>longport-openapi</name>
-  <description>LongPort OpenAPI SDK for Java</description>
-  <url>https://github.com/longportapp/openapi</url>
+  <name>longbridge-openapi</name>
+  <description>Longbridge OpenAPI SDK for Java</description>
+  <url>https://github.com/longbridge/openapi</url>
   <packaging>jar</packaging>
 
   <scm>
-    <connection>scm:git:git@github.com:longportapp/openapi.git</connection>
-    <developerConnection>scm:git:git@github.com:longportapp/openapi.git</developerConnection>
-    <url>https://github.com/longportapp/openapi</url>
+    <connection>scm:git:git@github.com:longbridge/openapi.git</connection>
+    <developerConnection>scm:git:git@github.com:longbridge/openapi.git</developerConnection>
+    <url>https://github.com/longbridge/openapi</url>
   </scm>
 
   <developers>
     <developer>
       <name>sunli829</name>
       <email>scott_s829@163.com</email>
-      <organization>https://github.com/longportapp</organization>
+      <organization>https://github.com/longbridge</organization>
       <timezone>+8</timezone>
     </developer>
   </developers>

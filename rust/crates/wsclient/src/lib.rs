@@ -1,4 +1,4 @@
-//! LongPort OpenAPI Websocket client
+//! Longbridge OpenAPI Websocket client
 
 #![forbid(unsafe_code)]
 #![deny(unreachable_pub)]

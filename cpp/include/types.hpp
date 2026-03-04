@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 
-namespace longport {
+namespace longbridge {
 
 struct Date
 {
@@ -2066,4 +2066,4 @@ struct EstimateMaxPurchaseQuantityResponse
 
 } // namespace trade
 
-} // namespace longport
+} // namespace longbridge

@@ -1,30 +1,30 @@
-use longport::oauth::{OAuthBuilder as CoreOAuthBuilder, OAuthError};
+use longbridge::oauth::{OAuthBuilder as CoreOAuthBuilder, OAuthError};
 use pyo3::prelude::*;
 
 use crate::error::ErrorNewType;
 
 fn oauth_err(e: OAuthError) -> PyErr {
-    ErrorNewType(longport::Error::OAuth(e.to_string())).into()
+    ErrorNewType(longbridge::Error::OAuth(e.to_string())).into()
 }
 
-/// OAuth 2.0 client handle for LongPort OpenAPI
+/// OAuth 2.0 client handle for Longbridge OpenAPI
 ///
 /// Obtain an instance via :meth:`OAuthBuilder.build` (blocking) or
 /// :meth:`OAuthBuilder.build_async` (async).  Pass it to
 /// :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`.
 #[pyclass(name = "OAuth")]
-pub(crate) struct OAuth(pub(crate) longport::oauth::OAuth);
+pub(crate) struct OAuth(pub(crate) longbridge::oauth::OAuth);
 
 /// Builder for the OAuth 2.0 authorization flow
 ///
 /// Args:
-///     client_id: OAuth 2.0 client ID from the LongPort developer portal
+///     client_id: OAuth 2.0 client ID from the Longbridge developer portal
 ///     callback_port: TCP port for the local callback server (default 60355).
 ///         Must match one of the redirect URIs registered for the client.
 ///
 /// Example (blocking)::
 ///
-///     from longport.openapi import OAuthBuilder, Config
+///     from longbridge.openapi import OAuthBuilder, Config
 ///
 ///     oauth = OAuthBuilder("your-client-id").build(
 ///         lambda url: print("Open:", url)
@@ -34,7 +34,7 @@ pub(crate) struct OAuth(pub(crate) longport::oauth::OAuth);
 /// Example (async)::
 ///
 ///     import asyncio
-///     from longport.openapi import OAuthBuilder, Config
+///     from longbridge.openapi import OAuthBuilder, Config
 ///
 ///     async def main():
 ///         oauth = await OAuthBuilder("your-client-id").build_async(

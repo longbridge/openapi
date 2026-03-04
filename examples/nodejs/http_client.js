@@ -1,4 +1,4 @@
-const { HttpClient, OAuthBuilder } = require("longport");
+const { HttpClient, OAuthBuilder } = require('longbridge');
 
 async function main() {
   const oauth = await OAuthBuilder.build("your-client-id", (url) => {

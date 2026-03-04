@@ -8,7 +8,7 @@
 
 typedef struct lb_quote_context_t lb_quote_context_t;
 
-namespace longport {
+namespace longbridge {
 namespace quote {
 
 /// Quote context
@@ -308,4 +308,4 @@ public:
 };
 
 } // namespace quote
-} // namespace longport
+} // namespace longbridge

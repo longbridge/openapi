@@ -5,7 +5,7 @@
 
 typedef struct lb_error_t lb_error_t;
 
-namespace longport {
+namespace longbridge {
 
 enum class ErrorKind
 {
@@ -47,4 +47,4 @@ public:
   std::optional<const char*> message() const;
 };
 
-} // namespace longport
+} // namespace longbridge

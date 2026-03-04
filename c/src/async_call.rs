@@ -4,7 +4,7 @@ use std::{
     sync::{Arc, LazyLock},
 };
 
-use longport::Result;
+use longbridge::Result;
 use tokio::runtime::Runtime;
 
 use crate::error::CError;

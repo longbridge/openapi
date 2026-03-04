@@ -1,7 +1,7 @@
 #include "types.hpp"
-#include "longport.h"
+#include "longbridge.h"
 
-namespace longport {
+namespace longbridge {
 namespace quote {
 
 SubFlags
@@ -42,4 +42,4 @@ DerivativeType::has_warrant()
 
 } // namespace quote
 
-} // namespace longport
+} // namespace longbridge

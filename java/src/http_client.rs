@@ -5,7 +5,7 @@ use jni::{
     objects::{JClass, JObject, JString},
     sys::jlong,
 };
-use longport::httpclient::{HttpClient, HttpClientConfig, Json, Method};
+use longbridge::httpclient::{HttpClient, HttpClientConfig, Json, Method};
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -16,7 +16,7 @@ use crate::{
 };
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClientFromApikey(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newHttpClientFromApikey(
     mut env: JNIEnv,
     _class: JClass,
     app_key: JString,
@@ -37,28 +37,28 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClientFromApike
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_com_longport_SdkNative_newHttpClientFromApikeyEnv(
+pub extern "system" fn Java_com_longbridge_SdkNative_newHttpClientFromApikeyEnv(
     mut env: JNIEnv,
     _class: JClass,
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
         let config = HttpClient::new(
-            longport::httpclient::HttpClientConfig::from_apikey_env()
-                .map_err(longport::Error::HttpClient)?,
+            longbridge::httpclient::HttpClientConfig::from_apikey_env()
+                .map_err(longbridge::Error::HttpClient)?,
         );
         Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClientFromOauth(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newHttpClientFromOauth(
     mut env: JNIEnv,
     _class: JClass,
     oauth: jlong,
     http_url: JString,
 ) -> jlong {
     jni_result(&mut env, 0, |env| {
-        let oauth = &*(oauth as *const longport::oauth::OAuth);
+        let oauth = &*(oauth as *const longbridge::oauth::OAuth);
         let mut config = HttpClientConfig::from_oauth(oauth.clone());
         if !http_url.is_null() {
             config = config.http_url(String::from_jvalue(env, http_url.into())?);
@@ -68,7 +68,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newHttpClientFromOauth
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_freeHttpClient(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeHttpClient(
     _env: JNIEnv,
     _class: JClass,
     http_client: i64,
@@ -77,7 +77,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_freeHttpClient(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_httpClientRequest(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_httpClientRequest(
     mut env: JNIEnv,
     _class: JClass,
     http_client: i64,
@@ -121,11 +121,11 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_httpClientRequest(
                     .body(Json(req_data))
                     .send()
                     .await
-                    .map_err(|err| JniError::OpenApi(longport::Error::HttpClient(err)))?,
+                    .map_err(|err| JniError::OpenApi(longbridge::Error::HttpClient(err)))?,
                 None => req
                     .send()
                     .await
-                    .map_err(|err| JniError::OpenApi(longport::Error::HttpClient(err)))?,
+                    .map_err(|err| JniError::OpenApi(longbridge::Error::HttpClient(err)))?,
             };
 
             Ok(resp)

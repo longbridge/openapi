@@ -5,7 +5,7 @@ use jni::{
     errors::Result,
     objects::{JObject, JValueOwned},
 };
-use longport_java_macros::impl_java_enum;
+use longbridge_java_macros::impl_java_enum;
 
 use crate::{
     init::DERIVATIVE_TYPE_CLASS,
@@ -13,32 +13,32 @@ use crate::{
 };
 
 impl_java_enum!(
-    "com/longport/ErrorKind",
-    longport::SimpleErrorKind,
+    "com/longbridge/ErrorKind",
+    longbridge::SimpleErrorKind,
     [Http, OpenApi, Other, OAuth]
 );
 
 impl_java_enum!(
-    "com/longport/Language",
-    longport::Language,
+    "com/longbridge/Language",
+    longbridge::Language,
     [ZH_CN, ZH_HK, EN]
 );
 
 impl_java_enum!(
-    "com/longport/PushCandlestickMode",
-    longport::PushCandlestickMode,
+    "com/longbridge/PushCandlestickMode",
+    longbridge::PushCandlestickMode,
     [Realtime, Confirmed]
 );
 
 impl_java_enum!(
-    "com/longport/Market",
-    longport::Market,
+    "com/longbridge/Market",
+    longbridge::Market,
     [Unknown, US, HK, CN, SG, Crypto]
 );
 
 impl_java_enum!(
-    "com/longport/quote/TradeStatus",
-    longport::quote::TradeStatus,
+    "com/longbridge/quote/TradeStatus",
+    longbridge::quote::TradeStatus,
     [
         Normal,
         Halted,
@@ -55,14 +55,14 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
-    "com/longport/quote/TradeSession",
-    longport::quote::TradeSession,
+    "com/longbridge/quote/TradeSession",
+    longbridge::quote::TradeSession,
     [Intraday, Pre, Post, Overnight]
 );
 
 impl_java_enum!(
-    "com/longport/quote/TradeDirection",
-    longport::quote::TradeDirection,
+    "com/longbridge/quote/TradeDirection",
+    longbridge::quote::TradeDirection,
     [Neutral, Down, Up]
 );
 
@@ -74,13 +74,13 @@ enum DerivativeType {
 
 pub(crate) struct DerivativeTypes(Vec<DerivativeType>);
 
-impl From<longport::quote::DerivativeType> for DerivativeTypes {
-    fn from(ty: longport::quote::DerivativeType) -> Self {
+impl From<longbridge::quote::DerivativeType> for DerivativeTypes {
+    fn from(ty: longbridge::quote::DerivativeType) -> Self {
         let mut res = Vec::new();
-        if ty.contains(longport::quote::DerivativeType::OPTION) {
+        if ty.contains(longbridge::quote::DerivativeType::OPTION) {
             res.push(DerivativeType::Option);
         }
-        if ty.contains(longport::quote::DerivativeType::WARRANT) {
+        if ty.contains(longbridge::quote::DerivativeType::WARRANT) {
             res.push(DerivativeType::Warrant);
         }
         DerivativeTypes(res)
@@ -89,7 +89,7 @@ impl From<longport::quote::DerivativeType> for DerivativeTypes {
 
 impl JSignature for DerivativeTypes {
     fn signature() -> Cow<'static, str> {
-        concat!("[L", "com/longport/quote/DerivativeType", ";").into()
+        concat!("[L", "com/longbridge/quote/DerivativeType", ";").into()
     }
 }
 
@@ -102,12 +102,12 @@ impl IntoJValue for DerivativeTypes {
                 DerivativeType::Option => env.get_static_field(
                     cls,
                     "Option",
-                    concat!("L", "com/longport/quote/DerivativeType", ";"),
+                    concat!("L", "com/longbridge/quote/DerivativeType", ";"),
                 )?,
                 DerivativeType::Warrant => env.get_static_field(
                     cls,
                     "Warrant",
-                    concat!("L", "com/longport/quote/DerivativeType", ";"),
+                    concat!("L", "com/longbridge/quote/DerivativeType", ";"),
                 )?,
             };
             env.set_object_array_element(&array, i as i32, value.l()?)?;
@@ -117,26 +117,26 @@ impl IntoJValue for DerivativeTypes {
 }
 
 impl_java_enum!(
-    "com/longport/quote/OptionType",
-    longport::quote::OptionType,
+    "com/longbridge/quote/OptionType",
+    longbridge::quote::OptionType,
     [Unknown, American, Europe]
 );
 
 impl_java_enum!(
-    "com/longport/quote/OptionDirection",
-    longport::quote::OptionDirection,
+    "com/longbridge/quote/OptionDirection",
+    longbridge::quote::OptionDirection,
     [Unknown, Put, Call]
 );
 
 impl_java_enum!(
-    "com/longport/quote/WarrantType",
-    longport::quote::WarrantType,
+    "com/longbridge/quote/WarrantType",
+    longbridge::quote::WarrantType,
     [Unknown, Call, Put, Bull, Bear, Inline]
 );
 
 impl_java_enum!(
-    "com/longport/quote/Period",
-    longport::quote::Period,
+    "com/longbridge/quote/Period",
+    longbridge::quote::Period,
     [
         #[java(remote = "UnknownPeriod")]
         Unknown,
@@ -176,14 +176,14 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
-    "com/longport/quote/AdjustType",
-    longport::quote::AdjustType,
+    "com/longbridge/quote/AdjustType",
+    longbridge::quote::AdjustType,
     [NoAdjust, ForwardAdjust]
 );
 
 impl_java_enum!(
-    "com/longport/quote/SecurityBoard",
-    longport::quote::SecurityBoard,
+    "com/longbridge/quote/SecurityBoard",
+    longbridge::quote::SecurityBoard,
     [
         Unknown,
         USMain,
@@ -216,14 +216,14 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
-    "com/longport/quote/SecuritiesUpdateMode",
-    longport::quote::SecuritiesUpdateMode,
+    "com/longbridge/quote/SecuritiesUpdateMode",
+    longbridge::quote::SecuritiesUpdateMode,
     [Add, Remove, Replace]
 );
 
 impl_java_enum!(
-    "com/longport/quote/CalcIndex",
-    longport::quote::CalcIndex,
+    "com/longbridge/quote/CalcIndex",
+    longbridge::quote::CalcIndex,
     [
         LastDone,
         ChangeValue,
@@ -269,20 +269,20 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
-    "com/longport/quote/WarrantStatus",
-    longport::quote::WarrantStatus,
+    "com/longbridge/quote/WarrantStatus",
+    longbridge::quote::WarrantStatus,
     [Suspend, PrepareList, Normal]
 );
 
 impl_java_enum!(
-    "com/longport/quote/SortOrderType",
-    longport::quote::SortOrderType,
+    "com/longbridge/quote/SortOrderType",
+    longbridge::quote::SortOrderType,
     [Ascending, Descending]
 );
 
 impl_java_enum!(
-    "com/longport/quote/WarrantSortBy",
-    longport::quote::WarrantSortBy,
+    "com/longbridge/quote/WarrantSortBy",
+    longbridge::quote::WarrantSortBy,
     [
         LastDone,
         ChangeRate,
@@ -310,52 +310,52 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
-    "com/longport/quote/FilterWarrantExpiryDate",
-    longport::quote::FilterWarrantExpiryDate,
+    "com/longbridge/quote/FilterWarrantExpiryDate",
+    longbridge::quote::FilterWarrantExpiryDate,
     [LT_3, Between_3_6, Between_6_12, GT_12]
 );
 
 impl_java_enum!(
-    "com/longport/quote/FilterWarrantInOutBoundsType",
-    longport::quote::FilterWarrantInOutBoundsType,
+    "com/longbridge/quote/FilterWarrantInOutBoundsType",
+    longbridge::quote::FilterWarrantInOutBoundsType,
     [In, Out]
 );
 
 impl_java_enum!(
-    "com/longport/quote/SecurityListCategory",
-    longport::quote::SecurityListCategory,
+    "com/longbridge/quote/SecurityListCategory",
+    longbridge::quote::SecurityListCategory,
     [Overnight]
 );
 
 impl_java_enum!(
-    "com/longport/quote/TradeSessions",
-    longport::quote::TradeSessions,
+    "com/longbridge/quote/TradeSessions",
+    longbridge::quote::TradeSessions,
     [Intraday, All]
 );
 
 impl_java_enum!(
-    "com/longport/quote/Granularity",
-    longport::quote::Granularity,
+    "com/longbridge/quote/Granularity",
+    longbridge::quote::Granularity,
     [Unknown, Daily, Weekly, Monthly]
 );
 
 impl_java_enum!(
-    "com/longport/trade/OrderSide",
-    longport::trade::OrderSide,
+    "com/longbridge/trade/OrderSide",
+    longbridge::trade::OrderSide,
     [Unknown, Buy, Sell]
 );
 
 impl_java_enum!(
-    "com/longport/trade/OrderType",
-    longport::trade::OrderType,
+    "com/longbridge/trade/OrderType",
+    longbridge::trade::OrderType,
     [
         Unknown, LO, ELO, MO, AO, ALO, ODD, LIT, MIT, TSLPAMT, TSLPPCT, TSMAMT, TSMPCT, SLO
     ]
 );
 
 impl_java_enum!(
-    "com/longport/trade/OrderStatus",
-    longport::trade::OrderStatus,
+    "com/longbridge/trade/OrderStatus",
+    longbridge::trade::OrderStatus,
     [
         Unknown,
         NotReported,
@@ -379,8 +379,8 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
-    "com/longport/trade/OrderTag",
-    longport::trade::OrderTag,
+    "com/longbridge/trade/OrderTag",
+    longbridge::trade::OrderTag,
     [
         Unknown,
         Normal,
@@ -396,55 +396,55 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
-    "com/longport/trade/TriggerStatus",
-    longport::trade::TriggerStatus,
+    "com/longbridge/trade/TriggerStatus",
+    longbridge::trade::TriggerStatus,
     [Unknown, Deactive, Active, Released]
 );
 
 impl_java_enum!(
-    "com/longport/trade/TopicType",
-    longport::trade::TopicType,
+    "com/longbridge/trade/TopicType",
+    longbridge::trade::TopicType,
     [Private]
 );
 
 impl_java_enum!(
-    "com/longport/trade/TimeInForceType",
-    longport::trade::TimeInForceType,
+    "com/longbridge/trade/TimeInForceType",
+    longbridge::trade::TimeInForceType,
     [Unknown, Day, GoodTilCanceled, GoodTilDate]
 );
 
 impl_java_enum!(
-    "com/longport/trade/OutsideRTH",
-    longport::trade::OutsideRTH,
+    "com/longbridge/trade/OutsideRTH",
+    longbridge::trade::OutsideRTH,
     [Unknown, RTHOnly, AnyTime, Overnight]
 );
 
 impl_java_enum!(
-    "com/longport/trade/BalanceType",
-    longport::trade::BalanceType,
+    "com/longbridge/trade/BalanceType",
+    longbridge::trade::BalanceType,
     [Unknown, Cash, Stock, Fund]
 );
 
 impl_java_enum!(
-    "com/longport/trade/CashFlowDirection",
-    longport::trade::CashFlowDirection,
+    "com/longbridge/trade/CashFlowDirection",
+    longbridge::trade::CashFlowDirection,
     [Unknown, Out, In]
 );
 
 impl_java_enum!(
-    "com/longport/trade/CommissionFreeStatus",
-    longport::trade::CommissionFreeStatus,
+    "com/longbridge/trade/CommissionFreeStatus",
+    longbridge::trade::CommissionFreeStatus,
     [Unknown, None, Calculated, Pending, Ready]
 );
 
 impl_java_enum!(
-    "com/longport/trade/DeductionStatus",
-    longport::trade::DeductionStatus,
+    "com/longbridge/trade/DeductionStatus",
+    longbridge::trade::DeductionStatus,
     [Unknown, None, NoData, Pending, Done]
 );
 
 impl_java_enum!(
-    "com/longport/trade/ChargeCategoryCode",
-    longport::trade::ChargeCategoryCode,
+    "com/longbridge/trade/ChargeCategoryCode",
+    longbridge::trade::ChargeCategoryCode,
     [Unknown, Broker, Third]
 );

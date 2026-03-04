@@ -17,14 +17,14 @@ mod types;
 #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
 pub mod blocking;
 
-pub use longport_oauth as oauth;
+pub use longbridge_oauth as oauth;
 pub mod quote;
 pub mod trade;
 
 pub use config::{Config, Language, PushCandlestickMode};
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
-pub use longport_httpcli as httpclient;
-pub use longport_wscli as wsclient;
+pub use longbridge_httpcli as httpclient;
+pub use longbridge_wscli as wsclient;
 pub use quote::QuoteContext;
 pub use rust_decimal::Decimal;
 pub use trade::TradeContext;

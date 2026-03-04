@@ -1,7 +1,7 @@
 """HTTP client (async). Use asyncio with HttpClient.request_async."""
 import asyncio
 
-from longport.openapi import HttpClient, OAuthBuilder
+from longbridge.openapi import HttpClient, OAuthBuilder
 
 
 async def main() -> None:

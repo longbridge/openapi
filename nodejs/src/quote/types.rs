@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use longport::quote::SubFlags;
-use longport_nodejs_macros::{JsEnum, JsObject};
+use longbridge::quote::SubFlags;
+use longbridge_nodejs_macros::{JsEnum, JsObject};
 
 use crate::{
     decimal::Decimal,
@@ -12,7 +12,7 @@ use crate::{
 /// Subscription
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::Subscription")]
+#[js(remote = "longbridge::quote::Subscription")]
 pub struct Subscription {
     symbol: String,
     #[js(sub_types)]
@@ -45,13 +45,13 @@ impl ToJSON for DerivativeType {
 
 struct DerivativeTypes(Vec<DerivativeType>);
 
-impl From<longport::quote::DerivativeType> for DerivativeTypes {
-    fn from(ty: longport::quote::DerivativeType) -> Self {
+impl From<longbridge::quote::DerivativeType> for DerivativeTypes {
+    fn from(ty: longbridge::quote::DerivativeType) -> Self {
         let mut res = Vec::new();
-        if ty.contains(longport::quote::DerivativeType::OPTION) {
+        if ty.contains(longbridge::quote::DerivativeType::OPTION) {
             res.push(DerivativeType::Option);
         }
-        if ty.contains(longport::quote::DerivativeType::WARRANT) {
+        if ty.contains(longbridge::quote::DerivativeType::WARRANT) {
             res.push(DerivativeType::Warrant);
         }
         DerivativeTypes(res)
@@ -60,7 +60,7 @@ impl From<longport::quote::DerivativeType> for DerivativeTypes {
 
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::TradeStatus")]
+#[js(remote = "longbridge::quote::TradeStatus")]
 pub enum TradeStatus {
     /// Normal
     Normal,
@@ -90,7 +90,7 @@ pub enum TradeStatus {
 /// Trade session
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::TradeSession")]
+#[js(remote = "longbridge::quote::TradeSession")]
 pub enum TradeSession {
     /// Intraday
     Intraday,
@@ -172,7 +172,7 @@ impl From<SubFlags> for SubTypes {
 /// Trade direction
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::TradeDirection")]
+#[js(remote = "longbridge::quote::TradeDirection")]
 pub enum TradeDirection {
     /// Neutral
     Neutral,
@@ -185,7 +185,7 @@ pub enum TradeDirection {
 /// Option type
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::OptionType")]
+#[js(remote = "longbridge::quote::OptionType")]
 pub enum OptionType {
     /// Unknown
     Unknown,
@@ -198,7 +198,7 @@ pub enum OptionType {
 /// Option direction
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::OptionDirection")]
+#[js(remote = "longbridge::quote::OptionDirection")]
 pub enum OptionDirection {
     /// Unknown
     Unknown,
@@ -211,7 +211,7 @@ pub enum OptionDirection {
 /// Warrant type
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::WarrantType")]
+#[js(remote = "longbridge::quote::WarrantType")]
 pub enum WarrantType {
     /// Unknown
     Unknown,
@@ -231,7 +231,7 @@ pub enum WarrantType {
 #[napi_derive::napi]
 #[allow(non_camel_case_types)]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::Period")]
+#[js(remote = "longbridge::quote::Period")]
 pub enum Period {
     /// Unknown
     #[js(remote = "UnknownPeriod")]
@@ -291,7 +291,7 @@ pub enum Period {
 /// Candlestick adjustment type
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::AdjustType", from = false)]
+#[js(remote = "longbridge::quote::AdjustType", from = false)]
 pub enum AdjustType {
     /// Actual
     NoAdjust,
@@ -302,7 +302,7 @@ pub enum AdjustType {
 /// Security board
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::SecurityBoard")]
+#[js(remote = "longbridge::quote::SecurityBoard")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum SecurityBoard {
     /// Unknown
@@ -364,7 +364,7 @@ pub enum SecurityBoard {
 /// The basic information of securities
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::SecurityStaticInfo")]
+#[js(remote = "longbridge::quote::SecurityStaticInfo")]
 pub struct SecurityStaticInfo {
     /// Security code
     symbol: String,
@@ -404,7 +404,7 @@ pub struct SecurityStaticInfo {
 /// Quote of US pre/post market
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Copy, Clone)]
-#[js(remote = "longport::quote::PrePostQuote")]
+#[js(remote = "longbridge::quote::PrePostQuote")]
 pub struct PrePostQuote {
     /// Latest price
     last_done: Decimal,
@@ -426,7 +426,7 @@ pub struct PrePostQuote {
 /// Quote of securitity
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::SecurityQuote")]
+#[js(remote = "longbridge::quote::SecurityQuote")]
 pub struct SecurityQuote {
     /// Security code
     symbol: String,
@@ -463,7 +463,7 @@ pub struct SecurityQuote {
 /// Quote of option
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::OptionQuote")]
+#[js(remote = "longbridge::quote::OptionQuote")]
 pub struct OptionQuote {
     /// Security code
     symbol: String,
@@ -511,7 +511,7 @@ pub struct OptionQuote {
 /// Quote of warrant
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::WarrantQuote")]
+#[js(remote = "longbridge::quote::WarrantQuote")]
 pub struct WarrantQuote {
     /// Security code
     symbol: String,
@@ -563,7 +563,7 @@ pub struct WarrantQuote {
 /// Depth
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Copy, Clone)]
-#[js(remote = "longport::quote::Depth")]
+#[js(remote = "longbridge::quote::Depth")]
 pub struct Depth {
     /// Position
     position: i32,
@@ -579,7 +579,7 @@ pub struct Depth {
 /// Security depth
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::SecurityDepth")]
+#[js(remote = "longbridge::quote::SecurityDepth")]
 pub struct SecurityDepth {
     /// Ask depth
     #[js(array)]
@@ -592,7 +592,7 @@ pub struct SecurityDepth {
 /// Brokers
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::Brokers")]
+#[js(remote = "longbridge::quote::Brokers")]
 pub struct Brokers {
     /// Position
     position: i32,
@@ -603,7 +603,7 @@ pub struct Brokers {
 /// Security brokers
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::SecurityBrokers")]
+#[js(remote = "longbridge::quote::SecurityBrokers")]
 pub struct SecurityBrokers {
     /// Ask brokers
     #[js(array)]
@@ -616,7 +616,7 @@ pub struct SecurityBrokers {
 /// Participant info
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::ParticipantInfo")]
+#[js(remote = "longbridge::quote::ParticipantInfo")]
 pub struct ParticipantInfo {
     /// Broker IDs
     broker_ids: Vec<i32>,
@@ -631,7 +631,7 @@ pub struct ParticipantInfo {
 /// Trade
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::Trade")]
+#[js(remote = "longbridge::quote::Trade")]
 pub struct Trade {
     /// Price
     price: Decimal,
@@ -651,7 +651,7 @@ pub struct Trade {
 /// Intraday line
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::IntradayLine")]
+#[js(remote = "longbridge::quote::IntradayLine")]
 pub struct IntradayLine {
     /// Close price of the minute
     price: Decimal,
@@ -669,7 +669,7 @@ pub struct IntradayLine {
 /// Candlestick
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Copy, Clone)]
-#[js(remote = "longport::quote::Candlestick", non_exhaustive)]
+#[js(remote = "longbridge::quote::Candlestick", non_exhaustive)]
 pub struct Candlestick {
     /// Close price
     close: Decimal,
@@ -693,7 +693,7 @@ pub struct Candlestick {
 /// Strike price info
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::StrikePriceInfo")]
+#[js(remote = "longbridge::quote::StrikePriceInfo")]
 pub struct StrikePriceInfo {
     /// Strike price
     price: Decimal,
@@ -708,7 +708,7 @@ pub struct StrikePriceInfo {
 /// Issuer info
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::IssuerInfo")]
+#[js(remote = "longbridge::quote::IssuerInfo")]
 pub struct IssuerInfo {
     /// Issuer ID
     issuer_id: i32,
@@ -723,7 +723,7 @@ pub struct IssuerInfo {
 /// Sort order type
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::SortOrderType")]
+#[js(remote = "longbridge::quote::SortOrderType")]
 pub enum SortOrderType {
     /// Ascending
     Ascending,
@@ -734,7 +734,7 @@ pub enum SortOrderType {
 /// Warrant sort by
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::WarrantSortBy")]
+#[js(remote = "longbridge::quote::WarrantSortBy")]
 pub enum WarrantSortBy {
     /// Last done
     LastDone,
@@ -785,7 +785,7 @@ pub enum WarrantSortBy {
 /// Filter warrant expiry date type
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::FilterWarrantExpiryDate")]
+#[js(remote = "longbridge::quote::FilterWarrantExpiryDate")]
 #[allow(non_camel_case_types)]
 pub enum FilterWarrantExpiryDate {
     /// Less than 3 months
@@ -801,7 +801,7 @@ pub enum FilterWarrantExpiryDate {
 /// Filter warrant in/out of the bounds type
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::FilterWarrantInOutBoundsType")]
+#[js(remote = "longbridge::quote::FilterWarrantInOutBoundsType")]
 pub enum FilterWarrantInOutBoundsType {
     /// In bounds
     In,
@@ -812,7 +812,7 @@ pub enum FilterWarrantInOutBoundsType {
 /// Warrant info
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::WarrantInfo")]
+#[js(remote = "longbridge::quote::WarrantInfo")]
 pub struct WarrantInfo {
     /// Security code
     symbol: String,
@@ -880,7 +880,7 @@ pub struct WarrantInfo {
 /// Warrant status
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::WarrantStatus")]
+#[js(remote = "longbridge::quote::WarrantStatus")]
 pub enum WarrantStatus {
     /// Suspend
     Suspend,
@@ -893,7 +893,7 @@ pub enum WarrantStatus {
 /// The information of trading session
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Copy, Clone)]
-#[js(remote = "longport::quote::TradingSessionInfo")]
+#[js(remote = "longbridge::quote::TradingSessionInfo")]
 pub struct TradingSessionInfo {
     /// Being trading time
     begin_time: Time,
@@ -906,7 +906,7 @@ pub struct TradingSessionInfo {
 /// Market trading session
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::MarketTradingSession")]
+#[js(remote = "longbridge::quote::MarketTradingSession")]
 pub struct MarketTradingSession {
     /// Market
     market: Market,
@@ -918,7 +918,7 @@ pub struct MarketTradingSession {
 /// Real-time quote
 #[napi_derive::napi]
 #[derive(JsObject, Debug)]
-#[js(remote = "longport::quote::RealtimeQuote")]
+#[js(remote = "longbridge::quote::RealtimeQuote")]
 pub struct RealtimeQuote {
     /// Security code
     symbol: String,
@@ -944,7 +944,7 @@ pub struct RealtimeQuote {
 /// Push real-time quote
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::PushQuote")]
+#[js(remote = "longbridge::quote::PushQuote")]
 pub struct PushQuote {
     /// Latest price
     last_done: Decimal,
@@ -974,7 +974,7 @@ pub struct PushQuote {
 /// Push real-time depth
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::PushDepth")]
+#[js(remote = "longbridge::quote::PushDepth")]
 pub struct PushDepth {
     /// Ask depth
     #[js(array)]
@@ -987,7 +987,7 @@ pub struct PushDepth {
 /// Push real-time brokers
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::PushBrokers")]
+#[js(remote = "longbridge::quote::PushBrokers")]
 pub struct PushBrokers {
     /// Ask brokers
     #[js(array)]
@@ -1000,7 +1000,7 @@ pub struct PushBrokers {
 /// Push real-time trades
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::PushTrades")]
+#[js(remote = "longbridge::quote::PushTrades")]
 pub struct PushTrades {
     /// Trades data
     #[js(array)]
@@ -1010,7 +1010,7 @@ pub struct PushTrades {
 /// Candlestick updated event
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::PushCandlestick")]
+#[js(remote = "longbridge::quote::PushCandlestick")]
 pub struct PushCandlestick {
     /// Period type
     period: Period,
@@ -1023,7 +1023,7 @@ pub struct PushCandlestick {
 /// Market trading days
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::MarketTradingDays")]
+#[js(remote = "longbridge::quote::MarketTradingDays")]
 pub struct MarketTradingDays {
     /// Trading days
     #[js(array)]
@@ -1036,7 +1036,7 @@ pub struct MarketTradingDays {
 /// Capital flow line
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::CapitalFlowLine")]
+#[js(remote = "longbridge::quote::CapitalFlowLine")]
 pub struct CapitalFlowLine {
     /// Inflow capital data
     inflow: Decimal,
@@ -1048,7 +1048,7 @@ pub struct CapitalFlowLine {
 /// Capital distribution
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::CapitalDistribution")]
+#[js(remote = "longbridge::quote::CapitalDistribution")]
 pub struct CapitalDistribution {
     /// Large order
     large: Decimal,
@@ -1061,7 +1061,7 @@ pub struct CapitalDistribution {
 /// Capital distribution response
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::CapitalDistributionResponse")]
+#[js(remote = "longbridge::quote::CapitalDistributionResponse")]
 pub struct CapitalDistributionResponse {
     /// Time
     #[js(datetime)]
@@ -1075,7 +1075,7 @@ pub struct CapitalDistributionResponse {
 /// Watchlist group
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::WatchlistGroup")]
+#[js(remote = "longbridge::quote::WatchlistGroup")]
 pub struct WatchlistGroup {
     /// Group id
     id: i64,
@@ -1089,7 +1089,7 @@ pub struct WatchlistGroup {
 /// Watchlist security
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::WatchlistSecurity")]
+#[js(remote = "longbridge::quote::WatchlistSecurity")]
 pub struct WatchlistSecurity {
     /// Security symbol
     symbol: String,
@@ -1108,7 +1108,7 @@ pub struct WatchlistSecurity {
 /// Securities update mode
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::SecuritiesUpdateMode")]
+#[js(remote = "longbridge::quote::SecuritiesUpdateMode")]
 pub enum SecuritiesUpdateMode {
     /// Add securities
     Add,
@@ -1120,7 +1120,7 @@ pub enum SecuritiesUpdateMode {
 
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::CalcIndex")]
+#[js(remote = "longbridge::quote::CalcIndex")]
 pub enum CalcIndex {
     /// Latest price
     LastDone,
@@ -1207,7 +1207,7 @@ pub enum CalcIndex {
 /// Security calc index response
 #[napi_derive::napi]
 #[derive(JsObject, Debug, Clone)]
-#[js(remote = "longport::quote::SecurityCalcIndex")]
+#[js(remote = "longbridge::quote::SecurityCalcIndex")]
 pub struct SecurityCalcIndex {
     /// Security code
     symbol: String,
@@ -1336,7 +1336,7 @@ pub struct SecurityCalcIndex {
 /// Security list category
 #[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::SecurityListCategory")]
+#[js(remote = "longbridge::quote::SecurityListCategory")]
 pub enum SecurityListCategory {
     /// Overnight
     Overnight,
@@ -1345,7 +1345,7 @@ pub enum SecurityListCategory {
 /// Security
 #[napi_derive::napi]
 #[derive(JsObject, Debug, Clone)]
-#[js(remote = "longport::quote::Security")]
+#[js(remote = "longbridge::quote::Security")]
 pub struct Security {
     /// Security code
     symbol: String,
@@ -1359,7 +1359,7 @@ pub struct Security {
 
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::QuotePackageDetail")]
+#[js(remote = "longbridge::quote::QuotePackageDetail")]
 pub struct QuotePackageDetail {
     /// Key
     key: String,
@@ -1378,7 +1378,7 @@ pub struct QuotePackageDetail {
 /// Trade sessions
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
-#[js(remote = "longport::quote::TradeSessions")]
+#[js(remote = "longbridge::quote::TradeSessions")]
 pub enum TradeSessions {
     /// Intraday
     Intraday,
@@ -1389,7 +1389,7 @@ pub enum TradeSessions {
 /// Market temperature
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::MarketTemperature")]
+#[js(remote = "longbridge::quote::MarketTemperature")]
 pub struct MarketTemperature {
     /// Temperature value
     temperature: i32,
@@ -1407,7 +1407,7 @@ pub struct MarketTemperature {
 /// Data granularity
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longport::quote::Granularity")]
+#[js(remote = "longbridge::quote::Granularity")]
 pub enum Granularity {
     /// Unknown
     Unknown,
@@ -1422,7 +1422,7 @@ pub enum Granularity {
 /// History market temperature response
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longport::quote::HistoryMarketTemperatureResponse")]
+#[js(remote = "longbridge::quote::HistoryMarketTemperatureResponse")]
 pub struct HistoryMarketTemperatureResponse {
     /// Granularity
     granularity: Granularity,

@@ -1,4 +1,4 @@
-use longport_proto::quote::{self, Period, PushQuoteTag, TradeStatus};
+use longbridge_proto::quote::{self, Period, PushQuoteTag, TradeStatus};
 use prost::Message;
 use rust_decimal::Decimal;
 use time::OffsetDateTime;
@@ -53,7 +53,7 @@ impl Default for PushQuote {
     }
 }
 
-impl longport_candlesticks::QuoteType for PushQuote {
+impl longbridge_candlesticks::QuoteType for PushQuote {
     type PriceType = Decimal;
     type VolumeType = i64;
     type TurnoverType = Decimal;
@@ -100,7 +100,7 @@ impl longport_candlesticks::QuoteType for PushQuote {
     }
 }
 
-impl longport_candlesticks::TradeType for PushQuote {
+impl longbridge_candlesticks::TradeType for PushQuote {
     type PriceType = Decimal;
     type VolumeType = i64;
     type TurnoverType = Decimal;
@@ -229,7 +229,7 @@ fn parse_push_quote(data: &[u8]) -> Result<(PushEvent, PushQuoteTag)> {
                 volume: push_quote.volume,
                 turnover: push_quote.turnover.parse().unwrap_or_default(),
                 trade_status: TradeStatus::try_from(push_quote.trade_status).unwrap_or_default(),
-                trade_session: longport_proto::quote::TradeSession::try_from(
+                trade_session: longbridge_proto::quote::TradeSession::try_from(
                     push_quote.trade_session,
                 )
                 .unwrap_or_default()

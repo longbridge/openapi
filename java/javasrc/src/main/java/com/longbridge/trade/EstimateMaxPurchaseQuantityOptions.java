@@ -1,0 +1,40 @@
+package com.longbridge.trade;
+
+import java.math.BigDecimal;
+
+@SuppressWarnings("unused")
+public class EstimateMaxPurchaseQuantityOptions {
+    private String symbol;
+    private OrderType orderType;
+    private OrderSide side;
+    private BigDecimal price;
+    private String currency;
+    private String orderId;
+    private boolean fractionalShares;
+
+    public EstimateMaxPurchaseQuantityOptions(String symbol, OrderType orderType, OrderSide side) {
+        this.symbol = symbol;
+        this.orderType = orderType;
+        this.side = side;
+    }
+
+    public EstimateMaxPurchaseQuantityOptions setPrice(BigDecimal price) {
+        this.price = price;
+        return this;
+    }
+
+    public EstimateMaxPurchaseQuantityOptions setCurrency(String currency) {
+        this.currency = currency;
+        return this;
+    }
+
+    public EstimateMaxPurchaseQuantityOptions setOrderId(String orderId) {
+        this.orderId = orderId;
+        return this;
+    }
+
+    public EstimateMaxPurchaseQuantityOptions fractionalShares() {
+        this.fractionalShares = true;
+        return this;
+    }
+}

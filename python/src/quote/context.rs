@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport::{
+use longbridge::{
     blocking::QuoteContextSync,
     quote::{RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup},
 };
@@ -393,13 +393,13 @@ impl QuoteContext {
         price_type: Option<Vec<FilterWarrantInOutBoundsType>>,
         status: Option<Vec<WarrantStatus>>,
     ) -> PyResult<Vec<WarrantInfo>> {
-        let warrant_type: Option<Vec<longport::quote::WarrantType>> =
+        let warrant_type: Option<Vec<longbridge::quote::WarrantType>> =
             warrant_type.map(|v| v.into_iter().map(Into::into).collect());
-        let expiry_date: Option<Vec<longport::quote::FilterWarrantExpiryDate>> =
+        let expiry_date: Option<Vec<longbridge::quote::FilterWarrantExpiryDate>> =
             expiry_date.map(|v| v.into_iter().map(Into::into).collect());
-        let price_type: Option<Vec<longport::quote::FilterWarrantInOutBoundsType>> =
+        let price_type: Option<Vec<longbridge::quote::FilterWarrantInOutBoundsType>> =
             price_type.map(|v| v.into_iter().map(Into::into).collect());
-        let status: Option<Vec<longport::quote::WarrantStatus>> =
+        let status: Option<Vec<longbridge::quote::WarrantStatus>> =
             status.map(|v| v.into_iter().map(Into::into).collect());
         self.ctx
             .warrant_list(

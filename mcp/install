@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -u
 
-repo='longportapp/openapi'
-app_name='LongPort MCP'
-bin_name='longport-mcp'
+repo='longbridge/openapi'
+app_name='Longbridge MCP'
+bin_name='longbridge-mcp'
 tmpdir=.tmp_install
 
 if [[ ${OS:-} = Windows_NT ]]; then
@@ -61,7 +61,7 @@ get_mcp_release() {
   fetch_github_api "https://api.github.com/repos/$repo/releases" | # Get latest release from GitHub api
     grep '"tag_name":' |                                               # Get tag line
     sed -E 's/.*"([^"]+)".*/\1/' |                                       # Pluck JSON value
-    grep "longport-mcp" | head -n 1
+    grep "longbridge-mcp" | head -n 1
 }
 
 get_version() {

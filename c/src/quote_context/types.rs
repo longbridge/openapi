@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 
-use longport::quote::{
+use longbridge::quote::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
     HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
     MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,

@@ -42,10 +42,10 @@ jobs:
           components: rustfmt, clippy
 
       - name: Check with clippy
-        run: cargo clippy -p longport --all-features
+        run: cargo clippy -p longbridge --all-features
 
       - name: Test
-        run: cargo test -p longport --all-features
+        run: cargo test -p longbridge --all-features
 
   check-python-sdk:
     needs:
@@ -73,7 +73,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Check with clippy
-        run: cargo clippy -p longport-python --all-features
+        run: cargo clippy -p longbridge-python --all-features
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -82,8 +82,8 @@ jobs:
           args: -i python${{ matrix.python-version }} --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
-          pip install longport --no-index --find-links dist --force-reinstall
-          python -c "import longport"
+          pip install longbridge --no-index --find-links dist --force-reinstall
+          python -c "import longbridge"
 
   build-python:
     needs:
@@ -119,7 +119,7 @@ jobs:
           args: -i python --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
-          pip install longport --no-index --find-links dist --force-reinstall
+          pip install longbridge --no-index --find-links dist --force-reinstall
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -161,7 +161,7 @@ jobs:
           targets: ${{ matrix.settings.target }}
 
       - name: Check with clippy
-        run: cargo clippy -p longport-nodejs --all-features
+        run: cargo clippy -p longbridge-nodejs --all-features
 
       - name: Install dependencies
         working-directory: nodejs
@@ -180,7 +180,7 @@ jobs:
       - name: Move artifacts
         run: |
           mkdir -p artifacts
-          mv longport.*.node artifacts/
+          mv longbridge.*.node artifacts/
           yarn artifacts
         working-directory: ./nodejs
 
@@ -216,7 +216,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Check with clippy
-        run: cargo clippy -p longport-java --all-features
+        run: cargo clippy -p longbridge-java --all-features
 
       - name: Compile java sources
         working-directory: java/javasrc
@@ -257,7 +257,7 @@ jobs:
         run: cargo install cargo-make
 
       - name: Check with clippy
-        run: cargo clippy -p longport-c --all-features
+        run: cargo clippy -p longbridge-c --all-features
 
       - name: Build with cmake
         if: ${{ matrix.os != 'macos-15' }}

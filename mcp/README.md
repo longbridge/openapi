@@ -1,11 +1,11 @@
-# LongPort MCP
+# Longbridge MCP
 
-A [MCP](https://modelcontextprotocol.io/introduction) server implementation for [LongPort OpenAPI](https://open.longportapp.com), provides real-time stock market data, provides AI access analysis and trading capabilities through MCP.
+A [MCP](https://modelcontextprotocol.io/introduction) server implementation for [Longbridge OpenAPI](https://open.longbridge.com), provides real-time stock market data, provides AI access analysis and trading capabilities through MCP.
 
 ## Documentation
 
-- LongPort OpenAPI: https://open.longportapp.com/en/
-- SDK docs: https://longportapp.github.io/openapi
+- Longbridge OpenAPI: https://open.longbridge.com/en/
+- SDK docs: https://longbridge.github.io/openapi
 
 ## Features
 
@@ -20,12 +20,12 @@ A [MCP](https://modelcontextprotocol.io/introduction) server implementation for 
 Run script to install:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/longportapp/openapi/refs/heads/main/mcp/install | bash
+curl -sSL https://raw.githubusercontent.com/longbridge/openapi/refs/heads/main/mcp/install | bash
 ```
 
 ### Windows
 
-Download the latest binary from the [Releases](https://github.com/longportapp/openapi/releases/tag/longport-mcp-0.1.0) page.
+Download the latest binary from the [Releases](https://github.com/longbridge/openapi/releases/tag/longbridge-mcp-0.1.0) page.
 
 ## Example Prompts
 
@@ -43,29 +43,29 @@ Once you done server setup, and connected, you can talk with AI:
 
 ### Use in Cursor
 
-To configure LongPort MCP in Cursor:
+To configure Longbridge MCP in Cursor:
 
 - Open Cursor Settings
 - Go to Features > MCP Servers
 - Click `+ Add New MCP Server`
 - Enter the following:
-  - Name: `longport-mcp` (or your preferred name)
+  - Name: `longbridge-mcp` (or your preferred name)
   - Type: `command`
-  - Command: `env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp`
+  - Command: `env LONGBRIDGE_APP_KEY=your-app-key LONGBRIDGE_APP_SECRET=your-app-secret LONGBRIDGE_ACCESS_TOKEN=your-access-token longbridge-mcp`
 
-If you are using Windows, replace command with `cmd /c "set LONGPORT_APP_KEY=your-app-key && set LONGPORT_APP_SECRET=your-app-secret && set LONGPORT_ACCESS_TOKEN=your-access-token && longport-mcp"`
+If you are using Windows, replace command with `cmd /c "set LONGBRIDGE_APP_KEY=your-app-key && set LONGBRIDGE_APP_SECRET=your-app-secret && set LONGBRIDGE_ACCESS_TOKEN=your-access-token && longbridge-mcp"`
 
 Or use this config:
 
 ```json
 {
   "mcpServers": {
-    "longport-mcp": {
-      "command": "/usr/local/bin/longport-mcp",
+    "longbridge-mcp": {
+      "command": "/usr/local/bin/longbridge-mcp",
       "env": {
-        "LONGPORT_APP_KEY": "your-app-key",
-        "LONGPORT_APP_SECRET": "your-app-secret",
-        "LONGPORT_ACCESS_TOKEN": "your-access-token"
+        "LONGBRIDGE_APP_KEY": "your-app-key",
+        "LONGBRIDGE_APP_SECRET": "your-app-secret",
+        "LONGBRIDGE_ACCESS_TOKEN": "your-access-token"
       }
     }
   }
@@ -74,27 +74,27 @@ Or use this config:
 
 ### Use in Cherry Studio
 
-To configure LongPort MCP in Cherry Studio:
+To configure Longbridge MCP in Cherry Studio:
 
 - Go to Settings > MCP Servers
 - Click `+ Add Server`
 - Enter the following:
-  - Name: `longport-mcp` (or your preferred name)
+  - Name: `longbridge-mcp` (or your preferred name)
   - Type: `STDIO`
-  - Command: `env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp`
+  - Command: `env LONGBRIDGE_APP_KEY=your-app-key LONGBRIDGE_APP_SECRET=your-app-secret LONGBRIDGE_ACCESS_TOKEN=your-access-token longbridge-mcp`
 
-If you are using Windows, replace command with `cmd /c "set LONGPORT_APP_KEY=your-app-key && set LONGPORT_APP_SECRET=your-app-secret && set LONGPORT_ACCESS_TOKEN=your-access-token && longport-mcp"`
+If you are using Windows, replace command with `cmd /c "set LONGBRIDGE_APP_KEY=your-app-key && set LONGBRIDGE_APP_SECRET=your-app-secret && set LONGBRIDGE_ACCESS_TOKEN=your-access-token && longbridge-mcp"`
 
 ## Running as a SSE server
 
 ```bash
-env LONGPORT_APP_KEY=your-app-key LONGPORT_APP_SECRET=your-app-secret LONGPORT_ACCESS_TOKEN=your-access-token longport-mcp --sse
+env LONGBRIDGE_APP_KEY=your-app-key LONGBRIDGE_APP_SECRET=your-app-secret LONGBRIDGE_ACCESS_TOKEN=your-access-token longbridge-mcp --sse
 ```
 
 Default bind address is `127.0.0.1:8000`, you can change it by using the `--bind` flag:
 
 ```bash
-longport-mcp --sse --bind 127.0.0.1:3000
+longbridge-mcp --sse --bind 127.0.0.1:3000
 ```
 
 ## Configuration
@@ -104,7 +104,7 @@ longport-mcp --sse --bind 127.0.0.1:3000
 To run the server in read-only mode, set the flag `--readonly`:
 
 ```bash
-longport-mcp --readonly
+longbridge-mcp --readonly
 ```
 
 This will prevent the server from submitting orders to the exchange.
@@ -114,5 +114,5 @@ This will prevent the server from submitting orders to the exchange.
 To enable logging, set the flag `--log-dir` to the directory where you want to store the logs:
 
 ```bash
-longport-mcp --log-dir /path/to/log/dir
+longbridge-mcp --log-dir /path/to/log/dir
 ```

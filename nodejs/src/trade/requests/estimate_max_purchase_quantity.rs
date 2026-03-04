@@ -18,11 +18,11 @@ pub struct EstimateMaxPurchaseQuantityOptions<'env> {
 }
 
 impl<'env> From<EstimateMaxPurchaseQuantityOptions<'env>>
-    for longport::trade::EstimateMaxPurchaseQuantityOptions
+    for longbridge::trade::EstimateMaxPurchaseQuantityOptions
 {
     #[inline]
     fn from(opts: EstimateMaxPurchaseQuantityOptions) -> Self {
-        let mut opts2 = longport::trade::EstimateMaxPurchaseQuantityOptions::new(
+        let mut opts2 = longbridge::trade::EstimateMaxPurchaseQuantityOptions::new(
             opts.symbol,
             opts.order_type.into(),
             opts.side.into(),

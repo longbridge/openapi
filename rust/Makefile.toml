@@ -1,6 +1,6 @@
 [tasks.rust]
 command = "cargo"
-args = ["build", "-p", "longport"]
+args = ["build", "-p", "longbridge"]
 
 [tasks.protoc]
 script_runner = "@rust"

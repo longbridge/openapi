@@ -22,9 +22,9 @@ npm run build:debug
 
 ## After modifying the C SDK (`c/`)
 
-`c/csrc/include/longport.h` is **auto-generated** by `cbindgen` during the
+`c/csrc/include/longbridge.h` is **auto-generated** by `cbindgen` during the
 build — never edit it by hand. Rebuild the C crate to update it:
 
 ```bash
-cargo build -p longport-c
+cargo build -p longbridge-c
 ```

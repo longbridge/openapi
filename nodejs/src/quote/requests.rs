@@ -10,10 +10,10 @@ pub struct CreateWatchlistGroup {
     pub securities: Option<Vec<String>>,
 }
 
-impl From<CreateWatchlistGroup> for longport::quote::RequestCreateWatchlistGroup {
+impl From<CreateWatchlistGroup> for longbridge::quote::RequestCreateWatchlistGroup {
     #[inline]
     fn from(CreateWatchlistGroup { name, securities }: CreateWatchlistGroup) -> Self {
-        longport::quote::RequestCreateWatchlistGroup { name, securities }
+        longbridge::quote::RequestCreateWatchlistGroup { name, securities }
     }
 }
 
@@ -41,7 +41,7 @@ pub struct UpdateWatchlistGroup {
     pub mode: SecuritiesUpdateMode,
 }
 
-impl From<UpdateWatchlistGroup> for longport::quote::RequestUpdateWatchlistGroup {
+impl From<UpdateWatchlistGroup> for longbridge::quote::RequestUpdateWatchlistGroup {
     #[inline]
     fn from(
         UpdateWatchlistGroup {
@@ -51,7 +51,7 @@ impl From<UpdateWatchlistGroup> for longport::quote::RequestUpdateWatchlistGroup
             mode,
         }: UpdateWatchlistGroup,
     ) -> Self {
-        longport::quote::RequestUpdateWatchlistGroup {
+        longbridge::quote::RequestUpdateWatchlistGroup {
             id,
             name,
             securities,

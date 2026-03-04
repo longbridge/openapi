@@ -1,5 +1,5 @@
 [package]
-name = "longport-java-macros"
+name = "longbridge-java-macros"
 version.workspace = true
 edition.workspace = true
 

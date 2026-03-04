@@ -1,12 +1,12 @@
 use std::borrow::Borrow;
 
-use longport::{Decimal, Market};
-use longport_java_macros::impl_java_class;
+use longbridge::{Decimal, Market};
+use longbridge_java_macros::impl_java_class;
 use time::Date;
 
 impl_java_class!(
-    "com/longport/quote/Trade",
-    longport::quote::Trade,
+    "com/longbridge/quote/Trade",
+    longbridge::quote::Trade,
     [
         price,
         volume,
@@ -18,8 +18,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/Brokers",
-    longport::quote::Brokers,
+    "com/longbridge/quote/Brokers",
+    longbridge::quote::Brokers,
     [
         position,
         #[java(priarray)]
@@ -28,14 +28,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/Depth",
-    longport::quote::Depth,
+    "com/longbridge/quote/Depth",
+    longbridge::quote::Depth,
     [position, price, volume, order_num]
 );
 
 impl_java_class!(
-    "com/longport/quote/Subscription",
-    longport::quote::Subscription,
+    "com/longbridge/quote/Subscription",
+    longbridge::quote::Subscription,
     [
         symbol,
         sub_types,
@@ -45,8 +45,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/PushQuote",
-    longport::quote::PushQuote,
+    "com/longbridge/quote/PushQuote",
+    longbridge::quote::PushQuote,
     [
         last_done,
         open,
@@ -63,8 +63,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/PushDepth",
-    longport::quote::PushDepth,
+    "com/longbridge/quote/PushDepth",
+    longbridge::quote::PushDepth,
     [
         #[java(objarray)]
         asks,
@@ -74,8 +74,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/PushBrokers",
-    longport::quote::PushBrokers,
+    "com/longbridge/quote/PushBrokers",
+    longbridge::quote::PushBrokers,
     [
         #[java(objarray)]
         ask_brokers,
@@ -85,8 +85,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/PushTrades",
-    longport::quote::PushTrades,
+    "com/longbridge/quote/PushTrades",
+    longbridge::quote::PushTrades,
     [
         #[java(objarray)]
         trades,
@@ -94,20 +94,20 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/PushCandlestick",
-    longport::quote::PushCandlestick,
+    "com/longbridge/quote/PushCandlestick",
+    longbridge::quote::PushCandlestick,
     [period, candlestick, is_confirmed]
 );
 
 impl_java_class!(
-    "com/longport/quote/Security",
-    longport::quote::Security,
+    "com/longbridge/quote/Security",
+    longbridge::quote::Security,
     [symbol, name_cn, name_en, name_hk,]
 );
 
 impl_java_class!(
-    "com/longport/quote/SecurityStaticInfo",
-    longport::quote::SecurityStaticInfo,
+    "com/longbridge/quote/SecurityStaticInfo",
+    longbridge::quote::SecurityStaticInfo,
     [
         symbol,
         name_cn,
@@ -130,16 +130,16 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/PrePostQuote",
-    longport::quote::PrePostQuote,
+    "com/longbridge/quote/PrePostQuote",
+    longbridge::quote::PrePostQuote,
     [
         last_done, timestamp, volume, turnover, high, low, prev_close
     ]
 );
 
 impl_java_class!(
-    "com/longport/quote/SecurityQuote",
-    longport::quote::SecurityQuote,
+    "com/longbridge/quote/SecurityQuote",
+    longbridge::quote::SecurityQuote,
     [
         symbol,
         last_done,
@@ -158,8 +158,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/OptionQuote",
-    longport::quote::OptionQuote,
+    "com/longbridge/quote/OptionQuote",
+    longbridge::quote::OptionQuote,
     [
         symbol,
         last_done,
@@ -185,8 +185,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/WarrantQuote",
-    longport::quote::WarrantQuote,
+    "com/longbridge/quote/WarrantQuote",
+    longbridge::quote::WarrantQuote,
     [
         symbol,
         last_done,
@@ -214,8 +214,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/SecurityDepth",
-    longport::quote::SecurityDepth,
+    "com/longbridge/quote/SecurityDepth",
+    longbridge::quote::SecurityDepth,
     [
         #[java(objarray)]
         asks,
@@ -225,8 +225,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/SecurityBrokers",
-    longport::quote::SecurityBrokers,
+    "com/longbridge/quote/SecurityBrokers",
+    longbridge::quote::SecurityBrokers,
     [
         #[java(objarray)]
         ask_brokers,
@@ -236,8 +236,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/ParticipantInfo",
-    longport::quote::ParticipantInfo,
+    "com/longbridge/quote/ParticipantInfo",
+    longbridge::quote::ParticipantInfo,
     [
         #[java(priarray)]
         broker_ids,
@@ -248,14 +248,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/IntradayLine",
-    longport::quote::IntradayLine,
+    "com/longbridge/quote/IntradayLine",
+    longbridge::quote::IntradayLine,
     [price, timestamp, volume, turnover, avg_price]
 );
 
 impl_java_class!(
-    "com/longport/quote/Candlestick",
-    longport::quote::Candlestick,
+    "com/longbridge/quote/Candlestick",
+    longbridge::quote::Candlestick,
     [
         close,
         open,
@@ -270,20 +270,20 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/StrikePriceInfo",
-    longport::quote::StrikePriceInfo,
+    "com/longbridge/quote/StrikePriceInfo",
+    longbridge::quote::StrikePriceInfo,
     [price, call_symbol, put_symbol, standard]
 );
 
 impl_java_class!(
-    "com/longport/quote/IssuerInfo",
-    longport::quote::IssuerInfo,
+    "com/longbridge/quote/IssuerInfo",
+    longbridge::quote::IssuerInfo,
     [issuer_id, name_cn, name_en, name_hk]
 );
 
 impl_java_class!(
-    "com/longport/quote/MarketTradingSession",
-    longport::quote::MarketTradingSession,
+    "com/longbridge/quote/MarketTradingSession",
+    longbridge::quote::MarketTradingSession,
     [
         market,
         #[java(objarray)]
@@ -292,14 +292,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/TradingSessionInfo",
-    longport::quote::TradingSessionInfo,
+    "com/longbridge/quote/TradingSessionInfo",
+    longbridge::quote::TradingSessionInfo,
     [begin_time, end_time, trade_session]
 );
 
 impl_java_class!(
-    "com/longport/quote/MarketTradingDays",
-    longport::quote::MarketTradingDays,
+    "com/longbridge/quote/MarketTradingDays",
+    longbridge::quote::MarketTradingDays,
     [
         #[java(objarray)]
         trading_days,
@@ -309,14 +309,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/CapitalFlowLine",
-    longport::quote::CapitalFlowLine,
+    "com/longbridge/quote/CapitalFlowLine",
+    longbridge::quote::CapitalFlowLine,
     [inflow, timestamp]
 );
 
 impl_java_class!(
-    "com/longport/quote/CapitalDistribution",
-    longport::quote::CapitalDistribution,
+    "com/longbridge/quote/CapitalDistribution",
+    longbridge::quote::CapitalDistribution,
     [large, medium, small]
 );
 
@@ -364,9 +364,9 @@ pub(crate) struct SecurityCalcIndex {
     pub(crate) rho: Option<Decimal>,
 }
 
-impl From<longport::quote::SecurityCalcIndex> for SecurityCalcIndex {
+impl From<longbridge::quote::SecurityCalcIndex> for SecurityCalcIndex {
     fn from(
-        longport::quote::SecurityCalcIndex {
+        longbridge::quote::SecurityCalcIndex {
             symbol,
             last_done,
             change_value,
@@ -408,7 +408,7 @@ impl From<longport::quote::SecurityCalcIndex> for SecurityCalcIndex {
             theta,
             vega,
             rho,
-        }: longport::quote::SecurityCalcIndex,
+        }: longbridge::quote::SecurityCalcIndex,
     ) -> Self {
         Self {
             symbol,
@@ -457,7 +457,7 @@ impl From<longport::quote::SecurityCalcIndex> for SecurityCalcIndex {
 }
 
 impl_java_class!(
-    "com/longport/quote/SecurityCalcIndex",
+    "com/longbridge/quote/SecurityCalcIndex",
     SecurityCalcIndex,
     [
         symbol,
@@ -505,8 +505,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/WatchlistGroup",
-    longport::quote::WatchlistGroup,
+    "com/longbridge/quote/WatchlistGroup",
+    longbridge::quote::WatchlistGroup,
     [
         id,
         name,
@@ -516,8 +516,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/WatchlistSecurity",
-    longport::quote::WatchlistSecurity,
+    "com/longbridge/quote/WatchlistSecurity",
+    longbridge::quote::WatchlistSecurity,
     [symbol, market, name, watched_price, watched_at]
 );
 
@@ -526,20 +526,20 @@ pub(crate) struct CreateWatchlistGroupResponse {
 }
 
 impl_java_class!(
-    "com/longport/quote/CreateWatchlistGroupResponse",
+    "com/longbridge/quote/CreateWatchlistGroupResponse",
     CreateWatchlistGroupResponse,
     [id]
 );
 
 impl_java_class!(
-    "com/longport/quote/CapitalDistributionResponse",
-    longport::quote::CapitalDistributionResponse,
+    "com/longbridge/quote/CapitalDistributionResponse",
+    longbridge::quote::CapitalDistributionResponse,
     [timestamp, capital_in, capital_out]
 );
 
 impl_java_class!(
-    "com/longport/quote/RealtimeQuote",
-    longport::quote::RealtimeQuote,
+    "com/longbridge/quote/RealtimeQuote",
+    longbridge::quote::RealtimeQuote,
     [
         symbol,
         last_done,
@@ -554,8 +554,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/WarrantInfo",
-    longport::quote::WarrantInfo,
+    "com/longbridge/quote/WarrantInfo",
+    longbridge::quote::WarrantInfo,
     [
         symbol,
         warrant_type,
@@ -586,8 +586,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/PushOrderChanged",
-    longport::trade::PushOrderChanged,
+    "com/longbridge/trade/PushOrderChanged",
+    longbridge::trade::PushOrderChanged,
     [
         side,
         stock_name,
@@ -618,14 +618,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/Execution",
-    longport::trade::Execution,
+    "com/longbridge/trade/Execution",
+    longbridge::trade::Execution,
     [order_id, trade_id, symbol, trade_done_at, quantity, price]
 );
 
 impl_java_class!(
-    "com/longport/trade/Order",
-    longport::trade::Order,
+    "com/longbridge/trade/Order",
+    longbridge::trade::Order,
     [
         order_id,
         status,
@@ -662,14 +662,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/SubmitOrderResponse",
-    longport::trade::SubmitOrderResponse,
+    "com/longbridge/trade/SubmitOrderResponse",
+    longbridge::trade::SubmitOrderResponse,
     [order_id]
 );
 
 impl_java_class!(
-    "com/longport/trade/CashInfo",
-    longport::trade::CashInfo,
+    "com/longbridge/trade/CashInfo",
+    longbridge::trade::CashInfo,
     [
         withdraw_cash,
         available_cash,
@@ -680,14 +680,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/FrozenTransactionFee",
-    longport::trade::FrozenTransactionFee,
+    "com/longbridge/trade/FrozenTransactionFee",
+    longbridge::trade::FrozenTransactionFee,
     [currency, frozen_transaction_fee]
 );
 
 impl_java_class!(
-    "com/longport/trade/AccountBalance",
-    longport::trade::AccountBalance,
+    "com/longbridge/trade/AccountBalance",
+    longbridge::trade::AccountBalance,
     [
         total_cash,
         max_finance_amount,
@@ -707,8 +707,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/CashFlow",
-    longport::trade::CashFlow,
+    "com/longbridge/trade/CashFlow",
+    longbridge::trade::CashFlow,
     [
         transaction_flow_name,
         direction,
@@ -722,8 +722,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/FundPositionsResponse",
-    longport::trade::FundPositionsResponse,
+    "com/longbridge/trade/FundPositionsResponse",
+    longbridge::trade::FundPositionsResponse,
     [
         #[java(objarray)]
         channels
@@ -731,8 +731,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/FundPositionChannel",
-    longport::trade::FundPositionChannel,
+    "com/longbridge/trade/FundPositionChannel",
+    longbridge::trade::FundPositionChannel,
     [
         account_channel,
         #[java(objarray)]
@@ -741,8 +741,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/FundPosition",
-    longport::trade::FundPosition,
+    "com/longbridge/trade/FundPosition",
+    longbridge::trade::FundPosition,
     [
         symbol,
         current_net_asset_value,
@@ -758,8 +758,8 @@ pub(crate) struct StockPositionsResponse {
     channels: Vec<StockPositionChannel>,
 }
 
-impl From<longport::trade::StockPositionsResponse> for StockPositionsResponse {
-    fn from(value: longport::trade::StockPositionsResponse) -> Self {
+impl From<longbridge::trade::StockPositionsResponse> for StockPositionsResponse {
+    fn from(value: longbridge::trade::StockPositionsResponse) -> Self {
         Self {
             channels: value
                 .channels
@@ -771,7 +771,7 @@ impl From<longport::trade::StockPositionsResponse> for StockPositionsResponse {
 }
 
 impl_java_class!(
-    "com/longport/trade/StockPositionsResponse",
+    "com/longbridge/trade/StockPositionsResponse",
     StockPositionsResponse,
     [
         #[java(objarray)]
@@ -784,8 +784,8 @@ pub(crate) struct StockPositionChannel {
     positions: Vec<StockPosition>,
 }
 
-impl From<longport::trade::StockPositionChannel> for StockPositionChannel {
-    fn from(value: longport::trade::StockPositionChannel) -> Self {
+impl From<longbridge::trade::StockPositionChannel> for StockPositionChannel {
+    fn from(value: longbridge::trade::StockPositionChannel) -> Self {
         Self {
             account_channel: value.account_channel,
             positions: value
@@ -798,7 +798,7 @@ impl From<longport::trade::StockPositionChannel> for StockPositionChannel {
 }
 
 impl_java_class!(
-    "com/longport/trade/StockPositionChannel",
+    "com/longbridge/trade/StockPositionChannel",
     StockPositionChannel,
     [
         account_channel,
@@ -818,8 +818,8 @@ pub(crate) struct StockPosition {
     init_quantity: Decimal,
 }
 
-impl From<longport::trade::StockPosition> for StockPosition {
-    fn from(value: longport::trade::StockPosition) -> Self {
+impl From<longbridge::trade::StockPosition> for StockPosition {
+    fn from(value: longbridge::trade::StockPosition) -> Self {
         Self {
             symbol: value.symbol,
             symbol_name: value.symbol_name,
@@ -834,7 +834,7 @@ impl From<longport::trade::StockPosition> for StockPosition {
 }
 
 impl_java_class!(
-    "com/longport/trade/StockPosition",
+    "com/longbridge/trade/StockPosition",
     StockPosition,
     [
         symbol,
@@ -849,26 +849,26 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/MarginRatio",
-    longport::trade::MarginRatio,
+    "com/longbridge/trade/MarginRatio",
+    longbridge::trade::MarginRatio,
     [im_factor, mm_factor, fm_factor]
 );
 
 impl_java_class!(
-    "com/longport/trade/OrderHistoryDetail",
-    longport::trade::OrderHistoryDetail,
+    "com/longbridge/trade/OrderHistoryDetail",
+    longbridge::trade::OrderHistoryDetail,
     [price, quantity, status, msg, time]
 );
 
 impl_java_class!(
-    "com/longport/trade/OrderChargeFee",
-    longport::trade::OrderChargeFee,
+    "com/longbridge/trade/OrderChargeFee",
+    longbridge::trade::OrderChargeFee,
     [code, name, amount, currency]
 );
 
 impl_java_class!(
-    "com/longport/trade/OrderChargeItem",
-    longport::trade::OrderChargeItem,
+    "com/longbridge/trade/OrderChargeItem",
+    longbridge::trade::OrderChargeItem,
     [
         code,
         name,
@@ -878,8 +878,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/OrderChargeDetail",
-    longport::trade::OrderChargeDetail,
+    "com/longbridge/trade/OrderChargeDetail",
+    longbridge::trade::OrderChargeDetail,
     [
         total_amount,
         currency,
@@ -889,8 +889,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/OrderDetail",
-    longport::trade::OrderDetail,
+    "com/longbridge/trade/OrderDetail",
+    longbridge::trade::OrderDetail,
     [
         order_id,
         status,
@@ -939,26 +939,26 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/trade/EstimateMaxPurchaseQuantityResponse",
-    longport::trade::EstimateMaxPurchaseQuantityResponse,
+    "com/longbridge/trade/EstimateMaxPurchaseQuantityResponse",
+    longbridge::trade::EstimateMaxPurchaseQuantityResponse,
     [cash_max_qty, margin_max_qty]
 );
 
 impl_java_class!(
-    "com/longport/quote/QuotePackageDetail",
-    longport::quote::QuotePackageDetail,
+    "com/longbridge/quote/QuotePackageDetail",
+    longbridge::quote::QuotePackageDetail,
     [key, name, description, start_at, end_at]
 );
 
 impl_java_class!(
-    "com/longport/quote/MarketTemperature",
-    longport::quote::MarketTemperature,
+    "com/longbridge/quote/MarketTemperature",
+    longbridge::quote::MarketTemperature,
     [temperature, description, valuation, sentiment, timestamp]
 );
 
 impl_java_class!(
-    "com/longport/quote/HistoryMarketTemperatureResponse",
-    longport::quote::HistoryMarketTemperatureResponse,
+    "com/longbridge/quote/HistoryMarketTemperatureResponse",
+    longbridge::quote::HistoryMarketTemperatureResponse,
     [
         granularity,
         #[java(objarray)]

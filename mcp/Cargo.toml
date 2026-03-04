@@ -1,10 +1,10 @@
 [package]
-name = "longport-mcp"
+name = "longbridge-mcp"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
-longport.workspace = true
+longbridge.workspace = true
 
 poem-mcpserver = { workspace = true, features = ["streamable-http"] }
 poem = { workspace = true, features = ["sse"] }

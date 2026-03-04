@@ -10,7 +10,7 @@
 
 typedef struct lb_config_t lb_config_t;
 
-namespace longport {
+namespace longbridge {
 
 class Config
 {
@@ -30,10 +30,10 @@ public:
   /// Create a new `Config` for API Key authentication
   ///
   /// Optional environment variables are read automatically:
-  /// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
-  /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-  /// `LONGPORT_LOG_PATH`.  Use the chainable `set_*` methods to override any
+  /// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
+  /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
+  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+  /// `LONGBRIDGE_LOG_PATH`.  Use the chainable `set_*` methods to override any
   /// of these values.
   ///
   /// @param app_key       App key
@@ -45,20 +45,20 @@ public:
 
   /// Create a new `Config` from environment variables (API Key mode)
   ///
-  /// Variables: `LONGPORT_APP_KEY`, `LONGPORT_APP_SECRET`,
-  /// `LONGPORT_ACCESS_TOKEN`, `LONGPORT_HTTP_URL`, `LONGPORT_QUOTE_WS_URL`,
-  /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_ENABLE_OVERNIGHT`,
-  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-  /// `LONGPORT_LOG_PATH`
+  /// Variables: `LONGBRIDGE_APP_KEY`, `LONGBRIDGE_APP_SECRET`,
+  /// `LONGBRIDGE_ACCESS_TOKEN`, `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`,
+  /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
+  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+  /// `LONGBRIDGE_LOG_PATH`
   static Config from_apikey_env(Status& status);
 
   /// Create a new `Config` for OAuth 2.0 authentication
   ///
   /// Optional environment variables are read automatically:
-  /// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
-  /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-  /// `LONGPORT_LOG_PATH`.  Use the chainable `set_*` methods to override any
+  /// `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
+  /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
+  /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+  /// `LONGBRIDGE_LOG_PATH`.  Use the chainable `set_*` methods to override any
   /// of these values.
   ///
   /// @param oauth OAuth 2.0 client obtained from `OAuthBuilder::build`
@@ -91,4 +91,4 @@ public:
   Config& set_log_path(const std::string& path);
 };
 
-} // namespace longport
+} // namespace longbridge

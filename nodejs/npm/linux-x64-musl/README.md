@@ -1,3 +1,3 @@
-# `longport-linux-x64-musl`
+# `longbridge-linux-x64-musl`
 
-This is the **x86_64-unknown-linux-musl** binary for `longport`
+This is the **x86_64-unknown-linux-musl** binary for `longbridge`

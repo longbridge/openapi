@@ -10,9 +10,9 @@ set(SOURCES
     src/oauth.cpp
 )
 add_library(
-    longport_cpp SHARED
+    longbridge_cpp SHARED
     ${SOURCES}
 )
-target_link_libraries(longport_cpp longport_c)
+target_link_libraries(longbridge_cpp longbridge_c)
 
 add_subdirectory(test)

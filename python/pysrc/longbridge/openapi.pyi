@@ -1,0 +1,7337 @@
+from datetime import datetime, date, time
+from decimal import Decimal
+from typing import Any, Awaitable, Callable, List, Optional, Type
+
+
+class ErrorKind:
+    """
+    Error kind
+    """
+
+    class Http(ErrorKind):
+        """
+        HTTP error
+        """
+
+    class OpenApi(ErrorKind):
+        """
+        OpenApi error
+        """
+
+    class Other(ErrorKind):
+        """
+        Other error
+        """
+
+
+class OpenApiException(Exception):
+    """
+    OpenAPI exception
+    """
+
+    kind: ErrorKind
+    """
+    Error kind
+    """
+
+    code: int
+    """
+    Error code
+    """
+
+    message: str
+    """
+    Error message
+    """
+
+    def __init__(self, code: int, message: str) -> None:
+        ...
+
+
+class HttpClient:
+    """
+    A HTTP client for Longbridge OpenAPI.
+    """
+
+    @staticmethod
+    def from_apikey(
+        app_key: str,
+        app_secret: str,
+        access_token: str,
+        http_url: Optional[str] = None,
+    ) -> HttpClient:
+        """
+        Create a new ``HttpClient`` using API Key authentication.
+
+        ``LONGBRIDGE_HTTP_URL`` is read from the environment automatically.
+        Passing ``http_url`` overrides that value.
+
+        Args:
+            app_key: App Key
+            app_secret: App Secret
+            access_token: Access Token
+            http_url: HTTP API url override (reads ``LONGBRIDGE_HTTP_URL``
+                from env if omitted; falls back to
+                ``https://openapi.longbridge.com``)
+        """
+
+    @classmethod
+    def from_apikey_env(cls: Type[HttpClient]) -> HttpClient:
+        """
+        Create a new ``HttpClient`` from environment variables (API Key
+        authentication).
+
+        Variables:
+
+        - ``LONGBRIDGE_HTTP_URL`` - HTTP endpoint url
+        - ``LONGBRIDGE_APP_KEY`` - App key
+        - ``LONGBRIDGE_APP_SECRET`` - App secret
+        - ``LONGBRIDGE_ACCESS_TOKEN`` - Access token
+        """
+
+    @classmethod
+    def from_oauth(
+        cls: Type[HttpClient],
+        oauth: OAuth,
+        http_url: Optional[str] = None,
+    ) -> HttpClient:
+        """
+        Create a new ``HttpClient`` from an OAuth handle.
+
+        ``LONGBRIDGE_HTTP_URL`` is read from the environment automatically.
+        Passing ``http_url`` overrides that value.
+
+        Args:
+            oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
+                :meth:`OAuthBuilder.build_async`
+            http_url: HTTP API url override (reads ``LONGBRIDGE_HTTP_URL``
+                from env if omitted; falls back to
+                ``https://openapi.longbridge.com``)
+        """
+
+    def request(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Any:
+        """
+        Performs a HTTP reqest
+
+        Examples:
+            ::
+
+                from longbridge.openapi import HttpClient
+
+                client = HttpClient.from_apikey(app_key, app_secret, access_token)
+
+                # get
+                resp = client.request("get", "/foo/bar")
+                print(resp)
+
+                # post
+                client.request("post", "/foo/bar", body={ "foo": 1, "bar": 2 })
+        """
+        ...
+
+    def request_async(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Awaitable[Any]:
+        """
+        Performs an async HTTP request. Returns an awaitable; must be awaited inside asyncio.
+
+        Args:
+            method: HTTP method (e.g. "get", "post").
+            path: Request path (e.g. "/v1/trade/execution/today").
+            headers: Optional request headers.
+            body: Optional JSON-serializable request body.
+
+        Returns:
+            An awaitable that resolves to the response body (same as sync request).
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import HttpClient
+
+                async def main():
+                    http_cli = HttpClient.from_apikey_env()
+                    resp = await http_cli.request_async(
+                        "get",
+                        "/v1/trade/execution/today",
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+
+class PushCandlestickMode:
+    """
+    Push candlestick mode
+    """
+
+    class Realtime(PushCandlestickMode):
+        """
+        Real-time
+        """
+
+    class Confirmed(PushCandlestickMode):
+        """
+        Confirmed
+        """
+
+
+class OAuth:
+    """
+    OAuth 2.0 client handle for Longbridge OpenAPI.
+
+    Obtain an instance via :meth:`OAuthBuilder.build` (blocking) or
+    :meth:`AsyncOAuthBuilder.build` (async).  Pass it to
+    :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`.
+    """
+
+
+class OAuthBuilder:
+    """
+    Builder for the OAuth 2.0 authorization flow.
+
+    Args:
+        client_id: OAuth 2.0 client ID from the Longbridge developer portal
+        callback_port: TCP port for the local callback server (default 60355).
+            Must match one of the redirect URIs registered for the client.
+
+    Example (blocking)::
+
+        from longbridge.openapi import OAuthBuilder, Config
+
+        oauth = OAuthBuilder("your-client-id").build(
+            lambda url: print("Open:", url)
+        )
+        config = Config.from_oauth(oauth)
+
+    Example (async)::
+
+        import asyncio
+        from longbridge.openapi import OAuthBuilder, Config
+
+        async def main():
+            oauth = await OAuthBuilder("your-client-id").build_async(
+                lambda url: print("Open:", url)
+            )
+            config = Config.from_oauth(oauth)
+
+        asyncio.run(main())
+    """
+
+    def __init__(self, client_id: str, callback_port: Optional[int] = None) -> None: ...
+
+    def build(self, on_open_url: Callable[[str], None]) -> OAuth:
+        """
+        Build an OAuth 2.0 client (blocking).
+
+        If a valid token is already cached on disk
+        (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+        otherwise the browser authorization flow is started and
+        ``on_open_url`` is called with the authorization URL.
+
+        Args:
+            on_open_url: Callable that receives the authorization URL as a
+                string.
+
+        Returns:
+            :class:`OAuth` handle
+        """
+
+    async def build_async(self, on_open_url: Callable[[str], None]) -> OAuth:
+        """
+        Build an OAuth 2.0 client (async).
+
+        If a valid token is already cached on disk
+        (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+        otherwise the browser authorization flow is started and
+        ``on_open_url`` is called with the authorization URL.
+
+        Args:
+            on_open_url: Callable that receives the authorization URL as a
+                string.
+
+        Returns:
+            Awaitable resolving to an :class:`OAuth` handle
+        """
+
+
+class Config:
+    """
+    Configuration options for Longbridge SDK
+
+    Args:
+        app_key: App Key
+        app_secret: App Secret
+        access_token: Access Token
+        http_url: HTTP API url (default: ``https://openapi.longbridge.com``)
+        quote_ws_url: Websocket url for quote API
+        trade_ws_url: Websocket url for trade API
+        language: Language identifier (default: ``Language.EN``)
+        enable_overnight: Enable overnight quote (default: ``False``)
+        push_candlestick_mode: Push candlestick mode
+        enable_print_quote_packages: Print opened quote packages on connect
+            (default: ``True``)
+        log_path: Path for log files (default: no logs)
+    """
+
+    @staticmethod
+    def from_apikey(
+        app_key: str,
+        app_secret: str,
+        access_token: str,
+        http_url: Optional[str] = None,
+        quote_ws_url: Optional[str] = None,
+        trade_ws_url: Optional[str] = None,
+        language: Optional[Type[Language]] = None,
+        enable_overnight: bool = False,
+        push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime,
+        enable_print_quote_packages: bool = True,
+        log_path: Optional[str] = None,
+    ) -> Config:
+        """
+        Create a new ``Config`` using API Key authentication.
+
+        Optional environment variables are read automatically
+        (``LONGBRIDGE_HTTP_URL``, ``LONGBRIDGE_LANGUAGE``,
+        ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
+        ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
+        ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``).
+        Any explicit parameter overrides the corresponding env variable.
+
+        Args:
+            app_key: App Key
+            app_secret: App Secret
+            access_token: Access Token
+            http_url: HTTP API url override (reads ``LONGBRIDGE_HTTP_URL``
+                from env if omitted)
+            quote_ws_url: Quote WS url override (reads
+                ``LONGBRIDGE_QUOTE_WS_URL`` from env if omitted)
+            trade_ws_url: Trade WS url override (reads
+                ``LONGBRIDGE_TRADE_WS_URL`` from env if omitted)
+            language: Language identifier override (reads
+                ``LONGBRIDGE_LANGUAGE`` from env if omitted)
+            enable_overnight: Enable overnight quote (default: ``False``)
+            push_candlestick_mode: Push candlestick mode
+            enable_print_quote_packages: Print opened quote packages on
+                connect (default: ``True``)
+            log_path: Path for log files (default: no logs)
+        """
+
+    @classmethod
+    def from_apikey_env(cls: Type[Config]) -> Config:
+        """
+        Create a new ``Config`` from environment variables (API Key
+        authentication).
+
+        It first gets the environment variables from the ``.env`` file in the
+        current directory.
+
+        Variables:
+
+        - ``LONGBRIDGE_APP_KEY`` - App key
+        - ``LONGBRIDGE_APP_SECRET`` - App secret
+        - ``LONGBRIDGE_ACCESS_TOKEN`` - Access token
+        - ``LONGBRIDGE_LANGUAGE`` - ``zh-CN``, ``zh-HK`` or ``en``
+          (Default: ``en``)
+        - ``LONGBRIDGE_HTTP_URL`` - HTTP endpoint url
+        - ``LONGBRIDGE_QUOTE_WS_URL`` - Quote websocket endpoint url
+        - ``LONGBRIDGE_TRADE_WS_URL`` - Trade websocket endpoint url
+        - ``LONGBRIDGE_ENABLE_OVERNIGHT`` - ``true`` or ``false``
+          (Default: ``false``)
+        - ``LONGBRIDGE_PUSH_CANDLESTICK_MODE`` - ``realtime`` or ``confirmed``
+          (Default: ``realtime``)
+        - ``LONGBRIDGE_PRINT_QUOTE_PACKAGES`` - ``true`` or ``false``
+          (Default: ``true``)
+        - ``LONGBRIDGE_LOG_PATH`` - Log file directory (Default: no logs)
+        """
+
+    @classmethod
+    def from_oauth(
+        cls: Type[Config],
+        oauth: OAuth,
+        http_url: Optional[str] = None,
+        quote_ws_url: Optional[str] = None,
+        trade_ws_url: Optional[str] = None,
+        language: Optional[Type[Language]] = None,
+        enable_overnight: Optional[bool] = None,
+        push_candlestick_mode: Optional[Type[PushCandlestickMode]] = None,
+        enable_print_quote_packages: Optional[bool] = None,
+        log_path: Optional[str] = None,
+    ) -> Config:
+        """
+        Create a new ``Config`` for OAuth 2.0 authentication.
+
+        OAuth 2.0 is the recommended authentication method — no app_secret or
+        HMAC signatures required.
+
+        Optional environment variables are read automatically
+        (``LONGBRIDGE_HTTP_URL``, ``LONGBRIDGE_LANGUAGE``,
+        ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
+        ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
+        ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``).
+        Any explicit parameter overrides the corresponding env variable.
+
+        Args:
+            oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
+                :meth:`AsyncOAuthBuilder.build`
+            http_url: HTTP API url override (reads ``LONGBRIDGE_HTTP_URL``
+                from env if omitted)
+            quote_ws_url: Quote WS url override (reads
+                ``LONGBRIDGE_QUOTE_WS_URL`` from env if omitted)
+            trade_ws_url: Trade WS url override (reads
+                ``LONGBRIDGE_TRADE_WS_URL`` from env if omitted)
+            language: Language identifier override (reads
+                ``LONGBRIDGE_LANGUAGE`` from env if omitted)
+            enable_overnight: Enable overnight quote (optional)
+            push_candlestick_mode: Push candlestick mode (optional)
+            enable_print_quote_packages: Print opened quote packages on
+                connect (optional)
+            log_path: Path for log files (optional)
+
+        Returns:
+            Config object
+        """
+
+
+class Language:
+    """
+    Language identifier
+    """
+
+    class ZH_CN(Language):
+        """
+        zh-CN
+        """
+
+    class ZH_HK(Language):
+        """
+        zh-HK
+        """
+
+    class EN(Language):
+        """
+        en
+        """
+
+
+class Market:
+    """
+    Market
+    """
+
+    class Unknown(Market):
+        """
+        Unknown
+        """
+
+    class US(Market):
+        """
+        US market
+        """
+
+    class HK(Market):
+        """
+        HK market
+        """
+
+    class CN(Market):
+        """
+        CN market
+        """
+
+    class SG(Market):
+        """
+        SG market
+        """
+
+    class Crypto(Market):
+        """
+        Crypto market
+        """
+
+
+class PushQuote:
+    """
+    Quote message
+    """
+
+    last_done: Decimal
+    """
+    Latest price
+    """
+
+    open: Decimal
+    """
+    Open
+    """
+
+    high: Decimal
+    """
+    High
+    """
+
+    low: Decimal
+    """
+    Low
+    """
+
+    timestamp: datetime
+    """
+    Time of latest price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    trade_status: Type[TradeStatus]
+    """
+    Security trading status
+    """
+
+    trade_session: Type[TradeSession]
+    """
+    Trade session
+    """
+
+    current_volume: int
+    """
+    Increase volume between pushes
+    """
+
+    current_turnover: Decimal
+    """
+    Increase turnover between pushes
+    """
+
+
+class PushDepth:
+    """
+    Depth message
+    """
+
+    asks: List[Depth]
+    """
+    Ask depth
+    """
+
+    bids: List[Depth]
+    """
+    Bid depth
+    """
+
+
+class PushBrokers:
+    """
+    Brokers message
+    """
+
+    ask_brokers: List[Brokers]
+    """
+    Ask brokers
+    """
+
+    bid_brokers: List[Brokers]
+    """
+    Bid brokers
+    """
+
+
+class PushTrades:
+    """
+    Trades message
+    """
+
+    trades: List[Trade]
+    """
+    Trades data
+    """
+
+
+class PushCandlestick:
+    """
+    Candlestick updated event
+    """
+
+    period: Period
+    """
+    Period type
+    """
+
+    candlestick: Candlestick
+    """
+    Candlestick
+    """
+
+    is_confirmed: bool
+    """
+    Is confirmed
+    """
+
+
+class SubType:
+    """
+    Subscription flags
+    """
+
+    class Quote(SubType):
+        """
+        Quote
+        """
+
+    class Depth(SubType):
+        """
+        Depth
+        """
+
+    class Brokers(SubType):
+        """
+        Broker
+        """
+
+    class Trade(SubType):
+        """
+        Trade
+        """
+
+
+class DerivativeType:
+    """
+    Derivative type
+    """
+
+    class Option(DerivativeType):
+        """
+        US stock options
+        """
+
+    class Warrant(DerivativeType):
+        """
+        HK warrants
+        """
+
+
+class SecurityBoard:
+    """
+    Security board
+    """
+
+    class Unknown(SecurityBoard):
+        """
+        Unknown
+        """
+
+    class USMain(SecurityBoard):
+        """
+        US Pink Board
+        """
+
+    class USPink(SecurityBoard):
+        """
+        US Pink Board
+        """
+
+    class USDJI(SecurityBoard):
+        """
+        Dow Jones Industrial Average
+        """
+
+    class USNSDQ(SecurityBoard):
+        """
+        Nasdsaq Index
+        """
+
+    class USSector(SecurityBoard):
+        """
+        US Industry Board
+        """
+
+    class USOption(SecurityBoard):
+        """
+        US Option
+        """
+
+    class USOptionS(SecurityBoard):
+        """
+        US Sepecial Option
+        """
+
+    class HKEquity(SecurityBoard):
+        """
+        Hong Kong Equity Securities
+        """
+
+    class HKPreIPO(SecurityBoard):
+        """
+        HK PreIPO Security
+        """
+
+    class HKWarrant(SecurityBoard):
+        """
+        HK Warrant
+        """
+
+    class HKHS(SecurityBoard):
+        """
+        Hang Seng Index
+        """
+
+    class HKSector(SecurityBoard):
+        """
+        HK Industry Board
+        """
+
+    class SHMainConnect(SecurityBoard):
+        """
+        SH Main Board(Connect)
+        """
+
+    class SHMainNonConnect(SecurityBoard):
+        """
+        SH Main Board(Non Connect)
+        """
+
+    class SHSTAR(SecurityBoard):
+        """
+        SH Science and Technology Innovation Board
+        """
+
+    class CNIX(SecurityBoard):
+        """
+        CN Index
+        """
+
+    class CNSector(SecurityBoard):
+        """
+        CN Industry Board
+        """
+
+    class SZMainConnect(SecurityBoard):
+        """
+        SZ Main Board(Connect)
+        """
+
+    class SZMainNonConnect(SecurityBoard):
+        """
+        SZ Main Board(Non Connect)
+        """
+
+    class SZGEMConnect(SecurityBoard):
+        """
+        SZ Gem Board(Connect)
+        """
+
+    class SZGEMNonConnect(SecurityBoard):
+        """
+        SZ Gem Board(Non Connect)
+        """
+
+    class SGMain(SecurityBoard):
+        """
+        SG Main Board
+        """
+
+    class STI(SecurityBoard):
+        """
+        Singapore Straits Index
+        """
+
+    class SGSector(SecurityBoard):
+        """
+        SG Industry Board
+        """
+
+
+class Security:
+    """
+    Security
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    name_cn: str
+    """
+    Security name (zh-CN)
+    """
+
+    name_en: str
+    """
+    Security name (en)
+    """
+
+    name_hk: str
+    """
+    Security name (zh-HK)
+    """
+
+
+class SecurityListCategory:
+    """
+    Security list category
+    """
+
+    class Overnight(SecurityListCategory):
+        """
+        Overnight
+        """
+
+
+class SecurityStaticInfo:
+    """
+    The basic information of securities
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    name_cn: str
+    """
+    Security name (zh-CN)
+    """
+
+    name_en: str
+    """
+    Security name (en)
+    """
+
+    name_hk: str
+    """
+    Security name (zh-HK)
+    """
+
+    exchange: str
+    """
+    Exchange which the security belongs to
+    """
+
+    currency: str
+    """
+    Trading currency
+    """
+
+    lot_size: int
+    """
+    Lot size
+    """
+
+    total_shares: int
+    """
+    Total shares
+    """
+
+    circulating_shares: int
+    """
+    Circulating shares
+    """
+
+    hk_shares: int
+    """
+    HK shares (only HK stocks)
+    """
+
+    eps: Decimal
+    """
+    Earnings per share
+    """
+
+    eps_ttm: Decimal
+    """
+    Earnings per share (TTM)
+    """
+
+    bps: Decimal
+    """
+    Net assets per share
+    """
+
+    dividend_yield: Decimal
+    """
+    Dividend yield
+    """
+
+    stock_derivatives: List[Type[DerivativeType]]
+    """
+    Types of supported derivatives
+    """
+
+    board: Type[SecurityBoard]
+    """
+    Board
+    """
+
+
+class TradeStatus:
+    """
+    Security Status
+    """
+
+    class Normal(TradeStatus):
+        """
+        Normal
+        """
+
+    class Halted(TradeStatus):
+        """
+        Suspension
+        """
+
+    class Delisted(TradeStatus):
+        """
+        Delisted
+        """
+
+    class Fuse(TradeStatus):
+        """
+        Fuse
+        """
+
+    class PrepareList(TradeStatus):
+        """
+        Prepare List
+        """
+
+    class CodeMoved(TradeStatus):
+        """
+        Code Moved
+        """
+
+    class ToBeOpened(TradeStatus):
+        """
+        To Be Opened
+        """
+
+    class SplitStockHalts(TradeStatus):
+        """
+        Split Stock Halts
+        """
+
+    class Expired(TradeStatus):
+        """
+        Expired
+        """
+
+    class WarrantPrepareList(TradeStatus):
+        """
+        Warrant To BeListed
+        """
+
+    class Suspend(TradeStatus):
+        """
+        Suspend
+        """
+
+
+class PrePostQuote:
+    """
+    Quote of US pre/post market
+    """
+
+    last_done: Decimal
+    """
+    Latest price
+    """
+
+    timestamp: datetime
+    """
+    Time of latest price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    high: Decimal
+    """
+    High
+    """
+
+    low: Decimal
+    """
+    Low
+    """
+
+    prev_close: Decimal
+    """
+    Close of the last trade session
+    """
+
+
+class SecurityQuote:
+    """
+    Quote of securitity
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    last_done: Decimal
+    """
+    Latest price
+    """
+
+    prev_close: Decimal
+    """
+    Yesterday's close
+    """
+
+    open: Decimal
+    """
+    Open
+    """
+
+    high: Decimal
+    """
+    High
+    """
+
+    low: Decimal
+    """
+    Low
+    """
+
+    timestamp: datetime
+    """
+    Time of latest price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    trade_status: Type[TradeStatus]
+    """
+    Security trading status
+    """
+
+    pre_market_quote: Optional[PrePostQuote]
+    """
+    Quote of US pre market
+    """
+
+    post_market_quote: Optional[PrePostQuote]
+    """
+    Quote of US post market
+    """
+
+    overnight_quote: Optional[PrePostQuote]
+    """
+    Quote of US overnight market
+    """
+
+
+class OptionType:
+    """
+    Option type
+    """
+
+    class Unknown(OptionType):
+        """
+        Unknown
+        """
+
+    class American(OptionType):
+        """
+        American
+        """
+
+    class Europe(OptionType):
+        """
+        Europe
+        """
+
+
+class OptionDirection:
+    """
+    Option direction
+    """
+
+    class Unknown(OptionDirection):
+        """
+        Unknown
+        """
+
+    class Put(OptionDirection):
+        """
+        Put
+        """
+
+    class Call(OptionDirection):
+        """
+        Call
+        """
+
+
+class OptionQuote:
+    """
+    Quote of option
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    last_done: Decimal
+    """
+    Latest price
+    """
+
+    prev_close: Decimal
+    """
+    Yesterday's close
+    """
+
+    open: Decimal
+    """
+    Open
+    """
+
+    high: Decimal
+    """
+    High
+    """
+
+    low: Decimal
+    """
+    Low
+    """
+
+    timestamp: datetime
+    """
+    Time of latest price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    trade_status: Type[TradeStatus]
+    """
+    Security trading status
+    """
+
+    implied_volatility: Decimal
+    """
+    Implied volatility
+    """
+
+    open_interest: int
+    """
+    Number of open positions
+    """
+
+    expiry_date: date
+    """
+    Exprity date
+    """
+
+    strike_price: Decimal
+    """
+    Strike price
+    """
+
+    contract_multiplier: Decimal
+    """
+    Contract multiplier
+    """
+
+    contract_type: Type[OptionType]
+    """
+    Option type
+    """
+
+    contract_size: Decimal
+    """
+    Contract size
+    """
+
+    direction: Type[OptionDirection]
+    """
+    Option direction
+    """
+
+    historical_volatility: Decimal
+    """
+    Underlying security historical volatility of the option
+    """
+
+    underlying_symbol: str
+    """
+    Underlying security symbol of the option
+    """
+
+
+class WarrantType:
+    """
+    Warrant type
+    """
+
+    class Unknown(WarrantType):
+        """
+        Unknown
+        """
+
+    class Call(WarrantType):
+        """
+        Call
+        """
+
+    class Put(WarrantType):
+        """
+        Put
+        """
+
+    class Bull(WarrantType):
+        """
+        Bull
+        """
+
+    class Bear(WarrantType):
+        """
+        Bear
+        """
+
+    class Inline(WarrantType):
+        """
+        Inline
+        """
+
+
+class WarrantQuote:
+    """
+    Quote of warrant
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    last_done: Decimal
+    """
+    Latest price
+    """
+
+    prev_close: Decimal
+    """
+    Yesterday's close
+    """
+
+    open: Decimal
+    """
+    Open
+    """
+
+    high: Decimal
+    """
+    High
+    """
+
+    low: Decimal
+    """
+    Low
+    """
+
+    timestamp: datetime
+    """
+    Time of latest price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    trade_status: Type[TradeStatus]
+    """
+    Security trading status
+    """
+
+    implied_volatility: Decimal
+    """
+    Implied volatility
+    """
+
+    expiry_date: date
+    """
+    Exprity date
+    """
+
+    last_trade_date: date
+    """
+    Last tradalbe date
+    """
+
+    outstanding_ratio: Decimal
+    """
+    Outstanding ratio
+    """
+
+    outstanding_quantity: int
+    """
+    Outstanding quantity
+    """
+
+    conversion_ratio: Decimal
+    """
+    Conversion ratio
+    """
+
+    category: Type[WarrantType]
+    """
+    Warrant type
+    """
+
+    strike_price: Decimal
+    """
+    Strike price
+    """
+
+    upper_strike_price: Decimal
+    """
+    Upper bound price
+    """
+
+    lower_strike_price: Decimal
+    """
+    Lower bound price
+    """
+
+    call_price: Decimal
+    """
+    Call price
+    """
+
+    underlying_symbol: str
+    """
+    Underlying security symbol of the warrant
+    """
+
+
+class Depth:
+    """
+    Depth
+    """
+
+    position: int
+    """
+    Position
+    """
+
+    price: Optional[Decimal]
+    """
+    Price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    order_num: int
+    """
+    Number of orders
+    """
+
+
+class SecurityDepth:
+    """
+    Security depth
+    """
+
+    asks: List[Depth]
+    """
+    Ask depth
+    """
+
+    bids: List[Depth]
+    """
+    Bid depth
+    """
+
+
+class Brokers:
+    """
+    Brokers
+    """
+
+    position: int
+    """
+    Position
+    """
+
+    broker_ids: List[int]
+    """
+    Broker IDs
+    """
+
+
+class SecurityBrokers:
+    """
+    Security brokers
+    """
+
+    ask_brokers: List[Brokers]
+    """
+    Ask brokers
+    """
+
+    bid_brokers: List[Brokers]
+    """
+    Bid brokers
+    """
+
+
+class ParticipantInfo:
+    """
+    Participant info
+    """
+
+    broker_ids: List[int]
+    """
+    Broker IDs
+    """
+
+    name_cn: str
+    """
+    Participant name (zh-CN)
+    """
+
+    name_en: str
+    """
+    Participant name (en)
+    """
+
+    name_hk: str
+    """
+    Participant name (zh-HK)
+    """
+
+
+class TradeDirection:
+    """
+    Trade direction
+    """
+
+    class Neutral(TradeDirection):
+        """
+        Neutral
+        """
+
+    class Down(TradeDirection):
+        """
+        Down
+        """
+
+    class Up(TradeDirection):
+        """
+        Up
+        """
+
+
+class TradeSession:
+    """
+    Trade session
+    """
+
+    class Intraday(TradeSession):
+        """
+        Intraday
+        """
+
+    class Pre(TradeSession):
+        """
+        Pre-Market
+        """
+
+    class Post(TradeSession):
+        """
+        Post-Market
+        """
+
+    class Overnight(TradeSession):
+        """
+        Overnight
+        """
+
+
+class Trade:
+    """
+    Trade
+    """
+
+    price: Decimal
+    """
+    Price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    timestamp: datetime
+    """
+    Time of trading
+    """
+
+    trade_type: str
+    """
+    Trade type
+
+    HK
+
+    - `*` - Overseas trade
+    - `D` - Odd-lot trade
+    - `M` - Non-direct off-exchange trade
+    - `P` - Late trade (Off-exchange previous day)
+    - `U` - Auction trade
+    - `X` - Direct off-exchange trade
+    - `Y` - Automatch internalized
+    - `<empty string>` - Automatch normal
+
+    US
+
+    - `<empty string>` - Regular sale
+    - `A` - Acquisition
+    - `B` - Bunched trade
+    - `D` - Distribution
+    - `F` - Intermarket sweep
+    - `G` - Bunched sold trades
+    - `H` - Price variation trade
+    - `I` - Odd lot trade
+    - `K` - Rule 155 trde(NYSE MKT)
+    - `M` - Market center close price
+    - `P` - Prior reference price
+    - `Q` - Market center open price
+    - `S` - Split trade
+    - `V` - Contingent trade
+    - `W` - Average price trade
+    - `X` - Cross trade
+    - `1` - Stopped stock(Regular trade)
+    """
+
+    direction: Type[TradeDirection]
+    """
+    Trade direction
+    """
+
+    trade_session: Type[TradeSession]
+    """
+    Trade session
+    """
+
+
+class IntradayLine:
+    """
+    Intraday line
+    """
+
+    price: Decimal
+    """
+    Close price of the minute
+    """
+
+    timestamp: datetime
+    """
+    Start time of the minute
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    avg_price: Decimal
+    """
+    Average price
+    """
+
+
+class Candlestick:
+    """
+    Candlestick
+    """
+
+    close: Decimal
+    """
+    Close price
+    """
+
+    open: Decimal
+    """
+    Open price
+    """
+
+    low: Decimal
+    """
+    Low price
+    """
+
+    high: Decimal
+    """
+    High price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    timestamp: datetime
+    """
+    Timestamp
+    """
+
+    trade_session: TradeSession
+    """
+    Trade session
+    """
+
+
+class AdjustType:
+    """
+    Candlestick adjustment type
+    """
+
+    class NoAdjust(AdjustType):
+        """
+        Actual
+        """
+
+    class ForwardAdjust(AdjustType):
+        """
+        Adjust forward
+        """
+
+
+class Period:
+    """
+    Candlestick period
+    """
+
+    class Unknown(Period):
+        """
+        Unknown
+        """
+
+    class Min_1(Period):
+        """
+        One Minute
+        """
+
+    class Min_2(Period):
+        """
+        Two Minutes
+        """
+
+    class Min_3(Period):
+        """
+        Three Minutes
+        """
+
+    class Min_5(Period):
+        """
+        Five Minutes
+        """
+
+    class Min_10(Period):
+        """
+        Ten Minutes
+        """
+
+    class Min_15(Period):
+        """
+        Fifteen Minutes
+        """
+
+    class Min_20(Period):
+        """
+        Twenty Minutes
+        """
+
+    class Min_30(Period):
+        """
+        Thirty Minutes
+        """
+
+    class Min_45(Period):
+        """
+        Forty-Five Minutes
+        """
+
+    class Min_60(Period):
+        """
+        Sixty Minutes
+        """
+
+    class Min_120(Period):
+        """
+        Two Hours
+        """
+
+    class Min_180(Period):
+        """
+        Three Hours
+        """
+
+    class Min_240(Period):
+        """
+        Four Hours
+        """
+
+    class Day(Period):
+        """
+        Daily
+        """
+
+    class Week(Period):
+        """
+        Weekly
+        """
+
+    class Month(Period):
+        """
+        Monthly
+        """
+
+    class Quarter(Period):
+        """
+        Quarterly
+        """
+
+    class Year(Period):
+        """
+        Yearly
+        """
+
+
+class StrikePriceInfo:
+    """
+    Strike price info
+    """
+
+    price: Decimal
+    """
+    Strike price
+    """
+
+    call_symbol: str
+    """
+    Security code of call option
+    """
+
+    put_symbol: str
+    """
+    Security code of put option
+    """
+
+    standard: bool
+    """
+    Is standard
+    """
+
+
+class IssuerInfo:
+    """
+    Issuer info
+    """
+
+    issuer_id: int
+    """
+    Issuer ID
+    """
+
+    name_cn: str
+    """
+    Issuer name (zh-CN)
+    """
+
+    name_en: str
+    """
+    Issuer name (en)
+    """
+
+    name_hk: str
+    """
+    Issuer name (zh-HK)
+    """
+
+
+class WarrantStatus:
+    """
+    Warrant status
+    """
+
+    class Suspend(WarrantStatus):
+        """
+        Suspend
+        """
+
+    class PrepareList(WarrantStatus):
+        """
+        Prepare List
+        """
+
+    class Normal(WarrantStatus):
+        """
+        Normal
+        """
+
+
+class SortOrderType:
+    """
+    Sort order type
+    """
+
+    class Ascending(SortOrderType):
+        """
+        Ascending
+        """
+
+    class Descending(SortOrderType):
+        """
+        Descending
+        """
+
+
+class WarrantSortBy:
+    """
+    Warrant sort by
+    """
+
+    class LastDone(WarrantSortBy):
+        """
+        LastDone
+        """
+
+    class ChangeRate(WarrantSortBy):
+        """
+        Change rate
+        """
+
+    class ChangeValue(WarrantSortBy):
+        """
+        Change value
+        """
+
+    class Volume(WarrantSortBy):
+        """
+        Volume
+        """
+
+    class Turnover(WarrantSortBy):
+        """
+        Turnover
+        """
+
+    class ExpiryDate(WarrantSortBy):
+        """
+        Expiry date
+        """
+
+    class StrikePrice(WarrantSortBy):
+        """
+        Strike price
+        """
+
+    class UpperStrikePrice(WarrantSortBy):
+        """
+        Upper strike price
+        """
+
+    class LowerStrikePrice(WarrantSortBy):
+        """
+        Lower strike price
+        """
+
+    class OutstandingQuantity(WarrantSortBy):
+        """
+        Outstanding quantity
+        """
+
+    class OutstandingRatio(WarrantSortBy):
+        """
+        Outstanding ratio
+        """
+
+    class Premium(WarrantSortBy):
+        """
+        Premium
+        """
+
+    class ItmOtm(WarrantSortBy):
+        """
+        In/out of the bound
+        """
+
+    class ImpliedVolatility(WarrantSortBy):
+        """
+        Implied volatility
+        """
+
+    class Delta(WarrantSortBy):
+        """
+        Greek value delta
+        """
+
+    class CallPrice(WarrantSortBy):
+        """
+        Call price
+        """
+
+    class ToCallPrice(WarrantSortBy):
+        """
+        Price interval from the call price
+        """
+
+    class EffectiveLeverage(WarrantSortBy):
+        """
+        Effective leverage
+        """
+
+    class LeverageRatio(WarrantSortBy):
+        """
+        Leverage ratio
+        """
+
+    class ConversionRatio(WarrantSortBy):
+        """
+        Conversion ratio
+        """
+
+    class BalancePoint(WarrantSortBy):
+        """
+        Breakeven point
+        """
+
+    class Status(WarrantSortBy):
+        """
+        Status
+        """
+
+
+class FilterWarrantExpiryDate:
+    """
+    Filter warrant expiry date type
+    """
+
+    class LT_3(FilterWarrantExpiryDate):
+        """
+        Less than 3 months
+        """
+
+    class Between_3_6(FilterWarrantExpiryDate):
+        """
+        3 - 6 months
+        """
+
+    class Between_6_12(FilterWarrantExpiryDate):
+        """
+        6 - 12 months
+        """
+
+    class GT_12(FilterWarrantExpiryDate):
+        """
+        Greater than 12 months
+        """
+
+
+class FilterWarrantInOutBoundsType:
+    """
+    Filter warrant in/out of the bounds type
+    """
+
+    class In(FilterWarrantInOutBoundsType):
+        """
+        In bounds
+        """
+
+    class Out(FilterWarrantInOutBoundsType):
+        """
+        Out bounds
+        """
+
+
+class WarrantInfo:
+    """
+    Warrant info
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    warrant_type: Type[WarrantType]
+    """
+    Warrant type
+    """
+
+    name: str
+    """
+    Security name
+    """
+
+    last_done: Decimal
+    """
+    Latest price
+    """
+
+    change_rate: Decimal
+    """
+    Quote change rate
+    """
+
+    change_value: Decimal
+    """
+    Quote change
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    expiry_date: date
+    """
+    Expiry date
+    """
+
+    strike_price: Optional[Decimal]
+    """
+    Strike price
+    """
+
+    upper_strike_price: Optional[Decimal]
+    """
+    Upper strike price
+    """
+
+    lower_strike_price: Optional[Decimal]
+    """
+    Lower strike price
+    """
+
+    outstanding_qty: int
+    """
+    Outstanding quantity
+    """
+
+    outstanding_ratio: Decimal
+    """
+    Outstanding ratio
+    """
+
+    premium: Decimal
+    """
+    Premium
+    """
+
+    itm_otm: Optional[Decimal]
+    """
+    In/out of the bound
+    """
+
+    implied_volatility: Optional[Decimal]
+    """
+    Implied volatility
+    """
+
+    delta: Optional[Decimal]
+    """
+    Greek value delta
+    """
+
+    call_price: Optional[Decimal]
+    """
+    Call price
+    """
+
+    to_call_price: Optional[Decimal]
+    """
+    Price interval from the call price
+    """
+
+    effective_leverage: Optional[Decimal]
+    """
+    Effective leverage
+    """
+
+    leverage_ratio: Decimal
+    """
+    Leverage ratio
+    """
+
+    conversion_ratio: Optional[Decimal]
+    """
+    Conversion ratio
+    """
+
+    balance_point: Optional[Decimal]
+    """
+    Breakeven point
+    """
+
+    status: Type[WarrantStatus]
+    """
+    Status
+    """
+
+
+class TradingSessionInfo:
+    """
+    The information of trading session
+    """
+
+    begin_time: time
+    """
+    Being trading time
+    """
+
+    end_time: time
+    """
+    End trading time
+    """
+
+    trade_session: Type[TradeSession]
+    """
+    Trading sessions
+    """
+
+
+class MarketTradingSession:
+    """
+    Market trading session
+    """
+
+    market: Type[Market]
+    """
+    Market
+    """
+
+    trade_sessions: List[TradingSessionInfo]
+    """
+    Trading session
+    """
+
+
+class MarketTradingDays:
+    trading_days: List[date]
+    half_trading_days: List[date]
+
+
+class CapitalFlowLine:
+    """
+    Capital flow line
+    """
+
+    inflow: Decimal
+    """
+    Inflow capital data
+    """
+
+    timestamp: datetime
+    """
+    Time
+    """
+
+
+class CapitalDistribution:
+    """
+    Capital distribution
+    """
+
+    large: Decimal
+    """
+    Large order
+    """
+
+    medium: Decimal
+    """
+    Medium order
+    """
+
+    small: Decimal
+    """
+    Small order
+    """
+
+
+class CapitalDistributionResponse:
+    """
+    Capital distribution response
+    """
+
+    timestamp: datetime
+    """
+    Time
+    """
+
+    capital_in: CapitalDistribution
+    """
+    Inflow capital data
+    """
+
+    capital_out: CapitalDistribution
+    """
+    Outflow capital data
+    """
+
+
+class WatchlistSecurity:
+    """
+    Watchlist security
+    """
+
+    symbol: str
+    """
+    Security symbol
+    """
+
+    market: Market
+    """
+    Market
+    """
+
+    name: str
+    """
+    Security name
+    """
+
+    watched_price: Optional[Decimal]
+    """
+    Watched price
+    """
+
+    watched_at: datetime
+    """
+    Watched time
+    """
+
+
+class WatchlistGroup:
+    id: int
+    """
+    Group id
+    """
+
+    name: str
+    """
+    Group name
+    """
+
+    securities: List[WatchlistSecurity]
+    """
+    Securities
+    """
+
+
+class SecuritiesUpdateMode:
+    """
+    Securities update mode
+    """
+
+    class Add(SecuritiesUpdateMode):
+        """
+        Add securities
+        """
+
+    class Remove(SecuritiesUpdateMode):
+        """
+        Remove securities
+        """
+
+    class Replace(SecuritiesUpdateMode):
+        """
+        Replace securities
+        """
+
+
+class RealtimeQuote:
+    """
+    Real-time quote
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    last_done: Decimal
+    """
+    Latest price
+    """
+
+    open: Decimal
+    """
+    Open
+    """
+
+    high: Decimal
+    """
+    High
+    """
+
+    low: Decimal
+    """
+    Low
+    """
+
+    timestamp: datetime
+    """
+    Time of latest price
+    """
+
+    volume: int
+    """
+    Volume
+    """
+
+    turnover: Decimal
+    """
+    Turnover
+    """
+
+    trade_status: Type[TradeStatus]
+    """
+    Security trading status
+    """
+
+
+class Subscription:
+    """
+    Subscription
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    sub_types: List[Type[SubType]]
+    """
+    Subscription types
+    """
+
+    candlesticks: List[Type[Period]]
+    """
+    Candlesticks
+    """
+
+
+class CalcIndex:
+    """
+    Calc index
+    """
+
+    class LastDone(CalcIndex):
+        """
+        Latest price
+        """
+
+    class ChangeValue(CalcIndex):
+        """
+        Change value
+        """
+
+    class ChangeRate(CalcIndex):
+        """
+        Change rate
+        """
+
+    class Volume(CalcIndex):
+        """
+        Volume
+        """
+
+    class Turnover(CalcIndex):
+        """
+        Turnover
+        """
+
+    class YtdChangeRate(CalcIndex):
+        """
+        Year-to-date change ratio
+        """
+
+    class TurnoverRate(CalcIndex):
+        """
+        Turnover rate
+        """
+
+    class TotalMarketValue(CalcIndex):
+        """
+        Total market value
+        """
+
+    class CapitalFlow(CalcIndex):
+        """
+        Capital flow
+        """
+
+    class Amplitude(CalcIndex):
+        """
+        Amplitude
+        """
+
+    class VolumeRatio(CalcIndex):
+        """
+        Volume ratio
+        """
+
+    class PeTtmRatio(CalcIndex):
+        """
+        PE (TTM)
+        """
+
+    class PbRatio(CalcIndex):
+        """
+        PB
+        """
+
+    class DividendRatioTtm(CalcIndex):
+        """
+        Dividend ratio (TTM)
+        """
+
+    class FiveDayChangeRate(CalcIndex):
+        """
+        Five days change ratio
+        """
+
+    class TenDayChangeRate(CalcIndex):
+        """
+        Ten days change ratio
+        """
+
+    class HalfYearChangeRate(CalcIndex):
+        """
+        Half year change ratio
+        """
+
+    class FiveMinutesChangeRate(CalcIndex):
+        """
+        Five minutes change ratio
+        """
+
+    class ExpiryDate(CalcIndex):
+        """
+        Expiry date
+        """
+
+    class StrikePrice(CalcIndex):
+        """
+        Strike price
+        """
+
+    class UpperStrikePrice(CalcIndex):
+        """
+        Upper bound price
+        """
+
+    class LowerStrikePrice(CalcIndex):
+        """
+        Lower bound price
+        """
+
+    class OutstandingQty(CalcIndex):
+        """
+        Outstanding quantity
+        """
+
+    class OutstandingRatio(CalcIndex):
+        """
+        Outstanding ratio
+        """
+
+    class Premium(CalcIndex):
+        """
+        Premium
+        """
+
+    class ItmOtm(CalcIndex):
+        """
+        In/out of the bound
+        """
+
+    class ImpliedVolatility(CalcIndex):
+        """
+        Implied volatility
+        """
+
+    class WarrantDelta(CalcIndex):
+        """
+        Warrant delta
+        """
+
+    class CallPrice(CalcIndex):
+        """
+        Call price
+        """
+
+    class ToCallPrice(CalcIndex):
+        """
+        Price interval from the call price
+        """
+
+    class EffectiveLeverage(CalcIndex):
+        """
+        Effective leverage
+        """
+
+    class LeverageRatio(CalcIndex):
+        """
+        Leverage ratio
+        """
+
+    class ConversionRatio(CalcIndex):
+        """
+        Conversion ratio
+        """
+
+    class BalancePoint(CalcIndex):
+        """
+        Breakeven point
+        """
+
+    class OpenInterest(CalcIndex):
+        """
+        Open interest
+        """
+
+    class Delta(CalcIndex):
+        """
+        Delta
+        """
+
+    class Gamma(CalcIndex):
+        """
+        Gamma
+        """
+
+    class Theta(CalcIndex):
+        """
+        Theta
+        """
+
+    class Vega(CalcIndex):
+        """
+        Vega
+        """
+
+    class Rho(CalcIndex):
+        """
+        Rho
+        """
+
+
+class SecurityCalcIndex:
+    """
+    Security calc index response
+    """
+
+    symbol: str
+    """
+    Security symbol
+    """
+
+    last_done: Optional[Decimal]
+    """
+    Latest price
+    """
+
+    change_value: Optional[Decimal]
+    """
+    Change value
+    """
+
+    change_rate: Optional[Decimal]
+    """
+    Change ratio
+    """
+
+    volume: Optional[int]
+    """
+    Volume
+    """
+
+    turnover: Optional[Decimal]
+    """
+    Turnover
+    """
+
+    ytd_change_rate: Optional[Decimal]
+    """
+    Year-to-date change ratio
+    """
+
+    turnover_rate: Optional[Decimal]
+    """
+    turnover_rate
+    """
+
+    total_market_value: Optional[Decimal]
+    """
+    Total market value
+    """
+
+    capital_flow: Optional[Decimal]
+    """
+    Capital flow
+    """
+
+    amplitude: Optional[Decimal]
+    """
+    Amplitude
+    """
+
+    volume_ratio: Optional[Decimal]
+    """
+    Volume ratio
+    """
+
+    pe_ttm_ratio: Optional[Decimal]
+    """
+    PE (TTM)
+    """
+
+    pb_ratio: Optional[Decimal]
+    """
+    PB
+    """
+
+    dividend_ratio_ttm: Optional[Decimal]
+    """
+    Dividend ratio (TTM)
+    """
+
+    five_day_change_rate: Optional[Decimal]
+    """
+    Five days change ratio
+    """
+
+    ten_day_change_rate: Optional[Decimal]
+    """
+    Ten days change ratio
+    """
+
+    half_year_change_rate: Optional[Decimal]
+    """
+    Half year change ratio
+    """
+
+    five_minutes_change_rate: Optional[Decimal]
+    """
+    Five minutes change ratio
+    """
+
+    expiry_date: Optional[date]
+    """
+    Expiry date
+    """
+
+    strike_price: Optional[Decimal]
+    """
+    Strike price
+    """
+
+    upper_strike_price: Optional[Decimal]
+    """
+    Upper bound price
+    """
+
+    lower_strike_price: Optional[Decimal]
+    """
+    Lower bound price
+    """
+
+    outstanding_qty: Optional[int]
+    """
+    Outstanding quantity
+    """
+
+    outstanding_ratio: Optional[Decimal]
+    """
+    Outstanding ratio
+    """
+
+    premium: Optional[Decimal]
+    """
+    Premium
+    """
+
+    itm_otm: Optional[Decimal]
+    """
+    In/out of the bound
+    """
+
+    implied_volatility: Optional[Decimal]
+    """
+    Implied volatility
+    """
+
+    warrant_delta: Optional[Decimal]
+    """
+    Warrant delta
+    """
+
+    call_price: Optional[Decimal]
+    """
+    Call price
+    """
+
+    to_call_price: Optional[Decimal]
+    """
+    Price interval from the call price
+    """
+
+    effective_leverage: Optional[Decimal]
+    """
+    Effective leverage
+    """
+
+    leverage_ratio: Optional[Decimal]
+    """
+    Leverage ratio
+    """
+
+    conversion_ratio: Optional[Decimal]
+    """
+    Conversion ratio
+    """
+
+    balance_point: Optional[Decimal]
+    """
+    Breakeven point
+    """
+
+    open_interest: Optional[int]
+    """
+    Open interest
+    """
+
+    delta: Optional[Decimal]
+    """
+    Delta
+    """
+
+    gamma: Optional[Decimal]
+    """
+    Gamma
+    """
+
+    theta: Optional[Decimal]
+    """
+    Theta
+    """
+
+    vega: Optional[Decimal]
+    """
+    Vega
+    """
+
+    rho: Optional[Decimal]
+    """
+    Rho
+    """
+
+
+class QuotePackageDetail:
+    """
+    Quote package detail
+    """
+
+    key: str
+    """
+    Key
+    """
+
+    name: str
+    """
+    Name
+    """
+
+    description: str
+    """
+    Description
+    """
+
+    start_at: datetime
+    """
+    Start time
+    """
+
+    end_at: datetime
+    """
+    End time
+    """
+
+
+class TradeSessions:
+    """
+    Trade sessions
+    """
+
+    class Intraday(TradeSessions):
+        """
+        Intraday
+        """
+
+    class All(TradeSessions):
+        """
+        All
+        """
+
+
+class MarketTemperature:
+    """
+    Market temperature
+    """
+
+    temperature: int
+    """
+    Temperature value
+    """
+
+    description: str
+    """
+    Temperature description
+    """
+
+    valuation: int
+    """
+    Market valuation
+    """
+
+    sentiment: int
+    """
+    Market sentiment
+    """
+
+    timestamp: datetime
+    """
+    Time
+    """
+
+
+class Granularity:
+    """
+    Data granularity
+    """
+
+    class Unknown(Granularity):
+        """
+        Unknown
+        """
+
+    class Daily(Granularity):
+        """
+        Daily
+        """
+
+    class Weekly(Granularity):
+        """
+        Weekly
+        """
+
+    class Monthly(Granularity):
+        """
+        Monthly
+        """
+
+
+class HistoryMarketTemperatureResponse:
+    """
+    History market temperature response
+    """
+
+    granularity: Type[Granularity]
+    """
+    Granularity
+    """
+
+    records: List[MarketTemperature]
+    """
+    Records
+    """
+
+
+class QuoteContext:
+    """
+    Quote context
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+
+    def member_id(self) -> int:
+        """
+        Returns the member ID
+        """
+
+    def quote_level(self) -> str:
+        """
+        Returns the quote level
+        """
+
+    def quote_package_details(self) -> List[QuotePackageDetail]:
+        """
+        Returns the quote package details
+        """
+
+    def set_on_quote(self, callback: Callable[[str, PushQuote], None]) -> None:
+        """
+        Set quote callback, after receiving the quote data push, it will call back to this function.
+        """
+
+    def set_on_depth(self, callback: Callable[[str, PushDepth], None]) -> None:
+        """
+        Set depth callback, after receiving the depth data push, it will call back to this function.
+        """
+
+    def set_on_brokers(self, callback: Callable[[str, PushBrokers], None]) -> None:
+        """
+        Set brokers callback, after receiving the brokers data push, it will call back to this function.
+        """
+
+    def set_on_trades(self, callback: Callable[[str, PushTrades], None]) -> None:
+        """
+        Set trades callback, after receiving the trades data push, it will call back to this function.
+        """
+
+    def set_on_candlestick(self, callback: Callable[[str, PushCandlestick], None]) -> None:
+        """
+        Set candlestick callback, after receiving the candlestick updated event, it will call back to this function.
+        """
+
+    def subscribe(self, symbols: List[str], sub_types: List[Type[SubType]]) -> None:
+        """
+        Subscribe
+
+        Args:
+            symbols: Security codes
+            sub_types: Subscribe types
+
+        Examples:
+            ::
+
+                from time import sleep
+                from longbridge.openapi import QuoteContext, Config, SubType, PushQuote
+
+                def on_quote(symbol: str, event: PushQuote):
+                    print(symbol, event)
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+                ctx.set_on_quote(on_quote)
+
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                sleep(30)
+        """
+
+    def unsubscribe(self, symbols: List[str], sub_types: List[Type[SubType]]) -> None:
+        """
+        Unsubscribe
+
+        Args:
+            symbols: Security codes
+            sub_types: Subscribe types
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, SubType
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
+        """
+
+    def subscribe_candlesticks(self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+        """
+        Subscribe security candlesticks
+
+        Args:
+            symbol: Security code
+            period: Period type
+            trade_sessions: Trade sessions
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, PushCandlestick, TradeSessions
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                def on_candlestick(symbol: str, event: PushCandlestick):
+                    print(symbol, event)
+
+                ctx.set_on_candlestick(on_candlestick)
+                ctx.subscribe_candlesticks("700.HK", Period.Min_1, TradeSessions.Intraday)
+                sleep(30)
+        """
+
+    def unsubscribe_candlesticks(self, symbol: str, period: Type[Period]) -> None:
+        """
+        Subscribe security candlesticks
+
+        Args:
+            symbol: Security code
+            period: Period type
+        """
+
+    def subscriptions(self) -> List[Subscription]:
+        """
+        Get subscription information
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, SubType
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                resp = ctx.subscriptions()
+                print(resp)
+        """
+
+    def static_info(self, symbols: List[str]) -> List[SecurityStaticInfo]:
+        """
+        Get basic information of securities
+
+        Args:
+            symbols: Security codes
+
+        Returns:
+            Security info list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.static_info(
+                    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+                print(resp)
+        """
+
+    def quote(self, symbols: List[str]) -> List[SecurityQuote]:
+        """
+        Get quote of securities
+
+        Args:
+            symbols: Security codes
+
+        Returns:
+            Security quote list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+                print(resp)
+        """
+
+    def option_quote(self, symbols: List[str]) -> List[OptionQuote]:
+        """
+        Get quote of option securities
+
+        Args:
+            symbols: Security codes
+
+        Returns:
+            Option quote list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.option_quote(["AAPL230317P160000.US"])
+                print(resp)
+        """
+
+    def warrant_quote(self, symbols: List[str]) -> List[WarrantQuote]:
+        """
+        Get quote of warrant securities
+
+        Args:
+            symbols: Security codes
+
+        Returns:
+            Warrant quote list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.warrant_quote(["21125.HK"])
+                print(resp)
+        """
+
+    def depth(self, symbol: str) -> SecurityDepth:
+        """
+        Get security depth
+
+        Args:
+            symbol: Security code
+
+        Returns:
+            Security depth
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.depth("700.HK")
+                print(resp)
+        """
+
+    def brokers(self, symbol: str) -> SecurityBrokers:
+        """
+        Get security brokers
+
+        Args:
+            symbol: Security code
+
+        Returns:
+            Security brokers
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.brokers("700.HK")
+                print(resp)
+        """
+
+    def participants(self) -> List[ParticipantInfo]:
+        """
+        Get participants
+
+        Returns:
+            Participants
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.participants()
+                print(resp)
+        """
+
+    def trades(self, symbol: str, count: int) -> List[Trade]:
+        """
+        Get security trades
+
+        Args:
+            symbol: Security code
+            count: Count of trades (Maximum is `1000`)
+
+        Returns:
+            Trades
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.trades("700.HK", 10)
+                print(resp)
+        """
+
+    def intraday(self, symbol: str, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[IntradayLine]:
+        """
+        Get security intraday lines
+
+        Args:
+            symbol: Security code
+            trade_sessions: Trade sessions
+
+        Returns:
+            Intraday lines
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, TradeSessions
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.intraday("700.HK", TradeSessions.Intraday)
+                print(resp)
+        """
+
+    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+        """
+        Get security candlesticks
+
+        Args:
+            symbol: Security code
+            period: Candlestick period
+            count: Count of cancdlestick (Maximum is `1000`)
+            adjust_type: Adjustment type
+            trade_sessions: Trade sessions
+
+        Returns:
+            Candlesticks
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, Period, AdjustType, TradeSessions
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.candlesticks(
+                    "700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday)
+                print(resp)
+        """
+
+    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int, time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+        """
+        Get security history candlesticks by offset
+
+        Args:
+            symbol: Security code
+            period: Period type
+            adjust_type: Adjust type
+            forward: If `True`, query the latest from the specified time
+            count: Count of candlesticks
+            time: Datetime
+            trade_sessions: Trade sessions
+        """
+
+    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date], end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+        """
+        Get security history candlesticks by date
+
+        Args:
+            symbol: Security code
+            period: Period type
+            adjust_type: Adjust type
+            start: Start date
+            end: End date
+            trade_sessions: Trade sessions
+        """
+
+    def option_chain_expiry_date_list(self, symbol: str) -> List[date]:
+        """
+        Get option chain expiry date list
+
+        Args:
+            symbol: Security code
+
+        Returns:
+            Option chain expiry date list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.option_chain_expiry_date_list("AAPL.US")
+                print(resp)
+        """
+
+    def option_chain_info_by_date(self, symbol: str, expiry_date: date) -> List[StrikePriceInfo]:
+        """
+        Get option chain info by date
+
+        Args:
+            symbol: Security code
+            expiry_date: Expiry date
+
+        Returns:
+            Option chain info
+
+        Examples:
+            ::
+
+                from datetime import date
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.option_chain_info_by_date(
+                    "AAPL.US", date(2023, 1, 20))
+                print(resp)
+        """
+
+    def warrant_issuers(self) -> List[IssuerInfo]:
+        """
+        Get warrant issuers
+
+        Returns:
+            Warrant issuers
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.warrant_issuers()
+                print(resp)
+        """
+
+    def warrant_list(self, symbol: str, sort_by: Type[WarrantSortBy], sort_order: Type[SortOrderType], warrant_type: Optional[List[Type[WarrantType]]] = None, issuer: Optional[List[int]] = None, expiry_date: Optional[List[Type[FilterWarrantExpiryDate]]] = None, price_type: Optional[List[Type[FilterWarrantInOutBoundsType]]] = None, status: Optional[List[Type[WarrantStatus]]] = None) -> List[WarrantInfo]:
+        """
+        Get warrant list
+
+        Args:
+            symbol: Security code
+            sort_by: Sort by field
+            sort_order: Sort order
+            warrant_type: Filter by warrant type
+            issuer: Filter by issuer
+            expiry_date: Filter by expiry date
+            price_type: Filter by price type
+            status: Filter by status
+
+        Returns:
+            Warrant list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, WarrantSortBy, SortOrderType
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.warrant_list("700.HK", WarrantSortBy.LastDone, SortOrderType.Ascending)
+                print(resp)
+        """
+
+    def trading_session(self) -> List[MarketTradingSession]:
+        """
+        Get trading session of the day
+
+        Returns:
+            Trading session of the day
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.trading_session()
+                print(resp)
+        """
+
+    def trading_days(self, market: Type[Market], begin: date, end: date) -> MarketTradingDays:
+        """
+        Get trading session of the day
+
+        The interval must be less than one month, and only the most recent year is supported.
+
+        Args:
+            market: Market
+            begin: Begin date
+            end: End date
+
+        Returns:
+            Trading days
+
+        Examples:
+            ::
+
+                from datetime import date
+                from longbridge.openapi import QuoteContext, Config, Market
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.trading_days(
+                    Market.HK, date(2022, 1, 1), date(2022, 2, 1))
+                print(resp)
+        """
+
+    def capital_flow(self, symbol: str) -> List[CapitalFlowLine]:
+        """
+        Get capital flow intraday
+
+        Args:
+            symbol: Security code
+
+        Returns:
+            Capital flow list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.capital_flow("700.HK")
+                print(resp)
+        """
+
+    def capital_distribution(self, symbol: str) -> CapitalDistributionResponse:
+        """
+        Get capital distribution
+
+        Args:
+            symbol: Security code
+
+        Returns:
+            Capital distribution
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.capital_distribution("700.HK")
+                print(resp)
+        """
+
+    def calc_indexes(self, symbols: List[str], indexes: List[Type[CalcIndex]]) -> List[SecurityCalcIndex]:
+        """
+        Get calc indexes
+
+        Args:
+            symbols: Security codes
+            indexes: Calc indexes
+
+        Returns:
+            Calc indexes of the symbols
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, CalcIndex
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.calc_indexes(["700.HK", "APPL.US"], [CalcIndex.LastDone, CalcIndex.ChangeRate])
+                print(resp)
+        """
+
+    def watchlist(self) -> List[WatchlistGroup]:
+        """
+        Get watch list
+
+        Returns:
+            Watch list groups
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.watchlist()
+                print(resp)
+        """
+
+    def create_watchlist_group(self, name: str, securities: Optional[List[str]] = None) -> int:
+        """
+        Create watchlist group
+
+        Args:
+            name: Group name
+            securities: Securities
+
+        Returns:
+            Group ID
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+                group_id = ctx.create_watchlist_group(name = "Watchlist1", securities = ["700.HK", "AAPL.US"])
+                print(group_id)
+        """
+
+    def delete_watchlist_group(self, id: int, purge: bool = False):
+        """
+        Delete watchlist group
+
+        Args:
+            id: Group ID
+            purge: Move securities in this group to the default group
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+                ctx.delete_watchlist_group(10086)
+        """
+
+    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]] = None, mode: Optional[Type[SecuritiesUpdateMode]] = None):
+        """
+        Update watchlist group
+
+        Args:
+            id: Group ID
+            name: Group name
+            securities: Securities
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, SecuritiesUpdateMode
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+                ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
+        """
+
+    def security_list(self, market: Type[Market], category: Optional[Type[SecurityListCategory]] = None) -> List[Security]:
+        """
+        Get security list
+
+        Args:
+            market: Market
+            category: Security list category
+
+        Returns:
+            Security list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, Market, SecurityListCategory
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.security_list(Market.HK, SecurityListCategory.Overnight)
+                print(resp)
+        """
+
+    def market_temperature(self, market: Type[Market]) -> MarketTemperature:
+        """
+        Get current market temperature
+
+        Args:
+            market: Market
+
+        Returns:
+            Market temperature
+
+        Examples:
+            ::
+
+                from longbridge.openapi import QuoteContext, Config, Market
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.market_temperature(Market.HK)
+                print(resp)
+        """
+
+    def history_market_temperature(self, market: Type[Market], start: date, end: date) -> HistoryMarketTemperatureResponse:
+        """
+        Get historical market temperature
+
+        Args:
+            market: Market
+            start: Start date
+            end: End date
+
+        Returns:
+            History market temperature
+
+        Examples:
+            ::
+
+                from datetime import date
+                from longbridge.openapi import QuoteContext, Config, Market
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                resp = ctx.history_market_temperature(Market.HK, date(2023, 1, 1), date(2023, 1, 31))
+                print(resp)
+        """
+
+    def realtime_quote(self, symbols: List[str]) -> List[RealtimeQuote]:
+        """
+        Get real-time quote
+
+        Get real-time quotes of the subscribed symbols, it always returns the data in the local storage.
+
+        Args:
+            symbols: Security codes
+
+        Returns:
+            Quote list
+
+        Examples:
+            ::
+
+                from time import sleep
+                from longbridge.openapi import QuoteContext, Config, SubType
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                sleep(5)
+                resp = ctx.realtime_quote(["700.HK", "AAPL.US"])
+                print(resp)
+        """
+
+    def realtime_depth(self, symbol: str) -> SecurityDepth:
+        """
+        Get real-time depth
+
+        Get real-time depth of the subscribed symbols, it always returns the data in the local storage.
+
+        Args:
+            symbol: Security code
+
+        Returns:
+            Security depth
+
+        Examples:
+            ::
+
+                from time import sleep
+                from longbridge.openapi import QuoteContext, Config, SubType
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
+                sleep(5)
+                resp = ctx.realtime_depth("700.HK")
+                print(resp)
+        """
+
+    def realtime_brokers(self, symbol: str) -> SecurityBrokers:
+        """
+        Get real-time brokers
+
+        Get real-time brokers of the subscribed symbols, it always returns the data in the local storage.
+
+        Args:
+            symbol: Security code
+
+        Returns:
+            Security brokers
+
+        Examples:
+            ::
+
+                from time import sleep
+                from longbridge.openapi import QuoteContext, Config, SubType
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
+                sleep(5)
+                resp = ctx.realtime_brokers("700.HK")
+                print(resp)
+        """
+
+    def realtime_trades(self, symbol: str, count: int) -> List[Trade]:
+        """
+        Get real-time trades
+
+        Get real-time trades of the subscribed symbols, it always returns the data in the local storage.
+
+        Args:
+            symbol: Security code
+            count: Count of trades
+
+        Returns:
+            Security trades
+
+        Examples:
+            ::
+
+                from time import sleep
+                from longbridge.openapi import QuoteContext, Config, SubType
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
+                sleep(5)
+                resp = ctx.realtime_trades("700.HK", 10)
+                print(resp)
+        """
+
+    def realtime_candlesticks(self, symbol: str, period: Type[Period], count: int) -> List[Candlestick]:
+        """
+        Get real-time candlesticks
+
+        Get Get real-time candlesticks of the subscribed symbols, it always returns the data in the local storage.
+
+        Args:
+            symbol: Security code
+            period: Period type
+            count: Count of candlesticks
+
+        Returns:
+            Security candlesticks
+
+        Examples:
+            ::
+
+                from time import sleep
+                from longbridge.openapi import QuoteContext, Config, Period
+
+                config = Config.from_apikey_env()
+                ctx = QuoteContext(config)
+
+                ctx.subscribe_candlesticks("AAPL.US", Period.Min_1)
+                sleep(5)
+                resp = ctx.realtime_candlesticks("AAPL.US", Period.Min_1, 10)
+                print(resp)
+        """
+
+
+class AsyncQuoteContext:
+    """
+    Async quote context for use with asyncio. Create via `AsyncQuoteContext.create(config)` and await inside asyncio.
+    Callbacks (set_on_quote, set_on_depth, etc.) are set the same way as the sync QuoteContext; all I/O methods return awaitables.
+    """
+
+    @classmethod
+    def create(cls: Type["AsyncQuoteContext"],
+               config: Config) -> Awaitable["AsyncQuoteContext"]:
+        """
+        Create an async quote context. Returns an awaitable; must be awaited inside asyncio.
+
+        Args:
+            config: Configuration object (same as sync QuoteContext).
+
+        Returns:
+            An awaitable that resolves to the AsyncQuoteContext instance.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import Config, AsyncQuoteContext
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.quote(["700.HK", "AAPL.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def member_id(self) -> int:
+        """Returns the member ID."""
+        ...
+
+    def quote_level(self) -> str:
+        """Returns the quote level."""
+        ...
+
+    def quote_package_details(self) -> List[QuotePackageDetail]:
+        """Returns the quote package details."""
+        ...
+
+    def set_on_quote(
+            self, callback: Callable[[str, PushQuote], None]) -> None:
+        """Set quote callback; called when quote push is received (same as sync QuoteContext)."""
+        ...
+
+    def set_on_depth(
+            self, callback: Callable[[str, PushDepth], None]) -> None:
+        """Set depth callback; called when depth push is received."""
+        ...
+
+    def set_on_brokers(
+            self, callback: Callable[[str, PushBrokers], None]) -> None:
+        """Set brokers callback; called when brokers push is received."""
+        ...
+
+    def set_on_trades(
+            self, callback: Callable[[str, PushTrades], None]) -> None:
+        """Set trades callback; called when trades push is received."""
+        ...
+
+    def set_on_candlestick(
+            self, callback: Callable[[str, PushCandlestick], None]) -> None:
+        """Set candlestick callback; called when candlestick push is received."""
+        ...
+
+    def subscribe(
+            self, symbols: List[str], sub_types: List[Type[SubType]]) -> Awaitable[None]:
+        """
+        Subscribe to symbols and sub types. Returns an awaitable; must be awaited in asyncio.
+
+        Args:
+            symbols: Security codes.
+            sub_types: Subscribe types.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SubType, PushQuote
+
+                def on_quote(symbol: str, event: PushQuote):
+                    print(symbol, event)
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    ctx.set_on_quote(on_quote)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    await asyncio.sleep(30)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def unsubscribe(
+            self, symbols: List[str], sub_types: List[Type[SubType]]) -> Awaitable[None]:
+        """
+        Unsubscribe from symbols and sub types. Returns an awaitable.
+
+        Args:
+            symbols: Security codes.
+            sub_types: Subscribe types.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    await ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
+
+                asyncio.run(main())
+        """
+        ...
+
+    def subscribe_candlesticks(
+            self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Subscribe security candlesticks. Returns an awaitable that resolves to initial candlesticks.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    PushCandlestick,
+                    TradeSessions,
+                )
+
+                def on_candlestick(symbol: str, event: PushCandlestick):
+                    print(symbol, event)
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    ctx.set_on_candlestick(on_candlestick)
+                    await ctx.subscribe_candlesticks(
+                        "700.HK",
+                        Period.Min_1,
+                        TradeSessions.Intraday,
+                    )
+                    await asyncio.sleep(30)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def unsubscribe_candlesticks(
+            self, symbol: str, period: Type[Period]) -> Awaitable[None]:
+        """
+        Unsubscribe security candlesticks. Returns an awaitable.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe_candlesticks(
+                        "700.HK",
+                        Period.Min_1,
+                        TradeSessions.Intraday,
+                    )
+                    await ctx.unsubscribe_candlesticks("700.HK", Period.Min_1)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def subscriptions(self) -> Awaitable[List[Subscription]]:
+        """
+        Get subscription information. Returns an awaitable that resolves to subscription list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    resp = await ctx.subscriptions()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def static_info(
+            self, symbols: List[str]) -> Awaitable[List[SecurityStaticInfo]]:
+        """
+        Get basic information of securities. Returns an awaitable that resolves to security info list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.static_info(
+                        ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def quote(self, symbols: List[str]) -> Awaitable[List[SecurityQuote]]:
+        """
+        Get quote of securities. Returns an awaitable that resolves to security quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def option_quote(self, symbols: List[str]
+                     ) -> Awaitable[List[OptionQuote]]:
+        """
+        Get quote of option securities. Returns an awaitable that resolves to option quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.option_quote(["AAPL230317P160000.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def warrant_quote(
+            self, symbols: List[str]) -> Awaitable[List[WarrantQuote]]:
+        """
+        Get quote of warrant securities. Returns an awaitable that resolves to warrant quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.warrant_quote(["21125.HK"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def depth(self, symbol: str) -> Awaitable[SecurityDepth]:
+        """
+        Get security depth. Returns an awaitable that resolves to security depth.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.depth("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def brokers(self, symbol: str) -> Awaitable[SecurityBrokers]:
+        """
+        Get security brokers. Returns an awaitable that resolves to security brokers.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.brokers("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def participants(self) -> Awaitable[List[ParticipantInfo]]:
+        """
+        Get participants. Returns an awaitable that resolves to participant list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.participants()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def trades(self, symbol: str, count: int) -> Awaitable[List[Trade]]:
+        """
+        Get security trades. Returns an awaitable that resolves to trades list (max count 1000).
+
+        Args:
+            symbol: Security code.
+            count: Count of trades.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.trades("700.HK", 10)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def intraday(self, symbol: str, trade_sessions: Type[TradeSessions]
+                 = TradeSessions.Intraday) -> Awaitable[List[IntradayLine]]:
+        """
+        Get security intraday lines. Returns an awaitable that resolves to intraday line list.
+
+        Args:
+            symbol: Security code.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, TradeSessions
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.intraday("700.HK", TradeSessions.Intraday)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType],
+                     trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Get security candlesticks. Returns an awaitable that resolves to candlesticks list (max count 1000).
+
+        Args:
+            symbol: Security code.
+            period: Candlestick period.
+            count: Count of candlesticks.
+            adjust_type: Adjustment type.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    AdjustType,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.candlesticks(
+                        "700.HK",
+                        Period.Day,
+                        10,
+                        AdjustType.NoAdjust,
+                        TradeSessions.Intraday,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int,
+                                       time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Get security history candlesticks by offset. Returns an awaitable that resolves to candlesticks list.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            adjust_type: Adjust type.
+            forward: If True, query the latest from the specified time.
+            count: Count of candlesticks.
+            time: Datetime.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longbridge.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    AdjustType,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.history_candlesticks_by_offset(
+                        "700.HK",
+                        Period.Day,
+                        AdjustType.NoAdjust,
+                        False,
+                        10,
+                        datetime.datetime(2023, 8, 18),
+                        TradeSessions.Intraday,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date],
+                                     end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Get security history candlesticks by date. Returns an awaitable that resolves to candlesticks list.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            adjust_type: Adjust type.
+            start: Start date.
+            end: End date.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longbridge.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    AdjustType,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.history_candlesticks_by_date(
+                        "700.HK",
+                        Period.Day,
+                        AdjustType.NoAdjust,
+                        datetime.date(2022, 5, 5),
+                        datetime.date(2022, 6, 23),
+                        TradeSessions.Intraday,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def option_chain_expiry_date_list(
+            self, symbol: str) -> Awaitable[List[date]]:
+        """
+        Get option chain expiry date list. Returns an awaitable that resolves to date list.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.option_chain_expiry_date_list("AAPL.US")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def option_chain_info_by_date(
+            self, symbol: str, expiry_date: date) -> Awaitable[List[StrikePriceInfo]]:
+        """
+        Get option chain info by date. Returns an awaitable that resolves to strike price info list.
+
+        Args:
+            symbol: Security code.
+            expiry_date: Expiry date.
+
+        Examples:
+            ::
+
+                import asyncio
+                from datetime import date
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.option_chain_info_by_date(
+                        "AAPL.US",
+                        date(2023, 1, 20),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def warrant_issuers(self) -> Awaitable[List[IssuerInfo]]:
+        """
+        Get warrant issuers. Returns an awaitable that resolves to issuer list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.warrant_issuers()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def warrant_list(self, symbol: str, sort_by: Type[WarrantSortBy], sort_order: Type[SortOrderType], warrant_type: Optional[List[Type[WarrantType]]] = None, issuer: Optional[List[int]] = None, expiry_date: Optional[
+                     List[Type[FilterWarrantExpiryDate]]] = None, price_type: Optional[List[Type[FilterWarrantInOutBoundsType]]] = None, status: Optional[List[Type[WarrantStatus]]] = None) -> Awaitable[List[WarrantInfo]]:
+        """
+        Get warrant list with optional filters. Returns an awaitable that resolves to warrant info list.
+
+        Args:
+            symbol: Security code.
+            sort_by: Sort by field.
+            sort_order: Sort order.
+            warrant_type: Filter by warrant type.
+            issuer: Filter by issuer.
+            expiry_date: Filter by expiry date.
+            price_type: Filter by price type.
+            status: Filter by status.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    WarrantSortBy,
+                    SortOrderType,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.warrant_list(
+                        "700.HK",
+                        WarrantSortBy.LastDone,
+                        SortOrderType.Ascending,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def trading_session(self) -> Awaitable[List[MarketTradingSession]]:
+        """
+        Get trading session of the day. Returns an awaitable that resolves to market trading session list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.trading_session()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def trading_days(self, market: Type[Market], begin: date,
+                     end: date) -> Awaitable[MarketTradingDays]:
+        """
+        Get trading days in the given market and date range. Returns an awaitable (interval must be less than one month).
+
+        Args:
+            market: Market.
+            begin: Begin date.
+            end: End date.
+
+        Examples:
+            ::
+
+                import asyncio
+                from datetime import date
+                from longbridge.openapi import AsyncQuoteContext, Config, Market
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.trading_days(
+                        Market.HK,
+                        date(2022, 1, 1),
+                        date(2022, 2, 1),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def capital_flow(
+            self, symbol: str) -> Awaitable[List[CapitalFlowLine]]:
+        """
+        Get capital flow intraday. Returns an awaitable that resolves to capital flow line list.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.capital_flow("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def capital_distribution(
+            self, symbol: str) -> Awaitable[CapitalDistributionResponse]:
+        """
+        Get capital distribution. Returns an awaitable that resolves to capital distribution response.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.capital_distribution("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def calc_indexes(
+            self, symbols: List[str], indexes: List[Type[CalcIndex]]) -> Awaitable[List[SecurityCalcIndex]]:
+        """
+        Get calc indexes for symbols. Returns an awaitable that resolves to security calc index list.
+
+        Args:
+            symbols: Security codes.
+            indexes: Calc indexes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, CalcIndex
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.calc_indexes(
+                        ["700.HK", "APPL.US"],
+                        [CalcIndex.LastDone, CalcIndex.ChangeRate],
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def watchlist(self) -> Awaitable[List[WatchlistGroup]]:
+        """
+        Get watch list. Returns an awaitable that resolves to watchlist group list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.watchlist()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def create_watchlist_group(
+            self, name: str, securities: Optional[List[str]] = None) -> Awaitable[int]:
+        """
+        Create watchlist group. Returns an awaitable that resolves to group ID.
+
+        Args:
+            name: Group name.
+            securities: Securities.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    group_id = await ctx.create_watchlist_group(
+                        name="Watchlist1",
+                        securities=["700.HK", "AAPL.US"],
+                    )
+                    print(group_id)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def delete_watchlist_group(
+            self, id: int, purge: bool = False) -> Awaitable[None]:
+        """
+        Delete watchlist group. Returns an awaitable.
+
+        Args:
+            id: Group ID.
+            purge: Move securities in this group to the default group.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.delete_watchlist_group(10086)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]]
+                               = None, mode: Optional[Type[SecuritiesUpdateMode]] = None) -> Awaitable[None]:
+        """
+        Update watchlist group. Returns an awaitable.
+
+        Args:
+            id: Group ID.
+            name: Group name.
+            securities: Securities.
+            mode: Securities update mode.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SecuritiesUpdateMode
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.update_watchlist_group(
+                        10086,
+                        name="Watchlist2",
+                        securities=["700.HK", "AAPL.US"],
+                        mode=SecuritiesUpdateMode.Replace,
+                    )
+
+                asyncio.run(main())
+        """
+        ...
+
+    def security_list(
+            self, market: Type[Market], category: Optional[Type[SecurityListCategory]] = None) -> Awaitable[List[Security]]:
+        """
+        Get security list. Returns an awaitable that resolves to security list.
+
+        Args:
+            market: Market.
+            category: Security list category.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, Market, SecurityListCategory
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.security_list(
+                        Market.HK,
+                        SecurityListCategory.Overnight,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def market_temperature(
+            self, market: Type[Market]) -> Awaitable[MarketTemperature]:
+        """
+        Get current market temperature. Returns an awaitable that resolves to market temperature.
+
+        Args:
+            market: Market.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, Market
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.market_temperature(Market.HK)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_market_temperature(
+            self, market: Type[Market], start: date, end: date) -> Awaitable[HistoryMarketTemperatureResponse]:
+        """
+        Get historical market temperature. Returns an awaitable that resolves to history market temperature response.
+
+        Args:
+            market: Market.
+            start: Start date.
+            end: End date.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longbridge.openapi import AsyncQuoteContext, Config, Market
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.history_market_temperature(
+                        Market.HK,
+                        datetime.date(2023, 1, 1),
+                        datetime.date(2023, 1, 31),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_quote(
+            self, symbols: List[str]) -> Awaitable[List[RealtimeQuote]]:
+        """
+        Get real-time quote of subscribed symbols from local storage. Returns an awaitable that resolves to realtime quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_quote(["700.HK", "AAPL.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_depth(self, symbol: str) -> Awaitable[SecurityDepth]:
+        """
+        Get real-time depth of subscribed symbol from local storage. Returns an awaitable that resolves to security depth.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_depth("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_brokers(self, symbol: str) -> Awaitable[SecurityBrokers]:
+        """
+        Get real-time brokers of subscribed symbol from local storage. Returns an awaitable that resolves to security brokers.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_brokers("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_trades(self, symbol: str,
+                        count: int) -> Awaitable[List[Trade]]:
+        """
+        Get real-time trades of subscribed symbol from local storage. Returns an awaitable that resolves to trade list.
+
+        Args:
+            symbol: Security code.
+            count: Count of trades.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_trades("700.HK", 10)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_candlesticks(
+            self, symbol: str, period: Type[Period], count: int) -> Awaitable[List[Candlestick]]:
+        """
+        Get real-time candlesticks of subscribed symbol from local storage. Returns an awaitable that resolves to candlestick list.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            count: Count of candlesticks.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncQuoteContext, Config, Period
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe_candlesticks(
+                        "AAPL.US",
+                        Period.Min_1,
+                    )
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_candlesticks(
+                        "AAPL.US",
+                        Period.Min_1,
+                        10,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+
+class OrderSide:
+    """
+    Order side
+    """
+
+    class Unknown(OrderSide):
+        """
+        Unknown
+        """
+
+    class Buy(OrderSide):
+        """
+        Buy
+        """
+
+    class Sell(OrderSide):
+        """
+        Sell
+        """
+
+
+class OrderType:
+    """
+    Order type
+    """
+
+    class Unknown(OrderType):
+        """
+        Unknown
+        """
+
+    class LO(OrderType):
+        """
+        Limit Order
+        """
+
+    class ELO(OrderType):
+        """
+        Enhanced Limit Order
+        """
+
+    class MO(OrderType):
+        """
+        Market Order
+        """
+
+    class AO(OrderType):
+        """
+        At-auction Order
+        """
+
+    class ALO(OrderType):
+        """
+        At-auction Limit Order
+        """
+
+    class ODD(OrderType):
+        """
+        Odd Lots
+        """
+
+    class LIT(OrderType):
+        """
+        Limit If Touched
+        """
+
+    class MIT(OrderType):
+        """
+        Market If Touched
+        """
+
+    class TSLPAMT(OrderType):
+        """
+        Trailing Limit If Touched (Trailing Amount)
+        """
+
+    class TSLPPCT(OrderType):
+        """
+        Trailing Limit If Touched (Trailing Percent)
+        """
+
+    class TSMAMT(OrderType):
+        """
+        Trailing Market If Touched (Trailing Amount)
+        """
+
+    class TSMPCT(OrderType):
+        """
+        Trailing Market If Touched (Trailing Percent)
+        """
+
+    class SLO(OrderType):
+        """
+        Special Limit Order
+        """
+
+
+class OrderStatus:
+    """
+    Order status
+    """
+
+    class Unknown(OrderStatus):
+        """
+        Unknown
+        """
+
+    class NotReported(OrderStatus):
+        """
+        Not reported
+        """
+
+    class ReplacedNotReported(OrderStatus):
+        """
+        Not reported (Replaced Order)
+        """
+
+    class ProtectedNotReported(OrderStatus):
+        """
+        Not reported (Protected Order)
+        """
+
+    class VarietiesNotReported(OrderStatus):
+        """
+        Not reported (Conditional Order)
+        """
+
+    class Filled(OrderStatus):
+        """
+        Filled
+        """
+
+    class WaitToNew(OrderStatus):
+        """
+        Wait To New
+        """
+
+    class New(OrderStatus):
+        """
+        New
+        """
+
+    class WaitToReplace(OrderStatus):
+        """
+        Wait To Replace
+        """
+
+    class PendingReplace(OrderStatus):
+        """
+        Pending Replace
+        """
+
+    class Replaced(OrderStatus):
+        """
+        Replaced
+        """
+
+    class PartialFilled(OrderStatus):
+        """
+        Partial Filled
+        """
+
+    class WaitToCancel(OrderStatus):
+        """
+        Wait To Cancel
+        """
+
+    class PendingCancel(OrderStatus):
+        """
+        Pending Cancel
+        """
+
+    class Rejected(OrderStatus):
+        """
+        Rejected
+        """
+
+    class Canceled(OrderStatus):
+        """
+        Canceled
+        """
+
+    class Expired(OrderStatus):
+        """
+        ExpiredStatus
+        """
+
+    class PartialWithdrawal(OrderStatus):
+        """
+        PartialWithdrawal
+        """
+
+
+class OrderTag:
+    """
+    Order tag
+    """
+
+    class Unknown(OrderTag):
+        """
+        Unknown
+        """
+
+    class Normal(OrderTag):
+        """
+        Normal Order
+        """
+
+    class LongTerm(OrderTag):
+        """
+        Long term Order
+        """
+
+    class Grey(OrderTag):
+        """
+        Grey Order
+        """
+
+    class MarginCall(OrderTag):
+        """
+        Force Selling
+        """
+
+    class Offline(OrderTag):
+        """
+        OTC
+        """
+
+    class Creditor(OrderTag):
+        """
+        Option Exercise Long
+        """
+
+    class Debtor(OrderTag):
+        """
+        Option Exercise Short
+        """
+
+    class NonExercise(OrderTag):
+        """
+        Wavier Of Option Exercise
+        """
+
+    class AllocatedSub(OrderTag):
+        """
+        Trade Allocation
+        """
+
+
+class TriggerStatus:
+    """
+    Trigger status
+    """
+
+    class Unknown(TriggerStatus):
+        """
+        Unknown
+        """
+
+    class Deactive(TriggerStatus):
+        """
+        Deactive
+        """
+
+    class Active(TriggerStatus):
+        """
+        Active
+        """
+
+    class Released(TriggerStatus):
+        """
+        Released
+        """
+
+
+class Execution:
+    """
+    Execution
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    trade_id: str
+    """
+    Execution ID
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    trade_done_at: datetime
+    """
+    Trade done time
+    """
+
+    quantity: Decimal
+    """
+    Executed quantity
+    """
+
+    price: Decimal
+    """
+    Executed price
+    """
+
+
+class PushOrderChanged:
+    """
+    Order changed message
+    """
+
+    side: Type[OrderSide]
+    """
+    Order side
+    """
+
+    stock_name: str
+    """
+    Stock name
+    """
+
+    submitted_quantity: Decimal
+    """
+    Submitted quantity
+    """
+
+    symbol: str
+    """
+    Order symbol
+    """
+
+    order_type: Type[OrderType]
+    """
+    Order type
+    """
+
+    submitted_price: Decimal
+    """
+    Submitted price
+    """
+
+    executed_quantity: Decimal
+    """
+    Executed quantity
+    """
+
+    executed_price: Optional[Decimal]
+    """
+    Executed price
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    submitted_at: datetime
+    """
+    Submitted time
+    """
+
+    updated_at: datetime
+    """
+    Last updated time
+    """
+
+    trigger_price: Optional[Decimal]
+    """
+    Order trigger price
+    """
+
+    msg: str
+    """
+    Rejected message or remark
+    """
+
+    tag: Type[OrderTag]
+    """
+    Order tag
+    """
+
+    trigger_status: Optional[Type[TriggerStatus]]
+    """
+    Conditional order trigger status
+    """
+
+    trigger_at: Optional[datetime]
+    """
+    Conditional order trigger time
+    """
+
+    trailing_amount: Optional[Decimal]
+    """
+    Trailing amount
+    """
+
+    trailing_percent: Optional[Decimal]
+    """
+    Trailing percent
+    """
+
+    limit_offset: Optional[Decimal]
+    """
+    Limit offset amount
+    """
+
+    account_no: str
+    """
+    Account no
+    """
+
+    last_share: Optional[Decimal]
+    """
+    Last share
+    """
+
+    last_price: Optional[Decimal]
+    """
+    Last price
+    """
+
+    remark: str
+    """
+    Remark message
+    """
+
+
+class TimeInForceType:
+    """
+    Time in force type
+    """
+
+    class Unknown(TimeInForceType):
+        """
+        Unknown
+        """
+
+    class Day(TimeInForceType):
+        """
+        Day Order
+        """
+
+    class GoodTilCanceled(TimeInForceType):
+        """
+        Good Til Canceled Order
+        """
+
+    class GoodTilDate(TimeInForceType):
+        """
+        Good Til Date Order
+        """
+
+
+class OutsideRTH:
+    """
+    Enable or disable outside regular trading hours
+    """
+
+    class Unknown(OutsideRTH):
+        """
+        Unknown
+        """
+
+    class RTHOnly(OutsideRTH):
+        """
+        Regular trading hour only
+        """
+
+    class AnyTime(OutsideRTH):
+        """
+        Any time
+        """
+
+    class Overnight(OutsideRTH):
+        """
+        Overnight
+        """
+
+
+class Order:
+    """
+    Order
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    stock_name: str
+    """
+    Stock name
+    """
+
+    quantity: Decimal
+    """
+    Submitted quantity
+    """
+
+    executed_quantity: Decimal
+    """
+    Executed quantity
+    """
+
+    price: Optional[Decimal]
+    """
+    Submitted price
+    """
+
+    executed_price: Optional[Decimal]
+    """
+    Executed price
+    """
+
+    submitted_at: datetime
+    """
+    Submitted time
+    """
+
+    side: Type[OrderSide]
+    """
+    Order side
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    order_type: Type[OrderType]
+    """
+    Order type
+    """
+
+    last_done: Optional[Decimal]
+    """
+    Last done
+    """
+
+    trigger_price: Optional[Decimal]
+    """
+    `LIT` / `MIT` Order Trigger Price
+    """
+
+    msg: str
+    """
+    Rejected Message or remark
+    """
+
+    tag: Type[OrderTag]
+    """
+    Order tag
+    """
+
+    time_in_force: Type[TimeInForceType]
+    """
+    Time in force type
+    """
+
+    expire_date: Optional[date]
+    """
+    Long term order expire date
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Last updated time
+    """
+
+    trigger_at: Optional[datetime]
+    """
+    Conditional order trigger time
+    """
+
+    trailing_amount: Optional[Decimal]
+    """
+    `TSMAMT` / `TSLPAMT` order trailing amount
+    """
+
+    trailing_percent: Optional[Decimal]
+    """
+    `TSMPCT` / `TSLPPCT` order trailing percent
+    """
+
+    limit_offset: Optional[Decimal]
+    """
+    `TSLPAMT` / `TSLPPCT` order limit offset amount
+    """
+
+    trigger_status: Optional[Type[TriggerStatus]]
+    """
+    Conditional order trigger status
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    outside_rth: Optional[Type[OutsideRTH]]
+    """
+    Enable or disable outside regular trading hours
+    """
+
+    limit_depth_level: Optional[int]
+    """
+    Limit depth level
+    """
+
+    trigger_count: Optional[int]
+    """
+    Trigger count
+    """
+
+    monitor_price: Optional[Decimal]
+    """
+    Monitor price
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+
+class CommissionFreeStatus:
+    """
+    Commission-free Status
+    """
+
+    class Unknown(CommissionFreeStatus):
+        """
+        Unknown
+        """
+
+    class None_(CommissionFreeStatus):
+        """
+        None
+        """
+
+    class Calculated(CommissionFreeStatus):
+        """
+        Commission-free amount to be calculated
+        """
+
+    class Pending(CommissionFreeStatus):
+        """
+        Pending commission-free
+        """
+
+    class Ready(CommissionFreeStatus):
+        """
+        Commission-free applied
+        """
+
+
+class DeductionStatus:
+    """
+    Deduction status
+    """
+
+    class Unknown(DeductionStatus):
+        """
+        Unknown
+        """
+
+    class None_(DeductionStatus):
+        """
+        None
+        """
+
+    class NoData(DeductionStatus):
+        """
+        Settled with no data
+        """
+
+    class Pending(DeductionStatus):
+        """
+        Settled and pending distribution
+        """
+
+    class Done(DeductionStatus):
+        """
+        Settled and distributed
+        """
+
+
+class ChargeCategoryCode:
+    """
+    Charge category code
+    """
+
+    class Unknown(ChargeCategoryCode):
+        """
+        Unknown
+        """
+
+    class Broker(ChargeCategoryCode):
+        """
+        Broker
+        """
+
+    class Third(ChargeCategoryCode):
+        """
+        Third
+        """
+
+
+class OrderHistoryDetail:
+    """
+    Order history detail
+    """
+
+    price: Decimal
+    """
+    Executed price for executed orders, submitted price for expired, canceled, rejected orders, etc.
+    """
+
+    quantity: Decimal
+    """
+    Executed quantity for executed orders, remaining quantity for expired, canceled, rejected orders, etc.
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    msg: str
+    """
+    Execution or error message
+    """
+
+    time: datetime
+    """
+    Occurrence time
+    """
+
+
+class OrderChargeFee:
+    """
+    Order charge fee
+    """
+
+    code: str
+    """
+    Charge code
+    """
+
+    name: str
+    """
+    Charge name
+    """
+
+    amount: Decimal
+    """
+    Charge amount
+    """
+
+    currency: str
+    """
+    Charge currency
+    """
+
+
+class OrderChargeItem:
+    """
+    Order charge item
+    """
+
+    code: Type[ChargeCategoryCode]
+    """
+    Charge category code
+    """
+
+    name: str
+    """
+    Charge category name
+    """
+
+    fees: List[OrderChargeFee]
+    """
+    Charge details
+    """
+
+
+class OrderChargeDetail:
+    """
+    Order charge detail
+    """
+
+    total_amount: Decimal
+    """
+    Total charges amount
+    """
+
+    currency: str
+    """
+    Settlement currency
+    """
+
+    items: List[OrderChargeItem]
+    """
+    Order charge items
+    """
+
+
+class OrderDetail:
+    """
+    Order detail
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    stock_name: str
+    """
+    Stock name
+    """
+
+    quantity: Decimal
+    """
+    Submitted quantity
+    """
+
+    executed_quantity: Decimal
+    """
+    Executed quantity
+    """
+
+    price: Optional[Decimal]
+    """
+    Submitted price
+    """
+
+    executed_price: Optional[Decimal]
+    """
+    Executed price
+    """
+
+    submitted_at: datetime
+    """
+    Submitted time
+    """
+
+    side: Type[OrderSide]
+    """
+    Order side
+    """
+
+    symbol: str
+    """
+    Security code
+    """
+
+    order_type: Type[OrderType]
+    """
+    Order type
+    """
+
+    last_done: Optional[Decimal]
+    """
+    Last done
+    """
+
+    trigger_price: Optional[Decimal]
+    """
+    `LIT` / `MIT` Order Trigger Price
+    """
+
+    msg: str
+    """
+    Rejected Message or remark
+    """
+
+    tag: Type[OrderTag]
+    """
+    Order tag
+    """
+
+    time_in_force: Type[TimeInForceType]
+    """
+    Time in force type
+    """
+
+    expire_date: Optional[date]
+    """
+    Long term order expire date
+    """
+
+    updated_at: Optional[datetime]
+    """
+    Last updated time
+    """
+
+    trigger_at: Optional[datetime]
+    """
+    Conditional order trigger time
+    """
+
+    trailing_amount: Optional[Decimal]
+    """
+    `TSMAMT` / `TSLPAMT` order trailing amount
+    """
+
+    trailing_percent: Optional[Decimal]
+    """
+    `TSMPCT` / `TSLPPCT` order trailing percent
+    """
+
+    limit_offset: Optional[Decimal]
+    """
+    `TSLPAMT` / `TSLPPCT` order limit offset amount
+    """
+
+    trigger_status: Optional[Type[TriggerStatus]]
+    """
+    Conditional order trigger status
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    outside_rth: Optional[Type[OutsideRTH]]
+    """
+    Enable or disable outside regular trading hours
+    """
+
+    limit_depth_level: Optional[int]
+    """
+    Limit depth level
+    """
+
+    trigger_count: Optional[int]
+    """
+    Trigger count
+    """
+
+    monitor_price: Optional[Decimal]
+    """
+    Monitor price
+    """
+
+    remark: str
+    """
+    Remark
+    """
+
+    free_status: Type[CommissionFreeStatus]
+    """
+    Commission-free Status
+    """
+
+    free_amount: Optional[Decimal]
+    """
+    Commission-free amount
+    """
+
+    free_currency: Optional[str]
+    """
+    Commission-free currency
+    """
+
+    deductions_status: Type[DeductionStatus]
+    """
+    Deduction status
+    """
+
+    deductions_amount: Optional[Decimal]
+    """
+    Deduction amount
+    """
+
+    deductions_currency: Optional[str]
+    """
+    Deduction currency
+    """
+
+    platform_deducted_status: Type[DeductionStatus]
+    """
+    Platform fee deduction status
+    """
+
+    platform_deducted_amount: Optional[Decimal]
+    """
+    Platform deduction amount
+    """
+
+    platform_deducted_currency: Optional[str]
+    """
+    Platform deduction currency
+    """
+
+    history: List[OrderHistoryDetail]
+    """
+    Order history details
+    """
+
+    charge_detail: OrderChargeDetail
+    """
+    Order charges
+    """
+
+
+class SubmitOrderResponse:
+    """
+    Response for submit order request
+    """
+
+    order_id: str
+    """
+    Order id
+    """
+
+
+class CashInfo:
+    """
+    CashInfo
+    """
+
+    withdraw_cash: Decimal
+    """
+    Withdraw cash
+    """
+    available_cash: Decimal
+    """
+    Available cash
+    """
+    frozen_cash: Decimal
+    """
+    Frozen cash
+    """
+    settling_cash: Decimal
+    """
+    Cash to be settled
+    """
+    currency: str
+    """
+    Currency
+    """
+
+
+class FrozenTransactionFee:
+    currency: str
+    """
+    Currency
+    """
+
+    frozen_transaction_fee: Decimal
+    """
+    Frozen transaction fee
+    """
+
+
+class AccountBalance:
+    """
+    Account balance
+    """
+
+    total_cash: Decimal
+    """
+    Total cash
+    """
+    max_finance_amount: Decimal
+    """
+    Maximum financing amount
+    """
+    remaining_finance_amount: Decimal
+    """
+    Remaining financing amount
+    """
+    risk_level: int
+    """
+    Risk control level
+    """
+    margin_call: Decimal
+    """
+    Margin call
+    """
+    currency: str
+    """
+    Currency
+    """
+    cash_infos: List[CashInfo]
+    """
+    Cash details
+    """
+
+    net_assets: Decimal
+    """
+    Net assets
+    """
+
+    init_margin: Decimal
+    """
+    Initial margin
+    """
+
+    maintenance_margin: Decimal
+    """
+    Maintenance margin
+    """
+
+    buy_power: Decimal
+    """
+    Buy power
+    """
+
+    frozen_transaction_fees: FrozenTransactionFee
+    """
+    Frozen transaction fees
+    """
+
+
+class BalanceType:
+    class Unknown(BalanceType):
+        ...
+
+    class Cash(BalanceType):
+        ...
+
+    class Stock(BalanceType):
+        ...
+
+    class Fund(BalanceType):
+        ...
+
+
+class CashFlowDirection:
+    """
+    Cash flow direction
+    """
+
+    class Unknown(CashFlowDirection):
+        """
+        Unknown
+        """
+        ...
+
+    class Out(CashFlowDirection):
+        """
+        Out
+        """
+        ...
+
+    class In(CashFlowDirection):
+        """
+        In
+        """
+        ...
+
+
+class CashFlow:
+    """
+    Cash flow
+    """
+
+    transaction_flow_name: str
+    """
+    Cash flow name
+    """
+
+    direction: Type[CashFlowDirection]
+    """
+    Outflow direction
+    """
+
+    business_type: Type[BalanceType]
+    """
+    Balance type
+    """
+
+    balance: Decimal
+    """
+    Cash amount
+    """
+
+    currency: str
+    """
+    Cash currency
+    """
+
+    business_time: datetime
+    """
+    Business time
+    """
+
+    symbol: Optional[str]
+    """
+    Associated Stock code information
+    """
+
+    description: str
+    """
+    Cash flow description
+    """
+
+
+class FundPosition:
+    """
+    Fund position
+    """
+
+    symbol: str
+    """
+    Fund ISIN code
+    """
+
+    current_net_asset_value: Decimal
+    """
+    Current equity
+    """
+
+    net_asset_value_day: datetime
+    """
+    Current equity PyDecimal
+    """
+
+    symbol_name: str
+    """
+    Fund name
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    cost_net_asset_value: Decimal
+    """
+    Net cost
+    """
+
+    holding_units: Decimal
+    """
+    Holding units
+    """
+
+
+class FundPositionChannel:
+    """
+    Fund position channel
+    """
+
+    account_channel: str
+    """
+    Account type
+    """
+
+    positions: List[FundPosition]
+    """
+    Fund positions
+    """
+
+
+class FundPositionsResponse:
+    """
+    Fund positions response
+    """
+
+    channels: List[FundPositionChannel]
+    """
+    Channels
+    """
+
+
+class StockPosition:
+    """
+    Stock position
+    """
+
+    symbol: str
+    """
+    Stock code
+    """
+
+    symbol_name: str
+    """
+    Stock name
+    """
+
+    quantity: Decimal
+    """
+    The number of holdings
+    """
+
+    available_quantity: Decimal
+    """
+    Available quantity
+    """
+
+    currency: str
+    """
+    Currency
+    """
+
+    cost_price: Decimal
+    """
+    Cost Price(According to the client's choice of average purchase or diluted cost)
+    """
+
+    market: Market
+    """
+    Market
+    """
+
+    init_quantity: Optional[Decimal]
+    """
+    Initial position before market opening
+    """
+
+
+class StockPositionChannel:
+    """
+    Stock position channel
+    """
+
+    account_channel: str
+    """
+    Account type
+    """
+
+    positions: List[StockPosition]
+    """
+    Stock positions
+    """
+
+
+class StockPositionsResponse:
+    """
+    Stock positions response
+    """
+
+    channels: List[StockPositionChannel]
+    """
+    Channels
+    """
+
+
+class TopicType:
+    """
+    Topic type
+    """
+
+    class Private(TopicType):
+        """
+        Private notification for trade
+        """
+        ...
+
+
+class MarginRatio:
+    """
+    Margin ratio
+    """
+
+    im_factor: Decimal
+    """
+    Initial margin ratio
+    """
+
+    mm_factor: Decimal
+    """
+    Maintain the initial margin ratio
+    """
+
+    fm_factor: Decimal
+    """
+    Forced close-out margin ratio
+    """
+
+
+class EstimateMaxPurchaseQuantityResponse:
+    """
+    Response for estimate maximum purchase quantity
+    """
+
+    cash_max_qty: Decimal
+    """
+    Cash available quantity
+    """
+
+    margin_max_qty: Decimal
+    """
+    Margin available quantity
+    """
+
+
+class TradeContext:
+    """
+    Trade context
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+
+    def set_on_order_changed(self, callback: Callable[[PushOrderChanged], None]) -> None:
+        """
+        Set order changed callback, after receiving the order changed event, it will call back to this function.
+        """
+
+    def subscribe(self, topics: List[Type[TopicType]]) -> None:
+        """
+        Subscribe
+
+        Args:
+            topics: Topic list
+
+        Examples:
+            ::
+
+                from time import sleep
+                from decimal import Decimal
+                from longbridge.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType, PushOrderChanged, TopicType
+
+
+                def on_order_changed(event: PushOrderChanged):
+                    print(event)
+
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+                ctx.set_on_order_changed(on_order_changed)
+                ctx.subscribe([TopicType.Private])
+
+                resp = ctx.submit_order(
+                    side = OrderSide.Buy,
+                    symbol = "700.HK",
+                    order_type = OrderType.LO,
+                    submitted_price = Decimal(50),
+                    submitted_quantity = Decimal(200),
+                    time_in_force = TimeInForceType.Day,
+                    remark = "Hello from Python SDK",
+                )
+                print(resp)
+                sleep(5)  # waiting for push event
+        """
+
+    def unsubscribe(self, topics: List[Type[TopicType]]) -> None:
+        """
+        Unsubscribe
+
+        Args:
+            topics: Topic list
+        """
+
+    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> List[Execution]:
+        """
+        Get history executions
+
+        Args:
+            symbol: Filter by security code, example: `700.HK`, `AAPL.US`
+            start_at: Start time
+            end_at: End time
+
+        Returns:
+            Execution list
+
+        Examples:
+            ::
+
+                from datetime import datetime
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.history_executions(
+                    symbol = "700.HK",
+                    start_at = datetime(2022, 5, 9),
+                    end_at = datetime(2022, 5, 12),
+                )
+                print(resp)
+        """
+
+    def today_executions(self, symbol: Optional[str] = None, order_id: Optional[str] = None) -> List[Execution]:
+        """
+        Get today executions
+
+        Args:
+            symbol: Filter by security code
+            order_id: Filter by Order ID
+
+        Returns:
+            Execution list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.today_executions(symbol = "700.HK")
+                print(resp)
+        """
+
+    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> List[Order]:
+        """
+        Get history orders
+
+        Args:
+            symbol: Filter by security code
+            status: Filter by order status
+            side: Filter by order side
+            market: Filter by market type
+            start_at: Start time
+            end_at: End time
+
+        Returns:
+            Order list
+
+        Examples:
+            ::
+
+                from datetime import datetime
+                from longbridge.openapi import TradeContext, Config, OrderStatus, OrderSide, Market
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.history_orders(
+                    symbol = "700.HK",
+                    status = [OrderStatus.Filled, OrderStatus.New],
+                    side = OrderSide.Buy,
+                    market = Market.HK,
+                    start_at = datetime(2022, 5, 9),
+                    end_at = datetime(2022, 5, 12),
+                )
+                print(resp)
+        """
+
+    def today_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> List[Order]:
+        """
+        Get today orders
+
+        Args:
+            symbol: Filter by security code
+            status: Filter by order status
+            side: Filter by order side
+            market: Filter by market type
+            order_id: Filter by order id
+
+        Returns:
+            Order list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config, OrderStatus, OrderSide, Market
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.today_orders(
+                    symbol = "700.HK",
+                    status = [OrderStatus.Filled, OrderStatus.New],
+                    side = OrderSide.Buy,
+                    market = Market.HK,
+                )
+                print(resp)
+        """
+
+    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> None:
+        """
+        Replace order
+
+        Args:
+            quantity: Replaced quantity
+            price: Replaced price
+            trigger_price: Trigger price (`LIT` / `MIT` Order Required)
+            limit_offset: Limit offset amount (`TSLPAMT` / `TSLPPCT` Required)
+            trailing_amount: Trailing amount (`TSLPAMT` / `TSMAMT` Required)
+            trailing_percent: Trailing percent (`TSLPPCT` / `TSMAPCT` Required)
+            limit_depth_level: Limit depth level
+            trigger_count: Trigger count
+            monitor_price: Monitor price
+            remark: Remark (Maximum 64 characters)
+
+        Examples:
+            ::
+
+                from decimal import Decimal
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                ctx.replace_order(
+                    order_id = "709043056541253632",
+                    quantity = Decimal(100),
+                    price = Decimal(100),
+                )
+        """
+
+    def submit_order(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None,  trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None,  outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> SubmitOrderResponse:
+        """
+        Submit order
+
+        Args:
+            symbol: Security code
+            order_type: Order type
+            side: Order Side
+            submitted_quantity: Submitted quantity
+            time_in_force: Time in force type
+            submitted_price: Submitted price
+            trigger_price: Trigger price (`LIT` / `MIT` Required)
+            limit_offset: Limit offset amount (`TSLPAMT` / `TSLPPCT` Required)
+            trailing_amount: Trailing amount (`TSLPAMT` / `TSMAMT` Required)
+            trailing_percent: Trailing percent (`TSLPPCT` / `TSMAPCT` Required)
+            expire_date: Long term order expire date (Required when `time_in_force` is `GoodTilDate`)
+            outside_rth: Enable or disable outside regular trading hours
+            limit_depth_level: Limit depth level
+            trigger_count: Trigger count
+            monitor_price: Monitor price
+            remark: Remark (Maximum 64 characters)
+
+        Returns:
+            Response
+
+        Examples:
+            ::
+
+                from decimal import Decimal
+                from longbridge.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.submit_order(
+                    side = OrderSide.Buy,
+                    symbol = "700.HK",
+                    order_type = OrderType.LO,
+                    submitted_price = Decimal(50),
+                    submitted_quantity = Decimal(200),
+                    time_in_force = TimeInForceType.Day,
+                    remark = "Hello from Python SDK",
+                )
+                print(resp)
+        """
+
+    def cancel_order(self, order_id: str) -> None:
+        """
+        Cancel order
+
+        Args:
+            order_id: Order ID
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                ctx.cancel_order("709043056541253632")
+        """
+
+    def account_balance(self, currency: Optional[str] = None) -> List[AccountBalance]:
+        """
+        Get account balance
+
+        Args:
+            currency: Currency
+
+        Returns:
+            Account list
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.account_balance()
+                print(resp)
+        """
+
+    def cash_flow(self, start_at: datetime, end_at: datetime, business_type: Optional[Type[BalanceType]] = None, symbol: Optional[str] = None, page: Optional[int] = None, size: Optional[int] = None) -> List[CashFlow]:
+        """
+        Get cash flow
+
+        Args:
+            start_at: Start time
+            end_at: End time
+            business_type: Balance type
+            symbol: Target security code
+            page: Start page (Default: 1)
+            size: Page size (Default: 50)
+
+        Returns:
+            Cash flow list
+
+        Examples:
+            ::
+
+                from datetime import datetime
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.cash_flow(
+                    start_at = datetime(2022, 5, 9),
+                    end_at = datetime(2022, 5, 12),
+                )
+                print(resp)
+        """
+
+    def fund_positions(self, symbols: Optional[List[str]] = None) -> FundPositionsResponse:
+        """
+        Get fund positions
+
+        Args:
+            symbols: Filter by fund codes
+
+        Returns:
+            Fund positions
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.fund_positions()
+                print(resp)
+        """
+
+    def stock_positions(self, symbols: Optional[List[str]] = None) -> StockPositionsResponse:
+        """
+        Get stock positions
+
+        Args:
+            symbols: Filter by stock codes
+
+        Returns:
+            Stock positions
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.stock_positions()
+                print(resp)
+        """
+
+    def margin_ratio(self, symbol: str) -> MarginRatio:
+        """
+        Get margin ratio
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            Margin ratio
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.margin_ratio("700.HK")
+                print(resp)
+        """
+
+    def order_detail(self, order_id: str) -> OrderDetail:
+        """
+        Get order detail
+
+        Args:
+            order_id: Order id
+
+        Returns:
+            Order detail
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.order_detail("701276261045858304")
+                print(resp)
+        """
+
+    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[str] = None, order_id: Optional[str] = None, fractional_shares: bool = False) -> EstimateMaxPurchaseQuantityResponse:
+        """
+        Estimating the maximum purchase quantity for Hong Kong and US stocks, warrants, and options
+
+        Args:
+            symbol: Security symbol
+            order_type: Order type
+            side: Order side
+            price: Estimated order price,
+            currency: Settlement currency
+            order_id: Order ID, required when estimating the maximum purchase quantity for a modified order
+            fractional_shares: Get the maximum fractional share buying power
+
+        Returns:
+            Response
+
+        Examples:
+            ::
+
+                from longbridge.openapi import TradeContext, Config, OrderType, OrderSide
+
+                config = Config.from_apikey_env()
+                ctx = TradeContext(config)
+
+                resp = ctx.estimate_max_purchase_quantity(
+                    symbol = "700.HK",
+                    order_type = OrderType.LO,
+                    side = OrderSide.Buy,
+                )
+                print(resp)
+        """
+
+
+class AsyncTradeContext:
+    """
+    Async trade context for use with asyncio. Create via `AsyncTradeContext.create(config)` and await inside asyncio.
+    Callbacks (set_on_order_changed) are set the same way as the sync TradeContext; all I/O methods return awaitables.
+    """
+
+    @classmethod
+    def create(cls: Type["AsyncTradeContext"],
+               config: Config) -> Awaitable["AsyncTradeContext"]:
+        """
+        Create an async trade context. Returns an awaitable; must be awaited inside asyncio.
+
+        Args:
+            config: Configuration object (same as sync TradeContext).
+
+        Returns:
+            An awaitable that resolves to the AsyncTradeContext instance.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import Config, AsyncTradeContext
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.today_orders()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def set_on_order_changed(
+            self, callback: Callable[[PushOrderChanged], None]) -> None:
+        """Set order changed callback; called when order changed event is received (same as sync TradeContext)."""
+        ...
+
+    def subscribe(self, topics: List[Type[TopicType]]) -> Awaitable[None]:
+        """
+        Subscribe to topics (e.g. TopicType.Private). Returns an awaitable; must be awaited in asyncio.
+
+        Args:
+            topics: Topic list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longbridge.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderSide,
+                    OrderType,
+                    TimeInForceType,
+                    PushOrderChanged,
+                    TopicType,
+                )
+
+                def on_order_changed(event: PushOrderChanged):
+                    print(event)
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    ctx.set_on_order_changed(on_order_changed)
+                    await ctx.subscribe([TopicType.Private])
+                    resp = await ctx.submit_order(
+                        symbol="700.HK",
+                        order_type=OrderType.LO,
+                        side=OrderSide.Buy,
+                        submitted_quantity=Decimal(200),
+                        time_in_force=TimeInForceType.Day,
+                        submitted_price=Decimal(50),
+                        remark="Hello from Python SDK",
+                    )
+                    print(resp)
+                    await asyncio.sleep(5)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def unsubscribe(
+            self, topics: List[Type[TopicType]]) -> Awaitable[None]:
+        """
+        Unsubscribe from topics. Returns an awaitable.
+
+        Args:
+            topics: Topic list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config, TopicType
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    await ctx.subscribe([TopicType.Private])
+                    await ctx.unsubscribe([TopicType.Private])
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[datetime]
+                           = None, end_at: Optional[datetime] = None) -> Awaitable[List[Execution]]:
+        """
+        Get history executions. Optional filters: symbol, start_at, end_at. Returns an awaitable that resolves to execution list.
+
+        Args:
+            symbol: Filter by security code.
+            start_at: Start time.
+            end_at: End time.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.history_executions(
+                        symbol="700.HK",
+                        start_at=datetime.datetime(2022, 5, 9),
+                        end_at=datetime.datetime(2022, 5, 12),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def today_executions(
+            self, symbol: Optional[str] = None, order_id: Optional[str] = None) -> Awaitable[List[Execution]]:
+        """
+        Get today executions. Optional filters: symbol, order_id. Returns an awaitable that resolves to execution list.
+
+        Args:
+            symbol: Filter by security code.
+            order_id: Filter by order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.today_executions(symbol="700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None,
+                       market: Optional[Type[Market]] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> Awaitable[List[Order]]:
+        """
+        Get history orders with optional filters. Returns an awaitable that resolves to order list.
+
+        Args:
+            symbol: Filter by security code.
+            status: Filter by order status.
+            side: Filter by order side.
+            market: Filter by market type.
+            start_at: Start time.
+            end_at: End time.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longbridge.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderStatus,
+                    OrderSide,
+                    Market,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.history_orders(
+                        symbol="700.HK",
+                        status=[OrderStatus.Filled, OrderStatus.New],
+                        side=OrderSide.Buy,
+                        market=Market.HK,
+                        start_at=datetime.datetime(2022, 5, 9),
+                        end_at=datetime.datetime(2022, 5, 12),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def today_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]]
+                     = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> Awaitable[List[Order]]:
+        """
+        Get today orders with optional filters. Returns an awaitable that resolves to order list.
+
+        Args:
+            symbol: Filter by security code.
+            status: Filter by order status.
+            side: Filter by order side.
+            market: Filter by market type.
+            order_id: Filter by order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderStatus,
+                    OrderSide,
+                    Market,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.today_orders(
+                        symbol="700.HK",
+                        status=[OrderStatus.Filled, OrderStatus.New],
+                        side=OrderSide.Buy,
+                        market=Market.HK,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None,
+                      trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> Awaitable[None]:
+        """
+        Replace order. Returns an awaitable. Same parameters as sync TradeContext.replace_order.
+
+        Args:
+            order_id: Order ID.
+            quantity: Replaced quantity.
+            price: Replaced price.
+            trigger_price: Trigger price (LIT/MIT order).
+            limit_offset: Limit offset amount (TSLPAMT/TSLPPCT).
+            trailing_amount: Trailing amount (TSLPAMT/TSMAMT).
+            trailing_percent: Trailing percent (TSLPPCT/TSMPCT).
+            limit_depth_level: Limit depth level.
+            trigger_count: Trigger count.
+            monitor_price: Monitor price.
+            remark: Remark (max 64 characters).
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    await ctx.replace_order(
+                        order_id="709043056541253632",
+                        quantity=Decimal(100),
+                        price=Decimal(100),
+                    )
+
+                asyncio.run(main())
+        """
+        ...
+
+    def submit_order(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None,
+                     trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None, outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> Awaitable[SubmitOrderResponse]:
+        """
+        Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
+
+        Args:
+            symbol: Security code.
+            order_type: Order type.
+            side: Order side.
+            submitted_quantity: Submitted quantity.
+            time_in_force: Time in force type.
+            submitted_price: Submitted price.
+            trigger_price: Trigger price (LIT/MIT).
+            limit_offset: Limit offset amount (TSLPAMT/TSLPPCT).
+            trailing_amount: Trailing amount (TSLPAMT/TSMAMT).
+            trailing_percent: Trailing percent (TSLPPCT/TSMPCT).
+            expire_date: Long term order expire date (required when time_in_force is GoodTilDate).
+            outside_rth: Enable or disable outside regular trading hours.
+            limit_depth_level: Limit depth level.
+            trigger_count: Trigger count.
+            monitor_price: Monitor price.
+            remark: Remark (max 64 characters).
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longbridge.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderSide,
+                    OrderType,
+                    TimeInForceType,
+                )
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.submit_order(
+                        symbol="700.HK",
+                        order_type=OrderType.LO,
+                        side=OrderSide.Buy,
+                        submitted_quantity=Decimal(500),
+                        time_in_force=TimeInForceType.Day,
+                        submitted_price=Decimal(50),
+                        remark="Hello from Python SDK",
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def cancel_order(self, order_id: str) -> Awaitable[None]:
+        """
+        Cancel order by order_id. Returns an awaitable.
+
+        Args:
+            order_id: Order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    await ctx.cancel_order("709043056541253632")
+
+                asyncio.run(main())
+        """
+        ...
+
+    def account_balance(
+            self, currency: Optional[str] = None) -> Awaitable[List[AccountBalance]]:
+        """
+        Get account balance. Optional currency filter. Returns an awaitable that resolves to account balance list.
+
+        Args:
+            currency: Currency filter.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.account_balance()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def cash_flow(self, start_at: datetime, end_at: datetime, business_type: Optional[Type[BalanceType]] = None, symbol: Optional[
+                  str] = None, page: Optional[int] = None, size: Optional[int] = None) -> Awaitable[List[CashFlow]]:
+        """
+        Get cash flow. Required: start_at, end_at. Optional: business_type, symbol, page, size. Returns an awaitable that resolves to cash flow list.
+
+        Args:
+            start_at: Start time.
+            end_at: End time.
+            business_type: Balance type.
+            symbol: Target security code.
+            page: Start page (default 1).
+            size: Page size (default 50).
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.cash_flow(
+                        start_at=datetime.datetime(2022, 5, 9),
+                        end_at=datetime.datetime(2022, 5, 12),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def fund_positions(
+            self, symbols: Optional[List[str]] = None) -> Awaitable[FundPositionsResponse]:
+        """
+        Get fund positions. Optional filter: symbols. Returns an awaitable that resolves to fund positions response.
+
+        Args:
+            symbols: Filter by fund codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.fund_positions()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def stock_positions(
+            self, symbols: Optional[List[str]] = None) -> Awaitable[StockPositionsResponse]:
+        """
+        Get stock positions. Optional filter: symbols. Returns an awaitable that resolves to stock positions response.
+
+        Args:
+            symbols: Filter by stock codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.stock_positions()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def margin_ratio(self, symbol: str) -> Awaitable[MarginRatio]:
+        """
+        Get margin ratio for symbol. Returns an awaitable that resolves to margin ratio.
+
+        Args:
+            symbol: Security symbol.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.margin_ratio("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def order_detail(self, order_id: str) -> Awaitable[OrderDetail]:
+        """
+        Get order detail by order_id. Returns an awaitable that resolves to order detail.
+
+        Args:
+            order_id: Order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.order_detail("701276261045858304")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[
+                                       str] = None, order_id: Optional[str] = None, fractional_shares: bool = False) -> Awaitable[EstimateMaxPurchaseQuantityResponse]:
+        """
+        Estimate maximum purchase quantity. Returns an awaitable that resolves to estimate response. order_id required when estimating for replace order.
+
+        Args:
+            symbol: Security symbol.
+            order_type: Order type.
+            side: Order side.
+            price: Estimated order price.
+            currency: Settlement currency.
+            order_id: Order ID (required when estimating for replace order).
+            fractional_shares: Get maximum fractional share buying power.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import AsyncTradeContext, Config, OrderType, OrderSide
+
+                async def main():
+                    config = Config.from_apikey_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.estimate_max_purchase_quantity(
+                        symbol="700.HK",
+                        order_type=OrderType.LO,
+                        side=OrderSide.Buy,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...

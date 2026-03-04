@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use longport::httpclient::{
+use longbridge::httpclient::{
     HttpClient as LbHttpClient, HttpClientConfig, HttpClientError, Json, Method,
 };
 use pyo3::{conversion::IntoPyObject, exceptions::PyRuntimeError, prelude::*, types::PyType};
@@ -29,16 +29,16 @@ pub(crate) struct HttpClient(Arc<LbHttpClient>);
 impl HttpClient {
     /// Create a new ``HttpClient`` using API Key authentication.
     ///
-    /// ``LONGPORT_HTTP_URL`` is read from the environment automatically.
+    /// ``LONGBRIDGE_HTTP_URL`` is read from the environment automatically.
     /// Passing ``http_url`` overrides that value.
     ///
     /// Args:
     ///     app_key: App Key
     ///     app_secret: App Secret
     ///     access_token: Access Token
-    ///     http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL`` from
+    ///     http_url: HTTP API url override (reads ``LONGBRIDGE_HTTP_URL`` from
     ///         env if omitted; falls back to
-    ///         ``https://openapi.longportapp.com``)
+    ///         ``https://openapi.longbridge.com``)
     #[staticmethod]
     #[pyo3(signature = (app_key, app_secret, access_token, http_url = None))]
     fn from_apikey(
@@ -57,27 +57,27 @@ impl HttpClient {
     /// Create a new ``HttpClient`` from environment variables (API Key
     /// authentication).
     ///
-    /// Variables: ``LONGPORT_HTTP_URL``, ``LONGPORT_APP_KEY``,
-    /// ``LONGPORT_APP_SECRET``, ``LONGPORT_ACCESS_TOKEN``
+    /// Variables: ``LONGBRIDGE_HTTP_URL``, ``LONGBRIDGE_APP_KEY``,
+    /// ``LONGBRIDGE_APP_SECRET``, ``LONGBRIDGE_ACCESS_TOKEN``
     #[classmethod]
     fn from_apikey_env(_cls: Bound<PyType>) -> PyResult<Self> {
         Ok(Self(Arc::new(LbHttpClient::new(
-            longport::httpclient::HttpClientConfig::from_apikey_env()
-                .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?,
+            longbridge::httpclient::HttpClientConfig::from_apikey_env()
+                .map_err(|err| ErrorNewType(longbridge::Error::HttpClient(err)))?,
         ))))
     }
 
     /// Create a new ``HttpClient`` from an OAuth handle.
     ///
-    /// ``LONGPORT_HTTP_URL`` is read from the environment automatically.
+    /// ``LONGBRIDGE_HTTP_URL`` is read from the environment automatically.
     /// Passing ``http_url`` overrides that value.
     ///
     /// Args:
     ///     oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
     ///         :meth:`OAuthBuilder.build_async`
-    ///     http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL`` from
+    ///     http_url: HTTP API url override (reads ``LONGBRIDGE_HTTP_URL`` from
     ///         env if omitted; falls back to
-    ///         ``https://openapi.longportapp.com``)
+    ///         ``https://openapi.longbridge.com``)
     #[classmethod]
     #[pyo3(signature = (oauth, http_url = None))]
     fn from_oauth(_cls: Bound<PyType>, oauth: &OAuth, http_url: Option<String>) -> Self {
@@ -102,7 +102,7 @@ impl HttpClient {
             .map_err(|err| PyRuntimeError::new_err(err.to_string()))?;
         let req = self.0.request(
             method.to_uppercase().parse::<Method>().map_err(|_| {
-                ErrorNewType(longport::Error::HttpClient(
+                ErrorNewType(longbridge::Error::HttpClient(
                     HttpClientError::InvalidRequestMethod,
                 ))
             })?,
@@ -118,7 +118,7 @@ impl HttpClient {
                 let resp = tokio::runtime::Runtime::new()
                     .unwrap()
                     .block_on(req.body(Json(body)).response::<Json<Value>>().send())
-                    .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
+                    .map_err(|err| ErrorNewType(longbridge::Error::HttpClient(err)))?;
                 Python::attach(|py| {
                     Ok(pythonize::pythonize(py, &resp.0)
                         .map_err(|err| PyRuntimeError::new_err(err.to_string()))?
@@ -129,7 +129,7 @@ impl HttpClient {
                 let resp = tokio::runtime::Runtime::new()
                     .unwrap()
                     .block_on(req.response::<Json<Value>>().send())
-                    .map_err(|err| ErrorNewType(longport::Error::HttpClient(err)))?;
+                    .map_err(|err| ErrorNewType(longbridge::Error::HttpClient(err)))?;
                 Python::attach(|py| {
                     Ok(pythonize::pythonize(py, &resp.0)
                         .map_err(|err| PyRuntimeError::new_err(err.to_string()))?
@@ -154,7 +154,7 @@ impl HttpClient {
             .transpose()
             .map_err(|err| PyRuntimeError::new_err(err.to_string()))?;
         let method_parsed = method.to_uppercase().parse::<Method>().map_err(|_| {
-            ErrorNewType(longport::Error::HttpClient(
+            ErrorNewType(longbridge::Error::HttpClient(
                 HttpClientError::InvalidRequestMethod,
             ))
         })?;
@@ -171,12 +171,12 @@ impl HttpClient {
                     .response::<Json<Value>>()
                     .send()
                     .await
-                    .map_err(|e| ErrorNewType(longport::Error::HttpClient(e)))?,
+                    .map_err(|e| ErrorNewType(longbridge::Error::HttpClient(e)))?,
                 None => req
                     .response::<Json<Value>>()
                     .send()
                     .await
-                    .map_err(|e| ErrorNewType(longport::Error::HttpClient(e)))?,
+                    .map_err(|e| ErrorNewType(longbridge::Error::HttpClient(e)))?,
             };
             Ok(JsonResponse(resp.0))
         })

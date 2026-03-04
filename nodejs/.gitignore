@@ -1,4 +1,4 @@
-longport.*.node
+longbridge.*.node
 docs
 node_modules
 package-lock.json

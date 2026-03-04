@@ -10,13 +10,13 @@ use crate::{
 /// `Config.fromOAuth`.  All fields are optional.
 #[napi_derive::napi(object)]
 pub struct ExtraConfigParams {
-    /// HTTP API url (default: "https://openapi.longportapp.com")
+    /// HTTP API url (default: "https://openapi.longbridge.com")
     pub http_url: Option<String>,
     /// Websocket url for quote API (default:
-    /// "wss://openapi-quote.longportapp.com/v2")
+    /// "wss://openapi-quote.longbridge.com/v2")
     pub quote_ws_url: Option<String>,
     /// Websocket url for trade API (default:
-    /// "wss://openapi-trade.longportapp.com/v2")
+    /// "wss://openapi-trade.longbridge.com/v2")
     pub trade_ws_url: Option<String>,
     /// Language identifier (default: Language.EN)
     pub language: Option<Language>,
@@ -31,7 +31,10 @@ pub struct ExtraConfigParams {
     pub log_path: Option<String>,
 }
 
-fn apply_extra(mut config: longport::Config, extra: Option<ExtraConfigParams>) -> longport::Config {
+fn apply_extra(
+    mut config: longbridge::Config,
+    extra: Option<ExtraConfigParams>,
+) -> longbridge::Config {
     if let Some(extra) = extra {
         if let Some(http_url) = extra.http_url {
             config.set_http_url(http_url);
@@ -61,20 +64,20 @@ fn apply_extra(mut config: longport::Config, extra: Option<ExtraConfigParams>) -
     config
 }
 
-/// Configuration for LongPort sdk
+/// Configuration for Longbridge SDK
 #[napi_derive::napi]
-pub struct Config(pub(crate) longport::Config);
+pub struct Config(pub(crate) longbridge::Config);
 
 #[napi_derive::napi]
 impl Config {
     /// Create a new `Config` using API Key authentication
     ///
     /// Optional environment variables are read automatically
-    /// (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
-    /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-    /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-    /// `LONGPORT_LOG_PATH`).  Fields set in `extra` override the
-    /// corresponding environment variables.
+    /// (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
+    /// `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
+    /// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
+    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+    /// set in `extra` override the corresponding environment variables.
     ///
     /// @param appKey       Application key
     /// @param appSecret    Application secret
@@ -83,12 +86,12 @@ impl Config {
     ///
     /// @example
     /// ```javascript
-    /// const { Config } = require('longport');
+    /// const { Config } = require('longbridge');
     ///
     /// const config = Config.fromApikey(
-    ///   process.env.LONGPORT_APP_KEY,
-    ///   process.env.LONGPORT_APP_SECRET,
-    ///   process.env.LONGPORT_ACCESS_TOKEN,
+    ///   process.env.LONGBRIDGE_APP_KEY,
+    ///   process.env.LONGBRIDGE_APP_SECRET,
+    ///   process.env.LONGBRIDGE_ACCESS_TOKEN,
     /// );
     /// ```
     #[napi(factory, js_name = "fromApikey")]
@@ -98,7 +101,7 @@ impl Config {
         access_token: String,
         extra: Option<ExtraConfigParams>,
     ) -> Self {
-        let config = longport::Config::from_apikey(app_key, app_secret, access_token);
+        let config = longbridge::Config::from_apikey(app_key, app_secret, access_token);
         Self(apply_extra(config, extra))
     }
 
@@ -109,25 +112,25 @@ impl Config {
     ///
     /// # Variables
     ///
-    /// - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
+    /// - `LONGBRIDGE_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
     ///   (Default: `en`)
-    /// - `LONGPORT_APP_KEY` - App key
-    /// - `LONGPORT_APP_SECRET` - App secret
-    /// - `LONGPORT_ACCESS_TOKEN` - Access token
-    /// - `LONGPORT_HTTP_URL` - HTTP endpoint url
-    /// - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url
-    /// - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
-    /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
+    /// - `LONGBRIDGE_APP_KEY` - App key
+    /// - `LONGBRIDGE_APP_SECRET` - App secret
+    /// - `LONGBRIDGE_ACCESS_TOKEN` - Access token
+    /// - `LONGBRIDGE_HTTP_URL` - HTTP endpoint url
+    /// - `LONGBRIDGE_QUOTE_WS_URL` - Quote websocket endpoint url
+    /// - `LONGBRIDGE_TRADE_WS_URL` - Trade websocket endpoint url
+    /// - `LONGBRIDGE_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
     ///   `false` (Default: `false`)
-    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
-    ///   `realtime`)
-    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
-    ///   `true` or `false` (Default: `true`)
-    /// - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
+    /// - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
+    ///   (Default: `realtime`)
+    /// - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
+    ///   connected, `true` or `false` (Default: `true`)
+    /// - `LONGBRIDGE_LOG_PATH` - Log file directory (Default: no logs)
     #[napi(factory, js_name = "fromApikeyEnv")]
     pub fn from_apikey_env() -> Result<Self> {
         Ok(Self(
-            longport::Config::from_apikey_env().map_err(ErrorNewType)?,
+            longbridge::Config::from_apikey_env().map_err(ErrorNewType)?,
         ))
     }
 
@@ -137,18 +140,18 @@ impl Config {
     /// tokens and does not require app_secret or HMAC signatures.
     ///
     /// Optional environment variables are read automatically
-    /// (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
-    /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-    /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
-    /// `LONGPORT_LOG_PATH`).  Fields set in `extra` override the
-    /// corresponding environment variables.
+    /// (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
+    /// `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
+    /// `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
+    /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+    /// set in `extra` override the corresponding environment variables.
     ///
     /// @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
     /// @param extra  Optional extra parameters (override env variables)
     ///
     /// @example
     /// ```javascript
-    /// const { OAuthBuilder, Config } = require('longport');
+    /// const { OAuthBuilder, Config } = require('longbridge');
     ///
     /// const oauth = await OAuthBuilder.build('your-client-id', (url) => {
     ///   console.log('Open:', url);
@@ -157,7 +160,7 @@ impl Config {
     /// ```
     #[napi(factory, js_name = "fromOAuth")]
     pub fn from_oauth(oauth: &OAuth, extra: Option<ExtraConfigParams>) -> Self {
-        let config = longport::Config::from_oauth(oauth.0.clone());
+        let config = longbridge::Config::from_oauth(oauth.0.clone());
         Self(apply_extra(config, extra))
     }
 }

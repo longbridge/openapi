@@ -1,4 +1,4 @@
-use longport_candlesticks::{
+use longbridge_candlesticks::{
     Period, TRADE_SESSION_INTRADAY, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST, TRADE_SESSION_PRE,
     markets::US,
 };

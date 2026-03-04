@@ -1,6 +1,6 @@
 from time import sleep
 
-from longport.openapi import (
+from longbridge.openapi import (
     QuoteContext,
     Config,
     OAuthBuilder,

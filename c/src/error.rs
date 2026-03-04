@@ -1,13 +1,13 @@
 use std::os::raw::c_char;
 
-use longport::Error;
-use longport_c_macros::CEnum;
+use longbridge::Error;
+use longbridge_c_macros::CEnum;
 
 use crate::types::{CString, ToFFI};
 
 /// Error kind
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::SimpleErrorKind")]
+#[c(remote = "longbridge::SimpleErrorKind")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CErrorKind {

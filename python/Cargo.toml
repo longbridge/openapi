@@ -1,22 +1,22 @@
 [package]
 edition.workspace = true
-name = "longport-python"
+name = "longbridge-python"
 version.workspace = true
-description = "LongPort OpenAPI SDK for Python"
-homepage = "https://open.longportapp.com/en/"
+description = "Longbridge OpenAPI SDK for Python"
+homepage = "https://open.longbridge.com/en/"
 readme = "README.md"
-repository = "https://github.com/longportapp/openapi"
+repository = "https://github.com/longbridge/openapi"
 license = "MIT OR Apache-2.0"
-keywords = ["longport", "openapi", "sdk"]
+keywords = ["longbridge", "openapi", "sdk"]
 categories = ["api-bindings"]
 
 [lib]
-name = "longport"
+name = "longbridge"
 crate-type = ["cdylib"]
 
 [dependencies]
-longport = { workspace = true, features = ["blocking"] }
-longport-python-macros = { path = "crates/macros" }
+longbridge = { workspace = true, features = ["blocking"] }
+longbridge-python-macros = { path = "crates/macros" }
 pyo3-async-runtimes = { workspace = true }
 
 parking_lot.workspace = true

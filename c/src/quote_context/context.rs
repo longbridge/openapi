@@ -5,7 +5,7 @@ use std::{
     time::Instant,
 };
 
-use longport::{
+use longbridge::{
     QuoteContext,
     quote::{
         PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,

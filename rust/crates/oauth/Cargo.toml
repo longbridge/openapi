@@ -1,8 +1,8 @@
 [package]
 edition.workspace = true
-name = "longport-oauth"
+name = "longbridge-oauth"
 version.workspace = true
-description = "LongPort OpenAPI OAuth 2.0 client for Rust"
+description = "Longbridge OpenAPI OAuth 2.0 client for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

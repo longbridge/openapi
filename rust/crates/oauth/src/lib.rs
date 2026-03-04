@@ -1,4 +1,4 @@
-//! OAuth 2.0 authentication support for LongPort OpenAPI
+//! OAuth 2.0 authentication support for Longbridge OpenAPI
 //!
 //! This crate provides utilities for performing OAuth 2.0 authorization code
 //! flow to obtain access tokens for API authentication.
@@ -6,7 +6,7 @@
 //! # Example
 //!
 //! ```no_run
-//! use longport_oauth::OAuthBuilder;
+//! use longbridge_oauth::OAuthBuilder;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -174,7 +174,7 @@ struct OAuthInner {
 // Public OAuth handle (Clone = Arc reference bump)
 // ---------------------------------------------------------------------------
 
-/// OAuth 2.0 client for LongPort OpenAPI
+/// OAuth 2.0 client for Longbridge OpenAPI
 ///
 /// Obtain an instance via [`OAuthBuilder`].  Cloning is cheap – all clones
 /// share the same internal state through an [`Arc`].

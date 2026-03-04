@@ -1,5 +1,5 @@
 [package]
-name = "longport-python-macros"
+name = "longbridge-python-macros"
 version.workspace = true
 edition.workspace = true
 

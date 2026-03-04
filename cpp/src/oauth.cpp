@@ -1,8 +1,8 @@
 #include "oauth.hpp"
 #include "callback.hpp"
-#include "longport.h"
+#include "longbridge.h"
 
-namespace longport {
+namespace longbridge {
 
 // ── OAuth ────────────────────────────────────────────────────────────────────
 
@@ -90,4 +90,4 @@ OAuthBuilder::build(std::function<void(const std::string&)> open_url,
     new AsyncCallback<void*, OAuth>(callback));
 }
 
-} // namespace longport
+} // namespace longbridge

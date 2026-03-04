@@ -6,7 +6,7 @@ const {
   TimeInForceType,
   OrderType,
   OAuthBuilder,
-} = require("longport");
+} = require('longbridge');
 
 async function main() {
   const oauth = await OAuthBuilder.build("your-client-id", (url) => {

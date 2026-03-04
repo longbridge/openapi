@@ -1,8 +1,8 @@
 [package]
 edition.workspace = true
-name = "longport-proto"
+name = "longbridge-proto"
 version.workspace = true
-description = "LongPort Protocol"
+description = "Longbridge Protocol"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

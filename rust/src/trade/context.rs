@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use longport_httpcli::{HttpClient, Json, Method};
-use longport_wscli::WsClientError;
+use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_wscli::WsClientError;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{mpsc, oneshot};
@@ -99,14 +99,14 @@ impl TradeContext {
 
     /// Subscribe
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/trade-push#subscribe>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/trade-push#subscribe>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     Config, decimal,
     ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType, TradeContext},
     /// };
@@ -150,7 +150,7 @@ impl TradeContext {
 
     /// Unsubscribe
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/trade-push#cancel-subscribe>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/trade-push#cancel-subscribe>
     pub async fn unsubscribe<I>(&self, topics: I) -> Result<()>
     where
         I: IntoIterator<Item = TopicType>,
@@ -168,14 +168,14 @@ impl TradeContext {
 
     /// Get history executions
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/execution/history_executions>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/execution/history_executions>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     trade::{GetHistoryExecutionsOptions, TradeContext},
     ///     Config,
     /// };
@@ -218,14 +218,14 @@ impl TradeContext {
 
     /// Get today executions
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/execution/today_executions>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/execution/today_executions>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     Config,
     ///     trade::{GetTodayExecutionsOptions, TradeContext},
     /// };
@@ -264,14 +264,14 @@ impl TradeContext {
 
     /// Get history orders
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/order/history_orders>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/order/history_orders>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus, TradeContext},
     ///     Config, Market,
     /// };
@@ -317,14 +317,14 @@ impl TradeContext {
 
     /// Get today orders
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/order/today_orders>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/order/today_orders>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     Config, Market,
     ///     trade::{GetTodayOrdersOptions, OrderSide, OrderStatus, TradeContext},
     /// };
@@ -367,14 +367,14 @@ impl TradeContext {
 
     /// Replace order
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/order/replace>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/order/replace>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     Config, decimal,
     ///     trade::{ReplaceOrderOptions, TradeContext},
     /// };
@@ -405,14 +405,14 @@ impl TradeContext {
 
     /// Submit order
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/order/submit>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/order/submit>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     Config, decimal,
     ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType, TradeContext},
     /// };
@@ -453,14 +453,14 @@ impl TradeContext {
 
     /// Cancel order
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/order/withdraw>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/order/withdraw>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, trade::TradeContext};
+    /// use longbridge::{Config, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -492,14 +492,14 @@ impl TradeContext {
 
     /// Get account balance
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/account>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/asset/account>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, trade::TradeContext};
+    /// use longbridge::{Config, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -536,14 +536,14 @@ impl TradeContext {
 
     /// Get cash flow
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/cashflow>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/asset/cashflow>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     trade::{GetCashFlowOptions, TradeContext},
     ///     Config,
     /// };
@@ -580,14 +580,14 @@ impl TradeContext {
 
     /// Get fund positions
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/fund>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/asset/fund>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, trade::TradeContext};
+    /// use longbridge::{Config, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -616,14 +616,14 @@ impl TradeContext {
 
     /// Get stock positions
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/stock>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/asset/stock>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, trade::TradeContext};
+    /// use longbridge::{Config, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -652,14 +652,14 @@ impl TradeContext {
 
     /// Get margin ratio
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/margin_ratio>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/asset/margin_ratio>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, trade::TradeContext};
+    /// use longbridge::{Config, trade::TradeContext};
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
@@ -692,14 +692,14 @@ impl TradeContext {
 
     /// Get order detail
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/order/order_detail>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/order/order_detail>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     Config, Market,
     ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus, TradeContext},
     /// };
@@ -738,14 +738,14 @@ impl TradeContext {
     /// warrants, and options
     ///
     ///
-    /// Reference: <https://open.longportapp.com/en/docs/trade/order/estimate_available_buy_limit>
+    /// Reference: <https://open.longbridge.com/en/docs/trade/order/estimate_available_buy_limit>
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
+    /// use longbridge::{
     ///     Config,
     ///     trade::{EstimateMaxPurchaseQuantityOptions, OrderSide, OrderType, TradeContext},
     /// };

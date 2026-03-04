@@ -1,14 +1,14 @@
 [package]
 edition.workspace = true
-name = "longport-java"
+name = "longbridge-java"
 version.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-longport.workspace = true
-longport-java-macros = { path = "./crates/macros" }
+longbridge.workspace = true
+longbridge-java-macros = { path = "./crates/macros" }
 
 jni.workspace = true
 thiserror.workspace = true

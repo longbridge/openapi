@@ -1,4 +1,4 @@
-//! LongPort OpenAPI SDK blocking API
+//! Longbridge OpenAPI SDK blocking API
 
 mod error;
 mod quote;

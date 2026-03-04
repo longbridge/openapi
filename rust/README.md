@@ -1,11 +1,11 @@
-# LongPort OpenAPI SDK for Rust
+# Longbridge OpenAPI SDK for Rust
 
 <div align="center">
-  <a href="https://crates.io/crates/longport">
-    <img src="https://img.shields.io/crates/v/longport.svg?style=flat-square"
+  <a href="https://crates.io/crates/longbridge">
+    <img src="https://img.shields.io/crates/v/longbridge.svg?style=flat-square"
     alt="Crates.io version" />
   </a>
-  <a href="https://docs.rs/longport">
+  <a href="https://docs.rs/longbridge">
     <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square"
       alt="docs.rs docs" />
   </a>
@@ -20,13 +20,13 @@
 </div>
 
 
-`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longbridge` provides an easy-to-use interface for invoking [`Longbridge OpenAPI`](https://open.longbridge.com/en/).
 
 ## Documentation
 
-- SDK docs: https://longportapp.github.io/openapi/rust/longport/index.html
-- crates.io: https://crates.io/crates/longport
-- LongPort OpenAPI: https://open.longportapp.com/en/
+- SDK docs: https://longbridge.github.io/openapi/rust/longbridge/index.html
+- crates.io: https://crates.io/crates/longbridge
+- Longbridge OpenAPI: https://open.longbridge.com/en/
 
 ## Examples
 
@@ -45,12 +45,12 @@ _Add dependencies to `Cargo.toml`_
 
 ```toml
 [dependencies]
-longport = "1.0.0"
+longbridge = "4.0.0"
 ```
 
 ### Authentication
 
-LongPort OpenAPI supports two authentication methods:
+Longbridge OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
@@ -102,7 +102,7 @@ Response:
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, oauth::OAuthBuilder};
+use longbridge::{Config, oauth::OAuthBuilder};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -133,17 +133,17 @@ For backward compatibility you can use the traditional API key method.
 _Setting environment variables (macOS/Linux)_
 
 ```bash
-export LONGPORT_APP_KEY="App Key get from user center"
-export LONGPORT_APP_SECRET="App Secret get from user center"
-export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
+export LONGBRIDGE_APP_KEY="App Key get from user center"
+export LONGBRIDGE_APP_SECRET="App Secret get from user center"
+export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables (Windows)_
 
 ```powershell
-setx LONGPORT_APP_KEY "App Key get from user center"
-setx LONGPORT_APP_SECRET "App Secret get from user center"
-setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
+setx LONGBRIDGE_APP_KEY "App Key get from user center"
+setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
+setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
@@ -152,7 +152,7 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, QuoteContext, oauth::OAuthBuilder};
+use longbridge::{Config, QuoteContext, oauth::OAuthBuilder};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -178,7 +178,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, QuoteContext};
+use longbridge::{Config, QuoteContext};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -202,7 +202,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{quote::SubFlags, Config, QuoteContext};
+use longbridge::{quote::SubFlags, Config, QuoteContext};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -228,7 +228,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{
+use longbridge::{
     decimal,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
     Config, TradeContext,
@@ -264,11 +264,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 - Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
 - If you don't see push events, keep the process alive (receiver loop / `sleep`).
-- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+- For debugging, set `LONGBRIDGE_LOG_PATH` to enable SDK logs.
 
 ## Crate features
 
-To avoid compiling unused dependencies, longport gates certain features, all of which are disabled by default:
+To avoid compiling unused dependencies, longbridge gates certain features, all of which are disabled by default:
 
 | Feature  | Description                         |
 |----------|-------------------------------------|

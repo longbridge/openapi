@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use jni::{JNIEnv, errors::Result, objects::JValueOwned};
-use longport::quote::SubFlags;
+use longbridge::quote::SubFlags;
 
 use crate::types::{IntoJValue, JSignature};
 

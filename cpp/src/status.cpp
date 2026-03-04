@@ -1,8 +1,8 @@
 #include "status.hpp"
 #include "convert.hpp"
-#include "longport.h"
+#include "longbridge.h"
 
-namespace longport {
+namespace longbridge {
 
 Status::Status()
 {
@@ -86,4 +86,4 @@ Status::message() const
   return err_ ? std::make_optional(lb_error_message(err_)) : std::nullopt;
 }
 
-} // namespace longport
+} // namespace longbridge

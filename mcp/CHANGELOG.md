@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [3.0.9] 2025-07-24
 
-- Add option_quote mcp tool [#269](https://github.com/longportapp/openapi/pull/269)
+- Add option_quote mcp tool [#269](https://github.com/longbridge/openapi/pull/269)
 
 # [0.2.1] 2025-05-07
 

@@ -3,7 +3,7 @@ use jni::{
     objects::{JClass, JObject, JString},
     sys::{jboolean, jlong},
 };
-use longport::{Config, Language, PushCandlestickMode};
+use longbridge::{Config, Language, PushCandlestickMode};
 
 use crate::{error::jni_result, types::FromJValue};
 
@@ -11,7 +11,7 @@ use crate::{error::jni_result, types::FromJValue};
 // ──────────────────────────────────────────────────────────────
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_com_longport_SdkNative_newConfigFromApikey(
+pub extern "system" fn Java_com_longbridge_SdkNative_newConfigFromApikey(
     mut env: JNIEnv,
     _class: JClass,
     app_key: JString,
@@ -28,7 +28,7 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfigFromApikey(
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_com_longport_SdkNative_newConfigFromApikeyEnv(
+pub extern "system" fn Java_com_longbridge_SdkNative_newConfigFromApikeyEnv(
     mut env: JNIEnv,
     _class: JClass,
 ) -> jlong {
@@ -39,13 +39,13 @@ pub extern "system" fn Java_com_longport_SdkNative_newConfigFromApikeyEnv(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_newConfigFromOauth(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newConfigFromOauth(
     mut env: JNIEnv,
     _class: JClass,
     oauth: jlong,
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
-        let oauth = &*(oauth as *const longport::oauth::OAuth);
+        let oauth = &*(oauth as *const longbridge::oauth::OAuth);
         let config = Config::from_oauth(oauth.clone());
         Ok(Box::into_raw(Box::new(config)) as jlong)
     })
@@ -55,7 +55,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_newConfigFromOauth(
 // ───────────────────────────────────────────────────────────────────
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetHttpUrl(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetHttpUrl(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -69,7 +69,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetHttpUrl(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetQuoteWsUrl(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetQuoteWsUrl(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -83,7 +83,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetQuoteWsUrl(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetTradeWsUrl(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetTradeWsUrl(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -97,7 +97,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetTradeWsUrl(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetLanguage(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetLanguage(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -111,7 +111,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetLanguage(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetEnableOvernight(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnableOvernight(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -123,7 +123,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetEnableOvernig
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetPushCandlestickMode(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetPushCandlestickMode(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -137,7 +137,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetPushCandlesti
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetEnablePrintQuotePackages(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnablePrintQuotePackages(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -152,7 +152,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetEnablePrintQu
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetLogPath(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetLogPath(
     mut env: JNIEnv,
     _class: JClass,
     config: jlong,
@@ -168,7 +168,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configSetLogPath(
 // ── Free ──────────────────────────────────────────────────────────────────────
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_freeConfig(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeConfig(
     _env: JNIEnv,
     _class: JClass,
     config: jlong,

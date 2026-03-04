@@ -4,6 +4,6 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-longport = { path = "../../../rust" }
+longbridge = { path = "../../../rust" }
 tokio = { version = "1.19", features = ["rt-multi-thread", "macros"] }
 tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }

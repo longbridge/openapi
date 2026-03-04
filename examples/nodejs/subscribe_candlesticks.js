@@ -1,4 +1,4 @@
-const { Config, QuoteContext, Period, TradeSessions, OAuthBuilder } = require("longport");
+const { Config, QuoteContext, Period, TradeSessions, OAuthBuilder } = require('longbridge');
 
 let globalCtx;
 

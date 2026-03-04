@@ -1,11 +1,11 @@
-# LongPort OpenAPI SDK for Java
+# Longbridge OpenAPI SDK for Java
 
-`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
+`longbridge` provides an easy-to-use interface for invoking [`Longbridge OpenAPI`](https://open.longbridge.com/en/).
 
 ## Documentation
 
-- SDK docs: https://longportapp.github.io/openapi/java/index.html
-- LongPort OpenAPI: https://open.longportapp.com/en/
+- SDK docs: https://longbridge.github.io/openapi/java/index.html
+- Longbridge OpenAPI: https://open.longbridge.com/en/
 
 ## Examples
 
@@ -19,14 +19,14 @@ Runnable examples live in `examples/java/`:
 
 ## Quickstart
 
-_Install LongPort OpenAPI SDK_
+_Install Longbridge OpenAPI SDK_
 
-Add `io.github.longportapp:openapi-sdk` to `pom.xml`
+Add `io.github.longbridge:openapi-sdk` to `pom.xml`
 
 ```xml
 <dependencies>
     <dependency>
-        <groupId>io.github.longportapp</groupId>
+        <groupId>io.github.longbridge</groupId>
         <artifactId>openapi-sdk</artifactId>
         <version>LATEST</version>
     </dependency>
@@ -35,7 +35,7 @@ Add `io.github.longportapp:openapi-sdk` to `pom.xml`
 
 ### Authentication
 
-LongPort OpenAPI supports two authentication methods:
+Longbridge OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
@@ -91,7 +91,7 @@ authorization or refresh.  The resulting `OAuth` handle is passed directly to
 `Config.fromOAuth`.
 
 ```java
-import com.longport.*;
+import com.longbridge.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
@@ -110,24 +110,24 @@ class Main {
 _Setting environment variables(MacOS/Linux)_
 
 ```bash
-export LONGPORT_APP_KEY="App Key get from user center"
-export LONGPORT_APP_SECRET="App Secret get from user center"
-export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
+export LONGBRIDGE_APP_KEY="App Key get from user center"
+export LONGBRIDGE_APP_SECRET="App Secret get from user center"
+export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"
 ```
 
 _Setting environment variables(Windows)_
 
 ```powershell
-setx LONGPORT_APP_KEY "App Key get from user center"
-setx LONGPORT_APP_SECRET "App Secret get from user center"
-setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
+setx LONGBRIDGE_APP_KEY "App Key get from user center"
+setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
+setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 ```
 
 ## Quote API _(Get basic information of securities)_
 
 ```java
-import com.longport.*;
-import com.longport.quote.*;
+import com.longbridge.*;
+import com.longbridge.quote.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
@@ -149,8 +149,8 @@ class Main {
 ## Quote API _(Subscribe quotes)_
 
 ```java
-import com.longport.*;
-import com.longport.quote.*;
+import com.longbridge.*;
+import com.longbridge.quote.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
@@ -172,8 +172,8 @@ class Main {
 ## Trade API _(Submit order)_
 
 ```java
-import com.longport.*;
-import com.longport.trade.*;
+import com.longbridge.*;
+import com.longbridge.trade.*;
 import java.math.BigDecimal;
 
 class Main {
@@ -199,7 +199,7 @@ class Main {
 
 - Windows `setx` requires a new terminal; use `set` for the current `cmd.exe` session.
 - If you don't see push events, ensure the program keeps running (e.g. `Thread.sleep(...)`).
-- For debugging, set `LONGPORT_LOG_PATH` to enable SDK logs.
+- For debugging, set `LONGBRIDGE_LOG_PATH` to enable SDK logs.
 
 ## License
 

@@ -38,7 +38,7 @@ jobs:
           sudo apt-get install -y doxygen
 
       - name: Build Rust doc
-        run: cargo doc -p longport --no-deps
+        run: cargo doc -p longbridge --no-deps
 
       - name: Build Python wheels
         uses: PyO3/maturin-action@v1
@@ -47,8 +47,8 @@ jobs:
           args: -i python3.13 --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
-          pip install longport --no-index --find-links dist --force-reinstall
-          python -c "import longport"
+          pip install longbridge --no-index --find-links dist --force-reinstall
+          python -c "import longbridge"
       - name: Build Python docs
         run: |
           pip install -r docs/requirements.txt

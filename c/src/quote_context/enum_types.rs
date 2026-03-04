@@ -1,8 +1,8 @@
-use longport_c_macros::CEnum;
+use longbridge_c_macros::CEnum;
 
 /// Trade status
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::TradeStatus")]
+#[c(remote = "longbridge::quote::TradeStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CTradeStatus {
@@ -43,7 +43,7 @@ pub enum CTradeStatus {
 
 /// Trade session
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::TradeSession")]
+#[c(remote = "longbridge::quote::TradeSession")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CTradeSession {
@@ -63,7 +63,7 @@ pub enum CTradeSession {
 
 /// Trade direction
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::TradeDirection")]
+#[c(remote = "longbridge::quote::TradeDirection")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CTradeDirection {
@@ -80,7 +80,7 @@ pub enum CTradeDirection {
 
 /// Option type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::OptionType")]
+#[c(remote = "longbridge::quote::OptionType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum COptionType {
@@ -97,7 +97,7 @@ pub enum COptionType {
 
 /// Option direction
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::OptionDirection")]
+#[c(remote = "longbridge::quote::OptionDirection")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum COptionDirection {
@@ -114,7 +114,7 @@ pub enum COptionDirection {
 
 /// Warrant type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::WarrantType")]
+#[c(remote = "longbridge::quote::WarrantType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CWarrantType {
@@ -140,7 +140,7 @@ pub enum CWarrantType {
 
 /// Adjust type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::AdjustType")]
+#[c(remote = "longbridge::quote::AdjustType")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CAdjustType {
@@ -154,7 +154,7 @@ pub enum CAdjustType {
 
 /// Adjust type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::SecurityBoard")]
+#[c(remote = "longbridge::quote::SecurityBoard")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CSecurityBoard {
@@ -243,7 +243,7 @@ pub enum CSecurityBoard {
 
 /// Candlestick period
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::Period")]
+#[c(remote = "longbridge::quote::Period")]
 #[allow(clippy::enum_variant_names, non_camel_case_types)]
 #[repr(C)]
 pub enum CPeriod {
@@ -308,7 +308,7 @@ pub enum CPeriod {
 
 /// Trade session
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::SecuritiesUpdateMode")]
+#[c(remote = "longbridge::quote::SecuritiesUpdateMode")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CSecuritiesUpdateMode {
@@ -325,7 +325,7 @@ pub enum CSecuritiesUpdateMode {
 
 /// Calc index
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::CalcIndex")]
+#[c(remote = "longbridge::quote::CalcIndex")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CCalcIndex {
@@ -453,7 +453,7 @@ pub enum CCalcIndex {
 
 /// Sort order type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::SortOrderType")]
+#[c(remote = "longbridge::quote::SortOrderType")]
 #[repr(C)]
 pub enum CSortOrderType {
     /// Ascending
@@ -466,7 +466,7 @@ pub enum CSortOrderType {
 
 /// Warrant sort by
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::WarrantSortBy")]
+#[c(remote = "longbridge::quote::WarrantSortBy")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CWarrantSortBy {
@@ -540,7 +540,7 @@ pub enum CWarrantSortBy {
 
 /// Filter warrant expiry date type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::FilterWarrantExpiryDate")]
+#[c(remote = "longbridge::quote::FilterWarrantExpiryDate")]
 #[allow(non_camel_case_types)]
 #[repr(C)]
 pub enum CFilterWarrantExpiryDate {
@@ -560,7 +560,7 @@ pub enum CFilterWarrantExpiryDate {
 
 /// Filter warrant in/out of the bounds type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::FilterWarrantInOutBoundsType")]
+#[c(remote = "longbridge::quote::FilterWarrantInOutBoundsType")]
 #[allow(non_camel_case_types)]
 #[repr(C)]
 pub enum CFilterWarrantInOutBoundsType {
@@ -574,7 +574,7 @@ pub enum CFilterWarrantInOutBoundsType {
 
 /// Warrant status
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::WarrantStatus")]
+#[c(remote = "longbridge::quote::WarrantStatus")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CWarrantStatus {
@@ -591,7 +591,7 @@ pub enum CWarrantStatus {
 
 /// Security list category
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::SecurityListCategory")]
+#[c(remote = "longbridge::quote::SecurityListCategory")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CSecurityListCategory {
@@ -602,7 +602,7 @@ pub enum CSecurityListCategory {
 
 /// Trade sessions
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::TradeSessions")]
+#[c(remote = "longbridge::quote::TradeSessions")]
 #[repr(C)]
 pub enum CTradeSessions {
     /// Intraday
@@ -615,7 +615,7 @@ pub enum CTradeSessions {
 
 /// Data granularity
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longport::quote::Granularity")]
+#[c(remote = "longbridge::quote::Granularity")]
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CGranularity {

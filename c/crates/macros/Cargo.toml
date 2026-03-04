@@ -1,5 +1,5 @@
 [package]
-name = "longport-c-macros"
+name = "longbridge-c-macros"
 version.workspace = true
 edition.workspace = true
 

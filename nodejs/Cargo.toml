@@ -1,14 +1,14 @@
 [package]
 edition.workspace = true
-name = "longport-nodejs"
+name = "longbridge-nodejs"
 version.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-longport.workspace = true
-longport-nodejs-macros = { path = "crates/macros" }
+longbridge.workspace = true
+longbridge-nodejs-macros = { path = "crates/macros" }
 
 napi = { workspace = true, features = [
     "napi4",
