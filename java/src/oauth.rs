@@ -5,7 +5,7 @@ use jni::{
 };
 use longport::oauth::{OAuth, OAuthBuilder};
 
-use crate::{async_util, error::jni_result};
+use crate::{async_util, error::jni_result, types::JavaLong};
 
 // ── OAuth native handle
 // ───────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_oauthBuild(
                 })
                 .await
                 .map_err(|e| crate::error::JniError::Other(e.to_string()))?;
-            Ok(Box::into_raw(Box::new(oauth)) as jlong)
+            Ok(JavaLong::from(Box::into_raw(Box::new(oauth)) as jlong))
         })?;
         Ok(())
     })

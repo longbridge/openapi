@@ -12,10 +12,10 @@ mod sub_flags;
 use std::borrow::Cow;
 
 use jni::{
-    JNIEnv,
     errors::Result,
     objects::{GlobalRef, JObject, JValueOwned},
     strings::JNIString,
+    JNIEnv,
 };
 
 pub(crate) use self::{
@@ -25,7 +25,7 @@ pub(crate) use self::{
     },
     object_array::ObjectArray,
     primary_array::PrimaryArray,
-    primary_types::JavaInteger,
+    primary_types::{JavaInteger, JavaLong},
 };
 
 pub(crate) trait ClassLoader {

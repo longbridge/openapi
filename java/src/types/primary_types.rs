@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
-use jni::{JNIEnv, errors::Result, objects::JValueOwned};
+use jni::{errors::Result, objects::JValueOwned, JNIEnv};
 
 use crate::{
-    init::INTEGER_CLASS,
+    init::{INTEGER_CLASS, LONG_CLASS},
     types::{FromJValue, IntoJValue, JSignature},
 };
 
@@ -84,6 +84,47 @@ impl IntoJValue for f64 {
     #[inline]
     fn into_jvalue<'a>(self, _env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
         Ok(JValueOwned::from(self))
+    }
+}
+
+pub(crate) struct JavaLong(i64);
+
+impl From<i64> for JavaLong {
+    #[inline]
+    fn from(value: i64) -> Self {
+        JavaLong(value)
+    }
+}
+
+impl From<JavaLong> for i64 {
+    #[inline]
+    fn from(value: JavaLong) -> Self {
+        value.0
+    }
+}
+
+impl JSignature for JavaLong {
+    fn signature() -> Cow<'static, str> {
+        "Ljava/lang/Long;".into()
+    }
+}
+
+impl FromJValue for JavaLong {
+    fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
+        let obj = value.l()?;
+        let value = env.call_method(obj, "longValue", "()J", &[])?;
+        Ok(JavaLong(value.j()?))
+    }
+}
+
+impl IntoJValue for JavaLong {
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        let obj = env.new_object(
+            LONG_CLASS.get().unwrap(),
+            "(J)V",
+            &[JValueOwned::from(self.0).borrow()],
+        )?;
+        Ok(JValueOwned::from(obj))
     }
 }
 

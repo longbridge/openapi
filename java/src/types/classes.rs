@@ -132,9 +132,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longport/quote/PrePostQuote",
     longport::quote::PrePostQuote,
-    [
-        last_done, timestamp, volume, turnover, high, low, prev_close
-    ]
+    [last_done, timestamp, volume, turnover, high, low, prev_close]
 );
 
 impl_java_class!(
