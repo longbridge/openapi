@@ -2975,12 +2975,15 @@ class QuoteContext:
             ::
 
                 from time import sleep
-                from longbridge.openapi import QuoteContext, Config, SubType, PushQuote
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SubType, PushQuote
 
                 def on_quote(symbol: str, event: PushQuote):
                     print(symbol, event)
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
                 ctx.set_on_quote(on_quote)
 
@@ -2999,8 +3002,11 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, SubType
-                config = Config.from_apikey_env()
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SubType
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3019,8 +3025,11 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, PushCandlestick, TradeSessions
-                config = Config.from_apikey_env()
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, PushCandlestick, TradeSessions
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 def on_candlestick(symbol: str, event: PushCandlestick):
@@ -3047,8 +3056,11 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, SubType
-                config = Config.from_apikey_env()
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SubType
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3069,9 +3081,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.static_info(
@@ -3092,9 +3107,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
@@ -3114,9 +3132,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.option_quote(["AAPL230317P160000.US"])
@@ -3136,9 +3157,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.warrant_quote(["21125.HK"])
@@ -3158,9 +3182,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.depth("700.HK")
@@ -3180,9 +3207,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.brokers("700.HK")
@@ -3199,9 +3229,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.participants()
@@ -3222,9 +3255,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.trades("700.HK", 10)
@@ -3245,9 +3281,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, TradeSessions
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, TradeSessions
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.intraday("700.HK", TradeSessions.Intraday)
@@ -3271,9 +3310,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, Period, AdjustType, TradeSessions
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, Period, AdjustType, TradeSessions
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.candlesticks(
@@ -3321,9 +3363,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.option_chain_expiry_date_list("AAPL.US")
@@ -3345,9 +3390,12 @@ class QuoteContext:
             ::
 
                 from datetime import date
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.option_chain_info_by_date(
@@ -3365,9 +3413,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.warrant_issuers()
@@ -3394,9 +3445,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, WarrantSortBy, SortOrderType
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, WarrantSortBy, SortOrderType
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.warrant_list("700.HK", WarrantSortBy.LastDone, SortOrderType.Ascending)
@@ -3413,9 +3467,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.trading_session()
@@ -3440,9 +3497,12 @@ class QuoteContext:
             ::
 
                 from datetime import date
-                from longbridge.openapi import QuoteContext, Config, Market
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, Market
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.trading_days(
@@ -3463,9 +3523,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.capital_flow("700.HK")
@@ -3485,9 +3548,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.capital_distribution("700.HK")
@@ -3508,9 +3574,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, CalcIndex
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, CalcIndex
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.calc_indexes(["700.HK", "APPL.US"], [CalcIndex.LastDone, CalcIndex.ChangeRate])
@@ -3527,9 +3596,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.watchlist()
@@ -3550,9 +3622,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
                 group_id = ctx.create_watchlist_group(name = "Watchlist1", securities = ["700.HK", "AAPL.US"])
                 print(group_id)
@@ -3569,9 +3644,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
                 ctx.delete_watchlist_group(10086)
         """
@@ -3588,9 +3666,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, SecuritiesUpdateMode
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SecuritiesUpdateMode
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
                 ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
         """
@@ -3609,9 +3690,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, Market, SecurityListCategory
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, Market, SecurityListCategory
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.security_list(Market.HK, SecurityListCategory.Overnight)
@@ -3631,9 +3715,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longbridge.openapi import QuoteContext, Config, Market
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, Market
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.market_temperature(Market.HK)
@@ -3656,9 +3743,12 @@ class QuoteContext:
             ::
 
                 from datetime import date
-                from longbridge.openapi import QuoteContext, Config, Market
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, Market
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 resp = ctx.history_market_temperature(Market.HK, date(2023, 1, 1), date(2023, 1, 31))
@@ -3681,9 +3771,12 @@ class QuoteContext:
             ::
 
                 from time import sleep
-                from longbridge.openapi import QuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SubType
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3708,9 +3801,12 @@ class QuoteContext:
             ::
 
                 from time import sleep
-                from longbridge.openapi import QuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SubType
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
@@ -3735,9 +3831,12 @@ class QuoteContext:
             ::
 
                 from time import sleep
-                from longbridge.openapi import QuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SubType
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
@@ -3763,9 +3862,12 @@ class QuoteContext:
             ::
 
                 from time import sleep
-                from longbridge.openapi import QuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, SubType
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
@@ -3792,9 +3894,12 @@ class QuoteContext:
             ::
 
                 from time import sleep
-                from longbridge.openapi import QuoteContext, Config, Period
+                from longbridge.openapi import OAuthBuilder, QuoteContext, Config, Period
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = QuoteContext(config)
 
                 ctx.subscribe_candlesticks("AAPL.US", Period.Min_1)
@@ -3826,10 +3931,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import Config, AsyncQuoteContext
+                from longbridge.openapi import OAuthBuilder, Config, AsyncQuoteContext
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.quote(["700.HK", "AAPL.US"])
                     print(resp)
@@ -3888,13 +3996,16 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SubType, PushQuote
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SubType, PushQuote
 
                 def on_quote(symbol: str, event: PushQuote):
                     print(symbol, event)
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     ctx.set_on_quote(on_quote)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3917,10 +4028,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     await ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
@@ -3943,7 +4057,7 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncQuoteContext,
                     Config,
                     Period,
@@ -3955,7 +4069,10 @@ class AsyncQuoteContext:
                     print(symbol, event)
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     ctx.set_on_candlestick(on_candlestick)
                     await ctx.subscribe_candlesticks(
@@ -3982,7 +4099,7 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncQuoteContext,
                     Config,
                     Period,
@@ -3990,7 +4107,10 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe_candlesticks(
                         "700.HK",
@@ -4011,10 +4131,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     resp = await ctx.subscriptions()
@@ -4036,10 +4159,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.static_info(
                         ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
@@ -4061,10 +4187,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
                     print(resp)
@@ -4085,10 +4214,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.option_quote(["AAPL230317P160000.US"])
                     print(resp)
@@ -4109,10 +4241,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_quote(["21125.HK"])
                     print(resp)
@@ -4132,10 +4267,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.depth("700.HK")
                     print(resp)
@@ -4155,10 +4293,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.brokers("700.HK")
                     print(resp)
@@ -4175,10 +4316,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.participants()
                     print(resp)
@@ -4199,10 +4343,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.trades("700.HK", 10)
                     print(resp)
@@ -4224,10 +4371,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, TradeSessions
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, TradeSessions
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.intraday("700.HK", TradeSessions.Intraday)
                     print(resp)
@@ -4252,7 +4402,7 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncQuoteContext,
                     Config,
                     Period,
@@ -4261,7 +4411,10 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.candlesticks(
                         "700.HK",
@@ -4295,7 +4448,7 @@ class AsyncQuoteContext:
 
                 import asyncio
                 import datetime
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncQuoteContext,
                     Config,
                     Period,
@@ -4304,7 +4457,10 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.history_candlesticks_by_offset(
                         "700.HK",
@@ -4339,7 +4495,7 @@ class AsyncQuoteContext:
 
                 import asyncio
                 import datetime
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncQuoteContext,
                     Config,
                     Period,
@@ -4348,7 +4504,10 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.history_candlesticks_by_date(
                         "700.HK",
@@ -4376,10 +4535,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.option_chain_expiry_date_list("AAPL.US")
                     print(resp)
@@ -4402,10 +4564,13 @@ class AsyncQuoteContext:
 
                 import asyncio
                 from datetime import date
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.option_chain_info_by_date(
                         "AAPL.US",
@@ -4425,10 +4590,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_issuers()
                     print(resp)
@@ -4456,7 +4624,7 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncQuoteContext,
                     Config,
                     WarrantSortBy,
@@ -4464,7 +4632,10 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_list(
                         "700.HK",
@@ -4485,10 +4656,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.trading_session()
                     print(resp)
@@ -4512,10 +4686,13 @@ class AsyncQuoteContext:
 
                 import asyncio
                 from datetime import date
-                from longbridge.openapi import AsyncQuoteContext, Config, Market
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, Market
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.trading_days(
                         Market.HK,
@@ -4540,10 +4717,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.capital_flow("700.HK")
                     print(resp)
@@ -4564,10 +4744,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.capital_distribution("700.HK")
                     print(resp)
@@ -4589,10 +4772,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, CalcIndex
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, CalcIndex
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.calc_indexes(
                         ["700.HK", "APPL.US"],
@@ -4612,10 +4798,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.watchlist()
                     print(resp)
@@ -4637,10 +4826,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     group_id = await ctx.create_watchlist_group(
                         name="Watchlist1",
@@ -4665,10 +4857,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.delete_watchlist_group(10086)
 
@@ -4691,10 +4886,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SecuritiesUpdateMode
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SecuritiesUpdateMode
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.update_watchlist_group(
                         10086,
@@ -4720,10 +4918,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, Market, SecurityListCategory
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, Market, SecurityListCategory
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.security_list(
                         Market.HK,
@@ -4747,10 +4948,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, Market
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, Market
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.market_temperature(Market.HK)
                     print(resp)
@@ -4774,10 +4978,13 @@ class AsyncQuoteContext:
 
                 import asyncio
                 import datetime
-                from longbridge.openapi import AsyncQuoteContext, Config, Market
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, Market
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.history_market_temperature(
                         Market.HK,
@@ -4802,10 +5009,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     await asyncio.sleep(5)
@@ -4827,10 +5037,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
                     await asyncio.sleep(5)
@@ -4852,10 +5065,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
                     await asyncio.sleep(5)
@@ -4879,10 +5095,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, SubType
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
                     await asyncio.sleep(5)
@@ -4907,10 +5126,13 @@ class AsyncQuoteContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncQuoteContext, Config, Period
+                from longbridge.openapi import OAuthBuilder, AsyncQuoteContext, Config, Period
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe_candlesticks(
                         "AAPL.US",
@@ -6373,14 +6595,17 @@ class TradeContext:
 
                 from time import sleep
                 from decimal import Decimal
-                from longbridge.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType, PushOrderChanged, TopicType
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config, OrderSide, OrderType, TimeInForceType, PushOrderChanged, TopicType
 
 
                 def on_order_changed(event: PushOrderChanged):
                     print(event)
 
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
                 ctx.set_on_order_changed(on_order_changed)
                 ctx.subscribe([TopicType.Private])
@@ -6422,9 +6647,12 @@ class TradeContext:
             ::
 
                 from datetime import datetime
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.history_executions(
@@ -6449,9 +6677,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.today_executions(symbol = "700.HK")
@@ -6477,9 +6708,12 @@ class TradeContext:
             ::
 
                 from datetime import datetime
-                from longbridge.openapi import TradeContext, Config, OrderStatus, OrderSide, Market
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config, OrderStatus, OrderSide, Market
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.history_orders(
@@ -6510,9 +6744,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config, OrderStatus, OrderSide, Market
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config, OrderStatus, OrderSide, Market
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.today_orders(
@@ -6544,9 +6781,12 @@ class TradeContext:
             ::
 
                 from decimal import Decimal
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 ctx.replace_order(
@@ -6585,9 +6825,12 @@ class TradeContext:
             ::
 
                 from decimal import Decimal
-                from longbridge.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config, OrderSide, OrderType, TimeInForceType
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.submit_order(
@@ -6612,9 +6855,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 ctx.cancel_order("709043056541253632")
@@ -6633,9 +6879,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.account_balance()
@@ -6661,9 +6910,12 @@ class TradeContext:
             ::
 
                 from datetime import datetime
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.cash_flow(
@@ -6686,9 +6938,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.fund_positions()
@@ -6708,9 +6963,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.stock_positions()
@@ -6730,9 +6988,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.margin_ratio("700.HK")
@@ -6752,9 +7013,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.order_detail("701276261045858304")
@@ -6780,9 +7044,12 @@ class TradeContext:
         Examples:
             ::
 
-                from longbridge.openapi import TradeContext, Config, OrderType, OrderSide
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config, OrderType, OrderSide
 
-                config = Config.from_apikey_env()
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
                 ctx = TradeContext(config)
 
                 resp = ctx.estimate_max_purchase_quantity(
@@ -6816,10 +7083,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import Config, AsyncTradeContext
+                from longbridge.openapi import OAuthBuilder, Config, AsyncTradeContext
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.today_orders()
                     print(resp)
@@ -6845,7 +7115,7 @@ class AsyncTradeContext:
 
                 import asyncio
                 from decimal import Decimal
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncTradeContext,
                     Config,
                     OrderSide,
@@ -6859,7 +7129,10 @@ class AsyncTradeContext:
                     print(event)
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     ctx.set_on_order_changed(on_order_changed)
                     await ctx.subscribe([TopicType.Private])
@@ -6891,10 +7164,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config, TopicType
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config, TopicType
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     await ctx.subscribe([TopicType.Private])
                     await ctx.unsubscribe([TopicType.Private])
@@ -6918,10 +7194,13 @@ class AsyncTradeContext:
 
                 import asyncio
                 import datetime
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.history_executions(
                         symbol="700.HK",
@@ -6947,10 +7226,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.today_executions(symbol="700.HK")
                     print(resp)
@@ -6977,7 +7259,7 @@ class AsyncTradeContext:
 
                 import asyncio
                 import datetime
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncTradeContext,
                     Config,
                     OrderStatus,
@@ -6986,7 +7268,10 @@ class AsyncTradeContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.history_orders(
                         symbol="700.HK",
@@ -7018,7 +7303,7 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncTradeContext,
                     Config,
                     OrderStatus,
@@ -7027,7 +7312,10 @@ class AsyncTradeContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.today_orders(
                         symbol="700.HK",
@@ -7064,10 +7352,13 @@ class AsyncTradeContext:
 
                 import asyncio
                 from decimal import Decimal
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     await ctx.replace_order(
                         order_id="709043056541253632",
@@ -7107,7 +7398,7 @@ class AsyncTradeContext:
 
                 import asyncio
                 from decimal import Decimal
-                from longbridge.openapi import (
+                from longbridge.openapi import OAuthBuilder, (
                     AsyncTradeContext,
                     Config,
                     OrderSide,
@@ -7116,7 +7407,10 @@ class AsyncTradeContext:
                 )
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.submit_order(
                         symbol="700.HK",
@@ -7144,10 +7438,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     await ctx.cancel_order("709043056541253632")
 
@@ -7167,10 +7464,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.account_balance()
                     print(resp)
@@ -7197,10 +7497,13 @@ class AsyncTradeContext:
 
                 import asyncio
                 import datetime
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.cash_flow(
                         start_at=datetime.datetime(2022, 5, 9),
@@ -7224,10 +7527,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.fund_positions()
                     print(resp)
@@ -7248,10 +7554,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.stock_positions()
                     print(resp)
@@ -7271,10 +7580,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.margin_ratio("700.HK")
                     print(resp)
@@ -7294,10 +7606,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.order_detail("701276261045858304")
                     print(resp)
@@ -7324,10 +7639,13 @@ class AsyncTradeContext:
             ::
 
                 import asyncio
-                from longbridge.openapi import AsyncTradeContext, Config, OrderType, OrderSide
+                from longbridge.openapi import OAuthBuilder, AsyncTradeContext, Config, OrderType, OrderSide
 
                 async def main():
-                    config = Config.from_apikey_env()
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.estimate_max_purchase_quantity(
                         symbol="700.HK",
