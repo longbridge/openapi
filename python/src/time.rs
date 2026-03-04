@@ -5,7 +5,7 @@ use pyo3::{
     types::{PyDate, PyDateAccess, PyDateTime, PyTime, PyTimeAccess},
 };
 use time::{
-    Date, Month, OffsetDateTime, PrimitiveDateTime, Time, format_description::well_known::Rfc3339,
+    format_description::well_known::Rfc3339, Date, Month, OffsetDateTime, PrimitiveDateTime, Time,
 };
 
 #[derive(Copy, Clone)]

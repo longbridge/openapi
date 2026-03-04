@@ -1,4 +1,4 @@
-use longport::oauth::{OAuth as CoreOAuth, OAuthError, OAuthToken as CoreOAuthToken};
+use longport::oauth::{OAuthBuilder as CoreOAuthBuilder, OAuthError};
 use pyo3::prelude::*;
 
 use crate::error::ErrorNewType;
@@ -7,215 +7,124 @@ fn oauth_err(e: OAuthError) -> PyErr {
     ErrorNewType(longport::Error::OAuth(e.to_string())).into()
 }
 
-/// OAuth 2.0 access token
-#[pyclass(name = "OAuthToken")]
-pub(crate) struct OAuthToken(pub(crate) CoreOAuthToken);
-
-#[pymethods]
-impl OAuthToken {
-    /// Returns `True` if the token has expired
-    fn is_expired(&self) -> bool {
-        self.0.is_expired()
-    }
-
-    /// Returns `True` if the token will expire within 1 hour
-    fn expires_soon(&self) -> bool {
-        self.0.expires_soon()
-    }
-
-    /// Load a token from the default path (`~/.longbridge-openapi/token`)
-    #[staticmethod]
-    fn load() -> PyResult<Self> {
-        CoreOAuthToken::load().map(OAuthToken).map_err(oauth_err)
-    }
-
-    /// Load a token from an explicit file path
-    ///
-    /// Args:
-    ///     path: Path to the token JSON file
-    #[staticmethod]
-    fn load_from_path(path: String) -> PyResult<Self> {
-        CoreOAuthToken::load_from_path(path)
-            .map(OAuthToken)
-            .map_err(oauth_err)
-    }
-
-    /// Save the token to the default path (`~/.longbridge-openapi/token`)
-    fn save(&self) -> PyResult<()> {
-        self.0.save().map_err(oauth_err)
-    }
-
-    /// Save the token to an explicit file path
-    ///
-    /// The parent directory is created automatically if it does not exist.
-    ///
-    /// Args:
-    ///     path: Destination path for the token JSON file
-    fn save_to_path(&self, path: String) -> PyResult<()> {
-        self.0.save_to_path(path).map_err(oauth_err)
-    }
-}
-
-/// Synchronous OAuth 2.0 client for LongPort OpenAPI
+/// OAuth 2.0 client handle for LongPort OpenAPI
 ///
-/// Blocks the calling thread while waiting for browser authorization.
-/// Use `AsyncOAuth` instead if you need a non-blocking, awaitable interface.
+/// Obtain an instance via :meth:`OAuthBuilder.build` (blocking) or
+/// :meth:`OAuthBuilder.build_async` (async).  Pass it to
+/// :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`.
 #[pyclass(name = "OAuth")]
-pub(crate) struct OAuth {
-    inner: CoreOAuth,
+pub(crate) struct OAuth(pub(crate) longport::oauth::OAuth);
+
+/// Builder for the OAuth 2.0 authorization flow
+///
+/// Args:
+///     client_id: OAuth 2.0 client ID from the LongPort developer portal
+///     callback_port: TCP port for the local callback server (default 60355).
+///         Must match one of the redirect URIs registered for the client.
+///
+/// Example (blocking)::
+///
+///     from longport.openapi import OAuthBuilder, Config
+///
+///     oauth = OAuthBuilder("your-client-id").build(
+///         lambda url: print("Open:", url)
+///     )
+///     config = Config.from_oauth(oauth)
+///
+/// Example (async)::
+///
+///     import asyncio
+///     from longport.openapi import OAuthBuilder, Config
+///
+///     async def main():
+///         oauth = await OAuthBuilder("your-client-id").build_async(
+///             lambda url: print("Open:", url)
+///         )
+///         config = Config.from_oauth(oauth)
+///
+///     asyncio.run(main())
+#[pyclass(name = "OAuthBuilder")]
+pub(crate) struct OAuthBuilder {
+    client_id: String,
+    callback_port: Option<u16>,
 }
 
 #[pymethods]
-impl OAuth {
-    /// Create a new OAuth 2.0 client
-    ///
-    /// Args:
-    ///     client_id: OAuth 2.0 client ID from the LongPort developer portal
+impl OAuthBuilder {
     #[new]
-    fn py_new(client_id: String) -> Self {
+    #[pyo3(signature = (client_id, callback_port = None))]
+    fn py_new(client_id: String, callback_port: Option<u16>) -> Self {
         Self {
-            inner: CoreOAuth::new(client_id),
+            client_id,
+            callback_port,
         }
     }
 
-    /// Set the callback port
+    /// Build an OAuth 2.0 client (blocking).
     ///
-    /// Args:
-    ///     callback_port: TCP port for the local callback server (default
-    ///         60355). Must match one of the redirect URIs registered for
-    ///         the client.
-    fn set_callback_port(&mut self, callback_port: u16) {
-        self.inner.set_callback_port(callback_port);
-    }
-
-    /// Start the OAuth 2.0 authorization flow (blocking)
-    ///
-    /// Starts a local HTTP server, calls `on_open_url` with the authorization
-    /// URL, then blocks until the redirect arrives and exchanges the
-    /// authorization code for a token.
+    /// If a valid token is already cached on disk
+    /// (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+    /// otherwise the browser authorization flow is started and
+    /// ``on_open_url`` is called with the authorization URL.
     ///
     /// Args:
     ///     on_open_url: Callable that receives the authorization URL as a
-    ///         string. Use it to open the URL in a browser or print it.
+    ///         string.
     ///
     /// Returns:
-    ///     OAuthToken that can be passed to Config.from_oauth or
-    ///     HttpClient.from_oauth
-    fn authorize(&self, on_open_url: Py<PyAny>) -> PyResult<OAuthToken> {
-        let inner = self.inner.clone();
+    ///     :class:`OAuth` handle
+    fn build(&self, on_open_url: Py<PyAny>) -> PyResult<OAuth> {
+        let mut builder = CoreOAuthBuilder::new(self.client_id.clone());
+        if let Some(port) = self.callback_port {
+            builder = builder.callback_port(port);
+        }
         tokio::runtime::Runtime::new()
             .unwrap()
             .block_on(async move {
-                inner
-                    .authorize(move |url| {
+                builder
+                    .build(move |url| {
                         Python::attach(|py| {
                             let _ = on_open_url.call1(py, (url,));
                         });
                     })
                     .await
-                    .map(OAuthToken)
+                    .map(OAuth)
                     .map_err(oauth_err)
             })
     }
 
-    /// Refresh an access token using an existing OAuthToken (blocking)
+    /// Build an OAuth 2.0 client (async).
     ///
-    /// Args:
-    ///     token: Existing OAuthToken whose refresh token is used
-    ///
-    /// Returns:
-    ///     New OAuthToken with a fresh access token
-    fn refresh(&self, token: &OAuthToken) -> PyResult<OAuthToken> {
-        let inner = self.inner.clone();
-        let inner_token = token.0.clone();
-        tokio::runtime::Runtime::new()
-            .unwrap()
-            .block_on(async move {
-                inner
-                    .refresh(&inner_token)
-                    .await
-                    .map(OAuthToken)
-                    .map_err(oauth_err)
-            })
-    }
-}
-
-/// Asynchronous OAuth 2.0 client for LongPort OpenAPI
-///
-/// Returns awaitables; must be used inside an `asyncio` event loop.
-/// Use `OAuth` instead for a plain blocking interface.
-#[pyclass(name = "AsyncOAuth")]
-pub(crate) struct AsyncOAuth {
-    inner: CoreOAuth,
-}
-
-#[pymethods]
-impl AsyncOAuth {
-    /// Create a new AsyncOAuth 2.0 client
-    ///
-    /// Args:
-    ///     client_id: OAuth 2.0 client ID from the LongPort developer portal
-    #[new]
-    fn py_new(client_id: String) -> Self {
-        Self {
-            inner: CoreOAuth::new(client_id),
-        }
-    }
-
-    /// Set the callback port
-    ///
-    /// Args:
-    ///     callback_port: TCP port for the local callback server (default
-    ///         60355). Must match one of the redirect URIs registered for
-    ///         the client.
-    fn set_callback_port(&mut self, callback_port: u16) {
-        self.inner.set_callback_port(callback_port);
-    }
-
-    /// Start the OAuth 2.0 authorization flow (async)
-    ///
-    /// Starts a local HTTP server, calls `on_open_url` with the authorization
-    /// URL, then awaits the redirect and exchanges the authorization code for
-    /// a token.
+    /// If a valid token is already cached on disk
+    /// (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+    /// otherwise the browser authorization flow is started and
+    /// ``on_open_url`` is called with the authorization URL.
     ///
     /// Args:
     ///     on_open_url: Callable that receives the authorization URL as a
-    ///         string. Use it to open the URL in a browser or print it.
+    ///         string.
     ///
     /// Returns:
-    ///     Awaitable resolving to an OAuthToken
-    fn authorize<'py>(
+    ///     Awaitable resolving to an :class:`OAuth` handle
+    fn build_async<'py>(
         &self,
         py: Python<'py>,
         on_open_url: Py<PyAny>,
     ) -> PyResult<Bound<'py, PyAny>> {
-        let inner = self.inner.clone();
+        let mut builder = CoreOAuthBuilder::new(self.client_id.clone());
+        if let Some(port) = self.callback_port {
+            builder = builder.callback_port(port);
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let token = inner
-                .authorize(move |url| {
+            builder
+                .build(move |url| {
                     Python::attach(|py| {
                         let _ = on_open_url.call1(py, (url,));
                     });
                 })
                 .await
-                .map_err(oauth_err)?;
-            Ok(OAuthToken(token))
-        })
-    }
-
-    /// Refresh an access token using an existing OAuthToken (async)
-    ///
-    /// Args:
-    ///     token: Existing OAuthToken whose refresh token is used
-    ///
-    /// Returns:
-    ///     Awaitable resolving to a new OAuthToken
-    fn refresh<'py>(&self, py: Python<'py>, token: &OAuthToken) -> PyResult<Bound<'py, PyAny>> {
-        let inner = self.inner.clone();
-        let inner_token = token.0.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let new_token = inner.refresh(&inner_token).await.map_err(oauth_err)?;
-            Ok(OAuthToken(new_token))
+                .map(OAuth)
+                .map_err(oauth_err)
         })
     }
 }

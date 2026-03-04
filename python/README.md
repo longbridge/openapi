@@ -87,42 +87,42 @@ Response:
 
 Save the `client_id` for use in your application.
 
-**Step 2: Authorize, Refresh, and Get Token**
+**Step 2: Build an OAuth client and create Config**
+
+`OAuthBuilder` loads a cached token from
+`~/.longbridge-openapi/tokens/<client_id>`
+(`%USERPROFILE%\.longbridge-openapi\tokens\<client_id>` on Windows) if one
+exists and is still valid, or starts the browser authorization flow
+automatically.  The token is persisted to the same path after a successful
+authorization or refresh.
 
 ```python
-from longport.openapi import Config, OAuth, OAuthToken
+from longport.openapi import OAuthBuilder, Config
 
-def get_token() -> OAuthToken:
-    try:
-        token = OAuthToken.load()
-    except Exception:
-        token = None
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
+```
 
-    if token is None or token.is_expired():
-        # No saved token or token has expired — re-authorize
-        oauth = OAuth("your-client-id")
-        token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-        token.save()
-    elif token.expires_soon():
-        # Token will expire soon — refresh it
-        try:
-            oauth = OAuth("your-client-id")
-            token = oauth.refresh(token)
-            token.save()
-        except Exception:
-            # Refresh failed — fall back to re-authorization
-            oauth = OAuth("your-client-id")
-            token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-            token.save()
-    return token
+For async code use `build_async`:
 
-# Create config with OAuth token
-config = Config.from_oauth(get_token())
+```python
+import asyncio
+from longport.openapi import OAuthBuilder, Config
+
+async def main():
+    oauth = await OAuthBuilder("your-client-id").build_async(
+        lambda url: print(f"Open this URL to authorize: {url}")
+    )
+    config = Config.from_oauth(oauth)
+
+asyncio.run(main())
 ```
 
 #### 2. Legacy API Key (Environment Variables)
 
-_Setting environment variables(MacOS/Linux)_
+_Setting environment variables (macOS/Linux)_
 
 ```bash
 export LONGPORT_APP_KEY="App Key get from user center"
@@ -130,7 +130,7 @@ export LONGPORT_APP_SECRET="App Secret get from user center"
 export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 ```
 
-_Setting environment variables(Windows)_
+_Setting environment variables (Windows)_
 
 ```powershell
 setx LONGPORT_APP_KEY "App Key get from user center"
@@ -138,31 +138,23 @@ setx LONGPORT_APP_SECRET "App Secret get from user center"
 setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 ```
 
+Then create a config from the environment:
+
+```python
+from longport.openapi import Config
+
+config = Config.from_apikey_env()
+```
+
 ## Quote API _(Get basic information of securities)_
 
 ```python
-from longport.openapi import Config, QuoteContext, OAuth, OAuthToken
+from longport.openapi import Config, QuoteContext, OAuthBuilder
 
-def get_token() -> OAuthToken:
-    try:
-        token = OAuthToken.load()
-        if token.is_expired():
-            raise Exception("expired")
-        if token.expires_soon():
-            try:
-                return OAuth("your-client-id").refresh(token)
-            except Exception:
-                pass
-        else:
-            return token
-    except Exception:
-        pass
-    oauth = OAuth("your-client-id")
-    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-    token.save()
-    return token
-
-config = Config.from_oauth(get_token())
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # Create a context for quote APIs
 ctx = QuoteContext(config)
@@ -176,28 +168,12 @@ print(resp)
 
 ```python
 from time import sleep
-from longport.openapi import Config, QuoteContext, SubType, PushQuote, OAuth, OAuthToken
+from longport.openapi import Config, QuoteContext, SubType, PushQuote, OAuthBuilder
 
-def get_token() -> OAuthToken:
-    try:
-        token = OAuthToken.load()
-        if token.is_expired():
-            raise Exception("expired")
-        if token.expires_soon():
-            try:
-                return OAuth("your-client-id").refresh(token)
-            except Exception:
-                pass
-        else:
-            return token
-    except Exception:
-        pass
-    oauth = OAuth("your-client-id")
-    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-    token.save()
-    return token
-
-config = Config.from_oauth(get_token())
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # A callback to receive quote data
 def on_quote(symbol: str, event: PushQuote):
@@ -208,9 +184,9 @@ ctx = QuoteContext(config)
 ctx.set_on_quote(on_quote)
 
 # Subscribe
-resp = ctx.subscribe(["700.HK"], [SubType.Quote], is_first_push=True)
+ctx.subscribe(["700.HK"], [SubType.Quote], is_first_push=True)
 
-# Receive push duration to 30 seconds
+# Receive push for 30 seconds
 sleep(30)
 ```
 
@@ -218,43 +194,29 @@ sleep(30)
 
 ```python
 from decimal import Decimal
-from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuth, OAuthToken
+from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuthBuilder
 
-def get_token() -> OAuthToken:
-    try:
-        token = OAuthToken.load()
-        if token.is_expired():
-            raise Exception("expired")
-        if token.expires_soon():
-            try:
-                return OAuth("your-client-id").refresh(token)
-            except Exception:
-                pass
-        else:
-            return token
-    except Exception:
-        pass
-    oauth = OAuth("your-client-id")
-    token = oauth.authorize(lambda url: print(f"Open this URL to authorize: {url}"))
-    token.save()
-    return token
-
-config = Config.from_oauth(get_token())
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # Create a context for trade APIs
 ctx = TradeContext(config)
 
 # Submit order
-resp = ctx.submit_order("700.HK", OrderType.LO, OrderSide.Buy, Decimal(
-    "500"), TimeInForceType.Day, submitted_price=Decimal("50"), remark="Hello from Python SDK")
+resp = ctx.submit_order(
+    "700.HK", OrderType.LO, OrderSide.Buy,
+    Decimal("500"), TimeInForceType.Day,
+    submitted_price=Decimal("50"),
+    remark="Hello from Python SDK",
+)
 print(resp)
 ```
 
 ## Asynchronous API
 
-**Note:** The async API is currently in an early experience stage; we welcome feedback.
-
-The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API and may be invoked from internal threads.
+The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API.
 
 - **Async quote**: create with `ctx = await AsyncQuoteContext.create(config)`, then e.g. `await ctx.quote(["700.HK"])`, `await ctx.subscribe(...)`.
 - **Async trade**: create with `ctx = await AsyncTradeContext.create(config)`, then e.g. `await ctx.today_orders()`, `await ctx.submit_order(...)`.
@@ -264,36 +226,16 @@ Example (async quote):
 
 ```python
 import asyncio
-from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuth, OAuthToken
+from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuthBuilder
 
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)
 
-async def get_token() -> OAuthToken:
-    try:
-        token = OAuthToken.load()
-        if token.is_expired():
-            raise Exception("expired")
-        if token.expires_soon():
-            try:
-                oauth = OAuth("your-client-id")
-                token = await oauth.refresh_async(token)
-                token.save()
-                return token
-            except Exception:
-                pass
-        else:
-            return token
-    except Exception:
-        pass
-    oauth = OAuth("your-client-id")
-    token = await oauth.authorize_async(lambda url: print(f"Open this URL to authorize: {url}"))
-    token.save()
-    return token
-
 async def main():
-    token = await get_token()
-    config = Config.from_oauth(token)
+    oauth = await OAuthBuilder("your-client-id").build_async(
+        lambda url: print(f"Open this URL to authorize: {url}")
+    )
+    config = Config.from_oauth(oauth)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])

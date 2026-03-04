@@ -1,5 +1,5 @@
 use longport_python_macros::PyEnum;
-use pyo3::{PyErr, pyclass};
+use pyo3::{pyclass, PyErr};
 
 pyo3::import_exception!(longport.openapi, OpenApiException);
 

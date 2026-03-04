@@ -50,40 +50,55 @@ class OpenApiException(Exception):
 
 class HttpClient:
     """
-    A HTTP client for longPort open api
-
-    Args:
-        http_url: HTTP API url
-        app_key: App Key
-        app_secret: App Secret
-        access_token: Access Token
+    A HTTP client for LongPort OpenAPI.
     """
 
-    def __init__(self, http_url: str, app_key: str,
-                 app_secret: str, access_token: str) -> None: ...
-
-    @classmethod
-    def from_env(cls: Type[HttpClient]) -> HttpClient:
+    @staticmethod
+    def from_apikey(
+        app_key: str,
+        app_secret: str,
+        access_token: str,
+        http_url: Optional[str] = None,
+    ) -> HttpClient:
         """
-        Create a new `HttpClient` from the given environment variables
-
-        It first gets the environment variables from the `.env` file in the current directory.
-
-        # Variables
-
-        - `LONGPORT_HTTP_URL` - HTTP endpoint url
-        - `LONGPORT_APP_KEY` - App key
-        - `LONGPORT_APP_SECRET` - App secret
-        - `LONGPORT_ACCESS_TOKEN` - Access token
-        """
-
-    @classmethod
-    def from_oauth(cls: Type[HttpClient], token: OAuthToken) -> HttpClient:
-        """
-        Create a new `HttpClient` from an OAuthToken
+        Create a new ``HttpClient`` using API Key authentication.
 
         Args:
-            token: OAuthToken returned by :meth:`OAuth.authorize` or :meth:`OAuth.refresh`
+            app_key: App Key
+            app_secret: App Secret
+            access_token: Access Token
+            http_url: HTTP API url (default:
+                ``https://openapi.longportapp.com``)
+        """
+
+    @classmethod
+    def from_apikey_env(cls: Type[HttpClient]) -> HttpClient:
+        """
+        Create a new ``HttpClient`` from environment variables (API Key
+        authentication).
+
+        Variables:
+
+        - ``LONGPORT_HTTP_URL`` - HTTP endpoint url
+        - ``LONGPORT_APP_KEY`` - App key
+        - ``LONGPORT_APP_SECRET`` - App secret
+        - ``LONGPORT_ACCESS_TOKEN`` - Access token
+        """
+
+    @classmethod
+    def from_oauth(
+        cls: Type[HttpClient],
+        oauth: OAuth,
+        http_url: Optional[str] = None,
+    ) -> HttpClient:
+        """
+        Create a new ``HttpClient`` from an OAuth handle.
+
+        Args:
+            oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
+                :meth:`OAuthBuilder.build_async`
+            http_url: HTTP API url (default:
+                ``https://openapi.longportapp.com``)
         """
 
     def request(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Any:
@@ -95,15 +110,14 @@ class HttpClient:
 
                 from longport.openapi import HttpClient
 
-                client = HttpClient(http_url, app_key,
-                                    app_secret, access_token);
+                client = HttpClient.from_apikey(app_key, app_secret, access_token)
 
                 # get
-                resp = client.request("get", "/foo/bar");
+                resp = client.request("get", "/foo/bar")
                 print(resp)
 
                 # post
-                client.request("get", "/foo/bar", { "foo": 1, "bar": 2 });
+                client.request("post", "/foo/bar", body={ "foo": 1, "bar": 2 })
         """
         ...
 
@@ -127,7 +141,7 @@ class HttpClient:
                 from longport.openapi import HttpClient
 
                 async def main():
-                    http_cli = HttpClient.from_env()
+                    http_cli = HttpClient.from_apikey_env()
                     resp = await http_cli.request_async(
                         "get",
                         "/v1/trade/execution/today",
@@ -155,161 +169,82 @@ class PushCandlestickMode:
         """
 
 
-class OAuthToken:
-    """
-    OAuth 2.0 access token
-    """
-
-    def is_expired(self) -> bool:
-        """Returns ``True`` if the token has expired"""
-
-    def expires_soon(self) -> bool:
-        """Returns ``True`` if the token will expire within 1 hour"""
-
-    @staticmethod
-    def load() -> OAuthToken:
-        """
-        Load a token from the default path (``~/.longbridge-openapi/token``)
-
-        Returns:
-            OAuthToken loaded from disk
-
-        Raises:
-            RuntimeError: If the file cannot be read or parsed
-        """
-
-    @staticmethod
-    def load_from_path(path: str) -> OAuthToken:
-        """
-        Load a token from an explicit file path
-
-        Args:
-            path: Path to the token JSON file
-
-        Returns:
-            OAuthToken loaded from disk
-
-        Raises:
-            RuntimeError: If the file cannot be read or parsed
-        """
-
-    def save(self) -> None:
-        """
-        Save the token to the default path (``~/.longbridge-openapi/token``)
-
-        The parent directory is created automatically if it does not exist.
-
-        Raises:
-            RuntimeError: If the file cannot be written
-        """
-
-    def save_to_path(self, path: str) -> None:
-        """
-        Save the token to an explicit file path
-
-        The parent directory is created automatically if it does not exist.
-
-        Args:
-            path: Destination path for the token JSON file
-
-        Raises:
-            RuntimeError: If the file cannot be written
-        """
-
-
 class OAuth:
     """
-    Synchronous OAuth 2.0 client for LongPort OpenAPI.
+    OAuth 2.0 client handle for LongPort OpenAPI.
 
-    Blocks the calling thread while waiting for browser authorization.
-    Use :class:`AsyncOAuth` instead if you need a non-blocking, awaitable interface.
+    Obtain an instance via :meth:`OAuthBuilder.build` (blocking) or
+    :meth:`AsyncOAuthBuilder.build` (async).  Pass it to
+    :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`.
+    """
+
+
+class OAuthBuilder:
+    """
+    Builder for the OAuth 2.0 authorization flow.
 
     Args:
         client_id: OAuth 2.0 client ID from the LongPort developer portal
+        callback_port: TCP port for the local callback server (default 60355).
+            Must match one of the redirect URIs registered for the client.
+
+    Example (blocking)::
+
+        from longport.openapi import OAuthBuilder, Config
+
+        oauth = OAuthBuilder("your-client-id").build(
+            lambda url: print("Open:", url)
+        )
+        config = Config.from_oauth(oauth)
+
+    Example (async)::
+
+        import asyncio
+        from longport.openapi import OAuthBuilder, Config
+
+        async def main():
+            oauth = await OAuthBuilder("your-client-id").build_async(
+                lambda url: print("Open:", url)
+            )
+            config = Config.from_oauth(oauth)
+
+        asyncio.run(main())
     """
 
-    def __init__(self, client_id: str) -> None: ...
+    def __init__(self, client_id: str, callback_port: Optional[int] = None) -> None: ...
 
-    def set_callback_port(self, callback_port: int) -> None:
+    def build(self, on_open_url: Callable[[str], None]) -> OAuth:
         """
-        Set the callback port
+        Build an OAuth 2.0 client (blocking).
+
+        If a valid token is already cached on disk
+        (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+        otherwise the browser authorization flow is started and
+        ``on_open_url`` is called with the authorization URL.
 
         Args:
-            callback_port: TCP port for the local callback server (default 60355).
-                Must match one of the redirect URIs registered for the client.
-        """
-
-    def authorize(self, on_open_url: Callable[[str], None]) -> OAuthToken:
-        """
-        Start the OAuth 2.0 authorization flow (blocking)
-
-        Starts a local HTTP server, calls ``on_open_url`` with the authorization
-        URL, then blocks until the redirect arrives and exchanges the code for a token.
-
-        Args:
-            on_open_url: Callable that receives the authorization URL as a string.
+            on_open_url: Callable that receives the authorization URL as a
+                string.
 
         Returns:
-            OAuthToken that can be passed to :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`
+            :class:`OAuth` handle
         """
 
-    def refresh(self, token: OAuthToken) -> OAuthToken:
+    async def build_async(self, on_open_url: Callable[[str], None]) -> OAuth:
         """
-        Refresh an access token using an existing OAuthToken (blocking)
+        Build an OAuth 2.0 client (async).
+
+        If a valid token is already cached on disk
+        (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+        otherwise the browser authorization flow is started and
+        ``on_open_url`` is called with the authorization URL.
 
         Args:
-            token: Existing OAuthToken whose refresh token is used
+            on_open_url: Callable that receives the authorization URL as a
+                string.
 
         Returns:
-            New OAuthToken with a fresh access token
-        """
-
-
-class AsyncOAuth:
-    """
-    Asynchronous OAuth 2.0 client for LongPort OpenAPI.
-
-    Returns awaitables; must be used inside an ``asyncio`` event loop.
-    Use :class:`OAuth` instead for a plain blocking interface.
-
-    Args:
-        client_id: OAuth 2.0 client ID from the LongPort developer portal
-    """
-
-    def __init__(self, client_id: str) -> None: ...
-
-    def set_callback_port(self, callback_port: int) -> None:
-        """
-        Set the callback port
-
-        Args:
-            callback_port: TCP port for the local callback server (default 60355).
-                Must match one of the redirect URIs registered for the client.
-        """
-
-    async def authorize(self, on_open_url: Callable[[str], None]) -> OAuthToken:
-        """
-        Start the OAuth 2.0 authorization flow (async)
-
-        Starts a local HTTP server, calls ``on_open_url`` with the authorization
-        URL, then awaits the redirect and exchanges the code for a token.
-
-        Args:
-            on_open_url: Callable that receives the authorization URL as a string.
-
-        Returns:
-            OAuthToken that can be passed to :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`
-        """
-
-    async def refresh(self, token: OAuthToken) -> OAuthToken:
-        """
-        Refresh an access token using an existing OAuthToken (async)
-
-        Args:
-            token: Existing OAuthToken whose refresh token is used
-
-        Returns:
-            New OAuthToken with a fresh access token
+            Awaitable resolving to an :class:`OAuth` handle
         """
 
 
@@ -321,18 +256,19 @@ class Config:
         app_key: App Key
         app_secret: App Secret
         access_token: Access Token
-        http_url: HTTP API url
+        http_url: HTTP API url (default: ``https://openapi.longportapp.com``)
         quote_ws_url: Websocket url for quote API
         trade_ws_url: Websocket url for trade API
-        language: Language identifier
-        enable_overnight: Enable overnight quote
+        language: Language identifier (default: ``Language.EN``)
+        enable_overnight: Enable overnight quote (default: ``False``)
         push_candlestick_mode: Push candlestick mode
-        enable_print_quote_packages: Enable printing the opened quote packages when connected to the server
-        log_path: Set the path of the log files
+        enable_print_quote_packages: Print opened quote packages on connect
+            (default: ``True``)
+        log_path: Path for log files (default: no logs)
     """
 
-    def __init__(
-        self,
+    @staticmethod
+    def from_apikey(
         app_key: str,
         app_secret: str,
         access_token: str,
@@ -344,54 +280,87 @@ class Config:
         push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime,
         enable_print_quote_packages: bool = True,
         log_path: Optional[str] = None,
-    ) -> None: ...
-
-    @classmethod
-    def from_env(cls: Type[Config]) -> Config:
+    ) -> Config:
         """
-        Create a new `Config` from the given environment variables
-
-        It first gets the environment variables from the `.env` file in the current directory.
-
-        # Variables
-
-        - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en` (Default: `en`)
-        - `LONGPORT_APP_KEY` - App key
-        - `LONGPORT_APP_SECRET` - App secret
-        - `LONGPORT_ACCESS_TOKEN` - Access token
-        - `LONGPORT_HTTP_URL` - HTTP endpoint url
-        - `LONGPORT_QUOTE_WS_URL` - Quote websocket endpoint url
-        - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
-        - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or `false` (Default: `false`)
-        - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default: `realtime`)
-        - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected, `true` or `false` (Default: `true`)
-        - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no logs`)
-        """
-
-    @classmethod
-    def from_oauth(cls: Type[Config], token: OAuthToken) -> Config:
-        """
-        Create a new ``Config`` for OAuth 2.0 authentication
-
-        OAuth 2.0 is the recommended authentication method that uses Bearer
-        tokens and does not require app_secret or HMAC signatures.
+        Create a new ``Config`` using API Key authentication.
 
         Args:
-            token: OAuthToken returned by :meth:`OAuth.authorize` or :meth:`OAuth.refresh`
+            app_key: App Key
+            app_secret: App Secret
+            access_token: Access Token
+            http_url: HTTP API url override (optional)
+            quote_ws_url: Quote WS url override (optional)
+            trade_ws_url: Trade WS url override (optional)
+            language: Language identifier (optional)
+            enable_overnight: Enable overnight quote (optional)
+            push_candlestick_mode: Push candlestick mode (optional)
+            enable_print_quote_packages: Print opened quote packages on
+                connect (optional)
+            log_path: Path for log files (optional)
+        """
+
+    @classmethod
+    def from_apikey_env(cls: Type[Config]) -> Config:
+        """
+        Create a new ``Config`` from environment variables (API Key
+        authentication).
+
+        It first gets the environment variables from the ``.env`` file in the
+        current directory.
+
+        Variables:
+
+        - ``LONGPORT_APP_KEY`` - App key
+        - ``LONGPORT_APP_SECRET`` - App secret
+        - ``LONGPORT_ACCESS_TOKEN`` - Access token
+        - ``LONGPORT_LANGUAGE`` - ``zh-CN``, ``zh-HK`` or ``en``
+          (Default: ``en``)
+        - ``LONGPORT_HTTP_URL`` - HTTP endpoint url
+        - ``LONGPORT_QUOTE_WS_URL`` - Quote websocket endpoint url
+        - ``LONGPORT_TRADE_WS_URL`` - Trade websocket endpoint url
+        - ``LONGPORT_ENABLE_OVERNIGHT`` - ``true`` or ``false``
+          (Default: ``false``)
+        - ``LONGPORT_PUSH_CANDLESTICK_MODE`` - ``realtime`` or ``confirmed``
+          (Default: ``realtime``)
+        - ``LONGPORT_PRINT_QUOTE_PACKAGES`` - ``true`` or ``false``
+          (Default: ``true``)
+        - ``LONGPORT_LOG_PATH`` - Log file directory (Default: no logs)
+        """
+
+    @classmethod
+    def from_oauth(
+        cls: Type[Config],
+        oauth: OAuth,
+        http_url: Optional[str] = None,
+        quote_ws_url: Optional[str] = None,
+        trade_ws_url: Optional[str] = None,
+        language: Optional[Type[Language]] = None,
+        enable_overnight: Optional[bool] = None,
+        push_candlestick_mode: Optional[Type[PushCandlestickMode]] = None,
+        enable_print_quote_packages: Optional[bool] = None,
+        log_path: Optional[str] = None,
+    ) -> Config:
+        """
+        Create a new ``Config`` for OAuth 2.0 authentication.
+
+        OAuth 2.0 is the recommended authentication method — no app_secret or
+        HMAC signatures required.
+
+        Args:
+            oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
+                :meth:`AsyncOAuthBuilder.build`
+            http_url: HTTP API url override (optional)
+            quote_ws_url: Quote WS url override (optional)
+            trade_ws_url: Trade WS url override (optional)
+            language: Language identifier (optional)
+            enable_overnight: Enable overnight quote (optional)
+            push_candlestick_mode: Push candlestick mode (optional)
+            enable_print_quote_packages: Print opened quote packages on
+                connect (optional)
+            log_path: Path for log files (optional)
 
         Returns:
             Config object
-        """
-
-    def refresh_access_token(self, expired_at: Optional[datetime] = None) -> str:
-        """
-        Gets a new `access_token`
-
-        Args:
-            expired_at: The expiration time of the access token, defaults to `90` days.
-
-        Returns:
-            Access token
         """
 
 
@@ -2977,7 +2946,7 @@ class QuoteContext:
                 def on_quote(symbol: str, event: PushQuote):
                     print(symbol, event)
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
                 ctx.set_on_quote(on_quote)
 
@@ -2997,7 +2966,7 @@ class QuoteContext:
             ::
 
                 from longport.openapi import QuoteContext, Config, SubType
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3017,7 +2986,7 @@ class QuoteContext:
             ::
 
                 from longport.openapi import QuoteContext, Config, PushCandlestick, TradeSessions
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 def on_candlestick(symbol: str, event: PushCandlestick):
@@ -3045,7 +3014,7 @@ class QuoteContext:
             ::
 
                 from longport.openapi import QuoteContext, Config, SubType
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3068,7 +3037,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.static_info(
@@ -3091,7 +3060,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
@@ -3113,7 +3082,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.option_quote(["AAPL230317P160000.US"])
@@ -3135,7 +3104,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.warrant_quote(["21125.HK"])
@@ -3157,7 +3126,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.depth("700.HK")
@@ -3179,7 +3148,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.brokers("700.HK")
@@ -3198,7 +3167,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.participants()
@@ -3221,7 +3190,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.trades("700.HK", 10)
@@ -3244,7 +3213,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config, TradeSessions
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.intraday("700.HK", TradeSessions.Intraday)
@@ -3270,7 +3239,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config, Period, AdjustType, TradeSessions
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.candlesticks(
@@ -3320,7 +3289,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.option_chain_expiry_date_list("AAPL.US")
@@ -3344,7 +3313,7 @@ class QuoteContext:
                 from datetime import date
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.option_chain_info_by_date(
@@ -3364,7 +3333,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.warrant_issuers()
@@ -3393,7 +3362,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config, WarrantSortBy, SortOrderType
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.warrant_list("700.HK", WarrantSortBy.LastDone, SortOrderType.Ascending)
@@ -3412,7 +3381,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.trading_session()
@@ -3439,7 +3408,7 @@ class QuoteContext:
                 from datetime import date
                 from longport.openapi import QuoteContext, Config, Market
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.trading_days(
@@ -3462,7 +3431,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.capital_flow("700.HK")
@@ -3484,7 +3453,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.capital_distribution("700.HK")
@@ -3507,7 +3476,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config, CalcIndex
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.calc_indexes(["700.HK", "APPL.US"], [CalcIndex.LastDone, CalcIndex.ChangeRate])
@@ -3526,7 +3495,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.watchlist()
@@ -3549,7 +3518,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
                 group_id = ctx.create_watchlist_group(name = "Watchlist1", securities = ["700.HK", "AAPL.US"])
                 print(group_id)
@@ -3568,7 +3537,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
                 ctx.delete_watchlist_group(10086)
         """
@@ -3587,7 +3556,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config, SecuritiesUpdateMode
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
                 ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
         """
@@ -3608,7 +3577,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config, Market, SecurityListCategory
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.security_list(Market.HK, SecurityListCategory.Overnight)
@@ -3630,7 +3599,7 @@ class QuoteContext:
 
                 from longport.openapi import QuoteContext, Config, Market
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.market_temperature(Market.HK)
@@ -3655,7 +3624,7 @@ class QuoteContext:
                 from datetime import date
                 from longport.openapi import QuoteContext, Config, Market
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 resp = ctx.history_market_temperature(Market.HK, date(2023, 1, 1), date(2023, 1, 31))
@@ -3680,7 +3649,7 @@ class QuoteContext:
                 from time import sleep
                 from longport.openapi import QuoteContext, Config, SubType
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3707,7 +3676,7 @@ class QuoteContext:
                 from time import sleep
                 from longport.openapi import QuoteContext, Config, SubType
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
@@ -3734,7 +3703,7 @@ class QuoteContext:
                 from time import sleep
                 from longport.openapi import QuoteContext, Config, SubType
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
@@ -3762,7 +3731,7 @@ class QuoteContext:
                 from time import sleep
                 from longport.openapi import QuoteContext, Config, SubType
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
@@ -3791,7 +3760,7 @@ class QuoteContext:
                 from time import sleep
                 from longport.openapi import QuoteContext, Config, Period
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = QuoteContext(config)
 
                 ctx.subscribe_candlesticks("AAPL.US", Period.Min_1)
@@ -3826,7 +3795,7 @@ class AsyncQuoteContext:
                 from longport.openapi import Config, AsyncQuoteContext
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.quote(["700.HK", "AAPL.US"])
                     print(resp)
@@ -3891,7 +3860,7 @@ class AsyncQuoteContext:
                     print(symbol, event)
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     ctx.set_on_quote(on_quote)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -3917,7 +3886,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     await ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
@@ -3952,7 +3921,7 @@ class AsyncQuoteContext:
                     print(symbol, event)
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     ctx.set_on_candlestick(on_candlestick)
                     await ctx.subscribe_candlesticks(
@@ -3987,7 +3956,7 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe_candlesticks(
                         "700.HK",
@@ -4011,7 +3980,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     resp = await ctx.subscriptions()
@@ -4036,7 +4005,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.static_info(
                         ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
@@ -4061,7 +4030,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
                     print(resp)
@@ -4085,7 +4054,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.option_quote(["AAPL230317P160000.US"])
                     print(resp)
@@ -4109,7 +4078,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_quote(["21125.HK"])
                     print(resp)
@@ -4132,7 +4101,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.depth("700.HK")
                     print(resp)
@@ -4155,7 +4124,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.brokers("700.HK")
                     print(resp)
@@ -4175,7 +4144,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.participants()
                     print(resp)
@@ -4199,7 +4168,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.trades("700.HK", 10)
                     print(resp)
@@ -4224,7 +4193,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, TradeSessions
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.intraday("700.HK", TradeSessions.Intraday)
                     print(resp)
@@ -4258,7 +4227,7 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.candlesticks(
                         "700.HK",
@@ -4301,7 +4270,7 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.history_candlesticks_by_offset(
                         "700.HK",
@@ -4345,7 +4314,7 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.history_candlesticks_by_date(
                         "700.HK",
@@ -4376,7 +4345,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.option_chain_expiry_date_list("AAPL.US")
                     print(resp)
@@ -4402,7 +4371,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.option_chain_info_by_date(
                         "AAPL.US",
@@ -4425,7 +4394,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_issuers()
                     print(resp)
@@ -4461,7 +4430,7 @@ class AsyncQuoteContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_list(
                         "700.HK",
@@ -4485,7 +4454,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.trading_session()
                     print(resp)
@@ -4512,7 +4481,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, Market
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.trading_days(
                         Market.HK,
@@ -4540,7 +4509,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.capital_flow("700.HK")
                     print(resp)
@@ -4564,7 +4533,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.capital_distribution("700.HK")
                     print(resp)
@@ -4589,7 +4558,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, CalcIndex
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.calc_indexes(
                         ["700.HK", "APPL.US"],
@@ -4612,7 +4581,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.watchlist()
                     print(resp)
@@ -4637,7 +4606,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     group_id = await ctx.create_watchlist_group(
                         name="Watchlist1",
@@ -4665,7 +4634,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.delete_watchlist_group(10086)
 
@@ -4691,7 +4660,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, SecuritiesUpdateMode
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.update_watchlist_group(
                         10086,
@@ -4720,7 +4689,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, Market, SecurityListCategory
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.security_list(
                         Market.HK,
@@ -4747,7 +4716,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, Market
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.market_temperature(Market.HK)
                     print(resp)
@@ -4774,7 +4743,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, Market
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     resp = await ctx.history_market_temperature(
                         Market.HK,
@@ -4802,7 +4771,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     await asyncio.sleep(5)
@@ -4827,7 +4796,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
                     await asyncio.sleep(5)
@@ -4852,7 +4821,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
                     await asyncio.sleep(5)
@@ -4879,7 +4848,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, SubType
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
                     await asyncio.sleep(5)
@@ -4907,7 +4876,7 @@ class AsyncQuoteContext:
                 from longport.openapi import AsyncQuoteContext, Config, Period
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncQuoteContext.create(config)
                     await ctx.subscribe_candlesticks(
                         "AAPL.US",
@@ -6377,7 +6346,7 @@ class TradeContext:
                     print(event)
 
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
                 ctx.set_on_order_changed(on_order_changed)
                 ctx.subscribe([TopicType.Private])
@@ -6421,7 +6390,7 @@ class TradeContext:
                 from datetime import datetime
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.history_executions(
@@ -6448,7 +6417,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.today_executions(symbol = "700.HK")
@@ -6476,7 +6445,7 @@ class TradeContext:
                 from datetime import datetime
                 from longport.openapi import TradeContext, Config, OrderStatus, OrderSide, Market
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.history_orders(
@@ -6509,7 +6478,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config, OrderStatus, OrderSide, Market
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.today_orders(
@@ -6543,7 +6512,7 @@ class TradeContext:
                 from decimal import Decimal
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 ctx.replace_order(
@@ -6584,7 +6553,7 @@ class TradeContext:
                 from decimal import Decimal
                 from longport.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.submit_order(
@@ -6611,7 +6580,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 ctx.cancel_order("709043056541253632")
@@ -6632,7 +6601,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.account_balance()
@@ -6660,7 +6629,7 @@ class TradeContext:
                 from datetime import datetime
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.cash_flow(
@@ -6685,7 +6654,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.fund_positions()
@@ -6707,7 +6676,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.stock_positions()
@@ -6729,7 +6698,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.margin_ratio("700.HK")
@@ -6751,7 +6720,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.order_detail("701276261045858304")
@@ -6779,7 +6748,7 @@ class TradeContext:
 
                 from longport.openapi import TradeContext, Config, OrderType, OrderSide
 
-                config = Config.from_env()
+                config = Config.from_apikey_env()
                 ctx = TradeContext(config)
 
                 resp = ctx.estimate_max_purchase_quantity(
@@ -6816,7 +6785,7 @@ class AsyncTradeContext:
                 from longport.openapi import Config, AsyncTradeContext
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.today_orders()
                     print(resp)
@@ -6856,7 +6825,7 @@ class AsyncTradeContext:
                     print(event)
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     ctx.set_on_order_changed(on_order_changed)
                     await ctx.subscribe([TopicType.Private])
@@ -6891,7 +6860,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config, TopicType
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     await ctx.subscribe([TopicType.Private])
                     await ctx.unsubscribe([TopicType.Private])
@@ -6918,7 +6887,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.history_executions(
                         symbol="700.HK",
@@ -6947,7 +6916,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.today_executions(symbol="700.HK")
                     print(resp)
@@ -6983,7 +6952,7 @@ class AsyncTradeContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.history_orders(
                         symbol="700.HK",
@@ -7024,7 +6993,7 @@ class AsyncTradeContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.today_orders(
                         symbol="700.HK",
@@ -7064,7 +7033,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     await ctx.replace_order(
                         order_id="709043056541253632",
@@ -7113,7 +7082,7 @@ class AsyncTradeContext:
                 )
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.submit_order(
                         symbol="700.HK",
@@ -7144,7 +7113,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     await ctx.cancel_order("709043056541253632")
 
@@ -7167,7 +7136,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.account_balance()
                     print(resp)
@@ -7197,7 +7166,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.cash_flow(
                         start_at=datetime.datetime(2022, 5, 9),
@@ -7224,7 +7193,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.fund_positions()
                     print(resp)
@@ -7248,7 +7217,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.stock_positions()
                     print(resp)
@@ -7271,7 +7240,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.margin_ratio("700.HK")
                     print(resp)
@@ -7294,7 +7263,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.order_detail("701276261045858304")
                     print(resp)
@@ -7324,7 +7293,7 @@ class AsyncTradeContext:
                 from longport.openapi import AsyncTradeContext, Config, OrderType, OrderSide
 
                 async def main():
-                    config = Config.from_env()
+                    config = Config.from_apikey_env()
                     ctx = await AsyncTradeContext.create(config)
                     resp = await ctx.estimate_max_purchase_quantity(
                         symbol="700.HK",
