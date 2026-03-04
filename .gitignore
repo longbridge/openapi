@@ -4,3 +4,8 @@
 *.log
 cmake.build
 build
+
+# Eclipse IDE
+.project
+.classpath
+.settings/
