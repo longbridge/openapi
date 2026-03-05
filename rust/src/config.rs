@@ -17,10 +17,10 @@ use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
 use crate::error::Result;
 
-const DEFAULT_QUOTE_WS_URL: &str = "wss://openapi-quote.longbridge.com/v2";
-const DEFAULT_TRADE_WS_URL: &str = "wss://openapi-trade.longbridge.com/v2";
-const DEFAULT_QUOTE_WS_URL_CN: &str = "wss://openapi-quote.longbridge.cn/v2";
-const DEFAULT_TRADE_WS_URL_CN: &str = "wss://openapi-trade.longbridge.cn/v2";
+const DEFAULT_QUOTE_WS_URL: &str = "wss://openapi-quote.longportapp.com/v2";
+const DEFAULT_TRADE_WS_URL: &str = "wss://openapi-trade.longportapp.com/v2";
+const DEFAULT_QUOTE_WS_URL_CN: &str = "wss://openapi-quote.longportapp.cn/v2";
+const DEFAULT_TRADE_WS_URL_CN: &str = "wss://openapi-trade.longportapp.cn/v2";
 
 /// Language identifier
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, IntoPrimitive)]
