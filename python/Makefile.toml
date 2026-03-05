@@ -8,11 +8,41 @@ dependencies = ["install-maturin"]
 command = "pip"
 args = ["install", "maturin>=1.0,<2.0"]
 
-[tasks.install-python-sdk.windows]
-command = "pip"
-args = [
-    "install",
-    "target/wheels/longbridge-4.0.0-cp311-cp311-win_amd64.whl",
-    "-I",
-]
+[tasks.install-python-sdk]
+script_runner = "@rust"
+script = '''
+//! ```cargo
+//! [dependencies]
+//! ```
+fn main() {
+    let root = std::env::var("CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY").unwrap();
+    let cargo_toml = std::fs::read_to_string(format!("{}/Cargo.toml", root)).unwrap();
+    let version = cargo_toml
+        .lines()
+        .find_map(|line| {
+            let line = line.trim();
+            line.strip_prefix("version")
+                .and_then(|s| s.trim().strip_prefix('='))
+                .map(|s| s.trim().trim_matches('"').to_string())
+        })
+        .expect("version not found in Cargo.toml");
+    let wheels: Vec<_> = std::fs::read_dir("target/wheels")
+        .unwrap()
+        .filter_map(|e| e.ok())
+        .map(|e| e.path())
+        .filter(|p| {
+            p.file_name()
+                .and_then(|n| n.to_str())
+                .map(|n| n.starts_with(&format!("longbridge-{}-", version)) && n.ends_with(".whl"))
+                .unwrap_or(false)
+        })
+        .collect();
+    let wheel = wheels.first().expect("no matching .whl found");
+    let status = std::process::Command::new("pip")
+        .args(["install", wheel.to_str().unwrap(), "-I"])
+        .status()
+        .unwrap();
+    std::process::exit(status.code().unwrap_or(1));
+}
+'''
 dependencies = ["python"]
