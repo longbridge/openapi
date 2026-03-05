@@ -86,30 +86,28 @@ impl TradeContext {
     ///
     /// ```javascript
     /// const {
-    ///  OAuth, Config,
-    ///  TradeContext,
-    ///  Decimal,
-    ///  OrderSide,
-    ///  TimeInForceType,
-    ///  OrderType,
-    ///  TopicType,
+    ///   OAuth, Config,
+    ///   TradeContext,
+    ///   Decimal,
+    ///   OrderSide,
+    ///   TimeInForceType,
+    ///   OrderType,
+    ///   TopicType,
     /// } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => {
-    ///     ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
-    ///     ctx.subscribe([TopicType.Private]);
-    ///     return ctx.submitOrder({
-    ///       symbol: "700.HK",
-    ///       orderType: OrderType.LO,
-    ///       side: OrderSide.Buy,
-    ///       timeInForce: TimeInForceType.Day,
-    ///       submittedPrice: new Decimal("50"),
-    ///       submittedQuantity: 200,
-    ///     });
-    ///   })
-    ///   .then((resp) => console.log(resp.toString()));
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
+    /// await ctx.subscribe([TopicType.Private]);
+    /// const resp = await ctx.submitOrder({
+    ///   symbol: "700.HK",
+    ///   orderType: OrderType.LO,
+    ///   side: OrderSide.Buy,
+    ///   timeInForce: TimeInForceType.Day,
+    ///   submittedPrice: new Decimal("50"),
+    ///   submittedQuantity: 200,
+    /// });
+    /// console.log(resp.toString());
     /// ```
     #[napi]
     pub async fn subscribe(&self, topics: Vec<TopicType>) -> Result<()> {
@@ -137,20 +135,16 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) =>
-    ///     ctx.historyExecutions({
-    ///       symbol: "700.HK",
-    ///       startAt: new Date(2022, 5, 9),
-    ///       endAt: new Date(2022, 5, 12),
-    ///     })
-    ///   )
-    ///   .then((resp) => {
-    ///     for (let obj of resp) {
-    ///       console.log(obj.toString());
-    ///     }
-    ///   });
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.historyExecutions({
+    ///   symbol: "700.HK",
+    ///   startAt: new Date(2022, 5, 9),
+    ///   endAt: new Date(2022, 5, 12),
+    /// });
+    /// for (let obj of resp) {
+    ///   console.log(obj.toString());
+    /// }
     /// ```
     #[napi]
     pub async fn history_executions(
@@ -173,14 +167,12 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => ctx.todayExecutions({ symbol: "700.HK" }))
-    ///   .then((resp) => {
-    ///     for (let obj of resp) {
-    ///       console.log(obj.toString());
-    ///     }
-    ///   });
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.todayExecutions({ symbol: "700.HK" });
+    /// for (let obj of resp) {
+    ///   console.log(obj.toString());
+    /// }
     /// ```
     #[napi]
     pub async fn today_executions(
@@ -209,23 +201,19 @@ impl TradeContext {
     ///   Market,
     /// } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) =>
-    ///     ctx.historyOrders({
-    ///       symbol: "700.HK",
-    ///       status: [OrderStatus.Filled, OrderStatus.New],
-    ///       side: OrderSide.Buy,
-    ///       market: Market.HK,
-    ///       startAt: new Date(2022, 5, 9),
-    ///       endAt: new Date(2022, 5, 12),
-    ///     })
-    ///   )
-    ///   .then((resp) => {
-    ///     for (let obj of resp) {
-    ///       console.log(obj.toString());
-    ///     }
-    ///   });
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.historyOrders({
+    ///   symbol: "700.HK",
+    ///   status: [OrderStatus.Filled, OrderStatus.New],
+    ///   side: OrderSide.Buy,
+    ///   market: Market.HK,
+    ///   startAt: new Date(2022, 5, 9),
+    ///   endAt: new Date(2022, 5, 12),
+    /// });
+    /// for (let obj of resp) {
+    ///   console.log(obj.toString());
+    /// }
     /// ```
     #[napi]
     pub async fn history_orders(
@@ -254,21 +242,17 @@ impl TradeContext {
     ///   Market,
     /// } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) =>
-    ///     ctx.todayOrders({
-    ///       symbol: "700.HK",
-    ///       status: [OrderStatus.Filled, OrderStatus.New],
-    ///       side: OrderSide.Buy,
-    ///       market: Market.HK,
-    ///     })
-    ///   )
-    ///   .then((resp) => {
-    ///     for (let obj of resp) {
-    ///       console.log(obj.toString());
-    ///     }
-    ///   });
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.todayOrders({
+    ///   symbol: "700.HK",
+    ///   status: [OrderStatus.Filled, OrderStatus.New],
+    ///   side: OrderSide.Buy,
+    ///   market: Market.HK,
+    /// });
+    /// for (let obj of resp) {
+    ///   console.log(obj.toString());
+    /// }
     /// ```
     #[napi]
     pub async fn today_orders(&self, opts: Option<GetTodayOrdersOptions>) -> Result<Vec<Order>> {
@@ -288,20 +272,13 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext, Decimal } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) =>
-    ///     ctx.replaceOrder({
-    ///       orderId: "709043056541253632",
-    ///       quantity: 100,
-    ///       price: new Decimal("300"),
-    ///     })
-    ///   )
-    ///   .then((resp) => {
-    ///     for (let obj of resp) {
-    ///       console.log(obj.toString());
-    ///     }
-    ///   });
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// await ctx.replaceOrder({
+    ///   orderId: "709043056541253632",
+    ///   quantity: 100,
+    ///   price: new Decimal("300"),
+    /// });
     /// ```
     #[napi]
     pub fn replace_order<'env>(
@@ -331,19 +308,17 @@ impl TradeContext {
     ///   TimeInForceType,
     /// } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) =>
-    ///     ctx.submitOrder({
-    ///       symbol: "700.HK",
-    ///       orderType: OrderType.LO,
-    ///       side: OrderSide.Buy,
-    ///       timeInForce: TimeInForceType.Day,
-    ///       submittedQuantity: 200,
-    ///       submittedPrice: new Decimal("300"),
-    ///     })
-    ///   )
-    ///   .then((resp) => console.log(resp.toString()));
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.submitOrder({
+    ///   symbol: "700.HK",
+    ///   orderType: OrderType.LO,
+    ///   side: OrderSide.Buy,
+    ///   timeInForce: TimeInForceType.Day,
+    ///   submittedQuantity: 200,
+    ///   submittedPrice: new Decimal("300"),
+    /// });
+    /// console.log(resp.toString());
     /// ```
     #[napi]
     pub fn submit_order<'env>(
@@ -366,8 +341,9 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth))).then((ctx) => ctx.cancelOrder("709043056541253632"));
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// await ctx.cancelOrder("709043056541253632");
     /// ```
     #[napi]
     pub async fn cancel_order(&self, order_id: String) -> Result<()> {
@@ -385,14 +361,12 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => ctx.accountBalance())
-    ///   .then((resp) => {
-    ///     for (let obj of resp) {
-    ///       console.log(obj.toString());
-    ///     }
-    ///   });
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.accountBalance();
+    /// for (let obj of resp) {
+    ///   console.log(obj.toString());
+    /// }
     /// ```
     #[napi]
     pub async fn account_balance(&self, currency: Option<String>) -> Result<Vec<AccountBalance>> {
@@ -410,21 +384,17 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { OAuth, Config, TradeContext, GetCashFlowOptions } = require('longbridge');
+    /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) =>
-    ///     ctx.cashFlow({
-    ///       startAt: new Date(2022, 5, 9),
-    ///       endAt: new Date(2022, 5, 12),
-    ///     })
-    ///   )
-    ///   .then((resp) => {
-    ///     for (let obj of resp) {
-    ///       console.log(obj.toString());
-    ///     }
-    ///   });
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.cashFlow({
+    ///   startAt: new Date(2022, 5, 9),
+    ///   endAt: new Date(2022, 5, 12),
+    /// });
+    /// for (let obj of resp) {
+    ///   console.log(obj.toString());
+    /// }
     /// ```
     #[napi]
     pub async fn cash_flow(&self, opts: GetCashFlowOptions) -> Result<Vec<CashFlow>> {
@@ -444,10 +414,10 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => ctx.fundPositions())
-    ///   .then((resp) => console.log(resp))
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.fundPositions();
+    /// console.log(resp);
     /// ```
     #[napi]
     pub async fn fund_positions(
@@ -468,10 +438,10 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => ctx.stockPositions())
-    ///   .then((resp) => console.log(resp))
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.stockPositions();
+    /// console.log(resp);
     /// ```
     #[napi]
     pub async fn stock_positions(
@@ -492,10 +462,10 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => ctx.marginRatio("700.HK"))
-    ///   .then((resp) => console.log(resp))
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.marginRatio("700.HK");
+    /// console.log(resp);
     /// ```
     #[napi]
     pub async fn margin_ratio(&self, symbol: String) -> Result<MarginRatio> {
@@ -513,10 +483,10 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => ctx.orderDetail("701276261045858304"))
-    ///   .then((resp) => console.log(resp))
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.orderDetail("701276261045858304");
+    /// console.log(resp);
     /// ```
     #[napi]
     pub async fn order_detail(&self, order_id: String) -> Result<OrderDetail> {
@@ -535,14 +505,14 @@ impl TradeContext {
     /// ```javascript
     /// const { OAuth, Config, TradeContext, OrderType, OrderSide } = require('longbridge')
     ///
-    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
-    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
-    ///   .then((ctx) => ctx.estimateMaxPurchaseQuantity({
-    ///     symbol: "700.HK",
-    ///     orderType: OrderType.LO,
-    ///     side: OrderSide.Buy,
-    ///   }))
-    ///   .then((resp) => console.log(resp))
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.estimateMaxPurchaseQuantity({
+    ///   symbol: "700.HK",
+    ///   orderType: OrderType.LO,
+    ///   side: OrderSide.Buy,
+    /// });
+    /// console.log(resp);
     /// ```
     #[napi]
     pub fn estimate_max_purchase_quantity<'env>(

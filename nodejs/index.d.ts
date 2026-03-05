@@ -633,9 +633,9 @@ export declare class OAuth {
    * the browser authorization flow is started and `onOpenUrl` is called
    * with the authorization URL.
    *
-   * @param clientId      OAuth 2.0 client ID from the Longbridge developer portal
-   * @param onOpenUrl     Called with the authorization URL; open it in a
-   *                      browser or print it however you like
+   * @param clientId      OAuth 2.0 client ID from the Longbridge developer
+   * portal @param onOpenUrl     Called with the authorization URL; open
+   * it in a browser or print it however you like
    * @param callbackPort  TCP port for the local callback server
    *                      (default: 60355). Must match one of the redirect
    *                      URIs registered for the client.
@@ -1129,14 +1129,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => {
-   *     ctx.setOnQuote((_, event) => console.log(event.toString()));
-   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * ctx.setOnQuote((_, event) => console.log(event.toString()));
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
    * ```
    */
   subscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
@@ -1146,14 +1144,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => {
-   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
-   *       .then(() => ctx.unsubscribe(["AAPL.US"], [SubType.Quote]))
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
+   * await ctx.unsubscribe(["AAPL.US"], [SubType.Quote]);
    * ```
    */
   unsubscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
@@ -1167,16 +1163,13 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config)
-   *   .then((ctx) => {
-   *     return ctx
-   *       .subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
-   *       .then(() => ctx.subscriptions());
-   *   })
-   *   .then((resp) => console.log(resp.toString()));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
+   * const resp = await ctx.subscriptions();
+   * console.log(resp.toString());
    * ```
    */
   subscriptions(): Promise<Array<Subscription>>
@@ -1186,16 +1179,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   staticInfo(symbols: Array<string>): Promise<Array<SecurityStaticInfo>>
@@ -1205,16 +1196,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   quote(symbols: Array<string>): Promise<Array<SecurityQuote>>
@@ -1224,16 +1213,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * import { Config, QuoteContext } from 'longbridge'
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.optionQuote(["AAPL230317P160000.US"]))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.optionQuote(["AAPL230317P160000.US"]);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   optionQuote(symbols: Array<string>): Promise<Array<OptionQuote>>
@@ -1243,16 +1230,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.warrantQuote(["21125.HK"]))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.warrantQuote(["21125.HK"]);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   warrantQuote(symbols: Array<string>): Promise<Array<WarrantQuote>>
@@ -1262,12 +1247,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.depth("700.HK"))
-   *   .then((resp) => console.log(resp.toString()))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.depth("700.HK");
+   * console.log(resp.toString());
    * ```
    */
   depth(symbol: string): Promise<SecurityDepth>
@@ -1277,12 +1262,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.brokers("700.HK"))
-   *   .then((resp) => console.log(resp.toString()))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.brokers("700.HK");
+   * console.log(resp.toString());
    * ```
    */
   brokers(symbol: string): Promise<SecurityBrokers>
@@ -1292,16 +1277,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.participants())
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.participants();
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   participants(): Promise<Array<ParticipantInfo>>
@@ -1311,16 +1294,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.trades("700.HK", 10))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.trades("700.HK", 10);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   trades(symbol: string, count: number): Promise<Array<Trade>>
@@ -1330,16 +1311,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, TradeSessions } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, TradeSessions } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.intraday("700.HK", TradeSessions.Intraday))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.intraday("700.HK", TradeSessions.Intraday);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   intraday(symbol: string, tradeSessions: TradeSessions): Promise<Array<IntradayLine>>
@@ -1349,16 +1328,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Period, AdjustType, TradeSessions } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, Period, AdjustType, TradeSessions } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   candlesticks(symbol: string, period: Period, count: number, adjustType: AdjustType, tradeSessions: TradeSessions): Promise<Array<Candlestick>>
@@ -1372,16 +1349,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.optionChainExpiryDateList("AAPL.US"))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.optionChainExpiryDateList("AAPL.US");
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   optionChainExpiryDateList(symbol: string): Promise<Array<NaiveDate>>
@@ -1391,16 +1366,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20)))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20));
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   optionChainInfoByDate(symbol: string, expiryDate: NaiveDate): Promise<Array<StrikePriceInfo>>
@@ -1410,16 +1383,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.warrantIssuers())
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.warrantIssuers();
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   warrantIssuers(): Promise<Array<IssuerInfo>>
@@ -1427,16 +1398,16 @@ export declare class QuoteContext {
    * Query warrant list
    *
    * #### Example
+   *
    * ```javascript
-   * const { Config, QuoteContext, WarrantSortBy, SortOrderType } = require('longbridge')
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *  .then((ctx) => ctx.warrantList("700.HK", WarrantSortBy.LastDone, SortOrderType.Asc))
-   * .then((resp) => {
-   *  for (let obj of resp) {
-   *   console.log(obj.toString())
+   * const { OAuth, Config, QuoteContext, WarrantSortBy, SortOrderType } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.warrantList("700.HK", WarrantSortBy.LastDone, SortOrderType.Asc);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
    * }
-   * })
    * ```
    */
   warrantList(symbol: string, sortBy: WarrantSortBy, sortOrder: SortOrderType, warrantType?: Array<WarrantType> | undefined | null, issuer?: Array<number> | undefined | null, expiryDate?: Array<FilterWarrantExpiryDate> | undefined | null, priceType?: Array<FilterWarrantInOutBoundsType> | undefined | null, status?: Array<WarrantStatus> | undefined | null): Promise<Array<WarrantInfo>>
@@ -1446,16 +1417,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.tradingSession())
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.tradingSession();
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   tradingSession(): Promise<Array<MarketTradingSession>>
@@ -1465,12 +1434,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, Market, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20)))
-   *   .then((resp) => console.log(resp.toString()))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20));
+   * console.log(resp.toString());
    * ```
    */
   tradingDays(market: Market, begin: NaiveDate, end: NaiveDate): Promise<MarketTradingDays>
@@ -1480,16 +1449,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.capitalFlow("700.HK"))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString())
-   *     }
-   *   })
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.capitalFlow("700.HK");
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   capitalFlow(symbol: string): Promise<Array<CapitalFlowLine>>
@@ -1499,12 +1466,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.capitalDistribution("700.HK"))
-   *   .then((resp) => console.log(resp.toString()))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.capitalDistribution("700.HK");
+   * console.log(resp.toString());
    * ```
    */
   capitalDistribution(symbol: string): Promise<CapitalDistributionResponse>
@@ -1516,12 +1483,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.watchList())
-   *   .then((resp) => console.log(resp.toString()))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.watchList();
+   * console.log(resp.toString());
    * ```
    */
   watchlist(): Promise<Array<WatchlistGroup>>
@@ -1531,17 +1498,16 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config)
-   *   .then((ctx) => {
-   *     ctx.createWatchlistGroup({
-   *       name: "Watchlist1",
-   *       securities: ["700.HK", "BABA.US"],
-   *     })
-   *   .then((group_id) => console.log(group_id));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const groupId = await ctx.createWatchlistGroup({
+   *   name: "Watchlist1",
+   *   securities: ["700.HK", "BABA.US"],
    * });
+   * console.log(groupId);
+   * ```
    */
   createWatchlistGroup(req: CreateWatchlistGroup): Promise<number>
   /**
@@ -1550,10 +1516,11 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config)
-   *   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.deleteWatchlistGroup({ id: 10086 });
    * ```
    */
   deleteWatchlistGroup(req: DeleteWatchlistGroup): Promise<void>
@@ -1563,14 +1530,15 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext } = require('longbridge')
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config)
-   *   .then(ctx => ctx.updateWatchlistGroup({
-   *     id: 10086,
-   *     name: "Watchlist2",
-   *     securities: ["700.HK", "BABA.US"],
-   *   });
+   * const { OAuth, Config, QuoteContext } = require('longbridge')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.updateWatchlistGroup({
+   *   id: 10086,
+   *   name: "Watchlist2",
+   *   securities: ["700.HK", "BABA.US"],
+   * });
    * ```
    */
   updateWatchlistGroup(req: UpdateWatchlistGroup): Promise<void>
@@ -1580,12 +1548,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.securityList(Market.US, SecurityListCategory.Overnight))
-   *   .then((resp) => console.log(resp.toString()));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.securityList(Market.US, SecurityListCategory.Overnight);
+   * console.log(resp.toString());
    * ```
    */
   securityList(market: Market, category?: SecurityListCategory | undefined | null): Promise<Array<Security>>
@@ -1595,12 +1563,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Market } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, Market } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.marketTemperature(Market.HK))
-   *   .then((resp) => console.log(resp.toString()));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.marketTemperature(Market.HK);
+   * console.log(resp.toString());
    * ```
    */
   marketTemperature(market: Market): Promise<MarketTemperature>
@@ -1610,12 +1578,12 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Market, NaiveDate } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, Market, NaiveDate } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config)
-   *   .then((ctx) => ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20)))
-   *   .then((resp) => console.log(resp.toString()));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20));
+   * console.log(resp.toString());
    * ```
    */
   historyMarketTemperature(market: Market, startDate: NaiveDate, end: NaiveDate): Promise<HistoryMarketTemperatureResponse>
@@ -1625,20 +1593,16 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]).then(() => {
-   *     setTimeout(() => {
-   *       ctx.realtimeQuote(["700.HK", "AAPL.US"]).then((resp) => {
-   *         for (let obj of resp) {
-   *           console.log(obj.toString());
-   *         }
-   *       });
-   *     }, 5000);
-   *   });
-   * });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
+   * await new Promise((resolve) => setTimeout(resolve, 5000));
+   * const resp = await ctx.realtimeQuote(["700.HK", "AAPL.US"]);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   realtimeQuote(symbols: Array<string>): Promise<Array<RealtimeQuote>>
@@ -1648,17 +1612,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth]);
-   *   setTimeout(
-   *     () =>
-   *       ctx.realtimeDepth("700.HK").then((resp) => console.log(resp.toString())),
-   *     5000
-   *   );
-   * });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth]);
+   * await new Promise((resolve) => setTimeout(resolve, 5000));
+   * const resp = await ctx.realtimeDepth("700.HK");
+   * console.log(resp.toString());
    * ```
    */
   realtimeDepth(symbol: string): Promise<SecurityDepth>
@@ -1668,20 +1629,14 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, NaiveDate, SubType } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers]).then(() => {
-   *     setTimeout(
-   *       () =>
-   *         ctx
-   *           .realtimeBrokers("700.HK")
-   *           .then((resp) => console.log(resp.toString())),
-   *       5000
-   *     );
-   *   });
-   * });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers]);
+   * await new Promise((resolve) => setTimeout(resolve, 5000));
+   * const resp = await ctx.realtimeBrokers("700.HK");
+   * console.log(resp.toString());
    * ```
    */
   realtimeBrokers(symbol: string): Promise<SecurityBrokers>
@@ -1691,20 +1646,16 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, SubType } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade]).then(() => {
-   *     setTimeout(() => {
-   *       ctx.realtimeTrades("700.HK", 10).then((resp) => {
-   *         for (let obj of resp) {
-   *           console.log(obj.toString());
-   *         }
-   *       });
-   *     }, 5000);
-   *   });
-   * });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade]);
+   * await new Promise((resolve) => setTimeout(resolve, 5000));
+   * const resp = await ctx.realtimeTrades("700.HK", 10);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   realtimeTrades(symbol: string, count: number): Promise<Array<Trade>>
@@ -1714,20 +1665,16 @@ export declare class QuoteContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, QuoteContext, Period } = require('longbridge')
+   * const { OAuth, Config, QuoteContext, Period } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv();
-   * QuoteContext.new(config).then((ctx) => {
-   *   ctx.subscribeCandlesticks("700.HK", Period.Min_1).then(() => {
-   *     setTimeout(() => {
-   *       ctx.realtimeCandlesticks("700.HK", Period.Min_1, 10).then((resp) => {
-   *         for (let obj of resp) {
-   *           console.log(obj.toString());
-   *         }
-   *       });
-   *     }, 5000);
-   *   });
-   * });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+   * await ctx.subscribeCandlesticks("700.HK", Period.Min_1);
+   * await new Promise((resolve) => setTimeout(resolve, 5000));
+   * const resp = await ctx.realtimeCandlesticks("700.HK", Period.Min_1, 10);
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   realtimeCandlesticks(symbol: string, period: Period, count: number): Promise<Array<Candlestick>>
@@ -2080,30 +2027,28 @@ export declare class TradeContext {
    *
    * ```javascript
    * const {
-   *  Config,
-   *  TradeContext,
-   *  Decimal,
-   *  OrderSide,
-   *  TimeInForceType,
-   *  OrderType,
-   *  TopicType,
+   *   OAuth, Config,
+   *   TradeContext,
+   *   Decimal,
+   *   OrderSide,
+   *   TimeInForceType,
+   *   OrderType,
+   *   TopicType,
    * } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) => {
-   *     ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
-   *     ctx.subscribe([TopicType.Private]);
-   *     return ctx.submitOrder({
-   *       symbol: "700.HK",
-   *       orderType: OrderType.LO,
-   *       side: OrderSide.Buy,
-   *       timeInForce: TimeInForceType.Day,
-   *       submittedPrice: new Decimal("50"),
-   *       submittedQuantity: 200,
-   *     });
-   *   })
-   *   .then((resp) => console.log(resp.toString()));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
+   * await ctx.subscribe([TopicType.Private]);
+   * const resp = await ctx.submitOrder({
+   *   symbol: "700.HK",
+   *   orderType: OrderType.LO,
+   *   side: OrderSide.Buy,
+   *   timeInForce: TimeInForceType.Day,
+   *   submittedPrice: new Decimal("50"),
+   *   submittedQuantity: 200,
+   * });
+   * console.log(resp.toString());
    * ```
    */
   subscribe(topics: Array<TopicType>): Promise<void>
@@ -2115,22 +2060,18 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge');
+   * const { OAuth, Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) =>
-   *     ctx.historyExecutions({
-   *       symbol: "700.HK",
-   *       startAt: new Date(2022, 5, 9),
-   *       endAt: new Date(2022, 5, 12),
-   *     })
-   *   )
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.historyExecutions({
+   *   symbol: "700.HK",
+   *   startAt: new Date(2022, 5, 9),
+   *   endAt: new Date(2022, 5, 12),
+   * });
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   historyExecutions(opts?: GetHistoryExecutionsOptions | undefined | null): Promise<Array<Execution>>
@@ -2140,16 +2081,14 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge');
+   * const { OAuth, Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) => ctx.todayExecutions({ symbol: "700.HK" }))
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.todayExecutions({ symbol: "700.HK" });
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
@@ -2160,30 +2099,26 @@ export declare class TradeContext {
    *
    * ```javascript
    * const {
-   *   Config,
+   *   OAuth, Config,
    *   TradeContext,
    *   OrderStatus,
    *   OrderSide,
    *   Market,
    * } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) =>
-   *     ctx.historyOrders({
-   *       symbol: "700.HK",
-   *       status: [OrderStatus.Filled, OrderStatus.New],
-   *       side: OrderSide.Buy,
-   *       market: Market.HK,
-   *       startAt: new Date(2022, 5, 9),
-   *       endAt: new Date(2022, 5, 12),
-   *     })
-   *   )
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.historyOrders({
+   *   symbol: "700.HK",
+   *   status: [OrderStatus.Filled, OrderStatus.New],
+   *   side: OrderSide.Buy,
+   *   market: Market.HK,
+   *   startAt: new Date(2022, 5, 9),
+   *   endAt: new Date(2022, 5, 12),
+   * });
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   historyOrders(opts?: GetHistoryOrdersOptions | undefined | null): Promise<Array<Order>>
@@ -2194,28 +2129,24 @@ export declare class TradeContext {
    *
    * ```javascript
    * const {
-   *   Config,
+   *   OAuth, Config,
    *   TradeContext,
    *   OrderStatus,
    *   OrderSide,
    *   Market,
    * } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) =>
-   *     ctx.todayOrders({
-   *       symbol: "700.HK",
-   *       status: [OrderStatus.Filled, OrderStatus.New],
-   *       side: OrderSide.Buy,
-   *       market: Market.HK,
-   *     })
-   *   )
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.todayOrders({
+   *   symbol: "700.HK",
+   *   status: [OrderStatus.Filled, OrderStatus.New],
+   *   side: OrderSide.Buy,
+   *   market: Market.HK,
+   * });
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   todayOrders(opts?: GetTodayOrdersOptions | undefined | null): Promise<Array<Order>>
@@ -2225,22 +2156,15 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, Decimal } = require('longbridge');
+   * const { OAuth, Config, TradeContext, Decimal } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) =>
-   *     ctx.replaceOrder({
-   *       orderId: "709043056541253632",
-   *       quantity: 100,
-   *       price: new Decimal("300"),
-   *     })
-   *   )
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * await ctx.replaceOrder({
+   *   orderId: "709043056541253632",
+   *   quantity: 100,
+   *   price: new Decimal("300"),
+   * });
    * ```
    */
   replaceOrder(opts: ReplaceOrderOptions): Promise<undefined>
@@ -2251,7 +2175,7 @@ export declare class TradeContext {
    *
    * ```javascript
    * const {
-   *   Config,
+   *   OAuth, Config,
    *   TradeContext,
    *   OrderType,
    *   OrderSide,
@@ -2259,19 +2183,17 @@ export declare class TradeContext {
    *   TimeInForceType,
    * } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) =>
-   *     ctx.submitOrder({
-   *       symbol: "700.HK",
-   *       orderType: OrderType.LO,
-   *       side: OrderSide.Buy,
-   *       timeInForce: TimeInForceType.Day,
-   *       submittedQuantity: 200,
-   *       submittedPrice: new Decimal("300"),
-   *     })
-   *   )
-   *   .then((resp) => console.log(resp.toString()));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.submitOrder({
+   *   symbol: "700.HK",
+   *   orderType: OrderType.LO,
+   *   side: OrderSide.Buy,
+   *   timeInForce: TimeInForceType.Day,
+   *   submittedQuantity: 200,
+   *   submittedPrice: new Decimal("300"),
+   * });
+   * console.log(resp.toString());
    * ```
    */
   submitOrder(opts: SubmitOrderOptions): Promise<SubmitOrderResponse>
@@ -2281,10 +2203,11 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge');
+   * const { OAuth, Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config).then((ctx) => ctx.cancelOrder("709043056541253632"));
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * await ctx.cancelOrder("709043056541253632");
    * ```
    */
   cancelOrder(orderId: string): Promise<void>
@@ -2294,16 +2217,14 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge');
+   * const { OAuth, Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) => ctx.accountBalance())
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.accountBalance();
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   accountBalance(currency?: string | undefined | null): Promise<Array<AccountBalance>>
@@ -2313,21 +2234,17 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, GetCashFlowOptions } = require('longbridge');
+   * const { OAuth, Config, TradeContext } = require('longbridge');
    *
-   * let config = Config.fromApiKeyEnv();
-   * TradeContext.new(config)
-   *   .then((ctx) =>
-   *     ctx.cashFlow({
-   *       startAt: new Date(2022, 5, 9),
-   *       endAt: new Date(2022, 5, 12),
-   *     })
-   *   )
-   *   .then((resp) => {
-   *     for (let obj of resp) {
-   *       console.log(obj.toString());
-   *     }
-   *   });
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.cashFlow({
+   *   startAt: new Date(2022, 5, 9),
+   *   endAt: new Date(2022, 5, 12),
+   * });
+   * for (let obj of resp) {
+   *   console.log(obj.toString());
+   * }
    * ```
    */
   cashFlow(opts: GetCashFlowOptions): Promise<Array<CashFlow>>
@@ -2337,12 +2254,12 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { OAuth, Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * TradeContext.new(config)
-   *   .then((ctx) => ctx.fundPositions())
-   *   .then((resp) => console.log(resp))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.fundPositions();
+   * console.log(resp);
    * ```
    */
   fundPositions(symbols?: Array<string> | undefined | null): Promise<FundPositionsResponse>
@@ -2352,12 +2269,12 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { OAuth, Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * TradeContext.new(config)
-   *   .then((ctx) => ctx.stockPositions())
-   *   .then((resp) => console.log(resp))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.stockPositions();
+   * console.log(resp);
    * ```
    */
   stockPositions(symbols?: Array<string> | undefined | null): Promise<StockPositionsResponse>
@@ -2367,12 +2284,12 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { OAuth, Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * TradeContext.new(config)
-   *   .then((ctx) => ctx.marginRatio("700.HK"))
-   *   .then((resp) => console.log(resp))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.marginRatio("700.HK");
+   * console.log(resp);
    * ```
    */
   marginRatio(symbol: string): Promise<MarginRatio>
@@ -2382,12 +2299,12 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext } = require('longbridge')
+   * const { OAuth, Config, TradeContext } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * TradeContext.new(config)
-   *   .then((ctx) => ctx.orderDetail("701276261045858304"))
-   *   .then((resp) => console.log(resp))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.orderDetail("701276261045858304");
+   * console.log(resp);
    * ```
    */
   orderDetail(orderId: string): Promise<OrderDetail>
@@ -2398,16 +2315,16 @@ export declare class TradeContext {
    * #### Example
    *
    * ```javascript
-   * const { Config, TradeContext, OrderType, OrderSide } = require('longbridge')
+   * const { OAuth, Config, TradeContext, OrderType, OrderSide } = require('longbridge')
    *
-   * let config = Config.fromApiKeyEnv()
-   * TradeContext.new(config)
-   *   .then((ctx) => ctx.estimateMaxPurchaseQuantity({
-   *     symbol: "700.HK",
-   *     orderType: OrderType.LO,
-   *     side: OrderSide.Buy,
-   *   }))
-   *   .then((resp) => console.log(resp))
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = await TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.estimateMaxPurchaseQuantity({
+   *   symbol: "700.HK",
+   *   orderType: OrderType.LO,
+   *   side: OrderSide.Buy,
+   * });
+   * console.log(resp);
    * ```
    */
   estimateMaxPurchaseQuantity(opts: EstimateMaxPurchaseQuantityOptions): Promise<EstimateMaxPurchaseQuantityResponse>
