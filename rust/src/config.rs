@@ -6,12 +6,12 @@ use std::{
     sync::Arc,
 };
 
-pub(crate) use http::{header, HeaderValue, Request};
-use longbridge_httpcli::{is_cn, HttpClient, HttpClientConfig};
+pub(crate) use http::{HeaderValue, Request, header};
+use longbridge_httpcli::{HttpClient, HttpClientConfig, is_cn};
 use longbridge_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
-use tracing::{subscriber::NoSubscriber, Level, Subscriber};
+use tracing::{Level, Subscriber, subscriber::NoSubscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
