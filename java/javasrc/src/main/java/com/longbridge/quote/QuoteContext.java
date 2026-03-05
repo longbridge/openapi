@@ -1159,9 +1159,9 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param market
+     * @param market Market
      * @return A Future representing the result of the operation
-     * @throws OpenApiException
+     * @throws OpenApiException If an error occurs
      */
     public CompletableFuture<MarketTemperature> getMarketTemperature(Market market)
             throws OpenApiException {

@@ -132,7 +132,7 @@ public class HttpClient implements AutoCloseable {
      * @param requestBody Request body, it can be null
      * @param headers     Request headers, it can be null
      * @return A Future representing the result of the operation
-     * @throws RuntimeException
+     * @throws RuntimeException If the request fails
      */
     public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody,
             HashMap<String, String> headers)

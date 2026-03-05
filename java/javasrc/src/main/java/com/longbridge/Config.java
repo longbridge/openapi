@@ -40,7 +40,7 @@ public class Config implements AutoCloseable {
      * It first gets the environment variables from the .env file in the current
      * directory.
      *
-     * <h4>Variables</h4>
+     * <p><b>Variables</b></p>
      * <ul>
      * <li>{@code LONGBRIDGE_LANGUAGE} - Language identifier, {@code zh-CN},
      * {@code zh-HK} or {@code en} (Default: {@code en})</li>
