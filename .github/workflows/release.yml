@@ -2,7 +2,7 @@ name: Release
 on:
   push:
     branches:
-      - v3-longport/release
+      - v3-longport-release
 
 jobs:
   build-python-sdk:
