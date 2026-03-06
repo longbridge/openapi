@@ -84,46 +84,62 @@ jobs:
         run: |
           pip install longbridge --no-index --find-links dist --force-reinstall
           python -c "import longbridge"
-
-  build-python:
-    needs:
-      - check-python-sdk
-    runs-on: ${{ matrix.runs-on }}
-    strategy:
-      fail-fast: true
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        runs-on:
-          [
-            "windows-latest",
-            "ubuntu-24.04",
-            "ubuntu-24.04-arm",
-            "macos-15",
-            "macos-15-intel",
-          ]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          args: -i python --out dist -m python/Cargo.toml
-      - name: Install built wheel
-        run: |
-          pip install longbridge --no-index --find-links dist --force-reinstall
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.runs-on }}-${{ matrix.python-version }}
+          name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
+          path: dist
+
+  check-python-sdk-musl:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.target }}
+
+      - name: Setup QEMU
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build wheels (musl)
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: musllinux_1_2
+          args: -i python${{ matrix.python-version }} --out dist -m python/Cargo.toml
+
+      - name: Install built wheel
+        run: |
+          docker run --rm \
+            --platform ${{ matrix.target == 'aarch64-unknown-linux-musl' && 'linux/arm64' || 'linux/amd64' }} \
+            -v $(pwd)/dist:/dist \
+            python:${{ matrix.python-version }}-alpine \
+            sh -c "pip install --upgrade pip && pip install longbridge --no-index --find-links /dist --force-reinstall && python -c 'import longbridge'"
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-musl-${{ matrix.target }}-${{ matrix.python-version }}
           path: dist
 
   check-nodejs-sdk:
