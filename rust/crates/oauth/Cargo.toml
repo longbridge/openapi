@@ -9,6 +9,7 @@ license = "MIT OR Apache-2.0"
 blocking = ["tokio/rt-multi-thread"]
 
 [dependencies]
+dirs.workspace = true
 futures-util.workspace = true
 oauth2.workspace = true
 poem.workspace = true

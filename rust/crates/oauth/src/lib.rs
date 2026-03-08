@@ -67,9 +67,7 @@ pub type OAuthResult<T> = std::result::Result<T, OAuthError>;
 ///
 /// Path: `~/.longbridge-openapi/tokens/<client_id>`
 fn token_path_for_client_id(client_id: &str) -> OAuthResult<PathBuf> {
-    let home = std::env::var_os("HOME")
-        .or_else(|| std::env::var_os("USERPROFILE"))
-        .map(PathBuf::from)
+    let home = dirs::home_dir()
         .ok_or_else(|| OAuthError::OAuth("Cannot determine home directory".to_string()))?;
     Ok(home
         .join(".longbridge-openapi")
@@ -123,21 +121,28 @@ impl OAuthToken {
 
     fn load_from_path(path: impl AsRef<Path>) -> OAuthResult<Self> {
         let path = path.as_ref();
+        tracing::debug!(path = %path.display(), "loading token from disk");
         let data = std::fs::read_to_string(path).map_err(|e| {
+            tracing::debug!(path = %path.display(), error = %e, "failed to read token file");
             OAuthError::OAuth(format!("Failed to read token file {}: {e}", path.display()))
         })?;
-        serde_json::from_str(&data).map_err(|e| {
+        let token = serde_json::from_str(&data).map_err(|e| {
+            tracing::warn!(path = %path.display(), error = %e, "failed to parse token file");
             OAuthError::OAuth(format!(
                 "Failed to parse token file {}: {e}",
                 path.display()
             ))
-        })
+        })?;
+        tracing::debug!(path = %path.display(), "token loaded successfully");
+        Ok(token)
     }
 
     fn save_to_path(&self, path: impl AsRef<Path>) -> OAuthResult<()> {
         let path = path.as_ref();
+        tracing::debug!(path = %path.display(), "saving token to disk");
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
+                tracing::error!(path = %parent.display(), error = %e, "failed to create token directory");
                 OAuthError::OAuth(format!(
                     "Failed to create directory {}: {e}",
                     parent.display()
@@ -147,11 +152,14 @@ impl OAuthToken {
         let data = serde_json::to_string_pretty(self)
             .map_err(|e| OAuthError::OAuth(format!("Failed to serialize token: {e}")))?;
         std::fs::write(path, data).map_err(|e| {
+            tracing::error!(path = %path.display(), error = %e, "failed to write token file");
             OAuthError::OAuth(format!(
                 "Failed to write token file {}: {e}",
                 path.display()
             ))
-        })
+        })?;
+        tracing::debug!(path = %path.display(), "token saved successfully");
+        Ok(())
     }
 }
 
@@ -208,8 +216,19 @@ impl OAuth {
         let mut guard = self.0.token.lock().await;
 
         let needs_refresh = match guard.as_ref() {
-            None => true,
-            Some(t) => t.is_expired() || t.expires_soon(),
+            None => {
+                tracing::debug!(client_id = %self.0.client_id, "no in-memory token, refresh needed");
+                true
+            }
+            Some(t) if t.is_expired() => {
+                tracing::debug!(client_id = %self.0.client_id, "token expired, refresh needed");
+                true
+            }
+            Some(t) if t.expires_soon() => {
+                tracing::debug!(client_id = %self.0.client_id, expires_at = t.expires_at, "token expiring soon, proactive refresh");
+                true
+            }
+            Some(_) => false,
         };
 
         if needs_refresh && let Some(current) = guard.as_ref() {
@@ -223,7 +242,10 @@ impl OAuth {
         guard
             .as_ref()
             .map(|t| t.access_token.clone())
-            .ok_or_else(|| OAuthError::OAuth("No token available".to_string()))
+            .ok_or_else(|| {
+                tracing::error!(client_id = %self.0.client_id, "no token available");
+                OAuthError::OAuth("No token available".to_string())
+            })
     }
 
     // ------------------------------------------------------------------
@@ -259,35 +281,39 @@ impl OAuth {
             .add_scope(Scope::new(String::new()))
             .url();
 
-        tracing::info!("Starting OAuth authorization flow");
+        tracing::info!("starting OAuth authorization flow");
         open_url(auth_url.as_str());
 
         let (code, state) = wait_for_callback(acceptor).await?;
 
+        tracing::debug!(client_id = %self.0.client_id, "received OAuth callback, verifying CSRF token");
         if state != *csrf_token.secret() {
+            tracing::warn!(client_id = %self.0.client_id, "CSRF token mismatch, possible CSRF attack");
             return Err(OAuthError::OAuth("CSRF token mismatch".to_string()));
         }
 
-        tracing::debug!("Exchanging authorization code for token");
+        tracing::debug!(client_id = %self.0.client_id, "exchanging authorization code for token");
         let token_response = client
             .exchange_code(AuthorizationCode::new(code))
             .request_async(async_http_client)
             .await
-            .map_err(|e| OAuthError::OAuth(format!("Failed to exchange code for token: {}", e)))?;
+            .map_err(|e| {
+                tracing::error!(client_id = %self.0.client_id, error = %e, "failed to exchange authorization code for token");
+                OAuthError::OAuth(format!("Failed to exchange code for token: {}", e))
+            })?;
 
-        Ok(OAuthToken::from_oauth2_response(
-            self.0.client_id.clone(),
-            &token_response,
-        ))
+        let token = OAuthToken::from_oauth2_response(self.0.client_id.clone(), &token_response);
+        tracing::info!(client_id = %self.0.client_id, expires_at = token.expires_at, "authorization flow completed, token obtained");
+        Ok(token)
     }
 
     async fn refresh_token(&self, token: &OAuthToken) -> OAuthResult<OAuthToken> {
-        let refresh_token_str = token
-            .refresh_token
-            .as_deref()
-            .ok_or_else(|| OAuthError::OAuth("No refresh token available".to_string()))?;
+        let refresh_token_str = token.refresh_token.as_deref().ok_or_else(|| {
+            tracing::warn!(client_id = %self.0.client_id, "no refresh token available");
+            OAuthError::OAuth("No refresh token available".to_string())
+        })?;
 
-        tracing::debug!("Refreshing OAuth token");
+        tracing::debug!(client_id = %self.0.client_id, "refreshing OAuth token");
 
         let client = create_oauth_client(
             &self.0.client_id,
@@ -297,16 +323,21 @@ impl OAuth {
             .exchange_refresh_token(&RefreshToken::new(refresh_token_str.to_string()))
             .request_async(async_http_client)
             .await
-            .map_err(|e| OAuthError::OAuth(format!("Failed to refresh token: {}", e)))?;
+            .map_err(|e| {
+                tracing::error!(client_id = %self.0.client_id, error = %e, "failed to refresh token");
+                OAuthError::OAuth(format!("Failed to refresh token: {}", e))
+            })?;
 
         let mut new_token =
             OAuthToken::from_oauth2_response(self.0.client_id.clone(), &token_response);
 
         // Preserve refresh token if not returned
         if new_token.refresh_token.is_none() {
+            tracing::debug!(client_id = %self.0.client_id, "server did not return new refresh token, preserving existing one");
             new_token.refresh_token = Some(refresh_token_str.to_string());
         }
 
+        tracing::debug!(client_id = %self.0.client_id, expires_at = new_token.expires_at, "token refreshed successfully");
         Ok(new_token)
     }
 }
@@ -396,21 +427,21 @@ impl OAuthBuilder {
 
         let token = match loaded {
             Some(t) if !t.is_expired() => {
-                tracing::debug!("Loaded valid token from {}", token_path.display());
+                tracing::debug!(path = %token_path.display(), expires_at = t.expires_at, "loaded valid token from disk");
                 t
             }
             Some(t) => {
                 tracing::debug!(
-                    "Loaded expired token from {}, attempting refresh",
-                    token_path.display()
+                    path = %token_path.display(),
+                    "loaded expired token from disk, attempting refresh"
                 );
                 match oauth.refresh_token(&t).await {
                     Ok(refreshed) => {
                         refreshed.save_to_path(&token_path)?;
                         refreshed
                     }
-                    Err(_) => {
-                        tracing::debug!("Token refresh failed, starting authorization flow");
+                    Err(e) => {
+                        tracing::warn!(error = %e, "token refresh failed, falling back to authorization flow");
                         let new_token = oauth.authorize_inner(open_url).await?;
                         new_token.save_to_path(&token_path)?;
                         new_token
@@ -418,7 +449,7 @@ impl OAuthBuilder {
                 }
             }
             None => {
-                tracing::debug!("No token found, starting authorization flow");
+                tracing::debug!("no cached token found, starting authorization flow");
                 let new_token = oauth.authorize_inner(open_url).await?;
                 new_token.save_to_path(&token_path)?;
                 new_token
@@ -513,14 +544,30 @@ async fn wait_for_callback(acceptor: poem::listener::TcpAcceptor) -> OAuthResult
         ),
     );
 
+    tracing::debug!(
+        "waiting for OAuth callback (timeout: {}s)",
+        AUTH_TIMEOUT.as_secs()
+    );
     let result = match timeout(AUTH_TIMEOUT, rx).await {
-        Ok(Ok(r)) => r.map_err(|e| OAuthError::OAuth(format!("OAuth authorization failed: {e}"))),
-        Ok(Err(_)) => Err(OAuthError::OAuth(
-            "Callback channel closed unexpectedly".to_string(),
-        )),
-        Err(_) => Err(OAuthError::OAuth(
-            "Authorization timeout - no response received within 5 minutes".to_string(),
-        )),
+        Ok(Ok(r)) => r.map_err(|e| {
+            tracing::warn!(error = %e, "OAuth authorization failed at callback");
+            OAuthError::OAuth(format!("OAuth authorization failed: {e}"))
+        }),
+        Ok(Err(_)) => {
+            tracing::error!("OAuth callback channel closed unexpectedly");
+            Err(OAuthError::OAuth(
+                "Callback channel closed unexpectedly".to_string(),
+            ))
+        }
+        Err(_) => {
+            tracing::warn!(
+                timeout_secs = AUTH_TIMEOUT.as_secs(),
+                "OAuth authorization timed out waiting for callback"
+            );
+            Err(OAuthError::OAuth(
+                "Authorization timeout - no response received within 5 minutes".to_string(),
+            ))
+        }
     };
 
     server_task.abort();
