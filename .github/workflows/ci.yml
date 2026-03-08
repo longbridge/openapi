@@ -19,6 +19,7 @@ jobs:
         with:
           toolchain: nightly
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
       - name: Check format
         run: cargo fmt --all -- --check
 
@@ -40,6 +41,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
 
       - name: Check with clippy
         run: cargo clippy -p longbridge --all-features
@@ -71,6 +73,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-python --all-features
@@ -115,6 +118,7 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
           targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
 
       - name: Setup QEMU
         if: matrix.target == 'aarch64-unknown-linux-musl'
@@ -175,9 +179,21 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
           targets: ${{ matrix.settings.target }}
+      - uses: Swatinem/rust-cache@v2
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-nodejs --all-features
+
+      - name: Get yarn cache directory
+        id: yarn-cache-dir
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+        shell: bash
+        working-directory: nodejs
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('nodejs/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         working-directory: nodejs
@@ -230,6 +246,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-java --all-features
@@ -265,12 +282,13 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
 
       - name: Get CMake
         uses: lukka/get-cmake@latest
 
       - name: Install cargo make
-        run: cargo install cargo-make
+        uses: davidB/rust-cargo-make@v1
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-c --all-features
@@ -311,6 +329,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
 
       - name: Install target
         run: |
@@ -356,6 +375,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
 
       - name: Install target
         run: |
