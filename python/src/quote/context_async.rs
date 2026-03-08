@@ -725,12 +725,12 @@ impl AsyncQuoteContext {
         py: Python<'_>,
         market: Market,
         start_date: PyDateWrapper,
-        end: PyDateWrapper,
+        end_date: PyDateWrapper,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: HistoryMarketTemperatureResponse = ctx
-                .history_market_temperature(market.into(), start_date.0, end.0)
+                .history_market_temperature(market.into(), start_date.0, end_date.0)
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;

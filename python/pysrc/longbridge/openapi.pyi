@@ -223,7 +223,8 @@ class OAuthBuilder:
         asyncio.run(main())
     """
 
-    def __init__(self, client_id: str, callback_port: Optional[int] = None) -> None: ...
+    def __init__(self, client_id: str,
+                 callback_port: Optional[int] = None) -> None: ...
 
     def build(self, on_open_url: Callable[[str], None]) -> OAuth:
         """
@@ -750,6 +751,16 @@ class SecurityBoard:
     class SGSector(SecurityBoard):
         """
         SG Industry Board
+        """
+
+    class SPXIndex(SecurityBoard):
+        """
+        S&P 500 Index
+        """
+
+    class VIXIndex(SecurityBoard):
+        """
+        CBOE Volatility Index
         """
 
 
@@ -3727,14 +3738,14 @@ class QuoteContext:
                 print(resp)
         """
 
-    def history_market_temperature(self, market: Type[Market], start: date, end: date) -> HistoryMarketTemperatureResponse:
+    def history_market_temperature(self, market: Type[Market], start_date: date, end_date: date) -> HistoryMarketTemperatureResponse:
         """
         Get historical market temperature
 
         Args:
             market: Market
-            start: Start date
-            end: End date
+            start_date: Start date
+            end_date: End date
 
         Returns:
             History market temperature
@@ -3845,7 +3856,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def realtime_trades(self, symbol: str, count: int) -> List[Trade]:
+    def realtime_trades(self, symbol: str, count: int = 500) -> List[Trade]:
         """
         Get real-time trades
 
@@ -3876,7 +3887,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def realtime_candlesticks(self, symbol: str, period: Type[Period], count: int) -> List[Candlestick]:
+    def realtime_candlesticks(self, symbol: str, period: Type[Period], count: int = 500) -> List[Candlestick]:
         """
         Get real-time candlesticks
 
@@ -4964,14 +4975,14 @@ class AsyncQuoteContext:
         ...
 
     def history_market_temperature(
-            self, market: Type[Market], start: date, end: date) -> Awaitable[HistoryMarketTemperatureResponse]:
+            self, market: Type[Market], start_date: date, end_date: date) -> Awaitable[HistoryMarketTemperatureResponse]:
         """
         Get historical market temperature. Returns an awaitable that resolves to history market temperature response.
 
         Args:
             market: Market.
-            start: Start date.
-            end: End date.
+            start_date: Start date.
+            end_date: End date.
 
         Examples:
             ::
@@ -5083,7 +5094,7 @@ class AsyncQuoteContext:
         ...
 
     def realtime_trades(self, symbol: str,
-                        count: int) -> Awaitable[List[Trade]]:
+                        count: int = 500) -> Awaitable[List[Trade]]:
         """
         Get real-time trades of subscribed symbol from local storage. Returns an awaitable that resolves to trade list.
 
@@ -5113,7 +5124,7 @@ class AsyncQuoteContext:
         ...
 
     def realtime_candlesticks(
-            self, symbol: str, period: Type[Period], count: int) -> Awaitable[List[Candlestick]]:
+            self, symbol: str, period: Type[Period], count: int = 500) -> Awaitable[List[Candlestick]]:
         """
         Get real-time candlesticks of subscribed symbol from local storage. Returns an awaitable that resolves to candlestick list.
 
@@ -6288,7 +6299,7 @@ class AccountBalance:
     Buy power
     """
 
-    frozen_transaction_fees: FrozenTransactionFee
+    frozen_transaction_fees: List[FrozenTransactionFee]
     """
     Frozen transaction fees
     """

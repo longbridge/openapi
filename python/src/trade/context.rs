@@ -413,7 +413,7 @@ impl TradeContext {
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
     /// warrants, and options
     #[allow(clippy::too_many_arguments)]
-    #[pyo3(signature = (symbol, order_type, side, price, currency = None, order_id = None, fractional_shares = false))]
+    #[pyo3(signature = (symbol, order_type, side, price = None, currency = None, order_id = None, fractional_shares = false))]
     pub fn estimate_max_purchase_quantity(
         &self,
         symbol: String,

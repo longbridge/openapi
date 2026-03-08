@@ -558,10 +558,10 @@ impl QuoteContext {
         &self,
         market: Market,
         start_date: PyDateWrapper,
-        end: PyDateWrapper,
+        end_date: PyDateWrapper,
     ) -> PyResult<HistoryMarketTemperatureResponse> {
         self.ctx
-            .history_market_temperature(market.into(), start_date.0, end.0)
+            .history_market_temperature(market.into(), start_date.0, end_date.0)
             .map_err(ErrorNewType)?
             .try_into()
     }
