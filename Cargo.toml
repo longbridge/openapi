@@ -54,9 +54,9 @@ pyo3 = "0.27.0"
 pyo3-async-runtimes = { version = "0.27", features = ["tokio-runtime"] }
 pythonize = "0.27.0"
 pyo3-build-config = "0.26.0"
-napi = { version = "3.2.5", default-features = false }
-napi-derive = "3.2.5"
-napi-build = "2.2.3"
+napi = { version = "3.8.3", default-features = false }
+napi-derive = "3.5.2"
+napi-build = "2.3.1"
 chrono = "0.4.41"
 poem-mcpserver = "0.3.1"
 poem-mcpserver-macros = "0.3.1"
