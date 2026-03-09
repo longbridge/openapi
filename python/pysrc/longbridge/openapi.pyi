@@ -1,6 +1,6 @@
 from datetime import datetime, date, time
 from decimal import Decimal
-from typing import Any, Awaitable, Callable, List, Optional, Type
+from typing import Any, Awaitable, Callable, Coroutine, List, Optional, Type
 
 
 class ErrorKind:
@@ -3970,28 +3970,28 @@ class AsyncQuoteContext:
         ...
 
     def set_on_quote(
-            self, callback: Callable[[str, PushQuote], None]) -> None:
-        """Set quote callback; called when quote push is received (same as sync QuoteContext)."""
+            self, callback: Callable[[str, PushQuote], None] | Callable[[str, PushQuote], Coroutine[Any, Any, None]]) -> None:
+        """Set quote callback; called when quote push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_depth(
-            self, callback: Callable[[str, PushDepth], None]) -> None:
-        """Set depth callback; called when depth push is received."""
+            self, callback: Callable[[str, PushDepth], None] | Callable[[str, PushDepth], Coroutine[Any, Any, None]]) -> None:
+        """Set depth callback; called when depth push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_brokers(
-            self, callback: Callable[[str, PushBrokers], None]) -> None:
-        """Set brokers callback; called when brokers push is received."""
+            self, callback: Callable[[str, PushBrokers], None] | Callable[[str, PushBrokers], Coroutine[Any, Any, None]]) -> None:
+        """Set brokers callback; called when brokers push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_trades(
-            self, callback: Callable[[str, PushTrades], None]) -> None:
-        """Set trades callback; called when trades push is received."""
+            self, callback: Callable[[str, PushTrades], None] | Callable[[str, PushTrades], Coroutine[Any, Any, None]]) -> None:
+        """Set trades callback; called when trades push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_candlestick(
-            self, callback: Callable[[str, PushCandlestick], None]) -> None:
-        """Set candlestick callback; called when candlestick push is received."""
+            self, callback: Callable[[str, PushCandlestick], None] | Callable[[str, PushCandlestick], Coroutine[Any, Any, None]]) -> None:
+        """Set candlestick callback; called when candlestick push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def subscribe(
@@ -7110,8 +7110,8 @@ class AsyncTradeContext:
         ...
 
     def set_on_order_changed(
-            self, callback: Callable[[PushOrderChanged], None]) -> None:
-        """Set order changed callback; called when order changed event is received (same as sync TradeContext)."""
+            self, callback: Callable[[PushOrderChanged], None] | Callable[[PushOrderChanged], Coroutine[Any, Any, None]]) -> None:
+        """Set order changed callback; called when order changed event is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def subscribe(self, topics: List[Type[TopicType]]) -> Awaitable[None]:

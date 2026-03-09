@@ -48,13 +48,25 @@ impl AsyncQuoteContext {
     fn create(cls: &Bound<PyType>, config: &Config) -> PyResult<Py<PyAny>> {
         let py = cls.py();
         let config = Arc::new(config.0.clone());
+        let event_loop = py
+            .import("asyncio")
+            .ok()
+            .and_then(|m| m.getattr("get_running_loop").ok())
+            .and_then(|f| f.call0().ok())
+            .map(|l| l.unbind());
+        let event_loop = Arc::new(event_loop);
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let (ctx, mut event_rx) = QuoteContext::try_new(config).await.map_err(ErrorNewType)?;
             let callbacks = Arc::new(Mutex::new(Callbacks::default()));
             let callbacks_clone = callbacks.clone();
+            let event_loop_clone = event_loop.clone();
             pyo3_async_runtimes::tokio::get_runtime().spawn(async move {
                 while let Some(event) = event_rx.recv().await {
-                    handle_push_event(&callbacks_clone.lock(), event);
+                    pyo3::Python::attach(|py| {
+                        let loop_ref = event_loop_clone.as_ref().as_ref().map(|l| l.bind(py));
+                        #[allow(clippy::needless_option_as_deref)]
+                        handle_push_event(&callbacks_clone.lock(), event, loop_ref.as_deref());
+                    });
                 }
             });
             Ok(AsyncQuoteContext {
@@ -85,7 +97,8 @@ impl AsyncQuoteContext {
             .collect()
     }
 
-    /// Set quote callback.
+    /// Set quote callback. The callback may be sync or async; if it returns a
+    /// coroutine, it is scheduled on the asyncio event loop.
     fn set_on_quote(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().quote = None;
@@ -94,7 +107,7 @@ impl AsyncQuoteContext {
         }
     }
 
-    /// Set depth callback.
+    /// Set depth callback. May be sync or async (coroutines are scheduled).
     fn set_on_depth(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().depth = None;
@@ -103,7 +116,7 @@ impl AsyncQuoteContext {
         }
     }
 
-    /// Set brokers callback.
+    /// Set brokers callback. May be sync or async (coroutines are scheduled).
     fn set_on_brokers(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().brokers = None;
@@ -112,7 +125,7 @@ impl AsyncQuoteContext {
         }
     }
 
-    /// Set trades callback.
+    /// Set trades callback. May be sync or async (coroutines are scheduled).
     fn set_on_trades(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().trades = None;
@@ -121,7 +134,8 @@ impl AsyncQuoteContext {
         }
     }
 
-    /// Set candlestick callback.
+    /// Set candlestick callback. May be sync or async (coroutines are
+    /// scheduled).
     fn set_on_candlestick(&self, py: Python<'_>, callback: Py<PyAny>) {
         if callback.is_none(py) {
             self.callbacks.lock().candlestick = None;

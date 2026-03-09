@@ -243,7 +243,7 @@ print(resp)
 
 ## Asynchronous API
 
-The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API.
+The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API. **Async quote/trade contexts support async callbacks**: if a `set_on_quote`, `set_on_candlestick`, or `set_on_order_changed` callback is an async function (returns a coroutine), it is scheduled on the event loop and run asynchronously.
 
 - **Async quote**: create with `ctx = await AsyncQuoteContext.create(config)`, then e.g. `await ctx.quote(["700.HK"])`, `await ctx.subscribe(...)`.
 - **Async trade**: create with `ctx = await AsyncTradeContext.create(config)`, then e.g. `await ctx.today_orders()`, `await ctx.submit_order(...)`.

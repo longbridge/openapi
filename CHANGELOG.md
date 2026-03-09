@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking** (Node.js):
   - `Config.fromEnv()` → `Config.fromApikeyEnv()`
 
+- Python: `AsyncQuoteContext` and `AsyncTradeContext` support async callbacks for `set_on_quote`, `set_on_depth`, `set_on_brokers`, `set_on_trades`, `set_on_candlestick`, and `set_on_order_changed`. If a callback returns a coroutine, it is scheduled on the asyncio event loop. (Non-breaking: sync callbacks continue to work as before.)
+
 # [3.0.22]
 
 - python: add asyncio support for quote, trade, and HTTP client; existing sync API unchanged.

@@ -4,7 +4,8 @@ import asyncio
 from longbridge.openapi import AsyncQuoteContext, Config, OAuthBuilder, SubType, PushQuote
 
 
-def on_quote(symbol: str, event: PushQuote) -> None:
+async def on_quote(symbol: str, event: PushQuote) -> None:
+    """Callback may be sync or async; async callbacks are scheduled on the event loop."""
     print(symbol, event)
 
 

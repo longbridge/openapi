@@ -1,3 +1,4 @@
+mod async_callback;
 mod config;
 mod decimal;
 mod error;

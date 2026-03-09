@@ -52,7 +52,7 @@ impl QuoteContext {
         let ctx = QuoteContextSync::try_new(Arc::new(config.0.clone()), {
             let callbacks = callbacks.clone();
             move |event| {
-                handle_push_event(&callbacks.lock(), event);
+                handle_push_event(&callbacks.lock(), event, None);
             }
         })
         .map_err(ErrorNewType)?;
