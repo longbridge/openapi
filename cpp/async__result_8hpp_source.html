@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LongPort OpenAPI C++ SDK: include/async_result.hpp Source File</title>
+<title>Longbridge OpenAPI C++ SDK: include/async_result.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">LongPort OpenAPI C++ SDK
+   <div id="projectname">Longbridge OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -72,55 +72,65 @@ $(function() {
 <a href="async__result_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="status_8hpp.html">status.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
-<div class="line"><a name="l00007"></a><span class="lineno"><a class="line" href="namespacelongport.html">    7</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongport.html">longport</a> {</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html">   10</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structlongport_1_1_async_result.html">AsyncResult</a></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  Ctx ctx_;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="classlongport_1_1_status.html">Status</a> status_;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keyword">const</span> T* data_;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html#a898884a50f8aa3ca3542c7af4f17a507">   18</a></span>&#160;  <a class="code" href="structlongport_1_1_async_result.html#a898884a50f8aa3ca3542c7af4f17a507">AsyncResult</a>(Ctx ctx, <a class="code" href="classlongport_1_1_status.html">Status</a> <a class="code" href="structlongport_1_1_async_result.html#ae30bb6be1fe7369b9f292b16a83c9531">status</a>, <span class="keyword">const</span> T* data)</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    : ctx_(ctx)</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    , status_(std::move(<a class="code" href="structlongport_1_1_async_result.html#ae30bb6be1fe7369b9f292b16a83c9531">status</a>))</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    , data_(data)</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  {</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  }</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html#a15f1c10f6c69f67ffce072c28de535a6">   25</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">operator</span> bool() { <span class="keywordflow">return</span> status_.<a class="code" href="classlongport_1_1_status.html#a1ab59d8f855b439d40dddd6b88bfece2">is_ok</a>(); }</div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html#a964d73a22d3c946bd26f1c9ca3915e1e">   26</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> T* <a class="code" href="structlongport_1_1_async_result.html#a964d73a22d3c946bd26f1c9ca3915e1e">operator-&gt;</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> data_; }</div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html#ae30bb6be1fe7369b9f292b16a83c9531">   27</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classlongport_1_1_status.html">Status</a>&amp; <a class="code" href="structlongport_1_1_async_result.html#ae30bb6be1fe7369b9f292b16a83c9531">status</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> status_; }</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="status_8hpp.html">status.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="namespacelongbridge.html">    8</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongbridge.html">longbridge</a> {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html">   11</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structlongbridge_1_1_async_result.html">AsyncResult</a></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;{</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  Ctx ctx_;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <a class="code" href="classlongbridge_1_1_status.html">Status</a> status_;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">const</span> T* data_;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#a51419ec234349a9374f687e77300c2e6">   19</a></span>&#160;  <a class="code" href="structlongbridge_1_1_async_result.html#a51419ec234349a9374f687e77300c2e6">AsyncResult</a>(Ctx ctx, <a class="code" href="classlongbridge_1_1_status.html">Status</a> <a class="code" href="structlongbridge_1_1_async_result.html#af764afefade2ef7eac6d11208fd2e31a">status</a>, <span class="keyword">const</span> T* data)</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    : ctx_(ctx)</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    , status_(std::move(<a class="code" href="structlongbridge_1_1_async_result.html#af764afefade2ef7eac6d11208fd2e31a">status</a>))</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    , data_(data)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  }</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#a9dacffbc11c927115367ad00f13b1390">   26</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">operator</span> bool() { <span class="keywordflow">return</span> status_.<a class="code" href="classlongbridge_1_1_status.html#adab569d7b14da7e5c446d7d7b2fb1d61">is_ok</a>(); }</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#a9595e76020f70467adfa9eaef4004227">   27</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> T* <a class="code" href="structlongbridge_1_1_async_result.html#a9595e76020f70467adfa9eaef4004227">operator-&gt;</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> data_; }</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html#a1a0d75feb6fc841137be8f7e7ad24d86">   29</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> Ctx&amp; <a class="code" href="structlongport_1_1_async_result.html#a1a0d75feb6fc841137be8f7e7ad24d86">context</a>() { <span class="keywordflow">return</span> ctx_; }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html#aecaed8f6468d3600dd377df7953b5712">   32</a></span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="structlongport_1_1_async_result.html#aecaed8f6468d3600dd377df7953b5712">is_ok</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> status_.<a class="code" href="classlongport_1_1_status.html#a1ab59d8f855b439d40dddd6b88bfece2">is_ok</a>(); }</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="structlongport_1_1_async_result.html#ac2619b5e07ff3a2ffad2db738c62eb23">   35</a></span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="structlongport_1_1_async_result.html#ac2619b5e07ff3a2ffad2db738c62eb23">is_err</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> status_.<a class="code" href="classlongport_1_1_status.html#a9eaef25c83a92e021114eb4b4071e6da">is_err</a>(); }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> U = T,</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;           <span class="keyword">typename</span> std::enable_if&lt;!std::is_void&lt;U&gt;::value, <span class="keywordtype">int</span>&gt;::type = 0&gt;</div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#a1fd62e2581d85666af84e27201b8306a">   31</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> U&amp; <a class="code" href="structlongbridge_1_1_async_result.html#a1fd62e2581d85666af84e27201b8306a">operator*</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">  </span>{</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">return</span> *data_;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#af764afefade2ef7eac6d11208fd2e31a">   36</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classlongbridge_1_1_status.html">Status</a>&amp; <a class="code" href="structlongbridge_1_1_async_result.html#af764afefade2ef7eac6d11208fd2e31a">status</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> status_; }</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">   39</a></span>&#160;<span class="keyword">using</span> <a class="code" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a> = std::function&lt;void(<a class="code" href="structlongport_1_1_async_result.html">AsyncResult&lt;Ctx, T&gt;</a>)&gt;;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;} <span class="comment">// namespace longport</span></div>
-<div class="ttc" id="aclasslongport_1_1_status_html"><div class="ttname"><a href="classlongport_1_1_status.html">longport::Status</a></div><div class="ttdef"><b>Definition:</b> status.hpp:18</div></div>
-<div class="ttc" id="aclasslongport_1_1_status_html_a1ab59d8f855b439d40dddd6b88bfece2"><div class="ttname"><a href="classlongport_1_1_status.html#a1ab59d8f855b439d40dddd6b88bfece2">longport::Status::is_ok</a></div><div class="ttdeci">bool is_ok() const</div><div class="ttdoc">Returns true if no errors occurs.</div></div>
-<div class="ttc" id="aclasslongport_1_1_status_html_a9eaef25c83a92e021114eb4b4071e6da"><div class="ttname"><a href="classlongport_1_1_status.html#a9eaef25c83a92e021114eb4b4071e6da">longport::Status::is_err</a></div><div class="ttdeci">bool is_err() const</div><div class="ttdoc">Returns true if an errors occurs.</div></div>
-<div class="ttc" id="anamespacelongport_html"><div class="ttname"><a href="namespacelongport.html">longport</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:7</div></div>
-<div class="ttc" id="anamespacelongport_html_a5474340afc19827a58958a5af2cb33fc"><div class="ttname"><a href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">longport::AsyncCallback</a></div><div class="ttdeci">std::function&lt; void(AsyncResult&lt; Ctx, T &gt;)&gt; AsyncCallback</div><div class="ttdef"><b>Definition:</b> async_result.hpp:39</div></div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#a400d195d4d584ede3132cc25a3068c81">   38</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> Ctx&amp; <a class="code" href="structlongbridge_1_1_async_result.html#a400d195d4d584ede3132cc25a3068c81">context</a>() { <span class="keywordflow">return</span> ctx_; }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#a65eccd8b1ff6f6bdbf85bf7e9320cb2e">   41</a></span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="structlongbridge_1_1_async_result.html#a65eccd8b1ff6f6bdbf85bf7e9320cb2e">is_ok</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> status_.<a class="code" href="classlongbridge_1_1_status.html#adab569d7b14da7e5c446d7d7b2fb1d61">is_ok</a>(); }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_async_result.html#a2e5cfec8d8ee9448f60ad4dd5e54d257">   44</a></span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="structlongbridge_1_1_async_result.html#a2e5cfec8d8ee9448f60ad4dd5e54d257">is_err</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> status_.<a class="code" href="classlongbridge_1_1_status.html#ac01867a71cdea5e56fea4c76dbcb15d5">is_err</a>(); }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">   48</a></span>&#160;<span class="keyword">using</span> <a class="code" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a> = std::function&lt;void(<a class="code" href="structlongbridge_1_1_async_result.html">AsyncResult&lt;Ctx, T&gt;</a>)&gt;;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;} <span class="comment">// namespace longbridge</span></div>
+<div class="ttc" id="aclasslongbridge_1_1_status_html"><div class="ttname"><a href="classlongbridge_1_1_status.html">longbridge::Status</a></div><div class="ttdef"><b>Definition:</b> status.hpp:19</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_status_html_ac01867a71cdea5e56fea4c76dbcb15d5"><div class="ttname"><a href="classlongbridge_1_1_status.html#ac01867a71cdea5e56fea4c76dbcb15d5">longbridge::Status::is_err</a></div><div class="ttdeci">bool is_err() const</div><div class="ttdoc">Returns true if an errors occurs.</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_status_html_adab569d7b14da7e5c446d7d7b2fb1d61"><div class="ttname"><a href="classlongbridge_1_1_status.html#adab569d7b14da7e5c446d7d7b2fb1d61">longbridge::Status::is_ok</a></div><div class="ttdeci">bool is_ok() const</div><div class="ttdoc">Returns true if no errors occurs.</div></div>
+<div class="ttc" id="anamespacelongbridge_html"><div class="ttname"><a href="namespacelongbridge.html">longbridge</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:8</div></div>
+<div class="ttc" id="anamespacelongbridge_html_ac08a510ffe531a5eb0ea8dc2238c55dc"><div class="ttname"><a href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">longbridge::AsyncCallback</a></div><div class="ttdeci">std::function&lt; void(AsyncResult&lt; Ctx, T &gt;)&gt; AsyncCallback</div><div class="ttdef"><b>Definition:</b> async_result.hpp:48</div></div>
 <div class="ttc" id="astatus_8hpp_html"><div class="ttname"><a href="status_8hpp.html">status.hpp</a></div></div>
-<div class="ttc" id="astructlongport_1_1_async_result_html"><div class="ttname"><a href="structlongport_1_1_async_result.html">longport::AsyncResult</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:11</div></div>
-<div class="ttc" id="astructlongport_1_1_async_result_html_a1a0d75feb6fc841137be8f7e7ad24d86"><div class="ttname"><a href="structlongport_1_1_async_result.html#a1a0d75feb6fc841137be8f7e7ad24d86">longport::AsyncResult::context</a></div><div class="ttdeci">const Ctx &amp; context()</div><div class="ttdef"><b>Definition:</b> async_result.hpp:29</div></div>
-<div class="ttc" id="astructlongport_1_1_async_result_html_a898884a50f8aa3ca3542c7af4f17a507"><div class="ttname"><a href="structlongport_1_1_async_result.html#a898884a50f8aa3ca3542c7af4f17a507">longport::AsyncResult::AsyncResult</a></div><div class="ttdeci">AsyncResult(Ctx ctx, Status status, const T *data)</div><div class="ttdef"><b>Definition:</b> async_result.hpp:18</div></div>
-<div class="ttc" id="astructlongport_1_1_async_result_html_a964d73a22d3c946bd26f1c9ca3915e1e"><div class="ttname"><a href="structlongport_1_1_async_result.html#a964d73a22d3c946bd26f1c9ca3915e1e">longport::AsyncResult::operator-&gt;</a></div><div class="ttdeci">const T * operator-&gt;() const</div><div class="ttdef"><b>Definition:</b> async_result.hpp:26</div></div>
-<div class="ttc" id="astructlongport_1_1_async_result_html_ac2619b5e07ff3a2ffad2db738c62eb23"><div class="ttname"><a href="structlongport_1_1_async_result.html#ac2619b5e07ff3a2ffad2db738c62eb23">longport::AsyncResult::is_err</a></div><div class="ttdeci">bool is_err() const</div><div class="ttdoc">Returns true if an errors occurs.</div><div class="ttdef"><b>Definition:</b> async_result.hpp:35</div></div>
-<div class="ttc" id="astructlongport_1_1_async_result_html_ae30bb6be1fe7369b9f292b16a83c9531"><div class="ttname"><a href="structlongport_1_1_async_result.html#ae30bb6be1fe7369b9f292b16a83c9531">longport::AsyncResult::status</a></div><div class="ttdeci">const Status &amp; status() const</div><div class="ttdef"><b>Definition:</b> async_result.hpp:27</div></div>
-<div class="ttc" id="astructlongport_1_1_async_result_html_aecaed8f6468d3600dd377df7953b5712"><div class="ttname"><a href="structlongport_1_1_async_result.html#aecaed8f6468d3600dd377df7953b5712">longport::AsyncResult::is_ok</a></div><div class="ttdeci">bool is_ok() const</div><div class="ttdoc">Returns true if no errors occurs.</div><div class="ttdef"><b>Definition:</b> async_result.hpp:32</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html"><div class="ttname"><a href="structlongbridge_1_1_async_result.html">longbridge::AsyncResult</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:12</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html_a1fd62e2581d85666af84e27201b8306a"><div class="ttname"><a href="structlongbridge_1_1_async_result.html#a1fd62e2581d85666af84e27201b8306a">longbridge::AsyncResult::operator*</a></div><div class="ttdeci">const U &amp; operator*() const</div><div class="ttdef"><b>Definition:</b> async_result.hpp:31</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html_a2e5cfec8d8ee9448f60ad4dd5e54d257"><div class="ttname"><a href="structlongbridge_1_1_async_result.html#a2e5cfec8d8ee9448f60ad4dd5e54d257">longbridge::AsyncResult::is_err</a></div><div class="ttdeci">bool is_err() const</div><div class="ttdoc">Returns true if an errors occurs.</div><div class="ttdef"><b>Definition:</b> async_result.hpp:44</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html_a400d195d4d584ede3132cc25a3068c81"><div class="ttname"><a href="structlongbridge_1_1_async_result.html#a400d195d4d584ede3132cc25a3068c81">longbridge::AsyncResult::context</a></div><div class="ttdeci">const Ctx &amp; context()</div><div class="ttdef"><b>Definition:</b> async_result.hpp:38</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html_a51419ec234349a9374f687e77300c2e6"><div class="ttname"><a href="structlongbridge_1_1_async_result.html#a51419ec234349a9374f687e77300c2e6">longbridge::AsyncResult::AsyncResult</a></div><div class="ttdeci">AsyncResult(Ctx ctx, Status status, const T *data)</div><div class="ttdef"><b>Definition:</b> async_result.hpp:19</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html_a65eccd8b1ff6f6bdbf85bf7e9320cb2e"><div class="ttname"><a href="structlongbridge_1_1_async_result.html#a65eccd8b1ff6f6bdbf85bf7e9320cb2e">longbridge::AsyncResult::is_ok</a></div><div class="ttdeci">bool is_ok() const</div><div class="ttdoc">Returns true if no errors occurs.</div><div class="ttdef"><b>Definition:</b> async_result.hpp:41</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html_a9595e76020f70467adfa9eaef4004227"><div class="ttname"><a href="structlongbridge_1_1_async_result.html#a9595e76020f70467adfa9eaef4004227">longbridge::AsyncResult::operator-&gt;</a></div><div class="ttdeci">const T * operator-&gt;() const</div><div class="ttdef"><b>Definition:</b> async_result.hpp:27</div></div>
+<div class="ttc" id="astructlongbridge_1_1_async_result_html_af764afefade2ef7eac6d11208fd2e31a"><div class="ttname"><a href="structlongbridge_1_1_async_result.html#af764afefade2ef7eac6d11208fd2e31a">longbridge::AsyncResult::status</a></div><div class="ttdeci">const Status &amp; status() const</div><div class="ttdef"><b>Definition:</b> async_result.hpp:36</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

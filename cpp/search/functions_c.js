@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['norm_5fpdf_857',['norm_pdf',['../classlongport_1_1_decimal.html#a615361713c4c0dace7646b5a857966b6',1,'longport::Decimal']]],
-  ['normalize_858',['normalize',['../classlongport_1_1_decimal.html#acacc87e656f1f30803753113c92a9d1f',1,'longport::Decimal']]]
+  ['norm_5fpdf_880',['norm_pdf',['../classlongbridge_1_1_decimal.html#a2302db4edd388417387421f717b0715b',1,'longbridge::Decimal']]],
+  ['normalize_881',['normalize',['../classlongbridge_1_1_decimal.html#a2458676863a88fe30f4988174b73753e',1,'longbridge::Decimal']]]
 ];

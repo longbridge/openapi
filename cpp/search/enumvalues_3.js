@@ -1,13 +1,13 @@
 var searchData=
 [
-  ['daily_1252',['Daily',['../namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca6fb29de98538e5d5335519854ab57ed7',1,'longport::quote']]],
-  ['day_1253',['Day',['../namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a03727ac48595a24daed975559c944a44',1,'longport::quote::Day()'],['../namespacelongport_1_1trade.html#aa049d7933fd4e0c5feb2c1b55b416c43a03727ac48595a24daed975559c944a44',1,'longport::trade::Day()']]],
-  ['deactive_1254',['Deactive',['../namespacelongport_1_1trade.html#a248fd8fad7309e7db52963bc06469022aa554f675592fb9dc3b60b3f029ce0e0b',1,'longport::trade']]],
-  ['debtor_1255',['Debtor',['../namespacelongport_1_1trade.html#a5c5bcdd549198121bbcedba1f1bb5ef0a98767816fd8bfd0e01b6ca8d208790b9',1,'longport::trade']]],
-  ['delisted_1256',['Delisted',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949a94dacdac68c59c558e242fc7f3a3cfc0',1,'longport::quote']]],
-  ['delta_1257',['Delta',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbeadb1f4ab5845def61a83d5df13e0c2397',1,'longport::quote::Delta()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001adb1f4ab5845def61a83d5df13e0c2397',1,'longport::quote::Delta()']]],
-  ['descending_1258',['Descending',['../namespacelongport_1_1quote.html#ae5b0516484ac8b93bb8d3c3c26ee746bae3cf5ac19407b1a62c6fccaff675a53b',1,'longport::quote']]],
-  ['dividendratiottm_1259',['DividendRatioTtm',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea5dbe3e16acc88a2c5ce1cf0163cf9af2',1,'longport::quote']]],
-  ['done_1260',['Done',['../namespacelongport_1_1trade.html#ad2e40a0655bc3c5d76938dba61068876af92965e2c8a7afb3c1b9a5c09a263636',1,'longport::trade']]],
-  ['down_1261',['Down',['../namespacelongport_1_1quote.html#a04fcc5a9def5bd8192509610dd79a1f0a08a38277b0309070706f6652eeae9a53',1,'longport::quote']]]
+  ['daily_1284',['Daily',['../namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0ae9cd73d29d6cef636516d9d408891d73',1,'longbridge::quote']]],
+  ['day_1285',['Day',['../namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4a03727ac48595a24daed975559c944a44',1,'longbridge::quote::Day()'],['../namespacelongbridge_1_1trade.html#afa1deed356a1ab7282111b60ca622c34a03727ac48595a24daed975559c944a44',1,'longbridge::trade::Day()']]],
+  ['deactive_1286',['Deactive',['../namespacelongbridge_1_1trade.html#a5f3b72857c03c6a3faa2a102efa91952aa554f675592fb9dc3b60b3f029ce0e0b',1,'longbridge::trade']]],
+  ['debtor_1287',['Debtor',['../namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da98767816fd8bfd0e01b6ca8d208790b9',1,'longbridge::trade']]],
+  ['delisted_1288',['Delisted',['../namespacelongbridge_1_1quote.html#a568e35ea1390b41113035045900c232aa94dacdac68c59c558e242fc7f3a3cfc0',1,'longbridge::quote']]],
+  ['delta_1289',['Delta',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011adb1f4ab5845def61a83d5df13e0c2397',1,'longbridge::quote::Delta()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7adb1f4ab5845def61a83d5df13e0c2397',1,'longbridge::quote::Delta()']]],
+  ['descending_1290',['Descending',['../namespacelongbridge_1_1quote.html#ae0b1f1fcce67cfc8ce30e65c78c1a762ae3cf5ac19407b1a62c6fccaff675a53b',1,'longbridge::quote']]],
+  ['dividendratiottm_1291',['DividendRatioTtm',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a5dbe3e16acc88a2c5ce1cf0163cf9af2',1,'longbridge::quote']]],
+  ['done_1292',['Done',['../namespacelongbridge_1_1trade.html#a7b9f2eee1c984825ea306e02e4e841cfaf92965e2c8a7afb3c1b9a5c09a263636',1,'longbridge::trade']]],
+  ['down_1293',['Down',['../namespacelongbridge_1_1quote.html#aa355880c75bee41851d27b6e2c55fed2a08a38277b0309070706f6652eeae9a53',1,'longbridge::quote']]]
 ];

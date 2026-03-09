@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['gamma_1029',['gamma',['../structlongport_1_1quote_1_1_security_calc_index.html#a98b82fe5c31842d53a94d15a4850af28',1,'longport::quote::SecurityCalcIndex']]],
-  ['granularity_1030',['granularity',['../structlongport_1_1quote_1_1_history_market_temperature_response.html#ab462a12961a903eaf0259171cd40469d',1,'longport::quote::HistoryMarketTemperatureResponse']]]
+  ['gamma_1060',['gamma',['../structlongbridge_1_1quote_1_1_security_calc_index.html#adc7481d5a3dc4723601e5a05679a61d6',1,'longbridge::quote::SecurityCalcIndex']]],
+  ['granularity_1061',['granularity',['../structlongbridge_1_1quote_1_1_history_market_temperature_response.html#a51bb6254d6a5cd9920456cf36981c666',1,'longbridge::quote::HistoryMarketTemperatureResponse']]]
 ];

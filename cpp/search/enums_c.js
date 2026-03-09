@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['timeinforcetype_1209',['TimeInForceType',['../namespacelongport_1_1trade.html#aa049d7933fd4e0c5feb2c1b55b416c43',1,'longport::trade']]],
-  ['topictype_1210',['TopicType',['../namespacelongport_1_1trade.html#accefd393398a0c5823816256fc3c50ad',1,'longport::trade']]],
-  ['tradedirection_1211',['TradeDirection',['../namespacelongport_1_1quote.html#a04fcc5a9def5bd8192509610dd79a1f0',1,'longport::quote']]],
-  ['tradesession_1212',['TradeSession',['../namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0',1,'longport::quote']]],
-  ['tradesessions_1213',['TradeSessions',['../namespacelongport_1_1quote.html#afa089b5c43711da2e1982c6cae06bd6f',1,'longport::quote']]],
-  ['tradestatus_1214',['TradeStatus',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949',1,'longport::quote']]],
-  ['triggerstatus_1215',['TriggerStatus',['../namespacelongport_1_1trade.html#a248fd8fad7309e7db52963bc06469022',1,'longport::trade']]]
+  ['timeinforcetype_1241',['TimeInForceType',['../namespacelongbridge_1_1trade.html#afa1deed356a1ab7282111b60ca622c34',1,'longbridge::trade']]],
+  ['topictype_1242',['TopicType',['../namespacelongbridge_1_1trade.html#a78fbadafa5d0bf766e95a71373900331',1,'longbridge::trade']]],
+  ['tradedirection_1243',['TradeDirection',['../namespacelongbridge_1_1quote.html#aa355880c75bee41851d27b6e2c55fed2',1,'longbridge::quote']]],
+  ['tradesession_1244',['TradeSession',['../namespacelongbridge_1_1quote.html#a3ecf294ed501aeb9673ad1cd6cd71669',1,'longbridge::quote']]],
+  ['tradesessions_1245',['TradeSessions',['../namespacelongbridge_1_1quote.html#a09a88001383d2df2b5e3ceb47050d341',1,'longbridge::quote']]],
+  ['tradestatus_1246',['TradeStatus',['../namespacelongbridge_1_1quote.html#a568e35ea1390b41113035045900c232a',1,'longbridge::quote']]],
+  ['triggerstatus_1247',['TriggerStatus',['../namespacelongbridge_1_1trade.html#a5f3b72857c03c6a3faa2a102efa91952',1,'longbridge::trade']]]
 ];

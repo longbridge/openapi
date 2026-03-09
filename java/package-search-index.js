@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.longport"},{"l":"com.longport.quote"},{"l":"com.longport.trade"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.longbridge"},{"l":"com.longbridge.quote"},{"l":"com.longbridge.trade"}]

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LongPort OpenAPI C++ SDK: include/callback.hpp Source File</title>
+<title>Longbridge OpenAPI C++ SDK: include/callback.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">LongPort OpenAPI C++ SDK
+   <div id="projectname">Longbridge OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -76,32 +76,32 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="async__result_8hpp.html">async_result.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="push_8hpp.html">push.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongport.html">longport</a> {</div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="namespacelongport_1_1callback.html">    9</a></span>&#160;<span class="keyword">namespace </span>callback {</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongbridge.html">longbridge</a> {</div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="namespacelongbridge_1_1callback.html">    9</a></span>&#160;<span class="keyword">namespace </span>callback {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> Res&gt;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<a class="code" href="namespacelongport.html#ac3a680182f746fe3f5fb5f4065a11c48">PushCallback&lt;Ctx, Res&gt;</a>*</div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="namespacelongport_1_1callback.html#ad0206624e59795e28793968c1e15f91b">   13</a></span>&#160;<a class="code" href="namespacelongport_1_1callback.html#ad0206624e59795e28793968c1e15f91b">get_push_callback</a>(<span class="keywordtype">void</span>* p)</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<a class="code" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">PushCallback&lt;Ctx, Res&gt;</a>*</div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="namespacelongbridge_1_1callback.html#af6ca9b0058d476e527fde0a67ee519ac">   13</a></span>&#160;<a class="code" href="namespacelongbridge_1_1callback.html#af6ca9b0058d476e527fde0a67ee519ac">get_push_callback</a>(<span class="keywordtype">void</span>* p)</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;{</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keywordflow">return</span> (<a class="code" href="namespacelongport.html#ac3a680182f746fe3f5fb5f4065a11c48">PushCallback&lt;Ctx, Res&gt;</a>*)p;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keywordflow">return</span> (<a class="code" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">PushCallback&lt;Ctx, Res&gt;</a>*)p;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;}</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> Res&gt;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;std::unique_ptr&lt;AsyncCallback&lt;Ctx, Res&gt;&gt;</div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="namespacelongport_1_1callback.html#a332e16fe8c5d6af8ab3ca85c6c9a23e0">   20</a></span>&#160;<a class="code" href="namespacelongport_1_1callback.html#a332e16fe8c5d6af8ab3ca85c6c9a23e0">get_async_callback</a>(<span class="keywordtype">void</span>* p)</div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="namespacelongbridge_1_1callback.html#a407d68240804f4f1a1a9ff0317a68b6a">   20</a></span>&#160;<a class="code" href="namespacelongbridge_1_1callback.html#a407d68240804f4f1a1a9ff0317a68b6a">get_async_callback</a>(<span class="keywordtype">void</span>* p)</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keyword">auto</span> callback_ptr = (<a class="code" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback&lt;Ctx, Res&gt;</a>*)p;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keyword">auto</span> callback_ptr = (<a class="code" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback&lt;Ctx, Res&gt;</a>*)p;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordflow">return</span> std::unique_ptr&lt;AsyncCallback&lt;Ctx, Res&gt;&gt;(callback_ptr);</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;}</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;} <span class="comment">// namespace callback</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;} <span class="comment">// namespace longport</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;} <span class="comment">// namespace longbridge</span></div>
 <div class="ttc" id="aasync__result_8hpp_html"><div class="ttname"><a href="async__result_8hpp.html">async_result.hpp</a></div></div>
-<div class="ttc" id="anamespacelongport_1_1callback_html_a332e16fe8c5d6af8ab3ca85c6c9a23e0"><div class="ttname"><a href="namespacelongport_1_1callback.html#a332e16fe8c5d6af8ab3ca85c6c9a23e0">longport::callback::get_async_callback</a></div><div class="ttdeci">std::unique_ptr&lt; AsyncCallback&lt; Ctx, Res &gt; &gt; get_async_callback(void *p)</div><div class="ttdef"><b>Definition:</b> callback.hpp:20</div></div>
-<div class="ttc" id="anamespacelongport_1_1callback_html_ad0206624e59795e28793968c1e15f91b"><div class="ttname"><a href="namespacelongport_1_1callback.html#ad0206624e59795e28793968c1e15f91b">longport::callback::get_push_callback</a></div><div class="ttdeci">PushCallback&lt; Ctx, Res &gt; * get_push_callback(void *p)</div><div class="ttdef"><b>Definition:</b> callback.hpp:13</div></div>
-<div class="ttc" id="anamespacelongport_html"><div class="ttname"><a href="namespacelongport.html">longport</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:7</div></div>
-<div class="ttc" id="anamespacelongport_html_a5474340afc19827a58958a5af2cb33fc"><div class="ttname"><a href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">longport::AsyncCallback</a></div><div class="ttdeci">std::function&lt; void(AsyncResult&lt; Ctx, T &gt;)&gt; AsyncCallback</div><div class="ttdef"><b>Definition:</b> async_result.hpp:39</div></div>
-<div class="ttc" id="anamespacelongport_html_ac3a680182f746fe3f5fb5f4065a11c48"><div class="ttname"><a href="namespacelongport.html#ac3a680182f746fe3f5fb5f4065a11c48">longport::PushCallback</a></div><div class="ttdeci">std::function&lt; void(PushEvent&lt; Ctx, T &gt;)&gt; PushCallback</div><div class="ttdef"><b>Definition:</b> push.hpp:27</div></div>
+<div class="ttc" id="anamespacelongbridge_1_1callback_html_a407d68240804f4f1a1a9ff0317a68b6a"><div class="ttname"><a href="namespacelongbridge_1_1callback.html#a407d68240804f4f1a1a9ff0317a68b6a">longbridge::callback::get_async_callback</a></div><div class="ttdeci">std::unique_ptr&lt; AsyncCallback&lt; Ctx, Res &gt; &gt; get_async_callback(void *p)</div><div class="ttdef"><b>Definition:</b> callback.hpp:20</div></div>
+<div class="ttc" id="anamespacelongbridge_1_1callback_html_af6ca9b0058d476e527fde0a67ee519ac"><div class="ttname"><a href="namespacelongbridge_1_1callback.html#af6ca9b0058d476e527fde0a67ee519ac">longbridge::callback::get_push_callback</a></div><div class="ttdeci">PushCallback&lt; Ctx, Res &gt; * get_push_callback(void *p)</div><div class="ttdef"><b>Definition:</b> callback.hpp:13</div></div>
+<div class="ttc" id="anamespacelongbridge_html"><div class="ttname"><a href="namespacelongbridge.html">longbridge</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:8</div></div>
+<div class="ttc" id="anamespacelongbridge_html_a4691be27906dbe9f1a49613c73c7de9d"><div class="ttname"><a href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">longbridge::PushCallback</a></div><div class="ttdeci">std::function&lt; void(PushEvent&lt; Ctx, T &gt;)&gt; PushCallback</div><div class="ttdef"><b>Definition:</b> push.hpp:27</div></div>
+<div class="ttc" id="anamespacelongbridge_html_ac08a510ffe531a5eb0ea8dc2238c55dc"><div class="ttname"><a href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">longbridge::AsyncCallback</a></div><div class="ttdeci">std::function&lt; void(AsyncResult&lt; Ctx, T &gt;)&gt; AsyncCallback</div><div class="ttdef"><b>Definition:</b> async_result.hpp:48</div></div>
 <div class="ttc" id="apush_8hpp_html"><div class="ttname"><a href="push_8hpp.html">push.hpp</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

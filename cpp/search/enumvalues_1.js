@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['balancepoint_1229',['BalancePoint',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea931112ddccf3eb468263cae3c2f2cc49',1,'longport::quote::BalancePoint()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001a931112ddccf3eb468263cae3c2f2cc49',1,'longport::quote::BalancePoint()']]],
-  ['bear_1230',['Bear',['../namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4a372137ebb0d053fecd7a594ec5cb5971',1,'longport::quote']]],
-  ['between_5f3_5f6_1231',['Between_3_6',['../namespacelongport_1_1quote.html#a581b39d5633ca7263f622748ee35d282a88192c6a31200e163645369b6c9c098c',1,'longport::quote']]],
-  ['between_5f6_5f12_1232',['Between_6_12',['../namespacelongport_1_1quote.html#a581b39d5633ca7263f622748ee35d282a3f56fabadefea58b54dab61d301e40a5',1,'longport::quote']]],
-  ['broker_1233',['Broker',['../namespacelongport_1_1trade.html#a63fd787d61e67de8cbb9347f03e2b438a8f794bcc6b1afd542a7f5e30721a05da',1,'longport::trade']]],
-  ['bull_1234',['Bull',['../namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4a92c21511d7b383b2f8ba5b00c3c9a473',1,'longport::quote']]],
-  ['buy_1235',['Buy',['../namespacelongport_1_1trade.html#a95c01172ea521fa1e32d91fb20c335afa831a28f1e8df07c553fcd59546465d13',1,'longport::trade']]]
+  ['balancepoint_1261',['BalancePoint',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a931112ddccf3eb468263cae3c2f2cc49',1,'longbridge::quote::BalancePoint()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a931112ddccf3eb468263cae3c2f2cc49',1,'longbridge::quote::BalancePoint()']]],
+  ['bear_1262',['Bear',['../namespacelongbridge_1_1quote.html#ab6ace2b26e98aa0ca802d19e3bbb69cca372137ebb0d053fecd7a594ec5cb5971',1,'longbridge::quote']]],
+  ['between_5f3_5f6_1263',['Between_3_6',['../namespacelongbridge_1_1quote.html#afd4ab4b1247c75d36b932c4840f3e999a88192c6a31200e163645369b6c9c098c',1,'longbridge::quote']]],
+  ['between_5f6_5f12_1264',['Between_6_12',['../namespacelongbridge_1_1quote.html#afd4ab4b1247c75d36b932c4840f3e999a3f56fabadefea58b54dab61d301e40a5',1,'longbridge::quote']]],
+  ['broker_1265',['Broker',['../namespacelongbridge_1_1trade.html#ad18383294f9b6800a1f1ad43ba89e23fa8f794bcc6b1afd542a7f5e30721a05da',1,'longbridge::trade']]],
+  ['bull_1266',['Bull',['../namespacelongbridge_1_1quote.html#ab6ace2b26e98aa0ca802d19e3bbb69cca92c21511d7b383b2f8ba5b00c3c9a473',1,'longbridge::quote']]],
+  ['buy_1267',['Buy',['../namespacelongbridge_1_1trade.html#aaa325af9ebe5749a44c828da0f7546cda831a28f1e8df07c553fcd59546465d13',1,'longbridge::trade']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['balancetype_1184',['BalanceType',['../namespacelongport_1_1trade.html#ad4e703fdb2ce4e5ef37fc1bb74368507',1,'longport::trade']]]
+  ['balancetype_1216',['BalanceType',['../namespacelongbridge_1_1trade.html#a7ab8acfb7926e0cfae7047d6c88c1cbc',1,'longbridge::trade']]]
 ];

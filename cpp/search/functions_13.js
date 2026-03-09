@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['unsubscribe_939',['unsubscribe',['../classlongport_1_1quote_1_1_quote_context.html#ab52a7ca741595003213ed7a2f1f88491',1,'longport::quote::QuoteContext::unsubscribe()'],['../classlongport_1_1trade_1_1_trade_context.html#a2abb31b9da78bff20be2c4711ea14611',1,'longport::trade::TradeContext::unsubscribe()']]],
-  ['unsubscribe_5fcandlesticks_940',['unsubscribe_candlesticks',['../classlongport_1_1quote_1_1_quote_context.html#a1959b01fab55b0ed5efd59240a23678b',1,'longport::quote::QuoteContext']]],
-  ['update_5fwatchlist_5fgroup_941',['update_watchlist_group',['../classlongport_1_1quote_1_1_quote_context.html#aa32421ee6a372a48b94f79e87ee57fb1',1,'longport::quote::QuoteContext']]]
+  ['unsubscribe_969',['unsubscribe',['../classlongbridge_1_1quote_1_1_quote_context.html#ae8bcc8c8c2f66de1decefa074a911547',1,'longbridge::quote::QuoteContext::unsubscribe()'],['../classlongbridge_1_1trade_1_1_trade_context.html#a35158082ee04f2e865aa8bfce39576b9',1,'longbridge::trade::TradeContext::unsubscribe()']]],
+  ['unsubscribe_5fcandlesticks_970',['unsubscribe_candlesticks',['../classlongbridge_1_1quote_1_1_quote_context.html#adb6978a3b09792898a3cbb7dd7eba0df',1,'longbridge::quote::QuoteContext']]],
+  ['update_5fwatchlist_5fgroup_971',['update_watchlist_group',['../classlongbridge_1_1quote_1_1_quote_context.html#ac44c1873a007d23d8040573ef9001aa6',1,'longbridge::quote::QuoteContext']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LongPort OpenAPI C++ SDK: include/push.hpp Source File</title>
+<title>Longbridge OpenAPI C++ SDK: include/push.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">LongPort OpenAPI C++ SDK
+   <div id="projectname">Longbridge OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -73,37 +73,37 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongport.html">longport</a> {</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongbridge.html">longbridge</a> {</div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="structlongport_1_1_push_event.html">    8</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structlongport_1_1_push_event.html">PushEvent</a></div>
+<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_push_event.html">    8</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structlongbridge_1_1_push_event.html">PushEvent</a></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  Ctx ctx_;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keyword">const</span> T* data_;</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structlongport_1_1_push_event.html#af21d7e4de55ebcdaed66c7c90039c54e">   15</a></span>&#160;  <a class="code" href="structlongport_1_1_push_event.html#af21d7e4de55ebcdaed66c7c90039c54e">PushEvent</a>(Ctx ctx, <span class="keyword">const</span> T* data)</div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_push_event.html#a6956106e2c9fb7893a71c4cb8f2d5fc0">   15</a></span>&#160;  <a class="code" href="structlongbridge_1_1_push_event.html#a6956106e2c9fb7893a71c4cb8f2d5fc0">PushEvent</a>(Ctx ctx, <span class="keyword">const</span> T* data)</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    : ctx_(ctx)</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    , data_(data)</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  {</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  }</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="structlongport_1_1_push_event.html#aad7ef8d3d1c8050c71117de678339bac">   21</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> T* <a class="code" href="structlongport_1_1_push_event.html#aad7ef8d3d1c8050c71117de678339bac">operator-&gt;</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> data_; }</div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_push_event.html#a0f6f44dd24e1cf77ba52b482c82963bf">   21</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> T* <a class="code" href="structlongbridge_1_1_push_event.html#a0f6f44dd24e1cf77ba52b482c82963bf">operator-&gt;</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> data_; }</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="structlongport_1_1_push_event.html#afebe40c1dbd23ae50761befa50acba1d">   23</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> Ctx&amp; <a class="code" href="structlongport_1_1_push_event.html#afebe40c1dbd23ae50761befa50acba1d">context</a>() { <span class="keywordflow">return</span> ctx_; }</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_push_event.html#abbd878a343e65bad5e7980f83c025c36">   23</a></span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> Ctx&amp; <a class="code" href="structlongbridge_1_1_push_event.html#abbd878a343e65bad5e7980f83c025c36">context</a>() { <span class="keywordflow">return</span> ctx_; }</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;};</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ctx, <span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="namespacelongport.html#ac3a680182f746fe3f5fb5f4065a11c48">   27</a></span>&#160;<span class="keyword">using</span> <a class="code" href="namespacelongport.html#ac3a680182f746fe3f5fb5f4065a11c48">PushCallback</a> = std::function&lt;void(<a class="code" href="structlongport_1_1_push_event.html">PushEvent&lt;Ctx, T&gt;</a>)&gt;;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">   27</a></span>&#160;<span class="keyword">using</span> <a class="code" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">PushCallback</a> = std::function&lt;void(<a class="code" href="structlongbridge_1_1_push_event.html">PushEvent&lt;Ctx, T&gt;</a>)&gt;;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
-<div class="ttc" id="anamespacelongport_html"><div class="ttname"><a href="namespacelongport.html">longport</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:7</div></div>
-<div class="ttc" id="anamespacelongport_html_ac3a680182f746fe3f5fb5f4065a11c48"><div class="ttname"><a href="namespacelongport.html#ac3a680182f746fe3f5fb5f4065a11c48">longport::PushCallback</a></div><div class="ttdeci">std::function&lt; void(PushEvent&lt; Ctx, T &gt;)&gt; PushCallback</div><div class="ttdef"><b>Definition:</b> push.hpp:27</div></div>
-<div class="ttc" id="astructlongport_1_1_push_event_html"><div class="ttname"><a href="structlongport_1_1_push_event.html">longport::PushEvent</a></div><div class="ttdef"><b>Definition:</b> push.hpp:9</div></div>
-<div class="ttc" id="astructlongport_1_1_push_event_html_aad7ef8d3d1c8050c71117de678339bac"><div class="ttname"><a href="structlongport_1_1_push_event.html#aad7ef8d3d1c8050c71117de678339bac">longport::PushEvent::operator-&gt;</a></div><div class="ttdeci">const T * operator-&gt;() const</div><div class="ttdef"><b>Definition:</b> push.hpp:21</div></div>
-<div class="ttc" id="astructlongport_1_1_push_event_html_af21d7e4de55ebcdaed66c7c90039c54e"><div class="ttname"><a href="structlongport_1_1_push_event.html#af21d7e4de55ebcdaed66c7c90039c54e">longport::PushEvent::PushEvent</a></div><div class="ttdeci">PushEvent(Ctx ctx, const T *data)</div><div class="ttdef"><b>Definition:</b> push.hpp:15</div></div>
-<div class="ttc" id="astructlongport_1_1_push_event_html_afebe40c1dbd23ae50761befa50acba1d"><div class="ttname"><a href="structlongport_1_1_push_event.html#afebe40c1dbd23ae50761befa50acba1d">longport::PushEvent::context</a></div><div class="ttdeci">const Ctx &amp; context()</div><div class="ttdef"><b>Definition:</b> push.hpp:23</div></div>
+<div class="ttc" id="anamespacelongbridge_html"><div class="ttname"><a href="namespacelongbridge.html">longbridge</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:8</div></div>
+<div class="ttc" id="anamespacelongbridge_html_a4691be27906dbe9f1a49613c73c7de9d"><div class="ttname"><a href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">longbridge::PushCallback</a></div><div class="ttdeci">std::function&lt; void(PushEvent&lt; Ctx, T &gt;)&gt; PushCallback</div><div class="ttdef"><b>Definition:</b> push.hpp:27</div></div>
+<div class="ttc" id="astructlongbridge_1_1_push_event_html"><div class="ttname"><a href="structlongbridge_1_1_push_event.html">longbridge::PushEvent</a></div><div class="ttdef"><b>Definition:</b> push.hpp:9</div></div>
+<div class="ttc" id="astructlongbridge_1_1_push_event_html_a0f6f44dd24e1cf77ba52b482c82963bf"><div class="ttname"><a href="structlongbridge_1_1_push_event.html#a0f6f44dd24e1cf77ba52b482c82963bf">longbridge::PushEvent::operator-&gt;</a></div><div class="ttdeci">const T * operator-&gt;() const</div><div class="ttdef"><b>Definition:</b> push.hpp:21</div></div>
+<div class="ttc" id="astructlongbridge_1_1_push_event_html_a6956106e2c9fb7893a71c4cb8f2d5fc0"><div class="ttname"><a href="structlongbridge_1_1_push_event.html#a6956106e2c9fb7893a71c4cb8f2d5fc0">longbridge::PushEvent::PushEvent</a></div><div class="ttdeci">PushEvent(Ctx ctx, const T *data)</div><div class="ttdef"><b>Definition:</b> push.hpp:15</div></div>
+<div class="ttc" id="astructlongbridge_1_1_push_event_html_abbd878a343e65bad5e7980f83c025c36"><div class="ttname"><a href="structlongbridge_1_1_push_event.html#abbd878a343e65bad5e7980f83c025c36">longbridge::PushEvent::context</a></div><div class="ttdeci">const Ctx &amp; context()</div><div class="ttdef"><b>Definition:</b> push.hpp:23</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

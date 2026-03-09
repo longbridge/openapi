@@ -1,0 +1,232 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Longbridge OpenAPI SDK for Rust"><title>longbridge - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.0 (4a4ef493e 2026-03-02)" data-channel="1.94.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../static.files/storage-e2aeef58.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Crate longbridge</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../longbridge/index.html">longbridge</a><span class="version">4.0.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#longbridge-openapi-sdk-for-rust" title="Longbridge OpenAPI SDK for Rust">Longbridge OpenAPI SDK for Rust</a><ul><li><a href="#documentation" title="Documentation">Documentation</a></li><li><a href="#examples" title="Examples">Examples</a></li><li><a href="#quickstart" title="Quickstart">Quickstart</a></li><li><a href="#quote-api-get-basic-information-of-securities" title="Quote API (Get basic information of securities)">Quote API (Get basic information of securities)</a></li><li><a href="#quote-api-subscribe-quotes" title="Quote API (Subscribe quotes)">Quote API (Subscribe quotes)</a></li><li><a href="#trade-api-submit-order" title="Trade API (Submit order)">Trade API (Submit order)</a></li><li><a href="#troubleshooting" title="Troubleshooting">Troubleshooting</a></li><li><a href="#crate-features" title="Crate features">Crate features</a></li><li><a href="#license" title="License">License</a></li></ul></li></ul><h3><a href="#reexports">Crate Items</a></h3><ul class="block"><li><a href="#reexports" title="Re-exports">Re-exports</a></li><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#macros" title="Macros">Macros</a></li><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#enums" title="Enums">Enums</a></li><li><a href="#types" title="Type Aliases">Type Aliases</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>longbridge</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/longbridge/lib.rs.html#1-31">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="longbridge-openapi-sdk-for-rust"><a class="doc-anchor" href="#longbridge-openapi-sdk-for-rust">§</a>Longbridge OpenAPI SDK for Rust</h2><div align="center">
+  <a href="https://crates.io/crates/longbridge">
+    <img src="https://img.shields.io/crates/v/longbridge.svg?style=flat-square"
+    alt="Crates.io version" />
+  </a>
+  <a href="https://docs.rs/longbridge">
+    <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square"
+      alt="docs.rs docs" />
+  </a>
+  <a href="https://github.com/rust-secure-code/safety-dance/">
+    <img src="https://img.shields.io/badge/unsafe-forbidden-success.svg?style=flat-square"
+      alt="Unsafe Rust forbidden" />
+  </a>
+  <a href="https://blog.rust-lang.org/2021/11/01/Rust-1.89.0.html">
+    <img src="https://img.shields.io/badge/rustc-1.89.0+-ab6000.svg"
+      alt="rustc 1.89.0+" />
+  </a>
+</div>
+<p><code>longbridge</code> provides an easy-to-use interface for invoking <a href="https://open.longbridge.com/en/"><code>Longbridge OpenAPI</code></a>.</p>
+<h3 id="documentation"><a class="doc-anchor" href="#documentation">§</a>Documentation</h3>
+<ul>
+<li>SDK docs: https://longbridge.github.io/openapi/rust/longbridge/index.html</li>
+<li>crates.io: https://crates.io/crates/longbridge</li>
+<li>Longbridge OpenAPI: https://open.longbridge.com/en/</li>
+</ul>
+<h3 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h3>
+<p>Runnable examples live in <code>examples/rust/</code>:</p>
+<ul>
+<li><code>examples/rust/account_asset/src/main.rs</code></li>
+<li><code>examples/rust/http_client/src/main.rs</code></li>
+<li><code>examples/rust/subscribe_quote/src/main.rs</code></li>
+<li><code>examples/rust/subscribe_candlesticks/src/main.rs</code></li>
+<li><code>examples/rust/submit_order/src/main.rs</code></li>
+<li><code>examples/rust/today_orders/src/main.rs</code></li>
+</ul>
+<h3 id="quickstart"><a class="doc-anchor" href="#quickstart">§</a>Quickstart</h3>
+<p><em>Add dependencies to <code>Cargo.toml</code></em></p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+longbridge = &quot;4.0.0&quot;</code></pre></div><h4 id="authentication"><a class="doc-anchor" href="#authentication">§</a>Authentication</h4>
+<p>Longbridge OpenAPI supports two authentication methods:</p>
+<h5 id="1-oauth-20-recommended"><a class="doc-anchor" href="#1-oauth-20-recommended">§</a>1. OAuth 2.0 (Recommended)</h5>
+<p>OAuth 2.0 uses Bearer tokens without requiring HMAC signatures.  The token is
+persisted automatically at <code>~/.longbridge-openapi/tokens/&lt;client_id&gt;</code>
+(<code>%USERPROFILE%\.longbridge-openapi\tokens\&lt;client_id&gt;</code> on Windows) and
+refreshed transparently on every request.</p>
+<p><strong>Step 1: Register an OAuth Client</strong></p>
+<p>Register an OAuth client to obtain your <code>client_id</code>:</p>
+<p><em>bash / macOS / Linux</em></p>
+<div class="example-wrap"><pre class="language-bash"><code>curl -X POST https://openapi.longbridgeapp.com/oauth2/register \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{
+    &quot;client_name&quot;: &quot;My Application&quot;,
+    &quot;redirect_uris&quot;: [&quot;http://localhost:60355/callback&quot;],
+    &quot;grant_types&quot;: [&quot;authorization_code&quot;, &quot;refresh_token&quot;]
+  }&#39;</code></pre></div>
+<p><em>PowerShell (Windows)</em></p>
+<div class="example-wrap"><pre class="language-powershell"><code>Invoke-RestMethod -Method Post -Uri https://openapi.longbridgeapp.com/oauth2/register `
+  -ContentType &quot;application/json&quot; `
+  -Body &#39;{
+    &quot;client_name&quot;: &quot;My Application&quot;,
+    &quot;redirect_uris&quot;: [&quot;http://localhost:60355/callback&quot;],
+    &quot;grant_types&quot;: [&quot;authorization_code&quot;, &quot;refresh_token&quot;]
+  }&#39;</code></pre></div>
+<p>Response:</p>
+<div class="example-wrap"><pre class="language-json"><code>{
+  &quot;client_id&quot;: &quot;your-client-id-here&quot;,
+  &quot;client_secret&quot;: null,
+  &quot;client_name&quot;: &quot;My Application&quot;,
+  &quot;redirect_uris&quot;: [&quot;http://localhost:60355/callback&quot;]
+}</code></pre></div>
+<p><strong>Step 2: Build an <code>OAuth</code> handle and create <code>Config</code></strong></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>longbridge::{Config, oauth::OAuthBuilder};
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+    <span class="comment">// Loads an existing token from ~/.longbridge-openapi/tokens/&lt;client_id&gt;.
+    // If none exists or it is expired, opens the browser authorization flow.
+    // Token refresh is handled automatically on every subsequent request.
+    </span><span class="kw">let </span>oauth = OAuthBuilder::new(<span class="string">"your-client-id"</span>)
+        <span class="comment">// .callback_port(8080)  // optional, default 60355
+        </span>.build(|url| <span class="macro">println!</span>(<span class="string">"Open this URL to authorize: {url}"</span>))
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="kw">let </span>config = Arc::new(Config::from_oauth(oauth));
+
+    <span class="comment">// Use config to create contexts...
+    </span><span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>No shared secret required</li>
+<li>No per-request signature calculation</li>
+<li>Token lifecycle (load, refresh, persist) managed automatically</li>
+</ul>
+<h5 id="2-legacy-api-key-environment-variables"><a class="doc-anchor" href="#2-legacy-api-key-environment-variables">§</a>2. Legacy API Key (Environment Variables)</h5>
+<p>For backward compatibility you can use the traditional API key method.</p>
+<p><em>Setting environment variables (macOS/Linux)</em></p>
+<div class="example-wrap"><pre class="language-bash"><code>export LONGBRIDGE_APP_KEY=&quot;App Key get from user center&quot;
+export LONGBRIDGE_APP_SECRET=&quot;App Secret get from user center&quot;
+export LONGBRIDGE_ACCESS_TOKEN=&quot;Access Token get from user center&quot;</code></pre></div>
+<p><em>Setting environment variables (Windows)</em></p>
+<div class="example-wrap"><pre class="language-powershell"><code>setx LONGBRIDGE_APP_KEY &quot;App Key get from user center&quot;
+setx LONGBRIDGE_APP_SECRET &quot;App Secret get from user center&quot;
+setx LONGBRIDGE_ACCESS_TOKEN &quot;Access Token get from user center&quot;</code></pre></div><h4 id="other-environment-variables"><a class="doc-anchor" href="#other-environment-variables">§</a>Other environment variables</h4><div><table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody>
+<tr><td>LONGBRIDGE_LANGUAGE</td><td>Language identifier, <code>zh-CN</code>, <code>zh-HK</code> or <code>en</code> (Default: <code>en</code>)</td></tr>
+<tr><td>LONGBRIDGE_HTTP_URL</td><td>HTTP endpoint url (Default: <code>https://openapi.longbridge.com</code>)</td></tr>
+<tr><td>LONGBRIDGE_QUOTE_WS_URL</td><td>Quote websocket endpoint url (Default: <code>wss://openapi-quote.longbridge.com/v2</code>)</td></tr>
+<tr><td>LONGBRIDGE_TRADE_WS_URL</td><td>Trade websocket endpoint url (Default: <code>wss://openapi-trade.longbridge.com/v2</code>)</td></tr>
+<tr><td>LONGBRIDGE_ENABLE_OVERNIGHT</td><td>Enable overnight quote, <code>true</code> or <code>false</code> (Default: <code>false</code>)</td></tr>
+<tr><td>LONGBRIDGE_PUSH_CANDLESTICK_MODE</td><td><code>realtime</code> or <code>confirmed</code> (Default: <code>realtime</code>)</td></tr>
+<tr><td>LONGBRIDGE_PRINT_QUOTE_PACKAGES</td><td>Print quote packages when connected, <code>true</code> or <code>false</code> (Default: <code>true</code>)</td></tr>
+<tr><td>LONGBRIDGE_LOG_PATH</td><td>Set the path of the log files (Default: <code>no logs</code>)</td></tr>
+</tbody></table>
+</div><h3 id="quote-api-get-basic-information-of-securities"><a class="doc-anchor" href="#quote-api-get-basic-information-of-securities">§</a>Quote API <em>(Get basic information of securities)</em></h3>
+<p><strong>Using OAuth 2.0 (Recommended):</strong></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>longbridge::{Config, QuoteContext, oauth::OAuthBuilder};
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+    <span class="kw">let </span>oauth = OAuthBuilder::new(<span class="string">"your-client-id"</span>)
+        .build(|url| <span class="macro">println!</span>(<span class="string">"Open this URL to authorize: {url}"</span>))
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>config = Arc::new(Config::from_oauth(oauth));
+
+    <span class="comment">// Create a context for quote APIs
+    </span><span class="kw">let </span>(ctx, <span class="kw">_</span>) = QuoteContext::try_new(config).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="comment">// Get basic information of securities
+    </span><span class="kw">let </span>resp = ctx
+        .quote([<span class="string">"700.HK"</span>, <span class="string">"AAPL.US"</span>, <span class="string">"TSLA.US"</span>, <span class="string">"NFLX.US"</span>])
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="macro">println!</span>(<span class="string">"{:?}"</span>, resp);
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<p><strong>Using legacy API key (environment variables):</strong></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>longbridge::{Config, QuoteContext};
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+    <span class="comment">// Load configuration from environment variables
+    </span><span class="kw">let </span>config = Arc::new(Config::from_apikey_env()<span class="question-mark">?</span>);
+
+    <span class="comment">// Create a context for quote APIs
+    </span><span class="kw">let </span>(ctx, <span class="kw">_</span>) = QuoteContext::try_new(config.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="comment">// Get basic information of securities
+    </span><span class="kw">let </span>resp = ctx
+        .quote([<span class="string">"700.HK"</span>, <span class="string">"AAPL.US"</span>, <span class="string">"TSLA.US"</span>, <span class="string">"NFLX.US"</span>])
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="macro">println!</span>(<span class="string">"{:?}"</span>, resp);
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div><h3 id="quote-api-subscribe-quotes"><a class="doc-anchor" href="#quote-api-subscribe-quotes">§</a>Quote API <em>(Subscribe quotes)</em></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>longbridge::{quote::SubFlags, Config, QuoteContext};
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+    <span class="comment">// Load configuration from environment variables
+    </span><span class="kw">let </span>config = Arc::new(Config::from_apikey_env()<span class="question-mark">?</span>);
+
+    <span class="comment">// Create a context for quote APIs
+    </span><span class="kw">let </span>(ctx, <span class="kw-2">mut </span>receiver) = QuoteContext::try_new(config).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="comment">// Subscribe
+    </span>ctx.subscribe([<span class="string">"700.HK"</span>], SubFlags::QUOTE).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="comment">// Receive push events
+    </span><span class="kw">while let </span><span class="prelude-val">Some</span>(event) = receiver.recv().<span class="kw">await </span>{
+        <span class="macro">println!</span>(<span class="string">"{:?}"</span>, event);
+    }
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div><h3 id="trade-api-submit-order"><a class="doc-anchor" href="#trade-api-submit-order">§</a>Trade API <em>(Submit order)</em></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>longbridge::{
+    decimal,
+    trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
+    Config, TradeContext,
+};
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+    <span class="comment">// Load configuration from environment variables
+    </span><span class="kw">let </span>config = Arc::new(Config::from_apikey_env()<span class="question-mark">?</span>);
+
+    <span class="comment">// Create a context for trade APIs
+    </span><span class="kw">let </span>(ctx, <span class="kw">_</span>) = TradeContext::try_new(config).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="comment">// Submit order
+    </span><span class="kw">let </span>opts = SubmitOrderOptions::new(
+        <span class="string">"700.HK"</span>,
+        OrderType::LO,
+        OrderSide::Buy,
+        <span class="macro">decimal!</span>(<span class="number">500</span>),
+        TimeInForceType::Day,
+    )
+    .submitted_price(<span class="macro">decimal!</span>(<span class="number">50i32</span>))
+    .remark(<span class="string">"Hello from Rust SDK"</span>.to_string());
+
+    <span class="kw">let </span>resp = ctx.submit_order(opts).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="macro">println!</span>(<span class="string">"{:?}"</span>, resp);
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div><h3 id="troubleshooting"><a class="doc-anchor" href="#troubleshooting">§</a>Troubleshooting</h3>
+<ul>
+<li>Windows <code>setx</code> requires a new terminal; use <code>set</code> for the current <code>cmd.exe</code> session.</li>
+<li>If you don’t see push events, keep the process alive (receiver loop / <code>sleep</code>).</li>
+<li>For debugging, set <code>LONGBRIDGE_LOG_PATH</code> to enable SDK logs.</li>
+</ul>
+<h3 id="crate-features"><a class="doc-anchor" href="#crate-features">§</a>Crate features</h3>
+<p>To avoid compiling unused dependencies, longbridge gates certain features, all of which are disabled by default:</p>
+<div><table><thead><tr><th>Feature</th><th>Description</th></tr></thead><tbody>
+<tr><td>blocking</td><td>Provides the <code>blocking</code> client API.</td></tr>
+</tbody></table>
+</div><h3 id="license"><a class="doc-anchor" href="#license">§</a>License</h3>
+<p>Licensed under either of</p>
+<ul>
+<li>Apache License, Version 2.0,(<a href="../LICENSE-APACHE">LICENSE-APACHE</a> or <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>)</li>
+<li>MIT license (<a href="../LICENSE-MIT">LICENSE-MIT</a> or <a href="http://opensource.org/licenses/MIT">http://opensource.org/licenses/MIT</a>) at your option.</li>
+</ul>
+</div></details><h2 id="reexports" class="section-header">Re-exports<a href="#reexports" class="anchor">§</a></h2><dl class="item-table reexports"><dt id="reexport.QuoteContext"><code>pub use quote::<a class="struct" href="quote/struct.QuoteContext.html" title="struct longbridge::quote::QuoteContext">QuoteContext</a>;</code></dt><dt id="reexport.TradeContext"><code>pub use trade::<a class="struct" href="trade/struct.TradeContext.html" title="struct longbridge::trade::TradeContext">TradeContext</a>;</code></dt><dt id="reexport.oauth"><code>pub use longbridge_oauth as oauth;</code></dt><dt id="reexport.httpclient"><code>pub use longbridge_httpcli as httpclient;</code></dt><dt id="reexport.wsclient"><code>pub use longbridge_wscli as wsclient;</code></dt></dl><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="quote/index.html" title="mod longbridge::quote">quote</a></dt><dd>Quote related types</dd><dt><a class="mod" href="trade/index.html" title="mod longbridge::trade">trade</a></dt><dd>Trade related types</dd></dl><h2 id="macros" class="section-header">Macros<a href="#macros" class="anchor">§</a></h2><dl class="item-table"><dt><a class="macro" href="macro.decimal.html" title="macro longbridge::decimal">decimal</a></dt><dd>A macro to construct decimal.</dd></dl><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.Config.html" title="struct longbridge::Config">Config</a></dt><dd>Configuration options for Longbridge SDK</dd><dt><a class="struct" href="struct.Decimal.html" title="struct longbridge::Decimal">Decimal</a></dt><dd><code>Decimal</code> represents a 128 bit representation of a fixed-precision decimal number.
+The finite set of values of type <code>Decimal</code> are of the form m / 10<sup>e</sup>,
+where m is an integer such that -2<sup>96</sup> &lt; m &lt; 2<sup>96</sup>, and e is an integer
+between 0 and 28 inclusive.</dd></dl><h2 id="enums" class="section-header">Enums<a href="#enums" class="anchor">§</a></h2><dl class="item-table"><dt><a class="enum" href="enum.Error.html" title="enum longbridge::Error">Error</a></dt><dd>Longbridge OpenAPI SDK error type</dd><dt><a class="enum" href="enum.Language.html" title="enum longbridge::Language">Language</a></dt><dd>Language identifier</dd><dt><a class="enum" href="enum.Market.html" title="enum longbridge::Market">Market</a></dt><dd>Market</dd><dt><a class="enum" href="enum.PushCandlestickMode.html" title="enum longbridge::PushCandlestickMode">Push<wbr>Candlestick<wbr>Mode</a></dt><dd>Push mode for candlestick</dd><dt><a class="enum" href="enum.SimpleError.html" title="enum longbridge::SimpleError">Simple<wbr>Error</a></dt><dd>Simple error type</dd><dt><a class="enum" href="enum.SimpleErrorKind.html" title="enum longbridge::SimpleErrorKind">Simple<wbr>Error<wbr>Kind</a></dt><dd>Simple error kind</dd></dl><h2 id="types" class="section-header">Type Aliases<a href="#types" class="anchor">§</a></h2><dl class="item-table"><dt><a class="type" href="type.Result.html" title="type longbridge::Result">Result</a></dt><dd>Longbridge OpenAPI SDK result type</dd></dl></section></div></main></body></html>

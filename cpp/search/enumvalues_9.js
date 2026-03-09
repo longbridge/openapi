@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['lastdone_1293',['LastDone',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea7940fbc8e91b81ef7f1e52cb054c93ae',1,'longport::quote::LastDone()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001a7940fbc8e91b81ef7f1e52cb054c93ae',1,'longport::quote::LastDone()']]],
-  ['leverageratio_1294',['LeverageRatio',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea1c20c7c3ce560b95c494475aede2675f',1,'longport::quote::LeverageRatio()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001a1c20c7c3ce560b95c494475aede2675f',1,'longport::quote::LeverageRatio()']]],
-  ['lit_1295',['LIT',['../namespacelongport_1_1trade.html#a70f9925bd2da94a7a5db14cd6b781a27aa4e36ae36e52be95ee5c8d2bc974dfd8',1,'longport::trade']]],
-  ['lo_1296',['LO',['../namespacelongport_1_1trade.html#a70f9925bd2da94a7a5db14cd6b781a27a31d38ecd194aaab6e0584e14314036af',1,'longport::trade']]],
-  ['longterm_1297',['LongTerm',['../namespacelongport_1_1trade.html#a5c5bcdd549198121bbcedba1f1bb5ef0a068cb1d7a701350fb9029fc2a87c0957',1,'longport::trade']]],
-  ['lowerstrikeprice_1298',['LowerStrikePrice',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea3432899b63c5505b5155e68e268c855a',1,'longport::quote::LowerStrikePrice()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001a3432899b63c5505b5155e68e268c855a',1,'longport::quote::LowerStrikePrice()']]],
-  ['lt_5f3_1299',['LT_3',['../namespacelongport_1_1quote.html#a581b39d5633ca7263f622748ee35d282aecc53b5c7eef5e165bbe54f95557240f',1,'longport::quote']]]
+  ['lastdone_1325',['LastDone',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a7940fbc8e91b81ef7f1e52cb054c93ae',1,'longbridge::quote::LastDone()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a7940fbc8e91b81ef7f1e52cb054c93ae',1,'longbridge::quote::LastDone()']]],
+  ['leverageratio_1326',['LeverageRatio',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a1c20c7c3ce560b95c494475aede2675f',1,'longbridge::quote::LeverageRatio()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a1c20c7c3ce560b95c494475aede2675f',1,'longbridge::quote::LeverageRatio()']]],
+  ['lit_1327',['LIT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aaa4e36ae36e52be95ee5c8d2bc974dfd8',1,'longbridge::trade']]],
+  ['lo_1328',['LO',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa31d38ecd194aaab6e0584e14314036af',1,'longbridge::trade']]],
+  ['longterm_1329',['LongTerm',['../namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da068cb1d7a701350fb9029fc2a87c0957',1,'longbridge::trade']]],
+  ['lowerstrikeprice_1330',['LowerStrikePrice',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a3432899b63c5505b5155e68e268c855a',1,'longbridge::quote::LowerStrikePrice()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a3432899b63c5505b5155e68e268c855a',1,'longbridge::quote::LowerStrikePrice()']]],
+  ['lt_5f3_1331',['LT_3',['../namespacelongbridge_1_1quote.html#afd4ab4b1247c75d36b932c4840f3e999aecc53b5c7eef5e165bbe54f95557240f',1,'longbridge::quote']]]
 ];

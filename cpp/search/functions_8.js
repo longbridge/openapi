@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['intraday_842',['intraday',['../classlongport_1_1quote_1_1_quote_context.html#af520a83481540154e4c3345f355e5443',1,'longport::quote::QuoteContext']]],
-  ['is_5ferr_843',['is_err',['../structlongport_1_1_async_result.html#ac2619b5e07ff3a2ffad2db738c62eb23',1,'longport::AsyncResult::is_err()'],['../classlongport_1_1_status.html#a9eaef25c83a92e021114eb4b4071e6da',1,'longport::Status::is_err()']]],
-  ['is_5fnegative_844',['is_negative',['../classlongport_1_1_decimal.html#a679cbbfb122c8288df82a0fbb47d4078',1,'longport::Decimal']]],
-  ['is_5fok_845',['is_ok',['../structlongport_1_1_async_result.html#aecaed8f6468d3600dd377df7953b5712',1,'longport::AsyncResult::is_ok()'],['../classlongport_1_1_status.html#a1ab59d8f855b439d40dddd6b88bfece2',1,'longport::Status::is_ok()']]],
-  ['is_5fpositive_846',['is_positive',['../classlongport_1_1_decimal.html#aa58a78b4546eada587ad20e1d0011884',1,'longport::Decimal']]],
-  ['is_5fzero_847',['is_zero',['../classlongport_1_1_decimal.html#a17aea44f4008d40971d5a03b7ea81470',1,'longport::Decimal']]]
+  ['intraday_865',['intraday',['../classlongbridge_1_1quote_1_1_quote_context.html#ad9d3cee180163c0a27564910c4d121e8',1,'longbridge::quote::QuoteContext']]],
+  ['is_5ferr_866',['is_err',['../structlongbridge_1_1_async_result.html#a2e5cfec8d8ee9448f60ad4dd5e54d257',1,'longbridge::AsyncResult::is_err()'],['../classlongbridge_1_1_status.html#ac01867a71cdea5e56fea4c76dbcb15d5',1,'longbridge::Status::is_err()']]],
+  ['is_5fnegative_867',['is_negative',['../classlongbridge_1_1_decimal.html#a0cfe9b24027d88edc130e5afd31c7bfd',1,'longbridge::Decimal']]],
+  ['is_5fok_868',['is_ok',['../structlongbridge_1_1_async_result.html#a65eccd8b1ff6f6bdbf85bf7e9320cb2e',1,'longbridge::AsyncResult::is_ok()'],['../classlongbridge_1_1_status.html#adab569d7b14da7e5c446d7d7b2fb1d61',1,'longbridge::Status::is_ok()']]],
+  ['is_5fpositive_869',['is_positive',['../classlongbridge_1_1_decimal.html#a2f26948b3c8789aa2b5b39655433898a',1,'longbridge::Decimal']]],
+  ['is_5fzero_870',['is_zero',['../classlongbridge_1_1_decimal.html#aa82ed8f813d3b99d4308e4d4d8cb9a58',1,'longbridge::Decimal']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['key_1049',['key',['../structlongport_1_1quote_1_1_quote_package_detail.html#a970226c22d4ae27a10d67db118854866',1,'longport::quote::QuotePackageDetail']]]
+  ['key_1080',['key',['../structlongbridge_1_1quote_1_1_quote_package_detail.html#ad44903a93a5d1a90ed1bff12154a4374',1,'longbridge::quote::QuotePackageDetail']]]
 ];

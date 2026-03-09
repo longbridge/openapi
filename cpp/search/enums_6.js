@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['granularity_1193',['Granularity',['../namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5c',1,'longport::quote']]]
+  ['granularity_1225',['Granularity',['../namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0',1,'longbridge::quote']]]
 ];

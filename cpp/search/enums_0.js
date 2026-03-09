@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['adjusttype_1183',['AdjustType',['../namespacelongport_1_1quote.html#a866ffe475bc2cef271e858a5bdf16d6a',1,'longport::quote']]]
+  ['adjusttype_1215',['AdjustType',['../namespacelongbridge_1_1quote.html#a7ecee45d12af625ff6ec41c1a8e759af',1,'longbridge::quote']]]
 ];

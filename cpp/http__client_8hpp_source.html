@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LongPort OpenAPI C++ SDK: include/http_client.hpp Source File</title>
+<title>Longbridge OpenAPI C++ SDK: include/http_client.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">LongPort OpenAPI C++ SDK
+   <div id="projectname">Longbridge OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -76,63 +76,71 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="async__result_8hpp.html">async_result.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="status_8hpp.html">status.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a> <a class="code" href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a>;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongport.html">longport</a> {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="structlongport_1_1_http_result.html">   14</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structlongport_1_1_http_result.html">HttpResult</a></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;{</div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structlongport_1_1_http_result.html#a039c3afba9f51536b02f68667e27c21e">   16</a></span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structlongport_1_1_http_result.html#a039c3afba9f51536b02f68667e27c21e">response_body</a>;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="structlongport_1_1_http_result.html#a28737d70dc757a5bfd489677dfc150d5">   18</a></span>&#160;  <a class="code" href="structlongport_1_1_http_result.html#a28737d70dc757a5bfd489677dfc150d5">HttpResult</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structlongport_1_1_http_result.html#a039c3afba9f51536b02f68667e27c21e">response_body</a>)</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    : <a class="code" href="structlongport_1_1_http_result.html#a039c3afba9f51536b02f68667e27c21e">response_body</a>(<a class="code" href="structlongport_1_1_http_result.html#a039c3afba9f51536b02f68667e27c21e">response_body</a>)</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  }</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;};</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classlongport_1_1_http_client.html">   24</a></span>&#160;<span class="keyword">class </span><a class="code" href="classlongport_1_1_http_client.html">HttpClient</a></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a>* http_client_;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classlongport_1_1_http_client.html#aa85a3f95f001be8dd051a8cbf087811c">   30</a></span>&#160;  <a class="code" href="classlongport_1_1_http_client.html#aa85a3f95f001be8dd051a8cbf087811c">HttpClient</a>();</div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classlongport_1_1_http_client.html#a91ee4478c7436c98303c761d244511c5">   31</a></span>&#160;  <a class="code" href="classlongport_1_1_http_client.html#a91ee4478c7436c98303c761d244511c5">HttpClient</a>(<a class="code" href="classlongport_1_1_http_client.html">HttpClient</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classlongport_1_1_http_client.html#a27e19f872ee9e6eaf904ea310942b52e">   32</a></span>&#160;  <a class="code" href="classlongport_1_1_http_client.html#a27e19f872ee9e6eaf904ea310942b52e">~HttpClient</a>();</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classlongport_1_1_http_client.html#a642b8a6dd8f8b4ed5ac65dd3c91fc14d">   42</a></span>&#160;  <a class="code" href="classlongport_1_1_http_client.html#a642b8a6dd8f8b4ed5ac65dd3c91fc14d">HttpClient</a>(<span class="keyword">const</span> std::string&amp; http_url,</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;             <span class="keyword">const</span> std::string&amp; app_key,</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;             <span class="keyword">const</span> std::string&amp; app_secret,</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;             <span class="keyword">const</span> std::string&amp; access_token);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classlongport_1_1_http_client.html#a80b9af25ad9fea79dbf7219d12dec6b5">   47</a></span>&#160;  <a class="code" href="classlongport_1_1_status.html">Status</a> <a class="code" href="classlongport_1_1_http_client.html#a80b9af25ad9fea79dbf7219d12dec6b5">from_env</a>();</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="oauth_8hpp.html">oauth.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="status_8hpp.html">status.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a> <a class="code" href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a>;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacelongbridge.html">longbridge</a> {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_http_result.html">   15</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structlongbridge_1_1_http_result.html">HttpResult</a></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;{</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_http_result.html#afdbf55adc2aab79bfcc28563f20ff40e">   17</a></span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structlongbridge_1_1_http_result.html#afdbf55adc2aab79bfcc28563f20ff40e">response_body</a>;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="structlongbridge_1_1_http_result.html#a81aec7e09782dc72c8bdaaaad70d1ab9">   19</a></span>&#160;  <a class="code" href="structlongbridge_1_1_http_result.html#a81aec7e09782dc72c8bdaaaad70d1ab9">HttpResult</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structlongbridge_1_1_http_result.html#afdbf55adc2aab79bfcc28563f20ff40e">response_body</a>)</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    : <a class="code" href="structlongbridge_1_1_http_result.html#afdbf55adc2aab79bfcc28563f20ff40e">response_body</a>(<a class="code" href="structlongbridge_1_1_http_result.html#afdbf55adc2aab79bfcc28563f20ff40e">response_body</a>)</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  }</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;};</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html">   25</a></span>&#160;<span class="keyword">class </span><a class="code" href="classlongbridge_1_1_http_client.html">HttpClient</a></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a>* http_client_;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#ac8018bc18a53858db8e23228fabe291c">   31</a></span>&#160;  <a class="code" href="classlongbridge_1_1_http_client.html#ac8018bc18a53858db8e23228fabe291c">HttpClient</a>();</div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#a7715f50929b7f8173cf3ea2d5c6dc9fd">   32</a></span>&#160;  <a class="code" href="classlongbridge_1_1_http_client.html#a7715f50929b7f8173cf3ea2d5c6dc9fd">HttpClient</a>(<a class="code" href="classlongbridge_1_1_http_client.html">HttpClient</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#a641086780e53420fd32a3b9c7105a840">   33</a></span>&#160;  <a class="code" href="classlongbridge_1_1_http_client.html#a641086780e53420fd32a3b9c7105a840">HttpClient</a>(<a class="code" href="classlongbridge_1_1_http_client.html">HttpClient</a>&amp;&amp;) noexcept;</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#abc950aeecb0d4ee7d2bf5e4e102a6c20">   34</a></span>&#160;  ~<a class="code" href="classlongbridge_1_1_http_client.html">HttpClient</a>();</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#a1c137ba454a6ee145f33650a9d22269b">   44</a></span>&#160;  static <a class="code" href="classlongbridge_1_1_http_client.html">HttpClient</a> <a class="code" href="classlongbridge_1_1_http_client.html#a1c137ba454a6ee145f33650a9d22269b">from_apikey</a>(const std::<span class="keywordtype">string</span>&amp; app_key,</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                                const std::<span class="keywordtype">string</span>&amp; app_secret,</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                const std::<span class="keywordtype">string</span>&amp; access_token,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                                const std::optional&lt;std::<span class="keywordtype">string</span>&gt;&amp; http_url = std::nullopt);</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="classlongport_1_1_http_client.html#af1d157da5f0c1bf6f65743c145b7e6d1">   52</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlongport_1_1_http_client.html#af1d157da5f0c1bf6f65743c145b7e6d1">request</a>(<span class="keyword">const</span> std::string&amp; method,</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;               <span class="keyword">const</span> std::string&amp; path,</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;               <span class="keyword">const</span> std::optional&lt;std::map&lt;std::string, std::string&gt;&gt;&amp; headers,</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;               <span class="keyword">const</span> std::optional&lt;std::string&gt;&amp; body,</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;               <a class="code" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback&lt;void*, HttpResult&gt;</a> callback);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;};</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#a864eacff655bff7dfb6682ae55eb3b3f">   54</a></span>&#160;  static <a class="code" href="classlongbridge_1_1_http_client.html">HttpClient</a> <a class="code" href="classlongbridge_1_1_http_client.html#a864eacff655bff7dfb6682ae55eb3b3f">from_apikey_env</a>(<a class="code" href="classlongbridge_1_1_status.html">Status</a>&amp; status);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#af068252d0f29b0cc73dd88dde4095c5c">   62</a></span>&#160;  static <a class="code" href="classlongbridge_1_1_http_client.html">HttpClient</a> <a class="code" href="classlongbridge_1_1_http_client.html#af068252d0f29b0cc73dd88dde4095c5c">from_oauth</a>(const <a class="code" href="classlongbridge_1_1_o_auth.html">OAuth</a>&amp; oauth,</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                               const std::optional&lt;std::<span class="keywordtype">string</span>&gt;&amp; http_url = std::nullopt);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="classlongbridge_1_1_http_client.html#a56e22d88a793c3e76f41cda15b7a3553">   68</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlongbridge_1_1_http_client.html#a56e22d88a793c3e76f41cda15b7a3553">request</a>(const std::<span class="keywordtype">string</span>&amp; method,</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;               const std::<span class="keywordtype">string</span>&amp; path,</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;               const std::optional&lt;std::map&lt;std::<span class="keywordtype">string</span>, std::<span class="keywordtype">string</span>&gt;&gt;&amp; headers,</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;               const std::optional&lt;std::<span class="keywordtype">string</span>&gt;&amp; body,</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;               <a class="code" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt;<span class="keywordtype">void</span>*, <a class="code" href="structlongbridge_1_1_http_result.html">HttpResult</a>&gt; callback);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;};</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
 <div class="ttc" id="aasync__result_8hpp_html"><div class="ttname"><a href="async__result_8hpp.html">async_result.hpp</a></div></div>
-<div class="ttc" id="aclasslongport_1_1_http_client_html"><div class="ttname"><a href="classlongport_1_1_http_client.html">longport::HttpClient</a></div><div class="ttdef"><b>Definition:</b> http_client.hpp:25</div></div>
-<div class="ttc" id="aclasslongport_1_1_http_client_html_a27e19f872ee9e6eaf904ea310942b52e"><div class="ttname"><a href="classlongport_1_1_http_client.html#a27e19f872ee9e6eaf904ea310942b52e">longport::HttpClient::~HttpClient</a></div><div class="ttdeci">~HttpClient()</div></div>
-<div class="ttc" id="aclasslongport_1_1_http_client_html_a642b8a6dd8f8b4ed5ac65dd3c91fc14d"><div class="ttname"><a href="classlongport_1_1_http_client.html#a642b8a6dd8f8b4ed5ac65dd3c91fc14d">longport::HttpClient::HttpClient</a></div><div class="ttdeci">HttpClient(const std::string &amp;http_url, const std::string &amp;app_key, const std::string &amp;app_secret, const std::string &amp;access_token)</div></div>
-<div class="ttc" id="aclasslongport_1_1_http_client_html_a80b9af25ad9fea79dbf7219d12dec6b5"><div class="ttname"><a href="classlongport_1_1_http_client.html#a80b9af25ad9fea79dbf7219d12dec6b5">longport::HttpClient::from_env</a></div><div class="ttdeci">Status from_env()</div></div>
-<div class="ttc" id="aclasslongport_1_1_http_client_html_a91ee4478c7436c98303c761d244511c5"><div class="ttname"><a href="classlongport_1_1_http_client.html#a91ee4478c7436c98303c761d244511c5">longport::HttpClient::HttpClient</a></div><div class="ttdeci">HttpClient(HttpClient &amp;)=delete</div></div>
-<div class="ttc" id="aclasslongport_1_1_http_client_html_aa85a3f95f001be8dd051a8cbf087811c"><div class="ttname"><a href="classlongport_1_1_http_client.html#aa85a3f95f001be8dd051a8cbf087811c">longport::HttpClient::HttpClient</a></div><div class="ttdeci">HttpClient()</div></div>
-<div class="ttc" id="aclasslongport_1_1_http_client_html_af1d157da5f0c1bf6f65743c145b7e6d1"><div class="ttname"><a href="classlongport_1_1_http_client.html#af1d157da5f0c1bf6f65743c145b7e6d1">longport::HttpClient::request</a></div><div class="ttdeci">void request(const std::string &amp;method, const std::string &amp;path, const std::optional&lt; std::map&lt; std::string, std::string &gt;&gt; &amp;headers, const std::optional&lt; std::string &gt; &amp;body, AsyncCallback&lt; void *, HttpResult &gt; callback)</div></div>
-<div class="ttc" id="aclasslongport_1_1_status_html"><div class="ttname"><a href="classlongport_1_1_status.html">longport::Status</a></div><div class="ttdef"><b>Definition:</b> status.hpp:18</div></div>
-<div class="ttc" id="ahttp__client_8hpp_html_a59a1c6059784e3e3a881c4322045b9b1"><div class="ttname"><a href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a></div><div class="ttdeci">struct lb_http_client_t lb_http_client_t</div><div class="ttdef"><b>Definition:</b> http_client.hpp:10</div></div>
-<div class="ttc" id="anamespacelongport_html"><div class="ttname"><a href="namespacelongport.html">longport</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:7</div></div>
-<div class="ttc" id="anamespacelongport_html_a5474340afc19827a58958a5af2cb33fc"><div class="ttname"><a href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">longport::AsyncCallback</a></div><div class="ttdeci">std::function&lt; void(AsyncResult&lt; Ctx, T &gt;)&gt; AsyncCallback</div><div class="ttdef"><b>Definition:</b> async_result.hpp:39</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html"><div class="ttname"><a href="classlongbridge_1_1_http_client.html">longbridge::HttpClient</a></div><div class="ttdef"><b>Definition:</b> http_client.hpp:26</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html_a1c137ba454a6ee145f33650a9d22269b"><div class="ttname"><a href="classlongbridge_1_1_http_client.html#a1c137ba454a6ee145f33650a9d22269b">longbridge::HttpClient::from_apikey</a></div><div class="ttdeci">static HttpClient from_apikey(const std::string &amp;app_key, const std::string &amp;app_secret, const std::string &amp;access_token, const std::optional&lt; std::string &gt; &amp;http_url=std::nullopt)</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html_a56e22d88a793c3e76f41cda15b7a3553"><div class="ttname"><a href="classlongbridge_1_1_http_client.html#a56e22d88a793c3e76f41cda15b7a3553">longbridge::HttpClient::request</a></div><div class="ttdeci">void request(const std::string &amp;method, const std::string &amp;path, const std::optional&lt; std::map&lt; std::string, std::string &gt;&gt; &amp;headers, const std::optional&lt; std::string &gt; &amp;body, AsyncCallback&lt; void *, HttpResult &gt; callback)</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html_a641086780e53420fd32a3b9c7105a840"><div class="ttname"><a href="classlongbridge_1_1_http_client.html#a641086780e53420fd32a3b9c7105a840">longbridge::HttpClient::HttpClient</a></div><div class="ttdeci">HttpClient(HttpClient &amp;&amp;) noexcept</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html_a7715f50929b7f8173cf3ea2d5c6dc9fd"><div class="ttname"><a href="classlongbridge_1_1_http_client.html#a7715f50929b7f8173cf3ea2d5c6dc9fd">longbridge::HttpClient::HttpClient</a></div><div class="ttdeci">HttpClient(HttpClient &amp;)=delete</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html_a864eacff655bff7dfb6682ae55eb3b3f"><div class="ttname"><a href="classlongbridge_1_1_http_client.html#a864eacff655bff7dfb6682ae55eb3b3f">longbridge::HttpClient::from_apikey_env</a></div><div class="ttdeci">static HttpClient from_apikey_env(Status &amp;status)</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html_ac8018bc18a53858db8e23228fabe291c"><div class="ttname"><a href="classlongbridge_1_1_http_client.html#ac8018bc18a53858db8e23228fabe291c">longbridge::HttpClient::HttpClient</a></div><div class="ttdeci">HttpClient()</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_http_client_html_af068252d0f29b0cc73dd88dde4095c5c"><div class="ttname"><a href="classlongbridge_1_1_http_client.html#af068252d0f29b0cc73dd88dde4095c5c">longbridge::HttpClient::from_oauth</a></div><div class="ttdeci">static HttpClient from_oauth(const OAuth &amp;oauth, const std::optional&lt; std::string &gt; &amp;http_url=std::nullopt)</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_o_auth_html"><div class="ttname"><a href="classlongbridge_1_1_o_auth.html">longbridge::OAuth</a></div><div class="ttdef"><b>Definition:</b> oauth.hpp:19</div></div>
+<div class="ttc" id="aclasslongbridge_1_1_status_html"><div class="ttname"><a href="classlongbridge_1_1_status.html">longbridge::Status</a></div><div class="ttdef"><b>Definition:</b> status.hpp:19</div></div>
+<div class="ttc" id="ahttp__client_8hpp_html_a59a1c6059784e3e3a881c4322045b9b1"><div class="ttname"><a href="http__client_8hpp.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a></div><div class="ttdeci">struct lb_http_client_t lb_http_client_t</div><div class="ttdef"><b>Definition:</b> http_client.hpp:11</div></div>
+<div class="ttc" id="anamespacelongbridge_html"><div class="ttname"><a href="namespacelongbridge.html">longbridge</a></div><div class="ttdef"><b>Definition:</b> async_result.hpp:8</div></div>
+<div class="ttc" id="anamespacelongbridge_html_ac08a510ffe531a5eb0ea8dc2238c55dc"><div class="ttname"><a href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">longbridge::AsyncCallback</a></div><div class="ttdeci">std::function&lt; void(AsyncResult&lt; Ctx, T &gt;)&gt; AsyncCallback</div><div class="ttdef"><b>Definition:</b> async_result.hpp:48</div></div>
+<div class="ttc" id="aoauth_8hpp_html"><div class="ttname"><a href="oauth_8hpp.html">oauth.hpp</a></div></div>
 <div class="ttc" id="astatus_8hpp_html"><div class="ttname"><a href="status_8hpp.html">status.hpp</a></div></div>
-<div class="ttc" id="astructlongport_1_1_http_result_html"><div class="ttname"><a href="structlongport_1_1_http_result.html">longport::HttpResult</a></div><div class="ttdef"><b>Definition:</b> http_client.hpp:15</div></div>
-<div class="ttc" id="astructlongport_1_1_http_result_html_a039c3afba9f51536b02f68667e27c21e"><div class="ttname"><a href="structlongport_1_1_http_result.html#a039c3afba9f51536b02f68667e27c21e">longport::HttpResult::response_body</a></div><div class="ttdeci">const char * response_body</div><div class="ttdef"><b>Definition:</b> http_client.hpp:16</div></div>
-<div class="ttc" id="astructlongport_1_1_http_result_html_a28737d70dc757a5bfd489677dfc150d5"><div class="ttname"><a href="structlongport_1_1_http_result.html#a28737d70dc757a5bfd489677dfc150d5">longport::HttpResult::HttpResult</a></div><div class="ttdeci">HttpResult(const char *response_body)</div><div class="ttdef"><b>Definition:</b> http_client.hpp:18</div></div>
+<div class="ttc" id="astructlongbridge_1_1_http_result_html"><div class="ttname"><a href="structlongbridge_1_1_http_result.html">longbridge::HttpResult</a></div><div class="ttdef"><b>Definition:</b> http_client.hpp:16</div></div>
+<div class="ttc" id="astructlongbridge_1_1_http_result_html_a81aec7e09782dc72c8bdaaaad70d1ab9"><div class="ttname"><a href="structlongbridge_1_1_http_result.html#a81aec7e09782dc72c8bdaaaad70d1ab9">longbridge::HttpResult::HttpResult</a></div><div class="ttdeci">HttpResult(const char *response_body)</div><div class="ttdef"><b>Definition:</b> http_client.hpp:19</div></div>
+<div class="ttc" id="astructlongbridge_1_1_http_result_html_afdbf55adc2aab79bfcc28563f20ff40e"><div class="ttname"><a href="structlongbridge_1_1_http_result.html#afdbf55adc2aab79bfcc28563f20ff40e">longbridge::HttpResult::response_body</a></div><div class="ttdeci">const char * response_body</div><div class="ttdef"><b>Definition:</b> http_client.hpp:17</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

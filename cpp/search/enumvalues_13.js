@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['varietiesnotreported_1404',['VarietiesNotReported',['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872ea9991be986b7823ebd4248bac70729815',1,'longport::trade']]],
-  ['vega_1405',['Vega',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbeabb8efcd4ab24730b7cd34e88ac390878',1,'longport::quote']]],
-  ['vixindex_1406',['VIXIndex',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aaeecef8bef2fb8d51d5d06d1863055a70',1,'longport::quote']]],
-  ['volume_1407',['Volume',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbeabd7a9717d29c5ddcab1bc175eda1e298',1,'longport::quote::Volume()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001abd7a9717d29c5ddcab1bc175eda1e298',1,'longport::quote::Volume()']]],
-  ['volumeratio_1408',['VolumeRatio',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbeae68a2031d2f63bb393f2a335671e07f4',1,'longport::quote']]]
+  ['varietiesnotreported_1437',['VarietiesNotReported',['../namespacelongbridge_1_1trade.html#ae4ff3c9b718ed9ccb4e2267843a7425ca9991be986b7823ebd4248bac70729815',1,'longbridge::trade']]],
+  ['vega_1438',['Vega',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011abb8efcd4ab24730b7cd34e88ac390878',1,'longbridge::quote']]],
+  ['vixindex_1439',['VIXIndex',['../namespacelongbridge_1_1quote.html#a40e91c0c824de0ea4d827f1843457423aeecef8bef2fb8d51d5d06d1863055a70',1,'longbridge::quote']]],
+  ['volume_1440',['Volume',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011abd7a9717d29c5ddcab1bc175eda1e298',1,'longbridge::quote::Volume()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7abd7a9717d29c5ddcab1bc175eda1e298',1,'longbridge::quote::Volume()']]],
+  ['volumeratio_1441',['VolumeRatio',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011ae68a2031d2f63bb393f2a335671e07f4',1,'longbridge::quote']]]
 ];

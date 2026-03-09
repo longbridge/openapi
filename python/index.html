@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
       <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>LongPort OpenAPI SDK</title>
+    <title>Longbridge OpenAPI SDK</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -31,7 +31,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="." class="icon icon-home"> LongPort OpenAPI SDK
+          <a href="." class="icon icon-home"> Longbridge OpenAPI SDK
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
@@ -46,6 +46,16 @@
     <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#authentication">Authentication</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#oauth-20-recommended">OAuth 2.0 (Recommended)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#legacy-api-key-environment-variables">Legacy API Key (Environment Variables)</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#quote-api-get-basic-information-of-securities">Quote API (Get basic information of securities)</a>
     </li>
@@ -72,7 +82,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href=".">LongPort OpenAPI SDK</a>
+          <a href=".">Longbridge OpenAPI SDK</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -88,45 +98,59 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="longport-openapi-sdk-for-python">LongPort OpenAPI SDK for Python</h1>
-<p><code>longport</code> provides an easy-to-use interface for invokes <a href="https://open.longportapp.com/en/"><code>LongPort OpenAPI</code></a>.</p>
+                <h1 id="longbridge-openapi-sdk-for-python">Longbridge OpenAPI SDK for Python</h1>
+<p><code>longbridge</code> provides an easy-to-use interface for invokes <a href="https://open.longbridge.com/en/"><code>Longbridge OpenAPI</code></a>.</p>
 <h2 id="references">References</h2>
 <ul>
-<li><a href="reference_all/#longport.openapi.Config">Config</a></li>
+<li><a href="reference_all/#longbridge.openapi.Config">Config</a></li>
 </ul>
 <p>The configuration of the SDK.</p>
 <ul>
-<li><a href="reference_all/#longport.openapi.QuoteContext">QuoteContext</a></li>
+<li><a href="reference_all/#longbridge.openapi.QuoteContext">QuoteContext</a></li>
 </ul>
 <p>The Quote API part of the SDK, e.g.: get basic information of securities, subscribe quotes...</p>
 <ul>
-<li><a href="reference_all/#longport.openapi.TradeContext">TradeContext</a></li>
+<li><a href="reference_all/#longbridge.openapi.TradeContext">TradeContext</a></li>
 </ul>
 <p>The Trade API part of the SDK, e.g.: submit order, get order status...</p>
 <ul>
-<li><a href="reference_all/#longport.openapi.AsyncQuoteContext">AsyncQuoteContext</a></li>
+<li><a href="reference_all/#longbridge.openapi.AsyncQuoteContext">AsyncQuoteContext</a></li>
 </ul>
 <p>Async quote API for use with asyncio; create via <code>AsyncQuoteContext.create(config)</code> and await in asyncio.</p>
 <ul>
-<li><a href="reference_all/#longport.openapi.AsyncTradeContext">AsyncTradeContext</a></li>
+<li><a href="reference_all/#longbridge.openapi.AsyncTradeContext">AsyncTradeContext</a></li>
 </ul>
 <p>Async trade API for use with asyncio; create via <code>AsyncTradeContext.create(config)</code> and await in asyncio.</p>
 <h2 id="quickstart">Quickstart</h2>
-<p><em>Install LongPort OpenAPI SDK</em></p>
-<pre class="highlight"><code class="language-bash">pip install longport</code></pre>
-<p><em>Setting environment variables(MacOS/Linux)</em></p>
-<pre class="highlight"><code class="language-bash">export LONGPORT_APP_KEY="App Key get from user center"
-export LONGPORT_APP_SECRET="App Secret get from user center"
-export LONGPORT_ACCESS_TOKEN="Access Token get from user center"</code></pre>
-<p><em>Setting environment variables(Windows)</em></p>
-<pre class="highlight"><code class="language-powershell">setx LONGPORT_APP_KEY "App Key get from user center"
-setx LONGPORT_APP_SECRET "App Secret get from user center"
-setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"</code></pre>
-<h2 id="quote-api-get-basic-information-of-securities">Quote API <em>(Get basic information of securities)</em></h2>
-<pre class="highlight"><code class="language-python">from longport.openapi import Config, QuoteContext
+<p><em>Install Longbridge OpenAPI SDK</em></p>
+<pre class="highlight"><code class="language-bash">pip install longbridge</code></pre>
+<h3 id="authentication">Authentication</h3>
+<h4 id="oauth-20-recommended">OAuth 2.0 (Recommended)</h4>
+<pre class="highlight"><code class="language-python">from longbridge.openapi import OAuthBuilder, Config
 
-# Load configuration from environment variables
-config = Config.from_env()
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)</code></pre>
+<h4 id="legacy-api-key-environment-variables">Legacy API Key (Environment Variables)</h4>
+<p><em>macOS/Linux</em></p>
+<pre class="highlight"><code class="language-bash">export LONGBRIDGE_APP_KEY="App Key get from user center"
+export LONGBRIDGE_APP_SECRET="App Secret get from user center"
+export LONGBRIDGE_ACCESS_TOKEN="Access Token get from user center"</code></pre>
+<p><em>Windows</em></p>
+<pre class="highlight"><code class="language-powershell">setx LONGBRIDGE_APP_KEY "App Key get from user center"
+setx LONGBRIDGE_APP_SECRET "App Secret get from user center"
+setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"</code></pre>
+<pre class="highlight"><code class="language-python">from longbridge.openapi import Config
+
+config = Config.from_apikey_env()</code></pre>
+<h2 id="quote-api-get-basic-information-of-securities">Quote API <em>(Get basic information of securities)</em></h2>
+<pre class="highlight"><code class="language-python">from longbridge.openapi import Config, QuoteContext, OAuthBuilder
+
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # Create a context for quote APIs
 ctx = QuoteContext(config)
@@ -136,10 +160,12 @@ resp = ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
 print(resp)</code></pre>
 <h2 id="quote-api-subscribe-quotes">Quote API <em>(Subscribe quotes)</em></h2>
 <pre class="highlight"><code class="language-python">from time import sleep
-from longport.openapi import Config, QuoteContext, SubType, PushQuote
+from longbridge.openapi import Config, QuoteContext, SubType, PushQuote, OAuthBuilder
 
-# Load configuration from environment variables
-config = Config.from_env()
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # A callback to receive quote data
 def on_quote(symbol: str, event: PushQuote):
@@ -150,34 +176,43 @@ ctx = QuoteContext(config)
 ctx.set_on_quote(on_quote)
 
 # Subscribe
-resp = ctx.subscribe(["700.HK"], [SubType.Quote], is_first_push=True)
+ctx.subscribe(["700.HK"], [SubType.Quote])
 
-# Receive push duration to 30 seconds
+# Receive push for 30 seconds
 sleep(30)</code></pre>
 <h2 id="trade-api-submit-order">Trade API <em>(Submit order)</em></h2>
 <pre class="highlight"><code class="language-python">from decimal import Decimal
-from longport.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType
+from longbridge.openapi import TradeContext, Config, OrderType, OrderSide, TimeInForceType, OAuthBuilder
 
-# Load configuration from environment variables
-config = Config.from_env()
+oauth = OAuthBuilder("your-client-id").build(
+    lambda url: print(f"Open this URL to authorize: {url}")
+)
+config = Config.from_oauth(oauth)
 
 # Create a context for trade APIs
 ctx = TradeContext(config)
 
 # Submit order
-resp = ctx.submit_order("700.HK", OrderType.LO, OrderSide.Buy, Decimal(
-    "500"), TimeInForceType.Day, submitted_price=Decimal("50"), remark="Hello from Python SDK")
+resp = ctx.submit_order(
+    "700.HK", OrderType.LO, OrderSide.Buy,
+    Decimal("500"), TimeInForceType.Day,
+    submitted_price=Decimal("50"),
+    remark="Hello from Python SDK",
+)
 print(resp)</code></pre>
 <h2 id="asynchronous-api">Asynchronous API</h2>
 <p>The SDK provides async contexts and an async HTTP client for use with Python's <code>asyncio</code>. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API.</p>
 <pre class="highlight"><code class="language-python">import asyncio
-from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote
+from longbridge.openapi import Config, AsyncQuoteContext, SubType, PushQuote, OAuthBuilder
 
 def on_quote(symbol: str, event: PushQuote):
     print(symbol, event)
 
 async def main():
-    config = Config.from_env()
+    oauth = await OAuthBuilder("your-client-id").build_async(
+        lambda url: print(f"Open this URL to authorize: {url}")
+    )
+    config = Config.from_oauth(oauth)
     ctx = await AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
@@ -241,5 +276,5 @@ asyncio.run(main())</code></pre>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-02-05 10:45:52.712298+00:00
+Build Date UTC : 2026-03-09 07:24:12.449357+00:00
 -->

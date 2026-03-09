@@ -1,18 +1,18 @@
 var searchData=
 [
-  ['security_762',['Security',['../structlongport_1_1quote_1_1_security.html',1,'longport::quote']]],
-  ['securitybrokers_763',['SecurityBrokers',['../structlongport_1_1quote_1_1_security_brokers.html',1,'longport::quote']]],
-  ['securitycalcindex_764',['SecurityCalcIndex',['../structlongport_1_1quote_1_1_security_calc_index.html',1,'longport::quote']]],
-  ['securitydepth_765',['SecurityDepth',['../structlongport_1_1quote_1_1_security_depth.html',1,'longport::quote']]],
-  ['securityquote_766',['SecurityQuote',['../structlongport_1_1quote_1_1_security_quote.html',1,'longport::quote']]],
-  ['securitystaticinfo_767',['SecurityStaticInfo',['../structlongport_1_1quote_1_1_security_static_info.html',1,'longport::quote']]],
-  ['status_768',['Status',['../classlongport_1_1_status.html',1,'longport']]],
-  ['stockposition_769',['StockPosition',['../structlongport_1_1trade_1_1_stock_position.html',1,'longport::trade']]],
-  ['stockpositionchannel_770',['StockPositionChannel',['../structlongport_1_1trade_1_1_stock_position_channel.html',1,'longport::trade']]],
-  ['stockpositionsresponse_771',['StockPositionsResponse',['../structlongport_1_1trade_1_1_stock_positions_response.html',1,'longport::trade']]],
-  ['strikepriceinfo_772',['StrikePriceInfo',['../structlongport_1_1quote_1_1_strike_price_info.html',1,'longport::quote']]],
-  ['subflags_773',['SubFlags',['../classlongport_1_1quote_1_1_sub_flags.html',1,'longport::quote']]],
-  ['submitorderoptions_774',['SubmitOrderOptions',['../structlongport_1_1trade_1_1_submit_order_options.html',1,'longport::trade']]],
-  ['submitorderresponse_775',['SubmitOrderResponse',['../structlongport_1_1trade_1_1_submit_order_response.html',1,'longport::trade']]],
-  ['subscription_776',['Subscription',['../structlongport_1_1quote_1_1_subscription.html',1,'longport::quote']]]
+  ['security_779',['Security',['../structlongbridge_1_1quote_1_1_security.html',1,'longbridge::quote']]],
+  ['securitybrokers_780',['SecurityBrokers',['../structlongbridge_1_1quote_1_1_security_brokers.html',1,'longbridge::quote']]],
+  ['securitycalcindex_781',['SecurityCalcIndex',['../structlongbridge_1_1quote_1_1_security_calc_index.html',1,'longbridge::quote']]],
+  ['securitydepth_782',['SecurityDepth',['../structlongbridge_1_1quote_1_1_security_depth.html',1,'longbridge::quote']]],
+  ['securityquote_783',['SecurityQuote',['../structlongbridge_1_1quote_1_1_security_quote.html',1,'longbridge::quote']]],
+  ['securitystaticinfo_784',['SecurityStaticInfo',['../structlongbridge_1_1quote_1_1_security_static_info.html',1,'longbridge::quote']]],
+  ['status_785',['Status',['../classlongbridge_1_1_status.html',1,'longbridge']]],
+  ['stockposition_786',['StockPosition',['../structlongbridge_1_1trade_1_1_stock_position.html',1,'longbridge::trade']]],
+  ['stockpositionchannel_787',['StockPositionChannel',['../structlongbridge_1_1trade_1_1_stock_position_channel.html',1,'longbridge::trade']]],
+  ['stockpositionsresponse_788',['StockPositionsResponse',['../structlongbridge_1_1trade_1_1_stock_positions_response.html',1,'longbridge::trade']]],
+  ['strikepriceinfo_789',['StrikePriceInfo',['../structlongbridge_1_1quote_1_1_strike_price_info.html',1,'longbridge::quote']]],
+  ['subflags_790',['SubFlags',['../classlongbridge_1_1quote_1_1_sub_flags.html',1,'longbridge::quote']]],
+  ['submitorderoptions_791',['SubmitOrderOptions',['../structlongbridge_1_1trade_1_1_submit_order_options.html',1,'longbridge::trade']]],
+  ['submitorderresponse_792',['SubmitOrderResponse',['../structlongbridge_1_1trade_1_1_submit_order_response.html',1,'longbridge::trade']]],
+  ['subscription_793',['Subscription',['../structlongbridge_1_1quote_1_1_subscription.html',1,'longbridge::quote']]]
 ];

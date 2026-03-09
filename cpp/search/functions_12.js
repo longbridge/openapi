@@ -1,14 +1,14 @@
 var searchData=
 [
-  ['tan_928',['tan',['../classlongport_1_1_decimal.html#a9291976a6435cd14a910079f3601e0e2',1,'longport::Decimal']]],
-  ['to_5fdouble_929',['to_double',['../classlongport_1_1_decimal.html#a4192518f18f51b3c5a8e8e0260faf04f',1,'longport::Decimal']]],
-  ['to_5fstring_930',['to_string',['../classlongport_1_1_decimal.html#aeb968996c3ee6f3c1a973f172d276abf',1,'longport::Decimal']]],
-  ['today_5fexecutions_931',['today_executions',['../classlongport_1_1trade_1_1_trade_context.html#ae1ea46077a6372e69b221370260b672b',1,'longport::trade::TradeContext']]],
-  ['today_5forders_932',['today_orders',['../classlongport_1_1trade_1_1_trade_context.html#a4ee406fa9e447375ee073298cb468684',1,'longport::trade::TradeContext']]],
-  ['trade_933',['TRADE',['../classlongport_1_1quote_1_1_sub_flags.html#a6597469c20a397ca2bd0f2c877079992',1,'longport::quote::SubFlags']]],
-  ['tradecontext_934',['TradeContext',['../classlongport_1_1trade_1_1_trade_context.html#a857d9e75d65ea4d7a5c8cf577bc84bb7',1,'longport::trade::TradeContext::TradeContext()'],['../classlongport_1_1trade_1_1_trade_context.html#ae3bdf9ae523eeee1fe12154def6bf8ad',1,'longport::trade::TradeContext::TradeContext(const lb_trade_context_t *ctx)'],['../classlongport_1_1trade_1_1_trade_context.html#af62a367230b7479a07221a747c09056f',1,'longport::trade::TradeContext::TradeContext(const TradeContext &amp;ctx)'],['../classlongport_1_1trade_1_1_trade_context.html#a9d4ba7bcd1375b27323b19b0a4496040',1,'longport::trade::TradeContext::TradeContext(TradeContext &amp;&amp;ctx)']]],
-  ['trades_935',['trades',['../classlongport_1_1quote_1_1_quote_context.html#a9ea898a1e1cf626b4797169fad0f8429',1,'longport::quote::QuoteContext']]],
-  ['trading_5fdays_936',['trading_days',['../classlongport_1_1quote_1_1_quote_context.html#a3b065965da18cc0a143009ded24f1b12',1,'longport::quote::QuoteContext']]],
-  ['trading_5fsession_937',['trading_session',['../classlongport_1_1quote_1_1_quote_context.html#a7bfc910ef7b64f60ad130610073aa7cd',1,'longport::quote::QuoteContext']]],
-  ['trunc_938',['trunc',['../classlongport_1_1_decimal.html#ab7711faa98a04c243b154441a4794236',1,'longport::Decimal']]]
+  ['tan_958',['tan',['../classlongbridge_1_1_decimal.html#a710c75bba1e8837ca69263be7ccb2e6a',1,'longbridge::Decimal']]],
+  ['to_5fdouble_959',['to_double',['../classlongbridge_1_1_decimal.html#a10061a30fdf829bb9299a16c94ecbf3c',1,'longbridge::Decimal']]],
+  ['to_5fstring_960',['to_string',['../classlongbridge_1_1_decimal.html#acbdc9fa278f37e43bfa66fd762aaa8fa',1,'longbridge::Decimal']]],
+  ['today_5fexecutions_961',['today_executions',['../classlongbridge_1_1trade_1_1_trade_context.html#addb207fb478708806f4bb414a48fd8ce',1,'longbridge::trade::TradeContext']]],
+  ['today_5forders_962',['today_orders',['../classlongbridge_1_1trade_1_1_trade_context.html#aa591e194baa2934634b4a753dc95e0f7',1,'longbridge::trade::TradeContext']]],
+  ['trade_963',['TRADE',['../classlongbridge_1_1quote_1_1_sub_flags.html#ad414f552a626bbba44d65327673b2a72',1,'longbridge::quote::SubFlags']]],
+  ['tradecontext_964',['TradeContext',['../classlongbridge_1_1trade_1_1_trade_context.html#a006663a7a388aaf8a6a498a9d73aff87',1,'longbridge::trade::TradeContext::TradeContext()'],['../classlongbridge_1_1trade_1_1_trade_context.html#a6ae14e44b2577fe7676fa855f94a6e2c',1,'longbridge::trade::TradeContext::TradeContext(const lb_trade_context_t *ctx)'],['../classlongbridge_1_1trade_1_1_trade_context.html#a1c5488f278a7b4c6838419dd87064dcb',1,'longbridge::trade::TradeContext::TradeContext(const TradeContext &amp;ctx)'],['../classlongbridge_1_1trade_1_1_trade_context.html#a64a3279e442f162b64e0bcb6ab93b7eb',1,'longbridge::trade::TradeContext::TradeContext(TradeContext &amp;&amp;ctx)']]],
+  ['trades_965',['trades',['../classlongbridge_1_1quote_1_1_quote_context.html#a5329988f37c0b1a5ef4145dc8b80cdb2',1,'longbridge::quote::QuoteContext']]],
+  ['trading_5fdays_966',['trading_days',['../classlongbridge_1_1quote_1_1_quote_context.html#a880aaa31010b174bb42c81412c240559',1,'longbridge::quote::QuoteContext']]],
+  ['trading_5fsession_967',['trading_session',['../classlongbridge_1_1quote_1_1_quote_context.html#ab8a61cdb2a2b5b2d23f60a8dd0fdbb4f',1,'longbridge::quote::QuoteContext']]],
+  ['trunc_968',['trunc',['../classlongbridge_1_1_decimal.html#a00a972d23a92ae43d720ce7dafd2daba',1,'longbridge::Decimal']]]
 ];

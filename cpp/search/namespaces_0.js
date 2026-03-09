@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['callback_786',['callback',['../namespacelongport_1_1callback.html',1,'longport']]],
-  ['longport_787',['longport',['../namespacelongport.html',1,'']]],
-  ['quote_788',['quote',['../namespacelongport_1_1quote.html',1,'longport']]],
-  ['trade_789',['trade',['../namespacelongport_1_1trade.html',1,'longport']]]
+  ['callback_803',['callback',['../namespacelongbridge_1_1callback.html',1,'longbridge']]],
+  ['longbridge_804',['longbridge',['../namespacelongbridge.html',1,'']]],
+  ['quote_805',['quote',['../namespacelongbridge_1_1quote.html',1,'longbridge']]],
+  ['trade_806',['trade',['../namespacelongbridge_1_1trade.html',1,'longbridge']]]
 ];

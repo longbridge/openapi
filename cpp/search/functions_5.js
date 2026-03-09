@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['floor_827',['floor',['../classlongport_1_1_decimal.html#a2bee1eb7a97c3663b240647127ebe478',1,'longport::Decimal']]],
-  ['fract_828',['fract',['../classlongport_1_1_decimal.html#a24cc2ab7005c2c6c20c2270ee2281803',1,'longport::Decimal']]],
-  ['from_5fenv_829',['from_env',['../classlongport_1_1_config.html#ab6c542b85e343959b3d0f92ae005b575',1,'longport::Config::from_env()'],['../classlongport_1_1_http_client.html#a80b9af25ad9fea79dbf7219d12dec6b5',1,'longport::HttpClient::from_env()']]],
-  ['fund_5fpositions_830',['fund_positions',['../classlongport_1_1trade_1_1_trade_context.html#a0f0a02725a1533f3acefa4250cce5cc9',1,'longport::trade::TradeContext']]]
+  ['floor_848',['floor',['../classlongbridge_1_1_decimal.html#a7f2639465ea37b7a275e1a284c5838eb',1,'longbridge::Decimal']]],
+  ['fract_849',['fract',['../classlongbridge_1_1_decimal.html#a8b1e556c2e960c0bf972dad073b25194',1,'longbridge::Decimal']]],
+  ['from_5fapikey_850',['from_apikey',['../classlongbridge_1_1_config.html#a59767d070e2314034efd29d5d1c83a27',1,'longbridge::Config::from_apikey()'],['../classlongbridge_1_1_http_client.html#a1c137ba454a6ee145f33650a9d22269b',1,'longbridge::HttpClient::from_apikey()']]],
+  ['from_5fapikey_5fenv_851',['from_apikey_env',['../classlongbridge_1_1_config.html#a5854a4af3f66d07784dae232bc94a9ab',1,'longbridge::Config::from_apikey_env()'],['../classlongbridge_1_1_http_client.html#a864eacff655bff7dfb6682ae55eb3b3f',1,'longbridge::HttpClient::from_apikey_env()']]],
+  ['from_5foauth_852',['from_oauth',['../classlongbridge_1_1_config.html#abb4024d1f7eec07fe4c2b32186d1be40',1,'longbridge::Config::from_oauth()'],['../classlongbridge_1_1_http_client.html#af068252d0f29b0cc73dd88dde4095c5c',1,'longbridge::HttpClient::from_oauth()']]],
+  ['fund_5fpositions_853',['fund_positions',['../classlongbridge_1_1trade_1_1_trade_context.html#ac2135e51ac5d72f3b302e41b6f41d116',1,'longbridge::trade::TradeContext']]]
 ];

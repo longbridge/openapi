@@ -2,8 +2,8 @@ var searchData=
 [
   ['account_5fchannel_0',['account_channel',['../structlb__fund__position__channel__t.html#a9147e2895f2e8b5220dd0a6271c8caab',1,'lb_fund_position_channel_t::account_channel()'],['../structlb__stock__position__channel__t.html#a9147e2895f2e8b5220dd0a6271c8caab',1,'lb_stock_position_channel_t::account_channel()']]],
   ['account_5fno_1',['account_no',['../structlb__push__order__changed__t.html#a0735aed46ba856960ba217b180563f9d',1,'lb_push_order_changed_t']]],
-  ['adjusttypeforward_2',['AdjustTypeForward',['../longport_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa56ffbdbf49c35dc37c367183b427797e',1,'longport.h']]],
-  ['adjusttypenoadjust_3',['AdjustTypeNoAdjust',['../longport_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa2431e5109013a7697b3e8fb30950d916',1,'longport.h']]],
+  ['adjusttypeforward_2',['AdjustTypeForward',['../longbridge_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa56ffbdbf49c35dc37c367183b427797e',1,'longbridge.h']]],
+  ['adjusttypenoadjust_3',['AdjustTypeNoAdjust',['../longbridge_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa2431e5109013a7697b3e8fb30950d916',1,'longbridge.h']]],
   ['amount_4',['amount',['../structlb__order__charge__fee__t.html#ad38292d4bbc8f84f741959ed33f0c879',1,'lb_order_charge_fee_t']]],
   ['amplitude_5',['amplitude',['../structlb__security__calc__index__t.html#acd84640c54e99d29e9cf0784234ebd2d',1,'lb_security_calc_index_t']]],
   ['ask_5fbrokers_6',['ask_brokers',['../structlb__push__brokers__t.html#a6352db33357cab012166f960453660a0',1,'lb_push_brokers_t::ask_brokers()'],['../structlb__security__brokers__t.html#a6352db33357cab012166f960453660a0',1,'lb_security_brokers_t::ask_brokers()']]],

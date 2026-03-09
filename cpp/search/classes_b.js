@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['participantinfo_749',['ParticipantInfo',['../structlongport_1_1quote_1_1_participant_info.html',1,'longport::quote']]],
-  ['prepostquote_750',['PrePostQuote',['../structlongport_1_1quote_1_1_pre_post_quote.html',1,'longport::quote']]],
-  ['pushbrokers_751',['PushBrokers',['../structlongport_1_1quote_1_1_push_brokers.html',1,'longport::quote']]],
-  ['pushcandlestick_752',['PushCandlestick',['../structlongport_1_1quote_1_1_push_candlestick.html',1,'longport::quote']]],
-  ['pushdepth_753',['PushDepth',['../structlongport_1_1quote_1_1_push_depth.html',1,'longport::quote']]],
-  ['pushevent_754',['PushEvent',['../structlongport_1_1_push_event.html',1,'longport']]],
-  ['pushorderchanged_755',['PushOrderChanged',['../structlongport_1_1trade_1_1_push_order_changed.html',1,'longport::trade']]],
-  ['pushquote_756',['PushQuote',['../structlongport_1_1quote_1_1_push_quote.html',1,'longport::quote']]],
-  ['pushtrades_757',['PushTrades',['../structlongport_1_1quote_1_1_push_trades.html',1,'longport::quote']]]
+  ['participantinfo_766',['ParticipantInfo',['../structlongbridge_1_1quote_1_1_participant_info.html',1,'longbridge::quote']]],
+  ['prepostquote_767',['PrePostQuote',['../structlongbridge_1_1quote_1_1_pre_post_quote.html',1,'longbridge::quote']]],
+  ['pushbrokers_768',['PushBrokers',['../structlongbridge_1_1quote_1_1_push_brokers.html',1,'longbridge::quote']]],
+  ['pushcandlestick_769',['PushCandlestick',['../structlongbridge_1_1quote_1_1_push_candlestick.html',1,'longbridge::quote']]],
+  ['pushdepth_770',['PushDepth',['../structlongbridge_1_1quote_1_1_push_depth.html',1,'longbridge::quote']]],
+  ['pushevent_771',['PushEvent',['../structlongbridge_1_1_push_event.html',1,'longbridge']]],
+  ['pushorderchanged_772',['PushOrderChanged',['../structlongbridge_1_1trade_1_1_push_order_changed.html',1,'longbridge::trade']]],
+  ['pushquote_773',['PushQuote',['../structlongbridge_1_1quote_1_1_push_quote.html',1,'longbridge::quote']]],
+  ['pushtrades_774',['PushTrades',['../structlongbridge_1_1quote_1_1_push_trades.html',1,'longbridge::quote']]]
 ];

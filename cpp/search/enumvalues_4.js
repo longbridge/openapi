@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['effectiveleverage_1262',['EffectiveLeverage',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea48b260bf81eafbed90e7cc4c190f08ce',1,'longport::quote::EffectiveLeverage()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001a48b260bf81eafbed90e7cc4c190f08ce',1,'longport::quote::EffectiveLeverage()']]],
-  ['elo_1263',['ELO',['../namespacelongport_1_1trade.html#a70f9925bd2da94a7a5db14cd6b781a27aa7954119936a22d3073ae37952dc03a5',1,'longport::trade']]],
-  ['en_1264',['EN',['../namespacelongport.html#afcd559ca15df3b8c6ca500d2b3a3473caaa85f1840e282d8a8304dbc2c0d7c9b2',1,'longport']]],
-  ['europe_1265',['Europe',['../namespacelongport_1_1quote.html#a93b0788c16ed4e4300f06ba983d947e1a912d59cdf1d3f551fae21f6f0062258f',1,'longport::quote']]],
-  ['expired_1266',['Expired',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949a24fe48030f7d3097d5882535b04c3fa8',1,'longport::quote::Expired()'],['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872ea24fe48030f7d3097d5882535b04c3fa8',1,'longport::trade::Expired()']]],
-  ['expirydate_1267',['ExpiryDate',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea1b29ba78a2df965545c5a563b6e997ae',1,'longport::quote::ExpiryDate()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001a1b29ba78a2df965545c5a563b6e997ae',1,'longport::quote::ExpiryDate()']]]
+  ['effectiveleverage_1294',['EffectiveLeverage',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a48b260bf81eafbed90e7cc4c190f08ce',1,'longbridge::quote::EffectiveLeverage()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a48b260bf81eafbed90e7cc4c190f08ce',1,'longbridge::quote::EffectiveLeverage()']]],
+  ['elo_1295',['ELO',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aaa7954119936a22d3073ae37952dc03a5',1,'longbridge::trade']]],
+  ['en_1296',['EN',['../namespacelongbridge.html#ad0f389971f48611d4522ea9082bd5859aaa85f1840e282d8a8304dbc2c0d7c9b2',1,'longbridge']]],
+  ['europe_1297',['Europe',['../namespacelongbridge_1_1quote.html#af7d260cae987525c4d937a44b5f0a5eca912d59cdf1d3f551fae21f6f0062258f',1,'longbridge::quote']]],
+  ['expired_1298',['Expired',['../namespacelongbridge_1_1quote.html#a568e35ea1390b41113035045900c232aa24fe48030f7d3097d5882535b04c3fa8',1,'longbridge::quote::Expired()'],['../namespacelongbridge_1_1trade.html#ae4ff3c9b718ed9ccb4e2267843a7425ca24fe48030f7d3097d5882535b04c3fa8',1,'longbridge::trade::Expired()']]],
+  ['expirydate_1299',['ExpiryDate',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a1b29ba78a2df965545c5a563b6e997ae',1,'longbridge::quote::ExpiryDate()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a1b29ba78a2df965545c5a563b6e997ae',1,'longbridge::quote::ExpiryDate()']]]
 ];

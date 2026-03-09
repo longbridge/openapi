@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['brokers_705',['Brokers',['../structlongport_1_1quote_1_1_brokers.html',1,'longport::quote']]]
+  ['brokers_720',['Brokers',['../structlongbridge_1_1quote_1_1_brokers.html',1,'longbridge::quote']]]
 ];

@@ -1,14 +1,14 @@
 var searchData=
 [
-  ['fees_1018',['fees',['../structlongport_1_1trade_1_1_order_charge_item.html#ad20e72eb0f5c07b5346426d7a1a8c658',1,'longport::trade::OrderChargeItem']]],
-  ['five_5fday_5fchange_5frate_1019',['five_day_change_rate',['../structlongport_1_1quote_1_1_security_calc_index.html#a69a632be29d31689e3d0d88d5a04392b',1,'longport::quote::SecurityCalcIndex']]],
-  ['five_5fminutes_5fchange_5frate_1020',['five_minutes_change_rate',['../structlongport_1_1quote_1_1_security_calc_index.html#a51013a4b76be2414d965d06e3b7525d2',1,'longport::quote::SecurityCalcIndex']]],
-  ['fm_5ffactor_1021',['fm_factor',['../structlongport_1_1trade_1_1_margin_ratio.html#af8238a656dba7e36ebff60df814ae4a9',1,'longport::trade::MarginRatio']]],
-  ['fractional_5fshares_1022',['fractional_shares',['../structlongport_1_1trade_1_1_estimate_max_purchase_quantity_options.html#a0f1208f6b7421d0b7368585a7601bb75',1,'longport::trade::EstimateMaxPurchaseQuantityOptions']]],
-  ['free_5famount_1023',['free_amount',['../structlongport_1_1trade_1_1_order_detail.html#a501254ac98f03eb49b50112fc680a97f',1,'longport::trade::OrderDetail']]],
-  ['free_5fcurrency_1024',['free_currency',['../structlongport_1_1trade_1_1_order_detail.html#ae785aa3a069548eda61eddd795b5d636',1,'longport::trade::OrderDetail']]],
-  ['free_5fstatus_1025',['free_status',['../structlongport_1_1trade_1_1_order_detail.html#a18fbc8d68071d79b0f1fc774aa5a017a',1,'longport::trade::OrderDetail']]],
-  ['frozen_5fcash_1026',['frozen_cash',['../structlongport_1_1trade_1_1_cash_info.html#ab0d5dd301e71e228d00b89645a6f582b',1,'longport::trade::CashInfo']]],
-  ['frozen_5ftransaction_5ffee_1027',['frozen_transaction_fee',['../structlongport_1_1trade_1_1_frozen_transaction_fee.html#a7fe3251117234582d9a69e6190eeb277',1,'longport::trade::FrozenTransactionFee']]],
-  ['frozen_5ftransaction_5ffees_1028',['frozen_transaction_fees',['../structlongport_1_1trade_1_1_account_balance.html#a87411d57a28cb82d56f795ba0e271205',1,'longport::trade::AccountBalance']]]
+  ['fees_1049',['fees',['../structlongbridge_1_1trade_1_1_order_charge_item.html#a90526c3dfa635a926ca40b329b6331c2',1,'longbridge::trade::OrderChargeItem']]],
+  ['five_5fday_5fchange_5frate_1050',['five_day_change_rate',['../structlongbridge_1_1quote_1_1_security_calc_index.html#a23a44f9d7bf030abe6201847c7a720d8',1,'longbridge::quote::SecurityCalcIndex']]],
+  ['five_5fminutes_5fchange_5frate_1051',['five_minutes_change_rate',['../structlongbridge_1_1quote_1_1_security_calc_index.html#aeb6b78898e30d8b601eb00680e2581f2',1,'longbridge::quote::SecurityCalcIndex']]],
+  ['fm_5ffactor_1052',['fm_factor',['../structlongbridge_1_1trade_1_1_margin_ratio.html#a3a3f7b706691526bbc831a65130c480e',1,'longbridge::trade::MarginRatio']]],
+  ['fractional_5fshares_1053',['fractional_shares',['../structlongbridge_1_1trade_1_1_estimate_max_purchase_quantity_options.html#a33773992b679d1e24dcde2644cc60b2a',1,'longbridge::trade::EstimateMaxPurchaseQuantityOptions']]],
+  ['free_5famount_1054',['free_amount',['../structlongbridge_1_1trade_1_1_order_detail.html#a8b22abf7a475daabcf6f43636b335786',1,'longbridge::trade::OrderDetail']]],
+  ['free_5fcurrency_1055',['free_currency',['../structlongbridge_1_1trade_1_1_order_detail.html#a0b4adb06818f36cb57c94077ada94a06',1,'longbridge::trade::OrderDetail']]],
+  ['free_5fstatus_1056',['free_status',['../structlongbridge_1_1trade_1_1_order_detail.html#a59bd987b8b863a93e71357728c51a8f9',1,'longbridge::trade::OrderDetail']]],
+  ['frozen_5fcash_1057',['frozen_cash',['../structlongbridge_1_1trade_1_1_cash_info.html#a667fc2c12de1eb1bd6a307316878631e',1,'longbridge::trade::CashInfo']]],
+  ['frozen_5ftransaction_5ffee_1058',['frozen_transaction_fee',['../structlongbridge_1_1trade_1_1_frozen_transaction_fee.html#afeca3f17832604992c232732a0ebb20a',1,'longbridge::trade::FrozenTransactionFee']]],
+  ['frozen_5ftransaction_5ffees_1059',['frozen_transaction_fees',['../structlongbridge_1_1trade_1_1_account_balance.html#a47bca61070cba324cc46d116f6992368',1,'longbridge::trade::AccountBalance']]]
 ];
