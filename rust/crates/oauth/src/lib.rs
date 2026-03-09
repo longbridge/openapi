@@ -55,9 +55,115 @@ const DEFAULT_CALLBACK_PORT: u16 = 60355;
 /// Error type for OAuth operations
 #[derive(Debug, thiserror::Error)]
 pub enum OAuthError {
-    /// OAuth flow error
-    #[error("oauth error: {0}")]
-    OAuth(String),
+    /// Cannot determine home directory for token storage
+    #[error("cannot determine home directory")]
+    NoHomeDir,
+
+    /// Failed to read token file from disk
+    #[error("failed to read token file {path}: {source}")]
+    TokenFileRead {
+        /// Path to the token file
+        path: PathBuf,
+        /// I/O error from reading the file
+        #[source]
+        source: std::io::Error,
+    },
+
+    /// Failed to parse token file (invalid JSON or schema)
+    #[error("failed to parse token file {path}: {source}")]
+    TokenFileParse {
+        /// Path to the token file
+        path: PathBuf,
+        /// JSON parse error
+        #[source]
+        source: serde_json::Error,
+    },
+
+    /// Failed to create token directory
+    #[error("failed to create directory {path}: {source}")]
+    CreateDirFailed {
+        /// Directory path
+        path: PathBuf,
+        /// I/O error from creating the directory
+        #[source]
+        source: std::io::Error,
+    },
+
+    /// Failed to serialize token to JSON
+    #[error("failed to serialize token: {source}")]
+    SerializeToken {
+        /// JSON serialize error
+        #[source]
+        source: serde_json::Error,
+    },
+
+    /// Failed to write token file
+    #[error("failed to write token file {path}: {source}")]
+    TokenFileWrite {
+        /// Path to the token file
+        path: PathBuf,
+        /// I/O error from writing the file
+        #[source]
+        source: std::io::Error,
+    },
+
+    /// No token available (not loaded and authorization not yet completed)
+    #[error("no token available")]
+    NoTokenAvailable,
+
+    /// Failed to bind callback server for OAuth redirect
+    #[error("failed to bind callback server on port {port}: {message}")]
+    BindCallbackFailed {
+        /// Callback port
+        port: u16,
+        /// Underlying error message
+        message: String,
+    },
+
+    /// Failed to get local address of callback server
+    #[error("failed to get local address")]
+    LocalAddressFailed,
+
+    /// CSRF token mismatch (possible CSRF attack)
+    #[error("CSRF token mismatch")]
+    CsrfTokenMismatch,
+
+    /// Failed to exchange authorization code for token
+    #[error("failed to exchange code for token: {message}")]
+    ExchangeCodeFailed {
+        /// Server or protocol error message
+        message: String,
+    },
+
+    /// No refresh token available
+    #[error("no refresh token available")]
+    NoRefreshToken,
+
+    /// Failed to refresh access token
+    #[error("failed to refresh token: {message}")]
+    RefreshTokenFailed {
+        /// Server or protocol error message
+        message: String,
+    },
+
+    /// OAuth authorization failed (user denied or server error in callback)
+    #[error("OAuth authorization failed: {message}")]
+    AuthorizationFailed {
+        /// Error message from callback or server
+        message: String,
+    },
+
+    /// Callback channel closed unexpectedly
+    #[error("callback channel closed unexpectedly")]
+    CallbackChannelClosed,
+
+    /// Authorization timed out waiting for user callback
+    #[error("authorization timeout - no response received within 5 minutes")]
+    AuthorizationTimeout,
+
+    /// Other internal or low-level error (e.g. runtime setup)
+    #[error("{0}")]
+    Other(String),
 }
 
 /// Result type for OAuth operations
@@ -67,8 +173,7 @@ pub type OAuthResult<T> = std::result::Result<T, OAuthError>;
 ///
 /// Path: `~/.longbridge-openapi/tokens/<client_id>`
 fn token_path_for_client_id(client_id: &str) -> OAuthResult<PathBuf> {
-    let home = dirs::home_dir()
-        .ok_or_else(|| OAuthError::OAuth("Cannot determine home directory".to_string()))?;
+    let home = dirs::home_dir().ok_or(OAuthError::NoHomeDir)?;
     Ok(home
         .join(".longbridge-openapi")
         .join("tokens")
@@ -124,14 +229,17 @@ impl OAuthToken {
         tracing::debug!(path = %path.display(), "loading token from disk");
         let data = std::fs::read_to_string(path).map_err(|e| {
             tracing::debug!(path = %path.display(), error = %e, "failed to read token file");
-            OAuthError::OAuth(format!("Failed to read token file {}: {e}", path.display()))
+            OAuthError::TokenFileRead {
+                path: path.to_path_buf(),
+                source: e,
+            }
         })?;
         let token = serde_json::from_str(&data).map_err(|e| {
             tracing::warn!(path = %path.display(), error = %e, "failed to parse token file");
-            OAuthError::OAuth(format!(
-                "Failed to parse token file {}: {e}",
-                path.display()
-            ))
+            OAuthError::TokenFileParse {
+                path: path.to_path_buf(),
+                source: e,
+            }
         })?;
         tracing::debug!(path = %path.display(), "token loaded successfully");
         Ok(token)
@@ -143,20 +251,20 @@ impl OAuthToken {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 tracing::error!(path = %parent.display(), error = %e, "failed to create token directory");
-                OAuthError::OAuth(format!(
-                    "Failed to create directory {}: {e}",
-                    parent.display()
-                ))
+                OAuthError::CreateDirFailed {
+                    path: parent.to_path_buf(),
+                    source: e,
+                }
             })?;
         }
         let data = serde_json::to_string_pretty(self)
-            .map_err(|e| OAuthError::OAuth(format!("Failed to serialize token: {e}")))?;
+            .map_err(|e| OAuthError::SerializeToken { source: e })?;
         std::fs::write(path, data).map_err(|e| {
             tracing::error!(path = %path.display(), error = %e, "failed to write token file");
-            OAuthError::OAuth(format!(
-                "Failed to write token file {}: {e}",
-                path.display()
-            ))
+            OAuthError::TokenFileWrite {
+                path: path.to_path_buf(),
+                source: e,
+            }
         })?;
         tracing::debug!(path = %path.display(), "token saved successfully");
         Ok(())
@@ -244,7 +352,7 @@ impl OAuth {
             .map(|t| t.access_token.clone())
             .ok_or_else(|| {
                 tracing::error!(client_id = %self.0.client_id, "no token available");
-                OAuthError::OAuth("No token available".to_string())
+                OAuthError::NoTokenAvailable
             })
     }
 
@@ -256,18 +364,16 @@ impl OAuth {
         let acceptor = TcpListener::bind(format!("127.0.0.1:{}", self.0.callback_port))
             .into_acceptor()
             .await
-            .map_err(|e| {
-                OAuthError::OAuth(format!(
-                    "Failed to bind callback server on port {}: {}",
-                    self.0.callback_port, e
-                ))
+            .map_err(|e| OAuthError::BindCallbackFailed {
+                port: self.0.callback_port,
+                message: e.to_string(),
             })?;
         let port = acceptor
             .local_addr()
             .into_iter()
             .next()
             .and_then(|a| a.as_socket_addr().map(|s| s.port()))
-            .ok_or_else(|| OAuthError::OAuth("Failed to get local address".to_string()))?;
+            .ok_or(OAuthError::LocalAddressFailed)?;
 
         tracing::debug!("Callback server listening on port {port}");
 
@@ -289,7 +395,7 @@ impl OAuth {
         tracing::debug!(client_id = %self.0.client_id, "received OAuth callback, verifying CSRF token");
         if state != *csrf_token.secret() {
             tracing::warn!(client_id = %self.0.client_id, "CSRF token mismatch, possible CSRF attack");
-            return Err(OAuthError::OAuth("CSRF token mismatch".to_string()));
+            return Err(OAuthError::CsrfTokenMismatch);
         }
 
         tracing::debug!(client_id = %self.0.client_id, "exchanging authorization code for token");
@@ -299,7 +405,9 @@ impl OAuth {
             .await
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to exchange authorization code for token");
-                OAuthError::OAuth(format!("Failed to exchange code for token: {}", e))
+                OAuthError::ExchangeCodeFailed {
+                    message: e.to_string(),
+                }
             })?;
 
         let token = OAuthToken::from_oauth2_response(self.0.client_id.clone(), &token_response);
@@ -310,7 +418,7 @@ impl OAuth {
     async fn refresh_token(&self, token: &OAuthToken) -> OAuthResult<OAuthToken> {
         let refresh_token_str = token.refresh_token.as_deref().ok_or_else(|| {
             tracing::warn!(client_id = %self.0.client_id, "no refresh token available");
-            OAuthError::OAuth("No refresh token available".to_string())
+            OAuthError::NoRefreshToken
         })?;
 
         tracing::debug!(client_id = %self.0.client_id, "refreshing OAuth token");
@@ -325,7 +433,9 @@ impl OAuth {
             .await
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to refresh token");
-                OAuthError::OAuth(format!("Failed to refresh token: {}", e))
+                OAuthError::RefreshTokenFailed {
+                    message: e.to_string(),
+                }
             })?;
 
         let mut new_token =
@@ -402,7 +512,7 @@ impl OAuthBuilder {
         tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()
-            .map_err(|e| OAuthError::OAuth(format!("Failed to create Tokio runtime: {e}")))?
+            .map_err(|e| OAuthError::Other(e.to_string()))?
             .block_on(self.build(open_url))
     }
 
@@ -551,22 +661,20 @@ async fn wait_for_callback(acceptor: poem::listener::TcpAcceptor) -> OAuthResult
     let result = match timeout(AUTH_TIMEOUT, rx).await {
         Ok(Ok(r)) => r.map_err(|e| {
             tracing::warn!(error = %e, "OAuth authorization failed at callback");
-            OAuthError::OAuth(format!("OAuth authorization failed: {e}"))
+            OAuthError::AuthorizationFailed {
+                message: e.to_string(),
+            }
         }),
         Ok(Err(_)) => {
             tracing::error!("OAuth callback channel closed unexpectedly");
-            Err(OAuthError::OAuth(
-                "Callback channel closed unexpectedly".to_string(),
-            ))
+            Err(OAuthError::CallbackChannelClosed)
         }
         Err(_) => {
             tracing::warn!(
                 timeout_secs = AUTH_TIMEOUT.as_secs(),
                 "OAuth authorization timed out waiting for callback"
             );
-            Err(OAuthError::OAuth(
-                "Authorization timeout - no response received within 5 minutes".to_string(),
-            ))
+            Err(OAuthError::AuthorizationTimeout)
         }
     };
 
