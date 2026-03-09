@@ -582,6 +582,9 @@ jobs:
           - name: longbridge-candlesticks
             registryName: longbridge-candlesticks
             path: rust/crates/candlesticks
+          - name: longbridge-oauth
+            registryName: longbridge-oauth
+            path: rust/crates/oauth
           - name: longbridge
             registryName: longbridge
             path: rust
