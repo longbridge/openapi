@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::{
     client::{DEFAULT_CALLBACK_PORT, OAuth, OAuthInner},
-    error::{OAuthError, OAuthResult},
+    error::OAuthResult,
     token::{OAuthToken, token_path_for_client_id},
 };
 
@@ -66,7 +66,7 @@ impl OAuthBuilder {
         tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()
-            .map_err(|e| OAuthError::Other(e.to_string()))?
+            .map_err(|e| crate::error::OAuthError::Other(e.to_string()))?
             .block_on(self.build(open_url))
     }
 
