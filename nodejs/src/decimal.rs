@@ -264,7 +264,7 @@ impl Decimal {
     #[napi]
     #[inline]
     pub fn less_than(&self, other: &Decimal) -> bool {
-        self.0 <= other.0
+        self.0 < other.0
     }
 
     /// Returns `true` if the value of this Decimal is less than or equal to the

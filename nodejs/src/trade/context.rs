@@ -51,14 +51,22 @@ impl TradeContext {
                 while let Some(msg) = receiver.recv().await {
                     let callbacks = callbacks.lock();
                     match msg {
-                        PushEvent::OrderChanged(order_changed) => {
-                            if let Some(callback) = &callbacks.order_changed
-                                && let Ok(order_changed) = order_changed.try_into()
-                            {
-                                callback
-                                    .call(Ok(order_changed), ThreadsafeFunctionCallMode::Blocking);
+                        PushEvent::OrderChanged(order_changed) => match order_changed.try_into() {
+                            Ok(order_changed) => {
+                                if let Some(callback) = &callbacks.order_changed {
+                                    callback.call(
+                                        Ok(order_changed),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
                             }
-                        }
+                            Err(e) => {
+                                tracing::warn!(
+                                    error = %e,
+                                    "order changed push event conversion failed"
+                                );
+                            }
+                        },
                     }
                 }
             }

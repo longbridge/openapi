@@ -61,71 +61,106 @@ impl QuoteContext {
                 while let Some(msg) = receiver.recv().await {
                     let callbacks = callbacks.lock();
                     match msg.detail {
-                        PushEventDetail::Quote(quote) => {
-                            if let Some(callback) = &callbacks.quote
-                                && let Ok(quote) = quote.try_into()
-                            {
-                                callback.call(
-                                    Ok(PushQuoteEvent {
-                                        symbol: msg.symbol,
-                                        data: quote,
-                                    }),
-                                    ThreadsafeFunctionCallMode::Blocking,
+                        PushEventDetail::Quote(quote) => match quote.try_into() {
+                            Ok(quote) => {
+                                if let Some(callback) = &callbacks.quote {
+                                    callback.call(
+                                        Ok(PushQuoteEvent {
+                                            symbol: msg.symbol,
+                                            data: quote,
+                                        }),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
+                            }
+                            Err(e) => {
+                                tracing::warn!(
+                                    symbol = %msg.symbol,
+                                    error = %e,
+                                    "quote push event conversion failed"
                                 );
                             }
-                        }
-                        PushEventDetail::Depth(depth) => {
-                            if let Some(callback) = &callbacks.depth
-                                && let Ok(depth) = depth.try_into()
-                            {
-                                callback.call(
-                                    Ok(PushDepthEvent {
-                                        symbol: msg.symbol,
-                                        data: depth,
-                                    }),
-                                    ThreadsafeFunctionCallMode::Blocking,
+                        },
+                        PushEventDetail::Depth(depth) => match depth.try_into() {
+                            Ok(depth) => {
+                                if let Some(callback) = &callbacks.depth {
+                                    callback.call(
+                                        Ok(PushDepthEvent {
+                                            symbol: msg.symbol,
+                                            data: depth,
+                                        }),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
+                            }
+                            Err(e) => {
+                                tracing::warn!(
+                                    symbol = %msg.symbol,
+                                    error = %e,
+                                    "depth push event conversion failed"
                                 );
                             }
-                        }
-                        PushEventDetail::Brokers(brokers) => {
-                            if let Some(callback) = &callbacks.brokers
-                                && let Ok(brokers) = brokers.try_into()
-                            {
-                                callback.call(
-                                    Ok(PushBrokersEvent {
-                                        symbol: msg.symbol,
-                                        data: brokers,
-                                    }),
-                                    ThreadsafeFunctionCallMode::Blocking,
+                        },
+                        PushEventDetail::Brokers(brokers) => match brokers.try_into() {
+                            Ok(brokers) => {
+                                if let Some(callback) = &callbacks.brokers {
+                                    callback.call(
+                                        Ok(PushBrokersEvent {
+                                            symbol: msg.symbol,
+                                            data: brokers,
+                                        }),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
+                            }
+                            Err(e) => {
+                                tracing::warn!(
+                                    symbol = %msg.symbol,
+                                    error = %e,
+                                    "brokers push event conversion failed"
                                 );
                             }
-                        }
-                        PushEventDetail::Trade(trades) => {
-                            if let Some(callback) = &callbacks.trades
-                                && let Ok(trades) = trades.try_into()
-                            {
-                                callback.call(
-                                    Ok(PushTradesEvent {
-                                        symbol: msg.symbol,
-                                        data: trades,
-                                    }),
-                                    ThreadsafeFunctionCallMode::Blocking,
+                        },
+                        PushEventDetail::Trade(trades) => match trades.try_into() {
+                            Ok(trades) => {
+                                if let Some(callback) = &callbacks.trades {
+                                    callback.call(
+                                        Ok(PushTradesEvent {
+                                            symbol: msg.symbol,
+                                            data: trades,
+                                        }),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
+                            }
+                            Err(e) => {
+                                tracing::warn!(
+                                    symbol = %msg.symbol,
+                                    error = %e,
+                                    "trades push event conversion failed"
                                 );
                             }
-                        }
-                        PushEventDetail::Candlestick(candlestick) => {
-                            if let Some(callback) = &callbacks.candlestick
-                                && let Ok(candlestick) = candlestick.try_into()
-                            {
-                                callback.call(
-                                    Ok(PushCandlestickEvent {
-                                        symbol: msg.symbol,
-                                        data: candlestick,
-                                    }),
-                                    ThreadsafeFunctionCallMode::Blocking,
+                        },
+                        PushEventDetail::Candlestick(candlestick) => match candlestick.try_into() {
+                            Ok(candlestick) => {
+                                if let Some(callback) = &callbacks.candlestick {
+                                    callback.call(
+                                        Ok(PushCandlestickEvent {
+                                            symbol: msg.symbol,
+                                            data: candlestick,
+                                        }),
+                                        ThreadsafeFunctionCallMode::Blocking,
+                                    );
+                                }
+                            }
+                            Err(e) => {
+                                tracing::warn!(
+                                    symbol = %msg.symbol,
+                                    error = %e,
+                                    "candlestick push event conversion failed"
                                 );
                             }
-                        }
+                        },
                     }
                 }
             }
