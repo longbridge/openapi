@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// Topic type
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::TopicType")]
 pub(crate) enum TopicType {
@@ -17,7 +17,7 @@ pub(crate) enum TopicType {
 }
 
 /// Trade
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::Execution")]
 pub(crate) struct Execution {
@@ -35,7 +35,7 @@ pub(crate) struct Execution {
     price: PyDecimal,
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::OrderStatus")]
 pub(crate) enum OrderStatus {
@@ -77,7 +77,7 @@ pub(crate) enum OrderStatus {
     PartialWithdrawal,
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::OrderSide")]
 pub(crate) enum OrderSide {
@@ -89,7 +89,7 @@ pub(crate) enum OrderSide {
     Sell,
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::OrderType")]
 #[allow(clippy::upper_case_acronyms)]
@@ -125,7 +125,7 @@ pub(crate) enum OrderType {
 }
 
 /// Order tag
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::OrderTag")]
 pub(crate) enum OrderTag {
@@ -152,7 +152,7 @@ pub(crate) enum OrderTag {
 }
 
 /// Time in force type
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::TimeInForceType")]
 pub(crate) enum TimeInForceType {
@@ -167,7 +167,7 @@ pub(crate) enum TimeInForceType {
 }
 
 /// Trigger status
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::TriggerStatus")]
 pub(crate) enum TriggerStatus {
@@ -182,7 +182,7 @@ pub(crate) enum TriggerStatus {
 }
 
 /// Enable or disable outside regular trading hours
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::OutsideRTH")]
 pub(crate) enum OutsideRTH {
@@ -197,7 +197,7 @@ pub(crate) enum OutsideRTH {
 }
 
 /// Order
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::Order")]
 pub(crate) struct Order {
@@ -277,7 +277,7 @@ pub(crate) struct Order {
 }
 
 /// Commission-free Status
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::CommissionFreeStatus")]
 pub(crate) enum CommissionFreeStatus {
@@ -295,7 +295,7 @@ pub(crate) enum CommissionFreeStatus {
 }
 
 /// Deduction status
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::DeductionStatus")]
 pub(crate) enum DeductionStatus {
@@ -313,7 +313,7 @@ pub(crate) enum DeductionStatus {
 }
 
 /// Charge category code
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::ChargeCategoryCode")]
 pub(crate) enum ChargeCategoryCode {
@@ -326,7 +326,7 @@ pub(crate) enum ChargeCategoryCode {
 }
 
 /// Order history detail
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::OrderHistoryDetail")]
 pub(crate) struct OrderHistoryDetail {
@@ -345,7 +345,7 @@ pub(crate) struct OrderHistoryDetail {
 }
 
 /// Order charge fee
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::OrderChargeFee")]
 pub(crate) struct OrderChargeFee {
@@ -360,7 +360,7 @@ pub(crate) struct OrderChargeFee {
 }
 
 /// Order charge item
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::OrderChargeItem")]
 pub(crate) struct OrderChargeItem {
@@ -374,7 +374,7 @@ pub(crate) struct OrderChargeItem {
 }
 
 /// Order charge detail
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::OrderChargeDetail")]
 pub(crate) struct OrderChargeDetail {
@@ -388,7 +388,7 @@ pub(crate) struct OrderChargeDetail {
 }
 
 /// Order detail
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::OrderDetail")]
 pub(crate) struct OrderDetail {
@@ -496,7 +496,7 @@ pub(crate) struct OrderDetail {
 }
 
 /// Order changed message
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::PushOrderChanged")]
 pub(crate) struct PushOrderChanged {
@@ -562,7 +562,7 @@ pub(crate) struct PushOrderChanged {
 }
 
 /// Response for submit order request
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::SubmitOrderResponse")]
 pub(crate) struct SubmitOrderResponse {
@@ -571,7 +571,7 @@ pub(crate) struct SubmitOrderResponse {
 }
 
 /// Account balance
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::CashInfo")]
 pub(crate) struct CashInfo {
@@ -588,7 +588,7 @@ pub(crate) struct CashInfo {
 }
 
 /// Frozen transaction fee
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::FrozenTransactionFee")]
 pub(crate) struct FrozenTransactionFee {
@@ -599,7 +599,7 @@ pub(crate) struct FrozenTransactionFee {
 }
 
 /// Account balance
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::AccountBalance")]
 pub(crate) struct AccountBalance {
@@ -631,7 +631,7 @@ pub(crate) struct AccountBalance {
     pub frozen_transaction_fees: Vec<FrozenTransactionFee>,
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::BalanceType")]
 pub(crate) enum BalanceType {
@@ -645,7 +645,7 @@ pub(crate) enum BalanceType {
     Fund,
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::CashFlowDirection")]
 pub(crate) enum CashFlowDirection {
@@ -658,7 +658,7 @@ pub(crate) enum CashFlowDirection {
 }
 
 /// Account balance
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::CashFlow")]
 pub(crate) struct CashFlow {
@@ -681,7 +681,7 @@ pub(crate) struct CashFlow {
 }
 
 /// Fund positions response
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
 #[py(remote = "longbridge::trade::FundPositionsResponse")]
 pub(crate) struct FundPositionsResponse {
@@ -690,7 +690,7 @@ pub(crate) struct FundPositionsResponse {
 }
 
 /// Fund position channel
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::FundPositionChannel")]
 pub(crate) struct FundPositionChannel {
@@ -702,7 +702,7 @@ pub(crate) struct FundPositionChannel {
 }
 
 /// Fund position
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::FundPosition")]
 pub(crate) struct FundPosition {
@@ -723,7 +723,7 @@ pub(crate) struct FundPosition {
 }
 
 /// Stock positions response
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::StockPositionsResponse")]
 pub(crate) struct StockPositionsResponse {
@@ -732,7 +732,7 @@ pub(crate) struct StockPositionsResponse {
 }
 
 /// Stock position channel
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::StockPositionChannel")]
 pub(crate) struct StockPositionChannel {
@@ -744,7 +744,7 @@ pub(crate) struct StockPositionChannel {
 }
 
 /// Stock position
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::StockPosition")]
 pub(crate) struct StockPosition {
@@ -769,7 +769,7 @@ pub(crate) struct StockPosition {
 }
 
 /// Margin ratio
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::MarginRatio")]
 pub(crate) struct MarginRatio {
@@ -782,7 +782,7 @@ pub(crate) struct MarginRatio {
 }
 
 /// Response for estimate maximum purchase quantity
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::EstimateMaxPurchaseQuantityResponse")]
 pub(crate) struct EstimateMaxPurchaseQuantityResponse {

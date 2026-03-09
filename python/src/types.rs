@@ -1,7 +1,7 @@
 use longbridge_python_macros::PyEnum;
 use pyo3::prelude::*;
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::Market")]
 pub(crate) enum Market {
@@ -19,7 +19,7 @@ pub(crate) enum Market {
     Crypto,
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
 #[py(remote = "longbridge::Language")]
@@ -32,7 +32,7 @@ pub(crate) enum Language {
     EN,
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
 #[py(remote = "longbridge::PushCandlestickMode")]

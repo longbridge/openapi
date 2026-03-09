@@ -18,7 +18,7 @@ impl std::convert::From<ErrorNewType> for PyErr {
     }
 }
 
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::SimpleErrorKind")]
 pub(crate) enum ErrorKind {
