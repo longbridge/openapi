@@ -3,7 +3,11 @@ use std::sync::Arc;
 use longbridge::content::ContentContext;
 use pyo3::{prelude::*, types::PyType};
 
-use crate::{config::Config, content::types::{NewsItem, TopicItem}, error::ErrorNewType};
+use crate::{
+    config::Config,
+    content::types::{NewsItem, TopicItem},
+    error::ErrorNewType,
+};
 
 /// Async content context.
 #[pyclass]

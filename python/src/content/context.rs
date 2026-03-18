@@ -3,7 +3,11 @@ use std::sync::Arc;
 use longbridge::blocking::ContentContextSync;
 use pyo3::prelude::*;
 
-use crate::{config::Config, content::types::{NewsItem, TopicItem}, error::ErrorNewType};
+use crate::{
+    config::Config,
+    content::types::{NewsItem, TopicItem},
+    error::ErrorNewType,
+};
 
 #[pyclass]
 pub(crate) struct ContentContext {

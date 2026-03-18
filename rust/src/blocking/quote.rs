@@ -8,13 +8,13 @@ use crate::{
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
-        HistoryMarketTemperatureResponse,
-        IntradayLine, IssuerInfo, MarketTemperature, MarketTradingDays, MarketTradingSession,
-        OptionQuote, ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
-        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
-        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        SortOrderType, StrikePriceInfo, SubFlags, Subscription, Trade, TradeSessions, WarrantInfo,
-        WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
+        HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+        MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
+        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo,
+        SubFlags, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
+        WarrantStatus, WarrantType, WatchlistGroup,
     },
 };
 

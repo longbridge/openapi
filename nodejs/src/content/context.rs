@@ -2,7 +2,11 @@ use std::sync::Arc;
 
 use napi::Result;
 
-use crate::{config::Config, content::types::{NewsItem, TopicItem}, error::ErrorNewType};
+use crate::{
+    config::Config,
+    content::types::{NewsItem, TopicItem},
+    error::ErrorNewType,
+};
 
 /// Content context
 #[napi_derive::napi]
@@ -17,7 +21,8 @@ impl ContentContext {
     #[napi]
     pub async fn new(config: &Config) -> napi::Result<ContentContext> {
         Ok(Self {
-            ctx: longbridge::content::ContentContext::try_new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
+            ctx: longbridge::content::ContentContext::try_new(Arc::new(config.0.clone()))
+                .map_err(ErrorNewType)?,
         })
     }
 
