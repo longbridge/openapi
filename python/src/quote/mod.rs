@@ -58,7 +58,11 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::MarketTradingDays>()?;
     parent.add_class::<types::CapitalFlowLine>()?;
     parent.add_class::<types::CapitalDistributionResponse>()?;
+    parent.add_class::<types::CapitalDistribution>()?;
     parent.add_class::<types::SecurityBoard>()?;
+    parent.add_class::<types::Subscription>()?;
+    parent.add_class::<types::OptionDirection>()?;
+    parent.add_class::<types::QuotePackageDetail>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     parent.add_class::<context_async::AsyncQuoteContext>()?;

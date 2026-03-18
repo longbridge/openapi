@@ -29,6 +29,17 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::BalanceType>()?;
     parent.add_class::<types::EstimateMaxPurchaseQuantityResponse>()?;
     parent.add_class::<types::FrozenTransactionFee>()?;
+    parent.add_class::<types::SubmitOrderResponse>()?;
+    parent.add_class::<types::CashInfo>()?;
+    parent.add_class::<types::AccountBalance>()?;
+    parent.add_class::<types::CashFlowDirection>()?;
+    parent.add_class::<types::CashFlow>()?;
+    parent.add_class::<types::FundPositionsResponse>()?;
+    parent.add_class::<types::FundPositionChannel>()?;
+    parent.add_class::<types::FundPosition>()?;
+    parent.add_class::<types::StockPositionsResponse>()?;
+    parent.add_class::<types::StockPositionChannel>()?;
+    parent.add_class::<types::StockPosition>()?;
 
     parent.add_class::<context::TradeContext>()?;
     parent.add_class::<context_async::AsyncTradeContext>()?;
