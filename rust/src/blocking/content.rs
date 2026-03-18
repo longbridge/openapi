@@ -15,7 +15,8 @@ impl ContentContextSync {
         let rt = BlockingRuntime::try_new(
             move || async move {
                 let ctx = ContentContext::try_new(config)?;
-                let (_, rx) = mpsc::unbounded_channel::<std::convert::Infallible>();
+                let (tx, rx) = mpsc::unbounded_channel::<std::convert::Infallible>();
+                std::mem::forget(tx); // keep sender alive so event_rx never closes
                 Ok::<_, crate::Error>((ctx, rx))
             },
             |_: std::convert::Infallible| {},
