@@ -63,6 +63,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#trade-api-submit-order">Trade API (Submit order)</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#content-api-get-news-and-topics-for-a-security">Content API (Get news and topics for a security)</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#asynchronous-api">Asynchronous API</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
@@ -121,6 +123,14 @@
 <li><a href="reference_all/#longbridge.openapi.AsyncTradeContext">AsyncTradeContext</a></li>
 </ul>
 <p>Async trade API for use with asyncio; create via <code>AsyncTradeContext.create(config)</code> and await in asyncio.</p>
+<ul>
+<li><a href="reference_all/#longbridge.openapi.ContentContext">ContentContext</a></li>
+</ul>
+<p>The Content API part of the SDK, e.g.: get news, discussion topics for a security.</p>
+<ul>
+<li><a href="reference_all/#longbridge.openapi.AsyncContentContext">AsyncContentContext</a></li>
+</ul>
+<p>Async content API for use with asyncio; create via <code>AsyncContentContext.create(config)</code> and await in asyncio.</p>
 <h2 id="quickstart">Quickstart</h2>
 <p><em>Install Longbridge OpenAPI SDK</em></p>
 <pre class="highlight"><code class="language-bash">pip install longbridge</code></pre>
@@ -200,6 +210,21 @@ resp = ctx.submit_order(
     remark="Hello from Python SDK",
 )
 print(resp)</code></pre>
+<h2 id="content-api-get-news-and-topics-for-a-security">Content API <em>(Get news and topics for a security)</em></h2>
+<pre class="highlight"><code class="language-python">from longbridge.openapi import Config, ContentContext
+
+config = Config.from_apikey_env()
+
+# Create a context for content APIs
+ctx = ContentContext(config)
+
+# Get news for a security
+news = ctx.news("700.HK")
+print(news)
+
+# Get discussion topics for a security
+topics = ctx.topics("700.HK")
+print(topics)</code></pre>
 <h2 id="asynchronous-api">Asynchronous API</h2>
 <p>The SDK provides async contexts and an async HTTP client for use with Python's <code>asyncio</code>. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API.</p>
 <pre class="highlight"><code class="language-python">import asyncio
@@ -276,5 +301,5 @@ asyncio.run(main())</code></pre>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-03-18 10:26:47.298204+00:00
+Build Date UTC : 2026-03-19 02:57:15.318785+00:00
 -->

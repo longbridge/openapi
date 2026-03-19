@@ -84,9 +84,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__http__header__t.html">lb_http_header_t</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__async__result__t.html">lb_async_result_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__http__header__t.html">lb_http_header_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__push__quote__t.html">lb_push_quote_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -232,6 +232,12 @@ Data Structures</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__history__market__temperature__response__t.html">lb_history_market_temperature_response_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__filing__item__t.html">lb_filing_item_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__topic__item__t.html">lb_topic_item_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__news__item__t.html">lb_news_item_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -328,6 +334,8 @@ Typedefs</h2></td></tr>
 <tr class="separator:a9acc67f2320be0b0d1592631780714f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dcafee980a8ac92f4de67fdb7541d55"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a></td></tr>
 <tr class="separator:a1dcafee980a8ac92f4de67fdb7541d55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73d50b004289756079943cf60b38c79b"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a></td></tr>
+<tr class="separator:a73d50b004289756079943cf60b38c79b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a050557cb28af08567f39a2dac995788c"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="longbridge_8h.html#a050557cb28af08567f39a2dac995788c">lb_decimal_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a050557cb28af08567f39a2dac995788c">lb_decimal_t</a></td></tr>
 <tr class="separator:a050557cb28af08567f39a2dac995788c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74753f2e9628eafaece25e4f8e6ea2cc"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="longbridge_8h.html#a74753f2e9628eafaece25e4f8e6ea2cc">lb_error_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a74753f2e9628eafaece25e4f8e6ea2cc">lb_error_t</a></td></tr>
@@ -342,12 +350,12 @@ Typedefs</h2></td></tr>
 <tr class="separator:a2fc8527444c5b89959fe12f79a292603"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a926cfa821c03fd099c981194095a6104"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="longbridge_8h.html#a926cfa821c03fd099c981194095a6104">lb_trade_context_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a926cfa821c03fd099c981194095a6104">lb_trade_context_t</a></td></tr>
 <tr class="separator:a926cfa821c03fd099c981194095a6104"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a571f008d40524bfbcba1b03ec94c1d53"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__http__header__t.html">lb_http_header_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a571f008d40524bfbcba1b03ec94c1d53">lb_http_header_t</a></td></tr>
-<tr class="separator:a571f008d40524bfbcba1b03ec94c1d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a758dbcd7422018293b6aa148baa23dde"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__async__result__t.html">lb_async_result_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a758dbcd7422018293b6aa148baa23dde">lb_async_result_t</a></td></tr>
 <tr class="separator:a758dbcd7422018293b6aa148baa23dde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5af8e7ecef5e7ac7662ccc466ab87233"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>) (const struct <a class="el" href="structlb__async__result__t.html">lb_async_result_t</a> *)</td></tr>
 <tr class="separator:a5af8e7ecef5e7ac7662ccc466ab87233"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a571f008d40524bfbcba1b03ec94c1d53"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__http__header__t.html">lb_http_header_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a571f008d40524bfbcba1b03ec94c1d53">lb_http_header_t</a></td></tr>
+<tr class="separator:a571f008d40524bfbcba1b03ec94c1d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a459665767d593ef5ac16cf279af507"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a3a459665767d593ef5ac16cf279af507">lb_free_userdata_func_t</a>) (void *)</td></tr>
 <tr class="separator:a3a459665767d593ef5ac16cf279af507"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a017929d13222e0d7f30d2a6509c18686"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__push__quote__t.html">lb_push_quote_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a017929d13222e0d7f30d2a6509c18686">lb_push_quote_t</a></td></tr>
@@ -506,6 +514,12 @@ Typedefs</h2></td></tr>
 <tr class="separator:a7342669aec0dc4ade23cc60699836327"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeace4683b608c176bed63f78ccdcb3c4"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__history__market__temperature__response__t.html">lb_history_market_temperature_response_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#aeace4683b608c176bed63f78ccdcb3c4">lb_history_market_temperature_response_t</a></td></tr>
 <tr class="separator:aeace4683b608c176bed63f78ccdcb3c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f8372ee030ffa0f341ab0ce7e5ea45e"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__filing__item__t.html">lb_filing_item_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a1f8372ee030ffa0f341ab0ce7e5ea45e">lb_filing_item_t</a></td></tr>
+<tr class="separator:a1f8372ee030ffa0f341ab0ce7e5ea45e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d2a39bfe9ba40a3d1a94d9d6d6d84e0"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__topic__item__t.html">lb_topic_item_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a3d2a39bfe9ba40a3d1a94d9d6d6d84e0">lb_topic_item_t</a></td></tr>
+<tr class="separator:a3d2a39bfe9ba40a3d1a94d9d6d6d84e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0d34e8a992d5fca092677db32767759"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__news__item__t.html">lb_news_item_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#aa0d34e8a992d5fca092677db32767759">lb_news_item_t</a></td></tr>
+<tr class="separator:aa0d34e8a992d5fca092677db32767759"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -925,6 +939,16 @@ Functions</h2></td></tr>
 <tr class="separator:ae890d785795860bd6e5380d211ab5d6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bde35f4be29458bded4a14ad0df22aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a2bde35f4be29458bded4a14ad0df22aa">lb_config_free</a> (struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config)</td></tr>
 <tr class="separator:a2bde35f4be29458bded4a14ad0df22aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9fa71f91d190d27cba0cbf2eae53b78"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ac9fa71f91d190d27cba0cbf2eae53b78">lb_content_context_new</a> (const struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:ac9fa71f91d190d27cba0cbf2eae53b78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab58f63e338cc38bda0db8590d0e50d9a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ab58f63e338cc38bda0db8590d0e50d9a">lb_content_context_retain</a> (const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *ctx)</td></tr>
+<tr class="separator:ab58f63e338cc38bda0db8590d0e50d9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a965858b954eafd259bcf9487e68d449c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a965858b954eafd259bcf9487e68d449c">lb_content_context_release</a> (const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *ctx)</td></tr>
+<tr class="separator:a965858b954eafd259bcf9487e68d449c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f43acec22ba32dcb75906054eba795a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a3f43acec22ba32dcb75906054eba795a">lb_content_context_topics</a> (const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *ctx, const char *symbol, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a3f43acec22ba32dcb75906054eba795a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a2bb3052be3dd12170ff44449f2b120"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a4a2bb3052be3dd12170ff44449f2b120">lb_content_context_news</a> (const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *ctx, const char *symbol, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a4a2bb3052be3dd12170ff44449f2b120"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a255881fc72c4787576bec5421822e2a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a255881fc72c4787576bec5421822e2a4">lb_error_free</a> (struct <a class="el" href="longbridge_8h.html#a74753f2e9628eafaece25e4f8e6ea2cc">lb_error_t</a> *error)</td></tr>
 <tr class="separator:a255881fc72c4787576bec5421822e2a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb7a20a00c4213eb95c4bb62e2aa401e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#adb7a20a00c4213eb95c4bb62e2aa401e">lb_error_message</a> (const struct <a class="el" href="longbridge_8h.html#a74753f2e9628eafaece25e4f8e6ea2cc">lb_error_t</a> *error)</td></tr>
@@ -1053,6 +1077,8 @@ Functions</h2></td></tr>
 <tr class="separator:a52394feb380f1902173dc21c700a069e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07e1b1e600db1aa0d8ea79cdb1d1b5b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a07e1b1e600db1aa0d8ea79cdb1d1b5b0">lb_quote_context_realtime_candlesticks</a> (const struct <a class="el" href="longbridge_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, enum <a class="el" href="longbridge_8h.html#a2232d462d8b15fd3688cc8dfc15542e9">lb_period_t</a> period, uintptr_t count, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:a07e1b1e600db1aa0d8ea79cdb1d1b5b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa758c9f60105cad33d29a780296852db"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#aa758c9f60105cad33d29a780296852db">lb_quote_context_filings</a> (const struct <a class="el" href="longbridge_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:aa758c9f60105cad33d29a780296852db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2606f4e47c0b55c27c824f973abac0f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a2606f4e47c0b55c27c824f973abac0f8">lb_quote_context_security_list</a> (const struct <a class="el" href="longbridge_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, enum <a class="el" href="longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3">lb_market_t</a> market, const enum <a class="el" href="longbridge_8h.html#a69241c689dd7776335e35020eebee485">lb_security_list_category_t</a> *category, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:a2606f4e47c0b55c27c824f973abac0f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae69ec976ef34c666617539016cf06480"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ae69ec976ef34c666617539016cf06480">lb_quote_context_market_temperature</a> (const struct <a class="el" href="longbridge_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, enum <a class="el" href="longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3">lb_market_t</a> market, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
@@ -1599,6 +1625,21 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a73d50b004289756079943cf60b38c79b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73d50b004289756079943cf60b38c79b">&#9670;&nbsp;</a></span>lb_content_context_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Content context </p>
+
+</div>
+</div>
 <a id="a5c5e4b1c6d026325fe93851ab3e61a4d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5c5e4b1c6d026325fe93851ab3e61a4d">&#9670;&nbsp;</a></span>lb_create_watchlist_group_t</h2>
 
@@ -1771,6 +1812,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Execution </p>
+
+</div>
+</div>
+<a id="a1f8372ee030ffa0f341ab0ce7e5ea45e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f8372ee030ffa0f341ab0ce7e5ea45e">&#9670;&nbsp;</a></span>lb_filing_item_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structlb__filing__item__t.html">lb_filing_item_t</a> <a class="el" href="structlb__filing__item__t.html">lb_filing_item_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Filing item </p>
 
 </div>
 </div>
@@ -2173,6 +2229,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Market trading session </p>
+
+</div>
+</div>
+<a id="aa0d34e8a992d5fca092677db32767759"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0d34e8a992d5fca092677db32767759">&#9670;&nbsp;</a></span>lb_news_item_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structlb__news__item__t.html">lb_news_item_t</a> <a class="el" href="structlb__news__item__t.html">lb_news_item_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>News item </p>
 
 </div>
 </div>
@@ -2920,6 +2991,21 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3d2a39bfe9ba40a3d1a94d9d6d6d84e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d2a39bfe9ba40a3d1a94d9d6d6d84e0">&#9670;&nbsp;</a></span>lb_topic_item_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structlb__topic__item__t.html">lb_topic_item_t</a> <a class="el" href="structlb__topic__item__t.html">lb_topic_item_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Topic item </p>
 
 </div>
 </div>
@@ -4685,6 +4771,187 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">config</td><td>Config object </td></tr>
     <tr><td class="paramname">trade_ws_url</td><td>Trade WebSocket URL </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac9fa71f91d190d27cba0cbf2eae53b78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9fa71f91d190d27cba0cbf2eae53b78">&#9670;&nbsp;</a></span>lb_content_context_new()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_content_context_new </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *&#160;</td>
+          <td class="paramname"><em>config</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>userdata</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Create a new <code>ContentContext</code></p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">config</td><td>Config object </td></tr>
+    <tr><td class="paramname">callback</td><td>Async callback </td></tr>
+    <tr><td class="paramname">userdata</td><td>User data passed to the callback </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4a2bb3052be3dd12170ff44449f2b120"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a2bb3052be3dd12170ff44449f2b120">&#9670;&nbsp;</a></span>lb_content_context_news()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_content_context_news </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>userdata</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get news list for a symbol</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ctx</td><td>Content context </td></tr>
+    <tr><td class="paramname">symbol</td><td>Security symbol (e.g. "700.HK") </td></tr>
+    <tr><td class="paramname">callback</td><td>Async callback </td></tr>
+    <tr><td class="paramname">userdata</td><td>User data passed to the callback </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a965858b954eafd259bcf9487e68d449c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a965858b954eafd259bcf9487e68d449c">&#9670;&nbsp;</a></span>lb_content_context_release()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_content_context_release </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Release the content context (decrement reference count) </p>
+
+</div>
+</div>
+<a id="ab58f63e338cc38bda0db8590d0e50d9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab58f63e338cc38bda0db8590d0e50d9a">&#9670;&nbsp;</a></span>lb_content_context_retain()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_content_context_retain </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retain the content context (increment reference count) </p>
+
+</div>
+</div>
+<a id="a3f43acec22ba32dcb75906054eba795a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f43acec22ba32dcb75906054eba795a">&#9670;&nbsp;</a></span>lb_content_context_topics()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_content_context_topics </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a73d50b004289756079943cf60b38c79b">lb_content_context_t</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>userdata</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get discussion topics list for a symbol</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ctx</td><td>Content context </td></tr>
+    <tr><td class="paramname">symbol</td><td>Security symbol (e.g. "700.HK") </td></tr>
+    <tr><td class="paramname">callback</td><td>Async callback </td></tr>
+    <tr><td class="paramname">userdata</td><td>User data passed to the callback </td></tr>
   </table>
   </dd>
 </dl>
@@ -6478,6 +6745,47 @@ Variables</h1>
       </table>
 </div><div class="memdoc">
 <p>Get security depth </p>
+
+</div>
+</div>
+<a id="aa758c9f60105cad33d29a780296852db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa758c9f60105cad33d29a780296852db">&#9670;&nbsp;</a></span>lb_quote_context_filings()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_quote_context_filings </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>userdata</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get filings </p>
 
 </div>
 </div>

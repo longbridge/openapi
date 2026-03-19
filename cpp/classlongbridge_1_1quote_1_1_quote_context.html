@@ -203,6 +203,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac44c1873a007d23d8040573ef9001aa6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#ac44c1873a007d23d8040573ef9001aa6">update_watchlist_group</a> (const <a class="el" href="structlongbridge_1_1quote_1_1_update_watchlist_group.html">UpdateWatchlistGroup</a> &amp;req, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, void &gt; callback) const</td></tr>
 <tr class="memdesc:ac44c1873a007d23d8040573ef9001aa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create watchlist group.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#ac44c1873a007d23d8040573ef9001aa6">More...</a><br /></td></tr>
 <tr class="separator:ac44c1873a007d23d8040573ef9001aa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85431038d7e7da956d730f8f2cebd1a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a85431038d7e7da956d730f8f2cebd1a7">filings</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_filing_item.html">FilingItem</a> &gt;&gt; callback) const</td></tr>
+<tr class="memdesc:a85431038d7e7da956d730f8f2cebd1a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get filings.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#a85431038d7e7da956d730f8f2cebd1a7">More...</a><br /></td></tr>
+<tr class="separator:a85431038d7e7da956d730f8f2cebd1a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1fe96cbcadcb09a7b3cf08c0324a7b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#aa1fe96cbcadcb09a7b3cf08c0324a7b4">security_list</a> (<a class="el" href="namespacelongbridge.html#ac23c9164f0ed3247af35cd39ec1f0619">Market</a> market, <a class="el" href="namespacelongbridge_1_1quote.html#abd0ad1fcac6d23460ec4c165279f1a10">SecurityListCategory</a> category, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_security.html">Security</a> &gt;&gt; callback) const</td></tr>
 <tr class="memdesc:aa1fe96cbcadcb09a7b3cf08c0324a7b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get security list.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#aa1fe96cbcadcb09a7b3cf08c0324a7b4">More...</a><br /></td></tr>
 <tr class="separator:aa1fe96cbcadcb09a7b3cf08c0324a7b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -632,6 +635,36 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get security depth. </p>
+
+</div>
+</div>
+<a id="a85431038d7e7da956d730f8f2cebd1a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85431038d7e7da956d730f8f2cebd1a7">&#9670;&nbsp;</a></span>filings()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::quote::QuoteContext::filings </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_filing_item.html">FilingItem</a> &gt;&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get filings. </p>
 
 </div>
 </div>
