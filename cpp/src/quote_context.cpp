@@ -1280,6 +1280,38 @@ QuoteContext::update_watchlist_group(
 }
 
 void
+QuoteContext::filings(const std::string& symbol,
+                      AsyncCallback<QuoteContext, std::vector<FilingItem>> callback)
+  const
+{
+  lb_quote_context_filings(
+    ctx_,
+    symbol.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, std::vector<FilingItem>>(
+          res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto* rows = (const lb_filing_item_t*)res->data;
+        std::vector<FilingItem> items;
+        std::transform(rows,
+                       rows + res->length,
+                       std::back_inserter(items),
+                       [](auto row) { return convert(&row); });
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<FilingItem>>(
+          ctx, std::move(status), &items));
+      } else {
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<FilingItem>>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, std::vector<FilingItem>>(callback));
+}
+
+void
 QuoteContext::security_list(
   Market market,
   SecurityListCategory category,

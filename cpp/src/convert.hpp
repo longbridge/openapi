@@ -103,6 +103,9 @@ using longbridge::trade::SubmitOrderResponse;
 using longbridge::trade::TimeInForceType;
 using longbridge::trade::TopicType;
 using longbridge::trade::TriggerStatus;
+using longbridge::quote::FilingItem;
+using longbridge::content::NewsItem;
+using longbridge::content::TopicItem;
 
 inline lb_language_t
 convert(Language language)
@@ -2195,6 +2198,48 @@ convert(const lb_history_market_temperature_response_t* resp)
                  [](auto item) { return convert(&item); });
   return HistoryMarketTemperatureResponse{ convert(resp->granularity),
                                            records };
+}
+
+inline FilingItem
+convert(const lb_filing_item_t* item)
+{
+  std::vector<std::string> file_urls;
+  std::transform(item->file_urls,
+                 item->file_urls + item->num_file_urls,
+                 std::back_inserter(file_urls),
+                 [](auto url) { return std::string(url); });
+  return FilingItem{ item->id,
+                     item->title,
+                     item->description,
+                     item->file_name,
+                     file_urls,
+                     item->published_at };
+}
+
+inline TopicItem
+convert(const lb_topic_item_t* item)
+{
+  return TopicItem{ item->id,
+                    item->title,
+                    item->description,
+                    item->url,
+                    item->published_at,
+                    item->comments_count,
+                    item->likes_count,
+                    item->shares_count };
+}
+
+inline NewsItem
+convert(const lb_news_item_t* item)
+{
+  return NewsItem{ item->id,
+                   item->title,
+                   item->description,
+                   item->url,
+                   item->published_at,
+                   item->comments_count,
+                   item->likes_count,
+                   item->shares_count };
 }
 
 } // namespace convert

@@ -20,6 +20,7 @@ pub(crate) static TIME_LOCALDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new(
 pub(crate) static TIME_ZONE_ID: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static QUOTE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TRADE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static CONTENT_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DERIVATIVE_TYPE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 
@@ -72,7 +73,11 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         (DERIVATIVE_TYPE_CLASS, "com/longbridge/quote/DerivativeType"),
         (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException"),
         (QUOTE_CONTEXT_CLASS, "com/longbridge/quote/QuoteContext"),
-        (TRADE_CONTEXT_CLASS, "com/longbridge/trade/TradeContext")
+        (TRADE_CONTEXT_CLASS, "com/longbridge/trade/TradeContext"),
+        (
+            CONTENT_CONTEXT_CLASS,
+            "com/longbridge/content/ContentContext"
+        )
     );
 
     init_timezone_id(&mut env);
@@ -158,6 +163,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::QuotePackageDetail,
         longbridge::quote::MarketTemperature,
         longbridge::quote::HistoryMarketTemperatureResponse,
+        longbridge::quote::FilingItem,
         longbridge::trade::PushOrderChanged,
         longbridge::trade::Execution,
         longbridge::trade::Order,
@@ -178,6 +184,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::OrderChargeItem,
         longbridge::trade::OrderChargeDetail,
         longbridge::trade::OrderDetail,
-        longbridge::trade::EstimateMaxPurchaseQuantityResponse
+        longbridge::trade::EstimateMaxPurchaseQuantityResponse,
+        longbridge::content::TopicItem,
+        longbridge::content::NewsItem
     );
 }

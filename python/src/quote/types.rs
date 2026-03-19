@@ -1345,6 +1345,25 @@ pub(crate) enum TradeSessions {
     All,
 }
 
+/// Filing item
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::quote::FilingItem")]
+pub(crate) struct FilingItem {
+    /// Filing ID
+    id: String,
+    /// Title
+    title: String,
+    /// Description
+    description: String,
+    /// File name
+    file_name: String,
+    /// File URLs
+    file_urls: Vec<String>,
+    /// Published time
+    published_at: PyOffsetDateTimeWrapper,
+}
+
 /// Market temperature
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]

@@ -1246,6 +1246,23 @@ struct HistoryMarketTemperatureResponse
   std::vector<MarketTemperature> records;
 };
 
+/// Filing item
+struct FilingItem
+{
+  /// Filing ID
+  std::string id;
+  /// Title
+  std::string title;
+  /// Description
+  std::string description;
+  /// File name
+  std::string file_name;
+  /// File URLs
+  std::vector<std::string> file_urls;
+  /// Published time (Unix timestamp)
+  int64_t published_at;
+};
+
 } // namespace quote
 
 namespace trade {
@@ -2065,5 +2082,51 @@ struct EstimateMaxPurchaseQuantityResponse
 };
 
 } // namespace trade
+
+namespace content {
+
+/// Topic item
+struct TopicItem
+{
+  /// Topic ID
+  std::string id;
+  /// Title
+  std::string title;
+  /// Description
+  std::string description;
+  /// URL
+  std::string url;
+  /// Published time (Unix timestamp)
+  int64_t published_at;
+  /// Comments count
+  int32_t comments_count;
+  /// Likes count
+  int32_t likes_count;
+  /// Shares count
+  int32_t shares_count;
+};
+
+/// News item
+struct NewsItem
+{
+  /// News ID
+  std::string id;
+  /// Title
+  std::string title;
+  /// Description
+  std::string description;
+  /// URL
+  std::string url;
+  /// Published time (Unix timestamp)
+  int64_t published_at;
+  /// Comments count
+  int32_t comments_count;
+  /// Likes count
+  int32_t likes_count;
+  /// Shares count
+  int32_t shares_count;
+};
+
+} // namespace content
 
 } // namespace longbridge

@@ -129,6 +129,10 @@ cpp_compat = true
 "CGranularity" = "lb_granularity_t"
 "CMarketTemperature" = "lb_market_temperature_t"
 "CHistoryMarketTemperatureResponse" = "lb_history_market_temperature_response_t"
+"CFilingItem" = "lb_filing_item_t"
+"CTopicItem" = "lb_topic_item_t"
+"CNewsItem" = "lb_news_item_t"
+"CContentContext" = "lb_content_context_t"
 "COAuth" = "lb_oauth_t"
 
 [export]
@@ -169,5 +173,8 @@ include = [
     "CQuotePackageDetail",
     "CMarketTemperature",
     "CHistoryMarketTemperatureResponse",
+    "CFilingItem",
+    "CTopicItem",
+    "CNewsItem",
     "COAuth",
 ]

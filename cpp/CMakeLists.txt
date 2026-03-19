@@ -2,6 +2,7 @@ include_directories(../c/csrc/include include)
 set(SOURCES
     src/http_client.cpp
     src/config.cpp
+    src/content_context.cpp
     src/decimal.cpp
     src/status.cpp
     src/types.cpp

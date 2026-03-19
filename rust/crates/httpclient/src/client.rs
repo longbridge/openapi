@@ -9,6 +9,7 @@ use serde::Deserialize;
 use crate::{HttpClientConfig, HttpClientError, HttpClientResult, Json, RequestBuilder};
 
 /// Longbridge HTTP client
+#[derive(Clone)]
 pub struct HttpClient {
     pub(crate) http_cli: Client,
     pub(crate) config: Arc<HttpClientConfig>,

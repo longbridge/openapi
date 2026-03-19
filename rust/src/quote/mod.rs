@@ -18,13 +18,13 @@ pub use push_types::{
 pub use sub_flags::SubFlags;
 pub use types::{
     Brokers, CalcIndex, Candlestick, CapitalDistribution, CapitalDistributionResponse,
-    CapitalFlowLine, Depth, DerivativeType, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
-    Granularity, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-    MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,
-    ParticipantInfo, PrePostQuote, QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
-    RequestUpdateWatchlistGroup, SecuritiesUpdateMode, Security, SecurityBoard, SecurityBrokers,
-    SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-    SortOrderType, StrikePriceInfo, Subscription, Trade, TradeDirection, TradeSession,
-    TradeSessions, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
-    WarrantType, WatchlistGroup, WatchlistSecurity,
+    CapitalFlowLine, Depth, DerivativeType, FilingItem, FilterWarrantExpiryDate,
+    FilterWarrantInOutBoundsType, Granularity, HistoryMarketTemperatureResponse, IntradayLine,
+    IssuerInfo, MarketTemperature, MarketTradingDays, MarketTradingSession, OptionDirection,
+    OptionQuote, OptionType, ParticipantInfo, PrePostQuote, QuotePackageDetail, RealtimeQuote,
+    RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, SecuritiesUpdateMode, Security,
+    SecurityBoard, SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory,
+    SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo, Subscription, Trade,
+    TradeDirection, TradeSession, TradeSessions, TradingSessionInfo, WarrantInfo, WarrantQuote,
+    WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup, WatchlistSecurity,
 };

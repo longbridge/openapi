@@ -18,7 +18,7 @@ use crate::{
         push::handle_push_event,
         types::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+            FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
             QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security, SecurityBrokers,
@@ -695,6 +695,19 @@ impl AsyncQuoteContext {
                 .await
                 .map_err(ErrorNewType)?;
             Ok(())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get filings list. Returns awaitable.
+    #[pyo3(signature = (symbol))]
+    fn filings(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx.filings(symbol).await.map_err(ErrorNewType)?;
+            v.into_iter()
+                .map(|x| -> PyResult<FilingItem> { x.try_into() })
+                .collect::<PyResult<Vec<FilingItem>>>()
         })
         .map(|b| b.unbind())
     }

@@ -1283,6 +1283,11 @@ typedef enum lb_granularity_t {
  */
 typedef struct lb_config_t lb_config_t;
 
+/**
+ * Content context
+ */
+typedef struct lb_content_context_t lb_content_context_t;
+
 typedef struct lb_decimal_t lb_decimal_t;
 
 typedef struct lb_error_t lb_error_t;
@@ -1312,14 +1317,6 @@ typedef struct lb_quote_context_t lb_quote_context_t;
  */
 typedef struct lb_trade_context_t lb_trade_context_t;
 
-/**
- * HTTP Header
- */
-typedef struct lb_http_header_t {
-  const char *name;
-  const char *value;
-} lb_http_header_t;
-
 typedef struct lb_async_result_t {
   const void *ctx;
   const struct lb_error_t *error;
@@ -1329,6 +1326,14 @@ typedef struct lb_async_result_t {
 } lb_async_result_t;
 
 typedef void (*lb_async_callback_t)(const struct lb_async_result_t*);
+
+/**
+ * HTTP Header
+ */
+typedef struct lb_http_header_t {
+  const char *name;
+  const char *value;
+} lb_http_header_t;
 
 typedef void (*lb_free_userdata_func_t)(void*);
 
@@ -3870,6 +3875,116 @@ typedef struct lb_history_market_temperature_response_t {
   uintptr_t num_records;
 } lb_history_market_temperature_response_t;
 
+/**
+ * Filing item
+ */
+typedef struct lb_filing_item_t {
+  /**
+   * Filing ID
+   */
+  const char *id;
+  /**
+   * Title
+   */
+  const char *title;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * File name
+   */
+  const char *file_name;
+  /**
+   * File URLs
+   */
+  const char *const *file_urls;
+  /**
+   * Number of file URLs
+   */
+  uintptr_t num_file_urls;
+  /**
+   * Published time (Unix timestamp)
+   */
+  int64_t published_at;
+} lb_filing_item_t;
+
+/**
+ * Topic item
+ */
+typedef struct lb_topic_item_t {
+  /**
+   * Topic ID
+   */
+  const char *id;
+  /**
+   * Title
+   */
+  const char *title;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * URL
+   */
+  const char *url;
+  /**
+   * Published time (Unix timestamp)
+   */
+  int64_t published_at;
+  /**
+   * Comments count
+   */
+  int32_t comments_count;
+  /**
+   * Likes count
+   */
+  int32_t likes_count;
+  /**
+   * Shares count
+   */
+  int32_t shares_count;
+} lb_topic_item_t;
+
+/**
+ * News item
+ */
+typedef struct lb_news_item_t {
+  /**
+   * News ID
+   */
+  const char *id;
+  /**
+   * Title
+   */
+  const char *title;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * URL
+   */
+  const char *url;
+  /**
+   * Published time (Unix timestamp)
+   */
+  int64_t published_at;
+  /**
+   * Comments count
+   */
+  int32_t comments_count;
+  /**
+   * Likes count
+   */
+  int32_t likes_count;
+  /**
+   * Shares count
+   */
+  int32_t shares_count;
+} lb_news_item_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -3989,6 +4104,53 @@ void lb_config_set_log_path(struct lb_config_t *config, const char *log_path);
  * Free the config object
  */
 void lb_config_free(struct lb_config_t *config);
+
+/**
+ * Create a new `ContentContext`
+ *
+ * @param config    Config object
+ * @param callback  Async callback
+ * @param userdata  User data passed to the callback
+ */
+void lb_content_context_new(const struct lb_config_t *config,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Retain the content context (increment reference count)
+ */
+void lb_content_context_retain(const struct lb_content_context_t *ctx);
+
+/**
+ * Release the content context (decrement reference count)
+ */
+void lb_content_context_release(const struct lb_content_context_t *ctx);
+
+/**
+ * Get discussion topics list for a symbol
+ *
+ * @param ctx       Content context
+ * @param symbol    Security symbol (e.g. "700.HK")
+ * @param callback  Async callback
+ * @param userdata  User data passed to the callback
+ */
+void lb_content_context_topics(const struct lb_content_context_t *ctx,
+                               const char *symbol,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get news list for a symbol
+ *
+ * @param ctx       Content context
+ * @param symbol    Security symbol (e.g. "700.HK")
+ * @param callback  Async callback
+ * @param userdata  User data passed to the callback
+ */
+void lb_content_context_news(const struct lb_content_context_t *ctx,
+                             const char *symbol,
+                             lb_async_callback_t callback,
+                             void *userdata);
 
 /**
  * Free the error object
@@ -4506,6 +4668,14 @@ void lb_quote_context_realtime_candlesticks(const struct lb_quote_context_t *ctx
                                             uintptr_t count,
                                             lb_async_callback_t callback,
                                             void *userdata);
+
+/**
+ * Get filings
+ */
+void lb_quote_context_filings(const struct lb_quote_context_t *ctx,
+                              const char *symbol,
+                              lb_async_callback_t callback,
+                              void *userdata);
 
 /**
  * Get security list

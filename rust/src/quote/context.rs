@@ -12,7 +12,7 @@ use crate::{
     Config, Error, Language, Market, Result,
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-        HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+        FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
         MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
         QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
         RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
@@ -1560,6 +1560,33 @@ impl QuoteContext {
             .await?
             .0
             .list)
+    }
+
+    /// Get filings list
+    pub async fn filings(&self, symbol: impl Into<String>) -> Result<Vec<FilingItem>> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            symbol: String,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            items: Vec<FilingItem>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/quote/filings")
+            .query_params(Request {
+                symbol: symbol.into(),
+            })
+            .response::<Json<Response>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0
+            .items)
     }
 
     /// Get current market temperature

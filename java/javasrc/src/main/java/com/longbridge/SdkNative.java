@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.function.Consumer;
 import org.scijava.nativelib.NativeLoader;
 
+import com.longbridge.content.*;
 import com.longbridge.quote.*;
 import com.longbridge.trade.*;
 
@@ -55,6 +56,14 @@ public class SdkNative {
                         Consumer<String> openUrlCallback, AsyncCallback callback);
 
         public static native void freeOAuth(long oauth);
+
+        public static native void newContentContext(long config, AsyncCallback callback);
+
+        public static native void freeContentContext(long context);
+
+        public static native void contentContextTopics(long context, String symbol, AsyncCallback callback);
+
+        public static native void contentContextNews(long context, String symbol, AsyncCallback callback);
 
         public static native void newQuoteContext(long config, AsyncCallback callback);
 
@@ -152,6 +161,8 @@ public class SdkNative {
 
         public static native void quoteContextUpdateWatchlistGroup(long context, UpdateWatchlistGroup req,
                         AsyncCallback callback);
+
+        public static native void quoteContextFilings(long context, String symbol, AsyncCallback callback);
 
         public static native void quoteContextSecurityList(long context, Market market,
                         SecurityListCategory category,
