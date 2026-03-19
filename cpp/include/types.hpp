@@ -1260,7 +1260,7 @@ struct FilingItem
   /// File URLs
   std::vector<std::string> file_urls;
   /// Published time (Unix timestamp)
-  int64_t publish_at;
+  int64_t published_at;
 };
 
 } // namespace quote

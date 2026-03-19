@@ -1421,7 +1421,7 @@ pub struct FilingItem {
     file_urls: Vec<String>,
     /// Published time
     #[js(datetime)]
-    publish_at: DateTime<Utc>,
+    published_at: DateTime<Utc>,
 }
 
 /// Data granularity

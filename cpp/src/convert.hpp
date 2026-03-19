@@ -2213,7 +2213,7 @@ convert(const lb_filing_item_t* item)
                      item->description,
                      item->file_name,
                      file_urls,
-                     item->publish_at };
+                     item->published_at };
 }
 
 inline TopicItem

@@ -3038,7 +3038,7 @@ pub struct CFilingItem {
     /// Number of file URLs
     pub num_file_urls: usize,
     /// Published time (Unix timestamp)
-    pub publish_at: i64,
+    pub published_at: i64,
 }
 
 #[derive(Debug)]
@@ -3048,7 +3048,7 @@ pub(crate) struct CFilingItemOwned {
     description: CString,
     file_name: CString,
     file_urls: CVec<CString>,
-    publish_at: i64,
+    published_at: i64,
 }
 
 impl From<FilingItem> for CFilingItemOwned {
@@ -3059,7 +3059,7 @@ impl From<FilingItem> for CFilingItemOwned {
             description,
             file_name,
             file_urls,
-            publish_at,
+            published_at,
         } = item;
         CFilingItemOwned {
             id: id.into(),
@@ -3067,7 +3067,7 @@ impl From<FilingItem> for CFilingItemOwned {
             description: description.into(),
             file_name: file_name.into(),
             file_urls: file_urls.into(),
-            publish_at: publish_at.unix_timestamp(),
+            published_at: published_at.unix_timestamp(),
         }
     }
 }
@@ -3082,7 +3082,7 @@ impl ToFFI for CFilingItemOwned {
             description,
             file_name,
             file_urls,
-            publish_at,
+            published_at,
         } = self;
         CFilingItem {
             id: id.to_ffi_type(),
@@ -3091,7 +3091,7 @@ impl ToFFI for CFilingItemOwned {
             file_name: file_name.to_ffi_type(),
             file_urls: file_urls.to_ffi_type(),
             num_file_urls: file_urls.len(),
-            publish_at: *publish_at,
+            published_at: *published_at,
         }
     }
 }

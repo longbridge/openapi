@@ -1361,7 +1361,7 @@ pub(crate) struct FilingItem {
     /// File URLs
     file_urls: Vec<String>,
     /// Published time
-    publish_at: PyOffsetDateTimeWrapper,
+    published_at: PyOffsetDateTimeWrapper,
 }
 
 /// Market temperature

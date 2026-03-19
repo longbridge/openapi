@@ -434,7 +434,7 @@ export declare class FilingItem {
   /** File URLs */
   get fileUrls(): Array<string>
   /** Published time */
-  get publishAt(): Date
+  get publishedAt(): Date
 }
 
 /** Frozen transaction fee */
@@ -1592,6 +1592,8 @@ export declare class QuoteContext {
    * ```
    */
   updateWatchlistGroup(req: UpdateWatchlistGroup): Promise<void>
+  /** Get filings list */
+  filings(symbol: string): Promise<Array<FilingItem>>
   /**
    * Get security list
    *
@@ -1605,9 +1607,7 @@ export declare class QuoteContext {
    * const resp = await ctx.securityList(Market.US, SecurityListCategory.Overnight);
    * console.log(resp.toString());
    * ```
-   * Get filings list
    */
-  filings(symbol: string): Promise<Array<FilingItem>>
   securityList(market: Market, category?: SecurityListCategory | undefined | null): Promise<Array<Security>>
   /**
    * Get current market temperature

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use jni::{
     JNIEnv,
     errors::Result,
-    objects::{JClass, JObject, JString, JValueOwned},
+    objects::{JClass, JObject, JValueOwned},
 };
 use longbridge::{Config, content::ContentContext};
 

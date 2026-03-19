@@ -1006,18 +1006,6 @@ impl QuoteContext {
             .map_err(ErrorNewType)?)
     }
 
-    /// Get security list
-    ///
-    /// #### Example
-    ///
-    /// ```javascript
-    /// const { OAuth, Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
-    ///
-    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
-    /// const resp = await ctx.securityList(Market.US, SecurityListCategory.Overnight);
-    /// console.log(resp.toString());
-    /// ```
     /// Get filings list
     #[napi]
     pub async fn filings(&self, symbol: String) -> Result<Vec<FilingItem>> {
@@ -1030,6 +1018,18 @@ impl QuoteContext {
             .collect()
     }
 
+    /// Get security list
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { OAuth, Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
+    ///
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.securityList(Market.US, SecurityListCategory.Overnight);
+    /// console.log(resp.toString());
+    /// ```
     #[napi]
     pub async fn security_list(
         &self,

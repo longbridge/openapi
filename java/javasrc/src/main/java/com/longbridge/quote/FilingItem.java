@@ -11,7 +11,7 @@ public class FilingItem {
     private String description;
     private String fileName;
     private String[] fileUrls;
-    private OffsetDateTime publishAt;
+    private OffsetDateTime publishedAt;
 
     /**
      * Returns the filing ID.
@@ -63,8 +63,8 @@ public class FilingItem {
      *
      * @return the published time
      */
-    public OffsetDateTime getPublishAt() {
-        return publishAt;
+    public OffsetDateTime getPublishedAt() {
+        return publishedAt;
     }
 
     @Override

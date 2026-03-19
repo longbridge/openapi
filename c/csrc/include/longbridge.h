@@ -3906,7 +3906,7 @@ typedef struct lb_filing_item_t {
   /**
    * Published time (Unix timestamp)
    */
-  int64_t publish_at;
+  int64_t published_at;
 } lb_filing_item_t;
 
 /**

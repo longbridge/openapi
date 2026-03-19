@@ -700,6 +700,7 @@ impl AsyncQuoteContext {
     }
 
     /// Get filings list. Returns awaitable.
+    #[pyo3(signature = (symbol))]
     fn filings(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

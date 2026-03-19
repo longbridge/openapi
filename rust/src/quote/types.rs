@@ -1997,10 +1997,11 @@ pub struct FilingItem {
     pub file_urls: Vec<String>,
     /// Published time
     #[serde(
+        rename = "publish_at",
         serialize_with = "time::serde::rfc3339::serialize",
         deserialize_with = "crate::serde_utils::timestamp::deserialize"
     )]
-    pub publish_at: OffsetDateTime,
+    pub published_at: OffsetDateTime,
 }
 
 impl_serde_for_enum_string!(Granularity);

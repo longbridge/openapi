@@ -976,7 +976,7 @@ impl_java_class!(
         file_name,
         #[java(objarray)]
         file_urls,
-        publish_at
+        published_at
     ]
 );
 
