@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [4.0.2]
+
+## Added
+
+- **All bindings:** New `ContentContext` (Rust, C, C++, Java, Python, Node.js) with two methods:
+  - `topics(symbol)` — get discussion topics for a security.
+  - `news(symbol)` — get news list for a security.
+- **Quote API:** `QuoteContext.filings(symbol)` — get regulatory filings for a security. Available in all bindings (Rust, C, C++, Java, Python, Node.js).
+- **MCP server:** Expose `news`, `topics`, and `filings` as MCP tools.
+
 # [4.0.1]
 
 ## Fixed
