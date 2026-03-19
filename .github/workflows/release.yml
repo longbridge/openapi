@@ -573,6 +573,9 @@ jobs:
           - name: longbridge-proto
             registryName: longbridge-proto
             path: rust/crates/proto
+          - name: longbridge-oauth
+            registryName: longbridge-oauth
+            path: rust/crates/oauth
           - name: longbridge-httpcli
             registryName: longbridge-httpcli
             path: rust/crates/httpclient
@@ -582,9 +585,6 @@ jobs:
           - name: longbridge-candlesticks
             registryName: longbridge-candlesticks
             path: rust/crates/candlesticks
-          - name: longbridge-oauth
-            registryName: longbridge-oauth
-            path: rust/crates/oauth
           - name: longbridge
             registryName: longbridge
             path: rust
