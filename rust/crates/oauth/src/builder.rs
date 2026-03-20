@@ -12,7 +12,7 @@ use crate::{
 ///
 /// `client_id` is the only required field.
 ///
-/// The token is persisted at `~/.longbridge-openapi/tokens/<client_id>`.
+/// The token is persisted at `~/.longbridge/openapi/tokens/<client_id>`.
 pub struct OAuthBuilder {
     /// OAuth 2.0 client ID
     pub(crate) client_id: String,
@@ -44,7 +44,7 @@ impl OAuthBuilder {
     /// doc-test `fn main()`.
     ///
     /// First tries to load an existing token from
-    /// `~/.longbridge-openapi/tokens/<client_id>`.  If no valid token is found
+    /// `~/.longbridge/openapi/tokens/<client_id>`.  If no valid token is found
     /// the full browser-based authorization flow is started and `open_url` is
     /// called with the authorization URL.  The resulting token is persisted for
     /// future use.
@@ -73,7 +73,7 @@ impl OAuthBuilder {
     /// Asynchronously build the [`OAuth`] client.
     ///
     /// First tries to load an existing token from
-    /// `~/.longbridge-openapi/tokens/<client_id>`.  If no valid token is found
+    /// `~/.longbridge/openapi/tokens/<client_id>`.  If no valid token is found
     /// the full browser-based authorization flow is started and `open_url` is
     /// called with the authorization URL.  The resulting token is persisted for
     /// future use.

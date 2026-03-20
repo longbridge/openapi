@@ -4226,7 +4226,7 @@ const char *lb_http_result_response_body(const struct lb_http_result_t *http_res
  * Asynchronously build an OAuth 2.0 client.
  *
  * Tries to load an existing token from
- * `~/.longbridge-openapi/tokens/<client_id>`. If the token is missing or
+ * `~/.longbridge/openapi/tokens/<client_id>`. If the token is missing or
  * expired, starts a local callback server and calls `open_url_callback` so
  * the caller can open the authorization URL in a browser.
  *

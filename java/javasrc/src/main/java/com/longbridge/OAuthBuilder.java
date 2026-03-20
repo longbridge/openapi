@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * <p>
  * The builder will attempt to load an existing token from
- * {@code ~/.longbridge-openapi/tokens/<clientId>}. If no valid token is found,
+ * {@code ~/.longbridge/openapi/tokens/<clientId>}. If no valid token is found,
  * the full browser-based authorization flow is started and {@code onOpenUrl}
  * is called with the authorization URL. The resulting token is persisted for
  * future use.

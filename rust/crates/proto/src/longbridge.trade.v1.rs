@@ -59,7 +59,7 @@ pub struct Notification {
     #[prost(bytes = "vec", tag = "4")]
     pub data: ::prost::alloc::vec::Vec<u8>,
 }
-/// trade gateway command, see: <https://open.longbridgeapp.com/docs/trade/trade-push>
+/// trade gateway command, see: <https://open.longbridge.com/docs/trade/trade-push>
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

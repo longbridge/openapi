@@ -14,7 +14,7 @@ use crate::{
     token::{OAuthToken, token_path_for_client_id},
 };
 
-const OAUTH_BASE_URL: &str = "https://openapi.longbridgeapp.com/oauth2";
+const OAUTH_BASE_URL: &str = "https://openapi.longbridge.com/oauth2";
 
 /// Default port for the local OAuth callback server.
 pub(crate) const DEFAULT_CALLBACK_PORT: u16 = 60355;
@@ -31,7 +31,7 @@ pub(crate) struct OAuthInner {
 /// Obtain an instance via [`crate::OAuthBuilder`].  Cloning is cheap – all
 /// clones share the same internal state through an [`Arc`].
 ///
-/// The token file is stored at `~/.longbridge-openapi/tokens/<client_id>`.
+/// The token file is stored at `~/.longbridge/openapi/tokens/<client_id>`.
 #[derive(Clone)]
 pub struct OAuth(pub(crate) Arc<OAuthInner>);
 
@@ -54,7 +54,7 @@ impl OAuth {
     /// will expire within one hour.
     ///
     /// The refreshed token is persisted to
-    /// `~/.longbridge-openapi/tokens/<client_id>` so that subsequent runs can
+    /// `~/.longbridge/openapi/tokens/<client_id>` so that subsequent runs can
     /// avoid a full re-authorization.
     pub async fn access_token(&self) -> OAuthResult<String> {
         let mut guard = self.0.token.lock().await;

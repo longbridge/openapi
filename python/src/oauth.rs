@@ -63,7 +63,7 @@ impl OAuthBuilder {
     /// Build an OAuth 2.0 client (blocking).
     ///
     /// If a valid token is already cached on disk
-    /// (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+    /// (``~/.longbridge/openapi/tokens/<client_id>``) it is reused;
     /// otherwise the browser authorization flow is started and
     /// ``on_open_url`` is called with the authorization URL.
     ///
@@ -96,7 +96,7 @@ impl OAuthBuilder {
     /// Build an OAuth 2.0 client (async).
     ///
     /// If a valid token is already cached on disk
-    /// (``~/.longbridge-openapi/tokens/<client_id>``) it is reused;
+    /// (``~/.longbridge/openapi/tokens/<client_id>``) it is reused;
     /// otherwise the browser authorization flow is started and
     /// ``on_open_url`` is called with the authorization URL.
     ///

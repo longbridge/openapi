@@ -19,7 +19,7 @@ use crate::{
 };
 
 const HTTP_URL: &str = "https://openapi.longbridge.com";
-const HTTP_URL_CN: &str = "https://openapi.longportapp.cn";
+const HTTP_URL_CN: &str = "https://openapi.longbridge.cn";
 
 const USER_AGENT: &str = "openapi-sdk";
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
