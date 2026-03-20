@@ -7,13 +7,14 @@ use crate::{
     blocking::runtime::BlockingRuntime,
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-        FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, HistoryMarketTemperatureResponse,
-        IntradayLine, IssuerInfo, MarketTemperature, MarketTradingDays, MarketTradingSession,
-        OptionQuote, ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
-        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
-        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        SortOrderType, StrikePriceInfo, SubFlags, Subscription, Trade, TradeSessions, WarrantInfo,
-        WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
+        FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+        HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+        MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
+        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo,
+        SubFlags, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
+        WarrantStatus, WarrantType, WatchlistGroup,
     },
 };
 
@@ -899,6 +900,13 @@ impl QuoteContextSync {
     pub fn update_watchlist_group(&self, req: RequestUpdateWatchlistGroup) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.update_watchlist_group(req).await })
+    }
+
+    /// Get filings list
+    pub fn filings(&self, symbol: impl Into<String>) -> Result<Vec<FilingItem>> {
+        let symbol = symbol.into();
+        self.rt
+            .call(move |ctx| async move { ctx.filings(symbol).await })
     }
 
     /// Get security list

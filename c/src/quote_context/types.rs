@@ -2,7 +2,7 @@ use std::os::raw::c_char;
 
 use longbridge::quote::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
-    HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+    FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
     MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,
     ParticipantInfo, Period, PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote,
     PushTrades, QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers,
@@ -3018,6 +3018,80 @@ impl ToFFI for CHistoryMarketTemperatureResponseOwned {
             granularity: *granularity,
             records: records.to_ffi_type(),
             num_records: records.len(),
+        }
+    }
+}
+
+/// Filing item
+#[repr(C)]
+pub struct CFilingItem {
+    /// Filing ID
+    pub id: *const c_char,
+    /// Title
+    pub title: *const c_char,
+    /// Description
+    pub description: *const c_char,
+    /// File name
+    pub file_name: *const c_char,
+    /// File URLs
+    pub file_urls: *const *const c_char,
+    /// Number of file URLs
+    pub num_file_urls: usize,
+    /// Published time (Unix timestamp)
+    pub published_at: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CFilingItemOwned {
+    id: CString,
+    title: CString,
+    description: CString,
+    file_name: CString,
+    file_urls: CVec<CString>,
+    published_at: i64,
+}
+
+impl From<FilingItem> for CFilingItemOwned {
+    fn from(item: FilingItem) -> Self {
+        let FilingItem {
+            id,
+            title,
+            description,
+            file_name,
+            file_urls,
+            published_at,
+        } = item;
+        CFilingItemOwned {
+            id: id.into(),
+            title: title.into(),
+            description: description.into(),
+            file_name: file_name.into(),
+            file_urls: file_urls.into(),
+            published_at: published_at.unix_timestamp(),
+        }
+    }
+}
+
+impl ToFFI for CFilingItemOwned {
+    type FFIType = CFilingItem;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CFilingItemOwned {
+            id,
+            title,
+            description,
+            file_name,
+            file_urls,
+            published_at,
+        } = self;
+        CFilingItem {
+            id: id.to_ffi_type(),
+            title: title.to_ffi_type(),
+            description: description.to_ffi_type(),
+            file_name: file_name.to_ffi_type(),
+            file_urls: file_urls.to_ffi_type(),
+            num_file_urls: file_urls.len(),
+            published_at: *published_at,
         }
     }
 }

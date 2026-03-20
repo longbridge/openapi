@@ -1098,6 +1098,24 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtime
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextFilings(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(ObjectArray(context.ctx.filings(symbol).await?))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextSecurityList(
     mut env: JNIEnv,
     _class: JClass,

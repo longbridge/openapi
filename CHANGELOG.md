@@ -4,11 +4,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [4.0.3]
+
+## Changed
+
+- Migrate OAuth base URL from `openapi.longbridgeapp.com` to `openapi.longbridge.com`.
+- Migrate CN endpoint URLs from `longportapp.cn` to `longbridge.cn`.
+- Change OAuth token storage path from `~/.longbridge-openapi/` to `~/.longbridge/openapi/`.
+- Update all README docs to use `openapi.longbridge.com` for OAuth registration endpoints.
+- Update proto submodule with latest upstream changes (URL migration in proto comments).
+
+# [4.0.2]
+
+## Added
+
+- **All bindings:** New `ContentContext` (Rust, C, C++, Java, Python, Node.js) with two methods:
+  - `topics(symbol)` — get discussion topics for a security.
+  - `news(symbol)` — get news list for a security.
+- **Quote API:** `QuoteContext.filings(symbol)` — get regulatory filings for a security. Available in all bindings (Rust, C, C++, Java, Python, Node.js).
+- **MCP server:** Expose `news`, `topics`, and `filings` as MCP tools.
+
+# [4.0.1]
+
+## Fixed
+
+- **Python:** Fix `str()` on enum fields (e.g. `CashFlow.direction`, `Subscription`, `OptionDirection`) causing a hang/deadlock by registering previously missing types in the quote and trade modules. ([#476](https://github.com/longbridge/openapi/issues/476))
+
 # [4.0.0]
 
 ## Added
 
-- **OAuth 2.0** authentication for all language bindings (Rust, C, C++, Java, Python, Node.js). Use `OAuthBuilder` to run the browser flow; pass the resulting `OAuth` handle to `Config::from_oauth()`. Tokens are persisted under `~/.longbridge-openapi/tokens/<client_id>` and reused; the browser is only opened when no valid token exists.
+- **OAuth 2.0** authentication for all language bindings (Rust, C, C++, Java, Python, Node.js). Use `OAuthBuilder` to run the browser flow; pass the resulting `OAuth` handle to `Config::from_oauth()`. Tokens are persisted under `~/.longbridge/openapi/tokens/<client_id>` and reused; the browser is only opened when no valid token exists.
 
 - **Python — async callbacks:** `AsyncQuoteContext` and `AsyncTradeContext` accept async callbacks for `set_on_quote`, `set_on_depth`, `set_on_brokers`, `set_on_trades`, `set_on_candlestick`, and `set_on_order_changed`. If a callback returns a coroutine, the SDK schedules it on the asyncio loop. Sync callbacks still work as before.
 - **Python — `loop_` parameter:** `AsyncQuoteContext.create()` and `AsyncTradeContext.create()` take an optional `loop_` argument. When using async callbacks, pass `loop_=asyncio.get_running_loop()` so the SDK can schedule coroutines with `asyncio.run_coroutine_threadsafe`. Omit `loop_` when using only sync callbacks.

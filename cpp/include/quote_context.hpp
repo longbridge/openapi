@@ -239,6 +239,11 @@ public:
   void update_watchlist_group(const UpdateWatchlistGroup& req,
                               AsyncCallback<QuoteContext, void> callback) const;
 
+  /// Get filings
+  void filings(const std::string& symbol,
+               AsyncCallback<QuoteContext, std::vector<FilingItem>> callback)
+    const;
+
   /// Get security list
   void security_list(
     Market market,

@@ -1,7 +1,8 @@
 use longbridge::{
     Decimal, Error, Market, QuoteContext, TradeContext,
+    content::{ContentContext, NewsItem, TopicItem},
     quote::{
-        AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+        AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine, FilingItem,
         HistoryMarketTemperatureResponse, MarketTemperature, MarketTradingDays, OptionQuote,
         ParticipantInfo, Period, SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo,
         StrikePriceInfo, Trade, TradeSessions,
@@ -25,14 +26,20 @@ const DATE_FORMAT: &[BorrowedFormatItem] = format_description!("[year]-[month]-[
 pub(crate) struct Longbridge {
     quote_context: QuoteContext,
     trade_context: TradeContext,
+    content_context: ContentContext,
 }
 
 impl Longbridge {
     #[inline]
-    pub(crate) fn new(quote_context: QuoteContext, trade_context: TradeContext) -> Self {
+    pub(crate) fn new(
+        quote_context: QuoteContext,
+        trade_context: TradeContext,
+        content_context: ContentContext,
+    ) -> Self {
         Self {
             quote_context,
             trade_context,
+            content_context,
         }
     }
 }
@@ -553,5 +560,38 @@ impl Longbridge {
             .into_iter()
             .map(Json)
             .collect::<Vec<_>>())
+    }
+
+    /// Get news list for a stock symbol.
+    async fn news(&self, symbol: String) -> Result<Vec<Json<NewsItem>>, Error> {
+        Ok(self
+            .content_context
+            .news(symbol)
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect())
+    }
+
+    /// Get discussion topics list for a stock symbol.
+    async fn topics(&self, symbol: String) -> Result<Vec<Json<TopicItem>>, Error> {
+        Ok(self
+            .content_context
+            .topics(symbol)
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect())
+    }
+
+    /// Get filings list for a stock symbol.
+    async fn filings(&self, symbol: String) -> Result<Vec<Json<FilingItem>>, Error> {
+        Ok(self
+            .quote_context
+            .filings(symbol)
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect())
     }
 }

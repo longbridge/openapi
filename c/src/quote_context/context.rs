@@ -26,8 +26,8 @@ use crate::{
         },
         types::{
             CCandlestickOwned, CCapitalDistributionResponseOwned, CCapitalFlowLineOwned,
-            CCreateWatchlistGroup, CHistoryMarketTemperatureResponseOwned, CIntradayLineOwned,
-            CIssuerInfoOwned, CMarketTemperatureOwned, CMarketTradingDaysOwned,
+            CCreateWatchlistGroup, CFilingItemOwned, CHistoryMarketTemperatureResponseOwned,
+            CIntradayLineOwned, CIssuerInfoOwned, CMarketTemperatureOwned, CMarketTradingDaysOwned,
             CMarketTradingSessionOwned, COptionQuoteOwned, CParticipantInfoOwned, CPushBrokers,
             CPushBrokersOwned, CPushCandlestick, CPushCandlestickOwned, CPushDepth,
             CPushDepthOwned, CPushQuote, CPushQuoteOwned, CPushTrades, CPushTradesOwned,
@@ -1176,6 +1176,22 @@ pub unsafe extern "C" fn lb_quote_context_realtime_candlesticks(
             .realtime_candlesticks(symbol, period.into(), count)
             .await?
             .into();
+        Ok(rows)
+    });
+}
+
+/// Get filings
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_filings(
+    ctx: *const CQuoteContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let rows: CVec<CFilingItemOwned> = ctx_inner.filings(symbol).await?.into();
         Ok(rows)
     });
 }

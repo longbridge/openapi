@@ -39,7 +39,7 @@ First, register an OAuth client to get your `client_id`:
 _bash / macOS / Linux_
 
 ```bash
-curl -X POST https://openapi.longbridgeapp.com/oauth2/register \
+curl -X POST https://openapi.longbridge.com/oauth2/register \
   -H "Content-Type: application/json" \
   -d '{
     "client_name": "My Application",
@@ -51,7 +51,7 @@ curl -X POST https://openapi.longbridgeapp.com/oauth2/register \
 _PowerShell (Windows)_
 
 ```powershell
-Invoke-RestMethod -Method Post -Uri https://openapi.longbridgeapp.com/oauth2/register `
+Invoke-RestMethod -Method Post -Uri https://openapi.longbridge.com/oauth2/register `
   -ContentType "application/json" `
   -Body '{
     "client_name": "My Application",
@@ -75,7 +75,7 @@ Save the `client_id` for use in your application.
 **Step 2: Build OAuth client and create a Config**
 
 `lb_oauth_new` loads a cached token from
-`~/.longbridge-openapi/tokens/<client_id>` (`%USERPROFILE%\.longbridge-openapi\tokens\<client_id>` on Windows)
+`~/.longbridge/openapi/tokens/<client_id>` (`%USERPROFILE%\.longbridge\openapi\tokens\<client_id>` on Windows)
 if one exists and is still valid, or starts the browser authorization flow
 automatically.  The token is persisted to the same path after a successful
 authorization or refresh.  The resulting `lb_oauth_t*` handle is passed
@@ -135,14 +135,14 @@ setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 
 ### Other environment variables
 
-| Name                           | Description                                                                      |
-|--------------------------------|----------------------------------------------------------------------------------|
-| LONGBRIDGE_LANGUAGE              | Language identifier, `zh-CN`, `zh-HK` or `en` (Default: `en`)                    |
-| LONGBRIDGE_HTTP_URL              | HTTP endpoint url (Default: `https://openapi.longbridge.com`)                    |
-| LONGBRIDGE_QUOTE_WS_URL          | Quote websocket endpoint url (Default: `wss://openapi-quote.longbridge.com/v2`)  |
-| LONGBRIDGE_TRADE_WS_URL          | Trade websocket endpoint url (Default: `wss://openapi-trade.longbridge.com/v2`)  |
-| LONGBRIDGE_ENABLE_OVERNIGHT      | Enable overnight quote, `true` or `false` (Default: `false`)                     |
-| LONGBRIDGE_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                  |
+| Name                             | Description                                                                     |
+|----------------------------------|---------------------------------------------------------------------------------|
+| LONGBRIDGE_LANGUAGE              | Language identifier, `zh-CN`, `zh-HK` or `en` (Default: `en`)                   |
+| LONGBRIDGE_HTTP_URL              | HTTP endpoint url (Default: `https://openapi.longbridge.com`)                   |
+| LONGBRIDGE_QUOTE_WS_URL          | Quote websocket endpoint url (Default: `wss://openapi-quote.longbridge.com/v2`) |
+| LONGBRIDGE_TRADE_WS_URL          | Trade websocket endpoint url (Default: `wss://openapi-trade.longbridge.com/v2`) |
+| LONGBRIDGE_ENABLE_OVERNIGHT      | Enable overnight quote, `true` or `false` (Default: `false`)                    |
+| LONGBRIDGE_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                 |
 | LONGBRIDGE_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)        |
 | LONGBRIDGE_LOG_PATH              | Set the path of the log files (Default: `no logs`)                              |
 

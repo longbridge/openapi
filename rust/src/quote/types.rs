@@ -1981,6 +1981,29 @@ pub struct HistoryMarketTemperatureResponse {
     pub records: Vec<MarketTemperature>,
 }
 
+/// Filing item
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FilingItem {
+    /// Filing ID
+    pub id: String,
+    /// Title
+    pub title: String,
+    /// Description
+    #[serde(default)]
+    pub description: String,
+    /// File name
+    pub file_name: String,
+    /// File URLs
+    pub file_urls: Vec<String>,
+    /// Published time
+    #[serde(
+        rename = "publish_at",
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "crate::serde_utils::timestamp::deserialize"
+    )]
+    pub published_at: OffsetDateTime,
+}
+
 impl_serde_for_enum_string!(Granularity);
 impl_default_for_enum_string!(
     OptionType,

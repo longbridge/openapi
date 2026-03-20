@@ -26,7 +26,7 @@ impl OAuth {
     /// Build an OAuth 2.0 client.
     ///
     /// If a valid token is already cached on disk
-    /// (`~/.longbridge-openapi/tokens/<clientId>`) it is reused; otherwise
+    /// (`~/.longbridge/openapi/tokens/<clientId>`) it is reused; otherwise
     /// the browser authorization flow is started and `onOpenUrl` is called
     /// with the authorization URL.
     ///

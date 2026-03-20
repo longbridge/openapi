@@ -23,7 +23,15 @@
 - [AsyncTradeContext](reference_all.md#longbridge.openapi.AsyncTradeContext)
 
   Async trade API for use with asyncio; create via `AsyncTradeContext.create(config)` and await in asyncio.
-  
+
+- [ContentContext](reference_all.md#longbridge.openapi.ContentContext)
+
+  The Content API part of the SDK, e.g.: get news, discussion topics for a security.
+
+- [AsyncContentContext](reference_all.md#longbridge.openapi.AsyncContentContext)
+
+  Async content API for use with asyncio; create via `AsyncContentContext.create(config)` and await in asyncio.
+
 ## Quickstart
 
 _Install Longbridge OpenAPI SDK_
@@ -135,6 +143,25 @@ resp = ctx.submit_order(
     remark="Hello from Python SDK",
 )
 print(resp)
+```
+
+## Content API _(Get news and topics for a security)_
+
+```python
+from longbridge.openapi import Config, ContentContext
+
+config = Config.from_apikey_env()
+
+# Create a context for content APIs
+ctx = ContentContext(config)
+
+# Get news for a security
+news = ctx.news("700.HK")
+print(news)
+
+# Get discussion topics for a security
+topics = ctx.topics("700.HK")
+print(topics)
 ```
 
 ## Asynchronous API

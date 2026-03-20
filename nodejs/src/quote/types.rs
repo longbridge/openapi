@@ -1404,6 +1404,26 @@ pub struct MarketTemperature {
     timestamp: DateTime<Utc>,
 }
 
+/// Filing item
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::quote::FilingItem")]
+pub struct FilingItem {
+    /// Filing ID
+    id: String,
+    /// Title
+    title: String,
+    /// Description
+    description: String,
+    /// File name
+    file_name: String,
+    /// File URLs
+    file_urls: Vec<String>,
+    /// Published time
+    #[js(datetime)]
+    published_at: DateTime<Utc>,
+}
+
 /// Data granularity
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]

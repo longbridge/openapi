@@ -1,5 +1,6 @@
 mod async_callback;
 mod config;
+mod content;
 mod decimal;
 mod error;
 mod http_client;
@@ -25,6 +26,7 @@ fn longbridge(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     openapi.add_class::<error::ErrorKind>()?;
     quote::register_types(&openapi)?;
     trade::register_types(&openapi)?;
+    content::register_types(&openapi)?;
 
     m.add_submodule(&openapi)?;
     Ok(())

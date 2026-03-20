@@ -217,6 +217,16 @@ export declare class Config {
   static fromOAuth(oauth: OAuth, extra?: ExtraConfigParams | undefined | null): Config
 }
 
+/** Content context */
+export declare class ContentContext {
+  /** Create a new `ContentContext` */
+  static new(config: Config): Promise<ContentContext>
+  /** Get discussion topics list */
+  topics(symbol: string): Promise<Array<TopicItem>>
+  /** Get news list */
+  news(symbol: string): Promise<Array<NewsItem>>
+}
+
 export declare class Decimal {
   static E(): Decimal
   static E_INVERSE(): Decimal
@@ -407,6 +417,24 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
+}
+
+/** Filing item */
+export declare class FilingItem {
+  toString(): string
+  toJSON(): any
+  /** Filing ID */
+  get id(): string
+  /** Title */
+  get title(): string
+  /** Description */
+  get description(): string
+  /** File name */
+  get fileName(): string
+  /** File URLs */
+  get fileUrls(): Array<string>
+  /** Published time */
+  get publishedAt(): Date
 }
 
 /** Frozen transaction fee */
@@ -608,6 +636,28 @@ export declare class NaiveDatetime {
   toJSON(): any
 }
 
+/** News item */
+export declare class NewsItem {
+  toString(): string
+  toJSON(): any
+  /** News ID */
+  get id(): string
+  /** Title */
+  get title(): string
+  /** Description */
+  get description(): string
+  /** URL */
+  get url(): string
+  /** Published time */
+  get publishedAt(): Date
+  /** Comments count */
+  get commentsCount(): number
+  /** Likes count */
+  get likesCount(): number
+  /** Shares count */
+  get sharesCount(): number
+}
+
 /**
  * OAuth 2.0 client handle for Longbridge OpenAPI
  *
@@ -629,7 +679,7 @@ export declare class OAuth {
    * Build an OAuth 2.0 client.
    *
    * If a valid token is already cached on disk
-   * (`~/.longbridge-openapi/tokens/<clientId>`) it is reused; otherwise
+   * (`~/.longbridge/openapi/tokens/<clientId>`) it is reused; otherwise
    * the browser authorization flow is started and `onOpenUrl` is called
    * with the authorization URL.
    *
@@ -1542,6 +1592,8 @@ export declare class QuoteContext {
    * ```
    */
   updateWatchlistGroup(req: UpdateWatchlistGroup): Promise<void>
+  /** Get filings list */
+  filings(symbol: string): Promise<Array<FilingItem>>
   /**
    * Get security list
    *
@@ -1989,9 +2041,31 @@ export declare class Subscription {
 export declare class Time {
   constructor(hour: number, minute: number, second: number)
   get hour(): number
-  get monute(): number
+  get minute(): number
   get toString(): string
   toJSON(): any
+}
+
+/** Topic item */
+export declare class TopicItem {
+  toString(): string
+  toJSON(): any
+  /** Topic ID */
+  get id(): string
+  /** Title */
+  get title(): string
+  /** Description */
+  get description(): string
+  /** URL */
+  get url(): string
+  /** Published time */
+  get publishedAt(): Date
+  /** Comments count */
+  get commentsCount(): number
+  /** Likes count */
+  get likesCount(): number
+  /** Shares count */
+  get sharesCount(): number
 }
 
 /** Trade */

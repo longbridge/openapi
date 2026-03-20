@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 mod config;
+mod content;
 mod decimal;
 mod error;
 mod http_client;

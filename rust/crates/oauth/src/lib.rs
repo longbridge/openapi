@@ -12,7 +12,7 @@
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     // Build an OAuth client.  If a token exists on disk it is loaded;
 //!     // otherwise the browser authorization flow is triggered.
-//!     // Token is persisted at ~/.longbridge-openapi/tokens/<client_id>
+//!     // Token is persisted at ~/.longbridge/openapi/tokens/<client_id>
 //!     let oauth = OAuthBuilder::new("your-client-id")
 //!         // .callback_port(8080)  // optional, default 60355
 //!         .build(|url| println!("Please visit: {url}"))
@@ -142,7 +142,7 @@ mod tests {
         let path = token_path_for_client_id("my-app").unwrap();
         let path_str = path.to_string_lossy().replace('\\', "/");
         assert!(
-            path_str.ends_with(".longbridge-openapi/tokens/my-app"),
+            path_str.ends_with(".longbridge/openapi/tokens/my-app"),
             "unexpected path: {path_str}"
         );
     }

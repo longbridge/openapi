@@ -965,3 +965,47 @@ impl_java_class!(
         records
     ]
 );
+
+impl_java_class!(
+    "com/longbridge/quote/FilingItem",
+    longbridge::quote::FilingItem,
+    [
+        id,
+        title,
+        description,
+        file_name,
+        #[java(objarray)]
+        file_urls,
+        published_at
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/content/TopicItem",
+    longbridge::content::TopicItem,
+    [
+        id,
+        title,
+        description,
+        url,
+        published_at,
+        comments_count,
+        likes_count,
+        shares_count
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/content/NewsItem",
+    longbridge::content::NewsItem,
+    [
+        id,
+        title,
+        description,
+        url,
+        published_at,
+        comments_count,
+        likes_count,
+        shares_count
+    ]
+);

@@ -3,7 +3,7 @@ mod server;
 use std::{path::PathBuf, sync::Arc};
 
 use clap::Parser;
-use longbridge::{Config, QuoteContext, TradeContext};
+use longbridge::{Config, QuoteContext, TradeContext, content::ContentContext};
 use poem::{EndpointExt, Route, Server, listener::TcpListener, middleware::Cors};
 use poem_mcpserver::{McpServer, stdio::stdio, streamable_http};
 use server::Longbridge;
@@ -49,11 +49,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let (quote_context, _) = QuoteContext::try_new(config.clone()).await?;
     let (trade_context, _) = TradeContext::try_new(config.clone()).await?;
+    let content_context = ContentContext::try_new(config.clone())?;
     let readonly = cli.readonly;
 
     if !cli.http {
         tracing::info!("Starting MCP server with stdio transport");
-        let server = create_mcp_server(quote_context, trade_context, readonly);
+        let server = create_mcp_server(quote_context, trade_context, content_context, readonly);
         stdio(server).await?;
     } else {
         tracing::info!(
@@ -65,7 +66,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .at(
                 "/",
                 streamable_http::endpoint(move |_| {
-                    create_mcp_server(quote_context.clone(), trade_context.clone(), readonly)
+                    create_mcp_server(
+                        quote_context.clone(),
+                        trade_context.clone(),
+                        content_context.clone(),
+                        readonly,
+                    )
                 }),
             )
             .with(Cors::new());
@@ -78,9 +84,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn create_mcp_server(
     quote_context: QuoteContext,
     trade_context: TradeContext,
+    content_context: ContentContext,
     readonly: bool,
 ) -> McpServer<Longbridge> {
-    let mut server = McpServer::new().tools(Longbridge::new(quote_context, trade_context));
+    let mut server = McpServer::new().tools(Longbridge::new(
+        quote_context,
+        trade_context,
+        content_context,
+    ));
     if readonly {
         server = server.disable_tools(["submit_order"]);
     }

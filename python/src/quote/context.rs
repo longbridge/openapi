@@ -15,7 +15,7 @@ use crate::{
         push::handle_push_event,
         types::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+            FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
             QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security, SecurityBrokers,
@@ -528,6 +528,16 @@ impl QuoteContext {
         }
         self.ctx.update_watchlist_group(req).map_err(ErrorNewType)?;
         Ok(())
+    }
+
+    /// Get filings list
+    pub fn filings(&self, symbol: String) -> PyResult<Vec<FilingItem>> {
+        self.ctx
+            .filings(symbol)
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Get security list

@@ -14,7 +14,7 @@ use crate::{
         requests::{CreateWatchlistGroup, DeleteWatchlistGroup, UpdateWatchlistGroup},
         types::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+            FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
             QuotePackageDetail, RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex,
@@ -1004,6 +1004,18 @@ impl QuoteContext {
             .update_watchlist_group(req.into())
             .await
             .map_err(ErrorNewType)?)
+    }
+
+    /// Get filings list
+    #[napi]
+    pub async fn filings(&self, symbol: String) -> Result<Vec<FilingItem>> {
+        self.ctx
+            .filings(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     /// Get security list

@@ -123,7 +123,7 @@ pub struct ReconnectResponse {
     #[prost(uint32, tag = "4")]
     pub online: u32,
 }
-/// control command, see document: <https://open.longbridgeapp.com/docs/socket/control-command>
+/// control command, see document: <https://open.longbridge.com/docs/socket/control-command>
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

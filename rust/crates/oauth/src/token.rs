@@ -12,11 +12,12 @@ use crate::error::{OAuthError, OAuthResult};
 
 /// Returns the token file path for the given client ID.
 ///
-/// Path: `~/.longbridge-openapi/tokens/<client_id>`
+/// Path: `~/.longbridge/openapi/tokens/<client_id>`
 pub(crate) fn token_path_for_client_id(client_id: &str) -> OAuthResult<PathBuf> {
     let home = dirs::home_dir().ok_or(OAuthError::NoHomeDir)?;
     Ok(home
-        .join(".longbridge-openapi")
+        .join(".longbridge")
+        .join("openapi")
         .join("tokens")
         .join(client_id))
 }

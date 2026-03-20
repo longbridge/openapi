@@ -34,7 +34,7 @@ public:
 /// Builder for constructing an OAuth 2.0 client
 ///
 /// Tries to load an existing token from
-/// `~/.longbridge-openapi/tokens/<client_id>`. If the token is missing or
+/// `~/.longbridge/openapi/tokens/<client_id>`. If the token is missing or
 /// expired, starts a local callback server and calls `open_url` so the caller
 /// can open the authorization URL in a browser.
 class OAuthBuilder
