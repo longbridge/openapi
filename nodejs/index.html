@@ -27,11 +27,11 @@
 <p><strong>Step 1: Register OAuth Client</strong></p>
 <p>First, register an OAuth client to get your <code>client_id</code>:</p>
 <p><em>bash / macOS / Linux</em></p>
-<pre><code class="bash"><span class="hl-0">curl</span><span class="hl-1"> </span><span class="hl-3">-X</span><span class="hl-1"> </span><span class="hl-2">POST</span><span class="hl-1"> </span><span class="hl-2">https://openapi.longbridgeapp.com/oauth2/register</span><span class="hl-1"> </span><span class="hl-4">\</span><br/><span class="hl-1">  </span><span class="hl-3">-H</span><span class="hl-1"> </span><span class="hl-2">&quot;Content-Type: application/json&quot;</span><span class="hl-1"> </span><span class="hl-4">\</span><br/><span class="hl-1">  </span><span class="hl-3">-d</span><span class="hl-1"> </span><span class="hl-2">&#39;{</span><br/><span class="hl-2">    &quot;client_name&quot;: &quot;My Application&quot;,</span><br/><span class="hl-2">    &quot;redirect_uris&quot;: [&quot;http://localhost:60355/callback&quot;],</span><br/><span class="hl-2">    &quot;grant_types&quot;: [&quot;authorization_code&quot;, &quot;refresh_token&quot;]</span><br/><span class="hl-2">  }&#39;</span>
+<pre><code class="bash"><span class="hl-0">curl</span><span class="hl-1"> </span><span class="hl-3">-X</span><span class="hl-1"> </span><span class="hl-2">POST</span><span class="hl-1"> </span><span class="hl-2">https://openapi.longbridge.com/oauth2/register</span><span class="hl-1"> </span><span class="hl-4">\</span><br/><span class="hl-1">  </span><span class="hl-3">-H</span><span class="hl-1"> </span><span class="hl-2">&quot;Content-Type: application/json&quot;</span><span class="hl-1"> </span><span class="hl-4">\</span><br/><span class="hl-1">  </span><span class="hl-3">-d</span><span class="hl-1"> </span><span class="hl-2">&#39;{</span><br/><span class="hl-2">    &quot;client_name&quot;: &quot;My Application&quot;,</span><br/><span class="hl-2">    &quot;redirect_uris&quot;: [&quot;http://localhost:60355/callback&quot;],</span><br/><span class="hl-2">    &quot;grant_types&quot;: [&quot;authorization_code&quot;, &quot;refresh_token&quot;]</span><br/><span class="hl-2">  }&#39;</span>
 </code><button type="button">Copy</button></pre>
 
 <p><em>PowerShell (Windows)</em></p>
-<pre><code class="powershell">Invoke-RestMethod -Method Post -Uri https://openapi.longbridgeapp.com/oauth2/register `
+<pre><code class="powershell">Invoke-RestMethod -Method Post -Uri https://openapi.longbridge.com/oauth2/register `
   -ContentType "application/json" `
   -Body '{
     "client_name": "My Application",
@@ -47,8 +47,8 @@
 <p>Save the <code>client_id</code> for use in your application.</p>
 <p><strong>Step 2: Build an OAuth client and create Config</strong></p>
 <p><code>OAuth.build()</code> loads a cached token from
-<code>~/.longbridge-openapi/tokens/&lt;client_id&gt;</code>
-(<code>%USERPROFILE%\.longbridge-openapi\tokens\&lt;client_id&gt;</code> on Windows) if one
+<code>~/.longbridge/openapi/tokens/&lt;client_id&gt;</code>
+(<code>%USERPROFILE%\.longbridge\openapi\tokens\&lt;client_id&gt;</code> on Windows) if one
 exists and is still valid, or starts the browser authorization flow
 automatically.  The token is persisted to the same path after a successful
 authorization or refresh.</p>
