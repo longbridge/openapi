@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [4.0.4]
+
+## Fixed
+
+- **Rust:** Fix copy-paste field mapping bugs in `TryFrom<quote::FilterWarrant> for WarrantInfo` where `strike_price`, `itm_otm`, `implied_volatility`, `delta`, `effective_leverage`, `conversion_ratio`, and `balance_point` were incorrectly mapped to `last_done`. ([#485](https://github.com/longbridge/openapi/pull/485))
+
 # [4.0.3]
 
 ## Changed
