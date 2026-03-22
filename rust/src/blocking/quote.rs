@@ -35,19 +35,18 @@ impl QuoteContextSync {
 
     /// Returns the member ID
     pub fn member_id(&self) -> Result<i64> {
-        self.rt.call(|ctx| async move { Ok(ctx.member_id()) })
+        self.rt.call(|ctx| async move { ctx.member_id().await })
     }
 
     /// Returns the quote level
     pub fn quote_level(&self) -> Result<String> {
-        self.rt
-            .call(|ctx| async move { Ok(ctx.quote_level().to_string()) })
+        self.rt.call(|ctx| async move { ctx.quote_level().await })
     }
 
     /// Returns the quote package details
     pub fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
         self.rt
-            .call(|ctx| async move { Ok(ctx.quote_package_details().to_vec()) })
+            .call(|ctx| async move { ctx.quote_package_details().await })
     }
 
     /// Subscribe

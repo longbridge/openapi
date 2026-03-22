@@ -1,6 +1,6 @@
 use std::{
     collections::{HashMap, HashSet},
-    sync::Arc,
+    sync::{Arc, RwLock},
 };
 
 use comfy_table::Table;
@@ -38,6 +38,9 @@ use crate::{
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);
 
 pub(crate) enum Command {
+    EnsureConnected {
+        reply_tx: oneshot::Sender<Result<()>>,
+    },
     Request {
         command_code: u8,
         body: Vec<u8>,
@@ -125,6 +128,14 @@ pub(crate) struct MarketPackageDetail {
     pub(crate) warning: String,
 }
 
+/// User quote profile, populated after first WS connection.
+#[derive(Debug, Default, Clone)]
+pub(crate) struct UserProfile {
+    pub(crate) member_id: i64,
+    pub(crate) quote_level: String,
+    pub(crate) quote_package_details: Vec<QuotePackageDetail>,
+}
+
 pub(crate) struct Core {
     config: Arc<Config>,
     rate_limit: Vec<(u8, RateLimit)>,
@@ -133,30 +144,50 @@ pub(crate) struct Core {
     event_tx: mpsc::UnboundedSender<WsEvent>,
     event_rx: mpsc::UnboundedReceiver<WsEvent>,
     http_cli: HttpClient,
-    ws_cli: WsClient,
+    ws_cli: Option<WsClient>,
     session: Option<WsSession>,
     close: bool,
     subscriptions: HashMap<String, SubFlags>,
     trading_days: TradingDays,
     store: Store,
-    member_id: i64,
-    quote_level: String,
-    quote_package_details: Vec<QuotePackageDetail>,
     push_candlestick_mode: PushCandlestickMode,
+    user_profile: Arc<RwLock<Option<UserProfile>>>,
 }
 
 impl Core {
-    pub(crate) async fn try_new(
+    pub(crate) fn new(
         config: Arc<Config>,
         command_rx: mpsc::UnboundedReceiver<Command>,
         push_tx: mpsc::UnboundedSender<PushEvent>,
-    ) -> Result<Self> {
+        user_profile: Arc<RwLock<Option<UserProfile>>>,
+    ) -> Self {
         let http_cli = config.create_http_client();
+        let push_candlestick_mode = config.push_candlestick_mode.unwrap_or_default();
+        let (event_tx, event_rx) = mpsc::unbounded_channel();
+        Self {
+            config,
+            rate_limit: vec![],
+            command_rx,
+            push_tx,
+            event_tx,
+            event_rx,
+            http_cli,
+            ws_cli: None,
+            session: None,
+            close: false,
+            subscriptions: HashMap::new(),
+            trading_days: TradingDays::default(),
+            store: Store::default(),
+            push_candlestick_mode,
+            user_profile,
+        }
+    }
+
+    async fn connect(&mut self) -> Result<()> {
+        let http_cli = self.config.create_http_client();
         let otp = http_cli.get_otp().await?;
 
-        let (event_tx, event_rx) = mpsc::unbounded_channel();
-
-        let (url, res) = config.create_quote_ws_request().await;
+        let (url, res) = self.config.create_quote_ws_request().await;
         tracing::info!(url = url, "connecting to quote server");
         let request = res.map_err(WsClientError::from)?;
 
@@ -165,14 +196,14 @@ impl Core {
             ProtocolVersion::Version1,
             CodecType::Protobuf,
             Platform::OpenAPI,
-            event_tx.clone(),
+            self.event_tx.clone(),
             vec![],
         )
         .await?;
 
         tracing::info!(url = url, "quote server connected");
 
-        let session = ws_cli.request_auth(otp, config.create_metadata()).await?;
+        let session = ws_cli.request_auth(otp, self.config.create_metadata()).await?;
 
         // fetch user profile
         let resp = ws_cli
@@ -180,12 +211,12 @@ impl Core {
                 cmd_code::QUERY_USER_QUOTE_PROFILE,
                 None,
                 quote::UserQuoteProfileRequest {
-                    language: config.language.to_string(),
+                    language: self.config.language.to_string(),
                 },
             )
             .await?;
         let member_id = resp.member_id;
-        let quote_level = resp.quote_level;
+        let quote_level = resp.quote_level.clone();
         let (quote_package_details, quote_package_details_by_market) = resp
             .quote_level_detail
             .map(|details| {
@@ -232,7 +263,6 @@ impl Core {
         ws_cli.set_rate_limit(rate_limit.clone());
 
         let current_trade_days = fetch_trading_days(&ws_cli).await?;
-        let push_candlestick_mode = config.push_candlestick_mode.unwrap_or_default();
 
         let mut table = Table::new();
         for market_packages in quote_package_details_by_market {
@@ -250,7 +280,7 @@ impl Core {
             }
         }
 
-        if config.enable_print_quote_packages {
+        if self.config.enable_print_quote_packages {
             println!("{table}");
         }
 
@@ -261,40 +291,24 @@ impl Core {
             "quote context initialized",
         );
 
-        Ok(Self {
-            config,
-            rate_limit,
-            command_rx,
-            push_tx,
-            event_tx,
-            event_rx,
-            http_cli,
-            ws_cli,
-            session: Some(session),
-            close: false,
-            subscriptions: HashMap::new(),
-            trading_days: current_trade_days,
-            store: Store::default(),
+        *self.user_profile.write().unwrap() = Some(UserProfile {
             member_id,
             quote_level,
             quote_package_details,
-            push_candlestick_mode,
-        })
+        });
+
+        self.rate_limit = rate_limit;
+        self.trading_days = current_trade_days;
+        self.ws_cli = Some(ws_cli);
+        self.session = Some(session);
+        Ok(())
     }
 
-    #[inline]
-    pub(crate) fn member_id(&self) -> i64 {
-        self.member_id
-    }
-
-    #[inline]
-    pub(crate) fn quote_level(&self) -> &str {
-        &self.quote_level
-    }
-
-    #[inline]
-    pub(crate) fn quote_package_details(&self) -> &[QuotePackageDetail] {
-        &self.quote_package_details
+    async fn ensure_connected(&mut self) -> Result<()> {
+        if self.ws_cli.is_none() {
+            self.connect().await?;
+        }
+        Ok(())
     }
 
     pub(crate) async fn run(mut self) {
@@ -322,7 +336,7 @@ impl Core {
                 )
                 .await
                 {
-                    Ok(ws_cli) => self.ws_cli = ws_cli,
+                    Ok(ws_cli) => self.ws_cli = Some(ws_cli),
                     Err(err) => {
                         tracing::error!(error = %err, "failed to connect quote server");
                         continue;
@@ -332,10 +346,10 @@ impl Core {
                 tracing::info!(url = url, "quote server connected");
 
                 // request new session
+                let ws_cli = self.ws_cli.as_ref().expect("ws_cli set above");
                 match &self.session {
                     Some(session) if !session.is_expired() => {
-                        match self
-                            .ws_cli
+                        match ws_cli
                             .request_reconnect(&session.session_id, self.config.create_metadata())
                             .await
                         {
@@ -356,8 +370,7 @@ impl Core {
                             }
                         };
 
-                        match self
-                            .ws_cli
+                        match ws_cli
                             .request_auth(otp, self.config.create_metadata())
                             .await
                         {
@@ -406,8 +419,10 @@ impl Core {
                     }
                 }
                 _ = update_trading_days_interval.tick() => {
-                    if let Ok(days) = fetch_trading_days(&self.ws_cli).await {
-                        self.trading_days = days;
+                    if let Some(ws_cli) = &self.ws_cli {
+                        if let Ok(days) = fetch_trading_days(ws_cli).await {
+                            self.trading_days = days;
+                        }
                     }
                 }
             }
@@ -416,6 +431,11 @@ impl Core {
 
     async fn handle_command(&mut self, command: Command) -> Result<()> {
         match command {
+            Command::EnsureConnected { reply_tx } => {
+                let res = self.ensure_connected().await;
+                let _ = reply_tx.send(res);
+                Ok(())
+            }
             Command::Request {
                 command_code,
                 body,
@@ -501,12 +521,22 @@ impl Core {
         body: Vec<u8>,
         reply_tx: oneshot::Sender<Result<Vec<u8>>>,
     ) -> Result<()> {
-        let res = self.ws_cli.request_raw(command_code, None, body).await;
+        if let Err(e) = self.ensure_connected().await {
+            let _ = reply_tx.send(Err(e));
+            return Ok(());
+        }
+        let res = self
+            .ws_cli
+            .as_ref()
+            .expect("ws_cli connected above")
+            .request_raw(command_code, None, body)
+            .await;
         let _ = reply_tx.send(res.map_err(Into::into));
         Ok(())
     }
 
     async fn handle_subscribe(&mut self, symbols: Vec<String>, sub_types: SubFlags) -> Result<()> {
+        self.ensure_connected().await?;
         // send request
         let req = SubscribeRequest {
             symbol: symbols.clone(),
@@ -514,6 +544,8 @@ impl Core {
             is_first_push: true,
         };
         self.ws_cli
+            .as_ref()
+            .expect("ws_cli connected above")
             .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
             .await?;
 
@@ -533,6 +565,7 @@ impl Core {
         symbols: Vec<String>,
         sub_types: SubFlags,
     ) -> Result<()> {
+        self.ensure_connected().await?;
         tracing::info!(symbols = ?symbols, sub_types = ?sub_types, "unsubscribe");
 
         // send requests
@@ -565,8 +598,9 @@ impl Core {
             })
             .collect::<Vec<_>>();
 
+        let ws_cli = self.ws_cli.as_ref().expect("ws_cli connected in handle_unsubscribe");
         for req in requests {
-            self.ws_cli
+            ws_cli
                 .request::<_, ()>(cmd_code::UNSUBSCRIBE, None, req)
                 .await?;
         }
@@ -594,6 +628,7 @@ impl Core {
         period: Period,
         trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
+        self.ensure_connected().await?;
         tracing::info!(symbol = symbol, period = ?period, "subscribe candlesticks");
 
         if let Some(candlesticks) = self
@@ -615,6 +650,8 @@ impl Core {
             // update board
             let resp: SecurityStaticInfoResponse = self
                 .ws_cli
+                .as_ref()
+                .expect("ws_cli connected above")
                 .request(
                     cmd_code::GET_BASIC_INFO,
                     None,
@@ -637,6 +674,8 @@ impl Core {
         tracing::info!(symbol = symbol, period = ?period, "pull history candlesticks");
         let resp: SecurityCandlestickResponse = self
             .ws_cli
+            .as_ref()
+            .expect("ws_cli connected above")
             .request(
                 cmd_code::GET_SECURITY_CANDLESTICKS,
                 None,
@@ -694,6 +733,8 @@ impl Core {
             is_first_push: true,
         };
         self.ws_cli
+            .as_ref()
+            .expect("ws_cli connected above")
             .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
             .await?;
 
@@ -722,17 +763,19 @@ impl Core {
 
             if periods.is_empty() && !sub_flags.intersects(SubFlags::QUOTE | SubFlags::TRADE) {
                 tracing::info!(symbol = symbol, "unsubscribe quote for candlesticks");
-                self.ws_cli
-                    .request::<_, ()>(
-                        cmd_code::UNSUBSCRIBE,
-                        None,
-                        UnsubscribeRequest {
-                            symbol: vec![symbol],
-                            sub_type: (SubFlags::QUOTE | SubFlags::TRADE).into(),
-                            unsub_all: false,
-                        },
-                    )
-                    .await?;
+                if let Some(ws_cli) = &self.ws_cli {
+                    ws_cli
+                        .request::<_, ()>(
+                            cmd_code::UNSUBSCRIBE,
+                            None,
+                            UnsubscribeRequest {
+                                symbol: vec![symbol],
+                                sub_type: (SubFlags::QUOTE | SubFlags::TRADE).into(),
+                                unsub_all: false,
+                            },
+                        )
+                        .await?;
+                }
             }
         }
 
@@ -799,8 +842,9 @@ impl Core {
 
         tracing::info!(subscriptions = ?subscriptions, "resubscribe");
 
+        let ws_cli = self.ws_cli.as_ref().expect("ws_cli connected during reconnect");
         for (flags, symbols) in subscriptions {
-            self.ws_cli
+            ws_cli
                 .request::<_, ()>(
                     cmd_code::SUBSCRIBE,
                     None,

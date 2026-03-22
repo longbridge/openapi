@@ -171,23 +171,24 @@ impl QuoteContext {
 
     /// Returns the member ID
     #[napi]
-    pub fn member_id(&self) -> i64 {
-        self.ctx.member_id()
+    pub async fn member_id(&self) -> Result<i64> {
+        Ok(self.ctx.member_id().await.map_err(ErrorNewType)?)
     }
 
     /// Returns the quote level
     #[napi]
-    pub fn quote_level(&self) -> &str {
-        self.ctx.quote_level()
+    pub async fn quote_level(&self) -> Result<String> {
+        Ok(self.ctx.quote_level().await.map_err(ErrorNewType)?)
     }
 
     /// Returns the quote package details
     #[napi]
-    pub fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
+    pub async fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
         self.ctx
             .quote_package_details()
-            .iter()
-            .cloned()
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
             .map(TryInto::try_into)
             .collect()
     }

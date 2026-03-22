@@ -72,9 +72,7 @@ impl TradeContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
-        let core = Core::try_new(config, command_rx, push_tx)
-            .with_subscriber(log_subscriber.clone())
-            .await?;
+        let core = Core::new(config, command_rx, push_tx);
         tokio::spawn(core.run().with_subscriber(log_subscriber.clone()));
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {

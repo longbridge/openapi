@@ -79,23 +79,32 @@ impl AsyncQuoteContext {
     }
 
     /// Returns the member ID.
-    fn member_id(&self) -> PyResult<i64> {
-        Ok(self.ctx.member_id())
+    fn member_id<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(ctx.member_id().await.map_err(ErrorNewType)?)
+        })
     }
 
     /// Returns the quote level.
-    fn quote_level(&self) -> PyResult<String> {
-        Ok(self.ctx.quote_level().to_string())
+    fn quote_level<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(ctx.quote_level().await.map_err(ErrorNewType)?)
+        })
     }
 
     /// Returns the quote package details.
-    fn quote_package_details(&self) -> PyResult<Vec<QuotePackageDetail>> {
-        self.ctx
-            .quote_package_details()
-            .to_vec()
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect()
+    fn quote_package_details<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.quote_package_details()
+                .await
+                .map_err(ErrorNewType)?
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<PyResult<Vec<QuotePackageDetail>>>()
+        })
     }
 
     /// Set quote callback. The callback may be sync or async; if it returns a

@@ -42,7 +42,7 @@ pub(crate) struct Core {
     event_tx: mpsc::UnboundedSender<WsEvent>,
     event_rx: mpsc::UnboundedReceiver<WsEvent>,
     http_cli: HttpClient,
-    ws_cli: WsClient,
+    ws_cli: Option<WsClient>,
     session: Option<WsSession>,
     close: bool,
     subscriptions: HashSet<String>,
@@ -50,17 +50,31 @@ pub(crate) struct Core {
 }
 
 impl Core {
-    pub(crate) async fn try_new(
+    pub(crate) fn new(
         config: Arc<Config>,
         command_rx: mpsc::UnboundedReceiver<Command>,
         push_tx: mpsc::UnboundedSender<PushEvent>,
-    ) -> Result<Self> {
+    ) -> Self {
         let http_cli = config.create_http_client();
-        let otp = http_cli.get_otp().await?;
-
         let (event_tx, event_rx) = mpsc::unbounded_channel();
+        Self {
+            config,
+            command_rx,
+            push_tx,
+            event_tx,
+            event_rx,
+            http_cli,
+            ws_cli: None,
+            session: None,
+            close: false,
+            subscriptions: HashSet::new(),
+            unknown_orders: VecDeque::new(),
+        }
+    }
 
-        let (url, res) = config.create_trade_ws_request().await;
+    async fn connect(&mut self) -> Result<()> {
+        let otp = self.http_cli.get_otp().await?;
+        let (url, res) = self.config.create_trade_ws_request().await;
         tracing::info!(url = url, "connecting to trade server");
         let request = res.map_err(WsClientError::from)?;
         let ws_cli = WsClient::open(
@@ -68,28 +82,22 @@ impl Core {
             ProtocolVersion::Version1,
             CodecType::Protobuf,
             Platform::OpenAPI,
-            event_tx.clone(),
+            self.event_tx.clone(),
             vec![],
         )
         .await?;
-
         tracing::info!(url = url, "trade server connected");
-
         let session = ws_cli.request_auth(otp, Default::default()).await?;
+        self.ws_cli = Some(ws_cli);
+        self.session = Some(session);
+        Ok(())
+    }
 
-        Ok(Self {
-            config,
-            command_rx,
-            push_tx,
-            event_tx,
-            event_rx,
-            http_cli,
-            ws_cli,
-            session: Some(session),
-            close: false,
-            subscriptions: HashSet::new(),
-            unknown_orders: VecDeque::new(),
-        })
+    async fn ensure_connected(&mut self) -> Result<()> {
+        if self.ws_cli.is_none() {
+            self.connect().await?;
+        }
+        Ok(())
     }
 
     pub(crate) async fn run(mut self) {
@@ -117,7 +125,7 @@ impl Core {
                 )
                 .await
                 {
-                    Ok(ws_cli) => self.ws_cli = ws_cli,
+                    Ok(ws_cli) => self.ws_cli = Some(ws_cli),
                     Err(err) => {
                         tracing::error!(error = %err, "failed to connect trade server");
                         continue;
@@ -127,10 +135,10 @@ impl Core {
                 tracing::info!(url = url, "trade server connected");
 
                 // request new session
+                let ws_cli = self.ws_cli.as_ref().expect("ws_cli set above");
                 match &self.session {
                     Some(session) if !session.is_expired() => {
-                        match self
-                            .ws_cli
+                        match ws_cli
                             .request_reconnect(&session.session_id, Default::default())
                             .await
                         {
@@ -151,7 +159,7 @@ impl Core {
                             }
                         };
 
-                        match self.ws_cli.request_auth(otp, Default::default()).await {
+                        match ws_cli.request_auth(otp, Default::default()).await {
                             Ok(new_session) => self.session = Some(new_session),
                             Err(err) => {
                                 tracing::error!(error = %err, "failed to request session id");
@@ -260,24 +268,25 @@ impl Core {
     }
 
     async fn handle_subscribe(&mut self, topics: Vec<TopicType>) -> Result<()> {
+        self.ensure_connected().await?;
         let req = Sub {
             topics: topics.iter().map(ToString::to_string).collect(),
         };
         tracing::info!(topics = ?req.topics, "subscribing topics");
-        let resp: SubResponse = self.ws_cli.request(cmd_code::SUBSCRIBE, None, req).await?;
+        let ws_cli = self.ws_cli.as_ref().expect("ws_cli connected above");
+        let resp: SubResponse = ws_cli.request(cmd_code::SUBSCRIBE, None, req).await?;
         self.subscriptions = resp.current.into_iter().collect();
         Ok(())
     }
 
     async fn handle_unsubscribe(&mut self, topics: Vec<TopicType>) -> Result<()> {
+        self.ensure_connected().await?;
         let req = Unsub {
             topics: topics.iter().map(ToString::to_string).collect(),
         };
         tracing::info!(topics = ?req.topics, "unsubscribing topics");
-        let resp: UnsubResponse = self
-            .ws_cli
-            .request(cmd_code::UNSUBSCRIBE, None, req)
-            .await?;
+        let ws_cli = self.ws_cli.as_ref().expect("ws_cli connected above");
+        let resp: UnsubResponse = ws_cli.request(cmd_code::UNSUBSCRIBE, None, req).await?;
         self.subscriptions = resp.current.into_iter().collect();
 
         Ok(())
@@ -287,7 +296,8 @@ impl Core {
         let req = Sub {
             topics: self.subscriptions.iter().cloned().collect(),
         };
-        let resp: SubResponse = self.ws_cli.request(cmd_code::SUBSCRIBE, None, req).await?;
+        let ws_cli = self.ws_cli.as_ref().expect("ws_cli connected during reconnect");
+        let resp: SubResponse = ws_cli.request(cmd_code::SUBSCRIBE, None, req).await?;
         self.subscriptions = resp.current.into_iter().collect();
         Ok(())
     }
