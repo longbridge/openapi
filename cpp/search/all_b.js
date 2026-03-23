@@ -15,7 +15,7 @@ var searchData=
   ['max_326',['max',['../classlongbridge_1_1_decimal.html#a9841db703e5f072a2c69fc5b1e6d0002',1,'longbridge::Decimal']]],
   ['max_5ffinance_5famount_327',['max_finance_amount',['../structlongbridge_1_1trade_1_1_account_balance.html#a1591077e4d01e78e1fd8e83afe4d572b',1,'longbridge::trade::AccountBalance']]],
   ['medium_328',['medium',['../structlongbridge_1_1quote_1_1_capital_distribution.html#aba0db2b017ef72646009ecd22ac38cd6',1,'longbridge::quote::CapitalDistribution']]],
-  ['member_5fid_329',['member_id',['../classlongbridge_1_1quote_1_1_quote_context.html#afd734feb7782f3affd254e8bdc7ab61a',1,'longbridge::quote::QuoteContext']]],
+  ['member_5fid_329',['member_id',['../classlongbridge_1_1quote_1_1_quote_context.html#a300429e58884e0d0985eba85147e325f',1,'longbridge::quote::QuoteContext']]],
   ['message_330',['message',['../classlongbridge_1_1_status.html#a66f604656886364fac3d2ce1a4fcbdb7',1,'longbridge::Status']]],
   ['min_331',['min',['../classlongbridge_1_1_decimal.html#ad94bc1d71cdd367fffb3cfc6ac839f49',1,'longbridge::Decimal']]],
   ['min1_332',['Min1',['../namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4ab24f6123111e5fd9d9444fcd337dcbd6',1,'longbridge::quote']]],

@@ -130,7 +130,7 @@
 <ul>
 <li><a href="reference_all/#longbridge.openapi.AsyncContentContext">AsyncContentContext</a></li>
 </ul>
-<p>Async content API for use with asyncio; create via <code>AsyncContentContext.create(config)</code> and await in asyncio.</p>
+<p>Async content API for use with asyncio; create via <code>AsyncContentContext.create(config)</code> (synchronous, no await needed at construction).</p>
 <h2 id="quickstart">Quickstart</h2>
 <p><em>Install Longbridge OpenAPI SDK</em></p>
 <pre class="highlight"><code class="language-bash">pip install longbridge</code></pre>
@@ -238,7 +238,7 @@ async def main():
         lambda url: print(f"Open this URL to authorize: {url}")
     )
     config = Config.from_oauth(oauth)
-    ctx = await AsyncQuoteContext.create(config)
+    ctx = AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
     quotes = await ctx.quote(["700.HK"])
@@ -301,5 +301,5 @@ asyncio.run(main())</code></pre>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-03-22 04:20:13.271800+00:00
+Build Date UTC : 2026-03-23 09:41:12.119770+00:00
 -->

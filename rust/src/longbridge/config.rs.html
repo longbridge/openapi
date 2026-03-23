@@ -249,7 +249,7 @@
 <a href=#249 id=249 data-nosnippet>249</a>    ///         .await?;
 <a href=#250 id=250 data-nosnippet>250</a>    ///     let config = Arc::new(Config::from_oauth(oauth));
 <a href=#251 id=251 data-nosnippet>251</a>    ///
-<a href=#252 id=252 data-nosnippet>252</a>    ///     let (ctx, receiver) = longbridge::quote::QuoteContext::try_new(config).await?;
+<a href=#252 id=252 data-nosnippet>252</a>    ///     let (ctx, receiver) = longbridge::quote::QuoteContext::new(config);
 <a href=#253 id=253 data-nosnippet>253</a>    ///     Ok(())
 <a href=#254 id=254 data-nosnippet>254</a>    /// }
 <a href=#255 id=255 data-nosnippet>255</a>    /// ```
@@ -564,13 +564,10 @@
 <a href=#564 id=564 data-nosnippet>564</a>    </span><span class="kw">fn </span>test_config_default_values() {
 <a href=#565 id=565 data-nosnippet>565</a>        <span class="kw">let </span>config = Config::from_apikey(<span class="string">"key"</span>, <span class="string">"secret"</span>, <span class="string">"token"</span>);
 <a href=#566 id=566 data-nosnippet>566</a>
-<a href=#567 id=567 data-nosnippet>567</a>        <span class="macro">assert_eq!</span>(config.language, Language::EN);
-<a href=#568 id=568 data-nosnippet>568</a>        <span class="macro">assert_eq!</span>(config.quote_ws_url, <span class="prelude-val">None</span>);
-<a href=#569 id=569 data-nosnippet>569</a>        <span class="macro">assert_eq!</span>(config.trade_ws_url, <span class="prelude-val">None</span>);
-<a href=#570 id=570 data-nosnippet>570</a>        <span class="macro">assert_eq!</span>(config.enable_overnight, <span class="prelude-val">None</span>);
-<a href=#571 id=571 data-nosnippet>571</a>        <span class="macro">assert_eq!</span>(config.push_candlestick_mode, <span class="prelude-val">None</span>);
-<a href=#572 id=572 data-nosnippet>572</a>        <span class="macro">assert!</span>(config.enable_print_quote_packages);
-<a href=#573 id=573 data-nosnippet>573</a>        <span class="macro">assert_eq!</span>(config.log_path, <span class="prelude-val">None</span>);
-<a href=#574 id=574 data-nosnippet>574</a>    }
-<a href=#575 id=575 data-nosnippet>575</a>}
+<a href=#567 id=567 data-nosnippet>567</a>        <span class="comment">// Fields not controlled by environment variables
+<a href=#568 id=568 data-nosnippet>568</a>        </span><span class="macro">assert_eq!</span>(config.enable_overnight, <span class="prelude-val">None</span>);
+<a href=#569 id=569 data-nosnippet>569</a>        <span class="macro">assert_eq!</span>(config.push_candlestick_mode, <span class="prelude-val">None</span>);
+<a href=#570 id=570 data-nosnippet>570</a>        <span class="macro">assert!</span>(config.enable_print_quote_packages);
+<a href=#571 id=571 data-nosnippet>571</a>    }
+<a href=#572 id=572 data-nosnippet>572</a>}
 </code></pre></div></section></main></body></html>
