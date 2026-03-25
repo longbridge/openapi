@@ -6,7 +6,7 @@ use crate::{
     async_call::{CAsyncCallback, execute_async},
     config::CConfig,
     content_context::types::{CNewsItemOwned, COwnedTopicOwned, CTopicItemOwned},
-    types::{CVec, cstr_array_to_rust, cstr_to_rust},
+    types::{CString, CVec, cstr_array_to_rust, cstr_to_rust},
 };
 
 /// Content context
@@ -120,7 +120,7 @@ pub unsafe extern "C" fn lb_content_context_create_topic(
     };
     let license = if license >= 0 { Some(license) } else { None };
     execute_async(callback, ctx, userdata, async move {
-        let owned = ctx_inner
+        let id = ctx_inner
             .create_topic(CreateTopicOptions {
                 title,
                 body,
@@ -130,8 +130,7 @@ pub unsafe extern "C" fn lb_content_context_create_topic(
                 license,
             })
             .await?;
-        let rows: CVec<COwnedTopicOwned> = vec![COwnedTopicOwned::from(owned)].into();
-        Ok(rows)
+        Ok(CString::from(id))
     });
 }
 

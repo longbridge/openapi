@@ -65,7 +65,7 @@ impl AsyncContentContext {
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let resp = ctx
+            Ok(ctx
                 .create_topic(CreateTopicOptions {
                     title,
                     body,
@@ -75,8 +75,7 @@ impl AsyncContentContext {
                     license,
                 })
                 .await
-                .map_err(ErrorNewType)?;
-            OwnedTopic::try_from(resp)
+                .map_err(ErrorNewType)?)
         })
         .map(|b| b.unbind())
     }

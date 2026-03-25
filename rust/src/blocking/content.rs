@@ -37,7 +37,7 @@ impl ContentContextSync {
     }
 
     /// Create a new topic
-    pub fn create_topic(&self, opts: CreateTopicOptions) -> Result<OwnedTopic> {
+    pub fn create_topic(&self, opts: CreateTopicOptions) -> Result<String> {
         self.rt
             .call(move |ctx| async move { ctx.create_topic(opts).await })
     }

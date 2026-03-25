@@ -2,10 +2,7 @@ use std::os::raw::c_char;
 
 use longbridge::content::{NewsItem, OwnedTopic, TopicAuthor, TopicImage, TopicItem};
 
-use crate::{
-    async_call::CAsyncResult,
-    types::{CString, CVec, ToFFI},
-};
+use crate::types::{CString, CVec, ToFFI};
 
 /// Topic author
 #[repr(C)]

@@ -56,8 +56,9 @@ impl ContentContext {
         tickers: Option<Vec<String>>,
         hashtags: Option<Vec<String>>,
         license: Option<i32>,
-    ) -> PyResult<OwnedTopic> {
-        self.ctx
+    ) -> PyResult<String> {
+        Ok(self
+            .ctx
             .create_topic(CreateTopicOptions {
                 title,
                 body,
@@ -66,8 +67,7 @@ impl ContentContext {
                 hashtags,
                 license,
             })
-            .map_err(ErrorNewType)?
-            .try_into()
+            .map_err(ErrorNewType)?)
     }
 
     /// Get discussion topics list

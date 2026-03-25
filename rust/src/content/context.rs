@@ -46,10 +46,15 @@ impl ContentContext {
     /// Create a new topic
     ///
     /// Path: POST /v1/content/topics
-    pub async fn create_topic(&self, opts: CreateTopicOptions) -> Result<OwnedTopic> {
+    pub async fn create_topic(&self, opts: CreateTopicOptions) -> Result<String> {
+        #[derive(Debug, Deserialize)]
+        struct TopicId {
+            id: String,
+        }
+
         #[derive(Debug, Deserialize)]
         struct Response {
-            item: OwnedTopic,
+            item: TopicId,
         }
 
         Ok(self
@@ -61,7 +66,8 @@ impl ContentContext {
             .send()
             .await?
             .0
-            .item)
+            .item
+            .id)
     }
 
     /// Get discussion topics list
