@@ -55,17 +55,7 @@ impl AsyncContentContext {
 
     /// Create a new community topic. Returns awaitable.
     ///
-    /// Two content types are supported:
-    /// - `post` (default): plain text only; Markdown is NOT rendered.
-    /// - `article`: Markdown body; `title` is required.
-    ///
-    /// Permission: user must hold a funded Longbridge account (raises 403 otherwise).
-    ///
-    /// Symbols in body (e.g. "700.HK", "TSLA.US") are automatically linked. Use `tickers`
-    /// to associate additional symbols not mentioned in the body.
-    /// WARNING: do not abuse symbol linking for unrelated stocks.
-    ///
-    /// Rate limit: max 3 topics/min and 10/24h per user (raises 429 on excess).
+    /// See: <https://open.longbridge.com/docs/api?op=create_topic>
     #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None))]
     fn create_topic(
         &self,
@@ -150,16 +140,7 @@ impl AsyncContentContext {
 
     /// Post a reply to a community topic. Returns awaitable.
     ///
-    /// Body is plain text only — Markdown is not rendered.
-    ///
-    /// Permission: user must hold a funded Longbridge account (raises 403 otherwise).
-    ///
-    /// Symbols in body (e.g. "700.HK", "TSLA.US") are automatically linked.
-    /// WARNING: do not abuse symbol linking for unrelated stocks.
-    ///
-    /// Rate limit per user per topic: first 3 replies have no wait; subsequent replies
-    /// require incrementally longer intervals (3 s → 5 s → 8 s → 13 s → 21 s → 34 s → 55 s cap).
-    /// Raises 429 on excess.
+    /// See: <https://open.longbridge.com/docs/api?op=create_topic_reply>
     #[pyo3(signature = (topic_id, body, reply_to_id = None))]
     fn create_topic_reply(
         &self,

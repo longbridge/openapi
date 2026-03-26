@@ -25,9 +25,9 @@ impl ContentContext {
         }))
     }
 
-    /// Get topics created by the current authenticated user
+    /// Get topics created by the current authenticated user.
     ///
-    /// Path: GET /v1/content/topics/mine
+    /// See: <https://open.longbridge.com/docs/api?op=list_my_topics>
     pub async fn my_topics(&self, opts: MyTopicsOptions) -> Result<Vec<OwnedTopic>> {
         #[derive(Debug, Deserialize)]
         struct Response {
@@ -48,20 +48,7 @@ impl ContentContext {
 
     /// Create a new community topic.
     ///
-    /// Path: POST /v1/content/topics
-    ///
-    /// Two content types are supported:
-    /// - `post` (default): plain text only; Markdown is NOT rendered.
-    /// - `article`: Markdown body (server converts to HTML); `title` is required.
-    ///
-    /// Permission: user must hold a funded Longbridge account (returns 403 otherwise).
-    ///
-    /// Symbols in body (e.g. "700.HK", "TSLA.US") are automatically linked. Use `tickers`
-    /// to associate additional symbols not mentioned in the body.
-    /// WARNING: do not abuse symbol linking for unrelated stocks — moderation may restrict
-    /// publishing or mute the account.
-    ///
-    /// Rate limit: max 3 topics/min and 10/24h per user (429 on excess).
+    /// See: <https://open.longbridge.com/docs/api?op=create_topic>
     pub async fn create_topic(&self, opts: CreateTopicOptions) -> Result<String> {
         #[derive(Debug, Deserialize)]
         struct TopicId {
@@ -105,9 +92,9 @@ impl ContentContext {
             .items)
     }
 
-    /// Get full details of a topic by its ID
+    /// Get full details of a topic by its ID.
     ///
-    /// Path: GET /v1/content/topics/{id}
+    /// See: <https://open.longbridge.com/docs/api?op=topic_detail>
     pub async fn topic_detail(&self, id: impl Into<String>) -> Result<OwnedTopic> {
         #[derive(Debug, Deserialize)]
         struct Response {
@@ -126,9 +113,9 @@ impl ContentContext {
             .item)
     }
 
-    /// List replies on a topic
+    /// List replies on a topic.
     ///
-    /// Path: GET /v1/content/topics/{topic_id}/comments
+    /// See: <https://open.longbridge.com/docs/api?op=list_topic_replies>
     pub async fn list_topic_replies(
         &self,
         topic_id: impl Into<String>,
@@ -154,19 +141,7 @@ impl ContentContext {
 
     /// Post a reply to a community topic.
     ///
-    /// Path: POST /v1/content/topics/{topic_id}/comments
-    ///
-    /// Body is plain text only — Markdown is not rendered.
-    ///
-    /// Permission: user must hold a funded Longbridge account (returns 403 otherwise).
-    ///
-    /// Symbols in body (e.g. "700.HK", "TSLA.US") are automatically linked.
-    /// WARNING: do not abuse symbol linking for unrelated stocks — moderation may restrict
-    /// publishing or mute the account.
-    ///
-    /// Rate limit per user per topic: first 3 replies have no interval; subsequent replies
-    /// must wait an incrementally longer interval (3 s → 5 s → 8 s → 13 s → 21 s → 34 s → 55 s cap).
-    /// Returns 429 on excess.
+    /// See: <https://open.longbridge.com/docs/api?op=create_topic_reply>
     pub async fn create_topic_reply(
         &self,
         topic_id: impl Into<String>,
