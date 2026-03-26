@@ -6,7 +6,8 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     content::{
-        ContentContext, CreateTopicOptions, MyTopicsOptions, NewsItem, OwnedTopic, TopicItem,
+        ContentContext, CreateReplyOptions, CreateTopicOptions, ListTopicRepliesOptions,
+        MyTopicsOptions, NewsItem, OwnedTopic, TopicItem, TopicReply,
     },
 };
 
@@ -54,5 +55,34 @@ impl ContentContextSync {
         let symbol = symbol.into();
         self.rt
             .call(move |ctx| async move { ctx.news(symbol).await })
+    }
+
+    /// Get full details of a topic by its ID
+    pub fn topic_detail(&self, id: impl Into<String>) -> Result<OwnedTopic> {
+        let id = id.into();
+        self.rt
+            .call(move |ctx| async move { ctx.topic_detail(id).await })
+    }
+
+    /// List replies on a topic
+    pub fn list_topic_replies(
+        &self,
+        topic_id: impl Into<String>,
+        opts: ListTopicRepliesOptions,
+    ) -> Result<Vec<TopicReply>> {
+        let topic_id = topic_id.into();
+        self.rt
+            .call(move |ctx| async move { ctx.list_topic_replies(topic_id, opts).await })
+    }
+
+    /// Post a reply to a topic
+    pub fn create_topic_reply(
+        &self,
+        topic_id: impl Into<String>,
+        opts: CreateReplyOptions,
+    ) -> Result<TopicReply> {
+        let topic_id = topic_id.into();
+        self.rt
+            .call(move |ctx| async move { ctx.create_topic_reply(topic_id, opts).await })
     }
 }
