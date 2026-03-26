@@ -59,7 +59,7 @@ impl ContentContext {
     /// Symbols in body (e.g. "700.HK", "TSLA.US") are automatically linked. Use `tickers`
     /// to associate additional symbols not mentioned in the body.
     /// WARNING: do not abuse symbol linking for unrelated stocks — moderation may restrict
-    /// publishing or suspend the account.
+    /// publishing or mute the account.
     ///
     /// Rate limit: max 3 topics/min and 10/24h per user (429 on excess).
     pub async fn create_topic(&self, opts: CreateTopicOptions) -> Result<String> {
@@ -162,7 +162,7 @@ impl ContentContext {
     ///
     /// Symbols in body (e.g. "700.HK", "TSLA.US") are automatically linked.
     /// WARNING: do not abuse symbol linking for unrelated stocks — moderation may restrict
-    /// publishing or suspend the account.
+    /// publishing or mute the account.
     ///
     /// Rate limit per user per topic: first 3 replies have no interval; subsequent replies
     /// must wait an incrementally longer interval (3 s → 5 s → 8 s → 13 s → 21 s → 34 s → 55 s cap).
