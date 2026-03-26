@@ -130,7 +130,10 @@ impl ContentContext {
         Ok(self
             .0
             .http_cli
-            .request(Method::GET, format!("/v1/content/topics/{topic_id}/comments"))
+            .request(
+                Method::GET,
+                format!("/v1/content/topics/{topic_id}/comments"),
+            )
             .query_params(opts)
             .response::<Json<Response>>()
             .send()

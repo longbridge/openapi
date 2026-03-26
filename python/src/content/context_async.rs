@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
 use longbridge::content::{
-    ContentContext, CreateReplyOptions, CreateTopicOptions, ListTopicRepliesOptions, MyTopicsOptions,
+    ContentContext, CreateReplyOptions, CreateTopicOptions, ListTopicRepliesOptions,
+    MyTopicsOptions,
 };
 use pyo3::{prelude::*, types::PyType};
 
