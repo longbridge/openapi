@@ -168,7 +168,7 @@ pub struct CreateReplyOptions {
     /// Use `tickers` in the parent topic to associate additional stocks not
     /// mentioned in the body.
     pub body: String,
-    /// ID of the reply to. Set to `"0"` or omit to post a top-level reply.
+    /// ID of the reply to. Set to `None` to post a top-level reply.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_to_id: Option<String>,
 }
