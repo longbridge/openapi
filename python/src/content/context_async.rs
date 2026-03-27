@@ -1,11 +1,14 @@
 use std::sync::Arc;
 
-use longbridge::content::{ContentContext, CreateTopicOptions, MyTopicsOptions};
+use longbridge::content::{
+    ContentContext, CreateReplyOptions, CreateTopicOptions, ListTopicRepliesOptions,
+    MyTopicsOptions,
+};
 use pyo3::{prelude::*, types::PyType};
 
 use crate::{
     config::Config,
-    content::types::{NewsItem, OwnedTopic, TopicItem},
+    content::types::{NewsItem, OwnedTopic, TopicItem, TopicReply},
     error::ErrorNewType,
 };
 
@@ -51,7 +54,9 @@ impl AsyncContentContext {
         .map(|b| b.unbind())
     }
 
-    /// Create a new topic. Returns awaitable.
+    /// Create a new community topic. Returns awaitable.
+    ///
+    /// See: <https://open.longbridge.com/docs/api?op=create_topic>
     #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None))]
     fn create_topic(
         &self,
@@ -98,6 +103,60 @@ impl AsyncContentContext {
             v.into_iter()
                 .map(|x| -> PyResult<NewsItem> { x.try_into() })
                 .collect::<PyResult<Vec<NewsItem>>>()
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get full details of a topic by its ID. Returns awaitable.
+    fn topic_detail(&self, py: Python<'_>, id: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx.topic_detail(id).await.map_err(ErrorNewType)?;
+            OwnedTopic::try_from(v)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// List replies on a topic. Returns awaitable.
+    #[pyo3(signature = (topic_id, page = None, size = None))]
+    fn list_topic_replies(
+        &self,
+        py: Python<'_>,
+        topic_id: String,
+        page: Option<i32>,
+        size: Option<i32>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx
+                .list_topic_replies(topic_id, ListTopicRepliesOptions { page, size })
+                .await
+                .map_err(ErrorNewType)?;
+            v.into_iter()
+                .map(|x| -> PyResult<TopicReply> { x.try_into() })
+                .collect::<PyResult<Vec<TopicReply>>>()
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Post a reply to a community topic. Returns awaitable.
+    ///
+    /// See: <https://open.longbridge.com/docs/api?op=create_topic_reply>
+    #[pyo3(signature = (topic_id, body, reply_to_id = None))]
+    fn create_topic_reply(
+        &self,
+        py: Python<'_>,
+        topic_id: String,
+        body: String,
+        reply_to_id: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx
+                .create_topic_reply(topic_id, CreateReplyOptions { body, reply_to_id })
+                .await
+                .map_err(ErrorNewType)?;
+            TopicReply::try_from(v)
         })
         .map(|b| b.unbind())
     }

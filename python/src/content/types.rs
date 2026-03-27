@@ -94,6 +94,32 @@ pub(crate) struct TopicItem {
     shares_count: i32,
 }
 
+/// A reply on a topic
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::content::TopicReply")]
+pub(crate) struct TopicReply {
+    /// Reply ID
+    id: String,
+    /// Topic ID this reply belongs to
+    topic_id: String,
+    /// Reply body (plain text)
+    body: String,
+    /// ID of the parent reply ("0" means top-level)
+    reply_to_id: String,
+    /// Author info
+    author: TopicAuthor,
+    /// Attached images
+    #[py(array)]
+    images: Vec<TopicImage>,
+    /// Likes count
+    likes_count: i32,
+    /// Nested replies count
+    comments_count: i32,
+    /// Created time
+    created_at: PyOffsetDateTimeWrapper,
+}
+
 /// News item
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
