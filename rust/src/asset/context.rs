@@ -76,7 +76,7 @@ impl StatementContext {
     /// Get statement data list
     ///
     /// Path: GET /v1/statement/list
-    pub async fn statement_data_list(
+    pub async fn statements(
         &self,
         options: GetStatementListOptions,
     ) -> Result<GetStatementListResponse> {
@@ -86,7 +86,7 @@ impl StatementContext {
     /// Get statement data download url
     ///
     /// Path: GET /v1/statement/download
-    pub async fn statement_data_download_url(
+    pub async fn statement_download_url(
         &self,
         options: GetStatementOptions,
     ) -> Result<GetStatementResponse> {
