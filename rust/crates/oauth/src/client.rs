@@ -17,9 +17,12 @@ use crate::{
 
 const OAUTH_BASE_URL: &str = "https://openapi.longbridge.com/oauth2";
 const OAUTH_BASE_URL_CN: &str = "https://openapi.longbridge.cn/oauth2";
+const OAUTH_BASE_URL_TEST: &str = "https://openapi.longbridge.xyz/oauth2";
 
 async fn oauth_base_url() -> &'static str {
-    if is_cn().await {
+    if std::env::var("LONGBRIDGE_TEST_ENV").is_ok() {
+        OAUTH_BASE_URL_TEST
+    } else if is_cn().await {
         OAUTH_BASE_URL_CN
     } else {
         OAUTH_BASE_URL

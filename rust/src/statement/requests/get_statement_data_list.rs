@@ -19,21 +19,19 @@ impl From<StatementType> for i32 {
 /// Options for get statement data list request
 #[derive(Debug, Serialize, Clone)]
 pub struct GetStatementDataListOptions {
-    aaid: i64,
     statement_type: i32,
-    page: i32,
-    page_size: i32,
+    start_date: i32,
+    limit: i32,
 }
 
 impl GetStatementDataListOptions {
     /// Create a new `GetStatementDataListOptions`
     #[inline]
-    pub fn new(aaid: i64, statement_type: StatementType) -> Self {
+    pub fn new(statement_type: StatementType) -> Self {
         Self {
-            aaid,
             statement_type: statement_type.into(),
-            page: 1,
-            page_size: 20,
+            start_date: 1,
+            limit: 20,
         }
     }
 
@@ -41,13 +39,13 @@ impl GetStatementDataListOptions {
     #[inline]
     #[must_use]
     pub fn page(self, page: i32) -> Self {
-        Self { page, ..self }
+        Self { start_date: page, ..self }
     }
 
     /// Set the page size
     #[inline]
     #[must_use]
     pub fn page_size(self, page_size: i32) -> Self {
-        Self { page_size, ..self }
+        Self { limit: page_size, ..self }
     }
 }
