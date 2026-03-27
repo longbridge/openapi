@@ -1313,6 +1313,11 @@ typedef struct lb_oauth_t lb_oauth_t;
 typedef struct lb_quote_context_t lb_quote_context_t;
 
 /**
+ * Statement context
+ */
+typedef struct CStatementContext CStatementContext;
+
+/**
  * Trade context
  */
 typedef struct lb_trade_context_t lb_trade_context_t;
@@ -4106,6 +4111,54 @@ typedef struct lb_news_item_t {
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+/**
+ * Create a new `StatementContext`
+ *
+ * @param config  Config object
+ * @return A new statement context
+ */
+const struct CStatementContext *lb_statement_context_new(const struct lb_config_t *config);
+
+/**
+ * Retain the statement context (increment reference count)
+ */
+void lb_statement_context_retain(const struct CStatementContext *ctx);
+
+/**
+ * Release the statement context (decrement reference count)
+ */
+void lb_statement_context_release(const struct CStatementContext *ctx);
+
+/**
+ * Get statement data list
+ *
+ * @param ctx             Statement context
+ * @param statement_type  1 = daily, 2 = monthly
+ * @param start_date      Start date for pagination (0 = default)
+ * @param limit           Number of results (0 = default 20)
+ * @param callback        Async callback
+ * @param userdata        User data passed to the callback
+ */
+void lb_statement_context_statements(const struct CStatementContext *ctx,
+                                     int32_t statement_type,
+                                     int32_t start_date,
+                                     int32_t limit,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Get statement data download URL
+ *
+ * @param ctx       Statement context
+ * @param file_key  File key from the list response
+ * @param callback  Async callback
+ * @param userdata  User data passed to the callback
+ */
+void lb_statement_context_download_url(const struct CStatementContext *ctx,
+                                       const char *file_key,
+                                       lb_async_callback_t callback,
+                                       void *userdata);
 
 /**
  * Create a new `Config` using API Key authentication

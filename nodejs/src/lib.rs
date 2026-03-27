@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+mod asset;
 mod config;
 mod content;
 mod decimal;

@@ -1,3 +1,4 @@
+mod asset;
 mod async_callback;
 mod config;
 mod content;
@@ -24,6 +25,7 @@ fn longbridge(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     openapi.add_class::<types::PushCandlestickMode>()?;
     openapi.add_class::<http_client::HttpClient>()?;
     openapi.add_class::<error::ErrorKind>()?;
+    asset::register_types(&openapi)?;
     quote::register_types(&openapi)?;
     trade::register_types(&openapi)?;
     content::register_types(&openapi)?;

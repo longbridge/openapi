@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.function.Consumer;
 import org.scijava.nativelib.NativeLoader;
 
+import com.longbridge.asset.*;
 import com.longbridge.content.*;
 import com.longbridge.quote.*;
 import com.longbridge.trade.*;
@@ -56,6 +57,14 @@ public class SdkNative {
                         Consumer<String> openUrlCallback, AsyncCallback callback);
 
         public static native void freeOAuth(long oauth);
+
+        public static native long newStatementContext(long config);
+
+        public static native void freeStatementContext(long context);
+
+        public static native void statementContextStatements(long context, Object opts, AsyncCallback callback);
+
+        public static native void statementContextDownloadUrl(long context, String fileKey, AsyncCallback callback);
 
         public static native long newContentContext(long config);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "asset_context.hpp"
 #include "config.hpp"
 #include "decimal.hpp"
 #include "http_client.hpp"
