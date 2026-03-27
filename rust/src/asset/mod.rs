@@ -7,6 +7,6 @@ mod types;
 
 pub use context::StatementContext;
 pub use requests::{
-    GetStatementDataDownloadUrlOptions, GetStatementDataListOptions, StatementType,
+    GetStatementOptions, GetStatementListOptions, StatementType,
 };
 pub use types::*;

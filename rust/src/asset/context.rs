@@ -6,9 +6,9 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{
     Config, Result,
-    statement::{
-        GetStatementDataDownloadUrlOptions, GetStatementDataDownloadUrlResponse,
-        GetStatementDataListOptions, GetStatementDataListResponse, core,
+    asset::{
+        GetStatementOptions, GetStatementResponse,
+        GetStatementListOptions, GetStatementListResponse, core,
     },
 };
 
@@ -78,8 +78,8 @@ impl StatementContext {
     /// Path: GET /v1/statement/list
     pub async fn statement_data_list(
         &self,
-        options: GetStatementDataListOptions,
-    ) -> Result<GetStatementDataListResponse> {
+        options: GetStatementListOptions,
+    ) -> Result<GetStatementListResponse> {
         self.get(core::GET_STATEMENT_DATA_LIST_PATH, options).await
     }
 
@@ -88,8 +88,8 @@ impl StatementContext {
     /// Path: GET /v1/statement/download
     pub async fn statement_data_download_url(
         &self,
-        options: GetStatementDataDownloadUrlOptions,
-    ) -> Result<GetStatementDataDownloadUrlResponse> {
+        options: GetStatementOptions,
+    ) -> Result<GetStatementResponse> {
         self.get(core::GET_STATEMENT_DATA_DOWNLOAD_URL_PATH, options)
             .await
     }

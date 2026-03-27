@@ -18,13 +18,13 @@ impl From<StatementType> for i32 {
 
 /// Options for get statement data list request
 #[derive(Debug, Serialize, Clone)]
-pub struct GetStatementDataListOptions {
+pub struct GetStatementListOptions {
     statement_type: i32,
     start_date: i32,
     limit: i32,
 }
 
-impl GetStatementDataListOptions {
+impl GetStatementListOptions {
     /// Create a new `GetStatementDataListOptions`
     #[inline]
     pub fn new(statement_type: StatementType) -> Self {

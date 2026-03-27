@@ -22,7 +22,7 @@ pub mod blocking;
 pub use longbridge_oauth as oauth;
 pub mod content;
 pub mod quote;
-pub mod statement;
+pub mod asset;
 pub mod trade;
 
 pub use config::{Config, Language, PushCandlestickMode};
@@ -32,6 +32,6 @@ pub use longbridge_httpcli as httpclient;
 pub use longbridge_wscli as wsclient;
 pub use quote::QuoteContext;
 pub use rust_decimal::Decimal;
-pub use statement::StatementContext;
+pub use asset::StatementContext;
 pub use trade::TradeContext;
 pub use types::Market;
