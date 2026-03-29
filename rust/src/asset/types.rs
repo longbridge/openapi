@@ -187,9 +187,6 @@ pub struct EquityHolding {
     pub market_code: String,
     pub currency: String,
     pub currency_code: String,
-    pub sort_equity_type: String,
-    pub sort_market: String,
-    pub sort_currency: String,
     pub cost_price: String,
     pub income_amount: String,
     pub stock_status: String,
@@ -228,7 +225,6 @@ pub struct AccountBalanceChange {
     pub remark_zh: String,
     pub remark_hk: String,
     pub create_at: String,
-    pub sort_currency: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -260,7 +256,6 @@ pub struct EquityHoldingChange {
     pub market: String,
     pub market_code: String,
     pub create_at: String,
-    pub sort_market: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -280,7 +275,6 @@ pub struct AccountBalanceLock {
     pub amount: String,
     pub remark: String,
     pub ref_no: String,
-    pub sort_currency: String,
     pub currency: String,
     pub currency_code: String,
 }
@@ -306,7 +300,6 @@ pub struct EquityHoldingLock {
     pub quantity: String,
     pub remark: String,
     pub ref_no: String,
-    pub sort_market: String,
     pub market: String,
     pub market_code: String,
 }
@@ -428,7 +421,6 @@ pub struct FundTrade {
     pub currency_code: String,
     pub equity_type: String,
     pub equity_type_code: String,
-    pub sort_currency: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -455,7 +447,6 @@ pub struct IpoTrade {
     pub sub_amount: String,
     pub market: String,
     pub market_code: String,
-    pub sort_market: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -507,7 +498,6 @@ pub struct Interest {
     pub fine_interest: String,
     pub interest: String,
     pub total: String,
-    pub sort_currency: String,
     pub deduction_amount: String,
 }
 
@@ -528,7 +518,6 @@ pub struct LendingFee {
     pub rate: String,
     pub amount: String,
     pub current_amount: String,
-    pub sort_currency: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -541,7 +530,6 @@ pub struct CustodianFee {
     pub fee_amount: String,
     pub fee: String,
     pub total: String,
-    pub sort_currency: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -567,8 +555,6 @@ pub struct Corp {
     pub currency: String,
     pub currency_code: String,
     pub new_amount: String,
-    pub sort_market: String,
-    pub sort_currency: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
