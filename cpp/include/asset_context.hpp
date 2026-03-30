@@ -5,7 +5,7 @@
 #include "config.hpp"
 #include "types.hpp"
 
-typedef struct lb_statement_context_t lb_statement_context_t;
+typedef struct lb_asset_context_t lb_asset_context_t;
 
 namespace longbridge {
 namespace asset {
@@ -26,34 +26,34 @@ struct StatementDownloadUrlResponse
   std::string url;
 };
 
-/// Statement context
-class StatementContext
+/// Asset context
+class AssetContext
 {
 private:
-  const lb_statement_context_t* ctx_;
+  const lb_asset_context_t* ctx_;
 
 public:
-  StatementContext();
-  StatementContext(const lb_statement_context_t* ctx);
-  StatementContext(const StatementContext& ctx);
-  StatementContext(StatementContext&& ctx);
-  ~StatementContext();
+  AssetContext();
+  AssetContext(const lb_asset_context_t* ctx);
+  AssetContext(const AssetContext& ctx);
+  AssetContext(AssetContext&& ctx);
+  ~AssetContext();
 
-  StatementContext& operator=(const StatementContext& ctx);
+  AssetContext& operator=(const AssetContext& ctx);
 
-  static StatementContext create(const Config& config);
+  static AssetContext create(const Config& config);
 
   /// Get statement data list
   void statements(
     int32_t statement_type,
     int32_t start_date,
     int32_t limit,
-    AsyncCallback<StatementContext, std::vector<StatementItem>> callback) const;
+    AsyncCallback<AssetContext, std::vector<StatementItem>> callback) const;
 
   /// Get statement data download URL
   void statement_download_url(
     const std::string& file_key,
-    AsyncCallback<StatementContext, StatementDownloadUrlResponse> callback)
+    AsyncCallback<AssetContext, StatementDownloadUrlResponse> callback)
     const;
 };
 

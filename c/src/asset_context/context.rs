@@ -1,6 +1,6 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 
-use longbridge::asset::{GetStatementListOptions, GetStatementOptions, StatementContext, StatementType};
+use longbridge::asset::{GetStatementListOptions, GetStatementOptions, AssetContext, StatementType};
 
 use crate::{
     async_call::{CAsyncCallback, execute_async},
@@ -9,47 +9,47 @@ use crate::{
     types::{CString, CVec, cstr_to_rust},
 };
 
-/// Statement context
-pub struct CStatementContext {
-    ctx: StatementContext,
+/// Asset context
+pub struct CAssetContext {
+    ctx: AssetContext,
 }
 
-/// Create a new `StatementContext`
+/// Create a new `AssetContext`
 ///
 /// @param config  Config object
-/// @return A new statement context
+/// @return A new asset context
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_statement_context_new(
+pub unsafe extern "C" fn lb_asset_context_new(
     config: *const CConfig,
-) -> *const CStatementContext {
+) -> *const CAssetContext {
     let config = Arc::new((*config).0.clone());
-    let ctx = StatementContext::new(config);
-    Arc::into_raw(Arc::new(CStatementContext { ctx }))
+    let ctx = AssetContext::new(config);
+    Arc::into_raw(Arc::new(CAssetContext { ctx }))
 }
 
-/// Retain the statement context (increment reference count)
+/// Retain the asset context (increment reference count)
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_statement_context_retain(ctx: *const CStatementContext) {
+pub unsafe extern "C" fn lb_asset_context_retain(ctx: *const CAssetContext) {
     Arc::increment_strong_count(ctx);
 }
 
-/// Release the statement context (decrement reference count)
+/// Release the asset context (decrement reference count)
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_statement_context_release(ctx: *const CStatementContext) {
+pub unsafe extern "C" fn lb_asset_context_release(ctx: *const CAssetContext) {
     let _ = Arc::from_raw(ctx);
 }
 
 /// Get statement data list
 ///
-/// @param ctx             Statement context
+/// @param ctx             Asset context
 /// @param statement_type  1 = daily, 2 = monthly
 /// @param start_date      Start date for pagination (0 = default)
 /// @param limit           Number of results (0 = default 20)
 /// @param callback        Async callback
 /// @param userdata        User data passed to the callback
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_statement_context_statements(
-    ctx: *const CStatementContext,
+pub unsafe extern "C" fn lb_asset_context_statements(
+    ctx: *const CAssetContext,
     statement_type: i32,
     start_date: i32,
     limit: i32,
@@ -78,13 +78,13 @@ pub unsafe extern "C" fn lb_statement_context_statements(
 
 /// Get statement data download URL
 ///
-/// @param ctx       Statement context
+/// @param ctx       Asset context
 /// @param file_key  File key from the list response
 /// @param callback  Async callback
 /// @param userdata  User data passed to the callback
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_statement_context_download_url(
-    ctx: *const CStatementContext,
+pub unsafe extern "C" fn lb_asset_context_download_url(
+    ctx: *const CAssetContext,
     file_key: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,

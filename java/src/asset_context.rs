@@ -7,7 +7,7 @@ use jni::{
 use longbridge::{
     Config,
     asset::{
-        GetStatementListOptions, GetStatementOptions, StatementContext, StatementType,
+        GetStatementListOptions, GetStatementOptions, AssetContext, StatementType,
     },
 };
 
@@ -18,24 +18,24 @@ use crate::{
 };
 
 struct ContextObj {
-    ctx: StatementContext,
+    ctx: AssetContext,
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newStatementContext(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newAssetContext(
     mut env: JNIEnv,
     _class: JClass,
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
         let config = Arc::new((*(config as *const Config)).clone());
-        let ctx = StatementContext::new(config);
+        let ctx = AssetContext::new(config);
         Ok(Box::into_raw(Box::new(ContextObj { ctx })) as i64)
     })
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeStatementContext(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeAssetContext(
     _env: JNIEnv,
     _class: JClass,
     ctx: i64,
@@ -44,7 +44,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeStatementContext
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_statementContextStatements(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextStatements(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -78,7 +78,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_statementContextStat
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_statementContextDownloadUrl(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextDownloadUrl(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,

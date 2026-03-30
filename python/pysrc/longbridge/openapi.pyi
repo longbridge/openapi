@@ -7672,3 +7672,226 @@ class AsyncTradeContext:
                 asyncio.run(main())
         """
         ...
+
+
+class StatementType:
+    """
+    Statement type
+    """
+
+    class Daily(StatementType):
+        """
+        Daily statement
+        """
+
+    class Monthly(StatementType):
+        """
+        Monthly statement
+        """
+
+
+class StatementItem:
+    """
+    Statement item
+    """
+
+    dt: int
+    """
+    Statement date (integer, e.g. 20250301)
+    """
+
+    file_key: str
+    """
+    File key used to request the download URL
+    """
+
+
+class GetStatementListResponse:
+    """
+    Response for get statement list
+    """
+
+    list: List[StatementItem]
+    """
+    List of statement items
+    """
+
+
+class GetStatementResponse:
+    """
+    Response for get statement download URL
+    """
+
+    url: str
+    """
+    Presigned download URL
+    """
+
+
+class AssetContext:
+    """
+    Asset context
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+
+    def statements(self, statement_type: Type[StatementType], start_date: int = 1, limit: int = 20) -> GetStatementListResponse:
+        """
+        Get statement data list
+
+        Args:
+            statement_type: Statement type (StatementType.Daily or StatementType.Monthly)
+            start_date: Start date for pagination (default 1)
+            limit: Number of results (default 20)
+
+        Returns:
+            Statement list response
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, StatementType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.statements(StatementType.Daily)
+                for item in resp.list:
+                    print(item.dt, item.file_key)
+        """
+        ...
+
+    def statement_download_url(self, file_key: str) -> GetStatementResponse:
+        """
+        Get statement data download URL
+
+        Args:
+            file_key: File key obtained from the statements list
+
+        Returns:
+            Statement download URL response
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, AssetContext, Config, StatementType
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = AssetContext(config)
+
+                resp = ctx.statements(StatementType.Daily)
+                if resp.list:
+                    url_resp = ctx.statement_download_url(resp.list[0].file_key)
+                    print(url_resp.url)
+        """
+        ...
+
+
+class AsyncAssetContext:
+    """
+    Async asset context for use with asyncio. Create via `AsyncAssetContext.create(config)` and await inside asyncio.
+    All I/O methods return awaitables.
+    """
+
+    @classmethod
+    def create(cls: Type["AsyncAssetContext"], config: Config) -> "AsyncAssetContext":
+        """
+        Create an async asset context.
+
+        Args:
+            config: Configuration object.
+
+        Returns:
+            AsyncAssetContext instance.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, StatementType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.statements(StatementType.Daily)
+                    for item in resp.list:
+                        print(item.dt, item.file_key)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def statements(self, statement_type: Type[StatementType], start_date: int = 1, limit: int = 20) -> Awaitable[GetStatementListResponse]:
+        """
+        Get statement data list. Returns an awaitable.
+
+        Args:
+            statement_type: Statement type (StatementType.Daily or StatementType.Monthly)
+            start_date: Start date for pagination (default 1)
+            limit: Number of results (default 20)
+
+        Returns:
+            Statement list response
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, StatementType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.statements(StatementType.Daily, limit=5)
+                    for item in resp.list:
+                        print(item.dt, item.file_key)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def statement_download_url(self, file_key: str) -> Awaitable[GetStatementResponse]:
+        """
+        Get statement data download URL. Returns an awaitable.
+
+        Args:
+            file_key: File key obtained from the statements list
+
+        Returns:
+            Statement download URL response
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, Config, AsyncAssetContext, StatementType
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncAssetContext.create(config)
+                    resp = await ctx.statements(StatementType.Daily)
+                    if resp.list:
+                        url_resp = await ctx.statement_download_url(resp.list[0].file_key)
+                        print(url_resp.url)
+
+                asyncio.run(main())
+        """
+        ...

@@ -58,13 +58,13 @@ public class SdkNative {
 
         public static native void freeOAuth(long oauth);
 
-        public static native long newStatementContext(long config);
+        public static native long newAssetContext(long config);
 
-        public static native void freeStatementContext(long context);
+        public static native void freeAssetContext(long context);
 
-        public static native void statementContextStatements(long context, Object opts, AsyncCallback callback);
+        public static native void assetContextStatements(long context, Object opts, AsyncCallback callback);
 
-        public static native void statementContextDownloadUrl(long context, String fileKey, AsyncCallback callback);
+        public static native void assetContextDownloadUrl(long context, String fileKey, AsyncCallback callback);
 
         public static native long newContentContext(long config);
 

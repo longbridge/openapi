@@ -7,7 +7,7 @@ mod quote;
 mod runtime;
 mod trade;
 
-pub use asset::StatementContextSync;
+pub use asset::AssetContextSync;
 pub use content::ContentContextSync;
 pub use error::BlockingError;
 pub use quote::QuoteContextSync;

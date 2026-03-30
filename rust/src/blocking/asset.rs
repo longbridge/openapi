@@ -6,22 +6,22 @@ use crate::{
     Config, Result,
     asset::{
         GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
-        GetStatementResponse, StatementContext,
+        GetStatementResponse, AssetContext,
     },
     blocking::runtime::BlockingRuntime,
 };
 
-/// Blocking statement context
-pub struct StatementContextSync {
-    rt: BlockingRuntime<StatementContext>,
+/// Blocking asset context
+pub struct AssetContextSync {
+    rt: BlockingRuntime<AssetContext>,
 }
 
-impl StatementContextSync {
-    /// Create a `StatementContextSync`
+impl AssetContextSync {
+    /// Create a `AssetContextSync`
     pub fn new(config: Arc<Config>) -> Result<Self> {
         let rt = BlockingRuntime::try_new(
             move || {
-                let ctx = StatementContext::new(config);
+                let ctx = AssetContext::new(config);
                 let (tx, rx) = mpsc::unbounded_channel::<std::convert::Infallible>();
                 std::mem::forget(tx);
                 Ok::<_, crate::Error>((ctx, rx))

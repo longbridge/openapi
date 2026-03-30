@@ -11,20 +11,20 @@ use crate::{
     error::ErrorNewType,
 };
 
-/// Statement context
+/// Asset context
 #[napi_derive::napi]
 #[derive(Clone)]
-pub struct StatementContext {
-    ctx: longbridge::asset::StatementContext,
+pub struct AssetContext {
+    ctx: longbridge::asset::AssetContext,
 }
 
 #[napi_derive::napi]
-impl StatementContext {
-    /// Create a new `StatementContext`
+impl AssetContext {
+    /// Create a new `AssetContext`
     #[napi]
-    pub fn new(config: &Config) -> StatementContext {
+    pub fn new(config: &Config) -> AssetContext {
         Self {
-            ctx: longbridge::asset::StatementContext::new(Arc::new(config.0.clone())),
+            ctx: longbridge::asset::AssetContext::new(Arc::new(config.0.clone())),
         }
     }
 

@@ -5,26 +5,26 @@ import java.util.concurrent.CompletableFuture;
 import com.longbridge.*;
 
 /**
- * Statement context for querying and downloading account statements
+ * Asset context for querying and downloading account statements
  */
-public class StatementContext implements AutoCloseable {
+public class AssetContext implements AutoCloseable {
     private long raw;
 
     /**
-     * Create a StatementContext object
+     * Create a AssetContext object
      *
      * @param config Config object
-     * @return A StatementContext object
+     * @return A AssetContext object
      */
-    public static StatementContext create(Config config) {
-        StatementContext ctx = new StatementContext();
-        ctx.raw = SdkNative.newStatementContext(config.getRaw());
+    public static AssetContext create(Config config) {
+        AssetContext ctx = new AssetContext();
+        ctx.raw = SdkNative.newAssetContext(config.getRaw());
         return ctx;
     }
 
     @Override
     public void close() throws Exception {
-        SdkNative.freeStatementContext(raw);
+        SdkNative.freeAssetContext(raw);
     }
 
     /**
@@ -37,7 +37,7 @@ public class StatementContext implements AutoCloseable {
     public CompletableFuture<Object> getStatements(GetStatementListOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.statementContextStatements(raw, opts, callback);
+            SdkNative.assetContextStatements(raw, opts, callback);
         });
     }
 
@@ -51,7 +51,7 @@ public class StatementContext implements AutoCloseable {
     public CompletableFuture<Object> getStatementDownloadUrl(String fileKey)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.statementContextDownloadUrl(raw, fileKey, callback);
+            SdkNative.assetContextDownloadUrl(raw, fileKey, callback);
         });
     }
 }

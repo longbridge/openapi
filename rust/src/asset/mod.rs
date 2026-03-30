@@ -1,11 +1,11 @@
-//! Statement related types
+//! Asset related types
 
 mod context;
 mod core;
 mod requests;
 mod types;
 
-pub use context::StatementContext;
+pub use context::AssetContext;
 pub use requests::{
     GetStatementOptions, GetStatementListOptions, StatementType,
 };

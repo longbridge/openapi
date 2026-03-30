@@ -32,6 +32,6 @@ pub use longbridge_httpcli as httpclient;
 pub use longbridge_wscli as wsclient;
 pub use quote::QuoteContext;
 pub use rust_decimal::Decimal;
-pub use asset::StatementContext;
+pub use asset::AssetContext;
 pub use trade::TradeContext;
 pub use types::Market;

@@ -12,39 +12,39 @@ use crate::{
     },
 };
 
-struct InnerStatementContext {
+struct InnerAssetContext {
     http_cli: HttpClient,
     log_subscriber: Arc<dyn Subscriber + Send + Sync>,
 }
 
-impl Drop for InnerStatementContext {
+impl Drop for InnerAssetContext {
     fn drop(&mut self) {
         dispatcher::with_default(&self.log_subscriber.clone().into(), || {
-            tracing::info!("statement context dropped");
+            tracing::info!("asset context dropped");
         });
     }
 }
 
-/// Statement context
+/// Asset context
 #[derive(Clone)]
-pub struct StatementContext(Arc<InnerStatementContext>);
+pub struct AssetContext(Arc<InnerAssetContext>);
 
-impl StatementContext {
-    /// Create a `StatementContext`
+impl AssetContext {
+    /// Create a `AssetContext`
     pub fn new(config: Arc<Config>) -> Self {
-        let log_subscriber = config.create_log_subscriber("statement");
+        let log_subscriber = config.create_log_subscriber("asset");
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
-            tracing::info!(language = ?config.language, "creating statement context");
+            tracing::info!(language = ?config.language, "creating asset context");
         });
 
-        let ctx = Self(Arc::new(InnerStatementContext {
+        let ctx = Self(Arc::new(InnerAssetContext {
             http_cli: config.create_http_client(),
             log_subscriber,
         }));
 
         dispatcher::with_default(&ctx.0.log_subscriber.clone().into(), || {
-            tracing::info!("statement context created");
+            tracing::info!("asset context created");
         });
 
         ctx

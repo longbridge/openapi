@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge::asset::StatementContext;
+use longbridge::asset::AssetContext;
 use pyo3::{prelude::*, types::PyType};
 
 use crate::{
@@ -9,19 +9,19 @@ use crate::{
     error::ErrorNewType,
 };
 
-/// Async statement context.
+/// Async asset context.
 #[pyclass]
-pub(crate) struct AsyncStatementContext {
-    ctx: Arc<StatementContext>,
+pub(crate) struct AsyncAssetContext {
+    ctx: Arc<AssetContext>,
 }
 
 #[pymethods]
-impl AsyncStatementContext {
-    /// Create an async statement context.
+impl AsyncAssetContext {
+    /// Create an async asset context.
     #[classmethod]
     fn create(_cls: &Bound<PyType>, config: &Config) -> Self {
-        AsyncStatementContext {
-            ctx: Arc::new(StatementContext::new(Arc::new(config.0.clone()))),
+        AsyncAssetContext {
+            ctx: Arc::new(AssetContext::new(Arc::new(config.0.clone()))),
         }
     }
 

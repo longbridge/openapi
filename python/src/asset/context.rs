@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge::blocking::StatementContextSync;
+use longbridge::blocking::AssetContextSync;
 use pyo3::prelude::*;
 
 use crate::{
@@ -10,16 +10,16 @@ use crate::{
 };
 
 #[pyclass]
-pub(crate) struct StatementContext {
-    ctx: StatementContextSync,
+pub(crate) struct AssetContext {
+    ctx: AssetContextSync,
 }
 
 #[pymethods]
-impl StatementContext {
+impl AssetContext {
     #[new]
     fn new(config: &Config) -> PyResult<Self> {
         Ok(Self {
-            ctx: StatementContextSync::new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
+            ctx: AssetContextSync::new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
         })
     }
 

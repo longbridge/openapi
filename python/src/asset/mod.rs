@@ -9,7 +9,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::StatementItem>()?;
     parent.add_class::<types::GetStatementListResponse>()?;
     parent.add_class::<types::GetStatementResponse>()?;
-    parent.add_class::<context::StatementContext>()?;
-    parent.add_class::<context_async::AsyncStatementContext>()?;
+    parent.add_class::<context::AssetContext>()?;
+    parent.add_class::<context_async::AsyncAssetContext>()?;
     Ok(())
 }

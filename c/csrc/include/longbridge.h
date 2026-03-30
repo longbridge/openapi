@@ -1279,6 +1279,11 @@ typedef enum lb_granularity_t {
 } lb_granularity_t;
 
 /**
+ * Asset context
+ */
+typedef struct CAssetContext CAssetContext;
+
+/**
  * Configuration options for Longbridge SDK
  */
 typedef struct lb_config_t lb_config_t;
@@ -1311,11 +1316,6 @@ typedef struct lb_oauth_t lb_oauth_t;
  * Quote context
  */
 typedef struct lb_quote_context_t lb_quote_context_t;
-
-/**
- * Statement context
- */
-typedef struct CStatementContext CStatementContext;
 
 /**
  * Trade context
@@ -4113,52 +4113,52 @@ extern "C" {
 #endif // __cplusplus
 
 /**
- * Create a new `StatementContext`
+ * Create a new `AssetContext`
  *
  * @param config  Config object
- * @return A new statement context
+ * @return A new asset context
  */
-const struct CStatementContext *lb_statement_context_new(const struct lb_config_t *config);
+const struct CAssetContext *lb_asset_context_new(const struct lb_config_t *config);
 
 /**
- * Retain the statement context (increment reference count)
+ * Retain the asset context (increment reference count)
  */
-void lb_statement_context_retain(const struct CStatementContext *ctx);
+void lb_asset_context_retain(const struct CAssetContext *ctx);
 
 /**
- * Release the statement context (decrement reference count)
+ * Release the asset context (decrement reference count)
  */
-void lb_statement_context_release(const struct CStatementContext *ctx);
+void lb_asset_context_release(const struct CAssetContext *ctx);
 
 /**
  * Get statement data list
  *
- * @param ctx             Statement context
+ * @param ctx             Asset context
  * @param statement_type  1 = daily, 2 = monthly
  * @param start_date      Start date for pagination (0 = default)
  * @param limit           Number of results (0 = default 20)
  * @param callback        Async callback
  * @param userdata        User data passed to the callback
  */
-void lb_statement_context_statements(const struct CStatementContext *ctx,
-                                     int32_t statement_type,
-                                     int32_t start_date,
-                                     int32_t limit,
-                                     lb_async_callback_t callback,
-                                     void *userdata);
+void lb_asset_context_statements(const struct CAssetContext *ctx,
+                                 int32_t statement_type,
+                                 int32_t start_date,
+                                 int32_t limit,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
 
 /**
  * Get statement data download URL
  *
- * @param ctx       Statement context
+ * @param ctx       Asset context
  * @param file_key  File key from the list response
  * @param callback  Async callback
  * @param userdata  User data passed to the callback
  */
-void lb_statement_context_download_url(const struct CStatementContext *ctx,
-                                       const char *file_key,
-                                       lb_async_callback_t callback,
-                                       void *userdata);
+void lb_asset_context_download_url(const struct CAssetContext *ctx,
+                                   const char *file_key,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
 
 /**
  * Create a new `Config` using API Key authentication
