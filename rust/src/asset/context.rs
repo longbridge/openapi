@@ -7,8 +7,8 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result,
     asset::{
-        GetStatementOptions, GetStatementResponse,
-        GetStatementListOptions, GetStatementListResponse, core,
+        GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
+        GetStatementResponse, core,
     },
 };
 

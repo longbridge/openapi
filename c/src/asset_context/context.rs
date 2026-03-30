@@ -1,11 +1,13 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 
-use longbridge::asset::{GetStatementListOptions, GetStatementOptions, AssetContext, StatementType};
+use longbridge::asset::{
+    AssetContext, GetStatementListOptions, GetStatementOptions, StatementType,
+};
 
 use crate::{
+    asset_context::types::CStatementItemOwned,
     async_call::{CAsyncCallback, execute_async},
     config::CConfig,
-    asset_context::types::CStatementItemOwned,
     types::{CString, CVec, cstr_to_rust},
 };
 
@@ -19,9 +21,7 @@ pub struct CAssetContext {
 /// @param config  Config object
 /// @return A new asset context
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_asset_context_new(
-    config: *const CConfig,
-) -> *const CAssetContext {
+pub unsafe extern "C" fn lb_asset_context_new(config: *const CConfig) -> *const CAssetContext {
     let config = Arc::new((*config).0.clone());
     let ctx = AssetContext::new(config);
     Arc::into_raw(Arc::new(CAssetContext { ctx }))
@@ -70,8 +70,7 @@ pub unsafe extern "C" fn lb_asset_context_statements(
         opts = opts.page_size(limit);
     }
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CStatementItemOwned> =
-            ctx_inner.statements(opts).await?.list.into();
+        let rows: CVec<CStatementItemOwned> = ctx_inner.statements(opts).await?.list.into();
         Ok(rows)
     });
 }
@@ -93,11 +92,7 @@ pub unsafe extern "C" fn lb_asset_context_download_url(
     let file_key = cstr_to_rust(file_key);
     let opts = GetStatementOptions::new(file_key);
     execute_async(callback, ctx, userdata, async move {
-        let url: CString = ctx_inner
-            .statement_download_url(opts)
-            .await?
-            .url
-            .into();
+        let url: CString = ctx_inner.statement_download_url(opts).await?.url.into();
         Ok(url)
     });
 }

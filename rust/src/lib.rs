@@ -20,11 +20,12 @@ mod types;
 pub mod blocking;
 
 pub use longbridge_oauth as oauth;
+pub mod asset;
 pub mod content;
 pub mod quote;
-pub mod asset;
 pub mod trade;
 
+pub use asset::AssetContext;
 pub use config::{Config, Language, PushCandlestickMode};
 pub use content::ContentContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
@@ -32,6 +33,5 @@ pub use longbridge_httpcli as httpclient;
 pub use longbridge_wscli as wsclient;
 pub use quote::QuoteContext;
 pub use rust_decimal::Decimal;
-pub use asset::AssetContext;
 pub use trade::TradeContext;
 pub use types::Market;

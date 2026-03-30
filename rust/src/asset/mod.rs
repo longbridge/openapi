@@ -6,7 +6,5 @@ mod requests;
 mod types;
 
 pub use context::AssetContext;
-pub use requests::{
-    GetStatementOptions, GetStatementListOptions, StatementType,
-};
+pub use requests::{GetStatementListOptions, GetStatementOptions, StatementType};
 pub use types::*;

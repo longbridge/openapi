@@ -39,13 +39,19 @@ impl GetStatementListOptions {
     #[inline]
     #[must_use]
     pub fn page(self, page: i32) -> Self {
-        Self { start_date: page, ..self }
+        Self {
+            start_date: page,
+            ..self
+        }
     }
 
     /// Set the page size
     #[inline]
     #[must_use]
     pub fn page_size(self, page_size: i32) -> Self {
-        Self { limit: page_size, ..self }
+        Self {
+            limit: page_size,
+            ..self
+        }
     }
 }

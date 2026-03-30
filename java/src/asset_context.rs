@@ -6,9 +6,7 @@ use jni::{
 };
 use longbridge::{
     Config,
-    asset::{
-        GetStatementListOptions, GetStatementOptions, AssetContext, StatementType,
-    },
+    asset::{AssetContext, GetStatementListOptions, GetStatementOptions, StatementType},
 };
 
 use crate::{

@@ -46,11 +46,7 @@ impl AsyncAssetContext {
     }
 
     /// Get statement data download URL. Returns awaitable.
-    fn statement_download_url(
-        &self,
-        py: Python<'_>,
-        file_key: String,
-    ) -> PyResult<Py<PyAny>> {
+    fn statement_download_url(&self, py: Python<'_>, file_key: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let opts = longbridge::asset::GetStatementOptions::new(file_key);

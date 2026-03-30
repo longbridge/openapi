@@ -5,8 +5,8 @@ use tokio::sync::mpsc;
 use crate::{
     Config, Result,
     asset::{
-        GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
-        GetStatementResponse, AssetContext,
+        AssetContext, GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
+        GetStatementResponse,
     },
     blocking::runtime::BlockingRuntime,
 };

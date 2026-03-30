@@ -35,10 +35,7 @@ impl AssetContext {
         req: Option<GetStatementListRequest>,
     ) -> Result<GetStatementListResponse> {
         let req = req.unwrap_or_default();
-        let st = req
-            .statement_type
-            .unwrap_or(StatementType::Daily)
-            .into();
+        let st = req.statement_type.unwrap_or(StatementType::Daily).into();
         let mut opts = longbridge::asset::GetStatementListOptions::new(st);
         if let Some(start_date) = req.start_date {
             opts = opts.page(start_date);
