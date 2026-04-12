@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Fixed
 
+- **Rust:** Fix incorrect cache expiry checks in `QuoteContext`.
 - **All bindings:** Correct `SecurityStaticInfo.dividend_yield` doc comment from "Dividend yield" (ratio) to "Dividend" (per share amount) across all language SDKs (Rust, Python, Node.js, Java, C, C++).
 - **All bindings:** `create_topic` now returns the topic ID (`String`) instead of `OwnedTopic` to avoid deserialization errors when the API response omits optional fields.
 
