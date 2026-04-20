@@ -6,7 +6,7 @@ use std::{
     sync::Arc,
 };
 
-pub(crate) use http::{HeaderValue, Request, header};
+pub(crate) use http::{HeaderName, HeaderValue, Request, header};
 use longbridge_httpcli::{HttpClient, HttpClientConfig, is_cn};
 use longbridge_oauth::OAuth;
 use num_enum::IntoPrimitive;
@@ -127,6 +127,8 @@ pub struct Config {
     pub(crate) enable_print_quote_packages: bool,
     pub(crate) language: Language,
     pub(crate) log_path: Option<PathBuf>,
+    /// Extra headers injected into every HTTP and WebSocket upgrade request.
+    pub(crate) custom_headers: HashMap<String, String>,
 }
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
@@ -218,6 +220,7 @@ impl Config {
             push_candlestick_mode: extras.push_candlestick_mode,
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
+            custom_headers: Default::default(),
         }
     }
 
@@ -266,6 +269,7 @@ impl Config {
             push_candlestick_mode: extras.push_candlestick_mode,
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
+            custom_headers: Default::default(),
         }
     }
 
@@ -320,6 +324,7 @@ impl Config {
             push_candlestick_mode: extras.push_candlestick_mode,
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
+            custom_headers: Default::default(),
         })
     }
 
@@ -419,7 +424,12 @@ impl Config {
             config = config.http_url(url.clone());
         }
 
-        HttpClient::new(config).header(header::ACCEPT_LANGUAGE, self.language.as_str())
+        let mut client =
+            HttpClient::new(config).header(header::ACCEPT_LANGUAGE, self.language.as_str());
+        for (key, value) in &self.custom_headers {
+            client = client.header(key.as_str(), value.as_str());
+        }
+        client
     }
 
     fn create_ws_request(&self, url: &str) -> tokio_tungstenite::tungstenite::Result<Request<()>> {
@@ -428,6 +438,14 @@ impl Config {
             header::ACCEPT_LANGUAGE,
             HeaderValue::from_str(self.language.as_str()).unwrap(),
         );
+        for (key, value) in &self.custom_headers {
+            if let (Ok(name), Ok(val)) = (
+                HeaderName::from_bytes(key.as_bytes()),
+                HeaderValue::from_str(value),
+            ) {
+                request.headers_mut().append(name, val);
+            }
+        }
         Ok(request)
     }
 
@@ -468,6 +486,13 @@ impl Config {
     /// Default: `None`
     pub fn log_path(mut self, path: impl Into<PathBuf>) -> Self {
         self.log_path = Some(path.into());
+        self
+    }
+
+    /// Add a custom header to every HTTP request and WebSocket upgrade request.
+    #[must_use]
+    pub fn header(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
+        self.custom_headers.insert(key.into(), value.into());
         self
     }
 

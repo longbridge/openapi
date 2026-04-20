@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
+- **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
 - **Rust, Python:** `ContentContext` adds three new methods:
   - `topic_detail(topic_id)` — get detail of a single topic.
   - `list_topic_replies(opts)` — list replies for a topic, with optional page/size filtering.
