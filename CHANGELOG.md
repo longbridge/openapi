@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [Unreleased]
 
+## Removed
+
+- **MCP:** Removed the built-in MCP server implementation. It is now maintained as a standalone project at https://github.com/longbridge/longbridge-mcp.
+
 ## Added
 
 - **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
