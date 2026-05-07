@@ -42,7 +42,7 @@ where
     {
         let mut inner = self.inner.lock().await;
         match inner.values.get(&key) {
-            Some(Item { deadline, value }) if deadline < &Instant::now() => Ok(value.clone()),
+            Some(Item { deadline, value }) if deadline > &Instant::now() => Ok(value.clone()),
             _ => {
                 let value = f(key.clone()).await?;
                 let deadline = Instant::now() + inner.timeout;
