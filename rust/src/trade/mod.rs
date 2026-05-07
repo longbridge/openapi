@@ -3,11 +3,15 @@
 mod cmd_code;
 mod context;
 mod core;
+mod extra_types;
 mod push_types;
 mod requests;
 mod types;
 
 pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, TradeContext};
+pub use extra_types::{
+    ProfitAnalysisDetailOptions, ProfitAnalysisSummaryOptions, ProfitAnalysisSublistOptions,
+};
 pub use push_types::{PushEvent, PushOrderChanged, TopicType};
 pub use requests::{
     EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,

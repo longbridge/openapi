@@ -1953,6 +1953,80 @@ impl QuoteContext {
             .map_err(|_| WsClientError::ClientClosed)?;
         Ok(reply_rx.await.map_err(|_| WsClientError::ClientClosed)?)
     }
+
+    // -----------------------------------------------------------------------
+    // Internal HTTP helpers used by ext.rs
+    // -----------------------------------------------------------------------
+
+    /// Perform a GET request returning a raw JSON value.
+    pub(crate) async fn http_get_json<Q: serde::Serialize + Send + Sync>(
+        &self,
+        path: &'static str,
+        query: Q,
+    ) -> Result<serde_json::Value> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path)
+            .query_params(query)
+            .response::<Json<serde_json::Value>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Perform a POST request with a JSON body, returning a raw JSON value.
+    pub(crate) async fn http_post_json<B: serde::Serialize + Send + Sync>(
+        &self,
+        path: &'static str,
+        body: B,
+    ) -> Result<serde_json::Value> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, path)
+            .body(Json(body))
+            .response::<Json<serde_json::Value>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Perform a DELETE request with query params.
+    pub(crate) async fn http_delete_json<Q: serde::Serialize + Send + Sync>(
+        &self,
+        path: &'static str,
+        query: Q,
+    ) -> Result<()> {
+        self.0
+            .http_cli
+            .request(Method::DELETE, path)
+            .query_params(query)
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(())
+    }
+
+    /// Perform a PUT request with a JSON body, returning a raw JSON value.
+    pub(crate) async fn http_put_json<B: serde::Serialize + Send + Sync>(
+        &self,
+        path: &'static str,
+        body: B,
+    ) -> Result<serde_json::Value> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::PUT, path)
+            .body(Json(body))
+            .response::<Json<serde_json::Value>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
 }
 
 fn normalize_symbol(symbol: &str) -> &str {

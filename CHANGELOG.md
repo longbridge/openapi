@@ -8,6 +8,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
+- **Rust, Go:** ~56 new API methods across `QuoteContext`, `AssetContext`, `TradeContext`, and four new context types.
+
+### QuoteContext — Fundamental Data (counter_id endpoints)
+  - `financial_report(symbol, opts)` — GET /v1/quote/financial-reports
+  - `institution_ratings(symbol)` — GET /v1/quote/institution-ratings
+  - `institution_rating_latest(symbol)` — GET /v1/quote/institution-rating-latest
+  - `institution_rating_detail(symbol, opts)` — GET /v1/quote/institution-ratings/detail
+  - `dividends(symbol, opts)` — GET /v1/quote/dividends
+  - `dividend_detail(symbol, dividend_id)` — GET /v1/quote/dividends/details
+  - `forecast_eps(symbol)` — GET /v1/quote/forecast-eps
+  - `financial_consensus(symbol)` — GET /v1/quote/financial-consensus-detail
+  - `valuation(symbol, opts)` — GET /v1/quote/valuation
+  - `valuation_history(symbol, opts)` — GET /v1/quote/valuation/detail
+  - `industry_valuation(symbol)` — GET /v1/quote/industry-valuation-comparison
+  - `industry_valuation_distribution(symbol)` — GET /v1/quote/industry-valuation-distribution
+  - `company_overview(symbol)` — GET /v1/quote/comp-overview
+  - `company_executives(symbol)` — GET /v1/quote/company-professionals
+  - `shareholders(symbol)` — GET /v1/quote/shareholders
+  - `fund_holders(symbol)` — GET /v1/quote/fund-holders
+  - `corporate_actions(symbol, opts)` — GET /v1/quote/company-act
+  - `investor_relations(symbol)` — GET /v1/quote/invest-relations
+  - `operating_data(symbol, opts)` — GET /v1/quote/operatings
+
+### QuoteContext — Market Data (symbol passthrough)
+  - `market_status(market)` — GET /v1/quote/market-status
+  - `broker_holding(symbol, opts)` — GET /v1/quote/broker-holding
+  - `broker_holding_detail(symbol)` — GET /v1/quote/broker-holding/detail
+  - `broker_holding_daily(symbol, broker_id)` — GET /v1/quote/broker-holding/daily
+  - `ah_premium_klines(symbol, opts)` — GET /v1/quote/ahpremium/klines
+  - `ah_premium_timeshares(symbol)` — GET /v1/quote/ahpremium/timeshares
+  - `trade_statistics(symbol)` — GET /v1/quote/trades-statistics
+  - `market_anomaly(market)` — GET /v1/quote/changes
+  - `index_constituents(symbol)` — GET /v1/quote/index-constituents
+  - `finance_calendar(market, opts)` — GET /v1/quote/finance_calendar
+
+### AssetContext
+  - `exchange_rates()` — GET /v1/asset/exchange_rates
+
+### TradeContext
+  - `profit_analysis_summary(opts)` — GET /v1/portfolio/profit-analysis-summary
+  - `profit_analysis_sublist(opts)` — GET /v1/portfolio/profit-analysis-sublist
+  - `profit_analysis_detail(opts)` — GET /v1/portfolio/profit-analysis/detail
+
+### New module: `alert` (`AlertContext`)
+  - `list_alerts()` — GET /v1/notify/reminders
+  - `add_alert(opts)` — POST /v1/notify/reminders
+  - `delete_alerts(ids)` — DELETE /v1/notify/reminders
+  - `enable_alert(id)` — PUT /v1/notify/reminders
+  - `disable_alert(id)` — PUT /v1/notify/reminders
+
+### New module: `dca` (`DcaContext`)
+  - `list_dca_plans(status?)` — GET /v1/dailycoins/query
+  - `create_dca_plan(opts)` — POST /v1/dailycoins/create
+  - `update_dca_plan(opts)` — POST /v1/dailycoins/update
+  - `pause_dca_plan(plan_id)` — POST /v1/dailycoins/toggle
+  - `resume_dca_plan(plan_id)` — POST /v1/dailycoins/toggle
+  - `stop_dca_plan(plan_id)` — POST /v1/dailycoins/toggle
+  - `dca_history(opts)` — GET /v1/dailycoins/query-records
+  - `dca_statistics(symbol?)` — GET /v1/dailycoins/statistic
+  - `check_dca_support(opts)` — POST /v1/dailycoins/batch-check-support
+
+### New module: `sharelist` (`SharelistContext`)
+  - `list_sharelists(count?)` — GET /v1/sharelists
+  - `sharelist_detail(id)` — GET /v1/sharelists/{id}
+  - `create_sharelist(opts)` — POST /v1/sharelists
+  - `delete_sharelist(id)` — DELETE /v1/sharelists/{id}
+  - `add_sharelist_items(id, symbols)` — POST /v1/sharelists/{id}/items
+  - `remove_sharelist_items(id, symbols)` — DELETE /v1/sharelists/{id}/items
+  - `sort_sharelist_items(id, symbols)` — POST /v1/sharelists/{id}/items/sort
+  - `popular_sharelists(count?)` — GET /v1/sharelists/popular
+
+### New module: `quant` (`QuantContext`)
+  - `run_quant_script(opts)` — POST /v1/quant/run_script
+
+- **Rust:** `quote::utils::symbol_to_counter_id` helper converts symbols to counter-id format (`ST/MARKET/CODE`).
+- **Rust:** New option types in `quote::extra_types` and `trade::extra_types` for the above methods. All new endpoints return `serde_json::Value`.
+- **Go:** New option types co-located in each context file. All new endpoints return `json.RawMessage`.
+
 - **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
 - **Rust, Python:** `ContentContext` adds three new methods:
   - `topic_detail(topic_id)` — get detail of a single topic.

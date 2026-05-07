@@ -20,3 +20,14 @@ pub struct StatementItem {
 pub struct GetStatementResponse {
     pub url: String,
 }
+
+/// An exchange rate entry.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExchangeRate {
+    /// Source currency code (e.g. "USD").
+    pub from_currency: String,
+    /// Target currency code (e.g. "HKD").
+    pub to_currency: String,
+    /// Exchange rate value as a string decimal.
+    pub rate: String,
+}

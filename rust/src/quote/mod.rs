@@ -4,6 +4,8 @@ mod cache;
 mod cmd_code;
 mod context;
 mod core;
+mod ext;
+mod extra_types;
 mod push_types;
 mod store;
 mod sub_flags;
@@ -11,6 +13,11 @@ mod types;
 mod utils;
 
 pub use context::QuoteContext;
+pub use extra_types::{
+    AhPremiumKlinesOptions, BrokerHoldingOptions, CorporateActionsOptions, DividendsOptions,
+    FinanceCalendarOptions, FinancialReportOptions, InstitutionRatingDetailOptions,
+    OperatingDataOptions, ValuationHistoryOptions, ValuationOptions,
+};
 pub use longbridge_proto::quote::{AdjustType, Period, TradeStatus};
 pub use push_types::{
     PushBrokers, PushCandlestick, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades,

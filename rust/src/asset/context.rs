@@ -7,7 +7,7 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result,
     asset::{
-        GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
+        ExchangeRate, GetStatementListOptions, GetStatementListResponse, GetStatementOptions,
         GetStatementResponse, core,
     },
 };
@@ -92,5 +92,30 @@ impl AssetContext {
     ) -> Result<GetStatementResponse> {
         self.get(core::GET_STATEMENT_DATA_DOWNLOAD_URL_PATH, options)
             .await
+    }
+
+    /// Get all exchange rates.
+    ///
+    /// Path: GET /v1/asset/exchange_rates
+    pub async fn exchange_rates(&self) -> Result<Vec<ExchangeRate>> {
+        #[derive(Serialize)]
+        struct Empty {}
+
+        #[derive(serde::Deserialize)]
+        struct Response {
+            list: Vec<ExchangeRate>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/asset/exchange_rates")
+            .query_params(Empty {})
+            .response::<Json<Response>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0
+            .list)
     }
 }
