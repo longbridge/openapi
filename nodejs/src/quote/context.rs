@@ -16,11 +16,12 @@ use crate::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
             FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-            MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-            QuotePackageDetail, RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex,
-            SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType,
-            StrikePriceInfo, SubType, SubTypes, Subscription, Trade, TradeSessions, WarrantInfo,
-            WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
+            MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily,
+            OptionVolumeStats, ParticipantInfo, Period, PinnedMode, QuotePackageDetail,
+            RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+            SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse,
+            SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription, Trade, TradeSessions,
+            WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
         },
     },
     time::{NaiveDate, NaiveDatetime},
@@ -1004,6 +1005,16 @@ impl QuoteContext {
             .map_err(ErrorNewType)?)
     }
 
+    /// Pin or unpin watchlist securities
+    #[napi]
+    pub async fn update_pinned(&self, mode: PinnedMode, symbols: Vec<String>) -> Result<()> {
+        Ok(self
+            .ctx
+            .update_pinned(mode.into(), symbols)
+            .await
+            .map_err(ErrorNewType)?)
+    }
+
     /// Get filings list
     #[napi]
     pub async fn filings(&self, symbol: String) -> Result<Vec<FilingItem>> {
@@ -1220,5 +1231,43 @@ impl QuoteContext {
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Get short interest data for a US security
+    #[napi]
+    pub async fn short_positions(&self, symbol: String) -> Result<ShortPositionsResponse> {
+        Ok(self
+            .ctx
+            .short_positions(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get real-time option call/put volume
+    #[napi]
+    pub async fn option_volume(&self, symbol: String) -> Result<OptionVolumeStats> {
+        Ok(self
+            .ctx
+            .option_volume(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get daily historical option volume
+    #[napi]
+    pub async fn option_volume_daily(
+        &self,
+        symbol: String,
+        timestamp: i64,
+        count: u32,
+    ) -> Result<OptionVolumeDaily> {
+        Ok(self
+            .ctx
+            .option_volume_daily(symbol, timestamp, count)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
     }
 }

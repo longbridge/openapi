@@ -1082,6 +1082,17 @@ pub(crate) enum SecuritiesUpdateMode {
     Replace,
 }
 
+/// Pinned mode for watchlist securities
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::quote::PinnedMode")]
+pub(crate) enum PinnedMode {
+    /// Pin (add) securities to the top
+    Add,
+    /// Unpin (remove) securities from the top
+    Remove,
+}
+
 /// Calc index
 #[pyclass(eq, eq_int, from_py_object)]
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
@@ -1408,4 +1419,134 @@ pub(crate) struct HistoryMarketTemperatureResponse {
     /// Records
     #[py(array)]
     records: Vec<MarketTemperature>,
+}
+
+// ── Step 3: short_positions / option_volume / option_volume_daily ─
+
+/// Short interest response
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortPositionsResponse {
+    /// Security symbol
+    pub symbol: String,
+    /// Short interest data points
+    pub data: Vec<ShortPosition>,
+    /// Number of data sources
+    pub sources: i32,
+}
+
+impl From<longbridge::quote::ShortPositionsResponse> for ShortPositionsResponse {
+    fn from(v: longbridge::quote::ShortPositionsResponse) -> Self {
+        Self {
+            symbol: v.symbol,
+            data: v.data.into_iter().map(Into::into).collect(),
+            sources: v.sources,
+        }
+    }
+}
+
+/// One short position data point
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortPosition {
+    /// Settlement date (unix timestamp string)
+    pub timestamp: String,
+    /// Short ratio
+    pub rate: String,
+    /// Average daily share volume
+    pub avg_daily_share_volume: String,
+    /// Current shares short
+    pub current_shares_short: String,
+    /// Days to cover
+    pub days_to_cover: String,
+    /// Closing price
+    pub close: String,
+}
+
+impl From<longbridge::quote::ShortPosition> for ShortPosition {
+    fn from(v: longbridge::quote::ShortPosition) -> Self {
+        Self {
+            timestamp: v.timestamp,
+            rate: v.rate,
+            avg_daily_share_volume: v.avg_daily_share_volume,
+            current_shares_short: v.current_shares_short,
+            days_to_cover: v.days_to_cover,
+            close: v.close,
+        }
+    }
+}
+
+/// Option volume stats response
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct OptionVolumeStats {
+    /// Call volume string
+    pub c: String,
+    /// Put volume string
+    pub p: String,
+}
+
+impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
+    fn from(v: longbridge::quote::OptionVolumeStats) -> Self {
+        Self { c: v.c, p: v.p }
+    }
+}
+
+/// Daily option volume response
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct OptionVolumeDaily {
+    /// Daily stats
+    pub stats: Vec<OptionVolumeDailyStat>,
+}
+
+impl From<longbridge::quote::OptionVolumeDaily> for OptionVolumeDaily {
+    fn from(v: longbridge::quote::OptionVolumeDaily) -> Self {
+        Self {
+            stats: v.stats.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One day's option volume stat
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct OptionVolumeDailyStat {
+    /// Underlying symbol
+    pub symbol: String,
+    /// Date timestamp string
+    pub timestamp: String,
+    /// Total volume
+    pub total_volume: String,
+    /// Put volume
+    pub total_put_volume: String,
+    /// Call volume
+    pub total_call_volume: String,
+    /// Put/call volume ratio
+    pub put_call_volume_ratio: String,
+    /// Total open interest
+    pub total_open_interest: String,
+    /// Put open interest
+    pub total_put_open_interest: String,
+    /// Call open interest
+    pub total_call_open_interest: String,
+    /// Put/call OI ratio
+    pub put_call_open_interest_ratio: String,
+}
+
+impl From<longbridge::quote::OptionVolumeDailyStat> for OptionVolumeDailyStat {
+    fn from(v: longbridge::quote::OptionVolumeDailyStat) -> Self {
+        Self {
+            symbol: v.symbol,
+            timestamp: v.timestamp,
+            total_volume: v.total_volume,
+            total_put_volume: v.total_put_volume,
+            total_call_volume: v.total_call_volume,
+            put_call_volume_ratio: v.put_call_volume_ratio,
+            total_open_interest: v.total_open_interest,
+            total_put_open_interest: v.total_put_open_interest,
+            total_call_open_interest: v.total_call_open_interest,
+            put_call_open_interest_ratio: v.put_call_open_interest_ratio,
+        }
+    }
 }

@@ -18,6 +18,7 @@ longbridge.workspace = true
 longbridge-c-macros = { path = "crates/macros" }
 
 rust_decimal = { workspace = true, features = ["maths"] }
+serde_json.workspace = true
 tokio = { workspace = true, features = ["rt-multi-thread"] }
 parking_lot.workspace = true
 time.workspace = true

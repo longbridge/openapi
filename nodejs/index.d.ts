@@ -30,6 +30,36 @@ export declare class AccountBalance {
   get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 
+/** Price alert management context. */
+export declare class AlertContext {
+  /** Create a new AlertContext. */
+  static new(config: Config): AlertContext
+  /** List all price alerts. */
+  list(): Promise<AlertList>
+  /**
+   * Add a price alert for a security.
+   *
+   * `triggerValue` is a price or percentage string depending on `condition`.
+   */
+  add(symbol: string, condition: AlertCondition, triggerValue: string, frequency: AlertFrequency): Promise<void>
+  /** Enable a previously disabled price alert. */
+  enable(alertId: string): Promise<void>
+  /** Disable a price alert without deleting it. */
+  disable(alertId: string): Promise<void>
+  /** Delete one or more price alerts by ID. */
+  delete(alertIds: Array<string>): Promise<void>
+}
+
+/** Asset context */
+export declare class AssetContext {
+  /** Create a new `AssetContext` */
+  static new(config: Config): AssetContext
+  /** Get statement data list */
+  statements(req?: GetStatementListRequest | undefined | null): Promise<GetStatementListResponse>
+  /** Get statement data download URL */
+  statementDownloadUrl(req: GetStatementDownloadUrlRequest): Promise<GetStatementDownloadUrlResponse>
+}
+
 /** Brokers */
 export declare class Brokers {
   toString(): string
@@ -38,6 +68,19 @@ export declare class Brokers {
   get position(): number
   /** Broker IDs */
   get brokerIds(): Array<number>
+}
+
+/** Financial calendar context — earnings, dividends, splits, IPOs, macro data. */
+export declare class CalendarContext {
+  /** Create a new CalendarContext. */
+  static new(config: Config): CalendarContext
+  /**
+   * Get financial calendar events.
+   *
+   * `start` and `end` are date strings in `YYYY-MM-DD` format.
+   * `market` is an optional market filter (e.g. `"HK"` or `"US"`).
+   */
+  financeCalendar(category: CalendarCategory, start: string, end: string, market?: string | undefined | null): Promise<CalendarEventsResponse>
 }
 
 /** Candlestick */
@@ -230,6 +273,58 @@ export declare class ContentContext {
   /** Get news list */
   news(symbol: string): Promise<Array<NewsItem>>
 }
+
+/** Dollar-cost averaging (DCA) plan management context. */
+export declare class DcaContext {
+  /** Create a new DCAContext. */
+  static new(config: Config): DcaContext
+  /**
+   * List DCA plans.
+   *
+   * Pass `null` for `status` to return all plans regardless of status.
+   */
+  list(status?: DCAStatus | undefined | null, symbol?: string | undefined | null): Promise<DcaList>
+  /**
+   * Create a new DCA plan.
+   *
+   * `dayOfWeek` is required when `frequency` is `Weekly` or `Fortnightly`
+   * (e.g. `"Mon"`). `dayOfMonth` is required when `frequency` is
+   * `Monthly` (e.g. `"15"`).
+   */
+  create(symbol: string, amount: string, frequency: DCAFrequency, dayOfWeek: string | undefined | null, dayOfMonth: number | undefined | null, allowMargin: boolean): Promise<DcaCreateResult>
+  /** Update an existing DCA plan. */
+  update(planId: string, amount?: string | undefined | null, frequency?: DCAFrequency | undefined | null, dayOfWeek?: string | undefined | null, dayOfMonth?: number | undefined | null, allowMargin?: boolean | undefined | null): Promise<DcaCreateResult>
+  /** Pause (suspend) a DCA plan. */
+  pause(planId: string): Promise<void>
+  /** Resume a suspended DCA plan. */
+  resume(planId: string): Promise<void>
+  /** Permanently stop a DCA plan. */
+  stop(planId: string): Promise<void>
+  /** Get execution history for a DCA plan. */
+  history(planId: string, page: number, limit: number): Promise<DcaHistoryResponse>
+  /**
+   * Get DCA statistics.
+   *
+   * Pass `null` for `symbol` to get aggregate statistics across all plans.
+   */
+  stats(symbol?: string | undefined | null): Promise<DcaStats>
+  /** Check DCA support for a list of securities. */
+  checkSupport(symbols: Array<string>): Promise<DcaSupportList>
+  /**
+   * Calculate the next projected trade date for a DCA plan.
+   *
+   * `dayOfWeek` is used for `Weekly`/`Fortnightly` frequency (e.g. `"Mon"`).
+   * `dayOfMonth` is used for `Monthly` frequency (1–28).
+   */
+  calcDate(symbol: string, frequency: DCAFrequency, dayOfWeek?: string | undefined | null, dayOfMonth?: number | undefined | null): Promise<DcaCalcDateResult>
+  /**
+   * Update the advance reminder hours for DCA execution notifications.
+   *
+   * `hours` must be one of `"1"`, `"6"`, or `"12"`.
+   */
+  setReminder(hours: string): Promise<void>
+}
+export type DCAContext = DcaContext
 
 export declare class Decimal {
   static E(): Decimal
@@ -451,6 +546,52 @@ export declare class FrozenTransactionFee {
   get frozenTransactionFee(): Decimal
 }
 
+/** Fundamental data context */
+export declare class FundamentalContext {
+  /** Create a new `FundamentalContext` */
+  static new(config: Config): FundamentalContext
+  /** Get financial reports */
+  financialReport(symbol: string, kind: FinancialReportKind, period?: FinancialReportPeriod | undefined | null): Promise<FinancialReports>
+  /** Get analyst ratings (latest + consensus summary) */
+  institutionRating(symbol: string): Promise<InstitutionRating>
+  /** Get historical analyst rating details */
+  institutionRatingDetail(symbol: string): Promise<InstitutionRatingDetail>
+  /** Get dividend history */
+  dividend(symbol: string): Promise<DividendList>
+  /** Get detailed dividend information */
+  dividendDetail(symbol: string): Promise<DividendList>
+  /** Get EPS forecasts */
+  forecastEps(symbol: string): Promise<ForecastEps>
+  /** Get financial consensus estimates */
+  consensus(symbol: string): Promise<FinancialConsensus>
+  /** Get valuation metrics (PE / PB / PS / dividend yield) */
+  valuation(symbol: string): Promise<ValuationData>
+  /** Get historical valuation data */
+  valuationHistory(symbol: string): Promise<ValuationHistoryResponse>
+  /** Get industry peer valuation comparison */
+  industryValuation(symbol: string): Promise<IndustryValuationList>
+  /** Get industry valuation distribution */
+  industryValuationDist(symbol: string): Promise<IndustryValuationDist>
+  /** Get company overview */
+  company(symbol: string): Promise<CompanyOverview>
+  /** Get executive and board member information */
+  executive(symbol: string): Promise<ExecutiveList>
+  /** Get major shareholders */
+  shareholder(symbol: string): Promise<ShareholderList>
+  /** Get fund and ETF holders */
+  fundHolder(symbol: string): Promise<FundHolders>
+  /** Get corporate actions */
+  corpAction(symbol: string): Promise<CorpActions>
+  /** Get investor relations data */
+  investRelation(symbol: string): Promise<InvestRelations>
+  /** Get operating metrics and financial report summaries */
+  operating(symbol: string): Promise<OperatingList>
+  /** Get buyback data for a security */
+  buyback(symbol: string): Promise<BuybackData>
+  /** Get stock ratings for a security */
+  ratings(symbol: string): Promise<StockRatings>
+}
+
 /** Fund position */
 export declare class FundPosition {
   toString(): string
@@ -583,6 +724,30 @@ export declare class MarginRatio {
   get mmFactor(): Decimal
   /** Forced close-out margin ratio */
   get fmFactor(): Decimal
+}
+
+/** Market data context */
+export declare class MarketContext {
+  /** Create a new `MarketContext` */
+  static new(config: Config): MarketContext
+  /** Get market trading status */
+  marketStatus(): Promise<MarketStatusResponse>
+  /** Get top broker holdings */
+  brokerHolding(symbol: string, period: BrokerHoldingPeriod): Promise<BrokerHoldingTop>
+  /** Get full broker holding details */
+  brokerHoldingDetail(symbol: string): Promise<BrokerHoldingDetail>
+  /** Get daily holding history for a broker */
+  brokerHoldingDaily(symbol: string, brokerId: string): Promise<BrokerHoldingDailyHistory>
+  /** Get A/H premium K-lines */
+  ahPremium(symbol: string, period: AhPremiumPeriod, count: number): Promise<AhPremiumKlines>
+  /** Get A/H premium intraday data */
+  ahPremiumIntraday(symbol: string): Promise<AhPremiumIntraday>
+  /** Get trade statistics */
+  tradeStats(symbol: string): Promise<TradeStatsResponse>
+  /** Get market anomaly alerts */
+  anomaly(market: string): Promise<AnomalyResponse>
+  /** Get index constituent stocks */
+  constituent(symbol: string): Promise<IndexConstituents>
 }
 
 /** Market temperature */
@@ -1005,6 +1170,40 @@ export declare class ParticipantInfo {
   get nameEn(): string
   /** Participant name (zh-HK) */
   get nameHk(): string
+}
+
+/** Portfolio analytics context — exchange rates and P&L analysis. */
+export declare class PortfolioContext {
+  /** Create a new PortfolioContext. */
+  static new(config: Config): PortfolioContext
+  /** Get exchange rates for supported currencies. */
+  exchangeRate(): Promise<ExchangeRates>
+  /**
+   * Get portfolio P&L analysis (summary + per-security breakdown).
+   *
+   * `start` and `end` are optional date strings in `YYYY-MM-DD` format.
+   */
+  profitAnalysis(start?: string | undefined | null, end?: string | undefined | null): Promise<ProfitAnalysis>
+  /**
+   * Get P&L detail for a specific security.
+   *
+   * `start` and `end` are optional date strings in `YYYY-MM-DD` format.
+   */
+  profitAnalysisDetail(symbol: string, start?: string | undefined | null, end?: string | undefined | null): Promise<ProfitAnalysisDetail>
+  /**
+   * Get paginated P&L analysis grouped by market.
+   *
+   * All filter parameters are optional. `page` is 1-based (default 1);
+   * `size` controls the page size (default 20).
+   * `start` and `end` are optional date strings in `YYYY-MM-DD` format.
+   */
+  profitAnalysisByMarket(market: string | undefined | null, start: string | undefined | null, end: string | undefined | null, currency: string | undefined | null, page: number, size: number): Promise<ProfitAnalysisByMarket>
+  /**
+   * Get paginated P&L flow records for a security.
+   *
+   * `start` and `end` are optional date strings in `YYYY-MM-DD` format.
+   */
+  profitAnalysisFlows(symbol: string, page: number, size: number, derivative: boolean, start?: string | undefined | null, end?: string | undefined | null): Promise<ProfitAnalysisFlows>
 }
 
 /** Quote of US pre/post market */
@@ -1634,6 +1833,8 @@ export declare class QuoteContext {
    * ```
    */
   updateWatchlistGroup(req: UpdateWatchlistGroup): Promise<void>
+  /** Pin or unpin watchlist securities */
+  updatePinned(mode: PinnedMode, symbols: Array<string>): Promise<void>
   /** Get filings list */
   filings(symbol: string): Promise<Array<FilingItem>>
   /**
@@ -1772,6 +1973,12 @@ export declare class QuoteContext {
    * ```
    */
   realtimeCandlesticks(symbol: string, period: Period, count: number): Promise<Array<Candlestick>>
+  /** Get short interest data for a US security */
+  shortPositions(symbol: string): Promise<ShortPositionsResponse>
+  /** Get real-time option call/put volume */
+  optionVolume(symbol: string): Promise<OptionVolumeStats>
+  /** Get daily historical option volume */
+  optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
 }
 
 export declare class QuotePackageDetail {
@@ -2003,6 +2210,32 @@ export declare class SecurityStaticInfo {
   get stockDerivatives(): Array<DerivativeType>
   /** Board */
   get board(): SecurityBoard
+}
+
+/** Community sharelist management context. */
+export declare class SharelistContext {
+  /** Create a new SharelistContext. */
+  static new(config: Config): SharelistContext
+  /**
+   * List user's own and subscribed sharelists.
+   *
+   * `count` controls how many sharelists are returned per category.
+   */
+  list(count: number): Promise<SharelistList>
+  /** Get sharelist detail including constituent stocks and subscription info. */
+  detail(id: number): Promise<SharelistDetail>
+  /** Get popular (trending) sharelists. */
+  popular(count: number): Promise<SharelistList>
+  /** Create a new sharelist. */
+  create(name: string, description?: string | undefined | null): Promise<void>
+  /** Delete a sharelist. */
+  delete(id: number): Promise<void>
+  /** Add securities to a sharelist. */
+  addSecurities(id: number, symbols: Array<string>): Promise<void>
+  /** Remove securities from a sharelist. */
+  removeSecurities(id: number, symbols: Array<string>): Promise<void>
+  /** Reorder securities in a sharelist. */
+  sortSecurities(id: number, symbols: Array<string>): Promise<void>
 }
 
 /** Stock position */
@@ -2614,6 +2847,8 @@ export declare class WatchlistSecurity {
   get watchedPrice(): Decimal | null
   /** Watched time */
   get watchedAt(): Date
+  /** Whether the security is pinned to the top of the group */
+  get isPinned(): boolean
 }
 
 /** Candlestick adjustment type */
@@ -2622,6 +2857,154 @@ export declare const enum AdjustType {
   NoAdjust = 0,
   /** Adjust forward */
   ForwardAdjust = 1
+}
+
+/** A/H premium intraday response */
+export interface AhPremiumIntraday {
+  /** Intraday data points */
+  klines: Array<AhPremiumKline>
+}
+
+/** One A/H premium data point */
+export interface AhPremiumKline {
+  /** A-share price */
+  aprice: string
+  /** A-share previous close */
+  apreclose: string
+  /** H-share price */
+  hprice: string
+  /** H-share previous close */
+  hpreclose: string
+  /** CNY/HKD exchange rate */
+  currencyRate: string
+  /** A/H premium rate (negative = H-share at premium) */
+  ahpremiumRate: string
+  /** Price spread */
+  priceSpread: string
+  /** Data point timestamp (unix seconds) */
+  timestamp: number
+}
+
+/** A/H premium K-lines response */
+export interface AhPremiumKlines {
+  /** K-line data points */
+  klines: Array<AhPremiumKline>
+}
+
+/** A/H premium K-line period */
+export declare const enum AhPremiumPeriod {
+  /** 1-minute */
+  Min1 = 0,
+  /** 5-minute */
+  Min5 = 1,
+  /** 15-minute */
+  Min15 = 2,
+  /** 30-minute */
+  Min30 = 3,
+  /** 60-minute */
+  Min60 = 4,
+  /** Daily */
+  Day = 5,
+  /** Weekly */
+  Week = 6,
+  /** Monthly */
+  Month = 7,
+  /** Yearly */
+  Year = 8
+}
+
+/** Alert condition */
+export declare const enum AlertCondition {
+  /** Price rises above threshold */
+  PriceRise = 0,
+  /** Price falls below threshold */
+  PriceFall = 1,
+  /** Percentage rise above threshold */
+  PercentRise = 2,
+  /** Percentage fall below threshold */
+  PercentFall = 3
+}
+
+/** Alert trigger frequency */
+export declare const enum AlertFrequency {
+  /** Trigger once per day */
+  Daily = 0,
+  /** Trigger every time condition is met */
+  EveryTime = 1,
+  /** Trigger only once */
+  Once = 2
+}
+
+/** One price alert */
+export interface AlertItem {
+  /** Alert ID */
+  id: string
+  /** Condition: "1"=price_rise, "2"=price_fall, "3"=pct_rise, "4"=pct_fall */
+  indicatorId: string
+  /** Whether the alert is active */
+  enabled: boolean
+  /** Frequency: 1=daily, 2=every_time, 3=once */
+  frequency: number
+  /** Scope */
+  scope: number
+  /** Display text, e.g. "价格涨到 600" */
+  text: string
+  /** Trigger state flags */
+  state: Array<number>
+  /** Trigger value: `{"price":"500"}` or `{"chg":"5"}` */
+  valueMap: any
+}
+
+/** Alert list response */
+export interface AlertList {
+  /** Alert groups per security */
+  lists: Array<AlertSymbolGroup>
+}
+
+/** Alert items for one security */
+export interface AlertSymbolGroup {
+  /** Security symbol */
+  symbol: string
+  /** Ticker code (without market) */
+  code: string
+  /** Market, e.g. `"HK"` */
+  market: string
+  /** Security name */
+  name: string
+  /** Latest price */
+  price: string
+  /** Day change amount */
+  chg: string
+  /** Day change percentage */
+  pChg: string
+  /** Product type (may be empty) */
+  product: string
+  /** Alert items */
+  indicators: Array<AlertItem>
+}
+
+/** One market anomaly event (e.g. large block trade, margin buying surge) */
+export interface AnomalyItem {
+  /** Security symbol */
+  symbol: string
+  /** Security name */
+  name: string
+  /** Anomaly type name, e.g. `"大宗交易"`, `"融资买入"` */
+  alertName: string
+  /** Time of the anomaly (unix timestamp in milliseconds) */
+  alertTime: number
+  /** Change values — items are accessed as strings by the client */
+  changeValues: Array<string>
+  /** Sentiment direction: 1 = positive/up, 2 = negative/down */
+  emotion: number
+}
+
+/** Market anomaly response */
+export interface AnomalyResponse {
+  /** Whether anomaly alerts are globally disabled */
+  allOff: boolean
+  /** List of market anomaly events */
+  changes: Array<AnomalyItem>
 }
 
 export declare const enum BalanceType {
@@ -2633,6 +3016,117 @@ export declare const enum BalanceType {
   Stock = 2,
   /** Fund */
   Fund = 3
+}
+
+/** Changes in broker holding over 1 / 5 / 20 / 60 day periods */
+export interface BrokerHoldingChanges {
+  /** Current value */
+  value?: string
+  /** 1-day change */
+  chg1?: string
+  /** 5-day change */
+  chg5?: string
+  /** 20-day change */
+  chg20?: string
+  /** 60-day change */
+  chg60?: string
+}
+
+/** Daily broker holding history response */
+export interface BrokerHoldingDailyHistory {
+  /** Daily broker holding records */
+  list: Array<BrokerHoldingDailyItem>
+}
+
+/** One day's broker holding record */
+export interface BrokerHoldingDailyItem {
+  /** Date in `"2026.05.05"` format */
+  date: string
+  /** Total shares held */
+  holding?: string
+  /** Holding ratio */
+  ratio?: string
+  /** Change vs previous day */
+  chg?: string
+}
+
+/** Full broker holding detail response */
+export interface BrokerHoldingDetail {
+  /** Full list of broker holdings */
+  list: Array<BrokerHoldingDetailItem>
+  /** Last updated (may be empty) */
+  updatedAt: string
+}
+
+/** One broker's full holding detail */
+export interface BrokerHoldingDetailItem {
+  /** Broker name */
+  name: string
+  /** Participant number / broker code */
+  partiNumber: string
+  /** Holding ratio changes over various periods */
+  ratio: BrokerHoldingChanges
+  /** Share count changes over various periods */
+  shares: BrokerHoldingChanges
+  /** Whether this is a "strengthening" broker */
+  strong: boolean
+}
+
+/** One broker entry in a top-holding list */
+export interface BrokerHoldingEntry {
+  /** Broker name */
+  name: string
+  /** Participant number / broker code */
+  partiNumber: string
+  /** Net change in shares held */
+  chg?: string
+  /** Whether this is a "strengthening" broker */
+  strong: boolean
+}
+
+/** Broker holding lookback period */
+export declare const enum BrokerHoldingPeriod {
+  /** 1-day change */
+  Rct1 = 0,
+  /** 5-day change */
+  Rct5 = 1,
+  /** 20-day change */
+  Rct20 = 2,
+  /** 60-day change */
+  Rct60 = 3
+}
+
+/** Top broker holdings response */
+export interface BrokerHoldingTop {
+  /** Top brokers by net buying */
+  buy: Array<BrokerHoldingEntry>
+  /** Top brokers by net selling */
+  sell: Array<BrokerHoldingEntry>
+  /** Last updated (may be empty) */
+  updatedAt: string
+}
+
+/** Buyback data response */
+export interface BuybackData {
+  recentBuybacks?: RecentBuybacks
+  buybackHistory: Array<BuybackHistoryItem>
+  buybackRatios: Array<BuybackRatios>
+}
+
+/** Historical annual buyback data item */
+export interface BuybackHistoryItem {
+  fiscalYear: string
+  fiscalYearRange: string
+  netBuyback: string
+  netBuybackYield: string
+  netBuybackGrowthRate: string
+  currency: string
+}
+
+/** Buyback payout and cash-flow ratios */
+export interface BuybackRatios {
+  netBuybackPayoutRatio: string
+  netBuybackToCashflowRatio: string
 }
 
 export declare const enum CalcIndex {
@@ -2718,6 +3212,88 @@ export declare const enum CalcIndex {
   Rho = 39
 }
 
+/** Calendar event category */
+export declare const enum CalendarCategory {
+  /** Earnings reports */
+  Report = 0,
+  /** Dividend events */
+  Dividend = 1,
+  /** Stock splits */
+  Split = 2,
+  /** IPOs */
+  Ipo = 3,
+  /** Macro-economic data releases */
+  MacroData = 4,
+  /** Market closure days */
+  Closed = 5
+}
+
+/** One key-value data pair in a calendar event */
+export interface CalendarDataKv {
+  /** Key (may be empty) */
+  key: string
+  /** Formatted display value */
+  value: string
+  /** Value type code, e.g. `"estimate_eps"` */
+  valueType: string
+  /** Raw numeric value */
+  valueRaw: string
+}
+
+/** Events for one calendar date */
+export interface CalendarDateGroup {
+  /** Date string, e.g. `"2025-05-02"` */
+  date: string
+  /** Total event count for this date */
+  count: number
+  /** Event details */
+  infos: Array<CalendarEventInfo>
+}
+
+/** One financial calendar event */
+export interface CalendarEventInfo {
+  /** Security symbol */
+  symbol: string
+  /** Market, e.g. `"HK"` */
+  market: string
+  /** Event content description */
+  content: string
+  /** Security name */
+  counterName: string
+  /** Date type label, e.g. `"盘前"` */
+  dateType: string
+  /** Event date string, e.g. `"2025.05.02"` */
+  date: string
+  /** Chart UID (may be empty) */
+  chartUid: string
+  /** Structured data key-value pairs */
+  dataKv: Array<CalendarDataKv>
+  /** Event type code, e.g. `"financial"` */
+  eventType: string
+  /** Event datetime (unix timestamp string) */
+  datetime: string
+  /** Icon URL */
+  icon: string
+  /** Importance star rating (0–3) */
+  star: number
+  /** Internal event ID */
+  id: string
+  /** Financial market session time string */
+  financialMarketTime: string
+  /** Currency */
+  currency: string
+  /** Activity type code */
+  activityType: string
+}
+
+/** Finance calendar response */
+export interface CalendarEventsResponse {
+  /** Start date of the query window */
+  date: string
+  /** Per-day event groups */
+  list: Array<CalendarDateGroup>
+}
+
 export declare const enum CashFlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -2751,6 +3327,190 @@ export declare const enum CommissionFreeStatus {
   Ready = 4
 }
 
+/** Company overview response */
+export interface CompanyOverview {
+  /** Short name */
+  name: string
+  /** Full legal name */
+  companyName: string
+  /** Founding date */
+  founded: string
+  /** Listing date */
+  listingDate: string
+  /** Primary listing market */
+  market: string
+  /** Market region code */
+  region: string
+  /** Registered address */
+  address: string
+  /** Office address */
+  officeAddress: string
+  /** Website */
+  website: string
+  /** IPO price */
+  issuePrice?: string
+  /** Shares offered at IPO */
+  sharesOffered: string
+  /** Chairman */
+  chairman: string
+  /** Company secretary */
+  secretary: string
+  /** Auditing institution */
+  auditInst: string
+  /** Company category */
+  category: string
+  /** Fiscal year end */
+  yearEnd: string
+  /** Number of employees */
+  employees: string
+  /** Phone number */
+  phone: string
+  /** Fax number */
+  fax: string
+  /** Email */
+  email: string
+  /** Legal representative */
+  legalRepr: string
+  /** CEO / MD */
+  manager: string
+  /** Business licence number */
+  busLicense: string
+  /** Accounting firm */
+  accountingFirm: string
+  /** Securities representative */
+  securitiesRep: string
+  /** Legal counsel */
+  legalCounsel: string
+  /** Postal code */
+  zipCode: string
+  /** Exchange ticker */
+  ticker: string
+  /** Logo URL */
+  icon: string
+  /** Business profile */
+  profile: string
+  /** ADS ratio */
+  adsRatio: string
+  /** Industry sector code */
+  sector: number
+}
+
+/** Consensus estimate for one metric */
+export interface ConsensusDetail {
+  /** Metric key */
+  key: string
+  /** Display name */
+  name: string
+  /** Metric description */
+  description: string
+  /** Actual value */
+  actual?: string
+  /** Consensus estimate */
+  estimate?: string
+  /** Actual minus estimate */
+  compValue?: string
+  /** Beat/miss description */
+  compDesc: string
+  /** Comparison code */
+  comp: string
+  /** Whether actual results are published */
+  isReleased: boolean
+}
+
+/** Consensus report for one fiscal period */
+export interface ConsensusReport {
+  /** Fiscal year */
+  fiscalYear: number
+  /** Fiscal period code */
+  fiscalPeriod: string
+  /** Human-readable period label */
+  periodText: string
+  /** Per-metric consensus details */
+  details: Array<ConsensusDetail>
+}
+
+/** One constituent stock of an index */
+export interface ConstituentStock {
+  /** Security symbol */
+  symbol: string
+  /** Security name */
+  name: string
+  /** Latest price */
+  lastDone?: string
+  /** Previous close */
+  prevClose?: string
+  /** Net capital inflow today */
+  inflow?: string
+  /** Turnover amount */
+  balance?: string
+  /** Trading volume (shares) */
+  amount?: string
+  /** Total shares outstanding */
+  totalShares?: string
+  /** Tags, e.g. `["领涨龙头"]` */
+  tags: Array<string>
+  /** Brief description */
+  intro: string
+  /** Market, e.g. `"HK"` */
+  market: string
+  /** Circulating shares */
+  circulatingShares?: string
+  /** Whether this is a delayed quote */
+  delay: boolean
+  /** Day change percentage */
+  chg?: string
+  /** Raw trade status code */
+  tradeStatus: number
+}
+
+/** One corporate action event */
+export interface CorpActionItem {
+  /** Internal ID */
+  id: string
+  /** Date in YYYYMMDD format */
+  date: string
+  /** Short display date */
+  dateStr: string
+  /** Date type label */
+  dateType: string
+  /** Time zone description */
+  dateZone: string
+  /** Event category */
+  actType: string
+  /** Description */
+  actDesc: string
+  /** Machine-readable action code */
+  action: string
+  /** Whether recent */
+  recent: boolean
+  /** Whether delayed */
+  isDelay: boolean
+  /** Delay content */
+  delayContent: string
+  /** Associated live stream */
+  live?: CorpActionLive
+}
+
+/** Live stream for a corp action */
+export interface CorpActionLive {
+  /** Stream ID */
+  id: string
+  /** Status code (may be integer or string in API) */
+  status: string
+  /** Start time */
+  startedAt: string
+  /** Title */
+  name: string
+  /** Icon URL */
+  icon: string
+}
+
+/** Corporate actions response */
+export interface CorpActions {
+  /** Corporate action events */
+  items: Array<CorpActionItem>
+}
+
 /** Options for creating a topic */
 export interface CreateTopicRequest {
   /** Topic title (required) */
@@ -2771,6 +3531,158 @@ export interface CreateWatchlistGroup {
   name: string
   /** Securities */
   securities?: Array<string>
+}
+
+/** Result of a DCA date calculation */
+export interface DcaCalcDateResult {
+  /** Next projected trade date (unix timestamp string) */
+  tradeDate: string
+}
+
+/** Result of creating or updating a DCA plan */
+export interface DcaCreateResult {
+  /** The plan ID */
+  planId: string
+}
+
+/** DCA investment frequency */
+export declare const enum DCAFrequency {
+  /** Daily investment */
+  Daily = 0,
+  /** Weekly investment */
+  Weekly = 1,
+  /** Fortnightly (every two weeks) investment */
+  Fortnightly = 2,
+  /** Monthly investment */
+  Monthly = 3
+}
+
+/** One DCA execution record */
+export interface DcaHistoryRecord {
+  /** Execution time */
+  createdAt: string
+  /** Associated order ID */
+  orderId: string
+  /** Status */
+  status: string
+  /** Action type */
+  action: string
+  /** Order type */
+  orderType: string
+  /** Executed quantity */
+  executedQty?: string
+  /** Executed price */
+  executedPrice?: string
+  /** Executed amount */
+  executedAmount?: string
+  /** Rejection reason (if any) */
+  rejectedReason: string
+  /** Security symbol */
+  symbol: string
+}
+
+/** DCA execution history response */
+export interface DcaHistoryResponse {
+  /** Execution history records */
+  records: Array<DcaHistoryRecord>
+  /** Whether more records exist */
+  hasMore: boolean
+}
+
+/** Response for DCA list and write operations */
+export interface DcaList {
+  /** DCA plans */
+  plans: Array<DcaPlan>
+}
+
+/** One DCA (dollar-cost averaging) investment plan */
+export interface DcaPlan {
+  /** Plan ID */
+  planId: string
+  /** Status: `"Active"`, `"Suspended"`, `"Finished"` */
+  status: string
+  /** Security symbol */
+  symbol: string
+  /** Member ID */
+  memberId: string
+  /** Account ID */
+  aaid: string
+  /** Account channel */
+  accountChannel: string
+  /** Display account */
+  displayAccount: string
+  /** Market */
+  market: string
+  /** Investment amount per period */
+  perInvestAmount: string
+  /** Frequency: `"Daily"`, `"Weekly"`, `"Monthly"` */
+  investFrequency: string
+  /** Day of week for weekly plans (e.g. `"Mon"`) */
+  investDayOfWeek: string
+  /** Day of month for monthly plans */
+  investDayOfMonth: string
+  /** Whether margin finance is allowed */
+  allowMarginFinance: boolean
+  /** Reminder time */
+  alterHours: string
+  /** Creation time */
+  createdAt: string
+  /** Last updated time */
+  updatedAt: string
+  /** Next investment date */
+  nextTrdDate: string
+  /** Security name */
+  stockName: string
+  /** Cumulative invested amount */
+  cumAmount?: string
+  /** Number of completed investment periods */
+  issueNumber: number
+  /** Average cost */
+  averageCost?: string
+  /** Cumulative profit/loss */
+  cumProfit?: string
+}
+
+/** DCA statistics response */
+export interface DcaStats {
+  /** Number of active plans */
+  activeCount: string
+  /** Number of finished plans */
+  finishedCount: string
+  /** Number of suspended plans */
+  suspendedCount: string
+  /** Nearest upcoming plans */
+  nearestPlans: Array<DcaPlan>
+  /** Days until next investment */
+  restDays: string
+  /** Total invested amount */
+  totalAmount?: string
+  /** Total profit/loss */
+  totalProfit?: string
+}
+
+/** DCA plan status */
+export declare const enum DCAStatus {
+  /** Active plan */
+  Active = 0,
+  /** Suspended plan */
+  Suspended = 1,
+  /** Finished plan */
+  Finished = 2
+}
+
+/** DCA support info for one security */
+export interface DcaSupportInfo {
+  /** Security symbol */
+  symbol: string
+  /** Whether DCA is supported for this security */
+  supportRegularSaving: boolean
+}
+
+/** Response for DCA support check */
+export interface DcaSupportList {
+  /** Support info per security */
+  infos: Array<DcaSupportInfo>
 }
 
 /** Deduction status */
@@ -2803,6 +3715,28 @@ export declare const enum DerivativeType {
   Warrant = 1
 }
 
+/** A single dividend event */
+export interface DividendItem {
+  /** Security symbol */
+  symbol: string
+  /** Internal record ID */
+  id: string
+  /** Human-readable description */
+  desc: string
+  /** Record / book-close date */
+  recordDate: string
+  /** Ex-dividend date */
+  exDate: string
+  /** Payment date */
+  paymentDate: string
+}
+
+/** Dividend history response */
+export interface DividendList {
+  /** List of dividend events */
+  list: Array<DividendItem>
+}
+
 /** Options for get cash flow request */
 export interface EstimateMaxPurchaseQuantityOptions {
   symbol: string
@@ -2812,6 +3746,44 @@ export interface EstimateMaxPurchaseQuantityOptions {
   currency?: string
   orderId?: string
   fractionalShares: boolean
+}
+
+/** One currency exchange rate */
+export interface ExchangeRate {
+  /** Average rate (base_currency / other_currency) */
+  averageRate: number
+  /** Base currency, e.g. `"USD"` */
+  baseCurrency: string
+  /** Bid rate */
+  bidRate: number
+  /** Offer rate */
+  offerRate: number
+  /** Other currency, e.g. `"HKD"` */
+  otherCurrency: string
+}
+
+/** Response for exchange rate query */
+export interface ExchangeRates {
+  /** List of exchange rates */
+  exchanges: Array<ExchangeRate>
+}
+
+/** Executives for one security */
+export interface ExecutiveGroup {
+  /** Security symbol */
+  symbol: string
+  /** Company wiki URL */
+  forwardUrl: string
+  /** Total executives */
+  total: number
+  /** Individual executives */
+  professionals: Array<Professional>
+}
+
+/** Executive list response */
+export interface ExecutiveList {
+  /** Groups of executives per security */
+  professionalList: Array<ExecutiveGroup>
 }
 
 /**
@@ -2866,6 +3838,120 @@ export declare const enum FilterWarrantInOutBoundsType {
   Out = 1
 }
 
+/** Financial consensus estimates response */
+export interface FinancialConsensus {
+  /** Per-period consensus reports */
+  list: Array<ConsensusReport>
+  /** Index of most recently released period */
+  currentIndex: number
+  /** Reporting currency */
+  currency: string
+  /** Available period types */
+  optPeriods: Array<string>
+  /** Currently returned period type */
+  currentPeriod: string
+}
+
+/** Financial report kind */
+export declare const enum FinancialReportKind {
+  /** Income statement */
+  IncomeStatement = 0,
+  /** Balance sheet */
+  BalanceSheet = 1,
+  /** Cash flow statement */
+  CashFlow = 2,
+  /** All statements */
+  All = 3
+}
+
+/** Financial report period type */
+export declare const enum FinancialReportPeriod {
+  /** Annual report */
+  Annual = 0,
+  /** Semi-annual report */
+  SemiAnnual = 1,
+  /** Q1 report */
+  Q1 = 2,
+  /** Q2 report */
+  Q2 = 3,
+  /** Q3 report */
+  Q3 = 4,
+  /** Full quarterly report */
+  QuarterlyFull = 5
+}
+
+/**
+ * Financial reports response.
+ * The `list` field is a nested object keyed by report kind.
+ */
+export interface FinancialReports {
+  /** Raw nested financial data object */
+  list: any
+}
+
+/** One profit-analysis flow record */
+export interface FlowItem {
+  executedDate: string
+  /** Execution timestamp as a JSON value string */
+  executedTimestamp: string
+  code: string
+  direction: string
+  executedQuantity?: string
+  executedPrice?: string
+  executedCost?: string
+  describe: string
+}
+
+/** EPS forecast response */
+export interface ForecastEps {
+  /** EPS forecast snapshots */
+  items: Array<ForecastEpsItem>
+}
+
+/** One EPS forecast snapshot */
+export interface ForecastEpsItem {
+  /** Median EPS estimate */
+  forecastEpsMedian?: string
+  /** Mean EPS estimate */
+  forecastEpsMean?: string
+  /** Lowest EPS estimate */
+  forecastEpsLowest?: string
+  /** Highest EPS estimate */
+  forecastEpsHighest?: string
+  /** Total forecasting institutions */
+  institutionTotal: number
+  /** Institutions that raised their estimate */
+  institutionUp: number
+  /** Institutions that lowered their estimate */
+  institutionDown: number
+  /** Forecast window start (ms timestamp) */
+  forecastStartDate: number
+  /** Forecast window end (ms timestamp) */
+  forecastEndDate: number
+}
+
+/** A fund or ETF holding the security */
+export interface FundHolder {
+  /** Ticker code */
+  code: string
+  /** Symbol */
+  symbol: string
+  /** Currency */
+  currency: string
+  /** Name */
+  name: string
+  /** Position ratio % */
+  positionRatio: string
+  /** Report date */
+  reportDate: string
+}
+
+/** Fund/ETF holders response */
+export interface FundHolders {
+  /** Funds and ETFs holding the queried security */
+  lists: Array<FundHolder>
+}
+
 /** Options for get cash flow request */
 export interface GetCashFlowOptions {
   /** Start time */
@@ -2908,6 +3994,34 @@ export interface GetHistoryOrdersOptions {
   endAt?: Date
 }
 
+/** Options for getting a statement download URL */
+export interface GetStatementDownloadUrlRequest {
+  /** File key obtained from the list statements endpoint */
+  fileKey: string
+}
+
+/** Response for get statement download URL */
+export interface GetStatementDownloadUrlResponse {
+  /** Presigned download URL */
+  url: string
+}
+
+/** Options for listing statements */
+export interface GetStatementListRequest {
+  /** Statement type: Daily (1) or Monthly (2) */
+  statementType?: StatementType
+  /** Start date for pagination */
+  startDate?: number
+  /** Number of results (default 20) */
+  limit?: number
+}
+
+/** Response for get statement list */
+export interface GetStatementListResponse {
+  /** List of statement items */
+  list: Array<StatementItem>
+}
+
 /** Options for get today executions request */
 export interface GetTodayExecutionsOptions {
   /** Security symbol */
@@ -2942,6 +4056,210 @@ export declare const enum Granularity {
   Monthly = 3
 }
 
+/** Index constituents response */
+export interface IndexConstituents {
+  /** Number of constituent stocks that fell today */
+  fallNum: number
+  /** Number of constituent stocks unchanged today */
+  flatNum: number
+  /** Number of constituent stocks that rose today */
+  riseNum: number
+  /** Constituent stock details */
+  stocks: Array<ConstituentStock>
+}
+
+/** Industry valuation distribution response */
+export interface IndustryValuationDist {
+  /** PE distribution */
+  pe?: ValuationDist
+  /** PB distribution */
+  pb?: ValuationDist
+  /** PS distribution */
+  ps?: ValuationDist
+}
+
+/** Historical valuation snapshot for a peer */
+export interface IndustryValuationHistory {
+  /** Unix timestamp string */
+  date: string
+  /** PE ratio */
+  pe?: string
+  /** PB ratio */
+  pb?: string
+  /** PS ratio */
+  ps?: string
+}
+
+/** Valuation data for one peer security */
+export interface IndustryValuationItem {
+  /** Security symbol */
+  symbol: string
+  /** Company name */
+  name: string
+  /** Reporting currency */
+  currency: string
+  /** Total assets */
+  assets?: string
+  /** Book value per share */
+  bps?: string
+  /** Earnings per share */
+  eps?: string
+  /** Dividends per share */
+  dps?: string
+  /** Dividend yield */
+  divYld?: string
+  /** Dividend payout ratio */
+  divPayoutRatio?: string
+  /** 5-year avg dividends per share */
+  fiveYAvgDps?: string
+  /** PE ratio */
+  pe?: string
+  /** Historical snapshots */
+  history: Array<IndustryValuationHistory>
+}
+
+/** Industry peer valuation comparison response */
+export interface IndustryValuationList {
+  /** Peer securities */
+  list: Array<IndustryValuationItem>
+}
+
+/** Combined analyst rating response */
+export interface InstitutionRating {
+  /** Latest rating snapshot */
+  latest: InstitutionRatingLatest
+  /** Consensus summary */
+  summary: InstitutionRatingSummary
+}
+
+/** Historical analyst rating detail response */
+export interface InstitutionRatingDetail {
+  /** Currency symbol */
+  ccySymbol: string
+  /** Historical rating distribution time-series */
+  evaluate: InstitutionRatingDetailEvaluate
+  /** Historical target price time-series */
+  target: InstitutionRatingDetailTarget
+}
+
+/** Historical rating distribution time-series */
+export interface InstitutionRatingDetailEvaluate {
+  /** Weekly rating snapshots */
+  list: Array<InstitutionRatingDetailEvaluateItem>
+}
+
+/** One weekly rating distribution snapshot */
+export interface InstitutionRatingDetailEvaluateItem {
+  /** Number of "Buy" ratings */
+  buy: number
+  /** Date in `"2021/05/14"` format */
+  date: string
+  /** Number of "Hold" ratings */
+  hold: number
+  /** Number of "Sell" ratings */
+  sell: number
+  /** Number of "Strong Buy" ratings */
+  strongBuy: number
+  /** Number of "Underperform" ratings */
+  under: number
+}
+
+/** Historical target price time-series */
+export interface InstitutionRatingDetailTarget {
+  /** Prediction accuracy ratio (may be null) */
+  dataPercent?: string
+  /** Overall prediction accuracy */
+  predictionAccuracy?: string
+  /** Last updated display string */
+  updatedAt: string
+  /** Weekly target price snapshots */
+  list: Array<InstitutionRatingDetailTargetItem>
+}
+
+/** One weekly target price snapshot */
+export interface InstitutionRatingDetailTargetItem {
+  /** Average target price */
+  avgTarget?: string
+  /** Date string */
+  date: string
+  /** Highest target price */
+  maxTarget?: string
+  /** Lowest target price */
+  minTarget?: string
+  /** Whether the stock reached the target */
+  meet: boolean
+  /** Actual stock price */
+  price?: string
+  /** Unix timestamp string */
+  timestamp: string
+}
+
+/** Latest analyst rating snapshot */
+export interface InstitutionRatingLatest {
+  /** Rating distribution counts */
+  evaluate: RatingEvaluate
+  /** Target price range */
+  target: RatingTarget
+  /** Industry classification ID */
+  industryId: number
+  /** Industry name */
+  industryName: string
+  /** Rank within the industry */
+  industryRank: number
+  /** Total securities in the industry */
+  industryTotal: number
+  /** Mean analyst count */
+  industryMean: number
+  /** Median analyst count */
+  industryMedian: number
+}
+
+/** Consensus summary */
+export interface InstitutionRatingSummary {
+  /** Currency symbol */
+  ccySymbol: string
+  /** Change vs previous period */
+  change?: string
+  /** Simplified rating distribution */
+  evaluate: RatingSummaryEvaluate
+  /** Overall recommendation */
+  recommend: string
+  /** Consensus target price */
+  target?: string
+  /** Last updated display string */
+  updatedAt: string
+}
+
+/** Investor relations response */
+export interface InvestRelations {
+  /** Link to IR page */
+  forwardUrl: string
+  /** Securities with a stake */
+  investSecurities: Array<InvestSecurity>
+}
+
+/** A security in which the company has a stake */
+export interface InvestSecurity {
+  /** Company ID */
+  companyId: string
+  /** Company name */
+  companyName: string
+  /** Company name in English */
+  companyNameEn: string
+  /** Company name in Simplified Chinese */
+  companyNameZhcn: string
+  /** Security symbol */
+  symbol: string
+  /** Currency */
+  currency: string
+  /** Percentage held */
+  percentOfShares?: string
+  /** Shareholder rank */
+  sharesRank: string
+  /** Market value of holding */
+  sharesValue?: string
+}
+
 export declare const enum Language {
   /** zh-CN */
   ZH_CN = 0,
@@ -2966,6 +4284,33 @@ export declare const enum Market {
   Crypto = 5
 }
 
+/** Market trading status response */
+export interface MarketStatusResponse {
+  /** Per-market trading status items */
+  marketTime: Array<MarketTimeItem>
+}
+
+/** Trading status for one market */
+export interface MarketTimeItem {
+  /** Market code: `"HK"`, `"US"`, `"CN"`, `"SG"` */
+  market: string
+  /**
+   * Raw trade status code (101=PreOpen, 102/103/105=Trading, 104=LunchBreak,
+   * 106=PostTrading, 108=Closed, 201=PreMarket, 204=PostMarket)
+   */
+  tradeStatus: number
+  /** Current market time (unix timestamp string) */
+  timestamp: string
+  /** Delayed-quote trade status code */
+  delayTradeStatus: number
+  /** Delayed-quote market time (unix timestamp string) */
+  delayTimestamp: string
+  /** Sub-status code */
+  subStatus: number
+  /** Delayed-quote sub-status code */
+  delaySubStatus: number
+}
+
 /** Options for listing topics created by the current authenticated user */
 export interface MyTopicsRequest {
   /** Page number (default 1) */
@@ -2974,6 +4319,58 @@ export interface MyTopicsRequest {
   size?: number
   /** Filter by topic type: "article" or "post"; empty returns all */
   topicType?: string
+}
+
+/** Key financial metrics from an operating report */
+export interface OperatingFinancial {
+  /** Ticker code */
+  code: string
+  /** Currency */
+  currency: string
+  /** Company name */
+  name: string
+  /** Region */
+  region: string
+  /** Report period code */
+  report: string
+  /** Indicators */
+  indicators: Array<OperatingIndicator>
+}
+
+/** One financial indicator */
+export interface OperatingIndicator {
+  /** Field key */
+  fieldName: string
+  /** Display name */
+  indicatorName: string
+  /** Formatted value */
+  indicatorValue: string
+  /** Year-over-year change */
+  yoy?: string
+}
+
+/** One operating summary report */
+export interface OperatingItem {
+  /** Report ID */
+  id: string
+  /** Period code */
+  report: string
+  /** Title */
+  title: string
+  /** Management discussion text */
+  txt: string
+  /** Whether most recent */
+  latest: boolean
+  /** Community page URL */
+  webUrl: string
+  /** Key financial metrics */
+  financial: OperatingFinancial
+}
+
+/** Operating metrics response */
+export interface OperatingList {
+  /** Operating summary reports */
+  list: Array<OperatingItem>
 }
 
 /** Option direction */
@@ -2994,6 +4391,44 @@ export declare const enum OptionType {
   American = 1,
   /** Europe */
   Europe = 2
+}
+
+/** Daily option volume response */
+export interface OptionVolumeDaily {
+  /** Daily stats */
+  stats: Array<OptionVolumeDailyStat>
+}
+
+/** One day's option volume stat */
+export interface OptionVolumeDailyStat {
+  /** Symbol */
+  symbol: string
+  /** Timestamp string */
+  timestamp: string
+  /** Total volume */
+  totalVolume: string
+  /** Put volume */
+  totalPutVolume: string
+  /** Call volume */
+  totalCallVolume: string
+  /** Put/call volume ratio */
+  putCallVolumeRatio: string
+  /** Total OI */
+  totalOpenInterest: string
+  /** Put OI */
+  totalPutOpenInterest: string
+  /** Call OI */
+  totalCallOpenInterest: string
+  /** Put/call OI ratio */
+  putCallOpenInterestRatio: string
+}
+
+/** Option volume stats response */
+export interface OptionVolumeStats {
+  /** Call volume */
+  c: string
+  /** Put volume */
+  p: string
 }
 
 export declare const enum OrderSide {
@@ -3153,11 +4588,320 @@ export declare const enum Period {
   Year = 18
 }
 
+/** Pinned mode for watchlist securities */
+export declare const enum PinnedMode {
+  /** Pin (add) securities to the top */
+  Add = 0,
+  /** Unpin (remove) securities from the top */
+  Remove = 1
+}
+
+/** One executive / board member */
+export interface Professional {
+  /** Internal wiki ID */
+  id: string
+  /** Full name */
+  name: string
+  /** Name in Simplified Chinese */
+  nameZhcn: string
+  /** Name in English */
+  nameEn: string
+  /** Job title */
+  title: string
+  /** Biography */
+  biography: string
+  /** Photo URL */
+  photo: string
+  /** Wiki profile URL */
+  wikiUrl: string
+}
+
+/** Combined profit analysis response */
+export interface ProfitAnalysis {
+  /** Summary overview */
+  summary: ProfitAnalysisSummary
+  /** Per-security breakdown */
+  sublist: ProfitAnalysisSublist
+}
+
+/** P&L analysis grouped by market */
+export interface ProfitAnalysisByMarket {
+  /** Total P&L across all returned items */
+  profit?: string
+  /** Whether more pages are available */
+  hasMore: boolean
+  /** Per-security P&L items for the requested market/page */
+  stockItems: Array<ProfitAnalysisByMarketItem>
+}
+
+/** One security entry in a by-market P&L response */
+export interface ProfitAnalysisByMarketItem {
+  /** Security symbol (ticker code) */
+  code: string
+  /** Security name */
+  name: string
+  /** Market, e.g. `"HK"`, `"US"` */
+  market: string
+  /** Profit/loss amount */
+  profit?: string
+}
+
+/** Detailed profit analysis for one security */
+export interface ProfitAnalysisDetail {
+  /** Total profit/loss */
+  profit?: string
+  /** Underlying stock P&L details */
+  underlyingDetails: ProfitDetails
+  /** Derivative P&L details */
+  derivativePnlDetails: ProfitDetails
+  /** Security name */
+  name: string
+  /** Last updated time (unix timestamp string) */
+  updatedAt: string
+  /** Last updated date string */
+  updatedDate: string
+  /** Currency */
+  currency: string
+  /** Default detail tab: 0 = underlying, 1 = derivative */
+  defaultTag: number
+  /** Query start time (unix timestamp string) */
+  start: string
+  /** Query end time (unix timestamp string) */
+  end: string
+  /** Query start date string */
+  startDate: string
+  /** Query end date string */
+  endDate: string
+}
+
+/** Profit-analysis flows response */
+export interface ProfitAnalysisFlows {
+  flowsList: Array<FlowItem>
+  hasMore: boolean
+}
+
+/** P&L for one security */
+export interface ProfitAnalysisItem {
+  /** Security name */
+  name: string
+  /** Market */
+  market: string
+  /** Whether still holding */
+  isHolding: boolean
+  /** Profit/loss amount */
+  profit?: string
+  /** Profit/loss rate */
+  profitRate?: string
+  /** Number of completed trades */
+  clearanceTimes: number
+  /** Asset type: `"stock"` or `"fund"` */
+  itemType: string
+  /** Currency */
+  currency: string
+  /** Security symbol */
+  symbol: string
+  /** Holding period display string */
+  holdingPeriod: string
+  /** Ticker code */
+  securityCode: string
+  /** ISIN (for funds) */
+  isin: string
+  /** Underlying stock P&L */
+  underlyingProfit?: string
+  /** Derivatives P&L */
+  derivativesProfit?: string
+  /** P&L in order currency */
+  orderProfit?: string
+}
+
+/** Per-security P&L breakdown */
+export interface ProfitAnalysisSublist {
+  /** Start time (unix timestamp string) */
+  start: string
+  /** End time (unix timestamp string) */
+  end: string
+  /** Start date string */
+  startDate: string
+  /** End date string */
+  endDate: string
+  /** Last updated time (unix timestamp string) */
+  updatedAt: string
+  /** Last updated date string */
+  updatedDate: string
+  /** Per-security items */
+  items: Array<ProfitAnalysisItem>
+}
+
+/** Account-level P&L summary */
+export interface ProfitAnalysisSummary {
+  /** Account currency */
+  currency: string
+  /** Current total asset value */
+  currentTotalAsset?: string
+  /** Query start date string */
+  startDate: string
+  /** Query end date string */
+  endDate: string
+  /** Start time (unix timestamp string) */
+  startTime: string
+  /** End time (unix timestamp string) */
+  endTime: string
+  /** Ending asset value */
+  endingAssetValue?: string
+  /** Initial asset value */
+  initialAssetValue?: string
+  /** Total invested amount */
+  investAmount?: string
+  /** Whether any trades occurred */
+  isTraded: boolean
+  /** Total profit/loss */
+  sumProfit?: string
+  /** Total profit/loss rate */
+  sumProfitRate?: string
+  /** Per-asset-type breakdown */
+  profits: ProfitSummaryBreakdown
+}
+
+/** One P&L detail line item (credit, debit, or fee) */
+export interface ProfitDetailEntry {
+  /** Description */
+  describe: string
+  /** Amount */
+  amount?: string
+}
+
+/** Detailed P&L breakdown for one asset class */
+export interface ProfitDetails {
+  /** Current holding market value */
+  holdingValue?: string
+  /** Total profit/loss */
+  profit?: string
+  /** Cumulative credited amount */
+  cumulativeCreditedAmount?: string
+  /** Credit detail entries */
+  creditedDetails: Array<ProfitDetailEntry>
+  /** Cumulative debited amount */
+  cumulativeDebitedAmount?: string
+  /** Debit detail entries */
+  debitedDetails: Array<ProfitDetailEntry>
+  /** Cumulative fee amount */
+  cumulativeFeeAmount?: string
+  /** Fee detail entries */
+  feeDetails: Array<ProfitDetailEntry>
+  /** Short position holding value */
+  shortHoldingValue?: string
+  /** Long position holding value */
+  longHoldingValue?: string
+  /** Opening position market value at period start */
+  holdingValueAtBeginning?: string
+  /** Closing position market value at period end */
+  holdingValueAtEnding?: string
+}
+
+/** P&L breakdown by asset type */
+export interface ProfitSummaryBreakdown {
+  /** Stock P&L */
+  stock?: string
+  /** Fund P&L */
+  fund?: string
+  /** Crypto P&L */
+  crypto?: string
+  /** Money market fund P&L */
+  mmf?: string
+  /** Other P&L */
+  other?: string
+  /** Cumulative transaction amount */
+  cumulativeTransactionAmount?: string
+  /** Total number of orders */
+  tradeOrderNum: string
+  /** Total number of traded securities */
+  tradeStockNum: string
+  /** IPO hits */
+  ipoHit: number
+  /** IPO subscriptions */
+  ipoSubscription: number
+  /** Per-category summary info */
+  summaryInfo: Array<ProfitSummaryInfo>
+}
+
+/** P&L summary for one asset category */
+export interface ProfitSummaryInfo {
+  /** Asset type: `"stock"`, `"fund"`, `"crypto"` */
+  assetType: string
+  /** Security with the maximum profit */
+  profitMax: string
+  /** Name of the max-profit security */
+  profitMaxName: string
+  /** Security with the maximum loss */
+  lossMax: string
+  /** Name of the max-loss security */
+  lossMaxName: string
+}
+
 export declare const enum PushCandlestickMode {
   /** Realtime mode */
   Realtime = 0,
   /** Confirmed mode */
   Confirmed = 1
+}
+
+/** Analyst rating distribution counts */
+export interface RatingEvaluate {
+  /** Number of "Buy" ratings */
+  buy: number
+  /** Number of "Strong Buy" / "Outperform" ratings */
+  over: number
+  /** Number of "Hold" ratings */
+  hold: number
+  /** Number of "Underperform" ratings */
+  under: number
+  /** Number of "Sell" ratings */
+  sell: number
+  /** Number of "No Opinion" ratings */
+  noOpinion: number
+  /** Total analyst count */
+  total: number
+  /** Window start (unix timestamp string) */
+  startDate: string
+  /** Window end (unix timestamp string) */
+  endDate: string
+}
+
+/** Simplified rating distribution */
+export interface RatingSummaryEvaluate {
+  /** Number of "Buy" ratings */
+  buy: number
+  /** Date of the update */
+  date: string
+  /** Number of "Hold" ratings */
+  hold: number
+  /** Number of "Sell" ratings */
+  sell: number
+  /** Number of "Strong Buy" ratings */
+  strongBuy: number
+  /** Number of "Underperform" ratings */
+  under: number
+}
+
+/** Analyst target price range */
+export interface RatingTarget {
+  /** Highest price target */
+  highestPrice?: string
+  /** Lowest price target */
+  lowestPrice?: string
+  /** Previous close price */
+  prevClose?: string
+  /** Window start */
+  startDate: string
+  /** Window end */
+  endDate: string
+}
+
+/** TTM buyback summary */
+export interface RecentBuybacks {
+  currency: string
+  netBuybackTtm: string
+  netBuybackYieldTtm: string
 }
 
 /** Options for replace order request */
@@ -3260,12 +5004,195 @@ export declare const enum SecurityListCategory {
   Overnight = 0
 }
 
+/** One major shareholder */
+export interface Shareholder {
+  /** Internal ID */
+  shareholderId: string
+  /** Name */
+  shareholderName: string
+  /** Institution type */
+  institutionType: string
+  /** Percentage held */
+  percentOfShares?: string
+  /** Change in shares held */
+  sharesChanged?: string
+  /** Report date */
+  reportDate: string
+  /** Cross-holdings */
+  stocks: Array<ShareholderStock>
+}
+
+/** Shareholder list response */
+export interface ShareholderList {
+  /** Major shareholders */
+  shareholderList: Array<Shareholder>
+  /** Link to full shareholder page */
+  forwardUrl: string
+  /** Total returned */
+  total: number
+}
+
+/** A cross-held security */
+export interface ShareholderStock {
+  /** Symbol */
+  symbol: string
+  /** Ticker code */
+  code: string
+  /** Market */
+  market: string
+  /** Day change */
+  chg: string
+}
+
+/** Sharelist detail response */
+export interface SharelistDetail {
+  /** Sharelist info */
+  sharelist: SharelistInfo
+  /** Subscription scopes */
+  scopes: SharelistScopes
+}
+
+/** Sharelist information */
+export interface SharelistInfo {
+  /** Sharelist ID */
+  id: number
+  /** Name */
+  name: string
+  /** Description */
+  description: string
+  /** Cover image URL */
+  cover: string
+  /** Number of subscribers */
+  subscribersCount: number
+  /** Creation time (unix timestamp) */
+  createdAt: number
+  /** Last stock edit time (unix timestamp) */
+  editedAt: number
+  /** YTD change percentage */
+  thisYearChg?: string
+  /** Creator info */
+  creator: any
+  /** Constituent stocks */
+  stocks: Array<SharelistStock>
+  /** Whether the current user is subscribed */
+  subscribed: boolean
+  /** Day change percentage */
+  chg?: string
+  /** Sharelist type: 0=regular, 3=official, 4=industry */
+  sharelistType: number
+  /** Industry code (for industry sharelists) */
+  industryCode: string
+}
+
+/** Response for sharelist list and popular queries */
+export interface SharelistList {
+  /** User's own and followed sharelists */
+  sharelists: Array<SharelistInfo>
+  /** Subscribed sharelists (may be absent in popular response) */
+  subscribedSharelists: Array<SharelistInfo>
+  /** Pagination cursor for subscribed list */
+  tailMark: string
+}
+
+/** Sharelist subscription scopes */
+export interface SharelistScopes {
+  /** Whether the current user is subscribed */
+  subscription: boolean
+  /** Whether the current user is the creator */
+  isSelf: boolean
+}
+
+/** Stock in a sharelist */
+export interface SharelistStock {
+  /** Security symbol */
+  symbol: string
+  /** Security name */
+  name: string
+  /** Market, e.g. `"HK"` */
+  market: string
+  /** Ticker code */
+  code: string
+  /** Brief description */
+  intro: string
+  /** Unread change log category */
+  unreadChangeLogCategory: string
+  /** Day change percentage */
+  change?: string
+  /** Latest price */
+  lastDone?: string
+  /** Trade status code */
+  tradeStatus?: number
+  /** Whether delayed quote */
+  latency?: boolean
+}
+
+/** One short position data point */
+export interface ShortPosition {
+  /** Settlement date timestamp string */
+  timestamp: string
+  /** Short ratio */
+  rate: string
+  /** Avg daily share volume */
+  avgDailyShareVolume: string
+  /** Current shares short */
+  currentSharesShort: string
+  /** Days to cover */
+  daysToCover: string
+  /** Closing price */
+  close: string
+}
+
+/** Short interest response */
+export interface ShortPositionsResponse {
+  /** Security symbol */
+  symbol: string
+  /** Data points */
+  data: Array<ShortPosition>
+  /** Number of sources */
+  sources: number
+}
+
 /** Sort order type */
 export declare const enum SortOrderType {
   /** Ascending */
   Ascending = 0,
   /** Descending */
   Descending = 1
+}
+
+/** Statement item */
+export interface StatementItem {
+  /** Statement date (integer, e.g. 20250301) */
+  dt: number
+  /** File key used to request the download URL */
+  fileKey: string
+}
+
+/** Statement type enum */
+export declare const enum StatementType {
+  /** Daily statement */
+  Daily = 1,
+  /** Monthly statement */
+  Monthly = 2
+}
+
+/**
+ * Stock ratings response.
+ *
+ * `ratingsJson` contains the full nested ratings structure as a JSON string.
+ */
+export interface StockRatings {
+  styleTxtName: string
+  scaleTxtName: string
+  reportPeriodTxt: string
+  /** Composite score as a JSON string */
+  multiScore: string
+  multiLetter: string
+  multiScoreChange: number
+  industryName: string
+  industryRank: number
+  /** Full ratings array as a JSON string */
+  ratingsJson: string
 }
 
 /** Options for submit order request */
@@ -3347,6 +5274,18 @@ export declare const enum TradeDirection {
   Up = 2
 }
 
+/** Trade volume at one price level */
+export interface TradePriceLevel {
+  /** Buy volume at this price */
+  buyAmount: string
+  /** Neutral (unknown direction) volume at this price */
+  neutralAmount: string
+  /** Price level */
+  price: string
+  /** Sell volume at this price */
+  sellAmount: string
+}
+
 /** Trade session */
 export declare const enum TradeSession {
   /** Intraday */
@@ -3365,6 +5304,36 @@ export declare const enum TradeSessions {
   Intraday = 0,
   /** All */
   All = 1
+}
+
+/** Summary trade statistics */
+export interface TradeStatistics {
+  /** Volume-weighted average price */
+  avgprice: string
+  /** Total buy volume (shares) */
+  buy: string
+  /** Total neutral / unknown-direction volume */
+  neutral: string
+  /** Previous close price */
+  preclose: string
+  /** Total sell volume (shares) */
+  sell: string
+  /** Data timestamp (unix timestamp string) */
+  timestamp: string
+  /** Total trading volume (shares) */
+  totalAmount: string
+  /** Unix timestamps for the last 5 trading days */
+  tradeDate: Array<string>
+  /** Total number of trades */
+  tradesCount: string
+}
+
+/** Trade statistics response */
+export interface TradeStatsResponse {
+  /** Summary statistics */
+  statistics: TradeStatistics
+  /** Per-price-level breakdown */
+  trades: Array<TradePriceLevel>
 }
 
 export declare const enum TradeStatus {
@@ -3414,6 +5383,100 @@ export interface UpdateWatchlistGroup {
   securities?: Array<string>
   /** Securities Update mode */
   mode: SecuritiesUpdateMode
+}
+
+/** Valuation metrics response */
+export interface ValuationData {
+  /** Valuation metrics */
+  metrics: ValuationMetricsData
+}
+
+/** Distribution statistics for one valuation metric */
+export interface ValuationDist {
+  /** Minimum value */
+  low?: string
+  /** Maximum value */
+  high?: string
+  /** Median value */
+  median?: string
+  /** Current value */
+  value?: string
+  /** Percentile ranking */
+  ranking?: string
+  /** Ordinal rank index */
+  rankIndex: string
+  /** Total securities in industry */
+  rankTotal: string
+}
+
+/** Historical valuation container */
+export interface ValuationHistoryData {
+  /** Historical metrics */
+  metrics: ValuationHistoryMetrics
+}
+
+/** Historical data for one valuation metric */
+export interface ValuationHistoryMetric {
+  /** Description */
+  desc: string
+  /** High */
+  high?: string
+  /** Low */
+  low?: string
+  /** Median */
+  median?: string
+  /** Data points */
+  list: Array<ValuationPoint>
+}
+
+/** Historical metrics container */
+export interface ValuationHistoryMetrics {
+  /** PE history */
+  pe?: ValuationHistoryMetric
+  /** PB history */
+  pb?: ValuationHistoryMetric
+  /** PS history */
+  ps?: ValuationHistoryMetric
+}
+
+/** Historical valuation response */
+export interface ValuationHistoryResponse {
+  /** Historical valuation data */
+  history: ValuationHistoryData
+}
+
+/** Historical time-series for one valuation metric */
+export interface ValuationMetricData {
+  /** Description */
+  desc: string
+  /** Historical high */
+  high?: string
+  /** Historical low */
+  low?: string
+  /** Historical median */
+  median?: string
+  /** Data points */
+  list: Array<ValuationPoint>
+}
+
+/** Valuation metrics container */
+export interface ValuationMetricsData {
+  /** PE ratio history */
+  pe?: ValuationMetricData
+  /** PB ratio history */
+  pb?: ValuationMetricData
+  /** PS ratio history */
+  ps?: ValuationMetricData
+  /** Dividend yield history */
+  dvdYld?: ValuationMetricData
+}
+
+/** One valuation data point */
+export interface ValuationPoint {
+  /** Unix timestamp (seconds) */
+  timestamp: number
+  /** Metric value */
+  value?: string
 }
 
 /** Warrant sort by */

@@ -820,12 +820,12 @@ impl ToFFI for CCashInfoOwned {
     }
 }
 
-/// Account balance
+/// Frozen transaction fee entry for a given currency
 #[repr(C)]
 pub struct CFrozenTransactionFee {
-    /// Total cash
+    /// Currency of the frozen fee
     pub currency: *const c_char,
-    /// Maximum financing amount
+    /// Amount of transaction fee frozen for pending orders
     pub frozen_transaction_fee: *const CDecimal,
 }
 
@@ -1488,13 +1488,18 @@ impl ToFFI for CMarginRatioOwned {
     }
 }
 
-/// Order detail
+/// Historical status record for a single order transition
 #[repr(C)]
 pub struct COrderHistoryDetail {
+    /// Order price at the time of this status transition
     pub price: *const CDecimal,
+    /// Order quantity at the time of this status transition
     pub quantity: *const CDecimal,
+    /// Order status for this history entry
     pub status: COrderStatus,
+    /// Rejection or remark message associated with this transition
     pub msg: *const c_char,
+    /// Unix timestamp of this status transition
     pub time: i64,
 }
 
@@ -2060,12 +2065,20 @@ impl ToFFI for COrderDetailOwned {
 #[derive(Debug)]
 #[repr(C)]
 pub struct CEstimateMaxPurchaseQuantityOptions {
+    /// Security symbol to estimate for
     pub symbol: *const c_char,
+    /// Order type
     pub order_type: COrderType,
+    /// Order price; may be null for market orders
     pub price: *const CDecimal,
+    /// Order side (buy or sell)
     pub side: COrderSide,
+    /// Settlement currency to use for the estimate (can be null)
     pub currency: *const c_char,
+    /// Existing order ID to exclude from available funds calculation (can be
+    /// null)
     pub order_id: *const c_char,
+    /// Whether to allow fractional share quantities in the result
     pub fractional_shares: bool,
 }
 

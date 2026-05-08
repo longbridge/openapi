@@ -1047,3 +1047,1357 @@ impl_java_class!(
         updated_at
     ]
 );
+
+// ── MarketContext types ───────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/market/MarketStatusResponse",
+    longbridge::market::MarketStatusResponse,
+    [
+        #[java(objarray)]
+        market_time
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/MarketTimeItem",
+    longbridge::market::MarketTimeItem,
+    [
+        market,
+        trade_status,
+        timestamp,
+        delay_trade_status,
+        delay_timestamp,
+        sub_status,
+        delay_sub_status
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/BrokerHoldingTop",
+    longbridge::market::BrokerHoldingTop,
+    [
+        #[java(objarray)]
+        buy,
+        #[java(objarray)]
+        sell,
+        updated_at
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/BrokerHoldingEntry",
+    longbridge::market::BrokerHoldingEntry,
+    [name, parti_number, chg, strong]
+);
+
+impl_java_class!(
+    "com/longbridge/market/BrokerHoldingDetail",
+    longbridge::market::BrokerHoldingDetail,
+    [
+        #[java(objarray)]
+        list,
+        updated_at
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/BrokerHoldingDetailItem",
+    longbridge::market::BrokerHoldingDetailItem,
+    [name, parti_number, ratio, shares, strong]
+);
+
+impl_java_class!(
+    "com/longbridge/market/BrokerHoldingChanges",
+    longbridge::market::BrokerHoldingChanges,
+    [value, chg_1, chg_5, chg_20, chg_60]
+);
+
+impl_java_class!(
+    "com/longbridge/market/BrokerHoldingDailyHistory",
+    longbridge::market::BrokerHoldingDailyHistory,
+    [
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/BrokerHoldingDailyItem",
+    longbridge::market::BrokerHoldingDailyItem,
+    [date, holding, ratio, chg]
+);
+
+impl_java_class!(
+    "com/longbridge/market/AhPremiumKlines",
+    longbridge::market::AhPremiumKlines,
+    [
+        #[java(objarray)]
+        klines
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/AhPremiumIntraday",
+    longbridge::market::AhPremiumIntraday,
+    [
+        #[java(objarray)]
+        klines
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/AhPremiumKline",
+    longbridge::market::AhPremiumKline,
+    [
+        aprice,
+        apreclose,
+        hprice,
+        hpreclose,
+        currency_rate,
+        ahpremium_rate,
+        price_spread,
+        timestamp
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/TradeStatsResponse",
+    longbridge::market::TradeStatsResponse,
+    [
+        statistics,
+        #[java(objarray)]
+        trades
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/TradeStatistics",
+    longbridge::market::TradeStatistics,
+    [
+        avgprice,
+        buy,
+        neutral,
+        preclose,
+        sell,
+        timestamp,
+        total_amount,
+        #[java(objarray)]
+        trade_date,
+        trades_count
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/TradePriceLevel",
+    longbridge::market::TradePriceLevel,
+    [buy_amount, neutral_amount, price, sell_amount]
+);
+
+impl_java_class!(
+    "com/longbridge/market/AnomalyResponse",
+    longbridge::market::AnomalyResponse,
+    [
+        all_off,
+        #[java(objarray)]
+        changes
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/AnomalyItem",
+    longbridge::market::AnomalyItem,
+    [
+        symbol,
+        name,
+        alert_name,
+        alert_time,
+        #[java(objarray)]
+        change_values,
+        emotion
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/IndexConstituents",
+    longbridge::market::IndexConstituents,
+    [
+        fall_num,
+        flat_num,
+        rise_num,
+        #[java(objarray)]
+        stocks
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/ConstituentStock",
+    longbridge::market::ConstituentStock,
+    [
+        symbol,
+        name,
+        last_done,
+        prev_close,
+        inflow,
+        balance,
+        amount,
+        total_shares,
+        #[java(objarray)]
+        tags,
+        intro,
+        market,
+        circulating_shares,
+        delay,
+        chg,
+        trade_status
+    ]
+);
+
+// ── CalendarContext types ─────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/calendar/CalendarEventsResponse",
+    longbridge::calendar::CalendarEventsResponse,
+    [
+        date,
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/calendar/CalendarDateGroup",
+    longbridge::calendar::CalendarDateGroup,
+    [
+        date,
+        count,
+        #[java(objarray)]
+        infos
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/calendar/CalendarEventInfo",
+    longbridge::calendar::CalendarEventInfo,
+    [
+        symbol,
+        market,
+        content,
+        counter_name,
+        date_type,
+        date,
+        chart_uid,
+        #[java(objarray)]
+        data_kv,
+        event_type,
+        datetime,
+        icon,
+        star,
+        live,
+        id,
+        financial_market_time,
+        currency,
+        ext,
+        activity_type
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/calendar/CalendarDataKv",
+    longbridge::calendar::CalendarDataKv,
+    [key, value, value_type, value_raw]
+);
+
+// ── PortfolioContext types ────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/portfolio/ExchangeRates",
+    longbridge::portfolio::ExchangeRates,
+    [
+        #[java(objarray)]
+        exchanges
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ExchangeRate",
+    longbridge::portfolio::ExchangeRate,
+    [
+        average_rate,
+        base_currency,
+        bid_rate,
+        offer_rate,
+        other_currency
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysis",
+    longbridge::portfolio::ProfitAnalysis,
+    [summary, sublist]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysisSummary",
+    longbridge::portfolio::ProfitAnalysisSummary,
+    [
+        currency,
+        current_total_asset,
+        start_date,
+        end_date,
+        start_time,
+        end_time,
+        ending_asset_value,
+        initial_asset_value,
+        invest_amount,
+        is_traded,
+        sum_profit,
+        sum_profit_rate,
+        profits
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitSummaryBreakdown",
+    longbridge::portfolio::ProfitSummaryBreakdown,
+    [
+        stock,
+        fund,
+        crypto,
+        mmf,
+        other,
+        cumulative_transaction_amount,
+        trade_order_num,
+        trade_stock_num,
+        ipo_hit,
+        ipo_subscription,
+        #[java(objarray)]
+        summary_info
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitSummaryInfo",
+    longbridge::portfolio::ProfitSummaryInfo,
+    [
+        asset_type,
+        profit_max,
+        profit_max_name,
+        loss_max,
+        loss_max_name
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysisSublist",
+    longbridge::portfolio::ProfitAnalysisSublist,
+    [
+        start,
+        end,
+        start_date,
+        end_date,
+        updated_at,
+        updated_date,
+        #[java(objarray)]
+        items
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysisItem",
+    longbridge::portfolio::ProfitAnalysisItem,
+    [
+        name,
+        market,
+        is_holding,
+        profit,
+        profit_rate,
+        clearance_times,
+        item_type,
+        currency,
+        symbol,
+        holding_period,
+        security_code,
+        isin,
+        underlying_profit,
+        derivatives_profit,
+        order_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysisDetail",
+    longbridge::portfolio::ProfitAnalysisDetail,
+    [
+        profit,
+        underlying_details,
+        derivative_pnl_details,
+        name,
+        updated_at,
+        updated_date,
+        currency,
+        default_tag,
+        start,
+        end,
+        start_date,
+        end_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitDetails",
+    longbridge::portfolio::ProfitDetails,
+    [
+        holding_value,
+        profit,
+        cumulative_credited_amount,
+        #[java(objarray)]
+        credited_details,
+        cumulative_debited_amount,
+        #[java(objarray)]
+        debited_details,
+        cumulative_fee_amount,
+        #[java(objarray)]
+        fee_details,
+        short_holding_value,
+        long_holding_value,
+        holding_value_at_beginning,
+        holding_value_at_ending
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitDetailEntry",
+    longbridge::portfolio::ProfitDetailEntry,
+    [describe, amount]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysisByMarketItem",
+    longbridge::portfolio::ProfitAnalysisByMarketItem,
+    [code, name, market, profit]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysisByMarket",
+    longbridge::portfolio::ProfitAnalysisByMarket,
+    [
+        profit,
+        has_more,
+        #[java(objarray)]
+        stock_items
+    ]
+);
+
+// ── DcaPlan and friends ───────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/dca/DcaPlan",
+    longbridge::dca::DcaPlan,
+    [
+        plan_id,
+        status,
+        symbol,
+        member_id,
+        aaid,
+        account_channel,
+        display_account,
+        market,
+        per_invest_amount,
+        invest_frequency,
+        invest_day_of_week,
+        invest_day_of_month,
+        allow_margin_finance,
+        alter_hours,
+        created_at,
+        updated_at,
+        next_trd_date,
+        stock_name,
+        cum_amount,
+        issue_number,
+        average_cost,
+        cum_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/dca/DcaList",
+    longbridge::dca::DcaList,
+    [
+        #[java(objarray)]
+        plans
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/dca/DcaStats",
+    longbridge::dca::DcaStats,
+    [
+        active_count,
+        finished_count,
+        suspended_count,
+        #[java(objarray)]
+        nearest_plans,
+        rest_days,
+        total_amount,
+        total_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/dca/DcaCreateResult",
+    longbridge::dca::DcaCreateResult,
+    [plan_id]
+);
+
+// ── SharelistContext types ────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/sharelist/SharelistStock",
+    longbridge::sharelist::SharelistStock,
+    [
+        symbol,
+        name,
+        market,
+        code,
+        intro,
+        unread_change_log_category,
+        change,
+        last_done,
+        trade_status,
+        latency
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/sharelist/SharelistScopes",
+    longbridge::sharelist::SharelistScopes,
+    [subscription, is_self]
+);
+
+impl_java_class!(
+    "com/longbridge/sharelist/SharelistInfo",
+    longbridge::sharelist::SharelistInfo,
+    [
+        id,
+        name,
+        description,
+        cover,
+        subscribers_count,
+        created_at,
+        edited_at,
+        this_year_chg,
+        creator,
+        #[java(objarray)]
+        stocks,
+        subscribed,
+        chg,
+        sharelist_type,
+        industry_code
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/sharelist/SharelistList",
+    longbridge::sharelist::SharelistList,
+    [
+        #[java(objarray)]
+        sharelists,
+        #[java(objarray)]
+        subscribed_sharelists,
+        tail_mark
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/sharelist/SharelistDetail",
+    longbridge::sharelist::SharelistDetail,
+    [sharelist, scopes]
+);
+// ── DCAContext types ──────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/dca/DcaHistoryRecord",
+    longbridge::dca::DcaHistoryRecord,
+    [
+        created_at,
+        order_id,
+        status,
+        action,
+        order_type,
+        executed_qty,
+        executed_price,
+        executed_amount,
+        rejected_reason,
+        symbol
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/dca/DcaHistoryResponse",
+    longbridge::dca::DcaHistoryResponse,
+    [
+        #[java(objarray)]
+        records,
+        has_more
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/dca/DcaSupportInfo",
+    longbridge::dca::DcaSupportInfo,
+    [symbol, support_regular_saving]
+);
+
+impl_java_class!(
+    "com/longbridge/dca/DcaSupportList",
+    longbridge::dca::DcaSupportList,
+    [
+        #[java(objarray)]
+        infos
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/dca/DcaCalcDateResult",
+    longbridge::dca::DcaCalcDateResult,
+    [trade_date]
+);
+
+// DcaPlan has serde_json::Value creator field - use JSON for DcaList
+// ── AlertContext types ────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/alert/AlertItem",
+    longbridge::alert::AlertItem,
+    [
+        id,
+        indicator_id,
+        enabled,
+        frequency,
+        scope,
+        text,
+        #[java(priarray)]
+        state,
+        value_map
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/alert/AlertSymbolGroup",
+    longbridge::alert::AlertSymbolGroup,
+    [
+        symbol,
+        code,
+        market,
+        name,
+        price,
+        chg,
+        p_chg,
+        product,
+        #[java(objarray)]
+        indicators
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/alert/AlertList",
+    longbridge::alert::AlertList,
+    [
+        #[java(objarray)]
+        lists
+    ]
+);
+// ── FundamentalContext types ──────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/fundamental/FinancialReports",
+    longbridge::fundamental::FinancialReports,
+    [list]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/DividendList",
+    longbridge::fundamental::DividendList,
+    [
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/DividendItem",
+    longbridge::fundamental::DividendItem,
+    [symbol, id, desc, record_date, ex_date, payment_date]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRating",
+    longbridge::fundamental::InstitutionRating,
+    [latest, summary]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingLatest",
+    longbridge::fundamental::InstitutionRatingLatest,
+    [
+        evaluate,
+        target,
+        industry_id,
+        industry_name,
+        industry_rank,
+        industry_total,
+        industry_mean,
+        industry_median
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/RatingEvaluate",
+    longbridge::fundamental::RatingEvaluate,
+    [
+        buy, over, hold, under, sell, no_opinion, total, start_date, end_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/RatingTarget",
+    longbridge::fundamental::RatingTarget,
+    [
+        highest_price,
+        lowest_price,
+        prev_close,
+        start_date,
+        end_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingSummary",
+    longbridge::fundamental::InstitutionRatingSummary,
+    [ccy_symbol, change, evaluate, recommend, target, updated_at]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/RatingSummaryEvaluate",
+    longbridge::fundamental::RatingSummaryEvaluate,
+    [buy, date, hold, sell, strong_buy, under]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingDetail",
+    longbridge::fundamental::InstitutionRatingDetail,
+    [ccy_symbol, evaluate, target]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingDetailEvaluate",
+    longbridge::fundamental::InstitutionRatingDetailEvaluate,
+    [
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingDetailEvaluateItem",
+    longbridge::fundamental::InstitutionRatingDetailEvaluateItem,
+    [buy, date, hold, sell, strong_buy, under]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingDetailTarget",
+    longbridge::fundamental::InstitutionRatingDetailTarget,
+    [
+        data_percent,
+        prediction_accuracy,
+        updated_at,
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingDetailTargetItem",
+    longbridge::fundamental::InstitutionRatingDetailTargetItem,
+    [
+        avg_target, date, max_target, min_target, meet, price, timestamp
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ForecastEps",
+    longbridge::fundamental::ForecastEps,
+    [
+        #[java(objarray)]
+        items
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ForecastEpsItem",
+    longbridge::fundamental::ForecastEpsItem,
+    [
+        forecast_eps_median,
+        forecast_eps_mean,
+        forecast_eps_lowest,
+        forecast_eps_highest,
+        institution_total,
+        institution_up,
+        institution_down,
+        forecast_start_date,
+        forecast_end_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/FinancialConsensus",
+    longbridge::fundamental::FinancialConsensus,
+    [
+        #[java(objarray)]
+        list,
+        current_index,
+        currency,
+        #[java(objarray)]
+        opt_periods,
+        current_period
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ConsensusReport",
+    longbridge::fundamental::ConsensusReport,
+    [
+        fiscal_year,
+        fiscal_period,
+        period_text,
+        #[java(objarray)]
+        details
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ConsensusDetail",
+    longbridge::fundamental::ConsensusDetail,
+    [
+        key,
+        name,
+        description,
+        actual,
+        estimate,
+        comp_value,
+        comp_desc,
+        comp,
+        is_released
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationData",
+    longbridge::fundamental::ValuationData,
+    [metrics]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationMetricsData",
+    longbridge::fundamental::ValuationMetricsData,
+    [pe, pb, ps, dvd_yld]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationMetricData",
+    longbridge::fundamental::ValuationMetricData,
+    [
+        desc,
+        high,
+        low,
+        median,
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationPoint",
+    longbridge::fundamental::ValuationPoint,
+    [timestamp, value]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationHistoryResponse",
+    longbridge::fundamental::ValuationHistoryResponse,
+    [history]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationHistoryData",
+    longbridge::fundamental::ValuationHistoryData,
+    [metrics]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationHistoryMetrics",
+    longbridge::fundamental::ValuationHistoryMetrics,
+    [pe, pb, ps]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationHistoryMetric",
+    longbridge::fundamental::ValuationHistoryMetric,
+    [
+        desc,
+        high,
+        low,
+        median,
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryValuationList",
+    longbridge::fundamental::IndustryValuationList,
+    [
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryValuationItem",
+    longbridge::fundamental::IndustryValuationItem,
+    [
+        symbol,
+        name,
+        currency,
+        assets,
+        bps,
+        eps,
+        dps,
+        div_yld,
+        div_payout_ratio,
+        five_y_avg_dps,
+        pe,
+        #[java(objarray)]
+        history
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryValuationHistory",
+    longbridge::fundamental::IndustryValuationHistory,
+    [date, pe, pb, ps]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryValuationDist",
+    longbridge::fundamental::IndustryValuationDist,
+    [pe, pb, ps]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationDist",
+    longbridge::fundamental::ValuationDist,
+    [low, high, median, value, ranking, rank_index, rank_total]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/CompanyOverview",
+    longbridge::fundamental::CompanyOverview,
+    [
+        name,
+        company_name,
+        founded,
+        listing_date,
+        market,
+        region,
+        address,
+        office_address,
+        website,
+        issue_price,
+        shares_offered,
+        chairman,
+        secretary,
+        audit_inst,
+        category,
+        year_end,
+        employees,
+        phone,
+        fax,
+        email,
+        legal_repr,
+        manager,
+        bus_license,
+        accounting_firm,
+        securities_rep,
+        legal_counsel,
+        zip_code,
+        ticker,
+        icon,
+        profile,
+        ads_ratio,
+        sector
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ExecutiveList",
+    longbridge::fundamental::ExecutiveList,
+    [
+        #[java(objarray)]
+        professional_list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ExecutiveGroup",
+    longbridge::fundamental::ExecutiveGroup,
+    [
+        symbol,
+        forward_url,
+        total,
+        #[java(objarray)]
+        professionals
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/Professional",
+    longbridge::fundamental::Professional,
+    [
+        id, name, name_zhcn, name_en, title, biography, photo, wiki_url
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ShareholderList",
+    longbridge::fundamental::ShareholderList,
+    [
+        #[java(objarray)]
+        shareholder_list,
+        forward_url,
+        total
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/Shareholder",
+    longbridge::fundamental::Shareholder,
+    [
+        shareholder_id,
+        shareholder_name,
+        institution_type,
+        percent_of_shares,
+        shares_changed,
+        report_date,
+        #[java(objarray)]
+        stocks
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ShareholderStock",
+    longbridge::fundamental::ShareholderStock,
+    [symbol, code, market, chg]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/FundHolders",
+    longbridge::fundamental::FundHolders,
+    [
+        #[java(objarray)]
+        lists
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/FundHolder",
+    longbridge::fundamental::FundHolder,
+    [code, symbol, currency, name, position_ratio, report_date]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/CorpActionLive",
+    longbridge::fundamental::CorpActionLive,
+    [id, status, started_at, name, icon]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/CorpActions",
+    longbridge::fundamental::CorpActions,
+    [
+        #[java(objarray)]
+        items
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/CorpActionItem",
+    longbridge::fundamental::CorpActionItem,
+    [
+        id,
+        date,
+        date_str,
+        date_type,
+        date_zone,
+        act_type,
+        act_desc,
+        action,
+        recent,
+        is_delay,
+        delay_content,
+        live,
+        security
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InvestRelations",
+    longbridge::fundamental::InvestRelations,
+    [
+        forward_url,
+        #[java(objarray)]
+        invest_securities
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InvestSecurity",
+    longbridge::fundamental::InvestSecurity,
+    [
+        company_id,
+        company_name,
+        company_name_en,
+        company_name_zhcn,
+        symbol,
+        currency,
+        percent_of_shares,
+        shares_rank,
+        shares_value
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/OperatingList",
+    longbridge::fundamental::OperatingList,
+    [
+        #[java(objarray)]
+        list
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/OperatingItem",
+    longbridge::fundamental::OperatingItem,
+    [
+        id,
+        report,
+        title,
+        txt,
+        latest,
+        web_url,
+        financial,
+        #[java(objarray)]
+        keywords
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/OperatingFinancial",
+    longbridge::fundamental::OperatingFinancial,
+    [
+        code,
+        counter_id,
+        currency,
+        name,
+        region,
+        report,
+        report_txt,
+        #[java(objarray)]
+        indicators
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/OperatingIndicator",
+    longbridge::fundamental::OperatingIndicator,
+    [field_name, indicator_name, indicator_value, yoy]
+);
+
+// ── QuoteContext extensions ───────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/quote/ShortPositionsResponse",
+    longbridge::quote::ShortPositionsResponse,
+    [
+        symbol,
+        #[java(objarray)]
+        data,
+        sources
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/ShortPosition",
+    longbridge::quote::ShortPosition,
+    [
+        timestamp,
+        rate,
+        avg_daily_share_volume,
+        current_shares_short,
+        days_to_cover,
+        close
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/OptionVolumeStats",
+    longbridge::quote::OptionVolumeStats,
+    [c, p]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/OptionVolumeDaily",
+    longbridge::quote::OptionVolumeDaily,
+    [
+        #[java(objarray)]
+        stats
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/OptionVolumeDailyStat",
+    longbridge::quote::OptionVolumeDailyStat,
+    [
+        symbol,
+        timestamp,
+        total_volume,
+        total_put_volume,
+        total_call_volume,
+        put_call_volume_ratio,
+        total_open_interest,
+        total_put_open_interest,
+        total_call_open_interest,
+        put_call_open_interest_ratio
+    ]
+);
+
+// ── FundamentalContext: BuybackData and related ───────────────────
+
+impl_java_class!(
+    "com/longbridge/fundamental/RecentBuybacks",
+    longbridge::fundamental::RecentBuybacks,
+    [currency, net_buyback_ttm, net_buyback_yield_ttm]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/BuybackHistoryItem",
+    longbridge::fundamental::BuybackHistoryItem,
+    [
+        fiscal_year,
+        fiscal_year_range,
+        net_buyback,
+        net_buyback_yield,
+        net_buyback_growth_rate,
+        currency
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/BuybackRatios",
+    longbridge::fundamental::BuybackRatios,
+    [net_buyback_payout_ratio, net_buyback_to_cashflow_ratio]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/BuybackData",
+    longbridge::fundamental::BuybackData,
+    [
+        recent_buybacks,
+        #[java(objarray)]
+        buyback_history,
+        #[java(objarray)]
+        buyback_ratios
+    ]
+);
+
+// ── FundamentalContext: StockRatings and related ──────────────────
+
+impl_java_class!(
+    "com/longbridge/fundamental/RatingIndicator",
+    longbridge::fundamental::RatingIndicator,
+    [name, score, letter]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/RatingLeafIndicator",
+    longbridge::fundamental::RatingLeafIndicator,
+    [name, value, value_type, score, letter]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/RatingSubIndicatorGroup",
+    longbridge::fundamental::RatingSubIndicatorGroup,
+    [
+        indicator,
+        #[java(objarray)]
+        sub_indicators
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/RatingCategory",
+    longbridge::fundamental::RatingCategory,
+    [
+        kind,
+        #[java(objarray)]
+        sub_indicators
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/StockRatings",
+    longbridge::fundamental::StockRatings,
+    [
+        style_txt_name,
+        scale_txt_name,
+        report_period_txt,
+        multi_score,
+        multi_letter,
+        multi_score_change,
+        industry_name,
+        industry_rank,
+        industry_total,
+        industry_mean_score,
+        industry_median_score,
+        #[java(objarray)]
+        ratings
+    ]
+);
+
+// ── PortfolioContext: ProfitAnalysisFlows and related ─────────────
+
+impl_java_class!(
+    "com/longbridge/portfolio/FlowItem",
+    longbridge::portfolio::FlowItem,
+    [
+        executed_date,
+        executed_timestamp,
+        code,
+        direction,
+        executed_quantity,
+        executed_price,
+        executed_cost,
+        describe
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/portfolio/ProfitAnalysisFlowsResponse",
+    longbridge::portfolio::ProfitAnalysisFlows,
+    [
+        #[java(objarray)]
+        flows_list,
+        has_more
+    ]
+);

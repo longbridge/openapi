@@ -222,6 +222,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/quote/PinnedMode",
+    longbridge::quote::PinnedMode,
+    [Add, Remove]
+);
+
+impl_java_enum!(
     "com/longbridge/quote/CalcIndex",
     longbridge::quote::CalcIndex,
     [

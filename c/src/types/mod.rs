@@ -44,6 +44,24 @@ impl ToFFI for i64 {
     }
 }
 
+impl ToFFI for i32 {
+    type FFIType = i32;
+
+    #[inline]
+    fn to_ffi_type(&self) -> Self::FFIType {
+        *self
+    }
+}
+
+impl ToFFI for bool {
+    type FFIType = bool;
+
+    #[inline]
+    fn to_ffi_type(&self) -> Self::FFIType {
+        *self
+    }
+}
+
 impl<T> ToFFI for *const *const T {
     type FFIType = *const T;
 

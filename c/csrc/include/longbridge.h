@@ -1278,10 +1278,14 @@ typedef enum lb_granularity_t {
   GranularityMonthly,
 } lb_granularity_t;
 
+typedef struct lb_alert_context_t lb_alert_context_t;
+
 /**
  * Asset context
  */
 typedef struct CAssetContext CAssetContext;
+
+typedef struct lb_calendar_context_t lb_calendar_context_t;
 
 /**
  * Configuration options for Longbridge SDK
@@ -1293,9 +1297,13 @@ typedef struct lb_config_t lb_config_t;
  */
 typedef struct lb_content_context_t lb_content_context_t;
 
+typedef struct lb_dca_context_t lb_dca_context_t;
+
 typedef struct lb_decimal_t lb_decimal_t;
 
 typedef struct lb_error_t lb_error_t;
+
+typedef struct lb_fundamental_context_t lb_fundamental_context_t;
 
 /**
  * A HTTP client for Longbridge OpenAPI
@@ -1305,6 +1313,11 @@ typedef struct lb_http_client_t lb_http_client_t;
 typedef struct lb_http_result_t lb_http_result_t;
 
 /**
+ * Market data context
+ */
+typedef struct lb_market_context_t lb_market_context_t;
+
+/**
  * OAuth 2.0 client — owns the Rust `OAuth` instance (opaque handle)
  *
  * Callers must never dereference or inspect the struct layout.
@@ -1312,10 +1325,14 @@ typedef struct lb_http_result_t lb_http_result_t;
  */
 typedef struct lb_oauth_t lb_oauth_t;
 
+typedef struct lb_portfolio_context_t lb_portfolio_context_t;
+
 /**
  * Quote context
  */
 typedef struct lb_quote_context_t lb_quote_context_t;
+
+typedef struct lb_sharelist_context_t lb_sharelist_context_t;
 
 /**
  * Trade context
@@ -2101,19 +2118,56 @@ typedef struct lb_get_stock_positions_options_t {
  * Options for estimate maximum purchase quantity
  */
 typedef struct lb_estimate_max_purchase_quantity_options_t {
+  /**
+   * Security symbol to estimate for
+   */
   const char *symbol;
+  /**
+   * Order type
+   */
   enum lb_order_type_t order_type;
+  /**
+   * Order price; may be null for market orders
+   */
   const struct lb_decimal_t *price;
+  /**
+   * Order side (buy or sell)
+   */
   enum lb_order_side_t side;
+  /**
+   * Settlement currency to use for the estimate (can be null)
+   */
   const char *currency;
+  /**
+   * Existing order ID to exclude from available funds calculation (can be
+   * null)
+   */
   const char *order_id;
+  /**
+   * Whether to allow fractional share quantities in the result
+   */
   bool fractional_shares;
 } lb_estimate_max_purchase_quantity_options_t;
 
+/**
+ * Active subscription for a security
+ */
 typedef struct lb_subscription_t {
+  /**
+   * Security code
+   */
   const char *symbol;
+  /**
+   * Bitmask of subscribed sub-types
+   */
   uint8_t sub_types;
+  /**
+   * Pointer to array of subscribed candlestick periods
+   */
   const enum lb_period_t *candlesticks;
+  /**
+   * Number of elements in the array.
+   */
   uintptr_t num_candlesticks;
 } lb_subscription_t;
 
@@ -2680,7 +2734,7 @@ typedef struct lb_market_trading_days_t {
 } lb_market_trading_days_t;
 
 /**
- * Market trading days
+ * Capital flow line data point
  */
 typedef struct lb_capital_flow_line_t {
   /**
@@ -2924,15 +2978,15 @@ typedef struct lb_order_t {
 } lb_order_t;
 
 /**
- * Account balance
+ * Frozen transaction fee entry for a given currency
  */
 typedef struct lb_frozen_transaction_fee_t {
   /**
-   * Total cash
+   * Currency of the frozen fee
    */
   const char *currency;
   /**
-   * Maximum financing amount
+   * Amount of transaction fee frozen for pending orders
    */
   const struct lb_decimal_t *frozen_transaction_fee;
 } lb_frozen_transaction_fee_t;
@@ -3277,13 +3331,28 @@ typedef struct lb_margin_ratio_t {
 } lb_margin_ratio_t;
 
 /**
- * Order detail
+ * Historical status record for a single order transition
  */
 typedef struct lb_order_history_detail_t {
+  /**
+   * Order price at the time of this status transition
+   */
   const struct lb_decimal_t *price;
+  /**
+   * Order quantity at the time of this status transition
+   */
   const struct lb_decimal_t *quantity;
+  /**
+   * Order status for this history entry
+   */
   enum lb_order_status_t status;
+  /**
+   * Rejection or remark message associated with this transition
+   */
   const char *msg;
+  /**
+   * Unix timestamp of this status transition
+   */
   int64_t time;
 } lb_order_history_detail_t;
 
@@ -3814,7 +3883,7 @@ typedef struct lb_warrant_info_t {
 } lb_warrant_info_t;
 
 /**
- * Security
+ * Quote package detail
  */
 typedef struct lb_quote_package_detail_t {
   /**
@@ -3865,6 +3934,9 @@ typedef struct lb_market_temperature_t {
   int64_t timestamp;
 } lb_market_temperature_t;
 
+/**
+ * Historical market temperature response
+ */
 typedef struct lb_history_market_temperature_response_t {
   /**
    * Granularity
@@ -4108,9 +4180,3403 @@ typedef struct lb_news_item_t {
   int32_t shares_count;
 } lb_news_item_t;
 
+/**
+ * Market trading time item describing the current status of a single market.
+ */
+typedef struct lb_market_time_item_t {
+  /**
+   * Market identifier string (e.g. `"US"`, `"HK"`).
+   */
+  const char *market;
+  /**
+   * Current trade status code for the market.
+   */
+  int32_t trade_status;
+  /**
+   * Timestamp of the current trade status as an ISO-8601 string.
+   */
+  const char *timestamp;
+  /**
+   * Delayed trade status code for the market.
+   */
+  int32_t delay_trade_status;
+  /**
+   * Timestamp of the delayed trade status as an ISO-8601 string.
+   */
+  const char *delay_timestamp;
+  /**
+   * Sub-status code for the current trade status.
+   */
+  int32_t sub_status;
+  /**
+   * Sub-status code for the delayed trade status.
+   */
+  int32_t delay_sub_status;
+} lb_market_time_item_t;
+
+/**
+ * Response containing the trading status for all markets.
+ */
+typedef struct lb_market_status_response_t {
+  /**
+   * Pointer to array of market time items.
+   */
+  const struct lb_market_time_item_t *market_time;
+  /**
+   * Number of elements in the array.
+   */
+  uintptr_t num_market_time;
+} lb_market_status_response_t;
+
+/**
+ * A single broker entry in a broker holding top list.
+ */
+typedef struct lb_broker_holding_entry_t {
+  /**
+   * Name of the broker.
+   */
+  const char *name;
+  /**
+   * Participant number identifying the broker.
+   */
+  const char *parti_number;
+  /**
+   * Change value as a decimal string.
+   */
+  const char *chg;
+  /**
+   * Whether this broker is marked as a strong holder.
+   */
+  bool strong;
+} lb_broker_holding_entry_t;
+
+/**
+ * Top broker holdings for a security, split into top buyers and top sellers.
+ */
+typedef struct lb_broker_holding_top_t {
+  /**
+   * Pointer to array of top-buying broker entries.
+   */
+  const struct lb_broker_holding_entry_t *buy;
+  /**
+   * Number of elements in the buy array.
+   */
+  uintptr_t num_buy;
+  /**
+   * Pointer to array of top-selling broker entries.
+   */
+  const struct lb_broker_holding_entry_t *sell;
+  /**
+   * Number of elements in the sell array.
+   */
+  uintptr_t num_sell;
+  /**
+   * Timestamp of the last update as an ISO-8601 string.
+   */
+  const char *updated_at;
+} lb_broker_holding_top_t;
+
+/**
+ * A set of holding change values over multiple time windows.
+ */
+typedef struct lb_broker_holding_changes_t {
+  /**
+   * Current value as a decimal string.
+   */
+  const char *value;
+  /**
+   * Change over 1 day as a decimal string.
+   */
+  const char *chg_1;
+  /**
+   * Change over 5 days as a decimal string.
+   */
+  const char *chg_5;
+  /**
+   * Change over 20 days as a decimal string.
+   */
+  const char *chg_20;
+  /**
+   * Change over 60 days as a decimal string.
+   */
+  const char *chg_60;
+} lb_broker_holding_changes_t;
+
+/**
+ * Detailed holding information for a single broker in the broker holding
+ * detail list.
+ */
+typedef struct lb_broker_holding_detail_item_t {
+  /**
+   * Name of the broker.
+   */
+  const char *name;
+  /**
+   * Participant number identifying the broker.
+   */
+  const char *parti_number;
+  /**
+   * Holding ratio and its changes over multiple time windows.
+   */
+  struct lb_broker_holding_changes_t ratio;
+  /**
+   * Absolute share count and its changes over multiple time windows.
+   */
+  struct lb_broker_holding_changes_t shares;
+  /**
+   * Whether this broker is marked as a strong holder.
+   */
+  bool strong;
+} lb_broker_holding_detail_item_t;
+
+/**
+ * Full broker holding detail response for a security.
+ */
+typedef struct lb_broker_holding_detail_t {
+  /**
+   * Pointer to array of broker holding detail items.
+   */
+  const struct lb_broker_holding_detail_item_t *list;
+  /**
+   * Number of elements in the array.
+   */
+  uintptr_t num_list;
+  /**
+   * Timestamp of the last update as an ISO-8601 string.
+   */
+  const char *updated_at;
+} lb_broker_holding_detail_t;
+
+/**
+ * A single day's broker holding record.
+ */
+typedef struct lb_broker_holding_daily_item_t {
+  /**
+   * Date of the record as a string (e.g. `"2024-01-15"`).
+   */
+  const char *date;
+  /**
+   * Total shares held by the broker on this date as a decimal string.
+   */
+  const char *holding;
+  /**
+   * Holding ratio as a decimal string.
+   */
+  const char *ratio;
+  /**
+   * Day-over-day change in holdings as a decimal string.
+   */
+  const char *chg;
+} lb_broker_holding_daily_item_t;
+
+/**
+ * Historical daily broker holding records for a security.
+ */
+typedef struct lb_broker_holding_daily_history_t {
+  /**
+   * Pointer to array of daily broker holding items.
+   */
+  const struct lb_broker_holding_daily_item_t *list;
+  /**
+   * Number of elements in the array.
+   */
+  uintptr_t num_list;
+} lb_broker_holding_daily_history_t;
+
+/**
+ * A single candlestick data point for the A/H share premium.
+ */
+typedef struct lb_ah_premium_kline_t {
+  /**
+   * A-share price as a decimal string.
+   */
+  const char *aprice;
+  /**
+   * A-share previous close price as a decimal string.
+   */
+  const char *apreclose;
+  /**
+   * H-share price as a decimal string.
+   */
+  const char *hprice;
+  /**
+   * H-share previous close price as a decimal string.
+   */
+  const char *hpreclose;
+  /**
+   * CNY/HKD currency exchange rate as a decimal string.
+   */
+  const char *currency_rate;
+  /**
+   * A/H premium rate as a decimal string.
+   */
+  const char *ahpremium_rate;
+  /**
+   * Price spread between A-share and H-share as a decimal string.
+   */
+  const char *price_spread;
+  /**
+   * Unix timestamp (seconds) of this data point.
+   */
+  int64_t timestamp;
+} lb_ah_premium_kline_t;
+
+/**
+ * Historical A/H premium kline data.
+ */
+typedef struct lb_ah_premium_klines_t {
+  /**
+   * Pointer to array of A/H premium kline data points.
+   */
+  const struct lb_ah_premium_kline_t *klines;
+  /**
+   * Number of elements in the array.
+   */
+  uintptr_t num_klines;
+} lb_ah_premium_klines_t;
+
+/**
+ * Intraday A/H premium data for the current trading session.
+ */
+typedef struct lb_ah_premium_intraday_t {
+  /**
+   * Pointer to array of intraday A/H premium kline data points.
+   */
+  const struct lb_ah_premium_kline_t *klines;
+  /**
+   * Number of elements in the array.
+   */
+  uintptr_t num_klines;
+} lb_ah_premium_intraday_t;
+
+/**
+ * Trade volume breakdown at a single price level.
+ */
+typedef struct lb_trade_price_level_t {
+  /**
+   * Total buy-side trade amount at this price level as a decimal string.
+   */
+  const char *buy_amount;
+  /**
+   * Total neutral (unknown direction) trade amount at this price level as a
+   * decimal string.
+   */
+  const char *neutral_amount;
+  /**
+   * Price of this level as a decimal string.
+   */
+  const char *price;
+  /**
+   * Total sell-side trade amount at this price level as a decimal string.
+   */
+  const char *sell_amount;
+} lb_trade_price_level_t;
+
+/**
+ * Aggregated trade statistics for a security over a period.
+ */
+typedef struct lb_trade_statistics_t {
+  /**
+   * Volume-weighted average price as a decimal string.
+   */
+  const char *avgprice;
+  /**
+   * Total buy-side trade amount as a decimal string.
+   */
+  const char *buy;
+  /**
+   * Total neutral (unknown direction) trade amount as a decimal string.
+   */
+  const char *neutral;
+  /**
+   * Previous close price as a decimal string.
+   */
+  const char *preclose;
+  /**
+   * Total sell-side trade amount as a decimal string.
+   */
+  const char *sell;
+  /**
+   * Timestamp of the statistics snapshot as an ISO-8601 string.
+   */
+  const char *timestamp;
+  /**
+   * Total traded amount (buy + sell + neutral) as a decimal string.
+   */
+  const char *total_amount;
+  /**
+   * Pointer to array of trade date strings (e.g. `"2024-01-15"`).
+   */
+  const char *const *trade_date;
+  /**
+   * Number of elements in the trade_date array.
+   */
+  uintptr_t num_trade_date;
+  /**
+   * Total number of individual trades as a decimal string.
+   */
+  const char *trades_count;
+} lb_trade_statistics_t;
+
+/**
+ * Full trade statistics response combining aggregate stats and per-price-level
+ * breakdown.
+ */
+typedef struct lb_trade_stats_response_t {
+  /**
+   * Aggregated trade statistics for the security.
+   */
+  struct lb_trade_statistics_t statistics;
+  /**
+   * Pointer to array of per-price-level trade breakdowns.
+   */
+  const struct lb_trade_price_level_t *trades;
+  /**
+   * Number of elements in the trades array.
+   */
+  uintptr_t num_trades;
+} lb_trade_stats_response_t;
+
+/**
+ * A single market anomaly alert item.
+ */
+typedef struct lb_anomaly_item_t {
+  /**
+   * Security symbol (e.g. `"700.HK"`).
+   */
+  const char *symbol;
+  /**
+   * Security name string.
+   */
+  const char *name;
+  /**
+   * Name of the anomaly alert type.
+   */
+  const char *alert_name;
+  /**
+   * Unix timestamp (seconds) when the alert was triggered.
+   */
+  int64_t alert_time;
+  /**
+   * Pointer to array of change value strings describing the anomaly.
+   */
+  const char *const *change_values;
+  /**
+   * Number of elements in the change_values array.
+   */
+  uintptr_t num_change_values;
+  /**
+   * Sentiment/emotion indicator for the anomaly (positive/negative
+   * direction).
+   */
+  int32_t emotion;
+} lb_anomaly_item_t;
+
+/**
+ * Response containing a list of market anomaly alerts.
+ */
+typedef struct lb_anomaly_response_t {
+  /**
+   * Whether all anomaly alerts are turned off.
+   */
+  bool all_off;
+  /**
+   * Pointer to array of anomaly alert items.
+   */
+  const struct lb_anomaly_item_t *changes;
+  /**
+   * Number of elements in the changes array.
+   */
+  uintptr_t num_changes;
+} lb_anomaly_response_t;
+
+/**
+ * A constituent stock within an index.
+ */
+typedef struct lb_constituent_stock_t {
+  /**
+   * Security symbol (e.g. `"700.HK"`).
+   */
+  const char *symbol;
+  /**
+   * Security name string.
+   */
+  const char *name;
+  /**
+   * Latest traded price as a decimal string.
+   */
+  const char *last_done;
+  /**
+   * Previous close price as a decimal string.
+   */
+  const char *prev_close;
+  /**
+   * Net capital inflow for the stock as a decimal string.
+   */
+  const char *inflow;
+  /**
+   * Outstanding balance (remaining sell-side liquidity) as a decimal string.
+   */
+  const char *balance;
+  /**
+   * Total traded amount for the session as a decimal string.
+   */
+  const char *amount;
+  /**
+   * Total issued shares as a decimal string.
+   */
+  const char *total_shares;
+  /**
+   * Pointer to array of tag strings associated with the stock.
+   */
+  const char *const *tags;
+  /**
+   * Number of elements in the tags array.
+   */
+  uintptr_t num_tags;
+  /**
+   * Brief introductory description of the stock.
+   */
+  const char *intro;
+  /**
+   * Market identifier string (e.g. `"HK"`, `"US"`).
+   */
+  const char *market;
+  /**
+   * Number of circulating (publicly tradeable) shares as a decimal string.
+   */
+  const char *circulating_shares;
+  /**
+   * Whether the quote data for this stock is delayed.
+   */
+  bool delay;
+  /**
+   * Price change (from previous close) as a decimal string.
+   */
+  const char *chg;
+  /**
+   * Current trade status code for the stock.
+   */
+  int32_t trade_status;
+} lb_constituent_stock_t;
+
+/**
+ * Index constituent data including breadth statistics and the list of member
+ * stocks.
+ */
+typedef struct lb_index_constituents_t {
+  /**
+   * Number of constituent stocks that declined in this session.
+   */
+  int32_t fall_num;
+  /**
+   * Number of constituent stocks that were unchanged in this session.
+   */
+  int32_t flat_num;
+  /**
+   * Number of constituent stocks that advanced in this session.
+   */
+  int32_t rise_num;
+  /**
+   * Pointer to array of constituent stock data.
+   */
+  const struct lb_constituent_stock_t *stocks;
+  /**
+   * Number of elements in the stocks array.
+   */
+  uintptr_t num_stocks;
+} lb_index_constituents_t;
+
+/**
+ * A single dividend event for a security (C-facing FFI type).
+ */
+typedef struct lb_dividend_item_t {
+  /**
+   * Security symbol (e.g. `"700.HK"`).
+   */
+  const char *symbol;
+  /**
+   * Unique identifier for the dividend event.
+   */
+  const char *id;
+  /**
+   * Human-readable description of the dividend.
+   */
+  const char *desc;
+  /**
+   * Record date ("YYYY-MM-DD").
+   */
+  const char *record_date;
+  /**
+   * Ex-dividend date ("YYYY-MM-DD").
+   */
+  const char *ex_date;
+  /**
+   * Payment date ("YYYY-MM-DD").
+   */
+  const char *payment_date;
+} lb_dividend_item_t;
+
+/**
+ * List of dividend items for a security (C-facing FFI type).
+ */
+typedef struct lb_dividend_list_t {
+  /**
+   * Pointer to the array of dividend items.
+   */
+  const struct lb_dividend_item_t *list;
+  /**
+   * Number of items in the array.
+   */
+  uintptr_t num_list;
+} lb_dividend_list_t;
+
+/**
+ * Aggregated institutional rating opinion counts over a date range (C-facing
+ * FFI type).
+ */
+typedef struct lb_rating_evaluate_t {
+  /**
+   * Number of "buy" ratings.
+   */
+  int32_t buy;
+  /**
+   * Number of "outperform" ratings.
+   */
+  int32_t over;
+  /**
+   * Number of "hold" ratings.
+   */
+  int32_t hold;
+  /**
+   * Number of "underperform" ratings.
+   */
+  int32_t under;
+  /**
+   * Number of "sell" ratings.
+   */
+  int32_t sell;
+  /**
+   * Number of "no opinion" ratings.
+   */
+  int32_t no_opinion;
+  /**
+   * Total number of ratings.
+   */
+  int32_t total;
+  /**
+   * Start date of the evaluation period ("YYYY-MM-DD").
+   */
+  const char *start_date;
+  /**
+   * End date of the evaluation period ("YYYY-MM-DD").
+   */
+  const char *end_date;
+} lb_rating_evaluate_t;
+
+/**
+ * Institutional price-target range over a date period (C-facing FFI type).
+ */
+typedef struct lb_rating_target_t {
+  /**
+   * Highest analyst price target in the period.
+   */
+  const char *highest_price;
+  /**
+   * Lowest analyst price target in the period.
+   */
+  const char *lowest_price;
+  /**
+   * Previous closing price at the start of the period.
+   */
+  const char *prev_close;
+  /**
+   * Start date of the target period ("YYYY-MM-DD").
+   */
+  const char *start_date;
+  /**
+   * End date of the target period ("YYYY-MM-DD").
+   */
+  const char *end_date;
+} lb_rating_target_t;
+
+/**
+ * Summary of rating opinion counts on a specific date (C-facing FFI type).
+ */
+typedef struct lb_rating_summary_evaluate_t {
+  /**
+   * Number of "buy" ratings.
+   */
+  int32_t buy;
+  /**
+   * Date of the rating summary ("YYYY-MM-DD").
+   */
+  const char *date;
+  /**
+   * Number of "hold" ratings.
+   */
+  int32_t hold;
+  /**
+   * Number of "sell" ratings.
+   */
+  int32_t sell;
+  /**
+   * Number of "strong buy" ratings.
+   */
+  int32_t strong_buy;
+  /**
+   * Number of "underperform" ratings.
+   */
+  int32_t under;
+} lb_rating_summary_evaluate_t;
+
+/**
+ * Latest institutional rating data including evaluate counts, price targets,
+ * and industry context (C-facing FFI type).
+ */
+typedef struct lb_institution_rating_latest_t {
+  /**
+   * Aggregated opinion counts for the current period.
+   */
+  struct lb_rating_evaluate_t evaluate;
+  /**
+   * Consensus price target range for the current period.
+   */
+  struct lb_rating_target_t target;
+  /**
+   * Industry identifier.
+   */
+  int64_t industry_id;
+  /**
+   * Industry name.
+   */
+  const char *industry_name;
+  /**
+   * Rank of the security within its industry by rating.
+   */
+  int32_t industry_rank;
+  /**
+   * Total number of securities in the industry.
+   */
+  int32_t industry_total;
+  /**
+   * Mean rating score for the industry.
+   */
+  int32_t industry_mean;
+  /**
+   * Median rating score for the industry.
+   */
+  int32_t industry_median;
+} lb_institution_rating_latest_t;
+
+/**
+ * Summary of the latest institutional rating for a security (C-facing FFI
+ * type).
+ */
+typedef struct lb_institution_rating_summary_t {
+  /**
+   * Currency symbol used for price targets (e.g. `"HKD"`).
+   */
+  const char *ccy_symbol;
+  /**
+   * Price change since the previous rating cycle.
+   */
+  const char *change;
+  /**
+   * Aggregated opinion counts on the summary date.
+   */
+  struct lb_rating_summary_evaluate_t evaluate;
+  /**
+   * Consensus recommendation label (e.g. `"Buy"`).
+   */
+  const char *recommend;
+  /**
+   * Consensus price target value.
+   */
+  const char *target;
+  /**
+   * Timestamp of the last update.
+   */
+  const char *updated_at;
+} lb_institution_rating_summary_t;
+
+/**
+ * Full institutional rating for a security, combining latest details and a
+ * summary (C-facing FFI type).
+ */
+typedef struct lb_institution_rating_t {
+  /**
+   * Most recent detailed rating data.
+   */
+  struct lb_institution_rating_latest_t latest;
+  /**
+   * High-level summary of the rating.
+   */
+  struct lb_institution_rating_summary_t summary;
+} lb_institution_rating_t;
+
+/**
+ * A single data point in the historical evaluate series for institution rating
+ * detail (C-facing FFI type).
+ */
+typedef struct lb_institution_rating_detail_evaluate_item_t {
+  /**
+   * Number of "buy" ratings on this date.
+   */
+  int32_t buy;
+  /**
+   * Date of this evaluate snapshot ("YYYY-MM-DD").
+   */
+  const char *date;
+  /**
+   * Number of "hold" ratings on this date.
+   */
+  int32_t hold;
+  /**
+   * Number of "sell" ratings on this date.
+   */
+  int32_t sell;
+  /**
+   * Number of "strong buy" ratings on this date.
+   */
+  int32_t strong_buy;
+  /**
+   * Number of "underperform" ratings on this date.
+   */
+  int32_t under;
+} lb_institution_rating_detail_evaluate_item_t;
+
+/**
+ * A single data point in the historical price-target series for institution
+ * rating detail (C-facing FFI type).
+ */
+typedef struct lb_institution_rating_detail_target_item_t {
+  /**
+   * Average analyst price target on this date.
+   */
+  const char *avg_target;
+  /**
+   * Date of this target snapshot ("YYYY-MM-DD").
+   */
+  const char *date;
+  /**
+   * Maximum analyst price target on this date.
+   */
+  const char *max_target;
+  /**
+   * Minimum analyst price target on this date.
+   */
+  const char *min_target;
+  /**
+   * Whether the price target was met.
+   */
+  bool meet;
+  /**
+   * Actual price on this date.
+   */
+  const char *price;
+  /**
+   * Unix timestamp of this data point.
+   */
+  const char *timestamp;
+} lb_institution_rating_detail_target_item_t;
+
+/**
+ * Detailed historical institution rating data including evaluate and
+ * price-target series (C-facing FFI type).
+ */
+typedef struct lb_institution_rating_detail_t {
+  /**
+   * Currency symbol used for price targets (e.g. `"HKD"`).
+   */
+  const char *ccy_symbol;
+  /**
+   * Pointer to the array of historical evaluate snapshots.
+   */
+  const struct lb_institution_rating_detail_evaluate_item_t *evaluate_list;
+  /**
+   * Number of items in `evaluate_list`.
+   */
+  uintptr_t num_evaluate_list;
+  /**
+   * Percentage of price targets that were met (as a string).
+   */
+  const char *data_percent;
+  /**
+   * Prediction accuracy rate for price targets (as a string).
+   */
+  const char *prediction_accuracy;
+  /**
+   * Timestamp of the last update.
+   */
+  const char *updated_at;
+  /**
+   * Pointer to the array of historical price-target snapshots.
+   */
+  const struct lb_institution_rating_detail_target_item_t *target_list;
+  /**
+   * Number of items in `target_list`.
+   */
+  uintptr_t num_target_list;
+} lb_institution_rating_detail_t;
+
+/**
+ * A single EPS forecast item covering a fiscal period (C-facing FFI type).
+ */
+typedef struct lb_forecast_eps_item_t {
+  /**
+   * Median EPS forecast across all contributing institutions.
+   */
+  const char *forecast_eps_median;
+  /**
+   * Mean EPS forecast across all contributing institutions.
+   */
+  const char *forecast_eps_mean;
+  /**
+   * Lowest individual EPS forecast.
+   */
+  const char *forecast_eps_lowest;
+  /**
+   * Highest individual EPS forecast.
+   */
+  const char *forecast_eps_highest;
+  /**
+   * Total number of institutions providing an EPS forecast.
+   */
+  int32_t institution_total;
+  /**
+   * Number of institutions that revised their forecast upward.
+   */
+  int32_t institution_up;
+  /**
+   * Number of institutions that revised their forecast downward.
+   */
+  int32_t institution_down;
+  /**
+   * Unix timestamp of the forecast period start date.
+   */
+  int64_t forecast_start_date;
+  /**
+   * Unix timestamp of the forecast period end date.
+   */
+  int64_t forecast_end_date;
+} lb_forecast_eps_item_t;
+
+/**
+ * Collection of EPS forecast items (C-facing FFI type).
+ */
+typedef struct lb_forecast_eps_t {
+  /**
+   * Pointer to the array of EPS forecast items.
+   */
+  const struct lb_forecast_eps_item_t *items;
+  /**
+   * Number of items in the array.
+   */
+  uintptr_t num_items;
+} lb_forecast_eps_t;
+
+/**
+ * A single (timestamp, value) data point in a valuation time series (C-facing
+ * FFI type).
+ */
+typedef struct lb_valuation_point_t {
+  /**
+   * Unix timestamp of the data point.
+   */
+  int64_t timestamp;
+  /**
+   * Valuation metric value at this timestamp (as a decimal string).
+   */
+  const char *value;
+} lb_valuation_point_t;
+
+/**
+ * Historical data for a single valuation metric (e.g. PE, PB) including
+ * summary statistics (C-facing FFI type).
+ */
+typedef struct lb_valuation_metric_data_t {
+  /**
+   * Description or label of the valuation metric.
+   */
+  const char *desc;
+  /**
+   * Highest value of the metric over the series.
+   */
+  const char *high;
+  /**
+   * Lowest value of the metric over the series.
+   */
+  const char *low;
+  /**
+   * Median value of the metric over the series.
+   */
+  const char *median;
+  /**
+   * Pointer to the array of time-series data points.
+   */
+  const struct lb_valuation_point_t *list;
+  /**
+   * Number of data points in `list`.
+   */
+  uintptr_t num_list;
+} lb_valuation_metric_data_t;
+
+/**
+ * Set of valuation metric data series for a security (C-facing FFI type).
+ */
+typedef struct lb_valuation_metrics_data_t {
+  /**
+   * Price-to-earnings ratio series, or null if unavailable.
+   */
+  const struct lb_valuation_metric_data_t *pe;
+  /**
+   * Price-to-book ratio series, or null if unavailable.
+   */
+  const struct lb_valuation_metric_data_t *pb;
+  /**
+   * Price-to-sales ratio series, or null if unavailable.
+   */
+  const struct lb_valuation_metric_data_t *ps;
+  /**
+   * Dividend yield series, or null if unavailable.
+   */
+  const struct lb_valuation_metric_data_t *dvd_yld;
+} lb_valuation_metrics_data_t;
+
+/**
+ * Valuation data container holding all metric series for a security (C-facing
+ * FFI type).
+ */
+typedef struct lb_valuation_data_t {
+  /**
+   * The set of valuation metric data series (PE, PB, PS, dividend yield).
+   */
+  struct lb_valuation_metrics_data_t metrics;
+} lb_valuation_data_t;
+
+typedef struct lb_valuation_metric_data_t CValuationHistoryMetric;
+
+/**
+ * Set of historical valuation metric series (PE, PB, PS) for a security
+ * (C-facing FFI type).
+ */
+typedef struct lb_valuation_history_metrics_t {
+  /**
+   * Historical price-to-earnings ratio series, or null if unavailable.
+   */
+  const CValuationHistoryMetric *pe;
+  /**
+   * Historical price-to-book ratio series, or null if unavailable.
+   */
+  const CValuationHistoryMetric *pb;
+  /**
+   * Historical price-to-sales ratio series, or null if unavailable.
+   */
+  const CValuationHistoryMetric *ps;
+} lb_valuation_history_metrics_t;
+
+/**
+ * Response containing historical valuation metric series (C-facing FFI type).
+ */
+typedef struct lb_valuation_history_response_t {
+  /**
+   * Historical price-to-earnings ratio series, or null if unavailable.
+   */
+  const CValuationHistoryMetric *pe;
+  /**
+   * Historical price-to-book ratio series, or null if unavailable.
+   */
+  const CValuationHistoryMetric *pb;
+  /**
+   * Historical price-to-sales ratio series, or null if unavailable.
+   */
+  const CValuationHistoryMetric *ps;
+} lb_valuation_history_response_t;
+
+/**
+ * High-level company profile and metadata (C-facing FFI type).
+ */
+typedef struct lb_company_overview_t {
+  /**
+   * Short display name of the company.
+   */
+  const char *name;
+  /**
+   * Full legal company name.
+   */
+  const char *company_name;
+  /**
+   * Year the company was founded.
+   */
+  const char *founded;
+  /**
+   * Stock listing date ("YYYY-MM-DD").
+   */
+  const char *listing_date;
+  /**
+   * Exchange or market where the stock is listed.
+   */
+  const char *market;
+  /**
+   * Geographic region of the company's primary operations.
+   */
+  const char *region;
+  /**
+   * Registered address of the company.
+   */
+  const char *address;
+  /**
+   * Principal office address.
+   */
+  const char *office_address;
+  /**
+   * Company website URL.
+   */
+  const char *website;
+  /**
+   * IPO issue price.
+   */
+  const char *issue_price;
+  /**
+   * Number of shares offered at IPO.
+   */
+  const char *shares_offered;
+  /**
+   * Name of the board chairman.
+   */
+  const char *chairman;
+  /**
+   * Name of the company secretary.
+   */
+  const char *secretary;
+  /**
+   * Name of the auditing institution.
+   */
+  const char *audit_inst;
+  /**
+   * Business category or industry classification label.
+   */
+  const char *category;
+  /**
+   * Fiscal year-end date (e.g. `"12/31"`).
+   */
+  const char *year_end;
+  /**
+   * Number of employees (as a string).
+   */
+  const char *employees;
+  /**
+   * Corporate phone number.
+   */
+  const char *phone;
+  /**
+   * Corporate fax number.
+   */
+  const char *fax;
+  /**
+   * Corporate email address.
+   */
+  const char *email;
+  /**
+   * Legal representative of the company.
+   */
+  const char *legal_repr;
+  /**
+   * General manager or CEO name.
+   */
+  const char *manager;
+  /**
+   * Stock ticker symbol.
+   */
+  const char *ticker;
+  /**
+   * Business description / company profile text.
+   */
+  const char *profile;
+  /**
+   * Numeric sector code.
+   */
+  int32_t sector;
+} lb_company_overview_t;
+
+/**
+ * A stock position held by a shareholder (C-facing FFI type).
+ */
+typedef struct lb_shareholder_stock_t {
+  /**
+   * Security symbol (e.g. `"700.HK"`).
+   */
+  const char *symbol;
+  /**
+   * Stock code.
+   */
+  const char *code;
+  /**
+   * Exchange or market of the stock.
+   */
+  const char *market;
+  /**
+   * Change in the holding since the previous report.
+   */
+  const char *chg;
+} lb_shareholder_stock_t;
+
+/**
+ * A single institutional or major shareholder entry (C-facing FFI type).
+ */
+typedef struct lb_shareholder_t {
+  /**
+   * Unique identifier for the shareholder.
+   */
+  const char *shareholder_id;
+  /**
+   * Display name of the shareholder.
+   */
+  const char *shareholder_name;
+  /**
+   * Type of institution (e.g. fund, insurance company).
+   */
+  const char *institution_type;
+  /**
+   * Percentage of total shares held.
+   */
+  const char *percent_of_shares;
+  /**
+   * Change in shares held since the previous report.
+   */
+  const char *shares_changed;
+  /**
+   * Date of the holdings report ("YYYY-MM-DD").
+   */
+  const char *report_date;
+  /**
+   * Pointer to the array of stock positions held by this shareholder.
+   */
+  const struct lb_shareholder_stock_t *stocks;
+  /**
+   * Number of stock positions in `stocks`.
+   */
+  uintptr_t num_stocks;
+} lb_shareholder_t;
+
+/**
+ * Paginated list of shareholders for a security (C-facing FFI type).
+ */
+typedef struct lb_shareholder_list_t {
+  /**
+   * Pointer to the array of shareholder entries.
+   */
+  const struct lb_shareholder_t *shareholder_list;
+  /**
+   * Number of entries in `shareholder_list`.
+   */
+  uintptr_t num_shareholder_list;
+  /**
+   * URL to fetch the next page of results, or empty if no next page.
+   */
+  const char *forward_url;
+  /**
+   * Total number of shareholders across all pages.
+   */
+  int32_t total;
+} lb_shareholder_list_t;
+
+/**
+ * A single fund that holds a position in a security (C-facing FFI type).
+ */
+typedef struct lb_fund_holder_t {
+  /**
+   * Fund code.
+   */
+  const char *code;
+  /**
+   * Security symbol held by the fund.
+   */
+  const char *symbol;
+  /**
+   * Currency of the fund's reported holding value.
+   */
+  const char *currency;
+  /**
+   * Fund name.
+   */
+  const char *name;
+  /**
+   * Proportion of the fund's portfolio allocated to this position.
+   */
+  const char *position_ratio;
+  /**
+   * Date of the holdings report ("YYYY-MM-DD").
+   */
+  const char *report_date;
+} lb_fund_holder_t;
+
+/**
+ * Collection of fund holders for a security (C-facing FFI type).
+ */
+typedef struct lb_fund_holders_t {
+  /**
+   * Pointer to the array of fund holder entries.
+   */
+  const struct lb_fund_holder_t *lists;
+  /**
+   * Number of entries in `lists`.
+   */
+  uintptr_t num_lists;
+} lb_fund_holders_t;
+
+/**
+ * A single corporate action event for a security (C-facing FFI type).
+ */
+typedef struct lb_corp_action_item_t {
+  /**
+   * Unique identifier for the corporate action.
+   */
+  const char *id;
+  /**
+   * Action date as a Unix timestamp string.
+   */
+  const char *date;
+  /**
+   * Human-readable action date string.
+   */
+  const char *date_str;
+  /**
+   * Type classification of the date (e.g. record date, ex-date).
+   */
+  const char *date_type;
+  /**
+   * Time zone associated with the action date.
+   */
+  const char *date_zone;
+  /**
+   * Type of corporate action (e.g. dividend, split).
+   */
+  const char *act_type;
+  /**
+   * Human-readable description of the action type.
+   */
+  const char *act_desc;
+  /**
+   * Action details or ratio string.
+   */
+  const char *action;
+  /**
+   * Whether this action occurred recently.
+   */
+  bool recent;
+  /**
+   * Whether announcement of this action was delayed.
+   */
+  bool is_delay;
+  /**
+   * Additional content explaining any delay.
+   */
+  const char *delay_content;
+} lb_corp_action_item_t;
+
+/**
+ * Collection of corporate action events for a security (C-facing FFI type).
+ */
+typedef struct lb_corp_actions_t {
+  /**
+   * Pointer to the array of corporate action items.
+   */
+  const struct lb_corp_action_item_t *items;
+  /**
+   * Number of items in the array.
+   */
+  uintptr_t num_items;
+} lb_corp_actions_t;
+
+/**
+ * A security held by an institutional investor (C-facing FFI type).
+ */
+typedef struct lb_invest_security_t {
+  /**
+   * Unique identifier for the investing company.
+   */
+  const char *company_id;
+  /**
+   * Display name of the investing company.
+   */
+  const char *company_name;
+  /**
+   * English name of the investing company.
+   */
+  const char *company_name_en;
+  /**
+   * Simplified Chinese name of the investing company.
+   */
+  const char *company_name_zhcn;
+  /**
+   * Security symbol held (e.g. `"700.HK"`).
+   */
+  const char *symbol;
+  /**
+   * Currency of the holding value.
+   */
+  const char *currency;
+  /**
+   * Percentage of total shares held.
+   */
+  const char *percent_of_shares;
+  /**
+   * Ranking of the holding within the investor's portfolio.
+   */
+  const char *shares_rank;
+  /**
+   * Market value of the holding.
+   */
+  const char *shares_value;
+} lb_invest_security_t;
+
+/**
+ * Paginated list of investment relations for a security (C-facing FFI type).
+ */
+typedef struct lb_invest_relations_t {
+  /**
+   * URL to fetch the next page of results, or empty if no next page.
+   */
+  const char *forward_url;
+  /**
+   * Pointer to the array of invested securities.
+   */
+  const struct lb_invest_security_t *invest_securities;
+  /**
+   * Number of entries in `invest_securities`.
+   */
+  uintptr_t num_invest_securities;
+} lb_invest_relations_t;
+
+/**
+ * A single operating/financial indicator within an operating report item
+ * (C-facing FFI type).
+ */
+typedef struct lb_operating_indicator_t {
+  /**
+   * Machine-readable field name for the indicator.
+   */
+  const char *field_name;
+  /**
+   * Human-readable display name for the indicator.
+   */
+  const char *indicator_name;
+  /**
+   * Value of the indicator (as a decimal string).
+   */
+  const char *indicator_value;
+  /**
+   * Year-over-year change for the indicator.
+   */
+  const char *yoy;
+} lb_operating_indicator_t;
+
+/**
+ * A single operating report entry including associated financial indicators
+ * (C-facing FFI type).
+ */
+typedef struct lb_operating_item_t {
+  /**
+   * Unique identifier for the operating report item.
+   */
+  const char *id;
+  /**
+   * Report period identifier (e.g. `"2024Q1"`).
+   */
+  const char *report;
+  /**
+   * Title of the operating report.
+   */
+  const char *title;
+  /**
+   * Plain-text content of the operating report.
+   */
+  const char *txt;
+  /**
+   * Whether this is the most recent operating report.
+   */
+  bool latest;
+  /**
+   * URL to the original web page for this report.
+   */
+  const char *web_url;
+  /**
+   * Currency used in the financial data.
+   */
+  const char *financial_currency;
+  /**
+   * Name of the financial reporting entity.
+   */
+  const char *financial_name;
+  /**
+   * Region associated with the financial report.
+   */
+  const char *financial_region;
+  /**
+   * Financial report period label.
+   */
+  const char *financial_report;
+  /**
+   * Pointer to the array of operating indicators for this item.
+   */
+  const struct lb_operating_indicator_t *indicators;
+  /**
+   * Number of indicators in the `indicators` array.
+   */
+  uintptr_t num_indicators;
+} lb_operating_item_t;
+
+/**
+ * Collection of operating report items for a security (C-facing FFI type).
+ */
+typedef struct lb_operating_list_t {
+  /**
+   * Pointer to the array of operating report items.
+   */
+  const struct lb_operating_item_t *list;
+  /**
+   * Number of items in the array.
+   */
+  uintptr_t num_list;
+} lb_operating_list_t;
+
+/**
+ * Financial reports serialised as a JSON string (C-facing FFI type).
+ */
+typedef struct lb_financial_reports_t {
+  /**
+   * JSON-encoded array of financial report entries.
+   */
+  const char *list_json;
+} lb_financial_reports_t;
+
+/**
+ * One consensus estimate detail for a financial metric.
+ */
+typedef struct lb_consensus_detail_t {
+  /**
+   * Metric key, e.g. "revenue", "eps".
+   */
+  const char *key;
+  /**
+   * Display name.
+   */
+  const char *name;
+  /**
+   * Metric description.
+   */
+  const char *description;
+  /**
+   * Actual reported value (empty string if not yet released).
+   */
+  const char *actual;
+  /**
+   * Consensus estimate value.
+   */
+  const char *estimate;
+  /**
+   * Actual minus estimate.
+   */
+  const char *comp_value;
+  /**
+   * Beat/miss description.
+   */
+  const char *comp_desc;
+  /**
+   * Comparison result code.
+   */
+  const char *comp;
+  /**
+   * Whether actual results have been published.
+   */
+  bool is_released;
+} lb_consensus_detail_t;
+
+/**
+ * Consensus report for one fiscal period.
+ */
+typedef struct lb_consensus_report_t {
+  /**
+   * Fiscal year, e.g. 2025.
+   */
+  int32_t fiscal_year;
+  /**
+   * Fiscal period code, e.g. "Q4".
+   */
+  const char *fiscal_period;
+  /**
+   * Human-readable period label, e.g. "Q4 FY2025".
+   */
+  const char *period_text;
+  /**
+   * Pointer to the array of consensus detail items.
+   */
+  const struct lb_consensus_detail_t *details;
+  /**
+   * Number of items in `details`.
+   */
+  uintptr_t num_details;
+} lb_consensus_report_t;
+
+/**
+ * Financial consensus response.
+ */
+typedef struct lb_financial_consensus_t {
+  /**
+   * Pointer to the array of consensus reports.
+   */
+  const struct lb_consensus_report_t *list;
+  /**
+   * Number of reports in `list`.
+   */
+  uintptr_t num_list;
+  /**
+   * Index of the most recently released period.
+   */
+  int32_t current_index;
+  /**
+   * Reporting currency, e.g. "HKD".
+   */
+  const char *currency;
+  /**
+   * Pointer to the array of available period type strings.
+   */
+  const char *const *opt_periods;
+  /**
+   * Number of items in `opt_periods`.
+   */
+  uintptr_t num_opt_periods;
+  /**
+   * Currently returned period type.
+   */
+  const char *current_period;
+} lb_financial_consensus_t;
+
+/**
+ * Historical valuation snapshot for an industry peer.
+ */
+typedef struct lb_industry_valuation_history_t {
+  /**
+   * Unix timestamp string.
+   */
+  const char *date;
+  /**
+   * Price-to-Earnings ratio.
+   */
+  const char *pe;
+  /**
+   * Price-to-Book ratio.
+   */
+  const char *pb;
+  /**
+   * Price-to-Sales ratio.
+   */
+  const char *ps;
+} lb_industry_valuation_history_t;
+
+/**
+ * Valuation data for one industry peer security.
+ */
+typedef struct lb_industry_valuation_item_t {
+  /**
+   * Security symbol.
+   */
+  const char *symbol;
+  /**
+   * Company name.
+   */
+  const char *name;
+  /**
+   * Reporting currency.
+   */
+  const char *currency;
+  /**
+   * Total assets.
+   */
+  const char *assets;
+  /**
+   * Book value per share.
+   */
+  const char *bps;
+  /**
+   * Earnings per share.
+   */
+  const char *eps;
+  /**
+   * Dividends per share.
+   */
+  const char *dps;
+  /**
+   * Dividend yield.
+   */
+  const char *div_yld;
+  /**
+   * Dividend payout ratio.
+   */
+  const char *div_payout_ratio;
+  /**
+   * 5-year average dividends per share.
+   */
+  const char *five_y_avg_dps;
+  /**
+   * Current PE ratio.
+   */
+  const char *pe;
+  /**
+   * Pointer to the array of historical snapshots.
+   */
+  const struct lb_industry_valuation_history_t *history;
+  /**
+   * Number of items in `history`.
+   */
+  uintptr_t num_history;
+} lb_industry_valuation_item_t;
+
+/**
+ * List of industry valuation items.
+ */
+typedef struct lb_industry_valuation_list_t {
+  /**
+   * Pointer to the array of industry valuation items.
+   */
+  const struct lb_industry_valuation_item_t *list;
+  /**
+   * Number of items in `list`.
+   */
+  uintptr_t num_list;
+} lb_industry_valuation_list_t;
+
+/**
+ * Distribution statistics for one valuation metric within an industry.
+ */
+typedef struct lb_valuation_dist_t {
+  /**
+   * Minimum value in the industry.
+   */
+  const char *low;
+  /**
+   * Maximum value in the industry.
+   */
+  const char *high;
+  /**
+   * Median value in the industry.
+   */
+  const char *median;
+  /**
+   * Current value of the queried security.
+   */
+  const char *value;
+  /**
+   * Percentile ranking (0-1 range as string).
+   */
+  const char *ranking;
+  /**
+   * Ordinal rank index (1-based).
+   */
+  const char *rank_index;
+  /**
+   * Total number of securities in the industry.
+   */
+  const char *rank_total;
+} lb_valuation_dist_t;
+
+/**
+ * Industry valuation distribution for PE, PB, PS ratios.
+ */
+typedef struct lb_industry_valuation_dist_t {
+  /**
+   * PE ratio distribution, or null if unavailable.
+   */
+  const struct lb_valuation_dist_t *pe;
+  /**
+   * PB ratio distribution, or null if unavailable.
+   */
+  const struct lb_valuation_dist_t *pb;
+  /**
+   * PS ratio distribution, or null if unavailable.
+   */
+  const struct lb_valuation_dist_t *ps;
+} lb_industry_valuation_dist_t;
+
+/**
+ * One executive or board member.
+ */
+typedef struct lb_professional_t {
+  /**
+   * Internal wiki person ID.
+   */
+  const char *id;
+  /**
+   * Full name.
+   */
+  const char *name;
+  /**
+   * Full name in Simplified Chinese.
+   */
+  const char *name_zhcn;
+  /**
+   * Full name in English.
+   */
+  const char *name_en;
+  /**
+   * Job title.
+   */
+  const char *title;
+  /**
+   * Biography text.
+   */
+  const char *biography;
+  /**
+   * URL to the person's photo.
+   */
+  const char *photo;
+  /**
+   * URL to the wiki profile page.
+   */
+  const char *wiki_url;
+} lb_professional_t;
+
+/**
+ * Executives for one security.
+ */
+typedef struct lb_executive_group_t {
+  /**
+   * Security symbol.
+   */
+  const char *symbol;
+  /**
+   * Link to the company wiki page.
+   */
+  const char *forward_url;
+  /**
+   * Total number of executives.
+   */
+  int32_t total;
+  /**
+   * Pointer to the array of professionals.
+   */
+  const struct lb_professional_t *professionals;
+  /**
+   * Number of items in `professionals`.
+   */
+  uintptr_t num_professionals;
+} lb_executive_group_t;
+
+/**
+ * List of executive groups per security.
+ */
+typedef struct lb_executive_list_t {
+  /**
+   * Pointer to the array of executive groups.
+   */
+  const struct lb_executive_group_t *professional_list;
+  /**
+   * Number of groups in `professional_list`.
+   */
+  uintptr_t num_professional_list;
+} lb_executive_list_t;
+
+/**
+ * TTM (trailing twelve months) buyback summary.
+ */
+typedef struct lb_recent_buybacks_t {
+  /**
+   * Reporting currency.
+   */
+  const char *currency;
+  /**
+   * Net buyback amount TTM.
+   */
+  const char *net_buyback_ttm;
+  /**
+   * Net buyback yield TTM.
+   */
+  const char *net_buyback_yield_ttm;
+} lb_recent_buybacks_t;
+
+/**
+ * Historical annual buyback data point.
+ */
+typedef struct lb_buyback_history_item_t {
+  /**
+   * Fiscal year label, e.g. "FY2024".
+   */
+  const char *fiscal_year;
+  /**
+   * Fiscal year date range string.
+   */
+  const char *fiscal_year_range;
+  /**
+   * Net buyback amount.
+   */
+  const char *net_buyback;
+  /**
+   * Net buyback yield.
+   */
+  const char *net_buyback_yield;
+  /**
+   * Year-over-year net buyback growth rate.
+   */
+  const char *net_buyback_growth_rate;
+  /**
+   * Reporting currency.
+   */
+  const char *currency;
+} lb_buyback_history_item_t;
+
+/**
+ * Buyback payout and cash-flow ratios.
+ */
+typedef struct lb_buyback_ratios_t {
+  /**
+   * Net buyback payout ratio.
+   */
+  const char *net_buyback_payout_ratio;
+  /**
+   * Net buyback to free cash-flow ratio.
+   */
+  const char *net_buyback_to_cashflow_ratio;
+} lb_buyback_ratios_t;
+
+/**
+ * Buyback data response.
+ */
+typedef struct lb_buyback_data_t {
+  /**
+   * TTM buyback summary, or null if unavailable.
+   */
+  const struct lb_recent_buybacks_t *recent_buybacks;
+  /**
+   * Pointer to the array of historical buyback items.
+   */
+  const struct lb_buyback_history_item_t *buyback_history;
+  /**
+   * Number of items in `buyback_history`.
+   */
+  uintptr_t num_buyback_history;
+  /**
+   * Pointer to the array of buyback ratios.
+   */
+  const struct lb_buyback_ratios_t *buyback_ratios;
+  /**
+   * Number of items in `buyback_ratios`.
+   */
+  uintptr_t num_buyback_ratios;
+} lb_buyback_data_t;
+
+/**
+ * A leaf rating indicator with a raw value.
+ */
+typedef struct lb_rating_leaf_indicator_t {
+  /**
+   * Indicator display name.
+   */
+  const char *name;
+  /**
+   * Formatted value string.
+   */
+  const char *value;
+  /**
+   * Value type hint, e.g. "percent".
+   */
+  const char *value_type;
+  /**
+   * Score (serialised as JSON string).
+   */
+  const char *score;
+  /**
+   * Letter grade.
+   */
+  const char *letter;
+} lb_rating_leaf_indicator_t;
+
+/**
+ * A rating indicator node (parent or leaf).
+ */
+typedef struct lb_rating_indicator_t {
+  /**
+   * Indicator display name.
+   */
+  const char *name;
+  /**
+   * Score (serialised as JSON string).
+   */
+  const char *score;
+  /**
+   * Letter grade.
+   */
+  const char *letter;
+} lb_rating_indicator_t;
+
+/**
+ * A group of sub-indicators under one category indicator.
+ */
+typedef struct lb_rating_sub_indicator_group_t {
+  /**
+   * Parent indicator for this group.
+   */
+  struct lb_rating_indicator_t indicator;
+  /**
+   * Pointer to the array of leaf sub-indicators.
+   */
+  const struct lb_rating_leaf_indicator_t *sub_indicators;
+  /**
+   * Number of items in `sub_indicators`.
+   */
+  uintptr_t num_sub_indicators;
+} lb_rating_sub_indicator_group_t;
+
+/**
+ * One rating category (e.g. growth, profitability).
+ */
+typedef struct lb_rating_category_t {
+  /**
+   * Category type code.
+   */
+  int32_t kind;
+  /**
+   * Pointer to the array of sub-indicator groups.
+   */
+  const struct lb_rating_sub_indicator_group_t *sub_indicators;
+  /**
+   * Number of items in `sub_indicators`.
+   */
+  uintptr_t num_sub_indicators;
+} lb_rating_category_t;
+
+/**
+ * Stock ratings response.
+ */
+typedef struct lb_stock_ratings_t {
+  /**
+   * Style display name.
+   */
+  const char *style_txt_name;
+  /**
+   * Scale display name.
+   */
+  const char *scale_txt_name;
+  /**
+   * Report period display text.
+   */
+  const char *report_period_txt;
+  /**
+   * Composite score (JSON string).
+   */
+  const char *multi_score;
+  /**
+   * Composite score letter grade.
+   */
+  const char *multi_letter;
+  /**
+   * Score change vs previous period.
+   */
+  int32_t multi_score_change;
+  /**
+   * Industry name.
+   */
+  const char *industry_name;
+  /**
+   * Industry rank (JSON string).
+   */
+  const char *industry_rank;
+  /**
+   * Total securities in the industry (JSON string).
+   */
+  const char *industry_total;
+  /**
+   * Industry mean score (JSON string).
+   */
+  const char *industry_mean_score;
+  /**
+   * Industry median score (JSON string).
+   */
+  const char *industry_median_score;
+  /**
+   * Pointer to the array of rating categories.
+   */
+  const struct lb_rating_category_t *ratings;
+  /**
+   * Number of items in `ratings`.
+   */
+  uintptr_t num_ratings;
+} lb_stock_ratings_t;
+
+/**
+ * A key-value pair carrying calendar data fields.
+ */
+typedef struct lb_calendar_data_kv_t {
+  /**
+   * Field key name.
+   */
+  const char *key;
+  /**
+   * Display value.
+   */
+  const char *value;
+  /**
+   * Type of the value (e.g. "string", "number").
+   */
+  const char *value_type;
+  /**
+   * Raw, unformatted value.
+   */
+  const char *value_raw;
+} lb_calendar_data_kv_t;
+
+/**
+ * Detailed information for a single calendar event.
+ */
+typedef struct lb_calendar_event_info_t {
+  /**
+   * Associated ticker symbol (may be empty).
+   */
+  const char *symbol;
+  /**
+   * Market the symbol belongs to (e.g. "US", "HK").
+   */
+  const char *market;
+  /**
+   * Human-readable event description / content.
+   */
+  const char *content;
+  /**
+   * Display name of the issuer or counter party.
+   */
+  const char *counter_name;
+  /**
+   * Classification of the date field (e.g. "announce", "ex-dividend").
+   */
+  const char *date_type;
+  /**
+   * Event date string (e.g. "2025-03-15").
+   */
+  const char *date;
+  /**
+   * Unique identifier used to retrieve the associated chart.
+   */
+  const char *chart_uid;
+  /**
+   * Pointer to an array of extra key-value data pairs for this event.
+   */
+  const struct lb_calendar_data_kv_t *data_kv;
+  /**
+   * Number of elements in the `data_kv` array.
+   */
+  uintptr_t num_data_kv;
+  /**
+   * Event type identifier string.
+   */
+  const char *event_type;
+  /**
+   * Full datetime string for events with a specific time component.
+   */
+  const char *datetime;
+  /**
+   * URL of the icon image representing this event.
+   */
+  const char *icon;
+  /**
+   * Star / importance rating for the event (higher is more important).
+   */
+  int32_t star;
+  /**
+   * Unique event ID.
+   */
+  const char *id;
+  /**
+   * Financial-market local time string for this event.
+   */
+  const char *financial_market_time;
+  /**
+   * Currency code relevant to the event (e.g. "USD").
+   */
+  const char *currency;
+  /**
+   * Activity type classification string.
+   */
+  const char *activity_type;
+} lb_calendar_event_info_t;
+
+/**
+ * A group of calendar events that share the same date.
+ */
+typedef struct lb_calendar_date_group_t {
+  /**
+   * Date string for this group (e.g. "2025-03-15").
+   */
+  const char *date;
+  /**
+   * Total number of events on this date.
+   */
+  int32_t count;
+  /**
+   * Pointer to an array of event info items.
+   */
+  const struct lb_calendar_event_info_t *infos;
+  /**
+   * Number of elements in the `infos` array.
+   */
+  uintptr_t num_infos;
+} lb_calendar_date_group_t;
+
+/**
+ * Response containing calendar events grouped by date.
+ */
+typedef struct lb_calendar_events_response_t {
+  /**
+   * Reference date string used for the query (e.g. "2025-03-15").
+   */
+  const char *date;
+  /**
+   * Pointer to an array of date-grouped event lists.
+   */
+  const struct lb_calendar_date_group_t *list;
+  /**
+   * Number of elements in the `list` array.
+   */
+  uintptr_t num_list;
+} lb_calendar_events_response_t;
+
+/**
+ * A single currency exchange rate entry.
+ */
+typedef struct lb_exchange_rate_t {
+  /**
+   * Mid (average) exchange rate between the two currencies.
+   */
+  double average_rate;
+  /**
+   * Base currency code (e.g. "USD").
+   */
+  const char *base_currency;
+  /**
+   * Bid rate (buy price) for the base currency.
+   */
+  double bid_rate;
+  /**
+   * Offer rate (sell price) for the base currency.
+   */
+  double offer_rate;
+  /**
+   * Counter currency code (e.g. "HKD").
+   */
+  const char *other_currency;
+} lb_exchange_rate_t;
+
+/**
+ * Collection of exchange rate entries.
+ */
+typedef struct lb_exchange_rates_t {
+  /**
+   * Pointer to an array of exchange rate items.
+   */
+  const struct lb_exchange_rate_t *exchanges;
+  /**
+   * Number of elements in the `exchanges` array.
+   */
+  uintptr_t num_exchanges;
+} lb_exchange_rates_t;
+
+/**
+ * A single alert indicator configuration for a symbol.
+ */
+typedef struct lb_alert_item_t {
+  /**
+   * Unique alert identifier.
+   */
+  const char *id;
+  /**
+   * Identifier of the indicator that triggers this alert.
+   */
+  const char *indicator_id;
+  /**
+   * Whether this alert is currently enabled.
+   */
+  bool enabled;
+  /**
+   * Alert notification frequency code.
+   */
+  int32_t frequency;
+  /**
+   * Scope of the alert (e.g. per-symbol or global).
+   */
+  int32_t scope;
+  /**
+   * Human-readable description text for the alert.
+   */
+  const char *text;
+  /**
+   * Pointer to an array of state codes associated with this alert.
+   */
+  const int32_t *state;
+  /**
+   * Number of elements in the `state` array.
+   */
+  uintptr_t num_state;
+  /**
+   * JSON-serialized map of additional indicator parameter values.
+   */
+  const char *value_map;
+} lb_alert_item_t;
+
+/**
+ * A symbol together with all of its associated alert indicators.
+ */
+typedef struct lb_alert_symbol_group_t {
+  /**
+   * Full symbol string (e.g. "700.HK").
+   */
+  const char *symbol;
+  /**
+   * Short ticker code without market suffix.
+   */
+  const char *code;
+  /**
+   * Market the symbol belongs to (e.g. "HK", "US").
+   */
+  const char *market;
+  /**
+   * Display name of the security.
+   */
+  const char *name;
+  /**
+   * Latest price as a string.
+   */
+  const char *price;
+  /**
+   * Absolute price change as a string.
+   */
+  const char *chg;
+  /**
+   * Percentage price change as a string.
+   */
+  const char *p_chg;
+  /**
+   * Product type string (e.g. "stock", "fund").
+   */
+  const char *product;
+  /**
+   * Pointer to an array of alert indicator items for this symbol.
+   */
+  const struct lb_alert_item_t *indicators;
+  /**
+   * Number of elements in the `indicators` array.
+   */
+  uintptr_t num_indicators;
+} lb_alert_symbol_group_t;
+
+/**
+ * Top-level response containing alert symbol groups.
+ */
+typedef struct lb_alert_list_t {
+  /**
+   * Pointer to an array of symbol group items.
+   */
+  const struct lb_alert_symbol_group_t *lists;
+  /**
+   * Number of elements in the `lists` array.
+   */
+  uintptr_t num_lists;
+} lb_alert_list_t;
+
+/**
+ * DCA (dollar-cost averaging) plan details.
+ */
+typedef struct lb_dca_plan_t {
+  /**
+   * Unique plan identifier.
+   */
+  const char *plan_id;
+  /**
+   * Current status of the plan (e.g. "active", "suspended", "finished").
+   */
+  const char *status;
+  /**
+   * Stock symbol (e.g. "AAPL.US").
+   */
+  const char *symbol;
+  /**
+   * Member ID that owns this plan.
+   */
+  const char *member_id;
+  /**
+   * Account identifier (AAID).
+   */
+  const char *aaid;
+  /**
+   * Account channel identifier.
+   */
+  const char *account_channel;
+  /**
+   * Display-friendly account name.
+   */
+  const char *display_account;
+  /**
+   * Market code (e.g. "US", "HK").
+   */
+  const char *market;
+  /**
+   * Investment amount per period (decimal string).
+   */
+  const char *per_invest_amount;
+  /**
+   * Investment frequency (e.g. "weekly", "monthly").
+   */
+  const char *invest_frequency;
+  /**
+   * Day of the week on which investment is executed (if weekly frequency).
+   */
+  const char *invest_day_of_week;
+  /**
+   * Day of the month on which investment is executed (if monthly frequency).
+   */
+  const char *invest_day_of_month;
+  /**
+   * Whether margin financing is allowed for this plan.
+   */
+  bool allow_margin_finance;
+  /**
+   * After-hours trading setting.
+   */
+  const char *alter_hours;
+  /**
+   * Plan creation timestamp (ISO 8601 string).
+   */
+  const char *created_at;
+  /**
+   * Plan last-updated timestamp (ISO 8601 string).
+   */
+  const char *updated_at;
+  /**
+   * Next scheduled trading date (ISO 8601 date string).
+   */
+  const char *next_trd_date;
+  /**
+   * Stock display name.
+   */
+  const char *stock_name;
+  /**
+   * Cumulative invested amount (decimal string).
+   */
+  const char *cum_amount;
+  /**
+   * Total number of investment executions to date.
+   */
+  int64_t issue_number;
+  /**
+   * Average cost per share across all executions (decimal string).
+   */
+  const char *average_cost;
+  /**
+   * Cumulative profit/loss (decimal string).
+   */
+  const char *cum_profit;
+} lb_dca_plan_t;
+
+/**
+ * List of DCA plans.
+ */
+typedef struct lb_dca_list_t {
+  /**
+   * Pointer to the array of DCA plans.
+   */
+  const struct lb_dca_plan_t *plans;
+  /**
+   * Number of plans in the array.
+   */
+  uintptr_t num_plans;
+} lb_dca_list_t;
+
+/**
+ * Aggregate statistics across all DCA plans for a user.
+ */
+typedef struct lb_dca_stats_t {
+  /**
+   * Number of currently active plans (decimal string).
+   */
+  const char *active_count;
+  /**
+   * Number of finished plans (decimal string).
+   */
+  const char *finished_count;
+  /**
+   * Number of suspended plans (decimal string).
+   */
+  const char *suspended_count;
+  /**
+   * Pointer to the array of nearest upcoming plans.
+   */
+  const struct lb_dca_plan_t *nearest_plans;
+  /**
+   * Number of plans in the nearest_plans array.
+   */
+  uintptr_t num_nearest_plans;
+  /**
+   * Days remaining until the next scheduled investment (decimal string).
+   */
+  const char *rest_days;
+  /**
+   * Total invested amount across all plans (decimal string).
+   */
+  const char *total_amount;
+  /**
+   * Total profit/loss across all plans (decimal string).
+   */
+  const char *total_profit;
+} lb_dca_stats_t;
+
+/**
+ * DCA support information for a single security.
+ */
+typedef struct lb_dca_support_info_t {
+  /**
+   * Stock symbol (e.g. "AAPL.US").
+   */
+  const char *symbol;
+  /**
+   * Whether regular (recurring) saving/investment is supported for this
+   * symbol.
+   */
+  bool support_regular_saving;
+} lb_dca_support_info_t;
+
+/**
+ * List of DCA support information entries.
+ */
+typedef struct lb_dca_support_list_t {
+  /**
+   * Pointer to the array of support info entries.
+   */
+  const struct lb_dca_support_info_t *infos;
+  /**
+   * Number of entries in the array.
+   */
+  uintptr_t num_infos;
+} lb_dca_support_list_t;
+
+/**
+ * Result returned by DCA create and update operations.
+ */
+typedef struct lb_dca_create_result_t {
+  /**
+   * The plan ID of the created or updated DCA plan.
+   */
+  const char *plan_id;
+} lb_dca_create_result_t;
+
+/**
+ * Result returned by DCA calc_date operation.
+ */
+typedef struct lb_dca_calc_date_result_t {
+  /**
+   * Next projected trade date (unix timestamp string).
+   */
+  const char *trade_date;
+} lb_dca_calc_date_result_t;
+
+/**
+ * One DCA execution history record.
+ */
+typedef struct lb_dca_history_record_t {
+  /**
+   * Execution timestamp (ISO 8601 string).
+   */
+  const char *created_at;
+  /**
+   * Associated order ID.
+   */
+  const char *order_id;
+  /**
+   * Execution status string.
+   */
+  const char *status;
+  /**
+   * Action type string.
+   */
+  const char *action;
+  /**
+   * Order type string.
+   */
+  const char *order_type;
+  /**
+   * Executed quantity (decimal string, may be empty).
+   */
+  const char *executed_qty;
+  /**
+   * Executed price (decimal string, may be empty).
+   */
+  const char *executed_price;
+  /**
+   * Executed amount (decimal string, may be empty).
+   */
+  const char *executed_amount;
+  /**
+   * Rejection reason (empty string if not rejected).
+   */
+  const char *rejected_reason;
+  /**
+   * Security symbol.
+   */
+  const char *symbol;
+} lb_dca_history_record_t;
+
+/**
+ * Paginated DCA execution history response.
+ */
+typedef struct lb_dca_history_response_t {
+  /**
+   * Pointer to the array of history records.
+   */
+  const struct lb_dca_history_record_t *records;
+  /**
+   * Number of records in the array.
+   */
+  uintptr_t num_records;
+  /**
+   * Whether more records exist.
+   */
+  bool has_more;
+} lb_dca_history_response_t;
+
+/**
+ * P&L summary for one asset category.
+ */
+typedef struct lb_profit_summary_info_t {
+  /**
+   * Asset type: "stock", "fund", "crypto".
+   */
+  const char *asset_type;
+  /**
+   * Security with the maximum profit.
+   */
+  const char *profit_max;
+  /**
+   * Name of the max-profit security.
+   */
+  const char *profit_max_name;
+  /**
+   * Security with the maximum loss.
+   */
+  const char *loss_max;
+  /**
+   * Name of the max-loss security.
+   */
+  const char *loss_max_name;
+} lb_profit_summary_info_t;
+
+/**
+ * P&L breakdown by asset type.
+ */
+typedef struct lb_profit_summary_breakdown_t {
+  /**
+   * Stock P&L.
+   */
+  const char *stock;
+  /**
+   * Fund P&L.
+   */
+  const char *fund;
+  /**
+   * Crypto P&L.
+   */
+  const char *crypto;
+  /**
+   * Money market fund P&L.
+   */
+  const char *mmf;
+  /**
+   * Other P&L.
+   */
+  const char *other;
+  /**
+   * Cumulative transaction amount.
+   */
+  const char *cumulative_transaction_amount;
+  /**
+   * Total number of orders.
+   */
+  const char *trade_order_num;
+  /**
+   * Total number of traded securities.
+   */
+  const char *trade_stock_num;
+  /**
+   * IPO hits.
+   */
+  int32_t ipo_hit;
+  /**
+   * IPO subscriptions.
+   */
+  int32_t ipo_subscription;
+  /**
+   * Pointer to array of per-category summary info.
+   */
+  const struct lb_profit_summary_info_t *summary_info;
+  /**
+   * Number of items in `summary_info`.
+   */
+  uintptr_t num_summary_info;
+} lb_profit_summary_breakdown_t;
+
+/**
+ * Account-level P&L summary.
+ */
+typedef struct lb_profit_analysis_summary_t {
+  /**
+   * Account currency.
+   */
+  const char *currency;
+  /**
+   * Current total asset value.
+   */
+  const char *current_total_asset;
+  /**
+   * Query start date string.
+   */
+  const char *start_date;
+  /**
+   * Query end date string.
+   */
+  const char *end_date;
+  /**
+   * Start time (unix timestamp string).
+   */
+  const char *start_time;
+  /**
+   * End time (unix timestamp string).
+   */
+  const char *end_time;
+  /**
+   * Ending asset value.
+   */
+  const char *ending_asset_value;
+  /**
+   * Initial asset value.
+   */
+  const char *initial_asset_value;
+  /**
+   * Total invested amount.
+   */
+  const char *invest_amount;
+  /**
+   * Whether any trades occurred.
+   */
+  bool is_traded;
+  /**
+   * Total profit/loss.
+   */
+  const char *sum_profit;
+  /**
+   * Total profit/loss rate.
+   */
+  const char *sum_profit_rate;
+  /**
+   * Per-asset-type breakdown (inline).
+   */
+  struct lb_profit_summary_breakdown_t profits;
+} lb_profit_analysis_summary_t;
+
+/**
+ * P&L for one security.
+ */
+typedef struct lb_profit_analysis_item_t {
+  /**
+   * Security name.
+   */
+  const char *name;
+  /**
+   * Market.
+   */
+  const char *market;
+  /**
+   * Whether still holding.
+   */
+  bool is_holding;
+  /**
+   * Profit/loss amount.
+   */
+  const char *profit;
+  /**
+   * Profit/loss rate.
+   */
+  const char *profit_rate;
+  /**
+   * Number of completed trades.
+   */
+  int64_t clearance_times;
+  /**
+   * Asset type: "stock" or "fund".
+   */
+  const char *item_type;
+  /**
+   * Currency.
+   */
+  const char *currency;
+  /**
+   * Security symbol.
+   */
+  const char *symbol;
+  /**
+   * Holding period display string.
+   */
+  const char *holding_period;
+  /**
+   * Ticker code.
+   */
+  const char *security_code;
+  /**
+   * ISIN (for funds).
+   */
+  const char *isin;
+  /**
+   * Underlying stock P&L.
+   */
+  const char *underlying_profit;
+  /**
+   * Derivatives P&L.
+   */
+  const char *derivatives_profit;
+  /**
+   * P&L in order currency.
+   */
+  const char *order_profit;
+} lb_profit_analysis_item_t;
+
+/**
+ * Per-security P&L breakdown.
+ */
+typedef struct lb_profit_analysis_sublist_t {
+  /**
+   * Start time (unix timestamp string).
+   */
+  const char *start;
+  /**
+   * End time (unix timestamp string).
+   */
+  const char *end;
+  /**
+   * Start date string.
+   */
+  const char *start_date;
+  /**
+   * End date string.
+   */
+  const char *end_date;
+  /**
+   * Last updated time (unix timestamp string).
+   */
+  const char *updated_at;
+  /**
+   * Last updated date string.
+   */
+  const char *updated_date;
+  /**
+   * Pointer to array of per-security items.
+   */
+  const struct lb_profit_analysis_item_t *items;
+  /**
+   * Number of items.
+   */
+  uintptr_t num_items;
+} lb_profit_analysis_sublist_t;
+
+/**
+ * Combined portfolio P&L analysis response.
+ */
+typedef struct lb_profit_analysis_t {
+  /**
+   * Account-level summary (inline).
+   */
+  struct lb_profit_analysis_summary_t summary;
+  /**
+   * Per-security breakdown (inline).
+   */
+  struct lb_profit_analysis_sublist_t sublist;
+} lb_profit_analysis_t;
+
+/**
+ * One security entry in a by-market P&L response.
+ */
+typedef struct lb_profit_analysis_by_market_item_t {
+  /**
+   * Security symbol (ticker code).
+   */
+  const char *code;
+  /**
+   * Security name.
+   */
+  const char *name;
+  /**
+   * Market, e.g. "HK", "US".
+   */
+  const char *market;
+  /**
+   * Profit/loss amount.
+   */
+  const char *profit;
+} lb_profit_analysis_by_market_item_t;
+
+/**
+ * P&L grouped by market response.
+ */
+typedef struct lb_profit_analysis_by_market_t {
+  /**
+   * Total P&L across all returned items.
+   */
+  const char *profit;
+  /**
+   * Whether more pages are available.
+   */
+  bool has_more;
+  /**
+   * Pointer to array of per-security items.
+   */
+  const struct lb_profit_analysis_by_market_item_t *stock_items;
+  /**
+   * Number of items in `stock_items`.
+   */
+  uintptr_t num_stock_items;
+} lb_profit_analysis_by_market_t;
+
+/**
+ * One profit-analysis flow record.
+ */
+typedef struct lb_flow_item_t {
+  /**
+   * Execution date string, e.g. "2024-01-15".
+   */
+  const char *executed_date;
+  /**
+   * Execution timestamp (serialised as JSON string).
+   */
+  const char *executed_timestamp;
+  /**
+   * Security code / ticker.
+   */
+  const char *code;
+  /**
+   * Direction of the flow (e.g. "buy", "sell").
+   */
+  const char *direction;
+  /**
+   * Executed quantity.
+   */
+  const char *executed_quantity;
+  /**
+   * Executed price.
+   */
+  const char *executed_price;
+  /**
+   * Executed cost.
+   */
+  const char *executed_cost;
+  /**
+   * Human-readable description.
+   */
+  const char *describe;
+} lb_flow_item_t;
+
+/**
+ * Paginated list of profit-analysis flow records.
+ */
+typedef struct lb_profit_analysis_flows_t {
+  /**
+   * Pointer to array of flow items.
+   */
+  const struct lb_flow_item_t *flows_list;
+  /**
+   * Number of items in `flows_list`.
+   */
+  uintptr_t num_flows_list;
+  /**
+   * Whether there are more pages.
+   */
+  bool has_more;
+} lb_profit_analysis_flows_t;
+
+/**
+ * One P&L detail line item (credit, debit, or fee).
+ */
+typedef struct lb_profit_detail_entry_t {
+  /**
+   * Description.
+   */
+  const char *describe;
+  /**
+   * Amount.
+   */
+  const char *amount;
+} lb_profit_detail_entry_t;
+
+/**
+ * Detailed P&L breakdown for one asset class.
+ */
+typedef struct lb_profit_details_t {
+  /**
+   * Current holding market value.
+   */
+  const char *holding_value;
+  /**
+   * Total profit/loss.
+   */
+  const char *profit;
+  /**
+   * Cumulative credited amount.
+   */
+  const char *cumulative_credited_amount;
+  /**
+   * Pointer to array of credit detail entries.
+   */
+  const struct lb_profit_detail_entry_t *credited_details;
+  /**
+   * Number of items in `credited_details`.
+   */
+  uintptr_t num_credited_details;
+  /**
+   * Cumulative debited amount.
+   */
+  const char *cumulative_debited_amount;
+  /**
+   * Pointer to array of debit detail entries.
+   */
+  const struct lb_profit_detail_entry_t *debited_details;
+  /**
+   * Number of items in `debited_details`.
+   */
+  uintptr_t num_debited_details;
+  /**
+   * Cumulative fee amount.
+   */
+  const char *cumulative_fee_amount;
+  /**
+   * Pointer to array of fee detail entries.
+   */
+  const struct lb_profit_detail_entry_t *fee_details;
+  /**
+   * Number of items in `fee_details`.
+   */
+  uintptr_t num_fee_details;
+  /**
+   * Short position holding value.
+   */
+  const char *short_holding_value;
+  /**
+   * Long position holding value.
+   */
+  const char *long_holding_value;
+  /**
+   * Opening position market value at period start.
+   */
+  const char *holding_value_at_beginning;
+  /**
+   * Closing position market value at period end.
+   */
+  const char *holding_value_at_ending;
+} lb_profit_details_t;
+
+/**
+ * Detailed P&L for one security.
+ */
+typedef struct lb_profit_analysis_detail_t {
+  /**
+   * Total profit/loss.
+   */
+  const char *profit;
+  /**
+   * Underlying stock P&L details (inline).
+   */
+  struct lb_profit_details_t underlying_details;
+  /**
+   * Derivative P&L details (inline).
+   */
+  struct lb_profit_details_t derivative_pnl_details;
+  /**
+   * Security name.
+   */
+  const char *name;
+  /**
+   * Last updated time (unix timestamp string).
+   */
+  const char *updated_at;
+  /**
+   * Last updated date string.
+   */
+  const char *updated_date;
+  /**
+   * Currency.
+   */
+  const char *currency;
+  /**
+   * Default detail tab: 0=underlying, 1=derivative.
+   */
+  int32_t default_tag;
+  /**
+   * Query start time (unix timestamp string).
+   */
+  const char *start;
+  /**
+   * Query end time (unix timestamp string).
+   */
+  const char *end;
+  /**
+   * Query start date string.
+   */
+  const char *start_date;
+  /**
+   * Query end date string.
+   */
+  const char *end_date;
+} lb_profit_analysis_detail_t;
+
+/**
+ * A stock entry within a sharelist.
+ */
+typedef struct lb_sharelist_stock_t {
+  /**
+   * Stock symbol (e.g. "AAPL.US").
+   */
+  const char *symbol;
+  /**
+   * Display name of the stock.
+   */
+  const char *name;
+  /**
+   * Market code (e.g. "US", "HK").
+   */
+  const char *market;
+  /**
+   * Stock code (ticker without market suffix).
+   */
+  const char *code;
+  /**
+   * Short introduction or description of the stock.
+   */
+  const char *intro;
+  /**
+   * Category of unread change log entries for this stock.
+   */
+  const char *unread_change_log_category;
+  /**
+   * Price change amount (decimal string); null if not available.
+   */
+  const char *change;
+  /**
+   * Last traded price (decimal string); null if not available.
+   */
+  const char *last_done;
+  /**
+   * Trade status code; valid only when `has_trade_status` is true.
+   */
+  int32_t trade_status;
+  /**
+   * Whether `trade_status` contains a valid value.
+   */
+  bool has_trade_status;
+} lb_sharelist_stock_t;
+
+/**
+ * Access/permission scopes associated with a sharelist.
+ */
+typedef struct lb_sharelist_scopes_t {
+  /**
+   * Whether the current user is subscribed to this sharelist.
+   */
+  bool subscription;
+  /**
+   * Whether this sharelist was created by the current authenticated user.
+   */
+  bool is_self;
+} lb_sharelist_scopes_t;
+
+/**
+ * Summary information about a sharelist.
+ */
+typedef struct lb_sharelist_info_t {
+  /**
+   * Unique sharelist identifier.
+   */
+  int64_t id;
+  /**
+   * Display name of the sharelist.
+   */
+  const char *name;
+  /**
+   * Human-readable description of the sharelist.
+   */
+  const char *description;
+  /**
+   * URL of the cover image for the sharelist.
+   */
+  const char *cover;
+  /**
+   * Total number of subscribers.
+   */
+  int64_t subscribers_count;
+  /**
+   * Creation timestamp (Unix seconds).
+   */
+  int64_t created_at;
+  /**
+   * Last-edited timestamp (Unix seconds).
+   */
+  int64_t edited_at;
+  /**
+   * Year-to-date price change percentage (decimal string).
+   */
+  const char *this_year_chg;
+  /**
+   * Creator information serialised as a JSON string.
+   */
+  const char *creator;
+  /**
+   * Pointer to the array of stocks in this sharelist.
+   */
+  const struct lb_sharelist_stock_t *stocks;
+  /**
+   * Number of stocks in the array.
+   */
+  uintptr_t num_stocks;
+  /**
+   * Whether the current user has subscribed to this sharelist.
+   */
+  bool subscribed;
+  /**
+   * Overall price change percentage of the sharelist (decimal string).
+   */
+  const char *chg;
+  /**
+   * Type code of the sharelist (e.g. 0 = normal, 1 = industry, …).
+   */
+  int32_t sharelist_type;
+  /**
+   * Industry code associated with the sharelist (if applicable).
+   */
+  const char *industry_code;
+} lb_sharelist_info_t;
+
+/**
+ * Paginated list of sharelists with subscription information.
+ */
+typedef struct lb_sharelist_list_t {
+  /**
+   * Pointer to the array of all sharelists.
+   */
+  const struct lb_sharelist_info_t *sharelists;
+  /**
+   * Number of sharelists in the array.
+   */
+  uintptr_t num_sharelists;
+  /**
+   * Pointer to the array of sharelists the current user has subscribed to.
+   */
+  const struct lb_sharelist_info_t *subscribed_sharelists;
+  /**
+   * Number of subscribed sharelists in the array.
+   */
+  uintptr_t num_subscribed_sharelists;
+  /**
+   * Pagination cursor for fetching the next page of results.
+   */
+  const char *tail_mark;
+} lb_sharelist_list_t;
+
+/**
+ * Full detail of a sharelist including access scopes.
+ */
+typedef struct lb_sharelist_detail_t {
+  /**
+   * Sharelist summary information.
+   */
+  struct lb_sharelist_info_t sharelist;
+  /**
+   * Access/permission scopes for the current user relative to this
+   * sharelist.
+   */
+  struct lb_sharelist_scopes_t scopes;
+} lb_sharelist_detail_t;
+
+/**
+ * Short position data for a single date
+ */
+typedef struct lb_short_position_t {
+  /**
+   * Date of the short position record (formatted string)
+   */
+  const char *timestamp;
+  /**
+   * Short interest as a percentage of shares outstanding
+   */
+  const char *rate;
+  /**
+   * Average daily share volume
+   */
+  const char *avg_daily_share_volume;
+  /**
+   * Current number of shares sold short
+   */
+  const char *current_shares_short;
+  /**
+   * Days to cover (short interest ratio)
+   */
+  const char *days_to_cover;
+  /**
+   * Closing price on the record date
+   */
+  const char *close;
+} lb_short_position_t;
+
+/**
+ * Short positions response for a security
+ */
+typedef struct lb_short_positions_response_t {
+  /**
+   * Security code
+   */
+  const char *symbol;
+  /**
+   * Pointer to array of short position records
+   */
+  const struct lb_short_position_t *data;
+  /**
+   * Number of elements in the array.
+   */
+  uintptr_t num_data;
+  /**
+   * Bitmask indicating the data sources included in the response
+   */
+  int32_t sources;
+} lb_short_positions_response_t;
+
+/**
+ * Option volume statistics (call and put totals)
+ */
+typedef struct lb_option_volume_stats_t {
+  /**
+   * Call option volume (formatted string)
+   */
+  const char *c;
+  /**
+   * Put option volume (formatted string)
+   */
+  const char *p;
+} lb_option_volume_stats_t;
+
+/**
+ * Daily option volume statistics for a single security
+ */
+typedef struct lb_option_volume_daily_stat_t {
+  /**
+   * Security code
+   */
+  const char *symbol;
+  /**
+   * Date of the record (formatted string)
+   */
+  const char *timestamp;
+  /**
+   * Total option volume (calls + puts, formatted string)
+   */
+  const char *total_volume;
+  /**
+   * Total put option volume (formatted string)
+   */
+  const char *total_put_volume;
+  /**
+   * Total call option volume (formatted string)
+   */
+  const char *total_call_volume;
+  /**
+   * Put-to-call volume ratio (formatted string)
+   */
+  const char *put_call_volume_ratio;
+  /**
+   * Total open interest across all options (formatted string)
+   */
+  const char *total_open_interest;
+  /**
+   * Total put open interest (formatted string)
+   */
+  const char *total_put_open_interest;
+  /**
+   * Total call open interest (formatted string)
+   */
+  const char *total_call_open_interest;
+  /**
+   * Put-to-call open interest ratio (formatted string)
+   */
+  const char *put_call_open_interest_ratio;
+} lb_option_volume_daily_stat_t;
+
+/**
+ * Collection of daily option volume statistics
+ */
+typedef struct lb_option_volume_daily_t {
+  /**
+   * Pointer to array of daily option volume stat records
+   */
+  const struct lb_option_volume_daily_stat_t *stats;
+  /**
+   * Number of elements in the array.
+   */
+  uintptr_t num_stats;
+} lb_option_volume_daily_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+const struct lb_alert_context_t *lb_alert_context_new(const struct lb_config_t *config);
+
+void lb_alert_context_retain(const struct lb_alert_context_t *ctx);
+
+void lb_alert_context_release(const struct lb_alert_context_t *ctx);
+
+/**
+ * List all price alerts. Returns `CAlertList`.
+ */
+void lb_alert_context_list(const struct lb_alert_context_t *ctx,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Add a price alert. condition: 1=PriceRise,2=PriceFall,3=PctRise,4=PctFall;
+ * frequency: 1=Daily,2=EveryTime,3=Once
+ */
+void lb_alert_context_add(const struct lb_alert_context_t *ctx,
+                          const char *symbol,
+                          int32_t condition,
+                          const char *trigger_value,
+                          int32_t frequency,
+                          lb_async_callback_t callback,
+                          void *userdata);
+
+/**
+ * Enable a price alert.
+ */
+void lb_alert_context_enable(const struct lb_alert_context_t *ctx,
+                             const char *alert_id,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Disable a price alert.
+ */
+void lb_alert_context_disable(const struct lb_alert_context_t *ctx,
+                              const char *alert_id,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Delete price alerts. alert_ids: array of alert ID strings, num_ids: count.
+ */
+void lb_alert_context_delete(const struct lb_alert_context_t *ctx,
+                             const char *const *alert_ids,
+                             uintptr_t num_ids,
+                             lb_async_callback_t callback,
+                             void *userdata);
 
 /**
  * Create a new `AssetContext`
@@ -4159,6 +7625,24 @@ void lb_asset_context_download_url(const struct CAssetContext *ctx,
                                    const char *file_key,
                                    lb_async_callback_t callback,
                                    void *userdata);
+
+const struct lb_calendar_context_t *lb_calendar_context_new(const struct lb_config_t *config);
+
+void lb_calendar_context_retain(const struct lb_calendar_context_t *ctx);
+
+void lb_calendar_context_release(const struct lb_calendar_context_t *ctx);
+
+/**
+ * Get financial calendar events. period:
+ * 0=Report,1=Dividend,2=Split,3=Ipo,4=MacroData,5=Closed
+ */
+void lb_calendar_context_finance_calendar(const struct lb_calendar_context_t *ctx,
+                                          int32_t category,
+                                          const char *start,
+                                          const char *end,
+                                          const char *market,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
 
 /**
  * Create a new `Config` using API Key authentication
@@ -4362,6 +7846,122 @@ void lb_content_context_news(const struct lb_content_context_t *ctx,
                              lb_async_callback_t callback,
                              void *userdata);
 
+const struct lb_dca_context_t *lb_dca_context_new(const struct lb_config_t *config);
+
+void lb_dca_context_retain(const struct lb_dca_context_t *ctx);
+
+void lb_dca_context_release(const struct lb_dca_context_t *ctx);
+
+/**
+ * List DCA plans (status: 0=Active,1=Suspended,2=Finished,-1=all).
+ * Returns `CDcaList`.
+ */
+void lb_dca_context_list(const struct lb_dca_context_t *ctx,
+                         int32_t status,
+                         lb_async_callback_t callback,
+                         void *userdata);
+
+/**
+ * Get DCA stats. Returns `CDcaStats`.
+ */
+void lb_dca_context_stats(const struct lb_dca_context_t *ctx,
+                          lb_async_callback_t callback,
+                          void *userdata);
+
+/**
+ * Check which symbols support DCA. Returns `CDcaSupportList`.
+ */
+void lb_dca_context_check_support(const struct lb_dca_context_t *ctx,
+                                  const char *const *symbols,
+                                  uintptr_t num_symbols,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Pause a DCA plan. Returns no data (empty response).
+ */
+void lb_dca_context_pause(const struct lb_dca_context_t *ctx,
+                          const char *plan_id,
+                          lb_async_callback_t callback,
+                          void *userdata);
+
+/**
+ * Resume a DCA plan. Returns no data (empty response).
+ */
+void lb_dca_context_resume(const struct lb_dca_context_t *ctx,
+                           const char *plan_id,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Stop a DCA plan. Returns no data (empty response).
+ */
+void lb_dca_context_stop(const struct lb_dca_context_t *ctx,
+                         const char *plan_id,
+                         lb_async_callback_t callback,
+                         void *userdata);
+
+/**
+ * Calculate next projected trade date. Returns `CDcaCalcDateResult`.
+ * day_of_month: 0 = not set; 1–28 = day of month for monthly plans.
+ */
+void lb_dca_context_calc_date(const struct lb_dca_context_t *ctx,
+                              const char *symbol,
+                              int32_t frequency,
+                              const char *day_of_week,
+                              uint32_t day_of_month,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get DCA execution history for a plan. Returns `CDcaHistoryResponse`.
+ */
+void lb_dca_context_history(const struct lb_dca_context_t *ctx,
+                            const char *plan_id,
+                            int32_t page,
+                            int32_t limit,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Update advance reminder hours. `hours` must be `"1"`, `"6"`, or `"12"`.
+ */
+void lb_dca_context_set_reminder(const struct lb_dca_context_t *ctx,
+                                 const char *hours,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Create a new DCA plan. Returns `CDcaCreateResult`.
+ * frequency: 0=Daily, 1=Weekly, 2=Fortnightly, 3=Monthly
+ * day_of_week: optional (e.g. "Mon"), pass NULL if not applicable
+ * day_of_month: 0 = not set
+ */
+void lb_dca_context_create(const struct lb_dca_context_t *ctx,
+                           const char *symbol,
+                           const char *amount,
+                           int32_t frequency,
+                           const char *day_of_week,
+                           uint32_t day_of_month,
+                           bool allow_margin,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Update an existing DCA plan. Returns `CDcaCreateResult`.
+ * Pass -1 for frequency to leave unchanged; pass NULL for optional string
+ * fields.
+ */
+void lb_dca_context_update(const struct lb_dca_context_t *ctx,
+                           const char *plan_id,
+                           const char *amount,
+                           int32_t frequency,
+                           const char *day_of_week,
+                           const char *day_of_month,
+                           int32_t allow_margin,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
 /**
  * Free the error object
  */
@@ -4372,6 +7972,178 @@ const char *lb_error_message(const struct lb_error_t *error);
 int64_t lb_error_code(const struct lb_error_t *error);
 
 enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
+
+const struct lb_fundamental_context_t *lb_fundamental_context_new(const struct lb_config_t *config);
+
+void lb_fundamental_context_retain(const struct lb_fundamental_context_t *ctx);
+
+void lb_fundamental_context_release(const struct lb_fundamental_context_t *ctx);
+
+/**
+ * Get financial reports — returns `CFinancialReports` (list_json is JSON
+ * string)
+ *
+ * @param kind   0=IS, 1=BS, 2=CF, 3=ALL
+ * @param period 0=af, 1=saf, 2=q1, 3=q2, 4=q3, 5=qf, -1=none
+ */
+void lb_fundamental_context_financial_report(const struct lb_fundamental_context_t *ctx,
+                                             const char *symbol,
+                                             int32_t kind,
+                                             int32_t period,
+                                             lb_async_callback_t callback,
+                                             void *userdata);
+
+/**
+ * Get analyst ratings. Returns `CInstitutionRating`.
+ */
+void lb_fundamental_context_institution_rating(const struct lb_fundamental_context_t *ctx,
+                                               const char *symbol,
+                                               lb_async_callback_t callback,
+                                               void *userdata);
+
+/**
+ * Get analyst rating detail. Returns `CInstitutionRatingDetail`.
+ */
+void lb_fundamental_context_institution_rating_detail(const struct lb_fundamental_context_t *ctx,
+                                                      const char *symbol,
+                                                      lb_async_callback_t callback,
+                                                      void *userdata);
+
+/**
+ * Get dividend history. Returns `CDividendList`.
+ */
+void lb_fundamental_context_dividend(const struct lb_fundamental_context_t *ctx,
+                                     const char *symbol,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Get detailed dividend information. Returns `CDividendList`.
+ */
+void lb_fundamental_context_dividend_detail(const struct lb_fundamental_context_t *ctx,
+                                            const char *symbol,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Get EPS forecasts. Returns `CForecastEps`.
+ */
+void lb_fundamental_context_forecast_eps(const struct lb_fundamental_context_t *ctx,
+                                         const char *symbol,
+                                         lb_async_callback_t callback,
+                                         void *userdata);
+
+/**
+ * Get valuation metrics. Returns `CValuationData`.
+ */
+void lb_fundamental_context_valuation(const struct lb_fundamental_context_t *ctx,
+                                      const char *symbol,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get historical valuation data. Returns `CValuationHistoryResponse`.
+ */
+void lb_fundamental_context_valuation_history(const struct lb_fundamental_context_t *ctx,
+                                              const char *symbol,
+                                              lb_async_callback_t callback,
+                                              void *userdata);
+
+/**
+ * Get company overview. Returns `CCompanyOverview`.
+ */
+void lb_fundamental_context_company(const struct lb_fundamental_context_t *ctx,
+                                    const char *symbol,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get major shareholders. Returns `CShareholderList`.
+ */
+void lb_fundamental_context_shareholder(const struct lb_fundamental_context_t *ctx,
+                                        const char *symbol,
+                                        lb_async_callback_t callback,
+                                        void *userdata);
+
+/**
+ * Get fund and ETF holders. Returns `CFundHolders`.
+ */
+void lb_fundamental_context_fund_holder(const struct lb_fundamental_context_t *ctx,
+                                        const char *symbol,
+                                        lb_async_callback_t callback,
+                                        void *userdata);
+
+/**
+ * Get corporate actions. Returns `CCorpActions`.
+ */
+void lb_fundamental_context_corp_action(const struct lb_fundamental_context_t *ctx,
+                                        const char *symbol,
+                                        lb_async_callback_t callback,
+                                        void *userdata);
+
+/**
+ * Get investor relations data. Returns `CInvestRelations`.
+ */
+void lb_fundamental_context_invest_relation(const struct lb_fundamental_context_t *ctx,
+                                            const char *symbol,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Get operating metrics. Returns `COperatingList`.
+ */
+void lb_fundamental_context_operating(const struct lb_fundamental_context_t *ctx,
+                                      const char *symbol,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get consensus estimates. Returns `CFinancialConsensus`.
+ */
+void lb_fundamental_context_consensus(const struct lb_fundamental_context_t *ctx,
+                                      const char *symbol,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get industry valuation. Returns `CIndustryValuationList`.
+ */
+void lb_fundamental_context_industry_valuation(const struct lb_fundamental_context_t *ctx,
+                                               const char *symbol,
+                                               lb_async_callback_t callback,
+                                               void *userdata);
+
+/**
+ * Get industry valuation distribution. Returns `CIndustryValuationDist`.
+ */
+void lb_fundamental_context_industry_valuation_dist(const struct lb_fundamental_context_t *ctx,
+                                                    const char *symbol,
+                                                    lb_async_callback_t callback,
+                                                    void *userdata);
+
+/**
+ * Get executive info. Returns `CExecutiveList`.
+ */
+void lb_fundamental_context_executive(const struct lb_fundamental_context_t *ctx,
+                                      const char *symbol,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get buyback data. Returns `CBuybackData`.
+ */
+void lb_fundamental_context_buyback(const struct lb_fundamental_context_t *ctx,
+                                    const char *symbol,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get stock ratings. Returns `CStockRatings`.
+ */
+void lb_fundamental_context_ratings(const struct lb_fundamental_context_t *ctx,
+                                    const char *symbol,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
 
 /**
  * Create a HTTP client using API Key authentication
@@ -4433,6 +8205,111 @@ void lb_http_result_free(struct lb_http_result_t *http_result);
 const char *lb_http_result_response_body(const struct lb_http_result_t *http_result);
 
 /**
+ * Create a new `MarketContext`
+ */
+const struct lb_market_context_t *lb_market_context_new(const struct lb_config_t *config);
+
+/**
+ * Retain the market context
+ */
+void lb_market_context_retain(const struct lb_market_context_t *ctx);
+
+/**
+ * Release the market context
+ */
+void lb_market_context_release(const struct lb_market_context_t *ctx);
+
+/**
+ * Get market trading status
+ *
+ * Returns `CMarketStatusResponse`
+ */
+void lb_market_context_market_status(const struct lb_market_context_t *ctx,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Get top broker holdings
+ *
+ * @param period  0=rct_1, 1=rct_5, 2=rct_20, 3=rct_60
+ * Returns `CBrokerHoldingTop`
+ */
+void lb_market_context_broker_holding(const struct lb_market_context_t *ctx,
+                                      const char *symbol,
+                                      int32_t period,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get full broker holding details
+ * Returns `CBrokerHoldingDetail`
+ */
+void lb_market_context_broker_holding_detail(const struct lb_market_context_t *ctx,
+                                             const char *symbol,
+                                             lb_async_callback_t callback,
+                                             void *userdata);
+
+/**
+ * Get daily broker holding history
+ * Returns `CBrokerHoldingDailyHistory`
+ */
+void lb_market_context_broker_holding_daily(const struct lb_market_context_t *ctx,
+                                            const char *symbol,
+                                            const char *broker_id,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Get A/H premium K-lines
+ *
+ * @param period  0=1m,1=5m,2=15m,3=30m,4=60m,5=day,6=week,7=month,8=year
+ * @param count   Number of K-lines
+ * Returns `CAhPremiumKlines`
+ */
+void lb_market_context_ah_premium(const struct lb_market_context_t *ctx,
+                                  const char *symbol,
+                                  int32_t period,
+                                  uint32_t count,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Get A/H premium intraday data
+ * Returns `CAhPremiumIntraday`
+ */
+void lb_market_context_ah_premium_intraday(const struct lb_market_context_t *ctx,
+                                           const char *symbol,
+                                           lb_async_callback_t callback,
+                                           void *userdata);
+
+/**
+ * Get trade statistics
+ * Returns `CTradeStatsResponse`
+ */
+void lb_market_context_trade_stats(const struct lb_market_context_t *ctx,
+                                   const char *symbol,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
+
+/**
+ * Get market anomaly alerts
+ * Returns `CAnomalyResponse`
+ */
+void lb_market_context_anomaly(const struct lb_market_context_t *ctx,
+                               const char *market,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get index constituent stocks
+ * Returns `CIndexConstituents`
+ */
+void lb_market_context_constituent(const struct lb_market_context_t *ctx,
+                                   const char *symbol,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
+
+/**
  * Asynchronously build an OAuth 2.0 client.
  *
  * Tries to load an existing token from
@@ -4470,6 +8347,64 @@ struct lb_oauth_t *lb_oauth_clone(const struct lb_oauth_t *oauth);
  * Free an OAuth 2.0 client object
  */
 void lb_oauth_free(struct lb_oauth_t *oauth);
+
+const struct lb_portfolio_context_t *lb_portfolio_context_new(const struct lb_config_t *config);
+
+void lb_portfolio_context_retain(const struct lb_portfolio_context_t *ctx);
+
+void lb_portfolio_context_release(const struct lb_portfolio_context_t *ctx);
+
+/**
+ * Get exchange rates. Returns CExchangeRates.
+ */
+void lb_portfolio_context_exchange_rate(const struct lb_portfolio_context_t *ctx,
+                                        lb_async_callback_t callback,
+                                        void *userdata);
+
+/**
+ * Get portfolio P&L analysis. Returns `CProfitAnalysis`.
+ */
+void lb_portfolio_context_profit_analysis(const struct lb_portfolio_context_t *ctx,
+                                          const char *start,
+                                          const char *end,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
+
+/**
+ * Get P&L by market. Returns `CProfitAnalysisByMarket`.
+ */
+void lb_portfolio_context_profit_analysis_by_market(const struct lb_portfolio_context_t *ctx,
+                                                    const char *market,
+                                                    const char *start,
+                                                    const char *end,
+                                                    const char *currency,
+                                                    int32_t page,
+                                                    int32_t size,
+                                                    lb_async_callback_t callback,
+                                                    void *userdata);
+
+/**
+ * Get P&L flow records for a security. Returns `CProfitAnalysisFlows`.
+ */
+void lb_portfolio_context_profit_analysis_flows(const struct lb_portfolio_context_t *ctx,
+                                                const char *symbol,
+                                                int32_t page,
+                                                int32_t size,
+                                                bool derivative,
+                                                const char *start,
+                                                const char *end,
+                                                lb_async_callback_t callback,
+                                                void *userdata);
+
+/**
+ * Get P&L detail for a security. Returns `CProfitAnalysisDetail`.
+ */
+void lb_portfolio_context_profit_analysis_detail(const struct lb_portfolio_context_t *ctx,
+                                                 const char *symbol,
+                                                 const char *start,
+                                                 const char *end,
+                                                 lb_async_callback_t callback,
+                                                 void *userdata);
 
 const struct lb_quote_context_t *lb_quote_context_new(const struct lb_config_t *config);
 
@@ -4815,6 +8750,16 @@ void lb_quote_context_delete_watchlist_group(const struct lb_quote_context_t *ct
                                              void *userdata);
 
 /**
+ * Update pinned watchlist securities (mode: 0=add, 1=remove)
+ */
+void lb_quote_context_update_pinned(const struct lb_quote_context_t *ctx,
+                                    int32_t mode,
+                                    const char *const *securities,
+                                    uintptr_t num_securities,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
  * Create watchlist group
  */
 void lb_quote_context_update_watchlist_group(const struct lb_quote_context_t *ctx,
@@ -4915,6 +8860,110 @@ void lb_quote_context_history_market_temperature(const struct lb_quote_context_t
                                                  const struct lb_date_t *end,
                                                  lb_async_callback_t callback,
                                                  void *userdata);
+
+/**
+ * Get short interest data for a US security. Returns
+ * `CShortPositionsResponse`.
+ */
+void lb_quote_context_short_positions(const struct lb_quote_context_t *ctx,
+                                      const char *symbol,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get real-time option call/put volume. Returns `COptionVolumeStats`.
+ */
+void lb_quote_context_option_volume(const struct lb_quote_context_t *ctx,
+                                    const char *symbol,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get daily historical option volume. Returns `COptionVolumeDaily`.
+ */
+void lb_quote_context_option_volume_daily(const struct lb_quote_context_t *ctx,
+                                          const char *symbol,
+                                          int64_t timestamp,
+                                          uint32_t count,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
+
+const struct lb_sharelist_context_t *lb_sharelist_context_new(const struct lb_config_t *config);
+
+void lb_sharelist_context_retain(const struct lb_sharelist_context_t *ctx);
+
+void lb_sharelist_context_release(const struct lb_sharelist_context_t *ctx);
+
+/**
+ * List user's sharelists. Returns `CSharelistList`.
+ */
+void lb_sharelist_context_list(const struct lb_sharelist_context_t *ctx,
+                               uint32_t count,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get sharelist detail. Returns `CSharelistDetail`.
+ */
+void lb_sharelist_context_detail(const struct lb_sharelist_context_t *ctx,
+                                 int64_t id,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get popular sharelists. Returns `CSharelistList`.
+ */
+void lb_sharelist_context_popular(const struct lb_sharelist_context_t *ctx,
+                                  uint32_t count,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Add securities to a sharelist.
+ */
+void lb_sharelist_context_add_securities(const struct lb_sharelist_context_t *ctx,
+                                         int64_t id,
+                                         const char *const *symbols,
+                                         uintptr_t num_symbols,
+                                         lb_async_callback_t callback,
+                                         void *userdata);
+
+/**
+ * Remove securities from a sharelist.
+ */
+void lb_sharelist_context_remove_securities(const struct lb_sharelist_context_t *ctx,
+                                            int64_t id,
+                                            const char *const *symbols,
+                                            uintptr_t num_symbols,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Create a new sharelist. Returns no data (empty response).
+ */
+void lb_sharelist_context_create(const struct lb_sharelist_context_t *ctx,
+                                 const char *name,
+                                 const char *description,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Delete a sharelist.
+ */
+void lb_sharelist_context_delete(const struct lb_sharelist_context_t *ctx,
+                                 int64_t id,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Reorder securities in a sharelist.
+ */
+void lb_sharelist_context_sort_securities(const struct lb_sharelist_context_t *ctx,
+                                          int64_t id,
+                                          const char *const *symbols,
+                                          uintptr_t num_symbols,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
 
 const struct lb_trade_context_t *lb_trade_context_new(const struct lb_config_t *config);
 

@@ -1,0 +1,1098 @@
+#![allow(missing_docs)]
+
+use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
+
+use crate::utils::counter::deserialize_counter_id_as_symbol;
+
+// ── financial_report ─────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::financial_report`]
+///
+/// The `list` field contains deeply-nested indicator/account/value data keyed
+/// by report kind (`"IS"`, `"BS"`, `"CF"`).  The exact structure varies and is
+/// preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FinancialReports {
+    /// Raw nested financial data. Top-level keys are report kinds such as
+    /// `"IS"` (income statement), `"BS"` (balance sheet), `"CF"` (cash flow).
+    pub list: serde_json::Value,
+}
+
+// ── dividend ─────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::dividend`] and
+/// [`crate::FundamentalContext::dividend_detail`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DividendList {
+    /// List of dividend events
+    pub list: Vec<DividendItem>,
+}
+
+/// A single dividend / distribution event
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DividendItem {
+    /// Security symbol, e.g. `"700.HK"`
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Internal record ID (may be absent in dividend_detail response)
+    #[serde(default)]
+    pub id: String,
+    /// Human-readable description, e.g. `"每股派息 5.3 HKD"`
+    pub desc: String,
+    /// Record / book-close date, e.g. `"2026.05.18"`
+    pub record_date: String,
+    /// Ex-dividend date, e.g. `"2026.05.15"`
+    pub ex_date: String,
+    /// Payment date, e.g. `"2026.06.01"`
+    pub payment_date: String,
+}
+
+// ── institution_rating ────────────────────────────────────────────
+
+/// Combined analyst-rating response for
+/// [`crate::FundamentalContext::institution_rating`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRating {
+    /// Latest snapshot from `/v1/quote/institution-rating-latest`
+    pub latest: InstitutionRatingLatest,
+    /// Consensus summary from `/v1/quote/institution-ratings`
+    pub summary: InstitutionRatingSummary,
+}
+
+/// Latest analyst-rating snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingLatest {
+    /// Rating distribution counts and date range
+    pub evaluate: RatingEvaluate,
+    /// Target price range
+    pub target: RatingTarget,
+    /// Industry classification ID
+    pub industry_id: i64,
+    /// Industry name
+    pub industry_name: String,
+    /// Rank of this security within the industry (1 = highest)
+    pub industry_rank: i32,
+    /// Total number of securities in the industry
+    pub industry_total: i32,
+    /// Mean analyst count in the industry
+    pub industry_mean: i32,
+    /// Median analyst count in the industry
+    pub industry_median: i32,
+}
+
+/// Analyst rating distribution counts
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RatingEvaluate {
+    /// Number of "Buy" ratings
+    pub buy: i32,
+    /// Number of "Strong Buy" / "Outperform" ratings
+    pub over: i32,
+    /// Number of "Hold" / "Neutral" ratings
+    pub hold: i32,
+    /// Number of "Underperform" ratings
+    pub under: i32,
+    /// Number of "Sell" ratings
+    pub sell: i32,
+    /// Number of "No Opinion" ratings
+    pub no_opinion: i32,
+    /// Total analyst count
+    pub total: i32,
+    /// Window start (unix timestamp string; `"0"` means unset)
+    pub start_date: String,
+    /// Window end (unix timestamp string; `"0"` means unset)
+    pub end_date: String,
+}
+
+/// Analyst target price range
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RatingTarget {
+    /// Highest price target
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub highest_price: Option<Decimal>,
+    /// Lowest price target
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub lowest_price: Option<Decimal>,
+    /// Previous close price
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub prev_close: Option<Decimal>,
+    /// Window start (unix timestamp string)
+    pub start_date: String,
+    /// Window end (unix timestamp string)
+    pub end_date: String,
+}
+
+/// Consensus summary from `/v1/quote/institution-ratings`
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingSummary {
+    /// Currency symbol, e.g. `"HK$"`
+    pub ccy_symbol: String,
+    /// Change vs previous period
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub change: Option<Decimal>,
+    /// Simplified rating distribution
+    pub evaluate: RatingSummaryEvaluate,
+    /// Overall recommendation, e.g. `"strong_buy"`
+    pub recommend: String,
+    /// Consensus target price
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub target: Option<Decimal>,
+    /// Last updated display string, e.g. `"2026 年 5 月 5 日"`
+    pub updated_at: String,
+}
+
+/// Simplified rating distribution for the consensus summary
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RatingSummaryEvaluate {
+    /// Number of "Buy" ratings
+    pub buy: i32,
+    /// Date of the latest update
+    pub date: String,
+    /// Number of "Hold" ratings
+    pub hold: i32,
+    /// Number of "Sell" ratings
+    pub sell: i32,
+    /// Number of "Strong Buy" ratings
+    pub strong_buy: i32,
+    /// Number of "Underperform" ratings
+    pub under: i32,
+}
+
+// ── institution_rating_detail ─────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::institution_rating_detail`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingDetail {
+    /// Currency symbol, e.g. `"HK$"`
+    pub ccy_symbol: String,
+    /// Historical rating distribution time-series
+    pub evaluate: InstitutionRatingDetailEvaluate,
+    /// Historical target price time-series
+    pub target: InstitutionRatingDetailTarget,
+}
+
+/// Historical rating distribution time-series
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingDetailEvaluate {
+    /// Weekly snapshots ordered from oldest to newest
+    pub list: Vec<InstitutionRatingDetailEvaluateItem>,
+}
+
+/// One weekly rating distribution snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingDetailEvaluateItem {
+    /// Number of "Buy" ratings
+    pub buy: i32,
+    /// Date in `"2021/05/14"` format
+    pub date: String,
+    /// Number of "Hold" ratings
+    pub hold: i32,
+    /// Number of "Sell" ratings
+    pub sell: i32,
+    /// Number of "Strong Buy" ratings
+    pub strong_buy: i32,
+    /// Number of "Underperform" ratings
+    pub under: i32,
+}
+
+/// Historical target price time-series
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingDetailTarget {
+    /// Prediction accuracy ratio, e.g. `"0.9934"` (may be `null`)
+    pub data_percent: Option<Decimal>,
+    /// Overall prediction accuracy percentage string
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub prediction_accuracy: Option<Decimal>,
+    /// Last updated display string
+    pub updated_at: String,
+    /// Weekly target price snapshots
+    pub list: Vec<InstitutionRatingDetailTargetItem>,
+}
+
+/// One weekly target price snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingDetailTargetItem {
+    /// Average target price
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub avg_target: Option<Decimal>,
+    /// Date in `"2021/05/16"` format
+    pub date: String,
+    /// Highest target price
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub max_target: Option<Decimal>,
+    /// Lowest target price
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub min_target: Option<Decimal>,
+    /// Whether the stock price reached the target
+    pub meet: bool,
+    /// Actual stock price at this date
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub price: Option<Decimal>,
+    /// Unix timestamp string
+    pub timestamp: String,
+}
+
+// ── forecast_eps ──────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::forecast_eps`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ForecastEps {
+    /// EPS forecast snapshots ordered by `forecast_start_date` ascending
+    pub items: Vec<ForecastEpsItem>,
+}
+
+/// One EPS forecast snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ForecastEpsItem {
+    /// Median EPS estimate
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub forecast_eps_median: Option<Decimal>,
+    /// Mean EPS estimate
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub forecast_eps_mean: Option<Decimal>,
+    /// Lowest EPS estimate
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub forecast_eps_lowest: Option<Decimal>,
+    /// Highest EPS estimate
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub forecast_eps_highest: Option<Decimal>,
+    /// Total number of forecasting institutions
+    pub institution_total: i32,
+    /// Number of institutions that raised their estimate
+    pub institution_up: i32,
+    /// Number of institutions that lowered their estimate
+    pub institution_down: i32,
+    /// Forecast window start
+    #[serde(deserialize_with = "crate::serde_utils::deserialize_timestamp")]
+    pub forecast_start_date: OffsetDateTime,
+    /// Forecast window end
+    #[serde(deserialize_with = "crate::serde_utils::deserialize_timestamp")]
+    pub forecast_end_date: OffsetDateTime,
+}
+
+// ── consensus ─────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::consensus`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FinancialConsensus {
+    /// Per-period consensus reports
+    pub list: Vec<ConsensusReport>,
+    /// Index into `list` of the most recently released period
+    pub current_index: i32,
+    /// Reporting currency, e.g. `"HKD"`
+    pub currency: String,
+    /// Available period types, e.g. `["qf", "saf", "af"]`
+    #[serde(default)]
+    pub opt_periods: Vec<String>,
+    /// Currently returned period type
+    pub current_period: String,
+}
+
+/// Consensus report for one fiscal period
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConsensusReport {
+    /// Fiscal year, e.g. `2025`
+    pub fiscal_year: i32,
+    /// Fiscal period code, e.g. `"Q4"`
+    pub fiscal_period: String,
+    /// Human-readable period label, e.g. `"Q4 FY2025"`
+    pub period_text: String,
+    /// Per-metric consensus details
+    pub details: Vec<ConsensusDetail>,
+}
+
+/// Consensus estimate for one financial metric
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConsensusDetail {
+    /// Metric key, e.g. `"revenue"`, `"eps"`
+    pub key: String,
+    /// Display name
+    pub name: String,
+    /// Metric description
+    pub description: String,
+    /// Actual reported value (empty string if not yet released)
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub actual: Option<Decimal>,
+    /// Consensus estimate value
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub estimate: Option<Decimal>,
+    /// Actual minus estimate
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub comp_value: Option<Decimal>,
+    /// Beat/miss description, e.g. `"超出预期"`
+    pub comp_desc: String,
+    /// Comparison result code for colour coding
+    pub comp: String,
+    /// Whether the actual results have been published
+    pub is_released: bool,
+}
+
+// ── valuation ─────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::valuation`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationData {
+    /// Valuation metrics (PE / PB / PS / dividend yield)
+    pub metrics: ValuationMetricsData,
+}
+
+/// Container for all valuation metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationMetricsData {
+    /// Price-to-Earnings ratio history
+    pub pe: Option<ValuationMetricData>,
+    /// Price-to-Book ratio history
+    pub pb: Option<ValuationMetricData>,
+    /// Price-to-Sales ratio history
+    pub ps: Option<ValuationMetricData>,
+    /// Dividend yield history
+    pub dvd_yld: Option<ValuationMetricData>,
+}
+
+/// Historical time-series for one valuation metric
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationMetricData {
+    /// Human-readable description with current value and percentile
+    pub desc: String,
+    /// Historical high value
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub high: Option<Decimal>,
+    /// Historical low value
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub low: Option<Decimal>,
+    /// Historical median value
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub median: Option<Decimal>,
+    /// Historical data points
+    pub list: Vec<ValuationPoint>,
+}
+
+/// One valuation data point
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationPoint {
+    /// Date of the data point
+    #[serde(deserialize_with = "crate::serde_utils::deserialize_timestamp")]
+    pub timestamp: OffsetDateTime,
+    /// Metric value
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub value: Option<Decimal>,
+}
+
+// ── valuation_history ─────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::valuation_history`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationHistoryResponse {
+    /// Historical valuation data
+    pub history: ValuationHistoryData,
+}
+
+/// Container for historical valuation metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationHistoryData {
+    /// Historical metrics (PE / PB / PS)
+    pub metrics: ValuationHistoryMetrics,
+}
+
+/// Historical valuation metrics container
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationHistoryMetrics {
+    /// Price-to-Earnings history
+    pub pe: Option<ValuationHistoryMetric>,
+    /// Price-to-Book history
+    pub pb: Option<ValuationHistoryMetric>,
+    /// Price-to-Sales history
+    pub ps: Option<ValuationHistoryMetric>,
+}
+
+/// Historical data for one valuation metric including statistical bounds
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationHistoryMetric {
+    /// Human-readable description
+    pub desc: String,
+    /// Historical high over the period
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub high: Option<Decimal>,
+    /// Historical low over the period
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub low: Option<Decimal>,
+    /// Historical median over the period
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub median: Option<Decimal>,
+    /// Historical data points
+    pub list: Vec<ValuationPoint>,
+}
+
+// ── industry_valuation ────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::industry_valuation`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryValuationList {
+    /// List of peer securities with their valuation data
+    pub list: Vec<IndustryValuationItem>,
+}
+
+/// Valuation data for one peer security
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryValuationItem {
+    /// Security symbol, e.g. `"700.HK"`
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Company name
+    pub name: String,
+    /// Reporting currency
+    pub currency: String,
+    /// Total assets
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub assets: Option<Decimal>,
+    /// Book value per share
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub bps: Option<Decimal>,
+    /// Earnings per share
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub eps: Option<Decimal>,
+    /// Dividends per share
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub dps: Option<Decimal>,
+    /// Dividend yield
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub div_yld: Option<Decimal>,
+    /// Dividend payout ratio
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub div_payout_ratio: Option<Decimal>,
+    /// 5-year average dividends per share
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub five_y_avg_dps: Option<Decimal>,
+    /// Current PE ratio
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub pe: Option<Decimal>,
+    /// Historical PE/PB/PS snapshots
+    pub history: Vec<IndustryValuationHistory>,
+}
+
+/// Historical valuation snapshot for an industry peer
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryValuationHistory {
+    /// Unix timestamp string
+    pub date: String,
+    /// Price-to-Earnings ratio
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub pe: Option<Decimal>,
+    /// Price-to-Book ratio
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub pb: Option<Decimal>,
+    /// Price-to-Sales ratio
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub ps: Option<Decimal>,
+}
+
+// ── industry_valuation_dist ───────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::industry_valuation_dist`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryValuationDist {
+    /// PE ratio distribution within the industry
+    pub pe: Option<ValuationDist>,
+    /// PB ratio distribution within the industry
+    pub pb: Option<ValuationDist>,
+    /// PS ratio distribution within the industry
+    pub ps: Option<ValuationDist>,
+}
+
+/// Distribution statistics for one valuation metric within an industry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationDist {
+    /// Minimum value in the industry
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub low: Option<Decimal>,
+    /// Maximum value in the industry
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub high: Option<Decimal>,
+    /// Median value in the industry
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub median: Option<Decimal>,
+    /// Current value of the queried security
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub value: Option<Decimal>,
+    /// Percentile ranking (0–1 range as string)
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub ranking: Option<Decimal>,
+    /// Ordinal rank index (1-based)
+    pub rank_index: String,
+    /// Total number of securities in the industry
+    pub rank_total: String,
+}
+
+// ── company ───────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::company`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CompanyOverview {
+    /// Short name, e.g. `"腾讯控股"`
+    pub name: String,
+    /// Full legal name
+    pub company_name: String,
+    /// Founding date
+    pub founded: String,
+    /// Listing date
+    pub listing_date: String,
+    /// Primary listing market display name
+    pub market: String,
+    /// Market region code, e.g. `"HK"`
+    pub region: String,
+    /// Registered address
+    pub address: String,
+    /// Principal office address
+    pub office_address: String,
+    /// Company website
+    pub website: String,
+    /// IPO issue price
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub issue_price: Option<Decimal>,
+    /// Number of shares offered at IPO
+    pub shares_offered: String,
+    /// Chairman name
+    pub chairman: String,
+    /// Company secretary name
+    pub secretary: String,
+    /// Auditing institution
+    pub audit_inst: String,
+    /// Company classification category
+    pub category: String,
+    /// Fiscal year end, e.g. `"12 月 31 日"`
+    pub year_end: String,
+    /// Number of employees
+    pub employees: String,
+    /// Phone number (API field name is `"Phone"`)
+    #[serde(rename = "Phone")]
+    pub phone: String,
+    /// Fax number
+    pub fax: String,
+    /// Investor relations email
+    pub email: String,
+    /// Legal representative
+    pub legal_repr: String,
+    /// CEO / Managing Director
+    pub manager: String,
+    /// Business licence number
+    pub bus_license: String,
+    /// Accounting firm
+    pub accounting_firm: String,
+    /// Securities representative
+    pub securities_rep: String,
+    /// Legal counsel
+    pub legal_counsel: String,
+    /// Postal code
+    pub zip_code: String,
+    /// Exchange ticker code, e.g. `"00700"`
+    pub ticker: String,
+    /// URL to the company's logo icon
+    pub icon: String,
+    /// Business profile / description
+    pub profile: String,
+    /// ADS ratio (may be empty)
+    #[serde(default)]
+    pub ads_ratio: String,
+    /// Industry sector code
+    pub sector: i32,
+}
+
+// ── executive ─────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::executive`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExecutiveList {
+    /// Groups of executives per security (usually one group)
+    pub professional_list: Vec<ExecutiveGroup>,
+}
+
+/// Executives for one security
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExecutiveGroup {
+    /// Security symbol
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Link to the company wiki page
+    pub forward_url: String,
+    /// Total number of executives
+    pub total: i32,
+    /// Individual executive entries
+    pub professionals: Vec<Professional>,
+}
+
+/// One executive / board member
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Professional {
+    /// Internal wiki person ID (string form)
+    pub id: String,
+    /// Full name
+    pub name: String,
+    /// Full name in Simplified Chinese
+    pub name_zhcn: String,
+    /// Full name in English
+    pub name_en: String,
+    /// Job title, e.g. `"Co-Founder, Chairman & CEO"`
+    pub title: String,
+    /// Biography text
+    pub biography: String,
+    /// URL to the person's photo
+    pub photo: String,
+    /// URL to the wiki profile page
+    pub wiki_url: String,
+}
+
+// ── shareholder ───────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::shareholder`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShareholderList {
+    /// List of major shareholders
+    pub shareholder_list: Vec<Shareholder>,
+    /// Link to the full shareholder page
+    #[serde(default)]
+    pub forward_url: String,
+    /// Total number of shareholders returned
+    pub total: i32,
+}
+
+/// One major shareholder
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Shareholder {
+    /// Internal shareholder ID (string form)
+    pub shareholder_id: String,
+    /// Shareholder name
+    pub shareholder_name: String,
+    /// Institution type (may be empty)
+    pub institution_type: String,
+    /// Percentage of shares held
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub percent_of_shares: Option<Decimal>,
+    /// Change in shares held (positive = bought, negative = sold)
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub shares_changed: Option<Decimal>,
+    /// Date of the most recent filing, e.g. `"2026-05-04"`
+    pub report_date: String,
+    /// Other securities held by this shareholder (cross-holdings)
+    #[serde(default)]
+    pub stocks: Vec<ShareholderStock>,
+}
+
+/// A security in an institutional shareholder's cross-holdings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShareholderStock {
+    /// Security symbol of the cross-held stock
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Ticker code, e.g. `"BLK"`
+    pub code: String,
+    /// Market, e.g. `"US"`
+    pub market: String,
+    /// Day change percentage, e.g. `"-0.32%"`
+    pub chg: String,
+}
+
+// ── fund_holder ───────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::fund_holder`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FundHolders {
+    /// Funds and ETFs that hold the queried security
+    pub lists: Vec<FundHolder>,
+}
+
+/// A fund or ETF that holds the queried security
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FundHolder {
+    /// Fund/ETF ticker code, e.g. `"513050"`
+    pub code: String,
+    /// Fund/ETF symbol, e.g. `"ETF/SH/513050"` → converted to `"513050.SH"`
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Reporting currency, e.g. `"CNY"`
+    pub currency: String,
+    /// Fund/ETF full name
+    pub name: String,
+    /// Position ratio as a percentage decimal
+    #[serde(with = "crate::serde_utils::decimal_empty_is_0")]
+    pub position_ratio: Decimal,
+    /// Report date, e.g. `"2025.12.31"`
+    pub report_date: String,
+}
+
+// ── corp_action ───────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::corp_action`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CorpActions {
+    /// Corporate action events
+    pub items: Vec<CorpActionItem>,
+}
+
+/// One corporate action event
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CorpActionItem {
+    /// Internal event ID
+    pub id: String,
+    /// Date in `YYYYMMDD` format, e.g. `"20260601"`
+    pub date: String,
+    /// Short display date, e.g. `"06.01"`
+    pub date_str: String,
+    /// Date type label, e.g. `"派息日"`, `"除权日"`
+    pub date_type: String,
+    /// Time zone description, e.g. `"北京时间"`
+    pub date_zone: String,
+    /// Event category, e.g. `"分配方案"`
+    pub act_type: String,
+    /// Human-readable event description
+    pub act_desc: String,
+    /// Machine-readable action code, e.g. `"DividendExDate"`
+    pub action: String,
+    /// Whether this is a recent event
+    pub recent: bool,
+    /// Whether publication was delayed
+    pub is_delay: bool,
+    /// Delay announcement content (if `is_delay` is `true`)
+    pub delay_content: String,
+    /// Associated live stream (if any)
+    pub live: Option<CorpActionLive>,
+    /// Associated security info (rarely populated; preserved as raw JSON)
+    pub security: Option<serde_json::Value>,
+}
+
+/// Live stream associated with a corporate action
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CorpActionLive {
+    /// Live stream ID
+    pub id: String,
+    /// Status code: 1=preview, 2=live, 3=ended, 4=replay, 5=processing
+    pub status: serde_json::Value, // API may return int or string
+    /// Start time
+    pub started_at: String,
+    /// Stream title
+    pub name: String,
+    /// Icon URL
+    pub icon: String,
+}
+
+// ── invest_relation ───────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::invest_relation`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InvestRelations {
+    /// Link to the full investor-relations page
+    #[serde(default)]
+    pub forward_url: String,
+    /// Securities in which the queried company holds a stake
+    pub invest_securities: Vec<InvestSecurity>,
+}
+
+/// A security in which the queried company has an investment stake
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InvestSecurity {
+    /// Internal company ID (string form; may be `"0"`)
+    pub company_id: String,
+    /// Company name (locale-aware)
+    pub company_name: String,
+    /// Company name in English
+    pub company_name_en: String,
+    /// Company name in Simplified Chinese
+    pub company_name_zhcn: String,
+    /// Security symbol of the invested company
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Reporting currency
+    pub currency: String,
+    /// Percentage of shares held
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub percent_of_shares: Option<Decimal>,
+    /// Shareholder rank, e.g. `"1"` = largest shareholder
+    pub shares_rank: String,
+    /// Market value of the holding
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub shares_value: Option<Decimal>,
+}
+
+// ── operating ─────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::operating`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OperatingList {
+    /// List of operating summary reports
+    pub list: Vec<OperatingItem>,
+}
+
+/// One operating summary report (annual / quarterly)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OperatingItem {
+    /// Internal report ID
+    pub id: String,
+    /// Report period code, e.g. `"af"` (annual), `"qf"` (quarterly)
+    pub report: String,
+    /// Report title, e.g. `"2025 财年年报"`
+    pub title: String,
+    /// Management discussion text
+    pub txt: String,
+    /// Whether this is the most recent report
+    pub latest: bool,
+    /// Keyword tags (structure undocumented; usually empty)
+    #[serde(default)]
+    pub keywords: Vec<serde_json::Value>,
+    /// URL to the full community report page
+    #[serde(default)]
+    pub web_url: String,
+    /// Key financial metrics extracted from the report
+    pub financial: OperatingFinancial,
+}
+
+/// Key financial metrics extracted from an operating report
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OperatingFinancial {
+    /// Ticker code (may be empty)
+    pub code: String,
+    /// Raw counter ID (may be empty)
+    pub counter_id: String,
+    /// Reporting currency
+    pub currency: String,
+    /// Company name
+    pub name: String,
+    /// Market region
+    pub region: String,
+    /// Report period code
+    pub report: String,
+    /// Report period display text
+    pub report_txt: String,
+    /// Financial indicators
+    pub indicators: Vec<OperatingIndicator>,
+}
+
+/// One financial indicator in an operating report
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OperatingIndicator {
+    /// Field name key, e.g. `"operating_revenue"`
+    pub field_name: String,
+    /// Display name, e.g. `"营业收入"`
+    pub indicator_name: String,
+    /// Formatted value, e.g. `"8217 亿"`
+    pub indicator_value: String,
+    /// Year-over-year change
+    #[serde(default, with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub yoy: Option<Decimal>,
+}
+
+// ── buyback ───────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::buyback`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BuybackData {
+    /// Most recent buyback summary (TTM)
+    #[serde(default)]
+    pub recent_buybacks: Option<RecentBuybacks>,
+    /// Historical annual buyback data
+    #[serde(default)]
+    pub buyback_history: Vec<BuybackHistoryItem>,
+    /// Buyback payout and cash-flow ratios
+    #[serde(default)]
+    pub buyback_ratios: Vec<BuybackRatios>,
+}
+
+/// TTM (trailing twelve months) buyback summary
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RecentBuybacks {
+    /// Reporting currency
+    pub currency: String,
+    /// Net buyback amount TTM
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub net_buyback_ttm: Option<Decimal>,
+    /// Net buyback yield TTM
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub net_buyback_yield_ttm: Option<Decimal>,
+}
+
+/// Historical annual buyback data point
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BuybackHistoryItem {
+    /// Fiscal year label, e.g. `"FY2024"`
+    pub fiscal_year: String,
+    /// Fiscal year date range string
+    pub fiscal_year_range: String,
+    /// Net buyback amount
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub net_buyback: Option<Decimal>,
+    /// Net buyback yield
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub net_buyback_yield: Option<Decimal>,
+    /// Year-over-year net buyback growth rate
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub net_buyback_growth_rate: Option<Decimal>,
+    /// Reporting currency
+    pub currency: String,
+}
+
+/// Buyback payout and cash-flow ratios
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BuybackRatios {
+    /// Net buyback payout ratio
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub net_buyback_payout_ratio: Option<Decimal>,
+    /// Net buyback to free cash-flow ratio
+    #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
+    pub net_buyback_to_cashflow_ratio: Option<Decimal>,
+}
+
+// ── ratings ───────────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::ratings`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StockRatings {
+    /// Style display name
+    #[serde(default)]
+    pub style_txt_name: String,
+    /// Scale display name
+    #[serde(default)]
+    pub scale_txt_name: String,
+    /// Report period display text
+    #[serde(default)]
+    pub report_period_txt: String,
+    /// Composite score (may be int, float, or null)
+    #[serde(default)]
+    pub multi_score: serde_json::Value,
+    /// Composite score letter grade
+    #[serde(default)]
+    pub multi_letter: String,
+    /// Score change vs previous period
+    #[serde(default)]
+    pub multi_score_change: i32,
+    /// Industry name
+    #[serde(default)]
+    pub industry_name: String,
+    /// Industry rank (may be int or null)
+    #[serde(default)]
+    pub industry_rank: serde_json::Value,
+    /// Total securities in the industry
+    #[serde(default)]
+    pub industry_total: serde_json::Value,
+    /// Industry mean score
+    #[serde(default)]
+    pub industry_mean_score: serde_json::Value,
+    /// Industry median score
+    #[serde(default)]
+    pub industry_median_score: serde_json::Value,
+    /// Detailed rating categories
+    #[serde(default)]
+    pub ratings: Vec<RatingCategory>,
+}
+
+/// One rating category (e.g. growth, profitability)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RatingCategory {
+    /// Category type code
+    #[serde(rename = "type")]
+    pub kind: i32,
+    /// Sub-indicator groups within this category
+    #[serde(default)]
+    pub sub_indicators: Vec<RatingSubIndicatorGroup>,
+}
+
+/// A group of sub-indicators under one category indicator
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RatingSubIndicatorGroup {
+    /// Parent indicator for this group
+    pub indicator: RatingIndicator,
+    /// Leaf sub-indicators
+    #[serde(default)]
+    pub sub_indicators: Vec<RatingLeafIndicator>,
+}
+
+/// A rating indicator node (may be a parent or a leaf)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RatingIndicator {
+    /// Indicator display name
+    pub name: String,
+    /// Score (may be int, float, or null)
+    #[serde(default)]
+    pub score: serde_json::Value,
+    /// Letter grade
+    #[serde(default)]
+    pub letter: String,
+}
+
+/// A leaf rating indicator with a raw value
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RatingLeafIndicator {
+    /// Indicator display name
+    pub name: String,
+    /// Formatted value string
+    #[serde(default)]
+    pub value: String,
+    /// Value type hint, e.g. `"percent"`
+    #[serde(default)]
+    pub value_type: String,
+    /// Score (may be int, float, or null)
+    #[serde(default)]
+    pub score: serde_json::Value,
+    /// Letter grade
+    #[serde(default)]
+    pub letter: String,
+}
+
+// ── enums ─────────────────────────────────────────────────────────
+
+/// Financial report kind
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Default)]
+pub enum FinancialReportKind {
+    /// Income statement
+    #[serde(rename = "IS")]
+    IncomeStatement,
+    /// Balance sheet
+    #[serde(rename = "BS")]
+    BalanceSheet,
+    /// Cash flow statement
+    #[serde(rename = "CF")]
+    CashFlow,
+    /// All statements
+    #[default]
+    #[serde(rename = "ALL")]
+    All,
+}
+
+/// Financial report period type
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum FinancialReportPeriod {
+    /// Annual report
+    #[serde(rename = "af")]
+    Annual,
+    /// Semi-annual report
+    #[serde(rename = "saf")]
+    SemiAnnual,
+    /// Q1 report
+    #[serde(rename = "q1")]
+    Q1,
+    /// Q2 report
+    #[serde(rename = "q2")]
+    Q2,
+    /// Q3 report
+    #[serde(rename = "q3")]
+    Q3,
+    /// Full quarterly report
+    #[serde(rename = "qf")]
+    QuarterlyFull,
+}

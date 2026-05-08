@@ -4,11 +4,12 @@ use longbridge::quote::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
     FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
     MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,
-    ParticipantInfo, Period, PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote,
-    PushTrades, QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers,
-    SecurityCalcIndex, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
-    Subscription, Trade, TradeDirection, TradeSession, TradeStatus, TradingSessionInfo,
-    WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup, WatchlistSecurity,
+    OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period,
+    PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
+    QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers, SecurityCalcIndex,
+    SecurityDepth, SecurityQuote, SecurityStaticInfo, ShortPosition, ShortPositionsResponse,
+    StrikePriceInfo, Subscription, Trade, TradeDirection, TradeSession, TradeStatus,
+    TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup, WatchlistSecurity,
 };
 
 use crate::{
@@ -600,11 +601,16 @@ impl ToFFI for CPushCandlestickOwned {
     }
 }
 
+/// Active subscription for a security
 #[repr(C)]
 pub struct CSubscription {
+    /// Security code
     symbol: *const c_char,
+    /// Bitmask of subscribed sub-types
     sub_types: u8,
+    /// Pointer to array of subscribed candlestick periods
     candlesticks: *const CPeriod,
+    /// Number of elements in the array.
     num_candlesticks: usize,
 }
 
@@ -1791,7 +1797,7 @@ impl ToFFI for CMarketTradingDaysOwned {
     }
 }
 
-/// Market trading days
+/// Capital flow line data point
 #[repr(C)]
 pub struct CCapitalFlowLine {
     /// Inflow capital data
@@ -2850,7 +2856,7 @@ impl ToFFI for CSecurityOwned {
     }
 }
 
-/// Security
+/// Quote package detail
 #[repr(C)]
 pub struct CQuotePackageDetail {
     /// Key
@@ -2978,6 +2984,7 @@ impl ToFFI for CMarketTemperatureOwned {
     }
 }
 
+/// Historical market temperature response
 #[repr(C)]
 pub struct CHistoryMarketTemperatureResponse {
     /// Granularity
@@ -3093,6 +3100,243 @@ impl ToFFI for CFilingItemOwned {
             file_urls: file_urls.to_ffi_type(),
             num_file_urls: file_urls.len(),
             published_at: *published_at,
+        }
+    }
+}
+
+// ── ShortPositionsResponse ────────────────────────────────────────
+
+/// Short position data for a single date
+#[repr(C)]
+pub struct CShortPosition {
+    /// Date of the short position record (formatted string)
+    pub timestamp: *const c_char,
+    /// Short interest as a percentage of shares outstanding
+    pub rate: *const c_char,
+    /// Average daily share volume
+    pub avg_daily_share_volume: *const c_char,
+    /// Current number of shares sold short
+    pub current_shares_short: *const c_char,
+    /// Days to cover (short interest ratio)
+    pub days_to_cover: *const c_char,
+    /// Closing price on the record date
+    pub close: *const c_char,
+}
+
+pub(crate) struct CShortPositionOwned {
+    timestamp: CString,
+    rate: CString,
+    avg_daily_share_volume: CString,
+    current_shares_short: CString,
+    days_to_cover: CString,
+    close: CString,
+}
+
+impl From<ShortPosition> for CShortPositionOwned {
+    fn from(v: ShortPosition) -> Self {
+        Self {
+            timestamp: v.timestamp.into(),
+            rate: v.rate.into(),
+            avg_daily_share_volume: v.avg_daily_share_volume.into(),
+            current_shares_short: v.current_shares_short.into(),
+            days_to_cover: v.days_to_cover.into(),
+            close: v.close.into(),
+        }
+    }
+}
+
+impl ToFFI for CShortPositionOwned {
+    type FFIType = CShortPosition;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CShortPosition {
+            timestamp: self.timestamp.to_ffi_type(),
+            rate: self.rate.to_ffi_type(),
+            avg_daily_share_volume: self.avg_daily_share_volume.to_ffi_type(),
+            current_shares_short: self.current_shares_short.to_ffi_type(),
+            days_to_cover: self.days_to_cover.to_ffi_type(),
+            close: self.close.to_ffi_type(),
+        }
+    }
+}
+
+/// Short positions response for a security
+#[repr(C)]
+pub struct CShortPositionsResponse {
+    /// Security code
+    pub symbol: *const c_char,
+    /// Pointer to array of short position records
+    pub data: *const CShortPosition,
+    /// Number of elements in the array.
+    pub num_data: usize,
+    /// Bitmask indicating the data sources included in the response
+    pub sources: i32,
+}
+
+pub(crate) struct CShortPositionsResponseOwned {
+    symbol: CString,
+    data: CVec<CShortPositionOwned>,
+    sources: i32,
+}
+
+impl From<ShortPositionsResponse> for CShortPositionsResponseOwned {
+    fn from(v: ShortPositionsResponse) -> Self {
+        Self {
+            symbol: v.symbol.into(),
+            data: v.data.into(),
+            sources: v.sources,
+        }
+    }
+}
+
+impl ToFFI for CShortPositionsResponseOwned {
+    type FFIType = CShortPositionsResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CShortPositionsResponse {
+            symbol: self.symbol.to_ffi_type(),
+            data: self.data.to_ffi_type(),
+            num_data: self.data.len(),
+            sources: self.sources,
+        }
+    }
+}
+
+// ── OptionVolumeStats ─────────────────────────────────────────────
+
+/// Option volume statistics (call and put totals)
+#[repr(C)]
+pub struct COptionVolumeStats {
+    /// Call option volume (formatted string)
+    pub c: *const c_char,
+    /// Put option volume (formatted string)
+    pub p: *const c_char,
+}
+
+pub(crate) struct COptionVolumeStatsOwned {
+    c: CString,
+    p: CString,
+}
+
+impl From<OptionVolumeStats> for COptionVolumeStatsOwned {
+    fn from(v: OptionVolumeStats) -> Self {
+        Self {
+            c: v.c.into(),
+            p: v.p.into(),
+        }
+    }
+}
+
+impl ToFFI for COptionVolumeStatsOwned {
+    type FFIType = COptionVolumeStats;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        COptionVolumeStats {
+            c: self.c.to_ffi_type(),
+            p: self.p.to_ffi_type(),
+        }
+    }
+}
+
+// ── OptionVolumeDaily ─────────────────────────────────────────────
+
+/// Daily option volume statistics for a single security
+#[repr(C)]
+pub struct COptionVolumeDailyStat {
+    /// Security code
+    pub symbol: *const c_char,
+    /// Date of the record (formatted string)
+    pub timestamp: *const c_char,
+    /// Total option volume (calls + puts, formatted string)
+    pub total_volume: *const c_char,
+    /// Total put option volume (formatted string)
+    pub total_put_volume: *const c_char,
+    /// Total call option volume (formatted string)
+    pub total_call_volume: *const c_char,
+    /// Put-to-call volume ratio (formatted string)
+    pub put_call_volume_ratio: *const c_char,
+    /// Total open interest across all options (formatted string)
+    pub total_open_interest: *const c_char,
+    /// Total put open interest (formatted string)
+    pub total_put_open_interest: *const c_char,
+    /// Total call open interest (formatted string)
+    pub total_call_open_interest: *const c_char,
+    /// Put-to-call open interest ratio (formatted string)
+    pub put_call_open_interest_ratio: *const c_char,
+}
+
+pub(crate) struct COptionVolumeDailyStatOwned {
+    symbol: CString,
+    timestamp: CString,
+    total_volume: CString,
+    total_put_volume: CString,
+    total_call_volume: CString,
+    put_call_volume_ratio: CString,
+    total_open_interest: CString,
+    total_put_open_interest: CString,
+    total_call_open_interest: CString,
+    put_call_open_interest_ratio: CString,
+}
+
+impl From<OptionVolumeDailyStat> for COptionVolumeDailyStatOwned {
+    fn from(v: OptionVolumeDailyStat) -> Self {
+        Self {
+            symbol: v.symbol.into(),
+            timestamp: v.timestamp.into(),
+            total_volume: v.total_volume.into(),
+            total_put_volume: v.total_put_volume.into(),
+            total_call_volume: v.total_call_volume.into(),
+            put_call_volume_ratio: v.put_call_volume_ratio.into(),
+            total_open_interest: v.total_open_interest.into(),
+            total_put_open_interest: v.total_put_open_interest.into(),
+            total_call_open_interest: v.total_call_open_interest.into(),
+            put_call_open_interest_ratio: v.put_call_open_interest_ratio.into(),
+        }
+    }
+}
+
+impl ToFFI for COptionVolumeDailyStatOwned {
+    type FFIType = COptionVolumeDailyStat;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        COptionVolumeDailyStat {
+            symbol: self.symbol.to_ffi_type(),
+            timestamp: self.timestamp.to_ffi_type(),
+            total_volume: self.total_volume.to_ffi_type(),
+            total_put_volume: self.total_put_volume.to_ffi_type(),
+            total_call_volume: self.total_call_volume.to_ffi_type(),
+            put_call_volume_ratio: self.put_call_volume_ratio.to_ffi_type(),
+            total_open_interest: self.total_open_interest.to_ffi_type(),
+            total_put_open_interest: self.total_put_open_interest.to_ffi_type(),
+            total_call_open_interest: self.total_call_open_interest.to_ffi_type(),
+            put_call_open_interest_ratio: self.put_call_open_interest_ratio.to_ffi_type(),
+        }
+    }
+}
+
+/// Collection of daily option volume statistics
+#[repr(C)]
+pub struct COptionVolumeDaily {
+    /// Pointer to array of daily option volume stat records
+    pub stats: *const COptionVolumeDailyStat,
+    /// Number of elements in the array.
+    pub num_stats: usize,
+}
+
+pub(crate) struct COptionVolumeDailyOwned {
+    stats: CVec<COptionVolumeDailyStatOwned>,
+}
+
+impl From<OptionVolumeDaily> for COptionVolumeDailyOwned {
+    fn from(v: OptionVolumeDaily) -> Self {
+        Self {
+            stats: v.stats.into(),
+        }
+    }
+}
+
+impl ToFFI for COptionVolumeDailyOwned {
+    type FFIType = COptionVolumeDaily;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        COptionVolumeDaily {
+            stats: self.stats.to_ffi_type(),
+            num_stats: self.stats.len(),
         }
     }
 }
