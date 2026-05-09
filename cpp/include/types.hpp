@@ -1263,6 +1263,48 @@ struct FilingItem
   int64_t published_at;
 };
 
+struct ShortPosition
+{
+  std::string timestamp;
+  std::string rate;
+  std::string avg_daily_share_volume;
+  std::string current_shares_short;
+  std::string days_to_cover;
+  std::string close;
+};
+
+struct ShortPositionsResponse
+{
+  std::string symbol;
+  std::vector<ShortPosition> data;
+  int32_t sources;
+};
+
+struct OptionVolumeStats
+{
+  std::string c;
+  std::string p;
+};
+
+struct OptionVolumeDailyStat
+{
+  std::string symbol;
+  std::string timestamp;
+  std::string total_volume;
+  std::string total_put_volume;
+  std::string total_call_volume;
+  std::string put_call_volume_ratio;
+  std::string total_open_interest;
+  std::string total_put_open_interest;
+  std::string total_call_open_interest;
+  std::string put_call_open_interest_ratio;
+};
+
+struct OptionVolumeDaily
+{
+  std::vector<OptionVolumeDailyStat> stats;
+};
+
 } // namespace quote
 
 namespace trade {
@@ -2213,5 +2255,1027 @@ struct CreateTopicOptions
 };
 
 } // namespace content
+
+// ── MarketContext types ───────────────────────────────────────────
+namespace market {
+
+/// Current trading status and timestamps for one market.
+struct MarketTimeItem
+{
+  longbridge::Market market;
+  int32_t trade_status;
+  std::string timestamp;
+  int32_t delay_trade_status;
+  std::string delay_timestamp;
+  int32_t sub_status;
+  int32_t delay_sub_status;
+};
+
+/// Response containing trading status for all markets.
+struct MarketStatusResponse
+{
+  std::vector<MarketTimeItem> market_time;
+};
+
+/// One broker's holding entry in a top-holders list.
+struct BrokerHoldingEntry
+{
+  std::string name;
+  std::string parti_number;
+  std::string chg;
+  bool strong;
+};
+
+/// Top broker holders (buy and sell sides).
+struct BrokerHoldingTop
+{
+  std::vector<BrokerHoldingEntry> buy;
+  std::vector<BrokerHoldingEntry> sell;
+  std::string updated_at;
+};
+
+/// Holding change figures over multiple periods for a broker.
+struct BrokerHoldingChanges
+{
+  std::string value;
+  std::string chg_1;
+  std::string chg_5;
+  std::string chg_20;
+  std::string chg_60;
+};
+
+/// Detailed holding entry for one broker including ratio and share changes.
+struct BrokerHoldingDetailItem
+{
+  std::string name;
+  std::string parti_number;
+  BrokerHoldingChanges ratio;
+  BrokerHoldingChanges shares;
+  bool strong;
+};
+
+/// Full broker holding detail with historical change data.
+struct BrokerHoldingDetail
+{
+  std::vector<BrokerHoldingDetailItem> list;
+  std::string updated_at;
+};
+
+/// One day's broker holding snapshot.
+struct BrokerHoldingDailyItem
+{
+  std::string date;
+  std::string holding;
+  std::string ratio;
+  std::string chg;
+};
+
+/// Historical daily broker holding series.
+struct BrokerHoldingDailyHistory
+{
+  std::vector<BrokerHoldingDailyItem> list;
+};
+
+/// A/H premium candlestick data point.
+struct AhPremiumKline
+{
+  std::string aprice;
+  std::string apreclose;
+  std::string hprice;
+  std::string hpreclose;
+  std::string currency_rate;
+  std::string ahpremium_rate;
+  std::string price_spread;
+  int64_t timestamp;
+};
+
+/// Historical A/H premium kline series.
+struct AhPremiumKlines
+{
+  std::vector<AhPremiumKline> klines;
+};
+
+/// Intraday A/H premium kline series.
+struct AhPremiumIntraday
+{
+  std::vector<AhPremiumKline> klines;
+};
+
+/// Trade volume and amount aggregated at one price level.
+struct TradePriceLevel
+{
+  std::string buy_amount;
+  std::string neutral_amount;
+  std::string price;
+  std::string sell_amount;
+};
+
+/// Aggregate buy/sell/neutral trade statistics for a security.
+struct TradeStatistics
+{
+  std::string avgprice;
+  std::string buy;
+  std::string neutral;
+  std::string preclose;
+  std::string sell;
+  std::string timestamp;
+  std::string total_amount;
+  std::vector<std::string> trade_date;
+  std::string trades_count;
+};
+
+/// Response for trade statistics including per-price-level breakdown.
+struct TradeStatsResponse
+{
+  TradeStatistics statistics;
+  std::vector<TradePriceLevel> trades;
+};
+
+/// A single anomaly (unusual market movement) alert item.
+struct AnomalyItem
+{
+  std::string symbol;
+  std::string name;
+  std::string alert_name;
+  int64_t alert_time;
+  std::vector<std::string> change_values;
+  int32_t emotion;
+};
+
+/// Response containing anomaly alert items.
+struct AnomalyResponse
+{
+  bool all_off;
+  std::vector<AnomalyItem> changes;
+};
+
+/// One constituent stock of an index.
+struct ConstituentStock
+{
+  std::string symbol;
+  std::string name;
+  std::string last_done;
+  std::string prev_close;
+  std::string inflow;
+  std::string balance;
+  std::string amount;
+  std::string total_shares;
+  std::vector<std::string> tags;
+  std::string intro;
+  std::string market;
+  std::string circulating_shares;
+  bool delay;
+  std::string chg;
+  int32_t trade_status;
+};
+
+/// Index constituent stocks with rise/fall/flat counts.
+struct IndexConstituents
+{
+  int32_t fall_num;
+  int32_t flat_num;
+  int32_t rise_num;
+  std::vector<ConstituentStock> stocks;
+};
+
+} // namespace market
+
+// ── FundamentalContext types ──────────────────────────────────────
+namespace fundamental {
+
+/// Institutional analyst recommendation.
+enum class InstitutionRecommend
+{
+  Unknown     = 0,
+  StrongBuy   = 1,
+  Buy         = 2,
+  Hold        = 3,
+  Sell        = 4,
+  StrongSell  = 5,
+  Underperform = 6,
+};
+
+/// One dividend event for a security.
+struct DividendItem
+{
+  std::string symbol;
+  std::string id;
+  std::string desc;
+  std::string record_date;
+  std::string ex_date;
+  std::string payment_date;
+};
+
+/// List of dividend events.
+struct DividendList
+{
+  std::vector<DividendItem> list;
+};
+
+/// Buy/sell/hold evaluation counts from institutional analysts.
+struct RatingEvaluate
+{
+  int32_t buy;
+  int32_t over;
+  int32_t hold;
+  int32_t under;
+  int32_t sell;
+  int32_t no_opinion;
+  int32_t total;
+  std::string start_date;
+  std::string end_date;
+};
+
+/// Analyst price target range.
+struct RatingTarget
+{
+  std::string highest_price;
+  std::string lowest_price;
+  std::string prev_close;
+  std::string start_date;
+  std::string end_date;
+};
+
+/// Summary evaluation counts for one rating period.
+struct RatingSummaryEvaluate
+{
+  int32_t buy;
+  std::string date;
+  int32_t hold;
+  int32_t sell;
+  int32_t strong_buy;
+  int32_t under;
+};
+
+/// Latest institutional rating data including industry comparison.
+struct InstitutionRatingLatest
+{
+  RatingEvaluate evaluate;
+  RatingTarget target;
+  int64_t industry_id;
+  std::string industry_name;
+  int32_t industry_rank;
+  int32_t industry_total;
+  int32_t industry_mean;
+  int32_t industry_median;
+};
+
+/// Institutional rating summary with current recommendation and target price.
+struct InstitutionRatingSummary
+{
+  std::string ccy_symbol;
+  std::string change;
+  RatingSummaryEvaluate evaluate;
+  InstitutionRecommend recommend;
+  std::string target;
+  std::string updated_at;
+};
+
+/// Combined latest and summary institutional rating data.
+struct InstitutionRating
+{
+  InstitutionRatingLatest latest;
+  InstitutionRatingSummary summary;
+};
+
+/// One evaluation data point in an institutional rating detail series.
+struct InstitutionRatingDetailEvaluateItem
+{
+  int32_t buy;
+  std::string date;
+  int32_t hold;
+  int32_t sell;
+  int32_t strong_buy;
+  int32_t under;
+};
+
+/// One target price data point in an institutional rating detail series.
+struct InstitutionRatingDetailTargetItem
+{
+  std::string avg_target;
+  std::string date;
+  std::string max_target;
+  std::string min_target;
+  bool meet;
+  std::string price;
+  std::string timestamp;
+};
+
+/// Detailed institutional rating including historical evaluate and target series.
+struct InstitutionRatingDetail
+{
+  std::string ccy_symbol;
+  std::vector<InstitutionRatingDetailEvaluateItem> evaluate_list;
+  std::string data_percent;
+  std::string prediction_accuracy;
+  std::string updated_at;
+  std::vector<InstitutionRatingDetailTargetItem> target_list;
+};
+
+/// Forecast EPS data point from institutional analysts.
+struct ForecastEpsItem
+{
+  std::string forecast_eps_median;
+  std::string forecast_eps_mean;
+  std::string forecast_eps_lowest;
+  std::string forecast_eps_highest;
+  int32_t institution_total;
+  int32_t institution_up;
+  int32_t institution_down;
+  int64_t forecast_start_date;
+  int64_t forecast_end_date;
+};
+
+/// Collection of forecast EPS items.
+struct ForecastEps
+{
+  std::vector<ForecastEpsItem> items;
+};
+
+/// One data point in a valuation time series.
+struct ValuationPoint
+{
+  int64_t timestamp;
+  std::string value;
+};
+
+/// Historical data for one valuation metric (PE, PB, PS, or dividend yield).
+struct ValuationMetricData
+{
+  std::string desc;
+  std::string high;
+  std::string low;
+  std::string median;
+  std::vector<ValuationPoint> list;
+};
+
+/// All valuation metrics for a security.
+struct ValuationMetricsData
+{
+  std::optional<ValuationMetricData> pe;
+  std::optional<ValuationMetricData> pb;
+  std::optional<ValuationMetricData> ps;
+  std::optional<ValuationMetricData> dvd_yld;
+};
+
+/// Valuation data container.
+struct ValuationData
+{
+  ValuationMetricsData metrics;
+};
+
+/// Historical valuation response (PE, PB, PS without dividend yield).
+struct ValuationHistoryResponse
+{
+  std::optional<ValuationMetricData> pe;
+  std::optional<ValuationMetricData> pb;
+  std::optional<ValuationMetricData> ps;
+};
+
+/// Company overview and profile information.
+struct CompanyOverview
+{
+  std::string name;
+  std::string company_name;
+  std::string founded;
+  std::string listing_date;
+  std::string market;
+  std::string region;
+  std::string address;
+  std::string office_address;
+  std::string website;
+  std::string issue_price;
+  std::string shares_offered;
+  std::string chairman;
+  std::string secretary;
+  std::string audit_inst;
+  std::string category;
+  std::string year_end;
+  std::string employees;
+  std::string phone;
+  std::string fax;
+  std::string email;
+  std::string legal_repr;
+  std::string manager;
+  std::string ticker;
+  std::string profile;
+  int32_t sector;
+};
+
+/// A security held by a shareholder.
+struct ShareholderStock
+{
+  std::string symbol;
+  std::string code;
+  std::string market;
+  std::string chg;
+};
+
+/// One institutional or major shareholder record.
+struct Shareholder
+{
+  std::string shareholder_id;
+  std::string shareholder_name;
+  std::string institution_type;
+  std::string percent_of_shares;
+  std::string shares_changed;
+  std::string report_date;
+  std::vector<ShareholderStock> stocks;
+};
+
+/// Paginated list of shareholders.
+struct ShareholderList
+{
+  std::vector<Shareholder> shareholder_list;
+  std::string forward_url;
+  int32_t total;
+};
+
+/// One fund's holding record for a security.
+struct FundHolder
+{
+  std::string code;
+  std::string symbol;
+  std::string currency;
+  std::string name;
+  std::string position_ratio;
+  std::string report_date;
+};
+
+/// Collection of fund holders for a security.
+struct FundHolders
+{
+  std::vector<FundHolder> lists;
+};
+
+/// One corporate action event (dividend, split, etc.).
+struct CorpActionItem
+{
+  std::string id;
+  std::string date;
+  std::string date_str;
+  std::string date_type;
+  std::string date_zone;
+  std::string act_type;
+  std::string act_desc;
+  std::string action;
+  bool recent;
+  bool is_delay;
+  std::string delay_content;
+};
+
+/// Collection of corporate action events.
+struct CorpActions
+{
+  std::vector<CorpActionItem> items;
+};
+
+/// One security in an investment relationship (parent/subsidiary holding).
+struct InvestSecurity
+{
+  std::string company_id;
+  std::string company_name;
+  std::string company_name_en;
+  std::string company_name_zhcn;
+  std::string symbol;
+  std::string currency;
+  std::string percent_of_shares;
+  std::string shares_rank;
+  std::string shares_value;
+};
+
+/// Investment relationship data including parent/subsidiary securities.
+struct InvestRelations
+{
+  std::string forward_url;
+  std::vector<InvestSecurity> invest_securities;
+};
+
+/// One operating indicator from a financial report.
+struct OperatingIndicator
+{
+  std::string field_name;
+  std::string indicator_name;
+  std::string indicator_value;
+  std::string yoy;
+};
+
+/// One operating report item with associated indicators.
+struct OperatingItem
+{
+  std::string id;
+  std::string report;
+  std::string title;
+  std::string txt;
+  bool latest;
+  std::string web_url;
+  std::string financial_currency;
+  std::string financial_name;
+  std::string financial_region;
+  std::string financial_report;
+  std::vector<OperatingIndicator> indicators;
+};
+
+/// List of operating report items.
+struct OperatingList
+{
+  std::vector<OperatingItem> list;
+};
+
+/// Financial reports — list_json contains serialized JSON
+struct FinancialReports
+{
+  std::string list_json;
+};
+
+/// One consensus estimate detail for a financial metric.
+struct ConsensusDetail
+{
+  std::string key;
+  std::string name;
+  std::string description;
+  std::string actual;
+  std::string estimate;
+  std::string comp_value;
+  std::string comp_desc;
+  std::string comp;
+  bool is_released;
+};
+
+/// Consensus report for one fiscal period.
+struct ConsensusReport
+{
+  int32_t fiscal_year;
+  std::string fiscal_period;
+  std::string period_text;
+  std::vector<ConsensusDetail> details;
+};
+
+/// Financial consensus response.
+struct FinancialConsensus
+{
+  std::vector<ConsensusReport> list;
+  int32_t current_index;
+  std::string currency;
+  std::vector<std::string> opt_periods;
+  std::string current_period;
+};
+
+/// Historical valuation snapshot for an industry peer.
+struct IndustryValuationHistory
+{
+  std::string date;
+  std::string pe;
+  std::string pb;
+  std::string ps;
+};
+
+/// Valuation data for one industry peer security.
+struct IndustryValuationItem
+{
+  std::string symbol;
+  std::string name;
+  std::string currency;
+  std::string assets;
+  std::string bps;
+  std::string eps;
+  std::string dps;
+  std::string div_yld;
+  std::string div_payout_ratio;
+  std::string five_y_avg_dps;
+  std::string pe;
+  std::vector<IndustryValuationHistory> history;
+};
+
+/// List of industry valuation items.
+struct IndustryValuationList
+{
+  std::vector<IndustryValuationItem> list;
+};
+
+/// Distribution statistics for one valuation metric within an industry.
+struct ValuationDist
+{
+  std::string low;
+  std::string high;
+  std::string median;
+  std::string value;
+  std::string ranking;
+  std::string rank_index;
+  std::string rank_total;
+};
+
+/// Industry valuation distribution for PE, PB, PS ratios.
+struct IndustryValuationDist
+{
+  std::optional<ValuationDist> pe;
+  std::optional<ValuationDist> pb;
+  std::optional<ValuationDist> ps;
+};
+
+/// One executive or board member.
+struct Professional
+{
+  std::string id;
+  std::string name;
+  std::string name_zhcn;
+  std::string name_en;
+  std::string title;
+  std::string biography;
+  std::string photo;
+  std::string wiki_url;
+};
+
+/// Executives for one security.
+struct ExecutiveGroup
+{
+  std::string symbol;
+  std::string forward_url;
+  int32_t total;
+  std::vector<Professional> professionals;
+};
+
+/// List of executive groups per security.
+struct ExecutiveList
+{
+  std::vector<ExecutiveGroup> professional_list;
+};
+
+/// TTM (trailing twelve months) buyback summary.
+struct RecentBuybacks
+{
+  std::string currency;
+  std::string net_buyback_ttm;
+  std::string net_buyback_yield_ttm;
+};
+
+/// Historical annual buyback data point.
+struct BuybackHistoryItem
+{
+  std::string fiscal_year;
+  std::string fiscal_year_range;
+  std::string net_buyback;
+  std::string net_buyback_yield;
+  std::string net_buyback_growth_rate;
+  std::string currency;
+};
+
+/// Buyback payout and cash-flow ratios.
+struct BuybackRatios
+{
+  std::string net_buyback_payout_ratio;
+  std::string net_buyback_to_cashflow_ratio;
+};
+
+/// Buyback data response.
+struct BuybackData
+{
+  std::optional<RecentBuybacks> recent_buybacks;
+  std::vector<BuybackHistoryItem> buyback_history;
+  std::vector<BuybackRatios> buyback_ratios;
+};
+
+/// A leaf rating indicator with a raw value.
+struct RatingLeafIndicator
+{
+  std::string name;
+  std::string value;
+  std::string value_type;
+  std::string score;
+  std::string letter;
+};
+
+/// A rating indicator node (parent or leaf).
+struct RatingIndicator
+{
+  std::string name;
+  std::string score;
+  std::string letter;
+};
+
+/// A group of sub-indicators under one category indicator.
+struct RatingSubIndicatorGroup
+{
+  RatingIndicator indicator;
+  std::vector<RatingLeafIndicator> sub_indicators;
+};
+
+/// One rating category (e.g. growth, profitability).
+struct RatingCategory
+{
+  int32_t kind;
+  std::vector<RatingSubIndicatorGroup> sub_indicators;
+};
+
+/// Stock ratings response.
+struct StockRatings
+{
+  std::string style_txt_name;
+  std::string scale_txt_name;
+  std::string report_period_txt;
+  std::string multi_score;
+  std::string multi_letter;
+  int32_t multi_score_change;
+  std::string industry_name;
+  std::string industry_rank;
+  std::string industry_total;
+  std::string industry_mean_score;
+  std::string industry_median_score;
+  std::vector<RatingCategory> ratings;
+};
+
+} // namespace fundamental
+
+namespace alert {
+
+/// One price alert rule attached to a security.
+struct AlertItem
+{
+  /// Alert ID
+  std::string id;
+  /// Condition: "1"=price_rise, "2"=price_fall, "3"=pct_rise, "4"=pct_fall
+  std::string indicator_id;
+  /// Whether the alert is currently active
+  bool enabled;
+  /// Trigger frequency: 1=daily, 2=every_time, 3=once
+  int32_t frequency;
+  /// Scope
+  int32_t scope;
+  /// Human-readable description of the trigger condition
+  std::string text;
+  /// Trigger state flags
+  std::vector<int32_t> state;
+  /// Trigger threshold, serialised as JSON: {"price":"500"} or {"chg":"5"}
+  std::string value_map;
+};
+
+/// All price alerts for one security.
+struct AlertSymbolGroup
+{
+  /// Security symbol
+  std::string symbol;
+  /// Ticker code (without market)
+  std::string code;
+  /// Market, e.g. "HK"
+  std::string market;
+  /// Security name
+  std::string name;
+  /// Latest price
+  std::string price;
+  /// Day change amount
+  std::string chg;
+  /// Day change percentage
+  std::string p_chg;
+  /// Product type (may be empty)
+  std::string product;
+  /// Alert items for this security
+  std::vector<AlertItem> indicators;
+};
+
+/// Response for AlertContext::list — alerts grouped by security.
+struct AlertList
+{
+  /// Alert groups, one per security
+  std::vector<AlertSymbolGroup> lists;
+};
+
+} // namespace alert
+
+namespace dca {
+
+/// DCA investment frequency.
+enum class DCAFrequency
+{
+  Daily       = 0,
+  Weekly      = 1,
+  Fortnightly = 2,
+  Monthly     = 3,
+};
+
+/// DCA plan status.
+enum class DCAStatus
+{
+  Active    = 0,
+  Suspended = 1,
+  Finished  = 2,
+};
+
+/// One DCA (dollar-cost averaging) investment plan.
+struct DcaPlan
+{
+  /// Plan ID
+  std::string plan_id;
+  /// Plan status
+  DCAStatus status;
+  /// Security symbol
+  std::string symbol;
+  /// Member ID
+  std::string member_id;
+  /// Account ID
+  std::string aaid;
+  /// Account channel
+  std::string account_channel;
+  /// Display account
+  std::string display_account;
+  /// Market
+  longbridge::Market market;
+  /// Investment amount per period
+  std::string per_invest_amount;
+  /// Investment frequency
+  DCAFrequency invest_frequency;
+  /// Day of week for weekly plans (e.g. "Mon")
+  std::string invest_day_of_week;
+  /// Day of month for monthly plans
+  std::string invest_day_of_month;
+  /// Whether margin finance is allowed
+  bool allow_margin_finance;
+  /// Advance reminder hours ("1", "6", or "12")
+  std::string alter_hours;
+  /// Creation time
+  std::string created_at;
+  /// Last updated time
+  std::string updated_at;
+  /// Next investment date
+  std::string next_trd_date;
+  /// Security name
+  std::string stock_name;
+  /// Cumulative invested amount
+  std::string cum_amount;
+  /// Number of completed investment periods
+  int64_t issue_number;
+  /// Average cost
+  std::string average_cost;
+  /// Cumulative profit/loss
+  std::string cum_profit;
+};
+
+/// Response for DCAContext::list and write operations.
+struct DcaList
+{
+  /// DCA plans
+  std::vector<DcaPlan> plans;
+};
+
+/// Response for DCAContext::stats — aggregate DCA statistics.
+struct DcaStats
+{
+  /// Number of active plans
+  std::string active_count;
+  /// Number of finished plans
+  std::string finished_count;
+  /// Number of suspended plans
+  std::string suspended_count;
+  /// Nearest upcoming plans
+  std::vector<DcaPlan> nearest_plans;
+  /// Days until next investment
+  std::string rest_days;
+  /// Total invested amount
+  std::string total_amount;
+  /// Total profit/loss
+  std::string total_profit;
+};
+
+/// DCA support info for one security.
+struct DcaSupportInfo
+{
+  /// Security symbol
+  std::string symbol;
+  /// Whether DCA is supported for this security
+  bool support_regular_saving;
+};
+
+/// Response for DCAContext::check_support.
+struct DcaSupportList
+{
+  /// Support info per security
+  std::vector<DcaSupportInfo> infos;
+};
+
+/// Response for DCAContext::calc_date — next projected trade date.
+struct DcaCalcDateResult
+{
+  /// Next projected trade date (unix timestamp string)
+  std::string trade_date;
+};
+
+/// Response for DCAContext::create_dca and DCAContext::update_dca.
+struct DcaCreateResult
+{
+  /// The plan ID of the created or updated DCA plan.
+  std::string plan_id;
+};
+
+/// One DCA execution history record.
+struct DcaHistoryRecord
+{
+  std::string created_at;
+  std::string order_id;
+  std::string status;
+  std::string action;
+  std::string order_type;
+  std::string executed_qty;
+  std::string executed_price;
+  std::string executed_amount;
+  std::string rejected_reason;
+  std::string symbol;
+};
+
+/// Paginated DCA execution history response.
+struct DcaHistoryResponse
+{
+  std::vector<DcaHistoryRecord> records;
+  bool has_more;
+};
+
+} // namespace dca
+
+namespace sharelist {
+
+/// A security constituent of a sharelist.
+struct SharelistStock
+{
+  /// Security symbol
+  std::string symbol;
+  /// Security name
+  std::string name;
+  /// Market, e.g. "HK"
+  std::string market;
+  /// Ticker code
+  std::string code;
+  /// Brief description
+  std::string intro;
+  /// Unread change log category
+  std::string unread_change_log_category;
+  /// Day change percentage (absent when quote unavailable)
+  std::optional<std::string> change;
+  /// Latest price (absent when quote unavailable)
+  std::optional<std::string> last_done;
+  /// Trade status code (absent when quote unavailable)
+  std::optional<int32_t> trade_status;
+};
+
+/// Subscription scope flags for a sharelist.
+struct SharelistScopes
+{
+  /// Whether the current user is subscribed to this sharelist
+  bool subscription;
+  /// Whether the current user is the creator of this sharelist
+  bool is_self;
+};
+
+/// Sharelist metadata and constituent stocks.
+struct SharelistInfo
+{
+  /// Sharelist ID
+  int64_t id;
+  /// Name
+  std::string name;
+  /// Description
+  std::string description;
+  /// Cover image URL
+  std::string cover;
+  /// Number of subscribers
+  int64_t subscribers_count;
+  /// Creation time (Unix timestamp)
+  int64_t created_at;
+  /// Last stock edit time (Unix timestamp)
+  int64_t edited_at;
+  /// YTD change percentage
+  std::string this_year_chg;
+  /// Creator info (serialised JSON)
+  std::string creator;
+  /// Constituent stocks
+  std::vector<SharelistStock> stocks;
+  /// Whether the current user is subscribed
+  bool subscribed;
+  /// Day change percentage
+  std::string chg;
+  /// Sharelist type: 0=regular, 3=official, 4=industry
+  int32_t sharelist_type;
+  /// Industry code (for industry sharelists)
+  std::string industry_code;
+};
+
+/// Response for SharelistContext::list and SharelistContext::popular.
+struct SharelistList
+{
+  /// User's own and followed sharelists
+  std::vector<SharelistInfo> sharelists;
+  /// Subscribed sharelists (may be empty in popular response)
+  std::vector<SharelistInfo> subscribed_sharelists;
+  /// Pagination cursor for the subscribed list
+  std::string tail_mark;
+};
+
+/// Response for SharelistContext::detail.
+struct SharelistDetail
+{
+  /// Sharelist info including constituent stocks
+  SharelistInfo sharelist;
+  /// Subscription scope flags for the current user
+  SharelistScopes scopes;
+};
+
+} // namespace sharelist
 
 } // namespace longbridge

@@ -10,9 +10,9 @@ use longbridge::{
     Config, Market, QuoteContext,
     quote::{
         AdjustType, CalcIndex, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, Period,
-        PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
-        SecuritiesUpdateMode, SecurityListCategory, SortOrderType, SubFlags, TradeSessions,
-        WarrantSortBy, WarrantStatus, WarrantType,
+        PinnedMode, PushEvent, PushEventDetail, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, SecuritiesUpdateMode, SecurityListCategory, SortOrderType,
+        SubFlags, TradeSessions, WarrantSortBy, WarrantStatus, WarrantType,
     },
 };
 use parking_lot::Mutex;
@@ -989,6 +989,26 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUpdateWa
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUpdatePinned(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    req: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let mode: PinnedMode = get_field(env, &req, "mode")?;
+        let symbols: ObjectArray<String> = get_field(env, &req, "symbols")?;
+        async_util::execute(env, callback, async move {
+            context.ctx.update_pinned(mode, symbols.0).await?;
+            Ok(())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextRealtimeQuote(
     mut env: JNIEnv,
     _class: JClass,
@@ -1170,6 +1190,71 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextHistoryM
                 .ctx
                 .history_market_temperature(market, start, end)
                 .await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextShortPositions(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.short_positions(symbol).await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionVolume(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.option_volume(symbol).await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionVolumeDaily(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    use crate::types::{JavaInteger, JavaLong, get_field};
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let timestamp_opt: Option<JavaLong> = get_field(env, &opts, "timestamp")?;
+        let timestamp = timestamp_opt.map(i64::from).unwrap_or(0);
+        let count_opt: Option<JavaInteger> = get_field(env, &opts, "count")?;
+        let count = count_opt.map(i32::from).unwrap_or(30) as u32;
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .option_volume_daily(symbol, timestamp, count)
+                .await?;
+            Ok(resp)
         })?;
         Ok(())
     })

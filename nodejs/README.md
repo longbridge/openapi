@@ -2,6 +2,23 @@
 
 `longbridge` provides an easy-to-use interface for invoking [`Longbridge OpenAPI`](https://open.longbridge.com/en/).
 
+
+## Context Types
+
+| Context | Description |
+|---------|-------------|
+| `QuoteContext` | Real-time quotes, candlesticks, options, warrants, watchlists, push subscriptions |
+| `TradeContext` | Orders, positions, account balance, executions, cash flow |
+| `AssetContext` | Account statement download |
+| `ContentContext` | News, community topics |
+| `FundamentalContext` | Financial reports, analyst ratings, dividends, valuation, company overview, shareholders |
+| `MarketContext` | Market status, broker holdings, A/H premium, trade statistics, anomaly alerts, index constituents |
+| `CalendarContext` | Financial calendar (earnings, dividends, splits, IPOs, macro data, market closures) |
+| `PortfolioContext` | Exchange rates, portfolio P&L analysis |
+| `AlertContext` | Price alert management (add/enable/disable/delete) |
+| `DCAContext` | Dollar-cost averaging plan management |
+| `SharelistContext` | Community sharelist management |
+
 ## Documentation
 
 - SDK docs: https://longbridge.github.io/openapi/nodejs/index.html

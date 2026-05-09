@@ -8,23 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
-- **Rust, Python:** `ContentContext` adds three new methods:
-  - `topic_detail(topic_id)` — get detail of a single topic.
-  - `list_topic_replies(opts)` — list replies for a topic, with optional page/size filtering.
-  - `create_topic_reply(opts)` — create a reply under a topic.
-- **Rust, Python:** New types `ListTopicRepliesOptions`, `CreateReplyOptions`, and `TopicReply` to support the above methods.
+- **All languages (Rust, Python, Node.js, Java, C, C++):** Seven new context types covering all major data APIs:
+  - `FundamentalContext` — financial reports, analyst ratings, dividends, EPS forecasts, consensus estimates, valuation (PE/PB/PS), industry valuation, company overview, executives, shareholders, fund holders, corporate actions, investor relations, operating reports, buyback data, stock ratings.
+  - `MarketContext` — market status, broker holding (top/detail/daily), A/H premium (klines/intraday), trade statistics, market anomalies, index constituents.
+  - `CalendarContext` — finance calendar (earnings, dividends, splits, IPOs, macro data, market closures, meetings, mergers).
+  - `PortfolioContext` — exchange rates, P&L analysis (summary/detail/by-market/flows).
+  - `AlertContext` — price alert management (list/add/delete/enable/disable).
+  - `DCAContext` — dollar-cost-averaging plan management (list/create/update/pause/resume/stop/history/stats/check-support/calc-date/set-reminder).
+  - `SharelistContext` — community sharelist management (list/detail/popular/create/delete/add-securities/remove-securities/sort-securities).
+- **All languages:** `QuoteContext` gains `short_positions`, `option_volume`, `option_volume_daily`, and `update_pinned`.
+- **All languages:** `ContentContext` gains `topic_detail`, `list_topic_replies`, and `create_topic_reply`.
+- **Rust:** `Config::header(key, value)` builder method for injecting custom HTTP/WebSocket headers.
+
+## Changed
+
+- **All languages:** Method parameters now use typed enums instead of raw integers: `DCAFrequency`, `DCAStatus`, `AlertCondition`, `AlertFrequency`, `CalendarCategory`, `FinancialReportKind`, `FinancialReportPeriod`, `BrokerHoldingPeriod`, `AhPremiumPeriod`.
+- **All languages:** Response struct fields are typed enums where applicable: `DcaPlan.status` / `invest_frequency` / `market`, `MarketTimeItem.market`, `FlowItem.direction`, `ProfitSummaryInfo.asset_type`, `InstitutionRatingSummary.recommend`.
+- **All languages:** All SDK responses are fully typed structs — no method returns a raw JSON string.
+- **All languages:** Monetary/numeric fields use `Decimal`/`Option<Decimal>` (Rust) or `BigDecimal` (Java). Non-parseable values such as `""` or `"--"` deserialize as `None`/`null`.
 
 ## Fixed
 
 - **Rust:** Fix incorrect cache expiry checks in `QuoteContext`.
-- **All bindings:** Correct `SecurityStaticInfo.dividend_yield` doc comment from "Dividend yield" (ratio) to "Dividend" (per share amount) across all language SDKs (Rust, Python, Node.js, Java, C, C++).
-- **All bindings:** `create_topic` now returns the topic ID (`String`) instead of `OwnedTopic` to avoid deserialization errors when the API response omits optional fields.
-
-## Changed
-
-- **All bindings:** `ContentContext.topics_mine` renamed to `my_topics`; `ListMyTopicsOptions` renamed to `MyTopicsOptions`.
-- **All bindings:** `license` field removed from `OwnedTopic` and `CreateTopicOptions`.
 
 # [4.0.6]
 

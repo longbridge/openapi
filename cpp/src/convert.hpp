@@ -2,9 +2,11 @@
 
 #include "longbridge.h"
 #include "types.hpp"
+#include "portfolio_context.hpp"
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
+
 
 namespace longbridge {
 namespace convert {
@@ -2285,6 +2287,470 @@ convert(const lb_owned_topic_t* item)
                       item->detail_url,
                       item->created_at,
                       item->updated_at };
+}
+
+// ── QuoteContext extension types ──────────────────────────────────
+
+inline quote::ShortPosition convert(const lb_short_position_t* p) {
+  return { p->timestamp, p->rate, p->avg_daily_share_volume, p->current_shares_short, p->days_to_cover, p->close };
+}
+inline quote::ShortPositionsResponse convert(const lb_short_positions_response_t* r) {
+  std::vector<quote::ShortPosition> data;
+  for (size_t i = 0; i < r->num_data; ++i) data.push_back(convert(&r->data[i]));
+  return { r->symbol, std::move(data), r->sources };
+}
+inline quote::OptionVolumeStats convert(const lb_option_volume_stats_t* s) {
+  return { s->c, s->p };
+}
+inline quote::OptionVolumeDailyStat convert(const lb_option_volume_daily_stat_t* s) {
+  return { s->symbol, s->timestamp, s->total_volume, s->total_put_volume, s->total_call_volume,
+           s->put_call_volume_ratio, s->total_open_interest, s->total_put_open_interest,
+           s->total_call_open_interest, s->put_call_open_interest_ratio };
+}
+inline quote::OptionVolumeDaily convert(const lb_option_volume_daily_t* r) {
+  std::vector<quote::OptionVolumeDailyStat> stats;
+  for (size_t i = 0; i < r->num_stats; ++i) stats.push_back(convert(&r->stats[i]));
+  return { std::move(stats) };
+}
+
+// ── MarketContext conversions ─────────────────────────────────────
+
+inline market::MarketTimeItem convert(const lb_market_time_item_t* item) {
+  return { convert(item->market), item->trade_status, item->timestamp, item->delay_trade_status, item->delay_timestamp, item->sub_status, item->delay_sub_status };
+}
+inline market::MarketStatusResponse convert(const lb_market_status_response_t* r) {
+  std::vector<market::MarketTimeItem> v;
+  for (size_t i = 0; i < r->num_market_time; ++i) v.push_back(convert(&r->market_time[i]));
+  return { std::move(v) };
+}
+inline market::BrokerHoldingEntry convert(const lb_broker_holding_entry_t* e) { return { e->name, e->parti_number, e->chg, e->strong }; }
+inline market::BrokerHoldingTop convert(const lb_broker_holding_top_t* t) {
+  std::vector<market::BrokerHoldingEntry> buy, sell;
+  for (size_t i = 0; i < t->num_buy; ++i) buy.push_back(convert(&t->buy[i]));
+  for (size_t i = 0; i < t->num_sell; ++i) sell.push_back(convert(&t->sell[i]));
+  return { std::move(buy), std::move(sell), t->updated_at };
+}
+inline market::BrokerHoldingChanges convert(const lb_broker_holding_changes_t& c) { return { c.value, c.chg_1, c.chg_5, c.chg_20, c.chg_60 }; }
+inline market::BrokerHoldingDetailItem convert(const lb_broker_holding_detail_item_t* item) { return { item->name, item->parti_number, convert(item->ratio), convert(item->shares), item->strong }; }
+inline market::BrokerHoldingDetail convert(const lb_broker_holding_detail_t* d) {
+  std::vector<market::BrokerHoldingDetailItem> list;
+  for (size_t i = 0; i < d->num_list; ++i) list.push_back(convert(&d->list[i]));
+  return { std::move(list), d->updated_at };
+}
+inline market::BrokerHoldingDailyItem convert(const lb_broker_holding_daily_item_t* item) { return { item->date, item->holding, item->ratio, item->chg }; }
+inline market::BrokerHoldingDailyHistory convert(const lb_broker_holding_daily_history_t* h) {
+  std::vector<market::BrokerHoldingDailyItem> list;
+  for (size_t i = 0; i < h->num_list; ++i) list.push_back(convert(&h->list[i]));
+  return { std::move(list) };
+}
+inline market::AhPremiumKline convert(const lb_ah_premium_kline_t* k) { return { k->aprice, k->apreclose, k->hprice, k->hpreclose, k->currency_rate, k->ahpremium_rate, k->price_spread, k->timestamp }; }
+inline market::AhPremiumKlines convert(const lb_ah_premium_klines_t* r) {
+  std::vector<market::AhPremiumKline> klines;
+  for (size_t i = 0; i < r->num_klines; ++i) klines.push_back(convert(&r->klines[i]));
+  return { std::move(klines) };
+}
+inline market::AhPremiumIntraday convert(const lb_ah_premium_intraday_t* r) {
+  std::vector<market::AhPremiumKline> klines;
+  for (size_t i = 0; i < r->num_klines; ++i) klines.push_back(convert(&r->klines[i]));
+  return { std::move(klines) };
+}
+inline market::TradePriceLevel convert(const lb_trade_price_level_t* p) { return { p->buy_amount, p->neutral_amount, p->price, p->sell_amount }; }
+inline market::TradeStatistics convert(const lb_trade_statistics_t* s) {
+  std::vector<std::string> td;
+  for (size_t i = 0; i < s->num_trade_date; ++i) td.push_back(s->trade_date[i]);
+  return { s->avgprice, s->buy, s->neutral, s->preclose, s->sell, s->timestamp, s->total_amount, std::move(td), s->trades_count };
+}
+inline market::TradeStatsResponse convert(const lb_trade_stats_response_t* r) {
+  std::vector<market::TradePriceLevel> trades;
+  for (size_t i = 0; i < r->num_trades; ++i) trades.push_back(convert(&r->trades[i]));
+  return { convert(&r->statistics), std::move(trades) };
+}
+inline market::AnomalyItem convert(const lb_anomaly_item_t* item) {
+  std::vector<std::string> cv;
+  for (size_t i = 0; i < item->num_change_values; ++i) cv.push_back(item->change_values[i]);
+  return { item->symbol, item->name, item->alert_name, item->alert_time, std::move(cv), item->emotion };
+}
+inline market::AnomalyResponse convert(const lb_anomaly_response_t* r) {
+  std::vector<market::AnomalyItem> changes;
+  for (size_t i = 0; i < r->num_changes; ++i) changes.push_back(convert(&r->changes[i]));
+  return { r->all_off, std::move(changes) };
+}
+inline market::ConstituentStock convert(const lb_constituent_stock_t* s) {
+  std::vector<std::string> tags;
+  for (size_t i = 0; i < s->num_tags; ++i) tags.push_back(s->tags[i]);
+  return { s->symbol, s->name, s->last_done, s->prev_close, s->inflow, s->balance, s->amount, s->total_shares, std::move(tags), s->intro, s->market, s->circulating_shares, s->delay, s->chg, s->trade_status };
+}
+inline market::IndexConstituents convert(const lb_index_constituents_t* r) {
+  std::vector<market::ConstituentStock> stocks;
+  for (size_t i = 0; i < r->num_stocks; ++i) stocks.push_back(convert(&r->stocks[i]));
+  return { r->fall_num, r->flat_num, r->rise_num, std::move(stocks) };
+}
+
+// ── FundamentalContext conversions ────────────────────────────────
+
+inline fundamental::InstitutionRatingDetailEvaluateItem convert(const lb_institution_rating_detail_evaluate_item_t* e) {
+  return { e->buy, e->date, e->hold, e->sell, e->strong_buy, e->under };
+}
+inline fundamental::InstitutionRatingDetailTargetItem convert(const lb_institution_rating_detail_target_item_t* t) {
+  return { t->avg_target, t->date, t->max_target, t->min_target, t->meet, t->price, t->timestamp };
+}
+inline fundamental::InstitutionRatingDetail convert(const lb_institution_rating_detail_t* r) {
+  std::vector<fundamental::InstitutionRatingDetailEvaluateItem> ev;
+  for (size_t i = 0; i < r->num_evaluate_list; ++i) ev.push_back(convert(&r->evaluate_list[i]));
+  std::vector<fundamental::InstitutionRatingDetailTargetItem> tg;
+  for (size_t i = 0; i < r->num_target_list; ++i) tg.push_back(convert(&r->target_list[i]));
+  return { r->ccy_symbol, std::move(ev), r->data_percent ? r->data_percent : "", r->prediction_accuracy, r->updated_at, std::move(tg) };
+}
+inline fundamental::ForecastEpsItem convert(const lb_forecast_eps_item_t* item) {
+  return { item->forecast_eps_median, item->forecast_eps_mean, item->forecast_eps_lowest,
+           item->forecast_eps_highest, item->institution_total, item->institution_up,
+           item->institution_down, item->forecast_start_date, item->forecast_end_date };
+}
+inline fundamental::ForecastEps convert(const lb_forecast_eps_t* r) {
+  std::vector<fundamental::ForecastEpsItem> items;
+  for (size_t i = 0; i < r->num_items; ++i) items.push_back(convert(&r->items[i]));
+  return { std::move(items) };
+}
+// ValuationData and ValuationHistoryResponse defined after convert_opt_metric below
+
+inline fundamental::DividendItem convert(const lb_dividend_item_t* item) { return { item->symbol, item->id, item->desc, item->record_date, item->ex_date, item->payment_date }; }
+inline fundamental::DividendList convert(const lb_dividend_list_t* r) {
+  std::vector<fundamental::DividendItem> list;
+  for (size_t i = 0; i < r->num_list; ++i) list.push_back(convert(&r->list[i]));
+  return { std::move(list) };
+}
+inline fundamental::RatingEvaluate convert(const lb_rating_evaluate_t& e) { return { e.buy, e.over, e.hold, e.under, e.sell, e.no_opinion, e.total, e.start_date, e.end_date }; }
+inline fundamental::RatingTarget convert(const lb_rating_target_t& t) { return { t.highest_price, t.lowest_price, t.prev_close, t.start_date, t.end_date }; }
+inline fundamental::RatingSummaryEvaluate convert(const lb_rating_summary_evaluate_t& e) { return { e.buy, e.date, e.hold, e.sell, e.strong_buy, e.under }; }
+inline fundamental::InstitutionRating convert(const lb_institution_rating_t* r) {
+  fundamental::InstitutionRatingLatest latest { convert(r->latest.evaluate), convert(r->latest.target), r->latest.industry_id, r->latest.industry_name, r->latest.industry_rank, r->latest.industry_total, r->latest.industry_mean, r->latest.industry_median };
+  fundamental::InstitutionRatingSummary summary { r->summary.ccy_symbol, r->summary.change, convert(r->summary.evaluate), static_cast<fundamental::InstitutionRecommend>(r->summary.recommend), r->summary.target, r->summary.updated_at };
+  return { std::move(latest), std::move(summary) };
+}
+inline fundamental::ValuationPoint convert(const lb_valuation_point_t* p) { return { p->timestamp, p->value }; }
+inline fundamental::ValuationMetricData convert(const lb_valuation_metric_data_t* m) {
+  std::vector<fundamental::ValuationPoint> list;
+  for (size_t i = 0; i < m->num_list; ++i) list.push_back(convert(&m->list[i]));
+  return { m->desc, m->high, m->low, m->median, std::move(list) };
+}
+inline std::optional<fundamental::ValuationMetricData> convert_opt_metric(const lb_valuation_metric_data_t* m) {
+  if (!m) return std::nullopt;
+  return convert(m);
+}
+inline fundamental::ValuationData convert(const lb_valuation_data_t* r) {
+  fundamental::ValuationMetricsData metrics {
+    convert_opt_metric(r->metrics.pe), convert_opt_metric(r->metrics.pb),
+    convert_opt_metric(r->metrics.ps), convert_opt_metric(r->metrics.dvd_yld)
+  };
+  return { std::move(metrics) };
+}
+inline fundamental::ValuationHistoryResponse convert(const lb_valuation_history_response_t* r) {
+  return { convert_opt_metric(r->pe), convert_opt_metric(r->pb), convert_opt_metric(r->ps) };
+}
+inline fundamental::CompanyOverview convert(const lb_company_overview_t* c) { return { c->name, c->company_name, c->founded, c->listing_date, c->market, c->region, c->address, c->office_address, c->website, c->issue_price, c->shares_offered, c->chairman, c->secretary, c->audit_inst, c->category, c->year_end, c->employees, c->phone, c->fax, c->email, c->legal_repr, c->manager, c->ticker, c->profile, c->sector }; }
+inline fundamental::ShareholderStock convert(const lb_shareholder_stock_t* s) { return { s->symbol, s->code, s->market, s->chg }; }
+inline fundamental::Shareholder convert(const lb_shareholder_t* s) {
+  std::vector<fundamental::ShareholderStock> stocks;
+  for (size_t i = 0; i < s->num_stocks; ++i) stocks.push_back(convert(&s->stocks[i]));
+  return { s->shareholder_id, s->shareholder_name, s->institution_type, s->percent_of_shares, s->shares_changed, s->report_date, std::move(stocks) };
+}
+inline fundamental::ShareholderList convert(const lb_shareholder_list_t* r) {
+  std::vector<fundamental::Shareholder> list;
+  for (size_t i = 0; i < r->num_shareholder_list; ++i) list.push_back(convert(&r->shareholder_list[i]));
+  return { std::move(list), r->forward_url, r->total };
+}
+inline fundamental::FundHolder convert(const lb_fund_holder_t* h) { return { h->code, h->symbol, h->currency, h->name, h->position_ratio, h->report_date }; }
+inline fundamental::FundHolders convert(const lb_fund_holders_t* r) {
+  std::vector<fundamental::FundHolder> lists;
+  for (size_t i = 0; i < r->num_lists; ++i) lists.push_back(convert(&r->lists[i]));
+  return { std::move(lists) };
+}
+inline fundamental::CorpActionItem convert(const lb_corp_action_item_t* item) { return { item->id, item->date, item->date_str, item->date_type, item->date_zone, item->act_type, item->act_desc, item->action, item->recent, item->is_delay, item->delay_content }; }
+inline fundamental::CorpActions convert(const lb_corp_actions_t* r) {
+  std::vector<fundamental::CorpActionItem> items;
+  for (size_t i = 0; i < r->num_items; ++i) items.push_back(convert(&r->items[i]));
+  return { std::move(items) };
+}
+inline fundamental::InvestSecurity convert(const lb_invest_security_t* s) { return { s->company_id, s->company_name, s->company_name_en, s->company_name_zhcn, s->symbol, s->currency, s->percent_of_shares, s->shares_rank, s->shares_value }; }
+inline fundamental::InvestRelations convert(const lb_invest_relations_t* r) {
+  std::vector<fundamental::InvestSecurity> secs;
+  for (size_t i = 0; i < r->num_invest_securities; ++i) secs.push_back(convert(&r->invest_securities[i]));
+  return { r->forward_url, std::move(secs) };
+}
+inline fundamental::OperatingIndicator convert(const lb_operating_indicator_t* ind) { return { ind->field_name, ind->indicator_name, ind->indicator_value, ind->yoy }; }
+inline fundamental::OperatingItem convert(const lb_operating_item_t* item) {
+  std::vector<fundamental::OperatingIndicator> inds;
+  for (size_t i = 0; i < item->num_indicators; ++i) inds.push_back(convert(&item->indicators[i]));
+  return { item->id, item->report, item->title, item->txt, item->latest, item->web_url, item->financial_currency, item->financial_name, item->financial_region, item->financial_report, std::move(inds) };
+}
+inline fundamental::OperatingList convert(const lb_operating_list_t* r) {
+  std::vector<fundamental::OperatingItem> list;
+  for (size_t i = 0; i < r->num_list; ++i) list.push_back(convert(&r->list[i]));
+  return { std::move(list) };
+}
+
+// New fundamental conversions
+
+inline fundamental::ConsensusDetail convert(const lb_consensus_detail_t* d) {
+  return { d->key, d->name, d->description, d->actual, d->estimate, d->comp_value, d->comp_desc, d->comp, d->is_released };
+}
+inline fundamental::ConsensusReport convert(const lb_consensus_report_t* r) {
+  std::vector<fundamental::ConsensusDetail> details;
+  for (size_t i = 0; i < r->num_details; ++i) details.push_back(convert(&r->details[i]));
+  return { r->fiscal_year, r->fiscal_period, r->period_text, std::move(details) };
+}
+inline fundamental::FinancialConsensus convert(const lb_financial_consensus_t* r) {
+  std::vector<fundamental::ConsensusReport> list;
+  for (size_t i = 0; i < r->num_list; ++i) list.push_back(convert(&r->list[i]));
+  std::vector<std::string> opt_periods;
+  for (size_t i = 0; i < r->num_opt_periods; ++i) opt_periods.push_back(r->opt_periods[i]);
+  return { std::move(list), r->current_index, r->currency, std::move(opt_periods), r->current_period };
+}
+inline fundamental::IndustryValuationHistory convert(const lb_industry_valuation_history_t* h) {
+  return { h->date, h->pe, h->pb, h->ps };
+}
+inline fundamental::IndustryValuationItem convert(const lb_industry_valuation_item_t* item) {
+  std::vector<fundamental::IndustryValuationHistory> hist;
+  for (size_t i = 0; i < item->num_history; ++i) hist.push_back(convert(&item->history[i]));
+  return { item->symbol, item->name, item->currency, item->assets, item->bps, item->eps,
+           item->dps, item->div_yld, item->div_payout_ratio, item->five_y_avg_dps, item->pe, std::move(hist) };
+}
+inline fundamental::IndustryValuationList convert(const lb_industry_valuation_list_t* r) {
+  std::vector<fundamental::IndustryValuationItem> list;
+  for (size_t i = 0; i < r->num_list; ++i) list.push_back(convert(&r->list[i]));
+  return { std::move(list) };
+}
+inline fundamental::ValuationDist convert_valuation_dist(const lb_valuation_dist_t* d) {
+  return { d->low, d->high, d->median, d->value, d->ranking, d->rank_index, d->rank_total };
+}
+inline fundamental::IndustryValuationDist convert(const lb_industry_valuation_dist_t* r) {
+  std::optional<fundamental::ValuationDist> pe, pb, ps;
+  if (r->pe) pe = convert_valuation_dist(r->pe);
+  if (r->pb) pb = convert_valuation_dist(r->pb);
+  if (r->ps) ps = convert_valuation_dist(r->ps);
+  return { std::move(pe), std::move(pb), std::move(ps) };
+}
+inline fundamental::Professional convert(const lb_professional_t* p) {
+  return { p->id, p->name, p->name_zhcn, p->name_en, p->title, p->biography, p->photo, p->wiki_url };
+}
+inline fundamental::ExecutiveGroup convert(const lb_executive_group_t* g) {
+  std::vector<fundamental::Professional> profs;
+  for (size_t i = 0; i < g->num_professionals; ++i) profs.push_back(convert(&g->professionals[i]));
+  return { g->symbol, g->forward_url, g->total, std::move(profs) };
+}
+inline fundamental::ExecutiveList convert(const lb_executive_list_t* r) {
+  std::vector<fundamental::ExecutiveGroup> list;
+  for (size_t i = 0; i < r->num_professional_list; ++i) list.push_back(convert(&r->professional_list[i]));
+  return { std::move(list) };
+}
+inline fundamental::BuybackHistoryItem convert(const lb_buyback_history_item_t* item) {
+  return { item->fiscal_year, item->fiscal_year_range, item->net_buyback, item->net_buyback_yield, item->net_buyback_growth_rate, item->currency };
+}
+inline fundamental::BuybackRatios convert(const lb_buyback_ratios_t* r) {
+  return { r->net_buyback_payout_ratio, r->net_buyback_to_cashflow_ratio };
+}
+inline fundamental::BuybackData convert(const lb_buyback_data_t* r) {
+  std::optional<fundamental::RecentBuybacks> recent;
+  if (r->recent_buybacks) {
+    recent = fundamental::RecentBuybacks{ r->recent_buybacks->currency, r->recent_buybacks->net_buyback_ttm, r->recent_buybacks->net_buyback_yield_ttm };
+  }
+  std::vector<fundamental::BuybackHistoryItem> hist;
+  for (size_t i = 0; i < r->num_buyback_history; ++i) hist.push_back(convert(&r->buyback_history[i]));
+  std::vector<fundamental::BuybackRatios> ratios;
+  for (size_t i = 0; i < r->num_buyback_ratios; ++i) ratios.push_back(convert(&r->buyback_ratios[i]));
+  return { std::move(recent), std::move(hist), std::move(ratios) };
+}
+inline fundamental::RatingLeafIndicator convert(const lb_rating_leaf_indicator_t* leaf) {
+  return { leaf->name, leaf->value, leaf->value_type, leaf->score, leaf->letter };
+}
+inline fundamental::RatingIndicator convert(const lb_rating_indicator_t* ind) {
+  return { ind->name, ind->score, ind->letter };
+}
+inline fundamental::RatingSubIndicatorGroup convert(const lb_rating_sub_indicator_group_t* g) {
+  std::vector<fundamental::RatingLeafIndicator> subs;
+  for (size_t i = 0; i < g->num_sub_indicators; ++i) subs.push_back(convert(&g->sub_indicators[i]));
+  return { convert(&g->indicator), std::move(subs) };
+}
+inline fundamental::RatingCategory convert(const lb_rating_category_t* cat) {
+  std::vector<fundamental::RatingSubIndicatorGroup> subs;
+  for (size_t i = 0; i < cat->num_sub_indicators; ++i) subs.push_back(convert(&cat->sub_indicators[i]));
+  return { cat->kind, std::move(subs) };
+}
+inline fundamental::StockRatings convert(const lb_stock_ratings_t* r) {
+  std::vector<fundamental::RatingCategory> ratings;
+  for (size_t i = 0; i < r->num_ratings; ++i) ratings.push_back(convert(&r->ratings[i]));
+  return { r->style_txt_name, r->scale_txt_name, r->report_period_txt, r->multi_score, r->multi_letter,
+           r->multi_score_change, r->industry_name, r->industry_rank, r->industry_total,
+           r->industry_mean_score, r->industry_median_score, std::move(ratings) };
+}
+
+// ── Portfolio conversions ─────────────────────────────────────────
+
+inline portfolio::ProfitSummaryInfo convert(const lb_profit_summary_info_t* item) {
+  return { static_cast<portfolio::AssetType>(item->asset_type), item->profit_max, item->profit_max_name, item->loss_max, item->loss_max_name };
+}
+inline portfolio::ProfitSummaryBreakdown convert(const lb_profit_summary_breakdown_t& b) {
+  std::vector<portfolio::ProfitSummaryInfo> info;
+  for (size_t i = 0; i < b.num_summary_info; ++i) info.push_back(convert(&b.summary_info[i]));
+  return { b.stock, b.fund, b.crypto, b.mmf, b.other, b.cumulative_transaction_amount,
+           b.trade_order_num, b.trade_stock_num, b.ipo_hit, b.ipo_subscription, std::move(info) };
+}
+inline portfolio::ProfitAnalysisSummary convert(const lb_profit_analysis_summary_t& s) {
+  return { s.currency, s.current_total_asset, s.start_date, s.end_date, s.start_time, s.end_time,
+           s.ending_asset_value, s.initial_asset_value, s.invest_amount, s.is_traded,
+           s.sum_profit, s.sum_profit_rate, convert(s.profits) };
+}
+inline portfolio::ProfitAnalysisItem convert(const lb_profit_analysis_item_t* item) {
+  return { item->name, item->market, item->is_holding, item->profit, item->profit_rate,
+           item->clearance_times, static_cast<portfolio::AssetType>(item->item_type), item->currency, item->symbol,
+           item->holding_period, item->security_code, item->isin,
+           item->underlying_profit, item->derivatives_profit, item->order_profit };
+}
+inline portfolio::ProfitAnalysisSublist convert(const lb_profit_analysis_sublist_t& sl) {
+  std::vector<portfolio::ProfitAnalysisItem> items;
+  for (size_t i = 0; i < sl.num_items; ++i) items.push_back(convert(&sl.items[i]));
+  return { sl.start, sl.end, sl.start_date, sl.end_date, sl.updated_at, sl.updated_date, std::move(items) };
+}
+inline portfolio::ProfitAnalysis convert(const lb_profit_analysis_t* r) {
+  return { convert(r->summary), convert(r->sublist) };
+}
+inline portfolio::ProfitAnalysisByMarketItem convert(const lb_profit_analysis_by_market_item_t* item) {
+  return { item->code, item->name, item->market, item->profit };
+}
+inline portfolio::ProfitAnalysisByMarket convert(const lb_profit_analysis_by_market_t* r) {
+  std::vector<portfolio::ProfitAnalysisByMarketItem> items;
+  for (size_t i = 0; i < r->num_stock_items; ++i) items.push_back(convert(&r->stock_items[i]));
+  return { r->profit, r->has_more, std::move(items) };
+}
+inline portfolio::FlowItem convert(const lb_flow_item_t* item) {
+  return { item->executed_date, item->executed_timestamp, item->code, static_cast<portfolio::FlowDirection>(item->direction),
+           item->executed_quantity, item->executed_price, item->executed_cost, item->describe };
+}
+inline portfolio::ProfitAnalysisFlows convert(const lb_profit_analysis_flows_t* r) {
+  std::vector<portfolio::FlowItem> flows;
+  for (size_t i = 0; i < r->num_flows_list; ++i) flows.push_back(convert(&r->flows_list[i]));
+  return { std::move(flows), r->has_more };
+}
+inline portfolio::ProfitDetailEntry convert(const lb_profit_detail_entry_t* e) {
+  return { e->describe, e->amount };
+}
+inline portfolio::ProfitDetails convert_profit_details(const lb_profit_details_t& d) {
+  std::vector<portfolio::ProfitDetailEntry> credited, debited, fee;
+  for (size_t i = 0; i < d.num_credited_details; ++i) credited.push_back(convert(&d.credited_details[i]));
+  for (size_t i = 0; i < d.num_debited_details; ++i) debited.push_back(convert(&d.debited_details[i]));
+  for (size_t i = 0; i < d.num_fee_details; ++i) fee.push_back(convert(&d.fee_details[i]));
+  return { d.holding_value, d.profit, d.cumulative_credited_amount, std::move(credited),
+           d.cumulative_debited_amount, std::move(debited), d.cumulative_fee_amount, std::move(fee),
+           d.short_holding_value, d.long_holding_value, d.holding_value_at_beginning, d.holding_value_at_ending };
+}
+inline portfolio::ProfitAnalysisDetail convert(const lb_profit_analysis_detail_t* r) {
+  return { r->profit, convert_profit_details(r->underlying_details), convert_profit_details(r->derivative_pnl_details),
+           r->name, r->updated_at, r->updated_date, r->currency, r->default_tag,
+           r->start, r->end, r->start_date, r->end_date };
+}
+
+// ── AlertContext ──────────────────────────────────────────────────
+
+inline alert::AlertItem convert(const lb_alert_item_t* item) {
+  std::vector<int32_t> state(item->state, item->state + item->num_state);
+  return { item->id, item->indicator_id, item->enabled, item->frequency, item->scope,
+           item->text, std::move(state), item->value_map };
+}
+inline alert::AlertSymbolGroup convert(const lb_alert_symbol_group_t* g) {
+  std::vector<alert::AlertItem> inds;
+  for (size_t i = 0; i < g->num_indicators; ++i) inds.push_back(convert(&g->indicators[i]));
+  return { g->symbol, g->code, g->market, g->name, g->price, g->chg, g->p_chg, g->product,
+           std::move(inds) };
+}
+inline alert::AlertList convert(const lb_alert_list_t* r) {
+  std::vector<alert::AlertSymbolGroup> lists;
+  for (size_t i = 0; i < r->num_lists; ++i) lists.push_back(convert(&r->lists[i]));
+  return { std::move(lists) };
+}
+
+// ── DCAContext ────────────────────────────────────────────────────
+
+inline dca::DcaPlan convert(const lb_dca_plan_t* p) {
+  return { p->plan_id, static_cast<dca::DCAStatus>(p->status), p->symbol, p->member_id, p->aaid, p->account_channel,
+           p->display_account, convert(p->market), p->per_invest_amount, static_cast<dca::DCAFrequency>(p->invest_frequency),
+           p->invest_day_of_week, p->invest_day_of_month, p->allow_margin_finance,
+           p->alter_hours, p->created_at, p->updated_at, p->next_trd_date, p->stock_name,
+           p->cum_amount, p->issue_number, p->average_cost, p->cum_profit };
+}
+inline dca::DcaList convert(const lb_dca_list_t* r) {
+  std::vector<dca::DcaPlan> plans;
+  for (size_t i = 0; i < r->num_plans; ++i) plans.push_back(convert(&r->plans[i]));
+  return { std::move(plans) };
+}
+inline dca::DcaStats convert(const lb_dca_stats_t* r) {
+  std::vector<dca::DcaPlan> np;
+  for (size_t i = 0; i < r->num_nearest_plans; ++i) np.push_back(convert(&r->nearest_plans[i]));
+  return { r->active_count, r->finished_count, r->suspended_count, std::move(np),
+           r->rest_days, r->total_amount, r->total_profit };
+}
+inline dca::DcaSupportInfo convert(const lb_dca_support_info_t* s) {
+  return { s->symbol, s->support_regular_saving };
+}
+inline dca::DcaSupportList convert(const lb_dca_support_list_t* r) {
+  std::vector<dca::DcaSupportInfo> infos;
+  for (size_t i = 0; i < r->num_infos; ++i) infos.push_back(convert(&r->infos[i]));
+  return { std::move(infos) };
+}
+inline dca::DcaCalcDateResult convert(const lb_dca_calc_date_result_t* r) {
+  return { r->trade_date };
+}
+inline dca::DcaCreateResult convert(const lb_dca_create_result_t* r) {
+  return { r->plan_id };
+}
+inline dca::DcaHistoryRecord convert(const lb_dca_history_record_t* r) {
+  return {
+    r->created_at ? r->created_at : "",
+    r->order_id ? r->order_id : "",
+    r->status ? r->status : "",
+    r->action ? r->action : "",
+    r->order_type ? r->order_type : "",
+    r->executed_qty ? r->executed_qty : "",
+    r->executed_price ? r->executed_price : "",
+    r->executed_amount ? r->executed_amount : "",
+    r->rejected_reason ? r->rejected_reason : "",
+    r->symbol ? r->symbol : ""
+  };
+}
+inline dca::DcaHistoryResponse convert(const lb_dca_history_response_t* r) {
+  std::vector<dca::DcaHistoryRecord> records;
+  for (size_t i = 0; i < r->num_records; i++) records.push_back(convert(&r->records[i]));
+  return { std::move(records), r->has_more };
+}
+
+// ── SharelistContext ──────────────────────────────────────────────
+
+inline sharelist::SharelistStock convert(const lb_sharelist_stock_t* s) {
+  std::optional<std::string> change = s->change ? std::optional<std::string>(s->change) : std::nullopt;
+  std::optional<std::string> last_done = s->last_done ? std::optional<std::string>(s->last_done) : std::nullopt;
+  std::optional<int32_t> trade_status = s->has_trade_status ? std::optional<int32_t>(s->trade_status) : std::nullopt;
+  return { s->symbol, s->name, s->market, s->code, s->intro, s->unread_change_log_category,
+           std::move(change), std::move(last_done), std::move(trade_status) };
+}
+inline sharelist::SharelistScopes convert(const lb_sharelist_scopes_t* s) {
+  return { s->subscription, s->is_self };
+}
+inline sharelist::SharelistInfo convert(const lb_sharelist_info_t* info) {
+  std::vector<sharelist::SharelistStock> stocks;
+  for (size_t i = 0; i < info->num_stocks; ++i) stocks.push_back(convert(&info->stocks[i]));
+  return { info->id, info->name, info->description, info->cover, info->subscribers_count,
+           info->created_at, info->edited_at, info->this_year_chg, info->creator,
+           std::move(stocks), info->subscribed, info->chg, info->sharelist_type,
+           info->industry_code };
+}
+inline sharelist::SharelistList convert(const lb_sharelist_list_t* r) {
+  std::vector<sharelist::SharelistInfo> sl, ssl;
+  for (size_t i = 0; i < r->num_sharelists; ++i) sl.push_back(convert(&r->sharelists[i]));
+  for (size_t i = 0; i < r->num_subscribed_sharelists; ++i)
+    ssl.push_back(convert(&r->subscribed_sharelists[i]));
+  return { std::move(sl), std::move(ssl), r->tail_mark };
+}
+inline sharelist::SharelistDetail convert(const lb_sharelist_detail_t* r) {
+  return { convert(&r->sharelist), convert(&r->scopes) };
 }
 
 } // namespace convert

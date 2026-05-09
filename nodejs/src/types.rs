@@ -40,3 +40,51 @@ pub enum PushCandlestickMode {
     /// Confirmed mode
     Confirmed,
 }
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::portfolio::types::FlowDirection")]
+pub enum FlowDirection {
+    /// Unknown
+    Unknown,
+    /// Buy
+    Buy,
+    /// Sell
+    Sell,
+}
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::portfolio::types::AssetType")]
+pub enum AssetType {
+    /// Unknown
+    Unknown,
+    /// Stock
+    Stock,
+    /// Fund
+    Fund,
+    /// Crypto
+    Crypto,
+}
+
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::fundamental::types::InstitutionRecommend")]
+pub enum InstitutionRecommend {
+    /// Unknown
+    Unknown,
+    /// Strong buy
+    StrongBuy,
+    /// Buy
+    Buy,
+    /// Hold
+    Hold,
+    /// Sell
+    Sell,
+    /// Strong sell
+    StrongSell,
+    /// Underperform
+    Underperform,
+    /// No opinion
+    NoOpinion,
+}

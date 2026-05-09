@@ -2266,6 +2266,15 @@ class SecuritiesUpdateMode:
         Replace securities
         """
 
+class PinnedMode:
+    """Pinned mode for watchlist securities."""
+
+    class Add(PinnedMode):
+        """Pin (add) securities to the top of the group"""
+
+    class Remove(PinnedMode):
+        """Unpin (remove) securities from the top of the group"""
+
 class RealtimeQuote:
     """
     Real-time quote
@@ -3685,6 +3694,19 @@ class QuoteContext:
                 ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
         """
 
+    def update_pinned(
+        self,
+        mode: Type[PinnedMode],
+        symbols: List[str],
+    ) -> None:
+        """
+        Pin or unpin watchlist securities.
+
+        Args:
+            mode: :class:`PinnedMode.Add` to pin, :class:`PinnedMode.Remove` to unpin
+            symbols: List of security symbols to pin/unpin
+        """
+
     def security_list(
         self,
         market: Type[Market],
@@ -4977,6 +4999,20 @@ class AsyncQuoteContext:
                     )
 
                 asyncio.run(main())
+        """
+        ...
+
+    def update_pinned(
+        self,
+        mode: Type[PinnedMode],
+        symbols: List[str],
+    ) -> Awaitable[None]:
+        """
+        Pin or unpin watchlist securities. Returns an awaitable.
+
+        Args:
+            mode: :class:`PinnedMode.Add` to pin, :class:`PinnedMode.Remove` to unpin
+            symbols: List of security symbols to pin/unpin
         """
         ...
 
@@ -8684,3 +8720,2654 @@ class AsyncContentContext:
                 asyncio.run(main())
         """
         ...
+
+# ── FundamentalContext ────────────────────────────────────────────
+
+class FinancialReports:
+    """
+    Financial reports response.
+
+    ``list`` contains raw nested data keyed by report kind
+    (``"IS"``, ``"BS"``, ``"CF"``).
+    """
+
+    list: object
+    """Raw financial data dict (IS/BS/CF indicators)"""
+
+
+class DividendItem:
+    """One dividend or distribution event."""
+
+    symbol: str
+    """Security symbol, e.g. ``"700.HK"``"""
+    id: str
+    """Internal record ID"""
+    desc: str
+    """Human-readable description, e.g. ``"每股派息 5.3 HKD"``"""
+    record_date: str
+    """Record / book-close date"""
+    ex_date: str
+    """Ex-dividend date"""
+    payment_date: str
+    """Payment date"""
+
+
+class DividendList:
+    """Dividend history response."""
+
+    list: list[DividendItem]
+    """List of dividend events"""
+
+
+class RatingEvaluate:
+    """Analyst rating distribution counts."""
+
+    buy: int
+    """Number of Buy ratings"""
+    over: int
+    """Number of Strong Buy / Outperform ratings"""
+    hold: int
+    """Number of Hold ratings"""
+    under: int
+    """Number of Underperform ratings"""
+    sell: int
+    """Number of Sell ratings"""
+    no_opinion: int
+    """Number of No Opinion ratings"""
+    total: int
+    """Total analyst count"""
+    start_date: str
+    """Window start (unix timestamp string)"""
+    end_date: str
+    """Window end (unix timestamp string)"""
+
+
+class RatingTarget:
+    """Analyst target price range."""
+
+    highest_price: str
+    """Highest price target"""
+    lowest_price: str
+    """Lowest price target"""
+    prev_close: str
+    """Previous close price"""
+    start_date: str
+    """Window start"""
+    end_date: str
+    """Window end"""
+
+
+class InstitutionRatingLatest:
+    """Latest analyst rating snapshot."""
+
+    evaluate: RatingEvaluate
+    """Rating distribution counts"""
+    target: RatingTarget
+    """Target price range"""
+    industry_id: int
+    """Industry classification ID"""
+    industry_name: str
+    """Industry name"""
+    industry_rank: int
+    """Rank within the industry (1 = highest)"""
+    industry_total: int
+    """Total securities in the industry"""
+    industry_mean: int
+    """Mean analyst count in the industry"""
+    industry_median: int
+    """Median analyst count in the industry"""
+
+
+class RatingSummaryEvaluate:
+    """Simplified rating distribution for consensus summary."""
+
+    buy: int
+    """Number of Buy ratings"""
+    date: str
+    """Date of the update"""
+    hold: int
+    """Number of Hold ratings"""
+    sell: int
+    """Number of Sell ratings"""
+    strong_buy: int
+    """Number of Strong Buy ratings"""
+    under: int
+    """Number of Underperform ratings"""
+
+
+class InstitutionRecommend:
+    """Institutional analyst recommendation."""
+
+    class Unknown(InstitutionRecommend): ...
+    """Unknown"""
+    class StrongBuy(InstitutionRecommend): ...
+    """Strong buy"""
+    class Buy(InstitutionRecommend): ...
+    """Buy"""
+    class Hold(InstitutionRecommend): ...
+    """Hold"""
+    class Sell(InstitutionRecommend): ...
+    """Sell"""
+    class StrongSell(InstitutionRecommend): ...
+    """Strong sell"""
+    class Underperform(InstitutionRecommend): ...
+    """Underperform"""
+    class NoOpinion(InstitutionRecommend): ...
+    """No opinion"""
+
+
+class InstitutionRatingSummary:
+    """Analyst consensus summary."""
+
+    ccy_symbol: str
+    """Currency symbol, e.g. ``"HK$"``"""
+    change: str
+    """Change vs previous period"""
+    evaluate: RatingSummaryEvaluate
+    """Simplified rating distribution"""
+    recommend: InstitutionRecommend
+    """Consensus recommendation"""
+    target: str
+    """Consensus target price"""
+    updated_at: str
+    """Last updated display string"""
+
+
+class InstitutionRating:
+    """Combined analyst rating response (latest + consensus summary)."""
+
+    latest: InstitutionRatingLatest
+    """Latest rating snapshot"""
+    summary: InstitutionRatingSummary
+    """Consensus summary"""
+
+
+class InstitutionRatingDetailEvaluateItem:
+    """One weekly rating distribution snapshot."""
+
+    buy: int
+    """Number of Buy ratings"""
+    date: str
+    """Date in ``"2021/05/14"`` format"""
+    hold: int
+    """Number of Hold ratings"""
+    sell: int
+    """Number of Sell ratings"""
+    strong_buy: int
+    """Number of Strong Buy / Outperform ratings"""
+    no_opinion: int
+    """Number of No Opinion ratings"""
+    under: int
+    """Number of Underperform ratings"""
+
+
+class InstitutionRatingDetailEvaluate:
+    """Historical rating distribution time-series."""
+
+    list: list[InstitutionRatingDetailEvaluateItem]
+    """Weekly rating distribution snapshots"""
+
+
+class InstitutionRatingDetailTargetItem:
+    """One weekly target price snapshot."""
+
+    avg_target: str
+    """Average target price"""
+    date: str
+    """Date string"""
+    max_target: str
+    """Highest target price"""
+    min_target: str
+    """Lowest target price"""
+    meet: bool
+    """Whether the stock price reached the target"""
+    price: str
+    """Actual stock price at this date"""
+    timestamp: str
+    """Unix timestamp string"""
+
+
+class InstitutionRatingDetailTarget:
+    """Historical target price time-series."""
+
+    data_percent: str | None
+    """Prediction accuracy ratio, e.g. ``"0.9934"`` (may be ``None``)"""
+    prediction_accuracy: str
+    """Overall prediction accuracy percentage"""
+    updated_at: str
+    """Last updated display string"""
+    list: list[InstitutionRatingDetailTargetItem]
+    """Weekly target price snapshots"""
+
+
+class InstitutionRatingDetail:
+    """Historical analyst rating detail response."""
+
+    ccy_symbol: str
+    """Currency symbol"""
+    evaluate: InstitutionRatingDetailEvaluate
+    """Historical rating distribution time-series"""
+    target: InstitutionRatingDetailTarget
+    """Historical target price time-series"""
+
+
+class ForecastEpsItem:
+    """One EPS forecast snapshot."""
+
+    forecast_eps_median: str
+    """Median EPS estimate"""
+    forecast_eps_mean: str
+    """Mean EPS estimate"""
+    forecast_eps_lowest: str
+    """Lowest EPS estimate"""
+    forecast_eps_highest: str
+    """Highest EPS estimate"""
+    institution_total: int
+    """Total number of forecasting institutions"""
+    institution_up: int
+    """Institutions that raised their estimate"""
+    institution_down: int
+    """Institutions that lowered their estimate"""
+    forecast_start_date: datetime
+    """Forecast window start"""
+    forecast_end_date: datetime
+    """Forecast window end"""
+
+
+class ForecastEps:
+    """EPS forecast response."""
+
+    items: list[ForecastEpsItem]
+    """EPS forecast snapshots"""
+
+
+class ConsensusDetail:
+    """Consensus estimate for one financial metric."""
+
+    key: str
+    """Metric key, e.g. ``"revenue"``"""
+    name: str
+    """Display name"""
+    description: str
+    """Metric description"""
+    actual: str
+    """Actual reported value (empty if not yet released)"""
+    estimate: str
+    """Consensus estimate value"""
+    comp_value: str
+    """Actual minus estimate"""
+    comp_desc: str
+    """Beat/miss description"""
+    comp: str
+    """Comparison result code"""
+    is_released: bool
+    """Whether actual results have been published"""
+
+
+class ConsensusReport:
+    """Consensus report for one fiscal period."""
+
+    fiscal_year: int
+    """Fiscal year, e.g. ``2025``"""
+    fiscal_period: str
+    """Fiscal period code"""
+    period_text: str
+    """Human-readable period label, e.g. ``"Q4 FY2025"``"""
+    details: list[ConsensusDetail]
+    """Per-metric consensus details"""
+
+
+class FinancialConsensus:
+    """Financial consensus estimates response."""
+
+    list: list[ConsensusReport]
+    """Per-period consensus reports"""
+    current_index: int
+    """Index of the most recently released period"""
+    currency: str
+    """Reporting currency"""
+    opt_periods: list[str]
+    """Available period types"""
+    current_period: str
+    """Currently returned period type"""
+
+
+class ValuationPoint:
+    """One valuation data point."""
+
+    timestamp: datetime
+    """Date of the data point"""
+    value: str
+    """Metric value"""
+
+
+class ValuationMetricData:
+    """Historical time-series for one valuation metric."""
+
+    desc: str
+    """Human-readable description with current value and percentile"""
+    high: str
+    """Historical high"""
+    low: str
+    """Historical low"""
+    median: str
+    """Historical median"""
+    list: list[ValuationPoint]
+    """Historical data points"""
+
+
+class ValuationMetricsData:
+    """Container for valuation metrics."""
+
+    pe: ValuationMetricData | None
+    """Price-to-Earnings ratio history"""
+    pb: ValuationMetricData | None
+    """Price-to-Book ratio history"""
+    ps: ValuationMetricData | None
+    """Price-to-Sales ratio history"""
+    dvd_yld: ValuationMetricData | None
+    """Dividend yield history"""
+
+
+class ValuationData:
+    """Valuation metrics response."""
+
+    metrics: ValuationMetricsData
+    """Valuation metrics (PE / PB / PS / dividend yield)"""
+
+
+class ValuationHistoryMetric:
+    """Historical data for one valuation metric."""
+
+    desc: str
+    """Human-readable description"""
+    high: str
+    """Historical high over the period"""
+    low: str
+    """Historical low over the period"""
+    median: str
+    """Historical median over the period"""
+    list: list[ValuationPoint]
+    """Historical data points"""
+
+
+class ValuationHistoryMetrics:
+    """Historical valuation metrics container."""
+
+    pe: ValuationHistoryMetric | None
+    """Price-to-Earnings history"""
+    pb: ValuationHistoryMetric | None
+    """Price-to-Book history"""
+    ps: ValuationHistoryMetric | None
+    """Price-to-Sales history"""
+
+
+class ValuationHistoryData:
+    """Historical valuation data container."""
+
+    metrics: ValuationHistoryMetrics
+    """Historical metrics"""
+
+
+class ValuationHistoryResponse:
+    """Historical valuation response."""
+
+    history: ValuationHistoryData
+    """Historical valuation data"""
+
+
+class IndustryValuationHistory:
+    """Historical valuation snapshot for one peer security."""
+
+    date: str
+    """Unix timestamp string"""
+    pe: str
+    """Price-to-Earnings ratio"""
+    pb: str
+    """Price-to-Book ratio"""
+    ps: str
+    """Price-to-Sales ratio"""
+
+
+class IndustryValuationItem:
+    """Valuation data for one peer security."""
+
+    symbol: str
+    """Security symbol"""
+    name: str
+    """Company name"""
+    currency: str
+    """Reporting currency"""
+    assets: str
+    """Total assets"""
+    bps: str
+    """Book value per share"""
+    eps: str
+    """Earnings per share"""
+    dps: str
+    """Dividends per share"""
+    div_yld: str
+    """Dividend yield"""
+    div_payout_ratio: str
+    """Dividend payout ratio"""
+    five_y_avg_dps: str
+    """5-year average dividends per share"""
+    pe: str
+    """Current PE ratio"""
+    history: list[IndustryValuationHistory]
+    """Historical PE/PB/PS snapshots"""
+
+
+class IndustryValuationList:
+    """Industry peer valuation comparison response."""
+
+    list: list[IndustryValuationItem]
+    """List of peer securities with valuation data"""
+
+
+class ValuationDist:
+    """Distribution statistics for one valuation metric."""
+
+    low: str
+    """Minimum value in the industry"""
+    high: str
+    """Maximum value in the industry"""
+    median: str
+    """Median value in the industry"""
+    value: str
+    """Current value of the queried security"""
+    ranking: str
+    """Percentile ranking (0–1 range)"""
+    rank_index: str
+    """Ordinal rank index"""
+    rank_total: str
+    """Total securities in the industry"""
+
+
+class IndustryValuationDist:
+    """Industry valuation distribution response."""
+
+    pe: ValuationDist | None
+    """PE ratio distribution"""
+    pb: ValuationDist | None
+    """PB ratio distribution"""
+    ps: ValuationDist | None
+    """PS ratio distribution"""
+
+
+class CompanyOverview:
+    """Company overview response."""
+
+    name: str
+    """Short name, e.g. ``"腾讯控股"``"""
+    company_name: str
+    """Full legal name"""
+    founded: str
+    """Founding date"""
+    listing_date: str
+    """Listing date"""
+    market: str
+    """Primary listing market display name"""
+    region: str
+    """Market region code, e.g. ``"HK"``"""
+    address: str
+    """Registered address"""
+    office_address: str
+    """Principal office address"""
+    website: str
+    """Company website"""
+    issue_price: str
+    """IPO issue price"""
+    shares_offered: str
+    """Number of shares offered at IPO"""
+    chairman: str
+    """Chairman name"""
+    secretary: str
+    """Company secretary"""
+    audit_inst: str
+    """Auditing institution"""
+    category: str
+    """Company classification category"""
+    year_end: str
+    """Fiscal year end"""
+    employees: str
+    """Number of employees"""
+    phone: str
+    """Phone number"""
+    fax: str
+    """Fax number"""
+    email: str
+    """Investor relations email"""
+    legal_repr: str
+    """Legal representative"""
+    manager: str
+    """CEO / Managing Director"""
+    ticker: str
+    """Exchange ticker code"""
+    icon: str
+    """Logo icon URL"""
+    profile: str
+    """Business profile / description"""
+    sector: int
+    """Industry sector code"""
+
+
+class Professional:
+    """One executive / board member."""
+
+    id: str
+    """Internal wiki person ID"""
+    name: str
+    """Full name"""
+    name_zhcn: str
+    """Full name in Simplified Chinese"""
+    name_en: str
+    """Full name in English"""
+    title: str
+    """Job title"""
+    biography: str
+    """Biography text"""
+    photo: str
+    """Photo URL"""
+    wiki_url: str
+    """Wiki profile URL"""
+
+
+class ExecutiveGroup:
+    """Executives for one security."""
+
+    symbol: str
+    """Security symbol"""
+    forward_url: str
+    """Link to company wiki page"""
+    total: int
+    """Total number of executives"""
+    professionals: list[Professional]
+    """Individual executive entries"""
+
+
+class ExecutiveList:
+    """Executive list response."""
+
+    professional_list: list[ExecutiveGroup]
+    """Groups of executives per security"""
+
+
+class ShareholderStock:
+    """A security in an institutional shareholder's cross-holdings."""
+
+    symbol: str
+    """Security symbol of the cross-held stock"""
+    code: str
+    """Ticker code"""
+    market: str
+    """Market"""
+    chg: str
+    """Day change percentage"""
+
+
+class Shareholder:
+    """One major shareholder."""
+
+    shareholder_id: str
+    """Internal shareholder ID"""
+    shareholder_name: str
+    """Shareholder name"""
+    institution_type: str
+    """Institution type"""
+    percent_of_shares: str
+    """Percentage of shares held"""
+    shares_changed: str
+    """Change in shares held"""
+    report_date: str
+    """Most recent filing date"""
+    stocks: list[ShareholderStock]
+    """Other securities held by this shareholder (cross-holdings)"""
+
+
+class ShareholderList:
+    """Shareholder list response."""
+
+    shareholder_list: list[Shareholder]
+    """List of major shareholders"""
+    forward_url: str
+    """Link to full shareholder page"""
+    total: int
+    """Total number returned"""
+
+
+class FundHolder:
+    """A fund or ETF that holds the queried security."""
+
+    code: str
+    """Fund/ETF ticker code"""
+    symbol: str
+    """Fund/ETF symbol"""
+    currency: str
+    """Reporting currency"""
+    name: str
+    """Fund/ETF full name"""
+    position_ratio: str
+    """Position ratio percentage string"""
+    report_date: str
+    """Report date"""
+
+
+class FundHolders:
+    """Fund/ETF holders response."""
+
+    lists: list[FundHolder]
+    """Funds and ETFs holding the queried security"""
+
+
+class CorpActionLive:
+    """Live stream associated with a corporate action."""
+
+    id: str
+    """Live stream ID"""
+    status: str
+    """Status: ``"1"``=preview, ``"2"``=live, ``"3"``=ended, ``"4"``=replay"""
+    started_at: str
+    """Start time"""
+    name: str
+    """Stream title"""
+    icon: str
+    """Icon URL"""
+
+
+class CorpActionItem:
+    """One corporate action event."""
+
+    id: str
+    """Internal event ID"""
+    date: str
+    """Date in YYYYMMDD format"""
+    date_str: str
+    """Short display date"""
+    date_type: str
+    """Date type label"""
+    date_zone: str
+    """Time zone description"""
+    act_type: str
+    """Event category"""
+    act_desc: str
+    """Human-readable event description"""
+    action: str
+    """Machine-readable action code"""
+    recent: bool
+    """Whether this is a recent event"""
+    is_delay: bool
+    """Whether publication was delayed"""
+    delay_content: str
+    """Delay announcement content"""
+    live: CorpActionLive | None
+    """Associated live stream (if any)"""
+
+
+class CorpActions:
+    """Corporate actions response."""
+
+    items: list[CorpActionItem]
+    """Corporate action events"""
+
+
+class InvestSecurity:
+    """A security in which the company has an investment stake."""
+
+    company_id: str
+    """Internal company ID"""
+    company_name: str
+    """Company name"""
+    company_name_en: str
+    """Company name in English"""
+    company_name_zhcn: str
+    """Company name in Simplified Chinese"""
+    symbol: str
+    """Security symbol"""
+    currency: str
+    """Reporting currency"""
+    percent_of_shares: str
+    """Percentage of shares held"""
+    shares_rank: str
+    """Shareholder rank"""
+    shares_value: str
+    """Market value of the holding"""
+
+
+class InvestRelations:
+    """Investor relations response."""
+
+    forward_url: str
+    """Link to investor relations page"""
+    invest_securities: list[InvestSecurity]
+    """Securities in which the company has a stake"""
+
+
+class OperatingIndicator:
+    """One financial indicator from an operating report."""
+
+    field_name: str
+    """Field name key, e.g. ``"operating_revenue"``"""
+    indicator_name: str
+    """Display name"""
+    indicator_value: str
+    """Formatted value, e.g. ``"8217 亿"``"""
+    yoy: str
+    """Year-over-year change as decimal string"""
+
+
+class OperatingFinancial:
+    """Key financial metrics from an operating report."""
+
+    code: str
+    """Ticker code"""
+    currency: str
+    """Reporting currency"""
+    name: str
+    """Company name"""
+    region: str
+    """Market region"""
+    report: str
+    """Report period code"""
+    indicators: list[OperatingIndicator]
+    """Financial indicators"""
+
+
+class OperatingItem:
+    """One operating summary report (annual / quarterly)."""
+
+    id: str
+    """Internal report ID"""
+    report: str
+    """Report period code, e.g. ``"af"`` (annual)"""
+    title: str
+    """Report title"""
+    txt: str
+    """Management discussion text"""
+    latest: bool
+    """Whether this is the most recent report"""
+    web_url: str
+    """URL to the full community report page"""
+    financial: OperatingFinancial
+    """Key financial metrics"""
+
+
+class OperatingList:
+    """Operating metrics response."""
+
+    list: list[OperatingItem]
+    """Operating summary reports"""
+
+
+class RecentBuybacks:
+    """TTM (trailing twelve months) buyback summary."""
+
+    currency: str
+    """Reporting currency"""
+    net_buyback_ttm: str
+    """Net buyback amount TTM"""
+    net_buyback_yield_ttm: str
+    """Net buyback yield TTM"""
+
+
+class BuybackHistoryItem:
+    """Historical annual buyback data item."""
+
+    fiscal_year: str
+    """Fiscal year label, e.g. ``"FY2024"``"""
+    fiscal_year_range: str
+    """Fiscal year date range string"""
+    net_buyback: str
+    """Net buyback amount"""
+    net_buyback_yield: str
+    """Net buyback yield"""
+    net_buyback_growth_rate: str
+    """Year-over-year net buyback growth rate"""
+    currency: str
+    """Reporting currency"""
+
+
+class BuybackRatios:
+    """Buyback payout and cash-flow ratios."""
+
+    net_buyback_payout_ratio: str
+    """Net buyback payout ratio"""
+    net_buyback_to_cashflow_ratio: str
+    """Net buyback to free cash-flow ratio"""
+
+
+class BuybackData:
+    """Response for :meth:`FundamentalContext.buyback`."""
+
+    recent_buybacks: "RecentBuybacks | None"
+    """Most recent TTM buyback summary"""
+    buyback_history: list[BuybackHistoryItem]
+    """Historical annual buyback data"""
+    buyback_ratios: list[BuybackRatios]
+    """Buyback payout and cash-flow ratios"""
+
+
+class StockRatings:
+    """
+    Response for :meth:`FundamentalContext.ratings`.
+
+    The ``ratings_json`` field contains the full nested ratings structure as a
+    JSON string (too complex to type fully).
+    """
+
+    style_txt_name: str
+    """Style display name"""
+    scale_txt_name: str
+    """Scale display name"""
+    report_period_txt: str
+    """Report period display text"""
+    multi_score: str
+    """Composite score (string representation)"""
+    multi_letter: str
+    """Composite score letter grade"""
+    multi_score_change: int
+    """Score change vs previous period"""
+    industry_name: str
+    """Industry name"""
+    industry_rank: int
+    """Industry rank"""
+    ratings_json: str
+    """Full ratings array as a JSON string"""
+
+
+class FinancialReportKind:
+    """Financial report kind."""
+
+    class IncomeStatement(FinancialReportKind): ...
+    """Income statement (IS)"""
+    class BalanceSheet(FinancialReportKind): ...
+    """Balance sheet (BS)"""
+    class CashFlow(FinancialReportKind): ...
+    """Cash flow statement (CF)"""
+    class All(FinancialReportKind): ...
+    """All statements (default)"""
+
+
+class FinancialReportPeriod:
+    """Financial report period type."""
+
+    class Annual(FinancialReportPeriod): ...
+    """Annual report (af)"""
+    class SemiAnnual(FinancialReportPeriod): ...
+    """Semi-annual report (saf)"""
+    class Q1(FinancialReportPeriod): ...
+    """Q1 report"""
+    class Q2(FinancialReportPeriod): ...
+    """Q2 report"""
+    class Q3(FinancialReportPeriod): ...
+    """Q3 report"""
+    class QuarterlyFull(FinancialReportPeriod): ...
+    """Full quarterly report (qf)"""
+    class ThreeQ(FinancialReportPeriod): ...
+    """Three-quarter report (3q, first three quarters)"""
+
+
+class FundamentalContext:
+    """
+    Fundamental data context.
+
+    Provides access to financial reports, analyst ratings, dividends,
+    valuation metrics, company overview, and more.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, FundamentalContext, FinancialReportKind
+
+            config = Config.from_env()
+            ctx = FundamentalContext(config)
+
+            overview = ctx.company("700.HK")
+            print(overview.name, overview.employees)
+
+            dividends = ctx.dividend("700.HK")
+            for d in dividends.list:
+                print(d.desc, d.payment_date)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create a FundamentalContext."""
+        ...
+
+    def financial_report(
+        self,
+        symbol: str,
+        kind: "FinancialReportKind" = ...,
+        period: "FinancialReportPeriod | None" = None,
+    ) -> "FinancialReports":
+        """
+        Get financial reports.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            kind: Report kind (default ``All``)
+            period: Report period (``None`` means not specified)
+
+        Returns:
+            Financial reports response
+        """
+        ...
+
+    def institution_rating(self, symbol: str) -> "InstitutionRating":
+        """
+        Get analyst ratings (latest snapshot + consensus summary).
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            Combined analyst rating response
+        """
+        ...
+
+    def institution_rating_detail(self, symbol: str) -> "InstitutionRatingDetail":
+        """Get historical analyst rating details."""
+        ...
+
+    def dividend(self, symbol: str) -> "DividendList":
+        """Get dividend history."""
+        ...
+
+    def dividend_detail(self, symbol: str) -> "DividendList":
+        """Get detailed dividend information."""
+        ...
+
+    def forecast_eps(self, symbol: str) -> "ForecastEps":
+        """Get EPS forecasts."""
+        ...
+
+    def consensus(self, symbol: str) -> "FinancialConsensus":
+        """Get financial consensus estimates."""
+        ...
+
+    def valuation(self, symbol: str) -> "ValuationData":
+        """Get valuation metrics (PE / PB / PS / dividend yield)."""
+        ...
+
+    def valuation_history(self, symbol: str) -> "ValuationHistoryResponse":
+        """Get historical valuation data."""
+        ...
+
+    def industry_valuation(self, symbol: str) -> "IndustryValuationList":
+        """Get industry peer valuation comparison."""
+        ...
+
+    def industry_valuation_dist(self, symbol: str) -> "IndustryValuationDist":
+        """Get industry valuation distribution."""
+        ...
+
+    def company(self, symbol: str) -> "CompanyOverview":
+        """Get company overview."""
+        ...
+
+    def executive(self, symbol: str) -> "ExecutiveList":
+        """Get executive and board member information."""
+        ...
+
+    def shareholder(self, symbol: str) -> "ShareholderList":
+        """Get major shareholders."""
+        ...
+
+    def fund_holder(self, symbol: str) -> "FundHolders":
+        """Get funds and ETFs that hold the security."""
+        ...
+
+    def corp_action(self, symbol: str) -> "CorpActions":
+        """Get corporate actions (dividends, splits, buybacks, etc.)."""
+        ...
+
+    def invest_relation(self, symbol: str) -> "InvestRelations":
+        """Get investor relations / investment holdings."""
+        ...
+
+    def operating(self, symbol: str) -> "OperatingList":
+        """Get operating metrics and financial report summaries."""
+        ...
+
+    def buyback(self, symbol: str) -> "BuybackData":
+        """
+        Get buyback data for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`BuybackData`
+        """
+        ...
+
+    def ratings(self, symbol: str) -> "StockRatings":
+        """
+        Get stock ratings for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`StockRatings`
+        """
+        ...
+
+
+# ── MarketContext ─────────────────────────────────────────────────
+
+class MarketTimeItem:
+    """Trading status for one market."""
+
+    market: Market
+    """Market"""
+    trade_status: int
+    """Raw trade status code (101=PreOpen, 102/105=Trading, 104=LunchBreak, 106=PostTrading, 108=Closed, 201=PreMarket, 204=PostMarket)"""
+    timestamp: str
+    """Current market time (unix timestamp string)"""
+    delay_trade_status: int
+    """Delayed-quote trade status code"""
+    delay_timestamp: str
+    """Delayed-quote market time (unix timestamp string)"""
+    sub_status: int
+    """Sub-status code"""
+    delay_sub_status: int
+    """Delayed-quote sub-status code"""
+
+
+class MarketStatusResponse:
+    """Market trading status response."""
+
+    market_time: list[MarketTimeItem]
+    """Per-market trading status items"""
+
+
+class BrokerHoldingEntry:
+    """One broker entry in a top-holding list."""
+
+    name: str
+    """Broker name"""
+    parti_number: str
+    """Participant number / broker code"""
+    chg: str
+    """Net change in shares held"""
+    strong: bool
+    """Whether this is a strengthening broker"""
+
+
+class BrokerHoldingTop:
+    """Top broker holdings response."""
+
+    buy: list[BrokerHoldingEntry]
+    """Top buying brokers"""
+    sell: list[BrokerHoldingEntry]
+    """Top selling brokers"""
+    updated_at: str
+    """Last updated string"""
+
+
+class BrokerHoldingChanges:
+    """Broker holding changes over multiple periods."""
+
+    value: str
+    """Current value"""
+    chg_1: str
+    """1-day change"""
+    chg_5: str
+    """5-day change"""
+    chg_20: str
+    """20-day change"""
+    chg_60: str
+    """60-day change"""
+
+
+class BrokerHoldingDetailItem:
+    """One broker's full holding detail."""
+
+    name: str
+    """Broker name"""
+    parti_number: str
+    """Participant number"""
+    ratio: BrokerHoldingChanges
+    """Holding ratio changes over various periods"""
+    shares: BrokerHoldingChanges
+    """Share count changes over various periods"""
+    strong: bool
+    """Whether this is a strengthening broker"""
+
+
+class BrokerHoldingDetail:
+    """Full broker holding detail response."""
+
+    list: list[BrokerHoldingDetailItem]
+    """Full broker list"""
+    updated_at: str
+    """Last updated string"""
+
+
+class BrokerHoldingDailyItem:
+    """One day's broker holding record."""
+
+    date: str
+    """Date in ``"2026.05.05"`` format"""
+    holding: str
+    """Total shares held"""
+    ratio: str
+    """Holding ratio"""
+    chg: str
+    """Daily change"""
+
+
+class BrokerHoldingDailyHistory:
+    """Daily broker holding history response."""
+
+    list: list[BrokerHoldingDailyItem]
+    """Daily records"""
+
+
+class AhPremiumKline:
+    """One A/H premium data point."""
+
+    aprice: str
+    """A-share price"""
+    apreclose: str
+    """A-share previous close"""
+    hprice: str
+    """H-share price"""
+    hpreclose: str
+    """H-share previous close"""
+    currency_rate: str
+    """CNY/HKD exchange rate"""
+    ahpremium_rate: str
+    """A/H premium rate (negative = H-share at premium)"""
+    price_spread: str
+    """Price spread"""
+    timestamp: datetime
+    """Data point timestamp"""
+
+
+class AhPremiumKlines:
+    """A/H premium K-line response."""
+
+    klines: list[AhPremiumKline]
+    """K-line data points"""
+
+
+class AhPremiumIntraday:
+    """A/H premium intraday response."""
+
+    klines: list[AhPremiumKline]
+    """Intraday data points"""
+
+
+class TradePriceLevel:
+    """Trade volume at one price level."""
+
+    buy_amount: str
+    """Buy volume at this price"""
+    neutral_amount: str
+    """Neutral (unknown direction) volume"""
+    price: str
+    """Price level"""
+    sell_amount: str
+    """Sell volume at this price"""
+
+
+class TradeStatistics:
+    """Summary trade statistics."""
+
+    avgprice: str
+    """Volume-weighted average price"""
+    buy: str
+    """Total buy volume (shares)"""
+    neutral: str
+    """Total neutral / unknown-direction volume"""
+    preclose: str
+    """Previous close price"""
+    sell: str
+    """Total sell volume (shares)"""
+    timestamp: str
+    """Data timestamp (unix timestamp string)"""
+    total_amount: str
+    """Total trading volume (shares)"""
+    trade_date: list[str]
+    """Unix timestamps for the last 5 trading days"""
+    trades_count: str
+    """Total number of trades"""
+
+
+class TradeStatsResponse:
+    """Trade statistics response."""
+
+    statistics: TradeStatistics
+    """Summary statistics"""
+    trades: list[TradePriceLevel]
+    """Per-price-level breakdown"""
+
+
+class AnomalyItem:
+    """One market anomaly event."""
+
+    symbol: str
+    """Security symbol"""
+    name: str
+    """Security name"""
+    alert_name: str
+    """Anomaly type name, e.g. ``"大宗交易"``"""
+    alert_time: int
+    """Time of the anomaly (unix timestamp in milliseconds)"""
+    change_values: list[str]
+    """Change value strings"""
+    emotion: int
+    """Sentiment direction: 1=positive/up, 2=negative/down"""
+
+
+class AnomalyResponse:
+    """Market anomaly response."""
+
+    all_off: bool
+    """Whether anomaly alerts are globally disabled"""
+    changes: list[AnomalyItem]
+    """List of market anomaly events"""
+
+
+class ConstituentStock:
+    """One constituent stock of an index."""
+
+    symbol: str
+    """Security symbol"""
+    name: str
+    """Security name"""
+    last_done: str
+    """Latest price"""
+    prev_close: str
+    """Previous close"""
+    inflow: str
+    """Net capital inflow today"""
+    balance: str
+    """Turnover amount"""
+    amount: str
+    """Trading volume (shares)"""
+    total_shares: str
+    """Total shares outstanding"""
+    tags: list[str]
+    """Tags, e.g. ``["领涨龙头"]``"""
+    intro: str
+    """Brief description"""
+    market: str
+    """Market, e.g. ``"HK"``"""
+    circulating_shares: str
+    """Circulating shares"""
+    delay: bool
+    """Whether this is a delayed quote"""
+    chg: str
+    """Day change percentage"""
+    trade_status: int
+    """Raw trade status code"""
+
+
+class IndexConstituents:
+    """Index constituents response."""
+
+    fall_num: int
+    """Number of constituent stocks that fell today"""
+    flat_num: int
+    """Number of constituent stocks unchanged today"""
+    rise_num: int
+    """Number of constituent stocks that rose today"""
+    stocks: list[ConstituentStock]
+    """Constituent stock details"""
+
+
+class BrokerHoldingPeriod:
+    """Broker holding lookback period."""
+
+    class Rct1(BrokerHoldingPeriod): ...
+    """1-day change"""
+    class Rct5(BrokerHoldingPeriod): ...
+    """5-day change"""
+    class Rct20(BrokerHoldingPeriod): ...
+    """20-day change"""
+    class Rct60(BrokerHoldingPeriod): ...
+    """60-day change"""
+
+
+class AhPremiumPeriod:
+    """A/H premium K-line period."""
+
+    class Min1(AhPremiumPeriod): ...
+    """1-minute"""
+    class Min5(AhPremiumPeriod): ...
+    """5-minute"""
+    class Min15(AhPremiumPeriod): ...
+    """15-minute"""
+    class Min30(AhPremiumPeriod): ...
+    """30-minute"""
+    class Min60(AhPremiumPeriod): ...
+    """60-minute"""
+    class Day(AhPremiumPeriod): ...
+    """Daily (default)"""
+    class Week(AhPremiumPeriod): ...
+    """Weekly"""
+    class Month(AhPremiumPeriod): ...
+    """Monthly"""
+    class Year(AhPremiumPeriod): ...
+    """Yearly"""
+
+
+class MarketContext:
+    """
+    Market data context.
+
+    Provides broker holdings, A/H premium, trade statistics,
+    market anomaly alerts, and index constituents.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, MarketContext
+
+            config = Config.from_env()
+            ctx = MarketContext(config)
+            status = ctx.market_status()
+            for item in status.market_time:
+                print(item.market, item.trade_status)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create a MarketContext."""
+        ...
+
+    def market_status(self) -> "MarketStatusResponse":
+        """Get current trading status for all markets."""
+        ...
+
+    def broker_holding(
+        self,
+        symbol: str,
+        period: "BrokerHoldingPeriod" = ...,
+    ) -> "BrokerHoldingTop":
+        """
+        Get top broker holdings (buy/sell leaders) for a security.
+
+        Args:
+            symbol: Security symbol
+            period: Lookback period (default ``Rct1``)
+        """
+        ...
+
+    def broker_holding_detail(self, symbol: str) -> "BrokerHoldingDetail":
+        """Get full broker holding details for a security."""
+        ...
+
+    def broker_holding_daily(
+        self, symbol: str, broker_id: str
+    ) -> "BrokerHoldingDailyHistory":
+        """
+        Get daily holding history for a specific broker.
+
+        Args:
+            symbol: Security symbol
+            broker_id: Broker participant number, e.g. ``"B01451"``
+        """
+        ...
+
+    def ah_premium(
+        self,
+        symbol: str,
+        period: "AhPremiumPeriod" = ...,
+        count: int = 100,
+    ) -> "AhPremiumKlines":
+        """
+        Get A/H premium K-line data for a dual-listed security.
+
+        Args:
+            symbol: H-share symbol, e.g. ``"2318.HK"``
+            period: K-line period (default ``Day``)
+            count: Number of K-lines to return
+        """
+        ...
+
+    def ah_premium_intraday(self, symbol: str) -> "AhPremiumIntraday":
+        """Get A/H premium intraday data for a dual-listed security."""
+        ...
+
+    def trade_stats(self, symbol: str) -> "TradeStatsResponse":
+        """Get buy/sell/neutral trade statistics for a security."""
+        ...
+
+    def anomaly(self, market: str) -> "AnomalyResponse":
+        """
+        Get market anomaly alerts (unusual price/volume events).
+
+        Args:
+            market: Market code: ``"HK"``, ``"US"``, ``"CN"``, ``"SG"``
+        """
+        ...
+
+    def constituent(self, symbol: str) -> "IndexConstituents":
+        """
+        Get constituent stocks for an index.
+
+        Args:
+            symbol: Index symbol, e.g. ``"HSI.HK"``
+        """
+        ...
+
+
+# ── CalendarContext ───────────────────────────────────────────────
+
+class CalendarDataKv:
+    """One key-value data pair in a calendar event."""
+
+    key: str
+    """Key (may be empty)"""
+    value: str
+    """Formatted display value"""
+    value_type: str
+    """Value type code, e.g. ``"estimate_eps"``"""
+    value_raw: str
+    """Raw numeric value"""
+
+
+class CalendarEventInfo:
+    """One financial calendar event."""
+
+    symbol: str
+    """Security symbol"""
+    market: str
+    """Market, e.g. ``"HK"``"""
+    content: str
+    """Event content description"""
+    counter_name: str
+    """Security name"""
+    date_type: str
+    """Date type label, e.g. ``"盘前"``"""
+    date: str
+    """Event date string, e.g. ``"2025.05.02"``"""
+    chart_uid: str
+    """Chart UID (may be empty)"""
+    data_kv: list[CalendarDataKv]
+    """Structured data key-value pairs"""
+    event_type: str
+    """Event type code, e.g. ``"financial"``"""
+    datetime: str
+    """Event datetime (unix timestamp string)"""
+    icon: str
+    """Icon URL"""
+    star: int
+    """Importance star rating (0–3)"""
+    id: str
+    """Internal event ID"""
+    financial_market_time: str
+    """Financial market session time string"""
+    currency: str
+    """Currency"""
+    activity_type: str
+    """Activity type code"""
+
+
+class CalendarDateGroup:
+    """Events for one calendar date."""
+
+    date: str
+    """Date string, e.g. ``"2025-05-02"``"""
+    count: int
+    """Total event count for this date"""
+    infos: list[CalendarEventInfo]
+    """Event details"""
+
+
+class CalendarEventsResponse:
+    """Finance calendar response."""
+
+    date: str
+    """Start date of the query window"""
+    list: list[CalendarDateGroup]
+    """Per-day event groups"""
+
+
+class CalendarCategory:
+    """Calendar event category."""
+
+    class Report(CalendarCategory): ...
+    """Earnings reports"""
+    class Dividend(CalendarCategory): ...
+    """Dividend events"""
+    class Split(CalendarCategory): ...
+    """Stock splits"""
+    class Ipo(CalendarCategory): ...
+    """IPOs"""
+    class MacroData(CalendarCategory): ...
+    """Macro-economic data releases"""
+    class Closed(CalendarCategory): ...
+    """Market closure days"""
+    class Meeting(CalendarCategory): ...
+    """Shareholder / analyst meetings"""
+    class Merge(CalendarCategory): ...
+    """Stock consolidations / mergers"""
+
+
+class CalendarContext:
+    """
+    Financial calendar context.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, CalendarContext, CalendarCategory
+
+            config = Config.from_env()
+            ctx = CalendarContext(config)
+            resp = ctx.finance_calendar(
+                CalendarCategory.Report, "2025-05-01", "2025-05-31", "HK"
+            )
+            for group in resp.list:
+                print(group.date, group.count)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create a CalendarContext."""
+        ...
+
+    def finance_calendar(
+        self,
+        category: "CalendarCategory",
+        start: str,
+        end: str,
+        market: str | None = None,
+    ) -> "CalendarEventsResponse":
+        """
+        Get financial calendar events.
+
+        Args:
+            category: Event category
+            start: Start date in ``YYYY-MM-DD`` format
+            end: End date in ``YYYY-MM-DD`` format
+            market: Optional market filter, e.g. ``"HK"``
+        """
+        ...
+
+
+# ── PortfolioContext ──────────────────────────────────────────────
+
+class ExchangeRate:
+    """One currency exchange rate."""
+
+    average_rate: float
+    """Average rate (base_currency per other_currency)"""
+    base_currency: str
+    """Base currency, e.g. ``"USD"``"""
+    bid_rate: float
+    """Bid rate"""
+    offer_rate: float
+    """Offer rate"""
+    other_currency: str
+    """Other currency, e.g. ``"HKD"``"""
+
+
+class ExchangeRates:
+    """Exchange rates response."""
+
+    exchanges: list[ExchangeRate]
+    """List of exchange rates"""
+
+
+class AssetType:
+    """Asset class category."""
+
+    class Unknown(AssetType): ...
+    """Unknown"""
+    class Stock(AssetType): ...
+    """Stock"""
+    class Fund(AssetType): ...
+    """Fund"""
+    class Crypto(AssetType): ...
+    """Crypto"""
+
+
+class FlowDirection:
+    """Trade flow direction."""
+
+    class Unknown(FlowDirection): ...
+    """Unknown"""
+    class Buy(FlowDirection): ...
+    """Buy"""
+    class Sell(FlowDirection): ...
+    """Sell"""
+
+
+class ProfitSummaryInfo:
+    """P&L summary for one asset category."""
+
+    asset_type: AssetType
+    """Asset type"""
+    profit_max: str
+    """Security with the maximum profit"""
+    profit_max_name: str
+    """Name of the max-profit security"""
+    loss_max: str
+    """Security with the maximum loss"""
+    loss_max_name: str
+    """Name of the max-loss security"""
+
+
+class ProfitSummaryBreakdown:
+    """P&L breakdown by asset type."""
+
+    stock: str
+    """Stock P&L"""
+    fund: str
+    """Fund P&L"""
+    crypto: str
+    """Crypto P&L"""
+    mmf: str
+    """Money market fund P&L"""
+    other: str
+    """Other P&L"""
+    cumulative_transaction_amount: str
+    """Cumulative transaction amount"""
+    trade_order_num: str
+    """Total number of orders"""
+    trade_stock_num: str
+    """Total number of traded securities"""
+    ipo: str
+    """IPO P&L"""
+    ipo_hit: int
+    """IPO hits"""
+    ipo_subscription: int
+    """IPO subscriptions"""
+    summary_info: list[ProfitSummaryInfo]
+    """Per-category summary"""
+
+
+class ProfitAnalysisSummary:
+    """Account-level P&L summary."""
+
+    currency: str
+    """Account currency"""
+    current_total_asset: str
+    """Current total asset value"""
+    start_date: str
+    """Query start date"""
+    end_date: str
+    """Query end date"""
+    start_time: str
+    """Start time (unix timestamp string)"""
+    end_time: str
+    """End time (unix timestamp string)"""
+    ending_asset_value: str
+    """Ending asset value"""
+    initial_asset_value: str
+    """Initial asset value"""
+    invest_amount: str
+    """Total invested amount"""
+    is_traded: bool
+    """Whether any trades occurred"""
+    sum_profit: str
+    """Total profit/loss"""
+    sum_profit_rate: str
+    """Total profit/loss rate"""
+    profits: ProfitSummaryBreakdown
+    """Per-asset-type breakdown"""
+
+
+class ProfitAnalysisItem:
+    """P&L for one security."""
+
+    name: str
+    """Security name"""
+    market: str
+    """Market"""
+    is_holding: bool
+    """Whether still holding"""
+    profit: str
+    """Profit/loss amount"""
+    profit_rate: str
+    """Profit/loss rate"""
+    clearance_times: int
+    """Number of completed trades"""
+    item_type: AssetType
+    """Asset type"""
+    currency: str
+    """Currency"""
+    symbol: str
+    """Security symbol"""
+    holding_period: str
+    """Holding period display string"""
+    security_code: str
+    """Ticker code"""
+    isin: str
+    """ISIN (for funds)"""
+    underlying_profit: str
+    """Underlying stock P&L"""
+    derivatives_profit: str
+    """Derivatives P&L"""
+    order_profit: str
+    """P&L in order currency"""
+
+
+class ProfitAnalysisSublist:
+    """Per-security P&L breakdown."""
+
+    start: str
+    """Start time (unix timestamp string)"""
+    end: str
+    """End time (unix timestamp string)"""
+    start_date: str
+    """Start date string"""
+    end_date: str
+    """End date string"""
+    updated_at: str
+    """Last updated time"""
+    updated_date: str
+    """Last updated date"""
+    items: list[ProfitAnalysisItem]
+    """Per-security items"""
+
+
+class ProfitAnalysis:
+    """Combined portfolio P&L analysis response."""
+
+    summary: ProfitAnalysisSummary
+    """Account-level summary"""
+    sublist: ProfitAnalysisSublist
+    """Per-security breakdown"""
+
+
+class ProfitDetailEntry:
+    """One P&L detail line item."""
+
+    describe: str
+    """Description"""
+    amount: str
+    """Amount"""
+
+
+class ProfitDetails:
+    """Detailed P&L breakdown for one asset class."""
+
+    holding_value: str
+    """Current holding market value"""
+    profit: str
+    """Total profit/loss"""
+    cumulative_credited_amount: str
+    """Cumulative credited amount"""
+    credited_details: list[ProfitDetailEntry]
+    """Credit detail entries"""
+    cumulative_debited_amount: str
+    """Cumulative debited amount"""
+    debited_details: list[ProfitDetailEntry]
+    """Debit detail entries"""
+    cumulative_fee_amount: str
+    """Cumulative fee amount"""
+    fee_details: list[ProfitDetailEntry]
+    """Fee detail entries"""
+    short_holding_value: str
+    """Short position holding value"""
+    long_holding_value: str
+    """Long position holding value"""
+    holding_value_at_beginning: str
+    """Opening position market value at period start"""
+    holding_value_at_ending: str
+    """Closing position market value at period end"""
+
+
+class ProfitAnalysisDetail:
+    """P&L detail for one security."""
+
+    profit: str
+    """Total profit/loss"""
+    underlying_details: ProfitDetails
+    """Underlying stock P&L details"""
+    derivative_pnl_details: ProfitDetails
+    """Derivative P&L details"""
+    name: str
+    """Security name"""
+    updated_at: str
+    """Last updated time"""
+    updated_date: str
+    """Last updated date"""
+    currency: str
+    """Currency"""
+    default_tag: int
+    """Default detail tab: 0=underlying, 1=derivative"""
+    start: int
+    """Query start time (unix timestamp)"""
+    end: int
+    """Query end time (unix timestamp)"""
+    start_date: str
+    """Query start date"""
+    end_date: str
+    """Query end date"""
+
+
+class PortfolioContext:
+    """
+    Portfolio analytics context.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, PortfolioContext
+
+            config = Config.from_env()
+            ctx = PortfolioContext(config)
+            rates = ctx.exchange_rate()
+            for r in rates.exchanges:
+                print(r.base_currency, r.other_currency, r.average_rate)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create a PortfolioContext."""
+        ...
+
+    def exchange_rate(self) -> "ExchangeRates":
+        """Get exchange rates for supported currencies."""
+        ...
+
+    def profit_analysis(
+        self,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysis":
+        """
+        Get portfolio P&L analysis (summary + per-security breakdown).
+
+        Args:
+            start: Optional start date in ``YYYY-MM-DD`` format
+            end: Optional end date in ``YYYY-MM-DD`` format
+        """
+        ...
+
+    def profit_analysis_detail(
+        self,
+        symbol: str,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysisDetail":
+        """
+        Get P&L detail for a specific security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            start: Optional start date
+            end: Optional end date
+        """
+        ...
+
+    def profit_analysis_by_market(
+        self,
+        page: int = 1,
+        size: int = 20,
+        market: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
+        currency: str | None = None,
+    ) -> "ProfitAnalysisByMarket":
+        """
+        Get P&L grouped by market with per-security breakdown.
+
+        Args:
+            page: Page number (1-based, default 1)
+            size: Page size (default 20)
+            market: Optional market filter, e.g. ``"HK"`` or ``"US"``
+            start: Optional start date in ``YYYY-MM-DD`` format
+            end: Optional end date in ``YYYY-MM-DD`` format
+            currency: Optional currency filter
+        """
+        ...
+
+    def profit_analysis_flows(
+        self,
+        symbol: str,
+        page: int,
+        size: int,
+        derivative: bool,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysisFlows":
+        """
+        Get paginated P&L flow records for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            page: Page number (1-based)
+            size: Page size
+            derivative: Whether to include derivative flows
+            start: Optional start date in ``YYYY-MM-DD`` format
+            end: Optional end date in ``YYYY-MM-DD`` format
+        """
+        ...
+
+
+class ProfitAnalysisByMarketItem:
+    """One security entry in a by-market P&L response."""
+
+    code: str
+    """Security symbol (ticker code)"""
+    name: str
+    """Security name"""
+    market: str
+    """Market, e.g. ``"HK"`` or ``"US"``"""
+    profit: str
+    """Profit/loss amount"""
+
+
+class ProfitAnalysisByMarket:
+    """Response for :meth:`PortfolioContext.profit_analysis_by_market`."""
+
+    profit: str
+    """Total P&L across all returned items"""
+    has_more: bool
+    """Whether more pages are available"""
+    stock_items: list[ProfitAnalysisByMarketItem]
+    """Per-security P&L items"""
+
+
+class FlowItem:
+    """One profit-analysis flow record."""
+
+    executed_date: str
+    """Execution date string, e.g. ``"2024-01-15"``"""
+    executed_timestamp: str
+    """Execution timestamp (string representation)"""
+    code: str
+    """Security code / ticker"""
+    direction: FlowDirection
+    """Direction of the flow"""
+    executed_quantity: str
+    """Executed quantity"""
+    executed_price: str
+    """Executed price"""
+    executed_cost: str
+    """Executed cost"""
+    describe: str
+    """Human-readable description"""
+
+
+class ProfitAnalysisFlows:
+    """Response for :meth:`PortfolioContext.profit_analysis_flows`."""
+
+    flows_list: list[FlowItem]
+    """Paginated list of flow items"""
+    has_more: bool
+    """Whether there are more pages"""
+
+
+# ── AlertContext ──────────────────────────────────────────────────
+
+class AlertItem:
+    """One price alert."""
+
+    id: str
+    """Alert ID"""
+    indicator_id: str
+    """Condition: ``"1"``=price_rise, ``"2"``=price_fall, ``"3"``=pct_rise, ``"4"``=pct_fall"""
+    enabled: bool
+    """Whether the alert is active"""
+    frequency: int
+    """Frequency: 1=daily, 2=every_time, 3=once"""
+    scope: int
+    """Scope"""
+    text: str
+    """Display text, e.g. ``"价格涨到 600"``"""
+    state: list[int]
+    """Trigger state flags"""
+
+
+class AlertSymbolGroup:
+    """Alert items for one security."""
+
+    symbol: str
+    """Security symbol"""
+    code: str
+    """Ticker code (without market)"""
+    market: str
+    """Market, e.g. ``"HK"``"""
+    name: str
+    """Security name"""
+    price: str
+    """Latest price"""
+    chg: str
+    """Day change amount"""
+    p_chg: str
+    """Day change percentage"""
+    product: str
+    """Product type"""
+    indicators: list[AlertItem]
+    """Alert items"""
+
+
+class AlertList:
+    """Alert list response."""
+
+    lists: list[AlertSymbolGroup]
+    """Alert groups per security"""
+
+
+class AlertCondition:
+    """Alert trigger condition."""
+
+    class PriceRise(AlertCondition): ...
+    """Price rises above threshold"""
+    class PriceFall(AlertCondition): ...
+    """Price falls below threshold"""
+    class PercentRise(AlertCondition): ...
+    """Percentage rises above threshold"""
+    class PercentFall(AlertCondition): ...
+    """Percentage falls below threshold"""
+
+
+class AlertFrequency:
+    """Alert trigger frequency."""
+
+    class Daily(AlertFrequency): ...
+    """Trigger once per day"""
+    class EveryTime(AlertFrequency): ...
+    """Trigger every time condition is met"""
+    class Once(AlertFrequency): ...
+    """Trigger only once"""
+
+
+class AlertContext:
+    """
+    Price alert management context.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, AlertContext, AlertCondition, AlertFrequency
+
+            config = Config.from_env()
+            ctx = AlertContext(config)
+
+            ctx.add("700.HK", AlertCondition.PriceRise, "600", AlertFrequency.Once)
+            alerts = ctx.list()
+            for group in alerts.lists:
+                print(group.symbol, len(group.indicators), "alerts")
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create an AlertContext."""
+        ...
+
+    def list(self) -> "AlertList":
+        """List all price alerts."""
+        ...
+
+    def add(
+        self,
+        symbol: str,
+        condition: "AlertCondition",
+        trigger_value: str,
+        frequency: "AlertFrequency",
+    ) -> None:
+        """
+        Add a price alert.
+
+        Args:
+            symbol: Security symbol
+            condition: Trigger condition
+            trigger_value: Threshold value, e.g. ``"600"`` (price) or ``"5"`` (percentage)
+            frequency: How often to trigger
+        """
+        ...
+
+    def enable(self, alert_id: str) -> None:
+        """Enable a price alert."""
+        ...
+
+    def disable(self, alert_id: str) -> None:
+        """Disable a price alert."""
+        ...
+
+    def delete(self, alert_ids: list[str]) -> None:
+        """Delete price alerts."""
+        ...
+
+
+# ── DCAContext ────────────────────────────────────────────────────
+
+class DcaPlan:
+    """One DCA (dollar-cost averaging) investment plan."""
+
+    plan_id: str
+    """Plan ID"""
+    status: DCAStatus
+    """Plan status"""
+    symbol: str
+    """Security symbol"""
+    member_id: str
+    """Member ID"""
+    aaid: str
+    """Account ID"""
+    account_channel: str
+    """Account channel"""
+    display_account: str
+    """Display account"""
+    market: Market
+    """Market"""
+    per_invest_amount: str
+    """Investment amount per period"""
+    invest_frequency: DCAFrequency
+    """Investment frequency"""
+    invest_day_of_week: str
+    """Day of week for weekly plans"""
+    invest_day_of_month: str
+    """Day of month for monthly plans"""
+    allow_margin_finance: bool
+    """Whether margin finance is allowed"""
+    alter_hours: str
+    """Reminder time"""
+    created_at: str
+    """Creation time"""
+    updated_at: str
+    """Last updated time"""
+    next_trd_date: str
+    """Next investment date"""
+    stock_name: str
+    """Security name"""
+    cum_amount: str
+    """Cumulative invested amount"""
+    issue_number: int
+    """Number of completed investment periods"""
+    average_cost: str
+    """Average cost"""
+    cum_profit: str
+    """Cumulative profit/loss"""
+
+
+class DcaList:
+    """DCA plan list response."""
+
+    plans: list[DcaPlan]
+    """DCA plans"""
+
+
+class DcaStats:
+    """DCA statistics response."""
+
+    active_count: str
+    """Number of active plans"""
+    finished_count: str
+    """Number of finished plans"""
+    suspended_count: str
+    """Number of suspended plans"""
+    nearest_plans: list[DcaPlan]
+    """Nearest upcoming plans"""
+    rest_days: str
+    """Days until next investment"""
+    total_amount: str
+    """Total invested amount"""
+    total_profit: str
+    """Total profit/loss"""
+
+
+class DcaSupportInfo:
+    """DCA support info for one security."""
+
+    symbol: str
+    """Security symbol"""
+    support_regular_saving: bool
+    """Whether DCA is supported for this security"""
+
+
+class DcaSupportList:
+    """DCA support check response."""
+
+    infos: list[DcaSupportInfo]
+    """Support info per security"""
+
+
+class DcaHistoryRecord:
+    """One DCA execution record."""
+
+    created_at: str
+    """Execution time"""
+    order_id: str
+    """Associated order ID"""
+    status: str
+    """Status"""
+    action: str
+    """Action type"""
+    order_type: str
+    """Order type"""
+    executed_qty: str
+    """Executed quantity"""
+    executed_price: str
+    """Executed price"""
+    executed_amount: str
+    """Executed amount"""
+    rejected_reason: str
+    """Rejection reason (if any)"""
+    symbol: str
+    """Security symbol"""
+
+
+class DcaHistoryResponse:
+    """DCA execution history response."""
+
+    records: list[DcaHistoryRecord]
+    """Execution history records"""
+    has_more: bool
+    """Whether more records exist"""
+
+
+class DcaCalcDateResult:
+    """Result for :meth:`DCAContext.calc_date`."""
+
+    trade_date: str
+    """Next projected trade date (unix timestamp string)"""
+
+
+class DCAFrequency:
+    """DCA investment frequency."""
+
+    class Daily(DCAFrequency): ...
+    """Daily investment"""
+    class Weekly(DCAFrequency): ...
+    """Weekly investment"""
+    class Fortnightly(DCAFrequency): ...
+    """Fortnightly (every two weeks) investment"""
+    class Monthly(DCAFrequency): ...
+    """Monthly investment"""
+
+
+class DCAStatus:
+    """DCA plan status."""
+
+    class Active(DCAStatus): ...
+    """Active plan"""
+    class Suspended(DCAStatus): ...
+    """Suspended plan"""
+    class Finished(DCAStatus): ...
+    """Permanently finished plan"""
+
+
+class DCAContext:
+    """
+    Dollar-cost averaging (DCA) plan management context.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, DCAContext, DCAFrequency
+
+            config = Config.from_env()
+            ctx = DCAContext(config)
+
+            # Check support
+            support = ctx.check_support(["AAPL.US", "700.HK"])
+            for info in support.infos:
+                print(info.symbol, info.support_regular_saving)
+
+            # Get stats
+            stats = ctx.stats()
+            print("Active plans:", stats.active_count)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create a DCAContext."""
+        ...
+
+    def list(
+        self,
+        status: "DCAStatus | None" = None,
+        symbol: str | None = None,
+    ) -> "DcaList":
+        """
+        List DCA plans.
+
+        Args:
+            status: Filter by plan status (``None`` = all)
+            symbol: Filter by security symbol
+        """
+        ...
+
+    def create(
+        self,
+        symbol: str,
+        amount: str,
+        frequency: "DCAFrequency",
+        day_of_week: str | None = None,
+        day_of_month: int | None = None,
+        allow_margin: bool = False,
+    ) -> "DcaList":
+        """
+        Create a new DCA plan.
+
+        Args:
+            symbol: Security symbol
+            amount: Investment amount per period
+            frequency: Investment frequency
+            day_of_week: Day of week for weekly plans, e.g. ``"Mon"``
+            day_of_month: Day of month for monthly plans (1–28)
+            allow_margin: Whether to allow margin finance
+        """
+        ...
+
+    def pause(self, plan_id: str) -> "DcaList":
+        """Pause (suspend) a DCA plan."""
+        ...
+
+    def resume(self, plan_id: str) -> "DcaList":
+        """Resume a suspended DCA plan."""
+        ...
+
+    def stop(self, plan_id: str) -> "DcaList":
+        """Permanently stop a DCA plan."""
+        ...
+
+    def history(
+        self,
+        plan_id: str,
+        page: int = 1,
+        limit: int = 20,
+    ) -> "DcaHistoryResponse":
+        """
+        Get execution history for a DCA plan.
+
+        Args:
+            plan_id: Plan ID
+            page: Page number (1-based)
+            limit: Results per page
+        """
+        ...
+
+    def stats(self, symbol: str | None = None) -> "DcaStats":
+        """
+        Get DCA statistics.
+
+        Args:
+            symbol: Optional security filter
+        """
+        ...
+
+    def check_support(self, symbols: list[str]) -> "DcaSupportList":
+        """
+        Check DCA support for a list of securities.
+
+        Args:
+            symbols: List of security symbols
+        """
+        ...
+
+    def calc_date(
+        self,
+        symbol: str,
+        frequency: "DCAFrequency",
+        day_of_week: str | None = None,
+        day_of_month: int | None = None,
+    ) -> "DcaCalcDateResult":
+        """
+        Calculate the next projected trade date for a DCA plan.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            frequency: Investment frequency
+            day_of_week: Day of week for weekly/fortnightly plans, e.g. ``"Mon"``
+            day_of_month: Day of month for monthly plans (1–28)
+        """
+        ...
+
+    def set_reminder(self, hours: str) -> None:
+        """
+        Update the advance reminder time for DCA plans.
+
+        Args:
+            hours: Reminder advance hours; must be ``"1"``, ``"6"``, or ``"12"``
+        """
+        ...
+
+
+# ── SharelistContext ──────────────────────────────────────────────
+
+class SharelistStock:
+    """A stock in a community sharelist."""
+
+    symbol: str
+    """Security symbol"""
+    name: str
+    """Security name"""
+    market: str
+    """Market, e.g. ``"HK"``"""
+    code: str
+    """Ticker code"""
+    intro: str
+    """Brief description"""
+    unread_change_log_category: str
+    """Unread change log category"""
+    change: str | None
+    """Day change percentage"""
+    last_done: str | None
+    """Latest price"""
+    trade_status: int | None
+    """Trade status code"""
+    latency: bool | None
+    """Whether delayed quote"""
+
+
+class SharelistScopes:
+    """Sharelist subscription scopes."""
+
+    subscription: bool
+    """Whether the current user is subscribed"""
+    is_self: bool
+    """Whether the current user is the creator"""
+
+
+class SharelistInfo:
+    """Sharelist information."""
+
+    id: int
+    """Sharelist ID"""
+    name: str
+    """Name"""
+    description: str
+    """Description"""
+    cover: str
+    """Cover image URL"""
+    subscribers_count: int
+    """Number of subscribers"""
+    this_year_chg: str
+    """YTD change percentage"""
+    stocks: list[SharelistStock]
+    """Constituent stocks"""
+    subscribed: bool
+    """Whether the current user is subscribed"""
+    chg: str
+    """Day change percentage"""
+    sharelist_type: int
+    """Type: 0=regular, 3=official, 4=industry"""
+    industry_code: str
+    """Industry code (for industry sharelists)"""
+
+
+class SharelistList:
+    """Sharelist list response."""
+
+    sharelists: list[SharelistInfo]
+    """User's own and followed sharelists"""
+    subscribed_sharelists: list[SharelistInfo]
+    """Subscribed sharelists"""
+    tail_mark: str
+    """Pagination cursor for subscribed list"""
+
+
+class SharelistDetail:
+    """Sharelist detail response."""
+
+    sharelist: SharelistInfo
+    """Sharelist info"""
+    scopes: SharelistScopes
+    """Subscription scopes"""
+
+
+class SharelistContext:
+    """
+    Community sharelist management context.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, SharelistContext
+
+            config = Config.from_env()
+            ctx = SharelistContext(config)
+
+            lists = ctx.list(20)
+            for sl in lists.sharelists:
+                print(sl.name, len(sl.stocks), "stocks")
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create a SharelistContext."""
+        ...
+
+    def list(self, count: int = 20) -> "SharelistList":
+        """
+        List user's own and subscribed sharelists.
+
+        Args:
+            count: Maximum number of results
+        """
+        ...
+
+    def detail(self, id: int) -> "SharelistDetail":
+        """
+        Get sharelist detail with constituent stocks.
+
+        Args:
+            id: Sharelist ID
+        """
+        ...
+
+    def popular(self, count: int = 20) -> "SharelistList":
+        """
+        Get popular / trending sharelists.
+
+        Args:
+            count: Maximum number of results
+        """
+        ...
+
+    def create(self, name: str, description: str | None = None) -> "SharelistDetail":
+        """
+        Create a new community sharelist.
+
+        Args:
+            name: Sharelist name
+            description: Optional description
+        """
+        ...
+
+    def delete(self, id: int) -> None:
+        """
+        Delete a sharelist.
+
+        Args:
+            id: Sharelist ID
+        """
+        ...
+
+    def add_securities(self, id: int, symbols: list[str]) -> None:
+        """
+        Add securities to a sharelist.
+
+        Args:
+            id: Sharelist ID
+            symbols: Security symbols to add
+        """
+        ...
+
+    def remove_securities(self, id: int, symbols: list[str]) -> None:
+        """
+        Remove securities from a sharelist.
+
+        Args:
+            id: Sharelist ID
+            symbols: Security symbols to remove
+        """
+        ...
+
+    def sort_securities(self, id: int, symbols: list[str]) -> None:
+        """
+        Reorder securities in a sharelist.
+
+        Args:
+            id: Sharelist ID
+            symbols: Security symbols in desired order
+        """
+        ...
+
+
+# ── QuoteContext extensions ───────────────────────────────────────
+
+class ShortPosition:
+    """One short interest data point."""
+
+    timestamp: str
+    """Settlement date (unix timestamp string)"""
+    rate: str
+    """Short interest as a ratio of float shares"""
+    avg_daily_share_volume: str
+    """Average daily share volume"""
+    current_shares_short: str
+    """Current shares short"""
+    days_to_cover: str
+    """Days to cover (short ratio)"""
+    close: str
+    """Closing price on the settlement date"""
+
+
+class ShortPositionsResponse:
+    """Short interest response."""
+
+    symbol: str
+    """Security symbol"""
+    data: list[ShortPosition]
+    """Short interest data points"""
+    sources: int
+    """Number of data sources"""
+
+
+class OptionVolumeStats:
+    """Real-time option call/put volume response."""
+
+    c: str
+    """Total call volume"""
+    p: str
+    """Total put volume"""
+
+
+class OptionVolumeDailyStat:
+    """One day's option volume statistics."""
+
+    symbol: str
+    """Underlying security symbol"""
+    timestamp: str
+    """Settlement date (unix timestamp string)"""
+    total_volume: int
+    """Total option volume (calls + puts)"""
+    total_put_volume: int
+    """Total put volume"""
+    total_call_volume: int
+    """Total call volume"""
+    put_call_volume_ratio: str
+    """Put/call volume ratio"""
+    total_open_interest: int
+    """Total open interest"""
+    total_put_open_interest: int
+    """Total put open interest"""
+    total_call_open_interest: int
+    """Total call open interest"""
+    put_call_open_interest_ratio: str
+    """Put/call open interest ratio"""
+
+
+class OptionVolumeDaily:
+    """Daily historical option volume response."""
+
+    stats: list[OptionVolumeDailyStat]
+    """Daily option volume statistics"""

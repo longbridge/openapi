@@ -21,8 +21,8 @@ use crate::{
             FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-            QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security, SecurityBrokers,
-            SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
+            PinnedMode, QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security,
+            SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
             SecurityStaticInfo, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
             Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
             WarrantType, WatchlistGroup,
@@ -692,6 +692,23 @@ impl AsyncQuoteContext {
         }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             ctx.update_watchlist_group(req)
+                .await
+                .map_err(ErrorNewType)?;
+            Ok(())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Pin or unpin watchlist securities. Returns awaitable.
+    fn update_pinned(
+        &self,
+        py: Python<'_>,
+        mode: PinnedMode,
+        symbols: Vec<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.update_pinned(mode.into(), symbols)
                 .await
                 .map_err(ErrorNewType)?;
             Ok(())

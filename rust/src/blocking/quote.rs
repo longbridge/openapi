@@ -9,12 +9,13 @@ use crate::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
         HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-        MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
-        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
-        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
-        SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo,
-        SubFlags, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
-        WarrantStatus, WarrantType, WatchlistGroup,
+        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily, OptionVolumeStats,
+        ParticipantInfo, Period, PinnedMode, PushEvent, QuotePackageDetail, RealtimeQuote,
+        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
+        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
+        ShortPositionsResponse, SortOrderType, StrikePriceInfo, SubFlags, Subscription, Trade,
+        TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType,
+        WatchlistGroup,
     },
 };
 
@@ -1165,5 +1166,40 @@ impl QuoteContextSync {
     ) -> Result<Vec<Candlestick>> {
         self.rt
             .call(move |ctx| async move { ctx.realtime_candlesticks(symbol, period, count).await })
+    }
+
+    /// Get short interest data for a US security
+    pub fn short_positions(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<ShortPositionsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.short_positions(symbol).await })
+    }
+
+    /// Get real-time option call/put volume
+    pub fn option_volume(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<OptionVolumeStats> {
+        self.rt
+            .call(move |ctx| async move { ctx.option_volume(symbol).await })
+    }
+
+    /// Get daily historical option volume
+    pub fn option_volume_daily(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+        timestamp: i64,
+        count: u32,
+    ) -> Result<OptionVolumeDaily> {
+        self.rt
+            .call(move |ctx| async move { ctx.option_volume_daily(symbol, timestamp, count).await })
+    }
+
+    /// Pin or unpin watchlist securities
+    pub fn update_pinned(&self, mode: PinnedMode, symbols: Vec<String>) -> Result<()> {
+        self.rt
+            .call(move |ctx| async move { ctx.update_pinned(mode, symbols).await })
     }
 }

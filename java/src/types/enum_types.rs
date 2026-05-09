@@ -222,6 +222,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/quote/PinnedMode",
+    longbridge::quote::PinnedMode,
+    [Add, Remove]
+);
+
+impl_java_enum!(
     "com/longbridge/quote/CalcIndex",
     longbridge::quote::CalcIndex,
     [
@@ -447,4 +453,76 @@ impl_java_enum!(
     "com/longbridge/trade/ChargeCategoryCode",
     longbridge::trade::ChargeCategoryCode,
     [Unknown, Broker, Third]
+);
+
+impl_java_enum!(
+    "com/longbridge/alert/AlertCondition",
+    longbridge::alert::types::AlertCondition,
+    [PriceRise, PriceFall, PercentRise, PercentFall]
+);
+impl_java_enum!(
+    "com/longbridge/alert/AlertFrequency",
+    longbridge::alert::types::AlertFrequency,
+    [Daily, EveryTime, Once]
+);
+impl_java_enum!(
+    "com/longbridge/dca/DCAFrequency",
+    longbridge::dca::types::DCAFrequency,
+    [Daily, Weekly, Fortnightly, Monthly]
+);
+impl_java_enum!(
+    "com/longbridge/dca/DCAStatus",
+    longbridge::dca::types::DCAStatus,
+    [Active, Suspended, Finished]
+);
+impl_java_enum!(
+    "com/longbridge/calendar/CalendarCategory",
+    longbridge::calendar::types::CalendarCategory,
+    [
+        Report, Dividend, Split, Ipo, MacroData, Closed, Meeting, Merge
+    ]
+);
+impl_java_enum!(
+    "com/longbridge/fundamental/FinancialReportKind",
+    longbridge::fundamental::types::FinancialReportKind,
+    [IncomeStatement, BalanceSheet, CashFlow, All]
+);
+impl_java_enum!(
+    "com/longbridge/fundamental/FinancialReportPeriod",
+    longbridge::fundamental::types::FinancialReportPeriod,
+    [Annual, SemiAnnual, Q1, Q2, Q3, QuarterlyFull, ThreeQ]
+);
+impl_java_enum!(
+    "com/longbridge/market/BrokerHoldingPeriod",
+    longbridge::market::types::BrokerHoldingPeriod,
+    [Rct1, Rct5, Rct20, Rct60]
+);
+impl_java_enum!(
+    "com/longbridge/market/AhPremiumPeriod",
+    longbridge::market::types::AhPremiumPeriod,
+    [Min1, Min5, Min15, Min30, Min60, Day, Week, Month, Year]
+);
+impl_java_enum!(
+    "com/longbridge/portfolio/FlowDirection",
+    longbridge::portfolio::types::FlowDirection,
+    [Unknown, Buy, Sell]
+);
+impl_java_enum!(
+    "com/longbridge/portfolio/AssetType",
+    longbridge::portfolio::types::AssetType,
+    [Unknown, Stock, Fund, Crypto]
+);
+impl_java_enum!(
+    "com/longbridge/fundamental/InstitutionRecommend",
+    longbridge::fundamental::types::InstitutionRecommend,
+    [
+        Unknown,
+        StrongBuy,
+        Buy,
+        Hold,
+        Sell,
+        StrongSell,
+        Underperform,
+        NoOpinion
+    ]
 );
