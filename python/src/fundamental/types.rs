@@ -53,7 +53,7 @@ impl<'py> IntoPyObject<'py> for &JsonValue {
 /// Financial reports response.
 ///
 /// The `list` field is a dict keyed by report kind (`"IS"`, `"BS"`, `"CF"`).
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct FinancialReports {
     /// Raw nested financial data dict
@@ -77,7 +77,7 @@ impl FinancialReports {
 // ── DividendList / DividendItem ───────────────────────────────────
 
 /// Dividend history response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DividendList {
     /// List of dividend events
@@ -93,7 +93,7 @@ impl From<lb::DividendList> for DividendList {
 }
 
 /// A single dividend event
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DividendItem {
     /// Security symbol, e.g. `"700.HK"`
@@ -126,7 +126,7 @@ impl From<lb::DividendItem> for DividendItem {
 // ── InstitutionRating ─────────────────────────────────────────────
 
 /// Combined analyst rating response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRating {
     /// Latest snapshot
@@ -145,7 +145,7 @@ impl From<lb::InstitutionRating> for InstitutionRating {
 }
 
 /// Latest analyst rating snapshot
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRatingLatest {
     /// Rating distribution counts
@@ -182,7 +182,7 @@ impl From<lb::InstitutionRatingLatest> for InstitutionRatingLatest {
 }
 
 /// Analyst rating distribution counts
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct RatingEvaluate {
     /// Number of "Buy" ratings
@@ -222,7 +222,7 @@ impl From<lb::RatingEvaluate> for RatingEvaluate {
 }
 
 /// Analyst target price range
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct RatingTarget {
     /// Highest price target
@@ -250,7 +250,7 @@ impl From<lb::RatingTarget> for RatingTarget {
 }
 
 /// Consensus summary
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRatingSummary {
     /// Currency symbol, e.g. `"HK$"`
@@ -281,7 +281,7 @@ impl From<lb::InstitutionRatingSummary> for InstitutionRatingSummary {
 }
 
 /// Simplified rating distribution
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct RatingSummaryEvaluate {
     /// Number of "Buy" ratings
@@ -314,7 +314,7 @@ impl From<lb::RatingSummaryEvaluate> for RatingSummaryEvaluate {
 // ── InstitutionRatingDetail ───────────────────────────────────────
 
 /// Historical analyst rating detail response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRatingDetail {
     /// Currency symbol
@@ -336,7 +336,7 @@ impl From<lb::InstitutionRatingDetail> for InstitutionRatingDetail {
 }
 
 /// Historical rating distribution time-series
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRatingDetailEvaluate {
     /// Weekly rating distribution snapshots
@@ -352,7 +352,7 @@ impl From<lb::InstitutionRatingDetailEvaluate> for InstitutionRatingDetailEvalua
 }
 
 /// One weekly rating distribution snapshot
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRatingDetailEvaluateItem {
     /// Number of "Buy" ratings
@@ -386,7 +386,7 @@ impl From<lb::InstitutionRatingDetailEvaluateItem> for InstitutionRatingDetailEv
 }
 
 /// Historical target price time-series
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRatingDetailTarget {
     /// Prediction accuracy ratio (may be `None`)
@@ -411,7 +411,7 @@ impl From<lb::InstitutionRatingDetailTarget> for InstitutionRatingDetailTarget {
 }
 
 /// One weekly target price snapshot
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InstitutionRatingDetailTargetItem {
     /// Average target price
@@ -447,7 +447,7 @@ impl From<lb::InstitutionRatingDetailTargetItem> for InstitutionRatingDetailTarg
 // ── ForecastEps ───────────────────────────────────────────────────
 
 /// EPS forecast response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ForecastEps {
     /// EPS forecast snapshots
@@ -463,7 +463,7 @@ impl From<lb::ForecastEps> for ForecastEps {
 }
 
 /// One EPS forecast snapshot
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ForecastEpsItem {
     /// Median EPS estimate
@@ -505,7 +505,7 @@ impl From<lb::ForecastEpsItem> for ForecastEpsItem {
 // ── FinancialConsensus ────────────────────────────────────────────
 
 /// Financial consensus estimates response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct FinancialConsensus {
     /// Per-period consensus reports
@@ -533,7 +533,7 @@ impl From<lb::FinancialConsensus> for FinancialConsensus {
 }
 
 /// Consensus report for one fiscal period
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ConsensusReport {
     /// Fiscal year
@@ -558,7 +558,7 @@ impl From<lb::ConsensusReport> for ConsensusReport {
 }
 
 /// Consensus estimate for one financial metric
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ConsensusDetail {
     /// Metric key, e.g. `"revenue"`
@@ -600,7 +600,7 @@ impl From<lb::ConsensusDetail> for ConsensusDetail {
 // ── ValuationData ─────────────────────────────────────────────────
 
 /// Valuation metrics response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationData {
     /// Valuation metrics (PE / PB / PS / dividend yield)
@@ -616,7 +616,7 @@ impl From<lb::ValuationData> for ValuationData {
 }
 
 /// Container for valuation metrics
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationMetricsData {
     /// Price-to-Earnings ratio history
@@ -641,7 +641,7 @@ impl From<lb::ValuationMetricsData> for ValuationMetricsData {
 }
 
 /// Historical time-series for one valuation metric
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationMetricData {
     /// Human-readable description
@@ -669,7 +669,7 @@ impl From<lb::ValuationMetricData> for ValuationMetricData {
 }
 
 /// One valuation data point
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationPoint {
     /// Date of the data point (datetime)
@@ -690,7 +690,7 @@ impl From<lb::ValuationPoint> for ValuationPoint {
 // ── ValuationHistoryResponse ──────────────────────────────────────
 
 /// Historical valuation response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationHistoryResponse {
     /// Historical valuation data
@@ -706,7 +706,7 @@ impl From<lb::ValuationHistoryResponse> for ValuationHistoryResponse {
 }
 
 /// Historical valuation container
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationHistoryData {
     /// Historical metrics
@@ -722,7 +722,7 @@ impl From<lb::ValuationHistoryData> for ValuationHistoryData {
 }
 
 /// Historical valuation metrics container
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationHistoryMetrics {
     /// Price-to-Earnings history
@@ -744,7 +744,7 @@ impl From<lb::ValuationHistoryMetrics> for ValuationHistoryMetrics {
 }
 
 /// Historical data for one valuation metric
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationHistoryMetric {
     /// Human-readable description
@@ -774,7 +774,7 @@ impl From<lb::ValuationHistoryMetric> for ValuationHistoryMetric {
 // ── IndustryValuationList ─────────────────────────────────────────
 
 /// Industry peer valuation comparison response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct IndustryValuationList {
     /// List of peer securities
@@ -790,7 +790,7 @@ impl From<lb::IndustryValuationList> for IndustryValuationList {
 }
 
 /// Valuation data for one peer security
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct IndustryValuationItem {
     /// Security symbol
@@ -839,7 +839,7 @@ impl From<lb::IndustryValuationItem> for IndustryValuationItem {
 }
 
 /// Historical valuation snapshot for a peer
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct IndustryValuationHistory {
     /// Unix timestamp string
@@ -866,7 +866,7 @@ impl From<lb::IndustryValuationHistory> for IndustryValuationHistory {
 // ── IndustryValuationDist ─────────────────────────────────────────
 
 /// Industry valuation distribution response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct IndustryValuationDist {
     /// PE ratio distribution
@@ -888,7 +888,7 @@ impl From<lb::IndustryValuationDist> for IndustryValuationDist {
 }
 
 /// Distribution statistics for one valuation metric
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationDist {
     /// Minimum value
@@ -924,7 +924,7 @@ impl From<lb::ValuationDist> for ValuationDist {
 // ── CompanyOverview ───────────────────────────────────────────────
 
 /// Company overview response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CompanyOverview {
     /// Short name
@@ -1035,7 +1035,7 @@ impl From<lb::CompanyOverview> for CompanyOverview {
 // ── ExecutiveList ─────────────────────────────────────────────────
 
 /// Executive list response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ExecutiveList {
     /// Groups of executives per security
@@ -1051,7 +1051,7 @@ impl From<lb::ExecutiveList> for ExecutiveList {
 }
 
 /// Executives for one security
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ExecutiveGroup {
     /// Security symbol
@@ -1076,7 +1076,7 @@ impl From<lb::ExecutiveGroup> for ExecutiveGroup {
 }
 
 /// One executive / board member
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct Professional {
     /// Internal wiki person ID
@@ -1115,7 +1115,7 @@ impl From<lb::Professional> for Professional {
 // ── ShareholderList ───────────────────────────────────────────────
 
 /// Shareholder list response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ShareholderList {
     /// List of major shareholders
@@ -1137,7 +1137,7 @@ impl From<lb::ShareholderList> for ShareholderList {
 }
 
 /// One major shareholder
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct Shareholder {
     /// Internal shareholder ID
@@ -1171,7 +1171,7 @@ impl From<lb::Shareholder> for Shareholder {
 }
 
 /// A cross-held security in an institutional shareholder's portfolio
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ShareholderStock {
     /// Security symbol
@@ -1198,7 +1198,7 @@ impl From<lb::ShareholderStock> for ShareholderStock {
 // ── FundHolders ───────────────────────────────────────────────────
 
 /// Fund/ETF holders response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct FundHolders {
     /// Funds and ETFs holding the queried security
@@ -1214,7 +1214,7 @@ impl From<lb::FundHolders> for FundHolders {
 }
 
 /// A fund or ETF holding the queried security
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct FundHolder {
     /// Fund/ETF ticker code
@@ -1247,7 +1247,7 @@ impl From<lb::FundHolder> for FundHolder {
 // ── CorpActions ───────────────────────────────────────────────────
 
 /// Corporate actions response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CorpActions {
     /// Corporate action events
@@ -1263,7 +1263,7 @@ impl From<lb::CorpActions> for CorpActions {
 }
 
 /// One corporate action event
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CorpActionItem {
     /// Internal event ID
@@ -1312,7 +1312,7 @@ impl From<lb::CorpActionItem> for CorpActionItem {
 }
 
 /// Live stream associated with a corp action
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CorpActionLive {
     /// Live stream ID
@@ -1342,7 +1342,7 @@ impl From<lb::CorpActionLive> for CorpActionLive {
 // ── InvestRelations ───────────────────────────────────────────────
 
 /// Investor relations response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InvestRelations {
     /// Link to investor relations page
@@ -1361,7 +1361,7 @@ impl From<lb::InvestRelations> for InvestRelations {
 }
 
 /// A security in which the company has an investment stake
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct InvestSecurity {
     /// Internal company ID
@@ -1403,7 +1403,7 @@ impl From<lb::InvestSecurity> for InvestSecurity {
 // ── OperatingList ─────────────────────────────────────────────────
 
 /// Operating metrics response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OperatingList {
     /// Operating summary reports
@@ -1419,7 +1419,7 @@ impl From<lb::OperatingList> for OperatingList {
 }
 
 /// One operating summary report
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OperatingItem {
     /// Internal report ID
@@ -1453,7 +1453,7 @@ impl From<lb::OperatingItem> for OperatingItem {
 }
 
 /// Key financial metrics from an operating report
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OperatingFinancial {
     /// Ticker code
@@ -1484,7 +1484,7 @@ impl From<lb::OperatingFinancial> for OperatingFinancial {
 }
 
 /// One financial indicator from an operating report
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OperatingIndicator {
     /// Field name key
@@ -1538,7 +1538,7 @@ impl From<FinancialReportKind> for lb::FinancialReportKind {
 // ── BuybackData ───────────────────────────────────────────────────
 
 /// TTM buyback summary
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct RecentBuybacks {
     pub currency: String,
@@ -1560,7 +1560,7 @@ impl From<lb::RecentBuybacks> for RecentBuybacks {
 }
 
 /// Historical annual buyback data item
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BuybackHistoryItem {
     pub fiscal_year: String,
@@ -1591,7 +1591,7 @@ impl From<lb::BuybackHistoryItem> for BuybackHistoryItem {
 }
 
 /// Buyback payout and cash-flow ratios
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BuybackRatios {
     pub net_buyback_payout_ratio: String,
@@ -1614,7 +1614,7 @@ impl From<lb::BuybackRatios> for BuybackRatios {
 }
 
 /// Buyback data response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BuybackData {
     pub recent_buybacks: Option<RecentBuybacks>,
@@ -1637,7 +1637,7 @@ impl From<lb::BuybackData> for BuybackData {
 /// Stock ratings response.
 ///
 /// `ratings_json` contains the full nested ratings structure as a JSON string.
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct StockRatings {
     pub style_txt_name: String,

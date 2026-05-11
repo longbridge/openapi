@@ -258,6 +258,19 @@ export declare class Config {
    * ```
    */
   static fromOAuth(oauth: OAuth, extra?: ExtraConfigParams | undefined | null): Config
+  /**
+   * Gets a new `access_token`
+   *
+   * This method is only available when using **Legacy API Key**
+   * authentication (i.e. `Config.fromApikey`). It is not supported for
+   * OAuth 2.0 mode.
+   *
+   * @param expiredAt - The expiration time of the access token, defaults to
+   *   90 days from now.
+   *
+   * @see https://open.longportapp.com/en/docs/refresh-token-api
+   */
+  refreshAccessToken(expiredAt?: Date | undefined | null): Promise<string>
 }
 
 /** Content context */

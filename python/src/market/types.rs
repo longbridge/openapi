@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 // ── MarketStatusResponse ──────────────────────────────────────────
 
 /// Market trading status response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct MarketStatusResponse {
     /// Per-market status items
@@ -20,7 +20,7 @@ impl From<lb::MarketStatusResponse> for MarketStatusResponse {
 }
 
 /// Trading status for one market
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct MarketTimeItem {
     /// Market
@@ -56,7 +56,7 @@ impl From<lb::MarketTimeItem> for MarketTimeItem {
 // ── BrokerHoldingTop ──────────────────────────────────────────────
 
 /// Top broker holdings response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BrokerHoldingTop {
     /// Top buying brokers
@@ -78,7 +78,7 @@ impl From<lb::BrokerHoldingTop> for BrokerHoldingTop {
 }
 
 /// One broker entry
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BrokerHoldingEntry {
     /// Broker name
@@ -105,7 +105,7 @@ impl From<lb::BrokerHoldingEntry> for BrokerHoldingEntry {
 // ── BrokerHoldingDetail ───────────────────────────────────────────
 
 /// Full broker holding detail response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BrokerHoldingDetail {
     /// Full broker list
@@ -124,7 +124,7 @@ impl From<lb::BrokerHoldingDetail> for BrokerHoldingDetail {
 }
 
 /// One broker's full holding detail
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BrokerHoldingDetailItem {
     /// Broker name
@@ -152,7 +152,7 @@ impl From<lb::BrokerHoldingDetailItem> for BrokerHoldingDetailItem {
 }
 
 /// Holding changes over multiple periods
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BrokerHoldingChanges {
     /// Current value
@@ -182,7 +182,7 @@ impl From<lb::BrokerHoldingChanges> for BrokerHoldingChanges {
 // ── BrokerHoldingDailyHistory ─────────────────────────────────────
 
 /// Daily broker holding history response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BrokerHoldingDailyHistory {
     /// Daily records
@@ -198,7 +198,7 @@ impl From<lb::BrokerHoldingDailyHistory> for BrokerHoldingDailyHistory {
 }
 
 /// One day's broker holding record
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct BrokerHoldingDailyItem {
     /// Date string
@@ -225,7 +225,7 @@ impl From<lb::BrokerHoldingDailyItem> for BrokerHoldingDailyItem {
 // ── AhPremiumKlines / AhPremiumIntraday ───────────────────────────
 
 /// A/H premium K-line response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AhPremiumKlines {
     /// K-line data points
@@ -241,7 +241,7 @@ impl From<lb::AhPremiumKlines> for AhPremiumKlines {
 }
 
 /// A/H premium intraday response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AhPremiumIntraday {
     /// Intraday data points
@@ -257,7 +257,7 @@ impl From<lb::AhPremiumIntraday> for AhPremiumIntraday {
 }
 
 /// One A/H premium data point
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AhPremiumKline {
     /// A-share price
@@ -296,7 +296,7 @@ impl From<lb::AhPremiumKline> for AhPremiumKline {
 // ── TradeStatsResponse ────────────────────────────────────────────
 
 /// Trade statistics response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct TradeStatsResponse {
     /// Summary statistics
@@ -315,7 +315,7 @@ impl From<lb::TradeStatsResponse> for TradeStatsResponse {
 }
 
 /// Summary trade statistics
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct TradeStatistics {
     /// Volume-weighted average price
@@ -355,7 +355,7 @@ impl From<lb::TradeStatistics> for TradeStatistics {
 }
 
 /// Trade volume at one price level
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct TradePriceLevel {
     /// Buy volume
@@ -382,7 +382,7 @@ impl From<lb::TradePriceLevel> for TradePriceLevel {
 // ── AnomalyResponse ───────────────────────────────────────────────
 
 /// Market anomaly response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AnomalyResponse {
     /// Whether anomaly alerts are disabled
@@ -401,7 +401,7 @@ impl From<lb::AnomalyResponse> for AnomalyResponse {
 }
 
 /// One anomaly event
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AnomalyItem {
     /// Security symbol
@@ -434,7 +434,7 @@ impl From<lb::AnomalyItem> for AnomalyItem {
 // ── IndexConstituents ─────────────────────────────────────────────
 
 /// Index constituents response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct IndexConstituents {
     /// Number of falling stocks today
@@ -459,7 +459,7 @@ impl From<lb::IndexConstituents> for IndexConstituents {
 }
 
 /// One constituent stock
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ConstituentStock {
     /// Security symbol

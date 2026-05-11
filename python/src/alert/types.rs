@@ -21,7 +21,7 @@ impl<'py> IntoPyObject<'py> for &JsonValue {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AlertItem {
     pub id: String,
@@ -49,7 +49,7 @@ impl From<lb::AlertItem> for AlertItem {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AlertSymbolGroup {
     pub symbol: String,
@@ -79,7 +79,7 @@ impl From<lb::AlertSymbolGroup> for AlertSymbolGroup {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AlertList {
     pub lists: Vec<AlertSymbolGroup>,

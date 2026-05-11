@@ -1,7 +1,7 @@
 use longbridge::dca::types as lb;
 use pyo3::prelude::*;
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaPlan {
     pub plan_id: String,
@@ -56,7 +56,7 @@ impl From<lb::DcaPlan> for DcaPlan {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaList {
     pub plans: Vec<DcaPlan>,
@@ -69,7 +69,7 @@ impl From<lb::DcaList> for DcaList {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaStats {
     pub active_count: String,
@@ -94,7 +94,7 @@ impl From<lb::DcaStats> for DcaStats {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaSupportInfo {
     pub symbol: String,
@@ -109,7 +109,7 @@ impl From<lb::DcaSupportInfo> for DcaSupportInfo {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaSupportList {
     pub infos: Vec<DcaSupportInfo>,
@@ -122,7 +122,7 @@ impl From<lb::DcaSupportList> for DcaSupportList {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaHistoryRecord {
     pub created_at: String,
@@ -153,7 +153,7 @@ impl From<lb::DcaHistoryRecord> for DcaHistoryRecord {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaHistoryResponse {
     pub records: Vec<DcaHistoryRecord>,
@@ -197,7 +197,7 @@ impl From<lb::DCAFrequency> for DCAFrequency {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaCalcDateResult {
     pub trade_date: String,
@@ -236,7 +236,7 @@ impl From<lb::DCAStatus> for DCAStatus {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct DcaCreateResult {
     /// The created or updated plan ID
