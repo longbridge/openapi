@@ -1,11 +1,17 @@
-use std::{ffi::CStr, os::raw::c_char, ptr};
+use std::{
+    ffi::{CStr, c_void},
+    os::raw::c_char,
+    ptr,
+};
 
 use longbridge::Config;
+use time::OffsetDateTime;
 
 use crate::{
+    async_call::{CAsyncCallback, execute_async},
     error::{CError, set_error},
     oauth::COAuth,
-    types::{CLanguage, CPushCandlestickMode},
+    types::{CLanguage, CPushCandlestickMode, CString},
 };
 
 /// Configuration options for Longbridge SDK
@@ -173,6 +179,40 @@ pub unsafe extern "C" fn lb_config_disable_print_quote_packages(config: *mut CCo
 pub unsafe extern "C" fn lb_config_set_log_path(config: *mut CConfig, log_path: *const c_char) {
     let path = CStr::from_ptr(log_path).to_str().expect("invalid log_path");
     (*config).0.set_log_path(path);
+}
+
+/// Gets a new `access_token`
+///
+/// This function is only available when using **Legacy API Key**
+/// authentication (i.e. `lb_config_from_apikey`). It is not supported for
+/// OAuth 2.0 mode.
+///
+/// @param config      Config object
+/// @param expired_at  Unix timestamp for token expiry. Pass `0` to use the
+///                    default (90 days from now).
+/// @param callback    Callback function; on success `res->data` is a
+///                    `const char*` access token (valid only within the
+///                    callback body).
+/// @param userdata    Opaque pointer forwarded to the callback
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_config_refresh_access_token(
+    config: *mut CConfig,
+    expired_at: i64,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let config = &mut (*config).0;
+    execute_async::<c_void, _, _>(callback, std::ptr::null(), userdata, async move {
+        let token: CString = config
+            .refresh_access_token(if expired_at == 0 {
+                None
+            } else {
+                Some(OffsetDateTime::from_unix_timestamp(expired_at).unwrap())
+            })
+            .await?
+            .into();
+        Ok(token)
+    });
 }
 
 /// Free the config object

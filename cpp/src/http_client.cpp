@@ -69,7 +69,7 @@ HttpClient::request(
   const std::string& path,
   const std::optional<std::map<std::string, std::string>>& headers,
   const std::optional<std::string>& body,
-  AsyncCallback<void*, HttpResult> callback)
+  AsyncCallback<NoContext, HttpResult> callback)
 {
   std::vector<lb_http_header_t> c_headers;
   if (headers) {
@@ -88,20 +88,20 @@ HttpClient::request(
     body ? body->c_str() : nullptr,
     [](auto res) {
       auto callback_ptr =
-        callback::get_async_callback<void*, HttpResult>(res->userdata);
+        callback::get_async_callback<NoContext, HttpResult>(res->userdata);
       Status status(res->error);
 
       if (status) {
         const lb_http_result_t* result = (const lb_http_result_t*)res->data;
         HttpResult http_res(lb_http_result_response_body(result));
-        (*callback_ptr)(AsyncResult<void*, HttpResult>(
-          nullptr, std::move(status), &http_res));
+        (*callback_ptr)(AsyncResult<NoContext, HttpResult>(
+          NoContext{}, std::move(status), &http_res));
       } else {
         (*callback_ptr)(
-          AsyncResult<void*, HttpResult>(nullptr, std::move(status), nullptr));
+          AsyncResult<NoContext, HttpResult>(NoContext{}, std::move(status), nullptr));
       }
     },
-    new AsyncCallback<void*, HttpResult>(callback));
+    new AsyncCallback<NoContext, HttpResult>(callback));
 }
 
 } // namespace longbridge

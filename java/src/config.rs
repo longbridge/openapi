@@ -4,8 +4,9 @@ use jni::{
     sys::{jboolean, jlong},
 };
 use longbridge::{Config, Language, PushCandlestickMode};
+use time::OffsetDateTime;
 
-use crate::{error::jni_result, types::FromJValue};
+use crate::{async_util, error::jni_result, types::FromJValue};
 
 // ── Constructors
 // ──────────────────────────────────────────────────────────────
@@ -162,6 +163,28 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetLogPath(
         let path = String::from_jvalue(env, log_path.into())?;
         (*(config as *mut Config)).set_log_path(path);
         Ok(config)
+    })
+}
+
+// ── Async operations
+// ──────────────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configRefreshAccessToken(
+    mut env: JNIEnv,
+    _class: JClass,
+    config: jlong,
+    expired_at: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let config = &*(config as *const Config);
+        let expired_at: Option<OffsetDateTime> = FromJValue::from_jvalue(env, expired_at.into())?;
+        async_util::execute(env, callback, async move {
+            let token = config.refresh_access_token(expired_at).await?;
+            Ok(token)
+        })?;
+        Ok(())
     })
 }
 

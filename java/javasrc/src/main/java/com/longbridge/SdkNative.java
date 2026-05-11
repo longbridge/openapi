@@ -11,6 +11,7 @@ import com.longbridge.quote.*;
 import com.longbridge.trade.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * @hidden
@@ -50,6 +51,9 @@ public class SdkNative {
         public static native long configSetEnablePrintQuotePackages(long config, boolean enable);
 
         public static native long configSetLogPath(long config, String logPath);
+
+        public static native void configRefreshAccessToken(long config, OffsetDateTime expiredAt,
+                        AsyncCallback callback);
 
         public static native void freeConfig(long config);
 

@@ -8078,6 +8078,26 @@ void lb_config_disable_print_quote_packages(struct lb_config_t *config);
 void lb_config_set_log_path(struct lb_config_t *config, const char *log_path);
 
 /**
+ * Gets a new `access_token`
+ *
+ * This function is only available when using **Legacy API Key**
+ * authentication (i.e. `lb_config_from_apikey`). It is not supported for
+ * OAuth 2.0 mode.
+ *
+ * @param config      Config object
+ * @param expired_at  Unix timestamp for token expiry. Pass `0` to use the
+ *                    default (90 days from now).
+ * @param callback    Callback function; on success `res->data` is a
+ *                    `const char*` access token (valid only within the
+ *                    callback body).
+ * @param userdata    Opaque pointer forwarded to the callback
+ */
+void lb_config_refresh_access_token(struct lb_config_t *config,
+                                    int64_t expired_at,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
  * Free the config object
  */
 void lb_config_free(struct lb_config_t *config);

@@ -54,7 +54,7 @@ public:
   /// @param open_url  Called with the authorization URL during the auth flow
   /// @param callback  Invoked on completion; result data is `OAuth*`
   void build(std::function<void(const std::string&)> open_url,
-             AsyncCallback<void*, OAuth> callback);
+             AsyncCallback<NoContext, OAuth> callback);
 };
 
 } // namespace longbridge

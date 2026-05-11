@@ -89,6 +89,18 @@ public:
 
   /// Set the log file path
   Config& set_log_path(const std::string& path);
+
+  /// Gets a new `access_token`
+  ///
+  /// This method is only available when using **Legacy API Key**
+  /// authentication (i.e. `Config::from_apikey`). It is not supported for
+  /// OAuth 2.0 mode.
+  ///
+  /// @param expired_at  Unix timestamp for token expiry. Pass `0` to use the
+  ///                    default (90 days from now).
+  /// @param callback    Callback invoked with the new access token string.
+  void refresh_access_token(int64_t expired_at,
+                            AsyncCallback<NoContext, std::string> callback);
 };
 
 } // namespace longbridge

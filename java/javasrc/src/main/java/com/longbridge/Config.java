@@ -1,5 +1,8 @@
 package com.longbridge;
 
+import java.time.OffsetDateTime;
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Configuration options for Longbridge SDK
  */
@@ -182,6 +185,34 @@ public class Config implements AutoCloseable {
     public Config logPath(String path) {
         this.raw = SdkNative.configSetLogPath(this.raw, path);
         return this;
+    }
+
+    /**
+     * Gets a new {@code access_token}.
+     *
+     * <p>This method is only available when using <b>Legacy API Key</b>
+     * authentication (i.e. {@link #fromApikey}). It is not supported for OAuth
+     * 2.0 mode.
+     *
+     * @param expiredAt The expiration time of the new access token. Pass
+     *                  {@code null} to use the default (90 days from now).
+     * @return A {@link CompletableFuture} that resolves to the new access token
+     *         string.
+     * @see <a href="https://open.longportapp.com/en/docs/refresh-token-api">Refresh Token API</a>
+     */
+    public CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+        SdkNative.configRefreshAccessToken(this.raw, expiredAt, new AsyncCallback() {
+            @Override
+            public void callback(Object err, Object result) {
+                if (err != null) {
+                    future.completeExceptionally((OpenApiException) err);
+                } else {
+                    future.complete((String) result);
+                }
+            }
+        });
+        return future;
     }
 
     /**

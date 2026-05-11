@@ -69,7 +69,7 @@ public:
                const std::string& path,
                const std::optional<std::map<std::string, std::string>>& headers,
                const std::optional<std::string>& body,
-               AsyncCallback<void*, HttpResult> callback);
+               AsyncCallback<NoContext, HttpResult> callback);
 };
 
 }

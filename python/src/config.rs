@@ -3,6 +3,7 @@ use pyo3::{prelude::*, types::PyType};
 use crate::{
     error::ErrorNewType,
     oauth::OAuth,
+    time::PyOffsetDateTimeWrapper,
     types::{Language, PushCandlestickMode},
 };
 
@@ -208,5 +209,28 @@ impl Config {
         }
 
         Self(config)
+    }
+
+    /// Gets a new ``access_token``.
+    ///
+    /// This method is only available when using **Legacy API Key**
+    /// authentication (i.e. :meth:`Config.from_apikey`). It is not supported
+    /// for OAuth 2.0 mode.
+    ///
+    /// Args:
+    ///     expired_at: The expiration time of the access token (default: 90
+    ///         days from now).
+    ///
+    /// Returns:
+    ///     New access token string
+    #[pyo3(signature = (expired_at = None))]
+    pub fn refresh_access_token(
+        &self,
+        expired_at: Option<PyOffsetDateTimeWrapper>,
+    ) -> PyResult<String> {
+        Ok(self
+            .0
+            .refresh_access_token_blocking(expired_at.map(|t| t.0))
+            .map_err(ErrorNewType)?)
     }
 }
