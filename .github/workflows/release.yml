@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - release
+      - release-python-nodejs
 
 jobs:
   build-python-sdk:
+    if: github.ref_name == 'release' || github.ref_name == 'release-python-nodejs'
     runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: true
@@ -45,6 +47,7 @@ jobs:
           path: dist
 
   build-python-sdk-musl:
+    if: github.ref_name == 'release' || github.ref_name == 'release-python-nodejs'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: true
@@ -89,6 +92,7 @@ jobs:
           path: dist
 
   build-nodejs-sdk:
+    if: github.ref_name == 'release' || github.ref_name == 'release-python-nodejs'
     strategy:
       fail-fast: true
       matrix:
@@ -140,6 +144,7 @@ jobs:
           path: nodejs/longbridge.*.node
 
   build-java-jni:
+    if: github.ref_name == 'release'
     strategy:
       fail-fast: true
       matrix:
@@ -199,6 +204,7 @@ jobs:
           path: longbridge_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
   copy-cpp-headers:
+    if: github.ref_name == 'release'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -218,6 +224,7 @@ jobs:
           path: cpp/include
 
   build-cpp-sdk-debug:
+    if: github.ref_name == 'release'
     needs:
       - copy-cpp-headers
     strategy:
@@ -302,6 +309,7 @@ jobs:
           path: dist/lib
 
   build-cpp-sdk-release:
+    if: github.ref_name == 'release'
     needs:
       - copy-cpp-headers
     strategy:
@@ -386,6 +394,7 @@ jobs:
           path: dist/lib
 
   build-ios-cpp-sdk:
+    if: github.ref_name == 'release'
     needs:
       - copy-cpp-headers
     strategy:
@@ -455,6 +464,7 @@ jobs:
           path: dist/lib
 
   build-android-cpp-sdk:
+    if: github.ref_name == 'release'
     needs:
       - copy-cpp-headers
     strategy:
@@ -552,6 +562,13 @@ jobs:
       - build-python-sdk
       - build-python-sdk-musl
       - build-nodejs-sdk
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "All builds are done"
+
+  build-full:
+    if: github.ref_name == 'release'
+    needs:
       - build-java-jni
       - build-cpp-sdk-debug
       - build-cpp-sdk-release
@@ -559,11 +576,13 @@ jobs:
       - build-android-cpp-sdk
     runs-on: ubuntu-24.04
     steps:
-      - run: echo "All builds are done"
+      - run: echo "All full builds are done"
 
   publish-rust-sdk:
+    if: github.ref_name == 'release'
     needs:
       - build
+      - build-full
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: true
@@ -621,8 +640,10 @@ jobs:
           cargo publish --no-verify
 
   publish-cpp-sdk:
+    if: github.ref_name == 'release'
     needs:
       - build
+      - build-full
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -719,8 +740,11 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-java-sdk:
+    if: github.ref_name == 'release'
     runs-on: ubuntu-24.04
-    needs: build
+    needs:
+      - build
+      - build-full
     steps:
       - uses: actions/checkout@v4
         with:
