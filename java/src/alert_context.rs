@@ -9,8 +9,46 @@ use longbridge::{AlertContext, Config, alert::types::*};
 use crate::{
     async_util,
     error::jni_result,
-    types::{FromJValue, ObjectArray, get_field},
+    types::{ObjectArray, get_field},
 };
+
+/// Read a Java `AlertItem` object into a Rust [`longbridge::alert::AlertItem`].
+fn read_alert_item(
+    env: &mut JNIEnv,
+    item: &JObject,
+) -> jni::errors::Result<longbridge::alert::AlertItem> {
+    let id: String = get_field(env, item, "id")?;
+    let indicator_id: String = get_field(env, item, "indicatorId")?;
+    let enabled: bool = get_field(env, item, "enabled")?;
+    let frequency: i32 = get_field(env, item, "frequency")?;
+    let scope: i32 = get_field(env, item, "scope")?;
+    let text: String = get_field(env, item, "text")?;
+    // state: int[] — read as a Java int array
+    let state = unsafe {
+        let state_obj = env.get_field(item, "state", "[I")?.l()?;
+        if state_obj.is_null() {
+            Vec::new()
+        } else {
+            let arr = jni::objects::JIntArray::from(state_obj);
+            let elements = env
+                .get_array_elements::<jni::sys::jint>(&arr, jni::objects::ReleaseMode::CopyBack)?;
+            std::slice::from_raw_parts(elements.as_ptr(), elements.len()).to_vec()
+        }
+    };
+    // valueMap: JSON string
+    let value_map_str: String = get_field(env, item, "valueMap")?;
+    let value_map = serde_json::from_str(&value_map_str).unwrap_or(serde_json::Value::Null);
+    Ok(longbridge::alert::AlertItem {
+        id,
+        indicator_id,
+        enabled,
+        frequency,
+        scope,
+        text,
+        state,
+        value_map,
+    })
+}
 
 struct ContextObj {
     ctx: AlertContext,
@@ -80,37 +118,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextAdd(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextEnable(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextUpdate(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    alert_id: JObject,
+    item: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
-        let id: String = FromJValue::from_jvalue(env, alert_id.into())?;
+        let alert_item = read_alert_item(env, &item)?;
         async_util::execute(env, callback, async move {
-            context.ctx.enable(id).await?;
-            Ok(())
-        })?;
-        Ok(())
-    })
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextDisable(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    alert_id: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let id: String = FromJValue::from_jvalue(env, alert_id.into())?;
-        async_util::execute(env, callback, async move {
-            context.ctx.disable(id).await?;
+            context.ctx.update(&alert_item).await?;
             Ok(())
         })?;
         Ok(())

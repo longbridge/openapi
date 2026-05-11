@@ -55,6 +55,30 @@ impl From<AlertItem> for CAlertItemOwned {
     }
 }
 
+impl CAlertItem {
+    /// Reconstruct a [`longbridge::alert::AlertItem`] from this C struct.
+    ///
+    /// # Safety
+    /// All pointer fields must be valid null-terminated C strings and the
+    /// `state` pointer must point to at least `num_state` valid `i32` values.
+    pub unsafe fn to_alert_item(&self) -> longbridge::alert::AlertItem {
+        use crate::types::cstr_to_rust;
+        let state = std::slice::from_raw_parts(self.state, self.num_state).to_vec();
+        let value_map_str = cstr_to_rust(self.value_map);
+        let value_map = serde_json::from_str(&value_map_str).unwrap_or(serde_json::Value::Null);
+        longbridge::alert::AlertItem {
+            id: cstr_to_rust(self.id),
+            indicator_id: cstr_to_rust(self.indicator_id),
+            enabled: self.enabled,
+            frequency: self.frequency,
+            scope: self.scope,
+            text: cstr_to_rust(self.text),
+            state,
+            value_map,
+        }
+    }
+}
+
 impl ToFFI for CAlertItemOwned {
     type FFIType = CAlertItem;
     fn to_ffi_type(&self) -> Self::FFIType {

@@ -26,6 +26,7 @@ impl<'py> IntoPyObject<'py> for &JsonValue {
 pub(crate) struct AlertItem {
     pub id: String,
     pub indicator_id: String,
+    #[pyo3(set)]
     pub enabled: bool,
     pub frequency: i32,
     pub scope: i32,
@@ -45,6 +46,21 @@ impl From<lb::AlertItem> for AlertItem {
             text: v.text,
             state: v.state,
             value_map: JsonValue(v.value_map),
+        }
+    }
+}
+
+impl From<AlertItem> for lb::AlertItem {
+    fn from(v: AlertItem) -> Self {
+        Self {
+            id: v.id,
+            indicator_id: v.indicator_id,
+            enabled: v.enabled,
+            frequency: v.frequency,
+            scope: v.scope,
+            text: v.text,
+            state: v.state,
+            value_map: v.value_map.0,
         }
     }
 }

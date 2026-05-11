@@ -33,12 +33,8 @@ impl AlertContext {
             .map_err(ErrorNewType)?;
         Ok(())
     }
-    fn enable(&self, alert_id: String) -> PyResult<()> {
-        self.ctx.enable(alert_id).map_err(ErrorNewType)?;
-        Ok(())
-    }
-    fn disable(&self, alert_id: String) -> PyResult<()> {
-        self.ctx.disable(alert_id).map_err(ErrorNewType)?;
+    fn update(&self, item: AlertItem) -> PyResult<()> {
+        self.ctx.update(item.into()).map_err(ErrorNewType)?;
         Ok(())
     }
     fn delete(&self, alert_ids: Vec<String>) -> PyResult<()> {

@@ -1666,6 +1666,48 @@ typedef struct lb_async_result_t {
 typedef void (*lb_async_callback_t)(const struct lb_async_result_t*);
 
 /**
+ * A single alert indicator configuration for a symbol.
+ */
+typedef struct lb_alert_item_t {
+  /**
+   * Unique alert identifier.
+   */
+  const char *id;
+  /**
+   * Identifier of the indicator that triggers this alert.
+   */
+  const char *indicator_id;
+  /**
+   * Whether this alert is currently enabled.
+   */
+  bool enabled;
+  /**
+   * Alert notification frequency code.
+   */
+  int32_t frequency;
+  /**
+   * Scope of the alert (e.g. per-symbol or global).
+   */
+  int32_t scope;
+  /**
+   * Human-readable description text for the alert.
+   */
+  const char *text;
+  /**
+   * Pointer to an array of state codes associated with this alert.
+   */
+  const int32_t *state;
+  /**
+   * Number of elements in the `state` array.
+   */
+  uintptr_t num_state;
+  /**
+   * JSON-serialized map of additional indicator parameter values.
+   */
+  const char *value_map;
+} lb_alert_item_t;
+
+/**
  * HTTP Header
  */
 typedef struct lb_http_header_t {
@@ -6701,48 +6743,6 @@ typedef struct lb_exchange_rates_t {
 } lb_exchange_rates_t;
 
 /**
- * A single alert indicator configuration for a symbol.
- */
-typedef struct lb_alert_item_t {
-  /**
-   * Unique alert identifier.
-   */
-  const char *id;
-  /**
-   * Identifier of the indicator that triggers this alert.
-   */
-  const char *indicator_id;
-  /**
-   * Whether this alert is currently enabled.
-   */
-  bool enabled;
-  /**
-   * Alert notification frequency code.
-   */
-  int32_t frequency;
-  /**
-   * Scope of the alert (e.g. per-symbol or global).
-   */
-  int32_t scope;
-  /**
-   * Human-readable description text for the alert.
-   */
-  const char *text;
-  /**
-   * Pointer to an array of state codes associated with this alert.
-   */
-  const int32_t *state;
-  /**
-   * Number of elements in the `state` array.
-   */
-  uintptr_t num_state;
-  /**
-   * JSON-serialized map of additional indicator parameter values.
-   */
-  const char *value_map;
-} lb_alert_item_t;
-
-/**
  * A symbol together with all of its associated alert indicators.
  */
 typedef struct lb_alert_symbol_group_t {
@@ -7878,17 +7878,27 @@ void lb_alert_context_add(const struct lb_alert_context_t *ctx,
 
 /**
  * Enable a price alert.
+ *
+ * `item` must point to a valid [`CAlertItem`] obtained from
+ * [`lb_alert_context_list`]. All fields are read before the function
+ * returns, so the pointer only needs to be valid for the duration of
+ * the call.
  */
 void lb_alert_context_enable(const struct lb_alert_context_t *ctx,
-                             const char *alert_id,
+                             const struct lb_alert_item_t *item,
                              lb_async_callback_t callback,
                              void *userdata);
 
 /**
  * Disable a price alert.
+ *
+ * `item` must point to a valid [`CAlertItem`] obtained from
+ * [`lb_alert_context_list`]. All fields are read before the function
+ * returns, so the pointer only needs to be valid for the duration of
+ * the call.
  */
 void lb_alert_context_disable(const struct lb_alert_context_t *ctx,
-                              const char *alert_id,
+                              const struct lb_alert_item_t *item,
                               lb_async_callback_t callback,
                               void *userdata);
 
