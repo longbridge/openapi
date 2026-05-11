@@ -114,6 +114,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a49dc973e1d10509c887a8bf44da5899e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#a49dc973e1d10509c887a8bf44da5899e">set_log_path</a> (const std::string &amp;path)</td></tr>
 <tr class="memdesc:a49dc973e1d10509c887a8bf44da5899e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the log file path.  <a href="classlongbridge_1_1_config.html#a49dc973e1d10509c887a8bf44da5899e">More...</a><br /></td></tr>
 <tr class="separator:a49dc973e1d10509c887a8bf44da5899e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acde50a8b298381f6b3c7db5375b8386c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#acde50a8b298381f6b3c7db5375b8386c">refresh_access_token</a> (int64_t expired_at, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, std::string &gt; callback)</td></tr>
+<tr class="separator:acde50a8b298381f6b3c7db5375b8386c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -367,7 +369,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">oauth</td><td><a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 client obtained from <code><a class="el" href="classlongbridge_1_1_o_auth_builder.html#a8233ec3eceb5628ac8fc917298a0ebca">OAuthBuilder::build</a></code> </td></tr>
+    <tr><td class="paramname">oauth</td><td><a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 client obtained from <code><a class="el" href="classlongbridge_1_1_o_auth_builder.html#a637a26b824300d839c2fdf116ec633d9">OAuthBuilder::build</a></code> </td></tr>
   </table>
   </dd>
 </dl>
@@ -388,6 +390,43 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="acde50a8b298381f6b3c7db5375b8386c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acde50a8b298381f6b3c7db5375b8386c">&#9670;&nbsp;</a></span>refresh_access_token()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::Config::refresh_access_token </td>
+          <td>(</td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>expired_at</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, std::string &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Gets a new <code>access_token</code></p>
+<p>This method is only available when using <b>Legacy API Key</b> authentication (i.e. <code><a class="el" href="classlongbridge_1_1_config.html#a59767d070e2314034efd29d5d1c83a27">Config::from_apikey</a></code>). It is not supported for <a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 mode.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expired_at</td><td>Unix timestamp for token expiry. Pass <code>0</code> to use the default (90 days from now). </td></tr>
+    <tr><td class="paramname">callback</td><td>Callback invoked with the new access token string. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

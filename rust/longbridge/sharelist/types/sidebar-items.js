@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["SharelistDetail","SharelistInfo","SharelistList","SharelistScopes","SharelistStock"]};

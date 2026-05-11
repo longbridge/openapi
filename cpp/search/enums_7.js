@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['language_1266',['Language',['../namespacelongbridge.html#ad0f389971f48611d4522ea9082bd5859',1,'longbridge']]]
+  ['institutionrecommend_2518',['InstitutionRecommend',['../namespacelongbridge_1_1fundamental.html#a38917927db20dc1c4378f58271dde063',1,'longbridge::fundamental']]]
 ];

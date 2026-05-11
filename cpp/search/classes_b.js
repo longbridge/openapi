@@ -1,12 +1,19 @@
 var searchData=
 [
-  ['oauth_780',['OAuth',['../classlongbridge_1_1_o_auth.html',1,'longbridge']]],
-  ['oauthbuilder_781',['OAuthBuilder',['../classlongbridge_1_1_o_auth_builder.html',1,'longbridge']]],
-  ['optionquote_782',['OptionQuote',['../structlongbridge_1_1quote_1_1_option_quote.html',1,'longbridge::quote']]],
-  ['order_783',['Order',['../structlongbridge_1_1trade_1_1_order.html',1,'longbridge::trade']]],
-  ['orderchargedetail_784',['OrderChargeDetail',['../structlongbridge_1_1trade_1_1_order_charge_detail.html',1,'longbridge::trade']]],
-  ['orderchargefee_785',['OrderChargeFee',['../structlongbridge_1_1trade_1_1_order_charge_fee.html',1,'longbridge::trade']]],
-  ['orderchargeitem_786',['OrderChargeItem',['../structlongbridge_1_1trade_1_1_order_charge_item.html',1,'longbridge::trade']]],
-  ['orderdetail_787',['OrderDetail',['../structlongbridge_1_1trade_1_1_order_detail.html',1,'longbridge::trade']]],
-  ['orderhistorydetail_788',['OrderHistoryDetail',['../structlongbridge_1_1trade_1_1_order_history_detail.html',1,'longbridge::trade']]]
+  ['oauth_1488',['OAuth',['../classlongbridge_1_1_o_auth.html',1,'longbridge']]],
+  ['oauthbuilder_1489',['OAuthBuilder',['../classlongbridge_1_1_o_auth_builder.html',1,'longbridge']]],
+  ['operatingindicator_1490',['OperatingIndicator',['../structlongbridge_1_1fundamental_1_1_operating_indicator.html',1,'longbridge::fundamental']]],
+  ['operatingitem_1491',['OperatingItem',['../structlongbridge_1_1fundamental_1_1_operating_item.html',1,'longbridge::fundamental']]],
+  ['operatinglist_1492',['OperatingList',['../structlongbridge_1_1fundamental_1_1_operating_list.html',1,'longbridge::fundamental']]],
+  ['optionquote_1493',['OptionQuote',['../structlongbridge_1_1quote_1_1_option_quote.html',1,'longbridge::quote']]],
+  ['optionvolumedaily_1494',['OptionVolumeDaily',['../structlongbridge_1_1quote_1_1_option_volume_daily.html',1,'longbridge::quote']]],
+  ['optionvolumedailystat_1495',['OptionVolumeDailyStat',['../structlongbridge_1_1quote_1_1_option_volume_daily_stat.html',1,'longbridge::quote']]],
+  ['optionvolumestats_1496',['OptionVolumeStats',['../structlongbridge_1_1quote_1_1_option_volume_stats.html',1,'longbridge::quote']]],
+  ['order_1497',['Order',['../structlongbridge_1_1trade_1_1_order.html',1,'longbridge::trade']]],
+  ['orderchargedetail_1498',['OrderChargeDetail',['../structlongbridge_1_1trade_1_1_order_charge_detail.html',1,'longbridge::trade']]],
+  ['orderchargefee_1499',['OrderChargeFee',['../structlongbridge_1_1trade_1_1_order_charge_fee.html',1,'longbridge::trade']]],
+  ['orderchargeitem_1500',['OrderChargeItem',['../structlongbridge_1_1trade_1_1_order_charge_item.html',1,'longbridge::trade']]],
+  ['orderdetail_1501',['OrderDetail',['../structlongbridge_1_1trade_1_1_order_detail.html',1,'longbridge::trade']]],
+  ['orderhistorydetail_1502',['OrderHistoryDetail',['../structlongbridge_1_1trade_1_1_order_history_detail.html',1,'longbridge::trade']]],
+  ['ownedtopic_1503',['OwnedTopic',['../structlongbridge_1_1content_1_1_owned_topic.html',1,'longbridge::content']]]
 ];

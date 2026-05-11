@@ -1,4 +1,12 @@
 com.longbridge
+com.longbridge.alert
+com.longbridge.asset
+com.longbridge.calendar
 com.longbridge.content
+com.longbridge.dca
+com.longbridge.fundamental
+com.longbridge.market
+com.longbridge.portfolio
 com.longbridge.quote
+com.longbridge.sharelist
 com.longbridge.trade

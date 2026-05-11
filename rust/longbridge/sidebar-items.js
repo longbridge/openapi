@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Error","Language","Market","PushCandlestickMode","SimpleError","SimpleErrorKind"],"macro":["decimal"],"mod":["content","quote","runtime","trade"],"struct":["Config","Decimal"],"type":["Result"]};
+window.SIDEBAR_ITEMS = {"enum":["Error","Language","Market","PushCandlestickMode","SimpleError","SimpleErrorKind"],"macro":["decimal"],"mod":["alert","asset","calendar","content","dca","fundamental","market","portfolio","quote","runtime","sharelist","trade"],"struct":["Config","Decimal"],"type":["Result"]};

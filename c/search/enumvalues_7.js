@@ -1,9 +1,11 @@
 var searchData=
 [
-  ['marketcn_1534',['MarketCN',['../longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3a271c68892160ae3e035d88ab15c5149a',1,'longbridge.h']]],
-  ['marketcrypto_1535',['MarketCrypto',['../longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3af2541828ffcf1c8b32dd42255daed547',1,'longbridge.h']]],
-  ['markethk_1536',['MarketHK',['../longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3a2eee2d56f04d14beed0a81d42edf701f',1,'longbridge.h']]],
-  ['marketsg_1537',['MarketSG',['../longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3a51550bc2fc27282a9947526ae60432f6',1,'longbridge.h']]],
-  ['marketunknown_1538',['MarketUnknown',['../longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3a3b82ceb85730bbc01f13f536a5f611c6',1,'longbridge.h']]],
-  ['marketus_1539',['MarketUS',['../longbridge_8h.html#a314b7af320779ef1151f6cceba24aad3a521c2056e7a70d71b67d33adefce7399',1,'longbridge.h']]]
+  ['institutionrecommendbuy_3061',['InstitutionRecommendBuy',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58a0958f034c7efc3e9e7f0916b603a4333',1,'longbridge.h']]],
+  ['institutionrecommendhold_3062',['InstitutionRecommendHold',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58ad49c1598278ea960824401976ae293b5',1,'longbridge.h']]],
+  ['institutionrecommendnoopinion_3063',['InstitutionRecommendNoOpinion',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58a5f04436b1332555c5e549174ab81219a',1,'longbridge.h']]],
+  ['institutionrecommendsell_3064',['InstitutionRecommendSell',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58a4a60253c5ba55bf2b65cd1ec465355c5',1,'longbridge.h']]],
+  ['institutionrecommendstrongbuy_3065',['InstitutionRecommendStrongBuy',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58a7bcf1df6d5e41deda4945eadd61b28ef',1,'longbridge.h']]],
+  ['institutionrecommendstrongsell_3066',['InstitutionRecommendStrongSell',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58abc246f4704807a00230690f7cf90eaa4',1,'longbridge.h']]],
+  ['institutionrecommendunderperform_3067',['InstitutionRecommendUnderperform',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58a123a44d9cd98fb28941a5917945a7d17',1,'longbridge.h']]],
+  ['institutionrecommendunknown_3068',['InstitutionRecommendUnknown',['../longbridge_8h.html#a2df8b4a7096c847cd6279a118ef28d58a249594d71ce117026223ce3e4661765f',1,'longbridge.h']]]
 ];

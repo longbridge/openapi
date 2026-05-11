@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CalendarCategory"],"struct":["CalendarDataKv","CalendarDateGroup","CalendarEventInfo","CalendarEventsResponse"]};

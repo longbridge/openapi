@@ -85,7 +85,9 @@ var menudata={children:[
 {text:"c",url:"globals_c.html#index_c"},
 {text:"d",url:"globals_d.html#index_d"},
 {text:"e",url:"globals_e.html#index_e"},
+{text:"f",url:"globals_f.html#index_f"},
 {text:"g",url:"globals_g.html#index_g"},
+{text:"i",url:"globals_i.html#index_i"},
 {text:"l",url:"globals_l.html#index_l"},
 {text:"m",url:"globals_m.html#index_m"},
 {text:"o",url:"globals_o.html#index_o"},
@@ -96,7 +98,8 @@ var menudata={children:[
 {text:"Functions",url:"globals_func.html",children:[
 {text:"l",url:"globals_func.html#index_l"}]},
 {text:"Typedefs",url:"globals_type.html",children:[
-{text:"l",url:"globals_type.html#index_l"}]},
+{text:"c",url:"globals_type.html#index_c"},
+{text:"l",url:"globals_type_l.html#index_l"}]},
 {text:"Enumerations",url:"globals_enum.html",children:[
 {text:"l",url:"globals_enum.html#index_l"}]},
 {text:"Enumerator",url:"globals_eval.html",children:[
@@ -105,7 +108,9 @@ var menudata={children:[
 {text:"c",url:"globals_eval_c.html#index_c"},
 {text:"d",url:"globals_eval_d.html#index_d"},
 {text:"e",url:"globals_eval_e.html#index_e"},
+{text:"f",url:"globals_eval_f.html#index_f"},
 {text:"g",url:"globals_eval_g.html#index_g"},
+{text:"i",url:"globals_eval_i.html#index_i"},
 {text:"l",url:"globals_eval_l.html#index_l"},
 {text:"m",url:"globals_eval_m.html#index_m"},
 {text:"o",url:"globals_eval_o.html#index_o"},

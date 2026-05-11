@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["ContentContext","NewsItem","TopicItem"]};
+window.SIDEBAR_ITEMS = {"struct":["ContentContext","CreateReplyOptions","CreateTopicOptions","ListTopicRepliesOptions","MyTopicsOptions","NewsItem","OwnedTopic","TopicAuthor","TopicImage","TopicItem","TopicReply"]};

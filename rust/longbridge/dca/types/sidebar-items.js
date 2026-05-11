@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DCAFrequency","DCAStatus"],"struct":["DcaCalcDateResult","DcaCreateResult","DcaHistoryRecord","DcaHistoryResponse","DcaList","DcaPlan","DcaStats","DcaSupportInfo","DcaSupportList"]};

@@ -203,6 +203,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac44c1873a007d23d8040573ef9001aa6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#ac44c1873a007d23d8040573ef9001aa6">update_watchlist_group</a> (const <a class="el" href="structlongbridge_1_1quote_1_1_update_watchlist_group.html">UpdateWatchlistGroup</a> &amp;req, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, void &gt; callback) const</td></tr>
 <tr class="memdesc:ac44c1873a007d23d8040573ef9001aa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create watchlist group.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#ac44c1873a007d23d8040573ef9001aa6">More...</a><br /></td></tr>
 <tr class="separator:ac44c1873a007d23d8040573ef9001aa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f7822532882d6662a940cab4365da63"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a0f7822532882d6662a940cab4365da63">update_pinned</a> (int32_t mode, const std::vector&lt; std::string &gt; &amp;securities, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, void &gt; callback) const</td></tr>
+<tr class="memdesc:a0f7822532882d6662a940cab4365da63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pin or unpin watchlist securities (mode: 0=add/pin, 1=remove/unpin)  <a href="classlongbridge_1_1quote_1_1_quote_context.html#a0f7822532882d6662a940cab4365da63">More...</a><br /></td></tr>
+<tr class="separator:a0f7822532882d6662a940cab4365da63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85431038d7e7da956d730f8f2cebd1a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a85431038d7e7da956d730f8f2cebd1a7">filings</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_filing_item.html">FilingItem</a> &gt;&gt; callback) const</td></tr>
 <tr class="memdesc:a85431038d7e7da956d730f8f2cebd1a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get filings.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#a85431038d7e7da956d730f8f2cebd1a7">More...</a><br /></td></tr>
 <tr class="separator:a85431038d7e7da956d730f8f2cebd1a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -228,6 +231,15 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7aa06f6670b169238a4cfa9f61487032"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ab4f16a5ca1019d5f7c4f099f0568fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a0ab4f16a5ca1019d5f7c4f099f0568fe">realtime_candlesticks</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4">Period</a> period, uintptr_t count, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_candlestick.html">Candlestick</a> &gt;&gt; callback) const</td></tr>
 <tr class="separator:a0ab4f16a5ca1019d5f7c4f099f0568fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49adbca33e7752b2d4a06e3d9585cb88"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a49adbca33e7752b2d4a06e3d9585cb88">short_positions</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, <a class="el" href="structlongbridge_1_1quote_1_1_short_positions_response.html">ShortPositionsResponse</a> &gt; callback) const</td></tr>
+<tr class="memdesc:a49adbca33e7752b2d4a06e3d9585cb88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get short interest data for a US security.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#a49adbca33e7752b2d4a06e3d9585cb88">More...</a><br /></td></tr>
+<tr class="separator:a49adbca33e7752b2d4a06e3d9585cb88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac882c28efe184bc4690f91efe42cdacf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#ac882c28efe184bc4690f91efe42cdacf">option_volume</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_stats.html">OptionVolumeStats</a> &gt; callback) const</td></tr>
+<tr class="memdesc:ac882c28efe184bc4690f91efe42cdacf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get real-time option call/put volume.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#ac882c28efe184bc4690f91efe42cdacf">More...</a><br /></td></tr>
+<tr class="separator:ac882c28efe184bc4690f91efe42cdacf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa35549f517a4f296883f44adfd0e8a9d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#aa35549f517a4f296883f44adfd0e8a9d">option_volume_daily</a> (const std::string &amp;symbol, int64_t timestamp, uint32_t count, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_daily.html">OptionVolumeDaily</a> &gt; callback) const</td></tr>
+<tr class="memdesc:aa35549f517a4f296883f44adfd0e8a9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get daily historical option volume.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#aa35549f517a4f296883f44adfd0e8a9d">More...</a><br /></td></tr>
+<tr class="separator:aa35549f517a4f296883f44adfd0e8a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -1026,6 +1038,78 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ac882c28efe184bc4690f91efe42cdacf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac882c28efe184bc4690f91efe42cdacf">&#9670;&nbsp;</a></span>option_volume()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::quote::QuoteContext::option_volume </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_stats.html">OptionVolumeStats</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get real-time option call/put volume. </p>
+
+</div>
+</div>
+<a id="aa35549f517a4f296883f44adfd0e8a9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa35549f517a4f296883f44adfd0e8a9d">&#9670;&nbsp;</a></span>option_volume_daily()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::quote::QuoteContext::option_volume_daily </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>timestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_daily.html">OptionVolumeDaily</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get daily historical option volume. </p>
+
+</div>
+</div>
 <a id="a4b1206889135f8712e52b88ef321f280"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4b1206889135f8712e52b88ef321f280">&#9670;&nbsp;</a></span>participants()</h2>
 
@@ -1462,6 +1546,36 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a49adbca33e7752b2d4a06e3d9585cb88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49adbca33e7752b2d4a06e3d9585cb88">&#9670;&nbsp;</a></span>short_positions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::quote::QuoteContext::short_positions </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, <a class="el" href="structlongbridge_1_1quote_1_1_short_positions_response.html">ShortPositionsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get short interest data for a US security. </p>
+
+</div>
+</div>
 <a id="aa7d2e40f0e94848aa229a629343821e8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa7d2e40f0e94848aa229a629343821e8">&#9670;&nbsp;</a></span>static_info()</h2>
 
@@ -1757,6 +1871,42 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Unsubscribe security candlesticks. </p>
+
+</div>
+</div>
+<a id="a0f7822532882d6662a940cab4365da63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f7822532882d6662a940cab4365da63">&#9670;&nbsp;</a></span>update_pinned()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::quote::QuoteContext::update_pinned </td>
+          <td>(</td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>securities</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, void &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Pin or unpin watchlist securities (mode: 0=add/pin, 1=remove/unpin) </p>
 
 </div>
 </div>

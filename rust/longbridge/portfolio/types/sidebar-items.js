@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AssetType","FlowDirection"],"struct":["ExchangeRate","ExchangeRates","FlowItem","ProfitAnalysis","ProfitAnalysisByMarket","ProfitAnalysisByMarketItem","ProfitAnalysisDetail","ProfitAnalysisFlows","ProfitAnalysisItem","ProfitAnalysisSublist","ProfitAnalysisSummary","ProfitDetailEntry","ProfitDetails","ProfitSummaryBreakdown","ProfitSummaryInfo"]};

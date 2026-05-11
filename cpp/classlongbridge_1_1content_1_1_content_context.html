@@ -93,6 +93,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad793d29b8f772f3e1cd34fa4030a60dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b3d88849e1cbc5dc620f8fffeca04c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1content_1_1_content_context.html">ContentContext</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1content_1_1_content_context.html#a0b3d88849e1cbc5dc620f8fffeca04c0">operator=</a> (const <a class="el" href="classlongbridge_1_1content_1_1_content_context.html">ContentContext</a> &amp;ctx)</td></tr>
 <tr class="separator:a0b3d88849e1cbc5dc620f8fffeca04c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea77b191d194cf8ae84d794ec09bdb99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1content_1_1_content_context.html#aea77b191d194cf8ae84d794ec09bdb99">my_topics</a> (const <a class="el" href="structlongbridge_1_1content_1_1_my_topics_options.html">MyTopicsOptions</a> &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1content_1_1_content_context.html">ContentContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1content_1_1_owned_topic.html">OwnedTopic</a> &gt;&gt; callback) const</td></tr>
+<tr class="memdesc:aea77b191d194cf8ae84d794ec09bdb99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get topics created by the current authenticated user.  <a href="classlongbridge_1_1content_1_1_content_context.html#aea77b191d194cf8ae84d794ec09bdb99">More...</a><br /></td></tr>
+<tr class="separator:aea77b191d194cf8ae84d794ec09bdb99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a433c843bf1e0205fd46b136141682744"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1content_1_1_content_context.html#a433c843bf1e0205fd46b136141682744">create_topic</a> (const <a class="el" href="structlongbridge_1_1content_1_1_create_topic_options.html">CreateTopicOptions</a> &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1content_1_1_content_context.html">ContentContext</a>, std::string &gt; callback) const</td></tr>
+<tr class="memdesc:a433c843bf1e0205fd46b136141682744"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new topic.  <a href="classlongbridge_1_1content_1_1_content_context.html#a433c843bf1e0205fd46b136141682744">More...</a><br /></td></tr>
+<tr class="separator:a433c843bf1e0205fd46b136141682744"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0edc9ea53a218a083a3cf87974db58a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1content_1_1_content_context.html#ac0edc9ea53a218a083a3cf87974db58a">topics</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1content_1_1_content_context.html">ContentContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1content_1_1_topic_item.html">TopicItem</a> &gt;&gt; callback) const</td></tr>
 <tr class="memdesc:ac0edc9ea53a218a083a3cf87974db58a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get discussion topics list for a symbol.  <a href="classlongbridge_1_1content_1_1_content_context.html#ac0edc9ea53a218a083a3cf87974db58a">More...</a><br /></td></tr>
 <tr class="separator:ac0edc9ea53a218a083a3cf87974db58a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,6 +226,66 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a433c843bf1e0205fd46b136141682744"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a433c843bf1e0205fd46b136141682744">&#9670;&nbsp;</a></span>create_topic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::content::ContentContext::create_topic </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structlongbridge_1_1content_1_1_create_topic_options.html">CreateTopicOptions</a> &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1content_1_1_content_context.html">ContentContext</a>, std::string &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a new topic. </p>
+
+</div>
+</div>
+<a id="aea77b191d194cf8ae84d794ec09bdb99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea77b191d194cf8ae84d794ec09bdb99">&#9670;&nbsp;</a></span>my_topics()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::content::ContentContext::my_topics </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structlongbridge_1_1content_1_1_my_topics_options.html">MyTopicsOptions</a> &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1content_1_1_content_context.html">ContentContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1content_1_1_owned_topic.html">OwnedTopic</a> &gt;&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get topics created by the current authenticated user. </p>
 
 </div>
 </div>

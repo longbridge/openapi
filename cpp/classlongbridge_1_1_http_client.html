@@ -86,8 +86,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a641086780e53420fd32a3b9c7105a840"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc950aeecb0d4ee7d2bf5e4e102a6c20"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_http_client.html#abc950aeecb0d4ee7d2bf5e4e102a6c20">~HttpClient</a> ()</td></tr>
 <tr class="separator:abc950aeecb0d4ee7d2bf5e4e102a6c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56e22d88a793c3e76f41cda15b7a3553"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_http_client.html#a56e22d88a793c3e76f41cda15b7a3553">request</a> (const std::string &amp;method, const std::string &amp;path, const std::optional&lt; std::map&lt; std::string, std::string &gt;&gt; &amp;headers, const std::optional&lt; std::string &gt; &amp;body, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; void *, <a class="el" href="structlongbridge_1_1_http_result.html">HttpResult</a> &gt; callback)</td></tr>
-<tr class="separator:a56e22d88a793c3e76f41cda15b7a3553"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42a7bba3a8ba59797135c3be6112eeaf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_http_client.html#a42a7bba3a8ba59797135c3be6112eeaf">request</a> (const std::string &amp;method, const std::string &amp;path, const std::optional&lt; std::map&lt; std::string, std::string &gt;&gt; &amp;headers, const std::optional&lt; std::string &gt; &amp;body, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, <a class="el" href="structlongbridge_1_1_http_result.html">HttpResult</a> &gt; callback)</td></tr>
+<tr class="separator:a42a7bba3a8ba59797135c3be6112eeaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -313,7 +313,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Create a new <code><a class="el" href="classlongbridge_1_1_http_client.html">HttpClient</a></code> from an <a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 client</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">oauth</td><td><a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 client obtained from <code><a class="el" href="classlongbridge_1_1_o_auth_builder.html#a8233ec3eceb5628ac8fc917298a0ebca">OAuthBuilder::build</a></code> </td></tr>
+    <tr><td class="paramname">oauth</td><td><a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 client obtained from <code><a class="el" href="classlongbridge_1_1_o_auth_builder.html#a637a26b824300d839c2fdf116ec633d9">OAuthBuilder::build</a></code> </td></tr>
     <tr><td class="paramname">http_url</td><td>HTTP endpoint url (default: <a href="https://openapi.longbridge.com">https://openapi.longbridge.com</a>) </td></tr>
   </table>
   </dd>
@@ -321,8 +321,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a56e22d88a793c3e76f41cda15b7a3553"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56e22d88a793c3e76f41cda15b7a3553">&#9670;&nbsp;</a></span>request()</h2>
+<a id="a42a7bba3a8ba59797135c3be6112eeaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42a7bba3a8ba59797135c3be6112eeaf">&#9670;&nbsp;</a></span>request()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -354,7 +354,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; void *, <a class="el" href="structlongbridge_1_1_http_result.html">HttpResult</a> &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="structlongbridge_1_1_no_context.html">NoContext</a>, <a class="el" href="structlongbridge_1_1_http_result.html">HttpResult</a> &gt;&#160;</td>
           <td class="paramname"><em>callback</em>&#160;</td>
         </tr>
         <tr>

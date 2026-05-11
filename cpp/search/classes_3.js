@@ -1,8 +1,20 @@
 var searchData=
 [
-  ['date_750',['Date',['../structlongbridge_1_1_date.html',1,'longbridge']]],
-  ['datetime_751',['DateTime',['../structlongbridge_1_1_date_time.html',1,'longbridge']]],
-  ['decimal_752',['Decimal',['../classlongbridge_1_1_decimal.html',1,'longbridge']]],
-  ['depth_753',['Depth',['../structlongbridge_1_1quote_1_1_depth.html',1,'longbridge::quote']]],
-  ['derivativetype_754',['DerivativeType',['../structlongbridge_1_1quote_1_1_derivative_type.html',1,'longbridge::quote']]]
+  ['date_1416',['Date',['../structlongbridge_1_1_date.html',1,'longbridge']]],
+  ['datetime_1417',['DateTime',['../structlongbridge_1_1_date_time.html',1,'longbridge']]],
+  ['dcacalcdateresult_1418',['DcaCalcDateResult',['../structlongbridge_1_1dca_1_1_dca_calc_date_result.html',1,'longbridge::dca']]],
+  ['dcacontext_1419',['DCAContext',['../classlongbridge_1_1dca_1_1_d_c_a_context.html',1,'longbridge::dca']]],
+  ['dcacreateresult_1420',['DcaCreateResult',['../structlongbridge_1_1dca_1_1_dca_create_result.html',1,'longbridge::dca']]],
+  ['dcahistoryrecord_1421',['DcaHistoryRecord',['../structlongbridge_1_1dca_1_1_dca_history_record.html',1,'longbridge::dca']]],
+  ['dcahistoryresponse_1422',['DcaHistoryResponse',['../structlongbridge_1_1dca_1_1_dca_history_response.html',1,'longbridge::dca']]],
+  ['dcalist_1423',['DcaList',['../structlongbridge_1_1dca_1_1_dca_list.html',1,'longbridge::dca']]],
+  ['dcaplan_1424',['DcaPlan',['../structlongbridge_1_1dca_1_1_dca_plan.html',1,'longbridge::dca']]],
+  ['dcastats_1425',['DcaStats',['../structlongbridge_1_1dca_1_1_dca_stats.html',1,'longbridge::dca']]],
+  ['dcasupportinfo_1426',['DcaSupportInfo',['../structlongbridge_1_1dca_1_1_dca_support_info.html',1,'longbridge::dca']]],
+  ['dcasupportlist_1427',['DcaSupportList',['../structlongbridge_1_1dca_1_1_dca_support_list.html',1,'longbridge::dca']]],
+  ['decimal_1428',['Decimal',['../classlongbridge_1_1_decimal.html',1,'longbridge']]],
+  ['depth_1429',['Depth',['../structlongbridge_1_1quote_1_1_depth.html',1,'longbridge::quote']]],
+  ['derivativetype_1430',['DerivativeType',['../structlongbridge_1_1quote_1_1_derivative_type.html',1,'longbridge::quote']]],
+  ['dividenditem_1431',['DividendItem',['../structlongbridge_1_1fundamental_1_1_dividend_item.html',1,'longbridge::fundamental']]],
+  ['dividendlist_1432',['DividendList',['../structlongbridge_1_1fundamental_1_1_dividend_list.html',1,'longbridge::fundamental']]]
 ];

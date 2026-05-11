@@ -1,5 +1,25 @@
 var searchData=
 [
-  ['adjusttypeforward_1461',['AdjustTypeForward',['../longbridge_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa56ffbdbf49c35dc37c367183b427797e',1,'longbridge.h']]],
-  ['adjusttypenoadjust_1462',['AdjustTypeNoAdjust',['../longbridge_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa2431e5109013a7697b3e8fb30950d916',1,'longbridge.h']]]
+  ['adjusttypeforward_2938',['AdjustTypeForward',['../longbridge_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa56ffbdbf49c35dc37c367183b427797e',1,'longbridge.h']]],
+  ['adjusttypenoadjust_2939',['AdjustTypeNoAdjust',['../longbridge_8h.html#ac7dfa4da1bb548d6575c619f3f22515fa2431e5109013a7697b3e8fb30950d916',1,'longbridge.h']]],
+  ['ahpremiumperiodday_2940',['AhPremiumPeriodDay',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7a9775077983fd79a71b802e3931ae7574',1,'longbridge.h']]],
+  ['ahpremiumperiodmin1_2941',['AhPremiumPeriodMin1',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7a0b0feda5238db981fff22a0f6766ae48',1,'longbridge.h']]],
+  ['ahpremiumperiodmin15_2942',['AhPremiumPeriodMin15',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7ad2c85e9ac6aeba6069dffeb145816051',1,'longbridge.h']]],
+  ['ahpremiumperiodmin30_2943',['AhPremiumPeriodMin30',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7a323aa1a67e18a7b6f6692ca193369d28',1,'longbridge.h']]],
+  ['ahpremiumperiodmin5_2944',['AhPremiumPeriodMin5',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7a39453c3ee6d08632d49266a608aa2ba6',1,'longbridge.h']]],
+  ['ahpremiumperiodmin60_2945',['AhPremiumPeriodMin60',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7add4ff89010e983b09f0c2cdced506987',1,'longbridge.h']]],
+  ['ahpremiumperiodmonth_2946',['AhPremiumPeriodMonth',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7a3ae433672951f727ca349c32226f8ee7',1,'longbridge.h']]],
+  ['ahpremiumperiodweek_2947',['AhPremiumPeriodWeek',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7ab095a2f04749a8d25427b0b727fadea3',1,'longbridge.h']]],
+  ['ahpremiumperiodyear_2948',['AhPremiumPeriodYear',['../longbridge_8h.html#a218b0affaf890ce7f1dbf96644cbc3a7ae6dc33345cf16681c76bcd5de677f0be',1,'longbridge.h']]],
+  ['alertconditionpercentfall_2949',['AlertConditionPercentFall',['../longbridge_8h.html#a3e9731c8b8b84ada0ca05de8158a77daaaef95a40c9e7a432822ebf648feda310',1,'longbridge.h']]],
+  ['alertconditionpercentrise_2950',['AlertConditionPercentRise',['../longbridge_8h.html#a3e9731c8b8b84ada0ca05de8158a77daa69f254e7adacba0c5a15c97fe0b8077f',1,'longbridge.h']]],
+  ['alertconditionpricefall_2951',['AlertConditionPriceFall',['../longbridge_8h.html#a3e9731c8b8b84ada0ca05de8158a77daa618a5f3923c94f0328168ca7b362eaf2',1,'longbridge.h']]],
+  ['alertconditionpricerise_2952',['AlertConditionPriceRise',['../longbridge_8h.html#a3e9731c8b8b84ada0ca05de8158a77daa171e718dd3eafbca2aa8722e3329c581',1,'longbridge.h']]],
+  ['alertfrequencydaily_2953',['AlertFrequencyDaily',['../longbridge_8h.html#a07521fd5051f0e49007f4df941185509aa59b1b0eaa7222001dfecf3dd9b6d763',1,'longbridge.h']]],
+  ['alertfrequencyeverytime_2954',['AlertFrequencyEveryTime',['../longbridge_8h.html#a07521fd5051f0e49007f4df941185509aa83fc6703d057cab2d32ebab97ba917e',1,'longbridge.h']]],
+  ['alertfrequencyonce_2955',['AlertFrequencyOnce',['../longbridge_8h.html#a07521fd5051f0e49007f4df941185509a4c65cfd1a66a19e5417188812b2f0158',1,'longbridge.h']]],
+  ['assettypecrypto_2956',['AssetTypeCrypto',['../longbridge_8h.html#a9101a870de19a14f76b60b713492a68ba2ab3e300e270b56e0305a8c320f15a79',1,'longbridge.h']]],
+  ['assettypefund_2957',['AssetTypeFund',['../longbridge_8h.html#a9101a870de19a14f76b60b713492a68bacd7c953c0abc111d6f345d211be965db',1,'longbridge.h']]],
+  ['assettypestock_2958',['AssetTypeStock',['../longbridge_8h.html#a9101a870de19a14f76b60b713492a68ba230f983270b7d522fb821e3c66659b24',1,'longbridge.h']]],
+  ['assettypeunknown_2959',['AssetTypeUnknown',['../longbridge_8h.html#a9101a870de19a14f76b60b713492a68ba1a04913386f10c3877583c6627187eea',1,'longbridge.h']]]
 ];
