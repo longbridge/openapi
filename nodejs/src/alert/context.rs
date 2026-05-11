@@ -46,16 +46,20 @@ impl AlertContext {
     }
 
     /// Enable a previously disabled price alert.
+    ///
+    /// Pass the [`AlertItem`] obtained from [`list`](Self::list).
     #[napi]
-    pub async fn enable(&self, alert_id: String) -> Result<()> {
-        self.ctx.enable(alert_id).await.map_err(ErrorNewType)?;
+    pub async fn enable(&self, item: AlertItem) -> Result<()> {
+        self.ctx.enable(&item.into()).await.map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Disable a price alert without deleting it.
+    ///
+    /// Pass the [`AlertItem`] obtained from [`list`](Self::list).
     #[napi]
-    pub async fn disable(&self, alert_id: String) -> Result<()> {
-        self.ctx.disable(alert_id).await.map_err(ErrorNewType)?;
+    pub async fn disable(&self, item: AlertItem) -> Result<()> {
+        self.ctx.disable(&item.into()).await.map_err(ErrorNewType)?;
         Ok(())
     }
 

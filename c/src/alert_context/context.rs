@@ -66,33 +66,43 @@ pub unsafe extern "C" fn lb_alert_context_add(
 }
 
 /// Enable a price alert.
+///
+/// `item` must point to a valid [`CAlertItem`] obtained from
+/// [`lb_alert_context_list`]. All fields are read before the function
+/// returns, so the pointer only needs to be valid for the duration of
+/// the call.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_alert_context_enable(
     ctx: *const CAlertContext,
-    alert_id: *const c_char,
+    item: *const CAlertItem,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let id = cstr_to_rust(alert_id);
+    let alert_item = (*item).to_alert_item();
     execute_async(callback, ctx, userdata, async move {
-        ctx_inner.enable(id).await?;
+        ctx_inner.enable(&alert_item).await?;
         Ok(())
     });
 }
 
 /// Disable a price alert.
+///
+/// `item` must point to a valid [`CAlertItem`] obtained from
+/// [`lb_alert_context_list`]. All fields are read before the function
+/// returns, so the pointer only needs to be valid for the duration of
+/// the call.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_alert_context_disable(
     ctx: *const CAlertContext,
-    alert_id: *const c_char,
+    item: *const CAlertItem,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let id = cstr_to_rust(alert_id);
+    let alert_item = (*item).to_alert_item();
     execute_async(callback, ctx, userdata, async move {
-        ctx_inner.disable(id).await?;
+        ctx_inner.disable(&alert_item).await?;
         Ok(())
     });
 }

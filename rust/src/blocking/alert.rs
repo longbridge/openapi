@@ -40,19 +40,13 @@ impl AlertContextSync {
             ctx.add(symbol, condition, trigger_value, frequency).await
         })
     }
-    pub fn enable(
-        &self,
-        alert_id: impl Into<String> + Send + 'static,
-    ) -> Result<serde_json::Value> {
+    pub fn enable(&self, item: AlertItem) -> Result<serde_json::Value> {
         self.rt
-            .call(move |ctx| async move { ctx.enable(alert_id).await })
+            .call(move |ctx| async move { ctx.enable(&item).await })
     }
-    pub fn disable(
-        &self,
-        alert_id: impl Into<String> + Send + 'static,
-    ) -> Result<serde_json::Value> {
+    pub fn disable(&self, item: AlertItem) -> Result<serde_json::Value> {
         self.rt
-            .call(move |ctx| async move { ctx.disable(alert_id).await })
+            .call(move |ctx| async move { ctx.disable(&item).await })
     }
     pub fn delete(&self, alert_ids: Vec<String>) -> Result<serde_json::Value> {
         self.rt

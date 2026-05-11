@@ -36,6 +36,21 @@ impl From<lb::AlertItem> for AlertItem {
     }
 }
 
+impl From<AlertItem> for lb::AlertItem {
+    fn from(v: AlertItem) -> Self {
+        Self {
+            id: v.id,
+            indicator_id: v.indicator_id,
+            enabled: v.enabled,
+            frequency: v.frequency,
+            scope: v.scope,
+            text: v.text,
+            state: v.state,
+            value_map: v.value_map,
+        }
+    }
+}
+
 /// Alert items for one security
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
