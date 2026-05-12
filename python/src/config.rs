@@ -233,4 +233,30 @@ impl Config {
             .refresh_access_token_blocking(expired_at.map(|t| t.0))
             .map_err(ErrorNewType)?)
     }
+
+    /// Async version of :meth:`Config.refresh_access_token`. Returns an
+    /// awaitable; must be awaited inside asyncio.
+    ///
+    /// Args:
+    ///     expired_at: The expiration time of the access token (default: 90
+    ///         days from now).
+    ///
+    /// Returns:
+    ///     New access token string
+    #[pyo3(signature = (expired_at = None))]
+    pub fn refresh_access_token_async(
+        &self,
+        py: Python<'_>,
+        expired_at: Option<PyOffsetDateTimeWrapper>,
+    ) -> PyResult<Py<PyAny>> {
+        let config = self.0.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            config
+                .refresh_access_token(expired_at.map(|t| t.0))
+                .await
+                .map_err(ErrorNewType)
+                .map_err(PyErr::from)
+        })
+        .map(|b| b.unbind())
+    }
 }
