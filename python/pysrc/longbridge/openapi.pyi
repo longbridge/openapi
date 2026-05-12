@@ -419,6 +419,26 @@ class Config:
             New access token string
         """
 
+    async def refresh_access_token_async(
+        self,
+        expired_at: Optional[datetime] = None,
+    ) -> str:
+        """
+        Async version of :meth:`Config.refresh_access_token`. Returns an
+        awaitable; must be awaited inside asyncio.
+
+        This method is only available when using **Legacy API Key**
+        authentication (i.e. :meth:`Config.from_apikey`). It is not supported
+        for OAuth 2.0 mode.
+
+        Args:
+            expired_at: The expiration time of the access token (default: 90
+                days from now).
+
+        Returns:
+            New access token string
+        """
+
 class Language:
     """
     Language identifier
