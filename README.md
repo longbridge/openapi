@@ -56,6 +56,10 @@ https://longbridge.github.io/openapi
 - Authentication errors (401/403)
   - Verify `LONGBRIDGE_APP_KEY`, `LONGBRIDGE_APP_SECRET`, `LONGBRIDGE_ACCESS_TOKEN` are correct and not expired.
   - Ensure your OpenAPI app has the required permissions.
+- OpenAPI error code 202203 (`call inner interface error`)
+  - Authentication succeeded, but the backend gateway failed to reach an internal service (e.g. the asset query service).
+  - **Most common cause:** your OpenAPI application does not have the required permission enabled. OpenAPI permissions are managed separately from your mobile app — go to [open.longbridge.com](https://open.longbridge.com) → App Management → Permissions, and enable the permission for the API you are calling (e.g. "Account Balance").
+  - If permissions are already enabled, provide the `trace_id` from the exception to Longbridge support so they can trace the internal call.
 - Network / connection errors
   - Check firewall/proxy rules for HTTPS/WSS.
   - If you use a custom endpoint, set `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`.

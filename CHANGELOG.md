@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [Unreleased]
+
+## Documentation
+
+- **README:** Add troubleshooting entry for OpenAPI error code 202203 (`call inner interface error`). Explains that this error indicates a backend internal service failure (authentication is not the issue), the most common cause is missing OpenAPI-specific permissions (separate from mobile app permissions), and instructs users to provide the `trace_id` from the exception when contacting support.
+
 # [4.0.6]
 
 ## Added
