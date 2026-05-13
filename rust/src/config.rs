@@ -7,9 +7,11 @@ use std::{
 };
 
 pub(crate) use http::{HeaderName, HeaderValue, Request, header};
-use longbridge_httpcli::{HttpClient, HttpClientConfig, is_cn};
+use longbridge_httpcli::{HttpClient, HttpClientConfig, Json, Method, is_cn};
 use longbridge_oauth::OAuth;
 use num_enum::IntoPrimitive;
+use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tracing::{Level, Subscriber, subscriber::NoSubscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
@@ -430,6 +432,70 @@ impl Config {
             client = client.header(key.as_str(), value.as_str());
         }
         client
+    }
+
+    /// Gets a new `access_token`
+    ///
+    /// This method is only available when using **Legacy API Key**
+    /// authentication (i.e. [`Config::from_apikey`]). It is not supported
+    /// for OAuth 2.0 mode.
+    ///
+    /// `expired_at` - The expiration time of the access token, defaults to `90`
+    /// days.
+    ///
+    /// Reference: <https://open.longportapp.com/en/docs/refresh-token-api>
+    pub async fn refresh_access_token(&self, expired_at: Option<OffsetDateTime>) -> Result<String> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            expired_at: String,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            token: String,
+        }
+
+        let request = Request {
+            expired_at: expired_at
+                .unwrap_or_else(|| OffsetDateTime::now_utc() + time::Duration::days(90))
+                .format(&time::format_description::well_known::Rfc3339)
+                .unwrap(),
+        };
+
+        let new_token = self
+            .create_http_client()
+            .request(Method::GET, "/v1/token/refresh")
+            .query_params(request)
+            .response::<Json<Response>>()
+            .send()
+            .await?
+            .0
+            .token;
+        Ok(new_token)
+    }
+
+    /// Gets a new `access_token`, and also replaces the `access_token` in
+    /// `Config`.
+    ///
+    /// This method is only available when using **Legacy API Key**
+    /// authentication (i.e. [`Config::from_apikey`]). It is not supported
+    /// for OAuth 2.0 mode.
+    ///
+    /// `expired_at` - The expiration time of the access token, defaults to `90`
+    /// days.
+    ///
+    /// Reference: <https://open.longportapp.com/en/docs/refresh-token-api>
+    #[cfg(feature = "blocking")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
+    pub fn refresh_access_token_blocking(
+        &self,
+        expired_at: Option<OffsetDateTime>,
+    ) -> Result<String> {
+        tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("create tokio runtime")
+            .block_on(self.refresh_access_token(expired_at))
     }
 
     fn create_ws_request(&self, url: &str) -> tokio_tungstenite::tungstenite::Result<Request<()>> {

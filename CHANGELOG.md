@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# [Unreleased]
+# [4.0.6]
 
 ## Added
 
@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All languages:** `QuoteContext` gains `short_positions`, `option_volume`, `option_volume_daily`, and `update_pinned`.
 - **All languages:** `ContentContext` gains `topic_detail`, `list_topic_replies`, and `create_topic_reply`.
 - **Rust:** `Config::header(key, value)` builder method for injecting custom HTTP/WebSocket headers.
+- **All languages (Rust, Python, Node.js, Java, C, C++):** Restore `Config::refresh_access_token` (and `refresh_access_token_blocking` in Rust). Refreshes the access token via the Longbridge token-refresh API. Only available with **Legacy API Key** authentication (`Config::from_apikey`); not supported in OAuth 2.0 mode.
 
 ## Changed
 

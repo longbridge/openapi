@@ -7877,30 +7877,18 @@ void lb_alert_context_add(const struct lb_alert_context_t *ctx,
                           void *userdata);
 
 /**
- * Enable a price alert.
+ * Update (enable or disable) a price alert.
  *
  * `item` must point to a valid [`CAlertItem`] obtained from
- * [`lb_alert_context_list`]. All fields are read before the function
+ * [`lb_alert_context_list`]. Set `enabled` to `true` to re-enable or
+ * `false` to disable. All fields of `item` are read before the function
  * returns, so the pointer only needs to be valid for the duration of
  * the call.
  */
-void lb_alert_context_enable(const struct lb_alert_context_t *ctx,
+void lb_alert_context_update(const struct lb_alert_context_t *ctx,
                              const struct lb_alert_item_t *item,
                              lb_async_callback_t callback,
                              void *userdata);
-
-/**
- * Disable a price alert.
- *
- * `item` must point to a valid [`CAlertItem`] obtained from
- * [`lb_alert_context_list`]. All fields are read before the function
- * returns, so the pointer only needs to be valid for the duration of
- * the call.
- */
-void lb_alert_context_disable(const struct lb_alert_context_t *ctx,
-                              const struct lb_alert_item_t *item,
-                              lb_async_callback_t callback,
-                              void *userdata);
 
 /**
  * Delete price alerts. alert_ids: array of alert ID strings, num_ids: count.
@@ -8086,6 +8074,26 @@ void lb_config_disable_print_quote_packages(struct lb_config_t *config);
  * @param log_path  Path for log files
  */
 void lb_config_set_log_path(struct lb_config_t *config, const char *log_path);
+
+/**
+ * Gets a new `access_token`
+ *
+ * This function is only available when using **Legacy API Key**
+ * authentication (i.e. `lb_config_from_apikey`). It is not supported for
+ * OAuth 2.0 mode.
+ *
+ * @param config      Config object
+ * @param expired_at  Unix timestamp for token expiry. Pass `0` to use the
+ *                    default (90 days from now).
+ * @param callback    Callback function; on success `res->data` is a
+ *                    `const char*` access token (valid only within the
+ *                    callback body).
+ * @param userdata    Opaque pointer forwarded to the callback
+ */
+void lb_config_refresh_access_token(struct lb_config_t *config,
+                                    int64_t expired_at,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
 
 /**
  * Free the config object

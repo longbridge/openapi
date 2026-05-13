@@ -45,12 +45,10 @@ public:
   void add(const std::string& symbol, AlertCondition condition,
            const std::string& trigger_value, AlertFrequency frequency,
            AsyncCallback<AlertContext, void> callback) const;
-  /// Enable a price alert by alert_id.
-  void enable(const std::string& alert_id,
+  /// Update (enable or disable) a price alert.
+  /// Set item.enabled before calling to choose the new state.
+  void update(const AlertItem& item,
               AsyncCallback<AlertContext, void> callback) const;
-  /// Disable a price alert by alert_id.
-  void disable(const std::string& alert_id,
-               AsyncCallback<AlertContext, void> callback) const;
 };
 
 } // namespace alert

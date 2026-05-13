@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 
 /// Statement type
-#[pyclass(eq, eq_int)]
+#[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum StatementType {
     /// Daily statement

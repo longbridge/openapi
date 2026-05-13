@@ -21,7 +21,7 @@ impl<'py> IntoPyObject<'py> for &JsonValue {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AlertItem {
     pub id: String,
@@ -65,7 +65,29 @@ impl From<AlertItem> for lb::AlertItem {
     }
 }
 
-#[pyclass(get_all)]
+impl<'a, 'py> FromPyObject<'a, 'py> for AlertItem {
+    type Error = PyErr;
+
+    fn extract(ob: pyo3::Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
+        let value_map = ob
+            .getattr("value_map")
+            .ok()
+            .and_then(|v| pythonize::depythonize::<serde_json::Value>(&v).ok())
+            .unwrap_or(serde_json::Value::Null);
+        Ok(AlertItem {
+            id: ob.getattr("id")?.extract()?,
+            indicator_id: ob.getattr("indicator_id")?.extract()?,
+            enabled: ob.getattr("enabled")?.extract()?,
+            frequency: ob.getattr("frequency")?.extract()?,
+            scope: ob.getattr("scope")?.extract()?,
+            text: ob.getattr("text")?.extract()?,
+            state: ob.getattr("state")?.extract()?,
+            value_map: JsonValue(value_map),
+        })
+    }
+}
+
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AlertSymbolGroup {
     pub symbol: String,
@@ -95,7 +117,7 @@ impl From<lb::AlertSymbolGroup> for AlertSymbolGroup {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct AlertList {
     pub lists: Vec<AlertSymbolGroup>,

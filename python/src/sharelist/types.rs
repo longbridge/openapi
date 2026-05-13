@@ -20,7 +20,7 @@ impl<'py> IntoPyObject<'py> for &JsonValue {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct SharelistStock {
     pub symbol: String,
@@ -51,7 +51,7 @@ impl From<lb::SharelistStock> for SharelistStock {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct SharelistScopes {
     pub subscription: bool,
@@ -66,7 +66,7 @@ impl From<lb::SharelistScopes> for SharelistScopes {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct SharelistInfo {
     pub id: i64,
@@ -105,7 +105,7 @@ impl From<lb::SharelistInfo> for SharelistInfo {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct SharelistList {
     pub sharelists: Vec<SharelistInfo>,
@@ -126,7 +126,7 @@ impl From<lb::SharelistList> for SharelistList {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct SharelistDetail {
     pub sharelist: SharelistInfo,

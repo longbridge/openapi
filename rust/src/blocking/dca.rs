@@ -8,11 +8,13 @@ use crate::{
     dca::{DCAContext, types::*},
 };
 
+/// Blocking dollar-cost averaging (DCA) plan management context.
 pub struct DCAContextSync {
     rt: BlockingRuntime<DCAContext>,
 }
 
 impl DCAContextSync {
+    /// Create a [`DCAContextSync`]
     pub fn new(config: Arc<Config>) -> Result<Self> {
         let rt = BlockingRuntime::try_new(
             move || {
@@ -25,10 +27,12 @@ impl DCAContextSync {
         )?;
         Ok(Self { rt })
     }
+    /// List DCA plans.
     pub fn list(&self, status: Option<DCAStatus>, symbol: Option<String>) -> Result<DcaList> {
         self.rt
             .call(move |ctx| async move { ctx.list(status, symbol).await })
     }
+    /// Create a new DCA plan.
     pub fn create(
         &self,
         symbol: impl Into<String> + Send + 'static,
@@ -50,6 +54,7 @@ impl DCAContextSync {
             .await
         })
     }
+    /// Update a DCA plan.
     pub fn update(
         &self,
         plan_id: impl Into<String> + Send + 'static,
@@ -71,18 +76,22 @@ impl DCAContextSync {
             .await
         })
     }
+    /// Pause a DCA plan.
     pub fn pause(&self, plan_id: impl Into<String> + Send + 'static) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.pause(plan_id).await })
     }
+    /// Resume a suspended DCA plan.
     pub fn resume(&self, plan_id: impl Into<String> + Send + 'static) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.resume(plan_id).await })
     }
+    /// Stop (permanently finish) a DCA plan.
     pub fn stop(&self, plan_id: impl Into<String> + Send + 'static) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.stop(plan_id).await })
     }
+    /// Get execution history for a DCA plan.
     pub fn history(
         &self,
         plan_id: impl Into<String> + Send + 'static,
@@ -92,14 +101,17 @@ impl DCAContextSync {
         self.rt
             .call(move |ctx| async move { ctx.history(plan_id, page, limit).await })
     }
+    /// Get DCA statistics.
     pub fn stats(&self, symbol: Option<String>) -> Result<DcaStats> {
         self.rt
             .call(move |ctx| async move { ctx.stats(symbol).await })
     }
+    /// Check DCA support for a list of securities.
     pub fn check_support(&self, symbols: Vec<String>) -> Result<DcaSupportList> {
         self.rt
             .call(move |ctx| async move { ctx.check_support(symbols).await })
     }
+    /// Calculate the next projected trade date for a DCA plan.
     pub fn calc_date(
         &self,
         symbol: impl Into<String> + Send + 'static,
@@ -112,6 +124,7 @@ impl DCAContextSync {
                 .await
         })
     }
+    /// Update the advance reminder hours for DCA execution notifications.
     pub fn set_reminder(&self, hours: impl Into<String> + Send + 'static) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.set_reminder(hours).await })

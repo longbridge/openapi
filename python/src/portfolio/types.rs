@@ -30,7 +30,7 @@ pub(crate) enum AssetType {
     Crypto,
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ExchangeRate {
     pub average_rate: f64,
@@ -51,7 +51,7 @@ impl From<lb::ExchangeRate> for ExchangeRate {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ExchangeRates {
     pub exchanges: Vec<ExchangeRate>,
@@ -64,7 +64,7 @@ impl From<lb::ExchangeRates> for ExchangeRates {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitSummaryInfo {
     pub asset_type: AssetType,
@@ -85,7 +85,7 @@ impl From<lb::ProfitSummaryInfo> for ProfitSummaryInfo {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitSummaryBreakdown {
     pub stock: Option<String>,
@@ -120,7 +120,7 @@ impl From<lb::ProfitSummaryBreakdown> for ProfitSummaryBreakdown {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysisSummary {
     pub currency: String,
@@ -157,7 +157,7 @@ impl From<lb::ProfitAnalysisSummary> for ProfitAnalysisSummary {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysisItem {
     pub name: String,
@@ -198,7 +198,7 @@ impl From<lb::ProfitAnalysisItem> for ProfitAnalysisItem {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysisSublist {
     pub start: String,
@@ -223,7 +223,7 @@ impl From<lb::ProfitAnalysisSublist> for ProfitAnalysisSublist {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysis {
     pub summary: ProfitAnalysisSummary,
@@ -238,7 +238,7 @@ impl From<lb::ProfitAnalysis> for ProfitAnalysis {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitDetailEntry {
     pub describe: String,
@@ -253,7 +253,7 @@ impl From<lb::ProfitDetailEntry> for ProfitDetailEntry {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitDetails {
     pub holding_value: Option<String>,
@@ -288,7 +288,7 @@ impl From<lb::ProfitDetails> for ProfitDetails {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysisDetail {
     pub profit: Option<String>,
@@ -323,7 +323,7 @@ impl From<lb::ProfitAnalysisDetail> for ProfitAnalysisDetail {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysisByMarketItem {
     pub code: String,
@@ -342,7 +342,7 @@ impl From<lb::ProfitAnalysisByMarketItem> for ProfitAnalysisByMarketItem {
     }
 }
 
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysisByMarket {
     pub profit: Option<String>,
@@ -362,7 +362,7 @@ impl From<lb::ProfitAnalysisByMarket> for ProfitAnalysisByMarket {
 // ── ProfitAnalysisFlows ───────────────────────────────────────────
 
 /// One profit-analysis flow record
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct FlowItem {
     pub executed_date: String,
@@ -392,7 +392,7 @@ impl From<lb::FlowItem> for FlowItem {
 }
 
 /// Profit-analysis flows response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ProfitAnalysisFlows {
     pub flows_list: Vec<FlowItem>,

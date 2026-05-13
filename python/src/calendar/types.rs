@@ -22,7 +22,7 @@ impl<'py> IntoPyObject<'py> for &JsonValue {
 }
 
 /// One key-value pair in a calendar event
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CalendarDataKv {
     /// Key (may be empty)
@@ -47,7 +47,7 @@ impl From<lb::CalendarDataKv> for CalendarDataKv {
 }
 
 /// One financial calendar event
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CalendarEventInfo {
     /// Security symbol
@@ -108,7 +108,7 @@ impl From<lb::CalendarEventInfo> for CalendarEventInfo {
 }
 
 /// Events for one calendar date
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CalendarDateGroup {
     /// Date string
@@ -130,7 +130,7 @@ impl From<lb::CalendarDateGroup> for CalendarDateGroup {
 }
 
 /// Finance calendar response
-#[pyclass(get_all)]
+#[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct CalendarEventsResponse {
     /// Start date of the query window
