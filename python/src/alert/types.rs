@@ -26,6 +26,7 @@ impl<'py> IntoPyObject<'py> for &JsonValue {
 pub(crate) struct AlertItem {
     pub id: String,
     pub indicator_id: String,
+    #[pyo3(set)]
     pub enabled: bool,
     pub frequency: i32,
     pub scope: i32,
@@ -46,6 +47,43 @@ impl From<lb::AlertItem> for AlertItem {
             state: v.state,
             value_map: JsonValue(v.value_map),
         }
+    }
+}
+
+impl From<AlertItem> for lb::AlertItem {
+    fn from(v: AlertItem) -> Self {
+        Self {
+            id: v.id,
+            indicator_id: v.indicator_id,
+            enabled: v.enabled,
+            frequency: v.frequency,
+            scope: v.scope,
+            text: v.text,
+            state: v.state,
+            value_map: v.value_map.0,
+        }
+    }
+}
+
+impl<'a, 'py> FromPyObject<'a, 'py> for AlertItem {
+    type Error = PyErr;
+
+    fn extract(ob: pyo3::Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
+        let value_map = ob
+            .getattr("value_map")
+            .ok()
+            .and_then(|v| pythonize::depythonize::<serde_json::Value>(&v).ok())
+            .unwrap_or(serde_json::Value::Null);
+        Ok(AlertItem {
+            id: ob.getattr("id")?.extract()?,
+            indicator_id: ob.getattr("indicator_id")?.extract()?,
+            enabled: ob.getattr("enabled")?.extract()?,
+            frequency: ob.getattr("frequency")?.extract()?,
+            scope: ob.getattr("scope")?.extract()?,
+            text: ob.getattr("text")?.extract()?,
+            state: ob.getattr("state")?.extract()?,
+            value_map: JsonValue(value_map),
+        })
     }
 }
 

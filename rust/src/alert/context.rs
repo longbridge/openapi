@@ -142,24 +142,26 @@ impl AlertContext {
         .await
     }
 
-    /// Enable a price alert.
+    /// Update a price alert.
     ///
-    /// Path: `POST /v1/notify/reminders` (with `id` + `enabled=true`)
-    pub async fn enable(&self, alert_id: impl Into<String>) -> Result<serde_json::Value> {
+    /// Requires the [`AlertItem`] from [`list`](Self::list). Set
+    /// `item.enabled` to `true` to re-enable or `false` to disable before
+    /// calling this method. All required fields are read from `item` directly
+    /// — no extra round-trip needed.
+    ///
+    /// Path: `POST /v1/notify/reminders`
+    pub async fn update(&self, item: &AlertItem) -> Result<serde_json::Value> {
         self.post(
             "/v1/notify/reminders",
-            serde_json::json!({ "id": alert_id.into(), "enabled": true }),
-        )
-        .await
-    }
-
-    /// Disable a price alert.
-    ///
-    /// Path: `POST /v1/notify/reminders` (with `id` + `enabled=false`)
-    pub async fn disable(&self, alert_id: impl Into<String>) -> Result<serde_json::Value> {
-        self.post(
-            "/v1/notify/reminders",
-            serde_json::json!({ "id": alert_id.into(), "enabled": false }),
+            serde_json::json!({
+                "id": item.id,
+                "indicator_id": item.indicator_id,
+                "frequency": item.frequency,
+                "scope": item.scope,
+                "state": item.state,
+                "value_map": item.value_map,
+                "enabled": item.enabled,
+            }),
         )
         .await
     }

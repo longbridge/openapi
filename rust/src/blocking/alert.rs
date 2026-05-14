@@ -43,21 +43,10 @@ impl AlertContextSync {
             ctx.add(symbol, condition, trigger_value, frequency).await
         })
     }
-    /// Enable a price alert.
-    pub fn enable(
-        &self,
-        alert_id: impl Into<String> + Send + 'static,
-    ) -> Result<serde_json::Value> {
+    /// Update (enable or disable) a price alert.
+    pub fn update(&self, item: AlertItem) -> Result<serde_json::Value> {
         self.rt
-            .call(move |ctx| async move { ctx.enable(alert_id).await })
-    }
-    /// Disable a price alert.
-    pub fn disable(
-        &self,
-        alert_id: impl Into<String> + Send + 'static,
-    ) -> Result<serde_json::Value> {
-        self.rt
-            .call(move |ctx| async move { ctx.disable(alert_id).await })
+            .call(move |ctx| async move { ctx.update(&item).await })
     }
     /// Delete price alerts.
     pub fn delete(&self, alert_ids: Vec<String>) -> Result<serde_json::Value> {
