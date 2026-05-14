@@ -20,6 +20,8 @@ jobs:
           toolchain: nightly
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
       - name: Check format
         run: cargo fmt --all -- --check
 
@@ -42,6 +44,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Check with clippy
         run: cargo clippy -p longbridge --all-features
@@ -74,6 +78,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-python --all-features
@@ -119,6 +125,8 @@ jobs:
           components: rustfmt, clippy
           targets: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Setup QEMU
         if: matrix.target == 'aarch64-unknown-linux-musl'
@@ -180,6 +188,8 @@ jobs:
           components: rustfmt, clippy
           targets: ${{ matrix.settings.target }}
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-nodejs --all-features
@@ -247,6 +257,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-java --all-features
@@ -283,6 +295,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Get CMake
         uses: lukka/get-cmake@latest
@@ -330,6 +344,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Install target
         run: |
@@ -376,6 +392,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
 
       - name: Install target
         run: |
