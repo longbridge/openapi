@@ -116,6 +116,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Config.refresh_access_token">refresh_access_token</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Config.refresh_access_token_async">refresh_access_token_async</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.Language">Language</a>
@@ -5965,6 +5967,83 @@ connect (optional)</p>
     <div class="doc doc-contents ">
 
         <p>Gets a new <code>access_token</code>.</p>
+<p>This method is only available when using <strong>Legacy API Key</strong>
+authentication (i.e. :meth:<code>Config.from_apikey</code>). It is not supported
+for OAuth 2.0 mode.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>expired_at</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>The expiration time of the access token (default: 90
+days from now).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+              –
+              <div class="doc-md-description">
+                <p>New access token string</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.Config.refresh_access_token_async" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">refresh_access_token_async</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">refresh_access_token_async(expired_at: Optional[datetime] = None) -&gt; str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Async version of :meth:<code>Config.refresh_access_token</code>. Returns an
+awaitable; must be awaited inside asyncio.</p>
 <p>This method is only available when using <strong>Legacy API Key</strong>
 authentication (i.e. :meth:<code>Config.from_apikey</code>). It is not supported
 for OAuth 2.0 mode.</p>

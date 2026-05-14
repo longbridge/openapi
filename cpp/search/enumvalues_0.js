@@ -1,14 +1,14 @@
 var searchData=
 [
-  ['active_2544',['Active',['../namespacelongbridge_1_1trade.html#a5f3b72857c03c6a3faa2a102efa91952a4d3d769b812b6faa6b76e1a8abaece2d',1,'longbridge::trade::Active()'],['../namespacelongbridge_1_1dca.html#a3b1a349881cb3959e8fc80b91b6ec7cfa4d3d769b812b6faa6b76e1a8abaece2d',1,'longbridge::dca::Active()']]],
-  ['add_2545',['Add',['../namespacelongbridge_1_1quote.html#a0f64e755c9abd9e9e331284632f95493aec211f7c20af43e742bf2570c3cb84f9',1,'longbridge::quote']]],
-  ['all_2546',['All',['../namespacelongbridge_1_1fundamental.html#ad2f8b2d896df58eb16ff5abb6d7931ffab1c94ca2fbc3e78fc30069c8d0f01680',1,'longbridge::fundamental::All()'],['../namespacelongbridge_1_1quote.html#a09a88001383d2df2b5e3ceb47050d341ab1c94ca2fbc3e78fc30069c8d0f01680',1,'longbridge::quote::All()']]],
-  ['allocatedsub_2547',['AllocatedSub',['../namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da79d43b20e3908abab83eeb19af215004',1,'longbridge::trade']]],
-  ['alo_2548',['ALO',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa2ffab764ab17e0b0195acd2c3bd61ca0',1,'longbridge::trade']]],
-  ['american_2549',['American',['../namespacelongbridge_1_1quote.html#af7d260cae987525c4d937a44b5f0a5ecac6c6f067a3ead9ce67a1c67a790fa26b',1,'longbridge::quote']]],
-  ['amplitude_2550',['Amplitude',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011af4d00f19181bdfc0474954a43262febf',1,'longbridge::quote']]],
-  ['annual_2551',['Annual',['../namespacelongbridge_1_1fundamental.html#ac6040bcd518fa44e8415f5e3c868cc52ac4c696d78d97d24ce69ebe19fd7f8483',1,'longbridge::fundamental']]],
-  ['anytime_2552',['AnyTime',['../namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1aaa8ec6efcb9945cb6100703d26630461',1,'longbridge::trade']]],
-  ['ao_2553',['AO',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa2c64c5cf613d8b9f4f7f3980d29aca10',1,'longbridge::trade']]],
-  ['ascending_2554',['Ascending',['../namespacelongbridge_1_1quote.html#ae0b1f1fcce67cfc8ce30e65c78c1a762acf3fb1ff52ea1eed3347ac5401ee7f0c',1,'longbridge::quote']]]
+  ['active_2542',['Active',['../namespacelongbridge_1_1trade.html#a5f3b72857c03c6a3faa2a102efa91952a4d3d769b812b6faa6b76e1a8abaece2d',1,'longbridge::trade::Active()'],['../namespacelongbridge_1_1dca.html#a3b1a349881cb3959e8fc80b91b6ec7cfa4d3d769b812b6faa6b76e1a8abaece2d',1,'longbridge::dca::Active()']]],
+  ['add_2543',['Add',['../namespacelongbridge_1_1quote.html#a0f64e755c9abd9e9e331284632f95493aec211f7c20af43e742bf2570c3cb84f9',1,'longbridge::quote']]],
+  ['all_2544',['All',['../namespacelongbridge_1_1fundamental.html#ad2f8b2d896df58eb16ff5abb6d7931ffab1c94ca2fbc3e78fc30069c8d0f01680',1,'longbridge::fundamental::All()'],['../namespacelongbridge_1_1quote.html#a09a88001383d2df2b5e3ceb47050d341ab1c94ca2fbc3e78fc30069c8d0f01680',1,'longbridge::quote::All()']]],
+  ['allocatedsub_2545',['AllocatedSub',['../namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da79d43b20e3908abab83eeb19af215004',1,'longbridge::trade']]],
+  ['alo_2546',['ALO',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa2ffab764ab17e0b0195acd2c3bd61ca0',1,'longbridge::trade']]],
+  ['american_2547',['American',['../namespacelongbridge_1_1quote.html#af7d260cae987525c4d937a44b5f0a5ecac6c6f067a3ead9ce67a1c67a790fa26b',1,'longbridge::quote']]],
+  ['amplitude_2548',['Amplitude',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011af4d00f19181bdfc0474954a43262febf',1,'longbridge::quote']]],
+  ['annual_2549',['Annual',['../namespacelongbridge_1_1fundamental.html#ac6040bcd518fa44e8415f5e3c868cc52ac4c696d78d97d24ce69ebe19fd7f8483',1,'longbridge::fundamental']]],
+  ['anytime_2550',['AnyTime',['../namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1aaa8ec6efcb9945cb6100703d26630461',1,'longbridge::trade']]],
+  ['ao_2551',['AO',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa2c64c5cf613d8b9f4f7f3980d29aca10',1,'longbridge::trade']]],
+  ['ascending_2552',['Ascending',['../namespacelongbridge_1_1quote.html#ae0b1f1fcce67cfc8ce30e65c78c1a762acf3fb1ff52ea1eed3347ac5401ee7f0c',1,'longbridge::quote']]]
 ];

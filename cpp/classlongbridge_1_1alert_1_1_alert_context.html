@@ -99,12 +99,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7a34130057938d83d2ff2d192d32c3a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html#a7a34130057938d83d2ff2d192d32c3a4">add</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge_1_1alert.html#a50839a92d31083930a52cc6d4365078a">AlertCondition</a> condition, const std::string &amp;trigger_value, <a class="el" href="namespacelongbridge_1_1alert.html#ac312623a5e979f07230f3403d9de2e46">AlertFrequency</a> frequency, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html">AlertContext</a>, void &gt; callback) const</td></tr>
 <tr class="memdesc:a7a34130057938d83d2ff2d192d32c3a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a price alert.  <a href="classlongbridge_1_1alert_1_1_alert_context.html#a7a34130057938d83d2ff2d192d32c3a4">More...</a><br /></td></tr>
 <tr class="separator:a7a34130057938d83d2ff2d192d32c3a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86c9b7f4c0ac473d55b6314c7d587829"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html#a86c9b7f4c0ac473d55b6314c7d587829">enable</a> (const std::string &amp;alert_id, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html">AlertContext</a>, void &gt; callback) const</td></tr>
-<tr class="memdesc:a86c9b7f4c0ac473d55b6314c7d587829"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable a price alert by alert_id.  <a href="classlongbridge_1_1alert_1_1_alert_context.html#a86c9b7f4c0ac473d55b6314c7d587829">More...</a><br /></td></tr>
-<tr class="separator:a86c9b7f4c0ac473d55b6314c7d587829"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4aad93d92191472781d1787199d3fe4c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html#a4aad93d92191472781d1787199d3fe4c">disable</a> (const std::string &amp;alert_id, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html">AlertContext</a>, void &gt; callback) const</td></tr>
-<tr class="memdesc:a4aad93d92191472781d1787199d3fe4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable a price alert by alert_id.  <a href="classlongbridge_1_1alert_1_1_alert_context.html#a4aad93d92191472781d1787199d3fe4c">More...</a><br /></td></tr>
-<tr class="separator:a4aad93d92191472781d1787199d3fe4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00c7192200a95385be099c14d4f2c99b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html#a00c7192200a95385be099c14d4f2c99b">update</a> (const <a class="el" href="structlongbridge_1_1alert_1_1_alert_item.html">AlertItem</a> &amp;item, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html">AlertContext</a>, void &gt; callback) const</td></tr>
+<tr class="separator:a00c7192200a95385be099c14d4f2c99b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -280,66 +276,6 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a4aad93d92191472781d1787199d3fe4c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4aad93d92191472781d1787199d3fe4c">&#9670;&nbsp;</a></span>disable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void longbridge::alert::AlertContext::disable </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>alert_id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html">AlertContext</a>, void &gt;&#160;</td>
-          <td class="paramname"><em>callback</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Disable a price alert by alert_id. </p>
-
-</div>
-</div>
-<a id="a86c9b7f4c0ac473d55b6314c7d587829"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86c9b7f4c0ac473d55b6314c7d587829">&#9670;&nbsp;</a></span>enable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void longbridge::alert::AlertContext::enable </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>alert_id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html">AlertContext</a>, void &gt;&#160;</td>
-          <td class="paramname"><em>callback</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Enable a price alert by alert_id. </p>
-
-</div>
-</div>
 <a id="acb424551cb24949bfb270b67dcb18573"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acb424551cb24949bfb270b67dcb18573">&#9670;&nbsp;</a></span>list()</h2>
 
@@ -375,6 +311,35 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a00c7192200a95385be099c14d4f2c99b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00c7192200a95385be099c14d4f2c99b">&#9670;&nbsp;</a></span>update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::alert::AlertContext::update </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structlongbridge_1_1alert_1_1_alert_item.html">AlertItem</a> &amp;&#160;</td>
+          <td class="paramname"><em>item</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html">AlertContext</a>, void &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Update (enable or disable) a price alert. Set item.enabled before calling to choose the new state. </p>
 
 </div>
 </div>

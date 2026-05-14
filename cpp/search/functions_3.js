@@ -4,11 +4,10 @@ var searchData=
   ['decimal_1665',['Decimal',['../classlongbridge_1_1_decimal.html#a7a3dd3d563c731c5807367a642fad1bc',1,'longbridge::Decimal::Decimal(double other, uint32_t dp)'],['../classlongbridge_1_1_decimal.html#a6143ac2e3d78bb87192499c27781567f',1,'longbridge::Decimal::Decimal(double other)'],['../classlongbridge_1_1_decimal.html#a8bf92de7e184cd1f587b6bbbf648d3bd',1,'longbridge::Decimal::Decimal(const std::string &amp;str)'],['../classlongbridge_1_1_decimal.html#a8ab52b5b9a18c9b279c1962a346606c7',1,'longbridge::Decimal::Decimal(const char *str)'],['../classlongbridge_1_1_decimal.html#aac9124a42cec7adb2a20849e0a46476d',1,'longbridge::Decimal::Decimal(const Decimal &amp;other)'],['../classlongbridge_1_1_decimal.html#a5de420fa657624bc449bd09ea71fed11',1,'longbridge::Decimal::Decimal(const lb_decimal_t *other)']]],
   ['delete_5fsharelist_1666',['delete_sharelist',['../classlongbridge_1_1sharelist_1_1_sharelist_context.html#aea2f07cef62822325d40f1384c62d7ba',1,'longbridge::sharelist::SharelistContext']]],
   ['delete_5fwatchlist_5fgroup_1667',['delete_watchlist_group',['../classlongbridge_1_1quote_1_1_quote_context.html#a0255d0b3c8890d126b7178cf1412bf7d',1,'longbridge::quote::QuoteContext']]],
-  ['depth_1668',['DEPTH',['../classlongbridge_1_1quote_1_1_sub_flags.html#a706dc94b4d106d8e7f0c4912373d6471',1,'longbridge::quote::SubFlags']]],
-  ['depth_1669',['depth',['../classlongbridge_1_1quote_1_1_quote_context.html#a92263146c1daffd85cf4e4486a97dfff',1,'longbridge::quote::QuoteContext']]],
+  ['depth_1668',['depth',['../classlongbridge_1_1quote_1_1_quote_context.html#a92263146c1daffd85cf4e4486a97dfff',1,'longbridge::quote::QuoteContext']]],
+  ['depth_1669',['DEPTH',['../classlongbridge_1_1quote_1_1_sub_flags.html#a706dc94b4d106d8e7f0c4912373d6471',1,'longbridge::quote::SubFlags']]],
   ['detail_1670',['detail',['../classlongbridge_1_1sharelist_1_1_sharelist_context.html#ad112039a146216596fc1a69c8ca63279',1,'longbridge::sharelist::SharelistContext']]],
-  ['disable_1671',['disable',['../classlongbridge_1_1alert_1_1_alert_context.html#a4aad93d92191472781d1787199d3fe4c',1,'longbridge::alert::AlertContext']]],
-  ['disable_5fprint_5fquote_5fpackages_1672',['disable_print_quote_packages',['../classlongbridge_1_1_config.html#a663b6a4f99c4ebd062632eba9092b94c',1,'longbridge::Config']]],
-  ['dividend_1673',['dividend',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#ad2656cc250cad9d8c8c52c5cda739499',1,'longbridge::fundamental::FundamentalContext']]],
-  ['dividend_5fdetail_1674',['dividend_detail',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#a23602f35ec96c03322d0a7376091e973',1,'longbridge::fundamental::FundamentalContext']]]
+  ['disable_5fprint_5fquote_5fpackages_1671',['disable_print_quote_packages',['../classlongbridge_1_1_config.html#a663b6a4f99c4ebd062632eba9092b94c',1,'longbridge::Config']]],
+  ['dividend_1672',['dividend',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#ad2656cc250cad9d8c8c52c5cda739499',1,'longbridge::fundamental::FundamentalContext']]],
+  ['dividend_5fdetail_1673',['dividend_detail',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#a23602f35ec96c03322d0a7376091e973',1,'longbridge::fundamental::FundamentalContext']]]
 ];

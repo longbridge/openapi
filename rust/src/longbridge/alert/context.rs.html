@@ -142,37 +142,39 @@
 <a href=#142 id=142 data-nosnippet>142</a>        .<span class="kw">await
 <a href=#143 id=143 data-nosnippet>143</a>    </span>}
 <a href=#144 id=144 data-nosnippet>144</a>
-<a href=#145 id=145 data-nosnippet>145</a>    <span class="doccomment">/// Enable a price alert.
+<a href=#145 id=145 data-nosnippet>145</a>    <span class="doccomment">/// Update a price alert.
 <a href=#146 id=146 data-nosnippet>146</a>    ///
-<a href=#147 id=147 data-nosnippet>147</a>    /// Path: `POST /v1/notify/reminders` (with `id` + `enabled=true`)
-<a href=#148 id=148 data-nosnippet>148</a>    </span><span class="kw">pub async fn </span>enable(<span class="kw-2">&amp;</span><span class="self">self</span>, alert_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;serde_json::Value&gt; {
-<a href=#149 id=149 data-nosnippet>149</a>        <span class="self">self</span>.post(
-<a href=#150 id=150 data-nosnippet>150</a>            <span class="string">"/v1/notify/reminders"</span>,
-<a href=#151 id=151 data-nosnippet>151</a>            <span class="macro">serde_json::json!</span>({ <span class="string">"id"</span>: alert_id.into(), <span class="string">"enabled"</span>: <span class="bool-val">true </span>}),
-<a href=#152 id=152 data-nosnippet>152</a>        )
-<a href=#153 id=153 data-nosnippet>153</a>        .<span class="kw">await
-<a href=#154 id=154 data-nosnippet>154</a>    </span>}
-<a href=#155 id=155 data-nosnippet>155</a>
-<a href=#156 id=156 data-nosnippet>156</a>    <span class="doccomment">/// Disable a price alert.
-<a href=#157 id=157 data-nosnippet>157</a>    ///
-<a href=#158 id=158 data-nosnippet>158</a>    /// Path: `POST /v1/notify/reminders` (with `id` + `enabled=false`)
-<a href=#159 id=159 data-nosnippet>159</a>    </span><span class="kw">pub async fn </span>disable(<span class="kw-2">&amp;</span><span class="self">self</span>, alert_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;serde_json::Value&gt; {
-<a href=#160 id=160 data-nosnippet>160</a>        <span class="self">self</span>.post(
-<a href=#161 id=161 data-nosnippet>161</a>            <span class="string">"/v1/notify/reminders"</span>,
-<a href=#162 id=162 data-nosnippet>162</a>            <span class="macro">serde_json::json!</span>({ <span class="string">"id"</span>: alert_id.into(), <span class="string">"enabled"</span>: <span class="bool-val">false </span>}),
-<a href=#163 id=163 data-nosnippet>163</a>        )
-<a href=#164 id=164 data-nosnippet>164</a>        .<span class="kw">await
-<a href=#165 id=165 data-nosnippet>165</a>    </span>}
-<a href=#166 id=166 data-nosnippet>166</a>
-<a href=#167 id=167 data-nosnippet>167</a>    <span class="doccomment">/// Delete price alerts.
-<a href=#168 id=168 data-nosnippet>168</a>    ///
-<a href=#169 id=169 data-nosnippet>169</a>    /// Path: `DELETE /v1/notify/reminders`
-<a href=#170 id=170 data-nosnippet>170</a>    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, alert_ids: Vec&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;serde_json::Value&gt; {
-<a href=#171 id=171 data-nosnippet>171</a>        <span class="self">self</span>.http_delete(
-<a href=#172 id=172 data-nosnippet>172</a>            <span class="string">"/v1/notify/reminders"</span>,
-<a href=#173 id=173 data-nosnippet>173</a>            <span class="macro">serde_json::json!</span>({ <span class="string">"ids"</span>: alert_ids }),
-<a href=#174 id=174 data-nosnippet>174</a>        )
-<a href=#175 id=175 data-nosnippet>175</a>        .<span class="kw">await
-<a href=#176 id=176 data-nosnippet>176</a>    </span>}
-<a href=#177 id=177 data-nosnippet>177</a>}
+<a href=#147 id=147 data-nosnippet>147</a>    /// Requires the [`AlertItem`] from [`list`](Self::list). Set
+<a href=#148 id=148 data-nosnippet>148</a>    /// `item.enabled` to `true` to re-enable or `false` to disable before
+<a href=#149 id=149 data-nosnippet>149</a>    /// calling this method. All required fields are read from `item` directly
+<a href=#150 id=150 data-nosnippet>150</a>    /// — no extra round-trip needed.
+<a href=#151 id=151 data-nosnippet>151</a>    ///
+<a href=#152 id=152 data-nosnippet>152</a>    /// Path: `POST /v1/notify/reminders`
+<a href=#153 id=153 data-nosnippet>153</a>    </span><span class="kw">pub async fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>AlertItem) -&gt; <span class="prelude-ty">Result</span>&lt;serde_json::Value&gt; {
+<a href=#154 id=154 data-nosnippet>154</a>        <span class="self">self</span>.post(
+<a href=#155 id=155 data-nosnippet>155</a>            <span class="string">"/v1/notify/reminders"</span>,
+<a href=#156 id=156 data-nosnippet>156</a>            <span class="macro">serde_json::json!</span>({
+<a href=#157 id=157 data-nosnippet>157</a>                <span class="string">"id"</span>: item.id,
+<a href=#158 id=158 data-nosnippet>158</a>                <span class="string">"indicator_id"</span>: item.indicator_id,
+<a href=#159 id=159 data-nosnippet>159</a>                <span class="string">"frequency"</span>: item.frequency,
+<a href=#160 id=160 data-nosnippet>160</a>                <span class="string">"scope"</span>: item.scope,
+<a href=#161 id=161 data-nosnippet>161</a>                <span class="string">"state"</span>: item.state,
+<a href=#162 id=162 data-nosnippet>162</a>                <span class="string">"value_map"</span>: item.value_map,
+<a href=#163 id=163 data-nosnippet>163</a>                <span class="string">"enabled"</span>: item.enabled,
+<a href=#164 id=164 data-nosnippet>164</a>            }),
+<a href=#165 id=165 data-nosnippet>165</a>        )
+<a href=#166 id=166 data-nosnippet>166</a>        .<span class="kw">await
+<a href=#167 id=167 data-nosnippet>167</a>    </span>}
+<a href=#168 id=168 data-nosnippet>168</a>
+<a href=#169 id=169 data-nosnippet>169</a>    <span class="doccomment">/// Delete price alerts.
+<a href=#170 id=170 data-nosnippet>170</a>    ///
+<a href=#171 id=171 data-nosnippet>171</a>    /// Path: `DELETE /v1/notify/reminders`
+<a href=#172 id=172 data-nosnippet>172</a>    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, alert_ids: Vec&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;serde_json::Value&gt; {
+<a href=#173 id=173 data-nosnippet>173</a>        <span class="self">self</span>.http_delete(
+<a href=#174 id=174 data-nosnippet>174</a>            <span class="string">"/v1/notify/reminders"</span>,
+<a href=#175 id=175 data-nosnippet>175</a>            <span class="macro">serde_json::json!</span>({ <span class="string">"ids"</span>: alert_ids }),
+<a href=#176 id=176 data-nosnippet>176</a>        )
+<a href=#177 id=177 data-nosnippet>177</a>        .<span class="kw">await
+<a href=#178 id=178 data-nosnippet>178</a>    </span>}
+<a href=#179 id=179 data-nosnippet>179</a>}
 </code></pre></div></section></main></body></html>
