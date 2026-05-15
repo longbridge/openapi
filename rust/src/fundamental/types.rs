@@ -1110,6 +1110,246 @@ pub enum FinancialReportKind {
     All,
 }
 
+// ── business_segments ─────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::business_segments`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BusinessSegments {
+    /// Report date
+    pub date: String,
+    /// Total revenue
+    pub total: String,
+    /// Reporting currency
+    pub currency: String,
+    /// Business segment breakdown
+    #[serde(default)]
+    pub business: Vec<BusinessSegmentItem>,
+}
+
+/// One business segment item (latest snapshot)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BusinessSegmentItem {
+    /// Segment name
+    pub name: String,
+    /// Percentage of total revenue
+    pub percent: String,
+}
+
+/// Response for [`crate::FundamentalContext::business_segments_history`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BusinessSegmentsHistory {
+    /// Historical snapshots
+    #[serde(default)]
+    pub historical: Vec<BusinessSegmentsHistoricalItem>,
+}
+
+/// One historical business segments snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BusinessSegmentsHistoricalItem {
+    /// Report date
+    pub date: String,
+    /// Total revenue
+    pub total: String,
+    /// Reporting currency
+    pub currency: String,
+    /// Business segment breakdown
+    #[serde(default)]
+    pub business: Vec<BusinessSegmentHistoryItem>,
+    /// Regional breakdown
+    #[serde(default)]
+    pub regionals: Vec<BusinessSegmentHistoryItem>,
+}
+
+/// One business/regional segment item in a historical snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BusinessSegmentHistoryItem {
+    /// Segment name
+    pub name: String,
+    /// Percentage of total
+    pub percent: String,
+    /// Absolute value
+    pub value: String,
+}
+
+// ── institution_rating_views ──────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::institution_rating_views`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingViews {
+    /// Historical rating distribution snapshots
+    #[serde(default)]
+    pub elist: Vec<InstitutionRatingViewItem>,
+}
+
+/// One historical rating distribution snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstitutionRatingViewItem {
+    /// Date as unix timestamp (int64)
+    pub date: i64,
+    /// Number of "Buy" ratings
+    pub buy: i32,
+    /// Number of "Outperform" ratings
+    pub over: i32,
+    /// Number of "Hold" ratings
+    pub hold: i32,
+    /// Number of "Underperform" ratings
+    pub under: i32,
+    /// Number of "Sell" ratings
+    pub sell: i32,
+    /// Total analyst count
+    pub total: i32,
+}
+
+// ── industry_rank ─────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::industry_rank`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryRankResponse {
+    /// Grouped rank items
+    #[serde(default)]
+    pub items: Vec<IndustryRankGroup>,
+}
+
+/// A group of ranked industry items
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryRankGroup {
+    /// Items in this group
+    #[serde(default)]
+    pub lists: Vec<IndustryRankItem>,
+}
+
+/// One ranked industry item
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryRankItem {
+    /// Industry / sector name
+    pub name: String,
+    /// Counter ID of the industry
+    pub counter_id: String,
+    /// Change percentage
+    pub chg: String,
+    /// Name of the leading stock
+    pub leading_name: String,
+    /// Ticker of the leading stock
+    pub leading_ticker: String,
+    /// Change percentage of the leading stock
+    pub leading_chg: String,
+    /// Value label name
+    pub value_name: String,
+    /// Value data
+    pub value_data: String,
+}
+
+// ── industry_peers ────────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::industry_peers`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryPeersResponse {
+    /// Top-level industry node info
+    pub top: IndustryPeersTop,
+    /// Root peer chain node (may be absent if no data)
+    pub chain: Option<IndustryPeerNode>,
+}
+
+/// Top-level industry info in the peers response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryPeersTop {
+    /// Industry name
+    pub name: String,
+    /// Market code
+    pub market: String,
+}
+
+/// A node in the recursive industry peer chain
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndustryPeerNode {
+    /// Node name
+    pub name: String,
+    /// Counter ID
+    pub counter_id: String,
+    /// Number of stocks in this node
+    pub stock_num: String,
+    /// Change percentage
+    pub chg: String,
+    /// Year-to-date change
+    pub ytd_chg: String,
+    /// Child nodes (recursive)
+    #[serde(default)]
+    pub next: Vec<IndustryPeerNode>,
+}
+
+// ── financial_report_snapshot ─────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::financial_report_snapshot`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FinancialReportSnapshot {
+    /// Company name
+    pub name: String,
+    /// Ticker code
+    pub ticker: String,
+    /// Fiscal period start date
+    pub fp_start: String,
+    /// Fiscal period end date
+    pub fp_end: String,
+    /// Reporting currency
+    pub currency: String,
+    /// Report description
+    pub report_desc: String,
+    /// Forecast revenue
+    pub fo_revenue: Option<SnapshotForecastMetric>,
+    /// Forecast EBIT
+    pub fo_ebit: Option<SnapshotForecastMetric>,
+    /// Forecast EPS
+    pub fo_eps: Option<SnapshotForecastMetric>,
+    /// Reported revenue
+    pub fr_revenue: Option<SnapshotReportedMetric>,
+    /// Reported net profit
+    pub fr_profit: Option<SnapshotReportedMetric>,
+    /// Reported operating cash flow
+    pub fr_operate_cash: Option<SnapshotReportedMetric>,
+    /// Reported investing cash flow
+    pub fr_invest_cash: Option<SnapshotReportedMetric>,
+    /// Reported financing cash flow
+    pub fr_finance_cash: Option<SnapshotReportedMetric>,
+    /// Reported total assets
+    pub fr_total_assets: Option<SnapshotReportedMetric>,
+    /// Reported total liabilities
+    pub fr_total_liability: Option<SnapshotReportedMetric>,
+    /// ROE TTM
+    pub fr_roe_ttm: String,
+    /// Profit margin
+    pub fr_profit_margin: String,
+    /// Profit margin TTM
+    pub fr_profit_margin_ttm: String,
+    /// Asset turnover TTM
+    pub fr_asset_turn_ttm: String,
+    /// Leverage TTM
+    pub fr_leverage_ttm: String,
+    /// Debt-to-assets ratio
+    pub fr_debt_assets_ratio: String,
+}
+
+/// A forecast metric in the financial report snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SnapshotForecastMetric {
+    /// Actual value
+    pub value: String,
+    /// Year-over-year change
+    pub yoy: String,
+    /// Beat/miss description
+    pub cmp_desc: String,
+    /// Consensus estimate value
+    pub est_value: String,
+}
+
+/// A reported metric in the financial report snapshot
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SnapshotReportedMetric {
+    /// Actual value
+    pub value: String,
+    /// Year-over-year change
+    pub yoy: String,
+}
+
 /// Financial report period type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum FinancialReportPeriod {

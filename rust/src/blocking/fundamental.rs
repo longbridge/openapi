@@ -179,4 +179,73 @@ impl FundamentalContextSync {
         self.rt
             .call(move |ctx| async move { ctx.ratings(symbol).await })
     }
+
+    /// Get latest business segment breakdown
+    pub fn business_segments(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<BusinessSegments> {
+        self.rt
+            .call(move |ctx| async move { ctx.business_segments(symbol).await })
+    }
+
+    /// Get historical business segment breakdowns
+    pub fn business_segments_history(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+        report: Option<&'static str>,
+        cate: Option<String>,
+    ) -> Result<BusinessSegmentsHistory> {
+        self.rt.call(
+            move |ctx| async move { ctx.business_segments_history(symbol, report, cate).await },
+        )
+    }
+
+    /// Get historical institutional rating views
+    pub fn institution_rating_views(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<InstitutionRatingViews> {
+        self.rt
+            .call(move |ctx| async move { ctx.institution_rating_views(symbol).await })
+    }
+
+    /// Get industry rank for a market
+    pub fn industry_rank(
+        &self,
+        market: impl Into<String> + Send + 'static,
+        indicator: impl Into<String> + Send + 'static,
+        sort_type: impl Into<String> + Send + 'static,
+        limit: u32,
+    ) -> Result<IndustryRankResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.industry_rank(market, indicator, sort_type, limit).await
+        })
+    }
+
+    /// Get industry peer chain
+    pub fn industry_peers(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+        market: impl Into<String> + Send + 'static,
+        industry_id: Option<String>,
+    ) -> Result<IndustryPeersResponse> {
+        self.rt.call(
+            move |ctx| async move { ctx.industry_peers(counter_id, market, industry_id).await },
+        )
+    }
+
+    /// Get financial report snapshot (earnings snapshot)
+    pub fn financial_report_snapshot(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+        report: Option<&'static str>,
+        fiscal_year: Option<i32>,
+        fiscal_period: Option<&'static str>,
+    ) -> Result<FinancialReportSnapshot> {
+        self.rt.call(move |ctx| async move {
+            ctx.financial_report_snapshot(symbol, report, fiscal_year, fiscal_period)
+                .await
+        })
+    }
 }
