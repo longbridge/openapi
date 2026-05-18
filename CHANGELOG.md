@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `industry_peers` — GET `/v1/quote/industries/peers`: recursive industry peer chain; accepts both symbol-style (`AAPL.US`) and raw counter IDs (`BK/US/123`).
   - `financial_report_snapshot` — GET `/v1/quote/financials/earnings-snapshot`: earnings snapshot with forecast (revenue/EBIT/EPS) and reported (P&L, cash-flows, balance-sheet ratios) metrics.
 - All new methods are also available on `FundamentalContextSync` (blocking API).
+- **Python, Node.js, Java, C, C++:** All six new `FundamentalContext` methods ported to every non-Rust SDK, including:
+  - New response types: `BusinessSegmentItem`, `BusinessSegments`, `BusinessSegmentHistoryItem`, `BusinessSegmentsHistoricalItem`, `BusinessSegmentsHistory`, `InstitutionRatingViewItem`, `InstitutionRatingViews`, `IndustryRankItem`, `IndustryRankGroup`, `IndustryRankResponse`, `IndustryPeersTop`, `IndustryPeerNode` (with `next_json` serialising the recursive child list), `IndustryPeersResponse`, `SnapshotForecastMetric`, `SnapshotReportedMetric`, `FinancialReportSnapshot`.
+  - **Python:** Sync (`FundamentalContext`) and async (`AsyncFundamentalContext`) variants; full type stubs in `openapi.pyi`.
+  - **Node.js:** `index.d.ts` regenerated with all new types and methods.
+  - **Java:** JNI bindings, Java source classes, and options POJOs; new methods on `FundamentalContext`.
+  - **C:** New C structs and functions in `longbridge.h` (regenerated via cbindgen).
+  - **C++:** New struct types in `types.hpp`, convert functions in `convert.hpp`, method declarations in `fundamental_context.hpp`, and implementations in `fundamental_context.cpp`.
 
 # [4.1.0]
 

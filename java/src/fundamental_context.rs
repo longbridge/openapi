@@ -192,3 +192,162 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
         Ok(())
     })
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetBusinessSegments(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.business_segments(symbol).await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetBusinessSegmentsHistory(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let report: Option<String> = get_field(env, &opts, "report")?;
+        let cate: Option<String> = get_field(env, &opts, "cate")?;
+        let report_static: Option<&'static str> = match report.as_deref() {
+            Some("qf") => Some("qf"),
+            Some("saf") => Some("saf"),
+            Some("af") => Some("af"),
+            _ => None,
+        };
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .business_segments_history(symbol, report_static, cate)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetInstitutionRatingViews(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.institution_rating_views(symbol).await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetIndustryRank(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let market: String = get_field(env, &opts, "market")?;
+        let indicator: String = get_field(env, &opts, "indicator")?;
+        let sort_type: String = get_field(env, &opts, "sortType")?;
+        let limit: i32 = get_field(env, &opts, "limit")?;
+        let limit = limit.max(0) as u32;
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .industry_rank(market, indicator, sort_type, limit)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetIndustryPeers(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let counter_id: String = get_field(env, &opts, "counterId")?;
+        let market: String = get_field(env, &opts, "market")?;
+        let industry_id: Option<String> = get_field(env, &opts, "industryId")?;
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .industry_peers(counter_id, market, industry_id)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetFinancialReportSnapshot(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let report: Option<String> = get_field(env, &opts, "report")?;
+        let fiscal_year: Option<i32> = get_field(env, &opts, "fiscalYear")?;
+        let fiscal_period: Option<String> = get_field(env, &opts, "fiscalPeriod")?;
+        let report_static: Option<&'static str> = match report.as_deref() {
+            Some("qf") => Some("qf"),
+            Some("saf") => Some("saf"),
+            Some("af") => Some("af"),
+            _ => None,
+        };
+        let fiscal_period_static: Option<&'static str> = match fiscal_period.as_deref() {
+            Some("q1") => Some("q1"),
+            Some("q2") => Some("q2"),
+            Some("q3") => Some("q3"),
+            Some("q4") => Some("q4"),
+            Some("fy") => Some("fy"),
+            Some("h1") => Some("h1"),
+            Some("h2") => Some("h2"),
+            _ => None,
+        };
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .financial_report_snapshot(symbol, report_static, fiscal_year, fiscal_period_static)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}

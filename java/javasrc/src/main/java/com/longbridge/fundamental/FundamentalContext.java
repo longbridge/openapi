@@ -265,4 +265,52 @@ public class FundamentalContext implements AutoCloseable {
             SdkNative.fundamentalContextGetRatings(raw, symbol, callback);
         });
     }
+
+    /** Get business segment breakdowns (latest snapshot). */
+    public CompletableFuture<BusinessSegments> getBusinessSegments(String symbol)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextGetBusinessSegments(raw, symbol, callback);
+        });
+    }
+
+    /** Get historical business segment breakdowns. */
+    public CompletableFuture<BusinessSegmentsHistory> getBusinessSegmentsHistory(
+            BusinessSegmentsHistoryOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextGetBusinessSegmentsHistory(raw, opts, callback);
+        });
+    }
+
+    /** Get historical institutional rating view time-series. */
+    public CompletableFuture<InstitutionRatingViews> getInstitutionRatingViews(String symbol)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextGetInstitutionRatingViews(raw, symbol, callback);
+        });
+    }
+
+    /** Get industry rank for a market. */
+    public CompletableFuture<IndustryRankResponse> getIndustryRank(IndustryRankOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextGetIndustryRank(raw, opts, callback);
+        });
+    }
+
+    /** Get the industry peer chain for a security or industry. */
+    public CompletableFuture<IndustryPeersResponse> getIndustryPeers(IndustryPeersOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextGetIndustryPeers(raw, opts, callback);
+        });
+    }
+
+    /** Get a financial report snapshot (earnings snapshot). */
+    public CompletableFuture<FinancialReportSnapshot> getFinancialReportSnapshot(
+            FinancialReportSnapshotOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextGetFinancialReportSnapshot(raw, opts, callback);
+        });
+    }
 }

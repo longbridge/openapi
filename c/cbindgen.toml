@@ -279,6 +279,23 @@ cpp_compat = true
 "CRatingSubIndicatorGroup" = "lb_rating_sub_indicator_group_t"
 "CRatingCategory" = "lb_rating_category_t"
 "CStockRatings" = "lb_stock_ratings_t"
+# FundamentalContext: new APIs
+"CBusinessSegmentItem" = "lb_business_segment_item_t"
+"CBusinessSegments" = "lb_business_segments_t"
+"CBusinessSegmentHistoryItem" = "lb_business_segment_history_item_t"
+"CBusinessSegmentsHistoricalItem" = "lb_business_segments_historical_item_t"
+"CBusinessSegmentsHistory" = "lb_business_segments_history_t"
+"CInstitutionRatingViewItem" = "lb_institution_rating_view_item_t"
+"CInstitutionRatingViews" = "lb_institution_rating_views_t"
+"CIndustryRankItem" = "lb_industry_rank_item_t"
+"CIndustryRankGroup" = "lb_industry_rank_group_t"
+"CIndustryRankResponse" = "lb_industry_rank_response_t"
+"CIndustryPeersTop" = "lb_industry_peers_top_t"
+"CIndustryPeerNode" = "lb_industry_peer_node_t"
+"CIndustryPeersResponse" = "lb_industry_peers_response_t"
+"CSnapshotForecastMetric" = "lb_snapshot_forecast_metric_t"
+"CSnapshotReportedMetric" = "lb_snapshot_reported_metric_t"
+"CFinancialReportSnapshot" = "lb_financial_report_snapshot_t"
 # QuoteContext extensions
 "CShortPosition" = "lb_short_position_t"
 "CShortPositionsResponse" = "lb_short_positions_response_t"
@@ -362,6 +379,12 @@ include = [
     "CProfessional", "CExecutiveGroup", "CExecutiveList",
     "CRecentBuybacks", "CBuybackHistoryItem", "CBuybackRatios", "CBuybackData",
     "CRatingLeafIndicator", "CRatingIndicator", "CRatingSubIndicatorGroup", "CRatingCategory", "CStockRatings",
+    "CBusinessSegmentItem", "CBusinessSegments",
+    "CBusinessSegmentHistoryItem", "CBusinessSegmentsHistoricalItem", "CBusinessSegmentsHistory",
+    "CInstitutionRatingViewItem", "CInstitutionRatingViews",
+    "CIndustryRankItem", "CIndustryRankGroup", "CIndustryRankResponse",
+    "CIndustryPeersTop", "CIndustryPeerNode", "CIndustryPeersResponse",
+    "CSnapshotForecastMetric", "CSnapshotReportedMetric", "CFinancialReportSnapshot",
     "CCalendarDataKv", "CCalendarEventInfo", "CCalendarDateGroup", "CCalendarEventsResponse",
     "CExchangeRate", "CExchangeRates",
     # AlertContext enums + data types

@@ -2984,6 +2984,159 @@ struct StockRatings
   std::vector<RatingCategory> ratings;
 };
 
+/// One business segment item (latest snapshot).
+struct BusinessSegmentItem
+{
+  std::string name;
+  std::string percent;
+};
+
+/// Business segments response.
+struct BusinessSegments
+{
+  std::string date;
+  std::string total;
+  std::string currency;
+  std::vector<BusinessSegmentItem> business;
+};
+
+/// One business/regional segment item in a historical snapshot.
+struct BusinessSegmentHistoryItem
+{
+  std::string name;
+  std::string percent;
+  std::string value;
+};
+
+/// One historical business segments snapshot.
+struct BusinessSegmentsHistoricalItem
+{
+  std::string date;
+  std::string total;
+  std::string currency;
+  std::vector<BusinessSegmentHistoryItem> business;
+  std::vector<BusinessSegmentHistoryItem> regionals;
+};
+
+/// Business segments history response.
+struct BusinessSegmentsHistory
+{
+  std::vector<BusinessSegmentsHistoricalItem> historical;
+};
+
+/// One historical rating distribution snapshot.
+struct InstitutionRatingViewItem
+{
+  std::string date;
+  std::string buy;
+  std::string over;
+  std::string hold;
+  std::string under;
+  std::string sell;
+  std::string total;
+};
+
+/// Institution rating views response.
+struct InstitutionRatingViews
+{
+  std::vector<InstitutionRatingViewItem> elist;
+};
+
+/// One ranked industry item.
+struct IndustryRankItem
+{
+  std::string name;
+  std::string counter_id;
+  std::string chg;
+  std::string leading_name;
+  std::string leading_ticker;
+  std::string leading_chg;
+  std::string value_name;
+  std::string value_data;
+};
+
+/// A group of ranked industry items.
+struct IndustryRankGroup
+{
+  std::vector<IndustryRankItem> lists;
+};
+
+/// Industry rank response.
+struct IndustryRankResponse
+{
+  std::vector<IndustryRankGroup> items;
+};
+
+/// Top-level industry info in the peers response.
+struct IndustryPeersTop
+{
+  std::string name;
+  std::string market;
+};
+
+/// A node in the recursive industry peer chain.
+///
+/// next_json contains the child nodes serialised as a JSON string.
+struct IndustryPeerNode
+{
+  std::string name;
+  std::string counter_id;
+  int32_t stock_num;
+  std::string chg;
+  std::string ytd_chg;
+  std::string next_json;
+};
+
+/// Industry peers response.
+struct IndustryPeersResponse
+{
+  IndustryPeersTop top;
+  std::optional<IndustryPeerNode> chain;
+};
+
+/// A forecast metric in the financial report snapshot.
+struct SnapshotForecastMetric
+{
+  std::string value;
+  std::string yoy;
+  std::string cmp_desc;
+  std::string est_value;
+};
+
+/// A reported metric in the financial report snapshot.
+struct SnapshotReportedMetric
+{
+  std::string value;
+  std::string yoy;
+};
+
+/// Financial report snapshot response.
+struct FinancialReportSnapshot
+{
+  std::string name;
+  std::string ticker;
+  std::string fp_start;
+  std::string fp_end;
+  std::string currency;
+  std::string report_desc;
+  std::optional<SnapshotForecastMetric> fo_revenue;
+  std::optional<SnapshotForecastMetric> fo_ebit;
+  std::optional<SnapshotForecastMetric> fo_eps;
+  std::optional<SnapshotReportedMetric> fr_revenue;
+  std::optional<SnapshotReportedMetric> fr_profit;
+  std::optional<SnapshotReportedMetric> fr_operate_cash;
+  std::optional<SnapshotReportedMetric> fr_invest_cash;
+  std::optional<SnapshotReportedMetric> fr_finance_cash;
+  std::optional<SnapshotReportedMetric> fr_total_assets;
+  std::optional<SnapshotReportedMetric> fr_total_liability;
+  std::string fr_roe_ttm;
+  std::string fr_profit_margin;
+  std::string fr_profit_margin_ttm;
+  std::string fr_asset_turn_ttm;
+  std::string fr_leverage_ttm;
+  std::string fr_debt_assets_ratio;
+};
+
 } // namespace fundamental
 
 namespace alert {

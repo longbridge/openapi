@@ -161,4 +161,105 @@ impl FundamentalContext {
     fn ratings(&self, symbol: String) -> PyResult<StockRatings> {
         Ok(self.ctx.ratings(symbol).map_err(ErrorNewType)?.into())
     }
+
+    /// Get business segment breakdowns (latest snapshot).
+    fn business_segments(&self, symbol: String) -> PyResult<BusinessSegments> {
+        Ok(self
+            .ctx
+            .business_segments(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get historical business segment breakdowns.
+    #[pyo3(signature = (symbol, report = None, cate = None))]
+    fn business_segments_history(
+        &self,
+        symbol: String,
+        report: Option<String>,
+        cate: Option<String>,
+    ) -> PyResult<BusinessSegmentsHistory> {
+        let report_static: Option<&'static str> = match report.as_deref() {
+            Some("qf") => Some("qf"),
+            Some("saf") => Some("saf"),
+            Some("af") => Some("af"),
+            _ => None,
+        };
+        Ok(self
+            .ctx
+            .business_segments_history(symbol, report_static, cate)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get historical institutional rating view time-series.
+    fn institution_rating_views(&self, symbol: String) -> PyResult<InstitutionRatingViews> {
+        Ok(self
+            .ctx
+            .institution_rating_views(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get industry rank for a market.
+    fn industry_rank(
+        &self,
+        market: String,
+        indicator: String,
+        sort_type: String,
+        limit: u32,
+    ) -> PyResult<IndustryRankResponse> {
+        Ok(self
+            .ctx
+            .industry_rank(market, indicator, sort_type, limit)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the industry peer chain for a security or industry.
+    #[pyo3(signature = (counter_id, market, industry_id = None))]
+    fn industry_peers(
+        &self,
+        counter_id: String,
+        market: String,
+        industry_id: Option<String>,
+    ) -> PyResult<IndustryPeersResponse> {
+        Ok(self
+            .ctx
+            .industry_peers(counter_id, market, industry_id)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get a financial report snapshot (earnings snapshot).
+    #[pyo3(signature = (symbol, report = None, fiscal_year = None, fiscal_period = None))]
+    fn financial_report_snapshot(
+        &self,
+        symbol: String,
+        report: Option<String>,
+        fiscal_year: Option<i32>,
+        fiscal_period: Option<String>,
+    ) -> PyResult<FinancialReportSnapshot> {
+        let report_static: Option<&'static str> = match report.as_deref() {
+            Some("qf") => Some("qf"),
+            Some("saf") => Some("saf"),
+            Some("af") => Some("af"),
+            _ => None,
+        };
+        let fiscal_period_static: Option<&'static str> = match fiscal_period.as_deref() {
+            Some("q1") => Some("q1"),
+            Some("q2") => Some("q2"),
+            Some("q3") => Some("q3"),
+            Some("q4") => Some("q4"),
+            Some("fy") => Some("fy"),
+            Some("h1") => Some("h1"),
+            Some("h2") => Some("h2"),
+            _ => None,
+        };
+        Ok(self
+            .ctx
+            .financial_report_snapshot(symbol, report_static, fiscal_year, fiscal_period_static)
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

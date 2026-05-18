@@ -2584,6 +2584,98 @@ inline fundamental::StockRatings convert(const lb_stock_ratings_t* r) {
            r->industry_mean_score, r->industry_median_score, std::move(ratings) };
 }
 
+// ── business_segments conversions ────────────────────────────────
+inline fundamental::BusinessSegmentItem convert(const lb_business_segment_item_t* item) {
+  return { item->name, item->percent };
+}
+inline fundamental::BusinessSegments convert(const lb_business_segments_t* r) {
+  std::vector<fundamental::BusinessSegmentItem> business;
+  for (size_t i = 0; i < r->num_business; ++i) business.push_back(convert(&r->business[i]));
+  return { r->date, r->total, r->currency, std::move(business) };
+}
+inline fundamental::BusinessSegmentHistoryItem convert(const lb_business_segment_history_item_t* item) {
+  return { item->name, item->percent, item->value };
+}
+inline fundamental::BusinessSegmentsHistoricalItem convert(const lb_business_segments_historical_item_t* item) {
+  std::vector<fundamental::BusinessSegmentHistoryItem> business, regionals;
+  for (size_t i = 0; i < item->num_business; ++i) business.push_back(convert(&item->business[i]));
+  for (size_t i = 0; i < item->num_regionals; ++i) regionals.push_back(convert(&item->regionals[i]));
+  return { item->date, item->total, item->currency, std::move(business), std::move(regionals) };
+}
+inline fundamental::BusinessSegmentsHistory convert(const lb_business_segments_history_t* r) {
+  std::vector<fundamental::BusinessSegmentsHistoricalItem> hist;
+  for (size_t i = 0; i < r->num_historical; ++i) hist.push_back(convert(&r->historical[i]));
+  return { std::move(hist) };
+}
+
+// ── institution_rating_views conversion ──────────────────────────
+inline fundamental::InstitutionRatingViewItem convert(const lb_institution_rating_view_item_t* item) {
+  return { item->date, item->buy, item->over, item->hold, item->under, item->sell, item->total };
+}
+inline fundamental::InstitutionRatingViews convert(const lb_institution_rating_views_t* r) {
+  std::vector<fundamental::InstitutionRatingViewItem> elist;
+  for (size_t i = 0; i < r->num_elist; ++i) elist.push_back(convert(&r->elist[i]));
+  return { std::move(elist) };
+}
+
+// ── industry_rank conversions ─────────────────────────────────────
+inline fundamental::IndustryRankItem convert(const lb_industry_rank_item_t* item) {
+  return { item->name, item->counter_id, item->chg, item->leading_name, item->leading_ticker,
+           item->leading_chg, item->value_name, item->value_data };
+}
+inline fundamental::IndustryRankGroup convert(const lb_industry_rank_group_t* g) {
+  std::vector<fundamental::IndustryRankItem> lists;
+  for (size_t i = 0; i < g->num_lists; ++i) lists.push_back(convert(&g->lists[i]));
+  return { std::move(lists) };
+}
+inline fundamental::IndustryRankResponse convert(const lb_industry_rank_response_t* r) {
+  std::vector<fundamental::IndustryRankGroup> items;
+  for (size_t i = 0; i < r->num_items; ++i) items.push_back(convert(&r->items[i]));
+  return { std::move(items) };
+}
+
+// ── industry_peers conversions ────────────────────────────────────
+inline fundamental::IndustryPeerNode convert(const lb_industry_peer_node_t* node) {
+  return { node->name, node->counter_id, node->stock_num, node->chg, node->ytd_chg,
+           node->next_json ? node->next_json : "" };
+}
+inline fundamental::IndustryPeersResponse convert(const lb_industry_peers_response_t* r) {
+  fundamental::IndustryPeersTop top{ r->top.name, r->top.market };
+  std::optional<fundamental::IndustryPeerNode> chain;
+  if (r->chain) chain = convert(r->chain);
+  return { std::move(top), std::move(chain) };
+}
+
+// ── financial_report_snapshot conversions ────────────────────────
+inline fundamental::SnapshotForecastMetric convert(const lb_snapshot_forecast_metric_t* m) {
+  return { m->value, m->yoy, m->cmp_desc, m->est_value };
+}
+inline fundamental::SnapshotReportedMetric convert(const lb_snapshot_reported_metric_t* m) {
+  return { m->value, m->yoy };
+}
+inline fundamental::FinancialReportSnapshot convert(const lb_financial_report_snapshot_t* r) {
+  std::optional<fundamental::SnapshotForecastMetric> fo_revenue, fo_ebit, fo_eps;
+  if (r->fo_revenue) fo_revenue = convert(r->fo_revenue);
+  if (r->fo_ebit) fo_ebit = convert(r->fo_ebit);
+  if (r->fo_eps) fo_eps = convert(r->fo_eps);
+  std::optional<fundamental::SnapshotReportedMetric> fr_revenue, fr_profit, fr_operate_cash,
+      fr_invest_cash, fr_finance_cash, fr_total_assets, fr_total_liability;
+  if (r->fr_revenue) fr_revenue = convert(r->fr_revenue);
+  if (r->fr_profit) fr_profit = convert(r->fr_profit);
+  if (r->fr_operate_cash) fr_operate_cash = convert(r->fr_operate_cash);
+  if (r->fr_invest_cash) fr_invest_cash = convert(r->fr_invest_cash);
+  if (r->fr_finance_cash) fr_finance_cash = convert(r->fr_finance_cash);
+  if (r->fr_total_assets) fr_total_assets = convert(r->fr_total_assets);
+  if (r->fr_total_liability) fr_total_liability = convert(r->fr_total_liability);
+  return { r->name, r->ticker, r->fp_start, r->fp_end, r->currency, r->report_desc,
+           std::move(fo_revenue), std::move(fo_ebit), std::move(fo_eps),
+           std::move(fr_revenue), std::move(fr_profit), std::move(fr_operate_cash),
+           std::move(fr_invest_cash), std::move(fr_finance_cash),
+           std::move(fr_total_assets), std::move(fr_total_liability),
+           r->fr_roe_ttm, r->fr_profit_margin, r->fr_profit_margin_ttm,
+           r->fr_asset_turn_ttm, r->fr_leverage_ttm, r->fr_debt_assets_ratio };
+}
+
 // ── Portfolio conversions ─────────────────────────────────────────
 
 inline portfolio::ProfitSummaryInfo convert(const lb_profit_summary_info_t* item) {
