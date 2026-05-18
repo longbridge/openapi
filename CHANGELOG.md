@@ -8,21 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Rust:** Six new `FundamentalContext` methods:
-  - `business_segments` — GET `/v1/quote/fundamentals/business-segments`: latest business segment breakdown (name, percent).
-  - `business_segments_history` — GET `/v1/quote/fundamentals/business-segments/history`: historical business and regional segment breakdowns with optional `report` and `cate` filters.
-  - `institution_rating_views` — GET `/v1/quote/ratings/institutional`: historical rating distribution time-series (buy/over/hold/under/sell/total per date).
-  - `industry_rank` — GET `/v1/quote/industry/rank`: industry leaderboard for a market with configurable indicator and sort direction.
-  - `industry_peers` — GET `/v1/quote/industries/peers`: recursive industry peer chain; accepts both symbol-style (`AAPL.US`) and raw counter IDs (`BK/US/123`).
-  - `financial_report_snapshot` — GET `/v1/quote/financials/earnings-snapshot`: earnings snapshot with forecast (revenue/EBIT/EPS) and reported (P&L, cash-flows, balance-sheet ratios) metrics.
-- All new methods are also available on `FundamentalContextSync` (blocking API).
-- **Python, Node.js, Java, C, C++:** All six new `FundamentalContext` methods ported to every non-Rust SDK, including:
-  - New response types: `BusinessSegmentItem`, `BusinessSegments`, `BusinessSegmentHistoryItem`, `BusinessSegmentsHistoricalItem`, `BusinessSegmentsHistory`, `InstitutionRatingViewItem`, `InstitutionRatingViews`, `IndustryRankItem`, `IndustryRankGroup`, `IndustryRankResponse`, `IndustryPeersTop`, `IndustryPeerNode` (with `next_json` serialising the recursive child list), `IndustryPeersResponse`, `SnapshotForecastMetric`, `SnapshotReportedMetric`, `FinancialReportSnapshot`.
-  - **Python:** Sync (`FundamentalContext`) and async (`AsyncFundamentalContext`) variants; full type stubs in `openapi.pyi`.
-  - **Node.js:** `index.d.ts` regenerated with all new types and methods.
-  - **Java:** JNI bindings, Java source classes, and options POJOs; new methods on `FundamentalContext`.
-  - **C:** New C structs and functions in `longbridge.h` (regenerated via cbindgen).
-  - **C++:** New struct types in `types.hpp`, convert functions in `convert.hpp`, method declarations in `fundamental_context.hpp`, and implementations in `fundamental_context.cpp`.
+- **All languages:** Six new `FundamentalContext` methods (Rust/Python/Node.js/Java/C/C++):
+  - `business_segments` — GET `/v1/quote/fundamentals/business-segments`
+  - `business_segments_history` — GET `/v1/quote/fundamentals/business-segments/history`
+  - `institution_rating_views` — GET `/v1/quote/ratings/institutional`
+  - `industry_rank` — GET `/v1/quote/industry/rank`
+  - `industry_peers` — GET `/v1/quote/industries/peers`
+  - `financial_report_snapshot` — GET `/v1/quote/financials/earnings-snapshot`
 
 # [4.1.0]
 
