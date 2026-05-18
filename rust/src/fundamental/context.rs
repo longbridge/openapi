@@ -496,4 +496,182 @@ impl FundamentalContext {
         )
         .await
     }
+
+    // ── business_segments ────────────────────────────────────────
+
+    /// Get the latest business segment breakdown for a security.
+    ///
+    /// Path: `GET /v1/quote/fundamentals/business-segments`
+    pub async fn business_segments(&self, symbol: impl Into<String>) -> Result<BusinessSegments> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        self.get(
+            "/v1/quote/fundamentals/business-segments",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            },
+        )
+        .await
+    }
+
+    /// Get historical business segment breakdowns for a security.
+    ///
+    /// Path: `GET /v1/quote/fundamentals/business-segments/history`
+    pub async fn business_segments_history(
+        &self,
+        symbol: impl Into<String>,
+        report: Option<&'static str>,
+        cate: Option<String>,
+    ) -> Result<BusinessSegmentsHistory> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            report: Option<&'static str>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            cate: Option<String>,
+        }
+        self.get(
+            "/v1/quote/fundamentals/business-segments/history",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                report,
+                cate,
+            },
+        )
+        .await
+    }
+
+    // ── institution_rating_views ──────────────────────────────────
+
+    /// Get historical institutional rating view time-series for a security.
+    ///
+    /// Path: `GET /v1/quote/ratings/institutional`
+    pub async fn institution_rating_views(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<InstitutionRatingViews> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        self.get(
+            "/v1/quote/ratings/institutional",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            },
+        )
+        .await
+    }
+
+    // ── industry_rank ─────────────────────────────────────────────
+
+    /// Get industry rank for a market.
+    ///
+    /// Path: `GET /v1/quote/industry/rank`
+    ///
+    /// `indicator` is a numeric string `"0"`–`"7"`;
+    /// `sort_type` is `"0"` (ascending) or `"1"` (descending).
+    pub async fn industry_rank(
+        &self,
+        market: impl Into<String>,
+        indicator: impl Into<String>,
+        sort_type: impl Into<String>,
+        limit: u32,
+    ) -> Result<IndustryRankResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            market: String,
+            indicator: String,
+            sort_type: String,
+            limit: u32,
+        }
+        self.get(
+            "/v1/quote/industry/rank",
+            Query {
+                market: market.into(),
+                indicator: indicator.into(),
+                sort_type: sort_type.into(),
+                limit,
+            },
+        )
+        .await
+    }
+
+    // ── industry_peers ────────────────────────────────────────────
+
+    /// Get the industry peer chain for a security or industry.
+    ///
+    /// Path: `GET /v1/quote/industries/peers`
+    ///
+    /// `counter_id` may be a regular symbol (e.g. `"AAPL.US"`) or an industry
+    /// counter ID (e.g. `"BK/US/123"`) — pass it through as-is if it already
+    /// contains a `/`.
+    pub async fn industry_peers(
+        &self,
+        counter_id: impl Into<String>,
+        market: impl Into<String>,
+        industry_id: Option<String>,
+    ) -> Result<IndustryPeersResponse> {
+        let raw = counter_id.into();
+        let cid = if raw.contains('/') {
+            raw
+        } else {
+            symbol_to_counter_id(&raw)
+        };
+        #[derive(Serialize)]
+        struct Query {
+            #[serde(rename = "type")]
+            kind: &'static str,
+            market: String,
+            industry_id: String,
+            counter_id: String,
+        }
+        self.get(
+            "/v1/quote/industries/peers",
+            Query {
+                kind: "1",
+                market: market.into(),
+                industry_id: industry_id.unwrap_or_default(),
+                counter_id: cid,
+            },
+        )
+        .await
+    }
+
+    // ── financial_report_snapshot ─────────────────────────────────
+
+    /// Get a financial report snapshot (earnings snapshot) for a security.
+    ///
+    /// Path: `GET /v1/quote/financials/earnings-snapshot`
+    pub async fn financial_report_snapshot(
+        &self,
+        symbol: impl Into<String>,
+        report: Option<&'static str>,
+        fiscal_year: Option<i32>,
+        fiscal_period: Option<&'static str>,
+    ) -> Result<FinancialReportSnapshot> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            report: Option<&'static str>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            fiscal_year: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            fiscal_period: Option<&'static str>,
+        }
+        self.get(
+            "/v1/quote/financials/earnings-snapshot",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                report,
+                fiscal_year,
+                fiscal_period,
+            },
+        )
+        .await
+    }
 }
