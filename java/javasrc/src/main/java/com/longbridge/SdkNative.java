@@ -390,6 +390,27 @@ public class SdkNative {
         public static native void fundamentalContextGetRatings(long context, String symbol,
                         AsyncCallback callback);
 
+        public static native void fundamentalContextGetBusinessSegments(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetBusinessSegmentsHistory(long context,
+                        Object opts,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetInstitutionRatingViews(long context,
+                        String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetIndustryRank(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetIndustryPeers(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetFinancialReportSnapshot(long context,
+                        Object opts,
+                        AsyncCallback callback);
+
         public static native void portfolioContextProfitAnalysisFlows(long context, Object opts,
                         AsyncCallback callback);
 
