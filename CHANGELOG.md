@@ -8,13 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **All languages:** Six new `FundamentalContext` methods (Rust/Python/Node.js/Java/C/C++):
-  - `business_segments` — GET `/v1/quote/fundamentals/business-segments`
-  - `business_segments_history` — GET `/v1/quote/fundamentals/business-segments/history`
-  - `institution_rating_views` — GET `/v1/quote/ratings/institutional`
-  - `industry_rank` — GET `/v1/quote/industry/rank`
-  - `industry_peers` — GET `/v1/quote/industries/peers`
-  - `financial_report_snapshot` — GET `/v1/quote/financials/earnings-snapshot`
+- **All languages (Rust/Python/Node.js/Java/C/C++):** Six new `FundamentalContext` methods:
+  - `BusinessSegments` — GET `/v1/quote/fundamentals/business-segments`: latest business segment breakdown.
+  - `BusinessSegmentsHistory` — GET `/v1/quote/fundamentals/business-segments/history`: historical business and regional segment breakdowns with optional `report` and `cate` filters.
+  - `InstitutionRatingViews` — GET `/v1/quote/ratings/institutional`: historical rating distribution time-series (buy/over/hold/under/sell per date).
+  - `IndustryRank` — GET `/v1/quote/industry/rank`: industry leaderboard; exposes `IndustryRankIndicator` and `IndustryRankSortType` enum constants.
+  - `IndustryPeers` — GET `/v1/quote/industries/peers`: recursive industry peer chain; accepts both symbol-style (`AAPL.US`) and raw counter IDs (`BK/US/123`).
+  - `FinancialReportSnapshot` — GET `/v1/quote/financials/earnings-snapshot`: earnings snapshot with forecast and reported metrics.
 
 # [4.1.0]
 
