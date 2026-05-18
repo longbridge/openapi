@@ -1184,20 +1184,20 @@ pub struct InstitutionRatingViews {
 /// One historical rating distribution snapshot
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InstitutionRatingViewItem {
-    /// Date as unix timestamp (int64)
-    pub date: i64,
-    /// Number of "Buy" ratings
-    pub buy: i32,
-    /// Number of "Outperform" ratings
-    pub over: i32,
-    /// Number of "Hold" ratings
-    pub hold: i32,
-    /// Number of "Underperform" ratings
-    pub under: i32,
-    /// Number of "Sell" ratings
-    pub sell: i32,
-    /// Total analyst count
-    pub total: i32,
+    /// Date as unix timestamp string (API returns as quoted or bare integer)
+    pub date: String,
+    /// Number of "Buy" ratings (API returns as string)
+    pub buy: String,
+    /// Number of "Outperform" ratings (API returns as string)
+    pub over: String,
+    /// Number of "Hold" ratings (API returns as string)
+    pub hold: String,
+    /// Number of "Underperform" ratings (API returns as string)
+    pub under: String,
+    /// Number of "Sell" ratings (API returns as string)
+    pub sell: String,
+    /// Total analyst count (API returns as string)
+    pub total: String,
 }
 
 // ── industry_rank ─────────────────────────────────────────────────
@@ -1266,8 +1266,8 @@ pub struct IndustryPeerNode {
     pub name: String,
     /// Counter ID
     pub counter_id: String,
-    /// Number of stocks in this node
-    pub stock_num: String,
+    /// Number of stocks in this node (API returns as integer)
+    pub stock_num: i32,
     /// Change percentage
     pub chg: String,
     /// Year-to-date change
