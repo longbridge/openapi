@@ -2376,6 +2376,223 @@ impl_java_class!(
     ]
 );
 
+// ── FundamentalContext: new APIs ──────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/fundamental/BusinessSegmentItem",
+    longbridge::fundamental::BusinessSegmentItem,
+    [name, percent]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/BusinessSegments",
+    longbridge::fundamental::BusinessSegments,
+    [
+        date,
+        total,
+        currency,
+        #[java(objarray)]
+        business
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/BusinessSegmentHistoryItem",
+    longbridge::fundamental::BusinessSegmentHistoryItem,
+    [name, percent, value]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/BusinessSegmentsHistoricalItem",
+    longbridge::fundamental::BusinessSegmentsHistoricalItem,
+    [
+        date,
+        total,
+        currency,
+        #[java(objarray)]
+        business,
+        #[java(objarray)]
+        regionals
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/BusinessSegmentsHistory",
+    longbridge::fundamental::BusinessSegmentsHistory,
+    [
+        #[java(objarray)]
+        historical
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingViewItem",
+    longbridge::fundamental::InstitutionRatingViewItem,
+    [date, buy, over, hold, under, sell, total]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/InstitutionRatingViews",
+    longbridge::fundamental::InstitutionRatingViews,
+    [
+        #[java(objarray)]
+        elist
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryRankItem",
+    longbridge::fundamental::IndustryRankItem,
+    [
+        name,
+        counter_id,
+        chg,
+        leading_name,
+        leading_ticker,
+        leading_chg,
+        value_name,
+        value_data
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryRankGroup",
+    longbridge::fundamental::IndustryRankGroup,
+    [
+        #[java(objarray)]
+        lists
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryRankResponse",
+    longbridge::fundamental::IndustryRankResponse,
+    [
+        #[java(objarray)]
+        items
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryPeersTop",
+    longbridge::fundamental::IndustryPeersTop,
+    [name, market]
+);
+
+// IndustryPeerNode has a recursive `next` field; we serialize it as nextJson.
+// Manual impl (macro can't rename fields).
+#[allow(non_upper_case_globals)]
+static com_longbridge_fundamental_IndustryPeerNode: std::sync::OnceLock<jni::objects::GlobalRef> =
+    std::sync::OnceLock::new();
+
+impl crate::types::ClassLoader for longbridge::fundamental::IndustryPeerNode {
+    fn init(env: &mut jni::JNIEnv) {
+        let cls = jni::descriptors::Desc::<jni::objects::JClass>::lookup(
+            "com/longbridge/fundamental/IndustryPeerNode",
+            env,
+        )
+        .expect("com/longbridge/fundamental/IndustryPeerNode");
+        let _ = com_longbridge_fundamental_IndustryPeerNode.set(env.new_global_ref(&*cls).unwrap());
+    }
+
+    fn class_ref() -> jni::objects::GlobalRef {
+        com_longbridge_fundamental_IndustryPeerNode
+            .get()
+            .cloned()
+            .unwrap()
+    }
+}
+
+impl crate::types::JSignature for longbridge::fundamental::IndustryPeerNode {
+    #[inline]
+    fn signature() -> ::std::borrow::Cow<'static, str> {
+        "Lcom/longbridge/fundamental/IndustryPeerNode;".into()
+    }
+}
+
+impl crate::types::IntoJValue for longbridge::fundamental::IndustryPeerNode {
+    fn into_jvalue<'a>(
+        self,
+        env: &mut jni::JNIEnv<'a>,
+    ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
+        let longbridge::fundamental::IndustryPeerNode {
+            name,
+            counter_id,
+            stock_num,
+            chg,
+            ytd_chg,
+            next,
+        } = self;
+        let next_json = serde_json::to_string(&next).unwrap_or_default();
+        let cls = <Self as crate::types::ClassLoader>::class_ref();
+        let obj = env.new_object(cls.borrow(), "()V", &[])?;
+        crate::types::set_field(env, &obj, "name", name)?;
+        crate::types::set_field(env, &obj, "counterId", counter_id)?;
+        crate::types::set_field(env, &obj, "stockNum", stock_num)?;
+        crate::types::set_field(env, &obj, "chg", chg)?;
+        crate::types::set_field(env, &obj, "ytdChg", ytd_chg)?;
+        crate::types::set_field(env, &obj, "nextJson", next_json)?;
+        Ok(obj.into())
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/fundamental/IndustryPeersResponse",
+    longbridge::fundamental::IndustryPeersResponse,
+    [top, chain]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/SnapshotForecastMetric",
+    longbridge::fundamental::SnapshotForecastMetric,
+    [value, yoy, cmp_desc, est_value]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/SnapshotReportedMetric",
+    longbridge::fundamental::SnapshotReportedMetric,
+    [value, yoy]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/FinancialReportSnapshot",
+    longbridge::fundamental::FinancialReportSnapshot,
+    [
+        name,
+        ticker,
+        fp_start,
+        fp_end,
+        currency,
+        report_desc,
+        #[java(nullable)]
+        fo_revenue,
+        #[java(nullable)]
+        fo_ebit,
+        #[java(nullable)]
+        fo_eps,
+        #[java(nullable)]
+        fr_revenue,
+        #[java(nullable)]
+        fr_profit,
+        #[java(nullable)]
+        fr_operate_cash,
+        #[java(nullable)]
+        fr_invest_cash,
+        #[java(nullable)]
+        fr_finance_cash,
+        #[java(nullable)]
+        fr_total_assets,
+        #[java(nullable)]
+        fr_total_liability,
+        fr_roe_ttm,
+        fr_profit_margin,
+        fr_profit_margin_ttm,
+        fr_asset_turn_ttm,
+        fr_leverage_ttm,
+        fr_debt_assets_ratio
+    ]
+);
+
 // ── PortfolioContext: ProfitAnalysisFlows and related ─────────────
 
 impl_java_class!(

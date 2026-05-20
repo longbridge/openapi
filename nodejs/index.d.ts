@@ -42,10 +42,14 @@ export declare class AlertContext {
    * `triggerValue` is a price or percentage string depending on `condition`.
    */
   add(symbol: string, condition: AlertCondition, triggerValue: string, frequency: AlertFrequency): Promise<void>
-  /** Enable a previously disabled price alert. */
-  enable(alertId: string): Promise<void>
-  /** Disable a price alert without deleting it. */
-  disable(alertId: string): Promise<void>
+  /**
+   * Update a price alert.
+   *
+   * Pass the [`AlertItem`] obtained from [`list`](Self::list). Set
+   * `item.enabled` to `true` to re-enable or `false` to disable before
+   * calling this method.
+   */
+  update(item: AlertItem): Promise<void>
   /** Delete one or more price alerts by ID. */
   delete(alertIds: Array<string>): Promise<void>
 }
@@ -603,6 +607,18 @@ export declare class FundamentalContext {
   buyback(symbol: string): Promise<BuybackData>
   /** Get stock ratings for a security */
   ratings(symbol: string): Promise<StockRatings>
+  /** Get business segment breakdowns (latest snapshot) */
+  businessSegments(symbol: string): Promise<BusinessSegments>
+  /** Get historical business segment breakdowns */
+  businessSegmentsHistory(symbol: string, report?: string | undefined | null, cate?: string | undefined | null): Promise<BusinessSegmentsHistory>
+  /** Get historical institutional rating view time-series */
+  institutionRatingViews(symbol: string): Promise<InstitutionRatingViews>
+  /** Get industry rank for a market */
+  industryRank(market: string, indicator: string, sortType: string, limit: number): Promise<IndustryRankResponse>
+  /** Get the industry peer chain for a security or industry */
+  industryPeers(counterId: string, market: string, industryId?: string | undefined | null): Promise<IndustryPeersResponse>
+  /** Get a financial report snapshot (earnings snapshot) */
+  financialReportSnapshot(symbol: string, report?: string | undefined | null, fiscalYear?: number | undefined | null, fiscalPeriod?: string | undefined | null): Promise<FinancialReportSnapshot>
 }
 
 /** Fund position */
@@ -3130,6 +3146,41 @@ export interface BrokerHoldingTop {
   updatedAt: string
 }
 
+/** One business/regional segment item in a historical snapshot */
+export interface BusinessSegmentHistoryItem {
+  name: string
+  percent: string
+  value: string
+}
+
+/** One business segment item (latest snapshot) */
+export interface BusinessSegmentItem {
+  name: string
+  percent: string
+}
+
+/** Business segments response */
+export interface BusinessSegments {
+  date: string
+  total: string
+  currency: string
+  business: Array<BusinessSegmentItem>
+}
+
+/** One historical business segments snapshot */
+export interface BusinessSegmentsHistoricalItem {
+  date: string
+  total: string
+  currency: string
+  business: Array<BusinessSegmentHistoryItem>
+  regionals: Array<BusinessSegmentHistoryItem>
+}
+
+/** Business segments history response */
+export interface BusinessSegmentsHistory {
+  historical: Array<BusinessSegmentsHistoricalItem>
+}
+
 /** Buyback data response */
 export interface BuybackData {
   recentBuybacks?: RecentBuybacks
@@ -3919,6 +3970,32 @@ export interface FinancialReports {
   list: any
 }
 
+/** Financial report snapshot response */
+export interface FinancialReportSnapshot {
+  name: string
+  ticker: string
+  fpStart: string
+  fpEnd: string
+  currency: string
+  reportDesc: string
+  foRevenue?: SnapshotForecastMetric
+  foEbit?: SnapshotForecastMetric
+  foEps?: SnapshotForecastMetric
+  frRevenue?: SnapshotReportedMetric
+  frProfit?: SnapshotReportedMetric
+  frOperateCash?: SnapshotReportedMetric
+  frInvestCash?: SnapshotReportedMetric
+  frFinanceCash?: SnapshotReportedMetric
+  frTotalAssets?: SnapshotReportedMetric
+  frTotalLiability?: SnapshotReportedMetric
+  frRoeTtm: string
+  frProfitMargin: string
+  frProfitMarginTtm: string
+  frAssetTurnTtm: string
+  frLeverageTtm: string
+  frDebtAssetsRatio: string
+}
+
 export declare const enum FlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -4107,6 +4184,55 @@ export interface IndexConstituents {
   stocks: Array<ConstituentStock>
 }
 
+/**
+ * A node in the recursive industry peer chain.
+ *
+ * `nextJson` contains the child nodes serialised as a JSON string.
+ */
+export interface IndustryPeerNode {
+  name: string
+  counterId: string
+  stockNum: number
+  chg: string
+  ytdChg: string
+  /** Child nodes as a JSON string */
+  nextJson: string
+}
+
+/** Industry peers response */
+export interface IndustryPeersResponse {
+  top: IndustryPeersTop
+  chain?: IndustryPeerNode
+}
+
+/** Top-level industry info in the peers response */
+export interface IndustryPeersTop {
+  name: string
+  market: string
+}
+
+/** A group of ranked industry items */
+export interface IndustryRankGroup {
+  lists: Array<IndustryRankItem>
+}
+
+/** One ranked industry item */
+export interface IndustryRankItem {
+  name: string
+  counterId: string
+  chg: string
+  leadingName: string
+  leadingTicker: string
+  leadingChg: string
+  valueName: string
+  valueData: string
+}
+
+/** Industry rank response */
+export interface IndustryRankResponse {
+  items: Array<IndustryRankGroup>
+}
+
 /** Industry valuation distribution response */
 export interface IndustryValuationDist {
   /** PE distribution */
@@ -4269,6 +4395,22 @@ export interface InstitutionRatingSummary {
   target?: string
   /** Last updated display string */
   updatedAt: string
+}
+
+/** One historical rating distribution snapshot */
+export interface InstitutionRatingViewItem {
+  date: string
+  buy: string
+  over: string
+  hold: string
+  under: string
+  sell: string
+  total: string
+}
+
+/** Institution rating views response */
+export interface InstitutionRatingViews {
+  elist: Array<InstitutionRatingViewItem>
 }
 
 export declare const enum InstitutionRecommend {
@@ -5212,6 +5354,20 @@ export interface ShortPositionsResponse {
   data: Array<ShortPosition>
   /** Number of sources */
   sources: number
+}
+
+/** A forecast metric in the financial report snapshot */
+export interface SnapshotForecastMetric {
+  value: string
+  yoy: string
+  cmpDesc: string
+  estValue: string
+}
+
+/** A reported metric in the financial report snapshot */
+export interface SnapshotReportedMetric {
+  value: string
+  yoy: string
 }
 
 /** Sort order type */

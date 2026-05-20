@@ -98,6 +98,24 @@ void FundamentalContext::buyback(const std::string& s, AsyncCallback<Fundamental
 void FundamentalContext::ratings(const std::string& s, AsyncCallback<FundamentalContext, StockRatings> callback) const {
   F_TYPED(StockRatings, lb_stock_ratings_t, lb_fundamental_context_ratings, ctx_, s.c_str());
 }
+void FundamentalContext::business_segments(const std::string& s, AsyncCallback<FundamentalContext, BusinessSegments> callback) const {
+  F_TYPED(BusinessSegments, lb_business_segments_t, lb_fundamental_context_business_segments, ctx_, s.c_str());
+}
+void FundamentalContext::business_segments_history(const std::string& s, const char* report, const char* cate, AsyncCallback<FundamentalContext, BusinessSegmentsHistory> callback) const {
+  F_TYPED(BusinessSegmentsHistory, lb_business_segments_history_t, lb_fundamental_context_business_segments_history, ctx_, s.c_str(), report, cate);
+}
+void FundamentalContext::institution_rating_views(const std::string& s, AsyncCallback<FundamentalContext, InstitutionRatingViews> callback) const {
+  F_TYPED(InstitutionRatingViews, lb_institution_rating_views_t, lb_fundamental_context_institution_rating_views, ctx_, s.c_str());
+}
+void FundamentalContext::industry_rank(const std::string& market, const std::string& indicator, const std::string& sort_type, uint32_t limit, AsyncCallback<FundamentalContext, IndustryRankResponse> callback) const {
+  F_TYPED(IndustryRankResponse, lb_industry_rank_response_t, lb_fundamental_context_industry_rank, ctx_, market.c_str(), indicator.c_str(), sort_type.c_str(), limit);
+}
+void FundamentalContext::industry_peers(const std::string& counter_id, const std::string& market, const char* industry_id, AsyncCallback<FundamentalContext, IndustryPeersResponse> callback) const {
+  F_TYPED(IndustryPeersResponse, lb_industry_peers_response_t, lb_fundamental_context_industry_peers, ctx_, counter_id.c_str(), market.c_str(), industry_id);
+}
+void FundamentalContext::financial_report_snapshot(const std::string& s, const char* report, int32_t fiscal_year, const char* fiscal_period, AsyncCallback<FundamentalContext, FinancialReportSnapshot> callback) const {
+  F_TYPED(FinancialReportSnapshot, lb_financial_report_snapshot_t, lb_fundamental_context_financial_report_snapshot, ctx_, s.c_str(), report, fiscal_year, fiscal_period);
+}
 
 #undef F_TYPED
 #undef F_JSON

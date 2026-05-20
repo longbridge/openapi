@@ -9614,6 +9614,228 @@ class StockRatings:
     """Full ratings array as a JSON string"""
 
 
+class BusinessSegmentItem:
+    """One business segment item (latest snapshot)."""
+
+    name: str
+    """Segment name"""
+    percent: str
+    """Percentage of total revenue"""
+
+
+class BusinessSegments:
+    """Response for :meth:`FundamentalContext.business_segments`."""
+
+    date: str
+    """Report date"""
+    total: str
+    """Total revenue"""
+    currency: str
+    """Reporting currency"""
+    business: list[BusinessSegmentItem]
+    """Business segment breakdown"""
+
+
+class BusinessSegmentHistoryItem:
+    """One business/regional segment item in a historical snapshot."""
+
+    name: str
+    """Segment name"""
+    percent: str
+    """Percentage of total"""
+    value: str
+    """Absolute value"""
+
+
+class BusinessSegmentsHistoricalItem:
+    """One historical business segments snapshot."""
+
+    date: str
+    """Report date"""
+    total: str
+    """Total revenue"""
+    currency: str
+    """Reporting currency"""
+    business: list[BusinessSegmentHistoryItem]
+    """Business segment breakdown"""
+    regionals: list[BusinessSegmentHistoryItem]
+    """Regional breakdown"""
+
+
+class BusinessSegmentsHistory:
+    """Response for :meth:`FundamentalContext.business_segments_history`."""
+
+    historical: list[BusinessSegmentsHistoricalItem]
+    """Historical snapshots"""
+
+
+class InstitutionRatingViewItem:
+    """One historical rating distribution snapshot."""
+
+    date: str
+    """Date as unix timestamp string"""
+    buy: str
+    """Number of Buy ratings"""
+    over: str
+    """Number of Outperform ratings"""
+    hold: str
+    """Number of Hold ratings"""
+    under: str
+    """Number of Underperform ratings"""
+    sell: str
+    """Number of Sell ratings"""
+    total: str
+    """Total analyst count"""
+
+
+class InstitutionRatingViews:
+    """Response for :meth:`FundamentalContext.institution_rating_views`."""
+
+    elist: list[InstitutionRatingViewItem]
+    """Historical rating distribution snapshots"""
+
+
+class IndustryRankItem:
+    """One ranked industry item."""
+
+    name: str
+    """Industry / sector name"""
+    counter_id: str
+    """Counter ID of the industry"""
+    chg: str
+    """Change percentage"""
+    leading_name: str
+    """Name of the leading stock"""
+    leading_ticker: str
+    """Ticker of the leading stock"""
+    leading_chg: str
+    """Change percentage of the leading stock"""
+    value_name: str
+    """Value label name"""
+    value_data: str
+    """Value data"""
+
+
+class IndustryRankGroup:
+    """A group of ranked industry items."""
+
+    lists: list[IndustryRankItem]
+    """Items in this group"""
+
+
+class IndustryRankResponse:
+    """Response for :meth:`FundamentalContext.industry_rank`."""
+
+    items: list[IndustryRankGroup]
+    """Grouped rank items"""
+
+
+class IndustryPeersTop:
+    """Top-level industry info in the peers response."""
+
+    name: str
+    """Industry name"""
+    market: str
+    """Market code"""
+
+
+class IndustryPeerNode:
+    """A node in the recursive industry peer chain."""
+
+    name: str
+    """Node name"""
+    counter_id: str
+    """Counter ID"""
+    stock_num: int
+    """Number of stocks in this node"""
+    chg: str
+    """Change percentage"""
+    ytd_chg: str
+    """Year-to-date change"""
+    next_json: str
+    """Child nodes as a JSON string"""
+
+
+class IndustryPeersResponse:
+    """Response for :meth:`FundamentalContext.industry_peers`."""
+
+    top: IndustryPeersTop
+    """Top-level industry node info"""
+    chain: "IndustryPeerNode | None"
+    """Root peer chain node"""
+
+
+class SnapshotForecastMetric:
+    """A forecast metric in the financial report snapshot."""
+
+    value: str
+    """Actual value"""
+    yoy: str
+    """Year-over-year change"""
+    cmp_desc: str
+    """Beat/miss description"""
+    est_value: str
+    """Consensus estimate value"""
+
+
+class SnapshotReportedMetric:
+    """A reported metric in the financial report snapshot."""
+
+    value: str
+    """Actual value"""
+    yoy: str
+    """Year-over-year change"""
+
+
+class FinancialReportSnapshot:
+    """Response for :meth:`FundamentalContext.financial_report_snapshot`."""
+
+    name: str
+    """Company name"""
+    ticker: str
+    """Ticker code"""
+    fp_start: str
+    """Fiscal period start date"""
+    fp_end: str
+    """Fiscal period end date"""
+    currency: str
+    """Reporting currency"""
+    report_desc: str
+    """Report description"""
+    fo_revenue: "SnapshotForecastMetric | None"
+    """Forecast revenue"""
+    fo_ebit: "SnapshotForecastMetric | None"
+    """Forecast EBIT"""
+    fo_eps: "SnapshotForecastMetric | None"
+    """Forecast EPS"""
+    fr_revenue: "SnapshotReportedMetric | None"
+    """Reported revenue"""
+    fr_profit: "SnapshotReportedMetric | None"
+    """Reported net profit"""
+    fr_operate_cash: "SnapshotReportedMetric | None"
+    """Reported operating cash flow"""
+    fr_invest_cash: "SnapshotReportedMetric | None"
+    """Reported investing cash flow"""
+    fr_finance_cash: "SnapshotReportedMetric | None"
+    """Reported financing cash flow"""
+    fr_total_assets: "SnapshotReportedMetric | None"
+    """Reported total assets"""
+    fr_total_liability: "SnapshotReportedMetric | None"
+    """Reported total liabilities"""
+    fr_roe_ttm: str
+    """ROE TTM"""
+    fr_profit_margin: str
+    """Profit margin"""
+    fr_profit_margin_ttm: str
+    """Profit margin TTM"""
+    fr_asset_turn_ttm: str
+    """Asset turnover TTM"""
+    fr_leverage_ttm: str
+    """Leverage TTM"""
+    fr_debt_assets_ratio: str
+    """Debt-to-assets ratio"""
+
+
 class FinancialReportKind:
     """Financial report kind."""
 
@@ -9789,6 +10011,110 @@ class FundamentalContext:
 
         Returns:
             :class:`StockRatings`
+        """
+        ...
+
+    def business_segments(self, symbol: str) -> "BusinessSegments":
+        """
+        Get business segment breakdowns (latest snapshot).
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`BusinessSegments`
+        """
+        ...
+
+    def business_segments_history(
+        self,
+        symbol: str,
+        report: "str | None" = None,
+        cate: "str | None" = None,
+    ) -> "BusinessSegmentsHistory":
+        """
+        Get historical business segment breakdowns.
+
+        Args:
+            symbol: Security symbol
+            report: Report type (``"qf"``, ``"saf"``, ``"af"``) or ``None``
+            cate: Category filter or ``None``
+
+        Returns:
+            :class:`BusinessSegmentsHistory`
+        """
+        ...
+
+    def institution_rating_views(self, symbol: str) -> "InstitutionRatingViews":
+        """
+        Get historical institutional rating view time-series.
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            :class:`InstitutionRatingViews`
+        """
+        ...
+
+    def industry_rank(
+        self,
+        market: str,
+        indicator: str,
+        sort_type: str,
+        limit: int,
+    ) -> "IndustryRankResponse":
+        """
+        Get industry rank for a market.
+
+        Args:
+            market: Market code, e.g. ``"US"``
+            indicator: Numeric string ``"0"``–``"7"``
+            sort_type: ``"0"`` (ascending) or ``"1"`` (descending)
+            limit: Maximum number of results
+
+        Returns:
+            :class:`IndustryRankResponse`
+        """
+        ...
+
+    def industry_peers(
+        self,
+        counter_id: str,
+        market: str,
+        industry_id: "str | None" = None,
+    ) -> "IndustryPeersResponse":
+        """
+        Get the industry peer chain for a security or industry.
+
+        Args:
+            counter_id: Symbol (e.g. ``"AAPL.US"``) or industry counter ID
+            market: Market code, e.g. ``"US"``
+            industry_id: Industry ID or ``None``
+
+        Returns:
+            :class:`IndustryPeersResponse`
+        """
+        ...
+
+    def financial_report_snapshot(
+        self,
+        symbol: str,
+        report: "str | None" = None,
+        fiscal_year: "int | None" = None,
+        fiscal_period: "str | None" = None,
+    ) -> "FinancialReportSnapshot":
+        """
+        Get a financial report snapshot (earnings snapshot).
+
+        Args:
+            symbol: Security symbol
+            report: Report type (``"qf"``, ``"saf"``, ``"af"``) or ``None``
+            fiscal_year: Fiscal year (e.g. ``2023``) or ``None``
+            fiscal_period: Fiscal period string or ``None``
+
+        Returns:
+            :class:`FinancialReportSnapshot`
         """
         ...
 

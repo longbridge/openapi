@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **All languages (Rust/Python/Node.js/Java/C/C++):** Six new `FundamentalContext` methods:
+  - `BusinessSegments` — GET `/v1/quote/fundamentals/business-segments`: latest business segment breakdown.
+  - `BusinessSegmentsHistory` — GET `/v1/quote/fundamentals/business-segments/history`: historical business and regional segment breakdowns with optional `report` and `cate` filters.
+  - `InstitutionRatingViews` — GET `/v1/quote/ratings/institutional`: historical rating distribution time-series (buy/over/hold/under/sell per date).
+  - `IndustryRank` — GET `/v1/quote/industry/rank`: industry leaderboard; exposes `IndustryRankIndicator` and `IndustryRankSortType` enum constants.
+  - `IndustryPeers` — GET `/v1/quote/industries/peers`: recursive industry peer chain; accepts both symbol-style (`AAPL.US`) and raw counter IDs (`BK/US/123`).
+  - `FinancialReportSnapshot` — GET `/v1/quote/financials/earnings-snapshot`: earnings snapshot with forecast and reported metrics.
+
 # [4.1.0]
 
 ## Breaking changes

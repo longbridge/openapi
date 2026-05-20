@@ -123,6 +123,44 @@ public:
   /// Get stock ratings
   void ratings(const std::string& symbol,
                AsyncCallback<FundamentalContext, StockRatings> callback) const;
+
+  /// Get business segment breakdowns (latest snapshot)
+  void business_segments(const std::string& symbol,
+                         AsyncCallback<FundamentalContext, BusinessSegments> callback) const;
+
+  /// Get historical business segment breakdowns.
+  /// Pass nullptr for report/cate to omit them.
+  void business_segments_history(const std::string& symbol,
+                                 const char* report,
+                                 const char* cate,
+                                 AsyncCallback<FundamentalContext, BusinessSegmentsHistory> callback) const;
+
+  /// Get historical institutional rating view time-series
+  void institution_rating_views(const std::string& symbol,
+                                AsyncCallback<FundamentalContext, InstitutionRatingViews> callback) const;
+
+  /// Get industry rank for a market.
+  /// indicator: "0"–"7"; sort_type: "0"=asc, "1"=desc
+  void industry_rank(const std::string& market,
+                     const std::string& indicator,
+                     const std::string& sort_type,
+                     uint32_t limit,
+                     AsyncCallback<FundamentalContext, IndustryRankResponse> callback) const;
+
+  /// Get the industry peer chain.
+  /// Pass nullptr for industry_id to omit it.
+  void industry_peers(const std::string& counter_id,
+                      const std::string& market,
+                      const char* industry_id,
+                      AsyncCallback<FundamentalContext, IndustryPeersResponse> callback) const;
+
+  /// Get a financial report snapshot.
+  /// Pass nullptr for report/fiscal_period; pass 0 for fiscal_year to omit it.
+  void financial_report_snapshot(const std::string& symbol,
+                                 const char* report,
+                                 int32_t fiscal_year,
+                                 const char* fiscal_period,
+                                 AsyncCallback<FundamentalContext, FinancialReportSnapshot> callback) const;
 };
 
 } // namespace fundamental

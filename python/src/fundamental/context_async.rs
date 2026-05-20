@@ -253,4 +253,137 @@ impl AsyncFundamentalContext {
         })
         .map(|b| b.unbind())
     }
+
+    /// Get business segment breakdowns. Returns awaitable.
+    fn business_segments(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(BusinessSegments::from(
+                ctx.business_segments(symbol).await.map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get historical business segment breakdowns. Returns awaitable.
+    #[pyo3(signature = (symbol, report = None, cate = None))]
+    fn business_segments_history(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        report: Option<String>,
+        cate: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let report_static: Option<&'static str> = match report.as_deref() {
+            Some("qf") => Some("qf"),
+            Some("saf") => Some("saf"),
+            Some("af") => Some("af"),
+            _ => None,
+        };
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(BusinessSegmentsHistory::from(
+                ctx.business_segments_history(symbol, report_static, cate)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get historical institutional rating view time-series. Returns awaitable.
+    fn institution_rating_views(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(InstitutionRatingViews::from(
+                ctx.institution_rating_views(symbol)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get industry rank for a market. Returns awaitable.
+    fn industry_rank(
+        &self,
+        py: Python<'_>,
+        market: String,
+        indicator: String,
+        sort_type: String,
+        limit: u32,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(IndustryRankResponse::from(
+                ctx.industry_rank(market, indicator, sort_type, limit)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the industry peer chain for a security or industry. Returns
+    /// awaitable.
+    #[pyo3(signature = (counter_id, market, industry_id = None))]
+    fn industry_peers(
+        &self,
+        py: Python<'_>,
+        counter_id: String,
+        market: String,
+        industry_id: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(IndustryPeersResponse::from(
+                ctx.industry_peers(counter_id, market, industry_id)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get a financial report snapshot. Returns awaitable.
+    #[pyo3(signature = (symbol, report = None, fiscal_year = None, fiscal_period = None))]
+    fn financial_report_snapshot(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        report: Option<String>,
+        fiscal_year: Option<i32>,
+        fiscal_period: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let report_static: Option<&'static str> = match report.as_deref() {
+            Some("qf") => Some("qf"),
+            Some("saf") => Some("saf"),
+            Some("af") => Some("af"),
+            _ => None,
+        };
+        let fiscal_period_static: Option<&'static str> = match fiscal_period.as_deref() {
+            Some("q1") => Some("q1"),
+            Some("q2") => Some("q2"),
+            Some("q3") => Some("q3"),
+            Some("q4") => Some("q4"),
+            Some("fy") => Some("fy"),
+            Some("h1") => Some("h1"),
+            Some("h2") => Some("h2"),
+            _ => None,
+        };
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(FinancialReportSnapshot::from(
+                ctx.financial_report_snapshot(
+                    symbol,
+                    report_static,
+                    fiscal_year,
+                    fiscal_period_static,
+                )
+                .await
+                .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
 }
