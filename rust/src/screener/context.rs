@@ -90,8 +90,10 @@ impl ScreenerContext {
     ) -> Result<ScreenerRecommendStrategiesResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        self.get("/v1/quote/screener/strategies/recommend", Empty {})
-            .await
+        let raw: serde_json::Value = self
+            .get("/v1/quote/screener/strategies/recommend", Empty {})
+            .await?;
+        Ok(ScreenerRecommendStrategiesResponse { data: raw })
     }
 
     // ── screener_user_strategies ──────────────────────────────────
@@ -102,8 +104,10 @@ impl ScreenerContext {
     pub async fn screener_user_strategies(&self) -> Result<ScreenerUserStrategiesResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        self.get("/v1/quote/screener/strategies/mine", Empty {})
-            .await
+        let raw: serde_json::Value = self
+            .get("/v1/quote/screener/strategies/mine", Empty {})
+            .await?;
+        Ok(ScreenerUserStrategiesResponse { data: raw })
     }
 
     // ── screener_strategy ─────────────────────────────────────────
@@ -116,7 +120,10 @@ impl ScreenerContext {
         struct Query {
             id: i64,
         }
-        self.get("/v1/quote/screener/strategy", Query { id }).await
+        let raw: serde_json::Value = self
+            .get("/v1/quote/screener/strategy", Query { id })
+            .await?;
+        Ok(ScreenerStrategyResponse { data: raw })
     }
 
     // ── screener_search ───────────────────────────────────────────
@@ -143,16 +150,18 @@ impl ScreenerContext {
             page: u32,
             size: u32,
         }
-        self.post(
-            "/v1/quote/screener/search",
-            Body {
-                market: market.into(),
-                strategy_id,
-                page,
-                size,
-            },
-        )
-        .await
+        let raw: serde_json::Value = self
+            .post(
+                "/v1/quote/screener/search",
+                Body {
+                    market: market.into(),
+                    strategy_id,
+                    page,
+                    size,
+                },
+            )
+            .await?;
+        Ok(ScreenerSearchResponse { data: raw })
     }
 
     // ── screener_indicators ───────────────────────────────────────
@@ -163,6 +172,7 @@ impl ScreenerContext {
     pub async fn screener_indicators(&self) -> Result<ScreenerIndicatorsResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        self.get("/v1/quote/screener/indicators", Empty {}).await
+        let raw: serde_json::Value = self.get("/v1/quote/screener/indicators", Empty {}).await?;
+        Ok(ScreenerIndicatorsResponse { data: raw })
     }
 }

@@ -305,16 +305,18 @@ impl MarketContext {
             #[serde(skip_serializing_if = "Option::is_none")]
             date: Option<String>,
         }
-        self.post(
-            "/v1/quote/market/stock-events",
-            Body {
-                limit,
-                sort,
-                markets,
-                date,
-            },
-        )
-        .await
+        let raw: serde_json::Value = self
+            .post(
+                "/v1/quote/market/stock-events",
+                Body {
+                    limit,
+                    sort,
+                    markets,
+                    date,
+                },
+            )
+            .await?;
+        Ok(StockEventsResponse { data: raw })
     }
 
     // ── rank_categories ───────────────────────────────────────────
@@ -325,7 +327,10 @@ impl MarketContext {
     pub async fn rank_categories(&self) -> Result<RankCategoriesResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        self.get("/v1/quote/market/rank/categories", Empty {}).await
+        let raw: serde_json::Value = self
+            .get("/v1/quote/market/rank/categories", Empty {})
+            .await?;
+        Ok(RankCategoriesResponse { data: raw })
     }
 
     // ── rank_list ─────────────────────────────────────────────────
@@ -344,14 +349,16 @@ impl MarketContext {
             delay_bmp: &'static str,
             need_article: &'static str,
         }
-        self.get(
-            "/v1/quote/market/rank/list",
-            Query {
-                key: key.into(),
-                delay_bmp: "false",
-                need_article: if need_article { "true" } else { "false" },
-            },
-        )
-        .await
+        let raw: serde_json::Value = self
+            .get(
+                "/v1/quote/market/rank/list",
+                Query {
+                    key: key.into(),
+                    delay_bmp: "false",
+                    need_article: if need_article { "true" } else { "false" },
+                },
+            )
+            .await?;
+        Ok(RankListResponse { data: raw })
     }
 }

@@ -2000,11 +2000,11 @@ impl QuoteContext {
                 last_timestamp: ts.to_string(),
                 count,
             })
-            .response::<Json<ShortPositionsResponse>>()
+            .response::<Json<serde_json::Value>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?;
-        Ok(resp.0)
+        Ok(ShortPositionsResponse { data: resp.0 })
     }
 
     // ── option_volume ─────────────────────────────────────────────
@@ -2105,11 +2105,11 @@ impl QuoteContext {
                 last_timestamp: ts.to_string(),
                 page_size: count.to_string(),
             })
-            .response::<Json<ShortTradesResponse>>()
+            .response::<Json<serde_json::Value>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?;
-        Ok(resp.0)
+        Ok(ShortTradesResponse { data: resp.0 })
     }
 
     // ── update_pinned ─────────────────────────────────────────────
