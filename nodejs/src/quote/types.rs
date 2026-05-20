@@ -1325,12 +1325,26 @@ pub struct SecurityCalcIndex {
     #[js(opt)]
     gamma: Option<Decimal>,
     /// Theta
+    ///
+    /// The raw value returned by the API is annualized (scaled by 252 trading
+    /// days per year). To obtain the standard per-calendar-day theta, divide
+    /// by 252: `theta / 252`.
     #[js(opt)]
     theta: Option<Decimal>,
     /// Vega
+    ///
+    /// The raw value returned by the API is expressed per 1 percentage-point
+    /// change in implied volatility (i.e. the value has been multiplied by
+    /// 100). To obtain the standard vega (per unit change in IV), divide by
+    /// 100: `vega / 100`.
     #[js(opt)]
     vega: Option<Decimal>,
     /// Rho
+    ///
+    /// The raw value returned by the API is expressed per 1 percentage-point
+    /// change in the risk-free rate (i.e. the value has been multiplied by
+    /// 100). To obtain the standard rho (per unit change in rate), divide by
+    /// 100: `rho / 100`.
     #[js(opt)]
     rho: Option<Decimal>,
 }

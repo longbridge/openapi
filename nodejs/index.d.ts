@@ -30,6 +30,16 @@ export declare class AccountBalance {
   get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 
+/** Asset context */
+export declare class AssetContext {
+  /** Create a new `AssetContext` */
+  static new(config: Config): AssetContext
+  /** Get statement data list */
+  statements(req?: GetStatementListRequest | undefined | null): Promise<GetStatementListResponse>
+  /** Get statement data download URL */
+  statementDownloadUrl(req: GetStatementDownloadUrlRequest): Promise<GetStatementDownloadUrlResponse>
+}
+
 /** Brokers */
 export declare class Brokers {
   toString(): string
@@ -1917,11 +1927,31 @@ export declare class SecurityCalcIndex {
   get delta(): Decimal | null
   /** Gamma */
   get gamma(): Decimal | null
-  /** Theta */
+  /**
+   * Theta
+   *
+   * The raw value returned by the API is annualized (scaled by 252 trading
+   * days per year). To obtain the standard per-calendar-day theta, divide
+   * by 252: `theta / 252`.
+   */
   get theta(): Decimal | null
-  /** Vega */
+  /**
+   * Vega
+   *
+   * The raw value returned by the API is expressed per 1 percentage-point
+   * change in implied volatility (i.e. the value has been multiplied by
+   * 100). To obtain the standard vega (per unit change in IV), divide by
+   * 100: `vega / 100`.
+   */
   get vega(): Decimal | null
-  /** Rho */
+  /**
+   * Rho
+   *
+   * The raw value returned by the API is expressed per 1 percentage-point
+   * change in the risk-free rate (i.e. the value has been multiplied by
+   * 100). To obtain the standard rho (per unit change in rate), divide by
+   * 100: `rho / 100`.
+   */
   get rho(): Decimal | null
 }
 
@@ -2614,6 +2644,8 @@ export declare class WatchlistSecurity {
   get watchedPrice(): Decimal | null
   /** Watched time */
   get watchedAt(): Date
+  /** Whether the security is pinned to the top of the group */
+  get isPinned(): boolean
 }
 
 /** Candlestick adjustment type */
@@ -2906,6 +2938,34 @@ export interface GetHistoryOrdersOptions {
   startAt?: Date
   /** End time */
   endAt?: Date
+}
+
+/** Options for getting a statement download URL */
+export interface GetStatementDownloadUrlRequest {
+  /** File key obtained from the list statements endpoint */
+  fileKey: string
+}
+
+/** Response for get statement download URL */
+export interface GetStatementDownloadUrlResponse {
+  /** Presigned download URL */
+  url: string
+}
+
+/** Options for listing statements */
+export interface GetStatementListRequest {
+  /** Statement type: Daily (1) or Monthly (2) */
+  statementType?: StatementType
+  /** Start date for pagination */
+  startDate?: number
+  /** Number of results (default 20) */
+  limit?: number
+}
+
+/** Response for get statement list */
+export interface GetStatementListResponse {
+  /** List of statement items */
+  list: Array<StatementItem>
 }
 
 /** Options for get today executions request */
@@ -3266,6 +3326,22 @@ export declare const enum SortOrderType {
   Ascending = 0,
   /** Descending */
   Descending = 1
+}
+
+/** Statement item */
+export interface StatementItem {
+  /** Statement date (integer, e.g. 20250301) */
+  dt: number
+  /** File key used to request the download URL */
+  fileKey: string
+}
+
+/** Statement type enum */
+export declare const enum StatementType {
+  /** Daily statement */
+  Daily = 1,
+  /** Monthly statement */
+  Monthly = 2
 }
 
 /** Options for submit order request */
