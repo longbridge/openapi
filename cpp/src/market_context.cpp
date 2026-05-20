@@ -15,9 +15,6 @@ void lb_market_context_ah_premium_intraday(const lb_market_context_t*, const cha
 void lb_market_context_trade_stats(const lb_market_context_t*, const char*, lb_async_callback_t, void*);
 void lb_market_context_anomaly(const lb_market_context_t*, const char*, lb_async_callback_t, void*);
 void lb_market_context_constituent(const lb_market_context_t*, const char*, lb_async_callback_t, void*);
-void lb_market_context_stock_events(const lb_market_context_t*, const char**, size_t, uint32_t, const char*, uint32_t, lb_async_callback_t, void*);
-void lb_market_context_rank_categories(const lb_market_context_t*, lb_async_callback_t, void*);
-void lb_market_context_rank_list(const lb_market_context_t*, const char*, bool, lb_async_callback_t, void*);
 }
 
 namespace longbridge {
