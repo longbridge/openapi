@@ -1207,12 +1207,13 @@ pub unsafe extern "C" fn lb_quote_context_history_market_temperature(
     });
 }
 
-/// Get short interest data for a US security. Returns
-/// `CShortPositionsResponse`.
+/// Get short interest data for a US or HK security. Returns
+/// `CShortPositionsResponse`. Market is inferred from symbol suffix.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_short_positions(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
+    count: u32,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -1221,8 +1222,29 @@ pub unsafe extern "C" fn lb_quote_context_short_positions(
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CShortPositionsResponseOwned> = CCow::new(
-            CShortPositionsResponseOwned::from(ctx_inner.short_positions(symbol).await?),
+            CShortPositionsResponseOwned::from(ctx_inner.short_positions(symbol, count).await?),
         );
+        Ok(resp)
+    });
+}
+
+/// Get short trade records for a HK or US security. Returns
+/// `CShortTradesResponse`. Market is inferred from symbol suffix.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_short_trades(
+    ctx: *const CQuoteContext,
+    symbol: *const c_char,
+    count: u32,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    use crate::{quote_context::types::CShortTradesResponseOwned, types::CCow};
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CShortTradesResponseOwned> = CCow::new(CShortTradesResponseOwned::from(
+            ctx_inner.short_trades(symbol, count).await?,
+        ));
         Ok(resp)
     });
 }

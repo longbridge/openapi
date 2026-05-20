@@ -564,3 +564,57 @@ impl From<AhPremiumPeriod> for lb::AhPremiumPeriod {
         }
     }
 }
+
+// ── StockEventsResponse ───────────────────────────────────────────
+
+/// Stock events response. `data` is a JSON string.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct StockEventsResponse {
+    /// Raw stock events data (JSON string)
+    pub data: String,
+}
+
+impl From<lb::StockEventsResponse> for StockEventsResponse {
+    fn from(v: lb::StockEventsResponse) -> Self {
+        Self {
+            data: v.data.to_string(),
+        }
+    }
+}
+
+// ── RankCategoriesResponse ────────────────────────────────────────
+
+/// Rank categories response. `data` is a JSON string.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct RankCategoriesResponse {
+    /// Raw rank categories data (JSON string)
+    pub data: String,
+}
+
+impl From<lb::RankCategoriesResponse> for RankCategoriesResponse {
+    fn from(v: lb::RankCategoriesResponse) -> Self {
+        Self {
+            data: v.data.to_string(),
+        }
+    }
+}
+
+// ── RankListResponse ──────────────────────────────────────────────
+
+/// Rank list response. `data` is a JSON string.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct RankListResponse {
+    /// Raw rank list data (JSON string)
+    pub data: String,
+}
+
+impl From<lb::RankListResponse> for RankListResponse {
+    fn from(v: lb::RankListResponse) -> Self {
+        Self {
+            data: v.data.to_string(),
+        }
+    }
+}

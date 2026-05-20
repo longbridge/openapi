@@ -2033,35 +2033,14 @@ impl_default_for_enum_string!(
 // ── short_positions ───────────────────────────────────────────────
 
 /// Response for [`crate::QuoteContext::short_positions`]
+///
+/// The raw data contains short interest/position data for a HK or US
+/// security.  The exact structure differs between markets so the
+/// payload is preserved as raw JSON.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShortPositionsResponse {
-    /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
-    pub symbol: String,
-    /// Short interest data points
-    pub data: Vec<ShortPosition>,
-    /// Number of data sources
-    pub sources: i32,
-}
-
-/// One short interest data point
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ShortPosition {
-    /// Settlement date (unix timestamp string)
-    pub timestamp: String,
-    /// Short interest as a ratio of float shares
-    pub rate: String,
-    /// Average daily share volume
-    pub avg_daily_share_volume: String,
-    /// Current shares short
-    pub current_shares_short: String,
-    /// Days to cover (short ratio)
-    pub days_to_cover: String,
-    /// Closing price on the settlement date
-    pub close: String,
+    /// Raw short positions data
+    pub data: serde_json::Value,
 }
 
 // ── option_volume ─────────────────────────────────────────────────
@@ -2111,18 +2090,6 @@ pub struct OptionVolumeDailyStat {
     pub total_call_open_interest: String,
     /// Put/call open interest ratio
     pub put_call_open_interest_ratio: String,
-}
-
-// ── hk_short_positions ────────────────────────────────────────────
-
-/// Response for [`crate::QuoteContext::hk_short_positions`]
-///
-/// The raw data contains HK short interest/position data.  The exact
-/// structure varies so the payload is preserved as raw JSON.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HkShortPositionsResponse {
-    /// Raw HK short positions data
-    pub data: serde_json::Value,
 }
 
 // ── short_trades ──────────────────────────────────────────────────

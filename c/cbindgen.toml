@@ -297,11 +297,26 @@ cpp_compat = true
 "CSnapshotReportedMetric" = "lb_snapshot_reported_metric_t"
 "CFinancialReportSnapshot" = "lb_financial_report_snapshot_t"
 # QuoteContext extensions
-"CShortPosition" = "lb_short_position_t"
 "CShortPositionsResponse" = "lb_short_positions_response_t"
+"CShortTradesResponse" = "lb_short_trades_response_t"
 "COptionVolumeStats" = "lb_option_volume_stats_t"
 "COptionVolumeDailyStat" = "lb_option_volume_daily_stat_t"
 "COptionVolumeDaily" = "lb_option_volume_daily_t"
+# FundamentalContext new types
+"CShareholderTopResponse" = "lb_shareholder_top_response_t"
+"CShareholderDetailResponse" = "lb_shareholder_detail_response_t"
+"CValuationComparisonResponse" = "lb_valuation_comparison_response_t"
+# MarketContext new types
+"CStockEventsResponse" = "lb_stock_events_response_t"
+"CRankCategoriesResponse" = "lb_rank_categories_response_t"
+"CRankListResponse" = "lb_rank_list_response_t"
+# ScreenerContext
+"CScreenerContext" = "lb_screener_context_t"
+"CScreenerRecommendStrategiesResponse" = "lb_screener_recommend_strategies_response_t"
+"CScreenerUserStrategiesResponse" = "lb_screener_user_strategies_response_t"
+"CScreenerStrategyResponse" = "lb_screener_strategy_response_t"
+"CScreenerSearchResponse" = "lb_screener_search_response_t"
+"CScreenerIndicatorsResponse" = "lb_screener_indicators_response_t"
 
 [export]
 include = [
@@ -415,7 +430,15 @@ include = [
     # FundamentalContext opaque type (no rename, typedef added in hpp)
     "CFundamentalContext",
     # QuoteContext extensions
-    "CShortPosition", "CShortPositionsResponse",
+    "CShortPositionsResponse", "CShortTradesResponse",
     "COptionVolumeStats",
     "COptionVolumeDailyStat", "COptionVolumeDaily",
+    # FundamentalContext new types
+    "CShareholderTopResponse", "CShareholderDetailResponse", "CValuationComparisonResponse",
+    # MarketContext new types
+    "CStockEventsResponse", "CRankCategoriesResponse", "CRankListResponse",
+    # ScreenerContext
+    "CScreenerContext",
+    "CScreenerRecommendStrategiesResponse", "CScreenerUserStrategiesResponse",
+    "CScreenerStrategyResponse", "CScreenerSearchResponse", "CScreenerIndicatorsResponse",
 ]

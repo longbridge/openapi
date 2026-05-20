@@ -861,4 +861,38 @@ impl AsyncQuoteContext {
         })
         .map(|b| b.unbind())
     }
+
+    /// Get short interest data for a US or HK security. Returns awaitable.
+    ///
+    /// Market is inferred from the symbol suffix (.HK → HK, otherwise US).
+    #[pyo3(signature = (symbol, count = 20))]
+    fn short_positions(&self, py: Python<'_>, symbol: String, count: u32) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::quote::types::ShortPositionsResponse = ctx
+                .short_positions(symbol, count)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get short trade records for a HK or US security. Returns awaitable.
+    ///
+    /// Market is inferred from the symbol suffix (.HK → HK, otherwise US).
+    #[pyo3(signature = (symbol, count = 20))]
+    fn short_trades(&self, py: Python<'_>, symbol: String, count: u32) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::quote::types::ShortTradesResponse = ctx
+                .short_trades(symbol, count)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
 }

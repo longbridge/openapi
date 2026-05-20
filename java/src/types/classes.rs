@@ -2230,25 +2230,13 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/quote/ShortPositionsResponse",
     longbridge::quote::ShortPositionsResponse,
-    [
-        symbol,
-        #[java(objarray)]
-        data,
-        sources
-    ]
+    [data]
 );
 
 impl_java_class!(
-    "com/longbridge/quote/ShortPosition",
-    longbridge::quote::ShortPosition,
-    [
-        timestamp,
-        rate,
-        avg_daily_share_volume,
-        current_shares_short,
-        days_to_cover,
-        close
-    ]
+    "com/longbridge/quote/ShortTradesResponse",
+    longbridge::quote::ShortTradesResponse,
+    [data]
 );
 
 impl_java_class!(
@@ -2618,4 +2606,76 @@ impl_java_class!(
         flows_list,
         has_more
     ]
+);
+
+// ── FundamentalContext: shareholders / valuation comparison ────────
+
+impl_java_class!(
+    "com/longbridge/fundamental/ShareholderTopResponse",
+    longbridge::fundamental::ShareholderTopResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ShareholderDetailResponse",
+    longbridge::fundamental::ShareholderDetailResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationComparisonResponse",
+    longbridge::fundamental::ValuationComparisonResponse,
+    [data]
+);
+
+// ── MarketContext: stock events / rank ────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/market/StockEventsResponse",
+    longbridge::market::StockEventsResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankCategoriesResponse",
+    longbridge::market::RankCategoriesResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankListResponse",
+    longbridge::market::RankListResponse,
+    [data]
+);
+
+// ── ScreenerContext ───────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerRecommendStrategiesResponse",
+    longbridge::screener::ScreenerRecommendStrategiesResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerUserStrategiesResponse",
+    longbridge::screener::ScreenerUserStrategiesResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerStrategyResponse",
+    longbridge::screener::ScreenerStrategyResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerSearchResponse",
+    longbridge::screener::ScreenerSearchResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerIndicatorsResponse",
+    longbridge::screener::ScreenerIndicatorsResponse,
+    [data]
 );

@@ -2291,13 +2291,11 @@ convert(const lb_owned_topic_t* item)
 
 // ── QuoteContext extension types ──────────────────────────────────
 
-inline quote::ShortPosition convert(const lb_short_position_t* p) {
-  return { p->timestamp, p->rate, p->avg_daily_share_volume, p->current_shares_short, p->days_to_cover, p->close };
-}
 inline quote::ShortPositionsResponse convert(const lb_short_positions_response_t* r) {
-  std::vector<quote::ShortPosition> data;
-  for (size_t i = 0; i < r->num_data; ++i) data.push_back(convert(&r->data[i]));
-  return { r->symbol, std::move(data), r->sources };
+  return { r->data ? r->data : "" };
+}
+inline quote::ShortTradesResponse convert(const lb_short_trades_response_t* r) {
+  return { r->data ? r->data : "" };
 }
 inline quote::OptionVolumeStats convert(const lb_option_volume_stats_t* s) {
   return { s->c, s->p };

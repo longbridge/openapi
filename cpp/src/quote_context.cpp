@@ -1657,11 +1657,13 @@ QuoteContext::realtime_candlesticks(
 
 void
 QuoteContext::short_positions(const std::string& symbol,
+                              uint32_t count,
                               AsyncCallback<QuoteContext, ShortPositionsResponse> callback) const
 {
   lb_quote_context_short_positions(
     ctx_,
     symbol.c_str(),
+    count,
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext, ShortPositionsResponse>(res->userdata);
@@ -1677,6 +1679,32 @@ QuoteContext::short_positions(const std::string& symbol,
       }
     },
     new AsyncCallback<QuoteContext, ShortPositionsResponse>(callback));
+}
+
+void
+QuoteContext::short_trades(const std::string& symbol,
+                           uint32_t count,
+                           AsyncCallback<QuoteContext, ShortTradesResponse> callback) const
+{
+  lb_quote_context_short_trades(
+    ctx_,
+    symbol.c_str(),
+    count,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, ShortTradesResponse>(res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+      if (status) {
+        auto value = convert::convert((const lb_short_trades_response_t*)res->data);
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, ShortTradesResponse>(ctx, std::move(status), &value));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, ShortTradesResponse>(ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, ShortTradesResponse>(callback));
 }
 
 void

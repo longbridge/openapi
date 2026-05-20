@@ -15,6 +15,9 @@ void lb_market_context_ah_premium_intraday(const lb_market_context_t*, const cha
 void lb_market_context_trade_stats(const lb_market_context_t*, const char*, lb_async_callback_t, void*);
 void lb_market_context_anomaly(const lb_market_context_t*, const char*, lb_async_callback_t, void*);
 void lb_market_context_constituent(const lb_market_context_t*, const char*, lb_async_callback_t, void*);
+void lb_market_context_stock_events(const lb_market_context_t*, const char**, size_t, uint32_t, const char*, uint32_t, lb_async_callback_t, void*);
+void lb_market_context_rank_categories(const lb_market_context_t*, lb_async_callback_t, void*);
+void lb_market_context_rank_list(const lb_market_context_t*, const char*, bool, lb_async_callback_t, void*);
 }
 
 namespace longbridge {
@@ -78,6 +81,31 @@ void MarketContext::constituent(const std::string& symbol, AsyncCallback<MarketC
 }
 
 #undef TYPED_CB
+
+// ── New JSON-string APIs ──────────────────────────────────────────
+#define M_JSON(cfn, CType, ...) cfn(__VA_ARGS__, [](auto res) { \
+  auto cb = callback::get_async_callback<MarketContext,std::string>(res->userdata); \
+  MarketContext mctx((const lb_market_context_t*)res->ctx); Status status(res->error); \
+  if(status){const CType* d=(const CType*)res->data; std::string j(d->data ? d->data : ""); (*cb)(AsyncResult<MarketContext,std::string>(mctx,std::move(status),&j));} \
+  else{(*cb)(AsyncResult<MarketContext,std::string>(mctx,std::move(status),nullptr));} \
+}, new AsyncCallback<MarketContext,std::string>(callback))
+
+void MarketContext::stock_events(const std::vector<std::string>& markets, uint32_t sort, const std::string* date, uint32_t limit, AsyncCallback<MarketContext, std::string> callback) const {
+  std::vector<const char*> mptrs;
+  for (const auto& m : markets) mptrs.push_back(m.c_str());
+  const char* date_str = date ? date->c_str() : nullptr;
+  M_JSON(lb_market_context_stock_events, lb_stock_events_response_t, ctx_, mptrs.data(), mptrs.size(), sort, date_str, limit);
+}
+
+void MarketContext::rank_categories(AsyncCallback<MarketContext, std::string> callback) const {
+  M_JSON(lb_market_context_rank_categories, lb_rank_categories_response_t, ctx_);
+}
+
+void MarketContext::rank_list(const std::string& key, bool need_article, AsyncCallback<MarketContext, std::string> callback) const {
+  M_JSON(lb_market_context_rank_list, lb_rank_list_response_t, ctx_, key.c_str(), need_article);
+}
+
+#undef M_JSON
 
 } // namespace market
 } // namespace longbridge

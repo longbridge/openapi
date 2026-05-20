@@ -65,7 +65,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::OptionDirection>()?;
     parent.add_class::<types::QuotePackageDetail>()?;
     parent.add_class::<types::ShortPositionsResponse>()?;
-    parent.add_class::<types::ShortPosition>()?;
+    parent.add_class::<types::ShortTradesResponse>()?;
     parent.add_class::<types::OptionVolumeStats>()?;
     parent.add_class::<types::OptionVolumeDaily>()?;
     parent.add_class::<types::OptionVolumeDailyStat>()?;

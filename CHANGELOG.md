@@ -8,21 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Rust, Python, Node.js:** Document normalization formulas for `SecurityCalcIndex` Greeks fields: `theta` (divide by 252 for per-trading-day), `vega` and `rho` (divide by 100 for per-unit change). The raw API values differ from Longbridge app display values by these factors.
-- **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
-- **Rust, Python:** `ContentContext` adds three new methods: `topic_detail`, `list_topic_replies`, `create_topic_reply`.
-- **All languages (Rust/Python/Node.js/Java/C/C++):** Six new `FundamentalContext` methods (PR #526):
-  - `BusinessSegments` — GET `/v1/quote/fundamentals/business-segments`
-  - `BusinessSegmentsHistory` — GET `/v1/quote/fundamentals/business-segments/history`
-  - `InstitutionRatingViews` — GET `/v1/quote/ratings/institutional`
-  - `IndustryRank` — GET `/v1/quote/industry/rank`
-  - `IndustryPeers` — GET `/v1/quote/industries/peers`
-  - `FinancialReportSnapshot` — GET `/v1/quote/financials/earnings-snapshot`
-- **All languages (Rust/Python/Node.js/Java/C/C++):** 13 new APIs across FundamentalContext, QuoteContext, MarketContext, and new ScreenerContext:
-  - `FundamentalContext`: `shareholder_top`, `shareholder_detail`, `valuation_comparison`
-  - `QuoteContext`: `short_positions` (extended to HK+US), `short_trades`
-  - `MarketContext`: `top_movers`, `rank_categories`, `rank_list`
-  - `ScreenerContext` (new): `screener_recommend_strategies`, `screener_user_strategies`, `screener_strategy`, `screener_search`, `screener_indicators`
+- **Rust, Python, Node.js:** Document normalization formulas for `SecurityCalcIndex` Greeks fields: `theta` (divide by 252 for per-trading-day), `vega` and `rho` (divide by 100 for per-unit change).
+- **Rust:** `Config::header(key, value)` builder method to inject custom headers.
+- **Rust, Python:** `ContentContext` adds `topic_detail`, `list_topic_replies`, `create_topic_reply`.
+- **All languages:** Six new `FundamentalContext` methods (PR #526): `BusinessSegments`, `BusinessSegmentsHistory`, `InstitutionRatingViews`, `IndustryRank`, `IndustryPeers`, `FinancialReportSnapshot`
+- **All languages:** 13 more new APIs: `shareholder_top`, `shareholder_detail`, `valuation_comparison` (FundamentalContext); `short_positions` (HK+US unified), `short_trades` (QuoteContext); `top_movers`, `rank_categories`, `rank_list` (MarketContext); `ScreenerContext` (new) with 5 screener methods
+
+### Changed
+
+- **All languages:** `QuoteContext::short_positions(symbol, count)` now auto-detects market from symbol suffix (`.HK` → HK, otherwise US). `ShortPositionsResponse` is raw JSON.
+
+### Breaking changes
+
+- **All languages:** `hk_short_positions` removed — use `short_positions(symbol, count)`.
+- **All languages:** `ShortPositionsResponse` raw JSON only; old typed fields removed.
 
 # [4.1.0]
 

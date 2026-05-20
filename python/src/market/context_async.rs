@@ -137,4 +137,51 @@ impl AsyncMarketContext {
         })
         .map(|b| b.unbind())
     }
+
+    /// Get stock events across one or more markets. Returns awaitable.
+    #[pyo3(signature = (markets, sort = 0, date = None, limit = 20))]
+    fn stock_events(
+        &self,
+        py: Python<'_>,
+        markets: Vec<String>,
+        sort: u32,
+        date: Option<String>,
+        limit: u32,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(StockEventsResponse::from(
+                ctx.stock_events(markets, sort, date, limit)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get all available rank category keys and labels. Returns awaitable.
+    fn rank_categories(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(RankCategoriesResponse::from(
+                ctx.rank_categories().await.map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get a ranked list of securities for the given category key. Returns
+    /// awaitable.
+    #[pyo3(signature = (key, need_article = false))]
+    fn rank_list(&self, py: Python<'_>, key: String, need_article: bool) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(RankListResponse::from(
+                ctx.rank_list(key, need_article)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
 }

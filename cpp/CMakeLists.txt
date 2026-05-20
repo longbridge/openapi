@@ -10,6 +10,7 @@ set(SOURCES
     src/calendar_context.cpp
     src/fundamental_context.cpp
     src/market_context.cpp
+    src/screener_context.cpp
     src/portfolio_context.cpp
     src/status.cpp
     src/types.cpp

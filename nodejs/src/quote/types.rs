@@ -1481,54 +1481,38 @@ pub struct HistoryMarketTemperatureResponse {
 // ── Step 3 additions ─────────────────────────────────────────────
 
 /// Short interest response
+/// Short interest / positions response (HK or US).
+///
+/// `data` is the raw JSON returned by the API as a string.
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct ShortPositionsResponse {
-    /// Security symbol
-    pub symbol: String,
-    /// Data points
-    pub data: Vec<ShortPosition>,
-    /// Number of sources
-    pub sources: i32,
+    /// Raw short positions data (JSON string)
+    pub data: String,
 }
 
 impl From<longbridge::quote::ShortPositionsResponse> for ShortPositionsResponse {
     fn from(v: longbridge::quote::ShortPositionsResponse) -> Self {
         Self {
-            symbol: v.symbol,
-            data: v.data.into_iter().map(Into::into).collect(),
-            sources: v.sources,
+            data: v.data.to_string(),
         }
     }
 }
 
-/// One short position data point
+/// Short trade records response (HK or US).
+///
+/// `data` is the raw JSON returned by the API as a string.
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct ShortPosition {
-    /// Settlement date timestamp string
-    pub timestamp: String,
-    /// Short ratio
-    pub rate: String,
-    /// Avg daily share volume
-    pub avg_daily_share_volume: String,
-    /// Current shares short
-    pub current_shares_short: String,
-    /// Days to cover
-    pub days_to_cover: String,
-    /// Closing price
-    pub close: String,
+pub struct ShortTradesResponse {
+    /// Raw short trade data (JSON string)
+    pub data: String,
 }
 
-impl From<longbridge::quote::ShortPosition> for ShortPosition {
-    fn from(v: longbridge::quote::ShortPosition) -> Self {
+impl From<longbridge::quote::ShortTradesResponse> for ShortTradesResponse {
+    fn from(v: longbridge::quote::ShortTradesResponse) -> Self {
         Self {
-            timestamp: v.timestamp,
-            rate: v.rate,
-            avg_daily_share_volume: v.avg_daily_share_volume,
-            current_shares_short: v.current_shares_short,
-            days_to_cover: v.days_to_cover,
-            close: v.close,
+            data: v.data.to_string(),
         }
     }
 }

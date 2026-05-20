@@ -15,14 +15,13 @@ use crate::{
     Config, Error, Language, Market, Result,
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-        FilingItem, HistoryMarketTemperatureResponse, HkShortPositionsResponse, IntradayLine,
-        IssuerInfo, MarketTemperature, MarketTradingDays, MarketTradingSession, OptionQuote,
-        OptionVolumeDaily, OptionVolumeStats, ParticipantInfo, Period, PushEvent,
-        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
-        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
-        SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse,
-        ShortTradesResponse, StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo,
-        WarrantQuote, WarrantType, WatchlistGroup,
+        FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily, OptionVolumeStats,
+        ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
+        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
+        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
+        ShortPositionsResponse, ShortTradesResponse, StrikePriceInfo, Subscription, Trade,
+        TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
@@ -1958,29 +1957,48 @@ impl QuoteContext {
 
     // ── short_positions ───────────────────────────────────────────
 
-    /// Get short interest data for a US security.
+    /// Get short interest data for a US or HK security.
     ///
-    /// Path: `GET /v1/quote/short-positions/us`
+    /// Market is inferred from the symbol suffix:
+    /// - `.HK` → `GET /v1/quote/short-positions/hk`
+    /// - otherwise → `GET /v1/quote/short-positions/us`
+    ///
+    /// `count` controls the number of records returned (1–100, default 20).
     pub async fn short_positions(
         &self,
         symbol: impl Into<String>,
+        count: u32,
     ) -> Result<ShortPositionsResponse> {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
         use crate::utils::counter::symbol_to_counter_id;
+
+        let sym = symbol.into();
+        let is_hk = sym.to_uppercase().ends_with(".HK");
+        let path = if is_hk {
+            "/v1/quote/short-positions/hk"
+        } else {
+            "/v1/quote/short-positions/us"
+        };
+        let ts = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+
         #[derive(serde::Serialize)]
         struct Query {
             counter_id: String,
-            last_timestamp: i64,
-            page_size: i32,
+            last_timestamp: String,
+            count: u32,
         }
-        let sym = symbol.into();
         let resp = self
             .0
             .http_cli
-            .request(Method::GET, "/v1/quote/short-positions/us")
+            .request(Method::GET, path)
             .query_params(Query {
                 counter_id: symbol_to_counter_id(&sym),
-                last_timestamp: 0,
-                page_size: 100,
+                last_timestamp: ts.to_string(),
+                count,
             })
             .response::<Json<ShortPositionsResponse>>()
             .send()
@@ -2047,46 +2065,6 @@ impl QuoteContext {
             .await?;
         Ok(resp.0)
     }
-    // ── hk_short_positions ────────────────────────────────────────
-
-    /// Get HK short interest / position data for a security.
-    ///
-    /// Path: `GET /v1/quote/short-positions/hk`
-    pub async fn hk_short_positions(
-        &self,
-        symbol: impl Into<String>,
-        count: u32,
-    ) -> Result<HkShortPositionsResponse> {
-        use std::time::{SystemTime, UNIX_EPOCH};
-
-        use crate::utils::counter::symbol_to_counter_id;
-        #[derive(serde::Serialize)]
-        struct Query {
-            counter_id: String,
-            last_timestamp: String,
-            count: u32,
-        }
-        let sym = symbol.into();
-        let ts = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_secs())
-            .unwrap_or(0);
-        let resp = self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/quote/short-positions/hk")
-            .query_params(Query {
-                counter_id: symbol_to_counter_id(&sym),
-                last_timestamp: ts.to_string(),
-                count,
-            })
-            .response::<Json<HkShortPositionsResponse>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(resp.0)
-    }
-
     // ── short_trades ──────────────────────────────────────────────
 
     /// Get short trade records for a HK or US security.

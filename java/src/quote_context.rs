@@ -1201,13 +1201,36 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextShortPos
     _class: JClass,
     context: i64,
     symbol: JObject,
+    count: i32,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let count = count.max(1) as u32;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.short_positions(symbol).await?;
+            let resp = context.ctx.short_positions(symbol, count).await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextShortTrades(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    count: i32,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let count = count.max(1) as u32;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.short_trades(symbol, count).await?;
             Ok(resp)
         })?;
         Ok(())

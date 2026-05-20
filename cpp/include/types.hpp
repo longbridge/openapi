@@ -1263,21 +1263,16 @@ struct FilingItem
   int64_t published_at;
 };
 
-struct ShortPosition
-{
-  std::string timestamp;
-  std::string rate;
-  std::string avg_daily_share_volume;
-  std::string current_shares_short;
-  std::string days_to_cover;
-  std::string close;
-};
-
+/// Short interest / positions response (HK or US). `data` is a raw JSON string.
 struct ShortPositionsResponse
 {
-  std::string symbol;
-  std::vector<ShortPosition> data;
-  int32_t sources;
+  std::string data;
+};
+
+/// Short trade records response (HK or US). `data` is a raw JSON string.
+struct ShortTradesResponse
+{
+  std::string data;
 };
 
 struct OptionVolumeStats

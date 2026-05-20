@@ -639,6 +639,7 @@ module.exports.PushTradesEvent = nativeBinding.PushTradesEvent
 module.exports.QuoteContext = nativeBinding.QuoteContext
 module.exports.QuotePackageDetail = nativeBinding.QuotePackageDetail
 module.exports.RealtimeQuote = nativeBinding.RealtimeQuote
+module.exports.ScreenerContext = nativeBinding.ScreenerContext
 module.exports.Security = nativeBinding.Security
 module.exports.SecurityBrokers = nativeBinding.SecurityBrokers
 module.exports.SecurityCalcIndex = nativeBinding.SecurityCalcIndex

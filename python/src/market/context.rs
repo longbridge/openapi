@@ -99,4 +99,35 @@ impl MarketContext {
     fn constituent(&self, symbol: String) -> PyResult<IndexConstituents> {
         Ok(self.ctx.constituent(symbol).map_err(ErrorNewType)?.into())
     }
+
+    /// Get stock events across one or more markets.
+    #[pyo3(signature = (markets, sort = 0, date = None, limit = 20))]
+    fn stock_events(
+        &self,
+        markets: Vec<String>,
+        sort: u32,
+        date: Option<String>,
+        limit: u32,
+    ) -> PyResult<StockEventsResponse> {
+        Ok(self
+            .ctx
+            .stock_events(markets, sort, date, limit)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get all available rank category keys and labels.
+    fn rank_categories(&self) -> PyResult<RankCategoriesResponse> {
+        Ok(self.ctx.rank_categories().map_err(ErrorNewType)?.into())
+    }
+
+    /// Get a ranked list of securities for the given category key.
+    #[pyo3(signature = (key, need_article = false))]
+    fn rank_list(&self, key: String, need_article: bool) -> PyResult<RankListResponse> {
+        Ok(self
+            .ctx
+            .rank_list(key, need_article)
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

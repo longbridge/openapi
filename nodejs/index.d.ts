@@ -607,18 +607,12 @@ export declare class FundamentalContext {
   buyback(symbol: string): Promise<BuybackData>
   /** Get stock ratings for a security */
   ratings(symbol: string): Promise<StockRatings>
-  /** Get business segment breakdowns (latest snapshot) */
-  businessSegments(symbol: string): Promise<BusinessSegments>
-  /** Get historical business segment breakdowns */
-  businessSegmentsHistory(symbol: string, report?: string | undefined | null, cate?: string | undefined | null): Promise<BusinessSegmentsHistory>
-  /** Get historical institutional rating view time-series */
-  institutionRatingViews(symbol: string): Promise<InstitutionRatingViews>
-  /** Get industry rank for a market */
-  industryRank(market: string, indicator: string, sortType: string, limit: number): Promise<IndustryRankResponse>
-  /** Get the industry peer chain for a security or industry */
-  industryPeers(counterId: string, market: string, industryId?: string | undefined | null): Promise<IndustryPeersResponse>
-  /** Get a financial report snapshot (earnings snapshot) */
-  financialReportSnapshot(symbol: string, report?: string | undefined | null, fiscalYear?: number | undefined | null, fiscalPeriod?: string | undefined | null): Promise<FinancialReportSnapshot>
+  /** Get ranked list of top shareholders */
+  shareholderTop(symbol: string): Promise<ShareholderTopResponse>
+  /** Get holding history and detail for one shareholder */
+  shareholderDetail(symbol: string, objectId: number): Promise<ShareholderDetailResponse>
+  /** Get valuation comparison between a security and optional peers */
+  valuationComparison(symbol: string, currency: string, comparisonSymbols?: Array<string> | undefined | null): Promise<ValuationComparisonResponse>
 }
 
 /** Fund position */
@@ -777,6 +771,12 @@ export declare class MarketContext {
   anomaly(market: string): Promise<AnomalyResponse>
   /** Get index constituent stocks */
   constituent(symbol: string): Promise<IndexConstituents>
+  /** Get stock events across one or more markets */
+  stockEvents(markets: Array<string>, sort: number, date: string | undefined | null, limit: number): Promise<StockEventsResponse>
+  /** Get all available rank category keys and labels */
+  rankCategories(): Promise<RankCategoriesResponse>
+  /** Get a ranked list of securities for the given category key */
+  rankList(key: string, needArticle: boolean): Promise<RankListResponse>
 }
 
 /** Market temperature */
@@ -2002,8 +2002,18 @@ export declare class QuoteContext {
    * ```
    */
   realtimeCandlesticks(symbol: string, period: Period, count: number): Promise<Array<Candlestick>>
-  /** Get short interest data for a US security */
-  shortPositions(symbol: string): Promise<ShortPositionsResponse>
+  /**
+   * Get short interest data for a US or HK security.
+   *
+   * Market is inferred from the symbol suffix (.HK → HK, otherwise US).
+   */
+  shortPositions(symbol: string, count: number): Promise<ShortPositionsResponse>
+  /**
+   * Get short trade records for a HK or US security.
+   *
+   * Market is inferred from the symbol suffix (.HK → HK, otherwise US).
+   */
+  shortTrades(symbol: string, count: number): Promise<ShortTradesResponse>
   /** Get real-time option call/put volume */
   optionVolume(symbol: string): Promise<OptionVolumeStats>
   /** Get daily historical option volume */
@@ -2047,6 +2057,22 @@ export declare class RealtimeQuote {
   get turnover(): Decimal
   /** Security trading status */
   get tradeStatus(): TradeStatus
+}
+
+/** Screener context */
+export declare class ScreenerContext {
+  /** Create a new `ScreenerContext` */
+  static new(config: Config): ScreenerContext
+  /** Get recommended built-in screener strategies */
+  screenerRecommendStrategies(): Promise<ScreenerRecommendStrategiesResponse>
+  /** Get the current user's saved screener strategies */
+  screenerUserStrategies(): Promise<ScreenerUserStrategiesResponse>
+  /** Get detail for one screener strategy by ID */
+  screenerStrategy(id: number): Promise<ScreenerStrategyResponse>
+  /** Search / screen securities using a strategy */
+  screenerSearch(market: string, strategyId: number | undefined | null, page: number, size: number): Promise<ScreenerSearchResponse>
+  /** Get all available screener indicator definitions */
+  screenerIndicators(): Promise<ScreenerIndicatorsResponse>
 }
 
 /** Security */
@@ -2153,31 +2179,11 @@ export declare class SecurityCalcIndex {
   get delta(): Decimal | null
   /** Gamma */
   get gamma(): Decimal | null
-  /**
-   * Theta
-   *
-   * The raw value returned by the API is annualized (scaled by 252 trading
-   * days per year). To obtain the standard per-calendar-day theta, divide
-   * by 252: `theta / 252`.
-   */
+  /** Theta */
   get theta(): Decimal | null
-  /**
-   * Vega
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in implied volatility (i.e. the value has been multiplied by
-   * 100). To obtain the standard vega (per unit change in IV), divide by
-   * 100: `vega / 100`.
-   */
+  /** Vega */
   get vega(): Decimal | null
-  /**
-   * Rho
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in the risk-free rate (i.e. the value has been multiplied by
-   * 100). To obtain the standard rho (per unit change in rate), divide by
-   * 100: `rho / 100`.
-   */
+  /** Rho */
   get rho(): Decimal | null
 }
 
@@ -3166,41 +3172,6 @@ export interface BrokerHoldingTop {
   updatedAt: string
 }
 
-/** One business/regional segment item in a historical snapshot */
-export interface BusinessSegmentHistoryItem {
-  name: string
-  percent: string
-  value: string
-}
-
-/** One business segment item (latest snapshot) */
-export interface BusinessSegmentItem {
-  name: string
-  percent: string
-}
-
-/** Business segments response */
-export interface BusinessSegments {
-  date: string
-  total: string
-  currency: string
-  business: Array<BusinessSegmentItem>
-}
-
-/** One historical business segments snapshot */
-export interface BusinessSegmentsHistoricalItem {
-  date: string
-  total: string
-  currency: string
-  business: Array<BusinessSegmentHistoryItem>
-  regionals: Array<BusinessSegmentHistoryItem>
-}
-
-/** Business segments history response */
-export interface BusinessSegmentsHistory {
-  historical: Array<BusinessSegmentsHistoricalItem>
-}
-
 /** Buyback data response */
 export interface BuybackData {
   recentBuybacks?: RecentBuybacks
@@ -3990,32 +3961,6 @@ export interface FinancialReports {
   list: any
 }
 
-/** Financial report snapshot response */
-export interface FinancialReportSnapshot {
-  name: string
-  ticker: string
-  fpStart: string
-  fpEnd: string
-  currency: string
-  reportDesc: string
-  foRevenue?: SnapshotForecastMetric
-  foEbit?: SnapshotForecastMetric
-  foEps?: SnapshotForecastMetric
-  frRevenue?: SnapshotReportedMetric
-  frProfit?: SnapshotReportedMetric
-  frOperateCash?: SnapshotReportedMetric
-  frInvestCash?: SnapshotReportedMetric
-  frFinanceCash?: SnapshotReportedMetric
-  frTotalAssets?: SnapshotReportedMetric
-  frTotalLiability?: SnapshotReportedMetric
-  frRoeTtm: string
-  frProfitMargin: string
-  frProfitMarginTtm: string
-  frAssetTurnTtm: string
-  frLeverageTtm: string
-  frDebtAssetsRatio: string
-}
-
 export declare const enum FlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -4204,55 +4149,6 @@ export interface IndexConstituents {
   stocks: Array<ConstituentStock>
 }
 
-/**
- * A node in the recursive industry peer chain.
- *
- * `nextJson` contains the child nodes serialised as a JSON string.
- */
-export interface IndustryPeerNode {
-  name: string
-  counterId: string
-  stockNum: number
-  chg: string
-  ytdChg: string
-  /** Child nodes as a JSON string */
-  nextJson: string
-}
-
-/** Industry peers response */
-export interface IndustryPeersResponse {
-  top: IndustryPeersTop
-  chain?: IndustryPeerNode
-}
-
-/** Top-level industry info in the peers response */
-export interface IndustryPeersTop {
-  name: string
-  market: string
-}
-
-/** A group of ranked industry items */
-export interface IndustryRankGroup {
-  lists: Array<IndustryRankItem>
-}
-
-/** One ranked industry item */
-export interface IndustryRankItem {
-  name: string
-  counterId: string
-  chg: string
-  leadingName: string
-  leadingTicker: string
-  leadingChg: string
-  valueName: string
-  valueData: string
-}
-
-/** Industry rank response */
-export interface IndustryRankResponse {
-  items: Array<IndustryRankGroup>
-}
-
 /** Industry valuation distribution response */
 export interface IndustryValuationDist {
   /** PE distribution */
@@ -4415,22 +4311,6 @@ export interface InstitutionRatingSummary {
   target?: string
   /** Last updated display string */
   updatedAt: string
-}
-
-/** One historical rating distribution snapshot */
-export interface InstitutionRatingViewItem {
-  date: string
-  buy: string
-  over: string
-  hold: string
-  under: string
-  sell: string
-  total: string
-}
-
-/** Institution rating views response */
-export interface InstitutionRatingViews {
-  elist: Array<InstitutionRatingViewItem>
 }
 
 export declare const enum InstitutionRecommend {
@@ -5069,6 +4949,18 @@ export declare const enum PushCandlestickMode {
   Confirmed = 1
 }
 
+/** Rank categories response. `data` is a JSON string. */
+export interface RankCategoriesResponse {
+  /** Raw rank categories data (JSON string) */
+  data: string
+}
+
+/** Rank list response. `data` is a JSON string. */
+export interface RankListResponse {
+  /** Raw rank list data (JSON string) */
+  data: string
+}
+
 /** Analyst rating distribution counts */
 export interface RatingEvaluate {
   /** Number of "Buy" ratings */
@@ -5152,6 +5044,36 @@ export interface ReplaceOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+}
+
+/** Screener indicator definitions response. `data` is a JSON string. */
+export interface ScreenerIndicatorsResponse {
+  /** Raw indicator definitions data (JSON string) */
+  data: string
+}
+
+/** Recommended screener strategies response. `data` is a JSON string. */
+export interface ScreenerRecommendStrategiesResponse {
+  /** Raw recommended strategies data (JSON string) */
+  data: string
+}
+
+/** Screener search results response. `data` is a JSON string. */
+export interface ScreenerSearchResponse {
+  /** Raw search results data (JSON string) */
+  data: string
+}
+
+/** Single screener strategy response. `data` is a JSON string. */
+export interface ScreenerStrategyResponse {
+  /** Raw strategy detail data (JSON string) */
+  data: string
+}
+
+/** User screener strategies response. `data` is a JSON string. */
+export interface ScreenerUserStrategiesResponse {
+  /** Raw user strategies data (JSON string) */
+  data: string
 }
 
 /** Securities update mode */
@@ -5246,6 +5168,12 @@ export interface Shareholder {
   stocks: Array<ShareholderStock>
 }
 
+/** Shareholder detail response. `data` is a JSON string. */
+export interface ShareholderDetailResponse {
+  /** Raw shareholder detail data (JSON string) */
+  data: string
+}
+
 /** Shareholder list response */
 export interface ShareholderList {
   /** Major shareholders */
@@ -5266,6 +5194,12 @@ export interface ShareholderStock {
   market: string
   /** Day change */
   chg: string
+}
+
+/** Top-shareholder list response. `data` is a JSON string. */
+export interface ShareholderTopResponse {
+  /** Raw top-shareholder data (JSON string) */
+  data: string
 }
 
 /** Sharelist detail response */
@@ -5350,44 +5284,25 @@ export interface SharelistStock {
   latency?: boolean
 }
 
-/** One short position data point */
-export interface ShortPosition {
-  /** Settlement date timestamp string */
-  timestamp: string
-  /** Short ratio */
-  rate: string
-  /** Avg daily share volume */
-  avgDailyShareVolume: string
-  /** Current shares short */
-  currentSharesShort: string
-  /** Days to cover */
-  daysToCover: string
-  /** Closing price */
-  close: string
-}
-
-/** Short interest response */
+/**
+ * Short interest response
+ * Short interest / positions response (HK or US).
+ *
+ * `data` is the raw JSON returned by the API as a string.
+ */
 export interface ShortPositionsResponse {
-  /** Security symbol */
-  symbol: string
-  /** Data points */
-  data: Array<ShortPosition>
-  /** Number of sources */
-  sources: number
+  /** Raw short positions data (JSON string) */
+  data: string
 }
 
-/** A forecast metric in the financial report snapshot */
-export interface SnapshotForecastMetric {
-  value: string
-  yoy: string
-  cmpDesc: string
-  estValue: string
-}
-
-/** A reported metric in the financial report snapshot */
-export interface SnapshotReportedMetric {
-  value: string
-  yoy: string
+/**
+ * Short trade records response (HK or US).
+ *
+ * `data` is the raw JSON returned by the API as a string.
+ */
+export interface ShortTradesResponse {
+  /** Raw short trade data (JSON string) */
+  data: string
 }
 
 /** Sort order type */
@@ -5412,6 +5327,12 @@ export declare const enum StatementType {
   Daily = 1,
   /** Monthly statement */
   Monthly = 2
+}
+
+/** Stock events response. `data` is a JSON string. */
+export interface StockEventsResponse {
+  /** Raw stock events data (JSON string) */
+  data: string
 }
 
 /**
@@ -5621,6 +5542,12 @@ export interface UpdateWatchlistGroup {
   securities?: Array<string>
   /** Securities Update mode */
   mode: SecuritiesUpdateMode
+}
+
+/** Valuation comparison response. `data` is a JSON string. */
+export interface ValuationComparisonResponse {
+  /** Raw valuation comparison data (JSON string) */
+  data: string
 }
 
 /** Valuation metrics response */

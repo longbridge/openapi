@@ -27,6 +27,9 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<ConstituentStock>()?;
     parent.add_class::<BrokerHoldingPeriod>()?;
     parent.add_class::<AhPremiumPeriod>()?;
+    parent.add_class::<StockEventsResponse>()?;
+    parent.add_class::<RankCategoriesResponse>()?;
+    parent.add_class::<RankListResponse>()?;
     parent.add_class::<context::MarketContext>()?;
     parent.add_class::<context_async::AsyncMarketContext>()?;
     Ok(())

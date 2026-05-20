@@ -1437,55 +1437,40 @@ pub(crate) struct HistoryMarketTemperatureResponse {
 
 // ── Step 3: short_positions / option_volume / option_volume_daily ─
 
-/// Short interest response
+/// Short interest / positions response (HK or US).
+///
+/// `data` is the raw JSON returned by the API preserved as a Python
+/// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ShortPositionsResponse {
-    /// Security symbol
-    pub symbol: String,
-    /// Short interest data points
-    pub data: Vec<ShortPosition>,
-    /// Number of data sources
-    pub sources: i32,
+    /// Raw short positions data (JSON object)
+    pub data: crate::fundamental::types::JsonValue,
 }
 
 impl From<longbridge::quote::ShortPositionsResponse> for ShortPositionsResponse {
     fn from(v: longbridge::quote::ShortPositionsResponse) -> Self {
         Self {
-            symbol: v.symbol,
-            data: v.data.into_iter().map(Into::into).collect(),
-            sources: v.sources,
+            data: crate::fundamental::types::JsonValue(v.data),
         }
     }
 }
 
-/// One short position data point
+/// Short trade records response (HK or US).
+///
+/// `data` is the raw JSON returned by the API preserved as a Python
+/// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct ShortPosition {
-    /// Settlement date (unix timestamp string)
-    pub timestamp: String,
-    /// Short ratio
-    pub rate: String,
-    /// Average daily share volume
-    pub avg_daily_share_volume: String,
-    /// Current shares short
-    pub current_shares_short: String,
-    /// Days to cover
-    pub days_to_cover: String,
-    /// Closing price
-    pub close: String,
+pub(crate) struct ShortTradesResponse {
+    /// Raw short trade data (JSON object)
+    pub data: crate::fundamental::types::JsonValue,
 }
 
-impl From<longbridge::quote::ShortPosition> for ShortPosition {
-    fn from(v: longbridge::quote::ShortPosition) -> Self {
+impl From<longbridge::quote::ShortTradesResponse> for ShortTradesResponse {
+    fn from(v: longbridge::quote::ShortTradesResponse) -> Self {
         Self {
-            timestamp: v.timestamp,
-            rate: v.rate,
-            avg_daily_share_volume: v.avg_daily_share_volume,
-            current_shares_short: v.current_shares_short,
-            days_to_cover: v.days_to_cover,
-            close: v.close,
+            data: crate::fundamental::types::JsonValue(v.data),
         }
     }
 }

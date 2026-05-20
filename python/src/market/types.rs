@@ -1,6 +1,69 @@
 use longbridge::market::types as lb;
 use pyo3::prelude::*;
 
+// ── StockEventsResponse ───────────────────────────────────────────
+
+/// Stock events response.
+///
+/// `data` is the raw JSON returned by the API preserved as a Python
+/// object (dict / list / etc.).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct StockEventsResponse {
+    /// Raw stock events data (JSON object)
+    pub data: crate::fundamental::types::JsonValue,
+}
+
+impl From<lb::StockEventsResponse> for StockEventsResponse {
+    fn from(v: lb::StockEventsResponse) -> Self {
+        Self {
+            data: crate::fundamental::types::JsonValue(v.data),
+        }
+    }
+}
+
+// ── RankCategoriesResponse ────────────────────────────────────────
+
+/// Rank categories response.
+///
+/// `data` is the raw JSON returned by the API preserved as a Python
+/// object (dict / list / etc.).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct RankCategoriesResponse {
+    /// Raw rank categories data (JSON object)
+    pub data: crate::fundamental::types::JsonValue,
+}
+
+impl From<lb::RankCategoriesResponse> for RankCategoriesResponse {
+    fn from(v: lb::RankCategoriesResponse) -> Self {
+        Self {
+            data: crate::fundamental::types::JsonValue(v.data),
+        }
+    }
+}
+
+// ── RankListResponse ──────────────────────────────────────────────
+
+/// Rank list response.
+///
+/// `data` is the raw JSON returned by the API preserved as a Python
+/// object (dict / list / etc.).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct RankListResponse {
+    /// Raw rank list data (JSON object)
+    pub data: crate::fundamental::types::JsonValue,
+}
+
+impl From<lb::RankListResponse> for RankListResponse {
+    fn from(v: lb::RankListResponse) -> Self {
+        Self {
+            data: crate::fundamental::types::JsonValue(v.data),
+        }
+    }
+}
+
 // ── MarketStatusResponse ──────────────────────────────────────────
 
 /// Market trading status response

@@ -4,8 +4,8 @@ use longbridge::market::{
     AhPremiumIntraday, AhPremiumKline, AhPremiumKlines, AnomalyItem, AnomalyResponse,
     BrokerHoldingChanges, BrokerHoldingDailyHistory, BrokerHoldingDailyItem, BrokerHoldingDetail,
     BrokerHoldingDetailItem, BrokerHoldingEntry, BrokerHoldingTop, ConstituentStock,
-    IndexConstituents, MarketStatusResponse, MarketTimeItem, TradePriceLevel, TradeStatistics,
-    TradeStatsResponse,
+    IndexConstituents, MarketStatusResponse, MarketTimeItem, RankCategoriesResponse,
+    RankListResponse, StockEventsResponse, TradePriceLevel, TradeStatistics, TradeStatsResponse,
 };
 
 use crate::types::{CMarket, CString, CVec, ToFFI};
@@ -954,6 +954,93 @@ impl ToFFI for CIndexConstituentsOwned {
             rise_num: self.rise_num,
             stocks: self.stocks.to_ffi_type(),
             num_stocks: self.stocks.len(),
+        }
+    }
+}
+
+// ── StockEventsResponse ───────────────────────────────────────────
+
+/// Stock events response. `data` is a NUL-terminated JSON string.
+#[repr(C)]
+pub struct CStockEventsResponse {
+    /// Raw stock events data as a JSON string
+    pub data: *const c_char,
+}
+
+pub(crate) struct CStockEventsResponseOwned {
+    data: CString,
+}
+
+impl From<StockEventsResponse> for CStockEventsResponseOwned {
+    fn from(v: StockEventsResponse) -> Self {
+        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        Self { data: json.into() }
+    }
+}
+
+impl ToFFI for CStockEventsResponseOwned {
+    type FFIType = CStockEventsResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CStockEventsResponse {
+            data: self.data.to_ffi_type(),
+        }
+    }
+}
+
+// ── RankCategoriesResponse ────────────────────────────────────────
+
+/// Rank categories response. `data` is a NUL-terminated JSON string.
+#[repr(C)]
+pub struct CRankCategoriesResponse {
+    /// Raw rank categories data as a JSON string
+    pub data: *const c_char,
+}
+
+pub(crate) struct CRankCategoriesResponseOwned {
+    data: CString,
+}
+
+impl From<RankCategoriesResponse> for CRankCategoriesResponseOwned {
+    fn from(v: RankCategoriesResponse) -> Self {
+        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        Self { data: json.into() }
+    }
+}
+
+impl ToFFI for CRankCategoriesResponseOwned {
+    type FFIType = CRankCategoriesResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRankCategoriesResponse {
+            data: self.data.to_ffi_type(),
+        }
+    }
+}
+
+// ── RankListResponse ──────────────────────────────────────────────
+
+/// Rank list response. `data` is a NUL-terminated JSON string.
+#[repr(C)]
+pub struct CRankListResponse {
+    /// Raw rank list data as a JSON string
+    pub data: *const c_char,
+}
+
+pub(crate) struct CRankListResponseOwned {
+    data: CString,
+}
+
+impl From<RankListResponse> for CRankListResponseOwned {
+    fn from(v: RankListResponse) -> Self {
+        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        Self { data: json.into() }
+    }
+}
+
+impl ToFFI for CRankListResponseOwned {
+    type FFIType = CRankListResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRankListResponse {
+            data: self.data.to_ffi_type(),
         }
     }
 }

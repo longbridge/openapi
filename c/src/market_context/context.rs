@@ -215,3 +215,71 @@ pub unsafe extern "C" fn lb_market_context_constituent(
         Ok(resp)
     });
 }
+
+/// Get stock events across one or more markets.
+/// Pass markets as a NULL-terminated array of C strings.
+/// Returns `CStockEventsResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_market_context_stock_events(
+    ctx: *const CMarketContext,
+    markets: *const *const c_char,
+    num_markets: usize,
+    sort: u32,
+    date: *const c_char,
+    limit: u32,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let markets: Vec<String> = (0..num_markets)
+        .map(|i| cstr_to_rust(*markets.add(i)))
+        .collect();
+    let date = if date.is_null() {
+        None
+    } else {
+        Some(cstr_to_rust(date))
+    };
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CStockEventsResponseOwned> = CCow::new(CStockEventsResponseOwned::from(
+            ctx_inner.stock_events(markets, sort, date, limit).await?,
+        ));
+        Ok(resp)
+    });
+}
+
+/// Get all available rank category keys and labels.
+/// Returns `CRankCategoriesResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_market_context_rank_categories(
+    ctx: *const CMarketContext,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CRankCategoriesResponseOwned> = CCow::new(
+            CRankCategoriesResponseOwned::from(ctx_inner.rank_categories().await?),
+        );
+        Ok(resp)
+    });
+}
+
+/// Get a ranked list of securities for the given category key.
+/// Returns `CRankListResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_market_context_rank_list(
+    ctx: *const CMarketContext,
+    key: *const c_char,
+    need_article: bool,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let key = cstr_to_rust(key);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CRankListResponseOwned> = CCow::new(CRankListResponseOwned::from(
+            ctx_inner.rank_list(key, need_article).await?,
+        ));
+        Ok(resp)
+    });
+}
