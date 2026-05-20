@@ -1299,12 +1299,26 @@ pub(crate) struct SecurityCalcIndex {
     #[py(opt)]
     gamma: Option<PyDecimal>,
     /// Theta
+    ///
+    /// The raw value returned by the API is annualized (scaled by 252 trading
+    /// days per year). To obtain the standard per-calendar-day theta, divide
+    /// by 252: `theta / 252`.
     #[py(opt)]
     theta: Option<PyDecimal>,
     /// Vega
+    ///
+    /// The raw value returned by the API is expressed per 1 percentage-point
+    /// change in implied volatility (i.e. the value has been multiplied by
+    /// 100). To obtain the standard vega (per unit change in IV), divide by
+    /// 100: `vega / 100`.
     #[py(opt)]
     vega: Option<PyDecimal>,
     /// Rho
+    ///
+    /// The raw value returned by the API is expressed per 1 percentage-point
+    /// change in the risk-free rate (i.e. the value has been multiplied by
+    /// 100). To obtain the standard rho (per unit change in rate), divide by
+    /// 100: `rho / 100`.
     #[py(opt)]
     rho: Option<PyDecimal>,
 }

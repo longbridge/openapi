@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Rust, Python, Node.js:** Document normalization formulas for `SecurityCalcIndex` Greeks fields: `theta` (divide by 252 for per-trading-day), `vega` and `rho` (divide by 100 for per-unit change). The raw API values differ from Longbridge app display values by these factors.
+- **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
+- **Rust, Python:** `ContentContext` adds three new methods:
+  - `topic_detail(topic_id)` — get detail of a single topic.
+  - `list_topic_replies(opts)` — list replies for a topic, with optional page/size filtering.
+  - `create_topic_reply(opts)` — create a reply under a topic.
+- **Rust, Python:** New types `ListTopicRepliesOptions`, `CreateReplyOptions`, and `TopicReply` to support the above methods.
 - **All languages (Rust/Python/Node.js/Java/C/C++):** Six new `FundamentalContext` methods:
   - `BusinessSegments` — GET `/v1/quote/fundamentals/business-segments`: latest business segment breakdown.
   - `BusinessSegmentsHistory` — GET `/v1/quote/fundamentals/business-segments/history`: historical business and regional segment breakdowns with optional `report` and `cate` filters.
