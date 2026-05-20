@@ -214,6 +214,33 @@ pub(crate) mod decimal_opt_empty_is_none {
     }
 }
 
+pub(crate) mod decimal_opt_str_is_none {
+    use rust_decimal::Decimal;
+
+    use super::*;
+
+    pub(crate) fn serialize<S>(value: &Option<Decimal>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.collect_str(&value),
+            _ => serializer.serialize_none(),
+        }
+    }
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<Decimal>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if value.is_empty() {
+            return Ok(None);
+        }
+        Ok(value.parse::<Decimal>().ok()) // non-parseable (e.g. "--") → None
+    }
+}
+
 pub(crate) mod decimal_opt_0_is_none {
     use rust_decimal::Decimal;
 
@@ -362,6 +389,15 @@ pub(crate) mod int64_str_empty_is_none {
     }
 }
 
+/// Free-function form of `timestamp::deserialize` for use with
+/// `#[serde(deserialize_with = "crate::serde_utils::deserialize_timestamp")]`.
+pub(crate) fn deserialize_timestamp<'de, D>(deserializer: D) -> Result<OffsetDateTime, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    timestamp::deserialize(deserializer)
+}
+
 pub(crate) mod int32_opt_0_is_none {
 
     use super::*;
@@ -386,5 +422,43 @@ pub(crate) mod int32_opt_0_is_none {
         } else {
             Ok(Some(value))
         }
+    }
+}
+
+/// Deserialize a field that may be either a string or integer, returning it as
+/// a String. Used for DCA fields like `invest_frequency` which the API
+/// sometimes returns as an integer.
+pub(crate) fn deserialize_string_or_int_as_string<'de, D>(d: D) -> Result<String, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::Deserialize;
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StringOrInt {
+        String(String),
+        Int(i64),
+    }
+    match StringOrInt::deserialize(d)? {
+        StringOrInt::String(s) => Ok(s),
+        StringOrInt::Int(n) => Ok(n.to_string()),
+    }
+}
+
+/// Deserialize a field that may be either a string or integer ID.
+pub(crate) fn deserialize_id_as_i64<'de, D>(d: D) -> Result<i64, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::Deserialize;
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StringOrInt {
+        String(String),
+        Int(i64),
+    }
+    match StringOrInt::deserialize(d)? {
+        StringOrInt::Int(n) => Ok(n),
+        StringOrInt::String(s) => s.parse::<i64>().map_err(serde::de::Error::custom),
     }
 }

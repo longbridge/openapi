@@ -18,8 +18,8 @@ use crate::{
             FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-            QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security, SecurityBrokers,
-            SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
+            PinnedMode, QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security,
+            SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
             SecurityStaticInfo, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
             Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
             WarrantType, WatchlistGroup,
@@ -529,6 +529,14 @@ impl QuoteContext {
         Ok(())
     }
 
+    /// Pin or unpin watchlist securities.
+    fn update_pinned(&self, mode: PinnedMode, symbols: Vec<String>) -> PyResult<()> {
+        self.ctx
+            .update_pinned(mode.into(), symbols)
+            .map_err(ErrorNewType)?;
+        Ok(())
+    }
+
     /// Get filings list
     pub fn filings(&self, symbol: String) -> PyResult<Vec<FilingItem>> {
         self.ctx
@@ -626,5 +634,37 @@ impl QuoteContext {
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Get short interest data for a US security
+    fn short_positions(
+        &self,
+        symbol: String,
+    ) -> PyResult<crate::quote::types::ShortPositionsResponse> {
+        Ok(self
+            .ctx
+            .short_positions(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get real-time option call/put volume
+    fn option_volume(&self, symbol: String) -> PyResult<crate::quote::types::OptionVolumeStats> {
+        Ok(self.ctx.option_volume(symbol).map_err(ErrorNewType)?.into())
+    }
+
+    /// Get daily historical option volume
+    #[pyo3(signature = (symbol, timestamp = 0, count = 30))]
+    fn option_volume_daily(
+        &self,
+        symbol: String,
+        timestamp: i64,
+        count: u32,
+    ) -> PyResult<crate::quote::types::OptionVolumeDaily> {
+        Ok(self
+            .ctx
+            .option_volume_daily(symbol, timestamp, count)
+            .map_err(ErrorNewType)?
+            .into())
     }
 }

@@ -42,6 +42,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::WatchlistSecurity>()?;
     parent.add_class::<types::WatchlistGroup>()?;
     parent.add_class::<types::SecuritiesUpdateMode>()?;
+    parent.add_class::<types::PinnedMode>()?;
     parent.add_class::<types::WarrantInfo>()?;
     parent.add_class::<types::WarrantStatus>()?;
     parent.add_class::<types::WarrantType>()?;
@@ -63,6 +64,11 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::Subscription>()?;
     parent.add_class::<types::OptionDirection>()?;
     parent.add_class::<types::QuotePackageDetail>()?;
+    parent.add_class::<types::ShortPositionsResponse>()?;
+    parent.add_class::<types::ShortPosition>()?;
+    parent.add_class::<types::OptionVolumeStats>()?;
+    parent.add_class::<types::OptionVolumeDaily>()?;
+    parent.add_class::<types::OptionVolumeDailyStat>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     parent.add_class::<context_async::AsyncQuoteContext>()?;

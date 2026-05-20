@@ -61,7 +61,7 @@ OAuthBuilder::OAuthBuilder(const std::string& client_id, uint16_t callback_port)
 
 void
 OAuthBuilder::build(std::function<void(const std::string&)> open_url,
-                    AsyncCallback<void*, OAuth> callback)
+                    AsyncCallback<NoContext, OAuth> callback)
 {
   auto* open_url_ptr = new std::function<void(const std::string&)>(open_url);
 
@@ -75,19 +75,19 @@ OAuthBuilder::build(std::function<void(const std::string&)> open_url,
     },
     open_url_ptr,
     [](const lb_async_result_t* res) {
-      auto callback_ptr = callback::get_async_callback<void*, OAuth>(res->userdata);
+      auto callback_ptr = callback::get_async_callback<NoContext, OAuth>(res->userdata);
       Status status(res->error);
 
       if (status) {
         OAuth oauth(static_cast<lb_oauth_t*>(res->data));
         (*callback_ptr)(
-          AsyncResult<void*, OAuth>(nullptr, std::move(status), &oauth));
+          AsyncResult<NoContext, OAuth>(NoContext{}, std::move(status), &oauth));
       } else {
         (*callback_ptr)(
-          AsyncResult<void*, OAuth>(nullptr, std::move(status), nullptr));
+          AsyncResult<NoContext, OAuth>(NoContext{}, std::move(status), nullptr));
       }
     },
-    new AsyncCallback<void*, OAuth>(callback));
+    new AsyncCallback<NoContext, OAuth>(callback));
 }
 
 } // namespace longbridge

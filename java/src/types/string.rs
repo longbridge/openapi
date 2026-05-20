@@ -40,3 +40,23 @@ impl IntoJValue for String {
         env.new_string(self).map(JValueOwned::from)
     }
 }
+
+impl crate::types::ClassLoader for serde_json::Value {
+    fn init(_env: &mut JNIEnv) {}
+    fn class_ref() -> jni::objects::GlobalRef {
+        STRING_CLASS.get().cloned().unwrap()
+    }
+}
+
+impl crate::types::JSignature for serde_json::Value {
+    fn signature() -> std::borrow::Cow<'static, str> {
+        "Ljava/lang/String;".into()
+    }
+}
+
+impl IntoJValue for serde_json::Value {
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        let s = serde_json::to_string(&self).unwrap_or_default();
+        env.new_string(s).map(JValueOwned::from)
+    }
+}

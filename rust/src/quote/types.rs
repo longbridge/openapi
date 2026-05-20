@@ -2030,6 +2030,101 @@ impl_default_for_enum_string!(
     Granularity
 );
 
+// ── short_positions ───────────────────────────────────────────────
+
+/// Response for [`crate::QuoteContext::short_positions`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortPositionsResponse {
+    /// Security symbol
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Short interest data points
+    pub data: Vec<ShortPosition>,
+    /// Number of data sources
+    pub sources: i32,
+}
+
+/// One short interest data point
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortPosition {
+    /// Settlement date (unix timestamp string)
+    pub timestamp: String,
+    /// Short interest as a ratio of float shares
+    pub rate: String,
+    /// Average daily share volume
+    pub avg_daily_share_volume: String,
+    /// Current shares short
+    pub current_shares_short: String,
+    /// Days to cover (short ratio)
+    pub days_to_cover: String,
+    /// Closing price on the settlement date
+    pub close: String,
+}
+
+// ── option_volume ─────────────────────────────────────────────────
+
+/// Response for [`crate::QuoteContext::option_volume`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OptionVolumeStats {
+    /// Total call volume (string)
+    pub c: String,
+    /// Total put volume (string)
+    pub p: String,
+}
+
+// ── option_volume_daily ───────────────────────────────────────────
+
+/// Response for [`crate::QuoteContext::option_volume_daily`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OptionVolumeDaily {
+    /// Daily option volume statistics
+    pub stats: Vec<OptionVolumeDailyStat>,
+}
+
+/// One day's option volume statistics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OptionVolumeDailyStat {
+    /// Underlying security symbol
+    #[serde(
+        rename = "underlying_counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Settlement date (unix timestamp string)
+    pub timestamp: String,
+    /// Total option volume (calls + puts) — string in API response
+    pub total_volume: String,
+    /// Total put volume — string in API response
+    pub total_put_volume: String,
+    /// Total call volume — string in API response
+    pub total_call_volume: String,
+    /// Put/call volume ratio
+    pub put_call_volume_ratio: String,
+    /// Total open interest — string in API response
+    pub total_open_interest: String,
+    /// Total put open interest
+    pub total_put_open_interest: String,
+    /// Total call open interest
+    pub total_call_open_interest: String,
+    /// Put/call open interest ratio
+    pub put_call_open_interest_ratio: String,
+}
+
+// ── pinned mode ───────────────────────────────────────────────────
+
+/// Mode for pinning/unpinning watchlist securities
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum PinnedMode {
+    /// Pin (add) the securities to the top of the group
+    Add,
+    /// Unpin (remove) the securities from the top of the group
+    Remove,
+}
+
 #[cfg(test)]
 mod tests {
     use serde::Deserialize;

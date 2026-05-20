@@ -3,8 +3,8 @@ use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 use longbridge::{
     QuoteContext,
     quote::{
-        PushEvent, PushEventDetail, RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup,
-        SubFlags,
+        PinnedMode, PushEvent, PushEventDetail, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, SubFlags,
     },
 };
 use parking_lot::Mutex;
@@ -970,6 +970,28 @@ pub unsafe extern "C" fn lb_quote_context_delete_watchlist_group(
     });
 }
 
+/// Update pinned watchlist securities (mode: 0=add, 1=remove)
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_update_pinned(
+    ctx: *const CQuoteContext,
+    mode: i32,
+    securities: *const *const c_char,
+    num_securities: usize,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let mode = match mode {
+        1 => PinnedMode::Remove,
+        _ => PinnedMode::Add,
+    };
+    let symbols = cstr_array_to_rust(securities, num_securities);
+    execute_async(callback, ctx, userdata, async move {
+        ctx_inner.update_pinned(mode, symbols).await?;
+        Ok(())
+    });
+}
+
 /// Create watchlist group
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_update_watchlist_group(
@@ -1181,6 +1203,68 @@ pub unsafe extern "C" fn lb_quote_context_history_market_temperature(
                 .history_market_temperature(market.into(), start, end)
                 .await?,
         );
+        Ok(resp)
+    });
+}
+
+/// Get short interest data for a US security. Returns
+/// `CShortPositionsResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_short_positions(
+    ctx: *const CQuoteContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    use crate::{quote_context::types::CShortPositionsResponseOwned, types::CCow};
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CShortPositionsResponseOwned> = CCow::new(
+            CShortPositionsResponseOwned::from(ctx_inner.short_positions(symbol).await?),
+        );
+        Ok(resp)
+    });
+}
+
+/// Get real-time option call/put volume. Returns `COptionVolumeStats`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_option_volume(
+    ctx: *const CQuoteContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    use crate::{quote_context::types::COptionVolumeStatsOwned, types::CCow};
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<COptionVolumeStatsOwned> = CCow::new(COptionVolumeStatsOwned::from(
+            ctx_inner.option_volume(symbol).await?,
+        ));
+        Ok(resp)
+    });
+}
+
+/// Get daily historical option volume. Returns `COptionVolumeDaily`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_option_volume_daily(
+    ctx: *const CQuoteContext,
+    symbol: *const c_char,
+    timestamp: i64,
+    count: u32,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    use crate::{quote_context::types::COptionVolumeDailyOwned, types::CCow};
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<COptionVolumeDailyOwned> = CCow::new(COptionVolumeDailyOwned::from(
+            ctx_inner
+                .option_volume_daily(symbol, timestamp, count)
+                .await?,
+        ));
         Ok(resp)
     });
 }

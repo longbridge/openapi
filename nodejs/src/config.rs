@@ -1,9 +1,11 @@
+use chrono::{DateTime, Utc};
 use napi::Result;
 
 use crate::{
     error::ErrorNewType,
     oauth::OAuth,
     types::{Language, PushCandlestickMode},
+    utils::from_datetime,
 };
 
 /// Optional extra parameters shared by `Config.fromApikey` and
@@ -162,5 +164,24 @@ impl Config {
     pub fn from_oauth(oauth: &OAuth, extra: Option<ExtraConfigParams>) -> Self {
         let config = longbridge::Config::from_oauth(oauth.0.clone());
         Self(apply_extra(config, extra))
+    }
+
+    /// Gets a new `access_token`
+    ///
+    /// This method is only available when using **Legacy API Key**
+    /// authentication (i.e. `Config.fromApikey`). It is not supported for
+    /// OAuth 2.0 mode.
+    ///
+    /// @param expiredAt - The expiration time of the access token, defaults to
+    ///   90 days from now.
+    ///
+    /// @see https://open.longportapp.com/en/docs/refresh-token-api
+    #[napi]
+    pub async fn refresh_access_token(&self, expired_at: Option<DateTime<Utc>>) -> Result<String> {
+        Ok(self
+            .0
+            .refresh_access_token(expired_at.map(from_datetime))
+            .await
+            .map_err(ErrorNewType)?)
     }
 }

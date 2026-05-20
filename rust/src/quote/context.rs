@@ -16,18 +16,19 @@ use crate::{
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-        MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
-        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
-        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
-        SecurityListCategory, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, Subscription,
-        Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
+        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily, OptionVolumeStats,
+        ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
+        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
+        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
+        ShortPositionsResponse, StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo,
+        WarrantQuote, WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
         sub_flags::SubFlags,
         types::{
-            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, SecuritiesUpdateMode,
-            SortOrderType, WarrantSortBy, WarrantStatus,
+            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, PinnedMode,
+            SecuritiesUpdateMode, SortOrderType, WarrantSortBy, WarrantStatus,
         },
         utils::{format_date, parse_date},
     },
@@ -1952,6 +1953,123 @@ impl QuoteContext {
             })
             .map_err(|_| WsClientError::ClientClosed)?;
         Ok(reply_rx.await.map_err(|_| WsClientError::ClientClosed)?)
+    }
+
+    // ── short_positions ───────────────────────────────────────────
+
+    /// Get short interest data for a US security.
+    ///
+    /// Path: `GET /v1/quote/short-positions/us`
+    pub async fn short_positions(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<ShortPositionsResponse> {
+        use crate::utils::counter::symbol_to_counter_id;
+        #[derive(serde::Serialize)]
+        struct Query {
+            counter_id: String,
+            last_timestamp: i64,
+            page_size: i32,
+        }
+        let sym = symbol.into();
+        let resp = self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/quote/short-positions/us")
+            .query_params(Query {
+                counter_id: symbol_to_counter_id(&sym),
+                last_timestamp: 0,
+                page_size: 100,
+            })
+            .response::<Json<ShortPositionsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(resp.0)
+    }
+
+    // ── option_volume ─────────────────────────────────────────────
+
+    /// Get real-time option call/put volume for a security.
+    ///
+    /// Path: `GET /v1/quote/option-volume-stats`
+    pub async fn option_volume(&self, symbol: impl Into<String>) -> Result<OptionVolumeStats> {
+        use crate::utils::counter::symbol_to_counter_id;
+        #[derive(serde::Serialize)]
+        struct Query {
+            underlying_counter_id: String,
+        }
+        let resp = self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/quote/option-volume-stats")
+            .query_params(Query {
+                underlying_counter_id: symbol_to_counter_id(&symbol.into()),
+            })
+            .response::<Json<OptionVolumeStats>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(resp.0)
+    }
+
+    /// Get daily historical option volume for a security.
+    ///
+    /// Path: `GET /v1/quote/option-volume-stats/daily`
+    pub async fn option_volume_daily(
+        &self,
+        symbol: impl Into<String>,
+        timestamp: i64,
+        count: u32,
+    ) -> Result<OptionVolumeDaily> {
+        use crate::utils::counter::symbol_to_counter_id;
+        #[derive(serde::Serialize)]
+        struct Query {
+            counter_id: String,
+            timestamp: i64,
+            line_num: u32,
+            direction: i32,
+        }
+        let resp = self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/quote/option-volume-stats/daily")
+            .query_params(Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                timestamp,
+                line_num: count,
+                direction: 1,
+            })
+            .response::<Json<OptionVolumeDaily>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(resp.0)
+    }
+    // ── update_pinned ─────────────────────────────────────────────
+
+    /// Pin or unpin watchlist securities.
+    ///
+    /// Path: `POST /v1/watchlist/pinned`
+    pub async fn update_pinned(&self, mode: PinnedMode, symbols: Vec<String>) -> Result<()> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            mode: PinnedMode,
+            securities: Vec<String>,
+        }
+
+        self.0
+            .http_cli
+            .request(Method::POST, "/v1/watchlist/pinned")
+            .body(Json(Request {
+                mode,
+                securities: symbols,
+            }))
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+
+        Ok(())
     }
 }
 

@@ -237,10 +237,15 @@ public:
   void update_watchlist_group(const UpdateWatchlistGroup& req,
                               AsyncCallback<QuoteContext, void> callback) const;
 
+  /// Pin or unpin watchlist securities (mode: 0=add/pin, 1=remove/unpin)
+  void update_pinned(int32_t mode,
+                     const std::vector<std::string>& securities,
+                     AsyncCallback<QuoteContext, void> callback) const;
+
   /// Get filings
-  void filings(const std::string& symbol,
-               AsyncCallback<QuoteContext, std::vector<FilingItem>> callback)
-    const;
+  void filings(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, std::vector<FilingItem>> callback) const;
 
   /// Get security list
   void security_list(
@@ -308,6 +313,20 @@ public:
     Period period,
     uintptr_t count,
     AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
+
+  /// Get short interest data for a US security
+  void short_positions(const std::string& symbol,
+                       AsyncCallback<QuoteContext, ShortPositionsResponse> callback) const;
+
+  /// Get real-time option call/put volume
+  void option_volume(const std::string& symbol,
+                     AsyncCallback<QuoteContext, OptionVolumeStats> callback) const;
+
+  /// Get daily historical option volume
+  void option_volume_daily(const std::string& symbol,
+                           int64_t timestamp,
+                           uint32_t count,
+                           AsyncCallback<QuoteContext, OptionVolumeDaily> callback) const;
 };
 
 } // namespace quote

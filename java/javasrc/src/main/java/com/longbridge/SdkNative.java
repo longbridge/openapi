@@ -11,6 +11,7 @@ import com.longbridge.quote.*;
 import com.longbridge.trade.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * @hidden
@@ -50,6 +51,9 @@ public class SdkNative {
         public static native long configSetEnablePrintQuotePackages(long config, boolean enable);
 
         public static native long configSetLogPath(long config, String logPath);
+
+        public static native void configRefreshAccessToken(long config, OffsetDateTime expiredAt,
+                        AsyncCallback callback);
 
         public static native void freeConfig(long config);
 
@@ -245,6 +249,172 @@ public class SdkNative {
 
         public static native void tradeContextEstimateMaxPurchaseQuantity(long context,
                         EstimateMaxPurchaseQuantityOptions opts,
+                        AsyncCallback callback);
+
+        // ── DCAContext ────────────────────────────────────────────────
+        public static native long newDcaContext(long config);
+        public static native void freeDcaContext(long context);
+        public static native void dcaContextList(long context, Object opts, AsyncCallback callback);
+        public static native void dcaContextStats(long context, String symbol, AsyncCallback callback);
+        public static native void dcaContextCheckSupport(long context, String[] symbols, AsyncCallback callback);
+        public static native void dcaContextHistory(long context, Object opts, AsyncCallback callback);
+        public static native void dcaContextPause(long context, String planId, AsyncCallback callback);
+        public static native void dcaContextResume(long context, String planId, AsyncCallback callback);
+        public static native void dcaContextStop(long context, String planId, AsyncCallback callback);
+        public static native void dcaContextCalcDate(long context, Object opts, AsyncCallback callback);
+        public static native void dcaContextSetReminder(long context, String hours, AsyncCallback callback);
+        public static native void dcaContextCreate(long context, Object opts, AsyncCallback callback);
+        public static native void dcaContextUpdate(long context, Object opts, AsyncCallback callback);
+
+        // ── SharelistContext ──────────────────────────────────────────
+        public static native long newSharelistContext(long config);
+        public static native void freeSharelistContext(long context);
+        public static native void sharelistContextList(long context, int count, AsyncCallback callback);
+        public static native void sharelistContextDetail(long context, long id, AsyncCallback callback);
+        public static native void sharelistContextPopular(long context, int count, AsyncCallback callback);
+        public static native void sharelistContextCreate(long context, Object opts, AsyncCallback callback);
+        public static native void sharelistContextAddSecurities(long context, long id, String[] symbols, AsyncCallback callback);
+        public static native void sharelistContextRemoveSecurities(long context, long id, String[] symbols, AsyncCallback callback);
+        public static native void sharelistContextSortSecurities(long context, long id, String[] symbols, AsyncCallback callback);
+        public static native void sharelistContextDelete(long context, long id, AsyncCallback callback);
+
+                // ── AlertContext ──────────────────────────────────────────────
+
+        public static native long newAlertContext(long config);
+        public static native void freeAlertContext(long context);
+        public static native void alertContextList(long context, AsyncCallback callback);
+        public static native void alertContextAdd(long context, Object opts, AsyncCallback callback);
+        public static native void alertContextEnable(long context, String alertId, AsyncCallback callback);
+        public static native void alertContextDisable(long context, String alertId, AsyncCallback callback);
+        public static native void alertContextDelete(long context, Object opts, AsyncCallback callback);
+
+                // ── CalendarContext ───────────────────────────────────────────
+
+        public static native long newCalendarContext(long config);
+        public static native void freeCalendarContext(long context);
+        public static native void calendarContextFinanceCalendar(long context, com.longbridge.calendar.FinanceCalendarOptions opts, AsyncCallback callback);
+
+        // ── PortfolioContext ──────────────────────────────────────────
+
+        public static native long newPortfolioContext(long config);
+        public static native void freePortfolioContext(long context);
+        public static native void portfolioContextExchangeRate(long context, AsyncCallback callback);
+        public static native void portfolioContextProfitAnalysis(long context, Object opts, AsyncCallback callback);
+        public static native void portfolioContextProfitAnalysisDetail(long context, Object opts, AsyncCallback callback);
+        public static native void portfolioContextProfitAnalysisByMarket(long context, Object opts, AsyncCallback callback);
+
+        // ── QuoteContext extensions (Step 3) ─────────────────────────
+
+        public static native void quoteContextShortPositions(long context, String symbol, AsyncCallback callback);
+        public static native void quoteContextOptionVolume(long context, String symbol, AsyncCallback callback);
+        public static native void quoteContextOptionVolumeDaily(long context, Object opts, AsyncCallback callback);
+
+        // ── MarketContext ─────────────────────────────────────────────
+
+        public static native long newMarketContext(long config);
+        public static native void freeMarketContext(long context);
+        public static native void marketContextMarketStatus(long context, AsyncCallback callback);
+        public static native void marketContextBrokerHolding(long context, com.longbridge.market.BrokerHoldingOptions opts, AsyncCallback callback);
+        public static native void marketContextBrokerHoldingDetail(long context, String symbol, AsyncCallback callback);
+        public static native void marketContextBrokerHoldingDaily(long context, com.longbridge.market.BrokerHoldingDailyOptions opts, AsyncCallback callback);
+        public static native void marketContextAhPremium(long context, com.longbridge.market.AhPremiumOptions opts, AsyncCallback callback);
+        public static native void marketContextAhPremiumIntraday(long context, String symbol, AsyncCallback callback);
+        public static native void marketContextTradeStats(long context, String symbol, AsyncCallback callback);
+        public static native void marketContextAnomaly(long context, String market, AsyncCallback callback);
+        public static native void marketContextConstituent(long context, String symbol, AsyncCallback callback);
+
+        // ── FundamentalContext ────────────────────────────────────────
+
+        public static native long newFundamentalContext(long config);
+
+        public static native void freeFundamentalContext(long context);
+
+        public static native void fundamentalContextFinancialReport(long context,
+                        com.longbridge.fundamental.FinancialReportOptions opts,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextInstitutionRating(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextInstitutionRatingDetail(long context,
+                        String symbol, AsyncCallback callback);
+
+        public static native void fundamentalContextDividend(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextDividendDetail(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextForecastEps(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextConsensus(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextValuation(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextValuationHistory(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextIndustryValuation(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextIndustryValuationDist(long context,
+                        String symbol, AsyncCallback callback);
+
+        public static native void fundamentalContextCompany(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextExecutive(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextShareholder(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextFundHolder(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextCorpAction(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextInvestRelation(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextOperating(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetBuyback(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetRatings(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetBusinessSegments(long context, String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetBusinessSegmentsHistory(long context,
+                        Object opts,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetInstitutionRatingViews(long context,
+                        String symbol,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetIndustryRank(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetIndustryPeers(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextGetFinancialReportSnapshot(long context,
+                        Object opts,
+                        AsyncCallback callback);
+
+        public static native void portfolioContextProfitAnalysisFlows(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native void quoteContextUpdatePinned(long context, Object req,
                         AsyncCallback callback);
 
         static {

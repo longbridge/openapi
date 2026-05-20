@@ -137,6 +137,171 @@ cpp_compat = true
 "CNewsItem" = "lb_news_item_t"
 "CContentContext" = "lb_content_context_t"
 "COAuth" = "lb_oauth_t"
+# Context opaque types (same pattern as CQuoteContext)
+"CFundamentalContext" = "lb_fundamental_context_t"
+"CAlertContext" = "lb_alert_context_t"
+"CDCAContext" = "lb_dca_context_t"
+"CSharelistContext" = "lb_sharelist_context_t"
+"CCalendarContext" = "lb_calendar_context_t"
+"CPortfolioContext" = "lb_portfolio_context_t"
+"CMarketContext" = "lb_market_context_t"
+# MarketContext types
+"CMarketTimeItem" = "lb_market_time_item_t"
+"CMarketStatusResponse" = "lb_market_status_response_t"
+"CBrokerHoldingEntry" = "lb_broker_holding_entry_t"
+"CBrokerHoldingTop" = "lb_broker_holding_top_t"
+"CBrokerHoldingChanges" = "lb_broker_holding_changes_t"
+"CBrokerHoldingDetailItem" = "lb_broker_holding_detail_item_t"
+"CBrokerHoldingDetail" = "lb_broker_holding_detail_t"
+"CBrokerHoldingDailyItem" = "lb_broker_holding_daily_item_t"
+"CBrokerHoldingDailyHistory" = "lb_broker_holding_daily_history_t"
+"CAhPremiumKline" = "lb_ah_premium_kline_t"
+"CAhPremiumKlines" = "lb_ah_premium_klines_t"
+"CAhPremiumIntraday" = "lb_ah_premium_intraday_t"
+"CTradePriceLevel" = "lb_trade_price_level_t"
+"CTradeStatistics" = "lb_trade_statistics_t"
+"CTradeStatsResponse" = "lb_trade_stats_response_t"
+"CAnomalyItem" = "lb_anomaly_item_t"
+"CAnomalyResponse" = "lb_anomaly_response_t"
+"CConstituentStock" = "lb_constituent_stock_t"
+"CIndexConstituents" = "lb_index_constituents_t"
+# FundamentalContext types
+"CDividendItem" = "lb_dividend_item_t"
+"CDividendList" = "lb_dividend_list_t"
+"CRatingEvaluate" = "lb_rating_evaluate_t"
+"CRatingTarget" = "lb_rating_target_t"
+"CRatingSummaryEvaluate" = "lb_rating_summary_evaluate_t"
+"CInstitutionRatingLatest" = "lb_institution_rating_latest_t"
+"CInstitutionRatingSummary" = "lb_institution_rating_summary_t"
+"CInstitutionRating" = "lb_institution_rating_t"
+"CInstitutionRatingDetailEvaluateItem" = "lb_institution_rating_detail_evaluate_item_t"
+"CInstitutionRatingDetailTargetItem" = "lb_institution_rating_detail_target_item_t"
+"CInstitutionRatingDetail" = "lb_institution_rating_detail_t"
+"CForecastEpsItem" = "lb_forecast_eps_item_t"
+"CForecastEps" = "lb_forecast_eps_t"
+"CValuationPoint" = "lb_valuation_point_t"
+"CValuationMetricData" = "lb_valuation_metric_data_t"
+"CValuationMetricsData" = "lb_valuation_metrics_data_t"
+"CValuationData" = "lb_valuation_data_t"
+"CValuationHistoryMetrics" = "lb_valuation_history_metrics_t"
+"CValuationHistoryResponse" = "lb_valuation_history_response_t"
+"CCompanyOverview" = "lb_company_overview_t"
+"CShareholderStock" = "lb_shareholder_stock_t"
+"CShareholder" = "lb_shareholder_t"
+"CShareholderList" = "lb_shareholder_list_t"
+"CFundHolder" = "lb_fund_holder_t"
+"CFundHolders" = "lb_fund_holders_t"
+"CCorpActionItem" = "lb_corp_action_item_t"
+"CCorpActions" = "lb_corp_actions_t"
+"CInvestSecurity" = "lb_invest_security_t"
+"CInvestRelations" = "lb_invest_relations_t"
+"COperatingIndicator" = "lb_operating_indicator_t"
+"COperatingItem" = "lb_operating_item_t"
+"COperatingList" = "lb_operating_list_t"
+"CFinancialReports" = "lb_financial_reports_t"
+# CalendarContext
+"CCalendarDataKv" = "lb_calendar_data_kv_t"
+"CCalendarEventInfo" = "lb_calendar_event_info_t"
+"CCalendarDateGroup" = "lb_calendar_date_group_t"
+"CCalendarEventsResponse" = "lb_calendar_events_response_t"
+# PortfolioContext
+"CExchangeRate" = "lb_exchange_rate_t"
+"CExchangeRates" = "lb_exchange_rates_t"
+"CProfitSummaryInfo" = "lb_profit_summary_info_t"
+"CProfitSummaryBreakdown" = "lb_profit_summary_breakdown_t"
+"CProfitAnalysisSummary" = "lb_profit_analysis_summary_t"
+"CProfitAnalysisItem" = "lb_profit_analysis_item_t"
+"CProfitAnalysisSublist" = "lb_profit_analysis_sublist_t"
+"CProfitAnalysis" = "lb_profit_analysis_t"
+"CProfitAnalysisByMarketItem" = "lb_profit_analysis_by_market_item_t"
+"CProfitAnalysisByMarket" = "lb_profit_analysis_by_market_t"
+"CFlowItem" = "lb_flow_item_t"
+"CProfitAnalysisFlows" = "lb_profit_analysis_flows_t"
+"CProfitDetailEntry" = "lb_profit_detail_entry_t"
+"CProfitDetails" = "lb_profit_details_t"
+"CProfitAnalysisDetail" = "lb_profit_analysis_detail_t"
+# AlertContext enums
+"CAlertCondition" = "lb_alert_condition_t"
+"CAlertFrequency" = "lb_alert_frequency_t"
+# DCAContext enums
+"CDCAFrequency" = "lb_dca_frequency_t"
+"CDCAStatus" = "lb_dca_status_t"
+# CalendarContext enums
+"CCalendarCategory" = "lb_calendar_category_t"
+# FundamentalContext enums
+"CFinancialReportKind" = "lb_financial_report_kind_t"
+"CFinancialReportPeriod" = "lb_financial_report_period_t"
+"CInstitutionRecommend" = "lb_institution_recommend_t"
+# MarketContext enums
+"CBrokerHoldingPeriod" = "lb_broker_holding_period_t"
+"CAhPremiumPeriod" = "lb_ah_premium_period_t"
+# PortfolioContext enums
+"CFlowDirection" = "lb_flow_direction_t"
+"CAssetType" = "lb_asset_type_t"
+# AlertContext
+"CAlertItem" = "lb_alert_item_t"
+"CAlertSymbolGroup" = "lb_alert_symbol_group_t"
+"CAlertList" = "lb_alert_list_t"
+# DCAContext
+"CDcaPlan" = "lb_dca_plan_t"
+"CDcaList" = "lb_dca_list_t"
+"CDcaStats" = "lb_dca_stats_t"
+"CDcaSupportInfo" = "lb_dca_support_info_t"
+"CDcaSupportList" = "lb_dca_support_list_t"
+"CDcaCreateResult" = "lb_dca_create_result_t"
+"CDcaCalcDateResult" = "lb_dca_calc_date_result_t"
+"CDcaHistoryRecord" = "lb_dca_history_record_t"
+"CDcaHistoryResponse" = "lb_dca_history_response_t"
+# SharelistContext
+"CSharelistStock" = "lb_sharelist_stock_t"
+"CSharelistScopes" = "lb_sharelist_scopes_t"
+"CSharelistInfo" = "lb_sharelist_info_t"
+"CSharelistList" = "lb_sharelist_list_t"
+"CSharelistDetail" = "lb_sharelist_detail_t"
+# FundamentalContext extra types
+"CConsensusDetail" = "lb_consensus_detail_t"
+"CConsensusReport" = "lb_consensus_report_t"
+"CFinancialConsensus" = "lb_financial_consensus_t"
+"CIndustryValuationHistory" = "lb_industry_valuation_history_t"
+"CIndustryValuationItem" = "lb_industry_valuation_item_t"
+"CIndustryValuationList" = "lb_industry_valuation_list_t"
+"CValuationDist" = "lb_valuation_dist_t"
+"CIndustryValuationDist" = "lb_industry_valuation_dist_t"
+"CProfessional" = "lb_professional_t"
+"CExecutiveGroup" = "lb_executive_group_t"
+"CExecutiveList" = "lb_executive_list_t"
+"CRecentBuybacks" = "lb_recent_buybacks_t"
+"CBuybackHistoryItem" = "lb_buyback_history_item_t"
+"CBuybackRatios" = "lb_buyback_ratios_t"
+"CBuybackData" = "lb_buyback_data_t"
+"CRatingLeafIndicator" = "lb_rating_leaf_indicator_t"
+"CRatingIndicator" = "lb_rating_indicator_t"
+"CRatingSubIndicatorGroup" = "lb_rating_sub_indicator_group_t"
+"CRatingCategory" = "lb_rating_category_t"
+"CStockRatings" = "lb_stock_ratings_t"
+# FundamentalContext: new APIs
+"CBusinessSegmentItem" = "lb_business_segment_item_t"
+"CBusinessSegments" = "lb_business_segments_t"
+"CBusinessSegmentHistoryItem" = "lb_business_segment_history_item_t"
+"CBusinessSegmentsHistoricalItem" = "lb_business_segments_historical_item_t"
+"CBusinessSegmentsHistory" = "lb_business_segments_history_t"
+"CInstitutionRatingViewItem" = "lb_institution_rating_view_item_t"
+"CInstitutionRatingViews" = "lb_institution_rating_views_t"
+"CIndustryRankItem" = "lb_industry_rank_item_t"
+"CIndustryRankGroup" = "lb_industry_rank_group_t"
+"CIndustryRankResponse" = "lb_industry_rank_response_t"
+"CIndustryPeersTop" = "lb_industry_peers_top_t"
+"CIndustryPeerNode" = "lb_industry_peer_node_t"
+"CIndustryPeersResponse" = "lb_industry_peers_response_t"
+"CSnapshotForecastMetric" = "lb_snapshot_forecast_metric_t"
+"CSnapshotReportedMetric" = "lb_snapshot_reported_metric_t"
+"CFinancialReportSnapshot" = "lb_financial_report_snapshot_t"
+# QuoteContext extensions
+"CShortPosition" = "lb_short_position_t"
+"CShortPositionsResponse" = "lb_short_positions_response_t"
+"COptionVolumeStats" = "lb_option_volume_stats_t"
+"COptionVolumeDailyStat" = "lb_option_volume_daily_stat_t"
+"COptionVolumeDaily" = "lb_option_volume_daily_t"
 
 [export]
 include = [
@@ -183,4 +348,74 @@ include = [
     "CTopicItem",
     "CNewsItem",
     "COAuth",
+    # MarketContext
+    "CMarketTimeItem", "CMarketStatusResponse",
+    "CBrokerHoldingEntry", "CBrokerHoldingTop",
+    "CBrokerHoldingChanges", "CBrokerHoldingDetailItem", "CBrokerHoldingDetail",
+    "CBrokerHoldingDailyItem", "CBrokerHoldingDailyHistory",
+    "CAhPremiumKline", "CAhPremiumKlines", "CAhPremiumIntraday",
+    "CTradePriceLevel", "CTradeStatistics", "CTradeStatsResponse",
+    "CAnomalyItem", "CAnomalyResponse",
+    "CConstituentStock", "CIndexConstituents",
+    # FundamentalContext
+    "CDividendItem", "CDividendList",
+    "CRatingEvaluate", "CRatingTarget", "CRatingSummaryEvaluate",
+    "CInstitutionRatingLatest", "CInstitutionRatingSummary", "CInstitutionRating",
+    "CInstitutionRatingDetailEvaluateItem", "CInstitutionRatingDetailTargetItem",
+    "CInstitutionRatingDetail",
+    "CForecastEpsItem", "CForecastEps",
+    "CValuationPoint", "CValuationMetricData", "CValuationMetricsData", "CValuationData",
+    "CValuationHistoryMetrics", "CValuationHistoryResponse",
+    "CCompanyOverview",
+    "CShareholderStock", "CShareholder", "CShareholderList",
+    "CFundHolder", "CFundHolders",
+    "CCorpActionItem", "CCorpActions",
+    "CInvestSecurity", "CInvestRelations",
+    "COperatingIndicator", "COperatingItem", "COperatingList",
+    "CFinancialReports",
+    "CConsensusDetail", "CConsensusReport", "CFinancialConsensus",
+    "CIndustryValuationHistory", "CIndustryValuationItem", "CIndustryValuationList",
+    "CValuationDist", "CIndustryValuationDist",
+    "CProfessional", "CExecutiveGroup", "CExecutiveList",
+    "CRecentBuybacks", "CBuybackHistoryItem", "CBuybackRatios", "CBuybackData",
+    "CRatingLeafIndicator", "CRatingIndicator", "CRatingSubIndicatorGroup", "CRatingCategory", "CStockRatings",
+    "CBusinessSegmentItem", "CBusinessSegments",
+    "CBusinessSegmentHistoryItem", "CBusinessSegmentsHistoricalItem", "CBusinessSegmentsHistory",
+    "CInstitutionRatingViewItem", "CInstitutionRatingViews",
+    "CIndustryRankItem", "CIndustryRankGroup", "CIndustryRankResponse",
+    "CIndustryPeersTop", "CIndustryPeerNode", "CIndustryPeersResponse",
+    "CSnapshotForecastMetric", "CSnapshotReportedMetric", "CFinancialReportSnapshot",
+    "CCalendarDataKv", "CCalendarEventInfo", "CCalendarDateGroup", "CCalendarEventsResponse",
+    "CExchangeRate", "CExchangeRates",
+    # AlertContext enums + data types
+    "CAlertCondition", "CAlertFrequency",
+    "CAlertItem", "CAlertSymbolGroup", "CAlertList",
+    # DCAContext enums
+    "CDCAFrequency", "CDCAStatus",
+    # DCAContext data types
+    "CDcaPlan", "CDcaList", "CDcaStats", "CDcaSupportInfo", "CDcaSupportList",
+    "CDcaCreateResult", "CDcaCalcDateResult",
+    "CDcaHistoryRecord", "CDcaHistoryResponse",
+    # CalendarContext enums
+    "CCalendarCategory",
+    # FundamentalContext enums
+    "CFinancialReportKind", "CFinancialReportPeriod", "CInstitutionRecommend",
+    # MarketContext enums
+    "CBrokerHoldingPeriod", "CAhPremiumPeriod",
+    # PortfolioContext enums
+    "CFlowDirection", "CAssetType",
+    # PortfolioContext data types
+    "CProfitSummaryInfo", "CProfitSummaryBreakdown", "CProfitAnalysisSummary",
+    "CProfitAnalysisItem", "CProfitAnalysisSublist", "CProfitAnalysis",
+    "CProfitAnalysisByMarketItem", "CProfitAnalysisByMarket",
+    "CFlowItem", "CProfitAnalysisFlows",
+    "CProfitDetailEntry", "CProfitDetails", "CProfitAnalysisDetail",
+    # SharelistContext data types
+    "CSharelistStock", "CSharelistScopes", "CSharelistInfo", "CSharelistList", "CSharelistDetail",
+    # FundamentalContext opaque type (no rename, typedef added in hpp)
+    "CFundamentalContext",
+    # QuoteContext extensions
+    "CShortPosition", "CShortPositionsResponse",
+    "COptionVolumeStats",
+    "COptionVolumeDailyStat", "COptionVolumeDaily",
 ]

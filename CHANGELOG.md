@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# [Unreleased]
+## [Unreleased]
 
-## Added
+### Added
 
 - **Rust, Python, Node.js:** Document normalization formulas for `SecurityCalcIndex` Greeks fields: `theta` (divide by 252 for per-trading-day), `vega` and `rho` (divide by 100 for per-unit change). The raw API values differ from Longbridge app display values by these factors.
 - **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
@@ -15,16 +15,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `list_topic_replies(opts)` — list replies for a topic, with optional page/size filtering.
   - `create_topic_reply(opts)` — create a reply under a topic.
 - **Rust, Python:** New types `ListTopicRepliesOptions`, `CreateReplyOptions`, and `TopicReply` to support the above methods.
+- **All languages (Rust/Python/Node.js/Java/C/C++):** Six new `FundamentalContext` methods:
+  - `BusinessSegments` — GET `/v1/quote/fundamentals/business-segments`: latest business segment breakdown.
+  - `BusinessSegmentsHistory` — GET `/v1/quote/fundamentals/business-segments/history`: historical business and regional segment breakdowns with optional `report` and `cate` filters.
+  - `InstitutionRatingViews` — GET `/v1/quote/ratings/institutional`: historical rating distribution time-series (buy/over/hold/under/sell per date).
+  - `IndustryRank` — GET `/v1/quote/industry/rank`: industry leaderboard; exposes `IndustryRankIndicator` and `IndustryRankSortType` enum constants.
+  - `IndustryPeers` — GET `/v1/quote/industries/peers`: recursive industry peer chain; accepts both symbol-style (`AAPL.US`) and raw counter IDs (`BK/US/123`).
+  - `FinancialReportSnapshot` — GET `/v1/quote/financials/earnings-snapshot`: earnings snapshot with forecast and reported metrics.
 
-## Fixed
+# [4.1.0]
 
-- **All bindings:** Correct `SecurityStaticInfo.dividend_yield` doc comment from "Dividend yield" (ratio) to "Dividend" (per share amount) across all language SDKs (Rust, Python, Node.js, Java, C, C++).
-- **All bindings:** `create_topic` now returns the topic ID (`String`) instead of `OwnedTopic` to avoid deserialization errors when the API response omits optional fields.
+## Breaking changes
+
+- **All languages (Rust, Python, Node.js, Java, C, C++):** `AlertContext::enable()` and `AlertContext::disable()` have been replaced by a single `AlertContext::update(item, enabled)` method. Pass the `AlertItem` from `list()` directly — `enabled = true` enables, `enabled = false` disables. This fixes `invalid frequency` / `invalid indicator id` API errors caused by the old methods sending incomplete fields.
+
+# [4.0.6]
+
+## Added
+
+- **All languages (Rust, Python, Node.js, Java, C, C++):** Seven new context types covering all major data APIs:
+  - `FundamentalContext` — financial reports, analyst ratings, dividends, EPS forecasts, consensus estimates, valuation (PE/PB/PS), industry valuation, company overview, executives, shareholders, fund holders, corporate actions, investor relations, operating reports, buyback data, stock ratings.
+  - `MarketContext` — market status, broker holding (top/detail/daily), A/H premium (klines/intraday), trade statistics, market anomalies, index constituents.
+  - `CalendarContext` — finance calendar (earnings, dividends, splits, IPOs, macro data, market closures, meetings, mergers).
+  - `PortfolioContext` — exchange rates, P&L analysis (summary/detail/by-market/flows).
+  - `AlertContext` — price alert management (list/add/delete/enable/disable).
+  - `DCAContext` — dollar-cost-averaging plan management (list/create/update/pause/resume/stop/history/stats/check-support/calc-date/set-reminder).
+  - `SharelistContext` — community sharelist management (list/detail/popular/create/delete/add-securities/remove-securities/sort-securities).
+- **All languages:** `QuoteContext` gains `short_positions`, `option_volume`, `option_volume_daily`, and `update_pinned`.
+- **All languages:** `ContentContext` gains `topic_detail`, `list_topic_replies`, and `create_topic_reply`.
+- **Rust:** `Config::header(key, value)` builder method for injecting custom HTTP/WebSocket headers.
+- **All languages (Rust, Python, Node.js, Java, C, C++):** Restore `Config::refresh_access_token` (and `refresh_access_token_blocking` in Rust). Refreshes the access token via the Longbridge token-refresh API. Only available with **Legacy API Key** authentication (`Config::from_apikey`); not supported in OAuth 2.0 mode.
 
 ## Changed
 
-- **All bindings:** `ContentContext.topics_mine` renamed to `my_topics`; `ListMyTopicsOptions` renamed to `MyTopicsOptions`.
-- **All bindings:** `license` field removed from `OwnedTopic` and `CreateTopicOptions`.
+- **All languages:** Method parameters now use typed enums instead of raw integers: `DCAFrequency`, `DCAStatus`, `AlertCondition`, `AlertFrequency`, `CalendarCategory`, `FinancialReportKind`, `FinancialReportPeriod`, `BrokerHoldingPeriod`, `AhPremiumPeriod`.
+- **All languages:** Response struct fields are typed enums where applicable: `DcaPlan.status` / `invest_frequency` / `market`, `MarketTimeItem.market`, `FlowItem.direction`, `ProfitSummaryInfo.asset_type`, `InstitutionRatingSummary.recommend`.
+- **All languages:** All SDK responses are fully typed structs — no method returns a raw JSON string.
+- **All languages:** Monetary/numeric fields use `Decimal`/`Option<Decimal>` (Rust) or `BigDecimal` (Java). Non-parseable values such as `""` or `"--"` deserialize as `None`/`null`.
+
+## Fixed
+
+- **Rust:** Fix incorrect cache expiry checks in `QuoteContext`.
 
 # [4.0.6]
 

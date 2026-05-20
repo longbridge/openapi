@@ -47,4 +47,9 @@ public:
 template<typename Ctx, typename T>
 using AsyncCallback = std::function<void(AsyncResult<Ctx, T>)>;
 
+/// Placeholder context type for async operations that have no meaningful
+/// context (analogous to `()` in Rust).
+struct NoContext
+{};
+
 } // namespace longbridge

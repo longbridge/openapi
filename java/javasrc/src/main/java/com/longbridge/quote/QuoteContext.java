@@ -1380,6 +1380,59 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Get short positions for a symbol
+     *
+     * @param symbol Security symbol
+     * @return A Future representing the short positions response
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<ShortPositionsResponse> getShortPositions(String symbol) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextShortPositions(this.raw, symbol, callback);
+        });
+    }
+
+    /**
+     * Get option volume statistics for a symbol
+     *
+     * @param symbol Security symbol
+     * @return A Future representing the option volume statistics
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<OptionVolumeStats> getOptionVolume(String symbol) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextOptionVolume(this.raw, symbol, callback);
+        });
+    }
+
+    /**
+     * Get daily option volume for a symbol
+     *
+     * @param opts Options including symbol, timestamp, and count
+     * @return A Future representing the daily option volume
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<OptionVolumeDaily> getOptionVolumeDaily(OptionVolumeDailyOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextOptionVolumeDaily(this.raw, opts, callback);
+        });
+    }
+
+    /**
+     * Update pinned securities (add or remove).
+     *
+     * @param req Request containing mode (Add/Remove) and security symbols
+     * @return A Future that completes when the operation is done
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> updatePinned(UpdatePinnedRequest req) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextUpdatePinned(this.raw, req, callback);
+        });
+    }
+
+    /**
      * Get real-time candlesticks
      * <p>
      * Get real-time candlesticks of the subscribed symbols, it always returns the

@@ -4,6 +4,13 @@ set(SOURCES
     src/config.cpp
     src/content_context.cpp
     src/decimal.cpp
+    src/alert_context.cpp
+    src/dca_context.cpp
+    src/sharelist_context.cpp
+    src/calendar_context.cpp
+    src/fundamental_context.cpp
+    src/market_context.cpp
+    src/portfolio_context.cpp
     src/status.cpp
     src/types.cpp
     src/quote_context.cpp

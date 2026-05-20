@@ -23,6 +23,23 @@ Longbridge OpenAPI provides programmatic quote trading interfaces for investors 
 | Go                          |                                                                       | https://github.com/longbridge/openapi-go         |
 | [MCP](mcp/README.md)        |                                                                       | An MCP server implementation for Longbridge OpenAPI |
 
+
+## Context Types
+
+| Context | Description |
+|---------|-------------|
+| `QuoteContext` | Real-time quotes, candlesticks, options, warrants, watchlists, push subscriptions |
+| `TradeContext` | Orders, positions, account balance, executions, cash flow |
+| `AssetContext` | Account statement download |
+| `ContentContext` | News, community topics |
+| `FundamentalContext` | Financial reports, analyst ratings, dividends, valuation, company overview, shareholders |
+| `MarketContext` | Market status, broker holdings, A/H premium, trade statistics, anomaly alerts, index constituents |
+| `CalendarContext` | Financial calendar (earnings, dividends, splits, IPOs, macro data, market closures) |
+| `PortfolioContext` | Exchange rates, portfolio P&L analysis |
+| `AlertContext` | Price alert management (add/enable/disable/delete) |
+| `DCAContext` | Dollar-cost averaging plan management |
+| `SharelistContext` | Community sharelist management |
+
 ## Quickstart
 
 Pick a language SDK from the table above and follow its README for install and first request. Full reference docs: https://longbridge.github.io/openapi

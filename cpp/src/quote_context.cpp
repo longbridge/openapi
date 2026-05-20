@@ -1303,6 +1303,28 @@ QuoteContext::update_watchlist_group(
 }
 
 void
+QuoteContext::update_pinned(int32_t mode,
+                             const std::vector<std::string>& securities,
+                             AsyncCallback<QuoteContext, void> callback) const
+{
+  auto c_securities = utils::get_cstring_vector(securities);
+  lb_quote_context_update_pinned(
+    ctx_,
+    mode,
+    c_securities.data(),
+    c_securities.size(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<QuoteContext, void>(
+        QuoteContext((const lb_quote_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<QuoteContext, void>(callback));
+}
+
+void
 QuoteContext::filings(const std::string& symbol,
                       AsyncCallback<QuoteContext, std::vector<FilingItem>> callback)
   const
@@ -1631,6 +1653,82 @@ QuoteContext::realtime_candlesticks(
       }
     },
     new AsyncCallback<QuoteContext, std::vector<Candlestick>>(callback));
+}
+
+void
+QuoteContext::short_positions(const std::string& symbol,
+                              AsyncCallback<QuoteContext, ShortPositionsResponse> callback) const
+{
+  lb_quote_context_short_positions(
+    ctx_,
+    symbol.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, ShortPositionsResponse>(res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+      if (status) {
+        auto value = convert::convert((const lb_short_positions_response_t*)res->data);
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, ShortPositionsResponse>(ctx, std::move(status), &value));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, ShortPositionsResponse>(ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, ShortPositionsResponse>(callback));
+}
+
+void
+QuoteContext::option_volume(const std::string& symbol,
+                            AsyncCallback<QuoteContext, OptionVolumeStats> callback) const
+{
+  lb_quote_context_option_volume(
+    ctx_,
+    symbol.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, OptionVolumeStats>(res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+      if (status) {
+        auto value = convert::convert((const lb_option_volume_stats_t*)res->data);
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, OptionVolumeStats>(ctx, std::move(status), &value));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, OptionVolumeStats>(ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, OptionVolumeStats>(callback));
+}
+
+void
+QuoteContext::option_volume_daily(const std::string& symbol,
+                                  int64_t timestamp,
+                                  uint32_t count,
+                                  AsyncCallback<QuoteContext, OptionVolumeDaily> callback) const
+{
+  lb_quote_context_option_volume_daily(
+    ctx_,
+    symbol.c_str(),
+    timestamp,
+    count,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, OptionVolumeDaily>(res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+      if (status) {
+        auto value = convert::convert((const lb_option_volume_daily_t*)res->data);
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, OptionVolumeDaily>(ctx, std::move(status), &value));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, OptionVolumeDaily>(ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, OptionVolumeDaily>(callback));
 }
 
 } // namespace quote

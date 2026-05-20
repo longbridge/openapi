@@ -119,4 +119,29 @@ Config::set_log_path(const std::string& path)
   return *this;
 }
 
+void
+Config::refresh_access_token(int64_t expired_at,
+                             AsyncCallback<NoContext, std::string> callback)
+{
+  lb_config_refresh_access_token(
+    config_,
+    expired_at,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<NoContext, std::string>(res->userdata);
+      Status status(res->error);
+
+      if (status) {
+        std::string access_token = (const char*)res->data;
+
+        (*callback_ptr)(AsyncResult<NoContext, std::string>(
+          NoContext{}, std::move(status), &access_token));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<NoContext, std::string>(NoContext{}, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<NoContext, std::string>(callback));
+}
+
 } // namespace longbridge

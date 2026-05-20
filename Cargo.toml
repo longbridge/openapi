@@ -1,22 +1,22 @@
 [workspace]
 resolver = "3"
-members = ["rust", "python", "nodejs", "java", "c", "mcp"]
+members = ["rust", "python", "nodejs", "java", "c"]
 
 [workspace.package]
-version = "4.0.5"
+version = "4.1.0"
 edition = "2024"
 
 [profile.release]
 lto = true
 
 [workspace.dependencies]
-longbridge-geo = { path = "rust/crates/geo", version = "4.0.5" }
-longbridge-wscli = { path = "rust/crates/wsclient", version = "4.0.5" }
-longbridge-httpcli = { path = "rust/crates/httpclient", version = "4.0.5" }
-longbridge-proto = { path = "rust/crates/proto", version = "4.0.5" }
-longbridge-candlesticks = { path = "rust/crates/candlesticks", version = "4.0.5" }
-longbridge-oauth = { path = "rust/crates/oauth", version = "4.0.5" }
-longbridge = { path = "rust", version = "4.0.5" }
+longbridge-geo = { path = "rust/crates/geo", version = "4.1.0" }
+longbridge-wscli = { path = "rust/crates/wsclient", version = "4.1.0" }
+longbridge-httpcli = { path = "rust/crates/httpclient", version = "4.1.0" }
+longbridge-proto = { path = "rust/crates/proto", version = "4.1.0" }
+longbridge-candlesticks = { path = "rust/crates/candlesticks", version = "4.1.0" }
+longbridge-oauth = { path = "rust/crates/oauth", version = "4.1.0" }
+longbridge = { path = "rust", version = "4.1.0" }
 
 tokio = "1.47.1"
 tokio-tungstenite = "0.27.0"
@@ -59,12 +59,7 @@ napi = { version = "3.8.3", default-features = false }
 napi-derive = "3.5.2"
 napi-build = "2.3.1"
 chrono = "0.4.41"
-poem-mcpserver = "0.3.1"
-poem-mcpserver-macros = "0.3.1"
 poem = "3.1.12"
-schemars = "1.0.4"
-clap = "4.5.45"
-dotenvy = "0.15.7"
 jni = "0.21.1"
 proc-macro2 = "1.0.101"
 quote = "1.0.40"
