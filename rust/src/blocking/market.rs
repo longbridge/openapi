@@ -5,7 +5,15 @@ use tokio::sync::mpsc;
 use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
-    market::{MarketContext, types::*},
+    market::{
+        MarketContext,
+        types::{
+            AhPremiumIntraday, AhPremiumKlines, AhPremiumPeriod, AnomalyResponse,
+            BrokerHoldingDailyHistory, BrokerHoldingDetail, BrokerHoldingPeriod, BrokerHoldingTop,
+            IndexConstituents, MarketStatusResponse, RankCategoriesResponse, RankListResponse,
+            StockEventsResponse, TradeStatsResponse,
+        },
+    },
 };
 
 /// Blocking market data context
@@ -104,5 +112,33 @@ impl MarketContextSync {
     ) -> Result<IndexConstituents> {
         self.rt
             .call(move |ctx| async move { ctx.constituent(symbol).await })
+    }
+
+    /// Get stock events across one or more markets
+    pub fn stock_events(
+        &self,
+        markets: Vec<String>,
+        sort: u32,
+        date: Option<String>,
+        limit: u32,
+    ) -> Result<StockEventsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.stock_events(markets, sort, date, limit).await })
+    }
+
+    /// Get all available rank category keys and labels
+    pub fn rank_categories(&self) -> Result<RankCategoriesResponse> {
+        self.rt
+            .call(|ctx| async move { ctx.rank_categories().await })
+    }
+
+    /// Get a ranked list of securities for the given category key
+    pub fn rank_list(
+        &self,
+        key: impl Into<String> + Send + 'static,
+        need_article: bool,
+    ) -> Result<RankListResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.rank_list(key, need_article).await })
     }
 }

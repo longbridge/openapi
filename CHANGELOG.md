@@ -10,18 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Rust, Python, Node.js:** Document normalization formulas for `SecurityCalcIndex` Greeks fields: `theta` (divide by 252 for per-trading-day), `vega` and `rho` (divide by 100 for per-unit change). The raw API values differ from Longbridge app display values by these factors.
 - **Rust:** `Config::header(key, value)` builder method to inject custom headers into every HTTP request and WebSocket upgrade request.
-- **Rust, Python:** `ContentContext` adds three new methods:
-  - `topic_detail(topic_id)` — get detail of a single topic.
-  - `list_topic_replies(opts)` — list replies for a topic, with optional page/size filtering.
-  - `create_topic_reply(opts)` — create a reply under a topic.
-- **Rust, Python:** New types `ListTopicRepliesOptions`, `CreateReplyOptions`, and `TopicReply` to support the above methods.
-- **All languages (Rust/Python/Node.js/Java/C/C++):** Six new `FundamentalContext` methods:
-  - `BusinessSegments` — GET `/v1/quote/fundamentals/business-segments`: latest business segment breakdown.
-  - `BusinessSegmentsHistory` — GET `/v1/quote/fundamentals/business-segments/history`: historical business and regional segment breakdowns with optional `report` and `cate` filters.
-  - `InstitutionRatingViews` — GET `/v1/quote/ratings/institutional`: historical rating distribution time-series (buy/over/hold/under/sell per date).
-  - `IndustryRank` — GET `/v1/quote/industry/rank`: industry leaderboard; exposes `IndustryRankIndicator` and `IndustryRankSortType` enum constants.
-  - `IndustryPeers` — GET `/v1/quote/industries/peers`: recursive industry peer chain; accepts both symbol-style (`AAPL.US`) and raw counter IDs (`BK/US/123`).
-  - `FinancialReportSnapshot` — GET `/v1/quote/financials/earnings-snapshot`: earnings snapshot with forecast and reported metrics.
+- **Rust, Python:** `ContentContext` adds three new methods: `topic_detail`, `list_topic_replies`, `create_topic_reply`.
+- **All languages (Rust/Python/Node.js/Java/C/C++):** Six new `FundamentalContext` methods (PR #526):
+  - `BusinessSegments` — GET `/v1/quote/fundamentals/business-segments`
+  - `BusinessSegmentsHistory` — GET `/v1/quote/fundamentals/business-segments/history`
+  - `InstitutionRatingViews` — GET `/v1/quote/ratings/institutional`
+  - `IndustryRank` — GET `/v1/quote/industry/rank`
+  - `IndustryPeers` — GET `/v1/quote/industries/peers`
+  - `FinancialReportSnapshot` — GET `/v1/quote/financials/earnings-snapshot`
+- **All languages (Rust/Python/Node.js/Java/C/C++):** 13 new APIs across FundamentalContext, QuoteContext, MarketContext, and new ScreenerContext:
+  - `FundamentalContext`: `shareholder_top`, `shareholder_detail`, `valuation_comparison`
+  - `QuoteContext`: `short_positions` (extended to HK+US), `short_trades`
+  - `MarketContext`: `top_movers`, `rank_categories`, `rank_list`
+  - `ScreenerContext` (new): `screener_recommend_strategies`, `screener_user_strategies`, `screener_strategy`, `screener_search`, `screener_indicators`
 
 # [4.1.0]
 

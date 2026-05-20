@@ -331,6 +331,43 @@ pub struct ConstituentStock {
     pub trade_status: i32,
 }
 
+// ── stock_events ──────────────────────────────────────────────────
+
+/// Response for [`crate::MarketContext::stock_events`]
+///
+/// The raw data contains stock events from all requested markets.  The
+/// exact structure varies so the payload is preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StockEventsResponse {
+    /// Raw stock events data
+    pub data: serde_json::Value,
+}
+
+// ── rank_categories ───────────────────────────────────────────────
+
+/// Response for [`crate::MarketContext::rank_categories`]
+///
+/// The raw data contains all available rank category keys and labels.
+/// The exact structure varies so the payload is preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankCategoriesResponse {
+    /// Raw rank category data
+    pub data: serde_json::Value,
+}
+
+// ── rank_list ─────────────────────────────────────────────────────
+
+/// Response for [`crate::MarketContext::rank_list`]
+///
+/// The raw data contains a ranked list of securities for the requested
+/// category key.  The exact structure varies so the payload is
+/// preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankListResponse {
+    /// Raw rank list data
+    pub data: serde_json::Value,
+}
+
 // ── enums ─────────────────────────────────────────────────────────
 
 /// Broker holding lookback period

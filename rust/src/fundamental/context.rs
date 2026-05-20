@@ -544,6 +544,30 @@ impl FundamentalContext {
         .await
     }
 
+    // ── shareholder_top ───────────────────────────────────────────
+
+    /// Get a ranked list of top shareholders for a security.
+    ///
+    /// Path: `GET /v1/quote/shareholders/top`
+    pub async fn shareholder_top(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<ShareholderTopResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        let raw: serde_json::Value = self
+            .get(
+                "/v1/quote/shareholders/top",
+                Query {
+                    counter_id: symbol_to_counter_id(&symbol.into()),
+                },
+            )
+            .await?;
+        Ok(ShareholderTopResponse { data: raw })
+    }
+
     // ── institution_rating_views ──────────────────────────────────
 
     /// Get historical institutional rating view time-series for a security.
@@ -566,14 +590,38 @@ impl FundamentalContext {
         .await
     }
 
+    // ── shareholder_detail ────────────────────────────────────────
+
+    /// Get holding history and detail for one shareholder object.
+    ///
+    /// Path: `GET /v1/quote/shareholders/holding`
+    pub async fn shareholder_detail(
+        &self,
+        symbol: impl Into<String>,
+        object_id: i64,
+    ) -> Result<ShareholderDetailResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            object_id: String,
+        }
+        let raw: serde_json::Value = self
+            .get(
+                "/v1/quote/shareholders/holding",
+                Query {
+                    counter_id: symbol_to_counter_id(&symbol.into()),
+                    object_id: object_id.to_string(),
+                },
+            )
+            .await?;
+        Ok(ShareholderDetailResponse { data: raw })
+    }
+
     // ── industry_rank ─────────────────────────────────────────────
 
     /// Get industry rank for a market.
     ///
     /// Path: `GET /v1/quote/industry/rank`
-    ///
-    /// `indicator` is a numeric string `"0"`–`"7"`;
-    /// `sort_type` is `"0"` (ascending) or `"1"` (descending).
     pub async fn industry_rank(
         &self,
         market: impl Into<String>,
@@ -605,10 +653,6 @@ impl FundamentalContext {
     /// Get the industry peer chain for a security or industry.
     ///
     /// Path: `GET /v1/quote/industries/peers`
-    ///
-    /// `counter_id` may be a regular symbol (e.g. `"AAPL.US"`) or an industry
-    /// counter ID (e.g. `"BK/US/123"`) — pass it through as-is if it already
-    /// contains a `/`.
     pub async fn industry_peers(
         &self,
         counter_id: impl Into<String>,
@@ -673,5 +717,40 @@ impl FundamentalContext {
             },
         )
         .await
+    }
+
+    // ── valuation_comparison ──────────────────────────────────────
+
+    /// Get valuation comparison between a security and optional peers.
+    ///
+    /// Path: `GET /v1/quote/compare/valuation`
+    pub async fn valuation_comparison(
+        &self,
+        symbol: impl Into<String>,
+        currency: impl Into<String>,
+        comparison_symbols: Option<Vec<String>>,
+    ) -> Result<ValuationComparisonResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            currency: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            comparison_counter_ids: Option<String>,
+        }
+        let comparison_counter_ids = comparison_symbols.map(|syms| {
+            let ids: Vec<String> = syms.iter().map(|s| symbol_to_counter_id(s)).collect();
+            serde_json::to_string(&ids).unwrap_or_default()
+        });
+        let raw: serde_json::Value = self
+            .get(
+                "/v1/quote/compare/valuation",
+                Query {
+                    counter_id: symbol_to_counter_id(&symbol.into()),
+                    currency: currency.into(),
+                    comparison_counter_ids,
+                },
+            )
+            .await?;
+        Ok(ValuationComparisonResponse { data: raw })
     }
 }

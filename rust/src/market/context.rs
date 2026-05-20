@@ -68,6 +68,23 @@ impl MarketContext {
             .0)
     }
 
+    async fn post<R, B>(&self, path: &'static str, body: B) -> Result<R>
+    where
+        R: DeserializeOwned + Send + Sync + 'static,
+        B: std::fmt::Debug + Serialize + Send + Sync + 'static,
+    {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, path)
+            .body(Json(body))
+            .response::<Json<R>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
     // ── market_status ─────────────────────────────────────────────
 
     /// Get current trading status for all markets.
@@ -260,6 +277,79 @@ impl MarketContext {
             "/v1/quote/index-constituents",
             Query {
                 counter_id: index_symbol_to_counter_id(&symbol.into()),
+            },
+        )
+        .await
+    }
+
+    // ── stock_events ──────────────────────────────────────────────
+
+    /// Get stock events across one or more markets.
+    ///
+    /// Path: `POST /v1/quote/market/stock-events`
+    ///
+    /// `sort` is the sort order code (0 = ascending, 1 = descending).
+    /// `date` is an optional date filter in `"YYYY-MM-DD"` format.
+    pub async fn stock_events(
+        &self,
+        markets: Vec<String>,
+        sort: u32,
+        date: Option<String>,
+        limit: u32,
+    ) -> Result<StockEventsResponse> {
+        #[derive(Debug, Serialize)]
+        struct Body {
+            limit: u32,
+            sort: u32,
+            markets: Vec<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            date: Option<String>,
+        }
+        self.post(
+            "/v1/quote/market/stock-events",
+            Body {
+                limit,
+                sort,
+                markets,
+                date,
+            },
+        )
+        .await
+    }
+
+    // ── rank_categories ───────────────────────────────────────────
+
+    /// Get all available rank category keys and labels.
+    ///
+    /// Path: `GET /v1/quote/market/rank/categories`
+    pub async fn rank_categories(&self) -> Result<RankCategoriesResponse> {
+        #[derive(Serialize)]
+        struct Empty {}
+        self.get("/v1/quote/market/rank/categories", Empty {}).await
+    }
+
+    // ── rank_list ─────────────────────────────────────────────────
+
+    /// Get a ranked list of securities for the given category key.
+    ///
+    /// Path: `GET /v1/quote/market/rank/list`
+    pub async fn rank_list(
+        &self,
+        key: impl Into<String>,
+        need_article: bool,
+    ) -> Result<RankListResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            key: String,
+            delay_bmp: &'static str,
+            need_article: &'static str,
+        }
+        self.get(
+            "/v1/quote/market/rank/list",
+            Query {
+                key: key.into(),
+                delay_bmp: "false",
+                need_article: if need_article { "true" } else { "false" },
             },
         )
         .await

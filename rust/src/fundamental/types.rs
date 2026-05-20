@@ -1350,6 +1350,33 @@ pub struct SnapshotReportedMetric {
     pub yoy: String,
 }
 
+// ── shareholder_top ───────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::shareholder_top`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShareholderTopResponse {
+    /// Raw top-shareholder data
+    pub data: serde_json::Value,
+}
+
+// ── shareholder_detail ────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::shareholder_detail`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShareholderDetailResponse {
+    /// Raw shareholder detail data
+    pub data: serde_json::Value,
+}
+
+// ── valuation_comparison ──────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::valuation_comparison`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationComparisonResponse {
+    /// Raw valuation comparison data
+    pub data: serde_json::Value,
+}
+
 /// Financial report period type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum FinancialReportPeriod {

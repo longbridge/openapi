@@ -2113,6 +2113,30 @@ pub struct OptionVolumeDailyStat {
     pub put_call_open_interest_ratio: String,
 }
 
+// ── hk_short_positions ────────────────────────────────────────────
+
+/// Response for [`crate::QuoteContext::hk_short_positions`]
+///
+/// The raw data contains HK short interest/position data.  The exact
+/// structure varies so the payload is preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HkShortPositionsResponse {
+    /// Raw HK short positions data
+    pub data: serde_json::Value,
+}
+
+// ── short_trades ──────────────────────────────────────────────────
+
+/// Response for [`crate::QuoteContext::short_trades`]
+///
+/// The raw data contains short trade records for the queried security.
+/// The exact structure varies so the payload is preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortTradesResponse {
+    /// Raw short trade data
+    pub data: serde_json::Value,
+}
+
 // ── pinned mode ───────────────────────────────────────────────────
 
 /// Mode for pinning/unpinning watchlist securities
