@@ -47,7 +47,7 @@ impl OAuthBuilder {
     /// # Examples
     ///
     /// ```no_run
-    /// use longbridge_oauth::{OAuthBuilder, FileTokenStorage};
+    /// use longbridge_oauth::{FileTokenStorage, OAuthBuilder};
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let oauth = OAuthBuilder::new("your-client-id")

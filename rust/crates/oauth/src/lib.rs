@@ -294,7 +294,8 @@ mod tests {
             refresh_token: None,
             expires_at: 9999999999,
         });
-        // The builder holds our storage; a second load on a fresh instance returns None.
+        // The builder holds our storage; a second load on a fresh instance returns
+        // None.
         let fresh = MemoryStorage::default();
         assert!(fresh.load("x").is_none());
         // But our pre-populated one returns the sentinel.
@@ -365,8 +366,9 @@ mod tests {
 
     #[test]
     fn test_file_token_storage_round_trip() {
-        use crate::storage::FileTokenStorage;
         use std::fs;
+
+        use crate::storage::FileTokenStorage;
 
         // Use a unique client_id so parallel test runs don't collide.
         let client_id = format!("__test__{}", std::process::id());
