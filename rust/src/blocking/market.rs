@@ -11,7 +11,7 @@ use crate::{
             AhPremiumIntraday, AhPremiumKlines, AhPremiumPeriod, AnomalyResponse,
             BrokerHoldingDailyHistory, BrokerHoldingDetail, BrokerHoldingPeriod, BrokerHoldingTop,
             IndexConstituents, MarketStatusResponse, RankCategoriesResponse, RankListResponse,
-            StockEventsResponse, TradeStatsResponse,
+            TopMoversResponse, TradeStatsResponse,
         },
     },
 };
@@ -114,16 +114,17 @@ impl MarketContextSync {
             .call(move |ctx| async move { ctx.constituent(symbol).await })
     }
 
-    /// Get stock events across one or more markets
-    pub fn stock_events(
+    /// Get top movers (stocks with unusual price movements) across one or more
+    /// markets
+    pub fn top_movers(
         &self,
         markets: Vec<String>,
         sort: u32,
         date: Option<String>,
         limit: u32,
-    ) -> Result<StockEventsResponse> {
+    ) -> Result<TopMoversResponse> {
         self.rt
-            .call(move |ctx| async move { ctx.stock_events(markets, sort, date, limit).await })
+            .call(move |ctx| async move { ctx.top_movers(markets, sort, date, limit).await })
     }
 
     /// Get all available rank category keys and labels

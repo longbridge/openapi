@@ -216,11 +216,11 @@ pub unsafe extern "C" fn lb_market_context_constituent(
     });
 }
 
-/// Get stock events across one or more markets.
-/// Pass markets as a NULL-terminated array of C strings.
-/// Returns `CStockEventsResponse`.
+/// Get top movers (stocks with unusual price movements) across one or more
+/// markets. Pass markets as a NULL-terminated array of C strings.
+/// Returns `CTopMoversResponse`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_market_context_stock_events(
+pub unsafe extern "C" fn lb_market_context_top_movers(
     ctx: *const CMarketContext,
     markets: *const *const c_char,
     num_markets: usize,
@@ -240,8 +240,8 @@ pub unsafe extern "C" fn lb_market_context_stock_events(
         Some(cstr_to_rust(date))
     };
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CStockEventsResponseOwned> = CCow::new(CStockEventsResponseOwned::from(
-            ctx_inner.stock_events(markets, sort, date, limit).await?,
+        let resp: CCow<CTopMoversResponseOwned> = CCow::new(CTopMoversResponseOwned::from(
+            ctx_inner.top_movers(markets, sort, date, limit).await?,
         ));
         Ok(resp)
     });

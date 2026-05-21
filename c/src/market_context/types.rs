@@ -5,7 +5,7 @@ use longbridge::market::{
     BrokerHoldingChanges, BrokerHoldingDailyHistory, BrokerHoldingDailyItem, BrokerHoldingDetail,
     BrokerHoldingDetailItem, BrokerHoldingEntry, BrokerHoldingTop, ConstituentStock,
     IndexConstituents, MarketStatusResponse, MarketTimeItem, RankCategoriesResponse,
-    RankListResponse, StockEventsResponse, TradePriceLevel, TradeStatistics, TradeStatsResponse,
+    RankListResponse, TopMoversResponse, TradePriceLevel, TradeStatistics, TradeStatsResponse,
 };
 
 use crate::types::{CMarket, CString, CVec, ToFFI};
@@ -958,30 +958,30 @@ impl ToFFI for CIndexConstituentsOwned {
     }
 }
 
-// ── StockEventsResponse ───────────────────────────────────────────
+// ── TopMoversResponse ─────────────────────────────────────────────
 
-/// Stock events response. `data` is a NUL-terminated JSON string.
+/// Top movers response. `data` is a NUL-terminated JSON string.
 #[repr(C)]
-pub struct CStockEventsResponse {
-    /// Raw stock events data as a JSON string
+pub struct CTopMoversResponse {
+    /// Raw top movers data as a JSON string
     pub data: *const c_char,
 }
 
-pub(crate) struct CStockEventsResponseOwned {
+pub(crate) struct CTopMoversResponseOwned {
     data: CString,
 }
 
-impl From<StockEventsResponse> for CStockEventsResponseOwned {
-    fn from(v: StockEventsResponse) -> Self {
+impl From<TopMoversResponse> for CTopMoversResponseOwned {
+    fn from(v: TopMoversResponse) -> Self {
         let json = serde_json::to_string(&v.data).unwrap_or_default();
         Self { data: json.into() }
     }
 }
 
-impl ToFFI for CStockEventsResponseOwned {
-    type FFIType = CStockEventsResponse;
+impl ToFFI for CTopMoversResponseOwned {
+    type FFIType = CTopMoversResponse;
     fn to_ffi_type(&self) -> Self::FFIType {
-        CStockEventsResponse {
+        CTopMoversResponse {
             data: self.data.to_ffi_type(),
         }
     }

@@ -386,8 +386,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::ShareholderTopResponse,
         longbridge::fundamental::ShareholderDetailResponse,
         longbridge::fundamental::ValuationComparisonResponse,
-        // MarketContext: stock events / rank
-        longbridge::market::StockEventsResponse,
+        // MarketContext: top movers / rank
+        longbridge::market::TopMoversResponse,
         longbridge::market::RankCategoriesResponse,
         longbridge::market::RankListResponse,
         // ScreenerContext

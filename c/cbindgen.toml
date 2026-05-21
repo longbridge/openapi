@@ -307,7 +307,7 @@ cpp_compat = true
 "CShareholderDetailResponse" = "lb_shareholder_detail_response_t"
 "CValuationComparisonResponse" = "lb_valuation_comparison_response_t"
 # MarketContext new types
-"CStockEventsResponse" = "lb_stock_events_response_t"
+"CTopMoversResponse" = "lb_top_movers_response_t"
 "CRankCategoriesResponse" = "lb_rank_categories_response_t"
 "CRankListResponse" = "lb_rank_list_response_t"
 # ScreenerContext
@@ -436,7 +436,7 @@ include = [
     # FundamentalContext new types
     "CShareholderTopResponse", "CShareholderDetailResponse", "CValuationComparisonResponse",
     # MarketContext new types
-    "CStockEventsResponse", "CRankCategoriesResponse", "CRankListResponse",
+    "CTopMoversResponse", "CRankCategoriesResponse", "CRankListResponse",
     # ScreenerContext
     "CScreenerContext",
     "CScreenerRecommendStrategiesResponse", "CScreenerUserStrategiesResponse",

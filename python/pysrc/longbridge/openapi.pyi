@@ -10332,15 +10332,15 @@ class MarketContext:
         """
         ...
 
-    def stock_events(
+    def top_movers(
         self,
         markets: List[str],
         sort: int = 0,
         date: Optional[str] = None,
         limit: int = 20,
-    ) -> "StockEventsResponse":
+    ) -> "TopMoversResponse":
         """
-        Get stock events across one or more markets.
+        Get top movers (stocks with unusual price movements) across one or more markets.
 
         Args:
             markets: List of market codes, e.g. ``["HK", "US"]``
@@ -10349,7 +10349,7 @@ class MarketContext:
             limit: Max records to return
 
         Returns:
-            :class:`StockEventsResponse` with raw JSON data
+            :class:`TopMoversResponse` with raw JSON data
         """
         ...
 
@@ -10380,11 +10380,11 @@ class MarketContext:
 
 # ── MarketContext new response types ──────────────────────────────
 
-class StockEventsResponse:
-    """Stock events response. ``data`` is a Python dict/list from JSON."""
+class TopMoversResponse:
+    """Top movers response. ``data`` is a Python dict/list from JSON."""
 
     data: object
-    """Raw stock events data (JSON object / list)"""
+    """Raw top movers data (JSON object / list)"""
 
 
 class RankCategoriesResponse:

@@ -2628,11 +2628,11 @@ impl_java_class!(
     [data]
 );
 
-// ── MarketContext: stock events / rank ────────────────────────────
+// ── MarketContext: top movers / rank ──────────────────────────────
 
 impl_java_class!(
-    "com/longbridge/market/StockEventsResponse",
-    longbridge::market::StockEventsResponse,
+    "com/longbridge/market/TopMoversResponse",
+    longbridge::market::TopMoversResponse,
     [data]
 );
 

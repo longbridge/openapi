@@ -282,21 +282,22 @@ impl MarketContext {
         .await
     }
 
-    // ── stock_events ──────────────────────────────────────────────
+    // ── top_movers ────────────────────────────────────────────────
 
-    /// Get stock events across one or more markets.
+    /// Get top movers (stocks with unusual price movements) across one or more
+    /// markets.
     ///
     /// Path: `POST /v1/quote/market/stock-events`
     ///
     /// `sort` is the sort order code (0 = ascending, 1 = descending).
     /// `date` is an optional date filter in `"YYYY-MM-DD"` format.
-    pub async fn stock_events(
+    pub async fn top_movers(
         &self,
         markets: Vec<String>,
         sort: u32,
         date: Option<String>,
         limit: u32,
-    ) -> Result<StockEventsResponse> {
+    ) -> Result<TopMoversResponse> {
         #[derive(Debug, Serialize)]
         struct Body {
             limit: u32,
@@ -316,7 +317,7 @@ impl MarketContext {
                 },
             )
             .await?;
-        Ok(StockEventsResponse { data: raw })
+        Ok(TopMoversResponse { data: raw })
     }
 
     // ── rank_categories ───────────────────────────────────────────

@@ -138,9 +138,10 @@ impl AsyncMarketContext {
         .map(|b| b.unbind())
     }
 
-    /// Get stock events across one or more markets. Returns awaitable.
+    /// Get top movers (stocks with unusual price movements) across one or more
+    /// markets. Returns awaitable.
     #[pyo3(signature = (markets, sort = 0, date = None, limit = 20))]
-    fn stock_events(
+    fn top_movers(
         &self,
         py: Python<'_>,
         markets: Vec<String>,
@@ -150,8 +151,8 @@ impl AsyncMarketContext {
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            Ok(StockEventsResponse::from(
-                ctx.stock_events(markets, sort, date, limit)
+            Ok(TopMoversResponse::from(
+                ctx.top_movers(markets, sort, date, limit)
                     .await
                     .map_err(ErrorNewType)?,
             ))

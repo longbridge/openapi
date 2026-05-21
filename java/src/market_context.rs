@@ -184,7 +184,7 @@ symbol_method!(
 market_method!(Java_com_longbridge_SdkNative_marketContextAnomaly, anomaly);
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextStockEvents(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextTopMovers(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -201,7 +201,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextStockEv
         let limit_opt: Option<JavaInteger> = get_field(env, &opts, "limit")?;
         let limit = limit_opt.map(i32::from).unwrap_or(20) as u32;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.stock_events(markets, sort, date, limit).await?;
+            let resp = context.ctx.top_movers(markets, sort, date, limit).await?;
             Ok(resp)
         })?;
         Ok(())

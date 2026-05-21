@@ -322,6 +322,7 @@ public class SdkNative {
         public static native void marketContextTradeStats(long context, String symbol, AsyncCallback callback);
         public static native void marketContextAnomaly(long context, String market, AsyncCallback callback);
         public static native void marketContextConstituent(long context, String symbol, AsyncCallback callback);
+        public static native void marketContextTopMovers(long context, com.longbridge.market.TopMoversOptions opts, AsyncCallback callback);
 
         // ── FundamentalContext ────────────────────────────────────────
 

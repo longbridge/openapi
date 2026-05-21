@@ -100,18 +100,19 @@ impl MarketContext {
         Ok(self.ctx.constituent(symbol).map_err(ErrorNewType)?.into())
     }
 
-    /// Get stock events across one or more markets.
+    /// Get top movers (stocks with unusual price movements) across one or more
+    /// markets.
     #[pyo3(signature = (markets, sort = 0, date = None, limit = 20))]
-    fn stock_events(
+    fn top_movers(
         &self,
         markets: Vec<String>,
         sort: u32,
         date: Option<String>,
         limit: u32,
-    ) -> PyResult<StockEventsResponse> {
+    ) -> PyResult<TopMoversResponse> {
         Ok(self
             .ctx
-            .stock_events(markets, sort, date, limit)
+            .top_movers(markets, sort, date, limit)
             .map_err(ErrorNewType)?
             .into())
     }

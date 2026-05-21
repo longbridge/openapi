@@ -1,21 +1,21 @@
 use longbridge::market::types as lb;
 use pyo3::prelude::*;
 
-// ── StockEventsResponse ───────────────────────────────────────────
+// ── TopMoversResponse ─────────────────────────────────────────────
 
-/// Stock events response.
+/// Top movers response.
 ///
 /// `data` is the raw JSON returned by the API preserved as a Python
 /// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct StockEventsResponse {
-    /// Raw stock events data (JSON object)
+pub(crate) struct TopMoversResponse {
+    /// Raw top movers data (JSON object)
     pub data: crate::fundamental::types::JsonValue,
 }
 
-impl From<lb::StockEventsResponse> for StockEventsResponse {
-    fn from(v: lb::StockEventsResponse) -> Self {
+impl From<lb::TopMoversResponse> for TopMoversResponse {
+    fn from(v: lb::TopMoversResponse) -> Self {
         Self {
             data: crate::fundamental::types::JsonValue(v.data),
         }

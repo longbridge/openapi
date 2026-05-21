@@ -7853,14 +7853,14 @@ typedef struct lb_valuation_comparison_response_t {
 } lb_valuation_comparison_response_t;
 
 /**
- * Stock events response. `data` is a NUL-terminated JSON string.
+ * Top movers response. `data` is a NUL-terminated JSON string.
  */
-typedef struct lb_stock_events_response_t {
+typedef struct lb_top_movers_response_t {
   /**
-   * Raw stock events data as a JSON string
+   * Raw top movers data as a JSON string
    */
   const char *data;
-} lb_stock_events_response_t;
+} lb_top_movers_response_t;
 
 /**
  * Rank categories response. `data` is a NUL-terminated JSON string.
@@ -8747,18 +8747,18 @@ void lb_market_context_constituent(const struct lb_market_context_t *ctx,
                                    void *userdata);
 
 /**
- * Get stock events across one or more markets.
- * Pass markets as a NULL-terminated array of C strings.
- * Returns `CStockEventsResponse`.
+ * Get top movers (stocks with unusual price movements) across one or more
+ * markets. Pass markets as a NULL-terminated array of C strings.
+ * Returns `CTopMoversResponse`.
  */
-void lb_market_context_stock_events(const struct lb_market_context_t *ctx,
-                                    const char *const *markets,
-                                    uintptr_t num_markets,
-                                    uint32_t sort,
-                                    const char *date,
-                                    uint32_t limit,
-                                    lb_async_callback_t callback,
-                                    void *userdata);
+void lb_market_context_top_movers(const struct lb_market_context_t *ctx,
+                                  const char *const *markets,
+                                  uintptr_t num_markets,
+                                  uint32_t sort,
+                                  const char *date,
+                                  uint32_t limit,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
 
 /**
  * Get all available rank category keys and labels.

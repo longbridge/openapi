@@ -771,8 +771,11 @@ export declare class MarketContext {
   anomaly(market: string): Promise<AnomalyResponse>
   /** Get index constituent stocks */
   constituent(symbol: string): Promise<IndexConstituents>
-  /** Get stock events across one or more markets */
-  stockEvents(markets: Array<string>, sort: number, date: string | undefined | null, limit: number): Promise<StockEventsResponse>
+  /**
+   * Get top movers (stocks with unusual price movements) across one or more
+   * markets
+   */
+  topMovers(markets: Array<string>, sort: number, date: string | undefined | null, limit: number): Promise<TopMoversResponse>
   /** Get all available rank category keys and labels */
   rankCategories(): Promise<RankCategoriesResponse>
   /** Get a ranked list of securities for the given category key */
@@ -5329,12 +5332,6 @@ export declare const enum StatementType {
   Monthly = 2
 }
 
-/** Stock events response. `data` is a JSON string. */
-export interface StockEventsResponse {
-  /** Raw stock events data (JSON string) */
-  data: string
-}
-
 /**
  * Stock ratings response.
  *
@@ -5421,6 +5418,12 @@ export declare const enum TimeInForceType {
 export declare const enum TopicType {
   /** Private notification for trade */
   Private = 0
+}
+
+/** Top movers response. `data` is a JSON string. */
+export interface TopMoversResponse {
+  /** Raw top movers data (JSON string) */
+  data: string
 }
 
 /** Trade direction */

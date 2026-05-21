@@ -20,8 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking changes
 
-- **All languages:** `hk_short_positions` removed — use `short_positions(symbol, count)`.
-- **All languages:** `ShortPositionsResponse` raw JSON only; old typed fields removed.
+- **All languages:** `MarketContext::stock_events` renamed to `top_movers`; `StockEventsResponse` → `TopMoversResponse`.
+- **All languages:** `hk_short_positions` removed — use `short_positions(symbol, count)` which auto-detects HK/US.
+- **All languages:** `ShortPositionsResponse` is now raw JSON; old typed fields removed.
 
 # [4.1.0]
 

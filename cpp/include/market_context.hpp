@@ -83,12 +83,12 @@ public:
   void constituent(const std::string& symbol,
                    AsyncCallback<MarketContext, IndexConstituents> callback) const;
 
-  /// Get stock events across one or more markets (raw JSON string)
-  void stock_events(const std::vector<std::string>& markets,
-                    uint32_t sort,
-                    const std::string* date,
-                    uint32_t limit,
-                    AsyncCallback<MarketContext, std::string> callback) const;
+  /// Get top movers (stocks with unusual price movements) across one or more markets (raw JSON string)
+  void top_movers(const std::vector<std::string>& markets,
+                  uint32_t sort,
+                  const std::string* date,
+                  uint32_t limit,
+                  AsyncCallback<MarketContext, std::string> callback) const;
 
   /// Get all available rank category keys and labels (raw JSON string)
   void rank_categories(AsyncCallback<MarketContext, std::string> callback) const;

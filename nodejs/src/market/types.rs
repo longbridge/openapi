@@ -565,18 +565,18 @@ impl From<AhPremiumPeriod> for lb::AhPremiumPeriod {
     }
 }
 
-// ── StockEventsResponse ───────────────────────────────────────────
+// ── TopMoversResponse ─────────────────────────────────────────────
 
-/// Stock events response. `data` is a JSON string.
+/// Top movers response. `data` is a JSON string.
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct StockEventsResponse {
-    /// Raw stock events data (JSON string)
+pub struct TopMoversResponse {
+    /// Raw top movers data (JSON string)
     pub data: String,
 }
 
-impl From<lb::StockEventsResponse> for StockEventsResponse {
-    fn from(v: lb::StockEventsResponse) -> Self {
+impl From<lb::TopMoversResponse> for TopMoversResponse {
+    fn from(v: lb::TopMoversResponse) -> Self {
         Self {
             data: v.data.to_string(),
         }

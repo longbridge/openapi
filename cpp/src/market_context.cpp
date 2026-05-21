@@ -87,11 +87,11 @@ void MarketContext::constituent(const std::string& symbol, AsyncCallback<MarketC
   else{(*cb)(AsyncResult<MarketContext,std::string>(mctx,std::move(status),nullptr));} \
 }, new AsyncCallback<MarketContext,std::string>(callback))
 
-void MarketContext::stock_events(const std::vector<std::string>& markets, uint32_t sort, const std::string* date, uint32_t limit, AsyncCallback<MarketContext, std::string> callback) const {
+void MarketContext::top_movers(const std::vector<std::string>& markets, uint32_t sort, const std::string* date, uint32_t limit, AsyncCallback<MarketContext, std::string> callback) const {
   std::vector<const char*> mptrs;
   for (const auto& m : markets) mptrs.push_back(m.c_str());
   const char* date_str = date ? date->c_str() : nullptr;
-  M_JSON(lb_market_context_stock_events, lb_stock_events_response_t, ctx_, mptrs.data(), mptrs.size(), sort, date_str, limit);
+  M_JSON(lb_market_context_top_movers, lb_top_movers_response_t, ctx_, mptrs.data(), mptrs.size(), sort, date_str, limit);
 }
 
 void MarketContext::rank_categories(AsyncCallback<MarketContext, std::string> callback) const {

@@ -331,15 +331,15 @@ pub struct ConstituentStock {
     pub trade_status: i32,
 }
 
-// ── stock_events ──────────────────────────────────────────────────
+// ── top_movers ────────────────────────────────────────────────────
 
-/// Response for [`crate::MarketContext::stock_events`]
+/// Response for [`crate::MarketContext::top_movers`]
 ///
-/// The raw data contains stock events from all requested markets.  The
-/// exact structure varies so the payload is preserved as raw JSON.
+/// The raw data contains top-movers stock events from all requested markets.
+/// The exact structure varies so the payload is preserved as raw JSON.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StockEventsResponse {
-    /// Raw stock events data
+pub struct TopMoversResponse {
+    /// Raw top movers data
     pub data: serde_json::Value,
 }
 

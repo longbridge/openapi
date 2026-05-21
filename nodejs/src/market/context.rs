@@ -123,18 +123,19 @@ impl MarketContext {
             .into())
     }
 
-    /// Get stock events across one or more markets
+    /// Get top movers (stocks with unusual price movements) across one or more
+    /// markets
     #[napi]
-    pub async fn stock_events(
+    pub async fn top_movers(
         &self,
         markets: Vec<String>,
         sort: u32,
         date: Option<String>,
         limit: u32,
-    ) -> Result<StockEventsResponse> {
+    ) -> Result<TopMoversResponse> {
         Ok(self
             .ctx
-            .stock_events(markets, sort, date, limit)
+            .top_movers(markets, sort, date, limit)
             .await
             .map_err(ErrorNewType)?
             .into())
