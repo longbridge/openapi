@@ -354,7 +354,11 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(storage.save_count(), 0, "save must not be called for a valid token");
+        assert_eq!(
+            storage.save_count(),
+            0,
+            "save must not be called for a valid token"
+        );
     }
 
     // --- FileTokenStorage round-trip ---
@@ -372,7 +376,10 @@ mod tests {
         let _ = fs::remove_file(&path);
 
         let storage = FileTokenStorage;
-        assert!(storage.load(&client_id).is_none(), "should be empty before save");
+        assert!(
+            storage.load(&client_id).is_none(),
+            "should be empty before save"
+        );
 
         let token = StoredToken {
             client_id: client_id.clone(),
@@ -382,7 +389,9 @@ mod tests {
         };
         storage.save(&token).unwrap();
 
-        let loaded = storage.load(&client_id).expect("token must be readable after save");
+        let loaded = storage
+            .load(&client_id)
+            .expect("token must be readable after save");
         assert_eq!(loaded.access_token, token.access_token);
         assert_eq!(loaded.refresh_token, token.refresh_token);
         assert_eq!(loaded.expires_at, token.expires_at);
