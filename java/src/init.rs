@@ -366,7 +366,9 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::OperatingFinancial,
         longbridge::fundamental::OperatingIndicator,
         // QuoteContext extensions
+        longbridge::quote::ShortPositionsItem,
         longbridge::quote::ShortPositionsResponse,
+        longbridge::quote::ShortTradesItem,
         longbridge::quote::ShortTradesResponse,
         longbridge::quote::OptionVolumeStats,
         longbridge::quote::OptionVolumeDaily,
@@ -385,10 +387,15 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         // FundamentalContext: shareholders / valuation comparison
         longbridge::fundamental::ShareholderTopResponse,
         longbridge::fundamental::ShareholderDetailResponse,
+        longbridge::fundamental::ValuationHistoryPoint,
+        longbridge::fundamental::ValuationComparisonItem,
         longbridge::fundamental::ValuationComparisonResponse,
         // MarketContext: top movers / rank
+        longbridge::market::TopMoversStock,
+        longbridge::market::TopMoversEvent,
         longbridge::market::TopMoversResponse,
         longbridge::market::RankCategoriesResponse,
+        longbridge::market::RankListItem,
         longbridge::market::RankListResponse,
         // ScreenerContext
         longbridge::screener::ScreenerRecommendStrategiesResponse,

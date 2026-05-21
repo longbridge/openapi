@@ -3,21 +3,89 @@ use pyo3::prelude::*;
 
 // ── TopMoversResponse ─────────────────────────────────────────────
 
+/// Stock information within a top-movers event.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct TopMoversStock {
+    /// Symbol (e.g. `"NVDA.US"`)
+    pub symbol: String,
+    /// Ticker code
+    pub code: String,
+    /// Security name
+    pub name: String,
+    /// Full name
+    pub full_name: String,
+    /// Price change (decimal ratio)
+    pub change: String,
+    /// Latest price
+    pub last_done: String,
+    /// Market code
+    pub market: String,
+    /// Labels / tags
+    pub labels: Vec<String>,
+    /// Logo URL
+    pub logo: String,
+}
+
+impl From<lb::TopMoversStock> for TopMoversStock {
+    fn from(v: lb::TopMoversStock) -> Self {
+        Self {
+            symbol: v.symbol,
+            code: v.code,
+            name: v.name,
+            full_name: v.full_name,
+            change: v.change,
+            last_done: v.last_done,
+            market: v.market,
+            labels: v.labels,
+            logo: v.logo,
+        }
+    }
+}
+
+/// One top-movers event entry.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct TopMoversEvent {
+    /// Event time (RFC 3339)
+    pub timestamp: String,
+    /// Alert reason description
+    pub alert_reason: String,
+    /// Alert type code
+    pub alert_type: i64,
+    /// Stock information
+    pub stock: TopMoversStock,
+    /// Associated news post (raw JSON object)
+    pub post: crate::fundamental::types::JsonValue,
+}
+
+impl From<lb::TopMoversEvent> for TopMoversEvent {
+    fn from(v: lb::TopMoversEvent) -> Self {
+        Self {
+            timestamp: v.timestamp,
+            alert_reason: v.alert_reason,
+            alert_type: v.alert_type,
+            stock: v.stock.into(),
+            post: crate::fundamental::types::JsonValue(v.post),
+        }
+    }
+}
+
 /// Top movers response.
-///
-/// `data` is the raw JSON returned by the API preserved as a Python
-/// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct TopMoversResponse {
-    /// Raw top movers data (JSON object)
-    pub data: crate::fundamental::types::JsonValue,
+    /// Top-mover events
+    pub events: Vec<TopMoversEvent>,
+    /// Pagination cursor for next page (raw JSON object)
+    pub next_params: crate::fundamental::types::JsonValue,
 }
 
 impl From<lb::TopMoversResponse> for TopMoversResponse {
     fn from(v: lb::TopMoversResponse) -> Self {
         Self {
-            data: crate::fundamental::types::JsonValue(v.data),
+            events: v.events.into_iter().map(Into::into).collect(),
+            next_params: crate::fundamental::types::JsonValue(v.next_params),
         }
     }
 }
@@ -45,21 +113,82 @@ impl From<lb::RankCategoriesResponse> for RankCategoriesResponse {
 
 // ── RankListResponse ──────────────────────────────────────────────
 
+/// One ranked security item.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct RankListItem {
+    /// Symbol (e.g. `"MU.US"`)
+    pub symbol: String,
+    /// Ticker code
+    pub code: String,
+    /// Security name
+    pub name: String,
+    /// Latest price
+    pub last_done: String,
+    /// Price change ratio
+    pub chg: String,
+    /// Absolute price change
+    pub change: String,
+    /// Net inflow
+    pub inflow: String,
+    /// Market cap
+    pub market_cap: String,
+    /// Industry name
+    pub industry: String,
+    /// Pre/post market price
+    pub pre_post_price: String,
+    /// Pre/post market change
+    pub pre_post_chg: String,
+    /// Amplitude
+    pub amplitude: String,
+    /// 5-day change
+    pub five_day_chg: String,
+    /// Turnover rate
+    pub turnover_rate: String,
+    /// Volume ratio
+    pub volume_rate: String,
+    /// P/B ratio (TTM)
+    pub pb_ttm: String,
+}
+
+impl From<lb::RankListItem> for RankListItem {
+    fn from(v: lb::RankListItem) -> Self {
+        Self {
+            symbol: v.symbol,
+            code: v.code,
+            name: v.name,
+            last_done: v.last_done,
+            chg: v.chg,
+            change: v.change,
+            inflow: v.inflow,
+            market_cap: v.market_cap,
+            industry: v.industry,
+            pre_post_price: v.pre_post_price,
+            pre_post_chg: v.pre_post_chg,
+            amplitude: v.amplitude,
+            five_day_chg: v.five_day_chg,
+            turnover_rate: v.turnover_rate,
+            volume_rate: v.volume_rate,
+            pb_ttm: v.pb_ttm,
+        }
+    }
+}
+
 /// Rank list response.
-///
-/// `data` is the raw JSON returned by the API preserved as a Python
-/// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct RankListResponse {
-    /// Raw rank list data (JSON object)
-    pub data: crate::fundamental::types::JsonValue,
+    /// Whether delayed / BMP data
+    pub bmp: bool,
+    /// Ranked security items
+    pub lists: Vec<RankListItem>,
 }
 
 impl From<lb::RankListResponse> for RankListResponse {
     fn from(v: lb::RankListResponse) -> Self {
         Self {
-            data: crate::fundamental::types::JsonValue(v.data),
+            bmp: v.bmp,
+            lists: v.lists.into_iter().map(Into::into).collect(),
         }
     }
 }

@@ -973,7 +973,7 @@ pub(crate) struct CTopMoversResponseOwned {
 
 impl From<TopMoversResponse> for CTopMoversResponseOwned {
     fn from(v: TopMoversResponse) -> Self {
-        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        let json = serde_json::to_string(&v).unwrap_or_default();
         Self { data: json.into() }
     }
 }
@@ -1031,7 +1031,7 @@ pub(crate) struct CRankListResponseOwned {
 
 impl From<RankListResponse> for CRankListResponseOwned {
     fn from(v: RankListResponse) -> Self {
-        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        let json = serde_json::to_string(&v).unwrap_or_default();
         Self { data: json.into() }
     }
 }

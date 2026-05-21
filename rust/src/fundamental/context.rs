@@ -4,7 +4,23 @@ use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, fundamental::types::*, utils::counter::symbol_to_counter_id};
+use crate::{
+    Config, Result,
+    fundamental::types::*,
+    utils::counter::{counter_id_to_symbol, symbol_to_counter_id},
+};
+
+/// Convert a Unix-seconds string to RFC 3339.
+fn unix_secs_str_to_rfc3339(s: &str) -> String {
+    s.parse::<i64>()
+        .ok()
+        .and_then(|ts| time::OffsetDateTime::from_unix_timestamp(ts).ok())
+        .map(|dt| {
+            use time::format_description::well_known::Rfc3339;
+            dt.format(&Rfc3339).unwrap_or_default()
+        })
+        .unwrap_or_else(|| s.to_string())
+}
 
 struct InnerFundamentalContext {
     http_cli: HttpClient,
@@ -751,6 +767,43 @@ impl FundamentalContext {
                 },
             )
             .await?;
-        Ok(ValuationComparisonResponse { data: raw })
+        let list = raw["list"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|item| {
+                let history = item["history"]
+                    .as_array()
+                    .cloned()
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(|h| ValuationHistoryPoint {
+                        date: unix_secs_str_to_rfc3339(h["date"].as_str().unwrap_or("")),
+                        pe: h["pe"].as_str().unwrap_or("").to_string(),
+                        pb: h["pb"].as_str().unwrap_or("").to_string(),
+                        ps: h["ps"].as_str().unwrap_or("").to_string(),
+                    })
+                    .collect();
+                ValuationComparisonItem {
+                    symbol: counter_id_to_symbol(item["counter_id"].as_str().unwrap_or("")),
+                    name: item["name"].as_str().unwrap_or("").to_string(),
+                    currency: item["currency"].as_str().unwrap_or("").to_string(),
+                    market_value: item["market_value"].as_str().unwrap_or("").to_string(),
+                    price_close: item["price_close"].as_str().unwrap_or("").to_string(),
+                    pe: item["pe"].as_str().unwrap_or("").to_string(),
+                    pb: item["pb"].as_str().unwrap_or("").to_string(),
+                    ps: item["ps"].as_str().unwrap_or("").to_string(),
+                    roe: item["roe"].as_str().unwrap_or("").to_string(),
+                    eps: item["eps"].as_str().unwrap_or("").to_string(),
+                    bps: item["bps"].as_str().unwrap_or("").to_string(),
+                    dps: item["dps"].as_str().unwrap_or("").to_string(),
+                    div_yld: item["div_yld"].as_str().unwrap_or("").to_string(),
+                    assets: item["assets"].as_str().unwrap_or("").to_string(),
+                    history,
+                }
+            })
+            .collect();
+        Ok(ValuationComparisonResponse { list })
     }
 }

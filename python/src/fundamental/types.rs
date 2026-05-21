@@ -1748,21 +1748,101 @@ impl From<lb::ShareholderDetailResponse> for ShareholderDetailResponse {
 
 // ── ValuationComparisonResponse ───────────────────────────────────
 
+/// One historical valuation data point.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ValuationHistoryPoint {
+    /// Date (RFC 3339)
+    pub date: String,
+    /// P/E ratio
+    pub pe: String,
+    /// P/B ratio
+    pub pb: String,
+    /// P/S ratio
+    pub ps: String,
+}
+
+impl From<lb::ValuationHistoryPoint> for ValuationHistoryPoint {
+    fn from(v: lb::ValuationHistoryPoint) -> Self {
+        Self {
+            date: v.date,
+            pe: v.pe,
+            pb: v.pb,
+            ps: v.ps,
+        }
+    }
+}
+
+/// One security's valuation comparison item.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ValuationComparisonItem {
+    /// Symbol (e.g. `"AAPL.US"`)
+    pub symbol: String,
+    /// Security name
+    pub name: String,
+    /// Currency
+    pub currency: String,
+    /// Market capitalisation
+    pub market_value: String,
+    /// Latest closing price
+    pub price_close: String,
+    /// P/E ratio
+    pub pe: String,
+    /// P/B ratio
+    pub pb: String,
+    /// P/S ratio
+    pub ps: String,
+    /// Return on equity
+    pub roe: String,
+    /// Earnings per share
+    pub eps: String,
+    /// Book value per share
+    pub bps: String,
+    /// Dividends per share
+    pub dps: String,
+    /// Dividend yield
+    pub div_yld: String,
+    /// Total assets
+    pub assets: String,
+    /// Historical valuation points
+    pub history: Vec<ValuationHistoryPoint>,
+}
+
+impl From<lb::ValuationComparisonItem> for ValuationComparisonItem {
+    fn from(v: lb::ValuationComparisonItem) -> Self {
+        Self {
+            symbol: v.symbol,
+            name: v.name,
+            currency: v.currency,
+            market_value: v.market_value,
+            price_close: v.price_close,
+            pe: v.pe,
+            pb: v.pb,
+            ps: v.ps,
+            roe: v.roe,
+            eps: v.eps,
+            bps: v.bps,
+            dps: v.dps,
+            div_yld: v.div_yld,
+            assets: v.assets,
+            history: v.history.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 /// Valuation comparison response.
-///
-/// `data` is the raw JSON returned by the API preserved as a Python
-/// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ValuationComparisonResponse {
-    /// Raw valuation comparison data (JSON object)
-    pub data: JsonValue,
+    /// Valuation comparison items
+    pub list: Vec<ValuationComparisonItem>,
 }
 
 impl From<lb::ValuationComparisonResponse> for ValuationComparisonResponse {
     fn from(v: lb::ValuationComparisonResponse) -> Self {
         Self {
-            data: JsonValue(v.data),
+            list: v.list.into_iter().map(Into::into).collect(),
         }
     }
 }

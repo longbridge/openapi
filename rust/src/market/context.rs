@@ -7,8 +7,25 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result,
     market::types::*,
-    utils::counter::{index_symbol_to_counter_id, symbol_to_counter_id},
+    utils::counter::{counter_id_to_symbol, index_symbol_to_counter_id, symbol_to_counter_id},
 };
+
+/// Convert a Unix-seconds value (integer or string) to RFC 3339.
+fn unix_secs_to_rfc3339(ts: i64) -> String {
+    time::OffsetDateTime::from_unix_timestamp(ts)
+        .map(|dt| {
+            use time::format_description::well_known::Rfc3339;
+            dt.format(&Rfc3339).unwrap_or_default()
+        })
+        .unwrap_or_else(|_| ts.to_string())
+}
+
+/// Convert a Unix-seconds string to RFC 3339.
+fn unix_secs_str_to_rfc3339(s: &str) -> String {
+    s.parse::<i64>()
+        .map(unix_secs_to_rfc3339)
+        .unwrap_or_else(|_| s.to_string())
+}
 
 struct InnerMarketContext {
     http_cli: HttpClient,
@@ -317,7 +334,53 @@ impl MarketContext {
                 },
             )
             .await?;
-        Ok(TopMoversResponse { data: raw })
+
+        let events = raw["events"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|ev| {
+                let ts = if let Some(n) = ev["timestamp"].as_i64() {
+                    unix_secs_to_rfc3339(n)
+                } else if let Some(s) = ev["timestamp"].as_str() {
+                    unix_secs_str_to_rfc3339(s)
+                } else {
+                    String::new()
+                };
+                let stock_val = &ev["stock"];
+                let stock = TopMoversStock {
+                    symbol: counter_id_to_symbol(stock_val["counter_id"].as_str().unwrap_or("")),
+                    code: stock_val["code"].as_str().unwrap_or("").to_string(),
+                    name: stock_val["name"].as_str().unwrap_or("").to_string(),
+                    full_name: stock_val["full_name"].as_str().unwrap_or("").to_string(),
+                    change: stock_val["change"].as_str().unwrap_or("").to_string(),
+                    last_done: stock_val["last_done"].as_str().unwrap_or("").to_string(),
+                    market: stock_val["market"].as_str().unwrap_or("").to_string(),
+                    labels: stock_val["labels"]
+                        .as_array()
+                        .map(|arr| {
+                            arr.iter()
+                                .filter_map(|l| l.as_str().map(|s| s.to_string()))
+                                .collect()
+                        })
+                        .unwrap_or_default(),
+                    logo: stock_val["logo"].as_str().unwrap_or("").to_string(),
+                };
+                TopMoversEvent {
+                    timestamp: ts,
+                    alert_reason: ev["alert_reason"].as_str().unwrap_or("").to_string(),
+                    alert_type: ev["alert_type"].as_i64().unwrap_or(0),
+                    stock,
+                    post: ev["post"].clone(),
+                }
+            })
+            .collect();
+        let next_params = raw["next_params"].clone();
+        Ok(TopMoversResponse {
+            events,
+            next_params,
+        })
     }
 
     // ── rank_categories ───────────────────────────────────────────
@@ -360,6 +423,31 @@ impl MarketContext {
                 },
             )
             .await?;
-        Ok(RankListResponse { data: raw })
+        let bmp = raw["bmp"].as_bool().unwrap_or(false);
+        let lists = raw["lists"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|item| RankListItem {
+                symbol: counter_id_to_symbol(item["counter_id"].as_str().unwrap_or("")),
+                code: item["code"].as_str().unwrap_or("").to_string(),
+                name: item["name"].as_str().unwrap_or("").to_string(),
+                last_done: item["last_done"].as_str().unwrap_or("").to_string(),
+                chg: item["chg"].as_str().unwrap_or("").to_string(),
+                change: item["change"].as_str().unwrap_or("").to_string(),
+                inflow: item["inflow"].as_str().unwrap_or("").to_string(),
+                market_cap: item["market_cap"].as_str().unwrap_or("").to_string(),
+                industry: item["industry"].as_str().unwrap_or("").to_string(),
+                pre_post_price: item["pre_post_price"].as_str().unwrap_or("").to_string(),
+                pre_post_chg: item["pre_post_chg"].as_str().unwrap_or("").to_string(),
+                amplitude: item["amplitude"].as_str().unwrap_or("").to_string(),
+                five_day_chg: item["five_day_chg"].as_str().unwrap_or("").to_string(),
+                turnover_rate: item["turnover_rate"].as_str().unwrap_or("").to_string(),
+                volume_rate: item["volume_rate"].as_str().unwrap_or("").to_string(),
+                pb_ttm: item["pb_ttm"].as_str().unwrap_or("").to_string(),
+            })
+            .collect();
+        Ok(RankListResponse { bmp, lists })
     }
 }

@@ -3121,7 +3121,7 @@ pub(crate) struct CShortPositionsResponseOwned {
 
 impl From<ShortPositionsResponse> for CShortPositionsResponseOwned {
     fn from(v: ShortPositionsResponse) -> Self {
-        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        let json = serde_json::to_string(&v).unwrap_or_default();
         Self { data: json.into() }
     }
 }
@@ -3154,7 +3154,7 @@ pub(crate) struct CShortTradesResponseOwned {
 
 impl From<ShortTradesResponse> for CShortTradesResponseOwned {
     fn from(v: ShortTradesResponse) -> Self {
-        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        let json = serde_json::to_string(&v).unwrap_or_default();
         Self { data: json.into() }
     }
 }

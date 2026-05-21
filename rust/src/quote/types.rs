@@ -2032,15 +2032,40 @@ impl_default_for_enum_string!(
 
 // ── short_positions ───────────────────────────────────────────────
 
+/// One short-position data point (unified for US and HK markets).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortPositionsItem {
+    /// Trading date (RFC 3339, e.g. `"2024-01-15T00:00:00Z"`)
+    pub timestamp: String,
+    /// Short ratio (both markets)
+    pub rate: String,
+    /// Closing price (both markets)
+    pub close: String,
+    /// [US] Number of short shares outstanding
+    #[serde(default)]
+    pub current_shares_short: String,
+    /// [US] Average daily share volume
+    #[serde(default)]
+    pub avg_daily_share_volume: String,
+    /// [US] Days to cover ratio
+    #[serde(default)]
+    pub days_to_cover: String,
+    /// [HK] Short sale amount (HKD)
+    #[serde(default)]
+    pub amount: String,
+    /// [HK] Short position balance
+    #[serde(default)]
+    pub balance: String,
+    /// [HK] Cost / closing price
+    #[serde(default)]
+    pub cost: String,
+}
+
 /// Response for [`crate::QuoteContext::short_positions`]
-///
-/// The raw data contains short interest/position data for a HK or US
-/// security.  The exact structure differs between markets so the
-/// payload is preserved as raw JSON.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShortPositionsResponse {
-    /// Raw short positions data
-    pub data: serde_json::Value,
+    /// Short position data points
+    pub data: Vec<ShortPositionsItem>,
 }
 
 // ── option_volume ─────────────────────────────────────────────────
@@ -2094,14 +2119,37 @@ pub struct OptionVolumeDailyStat {
 
 // ── short_trades ──────────────────────────────────────────────────
 
+/// One short-trade data point (unified for US and HK markets).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortTradesItem {
+    /// Trading date (RFC 3339)
+    pub timestamp: String,
+    /// Short ratio
+    pub rate: String,
+    /// Closing price
+    pub close: String,
+    /// [US] NYSE short amount
+    #[serde(default)]
+    pub nus_amount: String,
+    /// [US] NY short amount
+    #[serde(default)]
+    pub ny_amount: String,
+    /// [US] Total short amount
+    #[serde(default)]
+    pub total_amount: String,
+    /// [HK] Short sale amount
+    #[serde(default)]
+    pub amount: String,
+    /// [HK] Short position balance
+    #[serde(default)]
+    pub balance: String,
+}
+
 /// Response for [`crate::QuoteContext::short_trades`]
-///
-/// The raw data contains short trade records for the queried security.
-/// The exact structure varies so the payload is preserved as raw JSON.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShortTradesResponse {
-    /// Raw short trade data
-    pub data: serde_json::Value,
+    /// Short trade data points
+    pub data: Vec<ShortTradesItem>,
 }
 
 // ── pinned mode ───────────────────────────────────────────────────

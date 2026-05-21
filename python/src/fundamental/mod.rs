@@ -66,6 +66,8 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<StockRatings>()?;
     parent.add_class::<ShareholderTopResponse>()?;
     parent.add_class::<ShareholderDetailResponse>()?;
+    parent.add_class::<ValuationHistoryPoint>()?;
+    parent.add_class::<ValuationComparisonItem>()?;
     parent.add_class::<ValuationComparisonResponse>()?;
     parent.add_class::<context::FundamentalContext>()?;
     parent.add_class::<context_async::AsyncFundamentalContext>()?;

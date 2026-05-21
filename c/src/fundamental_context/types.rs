@@ -2916,7 +2916,7 @@ pub(crate) struct CValuationComparisonResponseOwned {
 
 impl From<ValuationComparisonResponse> for CValuationComparisonResponseOwned {
     fn from(v: ValuationComparisonResponse) -> Self {
-        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        let json = serde_json::to_string(&v).unwrap_or_default();
         Self { data: json.into() }
     }
 }

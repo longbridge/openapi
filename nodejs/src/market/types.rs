@@ -567,18 +567,89 @@ impl From<AhPremiumPeriod> for lb::AhPremiumPeriod {
 
 // ── TopMoversResponse ─────────────────────────────────────────────
 
-/// Top movers response. `data` is a JSON string.
+/// Stock information within a top-movers event.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct TopMoversStock {
+    /// Symbol (e.g. `"NVDA.US"`)
+    pub symbol: String,
+    /// Ticker code
+    pub code: String,
+    /// Security name
+    pub name: String,
+    /// Full name
+    pub full_name: String,
+    /// Price change (decimal ratio)
+    pub change: String,
+    /// Latest price
+    pub last_done: String,
+    /// Market code
+    pub market: String,
+    /// Labels / tags
+    pub labels: Vec<String>,
+    /// Logo URL
+    pub logo: String,
+}
+
+impl From<lb::TopMoversStock> for TopMoversStock {
+    fn from(v: lb::TopMoversStock) -> Self {
+        Self {
+            symbol: v.symbol,
+            code: v.code,
+            name: v.name,
+            full_name: v.full_name,
+            change: v.change,
+            last_done: v.last_done,
+            market: v.market,
+            labels: v.labels,
+            logo: v.logo,
+        }
+    }
+}
+
+/// One top-movers event entry.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct TopMoversEvent {
+    /// Event time (RFC 3339)
+    pub timestamp: String,
+    /// Alert reason description
+    pub alert_reason: String,
+    /// Alert type code
+    pub alert_type: i64,
+    /// Stock information
+    pub stock: TopMoversStock,
+    /// Associated news post (JSON string)
+    pub post: String,
+}
+
+impl From<lb::TopMoversEvent> for TopMoversEvent {
+    fn from(v: lb::TopMoversEvent) -> Self {
+        Self {
+            timestamp: v.timestamp,
+            alert_reason: v.alert_reason,
+            alert_type: v.alert_type,
+            stock: v.stock.into(),
+            post: v.post.to_string(),
+        }
+    }
+}
+
+/// Top movers response.
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct TopMoversResponse {
-    /// Raw top movers data (JSON string)
-    pub data: String,
+    /// Top-mover events
+    pub events: Vec<TopMoversEvent>,
+    /// Pagination cursor for next page (JSON string)
+    pub next_params: String,
 }
 
 impl From<lb::TopMoversResponse> for TopMoversResponse {
     fn from(v: lb::TopMoversResponse) -> Self {
         Self {
-            data: v.data.to_string(),
+            events: v.events.into_iter().map(Into::into).collect(),
+            next_params: v.next_params.to_string(),
         }
     }
 }
@@ -603,18 +674,82 @@ impl From<lb::RankCategoriesResponse> for RankCategoriesResponse {
 
 // ── RankListResponse ──────────────────────────────────────────────
 
-/// Rank list response. `data` is a JSON string.
+/// One ranked security item.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct RankListItem {
+    /// Symbol (e.g. `"MU.US"`)
+    pub symbol: String,
+    /// Ticker code
+    pub code: String,
+    /// Security name
+    pub name: String,
+    /// Latest price
+    pub last_done: String,
+    /// Price change ratio
+    pub chg: String,
+    /// Absolute price change
+    pub change: String,
+    /// Net inflow
+    pub inflow: String,
+    /// Market cap
+    pub market_cap: String,
+    /// Industry name
+    pub industry: String,
+    /// Pre/post market price
+    pub pre_post_price: String,
+    /// Pre/post market change
+    pub pre_post_chg: String,
+    /// Amplitude
+    pub amplitude: String,
+    /// 5-day change
+    pub five_day_chg: String,
+    /// Turnover rate
+    pub turnover_rate: String,
+    /// Volume ratio
+    pub volume_rate: String,
+    /// P/B ratio (TTM)
+    pub pb_ttm: String,
+}
+
+impl From<lb::RankListItem> for RankListItem {
+    fn from(v: lb::RankListItem) -> Self {
+        Self {
+            symbol: v.symbol,
+            code: v.code,
+            name: v.name,
+            last_done: v.last_done,
+            chg: v.chg,
+            change: v.change,
+            inflow: v.inflow,
+            market_cap: v.market_cap,
+            industry: v.industry,
+            pre_post_price: v.pre_post_price,
+            pre_post_chg: v.pre_post_chg,
+            amplitude: v.amplitude,
+            five_day_chg: v.five_day_chg,
+            turnover_rate: v.turnover_rate,
+            volume_rate: v.volume_rate,
+            pb_ttm: v.pb_ttm,
+        }
+    }
+}
+
+/// Rank list response.
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct RankListResponse {
-    /// Raw rank list data (JSON string)
-    pub data: String,
+    /// Whether delayed / BMP data
+    pub bmp: bool,
+    /// Ranked security items
+    pub lists: Vec<RankListItem>,
 }
 
 impl From<lb::RankListResponse> for RankListResponse {
     fn from(v: lb::RankListResponse) -> Self {
         Self {
-            data: v.data.to_string(),
+            bmp: v.bmp,
+            lists: v.lists.into_iter().map(Into::into).collect(),
         }
     }
 }

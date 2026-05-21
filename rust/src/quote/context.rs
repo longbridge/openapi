@@ -20,8 +20,9 @@ use crate::{
         ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
         RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
         SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        ShortPositionsResponse, ShortTradesResponse, StrikePriceInfo, Subscription, Trade,
-        TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
+        ShortPositionsItem, ShortPositionsResponse, ShortTradesItem, ShortTradesResponse,
+        StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote,
+        WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
@@ -37,6 +38,19 @@ use crate::{
 
 const RETRY_COUNT: usize = 3;
 const PARTICIPANT_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
+
+/// Convert a Unix-seconds string (or integer string) to an RFC 3339 timestamp.
+/// If parsing fails, the original string is returned unchanged.
+fn unix_secs_to_rfc3339(s: &str) -> String {
+    s.parse::<i64>()
+        .ok()
+        .and_then(|ts| time::OffsetDateTime::from_unix_timestamp(ts).ok())
+        .map(|dt| {
+            use time::format_description::well_known::Rfc3339;
+            dt.format(&Rfc3339).unwrap_or_default()
+        })
+        .unwrap_or_else(|| s.to_string())
+}
 const ISSUER_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const OPTION_CHAIN_EXPIRY_DATE_LIST_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
@@ -1991,7 +2005,7 @@ impl QuoteContext {
             last_timestamp: String,
             count: u32,
         }
-        let resp = self
+        let raw: Vec<serde_json::Value> = self
             .0
             .http_cli
             .request(Method::GET, path)
@@ -2000,11 +2014,35 @@ impl QuoteContext {
                 last_timestamp: ts.to_string(),
                 count,
             })
-            .response::<Json<serde_json::Value>>()
+            .response::<Json<Vec<serde_json::Value>>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(ShortPositionsResponse { data: resp.0 })
+            .await?
+            .0;
+        let data = raw
+            .into_iter()
+            .map(|v| {
+                let ts_str = v["timestamp"].as_str().unwrap_or("").to_string();
+                ShortPositionsItem {
+                    timestamp: unix_secs_to_rfc3339(&ts_str),
+                    rate: v["rate"].as_str().unwrap_or("").to_string(),
+                    close: v["close"].as_str().unwrap_or("").to_string(),
+                    current_shares_short: v["current_shares_short"]
+                        .as_str()
+                        .unwrap_or("")
+                        .to_string(),
+                    avg_daily_share_volume: v["avg_daily_share_volume"]
+                        .as_str()
+                        .unwrap_or("")
+                        .to_string(),
+                    days_to_cover: v["days_to_cover"].as_str().unwrap_or("").to_string(),
+                    amount: v["amount"].as_str().unwrap_or("").to_string(),
+                    balance: v["balance"].as_str().unwrap_or("").to_string(),
+                    cost: v["cost"].as_str().unwrap_or("").to_string(),
+                }
+            })
+            .collect();
+        Ok(ShortPositionsResponse { data })
     }
 
     // ── option_volume ─────────────────────────────────────────────
@@ -2096,7 +2134,7 @@ impl QuoteContext {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
-        let resp = self
+        let raw: Vec<serde_json::Value> = self
             .0
             .http_cli
             .request(Method::GET, path)
@@ -2105,11 +2143,28 @@ impl QuoteContext {
                 last_timestamp: ts.to_string(),
                 page_size: count.to_string(),
             })
-            .response::<Json<serde_json::Value>>()
+            .response::<Json<Vec<serde_json::Value>>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(ShortTradesResponse { data: resp.0 })
+            .await?
+            .0;
+        let data = raw
+            .into_iter()
+            .map(|v| {
+                let ts_str = v["timestamp"].as_str().unwrap_or("").to_string();
+                ShortTradesItem {
+                    timestamp: unix_secs_to_rfc3339(&ts_str),
+                    rate: v["rate"].as_str().unwrap_or("").to_string(),
+                    close: v["close"].as_str().unwrap_or("").to_string(),
+                    nus_amount: v["nus_amount"].as_str().unwrap_or("").to_string(),
+                    ny_amount: v["ny_amount"].as_str().unwrap_or("").to_string(),
+                    total_amount: v["total_amount"].as_str().unwrap_or("").to_string(),
+                    amount: v["amount"].as_str().unwrap_or("").to_string(),
+                    balance: v["balance"].as_str().unwrap_or("").to_string(),
+                }
+            })
+            .collect();
+        Ok(ShortTradesResponse { data })
     }
 
     // ── update_pinned ─────────────────────────────────────────────

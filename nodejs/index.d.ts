@@ -2182,11 +2182,31 @@ export declare class SecurityCalcIndex {
   get delta(): Decimal | null
   /** Gamma */
   get gamma(): Decimal | null
-  /** Theta */
+  /**
+   * Theta
+   *
+   * The raw value returned by the API is annualized (scaled by 252 trading
+   * days per year). To obtain the standard per-calendar-day theta, divide
+   * by 252: `theta / 252`.
+   */
   get theta(): Decimal | null
-  /** Vega */
+  /**
+   * Vega
+   *
+   * The raw value returned by the API is expressed per 1 percentage-point
+   * change in implied volatility (i.e. the value has been multiplied by
+   * 100). To obtain the standard vega (per unit change in IV), divide by
+   * 100: `vega / 100`.
+   */
   get vega(): Decimal | null
-  /** Rho */
+  /**
+   * Rho
+   *
+   * The raw value returned by the API is expressed per 1 percentage-point
+   * change in the risk-free rate (i.e. the value has been multiplied by
+   * 100). To obtain the standard rho (per unit change in rate), divide by
+   * 100: `rho / 100`.
+   */
   get rho(): Decimal | null
 }
 
@@ -4958,10 +4978,48 @@ export interface RankCategoriesResponse {
   data: string
 }
 
-/** Rank list response. `data` is a JSON string. */
+/** One ranked security item. */
+export interface RankListItem {
+  /** Symbol (e.g. `"MU.US"`) */
+  symbol: string
+  /** Ticker code */
+  code: string
+  /** Security name */
+  name: string
+  /** Latest price */
+  lastDone: string
+  /** Price change ratio */
+  chg: string
+  /** Absolute price change */
+  change: string
+  /** Net inflow */
+  inflow: string
+  /** Market cap */
+  marketCap: string
+  /** Industry name */
+  industry: string
+  /** Pre/post market price */
+  prePostPrice: string
+  /** Pre/post market change */
+  prePostChg: string
+  /** Amplitude */
+  amplitude: string
+  /** 5-day change */
+  fiveDayChg: string
+  /** Turnover rate */
+  turnoverRate: string
+  /** Volume ratio */
+  volumeRate: string
+  /** P/B ratio (TTM) */
+  pbTtm: string
+}
+
+/** Rank list response. */
 export interface RankListResponse {
-  /** Raw rank list data (JSON string) */
-  data: string
+  /** Whether delayed / BMP data */
+  bmp: boolean
+  /** Ranked security items */
+  lists: Array<RankListItem>
 }
 
 /** Analyst rating distribution counts */
@@ -5287,25 +5345,58 @@ export interface SharelistStock {
   latency?: boolean
 }
 
-/**
- * Short interest response
- * Short interest / positions response (HK or US).
- *
- * `data` is the raw JSON returned by the API as a string.
- */
-export interface ShortPositionsResponse {
-  /** Raw short positions data (JSON string) */
-  data: string
+/** One short-position data point (unified for US and HK markets). */
+export interface ShortPositionsItem {
+  /** Trading date (RFC 3339) */
+  timestamp: string
+  /** Short ratio */
+  rate: string
+  /** Closing price */
+  close: string
+  /** [US] Number of short shares outstanding */
+  currentSharesShort: string
+  /** [US] Average daily share volume */
+  avgDailyShareVolume: string
+  /** [US] Days to cover ratio */
+  daysToCover: string
+  /** [HK] Short sale amount (HKD) */
+  amount: string
+  /** [HK] Short position balance */
+  balance: string
+  /** [HK] Cost / closing price */
+  cost: string
 }
 
-/**
- * Short trade records response (HK or US).
- *
- * `data` is the raw JSON returned by the API as a string.
- */
+/** Short interest / positions response (HK or US). */
+export interface ShortPositionsResponse {
+  /** Short position data points */
+  data: Array<ShortPositionsItem>
+}
+
+/** One short-trade data point (unified for US and HK markets). */
+export interface ShortTradesItem {
+  /** Trading date (RFC 3339) */
+  timestamp: string
+  /** Short ratio */
+  rate: string
+  /** Closing price */
+  close: string
+  /** [US] NYSE short amount */
+  nusAmount: string
+  /** [US] NY short amount */
+  nyAmount: string
+  /** [US] Total short amount */
+  totalAmount: string
+  /** [HK] Short sale amount */
+  amount: string
+  /** [HK] Short position balance */
+  balance: string
+}
+
+/** Short trade records response (HK or US). */
 export interface ShortTradesResponse {
-  /** Raw short trade data (JSON string) */
-  data: string
+  /** Short trade data points */
+  data: Array<ShortTradesItem>
 }
 
 /** Sort order type */
@@ -5420,10 +5511,48 @@ export declare const enum TopicType {
   Private = 0
 }
 
-/** Top movers response. `data` is a JSON string. */
+/** One top-movers event entry. */
+export interface TopMoversEvent {
+  /** Event time (RFC 3339) */
+  timestamp: string
+  /** Alert reason description */
+  alertReason: string
+  /** Alert type code */
+  alertType: number
+  /** Stock information */
+  stock: TopMoversStock
+  /** Associated news post (JSON string) */
+  post: string
+}
+
+/** Top movers response. */
 export interface TopMoversResponse {
-  /** Raw top movers data (JSON string) */
-  data: string
+  /** Top-mover events */
+  events: Array<TopMoversEvent>
+  /** Pagination cursor for next page (JSON string) */
+  nextParams: string
+}
+
+/** Stock information within a top-movers event. */
+export interface TopMoversStock {
+  /** Symbol (e.g. `"NVDA.US"`) */
+  symbol: string
+  /** Ticker code */
+  code: string
+  /** Security name */
+  name: string
+  /** Full name */
+  fullName: string
+  /** Price change (decimal ratio) */
+  change: string
+  /** Latest price */
+  lastDone: string
+  /** Market code */
+  market: string
+  /** Labels / tags */
+  labels: Array<string>
+  /** Logo URL */
+  logo: string
 }
 
 /** Trade direction */
@@ -5547,10 +5676,44 @@ export interface UpdateWatchlistGroup {
   mode: SecuritiesUpdateMode
 }
 
-/** Valuation comparison response. `data` is a JSON string. */
+/** One security's valuation comparison item. */
+export interface ValuationComparisonItem {
+  /** Symbol (e.g. `"AAPL.US"`) */
+  symbol: string
+  /** Security name */
+  name: string
+  /** Currency */
+  currency: string
+  /** Market capitalisation */
+  marketValue: string
+  /** Latest closing price */
+  priceClose: string
+  /** P/E ratio */
+  pe: string
+  /** P/B ratio */
+  pb: string
+  /** P/S ratio */
+  ps: string
+  /** Return on equity */
+  roe: string
+  /** Earnings per share */
+  eps: string
+  /** Book value per share */
+  bps: string
+  /** Dividends per share */
+  dps: string
+  /** Dividend yield */
+  divYld: string
+  /** Total assets */
+  assets: string
+  /** Historical valuation points */
+  history: Array<ValuationHistoryPoint>
+}
+
+/** Valuation comparison response. */
 export interface ValuationComparisonResponse {
-  /** Raw valuation comparison data (JSON string) */
-  data: string
+  /** Valuation comparison items */
+  list: Array<ValuationComparisonItem>
 }
 
 /** Valuation metrics response */
@@ -5605,6 +5768,18 @@ export interface ValuationHistoryMetrics {
   pb?: ValuationHistoryMetric
   /** PS history */
   ps?: ValuationHistoryMetric
+}
+
+/** One historical valuation data point. */
+export interface ValuationHistoryPoint {
+  /** Date (RFC 3339) */
+  date: string
+  /** P/E ratio */
+  pe: string
+  /** P/B ratio */
+  pb: string
+  /** P/S ratio */
+  ps: string
 }
 
 /** Historical valuation response */

@@ -9925,11 +9925,59 @@ class ShareholderDetailResponse:
     """Raw shareholder detail data (JSON object / list)"""
 
 
-class ValuationComparisonResponse:
-    """Valuation comparison response. ``data`` is a Python dict/list from JSON."""
+class ValuationHistoryPoint:
+    """One historical valuation data point."""
 
-    data: object
-    """Raw valuation comparison data (JSON object / list)"""
+    date: str
+    """Date (RFC 3339, converted from Unix timestamp)"""
+    pe: str
+    """P/E ratio"""
+    pb: str
+    """P/B ratio"""
+    ps: str
+    """P/S ratio"""
+
+
+class ValuationComparisonItem:
+    """One security's valuation comparison item."""
+
+    symbol: str
+    """Symbol (e.g. ``"AAPL.US"``)"""
+    name: str
+    """Security name"""
+    currency: str
+    """Currency"""
+    market_value: str
+    """Market capitalisation"""
+    price_close: str
+    """Latest closing price"""
+    pe: str
+    """P/E ratio"""
+    pb: str
+    """P/B ratio"""
+    ps: str
+    """P/S ratio"""
+    roe: str
+    """Return on equity"""
+    eps: str
+    """Earnings per share"""
+    bps: str
+    """Book value per share"""
+    dps: str
+    """Dividends per share"""
+    div_yld: str
+    """Dividend yield"""
+    assets: str
+    """Total assets"""
+    history: List[ValuationHistoryPoint]
+    """Historical valuation points"""
+
+
+class ValuationComparisonResponse:
+    """Valuation comparison response."""
+
+    list: List[ValuationComparisonItem]
+    """Valuation comparison items"""
 
 
 # ── MarketContext ─────────────────────────────────────────────────
@@ -10380,11 +10428,51 @@ class MarketContext:
 
 # ── MarketContext new response types ──────────────────────────────
 
-class TopMoversResponse:
-    """Top movers response. ``data`` is a Python dict/list from JSON."""
+class TopMoversStock:
+    """Stock information within a top-movers event."""
 
-    data: object
-    """Raw top movers data (JSON object / list)"""
+    symbol: str
+    """Symbol (e.g. ``"NVDA.US"``)"""
+    code: str
+    """Ticker code"""
+    name: str
+    """Security name"""
+    full_name: str
+    """Full name"""
+    change: str
+    """Price change (decimal ratio)"""
+    last_done: str
+    """Latest price"""
+    market: str
+    """Market code"""
+    labels: List[str]
+    """Labels / tags"""
+    logo: str
+    """Logo URL"""
+
+
+class TopMoversEvent:
+    """One top-movers event entry."""
+
+    timestamp: str
+    """Event time (RFC 3339)"""
+    alert_reason: str
+    """Alert reason description"""
+    alert_type: int
+    """Alert type code"""
+    stock: TopMoversStock
+    """Stock information"""
+    post: object
+    """Associated news post (raw JSON object)"""
+
+
+class TopMoversResponse:
+    """Top movers response."""
+
+    events: List[TopMoversEvent]
+    """Top-mover events"""
+    next_params: object
+    """Pagination cursor for next page (raw JSON object)"""
 
 
 class RankCategoriesResponse:
@@ -10394,11 +10482,50 @@ class RankCategoriesResponse:
     """Raw rank categories data (JSON object / list)"""
 
 
-class RankListResponse:
-    """Rank list response. ``data`` is a Python dict/list from JSON."""
+class RankListItem:
+    """One ranked security item."""
 
-    data: object
-    """Raw rank list data (JSON object / list)"""
+    symbol: str
+    """Symbol (e.g. ``"MU.US"``)"""
+    code: str
+    """Ticker code"""
+    name: str
+    """Security name"""
+    last_done: str
+    """Latest price"""
+    chg: str
+    """Price change ratio"""
+    change: str
+    """Absolute price change"""
+    inflow: str
+    """Net inflow"""
+    market_cap: str
+    """Market cap"""
+    industry: str
+    """Industry name"""
+    pre_post_price: str
+    """Pre/post market price"""
+    pre_post_chg: str
+    """Pre/post market change"""
+    amplitude: str
+    """Amplitude"""
+    five_day_chg: str
+    """5-day change"""
+    turnover_rate: str
+    """Turnover rate"""
+    volume_rate: str
+    """Volume ratio"""
+    pb_ttm: str
+    """P/B ratio (TTM)"""
+
+
+class RankListResponse:
+    """Rank list response."""
+
+    bmp: bool
+    """Whether delayed / BMP data"""
+    lists: List[RankListItem]
+    """Ranked security items"""
 
 
 # ── ScreenerContext ───────────────────────────────────────────────
@@ -11658,26 +11785,62 @@ class SharelistContext:
 
 # ── QuoteContext extensions ───────────────────────────────────────
 
+class ShortPositionsItem:
+    """One short-position data point (unified for US and HK markets)."""
+
+    timestamp: str
+    """Trading date (RFC 3339)"""
+    rate: str
+    """Short ratio (both markets)"""
+    close: str
+    """Closing price (both markets)"""
+    current_shares_short: str
+    """[US] Number of short shares outstanding"""
+    avg_daily_share_volume: str
+    """[US] Average daily share volume"""
+    days_to_cover: str
+    """[US] Days to cover ratio"""
+    amount: str
+    """[HK] Short sale amount (HKD)"""
+    balance: str
+    """[HK] Short position balance"""
+    cost: str
+    """[HK] Cost / closing price"""
+
+
 class ShortPositionsResponse:
-    """Short interest / positions response (HK or US).
+    """Short interest / positions response (HK or US)."""
 
-    The ``data`` attribute is a Python dict/list converted from the raw JSON
-    returned by the API.  The exact shape differs between HK and US markets.
-    """
+    data: List[ShortPositionsItem]
+    """Short position data points"""
 
-    data: object
-    """Raw short positions data (JSON object / list)"""
+
+class ShortTradesItem:
+    """One short-trade data point (unified for US and HK markets)."""
+
+    timestamp: str
+    """Trading date (RFC 3339)"""
+    rate: str
+    """Short ratio"""
+    close: str
+    """Closing price"""
+    nus_amount: str
+    """[US] NYSE short amount"""
+    ny_amount: str
+    """[US] NY short amount"""
+    total_amount: str
+    """[US] Total short amount"""
+    amount: str
+    """[HK] Short sale amount"""
+    balance: str
+    """[HK] Short position balance"""
 
 
 class ShortTradesResponse:
-    """Short trade records response (HK or US).
+    """Short trade records response (HK or US)."""
 
-    The ``data`` attribute is a Python dict/list converted from the raw JSON
-    returned by the API.  The exact shape differs between HK and US markets.
-    """
-
-    data: object
-    """Raw short trade data (JSON object / list)"""
+    data: List[ShortTradesItem]
+    """Short trade data points"""
 
 
 class OptionVolumeStats:

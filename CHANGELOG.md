@@ -17,12 +17,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **All languages:** `QuoteContext::short_positions(symbol, count)` now auto-detects market from symbol suffix (`.HK` → HK, otherwise US). `ShortPositionsResponse` is raw JSON.
+- **Rust, Python, Node.js, Java, C:** `short_positions` and `short_trades` responses now use typed structs (`ShortPositionsItem` / `ShortTradesItem`) with RFC 3339 timestamps instead of raw JSON. Fields absent in a given market default to empty string.
+- **Rust, Python, Node.js, Java, C:** `rank_list` response now uses a typed `RankListResponse { bmp, lists: Vec<RankListItem> }` struct; `counter_id` is converted to `symbol`.
+- **Rust, Python, Node.js, Java, C:** `top_movers` response now uses a typed `TopMoversResponse { events: Vec<TopMoversEvent>, next_params }` struct; timestamps converted to RFC 3339 and `counter_id` converted to `symbol`.
+- **Rust, Python, Node.js, Java, C:** `valuation_comparison` response now uses a typed `ValuationComparisonResponse { list: Vec<ValuationComparisonItem> }` struct; history dates converted from Unix timestamp to RFC 3339 and `counter_id` converted to `symbol`.
 
 ### Breaking changes
 
 - **All languages:** `MarketContext::stock_events` renamed to `top_movers`; `StockEventsResponse` → `TopMoversResponse`.
 - **All languages:** `hk_short_positions` removed — use `short_positions(symbol, count)` which auto-detects HK/US.
-- **All languages:** `ShortPositionsResponse` is now raw JSON; old typed fields removed.
+- **All languages:** `ShortPositionsResponse.data` changed from raw JSON to `Vec<ShortPositionsItem>`; `ShortTradesResponse.data` changed from raw JSON to `Vec<ShortTradesItem>`.
+- **All languages:** `TopMoversResponse.data` (raw JSON) replaced by `TopMoversResponse { events, next_params }`.
+- **All languages:** `RankListResponse.data` (raw JSON) replaced by `RankListResponse { bmp, lists }`.
+- **All languages:** `ValuationComparisonResponse.data` (raw JSON) replaced by `ValuationComparisonResponse { list }`.
 
 # [4.1.0]
 
