@@ -2005,7 +2005,8 @@ impl QuoteContext {
             last_timestamp: String,
             count: u32,
         }
-        let raw: Vec<serde_json::Value> = self
+        // Response: {"counter_id":"ST/US/AAPL","data":[{...}]}
+        let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
@@ -2014,13 +2015,15 @@ impl QuoteContext {
                 last_timestamp: ts.to_string(),
                 count,
             })
-            .response::<Json<Vec<serde_json::Value>>>()
+            .response::<Json<serde_json::Value>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
             .0;
+        let empty = vec![];
+        let raw = outer["data"].as_array().unwrap_or(&empty);
         let data = raw
-            .into_iter()
+            .iter()
             .map(|v| {
                 let ts_str = v["timestamp"].as_str().unwrap_or("").to_string();
                 ShortPositionsItem {
@@ -2134,7 +2137,8 @@ impl QuoteContext {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
-        let raw: Vec<serde_json::Value> = self
+        // Response: {"counter_id":"ST/HK/700","data":[{...}]}
+        let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
@@ -2143,13 +2147,15 @@ impl QuoteContext {
                 last_timestamp: ts.to_string(),
                 page_size: count.to_string(),
             })
-            .response::<Json<Vec<serde_json::Value>>>()
+            .response::<Json<serde_json::Value>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
             .0;
+        let empty = vec![];
+        let raw = outer["data"].as_array().unwrap_or(&empty);
         let data = raw
-            .into_iter()
+            .iter()
             .map(|v| {
                 let ts_str = v["timestamp"].as_str().unwrap_or("").to_string();
                 ShortTradesItem {
