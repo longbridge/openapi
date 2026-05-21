@@ -7725,27 +7725,111 @@ typedef struct lb_sharelist_detail_t {
 } lb_sharelist_detail_t;
 
 /**
+ * One short-position record, unified for US and HK markets.
+ */
+typedef struct lb_short_positions_item_t {
+  /**
+   * Trading date in RFC 3339 format
+   */
+  const char *timestamp;
+  /**
+   * Short ratio
+   */
+  const char *rate;
+  /**
+   * Closing price
+   */
+  const char *close;
+  /**
+   * [US] Number of short shares outstanding
+   */
+  const char *current_shares_short;
+  /**
+   * [US] Average daily share volume
+   */
+  const char *avg_daily_share_volume;
+  /**
+   * [US] Days-to-cover ratio
+   */
+  const char *days_to_cover;
+  /**
+   * [HK] Short sale amount (HKD)
+   */
+  const char *amount;
+  /**
+   * [HK] Short position balance
+   */
+  const char *balance;
+  /**
+   * [HK] Closing price (HK naming)
+   */
+  const char *cost;
+} lb_short_positions_item_t;
+
+/**
  * Short positions / interest response (HK or US).
- *
- * `data` is a NUL-terminated JSON string.
  */
 typedef struct lb_short_positions_response_t {
   /**
-   * Raw short positions data as a JSON string
+   * Pointer to the array of short position items
    */
-  const char *data;
+  const struct lb_short_positions_item_t *data;
+  /**
+   * Number of items in `data`
+   */
+  uintptr_t num_data;
 } lb_short_positions_response_t;
 
 /**
+ * One short-trade record, unified for US and HK markets.
+ */
+typedef struct lb_short_trades_item_t {
+  /**
+   * Trading date in RFC 3339 format
+   */
+  const char *timestamp;
+  /**
+   * Short ratio
+   */
+  const char *rate;
+  /**
+   * Closing price
+   */
+  const char *close;
+  /**
+   * [US] NASDAQ short sale volume
+   */
+  const char *nus_amount;
+  /**
+   * [US] NYSE short sale volume
+   */
+  const char *ny_amount;
+  /**
+   * [US] Total short amount
+   */
+  const char *total_amount;
+  /**
+   * [HK] Short sale turnover amount (HKD)
+   */
+  const char *amount;
+  /**
+   * [HK] Short position balance
+   */
+  const char *balance;
+} lb_short_trades_item_t;
+
+/**
  * Short trade records response (HK or US).
- *
- * `data` is a NUL-terminated JSON string.
  */
 typedef struct lb_short_trades_response_t {
   /**
-   * Raw short trade data as a JSON string
+   * Pointer to the array of short trade items
    */
-  const char *data;
+  const struct lb_short_trades_item_t *data;
+  /**
+   * Number of items in `data`
+   */
+  uintptr_t num_data;
 } lb_short_trades_response_t;
 
 /**
@@ -7843,23 +7927,199 @@ typedef struct lb_shareholder_detail_response_t {
 } lb_shareholder_detail_response_t;
 
 /**
- * Valuation comparison response. `data` is a NUL-terminated JSON string.
+ * One historical valuation data point.
+ */
+typedef struct lb_valuation_history_point_t {
+  /**
+   * Date in RFC 3339 format
+   */
+  const char *date;
+  /**
+   * P/E ratio
+   */
+  const char *pe;
+  /**
+   * P/B ratio
+   */
+  const char *pb;
+  /**
+   * P/S ratio
+   */
+  const char *ps;
+} lb_valuation_history_point_t;
+
+/**
+ * One security's valuation comparison item.
+ */
+typedef struct lb_valuation_comparison_item_t {
+  /**
+   * Symbol, e.g. "AAPL.US"
+   */
+  const char *symbol;
+  /**
+   * Security name
+   */
+  const char *name;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Market capitalisation
+   */
+  const char *market_value;
+  /**
+   * Latest closing price
+   */
+  const char *price_close;
+  /**
+   * P/E ratio
+   */
+  const char *pe;
+  /**
+   * P/B ratio
+   */
+  const char *pb;
+  /**
+   * P/S ratio
+   */
+  const char *ps;
+  /**
+   * Return on equity
+   */
+  const char *roe;
+  /**
+   * Earnings per share
+   */
+  const char *eps;
+  /**
+   * Book value per share
+   */
+  const char *bps;
+  /**
+   * Dividends per share
+   */
+  const char *dps;
+  /**
+   * Dividend yield
+   */
+  const char *div_yld;
+  /**
+   * Total assets
+   */
+  const char *assets;
+  /**
+   * Pointer to the array of historical valuation points
+   */
+  const struct lb_valuation_history_point_t *history;
+  /**
+   * Number of items in `history`
+   */
+  uintptr_t num_history;
+} lb_valuation_comparison_item_t;
+
+/**
+ * Valuation comparison response.
  */
 typedef struct lb_valuation_comparison_response_t {
   /**
-   * Raw valuation comparison data as a JSON string
+   * Pointer to the array of valuation comparison items
    */
-  const char *data;
+  const struct lb_valuation_comparison_item_t *list;
+  /**
+   * Number of items in `list`
+   */
+  uintptr_t num_list;
 } lb_valuation_comparison_response_t;
 
 /**
- * Top movers response. `data` is a NUL-terminated JSON string.
+ * Stock information within a top-movers event.
+ */
+typedef struct lb_top_movers_stock_t {
+  /**
+   * Symbol, e.g. "TSLA.US"
+   */
+  const char *symbol;
+  /**
+   * Ticker code
+   */
+  const char *code;
+  /**
+   * Security name
+   */
+  const char *name;
+  /**
+   * Full name
+   */
+  const char *full_name;
+  /**
+   * Price change (decimal ratio)
+   */
+  const char *change;
+  /**
+   * Latest price
+   */
+  const char *last_done;
+  /**
+   * Market code
+   */
+  const char *market;
+  /**
+   * Logo URL
+   */
+  const char *logo;
+  /**
+   * Labels / tags
+   */
+  const char *const *labels;
+  /**
+   * Number of items in `labels`
+   */
+  uintptr_t num_labels;
+} lb_top_movers_stock_t;
+
+/**
+ * One top-movers event entry.
+ */
+typedef struct lb_top_movers_event_t {
+  /**
+   * Event time (RFC 3339)
+   */
+  const char *timestamp;
+  /**
+   * Alert reason description
+   */
+  const char *alert_reason;
+  /**
+   * Alert type code
+   */
+  int64_t alert_type;
+  /**
+   * Stock information
+   */
+  struct lb_top_movers_stock_t stock;
+  /**
+   * Associated news post as a JSON string (may be null)
+   */
+  const char *post;
+} lb_top_movers_event_t;
+
+/**
+ * Top movers response.
  */
 typedef struct lb_top_movers_response_t {
   /**
-   * Raw top movers data as a JSON string
+   * Pointer to the array of top-mover events
    */
-  const char *data;
+  const struct lb_top_movers_event_t *events;
+  /**
+   * Number of items in `events`
+   */
+  uintptr_t num_events;
+  /**
+   * Pagination cursor as a JSON string
+   */
+  const char *next_params;
 } lb_top_movers_response_t;
 
 /**
@@ -7873,13 +8133,91 @@ typedef struct lb_rank_categories_response_t {
 } lb_rank_categories_response_t;
 
 /**
- * Rank list response. `data` is a NUL-terminated JSON string.
+ * One ranked security item.
+ */
+typedef struct lb_rank_list_item_t {
+  /**
+   * Symbol, e.g. "MU.US"
+   */
+  const char *symbol;
+  /**
+   * Ticker code
+   */
+  const char *code;
+  /**
+   * Security name
+   */
+  const char *name;
+  /**
+   * Latest price
+   */
+  const char *last_done;
+  /**
+   * Price change ratio (decimal)
+   */
+  const char *chg;
+  /**
+   * Absolute price change
+   */
+  const char *change;
+  /**
+   * Net inflow
+   */
+  const char *inflow;
+  /**
+   * Market cap
+   */
+  const char *market_cap;
+  /**
+   * Industry name
+   */
+  const char *industry;
+  /**
+   * Pre/post market price
+   */
+  const char *pre_post_price;
+  /**
+   * Pre/post market change
+   */
+  const char *pre_post_chg;
+  /**
+   * Amplitude
+   */
+  const char *amplitude;
+  /**
+   * 5-day change
+   */
+  const char *five_day_chg;
+  /**
+   * Turnover rate
+   */
+  const char *turnover_rate;
+  /**
+   * Volume ratio
+   */
+  const char *volume_rate;
+  /**
+   * P/B ratio (TTM)
+   */
+  const char *pb_ttm;
+} lb_rank_list_item_t;
+
+/**
+ * Rank list response.
  */
 typedef struct lb_rank_list_response_t {
   /**
-   * Raw rank list data as a JSON string
+   * Whether the response is delayed / BMP data
    */
-  const char *data;
+  bool bmp;
+  /**
+   * Pointer to the array of ranked security items
+   */
+  const struct lb_rank_list_item_t *lists;
+  /**
+   * Number of items in `lists`
+   */
+  uintptr_t num_lists;
 } lb_rank_list_response_t;
 
 /**

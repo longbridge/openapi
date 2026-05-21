@@ -1,7 +1,9 @@
 package com.longbridge.market;
 
-/** Response for {@link MarketContext#getRankList}. Contains raw JSON data. */
+/** Response for {@link MarketContext#getRankList}. */
 public class RankListResponse {
-    /** Raw JSON data string */
-    public String data;
+    /** Whether the response is delayed */
+    public boolean bmp;
+    /** Ranked securities list */
+    public RankListItem[] lists;
 }

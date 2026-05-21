@@ -1,7 +1,7 @@
 package com.longbridge.quote;
 
-/** Response for {@link QuoteContext#getShortTrades}. Contains raw JSON data. */
+/** Response for {@link QuoteContext#getShortTrades}. Unified US+HK response. */
 public class ShortTradesResponse {
-    /** Raw JSON data string */
-    public String data;
+    /** Short trade records. US and HK fields populated depending on market. */
+    public ShortTradesItem[] data;
 }

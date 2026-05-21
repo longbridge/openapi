@@ -138,7 +138,7 @@ void FundamentalContext::shareholder_detail(const std::string& s, int64_t object
   F_JSON_STRUCT(lb_fundamental_context_shareholder_detail, lb_shareholder_detail_response_t, ctx_, s.c_str(), object_id);
 }
 
-void FundamentalContext::valuation_comparison(const std::string& s, const std::string& currency, const std::vector<std::string>* comparison_symbols, AsyncCallback<FundamentalContext, std::string> callback) const {
+void FundamentalContext::valuation_comparison(const std::string& s, const std::string& currency, const std::vector<std::string>* comparison_symbols, AsyncCallback<FundamentalContext, ValuationComparisonResponse> callback) const {
   std::vector<const char*> syms_ptrs;
   size_t num_syms = 0;
   const char** syms_data = nullptr;
@@ -147,7 +147,17 @@ void FundamentalContext::valuation_comparison(const std::string& s, const std::s
     syms_data = syms_ptrs.empty() ? nullptr : syms_ptrs.data();
     num_syms = syms_ptrs.size();
   }
-  F_JSON_STRUCT(lb_fundamental_context_valuation_comparison, lb_valuation_comparison_response_t, ctx_, s.c_str(), currency.c_str(), syms_data, num_syms);
+  lb_fundamental_context_valuation_comparison(ctx_, s.c_str(), currency.c_str(), syms_data, num_syms,
+    [](auto res) {
+      auto cb = callback::get_async_callback<FundamentalContext, ValuationComparisonResponse>(res->userdata);
+      FundamentalContext fctx((const lb_fundamental_context_t*)res->ctx); Status status(res->error);
+      if (status) {
+        auto r = convert::convert((const lb_valuation_comparison_response_t*)res->data);
+        (*cb)(AsyncResult<FundamentalContext, ValuationComparisonResponse>(fctx, std::move(status), &r));
+      } else {
+        (*cb)(AsyncResult<FundamentalContext, ValuationComparisonResponse>(fctx, std::move(status), nullptr));
+      }
+    }, new AsyncCallback<FundamentalContext, ValuationComparisonResponse>(callback));
 }
 
 #undef F_JSON_STRUCT

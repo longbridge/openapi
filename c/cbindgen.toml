@@ -297,7 +297,9 @@ cpp_compat = true
 "CSnapshotReportedMetric" = "lb_snapshot_reported_metric_t"
 "CFinancialReportSnapshot" = "lb_financial_report_snapshot_t"
 # QuoteContext extensions
+"CShortPositionsItem" = "lb_short_positions_item_t"
 "CShortPositionsResponse" = "lb_short_positions_response_t"
+"CShortTradesItem" = "lb_short_trades_item_t"
 "CShortTradesResponse" = "lb_short_trades_response_t"
 "COptionVolumeStats" = "lb_option_volume_stats_t"
 "COptionVolumeDailyStat" = "lb_option_volume_daily_stat_t"
@@ -305,10 +307,15 @@ cpp_compat = true
 # FundamentalContext new types
 "CShareholderTopResponse" = "lb_shareholder_top_response_t"
 "CShareholderDetailResponse" = "lb_shareholder_detail_response_t"
+"CValuationHistoryPoint" = "lb_valuation_history_point_t"
+"CValuationComparisonItem" = "lb_valuation_comparison_item_t"
 "CValuationComparisonResponse" = "lb_valuation_comparison_response_t"
 # MarketContext new types
+"CTopMoversStock" = "lb_top_movers_stock_t"
+"CTopMoversEvent" = "lb_top_movers_event_t"
 "CTopMoversResponse" = "lb_top_movers_response_t"
 "CRankCategoriesResponse" = "lb_rank_categories_response_t"
+"CRankListItem" = "lb_rank_list_item_t"
 "CRankListResponse" = "lb_rank_list_response_t"
 # ScreenerContext
 "CScreenerContext" = "lb_screener_context_t"
@@ -430,13 +437,17 @@ include = [
     # FundamentalContext opaque type (no rename, typedef added in hpp)
     "CFundamentalContext",
     # QuoteContext extensions
-    "CShortPositionsResponse", "CShortTradesResponse",
+    "CShortPositionsItem", "CShortPositionsResponse",
+    "CShortTradesItem", "CShortTradesResponse",
     "COptionVolumeStats",
     "COptionVolumeDailyStat", "COptionVolumeDaily",
     # FundamentalContext new types
-    "CShareholderTopResponse", "CShareholderDetailResponse", "CValuationComparisonResponse",
+    "CShareholderTopResponse", "CShareholderDetailResponse",
+    "CValuationHistoryPoint", "CValuationComparisonItem", "CValuationComparisonResponse",
     # MarketContext new types
-    "CTopMoversResponse", "CRankCategoriesResponse", "CRankListResponse",
+    "CTopMoversStock", "CTopMoversEvent", "CTopMoversResponse",
+    "CRankCategoriesResponse",
+    "CRankListItem", "CRankListResponse",
     # ScreenerContext
     "CScreenerContext",
     "CScreenerRecommendStrategiesResponse", "CScreenerUserStrategiesResponse",

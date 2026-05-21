@@ -7,9 +7,10 @@ use longbridge::quote::{
     OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period,
     PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
     QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers, SecurityCalcIndex,
-    SecurityDepth, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse, StrikePriceInfo,
-    Subscription, Trade, TradeDirection, TradeSession, TradeStatus, TradingSessionInfo,
-    WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup, WatchlistSecurity,
+    SecurityDepth, SecurityQuote, SecurityStaticInfo, ShortPositionsItem, ShortPositionsResponse,
+    ShortTradesItem, ShortTradesResponse, StrikePriceInfo, Subscription, Trade, TradeDirection,
+    TradeSession, TradeStatus, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantType,
+    WatchlistGroup, WatchlistSecurity,
 };
 
 use crate::{
@@ -3106,23 +3107,92 @@ impl ToFFI for CFilingItemOwned {
 
 // ── ShortPositionsResponse ────────────────────────────────────────
 
+/// One short-position record, unified for US and HK markets.
+#[repr(C)]
+pub struct CShortPositionsItem {
+    /// Trading date in RFC 3339 format
+    pub timestamp: *const c_char,
+    /// Short ratio
+    pub rate: *const c_char,
+    /// Closing price
+    pub close: *const c_char,
+    /// [US] Number of short shares outstanding
+    pub current_shares_short: *const c_char,
+    /// [US] Average daily share volume
+    pub avg_daily_share_volume: *const c_char,
+    /// [US] Days-to-cover ratio
+    pub days_to_cover: *const c_char,
+    /// [HK] Short sale amount (HKD)
+    pub amount: *const c_char,
+    /// [HK] Short position balance
+    pub balance: *const c_char,
+    /// [HK] Closing price (HK naming)
+    pub cost: *const c_char,
+}
+
+pub(crate) struct CShortPositionsItemOwned {
+    timestamp: CString,
+    rate: CString,
+    close: CString,
+    current_shares_short: CString,
+    avg_daily_share_volume: CString,
+    days_to_cover: CString,
+    amount: CString,
+    balance: CString,
+    cost: CString,
+}
+
+impl From<ShortPositionsItem> for CShortPositionsItemOwned {
+    fn from(v: ShortPositionsItem) -> Self {
+        Self {
+            timestamp: v.timestamp.into(),
+            rate: v.rate.into(),
+            close: v.close.into(),
+            current_shares_short: v.current_shares_short.into(),
+            avg_daily_share_volume: v.avg_daily_share_volume.into(),
+            days_to_cover: v.days_to_cover.into(),
+            amount: v.amount.into(),
+            balance: v.balance.into(),
+            cost: v.cost.into(),
+        }
+    }
+}
+
+impl ToFFI for CShortPositionsItemOwned {
+    type FFIType = CShortPositionsItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CShortPositionsItem {
+            timestamp: self.timestamp.to_ffi_type(),
+            rate: self.rate.to_ffi_type(),
+            close: self.close.to_ffi_type(),
+            current_shares_short: self.current_shares_short.to_ffi_type(),
+            avg_daily_share_volume: self.avg_daily_share_volume.to_ffi_type(),
+            days_to_cover: self.days_to_cover.to_ffi_type(),
+            amount: self.amount.to_ffi_type(),
+            balance: self.balance.to_ffi_type(),
+            cost: self.cost.to_ffi_type(),
+        }
+    }
+}
+
 /// Short positions / interest response (HK or US).
-///
-/// `data` is a NUL-terminated JSON string.
 #[repr(C)]
 pub struct CShortPositionsResponse {
-    /// Raw short positions data as a JSON string
-    pub data: *const c_char,
+    /// Pointer to the array of short position items
+    pub data: *const CShortPositionsItem,
+    /// Number of items in `data`
+    pub num_data: usize,
 }
 
 pub(crate) struct CShortPositionsResponseOwned {
-    data: CString,
+    data: CVec<CShortPositionsItemOwned>,
 }
 
 impl From<ShortPositionsResponse> for CShortPositionsResponseOwned {
     fn from(v: ShortPositionsResponse) -> Self {
-        let json = serde_json::to_string(&v).unwrap_or_default();
-        Self { data: json.into() }
+        Self {
+            data: v.data.into(),
+        }
     }
 }
 
@@ -3131,31 +3201,94 @@ impl ToFFI for CShortPositionsResponseOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CShortPositionsResponse {
             data: self.data.to_ffi_type(),
+            num_data: self.data.len(),
         }
     }
 }
 
 // ── ShortTradesResponse ───────────────────────────────────────────
 
-use longbridge::quote::ShortTradesResponse;
+/// One short-trade record, unified for US and HK markets.
+#[repr(C)]
+pub struct CShortTradesItem {
+    /// Trading date in RFC 3339 format
+    pub timestamp: *const c_char,
+    /// Short ratio
+    pub rate: *const c_char,
+    /// Closing price
+    pub close: *const c_char,
+    /// [US] NASDAQ short sale volume
+    pub nus_amount: *const c_char,
+    /// [US] NYSE short sale volume
+    pub ny_amount: *const c_char,
+    /// [US] Total short amount
+    pub total_amount: *const c_char,
+    /// [HK] Short sale turnover amount (HKD)
+    pub amount: *const c_char,
+    /// [HK] Short position balance
+    pub balance: *const c_char,
+}
+
+pub(crate) struct CShortTradesItemOwned {
+    timestamp: CString,
+    rate: CString,
+    close: CString,
+    nus_amount: CString,
+    ny_amount: CString,
+    total_amount: CString,
+    amount: CString,
+    balance: CString,
+}
+
+impl From<ShortTradesItem> for CShortTradesItemOwned {
+    fn from(v: ShortTradesItem) -> Self {
+        Self {
+            timestamp: v.timestamp.into(),
+            rate: v.rate.into(),
+            close: v.close.into(),
+            nus_amount: v.nus_amount.into(),
+            ny_amount: v.ny_amount.into(),
+            total_amount: v.total_amount.into(),
+            amount: v.amount.into(),
+            balance: v.balance.into(),
+        }
+    }
+}
+
+impl ToFFI for CShortTradesItemOwned {
+    type FFIType = CShortTradesItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CShortTradesItem {
+            timestamp: self.timestamp.to_ffi_type(),
+            rate: self.rate.to_ffi_type(),
+            close: self.close.to_ffi_type(),
+            nus_amount: self.nus_amount.to_ffi_type(),
+            ny_amount: self.ny_amount.to_ffi_type(),
+            total_amount: self.total_amount.to_ffi_type(),
+            amount: self.amount.to_ffi_type(),
+            balance: self.balance.to_ffi_type(),
+        }
+    }
+}
 
 /// Short trade records response (HK or US).
-///
-/// `data` is a NUL-terminated JSON string.
 #[repr(C)]
 pub struct CShortTradesResponse {
-    /// Raw short trade data as a JSON string
-    pub data: *const c_char,
+    /// Pointer to the array of short trade items
+    pub data: *const CShortTradesItem,
+    /// Number of items in `data`
+    pub num_data: usize,
 }
 
 pub(crate) struct CShortTradesResponseOwned {
-    data: CString,
+    data: CVec<CShortTradesItemOwned>,
 }
 
 impl From<ShortTradesResponse> for CShortTradesResponseOwned {
     fn from(v: ShortTradesResponse) -> Self {
-        let json = serde_json::to_string(&v).unwrap_or_default();
-        Self { data: json.into() }
+        Self {
+            data: v.data.into(),
+        }
     }
 }
 
@@ -3164,6 +3297,7 @@ impl ToFFI for CShortTradesResponseOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CShortTradesResponse {
             data: self.data.to_ffi_type(),
+            num_data: self.data.len(),
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.longbridge.fundamental;
 
-/** Response for {@link FundamentalContext#getValuationComparison}. Contains raw JSON data. */
+/** Response for {@link FundamentalContext#getValuationComparison}. */
 public class ValuationComparisonResponse {
-    /** Raw JSON data string */
-    public String data;
+    /** Comparison items (primary + peers) */
+    public ValuationComparisonItem[] list;
 }

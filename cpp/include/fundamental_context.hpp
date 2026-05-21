@@ -135,12 +135,12 @@ public:
                           int64_t object_id,
                           AsyncCallback<FundamentalContext, std::string> callback) const;
 
-  /// Get valuation comparison (raw JSON string).
+  /// Get valuation comparison.
   /// Pass nullptr for comparison_symbols to skip peer comparison.
   void valuation_comparison(const std::string& symbol,
                             const std::string& currency,
                             const std::vector<std::string>* comparison_symbols,
-                            AsyncCallback<FundamentalContext, std::string> callback) const;
+                            AsyncCallback<FundamentalContext, ValuationComparisonResponse> callback) const;
 };
 
 } // namespace fundamental

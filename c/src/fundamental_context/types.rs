@@ -2903,21 +2903,168 @@ impl ToFFI for CShareholderDetailResponseOwned {
 
 // ── ValuationComparisonResponse ───────────────────────────────────
 
-/// Valuation comparison response. `data` is a NUL-terminated JSON string.
+/// One historical valuation data point.
+#[repr(C)]
+pub struct CValuationHistoryPoint {
+    /// Date in RFC 3339 format
+    pub date: *const c_char,
+    /// P/E ratio
+    pub pe: *const c_char,
+    /// P/B ratio
+    pub pb: *const c_char,
+    /// P/S ratio
+    pub ps: *const c_char,
+}
+
+pub(crate) struct CValuationHistoryPointOwned {
+    date: CString,
+    pe: CString,
+    pb: CString,
+    ps: CString,
+}
+
+impl From<ValuationHistoryPoint> for CValuationHistoryPointOwned {
+    fn from(v: ValuationHistoryPoint) -> Self {
+        Self {
+            date: v.date.into(),
+            pe: v.pe.into(),
+            pb: v.pb.into(),
+            ps: v.ps.into(),
+        }
+    }
+}
+
+impl ToFFI for CValuationHistoryPointOwned {
+    type FFIType = CValuationHistoryPoint;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CValuationHistoryPoint {
+            date: self.date.to_ffi_type(),
+            pe: self.pe.to_ffi_type(),
+            pb: self.pb.to_ffi_type(),
+            ps: self.ps.to_ffi_type(),
+        }
+    }
+}
+
+/// One security's valuation comparison item.
+#[repr(C)]
+pub struct CValuationComparisonItem {
+    /// Symbol, e.g. "AAPL.US"
+    pub symbol: *const c_char,
+    /// Security name
+    pub name: *const c_char,
+    /// Currency
+    pub currency: *const c_char,
+    /// Market capitalisation
+    pub market_value: *const c_char,
+    /// Latest closing price
+    pub price_close: *const c_char,
+    /// P/E ratio
+    pub pe: *const c_char,
+    /// P/B ratio
+    pub pb: *const c_char,
+    /// P/S ratio
+    pub ps: *const c_char,
+    /// Return on equity
+    pub roe: *const c_char,
+    /// Earnings per share
+    pub eps: *const c_char,
+    /// Book value per share
+    pub bps: *const c_char,
+    /// Dividends per share
+    pub dps: *const c_char,
+    /// Dividend yield
+    pub div_yld: *const c_char,
+    /// Total assets
+    pub assets: *const c_char,
+    /// Pointer to the array of historical valuation points
+    pub history: *const CValuationHistoryPoint,
+    /// Number of items in `history`
+    pub num_history: usize,
+}
+
+pub(crate) struct CValuationComparisonItemOwned {
+    symbol: CString,
+    name: CString,
+    currency: CString,
+    market_value: CString,
+    price_close: CString,
+    pe: CString,
+    pb: CString,
+    ps: CString,
+    roe: CString,
+    eps: CString,
+    bps: CString,
+    dps: CString,
+    div_yld: CString,
+    assets: CString,
+    history: CVec<CValuationHistoryPointOwned>,
+}
+
+impl From<ValuationComparisonItem> for CValuationComparisonItemOwned {
+    fn from(v: ValuationComparisonItem) -> Self {
+        Self {
+            symbol: v.symbol.into(),
+            name: v.name.into(),
+            currency: v.currency.into(),
+            market_value: v.market_value.into(),
+            price_close: v.price_close.into(),
+            pe: v.pe.into(),
+            pb: v.pb.into(),
+            ps: v.ps.into(),
+            roe: v.roe.into(),
+            eps: v.eps.into(),
+            bps: v.bps.into(),
+            dps: v.dps.into(),
+            div_yld: v.div_yld.into(),
+            assets: v.assets.into(),
+            history: v.history.into(),
+        }
+    }
+}
+
+impl ToFFI for CValuationComparisonItemOwned {
+    type FFIType = CValuationComparisonItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CValuationComparisonItem {
+            symbol: self.symbol.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            currency: self.currency.to_ffi_type(),
+            market_value: self.market_value.to_ffi_type(),
+            price_close: self.price_close.to_ffi_type(),
+            pe: self.pe.to_ffi_type(),
+            pb: self.pb.to_ffi_type(),
+            ps: self.ps.to_ffi_type(),
+            roe: self.roe.to_ffi_type(),
+            eps: self.eps.to_ffi_type(),
+            bps: self.bps.to_ffi_type(),
+            dps: self.dps.to_ffi_type(),
+            div_yld: self.div_yld.to_ffi_type(),
+            assets: self.assets.to_ffi_type(),
+            history: self.history.to_ffi_type(),
+            num_history: self.history.len(),
+        }
+    }
+}
+
+/// Valuation comparison response.
 #[repr(C)]
 pub struct CValuationComparisonResponse {
-    /// Raw valuation comparison data as a JSON string
-    pub data: *const c_char,
+    /// Pointer to the array of valuation comparison items
+    pub list: *const CValuationComparisonItem,
+    /// Number of items in `list`
+    pub num_list: usize,
 }
 
 pub(crate) struct CValuationComparisonResponseOwned {
-    data: CString,
+    list: CVec<CValuationComparisonItemOwned>,
 }
 
 impl From<ValuationComparisonResponse> for CValuationComparisonResponseOwned {
     fn from(v: ValuationComparisonResponse) -> Self {
-        let json = serde_json::to_string(&v).unwrap_or_default();
-        Self { data: json.into() }
+        Self {
+            list: v.list.into(),
+        }
     }
 }
 
@@ -2925,7 +3072,8 @@ impl ToFFI for CValuationComparisonResponseOwned {
     type FFIType = CValuationComparisonResponse;
     fn to_ffi_type(&self) -> Self::FFIType {
         CValuationComparisonResponse {
-            data: self.data.to_ffi_type(),
+            list: self.list.to_ffi_type(),
+            num_list: self.list.len(),
         }
     }
 }

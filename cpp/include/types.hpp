@@ -1263,16 +1263,62 @@ struct FilingItem
   int64_t published_at;
 };
 
-/// Short interest / positions response (HK or US). `data` is a raw JSON string.
-struct ShortPositionsResponse
+/// One short-position record, unified for US and HK markets.
+struct ShortPositionsItem
 {
-  std::string data;
+  /// Trading date in RFC 3339 format
+  std::string timestamp;
+  /// Short ratio
+  std::string rate;
+  /// Closing price
+  std::string close;
+  /// [US] Number of short shares outstanding
+  std::string current_shares_short;
+  /// [US] Average daily share volume
+  std::string avg_daily_share_volume;
+  /// [US] Days-to-cover ratio
+  std::string days_to_cover;
+  /// [HK] Short sale amount (HKD)
+  std::string amount;
+  /// [HK] Short position balance
+  std::string balance;
+  /// [HK] Closing price (HK naming)
+  std::string cost;
 };
 
-/// Short trade records response (HK or US). `data` is a raw JSON string.
+/// Short interest / positions response (HK or US).
+struct ShortPositionsResponse
+{
+  /// Short position records
+  std::vector<ShortPositionsItem> data;
+};
+
+/// One short-trade record, unified for US and HK markets.
+struct ShortTradesItem
+{
+  /// Trading date in RFC 3339 format
+  std::string timestamp;
+  /// Short ratio
+  std::string rate;
+  /// Closing price
+  std::string close;
+  /// [US] NASDAQ short sale volume
+  std::string nus_amount;
+  /// [US] NYSE short sale volume
+  std::string ny_amount;
+  /// [US] Total short amount
+  std::string total_amount;
+  /// [HK] Short sale turnover amount (HKD)
+  std::string amount;
+  /// [HK] Short position balance
+  std::string balance;
+};
+
+/// Short trade records response (HK or US).
 struct ShortTradesResponse
 {
-  std::string data;
+  /// Short trade records
+  std::vector<ShortTradesItem> data;
 };
 
 struct OptionVolumeStats
@@ -2386,6 +2432,66 @@ struct TradeStatsResponse
   std::vector<TradePriceLevel> trades;
 };
 
+/// Stock information within a top-movers event.
+struct TopMoversStock
+{
+  std::string symbol;
+  std::string code;
+  std::string name;
+  std::string full_name;
+  std::string change;
+  std::string last_done;
+  std::string market;
+  std::string logo;
+  std::vector<std::string> labels;
+};
+
+/// One top-movers event entry.
+struct TopMoversEvent
+{
+  std::string timestamp;
+  std::string alert_reason;
+  int64_t alert_type;
+  TopMoversStock stock;
+  std::string post;
+};
+
+/// Response for top_movers.
+struct TopMoversResponse
+{
+  std::vector<TopMoversEvent> events;
+  /// Pagination cursor as a JSON string
+  std::string next_params;
+};
+
+/// One ranked security item.
+struct RankListItem
+{
+  std::string symbol;
+  std::string code;
+  std::string name;
+  std::string last_done;
+  std::string chg;
+  std::string change;
+  std::string inflow;
+  std::string market_cap;
+  std::string industry;
+  std::string pre_post_price;
+  std::string pre_post_chg;
+  std::string amplitude;
+  std::string five_day_chg;
+  std::string turnover_rate;
+  std::string volume_rate;
+  std::string pb_ttm;
+};
+
+/// Response for rank_list.
+struct RankListResponse
+{
+  bool bmp;
+  std::vector<RankListItem> lists;
+};
+
 /// A single anomaly (unusual market movement) alert item.
 struct AnomalyItem
 {
@@ -3130,6 +3236,41 @@ struct FinancialReportSnapshot
   std::string fr_asset_turn_ttm;
   std::string fr_leverage_ttm;
   std::string fr_debt_assets_ratio;
+};
+
+/// One historical valuation data point.
+struct ValuationHistoryPoint
+{
+  std::string date;
+  std::string pe;
+  std::string pb;
+  std::string ps;
+};
+
+/// One security's valuation comparison item.
+struct ValuationComparisonItem
+{
+  std::string symbol;
+  std::string name;
+  std::string currency;
+  std::string market_value;
+  std::string price_close;
+  std::string pe;
+  std::string pb;
+  std::string ps;
+  std::string roe;
+  std::string eps;
+  std::string bps;
+  std::string dps;
+  std::string div_yld;
+  std::string assets;
+  std::vector<ValuationHistoryPoint> history;
+};
+
+/// Valuation comparison response.
+struct ValuationComparisonResponse
+{
+  std::vector<ValuationComparisonItem> list;
 };
 
 } // namespace fundamental

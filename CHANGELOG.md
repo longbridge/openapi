@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Java, C, C++:** Response types for `short_positions`, `short_trades`, `top_movers`, `rank_list`, and `valuation_comparison` updated from raw-JSON stub structs to fully typed structs with named fields, matching the Rust/Python/Node.js SDK types. C SDK regenerated (`longbridge.h`) with new `lb_short_positions_item_t`, `lb_short_trades_item_t`, `lb_top_movers_stock_t`, `lb_top_movers_event_t`, `lb_rank_list_item_t`, `lb_valuation_history_point_t`, `lb_valuation_comparison_item_t` types.
 - **All languages:** `QuoteContext::short_positions(symbol, count)` now auto-detects market from symbol suffix (`.HK` → HK, otherwise US). `ShortPositionsResponse` is raw JSON.
 - **Rust, Python, Node.js, Java, C:** `short_positions` and `short_trades` responses now use typed structs (`ShortPositionsItem` / `ShortTradesItem`) with RFC 3339 timestamps instead of raw JSON. Fields absent in a given market default to empty string.
 - **Rust, Python, Node.js, Java, C:** `rank_list` response now uses a typed `RankListResponse { bmp, lists: Vec<RankListItem> }` struct; `counter_id` is converted to `symbol`.
