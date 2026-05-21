@@ -1,5 +1,3 @@
-//! OAuth client and HTTP server bindings.
-
 use std::{fmt, sync::Arc};
 
 use longbridge_geo::is_cn;
@@ -12,7 +10,8 @@ use poem::listener::{Acceptor, Listener, TcpListener};
 use crate::{
     callback::wait_for_callback,
     error::{OAuthError, OAuthResult},
-    token::{OAuthToken, token_path_for_client_id},
+    storage::TokenStorage,
+    token::OAuthToken,
 };
 
 const OAUTH_BASE_URL: &str = "https://openapi.longbridge.com/oauth2";
@@ -39,15 +38,14 @@ pub(crate) const DEFAULT_CALLBACK_PORT: u16 = 60355;
 pub(crate) struct OAuthInner {
     pub(crate) client_id: String,
     pub(crate) callback_port: u16,
+    pub(crate) storage: Arc<dyn TokenStorage>,
     pub(crate) token: tokio::sync::Mutex<Option<OAuthToken>>,
 }
 
-/// OAuth 2.0 client for Longbridge OpenAPI
+/// OAuth 2.0 client for Longbridge OpenAPI.
 ///
-/// Obtain an instance via [`crate::OAuthBuilder`].  Cloning is cheap – all
+/// Obtain an instance via [`crate::OAuthBuilder`].  Cloning is cheap — all
 /// clones share the same internal state through an [`Arc`].
-///
-/// The token file is stored at `~/.longbridge/openapi/tokens/<client_id>`.
 #[derive(Clone)]
 pub struct OAuth(pub(crate) Arc<OAuthInner>);
 
@@ -63,19 +61,16 @@ impl fmt::Debug for OAuth {
 impl OAuth {
     /// Create an OAuth client from a pre-existing access token.
     ///
-    /// This is useful for server-side scenarios where the token is obtained
-    /// externally (e.g., via an MCP OAuth proxy) and you need to construct
-    /// an [`OAuth`] instance without going through the browser authorization
-    /// flow.
-    ///
-    /// The returned instance does **not** support token refresh — calling
-    /// [`access_token`](OAuth::access_token) simply returns the provided
-    /// token until it expires.
+    /// Useful for server-side scenarios where the token is obtained externally
+    /// (e.g. via an MCP OAuth proxy).  The returned instance does **not**
+    /// support token refresh — [`access_token`](OAuth::access_token) simply
+    /// returns the provided token until it expires.
     pub fn from_token(access_token: impl Into<String>) -> Self {
         let access_token = access_token.into();
         Self(Arc::new(OAuthInner {
             client_id: String::new(),
             callback_port: DEFAULT_CALLBACK_PORT,
+            storage: crate::storage::default_storage(),
             token: tokio::sync::Mutex::new(Some(OAuthToken {
                 client_id: String::new(),
                 access_token,
@@ -85,17 +80,16 @@ impl OAuth {
         }))
     }
 
-    /// Return the OAuth client ID
+    /// Return the OAuth client ID.
     pub fn client_id(&self) -> &str {
         &self.0.client_id
     }
 
     /// Return a valid access token, refreshing it first if it has expired or
-    /// will expire within one hour.
+    /// will expire within five minutes.
     ///
-    /// The refreshed token is persisted to
-    /// `~/.longbridge/openapi/tokens/<client_id>` so that subsequent runs can
-    /// avoid a full re-authorization.
+    /// The refreshed token is persisted via the configured storage backend so
+    /// that subsequent runs can avoid a full re-authorization.
     pub async fn access_token(&self) -> OAuthResult<String> {
         let mut guard = self.0.token.lock().await;
 
@@ -112,9 +106,8 @@ impl OAuth {
         };
 
         if needs_refresh && let Some(current) = guard.as_ref() {
-            let token_path = token_path_for_client_id(&self.0.client_id)?;
             let refreshed = self.refresh_token(current).await?;
-            refreshed.save_to_path(&token_path)?;
+            self.0.storage.save(&refreshed.clone().into())?;
             *guard = Some(refreshed);
         }
 
