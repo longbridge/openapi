@@ -114,7 +114,14 @@ void FundamentalContext::industry_peers(const std::string& counter_id, const std
   F_TYPED(IndustryPeersResponse, lb_industry_peers_response_t, lb_fundamental_context_industry_peers, ctx_, counter_id.c_str(), market.c_str(), industry_id);
 }
 void FundamentalContext::financial_report_snapshot(const std::string& s, const char* report, int32_t fiscal_year, const char* fiscal_period, AsyncCallback<FundamentalContext, FinancialReportSnapshot> callback) const {
-  F_TYPED(FinancialReportSnapshot, lb_financial_report_snapshot_t, lb_fundamental_context_financial_report_snapshot, ctx_, s.c_str(), report, fiscal_year, fiscal_period);
+  // C API takes fiscal_year as a string; convert 0 → nullptr
+  std::string fy_str;
+  const char* fy_cstr = nullptr;
+  if (fiscal_year != 0) {
+    fy_str = std::to_string(fiscal_year);
+    fy_cstr = fy_str.c_str();
+  }
+  F_TYPED(FinancialReportSnapshot, lb_financial_report_snapshot_t, lb_fundamental_context_financial_report_snapshot, ctx_, s.c_str(), report, fy_cstr, fiscal_period);
 }
 
 #undef F_TYPED
