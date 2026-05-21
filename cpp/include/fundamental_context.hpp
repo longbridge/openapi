@@ -126,6 +126,40 @@ public:
   void ratings(const std::string& symbol,
                AsyncCallback<FundamentalContext, StockRatings> callback) const;
 
+  /// Get latest business segment breakdown
+  void business_segments(const std::string& symbol,
+                          AsyncCallback<FundamentalContext, BusinessSegments> callback) const;
+
+  /// Get historical business segment breakdowns (pass nullptr for report/cate to omit)
+  void business_segments_history(const std::string& symbol,
+                                  const char* report,
+                                  const char* cate,
+                                  AsyncCallback<FundamentalContext, BusinessSegmentsHistory> callback) const;
+
+  /// Get historical institutional rating view time-series
+  void institution_rating_views(const std::string& symbol,
+                                 AsyncCallback<FundamentalContext, InstitutionRatingViews> callback) const;
+
+  /// Get industry rank list for a market
+  void industry_rank(const std::string& market,
+                     const std::string& indicator,
+                     const std::string& sort_type,
+                     uint32_t limit,
+                     AsyncCallback<FundamentalContext, IndustryRankResponse> callback) const;
+
+  /// Get industry peer chain (pass nullptr for industry_id to omit)
+  void industry_peers(const std::string& counter_id,
+                      const std::string& market,
+                      const char* industry_id,
+                      AsyncCallback<FundamentalContext, IndustryPeersResponse> callback) const;
+
+  /// Get financial report snapshot (pass nullptr/0 for optional params)
+  void financial_report_snapshot(const std::string& symbol,
+                                  const char* report,
+                                  int32_t fiscal_year,
+                                  const char* fiscal_period,
+                                  AsyncCallback<FundamentalContext, FinancialReportSnapshot> callback) const;
+
   /// Get ranked list of top shareholders (raw JSON string)
   void shareholder_top(const std::string& symbol,
                        AsyncCallback<FundamentalContext, std::string> callback) const;
