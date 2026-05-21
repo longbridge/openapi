@@ -324,6 +324,43 @@ public class SdkNative {
         public static native void marketContextConstituent(long context, String symbol, AsyncCallback callback);
         public static native void marketContextTopMovers(long context, com.longbridge.market.TopMoversOptions opts, AsyncCallback callback);
 
+        public static native void marketContextRankCategories(long context,
+                        AsyncCallback callback);
+
+        public static native void marketContextRankList(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native long newScreenerContext(long config);
+
+        public static native void freeScreenerContext(long context);
+
+        public static native void screenerContextRecommendStrategies(long context,
+                        AsyncCallback callback);
+
+        public static native void screenerContextUserStrategies(long context,
+                        AsyncCallback callback);
+
+        public static native void screenerContextStrategy(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native void screenerContextSearch(long context, Object opts,
+                        AsyncCallback callback);
+
+        public static native void screenerContextIndicators(long context,
+                        AsyncCallback callback);
+
+        public static native void fundamentalContextShareholderTop(long context,
+                        String symbol, AsyncCallback callback);
+
+        public static native void fundamentalContextShareholderDetail(long context,
+                        Object opts, AsyncCallback callback);
+
+        public static native void fundamentalContextValuationComparison(long context,
+                        Object opts, AsyncCallback callback);
+
+        public static native void quoteContextShortTrades(long context, Object opts,
+                        AsyncCallback callback);
+
         // ── FundamentalContext ────────────────────────────────────────
 
         public static native long newFundamentalContext(long config);
