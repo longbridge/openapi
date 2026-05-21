@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Rust:** `Config::header(key, value)` builder method to inject custom headers.
 - **Rust, Python:** `ContentContext` adds `topic_detail`, `list_topic_replies`, `create_topic_reply`.
 - **All languages:** Six new `FundamentalContext` methods (PR #526): `BusinessSegments`, `BusinessSegmentsHistory`, `InstitutionRatingViews`, `IndustryRank`, `IndustryPeers`, `FinancialReportSnapshot`
+- **C, C++:** C SDK bindings for all six PR #526 `FundamentalContext` APIs: `lb_fundamental_context_business_segments`, `lb_fundamental_context_business_segments_history`, `lb_fundamental_context_institution_rating_views`, `lb_fundamental_context_industry_rank`, `lb_fundamental_context_industry_peers`, `lb_fundamental_context_financial_report_snapshot`. New typed structs added to `longbridge.h`.
 - **All languages:** 13 more new APIs: `shareholder_top`, `shareholder_detail`, `valuation_comparison` (FundamentalContext); `short_positions` (HK+US unified), `short_trades` (QuoteContext); `top_movers`, `rank_categories`, `rank_list` (MarketContext); `ScreenerContext` (new) with 5 screener methods
 
 ### Changed

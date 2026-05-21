@@ -3077,3 +3077,768 @@ impl ToFFI for CValuationComparisonResponseOwned {
         }
     }
 }
+
+// ── BusinessSegments ──────────────────────────────────────────────
+
+/// One business segment item (latest snapshot).
+#[repr(C)]
+pub struct CBusinessSegmentItem {
+    /// Segment name.
+    pub name: *const c_char,
+    /// Percentage of total revenue.
+    pub percent: *const c_char,
+}
+
+pub(crate) struct CBusinessSegmentItemOwned {
+    name: CString,
+    percent: CString,
+}
+
+impl From<longbridge::fundamental::BusinessSegmentItem> for CBusinessSegmentItemOwned {
+    fn from(v: longbridge::fundamental::BusinessSegmentItem) -> Self {
+        Self {
+            name: v.name.into(),
+            percent: v.percent.into(),
+        }
+    }
+}
+
+impl ToFFI for CBusinessSegmentItemOwned {
+    type FFIType = CBusinessSegmentItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CBusinessSegmentItem {
+            name: self.name.to_ffi_type(),
+            percent: self.percent.to_ffi_type(),
+        }
+    }
+}
+
+/// Current business segment breakdown for a security.
+#[repr(C)]
+pub struct CBusinessSegments {
+    /// Report date.
+    pub date: *const c_char,
+    /// Total revenue.
+    pub total: *const c_char,
+    /// Reporting currency.
+    pub currency: *const c_char,
+    /// Pointer to business segment items.
+    pub business: *const CBusinessSegmentItem,
+    /// Number of items in `business`.
+    pub num_business: usize,
+}
+
+pub(crate) struct CBusinessSegmentsOwned {
+    date: CString,
+    total: CString,
+    currency: CString,
+    business: CVec<CBusinessSegmentItemOwned>,
+}
+
+impl From<longbridge::fundamental::BusinessSegments> for CBusinessSegmentsOwned {
+    fn from(v: longbridge::fundamental::BusinessSegments) -> Self {
+        Self {
+            date: v.date.into(),
+            total: v.total.into(),
+            currency: v.currency.into(),
+            business: v.business.into(),
+        }
+    }
+}
+
+impl ToFFI for CBusinessSegmentsOwned {
+    type FFIType = CBusinessSegments;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CBusinessSegments {
+            date: self.date.to_ffi_type(),
+            total: self.total.to_ffi_type(),
+            currency: self.currency.to_ffi_type(),
+            business: self.business.to_ffi_type(),
+            num_business: self.business.len(),
+        }
+    }
+}
+
+// ── BusinessSegmentsHistory ───────────────────────────────────────
+
+/// One business/regional segment item in a historical snapshot.
+#[repr(C)]
+pub struct CBusinessSegmentHistoryItem {
+    /// Segment name.
+    pub name: *const c_char,
+    /// Percentage of total.
+    pub percent: *const c_char,
+    /// Absolute value.
+    pub value: *const c_char,
+}
+
+pub(crate) struct CBusinessSegmentHistoryItemOwned {
+    name: CString,
+    percent: CString,
+    value: CString,
+}
+
+impl From<longbridge::fundamental::BusinessSegmentHistoryItem>
+    for CBusinessSegmentHistoryItemOwned
+{
+    fn from(v: longbridge::fundamental::BusinessSegmentHistoryItem) -> Self {
+        Self {
+            name: v.name.into(),
+            percent: v.percent.into(),
+            value: v.value.into(),
+        }
+    }
+}
+
+impl ToFFI for CBusinessSegmentHistoryItemOwned {
+    type FFIType = CBusinessSegmentHistoryItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CBusinessSegmentHistoryItem {
+            name: self.name.to_ffi_type(),
+            percent: self.percent.to_ffi_type(),
+            value: self.value.to_ffi_type(),
+        }
+    }
+}
+
+/// One historical business segments snapshot.
+#[repr(C)]
+pub struct CBusinessSegmentsHistoricalItem {
+    /// Report date.
+    pub date: *const c_char,
+    /// Total revenue.
+    pub total: *const c_char,
+    /// Reporting currency.
+    pub currency: *const c_char,
+    /// Pointer to business segment breakdown items.
+    pub business: *const CBusinessSegmentHistoryItem,
+    /// Number of items in `business`.
+    pub num_business: usize,
+    /// Pointer to regional breakdown items.
+    pub regionals: *const CBusinessSegmentHistoryItem,
+    /// Number of items in `regionals`.
+    pub num_regionals: usize,
+}
+
+pub(crate) struct CBusinessSegmentsHistoricalItemOwned {
+    date: CString,
+    total: CString,
+    currency: CString,
+    business: CVec<CBusinessSegmentHistoryItemOwned>,
+    regionals: CVec<CBusinessSegmentHistoryItemOwned>,
+}
+
+impl From<longbridge::fundamental::BusinessSegmentsHistoricalItem>
+    for CBusinessSegmentsHistoricalItemOwned
+{
+    fn from(v: longbridge::fundamental::BusinessSegmentsHistoricalItem) -> Self {
+        Self {
+            date: v.date.into(),
+            total: v.total.into(),
+            currency: v.currency.into(),
+            business: v.business.into(),
+            regionals: v.regionals.into(),
+        }
+    }
+}
+
+impl ToFFI for CBusinessSegmentsHistoricalItemOwned {
+    type FFIType = CBusinessSegmentsHistoricalItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CBusinessSegmentsHistoricalItem {
+            date: self.date.to_ffi_type(),
+            total: self.total.to_ffi_type(),
+            currency: self.currency.to_ffi_type(),
+            business: self.business.to_ffi_type(),
+            num_business: self.business.len(),
+            regionals: self.regionals.to_ffi_type(),
+            num_regionals: self.regionals.len(),
+        }
+    }
+}
+
+/// Historical business segment breakdowns for a security.
+#[repr(C)]
+pub struct CBusinessSegmentsHistory {
+    /// Pointer to historical snapshot items.
+    pub historical: *const CBusinessSegmentsHistoricalItem,
+    /// Number of items in `historical`.
+    pub num_historical: usize,
+}
+
+pub(crate) struct CBusinessSegmentsHistoryOwned {
+    historical: CVec<CBusinessSegmentsHistoricalItemOwned>,
+}
+
+impl From<longbridge::fundamental::BusinessSegmentsHistory> for CBusinessSegmentsHistoryOwned {
+    fn from(v: longbridge::fundamental::BusinessSegmentsHistory) -> Self {
+        Self {
+            historical: v.historical.into(),
+        }
+    }
+}
+
+impl ToFFI for CBusinessSegmentsHistoryOwned {
+    type FFIType = CBusinessSegmentsHistory;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CBusinessSegmentsHistory {
+            historical: self.historical.to_ffi_type(),
+            num_historical: self.historical.len(),
+        }
+    }
+}
+
+// ── InstitutionRatingViews ────────────────────────────────────────
+
+/// One historical institutional rating distribution snapshot.
+#[repr(C)]
+pub struct CInstitutionRatingViewItem {
+    /// Date (unix timestamp string).
+    pub date: *const c_char,
+    /// Number of "Buy" ratings.
+    pub buy: *const c_char,
+    /// Number of "Outperform" ratings.
+    pub over: *const c_char,
+    /// Number of "Hold" ratings.
+    pub hold: *const c_char,
+    /// Number of "Underperform" ratings.
+    pub under: *const c_char,
+    /// Number of "Sell" ratings.
+    pub sell: *const c_char,
+    /// Total analyst count.
+    pub total: *const c_char,
+}
+
+pub(crate) struct CInstitutionRatingViewItemOwned {
+    date: CString,
+    buy: CString,
+    over: CString,
+    hold: CString,
+    under: CString,
+    sell: CString,
+    total: CString,
+}
+
+impl From<longbridge::fundamental::InstitutionRatingViewItem> for CInstitutionRatingViewItemOwned {
+    fn from(v: longbridge::fundamental::InstitutionRatingViewItem) -> Self {
+        Self {
+            date: v.date.into(),
+            buy: v.buy.into(),
+            over: v.over.into(),
+            hold: v.hold.into(),
+            under: v.under.into(),
+            sell: v.sell.into(),
+            total: v.total.into(),
+        }
+    }
+}
+
+impl ToFFI for CInstitutionRatingViewItemOwned {
+    type FFIType = CInstitutionRatingViewItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CInstitutionRatingViewItem {
+            date: self.date.to_ffi_type(),
+            buy: self.buy.to_ffi_type(),
+            over: self.over.to_ffi_type(),
+            hold: self.hold.to_ffi_type(),
+            under: self.under.to_ffi_type(),
+            sell: self.sell.to_ffi_type(),
+            total: self.total.to_ffi_type(),
+        }
+    }
+}
+
+/// Historical institutional rating views time-series for a security.
+#[repr(C)]
+pub struct CInstitutionRatingViews {
+    /// Pointer to rating view items.
+    pub elist: *const CInstitutionRatingViewItem,
+    /// Number of items in `elist`.
+    pub num_elist: usize,
+}
+
+pub(crate) struct CInstitutionRatingViewsOwned {
+    elist: CVec<CInstitutionRatingViewItemOwned>,
+}
+
+impl From<longbridge::fundamental::InstitutionRatingViews> for CInstitutionRatingViewsOwned {
+    fn from(v: longbridge::fundamental::InstitutionRatingViews) -> Self {
+        Self {
+            elist: v.elist.into(),
+        }
+    }
+}
+
+impl ToFFI for CInstitutionRatingViewsOwned {
+    type FFIType = CInstitutionRatingViews;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CInstitutionRatingViews {
+            elist: self.elist.to_ffi_type(),
+            num_elist: self.elist.len(),
+        }
+    }
+}
+
+// ── IndustryRank ──────────────────────────────────────────────────
+
+/// One ranked industry item.
+#[repr(C)]
+pub struct CIndustryRankItem {
+    /// Industry / sector name.
+    pub name: *const c_char,
+    /// Counter ID of the industry.
+    pub counter_id: *const c_char,
+    /// Change percentage.
+    pub chg: *const c_char,
+    /// Name of the leading stock.
+    pub leading_name: *const c_char,
+    /// Ticker of the leading stock.
+    pub leading_ticker: *const c_char,
+    /// Change percentage of the leading stock.
+    pub leading_chg: *const c_char,
+    /// Value label name.
+    pub value_name: *const c_char,
+    /// Value data.
+    pub value_data: *const c_char,
+}
+
+pub(crate) struct CIndustryRankItemOwned {
+    name: CString,
+    counter_id: CString,
+    chg: CString,
+    leading_name: CString,
+    leading_ticker: CString,
+    leading_chg: CString,
+    value_name: CString,
+    value_data: CString,
+}
+
+impl From<longbridge::fundamental::IndustryRankItem> for CIndustryRankItemOwned {
+    fn from(v: longbridge::fundamental::IndustryRankItem) -> Self {
+        Self {
+            name: v.name.into(),
+            counter_id: v.counter_id.into(),
+            chg: v.chg.into(),
+            leading_name: v.leading_name.into(),
+            leading_ticker: v.leading_ticker.into(),
+            leading_chg: v.leading_chg.into(),
+            value_name: v.value_name.into(),
+            value_data: v.value_data.into(),
+        }
+    }
+}
+
+impl ToFFI for CIndustryRankItemOwned {
+    type FFIType = CIndustryRankItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CIndustryRankItem {
+            name: self.name.to_ffi_type(),
+            counter_id: self.counter_id.to_ffi_type(),
+            chg: self.chg.to_ffi_type(),
+            leading_name: self.leading_name.to_ffi_type(),
+            leading_ticker: self.leading_ticker.to_ffi_type(),
+            leading_chg: self.leading_chg.to_ffi_type(),
+            value_name: self.value_name.to_ffi_type(),
+            value_data: self.value_data.to_ffi_type(),
+        }
+    }
+}
+
+/// A group of ranked industry items.
+#[repr(C)]
+pub struct CIndustryRankGroup {
+    /// Pointer to ranked items.
+    pub lists: *const CIndustryRankItem,
+    /// Number of items in `lists`.
+    pub num_lists: usize,
+}
+
+pub(crate) struct CIndustryRankGroupOwned {
+    lists: CVec<CIndustryRankItemOwned>,
+}
+
+impl From<longbridge::fundamental::IndustryRankGroup> for CIndustryRankGroupOwned {
+    fn from(v: longbridge::fundamental::IndustryRankGroup) -> Self {
+        Self {
+            lists: v.lists.into(),
+        }
+    }
+}
+
+impl ToFFI for CIndustryRankGroupOwned {
+    type FFIType = CIndustryRankGroup;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CIndustryRankGroup {
+            lists: self.lists.to_ffi_type(),
+            num_lists: self.lists.len(),
+        }
+    }
+}
+
+/// Industry rank response.
+#[repr(C)]
+pub struct CIndustryRankResponse {
+    /// Pointer to grouped rank items.
+    pub items: *const CIndustryRankGroup,
+    /// Number of groups in `items`.
+    pub num_items: usize,
+}
+
+pub(crate) struct CIndustryRankResponseOwned {
+    items: CVec<CIndustryRankGroupOwned>,
+}
+
+impl From<longbridge::fundamental::IndustryRankResponse> for CIndustryRankResponseOwned {
+    fn from(v: longbridge::fundamental::IndustryRankResponse) -> Self {
+        Self {
+            items: v.items.into(),
+        }
+    }
+}
+
+impl ToFFI for CIndustryRankResponseOwned {
+    type FFIType = CIndustryRankResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CIndustryRankResponse {
+            items: self.items.to_ffi_type(),
+            num_items: self.items.len(),
+        }
+    }
+}
+
+// ── IndustryPeers ─────────────────────────────────────────────────
+
+/// Top-level industry info in the peers response.
+#[repr(C)]
+pub struct CIndustryPeersTop {
+    /// Industry name.
+    pub name: *const c_char,
+    /// Market code.
+    pub market: *const c_char,
+}
+
+pub(crate) struct CIndustryPeersTopOwned {
+    name: CString,
+    market: CString,
+}
+
+impl From<longbridge::fundamental::IndustryPeersTop> for CIndustryPeersTopOwned {
+    fn from(v: longbridge::fundamental::IndustryPeersTop) -> Self {
+        Self {
+            name: v.name.into(),
+            market: v.market.into(),
+        }
+    }
+}
+
+impl ToFFI for CIndustryPeersTopOwned {
+    type FFIType = CIndustryPeersTop;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CIndustryPeersTop {
+            name: self.name.to_ffi_type(),
+            market: self.market.to_ffi_type(),
+        }
+    }
+}
+
+/// A node in the industry peer chain (recursive children serialised as JSON).
+#[repr(C)]
+pub struct CIndustryPeerNode {
+    /// Node name.
+    pub name: *const c_char,
+    /// Counter ID.
+    pub counter_id: *const c_char,
+    /// Number of stocks in this node.
+    pub stock_num: i32,
+    /// Change percentage.
+    pub chg: *const c_char,
+    /// Year-to-date change.
+    pub ytd_chg: *const c_char,
+    /// Child nodes serialised as a JSON string (may be NULL if empty).
+    pub next_json: *const c_char,
+}
+
+pub(crate) struct CIndustryPeerNodeOwned {
+    name: CString,
+    counter_id: CString,
+    stock_num: i32,
+    chg: CString,
+    ytd_chg: CString,
+    next_json: CString,
+}
+
+impl From<longbridge::fundamental::IndustryPeerNode> for CIndustryPeerNodeOwned {
+    fn from(v: longbridge::fundamental::IndustryPeerNode) -> Self {
+        let next_json = if v.next.is_empty() {
+            String::new()
+        } else {
+            serde_json::to_string(&v.next).unwrap_or_default()
+        };
+        Self {
+            name: v.name.into(),
+            counter_id: v.counter_id.into(),
+            stock_num: v.stock_num,
+            chg: v.chg.into(),
+            ytd_chg: v.ytd_chg.into(),
+            next_json: next_json.into(),
+        }
+    }
+}
+
+impl ToFFI for CIndustryPeerNodeOwned {
+    type FFIType = CIndustryPeerNode;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CIndustryPeerNode {
+            name: self.name.to_ffi_type(),
+            counter_id: self.counter_id.to_ffi_type(),
+            stock_num: self.stock_num,
+            chg: self.chg.to_ffi_type(),
+            ytd_chg: self.ytd_chg.to_ffi_type(),
+            next_json: self.next_json.to_ffi_type(),
+        }
+    }
+}
+
+/// Industry peer chain response.
+#[repr(C)]
+pub struct CIndustryPeersResponse {
+    /// Top-level industry node info.
+    pub top: CIndustryPeersTop,
+    /// Root peer chain node (NULL if absent).
+    pub chain: *const CIndustryPeerNode,
+}
+
+pub(crate) struct CIndustryPeersResponseOwned {
+    top: CIndustryPeersTopOwned,
+    chain: COption<CIndustryPeerNodeOwned>,
+}
+
+impl From<longbridge::fundamental::IndustryPeersResponse> for CIndustryPeersResponseOwned {
+    fn from(v: longbridge::fundamental::IndustryPeersResponse) -> Self {
+        Self {
+            top: v.top.into(),
+            chain: v.chain.into(),
+        }
+    }
+}
+
+impl ToFFI for CIndustryPeersResponseOwned {
+    type FFIType = CIndustryPeersResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CIndustryPeersResponse {
+            top: self.top.to_ffi_type(),
+            chain: self.chain.to_ffi_type(),
+        }
+    }
+}
+
+// ── FinancialReportSnapshot ───────────────────────────────────────
+
+/// A forecast metric in the financial report snapshot.
+#[repr(C)]
+pub struct CSnapshotForecastMetric {
+    /// Actual value.
+    pub value: *const c_char,
+    /// Year-over-year change.
+    pub yoy: *const c_char,
+    /// Beat/miss description.
+    pub cmp_desc: *const c_char,
+    /// Consensus estimate value.
+    pub est_value: *const c_char,
+}
+
+pub(crate) struct CSnapshotForecastMetricOwned {
+    value: CString,
+    yoy: CString,
+    cmp_desc: CString,
+    est_value: CString,
+}
+
+impl From<longbridge::fundamental::SnapshotForecastMetric> for CSnapshotForecastMetricOwned {
+    fn from(v: longbridge::fundamental::SnapshotForecastMetric) -> Self {
+        Self {
+            value: v.value.into(),
+            yoy: v.yoy.into(),
+            cmp_desc: v.cmp_desc.into(),
+            est_value: v.est_value.into(),
+        }
+    }
+}
+
+impl ToFFI for CSnapshotForecastMetricOwned {
+    type FFIType = CSnapshotForecastMetric;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CSnapshotForecastMetric {
+            value: self.value.to_ffi_type(),
+            yoy: self.yoy.to_ffi_type(),
+            cmp_desc: self.cmp_desc.to_ffi_type(),
+            est_value: self.est_value.to_ffi_type(),
+        }
+    }
+}
+
+/// A reported metric in the financial report snapshot.
+#[repr(C)]
+pub struct CSnapshotReportedMetric {
+    /// Actual value.
+    pub value: *const c_char,
+    /// Year-over-year change.
+    pub yoy: *const c_char,
+}
+
+pub(crate) struct CSnapshotReportedMetricOwned {
+    value: CString,
+    yoy: CString,
+}
+
+impl From<longbridge::fundamental::SnapshotReportedMetric> for CSnapshotReportedMetricOwned {
+    fn from(v: longbridge::fundamental::SnapshotReportedMetric) -> Self {
+        Self {
+            value: v.value.into(),
+            yoy: v.yoy.into(),
+        }
+    }
+}
+
+impl ToFFI for CSnapshotReportedMetricOwned {
+    type FFIType = CSnapshotReportedMetric;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CSnapshotReportedMetric {
+            value: self.value.to_ffi_type(),
+            yoy: self.yoy.to_ffi_type(),
+        }
+    }
+}
+
+/// Financial report snapshot (earnings snapshot) for a security.
+#[repr(C)]
+pub struct CFinancialReportSnapshot {
+    /// Company name.
+    pub name: *const c_char,
+    /// Ticker code.
+    pub ticker: *const c_char,
+    /// Fiscal period start date.
+    pub fp_start: *const c_char,
+    /// Fiscal period end date.
+    pub fp_end: *const c_char,
+    /// Reporting currency.
+    pub currency: *const c_char,
+    /// Report description.
+    pub report_desc: *const c_char,
+    /// Forecast revenue (NULL if absent).
+    pub fo_revenue: *const CSnapshotForecastMetric,
+    /// Forecast EBIT (NULL if absent).
+    pub fo_ebit: *const CSnapshotForecastMetric,
+    /// Forecast EPS (NULL if absent).
+    pub fo_eps: *const CSnapshotForecastMetric,
+    /// Reported revenue (NULL if absent).
+    pub fr_revenue: *const CSnapshotReportedMetric,
+    /// Reported net profit (NULL if absent).
+    pub fr_profit: *const CSnapshotReportedMetric,
+    /// Reported operating cash flow (NULL if absent).
+    pub fr_operate_cash: *const CSnapshotReportedMetric,
+    /// Reported investing cash flow (NULL if absent).
+    pub fr_invest_cash: *const CSnapshotReportedMetric,
+    /// Reported financing cash flow (NULL if absent).
+    pub fr_finance_cash: *const CSnapshotReportedMetric,
+    /// Reported total assets (NULL if absent).
+    pub fr_total_assets: *const CSnapshotReportedMetric,
+    /// Reported total liabilities (NULL if absent).
+    pub fr_total_liability: *const CSnapshotReportedMetric,
+    /// ROE TTM.
+    pub fr_roe_ttm: *const c_char,
+    /// Profit margin.
+    pub fr_profit_margin: *const c_char,
+    /// Profit margin TTM.
+    pub fr_profit_margin_ttm: *const c_char,
+    /// Asset turnover TTM.
+    pub fr_asset_turn_ttm: *const c_char,
+    /// Leverage TTM.
+    pub fr_leverage_ttm: *const c_char,
+    /// Debt-to-assets ratio.
+    pub fr_debt_assets_ratio: *const c_char,
+}
+
+pub(crate) struct CFinancialReportSnapshotOwned {
+    name: CString,
+    ticker: CString,
+    fp_start: CString,
+    fp_end: CString,
+    currency: CString,
+    report_desc: CString,
+    fo_revenue: COption<CSnapshotForecastMetricOwned>,
+    fo_ebit: COption<CSnapshotForecastMetricOwned>,
+    fo_eps: COption<CSnapshotForecastMetricOwned>,
+    fr_revenue: COption<CSnapshotReportedMetricOwned>,
+    fr_profit: COption<CSnapshotReportedMetricOwned>,
+    fr_operate_cash: COption<CSnapshotReportedMetricOwned>,
+    fr_invest_cash: COption<CSnapshotReportedMetricOwned>,
+    fr_finance_cash: COption<CSnapshotReportedMetricOwned>,
+    fr_total_assets: COption<CSnapshotReportedMetricOwned>,
+    fr_total_liability: COption<CSnapshotReportedMetricOwned>,
+    fr_roe_ttm: CString,
+    fr_profit_margin: CString,
+    fr_profit_margin_ttm: CString,
+    fr_asset_turn_ttm: CString,
+    fr_leverage_ttm: CString,
+    fr_debt_assets_ratio: CString,
+}
+
+impl From<longbridge::fundamental::FinancialReportSnapshot> for CFinancialReportSnapshotOwned {
+    fn from(v: longbridge::fundamental::FinancialReportSnapshot) -> Self {
+        Self {
+            name: v.name.into(),
+            ticker: v.ticker.into(),
+            fp_start: v.fp_start.into(),
+            fp_end: v.fp_end.into(),
+            currency: v.currency.into(),
+            report_desc: v.report_desc.into(),
+            fo_revenue: v.fo_revenue.into(),
+            fo_ebit: v.fo_ebit.into(),
+            fo_eps: v.fo_eps.into(),
+            fr_revenue: v.fr_revenue.into(),
+            fr_profit: v.fr_profit.into(),
+            fr_operate_cash: v.fr_operate_cash.into(),
+            fr_invest_cash: v.fr_invest_cash.into(),
+            fr_finance_cash: v.fr_finance_cash.into(),
+            fr_total_assets: v.fr_total_assets.into(),
+            fr_total_liability: v.fr_total_liability.into(),
+            fr_roe_ttm: v.fr_roe_ttm.into(),
+            fr_profit_margin: v.fr_profit_margin.into(),
+            fr_profit_margin_ttm: v.fr_profit_margin_ttm.into(),
+            fr_asset_turn_ttm: v.fr_asset_turn_ttm.into(),
+            fr_leverage_ttm: v.fr_leverage_ttm.into(),
+            fr_debt_assets_ratio: v.fr_debt_assets_ratio.into(),
+        }
+    }
+}
+
+impl ToFFI for CFinancialReportSnapshotOwned {
+    type FFIType = CFinancialReportSnapshot;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CFinancialReportSnapshot {
+            name: self.name.to_ffi_type(),
+            ticker: self.ticker.to_ffi_type(),
+            fp_start: self.fp_start.to_ffi_type(),
+            fp_end: self.fp_end.to_ffi_type(),
+            currency: self.currency.to_ffi_type(),
+            report_desc: self.report_desc.to_ffi_type(),
+            fo_revenue: self.fo_revenue.to_ffi_type(),
+            fo_ebit: self.fo_ebit.to_ffi_type(),
+            fo_eps: self.fo_eps.to_ffi_type(),
+            fr_revenue: self.fr_revenue.to_ffi_type(),
+            fr_profit: self.fr_profit.to_ffi_type(),
+            fr_operate_cash: self.fr_operate_cash.to_ffi_type(),
+            fr_invest_cash: self.fr_invest_cash.to_ffi_type(),
+            fr_finance_cash: self.fr_finance_cash.to_ffi_type(),
+            fr_total_assets: self.fr_total_assets.to_ffi_type(),
+            fr_total_liability: self.fr_total_liability.to_ffi_type(),
+            fr_roe_ttm: self.fr_roe_ttm.to_ffi_type(),
+            fr_profit_margin: self.fr_profit_margin.to_ffi_type(),
+            fr_profit_margin_ttm: self.fr_profit_margin_ttm.to_ffi_type(),
+            fr_asset_turn_ttm: self.fr_asset_turn_ttm.to_ffi_type(),
+            fr_leverage_ttm: self.fr_leverage_ttm.to_ffi_type(),
+            fr_debt_assets_ratio: self.fr_debt_assets_ratio.to_ffi_type(),
+        }
+    }
+}

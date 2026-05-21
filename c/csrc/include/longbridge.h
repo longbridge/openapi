@@ -6569,6 +6569,414 @@ typedef struct lb_stock_ratings_t {
 } lb_stock_ratings_t;
 
 /**
+ * One business segment item (latest snapshot).
+ */
+typedef struct lb_business_segment_item_t {
+  /**
+   * Segment name.
+   */
+  const char *name;
+  /**
+   * Percentage of total revenue.
+   */
+  const char *percent;
+} lb_business_segment_item_t;
+
+/**
+ * Current business segment breakdown for a security.
+ */
+typedef struct lb_business_segments_t {
+  /**
+   * Report date.
+   */
+  const char *date;
+  /**
+   * Total revenue.
+   */
+  const char *total;
+  /**
+   * Reporting currency.
+   */
+  const char *currency;
+  /**
+   * Pointer to business segment items.
+   */
+  const struct lb_business_segment_item_t *business;
+  /**
+   * Number of items in `business`.
+   */
+  uintptr_t num_business;
+} lb_business_segments_t;
+
+/**
+ * One business/regional segment item in a historical snapshot.
+ */
+typedef struct lb_business_segment_history_item_t {
+  /**
+   * Segment name.
+   */
+  const char *name;
+  /**
+   * Percentage of total.
+   */
+  const char *percent;
+  /**
+   * Absolute value.
+   */
+  const char *value;
+} lb_business_segment_history_item_t;
+
+/**
+ * One historical business segments snapshot.
+ */
+typedef struct lb_business_segments_historical_item_t {
+  /**
+   * Report date.
+   */
+  const char *date;
+  /**
+   * Total revenue.
+   */
+  const char *total;
+  /**
+   * Reporting currency.
+   */
+  const char *currency;
+  /**
+   * Pointer to business segment breakdown items.
+   */
+  const struct lb_business_segment_history_item_t *business;
+  /**
+   * Number of items in `business`.
+   */
+  uintptr_t num_business;
+  /**
+   * Pointer to regional breakdown items.
+   */
+  const struct lb_business_segment_history_item_t *regionals;
+  /**
+   * Number of items in `regionals`.
+   */
+  uintptr_t num_regionals;
+} lb_business_segments_historical_item_t;
+
+/**
+ * Historical business segment breakdowns for a security.
+ */
+typedef struct lb_business_segments_history_t {
+  /**
+   * Pointer to historical snapshot items.
+   */
+  const struct lb_business_segments_historical_item_t *historical;
+  /**
+   * Number of items in `historical`.
+   */
+  uintptr_t num_historical;
+} lb_business_segments_history_t;
+
+/**
+ * One historical institutional rating distribution snapshot.
+ */
+typedef struct lb_institution_rating_view_item_t {
+  /**
+   * Date (unix timestamp string).
+   */
+  const char *date;
+  /**
+   * Number of "Buy" ratings.
+   */
+  const char *buy;
+  /**
+   * Number of "Outperform" ratings.
+   */
+  const char *over;
+  /**
+   * Number of "Hold" ratings.
+   */
+  const char *hold;
+  /**
+   * Number of "Underperform" ratings.
+   */
+  const char *under;
+  /**
+   * Number of "Sell" ratings.
+   */
+  const char *sell;
+  /**
+   * Total analyst count.
+   */
+  const char *total;
+} lb_institution_rating_view_item_t;
+
+/**
+ * Historical institutional rating views time-series for a security.
+ */
+typedef struct lb_institution_rating_views_t {
+  /**
+   * Pointer to rating view items.
+   */
+  const struct lb_institution_rating_view_item_t *elist;
+  /**
+   * Number of items in `elist`.
+   */
+  uintptr_t num_elist;
+} lb_institution_rating_views_t;
+
+/**
+ * One ranked industry item.
+ */
+typedef struct lb_industry_rank_item_t {
+  /**
+   * Industry / sector name.
+   */
+  const char *name;
+  /**
+   * Counter ID of the industry.
+   */
+  const char *counter_id;
+  /**
+   * Change percentage.
+   */
+  const char *chg;
+  /**
+   * Name of the leading stock.
+   */
+  const char *leading_name;
+  /**
+   * Ticker of the leading stock.
+   */
+  const char *leading_ticker;
+  /**
+   * Change percentage of the leading stock.
+   */
+  const char *leading_chg;
+  /**
+   * Value label name.
+   */
+  const char *value_name;
+  /**
+   * Value data.
+   */
+  const char *value_data;
+} lb_industry_rank_item_t;
+
+/**
+ * A group of ranked industry items.
+ */
+typedef struct lb_industry_rank_group_t {
+  /**
+   * Pointer to ranked items.
+   */
+  const struct lb_industry_rank_item_t *lists;
+  /**
+   * Number of items in `lists`.
+   */
+  uintptr_t num_lists;
+} lb_industry_rank_group_t;
+
+/**
+ * Industry rank response.
+ */
+typedef struct lb_industry_rank_response_t {
+  /**
+   * Pointer to grouped rank items.
+   */
+  const struct lb_industry_rank_group_t *items;
+  /**
+   * Number of groups in `items`.
+   */
+  uintptr_t num_items;
+} lb_industry_rank_response_t;
+
+/**
+ * Top-level industry info in the peers response.
+ */
+typedef struct lb_industry_peers_top_t {
+  /**
+   * Industry name.
+   */
+  const char *name;
+  /**
+   * Market code.
+   */
+  const char *market;
+} lb_industry_peers_top_t;
+
+/**
+ * A node in the industry peer chain (recursive children serialised as JSON).
+ */
+typedef struct lb_industry_peer_node_t {
+  /**
+   * Node name.
+   */
+  const char *name;
+  /**
+   * Counter ID.
+   */
+  const char *counter_id;
+  /**
+   * Number of stocks in this node.
+   */
+  int32_t stock_num;
+  /**
+   * Change percentage.
+   */
+  const char *chg;
+  /**
+   * Year-to-date change.
+   */
+  const char *ytd_chg;
+  /**
+   * Child nodes serialised as a JSON string (may be NULL if empty).
+   */
+  const char *next_json;
+} lb_industry_peer_node_t;
+
+/**
+ * Industry peer chain response.
+ */
+typedef struct lb_industry_peers_response_t {
+  /**
+   * Top-level industry node info.
+   */
+  struct lb_industry_peers_top_t top;
+  /**
+   * Root peer chain node (NULL if absent).
+   */
+  const struct lb_industry_peer_node_t *chain;
+} lb_industry_peers_response_t;
+
+/**
+ * A forecast metric in the financial report snapshot.
+ */
+typedef struct lb_snapshot_forecast_metric_t {
+  /**
+   * Actual value.
+   */
+  const char *value;
+  /**
+   * Year-over-year change.
+   */
+  const char *yoy;
+  /**
+   * Beat/miss description.
+   */
+  const char *cmp_desc;
+  /**
+   * Consensus estimate value.
+   */
+  const char *est_value;
+} lb_snapshot_forecast_metric_t;
+
+/**
+ * A reported metric in the financial report snapshot.
+ */
+typedef struct lb_snapshot_reported_metric_t {
+  /**
+   * Actual value.
+   */
+  const char *value;
+  /**
+   * Year-over-year change.
+   */
+  const char *yoy;
+} lb_snapshot_reported_metric_t;
+
+/**
+ * Financial report snapshot (earnings snapshot) for a security.
+ */
+typedef struct lb_financial_report_snapshot_t {
+  /**
+   * Company name.
+   */
+  const char *name;
+  /**
+   * Ticker code.
+   */
+  const char *ticker;
+  /**
+   * Fiscal period start date.
+   */
+  const char *fp_start;
+  /**
+   * Fiscal period end date.
+   */
+  const char *fp_end;
+  /**
+   * Reporting currency.
+   */
+  const char *currency;
+  /**
+   * Report description.
+   */
+  const char *report_desc;
+  /**
+   * Forecast revenue (NULL if absent).
+   */
+  const struct lb_snapshot_forecast_metric_t *fo_revenue;
+  /**
+   * Forecast EBIT (NULL if absent).
+   */
+  const struct lb_snapshot_forecast_metric_t *fo_ebit;
+  /**
+   * Forecast EPS (NULL if absent).
+   */
+  const struct lb_snapshot_forecast_metric_t *fo_eps;
+  /**
+   * Reported revenue (NULL if absent).
+   */
+  const struct lb_snapshot_reported_metric_t *fr_revenue;
+  /**
+   * Reported net profit (NULL if absent).
+   */
+  const struct lb_snapshot_reported_metric_t *fr_profit;
+  /**
+   * Reported operating cash flow (NULL if absent).
+   */
+  const struct lb_snapshot_reported_metric_t *fr_operate_cash;
+  /**
+   * Reported investing cash flow (NULL if absent).
+   */
+  const struct lb_snapshot_reported_metric_t *fr_invest_cash;
+  /**
+   * Reported financing cash flow (NULL if absent).
+   */
+  const struct lb_snapshot_reported_metric_t *fr_finance_cash;
+  /**
+   * Reported total assets (NULL if absent).
+   */
+  const struct lb_snapshot_reported_metric_t *fr_total_assets;
+  /**
+   * Reported total liabilities (NULL if absent).
+   */
+  const struct lb_snapshot_reported_metric_t *fr_total_liability;
+  /**
+   * ROE TTM.
+   */
+  const char *fr_roe_ttm;
+  /**
+   * Profit margin.
+   */
+  const char *fr_profit_margin;
+  /**
+   * Profit margin TTM.
+   */
+  const char *fr_profit_margin_ttm;
+  /**
+   * Asset turnover TTM.
+   */
+  const char *fr_asset_turn_ttm;
+  /**
+   * Leverage TTM.
+   */
+  const char *fr_leverage_ttm;
+  /**
+   * Debt-to-assets ratio.
+   */
+  const char *fr_debt_assets_ratio;
+} lb_financial_report_snapshot_t;
+
+/**
  * A key-value pair carrying calendar data fields.
  */
 typedef struct lb_calendar_data_kv_t {
@@ -8908,6 +9316,74 @@ void lb_fundamental_context_shareholder_detail(const struct lb_fundamental_conte
                                                int64_t object_id,
                                                lb_async_callback_t callback,
                                                void *userdata);
+
+/**
+ * Get current business segment breakdown for a security.
+ * Returns `CBusinessSegments`.
+ */
+void lb_fundamental_context_business_segments(const struct lb_fundamental_context_t *ctx,
+                                              const char *symbol,
+                                              lb_async_callback_t callback,
+                                              void *userdata);
+
+/**
+ * Get historical business segment breakdowns for a security.
+ * Returns `CBusinessSegmentsHistory`.
+ * Pass NULL for `report` and/or `cate` to omit those filters.
+ */
+void lb_fundamental_context_business_segments_history(const struct lb_fundamental_context_t *ctx,
+                                                      const char *symbol,
+                                                      const char *report,
+                                                      const char *cate,
+                                                      lb_async_callback_t callback,
+                                                      void *userdata);
+
+/**
+ * Get historical institutional rating views for a security.
+ * Returns `CInstitutionRatingViews`.
+ */
+void lb_fundamental_context_institution_rating_views(const struct lb_fundamental_context_t *ctx,
+                                                     const char *symbol,
+                                                     lb_async_callback_t callback,
+                                                     void *userdata);
+
+/**
+ * Get industry rank for a market.
+ * Returns `CIndustryRankResponse`.
+ */
+void lb_fundamental_context_industry_rank(const struct lb_fundamental_context_t *ctx,
+                                          const char *market,
+                                          const char *indicator,
+                                          const char *sort_type,
+                                          uint32_t limit,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
+
+/**
+ * Get the industry peer chain for a security or industry.
+ * Returns `CIndustryPeersResponse`.
+ * Pass NULL for `industry_id` to omit it.
+ */
+void lb_fundamental_context_industry_peers(const struct lb_fundamental_context_t *ctx,
+                                           const char *counter_id,
+                                           const char *market,
+                                           const char *industry_id,
+                                           lb_async_callback_t callback,
+                                           void *userdata);
+
+/**
+ * Get a financial report snapshot for a security.
+ * Returns `CFinancialReportSnapshot`.
+ * Pass NULL for `report`, `fiscal_year_str`, and/or `fiscal_period` to omit
+ * them. `fiscal_year_str` should be a decimal integer string (e.g. `"2024"`).
+ */
+void lb_fundamental_context_financial_report_snapshot(const struct lb_fundamental_context_t *ctx,
+                                                      const char *symbol,
+                                                      const char *report,
+                                                      const char *fiscal_year_str,
+                                                      const char *fiscal_period,
+                                                      lb_async_callback_t callback,
+                                                      void *userdata);
 
 /**
  * Get valuation comparison between a security and optional peers.

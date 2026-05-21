@@ -9,6 +9,29 @@ use crate::{
     types::{CCow, cstr_to_rust},
 };
 
+// Helper: convert a nullable C string to an Option<&'static str> by matching
+// known enum-like values (e.g. report period codes).
+#[inline]
+unsafe fn cstr_to_static_opt(ptr: *const c_char) -> Option<&'static str> {
+    if ptr.is_null() {
+        return None;
+    }
+    let s = cstr_to_rust(ptr);
+    // Match against all known period/report values used across APIs.
+    match s.as_str() {
+        "qf" => Some("qf"),
+        "saf" => Some("saf"),
+        "af" => Some("af"),
+        "q1" => Some("q1"),
+        "q2" => Some("q2"),
+        "q3" => Some("q3"),
+        "annual" => Some("annual"),
+        "semi_annual" => Some("semi_annual"),
+        "quarterly" => Some("quarterly"),
+        _ => None,
+    }
+}
+
 pub(crate) struct CFundamentalContext {
     ctx: FundamentalContext,
 }
@@ -440,6 +463,165 @@ pub unsafe extern "C" fn lb_fundamental_context_shareholder_detail(
         let resp: CCow<CShareholderDetailResponseOwned> =
             CCow::new(CShareholderDetailResponseOwned::from(
                 ctx_inner.shareholder_detail(symbol, object_id).await?,
+            ));
+        Ok(resp)
+    });
+}
+
+/// Get current business segment breakdown for a security.
+/// Returns `CBusinessSegments`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_business_segments(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CBusinessSegmentsOwned> = CCow::new(CBusinessSegmentsOwned::from(
+            ctx_inner.business_segments(symbol).await?,
+        ));
+        Ok(resp)
+    });
+}
+
+/// Get historical business segment breakdowns for a security.
+/// Returns `CBusinessSegmentsHistory`.
+/// Pass NULL for `report` and/or `cate` to omit those filters.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_business_segments_history(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    report: *const c_char,
+    cate: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    let report: Option<&'static str> = cstr_to_static_opt(report);
+    let cate: Option<String> = if cate.is_null() {
+        None
+    } else {
+        Some(cstr_to_rust(cate))
+    };
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CBusinessSegmentsHistoryOwned> =
+            CCow::new(CBusinessSegmentsHistoryOwned::from(
+                ctx_inner
+                    .business_segments_history(symbol, report, cate)
+                    .await?,
+            ));
+        Ok(resp)
+    });
+}
+
+/// Get historical institutional rating views for a security.
+/// Returns `CInstitutionRatingViews`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_institution_rating_views(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CInstitutionRatingViewsOwned> = CCow::new(
+            CInstitutionRatingViewsOwned::from(ctx_inner.institution_rating_views(symbol).await?),
+        );
+        Ok(resp)
+    });
+}
+
+/// Get industry rank for a market.
+/// Returns `CIndustryRankResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_industry_rank(
+    ctx: *const CFundamentalContext,
+    market: *const c_char,
+    indicator: *const c_char,
+    sort_type: *const c_char,
+    limit: u32,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let market = cstr_to_rust(market);
+    let indicator = cstr_to_rust(indicator);
+    let sort_type = cstr_to_rust(sort_type);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CIndustryRankResponseOwned> = CCow::new(CIndustryRankResponseOwned::from(
+            ctx_inner
+                .industry_rank(market, indicator, sort_type, limit)
+                .await?,
+        ));
+        Ok(resp)
+    });
+}
+
+/// Get the industry peer chain for a security or industry.
+/// Returns `CIndustryPeersResponse`.
+/// Pass NULL for `industry_id` to omit it.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
+    ctx: *const CFundamentalContext,
+    counter_id: *const c_char,
+    market: *const c_char,
+    industry_id: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let counter_id = cstr_to_rust(counter_id);
+    let market = cstr_to_rust(market);
+    let industry_id: Option<String> = if industry_id.is_null() {
+        None
+    } else {
+        Some(cstr_to_rust(industry_id))
+    };
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CIndustryPeersResponseOwned> = CCow::new(CIndustryPeersResponseOwned::from(
+            ctx_inner
+                .industry_peers(counter_id, market, industry_id)
+                .await?,
+        ));
+        Ok(resp)
+    });
+}
+
+/// Get a financial report snapshot for a security.
+/// Returns `CFinancialReportSnapshot`.
+/// Pass NULL for `report`, `fiscal_year_str`, and/or `fiscal_period` to omit
+/// them. `fiscal_year_str` should be a decimal integer string (e.g. `"2024"`).
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_financial_report_snapshot(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    report: *const c_char,
+    fiscal_year_str: *const c_char,
+    fiscal_period: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    let report: Option<&'static str> = cstr_to_static_opt(report);
+    let fiscal_year: Option<i32> = if fiscal_year_str.is_null() {
+        None
+    } else {
+        cstr_to_rust(fiscal_year_str).parse::<i32>().ok()
+    };
+    let fiscal_period: Option<&'static str> = cstr_to_static_opt(fiscal_period);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CFinancialReportSnapshotOwned> =
+            CCow::new(CFinancialReportSnapshotOwned::from(
+                ctx_inner
+                    .financial_report_snapshot(symbol, report, fiscal_year, fiscal_period)
+                    .await?,
             ));
         Ok(resp)
     });
