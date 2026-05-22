@@ -234,111 +234,43 @@ impl FundamentalContext {
         Ok(self.ctx.ratings(symbol).await.map_err(ErrorNewType)?.into())
     }
 
-    /// Get business segment breakdowns (latest snapshot)
+    /// Get ranked list of top shareholders
     #[napi]
-    pub async fn business_segments(&self, symbol: String) -> Result<BusinessSegments> {
+    pub async fn shareholder_top(&self, symbol: String) -> Result<ShareholderTopResponse> {
         Ok(self
             .ctx
-            .business_segments(symbol)
+            .shareholder_top(symbol)
             .await
             .map_err(ErrorNewType)?
             .into())
     }
 
-    /// Get historical business segment breakdowns
+    /// Get holding history and detail for one shareholder
     #[napi]
-    pub async fn business_segments_history(
+    pub async fn shareholder_detail(
         &self,
         symbol: String,
-        report: Option<String>,
-        cate: Option<String>,
-    ) -> Result<BusinessSegmentsHistory> {
-        let report_static: Option<&'static str> = match report.as_deref() {
-            Some("qf") => Some("qf"),
-            Some("saf") => Some("saf"),
-            Some("af") => Some("af"),
-            _ => None,
-        };
+        object_id: i64,
+    ) -> Result<ShareholderDetailResponse> {
         Ok(self
             .ctx
-            .business_segments_history(symbol, report_static, cate)
+            .shareholder_detail(symbol, object_id)
             .await
             .map_err(ErrorNewType)?
             .into())
     }
 
-    /// Get historical institutional rating view time-series
+    /// Get valuation comparison between a security and optional peers
     #[napi]
-    pub async fn institution_rating_views(&self, symbol: String) -> Result<InstitutionRatingViews> {
-        Ok(self
-            .ctx
-            .institution_rating_views(symbol)
-            .await
-            .map_err(ErrorNewType)?
-            .into())
-    }
-
-    /// Get industry rank for a market
-    #[napi]
-    pub async fn industry_rank(
-        &self,
-        market: String,
-        indicator: String,
-        sort_type: String,
-        limit: u32,
-    ) -> Result<IndustryRankResponse> {
-        Ok(self
-            .ctx
-            .industry_rank(market, indicator, sort_type, limit)
-            .await
-            .map_err(ErrorNewType)?
-            .into())
-    }
-
-    /// Get the industry peer chain for a security or industry
-    #[napi]
-    pub async fn industry_peers(
-        &self,
-        counter_id: String,
-        market: String,
-        industry_id: Option<String>,
-    ) -> Result<IndustryPeersResponse> {
-        Ok(self
-            .ctx
-            .industry_peers(counter_id, market, industry_id)
-            .await
-            .map_err(ErrorNewType)?
-            .into())
-    }
-
-    /// Get a financial report snapshot (earnings snapshot)
-    #[napi]
-    pub async fn financial_report_snapshot(
+    pub async fn valuation_comparison(
         &self,
         symbol: String,
-        report: Option<String>,
-        fiscal_year: Option<i32>,
-        fiscal_period: Option<String>,
-    ) -> Result<FinancialReportSnapshot> {
-        let report_static: Option<&'static str> = match report.as_deref() {
-            Some("qf") => Some("qf"),
-            Some("saf") => Some("saf"),
-            Some("af") => Some("af"),
-            _ => None,
-        };
-        let fiscal_period_static: Option<&'static str> = match fiscal_period.as_deref() {
-            Some("q1") => Some("q1"),
-            Some("q2") => Some("q2"),
-            Some("q3") => Some("q3"),
-            Some("q4") => Some("q4"),
-            Some("fy") => Some("fy"),
-            Some("h1") => Some("h1"),
-            Some("h2") => Some("h2"),
-            _ => None,
-        };
+        currency: String,
+        comparison_symbols: Option<Vec<String>>,
+    ) -> Result<ValuationComparisonResponse> {
         Ok(self
             .ctx
-            .financial_report_snapshot(symbol, report_static, fiscal_year, fiscal_period_static)
+            .valuation_comparison(symbol, currency, comparison_symbols)
             .await
             .map_err(ErrorNewType)?
             .into())

@@ -4,6 +4,8 @@
 #include "callback.hpp"
 #include "config.hpp"
 #include "types.hpp"
+#include <string>
+#include <vector>
 
 typedef struct lb_market_context_t lb_market_context_t;
 
@@ -80,6 +82,21 @@ public:
   /// Get index constituents
   void constituent(const std::string& symbol,
                    AsyncCallback<MarketContext, IndexConstituents> callback) const;
+
+  /// Get top movers (stocks with unusual price movements) across one or more markets
+  void top_movers(const std::vector<std::string>& markets,
+                  uint32_t sort,
+                  const std::string* date,
+                  uint32_t limit,
+                  AsyncCallback<MarketContext, TopMoversResponse> callback) const;
+
+  /// Get all available rank category keys and labels (raw JSON string)
+  void rank_categories(AsyncCallback<MarketContext, std::string> callback) const;
+
+  /// Get a ranked list of securities for the given category key
+  void rank_list(const std::string& key,
+                 bool need_article,
+                 AsyncCallback<MarketContext, RankListResponse> callback) const;
 };
 
 } // namespace market

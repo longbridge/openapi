@@ -15,6 +15,7 @@ mod market_context;
 mod oauth;
 mod portfolio_context;
 mod quote_context;
+mod screener_context;
 mod sharelist_context;
 mod trade_context;
 mod types;

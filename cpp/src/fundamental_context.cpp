@@ -114,11 +114,60 @@ void FundamentalContext::industry_peers(const std::string& counter_id, const std
   F_TYPED(IndustryPeersResponse, lb_industry_peers_response_t, lb_fundamental_context_industry_peers, ctx_, counter_id.c_str(), market.c_str(), industry_id);
 }
 void FundamentalContext::financial_report_snapshot(const std::string& s, const char* report, int32_t fiscal_year, const char* fiscal_period, AsyncCallback<FundamentalContext, FinancialReportSnapshot> callback) const {
-  F_TYPED(FinancialReportSnapshot, lb_financial_report_snapshot_t, lb_fundamental_context_financial_report_snapshot, ctx_, s.c_str(), report, fiscal_year, fiscal_period);
+  // C API takes fiscal_year as a string; convert 0 → nullptr
+  std::string fy_str;
+  const char* fy_cstr = nullptr;
+  if (fiscal_year != 0) {
+    fy_str = std::to_string(fiscal_year);
+    fy_cstr = fy_str.c_str();
+  }
+  F_TYPED(FinancialReportSnapshot, lb_financial_report_snapshot_t, lb_fundamental_context_financial_report_snapshot, ctx_, s.c_str(), report, fy_cstr, fiscal_period);
 }
 
 #undef F_TYPED
 #undef F_JSON
+
+// ── New JSON-string APIs ──────────────────────────────────────────
+// These return a struct with a single `data` field (JSON string).
+// We extract the string and return it as std::string.
+#define F_JSON_STRUCT(cfn, CType, ...) cfn(__VA_ARGS__, [](auto res) { \
+  auto cb = callback::get_async_callback<FundamentalContext,std::string>(res->userdata); \
+  FundamentalContext fctx((const lb_fundamental_context_t*)res->ctx); Status status(res->error); \
+  if(status){const CType* d=(const CType*)res->data; std::string j(d->data ? d->data : ""); (*cb)(AsyncResult<FundamentalContext,std::string>(fctx,std::move(status),&j));} \
+  else{(*cb)(AsyncResult<FundamentalContext,std::string>(fctx,std::move(status),nullptr));} \
+}, new AsyncCallback<FundamentalContext,std::string>(callback))
+
+void FundamentalContext::shareholder_top(const std::string& s, AsyncCallback<FundamentalContext, std::string> callback) const {
+  F_JSON_STRUCT(lb_fundamental_context_shareholder_top, lb_shareholder_top_response_t, ctx_, s.c_str());
+}
+
+void FundamentalContext::shareholder_detail(const std::string& s, int64_t object_id, AsyncCallback<FundamentalContext, std::string> callback) const {
+  F_JSON_STRUCT(lb_fundamental_context_shareholder_detail, lb_shareholder_detail_response_t, ctx_, s.c_str(), object_id);
+}
+
+void FundamentalContext::valuation_comparison(const std::string& s, const std::string& currency, const std::vector<std::string>* comparison_symbols, AsyncCallback<FundamentalContext, ValuationComparisonResponse> callback) const {
+  std::vector<const char*> syms_ptrs;
+  size_t num_syms = 0;
+  const char** syms_data = nullptr;
+  if (comparison_symbols) {
+    for (const auto& sym : *comparison_symbols) syms_ptrs.push_back(sym.c_str());
+    syms_data = syms_ptrs.empty() ? nullptr : syms_ptrs.data();
+    num_syms = syms_ptrs.size();
+  }
+  lb_fundamental_context_valuation_comparison(ctx_, s.c_str(), currency.c_str(), syms_data, num_syms,
+    [](auto res) {
+      auto cb = callback::get_async_callback<FundamentalContext, ValuationComparisonResponse>(res->userdata);
+      FundamentalContext fctx((const lb_fundamental_context_t*)res->ctx); Status status(res->error);
+      if (status) {
+        auto r = convert::convert((const lb_valuation_comparison_response_t*)res->data);
+        (*cb)(AsyncResult<FundamentalContext, ValuationComparisonResponse>(fctx, std::move(status), &r));
+      } else {
+        (*cb)(AsyncResult<FundamentalContext, ValuationComparisonResponse>(fctx, std::move(status), nullptr));
+      }
+    }, new AsyncCallback<FundamentalContext, ValuationComparisonResponse>(callback));
+}
+
+#undef F_JSON_STRUCT
 
 } // namespace fundamental
 } // namespace longbridge

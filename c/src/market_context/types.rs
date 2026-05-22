@@ -4,8 +4,9 @@ use longbridge::market::{
     AhPremiumIntraday, AhPremiumKline, AhPremiumKlines, AnomalyItem, AnomalyResponse,
     BrokerHoldingChanges, BrokerHoldingDailyHistory, BrokerHoldingDailyItem, BrokerHoldingDetail,
     BrokerHoldingDetailItem, BrokerHoldingEntry, BrokerHoldingTop, ConstituentStock,
-    IndexConstituents, MarketStatusResponse, MarketTimeItem, TradePriceLevel, TradeStatistics,
-    TradeStatsResponse,
+    IndexConstituents, MarketStatusResponse, MarketTimeItem, RankCategoriesResponse, RankListItem,
+    RankListResponse, TopMoversEvent, TopMoversResponse, TopMoversStock, TradePriceLevel,
+    TradeStatistics, TradeStatsResponse,
 };
 
 use crate::types::{CMarket, CString, CVec, ToFFI};
@@ -954,6 +955,333 @@ impl ToFFI for CIndexConstituentsOwned {
             rise_num: self.rise_num,
             stocks: self.stocks.to_ffi_type(),
             num_stocks: self.stocks.len(),
+        }
+    }
+}
+
+// ── TopMoversResponse ─────────────────────────────────────────────
+
+/// Stock information within a top-movers event.
+#[repr(C)]
+pub struct CTopMoversStock {
+    /// Symbol, e.g. "TSLA.US"
+    pub symbol: *const c_char,
+    /// Ticker code
+    pub code: *const c_char,
+    /// Security name
+    pub name: *const c_char,
+    /// Full name
+    pub full_name: *const c_char,
+    /// Price change (decimal ratio)
+    pub change: *const c_char,
+    /// Latest price
+    pub last_done: *const c_char,
+    /// Market code
+    pub market: *const c_char,
+    /// Logo URL
+    pub logo: *const c_char,
+    /// Labels / tags
+    pub labels: *const *const c_char,
+    /// Number of items in `labels`
+    pub num_labels: usize,
+}
+
+pub(crate) struct CTopMoversStockOwned {
+    symbol: CString,
+    code: CString,
+    name: CString,
+    full_name: CString,
+    change: CString,
+    last_done: CString,
+    market: CString,
+    logo: CString,
+    labels: CVec<CString>,
+}
+
+impl From<TopMoversStock> for CTopMoversStockOwned {
+    fn from(v: TopMoversStock) -> Self {
+        Self {
+            symbol: v.symbol.into(),
+            code: v.code.into(),
+            name: v.name.into(),
+            full_name: v.full_name.into(),
+            change: v.change.into(),
+            last_done: v.last_done.into(),
+            market: v.market.into(),
+            logo: v.logo.into(),
+            labels: v.labels.into(),
+        }
+    }
+}
+
+impl ToFFI for CTopMoversStockOwned {
+    type FFIType = CTopMoversStock;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CTopMoversStock {
+            symbol: self.symbol.to_ffi_type(),
+            code: self.code.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            full_name: self.full_name.to_ffi_type(),
+            change: self.change.to_ffi_type(),
+            last_done: self.last_done.to_ffi_type(),
+            market: self.market.to_ffi_type(),
+            logo: self.logo.to_ffi_type(),
+            labels: self.labels.to_ffi_type(),
+            num_labels: self.labels.len(),
+        }
+    }
+}
+
+/// One top-movers event entry.
+#[repr(C)]
+pub struct CTopMoversEvent {
+    /// Event time (RFC 3339)
+    pub timestamp: *const c_char,
+    /// Alert reason description
+    pub alert_reason: *const c_char,
+    /// Alert type code
+    pub alert_type: i64,
+    /// Stock information
+    pub stock: CTopMoversStock,
+    /// Associated news post as a JSON string (may be null)
+    pub post: *const c_char,
+}
+
+pub(crate) struct CTopMoversEventOwned {
+    timestamp: CString,
+    alert_reason: CString,
+    alert_type: i64,
+    stock: CTopMoversStockOwned,
+    post: CString,
+}
+
+impl From<TopMoversEvent> for CTopMoversEventOwned {
+    fn from(v: TopMoversEvent) -> Self {
+        Self {
+            timestamp: v.timestamp.into(),
+            alert_reason: v.alert_reason.into(),
+            alert_type: v.alert_type,
+            stock: v.stock.into(),
+            post: v.post.to_string().into(),
+        }
+    }
+}
+
+impl ToFFI for CTopMoversEventOwned {
+    type FFIType = CTopMoversEvent;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CTopMoversEvent {
+            timestamp: self.timestamp.to_ffi_type(),
+            alert_reason: self.alert_reason.to_ffi_type(),
+            alert_type: self.alert_type,
+            stock: self.stock.to_ffi_type(),
+            post: self.post.to_ffi_type(),
+        }
+    }
+}
+
+/// Top movers response.
+#[repr(C)]
+pub struct CTopMoversResponse {
+    /// Pointer to the array of top-mover events
+    pub events: *const CTopMoversEvent,
+    /// Number of items in `events`
+    pub num_events: usize,
+    /// Pagination cursor as a JSON string
+    pub next_params: *const c_char,
+}
+
+pub(crate) struct CTopMoversResponseOwned {
+    events: CVec<CTopMoversEventOwned>,
+    next_params: CString,
+}
+
+impl From<TopMoversResponse> for CTopMoversResponseOwned {
+    fn from(v: TopMoversResponse) -> Self {
+        Self {
+            events: v.events.into(),
+            next_params: v.next_params.to_string().into(),
+        }
+    }
+}
+
+impl ToFFI for CTopMoversResponseOwned {
+    type FFIType = CTopMoversResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CTopMoversResponse {
+            events: self.events.to_ffi_type(),
+            num_events: self.events.len(),
+            next_params: self.next_params.to_ffi_type(),
+        }
+    }
+}
+
+// ── RankCategoriesResponse ────────────────────────────────────────
+
+/// Rank categories response. `data` is a NUL-terminated JSON string.
+#[repr(C)]
+pub struct CRankCategoriesResponse {
+    /// Raw rank categories data as a JSON string
+    pub data: *const c_char,
+}
+
+pub(crate) struct CRankCategoriesResponseOwned {
+    data: CString,
+}
+
+impl From<RankCategoriesResponse> for CRankCategoriesResponseOwned {
+    fn from(v: RankCategoriesResponse) -> Self {
+        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        Self { data: json.into() }
+    }
+}
+
+impl ToFFI for CRankCategoriesResponseOwned {
+    type FFIType = CRankCategoriesResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRankCategoriesResponse {
+            data: self.data.to_ffi_type(),
+        }
+    }
+}
+
+// ── RankListResponse ──────────────────────────────────────────────
+
+/// One ranked security item.
+#[repr(C)]
+pub struct CRankListItem {
+    /// Symbol, e.g. "MU.US"
+    pub symbol: *const c_char,
+    /// Ticker code
+    pub code: *const c_char,
+    /// Security name
+    pub name: *const c_char,
+    /// Latest price
+    pub last_done: *const c_char,
+    /// Price change ratio (decimal)
+    pub chg: *const c_char,
+    /// Absolute price change
+    pub change: *const c_char,
+    /// Net inflow
+    pub inflow: *const c_char,
+    /// Market cap
+    pub market_cap: *const c_char,
+    /// Industry name
+    pub industry: *const c_char,
+    /// Pre/post market price
+    pub pre_post_price: *const c_char,
+    /// Pre/post market change
+    pub pre_post_chg: *const c_char,
+    /// Amplitude
+    pub amplitude: *const c_char,
+    /// 5-day change
+    pub five_day_chg: *const c_char,
+    /// Turnover rate
+    pub turnover_rate: *const c_char,
+    /// Volume ratio
+    pub volume_rate: *const c_char,
+    /// P/B ratio (TTM)
+    pub pb_ttm: *const c_char,
+}
+
+pub(crate) struct CRankListItemOwned {
+    symbol: CString,
+    code: CString,
+    name: CString,
+    last_done: CString,
+    chg: CString,
+    change: CString,
+    inflow: CString,
+    market_cap: CString,
+    industry: CString,
+    pre_post_price: CString,
+    pre_post_chg: CString,
+    amplitude: CString,
+    five_day_chg: CString,
+    turnover_rate: CString,
+    volume_rate: CString,
+    pb_ttm: CString,
+}
+
+impl From<RankListItem> for CRankListItemOwned {
+    fn from(v: RankListItem) -> Self {
+        Self {
+            symbol: v.symbol.into(),
+            code: v.code.into(),
+            name: v.name.into(),
+            last_done: v.last_done.into(),
+            chg: v.chg.into(),
+            change: v.change.into(),
+            inflow: v.inflow.into(),
+            market_cap: v.market_cap.into(),
+            industry: v.industry.into(),
+            pre_post_price: v.pre_post_price.into(),
+            pre_post_chg: v.pre_post_chg.into(),
+            amplitude: v.amplitude.into(),
+            five_day_chg: v.five_day_chg.into(),
+            turnover_rate: v.turnover_rate.into(),
+            volume_rate: v.volume_rate.into(),
+            pb_ttm: v.pb_ttm.into(),
+        }
+    }
+}
+
+impl ToFFI for CRankListItemOwned {
+    type FFIType = CRankListItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRankListItem {
+            symbol: self.symbol.to_ffi_type(),
+            code: self.code.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            last_done: self.last_done.to_ffi_type(),
+            chg: self.chg.to_ffi_type(),
+            change: self.change.to_ffi_type(),
+            inflow: self.inflow.to_ffi_type(),
+            market_cap: self.market_cap.to_ffi_type(),
+            industry: self.industry.to_ffi_type(),
+            pre_post_price: self.pre_post_price.to_ffi_type(),
+            pre_post_chg: self.pre_post_chg.to_ffi_type(),
+            amplitude: self.amplitude.to_ffi_type(),
+            five_day_chg: self.five_day_chg.to_ffi_type(),
+            turnover_rate: self.turnover_rate.to_ffi_type(),
+            volume_rate: self.volume_rate.to_ffi_type(),
+            pb_ttm: self.pb_ttm.to_ffi_type(),
+        }
+    }
+}
+
+/// Rank list response.
+#[repr(C)]
+pub struct CRankListResponse {
+    /// Whether the response is delayed / BMP data
+    pub bmp: bool,
+    /// Pointer to the array of ranked security items
+    pub lists: *const CRankListItem,
+    /// Number of items in `lists`
+    pub num_lists: usize,
+}
+
+pub(crate) struct CRankListResponseOwned {
+    bmp: bool,
+    lists: CVec<CRankListItemOwned>,
+}
+
+impl From<RankListResponse> for CRankListResponseOwned {
+    fn from(v: RankListResponse) -> Self {
+        Self {
+            bmp: v.bmp,
+            lists: v.lists.into(),
+        }
+    }
+}
+
+impl ToFFI for CRankListResponseOwned {
+    type FFIType = CRankListResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CRankListResponse {
+            bmp: self.bmp,
+            lists: self.lists.to_ffi_type(),
+            num_lists: self.lists.len(),
         }
     }
 }

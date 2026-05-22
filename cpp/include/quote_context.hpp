@@ -314,9 +314,15 @@ public:
     uintptr_t count,
     AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
 
-  /// Get short interest data for a US security
+  /// Get short interest data for a US or HK security (market inferred from symbol suffix)
   void short_positions(const std::string& symbol,
+                       uint32_t count,
                        AsyncCallback<QuoteContext, ShortPositionsResponse> callback) const;
+
+  /// Get short trade records for a HK or US security (market inferred from symbol suffix)
+  void short_trades(const std::string& symbol,
+                    uint32_t count,
+                    AsyncCallback<QuoteContext, ShortTradesResponse> callback) const;
 
   /// Get real-time option call/put volume
   void option_volume(const std::string& symbol,

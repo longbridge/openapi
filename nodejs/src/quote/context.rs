@@ -20,8 +20,9 @@ use crate::{
             OptionVolumeStats, ParticipantInfo, Period, PinnedMode, QuotePackageDetail,
             RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
             SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse,
-            SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription, Trade, TradeSessions,
-            WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
+            ShortTradesResponse, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
+            Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
+            WarrantType, WatchlistGroup,
         },
     },
     time::{NaiveDate, NaiveDatetime},
@@ -1233,12 +1234,31 @@ impl QuoteContext {
             .collect()
     }
 
-    /// Get short interest data for a US security
+    /// Get short interest data for a US or HK security.
+    ///
+    /// Market is inferred from the symbol suffix (.HK → HK, otherwise US).
     #[napi]
-    pub async fn short_positions(&self, symbol: String) -> Result<ShortPositionsResponse> {
+    pub async fn short_positions(
+        &self,
+        symbol: String,
+        count: u32,
+    ) -> Result<ShortPositionsResponse> {
         Ok(self
             .ctx
-            .short_positions(symbol)
+            .short_positions(symbol, count)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get short trade records for a HK or US security.
+    ///
+    /// Market is inferred from the symbol suffix (.HK → HK, otherwise US).
+    #[napi]
+    pub async fn short_trades(&self, symbol: String, count: u32) -> Result<ShortTradesResponse> {
+        Ok(self
+            .ctx
+            .short_trades(symbol, count)
             .await
             .map_err(ErrorNewType)?
             .into())

@@ -2032,36 +2032,40 @@ impl_default_for_enum_string!(
 
 // ── short_positions ───────────────────────────────────────────────
 
+/// One short-position data point (unified for US and HK markets).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortPositionsItem {
+    /// Trading date (RFC 3339, e.g. `"2024-01-15T00:00:00Z"`)
+    pub timestamp: String,
+    /// Short ratio (both markets)
+    pub rate: String,
+    /// Closing price (both markets)
+    pub close: String,
+    /// [US] Number of short shares outstanding
+    #[serde(default)]
+    pub current_shares_short: String,
+    /// [US] Average daily share volume
+    #[serde(default)]
+    pub avg_daily_share_volume: String,
+    /// [US] Days to cover ratio
+    #[serde(default)]
+    pub days_to_cover: String,
+    /// [HK] Short sale amount (HKD)
+    #[serde(default)]
+    pub amount: String,
+    /// [HK] Short position balance
+    #[serde(default)]
+    pub balance: String,
+    /// [HK] Cost / closing price
+    #[serde(default)]
+    pub cost: String,
+}
+
 /// Response for [`crate::QuoteContext::short_positions`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShortPositionsResponse {
-    /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
-    pub symbol: String,
-    /// Short interest data points
-    pub data: Vec<ShortPosition>,
-    /// Number of data sources
-    pub sources: i32,
-}
-
-/// One short interest data point
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ShortPosition {
-    /// Settlement date (unix timestamp string)
-    pub timestamp: String,
-    /// Short interest as a ratio of float shares
-    pub rate: String,
-    /// Average daily share volume
-    pub avg_daily_share_volume: String,
-    /// Current shares short
-    pub current_shares_short: String,
-    /// Days to cover (short ratio)
-    pub days_to_cover: String,
-    /// Closing price on the settlement date
-    pub close: String,
+    /// Short position data points
+    pub data: Vec<ShortPositionsItem>,
 }
 
 // ── option_volume ─────────────────────────────────────────────────
@@ -2111,6 +2115,41 @@ pub struct OptionVolumeDailyStat {
     pub total_call_open_interest: String,
     /// Put/call open interest ratio
     pub put_call_open_interest_ratio: String,
+}
+
+// ── short_trades ──────────────────────────────────────────────────
+
+/// One short-trade data point (unified for US and HK markets).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortTradesItem {
+    /// Trading date (RFC 3339)
+    pub timestamp: String,
+    /// Short ratio
+    pub rate: String,
+    /// Closing price
+    pub close: String,
+    /// [US] NYSE short amount
+    #[serde(default)]
+    pub nus_amount: String,
+    /// [US] NY short amount
+    #[serde(default)]
+    pub ny_amount: String,
+    /// [US] Total short amount
+    #[serde(default)]
+    pub total_amount: String,
+    /// [HK] Short sale amount
+    #[serde(default)]
+    pub amount: String,
+    /// [HK] Short position balance
+    #[serde(default)]
+    pub balance: String,
+}
+
+/// Response for [`crate::QuoteContext::short_trades`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShortTradesResponse {
+    /// Short trade data points
+    pub data: Vec<ShortTradesItem>,
 }
 
 // ── pinned mode ───────────────────────────────────────────────────

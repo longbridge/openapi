@@ -2787,30 +2787,16 @@ class SecurityCalcIndex:
     theta: Optional[Decimal]
     """
     Theta
-
-    The raw value returned by the API is annualized (scaled by 252 trading
-    days per year). To obtain the standard per-calendar-day theta, divide
-    by 252: ``theta / 252``.
     """
 
     vega: Optional[Decimal]
     """
     Vega
-
-    The raw value returned by the API is expressed per 1 percentage-point
-    change in implied volatility (i.e. the value has been multiplied by
-    100). To obtain the standard vega (per unit change in IV), divide by
-    100: ``vega / 100``.
     """
 
     rho: Optional[Decimal]
     """
     Rho
-
-    The raw value returned by the API is expressed per 1 percentage-point
-    change in the risk-free rate (i.e. the value has been multiplied by
-    100). To obtain the standard rho (per unit change in rate), divide by
-    100: ``rho / 100``.
     """
 
 class QuotePackageDetail:
@@ -3998,6 +3984,40 @@ class QuoteContext:
                 sleep(5)
                 resp = ctx.realtime_candlesticks("AAPL.US", Period.Min_1, 10)
                 print(resp)
+        """
+
+    def short_positions(
+        self, symbol: str, count: int = 20
+    ) -> ShortPositionsResponse:
+        """
+        Get short interest / position data for a US or HK security.
+
+        Market is inferred from the symbol suffix: ``.HK`` → HK endpoint,
+        otherwise US endpoint.
+
+        Args:
+            symbol: Security code (e.g. ``"700.HK"`` or ``"AAPL.US"``)
+            count: Number of records (1–100, default 20)
+
+        Returns:
+            :class:`ShortPositionsResponse` with raw JSON data
+        """
+
+    def short_trades(
+        self, symbol: str, count: int = 20
+    ) -> ShortTradesResponse:
+        """
+        Get short trade records for a HK or US security.
+
+        Market is inferred from the symbol suffix: ``.HK`` → HK endpoint,
+        otherwise US endpoint.
+
+        Args:
+            symbol: Security code
+            count: Number of records (1–100, default 20)
+
+        Returns:
+            :class:`ShortTradesResponse` with raw JSON data
         """
 
 class AsyncQuoteContext:
@@ -5313,6 +5333,42 @@ class AsyncQuoteContext:
                     print(resp)
 
                 asyncio.run(main())
+        """
+        ...
+
+    def short_positions(
+        self, symbol: str, count: int = 20
+    ) -> Awaitable[ShortPositionsResponse]:
+        """
+        Get short interest / position data for a US or HK security. Returns awaitable.
+
+        Market is inferred from the symbol suffix: ``.HK`` → HK endpoint,
+        otherwise US endpoint.
+
+        Args:
+            symbol: Security code
+            count: Number of records (1–100, default 20)
+
+        Returns:
+            Awaitable resolving to :class:`ShortPositionsResponse`
+        """
+        ...
+
+    def short_trades(
+        self, symbol: str, count: int = 20
+    ) -> Awaitable[ShortTradesResponse]:
+        """
+        Get short trade records for a HK or US security. Returns awaitable.
+
+        Market is inferred from the symbol suffix: ``.HK`` → HK endpoint,
+        otherwise US endpoint.
+
+        Args:
+            symbol: Security code
+            count: Number of records (1–100, default 20)
+
+        Returns:
+            Awaitable resolving to :class:`ShortTradesResponse`
         """
         ...
 
@@ -9628,228 +9684,6 @@ class StockRatings:
     """Full ratings array as a JSON string"""
 
 
-class BusinessSegmentItem:
-    """One business segment item (latest snapshot)."""
-
-    name: str
-    """Segment name"""
-    percent: str
-    """Percentage of total revenue"""
-
-
-class BusinessSegments:
-    """Response for :meth:`FundamentalContext.business_segments`."""
-
-    date: str
-    """Report date"""
-    total: str
-    """Total revenue"""
-    currency: str
-    """Reporting currency"""
-    business: list[BusinessSegmentItem]
-    """Business segment breakdown"""
-
-
-class BusinessSegmentHistoryItem:
-    """One business/regional segment item in a historical snapshot."""
-
-    name: str
-    """Segment name"""
-    percent: str
-    """Percentage of total"""
-    value: str
-    """Absolute value"""
-
-
-class BusinessSegmentsHistoricalItem:
-    """One historical business segments snapshot."""
-
-    date: str
-    """Report date"""
-    total: str
-    """Total revenue"""
-    currency: str
-    """Reporting currency"""
-    business: list[BusinessSegmentHistoryItem]
-    """Business segment breakdown"""
-    regionals: list[BusinessSegmentHistoryItem]
-    """Regional breakdown"""
-
-
-class BusinessSegmentsHistory:
-    """Response for :meth:`FundamentalContext.business_segments_history`."""
-
-    historical: list[BusinessSegmentsHistoricalItem]
-    """Historical snapshots"""
-
-
-class InstitutionRatingViewItem:
-    """One historical rating distribution snapshot."""
-
-    date: str
-    """Date as unix timestamp string"""
-    buy: str
-    """Number of Buy ratings"""
-    over: str
-    """Number of Outperform ratings"""
-    hold: str
-    """Number of Hold ratings"""
-    under: str
-    """Number of Underperform ratings"""
-    sell: str
-    """Number of Sell ratings"""
-    total: str
-    """Total analyst count"""
-
-
-class InstitutionRatingViews:
-    """Response for :meth:`FundamentalContext.institution_rating_views`."""
-
-    elist: list[InstitutionRatingViewItem]
-    """Historical rating distribution snapshots"""
-
-
-class IndustryRankItem:
-    """One ranked industry item."""
-
-    name: str
-    """Industry / sector name"""
-    counter_id: str
-    """Counter ID of the industry"""
-    chg: str
-    """Change percentage"""
-    leading_name: str
-    """Name of the leading stock"""
-    leading_ticker: str
-    """Ticker of the leading stock"""
-    leading_chg: str
-    """Change percentage of the leading stock"""
-    value_name: str
-    """Value label name"""
-    value_data: str
-    """Value data"""
-
-
-class IndustryRankGroup:
-    """A group of ranked industry items."""
-
-    lists: list[IndustryRankItem]
-    """Items in this group"""
-
-
-class IndustryRankResponse:
-    """Response for :meth:`FundamentalContext.industry_rank`."""
-
-    items: list[IndustryRankGroup]
-    """Grouped rank items"""
-
-
-class IndustryPeersTop:
-    """Top-level industry info in the peers response."""
-
-    name: str
-    """Industry name"""
-    market: str
-    """Market code"""
-
-
-class IndustryPeerNode:
-    """A node in the recursive industry peer chain."""
-
-    name: str
-    """Node name"""
-    counter_id: str
-    """Counter ID"""
-    stock_num: int
-    """Number of stocks in this node"""
-    chg: str
-    """Change percentage"""
-    ytd_chg: str
-    """Year-to-date change"""
-    next_json: str
-    """Child nodes as a JSON string"""
-
-
-class IndustryPeersResponse:
-    """Response for :meth:`FundamentalContext.industry_peers`."""
-
-    top: IndustryPeersTop
-    """Top-level industry node info"""
-    chain: "IndustryPeerNode | None"
-    """Root peer chain node"""
-
-
-class SnapshotForecastMetric:
-    """A forecast metric in the financial report snapshot."""
-
-    value: str
-    """Actual value"""
-    yoy: str
-    """Year-over-year change"""
-    cmp_desc: str
-    """Beat/miss description"""
-    est_value: str
-    """Consensus estimate value"""
-
-
-class SnapshotReportedMetric:
-    """A reported metric in the financial report snapshot."""
-
-    value: str
-    """Actual value"""
-    yoy: str
-    """Year-over-year change"""
-
-
-class FinancialReportSnapshot:
-    """Response for :meth:`FundamentalContext.financial_report_snapshot`."""
-
-    name: str
-    """Company name"""
-    ticker: str
-    """Ticker code"""
-    fp_start: str
-    """Fiscal period start date"""
-    fp_end: str
-    """Fiscal period end date"""
-    currency: str
-    """Reporting currency"""
-    report_desc: str
-    """Report description"""
-    fo_revenue: "SnapshotForecastMetric | None"
-    """Forecast revenue"""
-    fo_ebit: "SnapshotForecastMetric | None"
-    """Forecast EBIT"""
-    fo_eps: "SnapshotForecastMetric | None"
-    """Forecast EPS"""
-    fr_revenue: "SnapshotReportedMetric | None"
-    """Reported revenue"""
-    fr_profit: "SnapshotReportedMetric | None"
-    """Reported net profit"""
-    fr_operate_cash: "SnapshotReportedMetric | None"
-    """Reported operating cash flow"""
-    fr_invest_cash: "SnapshotReportedMetric | None"
-    """Reported investing cash flow"""
-    fr_finance_cash: "SnapshotReportedMetric | None"
-    """Reported financing cash flow"""
-    fr_total_assets: "SnapshotReportedMetric | None"
-    """Reported total assets"""
-    fr_total_liability: "SnapshotReportedMetric | None"
-    """Reported total liabilities"""
-    fr_roe_ttm: str
-    """ROE TTM"""
-    fr_profit_margin: str
-    """Profit margin"""
-    fr_profit_margin_ttm: str
-    """Profit margin TTM"""
-    fr_asset_turn_ttm: str
-    """Asset turnover TTM"""
-    fr_leverage_ttm: str
-    """Leverage TTM"""
-    fr_debt_assets_ratio: str
-    """Debt-to-assets ratio"""
-
-
 class FinancialReportKind:
     """Financial report kind."""
 
@@ -10028,109 +9862,122 @@ class FundamentalContext:
         """
         ...
 
-    def business_segments(self, symbol: str) -> "BusinessSegments":
+    def shareholder_top(self, symbol: str) -> "ShareholderTopResponse":
         """
-        Get business segment breakdowns (latest snapshot).
+        Get ranked list of top shareholders.
 
         Args:
-            symbol: Security symbol, e.g. ``"AAPL.US"``
+            symbol: Security symbol
 
         Returns:
-            :class:`BusinessSegments`
+            :class:`ShareholderTopResponse` with raw JSON data
         """
         ...
 
-    def business_segments_history(
+    def shareholder_detail(
+        self, symbol: str, object_id: int
+    ) -> "ShareholderDetailResponse":
+        """
+        Get holding history and detail for one shareholder.
+
+        Args:
+            symbol: Security symbol
+            object_id: Shareholder object ID
+
+        Returns:
+            :class:`ShareholderDetailResponse` with raw JSON data
+        """
+        ...
+
+    def valuation_comparison(
         self,
         symbol: str,
-        report: "str | None" = None,
-        cate: "str | None" = None,
-    ) -> "BusinessSegmentsHistory":
+        currency: str,
+        comparison_symbols: Optional[List[str]] = None,
+    ) -> "ValuationComparisonResponse":
         """
-        Get historical business segment breakdowns.
+        Get valuation comparison between a security and optional peers.
 
         Args:
             symbol: Security symbol
-            report: Report type (``"qf"``, ``"saf"``, ``"af"``) or ``None``
-            cate: Category filter or ``None``
+            currency: Currency code (e.g. ``"USD"``)
+            comparison_symbols: Optional list of peer symbols
 
         Returns:
-            :class:`BusinessSegmentsHistory`
+            :class:`ValuationComparisonResponse` with raw JSON data
         """
         ...
 
-    def institution_rating_views(self, symbol: str) -> "InstitutionRatingViews":
-        """
-        Get historical institutional rating view time-series.
 
-        Args:
-            symbol: Security symbol
+# ── FundamentalContext new response types ─────────────────────────
 
-        Returns:
-            :class:`InstitutionRatingViews`
-        """
-        ...
+class ShareholderTopResponse:
+    """Top-shareholder list response. ``data`` is a Python dict/list from JSON."""
 
-    def industry_rank(
-        self,
-        market: str,
-        indicator: str,
-        sort_type: str,
-        limit: int,
-    ) -> "IndustryRankResponse":
-        """
-        Get industry rank for a market.
+    data: object
+    """Raw top-shareholder data (JSON object / list)"""
 
-        Args:
-            market: Market code, e.g. ``"US"``
-            indicator: Numeric string ``"0"``–``"7"``
-            sort_type: ``"0"`` (ascending) or ``"1"`` (descending)
-            limit: Maximum number of results
 
-        Returns:
-            :class:`IndustryRankResponse`
-        """
-        ...
+class ShareholderDetailResponse:
+    """Shareholder detail response. ``data`` is a Python dict/list from JSON."""
 
-    def industry_peers(
-        self,
-        counter_id: str,
-        market: str,
-        industry_id: "str | None" = None,
-    ) -> "IndustryPeersResponse":
-        """
-        Get the industry peer chain for a security or industry.
+    data: object
+    """Raw shareholder detail data (JSON object / list)"""
 
-        Args:
-            counter_id: Symbol (e.g. ``"AAPL.US"``) or industry counter ID
-            market: Market code, e.g. ``"US"``
-            industry_id: Industry ID or ``None``
 
-        Returns:
-            :class:`IndustryPeersResponse`
-        """
-        ...
+class ValuationHistoryPoint:
+    """One historical valuation data point."""
 
-    def financial_report_snapshot(
-        self,
-        symbol: str,
-        report: "str | None" = None,
-        fiscal_year: "int | None" = None,
-        fiscal_period: "str | None" = None,
-    ) -> "FinancialReportSnapshot":
-        """
-        Get a financial report snapshot (earnings snapshot).
+    date: str
+    """Date (RFC 3339, converted from Unix timestamp)"""
+    pe: str
+    """P/E ratio"""
+    pb: str
+    """P/B ratio"""
+    ps: str
+    """P/S ratio"""
 
-        Args:
-            symbol: Security symbol
-            report: Report type (``"qf"``, ``"saf"``, ``"af"``) or ``None``
-            fiscal_year: Fiscal year (e.g. ``2023``) or ``None``
-            fiscal_period: Fiscal period string or ``None``
 
-        Returns:
-            :class:`FinancialReportSnapshot`
-        """
-        ...
+class ValuationComparisonItem:
+    """One security's valuation comparison item."""
+
+    symbol: str
+    """Symbol (e.g. ``"AAPL.US"``)"""
+    name: str
+    """Security name"""
+    currency: str
+    """Currency"""
+    market_value: str
+    """Market capitalisation"""
+    price_close: str
+    """Latest closing price"""
+    pe: str
+    """P/E ratio"""
+    pb: str
+    """P/B ratio"""
+    ps: str
+    """P/S ratio"""
+    roe: str
+    """Return on equity"""
+    eps: str
+    """Earnings per share"""
+    bps: str
+    """Book value per share"""
+    dps: str
+    """Dividends per share"""
+    div_yld: str
+    """Dividend yield"""
+    assets: str
+    """Total assets"""
+    history: List[ValuationHistoryPoint]
+    """Historical valuation points"""
+
+
+class ValuationComparisonResponse:
+    """Valuation comparison response."""
+
+    list: List[ValuationComparisonItem]
+    """Valuation comparison items"""
 
 
 # ── MarketContext ─────────────────────────────────────────────────
@@ -10531,6 +10378,261 @@ class MarketContext:
         Args:
             symbol: Index symbol, e.g. ``"HSI.HK"``
         """
+        ...
+
+    def top_movers(
+        self,
+        markets: List[str],
+        sort: int = 0,
+        date: Optional[str] = None,
+        limit: int = 20,
+    ) -> "TopMoversResponse":
+        """
+        Get top movers (stocks with unusual price movements) across one or more markets.
+
+        Args:
+            markets: List of market codes, e.g. ``["HK", "US"]``
+            sort: Sort order (0=ascending, 1=descending)
+            date: Optional date filter (``"YYYY-MM-DD"``)
+            limit: Max records to return
+
+        Returns:
+            :class:`TopMoversResponse` with raw JSON data
+        """
+        ...
+
+    def rank_categories(self) -> "RankCategoriesResponse":
+        """
+        Get all available rank category keys and labels.
+
+        Returns:
+            :class:`RankCategoriesResponse` with raw JSON data
+        """
+        ...
+
+    def rank_list(
+        self, key: str, need_article: bool = False
+    ) -> "RankListResponse":
+        """
+        Get a ranked list of securities for the given category key.
+
+        Args:
+            key: Category key from :meth:`rank_categories`
+            need_article: Whether to include article content
+
+        Returns:
+            :class:`RankListResponse` with raw JSON data
+        """
+        ...
+
+
+# ── MarketContext new response types ──────────────────────────────
+
+class TopMoversStock:
+    """Stock information within a top-movers event."""
+
+    symbol: str
+    """Symbol (e.g. ``"NVDA.US"``)"""
+    code: str
+    """Ticker code"""
+    name: str
+    """Security name"""
+    full_name: str
+    """Full name"""
+    change: str
+    """Price change (decimal ratio)"""
+    last_done: str
+    """Latest price"""
+    market: str
+    """Market code"""
+    labels: List[str]
+    """Labels / tags"""
+    logo: str
+    """Logo URL"""
+
+
+class TopMoversEvent:
+    """One top-movers event entry."""
+
+    timestamp: str
+    """Event time (RFC 3339)"""
+    alert_reason: str
+    """Alert reason description"""
+    alert_type: int
+    """Alert type code"""
+    stock: TopMoversStock
+    """Stock information"""
+    post: object
+    """Associated news post (raw JSON object)"""
+
+
+class TopMoversResponse:
+    """Top movers response."""
+
+    events: List[TopMoversEvent]
+    """Top-mover events"""
+    next_params: object
+    """Pagination cursor for next page (raw JSON object)"""
+
+
+class RankCategoriesResponse:
+    """Rank categories response. ``data`` is a Python dict/list from JSON."""
+
+    data: object
+    """Raw rank categories data (JSON object / list)"""
+
+
+class RankListItem:
+    """One ranked security item."""
+
+    symbol: str
+    """Symbol (e.g. ``"MU.US"``)"""
+    code: str
+    """Ticker code"""
+    name: str
+    """Security name"""
+    last_done: str
+    """Latest price"""
+    chg: str
+    """Price change ratio"""
+    change: str
+    """Absolute price change"""
+    inflow: str
+    """Net inflow"""
+    market_cap: str
+    """Market cap"""
+    industry: str
+    """Industry name"""
+    pre_post_price: str
+    """Pre/post market price"""
+    pre_post_chg: str
+    """Pre/post market change"""
+    amplitude: str
+    """Amplitude"""
+    five_day_chg: str
+    """5-day change"""
+    turnover_rate: str
+    """Turnover rate"""
+    volume_rate: str
+    """Volume ratio"""
+    pb_ttm: str
+    """P/B ratio (TTM)"""
+
+
+class RankListResponse:
+    """Rank list response."""
+
+    bmp: bool
+    """Whether delayed / BMP data"""
+    lists: List[RankListItem]
+    """Ranked security items"""
+
+
+# ── ScreenerContext ───────────────────────────────────────────────
+
+class ScreenerRecommendStrategiesResponse:
+    """Recommended screener strategies response. ``data`` is a Python dict/list from JSON."""
+
+    data: object
+    """Raw recommended strategies data (JSON object / list)"""
+
+
+class ScreenerUserStrategiesResponse:
+    """User screener strategies response. ``data`` is a Python dict/list from JSON."""
+
+    data: object
+    """Raw user strategies data (JSON object / list)"""
+
+
+class ScreenerStrategyResponse:
+    """Single screener strategy response. ``data`` is a Python dict/list from JSON."""
+
+    data: object
+    """Raw strategy detail data (JSON object / list)"""
+
+
+class ScreenerSearchResponse:
+    """Screener search results response. ``data`` is a Python dict/list from JSON."""
+
+    data: object
+    """Raw search results data (JSON object / list)"""
+
+
+class ScreenerIndicatorsResponse:
+    """Screener indicator definitions response. ``data`` is a Python dict/list from JSON."""
+
+    data: object
+    """Raw indicator definitions data (JSON object / list)"""
+
+
+class ScreenerContext:
+    """Stock screener context — strategies, search, and indicators."""
+
+    def __init__(self, config: Config) -> None: ...
+
+    def screener_recommend_strategies(self) -> ScreenerRecommendStrategiesResponse:
+        """Get recommended built-in screener strategies."""
+        ...
+
+    def screener_user_strategies(self) -> ScreenerUserStrategiesResponse:
+        """Get the current user's saved screener strategies."""
+        ...
+
+    def screener_strategy(self, id: int) -> ScreenerStrategyResponse:
+        """Get detail for one screener strategy by ID."""
+        ...
+
+    def screener_search(
+        self,
+        market: str,
+        strategy_id: Optional[int] = None,
+        page: int = 1,
+        size: int = 20,
+    ) -> ScreenerSearchResponse:
+        """Search / screen securities using a strategy."""
+        ...
+
+    def screener_indicators(self) -> ScreenerIndicatorsResponse:
+        """Get all available screener indicator definitions."""
+        ...
+
+
+class AsyncScreenerContext:
+    """Async screener context for use with asyncio."""
+
+    @classmethod
+    def create(cls, config: Config) -> "AsyncScreenerContext": ...
+
+    def screener_recommend_strategies(
+        self,
+    ) -> Awaitable[ScreenerRecommendStrategiesResponse]:
+        """Get recommended built-in screener strategies. Returns awaitable."""
+        ...
+
+    def screener_user_strategies(
+        self,
+    ) -> Awaitable[ScreenerUserStrategiesResponse]:
+        """Get the current user's saved screener strategies. Returns awaitable."""
+        ...
+
+    def screener_strategy(
+        self, id: int
+    ) -> Awaitable[ScreenerStrategyResponse]:
+        """Get detail for one screener strategy by ID. Returns awaitable."""
+        ...
+
+    def screener_search(
+        self,
+        market: str,
+        strategy_id: Optional[int] = None,
+        page: int = 1,
+        size: int = 20,
+    ) -> Awaitable[ScreenerSearchResponse]:
+        """Search / screen securities using a strategy. Returns awaitable."""
+        ...
+
+    def screener_indicators(self) -> Awaitable[ScreenerIndicatorsResponse]:
+        """Get all available screener indicator definitions. Returns awaitable."""
         ...
 
 
@@ -11683,32 +11785,62 @@ class SharelistContext:
 
 # ── QuoteContext extensions ───────────────────────────────────────
 
-class ShortPosition:
-    """One short interest data point."""
+class ShortPositionsItem:
+    """One short-position data point (unified for US and HK markets)."""
 
     timestamp: str
-    """Settlement date (unix timestamp string)"""
+    """Trading date (RFC 3339)"""
     rate: str
-    """Short interest as a ratio of float shares"""
-    avg_daily_share_volume: str
-    """Average daily share volume"""
-    current_shares_short: str
-    """Current shares short"""
-    days_to_cover: str
-    """Days to cover (short ratio)"""
+    """Short ratio (both markets)"""
     close: str
-    """Closing price on the settlement date"""
+    """Closing price (both markets)"""
+    current_shares_short: str
+    """[US] Number of short shares outstanding"""
+    avg_daily_share_volume: str
+    """[US] Average daily share volume"""
+    days_to_cover: str
+    """[US] Days to cover ratio"""
+    amount: str
+    """[HK] Short sale amount (HKD)"""
+    balance: str
+    """[HK] Short position balance"""
+    cost: str
+    """[HK] Cost / closing price"""
 
 
 class ShortPositionsResponse:
-    """Short interest response."""
+    """Short interest / positions response (HK or US)."""
 
-    symbol: str
-    """Security symbol"""
-    data: list[ShortPosition]
-    """Short interest data points"""
-    sources: int
-    """Number of data sources"""
+    data: List[ShortPositionsItem]
+    """Short position data points"""
+
+
+class ShortTradesItem:
+    """One short-trade data point (unified for US and HK markets)."""
+
+    timestamp: str
+    """Trading date (RFC 3339)"""
+    rate: str
+    """Short ratio"""
+    close: str
+    """Closing price"""
+    nus_amount: str
+    """[US] NYSE short amount"""
+    ny_amount: str
+    """[US] NY short amount"""
+    total_amount: str
+    """[US] Total short amount"""
+    amount: str
+    """[HK] Short sale amount"""
+    balance: str
+    """[HK] Short position balance"""
+
+
+class ShortTradesResponse:
+    """Short trade records response (HK or US)."""
+
+    data: List[ShortTradesItem]
+    """Short trade data points"""
 
 
 class OptionVolumeStats:

@@ -122,4 +122,44 @@ impl MarketContext {
             .map_err(ErrorNewType)?
             .into())
     }
+
+    /// Get top movers (stocks with unusual price movements) across one or more
+    /// markets
+    #[napi]
+    pub async fn top_movers(
+        &self,
+        markets: Vec<String>,
+        sort: u32,
+        date: Option<String>,
+        limit: u32,
+    ) -> Result<TopMoversResponse> {
+        Ok(self
+            .ctx
+            .top_movers(markets, sort, date, limit)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get all available rank category keys and labels
+    #[napi]
+    pub async fn rank_categories(&self) -> Result<RankCategoriesResponse> {
+        Ok(self
+            .ctx
+            .rank_categories()
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get a ranked list of securities for the given category key
+    #[napi]
+    pub async fn rank_list(&self, key: String, need_article: bool) -> Result<RankListResponse> {
+        Ok(self
+            .ctx
+            .rank_list(key, need_article)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

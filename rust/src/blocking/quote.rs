@@ -13,9 +13,9 @@ use crate::{
         ParticipantInfo, Period, PinnedMode, PushEvent, QuotePackageDetail, RealtimeQuote,
         RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
         SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        ShortPositionsResponse, SortOrderType, StrikePriceInfo, SubFlags, Subscription, Trade,
-        TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType,
-        WatchlistGroup,
+        ShortPositionsResponse, ShortTradesResponse, SortOrderType, StrikePriceInfo, SubFlags,
+        Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
+        WarrantStatus, WarrantType, WatchlistGroup,
     },
 };
 
@@ -1168,13 +1168,14 @@ impl QuoteContextSync {
             .call(move |ctx| async move { ctx.realtime_candlesticks(symbol, period, count).await })
     }
 
-    /// Get short interest data for a US security
+    /// Get short interest data for a US or HK security
     pub fn short_positions(
         &self,
         symbol: impl Into<String> + Send + 'static,
+        count: u32,
     ) -> Result<ShortPositionsResponse> {
         self.rt
-            .call(move |ctx| async move { ctx.short_positions(symbol).await })
+            .call(move |ctx| async move { ctx.short_positions(symbol, count).await })
     }
 
     /// Get real-time option call/put volume
@@ -1201,5 +1202,15 @@ impl QuoteContextSync {
     pub fn update_pinned(&self, mode: PinnedMode, symbols: Vec<String>) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.update_pinned(mode, symbols).await })
+    }
+
+    /// Get short trade records for a HK or US security
+    pub fn short_trades(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+        count: u32,
+    ) -> Result<ShortTradesResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.short_trades(symbol, count).await })
     }
 }

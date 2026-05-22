@@ -13,6 +13,7 @@ mod market;
 mod oauth;
 mod portfolio;
 mod quote;
+mod screener;
 mod sharelist;
 mod time;
 mod trade;
@@ -41,6 +42,7 @@ fn longbridge(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     market::register_types(&openapi)?;
     portfolio::register_types(&openapi)?;
     quote::register_types(&openapi)?;
+    screener::register_types(&openapi)?;
     trade::register_types(&openapi)?;
     content::register_types(&openapi)?;
 

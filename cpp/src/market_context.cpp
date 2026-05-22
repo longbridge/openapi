@@ -79,5 +79,50 @@ void MarketContext::constituent(const std::string& symbol, AsyncCallback<MarketC
 
 #undef TYPED_CB
 
+// ── New JSON-string API (rank_categories) ────────────────────────
+#define M_JSON(cfn, CType, ...) cfn(__VA_ARGS__, [](auto res) { \
+  auto cb = callback::get_async_callback<MarketContext,std::string>(res->userdata); \
+  MarketContext mctx((const lb_market_context_t*)res->ctx); Status status(res->error); \
+  if(status){const CType* d=(const CType*)res->data; std::string j(d->data ? d->data : ""); (*cb)(AsyncResult<MarketContext,std::string>(mctx,std::move(status),&j));} \
+  else{(*cb)(AsyncResult<MarketContext,std::string>(mctx,std::move(status),nullptr));} \
+}, new AsyncCallback<MarketContext,std::string>(callback))
+
+void MarketContext::rank_categories(AsyncCallback<MarketContext, std::string> callback) const {
+  M_JSON(lb_market_context_rank_categories, lb_rank_categories_response_t, ctx_);
+}
+
+#undef M_JSON
+
+void MarketContext::top_movers(const std::vector<std::string>& markets, uint32_t sort, const std::string* date, uint32_t limit, AsyncCallback<MarketContext, TopMoversResponse> callback) const {
+  std::vector<const char*> mptrs;
+  for (const auto& m : markets) mptrs.push_back(m.c_str());
+  const char* date_str = date ? date->c_str() : nullptr;
+  lb_market_context_top_movers(ctx_, mptrs.data(), mptrs.size(), sort, date_str, limit,
+    [](auto res) {
+      auto cb = callback::get_async_callback<MarketContext, TopMoversResponse>(res->userdata);
+      MarketContext mctx((const lb_market_context_t*)res->ctx); Status status(res->error);
+      if (status) {
+        auto r = convert::convert((const lb_top_movers_response_t*)res->data);
+        (*cb)(AsyncResult<MarketContext, TopMoversResponse>(mctx, std::move(status), &r));
+      } else {
+        (*cb)(AsyncResult<MarketContext, TopMoversResponse>(mctx, std::move(status), nullptr));
+      }
+    }, new AsyncCallback<MarketContext, TopMoversResponse>(callback));
+}
+
+void MarketContext::rank_list(const std::string& key, bool need_article, AsyncCallback<MarketContext, RankListResponse> callback) const {
+  lb_market_context_rank_list(ctx_, key.c_str(), need_article,
+    [](auto res) {
+      auto cb = callback::get_async_callback<MarketContext, RankListResponse>(res->userdata);
+      MarketContext mctx((const lb_market_context_t*)res->ctx); Status status(res->error);
+      if (status) {
+        auto r = convert::convert((const lb_rank_list_response_t*)res->data);
+        (*cb)(AsyncResult<MarketContext, RankListResponse>(mctx, std::move(status), &r));
+      } else {
+        (*cb)(AsyncResult<MarketContext, RankListResponse>(mctx, std::move(status), nullptr));
+      }
+    }, new AsyncCallback<MarketContext, RankListResponse>(callback));
+}
+
 } // namespace market
 } // namespace longbridge

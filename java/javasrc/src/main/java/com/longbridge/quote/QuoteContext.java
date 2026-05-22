@@ -1392,6 +1392,13 @@ public class QuoteContext implements AutoCloseable {
         });
     }
 
+    /** Get daily short sale volume for US or HK stocks (market auto-detected from symbol suffix). */
+    public CompletableFuture<ShortTradesResponse> getShortTrades(ShortTradesOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextShortTrades(this.raw, opts, callback);
+        });
+    }
+
     /**
      * Get option volume statistics for a symbol
      *

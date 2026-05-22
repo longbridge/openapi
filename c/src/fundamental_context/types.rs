@@ -2843,7 +2843,242 @@ impl ToFFI for CStockRatingsOwned {
     }
 }
 
-// ── business_segments ─────────────────────────────────────────────
+// ── ShareholderTopResponse ────────────────────────────────────────
+
+/// Top-shareholder list response. `data` is a NUL-terminated JSON string.
+#[repr(C)]
+pub struct CShareholderTopResponse {
+    /// Raw top-shareholder data as a JSON string
+    pub data: *const c_char,
+}
+
+pub(crate) struct CShareholderTopResponseOwned {
+    data: CString,
+}
+
+impl From<ShareholderTopResponse> for CShareholderTopResponseOwned {
+    fn from(v: ShareholderTopResponse) -> Self {
+        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        Self { data: json.into() }
+    }
+}
+
+impl ToFFI for CShareholderTopResponseOwned {
+    type FFIType = CShareholderTopResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CShareholderTopResponse {
+            data: self.data.to_ffi_type(),
+        }
+    }
+}
+
+// ── ShareholderDetailResponse ─────────────────────────────────────
+
+/// Shareholder detail response. `data` is a NUL-terminated JSON string.
+#[repr(C)]
+pub struct CShareholderDetailResponse {
+    /// Raw shareholder detail data as a JSON string
+    pub data: *const c_char,
+}
+
+pub(crate) struct CShareholderDetailResponseOwned {
+    data: CString,
+}
+
+impl From<ShareholderDetailResponse> for CShareholderDetailResponseOwned {
+    fn from(v: ShareholderDetailResponse) -> Self {
+        let json = serde_json::to_string(&v.data).unwrap_or_default();
+        Self { data: json.into() }
+    }
+}
+
+impl ToFFI for CShareholderDetailResponseOwned {
+    type FFIType = CShareholderDetailResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CShareholderDetailResponse {
+            data: self.data.to_ffi_type(),
+        }
+    }
+}
+
+// ── ValuationComparisonResponse ───────────────────────────────────
+
+/// One historical valuation data point.
+#[repr(C)]
+pub struct CValuationHistoryPoint {
+    /// Date in RFC 3339 format
+    pub date: *const c_char,
+    /// P/E ratio
+    pub pe: *const c_char,
+    /// P/B ratio
+    pub pb: *const c_char,
+    /// P/S ratio
+    pub ps: *const c_char,
+}
+
+pub(crate) struct CValuationHistoryPointOwned {
+    date: CString,
+    pe: CString,
+    pb: CString,
+    ps: CString,
+}
+
+impl From<ValuationHistoryPoint> for CValuationHistoryPointOwned {
+    fn from(v: ValuationHistoryPoint) -> Self {
+        Self {
+            date: v.date.into(),
+            pe: v.pe.into(),
+            pb: v.pb.into(),
+            ps: v.ps.into(),
+        }
+    }
+}
+
+impl ToFFI for CValuationHistoryPointOwned {
+    type FFIType = CValuationHistoryPoint;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CValuationHistoryPoint {
+            date: self.date.to_ffi_type(),
+            pe: self.pe.to_ffi_type(),
+            pb: self.pb.to_ffi_type(),
+            ps: self.ps.to_ffi_type(),
+        }
+    }
+}
+
+/// One security's valuation comparison item.
+#[repr(C)]
+pub struct CValuationComparisonItem {
+    /// Symbol, e.g. "AAPL.US"
+    pub symbol: *const c_char,
+    /// Security name
+    pub name: *const c_char,
+    /// Currency
+    pub currency: *const c_char,
+    /// Market capitalisation
+    pub market_value: *const c_char,
+    /// Latest closing price
+    pub price_close: *const c_char,
+    /// P/E ratio
+    pub pe: *const c_char,
+    /// P/B ratio
+    pub pb: *const c_char,
+    /// P/S ratio
+    pub ps: *const c_char,
+    /// Return on equity
+    pub roe: *const c_char,
+    /// Earnings per share
+    pub eps: *const c_char,
+    /// Book value per share
+    pub bps: *const c_char,
+    /// Dividends per share
+    pub dps: *const c_char,
+    /// Dividend yield
+    pub div_yld: *const c_char,
+    /// Total assets
+    pub assets: *const c_char,
+    /// Pointer to the array of historical valuation points
+    pub history: *const CValuationHistoryPoint,
+    /// Number of items in `history`
+    pub num_history: usize,
+}
+
+pub(crate) struct CValuationComparisonItemOwned {
+    symbol: CString,
+    name: CString,
+    currency: CString,
+    market_value: CString,
+    price_close: CString,
+    pe: CString,
+    pb: CString,
+    ps: CString,
+    roe: CString,
+    eps: CString,
+    bps: CString,
+    dps: CString,
+    div_yld: CString,
+    assets: CString,
+    history: CVec<CValuationHistoryPointOwned>,
+}
+
+impl From<ValuationComparisonItem> for CValuationComparisonItemOwned {
+    fn from(v: ValuationComparisonItem) -> Self {
+        Self {
+            symbol: v.symbol.into(),
+            name: v.name.into(),
+            currency: v.currency.into(),
+            market_value: v.market_value.into(),
+            price_close: v.price_close.into(),
+            pe: v.pe.into(),
+            pb: v.pb.into(),
+            ps: v.ps.into(),
+            roe: v.roe.into(),
+            eps: v.eps.into(),
+            bps: v.bps.into(),
+            dps: v.dps.into(),
+            div_yld: v.div_yld.into(),
+            assets: v.assets.into(),
+            history: v.history.into(),
+        }
+    }
+}
+
+impl ToFFI for CValuationComparisonItemOwned {
+    type FFIType = CValuationComparisonItem;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CValuationComparisonItem {
+            symbol: self.symbol.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            currency: self.currency.to_ffi_type(),
+            market_value: self.market_value.to_ffi_type(),
+            price_close: self.price_close.to_ffi_type(),
+            pe: self.pe.to_ffi_type(),
+            pb: self.pb.to_ffi_type(),
+            ps: self.ps.to_ffi_type(),
+            roe: self.roe.to_ffi_type(),
+            eps: self.eps.to_ffi_type(),
+            bps: self.bps.to_ffi_type(),
+            dps: self.dps.to_ffi_type(),
+            div_yld: self.div_yld.to_ffi_type(),
+            assets: self.assets.to_ffi_type(),
+            history: self.history.to_ffi_type(),
+            num_history: self.history.len(),
+        }
+    }
+}
+
+/// Valuation comparison response.
+#[repr(C)]
+pub struct CValuationComparisonResponse {
+    /// Pointer to the array of valuation comparison items
+    pub list: *const CValuationComparisonItem,
+    /// Number of items in `list`
+    pub num_list: usize,
+}
+
+pub(crate) struct CValuationComparisonResponseOwned {
+    list: CVec<CValuationComparisonItemOwned>,
+}
+
+impl From<ValuationComparisonResponse> for CValuationComparisonResponseOwned {
+    fn from(v: ValuationComparisonResponse) -> Self {
+        Self {
+            list: v.list.into(),
+        }
+    }
+}
+
+impl ToFFI for CValuationComparisonResponseOwned {
+    type FFIType = CValuationComparisonResponse;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CValuationComparisonResponse {
+            list: self.list.to_ffi_type(),
+            num_list: self.list.len(),
+        }
+    }
+}
+
+// ── BusinessSegments ──────────────────────────────────────────────
 
 /// One business segment item (latest snapshot).
 #[repr(C)]
@@ -2878,7 +3113,7 @@ impl ToFFI for CBusinessSegmentItemOwned {
     }
 }
 
-/// Business segments response.
+/// Current business segment breakdown for a security.
 #[repr(C)]
 pub struct CBusinessSegments {
     /// Report date.
@@ -2887,7 +3122,7 @@ pub struct CBusinessSegments {
     pub total: *const c_char,
     /// Reporting currency.
     pub currency: *const c_char,
-    /// Pointer to the array of business segment items.
+    /// Pointer to business segment items.
     pub business: *const CBusinessSegmentItem,
     /// Number of items in `business`.
     pub num_business: usize,
@@ -2923,6 +3158,8 @@ impl ToFFI for CBusinessSegmentsOwned {
         }
     }
 }
+
+// ── BusinessSegmentsHistory ───────────────────────────────────────
 
 /// One business/regional segment item in a historical snapshot.
 #[repr(C)]
@@ -2973,11 +3210,11 @@ pub struct CBusinessSegmentsHistoricalItem {
     pub total: *const c_char,
     /// Reporting currency.
     pub currency: *const c_char,
-    /// Pointer to the business segment items.
+    /// Pointer to business segment breakdown items.
     pub business: *const CBusinessSegmentHistoryItem,
     /// Number of items in `business`.
     pub num_business: usize,
-    /// Pointer to the regional segment items.
+    /// Pointer to regional breakdown items.
     pub regionals: *const CBusinessSegmentHistoryItem,
     /// Number of items in `regionals`.
     pub num_regionals: usize,
@@ -3020,10 +3257,10 @@ impl ToFFI for CBusinessSegmentsHistoricalItemOwned {
     }
 }
 
-/// Business segments history response.
+/// Historical business segment breakdowns for a security.
 #[repr(C)]
 pub struct CBusinessSegmentsHistory {
-    /// Pointer to the historical snapshots.
+    /// Pointer to historical snapshot items.
     pub historical: *const CBusinessSegmentsHistoricalItem,
     /// Number of items in `historical`.
     pub num_historical: usize,
@@ -3051,22 +3288,22 @@ impl ToFFI for CBusinessSegmentsHistoryOwned {
     }
 }
 
-// ── institution_rating_views ──────────────────────────────────────
+// ── InstitutionRatingViews ────────────────────────────────────────
 
-/// One historical rating distribution snapshot.
+/// One historical institutional rating distribution snapshot.
 #[repr(C)]
 pub struct CInstitutionRatingViewItem {
-    /// Date as unix timestamp string.
+    /// Date (unix timestamp string).
     pub date: *const c_char,
-    /// Number of Buy ratings.
+    /// Number of "Buy" ratings.
     pub buy: *const c_char,
-    /// Number of Outperform ratings.
+    /// Number of "Outperform" ratings.
     pub over: *const c_char,
-    /// Number of Hold ratings.
+    /// Number of "Hold" ratings.
     pub hold: *const c_char,
-    /// Number of Underperform ratings.
+    /// Number of "Underperform" ratings.
     pub under: *const c_char,
-    /// Number of Sell ratings.
+    /// Number of "Sell" ratings.
     pub sell: *const c_char,
     /// Total analyst count.
     pub total: *const c_char,
@@ -3111,10 +3348,10 @@ impl ToFFI for CInstitutionRatingViewItemOwned {
     }
 }
 
-/// Institution rating views response.
+/// Historical institutional rating views time-series for a security.
 #[repr(C)]
 pub struct CInstitutionRatingViews {
-    /// Pointer to the rating view items.
+    /// Pointer to rating view items.
     pub elist: *const CInstitutionRatingViewItem,
     /// Number of items in `elist`.
     pub num_elist: usize,
@@ -3142,7 +3379,7 @@ impl ToFFI for CInstitutionRatingViewsOwned {
     }
 }
 
-// ── industry_rank ─────────────────────────────────────────────────
+// ── IndustryRank ──────────────────────────────────────────────────
 
 /// One ranked industry item.
 #[repr(C)]
@@ -3210,7 +3447,7 @@ impl ToFFI for CIndustryRankItemOwned {
 /// A group of ranked industry items.
 #[repr(C)]
 pub struct CIndustryRankGroup {
-    /// Pointer to the items in this group.
+    /// Pointer to ranked items.
     pub lists: *const CIndustryRankItem,
     /// Number of items in `lists`.
     pub num_lists: usize,
@@ -3241,9 +3478,9 @@ impl ToFFI for CIndustryRankGroupOwned {
 /// Industry rank response.
 #[repr(C)]
 pub struct CIndustryRankResponse {
-    /// Pointer to the grouped rank items.
+    /// Pointer to grouped rank items.
     pub items: *const CIndustryRankGroup,
-    /// Number of items in `items`.
+    /// Number of groups in `items`.
     pub num_items: usize,
 }
 
@@ -3269,7 +3506,7 @@ impl ToFFI for CIndustryRankResponseOwned {
     }
 }
 
-// ── industry_peers ────────────────────────────────────────────────
+// ── IndustryPeers ─────────────────────────────────────────────────
 
 /// Top-level industry info in the peers response.
 #[repr(C)]
@@ -3304,9 +3541,7 @@ impl ToFFI for CIndustryPeersTopOwned {
     }
 }
 
-/// A node in the recursive industry peer chain.
-///
-/// `next_json` contains the child nodes serialised as a JSON string.
+/// A node in the industry peer chain (recursive children serialised as JSON).
 #[repr(C)]
 pub struct CIndustryPeerNode {
     /// Node name.
@@ -3319,7 +3554,7 @@ pub struct CIndustryPeerNode {
     pub chg: *const c_char,
     /// Year-to-date change.
     pub ytd_chg: *const c_char,
-    /// Child nodes as a JSON string.
+    /// Child nodes serialised as a JSON string (may be NULL if empty).
     pub next_json: *const c_char,
 }
 
@@ -3334,13 +3569,18 @@ pub(crate) struct CIndustryPeerNodeOwned {
 
 impl From<longbridge::fundamental::IndustryPeerNode> for CIndustryPeerNodeOwned {
     fn from(v: longbridge::fundamental::IndustryPeerNode) -> Self {
+        let next_json = if v.next.is_empty() {
+            String::new()
+        } else {
+            serde_json::to_string(&v.next).unwrap_or_default()
+        };
         Self {
             name: v.name.into(),
             counter_id: v.counter_id.into(),
             stock_num: v.stock_num,
             chg: v.chg.into(),
             ytd_chg: v.ytd_chg.into(),
-            next_json: serde_json::to_string(&v.next).unwrap_or_default().into(),
+            next_json: next_json.into(),
         }
     }
 }
@@ -3359,12 +3599,12 @@ impl ToFFI for CIndustryPeerNodeOwned {
     }
 }
 
-/// Industry peers response.
+/// Industry peer chain response.
 #[repr(C)]
 pub struct CIndustryPeersResponse {
     /// Top-level industry node info.
     pub top: CIndustryPeersTop,
-    /// Root peer chain node, or null if absent.
+    /// Root peer chain node (NULL if absent).
     pub chain: *const CIndustryPeerNode,
 }
 
@@ -3392,7 +3632,7 @@ impl ToFFI for CIndustryPeersResponseOwned {
     }
 }
 
-// ── financial_report_snapshot ─────────────────────────────────────
+// ── FinancialReportSnapshot ───────────────────────────────────────
 
 /// A forecast metric in the financial report snapshot.
 #[repr(C)]
@@ -3470,7 +3710,7 @@ impl ToFFI for CSnapshotReportedMetricOwned {
     }
 }
 
-/// Financial report snapshot response.
+/// Financial report snapshot (earnings snapshot) for a security.
 #[repr(C)]
 pub struct CFinancialReportSnapshot {
     /// Company name.
@@ -3485,25 +3725,25 @@ pub struct CFinancialReportSnapshot {
     pub currency: *const c_char,
     /// Report description.
     pub report_desc: *const c_char,
-    /// Forecast revenue, or null.
+    /// Forecast revenue (NULL if absent).
     pub fo_revenue: *const CSnapshotForecastMetric,
-    /// Forecast EBIT, or null.
+    /// Forecast EBIT (NULL if absent).
     pub fo_ebit: *const CSnapshotForecastMetric,
-    /// Forecast EPS, or null.
+    /// Forecast EPS (NULL if absent).
     pub fo_eps: *const CSnapshotForecastMetric,
-    /// Reported revenue, or null.
+    /// Reported revenue (NULL if absent).
     pub fr_revenue: *const CSnapshotReportedMetric,
-    /// Reported net profit, or null.
+    /// Reported net profit (NULL if absent).
     pub fr_profit: *const CSnapshotReportedMetric,
-    /// Reported operating cash flow, or null.
+    /// Reported operating cash flow (NULL if absent).
     pub fr_operate_cash: *const CSnapshotReportedMetric,
-    /// Reported investing cash flow, or null.
+    /// Reported investing cash flow (NULL if absent).
     pub fr_invest_cash: *const CSnapshotReportedMetric,
-    /// Reported financing cash flow, or null.
+    /// Reported financing cash flow (NULL if absent).
     pub fr_finance_cash: *const CSnapshotReportedMetric,
-    /// Reported total assets, or null.
+    /// Reported total assets (NULL if absent).
     pub fr_total_assets: *const CSnapshotReportedMetric,
-    /// Reported total liabilities, or null.
+    /// Reported total liabilities (NULL if absent).
     pub fr_total_liability: *const CSnapshotReportedMetric,
     /// ROE TTM.
     pub fr_roe_ttm: *const c_char,

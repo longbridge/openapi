@@ -14,6 +14,7 @@ mod market;
 mod oauth;
 mod portfolio;
 mod quote;
+mod screener;
 mod sharelist;
 mod time;
 mod trade;

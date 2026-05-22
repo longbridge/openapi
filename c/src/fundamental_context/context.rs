@@ -9,6 +9,29 @@ use crate::{
     types::{CCow, cstr_to_rust},
 };
 
+// Helper: convert a nullable C string to an Option<&'static str> by matching
+// known enum-like values (e.g. report period codes).
+#[inline]
+unsafe fn cstr_to_static_opt(ptr: *const c_char) -> Option<&'static str> {
+    if ptr.is_null() {
+        return None;
+    }
+    let s = cstr_to_rust(ptr);
+    // Match against all known period/report values used across APIs.
+    match s.as_str() {
+        "qf" => Some("qf"),
+        "saf" => Some("saf"),
+        "af" => Some("af"),
+        "q1" => Some("q1"),
+        "q2" => Some("q2"),
+        "q3" => Some("q3"),
+        "annual" => Some("annual"),
+        "semi_annual" => Some("semi_annual"),
+        "quarterly" => Some("quarterly"),
+        _ => None,
+    }
+}
+
 pub(crate) struct CFundamentalContext {
     ctx: FundamentalContext,
 }
@@ -406,7 +429,47 @@ pub unsafe extern "C" fn lb_fundamental_context_ratings(
     });
 }
 
-/// Get business segment breakdowns. Returns `CBusinessSegments`.
+/// Get ranked list of top shareholders. Returns `CShareholderTopResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_shareholder_top(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CShareholderTopResponseOwned> = CCow::new(
+            CShareholderTopResponseOwned::from(ctx_inner.shareholder_top(symbol).await?),
+        );
+        Ok(resp)
+    });
+}
+
+/// Get holding history and detail for one shareholder. Returns
+/// `CShareholderDetailResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_shareholder_detail(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    object_id: i64,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CShareholderDetailResponseOwned> =
+            CCow::new(CShareholderDetailResponseOwned::from(
+                ctx_inner.shareholder_detail(symbol, object_id).await?,
+            ));
+        Ok(resp)
+    });
+}
+
+/// Get current business segment breakdown for a security.
+/// Returns `CBusinessSegments`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_business_segments(
     ctx: *const CFundamentalContext,
@@ -424,10 +487,9 @@ pub unsafe extern "C" fn lb_fundamental_context_business_segments(
     });
 }
 
-/// Get historical business segment breakdowns. Returns
-/// `CBusinessSegmentsHistory`.
-///
-/// Pass `NULL` for `report` or `cate` to omit those parameters.
+/// Get historical business segment breakdowns for a security.
+/// Returns `CBusinessSegmentsHistory`.
+/// Pass NULL for `report` and/or `cate` to omit those filters.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_business_segments_history(
     ctx: *const CFundamentalContext,
@@ -439,35 +501,25 @@ pub unsafe extern "C" fn lb_fundamental_context_business_segments_history(
 ) {
     let ctx_inner = (*ctx).ctx.clone();
     let symbol = cstr_to_rust(symbol);
-    let report_str = if report.is_null() {
-        None
-    } else {
-        Some(cstr_to_rust(report))
-    };
-    let cate_opt = if cate.is_null() {
+    let report: Option<&'static str> = cstr_to_static_opt(report);
+    let cate: Option<String> = if cate.is_null() {
         None
     } else {
         Some(cstr_to_rust(cate))
-    };
-    let report_static: Option<&'static str> = match report_str.as_deref() {
-        Some("qf") => Some("qf"),
-        Some("saf") => Some("saf"),
-        Some("af") => Some("af"),
-        _ => None,
     };
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CBusinessSegmentsHistoryOwned> =
             CCow::new(CBusinessSegmentsHistoryOwned::from(
                 ctx_inner
-                    .business_segments_history(symbol, report_static, cate_opt)
+                    .business_segments_history(symbol, report, cate)
                     .await?,
             ));
         Ok(resp)
     });
 }
 
-/// Get historical institutional rating views. Returns
-/// `CInstitutionRatingViews`.
+/// Get historical institutional rating views for a security.
+/// Returns `CInstitutionRatingViews`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_institution_rating_views(
     ctx: *const CFundamentalContext,
@@ -485,7 +537,8 @@ pub unsafe extern "C" fn lb_fundamental_context_institution_rating_views(
     });
 }
 
-/// Get industry rank for a market. Returns `CIndustryRankResponse`.
+/// Get industry rank for a market.
+/// Returns `CIndustryRankResponse`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_industry_rank(
     ctx: *const CFundamentalContext,
@@ -510,9 +563,9 @@ pub unsafe extern "C" fn lb_fundamental_context_industry_rank(
     });
 }
 
-/// Get industry peer chain. Returns `CIndustryPeersResponse`.
-///
-/// Pass `NULL` for `industry_id` to omit it.
+/// Get the industry peer chain for a security or industry.
+/// Returns `CIndustryPeersResponse`.
+/// Pass NULL for `industry_id` to omit it.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
     ctx: *const CFundamentalContext,
@@ -525,7 +578,7 @@ pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
     let ctx_inner = (*ctx).ctx.clone();
     let counter_id = cstr_to_rust(counter_id);
     let market = cstr_to_rust(market);
-    let industry_id_opt = if industry_id.is_null() {
+    let industry_id: Option<String> = if industry_id.is_null() {
         None
     } else {
         Some(cstr_to_rust(industry_id))
@@ -533,70 +586,76 @@ pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CIndustryPeersResponseOwned> = CCow::new(CIndustryPeersResponseOwned::from(
             ctx_inner
-                .industry_peers(counter_id, market, industry_id_opt)
+                .industry_peers(counter_id, market, industry_id)
                 .await?,
         ));
         Ok(resp)
     });
 }
 
-/// Get financial report snapshot. Returns `CFinancialReportSnapshot`.
-///
-/// Pass `NULL` for optional parameters to omit them.
-/// `fiscal_year` is ignored when 0.
+/// Get a financial report snapshot for a security.
+/// Returns `CFinancialReportSnapshot`.
+/// Pass NULL for `report`, `fiscal_year_str`, and/or `fiscal_period` to omit
+/// them. `fiscal_year_str` should be a decimal integer string (e.g. `"2024"`).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_financial_report_snapshot(
     ctx: *const CFundamentalContext,
     symbol: *const c_char,
     report: *const c_char,
-    fiscal_year: i32,
+    fiscal_year_str: *const c_char,
     fiscal_period: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
     let symbol = cstr_to_rust(symbol);
-    let report_str = if report.is_null() {
+    let report: Option<&'static str> = cstr_to_static_opt(report);
+    let fiscal_year: Option<i32> = if fiscal_year_str.is_null() {
         None
     } else {
-        Some(cstr_to_rust(report))
+        cstr_to_rust(fiscal_year_str).parse::<i32>().ok()
     };
-    let fiscal_year_opt = if fiscal_year == 0 {
-        None
-    } else {
-        Some(fiscal_year)
-    };
-    let fiscal_period_str = if fiscal_period.is_null() {
-        None
-    } else {
-        Some(cstr_to_rust(fiscal_period))
-    };
-    let report_static: Option<&'static str> = match report_str.as_deref() {
-        Some("qf") => Some("qf"),
-        Some("saf") => Some("saf"),
-        Some("af") => Some("af"),
-        _ => None,
-    };
-    let fiscal_period_static: Option<&'static str> = match fiscal_period_str.as_deref() {
-        Some("q1") => Some("q1"),
-        Some("q2") => Some("q2"),
-        Some("q3") => Some("q3"),
-        Some("q4") => Some("q4"),
-        Some("fy") => Some("fy"),
-        Some("h1") => Some("h1"),
-        Some("h2") => Some("h2"),
-        _ => None,
-    };
+    let fiscal_period: Option<&'static str> = cstr_to_static_opt(fiscal_period);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CFinancialReportSnapshotOwned> =
             CCow::new(CFinancialReportSnapshotOwned::from(
                 ctx_inner
-                    .financial_report_snapshot(
-                        symbol,
-                        report_static,
-                        fiscal_year_opt,
-                        fiscal_period_static,
-                    )
+                    .financial_report_snapshot(symbol, report, fiscal_year, fiscal_period)
+                    .await?,
+            ));
+        Ok(resp)
+    });
+}
+
+/// Get valuation comparison between a security and optional peers.
+/// Returns `CValuationComparisonResponse`.
+/// Pass NULL for `comparison_symbols` to skip peer comparison.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_valuation_comparison(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    currency: *const c_char,
+    comparison_symbols: *const *const c_char,
+    num_comparison_symbols: usize,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    let currency = cstr_to_rust(currency);
+    let comparison = if comparison_symbols.is_null() || num_comparison_symbols == 0 {
+        None
+    } else {
+        let syms: Vec<String> = (0..num_comparison_symbols)
+            .map(|i| cstr_to_rust(*comparison_symbols.add(i)))
+            .collect();
+        Some(syms)
+    };
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CValuationComparisonResponseOwned> =
+            CCow::new(CValuationComparisonResponseOwned::from(
+                ctx_inner
+                    .valuation_comparison(symbol, currency, comparison)
                     .await?,
             ));
         Ok(resp)

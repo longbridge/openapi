@@ -1350,6 +1350,81 @@ pub struct SnapshotReportedMetric {
     pub yoy: String,
 }
 
+// ── shareholder_top ───────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::shareholder_top`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShareholderTopResponse {
+    /// Raw top-shareholder data
+    pub data: serde_json::Value,
+}
+
+// ── shareholder_detail ────────────────────────────────────────────
+
+/// Response for [`crate::FundamentalContext::shareholder_detail`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShareholderDetailResponse {
+    /// Raw shareholder detail data
+    pub data: serde_json::Value,
+}
+
+// ── valuation_comparison ──────────────────────────────────────────
+
+/// One historical valuation data point.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationHistoryPoint {
+    /// Date (RFC 3339, converted from Unix timestamp)
+    pub date: String,
+    /// P/E ratio
+    pub pe: String,
+    /// P/B ratio
+    pub pb: String,
+    /// P/S ratio
+    pub ps: String,
+}
+
+/// One security's valuation comparison item.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationComparisonItem {
+    /// Symbol (converted from counter_id)
+    pub symbol: String,
+    /// Security name
+    pub name: String,
+    /// Currency
+    pub currency: String,
+    /// Market capitalisation
+    pub market_value: String,
+    /// Latest closing price
+    pub price_close: String,
+    /// P/E ratio
+    pub pe: String,
+    /// P/B ratio
+    pub pb: String,
+    /// P/S ratio
+    pub ps: String,
+    /// Return on equity
+    pub roe: String,
+    /// Earnings per share
+    pub eps: String,
+    /// Book value per share
+    pub bps: String,
+    /// Dividends per share
+    pub dps: String,
+    /// Dividend yield
+    pub div_yld: String,
+    /// Total assets
+    pub assets: String,
+    /// Historical valuation points
+    pub history: Vec<ValuationHistoryPoint>,
+}
+
+/// Response for [`crate::FundamentalContext::valuation_comparison`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValuationComparisonResponse {
+    /// Valuation comparison items
+    pub list: Vec<ValuationComparisonItem>,
+}
+
 /// Financial report period type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum FinancialReportPeriod {

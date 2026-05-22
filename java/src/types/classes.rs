@@ -2228,26 +2228,51 @@ impl_java_class!(
 // ── QuoteContext extensions ───────────────────────────────────────
 
 impl_java_class!(
-    "com/longbridge/quote/ShortPositionsResponse",
-    longbridge::quote::ShortPositionsResponse,
+    "com/longbridge/quote/ShortPositionsItem",
+    longbridge::quote::ShortPositionsItem,
     [
-        symbol,
-        #[java(objarray)]
-        data,
-        sources
+        timestamp,
+        rate,
+        close,
+        current_shares_short,
+        avg_daily_share_volume,
+        days_to_cover,
+        amount,
+        balance,
+        cost
     ]
 );
 
 impl_java_class!(
-    "com/longbridge/quote/ShortPosition",
-    longbridge::quote::ShortPosition,
+    "com/longbridge/quote/ShortPositionsResponse",
+    longbridge::quote::ShortPositionsResponse,
+    [
+        #[java(objarray)]
+        data
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/ShortTradesItem",
+    longbridge::quote::ShortTradesItem,
     [
         timestamp,
         rate,
-        avg_daily_share_volume,
-        current_shares_short,
-        days_to_cover,
-        close
+        close,
+        nus_amount,
+        ny_amount,
+        total_amount,
+        amount,
+        balance
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/quote/ShortTradesResponse",
+    longbridge::quote::ShortTradesResponse,
+    [
+        #[java(objarray)]
+        data
     ]
 );
 
@@ -2618,4 +2643,162 @@ impl_java_class!(
         flows_list,
         has_more
     ]
+);
+
+// ── FundamentalContext: shareholders / valuation comparison ────────
+
+impl_java_class!(
+    "com/longbridge/fundamental/ShareholderTopResponse",
+    longbridge::fundamental::ShareholderTopResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ShareholderDetailResponse",
+    longbridge::fundamental::ShareholderDetailResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationHistoryPoint",
+    longbridge::fundamental::ValuationHistoryPoint,
+    [date, pe, pb, ps]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationComparisonItem",
+    longbridge::fundamental::ValuationComparisonItem,
+    [
+        symbol,
+        name,
+        currency,
+        market_value,
+        price_close,
+        pe,
+        pb,
+        ps,
+        roe,
+        eps,
+        bps,
+        dps,
+        div_yld,
+        assets,
+        #[java(objarray)]
+        history
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/ValuationComparisonResponse",
+    longbridge::fundamental::ValuationComparisonResponse,
+    [
+        #[java(objarray)]
+        list
+    ]
+);
+
+// ── MarketContext: top movers / rank ──────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/market/TopMoversStock",
+    longbridge::market::TopMoversStock,
+    [
+        symbol,
+        code,
+        name,
+        full_name,
+        change,
+        last_done,
+        market,
+        #[java(objarray)]
+        labels,
+        logo
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/TopMoversEvent",
+    longbridge::market::TopMoversEvent,
+    [timestamp, alert_reason, alert_type, stock, post]
+);
+
+impl_java_class!(
+    "com/longbridge/market/TopMoversResponse",
+    longbridge::market::TopMoversResponse,
+    [
+        #[java(objarray)]
+        events,
+        next_params
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankCategoriesResponse",
+    longbridge::market::RankCategoriesResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankListItem",
+    longbridge::market::RankListItem,
+    [
+        symbol,
+        code,
+        name,
+        last_done,
+        chg,
+        change,
+        inflow,
+        market_cap,
+        industry,
+        pre_post_price,
+        pre_post_chg,
+        amplitude,
+        five_day_chg,
+        turnover_rate,
+        volume_rate,
+        pb_ttm
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankListResponse",
+    longbridge::market::RankListResponse,
+    [
+        bmp,
+        #[java(objarray)]
+        lists
+    ]
+);
+
+// ── ScreenerContext ───────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerRecommendStrategiesResponse",
+    longbridge::screener::ScreenerRecommendStrategiesResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerUserStrategiesResponse",
+    longbridge::screener::ScreenerUserStrategiesResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerStrategyResponse",
+    longbridge::screener::ScreenerStrategyResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerSearchResponse",
+    longbridge::screener::ScreenerSearchResponse,
+    [data]
+);
+
+impl_java_class!(
+    "com/longbridge/screener/ScreenerIndicatorsResponse",
+    longbridge::screener::ScreenerIndicatorsResponse,
+    [data]
 );

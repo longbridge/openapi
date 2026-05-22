@@ -1704,365 +1704,145 @@ impl From<FinancialReportPeriod> for lb::FinancialReportPeriod {
     }
 }
 
-// ── business_segments ─────────────────────────────────────────────
+// ── ShareholderTopResponse ────────────────────────────────────────
 
-/// One business segment item (latest snapshot)
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct BusinessSegmentItem {
-    pub name: String,
-    pub percent: String,
-}
-
-impl From<lb::BusinessSegmentItem> for BusinessSegmentItem {
-    fn from(v: lb::BusinessSegmentItem) -> Self {
-        Self {
-            name: v.name,
-            percent: v.percent,
-        }
-    }
-}
-
-/// Business segments response
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct BusinessSegments {
-    pub date: String,
-    pub total: String,
-    pub currency: String,
-    pub business: Vec<BusinessSegmentItem>,
-}
-
-impl From<lb::BusinessSegments> for BusinessSegments {
-    fn from(v: lb::BusinessSegments) -> Self {
-        Self {
-            date: v.date,
-            total: v.total,
-            currency: v.currency,
-            business: v.business.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-/// One business/regional segment item in a historical snapshot
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct BusinessSegmentHistoryItem {
-    pub name: String,
-    pub percent: String,
-    pub value: String,
-}
-
-impl From<lb::BusinessSegmentHistoryItem> for BusinessSegmentHistoryItem {
-    fn from(v: lb::BusinessSegmentHistoryItem) -> Self {
-        Self {
-            name: v.name,
-            percent: v.percent,
-            value: v.value,
-        }
-    }
-}
-
-/// One historical business segments snapshot
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct BusinessSegmentsHistoricalItem {
-    pub date: String,
-    pub total: String,
-    pub currency: String,
-    pub business: Vec<BusinessSegmentHistoryItem>,
-    pub regionals: Vec<BusinessSegmentHistoryItem>,
-}
-
-impl From<lb::BusinessSegmentsHistoricalItem> for BusinessSegmentsHistoricalItem {
-    fn from(v: lb::BusinessSegmentsHistoricalItem) -> Self {
-        Self {
-            date: v.date,
-            total: v.total,
-            currency: v.currency,
-            business: v.business.into_iter().map(Into::into).collect(),
-            regionals: v.regionals.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-/// Business segments history response
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct BusinessSegmentsHistory {
-    pub historical: Vec<BusinessSegmentsHistoricalItem>,
-}
-
-impl From<lb::BusinessSegmentsHistory> for BusinessSegmentsHistory {
-    fn from(v: lb::BusinessSegmentsHistory) -> Self {
-        Self {
-            historical: v.historical.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-// ── institution_rating_views ──────────────────────────────────────
-
-/// One historical rating distribution snapshot
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct InstitutionRatingViewItem {
-    pub date: String,
-    pub buy: String,
-    pub over: String,
-    pub hold: String,
-    pub under: String,
-    pub sell: String,
-    pub total: String,
-}
-
-impl From<lb::InstitutionRatingViewItem> for InstitutionRatingViewItem {
-    fn from(v: lb::InstitutionRatingViewItem) -> Self {
-        Self {
-            date: v.date,
-            buy: v.buy,
-            over: v.over,
-            hold: v.hold,
-            under: v.under,
-            sell: v.sell,
-            total: v.total,
-        }
-    }
-}
-
-/// Institution rating views response
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct InstitutionRatingViews {
-    pub elist: Vec<InstitutionRatingViewItem>,
-}
-
-impl From<lb::InstitutionRatingViews> for InstitutionRatingViews {
-    fn from(v: lb::InstitutionRatingViews) -> Self {
-        Self {
-            elist: v.elist.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-// ── industry_rank ─────────────────────────────────────────────────
-
-/// One ranked industry item
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct IndustryRankItem {
-    pub name: String,
-    pub counter_id: String,
-    pub chg: String,
-    pub leading_name: String,
-    pub leading_ticker: String,
-    pub leading_chg: String,
-    pub value_name: String,
-    pub value_data: String,
-}
-
-impl From<lb::IndustryRankItem> for IndustryRankItem {
-    fn from(v: lb::IndustryRankItem) -> Self {
-        Self {
-            name: v.name,
-            counter_id: v.counter_id,
-            chg: v.chg,
-            leading_name: v.leading_name,
-            leading_ticker: v.leading_ticker,
-            leading_chg: v.leading_chg,
-            value_name: v.value_name,
-            value_data: v.value_data,
-        }
-    }
-}
-
-/// A group of ranked industry items
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct IndustryRankGroup {
-    pub lists: Vec<IndustryRankItem>,
-}
-
-impl From<lb::IndustryRankGroup> for IndustryRankGroup {
-    fn from(v: lb::IndustryRankGroup) -> Self {
-        Self {
-            lists: v.lists.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-/// Industry rank response
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct IndustryRankResponse {
-    pub items: Vec<IndustryRankGroup>,
-}
-
-impl From<lb::IndustryRankResponse> for IndustryRankResponse {
-    fn from(v: lb::IndustryRankResponse) -> Self {
-        Self {
-            items: v.items.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-// ── industry_peers ────────────────────────────────────────────────
-
-/// Top-level industry info in the peers response
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct IndustryPeersTop {
-    pub name: String,
-    pub market: String,
-}
-
-impl From<lb::IndustryPeersTop> for IndustryPeersTop {
-    fn from(v: lb::IndustryPeersTop) -> Self {
-        Self {
-            name: v.name,
-            market: v.market,
-        }
-    }
-}
-
-/// A node in the recursive industry peer chain.
+/// Top-shareholder list response.
 ///
-/// `next_json` contains the child nodes serialised as a JSON string.
+/// `data` is the raw JSON returned by the API preserved as a Python
+/// object (dict / list / etc.).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct IndustryPeerNode {
+pub(crate) struct ShareholderTopResponse {
+    /// Raw top-shareholder data (JSON object)
+    pub data: JsonValue,
+}
+
+impl From<lb::ShareholderTopResponse> for ShareholderTopResponse {
+    fn from(v: lb::ShareholderTopResponse) -> Self {
+        Self {
+            data: JsonValue(v.data),
+        }
+    }
+}
+
+// ── ShareholderDetailResponse ─────────────────────────────────────
+
+/// Shareholder detail response.
+///
+/// `data` is the raw JSON returned by the API preserved as a Python
+/// object (dict / list / etc.).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShareholderDetailResponse {
+    /// Raw shareholder detail data (JSON object)
+    pub data: JsonValue,
+}
+
+impl From<lb::ShareholderDetailResponse> for ShareholderDetailResponse {
+    fn from(v: lb::ShareholderDetailResponse) -> Self {
+        Self {
+            data: JsonValue(v.data),
+        }
+    }
+}
+
+// ── ValuationComparisonResponse ───────────────────────────────────
+
+/// One historical valuation data point.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ValuationHistoryPoint {
+    /// Date (RFC 3339)
+    pub date: String,
+    /// P/E ratio
+    pub pe: String,
+    /// P/B ratio
+    pub pb: String,
+    /// P/S ratio
+    pub ps: String,
+}
+
+impl From<lb::ValuationHistoryPoint> for ValuationHistoryPoint {
+    fn from(v: lb::ValuationHistoryPoint) -> Self {
+        Self {
+            date: v.date,
+            pe: v.pe,
+            pb: v.pb,
+            ps: v.ps,
+        }
+    }
+}
+
+/// One security's valuation comparison item.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ValuationComparisonItem {
+    /// Symbol (e.g. `"AAPL.US"`)
+    pub symbol: String,
+    /// Security name
     pub name: String,
-    pub counter_id: String,
-    pub stock_num: i32,
-    pub chg: String,
-    pub ytd_chg: String,
-    /// Child nodes as a JSON string
-    pub next_json: String,
-}
-
-impl From<lb::IndustryPeerNode> for IndustryPeerNode {
-    fn from(v: lb::IndustryPeerNode) -> Self {
-        Self {
-            name: v.name,
-            counter_id: v.counter_id,
-            stock_num: v.stock_num,
-            chg: v.chg,
-            ytd_chg: v.ytd_chg,
-            next_json: serde_json::to_string(&v.next).unwrap_or_default(),
-        }
-    }
-}
-
-/// Industry peers response
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct IndustryPeersResponse {
-    pub top: IndustryPeersTop,
-    pub chain: Option<IndustryPeerNode>,
-}
-
-impl From<lb::IndustryPeersResponse> for IndustryPeersResponse {
-    fn from(v: lb::IndustryPeersResponse) -> Self {
-        Self {
-            top: v.top.into(),
-            chain: v.chain.map(Into::into),
-        }
-    }
-}
-
-// ── financial_report_snapshot ─────────────────────────────────────
-
-/// A forecast metric in the financial report snapshot
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct SnapshotForecastMetric {
-    pub value: String,
-    pub yoy: String,
-    pub cmp_desc: String,
-    pub est_value: String,
-}
-
-impl From<lb::SnapshotForecastMetric> for SnapshotForecastMetric {
-    fn from(v: lb::SnapshotForecastMetric) -> Self {
-        Self {
-            value: v.value,
-            yoy: v.yoy,
-            cmp_desc: v.cmp_desc,
-            est_value: v.est_value,
-        }
-    }
-}
-
-/// A reported metric in the financial report snapshot
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct SnapshotReportedMetric {
-    pub value: String,
-    pub yoy: String,
-}
-
-impl From<lb::SnapshotReportedMetric> for SnapshotReportedMetric {
-    fn from(v: lb::SnapshotReportedMetric) -> Self {
-        Self {
-            value: v.value,
-            yoy: v.yoy,
-        }
-    }
-}
-
-/// Financial report snapshot response
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct FinancialReportSnapshot {
-    pub name: String,
-    pub ticker: String,
-    pub fp_start: String,
-    pub fp_end: String,
+    /// Currency
     pub currency: String,
-    pub report_desc: String,
-    pub fo_revenue: Option<SnapshotForecastMetric>,
-    pub fo_ebit: Option<SnapshotForecastMetric>,
-    pub fo_eps: Option<SnapshotForecastMetric>,
-    pub fr_revenue: Option<SnapshotReportedMetric>,
-    pub fr_profit: Option<SnapshotReportedMetric>,
-    pub fr_operate_cash: Option<SnapshotReportedMetric>,
-    pub fr_invest_cash: Option<SnapshotReportedMetric>,
-    pub fr_finance_cash: Option<SnapshotReportedMetric>,
-    pub fr_total_assets: Option<SnapshotReportedMetric>,
-    pub fr_total_liability: Option<SnapshotReportedMetric>,
-    pub fr_roe_ttm: String,
-    pub fr_profit_margin: String,
-    pub fr_profit_margin_ttm: String,
-    pub fr_asset_turn_ttm: String,
-    pub fr_leverage_ttm: String,
-    pub fr_debt_assets_ratio: String,
+    /// Market capitalisation
+    pub market_value: String,
+    /// Latest closing price
+    pub price_close: String,
+    /// P/E ratio
+    pub pe: String,
+    /// P/B ratio
+    pub pb: String,
+    /// P/S ratio
+    pub ps: String,
+    /// Return on equity
+    pub roe: String,
+    /// Earnings per share
+    pub eps: String,
+    /// Book value per share
+    pub bps: String,
+    /// Dividends per share
+    pub dps: String,
+    /// Dividend yield
+    pub div_yld: String,
+    /// Total assets
+    pub assets: String,
+    /// Historical valuation points
+    pub history: Vec<ValuationHistoryPoint>,
 }
 
-impl From<lb::FinancialReportSnapshot> for FinancialReportSnapshot {
-    fn from(v: lb::FinancialReportSnapshot) -> Self {
+impl From<lb::ValuationComparisonItem> for ValuationComparisonItem {
+    fn from(v: lb::ValuationComparisonItem) -> Self {
         Self {
+            symbol: v.symbol,
             name: v.name,
-            ticker: v.ticker,
-            fp_start: v.fp_start,
-            fp_end: v.fp_end,
             currency: v.currency,
-            report_desc: v.report_desc,
-            fo_revenue: v.fo_revenue.map(Into::into),
-            fo_ebit: v.fo_ebit.map(Into::into),
-            fo_eps: v.fo_eps.map(Into::into),
-            fr_revenue: v.fr_revenue.map(Into::into),
-            fr_profit: v.fr_profit.map(Into::into),
-            fr_operate_cash: v.fr_operate_cash.map(Into::into),
-            fr_invest_cash: v.fr_invest_cash.map(Into::into),
-            fr_finance_cash: v.fr_finance_cash.map(Into::into),
-            fr_total_assets: v.fr_total_assets.map(Into::into),
-            fr_total_liability: v.fr_total_liability.map(Into::into),
-            fr_roe_ttm: v.fr_roe_ttm,
-            fr_profit_margin: v.fr_profit_margin,
-            fr_profit_margin_ttm: v.fr_profit_margin_ttm,
-            fr_asset_turn_ttm: v.fr_asset_turn_ttm,
-            fr_leverage_ttm: v.fr_leverage_ttm,
-            fr_debt_assets_ratio: v.fr_debt_assets_ratio,
+            market_value: v.market_value,
+            price_close: v.price_close,
+            pe: v.pe,
+            pb: v.pb,
+            ps: v.ps,
+            roe: v.roe,
+            eps: v.eps,
+            bps: v.bps,
+            dps: v.dps,
+            div_yld: v.div_yld,
+            assets: v.assets,
+            history: v.history.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Valuation comparison response.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ValuationComparisonResponse {
+    /// Valuation comparison items
+    pub list: Vec<ValuationComparisonItem>,
+}
+
+impl From<lb::ValuationComparisonResponse> for ValuationComparisonResponse {
+    fn from(v: lb::ValuationComparisonResponse) -> Self {
+        Self {
+            list: v.list.into_iter().map(Into::into).collect(),
         }
     }
 }

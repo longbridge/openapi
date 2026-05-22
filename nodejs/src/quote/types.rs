@@ -1480,55 +1480,111 @@ pub struct HistoryMarketTemperatureResponse {
 
 // ── Step 3 additions ─────────────────────────────────────────────
 
-/// Short interest response
+/// One short-position data point (unified for US and HK markets).
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct ShortPositionsItem {
+    /// Trading date (RFC 3339)
+    pub timestamp: String,
+    /// Short ratio
+    pub rate: String,
+    /// Closing price
+    pub close: String,
+    /// [US] Number of short shares outstanding
+    pub current_shares_short: String,
+    /// [US] Average daily share volume
+    pub avg_daily_share_volume: String,
+    /// [US] Days to cover ratio
+    pub days_to_cover: String,
+    /// [HK] Short sale amount (HKD)
+    pub amount: String,
+    /// [HK] Short position balance
+    pub balance: String,
+    /// [HK] Cost / closing price
+    pub cost: String,
+}
+
+impl From<longbridge::quote::ShortPositionsItem> for ShortPositionsItem {
+    fn from(v: longbridge::quote::ShortPositionsItem) -> Self {
+        Self {
+            timestamp: v.timestamp,
+            rate: v.rate,
+            close: v.close,
+            current_shares_short: v.current_shares_short,
+            avg_daily_share_volume: v.avg_daily_share_volume,
+            days_to_cover: v.days_to_cover,
+            amount: v.amount,
+            balance: v.balance,
+            cost: v.cost,
+        }
+    }
+}
+
+/// Short interest / positions response (HK or US).
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct ShortPositionsResponse {
-    /// Security symbol
-    pub symbol: String,
-    /// Data points
-    pub data: Vec<ShortPosition>,
-    /// Number of sources
-    pub sources: i32,
+    /// Short position data points
+    pub data: Vec<ShortPositionsItem>,
 }
 
 impl From<longbridge::quote::ShortPositionsResponse> for ShortPositionsResponse {
     fn from(v: longbridge::quote::ShortPositionsResponse) -> Self {
         Self {
-            symbol: v.symbol,
             data: v.data.into_iter().map(Into::into).collect(),
-            sources: v.sources,
         }
     }
 }
 
-/// One short position data point
+/// One short-trade data point (unified for US and HK markets).
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct ShortPosition {
-    /// Settlement date timestamp string
+pub struct ShortTradesItem {
+    /// Trading date (RFC 3339)
     pub timestamp: String,
     /// Short ratio
     pub rate: String,
-    /// Avg daily share volume
-    pub avg_daily_share_volume: String,
-    /// Current shares short
-    pub current_shares_short: String,
-    /// Days to cover
-    pub days_to_cover: String,
     /// Closing price
     pub close: String,
+    /// [US] NYSE short amount
+    pub nus_amount: String,
+    /// [US] NY short amount
+    pub ny_amount: String,
+    /// [US] Total short amount
+    pub total_amount: String,
+    /// [HK] Short sale amount
+    pub amount: String,
+    /// [HK] Short position balance
+    pub balance: String,
 }
 
-impl From<longbridge::quote::ShortPosition> for ShortPosition {
-    fn from(v: longbridge::quote::ShortPosition) -> Self {
+impl From<longbridge::quote::ShortTradesItem> for ShortTradesItem {
+    fn from(v: longbridge::quote::ShortTradesItem) -> Self {
         Self {
             timestamp: v.timestamp,
             rate: v.rate,
-            avg_daily_share_volume: v.avg_daily_share_volume,
-            current_shares_short: v.current_shares_short,
-            days_to_cover: v.days_to_cover,
             close: v.close,
+            nus_amount: v.nus_amount,
+            ny_amount: v.ny_amount,
+            total_amount: v.total_amount,
+            amount: v.amount,
+            balance: v.balance,
+        }
+    }
+}
+
+/// Short trade records response (HK or US).
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct ShortTradesResponse {
+    /// Short trade data points
+    pub data: Vec<ShortTradesItem>,
+}
+
+impl From<longbridge::quote::ShortTradesResponse> for ShortTradesResponse {
+    fn from(v: longbridge::quote::ShortTradesResponse) -> Self {
+        Self {
+            data: v.data.into_iter().map(Into::into).collect(),
         }
     }
 }

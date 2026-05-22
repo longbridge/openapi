@@ -331,6 +331,125 @@ pub struct ConstituentStock {
     pub trade_status: i32,
 }
 
+// ── top_movers ────────────────────────────────────────────────────
+
+/// Stock information within a top-movers event.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopMoversStock {
+    /// Symbol (converted from counter_id, e.g. `"NVDA.US"`)
+    pub symbol: String,
+    /// Ticker code (e.g. `"NVDA"`)
+    pub code: String,
+    /// Security name
+    pub name: String,
+    /// Full name
+    #[serde(default)]
+    pub full_name: String,
+    /// Price change (decimal ratio)
+    pub change: String,
+    /// Latest price
+    pub last_done: String,
+    /// Market code
+    pub market: String,
+    /// Labels / tags
+    #[serde(default)]
+    pub labels: Vec<String>,
+    /// Logo URL
+    #[serde(default)]
+    pub logo: String,
+}
+
+/// One top-movers event entry.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopMoversEvent {
+    /// Event time (RFC 3339)
+    pub timestamp: String,
+    /// Alert reason description
+    pub alert_reason: String,
+    /// Alert type code
+    pub alert_type: i64,
+    /// Stock information
+    pub stock: TopMoversStock,
+    /// Associated news post (raw JSON, complex structure)
+    pub post: serde_json::Value,
+}
+
+/// Response for [`crate::MarketContext::top_movers`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopMoversResponse {
+    /// Top-mover events
+    pub events: Vec<TopMoversEvent>,
+    /// Pagination cursor for next page
+    pub next_params: serde_json::Value,
+}
+
+// ── rank_categories ───────────────────────────────────────────────
+
+/// Response for [`crate::MarketContext::rank_categories`]
+///
+/// The raw data contains all available rank category keys and labels.
+/// The exact structure varies so the payload is preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankCategoriesResponse {
+    /// Raw rank category data
+    pub data: serde_json::Value,
+}
+
+// ── rank_list ─────────────────────────────────────────────────────
+
+/// One ranked security item.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankListItem {
+    /// Symbol (converted from counter_id, e.g. `"MU.US"`)
+    pub symbol: String,
+    /// Ticker code (e.g. `"MU"`)
+    pub code: String,
+    /// Security name
+    pub name: String,
+    /// Latest price
+    pub last_done: String,
+    /// Price change ratio (decimal)
+    pub chg: String,
+    /// Absolute price change
+    pub change: String,
+    /// Net inflow
+    pub inflow: String,
+    /// Market cap
+    pub market_cap: String,
+    /// Industry name
+    pub industry: String,
+    /// Pre/post market price
+    #[serde(default)]
+    pub pre_post_price: String,
+    /// Pre/post market change
+    #[serde(default)]
+    pub pre_post_chg: String,
+    /// Amplitude
+    #[serde(default)]
+    pub amplitude: String,
+    /// 5-day change
+    #[serde(default)]
+    pub five_day_chg: String,
+    /// Turnover rate
+    #[serde(default)]
+    pub turnover_rate: String,
+    /// Volume ratio
+    #[serde(default)]
+    pub volume_rate: String,
+    /// P/B ratio (TTM)
+    #[serde(default)]
+    pub pb_ttm: String,
+}
+
+/// Response for [`crate::MarketContext::rank_list`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankListResponse {
+    /// Whether delayed / BMP data
+    pub bmp: bool,
+    /// Ranked security items
+    pub lists: Vec<RankListItem>,
+}
+
 // ── enums ─────────────────────────────────────────────────────────
 
 /// Broker holding lookback period

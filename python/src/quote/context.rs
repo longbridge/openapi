@@ -636,14 +636,34 @@ impl QuoteContext {
             .collect()
     }
 
-    /// Get short interest data for a US security
+    /// Get short interest data for a US or HK security.
+    ///
+    /// Market is inferred from the symbol suffix (.HK → HK, otherwise US).
+    #[pyo3(signature = (symbol, count = 20))]
     fn short_positions(
         &self,
         symbol: String,
+        count: u32,
     ) -> PyResult<crate::quote::types::ShortPositionsResponse> {
         Ok(self
             .ctx
-            .short_positions(symbol)
+            .short_positions(symbol, count)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get short trade records for a HK or US security.
+    ///
+    /// Market is inferred from the symbol suffix (.HK → HK, otherwise US).
+    #[pyo3(signature = (symbol, count = 20))]
+    fn short_trades(
+        &self,
+        symbol: String,
+        count: u32,
+    ) -> PyResult<crate::quote::types::ShortTradesResponse> {
+        Ok(self
+            .ctx
+            .short_trades(symbol, count)
             .map_err(ErrorNewType)?
             .into())
     }

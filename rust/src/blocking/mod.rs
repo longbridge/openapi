@@ -11,6 +11,7 @@ mod market;
 mod portfolio;
 mod quote;
 mod runtime;
+mod screener;
 mod sharelist;
 mod trade;
 
@@ -24,5 +25,6 @@ pub use fundamental::FundamentalContextSync;
 pub use market::MarketContextSync;
 pub use portfolio::PortfolioContextSync;
 pub use quote::QuoteContextSync;
+pub use screener::ScreenerContextSync;
 pub use sharelist::SharelistContextSync;
 pub use trade::TradeContextSync;

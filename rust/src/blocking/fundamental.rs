@@ -248,4 +248,36 @@ impl FundamentalContextSync {
                 .await
         })
     }
+
+    /// Get ranked list of top shareholders
+    pub fn shareholder_top(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<ShareholderTopResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.shareholder_top(symbol).await })
+    }
+
+    /// Get holding history and detail for one shareholder object
+    pub fn shareholder_detail(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+        object_id: i64,
+    ) -> Result<ShareholderDetailResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.shareholder_detail(symbol, object_id).await })
+    }
+
+    /// Get valuation comparison between a security and optional peers
+    pub fn valuation_comparison(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+        currency: impl Into<String> + Send + 'static,
+        comparison_symbols: Option<Vec<String>>,
+    ) -> Result<ValuationComparisonResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.valuation_comparison(symbol, currency, comparison_symbols)
+                .await
+        })
+    }
 }

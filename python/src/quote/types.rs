@@ -1435,57 +1435,114 @@ pub(crate) struct HistoryMarketTemperatureResponse {
     records: Vec<MarketTemperature>,
 }
 
-// ── Step 3: short_positions / option_volume / option_volume_daily ─
+// ── Step 3: short_positions / short_trades / option_volume /
+// option_volume_daily
 
-/// Short interest response
+/// One short-position data point (unified for US and HK markets).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortPositionsItem {
+    /// Trading date (RFC 3339)
+    pub timestamp: String,
+    /// Short ratio
+    pub rate: String,
+    /// Closing price
+    pub close: String,
+    /// [US] Number of short shares outstanding
+    pub current_shares_short: String,
+    /// [US] Average daily share volume
+    pub avg_daily_share_volume: String,
+    /// [US] Days to cover ratio
+    pub days_to_cover: String,
+    /// [HK] Short sale amount (HKD)
+    pub amount: String,
+    /// [HK] Short position balance
+    pub balance: String,
+    /// [HK] Cost / closing price
+    pub cost: String,
+}
+
+impl From<longbridge::quote::ShortPositionsItem> for ShortPositionsItem {
+    fn from(v: longbridge::quote::ShortPositionsItem) -> Self {
+        Self {
+            timestamp: v.timestamp,
+            rate: v.rate,
+            close: v.close,
+            current_shares_short: v.current_shares_short,
+            avg_daily_share_volume: v.avg_daily_share_volume,
+            days_to_cover: v.days_to_cover,
+            amount: v.amount,
+            balance: v.balance,
+            cost: v.cost,
+        }
+    }
+}
+
+/// Short interest / positions response (HK or US).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ShortPositionsResponse {
-    /// Security symbol
-    pub symbol: String,
-    /// Short interest data points
-    pub data: Vec<ShortPosition>,
-    /// Number of data sources
-    pub sources: i32,
+    /// Short position data points
+    pub data: Vec<ShortPositionsItem>,
 }
 
 impl From<longbridge::quote::ShortPositionsResponse> for ShortPositionsResponse {
     fn from(v: longbridge::quote::ShortPositionsResponse) -> Self {
         Self {
-            symbol: v.symbol,
             data: v.data.into_iter().map(Into::into).collect(),
-            sources: v.sources,
         }
     }
 }
 
-/// One short position data point
+/// One short-trade data point (unified for US and HK markets).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct ShortPosition {
-    /// Settlement date (unix timestamp string)
+pub(crate) struct ShortTradesItem {
+    /// Trading date (RFC 3339)
     pub timestamp: String,
     /// Short ratio
     pub rate: String,
-    /// Average daily share volume
-    pub avg_daily_share_volume: String,
-    /// Current shares short
-    pub current_shares_short: String,
-    /// Days to cover
-    pub days_to_cover: String,
     /// Closing price
     pub close: String,
+    /// [US] NYSE short amount
+    pub nus_amount: String,
+    /// [US] NY short amount
+    pub ny_amount: String,
+    /// [US] Total short amount
+    pub total_amount: String,
+    /// [HK] Short sale amount
+    pub amount: String,
+    /// [HK] Short position balance
+    pub balance: String,
 }
 
-impl From<longbridge::quote::ShortPosition> for ShortPosition {
-    fn from(v: longbridge::quote::ShortPosition) -> Self {
+impl From<longbridge::quote::ShortTradesItem> for ShortTradesItem {
+    fn from(v: longbridge::quote::ShortTradesItem) -> Self {
         Self {
             timestamp: v.timestamp,
             rate: v.rate,
-            avg_daily_share_volume: v.avg_daily_share_volume,
-            current_shares_short: v.current_shares_short,
-            days_to_cover: v.days_to_cover,
             close: v.close,
+            nus_amount: v.nus_amount,
+            ny_amount: v.ny_amount,
+            total_amount: v.total_amount,
+            amount: v.amount,
+            balance: v.balance,
+        }
+    }
+}
+
+/// Short trade records response (HK or US).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortTradesResponse {
+    /// Short trade data points
+    pub data: Vec<ShortTradesItem>,
+}
+
+impl From<longbridge::quote::ShortTradesResponse> for ShortTradesResponse {
+    fn from(v: longbridge::quote::ShortTradesResponse) -> Self {
+        Self {
+            data: v.data.into_iter().map(Into::into).collect(),
         }
     }
 }

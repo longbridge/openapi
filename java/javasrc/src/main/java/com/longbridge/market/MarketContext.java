@@ -65,4 +65,19 @@ public class MarketContext implements AutoCloseable {
     public CompletableFuture<IndexConstituents> getConstituent(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> SdkNative.marketContextConstituent(raw, symbol, callback));
     }
+
+    /** Get top movers (stocks with unusual price movements) across one or more markets */
+    public CompletableFuture<TopMoversResponse> getTopMovers(TopMoversOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> SdkNative.marketContextTopMovers(raw, opts, callback));
+    }
+
+    /** Get rank category keys for the popularity leaderboard. */
+    public CompletableFuture<RankCategoriesResponse> getRankCategories() throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> SdkNative.marketContextRankCategories(raw, callback));
+    }
+
+    /** Get ranked stock list for a given category key (from getRankCategories). */
+    public CompletableFuture<RankListResponse> getRankList(RankListOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> SdkNative.marketContextRankList(raw, opts, callback));
+    }
 }

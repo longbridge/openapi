@@ -9,7 +9,7 @@ use longbridge::{Config, FundamentalContext, fundamental::types::*};
 use crate::{
     async_util,
     error::jni_result,
-    types::{FromJValue, get_field},
+    types::{FromJValue, ObjectArray, get_field},
 };
 
 struct ContextObj {
@@ -194,7 +194,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetBusinessSegments(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextShareholderTop(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -205,7 +205,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
         let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.business_segments(symbol).await?;
+            let resp = context.ctx.shareholder_top(symbol).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -213,48 +213,19 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetBusinessSegmentsHistory(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    opts: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let symbol: String = get_field(env, &opts, "symbol")?;
-        let report: Option<String> = get_field(env, &opts, "report")?;
-        let cate: Option<String> = get_field(env, &opts, "cate")?;
-        let report_static: Option<&'static str> = match report.as_deref() {
-            Some("qf") => Some("qf"),
-            Some("saf") => Some("saf"),
-            Some("af") => Some("af"),
-            _ => None,
-        };
-        async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
-                .business_segments_history(symbol, report_static, cate)
-                .await?;
-            Ok(resp)
-        })?;
-        Ok(())
-    })
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetInstitutionRatingViews(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextShareholderDetail(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
     symbol: JObject,
+    object_id: i64,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.institution_rating_views(symbol).await?;
+            let resp = context.ctx.shareholder_detail(symbol, object_id).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -262,89 +233,29 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetIndustryRank(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextValuationComparison(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    opts: JObject,
+    symbol: JObject,
+    currency: JObject,
+    comparison_symbols: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
-        let market: String = get_field(env, &opts, "market")?;
-        let indicator: String = get_field(env, &opts, "indicator")?;
-        let sort_type: String = get_field(env, &opts, "sortType")?;
-        let limit: i32 = get_field(env, &opts, "limit")?;
-        let limit = limit.max(0) as u32;
-        async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
-                .industry_rank(market, indicator, sort_type, limit)
-                .await?;
-            Ok(resp)
-        })?;
-        Ok(())
-    })
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetIndustryPeers(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    opts: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let counter_id: String = get_field(env, &opts, "counterId")?;
-        let market: String = get_field(env, &opts, "market")?;
-        let industry_id: Option<String> = get_field(env, &opts, "industryId")?;
-        async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
-                .industry_peers(counter_id, market, industry_id)
-                .await?;
-            Ok(resp)
-        })?;
-        Ok(())
-    })
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetFinancialReportSnapshot(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    opts: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let symbol: String = get_field(env, &opts, "symbol")?;
-        let report: Option<String> = get_field(env, &opts, "report")?;
-        let fiscal_year: Option<i32> = get_field(env, &opts, "fiscalYear")?;
-        let fiscal_period: Option<String> = get_field(env, &opts, "fiscalPeriod")?;
-        let report_static: Option<&'static str> = match report.as_deref() {
-            Some("qf") => Some("qf"),
-            Some("saf") => Some("saf"),
-            Some("af") => Some("af"),
-            _ => None,
-        };
-        let fiscal_period_static: Option<&'static str> = match fiscal_period.as_deref() {
-            Some("q1") => Some("q1"),
-            Some("q2") => Some("q2"),
-            Some("q3") => Some("q3"),
-            Some("q4") => Some("q4"),
-            Some("fy") => Some("fy"),
-            Some("h1") => Some("h1"),
-            Some("h2") => Some("h2"),
-            _ => None,
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let currency: String = FromJValue::from_jvalue(env, currency.into())?;
+        let comparison_syms: Option<Vec<String>> = if comparison_symbols.is_null() {
+            None
+        } else {
+            let arr: ObjectArray<String> = FromJValue::from_jvalue(env, comparison_symbols.into())?;
+            Some(arr.0)
         };
         async_util::execute(env, callback, async move {
             let resp = context
                 .ctx
-                .financial_report_snapshot(symbol, report_static, fiscal_year, fiscal_period_static)
+                .valuation_comparison(symbol, currency, comparison_syms)
                 .await?;
             Ok(resp)
         })?;

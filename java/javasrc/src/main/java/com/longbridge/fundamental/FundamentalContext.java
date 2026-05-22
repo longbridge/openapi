@@ -313,4 +313,25 @@ public class FundamentalContext implements AutoCloseable {
             SdkNative.fundamentalContextGetFinancialReportSnapshot(raw, opts, callback);
         });
     }
+
+    /** Get top 20 major shareholders with multi-period holdings. */
+    public CompletableFuture<ShareholderTopResponse> getShareholderTop(String symbol) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextShareholderTop(raw, symbol, callback);
+        });
+    }
+
+    /** Get holding history and trade detail for a specific shareholder. */
+    public CompletableFuture<ShareholderDetailResponse> getShareholderDetail(ShareholderDetailOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextShareholderDetail(raw, opts, callback);
+        });
+    }
+
+    /** Get valuation comparison between a symbol and optional peer symbols. */
+    public CompletableFuture<ValuationComparisonResponse> getValuationComparison(ValuationComparisonOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextValuationComparison(raw, opts, callback);
+        });
+    }
 }

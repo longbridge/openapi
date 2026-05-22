@@ -20,8 +20,9 @@ use crate::{
         ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
         RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
         SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        ShortPositionsResponse, StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo,
-        WarrantQuote, WarrantType, WatchlistGroup,
+        ShortPositionsItem, ShortPositionsResponse, ShortTradesItem, ShortTradesResponse,
+        StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote,
+        WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
@@ -37,6 +38,19 @@ use crate::{
 
 const RETRY_COUNT: usize = 3;
 const PARTICIPANT_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
+
+/// Convert a Unix-seconds string (or integer string) to an RFC 3339 timestamp.
+/// If parsing fails, the original string is returned unchanged.
+fn unix_secs_to_rfc3339(s: &str) -> String {
+    s.parse::<i64>()
+        .ok()
+        .and_then(|ts| time::OffsetDateTime::from_unix_timestamp(ts).ok())
+        .map(|dt| {
+            use time::format_description::well_known::Rfc3339;
+            dt.format(&Rfc3339).unwrap_or_default()
+        })
+        .unwrap_or_else(|| s.to_string())
+}
 const ISSUER_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const OPTION_CHAIN_EXPIRY_DATE_LIST_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
@@ -1957,35 +1971,81 @@ impl QuoteContext {
 
     // ── short_positions ───────────────────────────────────────────
 
-    /// Get short interest data for a US security.
+    /// Get short interest data for a US or HK security.
     ///
-    /// Path: `GET /v1/quote/short-positions/us`
+    /// Market is inferred from the symbol suffix:
+    /// - `.HK` → `GET /v1/quote/short-positions/hk`
+    /// - otherwise → `GET /v1/quote/short-positions/us`
+    ///
+    /// `count` controls the number of records returned (1–100, default 20).
     pub async fn short_positions(
         &self,
         symbol: impl Into<String>,
+        count: u32,
     ) -> Result<ShortPositionsResponse> {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
         use crate::utils::counter::symbol_to_counter_id;
+
+        let sym = symbol.into();
+        let is_hk = sym.to_uppercase().ends_with(".HK");
+        let path = if is_hk {
+            "/v1/quote/short-positions/hk"
+        } else {
+            "/v1/quote/short-positions/us"
+        };
+        let ts = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+
         #[derive(serde::Serialize)]
         struct Query {
             counter_id: String,
-            last_timestamp: i64,
-            page_size: i32,
+            last_timestamp: String,
+            count: u32,
         }
-        let sym = symbol.into();
-        let resp = self
+        // Response: {"counter_id":"ST/US/AAPL","data":[{...}]}
+        let outer: serde_json::Value = self
             .0
             .http_cli
-            .request(Method::GET, "/v1/quote/short-positions/us")
+            .request(Method::GET, path)
             .query_params(Query {
                 counter_id: symbol_to_counter_id(&sym),
-                last_timestamp: 0,
-                page_size: 100,
+                last_timestamp: ts.to_string(),
+                count,
             })
-            .response::<Json<ShortPositionsResponse>>()
+            .response::<Json<serde_json::Value>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(resp.0)
+            .await?
+            .0;
+        let empty = vec![];
+        let raw = outer["data"].as_array().unwrap_or(&empty);
+        let data = raw
+            .iter()
+            .map(|v| {
+                let ts_str = v["timestamp"].as_str().unwrap_or("").to_string();
+                ShortPositionsItem {
+                    timestamp: unix_secs_to_rfc3339(&ts_str),
+                    rate: v["rate"].as_str().unwrap_or("").to_string(),
+                    close: v["close"].as_str().unwrap_or("").to_string(),
+                    current_shares_short: v["current_shares_short"]
+                        .as_str()
+                        .unwrap_or("")
+                        .to_string(),
+                    avg_daily_share_volume: v["avg_daily_share_volume"]
+                        .as_str()
+                        .unwrap_or("")
+                        .to_string(),
+                    days_to_cover: v["days_to_cover"].as_str().unwrap_or("").to_string(),
+                    amount: v["amount"].as_str().unwrap_or("").to_string(),
+                    balance: v["balance"].as_str().unwrap_or("").to_string(),
+                    cost: v["cost"].as_str().unwrap_or("").to_string(),
+                }
+            })
+            .collect();
+        Ok(ShortPositionsResponse { data })
     }
 
     // ── option_volume ─────────────────────────────────────────────
@@ -2046,6 +2106,73 @@ impl QuoteContext {
             .await?;
         Ok(resp.0)
     }
+    // ── short_trades ──────────────────────────────────────────────
+
+    /// Get short trade records for a HK or US security.
+    ///
+    /// The API endpoint is auto-detected from the symbol suffix:
+    /// `.HK` → `GET /v1/quote/short-trades/hk`,
+    /// otherwise → `GET /v1/quote/short-trades/us`.
+    pub async fn short_trades(
+        &self,
+        symbol: impl Into<String>,
+        count: u32,
+    ) -> Result<ShortTradesResponse> {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        use crate::utils::counter::symbol_to_counter_id;
+        #[derive(serde::Serialize)]
+        struct Query {
+            counter_id: String,
+            last_timestamp: String,
+            page_size: String,
+        }
+        let sym = symbol.into();
+        let path = if sym.to_uppercase().ends_with(".HK") {
+            "/v1/quote/short-trades/hk"
+        } else {
+            "/v1/quote/short-trades/us"
+        };
+        let ts = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        // Response: {"counter_id":"ST/HK/700","data":[{...}]}
+        let outer: serde_json::Value = self
+            .0
+            .http_cli
+            .request(Method::GET, path)
+            .query_params(Query {
+                counter_id: symbol_to_counter_id(&sym),
+                last_timestamp: ts.to_string(),
+                page_size: count.to_string(),
+            })
+            .response::<Json<serde_json::Value>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0;
+        let empty = vec![];
+        let raw = outer["data"].as_array().unwrap_or(&empty);
+        let data = raw
+            .iter()
+            .map(|v| {
+                let ts_str = v["timestamp"].as_str().unwrap_or("").to_string();
+                ShortTradesItem {
+                    timestamp: unix_secs_to_rfc3339(&ts_str),
+                    rate: v["rate"].as_str().unwrap_or("").to_string(),
+                    close: v["close"].as_str().unwrap_or("").to_string(),
+                    nus_amount: v["nus_amount"].as_str().unwrap_or("").to_string(),
+                    ny_amount: v["ny_amount"].as_str().unwrap_or("").to_string(),
+                    total_amount: v["total_amount"].as_str().unwrap_or("").to_string(),
+                    amount: v["amount"].as_str().unwrap_or("").to_string(),
+                    balance: v["balance"].as_str().unwrap_or("").to_string(),
+                }
+            })
+            .collect();
+        Ok(ShortTradesResponse { data })
+    }
+
     // ── update_pinned ─────────────────────────────────────────────
 
     /// Pin or unpin watchlist securities.
