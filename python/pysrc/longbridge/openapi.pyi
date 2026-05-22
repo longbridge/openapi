@@ -10607,7 +10607,7 @@ class AsyncScreenerContext:
         self,
         market: str,
     ) -> Awaitable[ScreenerRecommendStrategiesResponse]:
-        """Get recommended built-in screener strategies. Returns awaitable."""
+        """Get preset built-in screener strategies. Returns awaitable."""
         ...
 
     def screener_user_strategies(
