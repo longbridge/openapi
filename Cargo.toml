@@ -3,7 +3,7 @@ resolver = "3"
 members = ["rust", "python", "nodejs", "java", "c"]
 
 [workspace.package]
-version = "4.1.0"
+version = "4.2.0"
 edition = "2024"
 
 [profile.release]

@@ -4,34 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.2.0]
 
 ### Added
 
-- **Rust, Python, Node.js:** Document normalization formulas for `SecurityCalcIndex` Greeks fields: `theta` (divide by 252 for per-trading-day), `vega` and `rho` (divide by 100 for per-unit change).
-- **Rust:** `Config::header(key, value)` builder method to inject custom headers.
-- **Rust, Python:** `ContentContext` adds `topic_detail`, `list_topic_replies`, `create_topic_reply`.
-- **All languages:** Six new `FundamentalContext` methods (PR #526): `BusinessSegments`, `BusinessSegmentsHistory`, `InstitutionRatingViews`, `IndustryRank`, `IndustryPeers`, `FinancialReportSnapshot`
-- **C, C++:** C SDK bindings for all six PR #526 `FundamentalContext` APIs: `lb_fundamental_context_business_segments`, `lb_fundamental_context_business_segments_history`, `lb_fundamental_context_institution_rating_views`, `lb_fundamental_context_industry_rank`, `lb_fundamental_context_industry_peers`, `lb_fundamental_context_financial_report_snapshot`. New typed structs added to `longbridge.h`.
-- **All languages:** 13 more new APIs: `shareholder_top`, `shareholder_detail`, `valuation_comparison` (FundamentalContext); `short_positions` (HK+US unified), `short_trades` (QuoteContext); `top_movers`, `rank_categories`, `rank_list` (MarketContext); `ScreenerContext` (new) with 5 screener methods
+- 19 new APIs: `FundamentalContext` +9, `QuoteContext` +1 (`short_trades`), `MarketContext` +3, new `ScreenerContext` +5 — see PR [#526](https://github.com/longbridge/openapi/pull/526), [#527](https://github.com/longbridge/openapi/pull/527)
+- **Rust:** `OAuthBuilder` gains `TokenStorage` trait for custom token persistence
 
 ### Changed
 
-- **Java, C, C++:** Response types for `short_positions`, `short_trades`, `top_movers`, `rank_list`, and `valuation_comparison` updated from raw-JSON stub structs to fully typed structs with named fields, matching the Rust/Python/Node.js SDK types. C SDK regenerated (`longbridge.h`) with new `lb_short_positions_item_t`, `lb_short_trades_item_t`, `lb_top_movers_stock_t`, `lb_top_movers_event_t`, `lb_rank_list_item_t`, `lb_valuation_history_point_t`, `lb_valuation_comparison_item_t` types.
-- **All languages:** `QuoteContext::short_positions(symbol, count)` now auto-detects market from symbol suffix (`.HK` → HK, otherwise US). `ShortPositionsResponse` is raw JSON.
-- **Rust, Python, Node.js, Java, C:** `short_positions` and `short_trades` responses now use typed structs (`ShortPositionsItem` / `ShortTradesItem`) with RFC 3339 timestamps instead of raw JSON. Fields absent in a given market default to empty string.
-- **Rust, Python, Node.js, Java, C:** `rank_list` response now uses a typed `RankListResponse { bmp, lists: Vec<RankListItem> }` struct; `counter_id` is converted to `symbol`.
-- **Rust, Python, Node.js, Java, C:** `top_movers` response now uses a typed `TopMoversResponse { events: Vec<TopMoversEvent>, next_params }` struct; timestamps converted to RFC 3339 and `counter_id` converted to `symbol`.
-- **Rust, Python, Node.js, Java, C:** `valuation_comparison` response now uses a typed `ValuationComparisonResponse { list: Vec<ValuationComparisonItem> }` struct; history dates converted from Unix timestamp to RFC 3339 and `counter_id` converted to `symbol`.
+- `short_positions` unified for HK+US; typed structs with RFC 3339 timestamps
+- `top_movers`, `rank_list`, `valuation_comparison`: typed structs, `counter_id` → symbol, RFC 3339 timestamps
 
 ### Breaking changes
 
-- **All languages:** `MarketContext::stock_events` renamed to `top_movers`; `StockEventsResponse` → `TopMoversResponse`.
-- **All languages:** `hk_short_positions` removed — use `short_positions(symbol, count)` which auto-detects HK/US.
-- **All languages:** `ShortPositionsResponse.data` changed from raw JSON to `Vec<ShortPositionsItem>`; `ShortTradesResponse.data` changed from raw JSON to `Vec<ShortTradesItem>`.
-- **All languages:** `TopMoversResponse.data` (raw JSON) replaced by `TopMoversResponse { events, next_params }`.
-- **All languages:** `RankListResponse.data` (raw JSON) replaced by `RankListResponse { bmp, lists }`.
-- **All languages:** `ValuationComparisonResponse.data` (raw JSON) replaced by `ValuationComparisonResponse { list }`.
+- `stock_events` → `top_movers`; `StockEventsResponse` → `TopMoversResponse`
+- `hk_short_positions` removed; use `short_positions(symbol, count)`
+- `ShortPositionsResponse`, `ShortTradesResponse`, `TopMoversResponse`, `RankListResponse`, `ValuationComparisonResponse` changed from raw JSON to typed structs
 
 # [4.1.0]
 
