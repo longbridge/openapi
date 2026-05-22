@@ -82,7 +82,7 @@ impl ScreenerContext {
 
     // ── screener_recommend_strategies ─────────────────────────────
 
-    /// Get recommended built-in screener strategies.
+    /// Get preset built-in screener strategies.
     ///
     /// Path: `GET /v1/quote/ai/screener/strategies/recommend`
     pub async fn screener_recommend_strategies(

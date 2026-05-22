@@ -10571,7 +10571,7 @@ class ScreenerContext:
     def __init__(self, config: Config) -> None: ...
 
     def screener_recommend_strategies(self, market: str) -> ScreenerRecommendStrategiesResponse:
-        """Get recommended built-in screener strategies."""
+        """Get preset built-in screener strategies."""
         ...
 
     def screener_user_strategies(self, market: str) -> ScreenerUserStrategiesResponse:
