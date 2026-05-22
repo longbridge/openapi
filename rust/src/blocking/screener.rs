@@ -35,15 +35,21 @@ impl ScreenerContextSync {
     }
 
     /// Get recommended built-in screener strategies
-    pub fn screener_recommend_strategies(&self) -> Result<ScreenerRecommendStrategiesResponse> {
+    pub fn screener_recommend_strategies(
+        &self,
+        market: impl Into<String> + Send + 'static,
+    ) -> Result<ScreenerRecommendStrategiesResponse> {
         self.rt
-            .call(|ctx| async move { ctx.screener_recommend_strategies().await })
+            .call(|ctx| async move { ctx.screener_recommend_strategies(market).await })
     }
 
     /// Get the current user's saved screener strategies
-    pub fn screener_user_strategies(&self) -> Result<ScreenerUserStrategiesResponse> {
+    pub fn screener_user_strategies(
+        &self,
+        market: impl Into<String> + Send + 'static,
+    ) -> Result<ScreenerUserStrategiesResponse> {
         self.rt
-            .call(|ctx| async move { ctx.screener_user_strategies().await })
+            .call(|ctx| async move { ctx.screener_user_strategies(market).await })
     }
 
     /// Get detail for one screener strategy by ID

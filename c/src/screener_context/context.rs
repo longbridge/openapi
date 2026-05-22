@@ -38,14 +38,16 @@ pub unsafe extern "C" fn lb_screener_context_release(ctx: *const CScreenerContex
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_screener_context_recommend_strategies(
     ctx: *const CScreenerContext,
+    market: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
+    let market = cstr_to_rust(market);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CScreenerRecommendStrategiesResponseOwned> =
             CCow::new(CScreenerRecommendStrategiesResponseOwned::from(
-                ctx_inner.screener_recommend_strategies().await?,
+                ctx_inner.screener_recommend_strategies(market).await?,
             ));
         Ok(resp)
     });
@@ -56,14 +58,17 @@ pub unsafe extern "C" fn lb_screener_context_recommend_strategies(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_screener_context_user_strategies(
     ctx: *const CScreenerContext,
+    market: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
+    let market = cstr_to_rust(market);
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CScreenerUserStrategiesResponseOwned> = CCow::new(
-            CScreenerUserStrategiesResponseOwned::from(ctx_inner.screener_user_strategies().await?),
-        );
+        let resp: CCow<CScreenerUserStrategiesResponseOwned> =
+            CCow::new(CScreenerUserStrategiesResponseOwned::from(
+                ctx_inner.screener_user_strategies(market).await?,
+            ));
         Ok(resp)
     });
 }

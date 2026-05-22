@@ -22,11 +22,11 @@ impl AsyncScreenerContext {
     }
 
     /// Get recommended built-in screener strategies. Returns awaitable.
-    fn screener_recommend_strategies(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+    fn screener_recommend_strategies(&self, py: Python<'_>, market: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(ScreenerRecommendStrategiesResponse::from(
-                ctx.screener_recommend_strategies()
+                ctx.screener_recommend_strategies(market)
                     .await
                     .map_err(ErrorNewType)?,
             ))
@@ -35,11 +35,13 @@ impl AsyncScreenerContext {
     }
 
     /// Get the current user's saved screener strategies. Returns awaitable.
-    fn screener_user_strategies(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+    fn screener_user_strategies(&self, py: Python<'_>, market: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(ScreenerUserStrategiesResponse::from(
-                ctx.screener_user_strategies().await.map_err(ErrorNewType)?,
+                ctx.screener_user_strategies(market)
+                    .await
+                    .map_err(ErrorNewType)?,
             ))
         })
         .map(|b| b.unbind())

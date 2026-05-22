@@ -10193,6 +10193,7 @@ void lb_screener_context_release(const struct lb_screener_context_t *ctx);
  * Returns `CScreenerRecommendStrategiesResponse`.
  */
 void lb_screener_context_recommend_strategies(const struct lb_screener_context_t *ctx,
+                                              const char *market,
                                               lb_async_callback_t callback,
                                               void *userdata);
 
@@ -10201,6 +10202,7 @@ void lb_screener_context_recommend_strategies(const struct lb_screener_context_t
  * Returns `CScreenerUserStrategiesResponse`.
  */
 void lb_screener_context_user_strategies(const struct lb_screener_context_t *ctx,
+                                         const char *market,
                                          lb_async_callback_t callback,
                                          void *userdata);
 

@@ -21,19 +21,22 @@ impl ScreenerContext {
     }
 
     /// Get recommended built-in screener strategies.
-    fn screener_recommend_strategies(&self) -> PyResult<ScreenerRecommendStrategiesResponse> {
+    fn screener_recommend_strategies(
+        &self,
+        market: String,
+    ) -> PyResult<ScreenerRecommendStrategiesResponse> {
         Ok(self
             .ctx
-            .screener_recommend_strategies()
+            .screener_recommend_strategies(market)
             .map_err(ErrorNewType)?
             .into())
     }
 
     /// Get the current user's saved screener strategies.
-    fn screener_user_strategies(&self) -> PyResult<ScreenerUserStrategiesResponse> {
+    fn screener_user_strategies(&self, market: String) -> PyResult<ScreenerUserStrategiesResponse> {
         Ok(self
             .ctx
-            .screener_user_strategies()
+            .screener_user_strategies(market)
             .map_err(ErrorNewType)?
             .into())
     }

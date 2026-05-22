@@ -46,7 +46,7 @@ impl ScreenerContext {
         self.0.log_subscriber.clone()
     }
 
-    async fn get<R, Q>(&self, path: &'static str, query: Q) -> Result<R>
+    async fn get<R, Q>(&self, path: &str, query: Q) -> Result<R>
     where
         R: DeserializeOwned + Send + Sync + 'static,
         Q: Serialize + Send + Sync,
@@ -63,7 +63,7 @@ impl ScreenerContext {
             .0)
     }
 
-    async fn post<R, B>(&self, path: &'static str, body: B) -> Result<R>
+    async fn post<R, B>(&self, path: &str, body: B) -> Result<R>
     where
         R: DeserializeOwned + Send + Sync + 'static,
         B: std::fmt::Debug + Serialize + Send + Sync + 'static,
@@ -84,14 +84,22 @@ impl ScreenerContext {
 
     /// Get recommended built-in screener strategies.
     ///
-    /// Path: `GET /v1/quote/screener/strategies/recommend`
+    /// Path: `GET /v1/quote/ai/screener/strategies/recommend`
     pub async fn screener_recommend_strategies(
         &self,
+        market: impl Into<String>,
     ) -> Result<ScreenerRecommendStrategiesResponse> {
         #[derive(Serialize)]
-        struct Empty {}
+        struct Query {
+            market: String,
+        }
         let raw: serde_json::Value = self
-            .get("/v1/quote/screener/strategies/recommend", Empty {})
+            .get(
+                "/v1/quote/ai/screener/strategies/recommend",
+                Query {
+                    market: market.into(),
+                },
+            )
             .await?;
         Ok(ScreenerRecommendStrategiesResponse { data: raw })
     }
@@ -100,12 +108,22 @@ impl ScreenerContext {
 
     /// Get the current user's saved screener strategies.
     ///
-    /// Path: `GET /v1/quote/screener/strategies/mine`
-    pub async fn screener_user_strategies(&self) -> Result<ScreenerUserStrategiesResponse> {
+    /// Path: `GET /v1/quote/ai/screener/strategies/mine`
+    pub async fn screener_user_strategies(
+        &self,
+        market: impl Into<String>,
+    ) -> Result<ScreenerUserStrategiesResponse> {
         #[derive(Serialize)]
-        struct Empty {}
+        struct Query {
+            market: String,
+        }
         let raw: serde_json::Value = self
-            .get("/v1/quote/screener/strategies/mine", Empty {})
+            .get(
+                "/v1/quote/ai/screener/strategies/mine",
+                Query {
+                    market: market.into(),
+                },
+            )
             .await?;
         Ok(ScreenerUserStrategiesResponse { data: raw })
     }
@@ -114,15 +132,12 @@ impl ScreenerContext {
 
     /// Get detail for one screener strategy by ID.
     ///
-    /// Path: `GET /v1/quote/screener/strategy?id=<id>`
+    /// Path: `GET /v1/quote/ai/screener/strategy/{id}`
     pub async fn screener_strategy(&self, id: i64) -> Result<ScreenerStrategyResponse> {
+        let path = format!("/v1/quote/ai/screener/strategy/{id}");
         #[derive(Serialize)]
-        struct Query {
-            id: i64,
-        }
-        let raw: serde_json::Value = self
-            .get("/v1/quote/screener/strategy", Query { id })
-            .await?;
+        struct Empty {}
+        let raw: serde_json::Value = self.get(&path, Empty {}).await?;
         Ok(ScreenerStrategyResponse { data: raw })
     }
 
@@ -130,7 +145,7 @@ impl ScreenerContext {
 
     /// Search / screen securities using a strategy.
     ///
-    /// Path: `POST /v1/quote/screener/search`
+    /// Path: `POST /v1/quote/ai/screener/search`
     ///
     /// When `strategy_id` is `Some`, it is included in the request body.
     /// When `None`, only `market`, `page`, and `size` are sent (custom
@@ -152,7 +167,7 @@ impl ScreenerContext {
         }
         let raw: serde_json::Value = self
             .post(
-                "/v1/quote/screener/search",
+                "/v1/quote/ai/screener/search",
                 Body {
                     market: market.into(),
                     strategy_id,
@@ -168,11 +183,13 @@ impl ScreenerContext {
 
     /// Get all available screener indicator definitions.
     ///
-    /// Path: `GET /v1/quote/screener/indicators`
+    /// Path: `GET /v1/quote/ai/screener/indicators`
     pub async fn screener_indicators(&self) -> Result<ScreenerIndicatorsResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        let raw: serde_json::Value = self.get("/v1/quote/screener/indicators", Empty {}).await?;
+        let raw: serde_json::Value = self
+            .get("/v1/quote/ai/screener/indicators", Empty {})
+            .await?;
         Ok(ScreenerIndicatorsResponse { data: raw })
     }
 }

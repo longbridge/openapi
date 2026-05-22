@@ -2,14 +2,14 @@ use std::sync::Arc;
 
 use jni::{
     JNIEnv,
-    objects::{JClass, JObject},
+    objects::{JClass, JObject, JString},
 };
 use longbridge::{Config, ScreenerContext};
 
 use crate::{
     async_util,
     error::jni_result,
-    types::{JavaInteger, get_field},
+    types::{FromJValue, JavaInteger, get_field},
 };
 
 struct ContextObj {
@@ -41,12 +41,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextRecom
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
+    market: JString,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let market: String = FromJValue::from_jvalue(env, market.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.screener_recommend_strategies().await?;
+            let resp = context.ctx.screener_recommend_strategies(market).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -58,12 +60,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextUserS
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
+    market: JString,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let market: String = FromJValue::from_jvalue(env, market.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.screener_user_strategies().await?;
+            let resp = context.ctx.screener_user_strategies(market).await?;
             Ok(resp)
         })?;
         Ok(())

@@ -10570,11 +10570,11 @@ class ScreenerContext:
 
     def __init__(self, config: Config) -> None: ...
 
-    def screener_recommend_strategies(self) -> ScreenerRecommendStrategiesResponse:
+    def screener_recommend_strategies(self, market: str) -> ScreenerRecommendStrategiesResponse:
         """Get recommended built-in screener strategies."""
         ...
 
-    def screener_user_strategies(self) -> ScreenerUserStrategiesResponse:
+    def screener_user_strategies(self, market: str) -> ScreenerUserStrategiesResponse:
         """Get the current user's saved screener strategies."""
         ...
 
@@ -10605,12 +10605,14 @@ class AsyncScreenerContext:
 
     def screener_recommend_strategies(
         self,
+        market: str,
     ) -> Awaitable[ScreenerRecommendStrategiesResponse]:
         """Get recommended built-in screener strategies. Returns awaitable."""
         ...
 
     def screener_user_strategies(
         self,
+        market: str,
     ) -> Awaitable[ScreenerUserStrategiesResponse]:
         """Get the current user's saved screener strategies. Returns awaitable."""
         ...

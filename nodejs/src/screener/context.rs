@@ -25,10 +25,11 @@ impl ScreenerContext {
     #[napi]
     pub async fn screener_recommend_strategies(
         &self,
+        market: String,
     ) -> Result<ScreenerRecommendStrategiesResponse> {
         Ok(self
             .ctx
-            .screener_recommend_strategies()
+            .screener_recommend_strategies(market)
             .await
             .map_err(ErrorNewType)?
             .into())
@@ -36,10 +37,13 @@ impl ScreenerContext {
 
     /// Get the current user's saved screener strategies
     #[napi]
-    pub async fn screener_user_strategies(&self) -> Result<ScreenerUserStrategiesResponse> {
+    pub async fn screener_user_strategies(
+        &self,
+        market: String,
+    ) -> Result<ScreenerUserStrategiesResponse> {
         Ok(self
             .ctx
-            .screener_user_strategies()
+            .screener_user_strategies(market)
             .await
             .map_err(ErrorNewType)?
             .into())
