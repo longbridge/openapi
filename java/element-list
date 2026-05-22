@@ -8,5 +8,6 @@ com.longbridge.fundamental
 com.longbridge.market
 com.longbridge.portfolio
 com.longbridge.quote
+com.longbridge.screener
 com.longbridge.sharelist
 com.longbridge.trade

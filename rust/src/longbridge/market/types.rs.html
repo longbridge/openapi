@@ -331,64 +331,183 @@
 <a href=#331 id=331 data-nosnippet>331</a>    </span><span class="kw">pub </span>trade_status: i32,
 <a href=#332 id=332 data-nosnippet>332</a>}
 <a href=#333 id=333 data-nosnippet>333</a>
-<a href=#334 id=334 data-nosnippet>334</a><span class="comment">// ── enums ─────────────────────────────────────────────────────────
+<a href=#334 id=334 data-nosnippet>334</a><span class="comment">// ── top_movers ────────────────────────────────────────────────────
 <a href=#335 id=335 data-nosnippet>335</a>
-<a href=#336 id=336 data-nosnippet>336</a></span><span class="doccomment">/// Broker holding lookback period
-<a href=#337 id=337 data-nosnippet>337</a></span><span class="attr">#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Default)]
-<a href=#338 id=338 data-nosnippet>338</a></span><span class="kw">pub enum </span>BrokerHoldingPeriod {
-<a href=#339 id=339 data-nosnippet>339</a>    <span class="doccomment">/// 1-day change
-<a href=#340 id=340 data-nosnippet>340</a>    </span><span class="attr">#[default]
-<a href=#341 id=341 data-nosnippet>341</a>    #[serde(rename = <span class="string">"rct_1"</span>)]
-<a href=#342 id=342 data-nosnippet>342</a>    </span>Rct1,
-<a href=#343 id=343 data-nosnippet>343</a>    <span class="doccomment">/// 5-day change
-<a href=#344 id=344 data-nosnippet>344</a>    </span><span class="attr">#[serde(rename = <span class="string">"rct_5"</span>)]
-<a href=#345 id=345 data-nosnippet>345</a>    </span>Rct5,
-<a href=#346 id=346 data-nosnippet>346</a>    <span class="doccomment">/// 20-day change
-<a href=#347 id=347 data-nosnippet>347</a>    </span><span class="attr">#[serde(rename = <span class="string">"rct_20"</span>)]
-<a href=#348 id=348 data-nosnippet>348</a>    </span>Rct20,
-<a href=#349 id=349 data-nosnippet>349</a>    <span class="doccomment">/// 60-day change
-<a href=#350 id=350 data-nosnippet>350</a>    </span><span class="attr">#[serde(rename = <span class="string">"rct_60"</span>)]
-<a href=#351 id=351 data-nosnippet>351</a>    </span>Rct60,
-<a href=#352 id=352 data-nosnippet>352</a>}
-<a href=#353 id=353 data-nosnippet>353</a>
-<a href=#354 id=354 data-nosnippet>354</a><span class="doccomment">/// A/H premium K-line period
-<a href=#355 id=355 data-nosnippet>355</a></span><span class="attr">#[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
-<a href=#356 id=356 data-nosnippet>356</a></span><span class="kw">pub enum </span>AhPremiumPeriod {
-<a href=#357 id=357 data-nosnippet>357</a>    <span class="doccomment">/// 1-minute
-<a href=#358 id=358 data-nosnippet>358</a>    </span>Min1,
-<a href=#359 id=359 data-nosnippet>359</a>    <span class="doccomment">/// 5-minute
-<a href=#360 id=360 data-nosnippet>360</a>    </span>Min5,
-<a href=#361 id=361 data-nosnippet>361</a>    <span class="doccomment">/// 15-minute
-<a href=#362 id=362 data-nosnippet>362</a>    </span>Min15,
-<a href=#363 id=363 data-nosnippet>363</a>    <span class="doccomment">/// 30-minute
-<a href=#364 id=364 data-nosnippet>364</a>    </span>Min30,
-<a href=#365 id=365 data-nosnippet>365</a>    <span class="doccomment">/// 60-minute
-<a href=#366 id=366 data-nosnippet>366</a>    </span>Min60,
-<a href=#367 id=367 data-nosnippet>367</a>    <span class="doccomment">/// Daily
-<a href=#368 id=368 data-nosnippet>368</a>    </span><span class="attr">#[default]
-<a href=#369 id=369 data-nosnippet>369</a>    </span>Day,
-<a href=#370 id=370 data-nosnippet>370</a>    <span class="doccomment">/// Weekly
-<a href=#371 id=371 data-nosnippet>371</a>    </span>Week,
-<a href=#372 id=372 data-nosnippet>372</a>    <span class="doccomment">/// Monthly
-<a href=#373 id=373 data-nosnippet>373</a>    </span>Month,
-<a href=#374 id=374 data-nosnippet>374</a>    <span class="doccomment">/// Yearly
-<a href=#375 id=375 data-nosnippet>375</a>    </span>Year,
-<a href=#376 id=376 data-nosnippet>376</a>}
-<a href=#377 id=377 data-nosnippet>377</a>
-<a href=#378 id=378 data-nosnippet>378</a><span class="kw">impl </span>AhPremiumPeriod {
-<a href=#379 id=379 data-nosnippet>379</a>    <span class="doccomment">/// Convert to the API's `line_type` parameter value
-<a href=#380 id=380 data-nosnippet>380</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_line_type(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
-<a href=#381 id=381 data-nosnippet>381</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#382 id=382 data-nosnippet>382</a>            AhPremiumPeriod::Min1 =&gt; <span class="string">"1"</span>,
-<a href=#383 id=383 data-nosnippet>383</a>            AhPremiumPeriod::Min5 =&gt; <span class="string">"5"</span>,
-<a href=#384 id=384 data-nosnippet>384</a>            AhPremiumPeriod::Min15 =&gt; <span class="string">"15"</span>,
-<a href=#385 id=385 data-nosnippet>385</a>            AhPremiumPeriod::Min30 =&gt; <span class="string">"30"</span>,
-<a href=#386 id=386 data-nosnippet>386</a>            AhPremiumPeriod::Min60 =&gt; <span class="string">"60"</span>,
-<a href=#387 id=387 data-nosnippet>387</a>            AhPremiumPeriod::Day =&gt; <span class="string">"1000"</span>,
-<a href=#388 id=388 data-nosnippet>388</a>            AhPremiumPeriod::Week =&gt; <span class="string">"2000"</span>,
-<a href=#389 id=389 data-nosnippet>389</a>            AhPremiumPeriod::Month =&gt; <span class="string">"3000"</span>,
-<a href=#390 id=390 data-nosnippet>390</a>            AhPremiumPeriod::Year =&gt; <span class="string">"4000"</span>,
-<a href=#391 id=391 data-nosnippet>391</a>        }
-<a href=#392 id=392 data-nosnippet>392</a>    }
-<a href=#393 id=393 data-nosnippet>393</a>}
+<a href=#336 id=336 data-nosnippet>336</a></span><span class="doccomment">/// Stock information within a top-movers event.
+<a href=#337 id=337 data-nosnippet>337</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#338 id=338 data-nosnippet>338</a></span><span class="kw">pub struct </span>TopMoversStock {
+<a href=#339 id=339 data-nosnippet>339</a>    <span class="doccomment">/// Symbol (converted from counter_id, e.g. `"NVDA.US"`)
+<a href=#340 id=340 data-nosnippet>340</a>    </span><span class="kw">pub </span>symbol: String,
+<a href=#341 id=341 data-nosnippet>341</a>    <span class="doccomment">/// Ticker code (e.g. `"NVDA"`)
+<a href=#342 id=342 data-nosnippet>342</a>    </span><span class="kw">pub </span>code: String,
+<a href=#343 id=343 data-nosnippet>343</a>    <span class="doccomment">/// Security name
+<a href=#344 id=344 data-nosnippet>344</a>    </span><span class="kw">pub </span>name: String,
+<a href=#345 id=345 data-nosnippet>345</a>    <span class="doccomment">/// Full name
+<a href=#346 id=346 data-nosnippet>346</a>    </span><span class="attr">#[serde(default)]
+<a href=#347 id=347 data-nosnippet>347</a>    </span><span class="kw">pub </span>full_name: String,
+<a href=#348 id=348 data-nosnippet>348</a>    <span class="doccomment">/// Price change (decimal ratio)
+<a href=#349 id=349 data-nosnippet>349</a>    </span><span class="kw">pub </span>change: String,
+<a href=#350 id=350 data-nosnippet>350</a>    <span class="doccomment">/// Latest price
+<a href=#351 id=351 data-nosnippet>351</a>    </span><span class="kw">pub </span>last_done: String,
+<a href=#352 id=352 data-nosnippet>352</a>    <span class="doccomment">/// Market code
+<a href=#353 id=353 data-nosnippet>353</a>    </span><span class="kw">pub </span>market: String,
+<a href=#354 id=354 data-nosnippet>354</a>    <span class="doccomment">/// Labels / tags
+<a href=#355 id=355 data-nosnippet>355</a>    </span><span class="attr">#[serde(default)]
+<a href=#356 id=356 data-nosnippet>356</a>    </span><span class="kw">pub </span>labels: Vec&lt;String&gt;,
+<a href=#357 id=357 data-nosnippet>357</a>    <span class="doccomment">/// Logo URL
+<a href=#358 id=358 data-nosnippet>358</a>    </span><span class="attr">#[serde(default)]
+<a href=#359 id=359 data-nosnippet>359</a>    </span><span class="kw">pub </span>logo: String,
+<a href=#360 id=360 data-nosnippet>360</a>}
+<a href=#361 id=361 data-nosnippet>361</a>
+<a href=#362 id=362 data-nosnippet>362</a><span class="doccomment">/// One top-movers event entry.
+<a href=#363 id=363 data-nosnippet>363</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#364 id=364 data-nosnippet>364</a></span><span class="kw">pub struct </span>TopMoversEvent {
+<a href=#365 id=365 data-nosnippet>365</a>    <span class="doccomment">/// Event time (RFC 3339)
+<a href=#366 id=366 data-nosnippet>366</a>    </span><span class="kw">pub </span>timestamp: String,
+<a href=#367 id=367 data-nosnippet>367</a>    <span class="doccomment">/// Alert reason description
+<a href=#368 id=368 data-nosnippet>368</a>    </span><span class="kw">pub </span>alert_reason: String,
+<a href=#369 id=369 data-nosnippet>369</a>    <span class="doccomment">/// Alert type code
+<a href=#370 id=370 data-nosnippet>370</a>    </span><span class="kw">pub </span>alert_type: i64,
+<a href=#371 id=371 data-nosnippet>371</a>    <span class="doccomment">/// Stock information
+<a href=#372 id=372 data-nosnippet>372</a>    </span><span class="kw">pub </span>stock: TopMoversStock,
+<a href=#373 id=373 data-nosnippet>373</a>    <span class="doccomment">/// Associated news post (raw JSON, complex structure)
+<a href=#374 id=374 data-nosnippet>374</a>    </span><span class="kw">pub </span>post: serde_json::Value,
+<a href=#375 id=375 data-nosnippet>375</a>}
+<a href=#376 id=376 data-nosnippet>376</a>
+<a href=#377 id=377 data-nosnippet>377</a><span class="doccomment">/// Response for [`crate::MarketContext::top_movers`]
+<a href=#378 id=378 data-nosnippet>378</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#379 id=379 data-nosnippet>379</a></span><span class="kw">pub struct </span>TopMoversResponse {
+<a href=#380 id=380 data-nosnippet>380</a>    <span class="doccomment">/// Top-mover events
+<a href=#381 id=381 data-nosnippet>381</a>    </span><span class="kw">pub </span>events: Vec&lt;TopMoversEvent&gt;,
+<a href=#382 id=382 data-nosnippet>382</a>    <span class="doccomment">/// Pagination cursor for next page
+<a href=#383 id=383 data-nosnippet>383</a>    </span><span class="kw">pub </span>next_params: serde_json::Value,
+<a href=#384 id=384 data-nosnippet>384</a>}
+<a href=#385 id=385 data-nosnippet>385</a>
+<a href=#386 id=386 data-nosnippet>386</a><span class="comment">// ── rank_categories ───────────────────────────────────────────────
+<a href=#387 id=387 data-nosnippet>387</a>
+<a href=#388 id=388 data-nosnippet>388</a></span><span class="doccomment">/// Response for [`crate::MarketContext::rank_categories`]
+<a href=#389 id=389 data-nosnippet>389</a>///
+<a href=#390 id=390 data-nosnippet>390</a>/// The raw data contains all available rank category keys and labels.
+<a href=#391 id=391 data-nosnippet>391</a>/// The exact structure varies so the payload is preserved as raw JSON.
+<a href=#392 id=392 data-nosnippet>392</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#393 id=393 data-nosnippet>393</a></span><span class="kw">pub struct </span>RankCategoriesResponse {
+<a href=#394 id=394 data-nosnippet>394</a>    <span class="doccomment">/// Raw rank category data
+<a href=#395 id=395 data-nosnippet>395</a>    </span><span class="kw">pub </span>data: serde_json::Value,
+<a href=#396 id=396 data-nosnippet>396</a>}
+<a href=#397 id=397 data-nosnippet>397</a>
+<a href=#398 id=398 data-nosnippet>398</a><span class="comment">// ── rank_list ─────────────────────────────────────────────────────
+<a href=#399 id=399 data-nosnippet>399</a>
+<a href=#400 id=400 data-nosnippet>400</a></span><span class="doccomment">/// One ranked security item.
+<a href=#401 id=401 data-nosnippet>401</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#402 id=402 data-nosnippet>402</a></span><span class="kw">pub struct </span>RankListItem {
+<a href=#403 id=403 data-nosnippet>403</a>    <span class="doccomment">/// Symbol (converted from counter_id, e.g. `"MU.US"`)
+<a href=#404 id=404 data-nosnippet>404</a>    </span><span class="kw">pub </span>symbol: String,
+<a href=#405 id=405 data-nosnippet>405</a>    <span class="doccomment">/// Ticker code (e.g. `"MU"`)
+<a href=#406 id=406 data-nosnippet>406</a>    </span><span class="kw">pub </span>code: String,
+<a href=#407 id=407 data-nosnippet>407</a>    <span class="doccomment">/// Security name
+<a href=#408 id=408 data-nosnippet>408</a>    </span><span class="kw">pub </span>name: String,
+<a href=#409 id=409 data-nosnippet>409</a>    <span class="doccomment">/// Latest price
+<a href=#410 id=410 data-nosnippet>410</a>    </span><span class="kw">pub </span>last_done: String,
+<a href=#411 id=411 data-nosnippet>411</a>    <span class="doccomment">/// Price change ratio (decimal)
+<a href=#412 id=412 data-nosnippet>412</a>    </span><span class="kw">pub </span>chg: String,
+<a href=#413 id=413 data-nosnippet>413</a>    <span class="doccomment">/// Absolute price change
+<a href=#414 id=414 data-nosnippet>414</a>    </span><span class="kw">pub </span>change: String,
+<a href=#415 id=415 data-nosnippet>415</a>    <span class="doccomment">/// Net inflow
+<a href=#416 id=416 data-nosnippet>416</a>    </span><span class="kw">pub </span>inflow: String,
+<a href=#417 id=417 data-nosnippet>417</a>    <span class="doccomment">/// Market cap
+<a href=#418 id=418 data-nosnippet>418</a>    </span><span class="kw">pub </span>market_cap: String,
+<a href=#419 id=419 data-nosnippet>419</a>    <span class="doccomment">/// Industry name
+<a href=#420 id=420 data-nosnippet>420</a>    </span><span class="kw">pub </span>industry: String,
+<a href=#421 id=421 data-nosnippet>421</a>    <span class="doccomment">/// Pre/post market price
+<a href=#422 id=422 data-nosnippet>422</a>    </span><span class="attr">#[serde(default)]
+<a href=#423 id=423 data-nosnippet>423</a>    </span><span class="kw">pub </span>pre_post_price: String,
+<a href=#424 id=424 data-nosnippet>424</a>    <span class="doccomment">/// Pre/post market change
+<a href=#425 id=425 data-nosnippet>425</a>    </span><span class="attr">#[serde(default)]
+<a href=#426 id=426 data-nosnippet>426</a>    </span><span class="kw">pub </span>pre_post_chg: String,
+<a href=#427 id=427 data-nosnippet>427</a>    <span class="doccomment">/// Amplitude
+<a href=#428 id=428 data-nosnippet>428</a>    </span><span class="attr">#[serde(default)]
+<a href=#429 id=429 data-nosnippet>429</a>    </span><span class="kw">pub </span>amplitude: String,
+<a href=#430 id=430 data-nosnippet>430</a>    <span class="doccomment">/// 5-day change
+<a href=#431 id=431 data-nosnippet>431</a>    </span><span class="attr">#[serde(default)]
+<a href=#432 id=432 data-nosnippet>432</a>    </span><span class="kw">pub </span>five_day_chg: String,
+<a href=#433 id=433 data-nosnippet>433</a>    <span class="doccomment">/// Turnover rate
+<a href=#434 id=434 data-nosnippet>434</a>    </span><span class="attr">#[serde(default)]
+<a href=#435 id=435 data-nosnippet>435</a>    </span><span class="kw">pub </span>turnover_rate: String,
+<a href=#436 id=436 data-nosnippet>436</a>    <span class="doccomment">/// Volume ratio
+<a href=#437 id=437 data-nosnippet>437</a>    </span><span class="attr">#[serde(default)]
+<a href=#438 id=438 data-nosnippet>438</a>    </span><span class="kw">pub </span>volume_rate: String,
+<a href=#439 id=439 data-nosnippet>439</a>    <span class="doccomment">/// P/B ratio (TTM)
+<a href=#440 id=440 data-nosnippet>440</a>    </span><span class="attr">#[serde(default)]
+<a href=#441 id=441 data-nosnippet>441</a>    </span><span class="kw">pub </span>pb_ttm: String,
+<a href=#442 id=442 data-nosnippet>442</a>}
+<a href=#443 id=443 data-nosnippet>443</a>
+<a href=#444 id=444 data-nosnippet>444</a><span class="doccomment">/// Response for [`crate::MarketContext::rank_list`]
+<a href=#445 id=445 data-nosnippet>445</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#446 id=446 data-nosnippet>446</a></span><span class="kw">pub struct </span>RankListResponse {
+<a href=#447 id=447 data-nosnippet>447</a>    <span class="doccomment">/// Whether delayed / BMP data
+<a href=#448 id=448 data-nosnippet>448</a>    </span><span class="kw">pub </span>bmp: bool,
+<a href=#449 id=449 data-nosnippet>449</a>    <span class="doccomment">/// Ranked security items
+<a href=#450 id=450 data-nosnippet>450</a>    </span><span class="kw">pub </span>lists: Vec&lt;RankListItem&gt;,
+<a href=#451 id=451 data-nosnippet>451</a>}
+<a href=#452 id=452 data-nosnippet>452</a>
+<a href=#453 id=453 data-nosnippet>453</a><span class="comment">// ── enums ─────────────────────────────────────────────────────────
+<a href=#454 id=454 data-nosnippet>454</a>
+<a href=#455 id=455 data-nosnippet>455</a></span><span class="doccomment">/// Broker holding lookback period
+<a href=#456 id=456 data-nosnippet>456</a></span><span class="attr">#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, Default)]
+<a href=#457 id=457 data-nosnippet>457</a></span><span class="kw">pub enum </span>BrokerHoldingPeriod {
+<a href=#458 id=458 data-nosnippet>458</a>    <span class="doccomment">/// 1-day change
+<a href=#459 id=459 data-nosnippet>459</a>    </span><span class="attr">#[default]
+<a href=#460 id=460 data-nosnippet>460</a>    #[serde(rename = <span class="string">"rct_1"</span>)]
+<a href=#461 id=461 data-nosnippet>461</a>    </span>Rct1,
+<a href=#462 id=462 data-nosnippet>462</a>    <span class="doccomment">/// 5-day change
+<a href=#463 id=463 data-nosnippet>463</a>    </span><span class="attr">#[serde(rename = <span class="string">"rct_5"</span>)]
+<a href=#464 id=464 data-nosnippet>464</a>    </span>Rct5,
+<a href=#465 id=465 data-nosnippet>465</a>    <span class="doccomment">/// 20-day change
+<a href=#466 id=466 data-nosnippet>466</a>    </span><span class="attr">#[serde(rename = <span class="string">"rct_20"</span>)]
+<a href=#467 id=467 data-nosnippet>467</a>    </span>Rct20,
+<a href=#468 id=468 data-nosnippet>468</a>    <span class="doccomment">/// 60-day change
+<a href=#469 id=469 data-nosnippet>469</a>    </span><span class="attr">#[serde(rename = <span class="string">"rct_60"</span>)]
+<a href=#470 id=470 data-nosnippet>470</a>    </span>Rct60,
+<a href=#471 id=471 data-nosnippet>471</a>}
+<a href=#472 id=472 data-nosnippet>472</a>
+<a href=#473 id=473 data-nosnippet>473</a><span class="doccomment">/// A/H premium K-line period
+<a href=#474 id=474 data-nosnippet>474</a></span><span class="attr">#[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
+<a href=#475 id=475 data-nosnippet>475</a></span><span class="kw">pub enum </span>AhPremiumPeriod {
+<a href=#476 id=476 data-nosnippet>476</a>    <span class="doccomment">/// 1-minute
+<a href=#477 id=477 data-nosnippet>477</a>    </span>Min1,
+<a href=#478 id=478 data-nosnippet>478</a>    <span class="doccomment">/// 5-minute
+<a href=#479 id=479 data-nosnippet>479</a>    </span>Min5,
+<a href=#480 id=480 data-nosnippet>480</a>    <span class="doccomment">/// 15-minute
+<a href=#481 id=481 data-nosnippet>481</a>    </span>Min15,
+<a href=#482 id=482 data-nosnippet>482</a>    <span class="doccomment">/// 30-minute
+<a href=#483 id=483 data-nosnippet>483</a>    </span>Min30,
+<a href=#484 id=484 data-nosnippet>484</a>    <span class="doccomment">/// 60-minute
+<a href=#485 id=485 data-nosnippet>485</a>    </span>Min60,
+<a href=#486 id=486 data-nosnippet>486</a>    <span class="doccomment">/// Daily
+<a href=#487 id=487 data-nosnippet>487</a>    </span><span class="attr">#[default]
+<a href=#488 id=488 data-nosnippet>488</a>    </span>Day,
+<a href=#489 id=489 data-nosnippet>489</a>    <span class="doccomment">/// Weekly
+<a href=#490 id=490 data-nosnippet>490</a>    </span>Week,
+<a href=#491 id=491 data-nosnippet>491</a>    <span class="doccomment">/// Monthly
+<a href=#492 id=492 data-nosnippet>492</a>    </span>Month,
+<a href=#493 id=493 data-nosnippet>493</a>    <span class="doccomment">/// Yearly
+<a href=#494 id=494 data-nosnippet>494</a>    </span>Year,
+<a href=#495 id=495 data-nosnippet>495</a>}
+<a href=#496 id=496 data-nosnippet>496</a>
+<a href=#497 id=497 data-nosnippet>497</a><span class="kw">impl </span>AhPremiumPeriod {
+<a href=#498 id=498 data-nosnippet>498</a>    <span class="doccomment">/// Convert to the API's `line_type` parameter value
+<a href=#499 id=499 data-nosnippet>499</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_line_type(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
+<a href=#500 id=500 data-nosnippet>500</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#501 id=501 data-nosnippet>501</a>            AhPremiumPeriod::Min1 =&gt; <span class="string">"1"</span>,
+<a href=#502 id=502 data-nosnippet>502</a>            AhPremiumPeriod::Min5 =&gt; <span class="string">"5"</span>,
+<a href=#503 id=503 data-nosnippet>503</a>            AhPremiumPeriod::Min15 =&gt; <span class="string">"15"</span>,
+<a href=#504 id=504 data-nosnippet>504</a>            AhPremiumPeriod::Min30 =&gt; <span class="string">"30"</span>,
+<a href=#505 id=505 data-nosnippet>505</a>            AhPremiumPeriod::Min60 =&gt; <span class="string">"60"</span>,
+<a href=#506 id=506 data-nosnippet>506</a>            AhPremiumPeriod::Day =&gt; <span class="string">"1000"</span>,
+<a href=#507 id=507 data-nosnippet>507</a>            AhPremiumPeriod::Week =&gt; <span class="string">"2000"</span>,
+<a href=#508 id=508 data-nosnippet>508</a>            AhPremiumPeriod::Month =&gt; <span class="string">"3000"</span>,
+<a href=#509 id=509 data-nosnippet>509</a>            AhPremiumPeriod::Year =&gt; <span class="string">"4000"</span>,
+<a href=#510 id=510 data-nosnippet>510</a>        }
+<a href=#511 id=511 data-nosnippet>511</a>    }
+<a href=#512 id=512 data-nosnippet>512</a>}
 </code></pre></div></section></main></body></html>

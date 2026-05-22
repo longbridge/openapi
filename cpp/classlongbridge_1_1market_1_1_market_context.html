@@ -120,6 +120,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a40cd72a8db2e488fa257af07aebcae42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1market_1_1_market_context.html#a40cd72a8db2e488fa257af07aebcae42">constituent</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongbridge_1_1market_1_1_index_constituents.html">IndexConstituents</a> &gt; callback) const</td></tr>
 <tr class="memdesc:a40cd72a8db2e488fa257af07aebcae42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get index constituents.  <a href="classlongbridge_1_1market_1_1_market_context.html#a40cd72a8db2e488fa257af07aebcae42">More...</a><br /></td></tr>
 <tr class="separator:a40cd72a8db2e488fa257af07aebcae42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacf5a538a35640fcd44d82c137c82722"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1market_1_1_market_context.html#aacf5a538a35640fcd44d82c137c82722">top_movers</a> (const std::vector&lt; std::string &gt; &amp;markets, uint32_t sort, const std::string *date, uint32_t limit, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongbridge_1_1market_1_1_top_movers_response.html">TopMoversResponse</a> &gt; callback) const</td></tr>
+<tr class="memdesc:aacf5a538a35640fcd44d82c137c82722"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get top movers (stocks with unusual price movements) across one or more markets.  <a href="classlongbridge_1_1market_1_1_market_context.html#aacf5a538a35640fcd44d82c137c82722">More...</a><br /></td></tr>
+<tr class="separator:aacf5a538a35640fcd44d82c137c82722"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ffe13fffad6c560c9e0029c94ab6054"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1market_1_1_market_context.html#a1ffe13fffad6c560c9e0029c94ab6054">rank_categories</a> (<a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1market_1_1_market_context.html">MarketContext</a>, std::string &gt; callback) const</td></tr>
+<tr class="memdesc:a1ffe13fffad6c560c9e0029c94ab6054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all available rank category keys and labels (raw JSON string)  <a href="classlongbridge_1_1market_1_1_market_context.html#a1ffe13fffad6c560c9e0029c94ab6054">More...</a><br /></td></tr>
+<tr class="separator:a1ffe13fffad6c560c9e0029c94ab6054"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d324564acfe364338773a3400d5e45c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1market_1_1_market_context.html#a7d324564acfe364338773a3400d5e45c">rank_list</a> (const std::string &amp;key, bool need_article, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongbridge_1_1market_1_1_rank_list_response.html">RankListResponse</a> &gt; callback) const</td></tr>
+<tr class="memdesc:a7d324564acfe364338773a3400d5e45c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a ranked list of securities for the given category key.  <a href="classlongbridge_1_1market_1_1_market_context.html#a7d324564acfe364338773a3400d5e45c">More...</a><br /></td></tr>
+<tr class="separator:a7d324564acfe364338773a3400d5e45c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -513,6 +522,110 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1ffe13fffad6c560c9e0029c94ab6054"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ffe13fffad6c560c9e0029c94ab6054">&#9670;&nbsp;</a></span>rank_categories()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::market::MarketContext::rank_categories </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1market_1_1_market_context.html">MarketContext</a>, std::string &gt;&#160;</td>
+          <td class="paramname"><em>callback</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get all available rank category keys and labels (raw JSON string) </p>
+
+</div>
+</div>
+<a id="a7d324564acfe364338773a3400d5e45c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d324564acfe364338773a3400d5e45c">&#9670;&nbsp;</a></span>rank_list()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::market::MarketContext::rank_list </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>need_article</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongbridge_1_1market_1_1_rank_list_response.html">RankListResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get a ranked list of securities for the given category key. </p>
+
+</div>
+</div>
+<a id="aacf5a538a35640fcd44d82c137c82722"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacf5a538a35640fcd44d82c137c82722">&#9670;&nbsp;</a></span>top_movers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::market::MarketContext::top_movers </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>markets</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>sort</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string *&#160;</td>
+          <td class="paramname"><em>date</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>limit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongbridge_1_1market_1_1_top_movers_response.html">TopMoversResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get top movers (stocks with unusual price movements) across one or more markets. </p>
 
 </div>
 </div>

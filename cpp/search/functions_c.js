@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['news_1729',['news',['../classlongbridge_1_1content_1_1_content_context.html#a002d6b5f98a87760bb7aaeee00be0f5d',1,'longbridge::content::ContentContext']]],
-  ['norm_5fpdf_1730',['norm_pdf',['../classlongbridge_1_1_decimal.html#a2302db4edd388417387421f717b0715b',1,'longbridge::Decimal']]],
-  ['normalize_1731',['normalize',['../classlongbridge_1_1_decimal.html#a2458676863a88fe30f4988174b73753e',1,'longbridge::Decimal']]]
+  ['news_1868',['news',['../classlongbridge_1_1content_1_1_content_context.html#a002d6b5f98a87760bb7aaeee00be0f5d',1,'longbridge::content::ContentContext']]],
+  ['norm_5fpdf_1869',['norm_pdf',['../classlongbridge_1_1_decimal.html#a2302db4edd388417387421f717b0715b',1,'longbridge::Decimal']]],
+  ['normalize_1870',['normalize',['../classlongbridge_1_1_decimal.html#a2458676863a88fe30f4988174b73753e',1,'longbridge::Decimal']]]
 ];

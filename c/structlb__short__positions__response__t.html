@@ -72,30 +72,26 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:ac32b11cac3faae6f478b0b81553f261a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__short__positions__response__t.html#ac32b11cac3faae6f478b0b81553f261a">symbol</a></td></tr>
-<tr class="separator:ac32b11cac3faae6f478b0b81553f261a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3349937793b5332226cee19a730e54ae"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structlb__short__position__t.html">lb_short_position_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__short__positions__response__t.html#a3349937793b5332226cee19a730e54ae">data</a></td></tr>
-<tr class="separator:a3349937793b5332226cee19a730e54ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07173748b1a3d17bcee4a326bebef27f"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structlb__short__positions__item__t.html">lb_short_positions_item_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__short__positions__response__t.html#a07173748b1a3d17bcee4a326bebef27f">data</a></td></tr>
+<tr class="separator:a07173748b1a3d17bcee4a326bebef27f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19444903a047f0334c1196e763da7d06"><td class="memItemLeft" align="right" valign="top">uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__short__positions__response__t.html#a19444903a047f0334c1196e763da7d06">num_data</a></td></tr>
 <tr class="separator:a19444903a047f0334c1196e763da7d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6081b595338e33e477b5cc0dc7ab415b"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__short__positions__response__t.html#a6081b595338e33e477b5cc0dc7ab415b">sources</a></td></tr>
-<tr class="separator:a6081b595338e33e477b5cc0dc7ab415b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Short positions response for a security </p>
+<div class="textblock"><p>Short positions / interest response (HK or US). </p>
 </div><h2 class="groupheader">Field Documentation</h2>
-<a id="a3349937793b5332226cee19a730e54ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3349937793b5332226cee19a730e54ae">&#9670;&nbsp;</a></span>data</h2>
+<a id="a07173748b1a3d17bcee4a326bebef27f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07173748b1a3d17bcee4a326bebef27f">&#9670;&nbsp;</a></span>data</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const struct <a class="el" href="structlb__short__position__t.html">lb_short_position_t</a>* data</td>
+          <td class="memname">const struct <a class="el" href="structlb__short__positions__item__t.html">lb_short_positions_item_t</a>* data</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Pointer to array of short position records </p>
+<p>Pointer to the array of short position items </p>
 
 </div>
 </div>
@@ -110,37 +106,7 @@ Data Fields</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Number of elements in the array. </p>
-
-</div>
-</div>
-<a id="a6081b595338e33e477b5cc0dc7ab415b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6081b595338e33e477b5cc0dc7ab415b">&#9670;&nbsp;</a></span>sources</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int32_t sources</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Bitmask indicating the data sources included in the response </p>
-
-</div>
-</div>
-<a id="ac32b11cac3faae6f478b0b81553f261a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac32b11cac3faae6f478b0b81553f261a">&#9670;&nbsp;</a></span>symbol</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char* symbol</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Security code </p>
+<p>Number of items in <code>data</code> </p>
 
 </div>
 </div>
