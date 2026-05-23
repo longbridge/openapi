@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.1]
+
+### Changed
+
+- `ScreenerContext`: screener endpoints migrated to `/v1/quote/ai/screener/*`; `screener_recommend_strategies` / `screener_user_strategies` now accept a `market` parameter; `screener_search` accepts typed `ScreenerCondition` objects (Mode B) instead of raw strings
+
+### Fixed
+
+- `OperatingFinancial`: renamed `counter_id` → `symbol` (converts `ST/US/AAPL` → `AAPL.US`)
+
 ## [4.2.0]
 
 ### Added
