@@ -109,7 +109,7 @@ impl From<lb::ScreenerIndicatorsResponse> for ScreenerIndicatorsResponse {
 // ── ScreenerCondition ─────────────────────────────────────────────
 
 /// A filter condition for screener_search Mode B.
-#[pyclass(get_all, set_all)]
+#[pyclass(get_all, set_all, from_py_object)]
 #[derive(Debug, Clone, Default)]
 pub(crate) struct ScreenerCondition {
     /// Indicator key without filter_ prefix, e.g. "pettm", "roe", "macd_day"
