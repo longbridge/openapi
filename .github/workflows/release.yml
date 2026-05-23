@@ -719,6 +719,7 @@ jobs:
         working-directory: ./nodejs
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-java-sdk:
     runs-on: ubuntu-24.04
