@@ -89,3 +89,33 @@ impl From<lb::ScreenerIndicatorsResponse> for ScreenerIndicatorsResponse {
         }
     }
 }
+
+// ── ScreenerCondition ─────────────────────────────────────────────
+
+/// A filter condition for screener_search Mode B.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone, Default)]
+pub struct ScreenerCondition {
+    /// Indicator key without filter_ prefix, e.g. "pettm", "roe", "macd_day"
+    pub key: String,
+    /// Lower bound (empty = no lower bound)
+    pub min: String,
+    /// Upper bound (empty = no upper bound)
+    pub max: String,
+    /// Technical indicator params as JSON string (empty object "{}" for
+    /// fundamental indicators)
+    pub tech_values: String,
+}
+
+impl From<ScreenerCondition> for longbridge::screener::ScreenerCondition {
+    fn from(v: ScreenerCondition) -> Self {
+        let tv: serde_json::Value =
+            serde_json::from_str(&v.tech_values).unwrap_or(serde_json::json!({}));
+        Self {
+            key: v.key,
+            min: v.min,
+            max: v.max,
+            tech_values: tv,
+        }
+    }
+}

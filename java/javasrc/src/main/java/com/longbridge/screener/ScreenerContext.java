@@ -20,14 +20,24 @@ public class ScreenerContext implements AutoCloseable {
         SdkNative.freeScreenerContext(raw);
     }
 
-    /** Get platform-recommended screener strategies. */
-    public CompletableFuture<ScreenerRecommendStrategiesResponse> getRecommendStrategies() throws OpenApiException {
-        return AsyncCallback.executeTask((callback) -> SdkNative.screenerContextRecommendStrategies(raw, callback));
+    /** Get platform-preset screener strategies for the given market (default "US"). */
+    public CompletableFuture<ScreenerRecommendStrategiesResponse> getRecommendStrategies(String market) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> SdkNative.screenerContextRecommendStrategies(raw, market, callback));
     }
 
-    /** Get the current user's saved screener strategies. */
+    /** Get platform-preset screener strategies (defaults to US market). */
+    public CompletableFuture<ScreenerRecommendStrategiesResponse> getRecommendStrategies() throws OpenApiException {
+        return getRecommendStrategies("US");
+    }
+
+    /** Get the current user's saved screener strategies for the given market (default "US"). */
+    public CompletableFuture<ScreenerUserStrategiesResponse> getUserStrategies(String market) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> SdkNative.screenerContextUserStrategies(raw, market, callback));
+    }
+
+    /** Get the current user's saved screener strategies (defaults to US market). */
     public CompletableFuture<ScreenerUserStrategiesResponse> getUserStrategies() throws OpenApiException {
-        return AsyncCallback.executeTask((callback) -> SdkNative.screenerContextUserStrategies(raw, callback));
+        return getUserStrategies("US");
     }
 
     /** Get detail for one screener strategy by ID. */

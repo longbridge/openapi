@@ -52,14 +52,16 @@ impl ScreenerContext {
         &self,
         market: String,
         strategy_id: Option<i64>,
-        conditions: Vec<String>,
+        conditions: Vec<ScreenerCondition>,
         show: Vec<String>,
         page: u32,
         size: u32,
     ) -> PyResult<ScreenerSearchResponse> {
+        let lb_conditions: Vec<longbridge::screener::ScreenerCondition> =
+            conditions.into_iter().map(Into::into).collect();
         Ok(self
             .ctx
-            .screener_search(market, strategy_id, conditions, show, page, size)
+            .screener_search(market, strategy_id, lb_conditions, show, page, size)
             .map_err(ErrorNewType)?
             .into())
     }

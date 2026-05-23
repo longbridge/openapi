@@ -39,6 +39,31 @@ pub struct ScreenerStrategyResponse {
     pub data: serde_json::Value,
 }
 
+// ── screener_condition ───────────────────────────────────────────
+
+/// A filter condition for [`crate::ScreenerContext::screener_search`] Mode B.
+///
+/// `key` is the indicator key (without the `filter_` prefix, e.g. `"pettm"`).
+/// `min` / `max` bound the range; leave empty for an open bound.
+/// `tech_values` is used for technical indicators (e.g. MACD/RSI); pass an
+/// empty map `{}` for fundamental indicators.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ScreenerCondition {
+    /// Indicator key without `filter_` prefix, e.g. `"pettm"`, `"roe"`,
+    /// `"macd_day"`
+    pub key: String,
+    /// Lower bound (empty string = no lower bound)
+    #[serde(default)]
+    pub min: String,
+    /// Upper bound (empty string = no upper bound)
+    #[serde(default)]
+    pub max: String,
+    /// Technical indicator parameters (empty map for fundamental indicators).
+    /// Example: `{"category": "goldenfork", "period": "day"}`
+    #[serde(default)]
+    pub tech_values: serde_json::Value,
+}
+
 // ── screener_search ───────────────────────────────────────────────
 
 /// Response for [`crate::ScreenerContext::screener_search`]

@@ -195,7 +195,7 @@ impl ScreenerContext {
         &self,
         market: impl Into<String>,
         strategy_id: Option<i64>,
-        conditions: Vec<String>,
+        conditions: Vec<ScreenerCondition>,
         show: Vec<String>,
         page: u32,
         size: u32,
@@ -241,23 +241,27 @@ impl ScreenerContext {
             }
             (mkt, filters)
         } else {
-            // Mode B: custom conditions ("KEY:MIN:MAX" strings)
+            // Mode B: typed condition objects
             let filters: Vec<serde_json::Value> = conditions
                 .iter()
-                .filter_map(|cond| {
-                    let parts: Vec<&str> = cond.splitn(3, ':').collect();
-                    if parts.is_empty() || parts[0].is_empty() {
-                        return None;
-                    }
-                    let key = parts[0].to_string();
-                    let min = parts.get(1).copied().unwrap_or("").to_string();
-                    let max = parts.get(2).copied().unwrap_or("").to_string();
-                    Some(serde_json::json!({
-                        "key": key,
-                        "min": min,
-                        "max": max,
-                        "tech_values": {},
-                    }))
+                .filter(|c| !c.key.is_empty())
+                .map(|c| {
+                    let api_key = if c.key.starts_with("filter_") {
+                        c.key.clone()
+                    } else {
+                        format!("filter_{}", c.key)
+                    };
+                    let tv = if c.tech_values.is_object() {
+                        c.tech_values.clone()
+                    } else {
+                        serde_json::json!({})
+                    };
+                    serde_json::json!({
+                        "key": api_key,
+                        "min": c.min,
+                        "max": c.max,
+                        "tech_values": tv,
+                    })
                 })
                 .collect();
             (market, filters)

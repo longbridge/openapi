@@ -63,7 +63,7 @@ impl ScreenerContextSync {
         &self,
         market: impl Into<String> + Send + 'static,
         strategy_id: Option<i64>,
-        conditions: Vec<String>,
+        conditions: Vec<crate::screener::ScreenerCondition>,
         show: Vec<String>,
         page: u32,
         size: u32,

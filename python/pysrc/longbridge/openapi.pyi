@@ -10530,6 +10530,28 @@ class RankListResponse:
 
 # ── ScreenerContext ───────────────────────────────────────────────
 
+class ScreenerCondition:
+    """A filter condition for :meth:`ScreenerContext.screener_search` Mode B."""
+
+    key: str
+    """Indicator key without ``filter_`` prefix, e.g. ``"pettm"``, ``"roe"``, ``"macd_day"``"""
+    min: str
+    """Lower bound (empty string = no lower bound)"""
+    max: str
+    """Upper bound (empty string = no upper bound)"""
+    tech_values: str
+    """Technical indicator params as JSON string. Use ``"{}"`` for fundamental indicators.
+    Example: ``'{"category": "goldenfork", "period": "day"}'``"""
+
+    def __init__(
+        self,
+        key: str,
+        min: str = "",
+        max: str = "",
+        tech_values: str = "{}",
+    ) -> None: ...
+
+
 class ScreenerRecommendStrategiesResponse:
     """Recommended screener strategies response. ``data`` is a Python dict/list from JSON."""
 
@@ -10586,7 +10608,7 @@ class ScreenerContext:
         self,
         market: str,
         strategy_id: Optional[int] = None,
-        conditions: List[str] = [],
+        conditions: List["ScreenerCondition"] = [],
         show: List[str] = [],
         page: int = 0,
         size: int = 20,
@@ -10598,7 +10620,7 @@ class ScreenerContext:
         ``market`` is taken from the strategy response.
 
         When *strategy_id* is ``None`` (Mode B), *conditions* must be provided as
-        ``"KEY:MIN:MAX"`` strings and *market* is used directly.
+        :class:`ScreenerCondition` objects and *market* is used directly.
 
         ``filter_`` is stripped from every ``items[].indicators[].key`` in the
         response before it is returned.
@@ -10640,7 +10662,7 @@ class AsyncScreenerContext:
         self,
         market: str,
         strategy_id: Optional[int] = None,
-        conditions: List[str] = [],
+        conditions: List["ScreenerCondition"] = [],
         show: List[str] = [],
         page: int = 0,
         size: int = 20,
@@ -10653,7 +10675,7 @@ class AsyncScreenerContext:
         ``market`` is taken from the strategy response.
 
         When *strategy_id* is ``None`` (Mode B), *conditions* must be provided as
-        ``"KEY:MIN:MAX"`` strings and *market* is used directly.
+        :class:`ScreenerCondition` objects and *market* is used directly.
 
         ``filter_`` is stripped from every ``items[].indicators[].key`` in the
         response before it is returned.

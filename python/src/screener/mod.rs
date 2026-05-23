@@ -11,6 +11,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<ScreenerStrategyResponse>()?;
     parent.add_class::<ScreenerSearchResponse>()?;
     parent.add_class::<ScreenerIndicatorsResponse>()?;
+    parent.add_class::<ScreenerCondition>()?;
     parent.add_class::<context::ScreenerContext>()?;
     parent.add_class::<context_async::AsyncScreenerContext>()?;
     Ok(())
