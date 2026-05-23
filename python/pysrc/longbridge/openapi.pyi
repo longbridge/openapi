@@ -9570,6 +9570,8 @@ class OperatingFinancial:
 
     code: str
     """Ticker code"""
+    symbol: str
+    """Symbol in CODE.MARKET format (e.g. ``AAPL.US``)"""
     currency: str
     """Reporting currency"""
     name: str

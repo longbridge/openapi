@@ -2208,7 +2208,7 @@ impl_java_class!(
     longbridge::fundamental::OperatingFinancial,
     [
         code,
-        counter_id,
+        symbol,
         currency,
         name,
         region,

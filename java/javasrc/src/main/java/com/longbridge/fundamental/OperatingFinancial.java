@@ -4,8 +4,8 @@ package com.longbridge.fundamental;
 public class OperatingFinancial {
     /** Ticker code (may be empty). */
     public String code;
-    /** Raw counter ID (may be empty). */
-    public String counterId;
+    /** Symbol in CODE.MARKET format (may be empty). */
+    public String symbol;
     /** Reporting currency. */
     public String currency;
     /** Company name. */
