@@ -391,64 +391,89 @@
 <a href=#391 id=391 data-nosnippet>391</a>    </span><span class="kw">pub async fn </span>rank_categories(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;RankCategoriesResponse&gt; {
 <a href=#392 id=392 data-nosnippet>392</a>        <span class="attr">#[derive(Serialize)]
 <a href=#393 id=393 data-nosnippet>393</a>        </span><span class="kw">struct </span>Empty {}
-<a href=#394 id=394 data-nosnippet>394</a>        <span class="kw">let </span>raw: serde_json::Value = <span class="self">self
+<a href=#394 id=394 data-nosnippet>394</a>        <span class="kw">let </span><span class="kw-2">mut </span>raw: serde_json::Value = <span class="self">self
 <a href=#395 id=395 data-nosnippet>395</a>            </span>.get(<span class="string">"/v1/quote/market/rank/categories"</span>, Empty {})
 <a href=#396 id=396 data-nosnippet>396</a>            .<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#397 id=397 data-nosnippet>397</a>        <span class="prelude-val">Ok</span>(RankCategoriesResponse { data: raw })
-<a href=#398 id=398 data-nosnippet>398</a>    }
-<a href=#399 id=399 data-nosnippet>399</a>
-<a href=#400 id=400 data-nosnippet>400</a>    <span class="comment">// ── rank_list ─────────────────────────────────────────────────
-<a href=#401 id=401 data-nosnippet>401</a>
-<a href=#402 id=402 data-nosnippet>402</a>    </span><span class="doccomment">/// Get a ranked list of securities for the given category key.
-<a href=#403 id=403 data-nosnippet>403</a>    ///
-<a href=#404 id=404 data-nosnippet>404</a>    /// Path: `GET /v1/quote/market/rank/list`
-<a href=#405 id=405 data-nosnippet>405</a>    </span><span class="kw">pub async fn </span>rank_list(
-<a href=#406 id=406 data-nosnippet>406</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#407 id=407 data-nosnippet>407</a>        key: <span class="kw">impl </span>Into&lt;String&gt;,
-<a href=#408 id=408 data-nosnippet>408</a>        need_article: bool,
-<a href=#409 id=409 data-nosnippet>409</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;RankListResponse&gt; {
-<a href=#410 id=410 data-nosnippet>410</a>        <span class="attr">#[derive(Serialize)]
-<a href=#411 id=411 data-nosnippet>411</a>        </span><span class="kw">struct </span>Query {
-<a href=#412 id=412 data-nosnippet>412</a>            key: String,
-<a href=#413 id=413 data-nosnippet>413</a>            delay_bmp: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
-<a href=#414 id=414 data-nosnippet>414</a>            need_article: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
-<a href=#415 id=415 data-nosnippet>415</a>        }
-<a href=#416 id=416 data-nosnippet>416</a>        <span class="kw">let </span>raw: serde_json::Value = <span class="self">self
-<a href=#417 id=417 data-nosnippet>417</a>            </span>.get(
-<a href=#418 id=418 data-nosnippet>418</a>                <span class="string">"/v1/quote/market/rank/list"</span>,
-<a href=#419 id=419 data-nosnippet>419</a>                Query {
-<a href=#420 id=420 data-nosnippet>420</a>                    key: key.into(),
-<a href=#421 id=421 data-nosnippet>421</a>                    delay_bmp: <span class="string">"false"</span>,
-<a href=#422 id=422 data-nosnippet>422</a>                    need_article: <span class="kw">if </span>need_article { <span class="string">"true" </span>} <span class="kw">else </span>{ <span class="string">"false" </span>},
-<a href=#423 id=423 data-nosnippet>423</a>                },
-<a href=#424 id=424 data-nosnippet>424</a>            )
-<a href=#425 id=425 data-nosnippet>425</a>            .<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#426 id=426 data-nosnippet>426</a>        <span class="kw">let </span>bmp = raw[<span class="string">"bmp"</span>].as_bool().unwrap_or(<span class="bool-val">false</span>);
-<a href=#427 id=427 data-nosnippet>427</a>        <span class="kw">let </span>lists = raw[<span class="string">"lists"</span>]
-<a href=#428 id=428 data-nosnippet>428</a>            .as_array()
-<a href=#429 id=429 data-nosnippet>429</a>            .cloned()
-<a href=#430 id=430 data-nosnippet>430</a>            .unwrap_or_default()
-<a href=#431 id=431 data-nosnippet>431</a>            .into_iter()
-<a href=#432 id=432 data-nosnippet>432</a>            .map(|item| RankListItem {
-<a href=#433 id=433 data-nosnippet>433</a>                symbol: counter_id_to_symbol(item[<span class="string">"counter_id"</span>].as_str().unwrap_or(<span class="string">""</span>)),
-<a href=#434 id=434 data-nosnippet>434</a>                code: item[<span class="string">"code"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#435 id=435 data-nosnippet>435</a>                name: item[<span class="string">"name"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#436 id=436 data-nosnippet>436</a>                last_done: item[<span class="string">"last_done"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#437 id=437 data-nosnippet>437</a>                chg: item[<span class="string">"chg"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#438 id=438 data-nosnippet>438</a>                change: item[<span class="string">"change"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#439 id=439 data-nosnippet>439</a>                inflow: item[<span class="string">"inflow"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#440 id=440 data-nosnippet>440</a>                market_cap: item[<span class="string">"market_cap"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#441 id=441 data-nosnippet>441</a>                industry: item[<span class="string">"industry"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#442 id=442 data-nosnippet>442</a>                pre_post_price: item[<span class="string">"pre_post_price"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#443 id=443 data-nosnippet>443</a>                pre_post_chg: item[<span class="string">"pre_post_chg"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#444 id=444 data-nosnippet>444</a>                amplitude: item[<span class="string">"amplitude"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#445 id=445 data-nosnippet>445</a>                five_day_chg: item[<span class="string">"five_day_chg"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#446 id=446 data-nosnippet>446</a>                turnover_rate: item[<span class="string">"turnover_rate"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#447 id=447 data-nosnippet>447</a>                volume_rate: item[<span class="string">"volume_rate"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#448 id=448 data-nosnippet>448</a>                pb_ttm: item[<span class="string">"pb_ttm"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
-<a href=#449 id=449 data-nosnippet>449</a>            })
-<a href=#450 id=450 data-nosnippet>450</a>            .collect();
-<a href=#451 id=451 data-nosnippet>451</a>        <span class="prelude-val">Ok</span>(RankListResponse { bmp, lists })
-<a href=#452 id=452 data-nosnippet>452</a>    }
-<a href=#453 id=453 data-nosnippet>453</a>}
+<a href=#397 id=397 data-nosnippet>397</a>        <span class="comment">// Strip the "ib_" prefix from all key fields so callers get clean keys
+<a href=#398 id=398 data-nosnippet>398</a>        // that can be passed back to rank_list without the prefix.
+<a href=#399 id=399 data-nosnippet>399</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(tags) = raw[<span class="string">"first_tags"</span>].as_array_mut() {
+<a href=#400 id=400 data-nosnippet>400</a>            <span class="kw">for </span>tag <span class="kw">in </span>tags.iter_mut() {
+<a href=#401 id=401 data-nosnippet>401</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(k) = tag[<span class="string">"key"</span>].as_str() {
+<a href=#402 id=402 data-nosnippet>402</a>                    <span class="kw">let </span>stripped = k.strip_prefix(<span class="string">"ib_"</span>).unwrap_or(k).to_string();
+<a href=#403 id=403 data-nosnippet>403</a>                    tag[<span class="string">"key"</span>] = serde_json::Value::String(stripped);
+<a href=#404 id=404 data-nosnippet>404</a>                }
+<a href=#405 id=405 data-nosnippet>405</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(subs) = tag[<span class="string">"second_tags"</span>].as_array_mut() {
+<a href=#406 id=406 data-nosnippet>406</a>                    <span class="kw">for </span>sub <span class="kw">in </span>subs.iter_mut() {
+<a href=#407 id=407 data-nosnippet>407</a>                        <span class="kw">if let </span><span class="prelude-val">Some</span>(sk) = sub[<span class="string">"key"</span>].as_str() {
+<a href=#408 id=408 data-nosnippet>408</a>                            <span class="kw">let </span>stripped = sk.strip_prefix(<span class="string">"ib_"</span>).unwrap_or(sk).to_string();
+<a href=#409 id=409 data-nosnippet>409</a>                            sub[<span class="string">"key"</span>] = serde_json::Value::String(stripped);
+<a href=#410 id=410 data-nosnippet>410</a>                        }
+<a href=#411 id=411 data-nosnippet>411</a>                    }
+<a href=#412 id=412 data-nosnippet>412</a>                }
+<a href=#413 id=413 data-nosnippet>413</a>            }
+<a href=#414 id=414 data-nosnippet>414</a>        }
+<a href=#415 id=415 data-nosnippet>415</a>        <span class="prelude-val">Ok</span>(RankCategoriesResponse { data: raw })
+<a href=#416 id=416 data-nosnippet>416</a>    }
+<a href=#417 id=417 data-nosnippet>417</a>
+<a href=#418 id=418 data-nosnippet>418</a>    <span class="comment">// ── rank_list ─────────────────────────────────────────────────
+<a href=#419 id=419 data-nosnippet>419</a>
+<a href=#420 id=420 data-nosnippet>420</a>    </span><span class="doccomment">/// Get a ranked list of securities for the given category key.
+<a href=#421 id=421 data-nosnippet>421</a>    ///
+<a href=#422 id=422 data-nosnippet>422</a>    /// Path: `GET /v1/quote/market/rank/list`
+<a href=#423 id=423 data-nosnippet>423</a>    </span><span class="kw">pub async fn </span>rank_list(
+<a href=#424 id=424 data-nosnippet>424</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#425 id=425 data-nosnippet>425</a>        key: <span class="kw">impl </span>Into&lt;String&gt;,
+<a href=#426 id=426 data-nosnippet>426</a>        need_article: bool,
+<a href=#427 id=427 data-nosnippet>427</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;RankListResponse&gt; {
+<a href=#428 id=428 data-nosnippet>428</a>        <span class="attr">#[derive(Serialize)]
+<a href=#429 id=429 data-nosnippet>429</a>        </span><span class="kw">struct </span>Query {
+<a href=#430 id=430 data-nosnippet>430</a>            key: String,
+<a href=#431 id=431 data-nosnippet>431</a>            delay_bmp: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+<a href=#432 id=432 data-nosnippet>432</a>            need_article: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+<a href=#433 id=433 data-nosnippet>433</a>        }
+<a href=#434 id=434 data-nosnippet>434</a>        <span class="kw">let </span>key_str = key.into();
+<a href=#435 id=435 data-nosnippet>435</a>        <span class="comment">// Add "ib_" prefix if the caller passed a clean key (without it).
+<a href=#436 id=436 data-nosnippet>436</a>        </span><span class="kw">let </span>api_key = <span class="kw">if </span>key_str.starts_with(<span class="string">"ib_"</span>) {
+<a href=#437 id=437 data-nosnippet>437</a>            key_str
+<a href=#438 id=438 data-nosnippet>438</a>        } <span class="kw">else </span>{
+<a href=#439 id=439 data-nosnippet>439</a>            <span class="macro">format!</span>(<span class="string">"ib_{key_str}"</span>)
+<a href=#440 id=440 data-nosnippet>440</a>        };
+<a href=#441 id=441 data-nosnippet>441</a>        <span class="kw">let </span>raw: serde_json::Value = <span class="self">self
+<a href=#442 id=442 data-nosnippet>442</a>            </span>.get(
+<a href=#443 id=443 data-nosnippet>443</a>                <span class="string">"/v1/quote/market/rank/list"</span>,
+<a href=#444 id=444 data-nosnippet>444</a>                Query {
+<a href=#445 id=445 data-nosnippet>445</a>                    key: api_key,
+<a href=#446 id=446 data-nosnippet>446</a>                    delay_bmp: <span class="string">"false"</span>,
+<a href=#447 id=447 data-nosnippet>447</a>                    need_article: <span class="kw">if </span>need_article { <span class="string">"true" </span>} <span class="kw">else </span>{ <span class="string">"false" </span>},
+<a href=#448 id=448 data-nosnippet>448</a>                },
+<a href=#449 id=449 data-nosnippet>449</a>            )
+<a href=#450 id=450 data-nosnippet>450</a>            .<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#451 id=451 data-nosnippet>451</a>        <span class="kw">let </span>bmp = raw[<span class="string">"bmp"</span>].as_bool().unwrap_or(<span class="bool-val">false</span>);
+<a href=#452 id=452 data-nosnippet>452</a>        <span class="kw">let </span>lists = raw[<span class="string">"lists"</span>]
+<a href=#453 id=453 data-nosnippet>453</a>            .as_array()
+<a href=#454 id=454 data-nosnippet>454</a>            .cloned()
+<a href=#455 id=455 data-nosnippet>455</a>            .unwrap_or_default()
+<a href=#456 id=456 data-nosnippet>456</a>            .into_iter()
+<a href=#457 id=457 data-nosnippet>457</a>            .map(|item| RankListItem {
+<a href=#458 id=458 data-nosnippet>458</a>                symbol: counter_id_to_symbol(item[<span class="string">"counter_id"</span>].as_str().unwrap_or(<span class="string">""</span>)),
+<a href=#459 id=459 data-nosnippet>459</a>                code: item[<span class="string">"code"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#460 id=460 data-nosnippet>460</a>                name: item[<span class="string">"name"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#461 id=461 data-nosnippet>461</a>                last_done: item[<span class="string">"last_done"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#462 id=462 data-nosnippet>462</a>                chg: item[<span class="string">"chg"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#463 id=463 data-nosnippet>463</a>                change: item[<span class="string">"change"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#464 id=464 data-nosnippet>464</a>                inflow: item[<span class="string">"inflow"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#465 id=465 data-nosnippet>465</a>                market_cap: item[<span class="string">"market_cap"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#466 id=466 data-nosnippet>466</a>                industry: item[<span class="string">"industry"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#467 id=467 data-nosnippet>467</a>                pre_post_price: item[<span class="string">"pre_post_price"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#468 id=468 data-nosnippet>468</a>                pre_post_chg: item[<span class="string">"pre_post_chg"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#469 id=469 data-nosnippet>469</a>                amplitude: item[<span class="string">"amplitude"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#470 id=470 data-nosnippet>470</a>                five_day_chg: item[<span class="string">"five_day_chg"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#471 id=471 data-nosnippet>471</a>                turnover_rate: item[<span class="string">"turnover_rate"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#472 id=472 data-nosnippet>472</a>                volume_rate: item[<span class="string">"volume_rate"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#473 id=473 data-nosnippet>473</a>                pb_ttm: item[<span class="string">"pb_ttm"</span>].as_str().unwrap_or(<span class="string">""</span>).to_string(),
+<a href=#474 id=474 data-nosnippet>474</a>            })
+<a href=#475 id=475 data-nosnippet>475</a>            .collect();
+<a href=#476 id=476 data-nosnippet>476</a>        <span class="prelude-val">Ok</span>(RankListResponse { bmp, lists })
+<a href=#477 id=477 data-nosnippet>477</a>    }
+<a href=#478 id=478 data-nosnippet>478</a>}
 </code></pre></div></section></main></body></html>

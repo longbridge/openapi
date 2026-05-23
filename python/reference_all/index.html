@@ -2994,6 +2994,8 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OperatingFinancial.code">code</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OperatingFinancial.symbol">symbol</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OperatingFinancial.currency">currency</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OperatingFinancial.name">name</a>
@@ -3641,6 +3643,20 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RankListResponse.bmp">bmp</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.RankListResponse.lists">lists</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.ScreenerCondition">ScreenerCondition</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ScreenerCondition.key">key</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ScreenerCondition.min">min</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ScreenerCondition.max">max</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ScreenerCondition.tech_values">tech_values</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ScreenerCondition.__init__">__init__</a>
     </li>
         </ul>
     </li>
@@ -54417,6 +54433,29 @@ asyncio.run(main())</code></pre>
 
 
 
+<h3 id="longbridge.openapi.OperatingFinancial.symbol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">symbol</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Symbol in CODE.MARKET format (e.g. <code>AAPL.US</code>)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="longbridge.openapi.OperatingFinancial.currency" class="doc doc-heading">
             <span class="doc doc-object-name doc-attribute-name">currency</span>
 
@@ -63007,6 +63046,162 @@ for item in status.market_time:
 
 
 
+<h2 id="longbridge.openapi.ScreenerCondition" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ScreenerCondition</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>A filter condition for :meth:<code>ScreenerContext.screener_search</code> Mode B.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.ScreenerCondition.key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">key: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Indicator key without <code>filter_</code> prefix, e.g. <code>"pettm"</code>, <code>"roe"</code>, <code>"macd_day"</code></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.ScreenerCondition.min" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">min</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">min: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Lower bound (empty string = no lower bound)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.ScreenerCondition.max" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">max</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">max: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Upper bound (empty string = no upper bound)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.ScreenerCondition.tech_values" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">tech_values</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">tech_values: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Technical indicator params as JSON string. Use <code>"{}"</code> for fundamental indicators.
+Example: <code>'{"category": "goldenfork", "period": "day"}'</code></p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.ScreenerCondition.__init__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">__init__(key: str, min: str = '', max: str = '', tech_values: str = '{}') -&gt; None</code></pre>
+
+    <div class="doc doc-contents ">
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="longbridge.openapi.ScreenerRecommendStrategiesResponse" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">ScreenerRecommendStrategiesResponse</span>
 
@@ -63410,11 +63605,11 @@ for item in status.market_time:
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">screener_recommend_strategies() -&gt; ScreenerRecommendStrategiesResponse</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">screener_recommend_strategies(market: str) -&gt; ScreenerRecommendStrategiesResponse</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Get recommended built-in screener strategies.</p>
+        <p>Get preset built-in screener strategies.</p>
 
 
     </div>
@@ -63429,7 +63624,7 @@ for item in status.market_time:
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">screener_user_strategies() -&gt; ScreenerUserStrategiesResponse</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">screener_user_strategies(market: str) -&gt; ScreenerUserStrategiesResponse</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -63467,11 +63662,18 @@ for item in status.market_time:
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">screener_search(market: str, strategy_id: Optional[int] = None, page: int = 1, size: int = 20) -&gt; ScreenerSearchResponse</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">screener_search(market: str, strategy_id: Optional[int] = None, conditions: List[ScreenerCondition] = [], show: List[str] = [], page: int = 0, size: int = 20) -&gt; ScreenerSearchResponse</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Search / screen securities using a strategy.</p>
+        <p>Search / screen securities using a strategy or custom conditions.</p>
+<p>When <em>strategy_id</em> is given (Mode A), the strategy is fetched from the AI
+endpoint and its filters are forwarded to the search request.  The
+<code>market</code> is taken from the strategy response.</p>
+<p>When <em>strategy_id</em> is <code>None</code> (Mode B), <em>conditions</em> must be provided as
+:class:<code>ScreenerCondition</code> objects and <em>market</em> is used directly.</p>
+<p><code>filter_</code> is stripped from every <code>items[].indicators[].key</code> in the
+response before it is returned.</p>
 
 
     </div>
@@ -63572,11 +63774,11 @@ for item in status.market_time:
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">screener_recommend_strategies() -&gt; Awaitable[ScreenerRecommendStrategiesResponse]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">screener_recommend_strategies(market: str) -&gt; Awaitable[ScreenerRecommendStrategiesResponse]</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Get recommended built-in screener strategies. Returns awaitable.</p>
+        <p>Get preset built-in screener strategies. Returns awaitable.</p>
 
 
     </div>
@@ -63591,7 +63793,7 @@ for item in status.market_time:
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">screener_user_strategies() -&gt; Awaitable[ScreenerUserStrategiesResponse]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">screener_user_strategies(market: str) -&gt; Awaitable[ScreenerUserStrategiesResponse]</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -63629,11 +63831,19 @@ for item in status.market_time:
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">screener_search(market: str, strategy_id: Optional[int] = None, page: int = 1, size: int = 20) -&gt; Awaitable[ScreenerSearchResponse]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">screener_search(market: str, strategy_id: Optional[int] = None, conditions: List[ScreenerCondition] = [], show: List[str] = [], page: int = 0, size: int = 20) -&gt; Awaitable[ScreenerSearchResponse]</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Search / screen securities using a strategy. Returns awaitable.</p>
+        <p>Search / screen securities using a strategy or custom conditions.
+Returns awaitable.</p>
+<p>When <em>strategy_id</em> is given (Mode A), the strategy is fetched from the AI
+endpoint and its filters are forwarded to the search request.  The
+<code>market</code> is taken from the strategy response.</p>
+<p>When <em>strategy_id</em> is <code>None</code> (Mode B), <em>conditions</em> must be provided as
+:class:<code>ScreenerCondition</code> objects and <em>market</em> is used directly.</p>
+<p><code>filter_</code> is stripped from every <code>items[].indicators[].key</code> in the
+response before it is returned.</p>
 
 
     </div>
