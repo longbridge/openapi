@@ -59,19 +59,22 @@ impl AsyncScreenerContext {
     }
 
     /// Search / screen securities using a strategy. Returns awaitable.
-    #[pyo3(signature = (market, strategy_id = None, page = 1, size = 20))]
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (market, strategy_id = None, conditions = vec![], show = vec![], page = 0, size = 20))]
     fn screener_search(
         &self,
         py: Python<'_>,
         market: String,
         strategy_id: Option<i64>,
+        conditions: Vec<String>,
+        show: Vec<String>,
         page: u32,
         size: u32,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(ScreenerSearchResponse::from(
-                ctx.screener_search(market, strategy_id, page, size)
+                ctx.screener_search(market, strategy_id, conditions, show, page, size)
                     .await
                     .map_err(ErrorNewType)?,
             ))

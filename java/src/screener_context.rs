@@ -111,7 +111,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextSearc
         async_util::execute(env, callback, async move {
             let resp = context
                 .ctx
-                .screener_search(market, strategy_id, page, size)
+                .screener_search(market, strategy_id, vec![], vec![], page, size)
                 .await?;
             Ok(resp)
         })?;

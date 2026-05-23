@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Screener:** all endpoints migrated to `/v1/quote/ai/screener/*`; `screener_recommend_strategies` and `screener_user_strategies` now require a `market` parameter; `screener_strategy(id)` uses a path parameter instead of a query parameter
+- **Screener:** `screener_strategy` and `screener_indicators` now strip the `filter_` prefix from response keys before returning; `screener_indicators` additionally builds `tech_values` from `tech_indicators`
+- **Screener:** `screener_search` gains `conditions` and `show` parameters; Mode A fetches the strategy via AI endpoint and derives `market` from the response; Mode B accepts `"KEY:MIN:MAX"` condition strings; response `items[].indicators[].key` values have `filter_` stripped; `page` is now 0-indexed and defaults to 0
 
 ## [4.2.0]
 

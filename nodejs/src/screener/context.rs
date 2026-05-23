@@ -60,18 +60,30 @@ impl ScreenerContext {
             .into())
     }
 
-    /// Search / screen securities using a strategy
+    /// Search / screen securities using a strategy or custom conditions.
+    ///
+    /// When `strategyId` is given (Mode A), the strategy is fetched from the AI
+    /// endpoint and its filters drive the search.  The market is taken from the
+    /// strategy response.
+    ///
+    /// When `strategyId` is `null` / `undefined` (Mode B), `conditions` must be
+    /// `"KEY:MIN:MAX"` strings and `market` is used directly.
+    ///
+    /// `filter_` is stripped from every `items[].indicators[].key` in the
+    /// response before it is returned.
     #[napi]
     pub async fn screener_search(
         &self,
         market: String,
         strategy_id: Option<i64>,
+        #[napi(ts_arg_type = "string[]")] conditions: Vec<String>,
+        #[napi(ts_arg_type = "string[]")] show: Vec<String>,
         page: u32,
         size: u32,
     ) -> Result<ScreenerSearchResponse> {
         Ok(self
             .ctx
-            .screener_search(market, strategy_id, page, size)
+            .screener_search(market, strategy_id, conditions, show, page, size)
             .await
             .map_err(ErrorNewType)?
             .into())

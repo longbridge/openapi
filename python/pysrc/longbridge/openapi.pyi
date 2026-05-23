@@ -10586,10 +10586,23 @@ class ScreenerContext:
         self,
         market: str,
         strategy_id: Optional[int] = None,
-        page: int = 1,
+        conditions: List[str] = [],
+        show: List[str] = [],
+        page: int = 0,
         size: int = 20,
     ) -> ScreenerSearchResponse:
-        """Search / screen securities using a strategy."""
+        """Search / screen securities using a strategy or custom conditions.
+
+        When *strategy_id* is given (Mode A), the strategy is fetched from the AI
+        endpoint and its filters are forwarded to the search request.  The
+        ``market`` is taken from the strategy response.
+
+        When *strategy_id* is ``None`` (Mode B), *conditions* must be provided as
+        ``"KEY:MIN:MAX"`` strings and *market* is used directly.
+
+        ``filter_`` is stripped from every ``items[].indicators[].key`` in the
+        response before it is returned.
+        """
         ...
 
     def screener_indicators(self) -> ScreenerIndicatorsResponse:
@@ -10627,10 +10640,24 @@ class AsyncScreenerContext:
         self,
         market: str,
         strategy_id: Optional[int] = None,
-        page: int = 1,
+        conditions: List[str] = [],
+        show: List[str] = [],
+        page: int = 0,
         size: int = 20,
     ) -> Awaitable[ScreenerSearchResponse]:
-        """Search / screen securities using a strategy. Returns awaitable."""
+        """Search / screen securities using a strategy or custom conditions.
+        Returns awaitable.
+
+        When *strategy_id* is given (Mode A), the strategy is fetched from the AI
+        endpoint and its filters are forwarded to the search request.  The
+        ``market`` is taken from the strategy response.
+
+        When *strategy_id* is ``None`` (Mode B), *conditions* must be provided as
+        ``"KEY:MIN:MAX"`` strings and *market* is used directly.
+
+        ``filter_`` is stripped from every ``items[].indicators[].key`` in the
+        response before it is returned.
+        """
         ...
 
     def screener_indicators(self) -> Awaitable[ScreenerIndicatorsResponse]:

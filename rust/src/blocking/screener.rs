@@ -63,11 +63,14 @@ impl ScreenerContextSync {
         &self,
         market: impl Into<String> + Send + 'static,
         strategy_id: Option<i64>,
+        conditions: Vec<String>,
+        show: Vec<String>,
         page: u32,
         size: u32,
     ) -> Result<ScreenerSearchResponse> {
         self.rt.call(move |ctx| async move {
-            ctx.screener_search(market, strategy_id, page, size).await
+            ctx.screener_search(market, strategy_id, conditions, show, page, size)
+                .await
         })
     }
 

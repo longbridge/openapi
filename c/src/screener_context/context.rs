@@ -115,7 +115,7 @@ pub unsafe extern "C" fn lb_screener_context_search(
         let resp: CCow<CScreenerSearchResponseOwned> =
             CCow::new(CScreenerSearchResponseOwned::from(
                 ctx_inner
-                    .screener_search(market, strategy_id, page, size)
+                    .screener_search(market, strategy_id, vec![], vec![], page, size)
                     .await?,
             ));
         Ok(resp)

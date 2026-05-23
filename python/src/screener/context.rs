@@ -47,17 +47,19 @@ impl ScreenerContext {
     }
 
     /// Search / screen securities using a strategy.
-    #[pyo3(signature = (market, strategy_id = None, page = 1, size = 20))]
+    #[pyo3(signature = (market, strategy_id = None, conditions = vec![], show = vec![], page = 0, size = 20))]
     fn screener_search(
         &self,
         market: String,
         strategy_id: Option<i64>,
+        conditions: Vec<String>,
+        show: Vec<String>,
         page: u32,
         size: u32,
     ) -> PyResult<ScreenerSearchResponse> {
         Ok(self
             .ctx
-            .screener_search(market, strategy_id, page, size)
+            .screener_search(market, strategy_id, conditions, show, page, size)
             .map_err(ErrorNewType)?
             .into())
     }
