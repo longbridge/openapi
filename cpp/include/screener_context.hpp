@@ -24,11 +24,13 @@ public:
 
   static ScreenerContext create(const Config& config);
 
-  /// Get recommended built-in screener strategies (raw JSON string)
-  void screener_recommend_strategies(AsyncCallback<ScreenerContext, std::string> callback) const;
+  /// Get preset screener strategies for a given market (raw JSON string)
+  void screener_recommend_strategies(const std::string& market,
+                                     AsyncCallback<ScreenerContext, std::string> callback) const;
 
   /// Get the current user's saved screener strategies (raw JSON string)
-  void screener_user_strategies(AsyncCallback<ScreenerContext, std::string> callback) const;
+  void screener_user_strategies(const std::string& market,
+                                AsyncCallback<ScreenerContext, std::string> callback) const;
 
   /// Get detail for one screener strategy by ID (raw JSON string)
   void screener_strategy(int64_t id, AsyncCallback<ScreenerContext, std::string> callback) const;

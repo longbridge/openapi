@@ -8,8 +8,7 @@ extern "C" {
 const lb_screener_context_t* lb_screener_context_new(const lb_config_t* config);
 void lb_screener_context_retain(const lb_screener_context_t* ctx);
 void lb_screener_context_release(const lb_screener_context_t* ctx);
-void lb_screener_context_recommend_strategies(const lb_screener_context_t*, lb_async_callback_t, void*);
-void lb_screener_context_user_strategies(const lb_screener_context_t*, lb_async_callback_t, void*);
+// Declarations already present in longbridge.h (with market param) — no need to redeclare.
 void lb_screener_context_strategy(const lb_screener_context_t*, int64_t, lb_async_callback_t, void*);
 void lb_screener_context_search(const lb_screener_context_t*, const char*, int64_t, bool, uint32_t, uint32_t, lb_async_callback_t, void*);
 void lb_screener_context_indicators(const lb_screener_context_t*, lb_async_callback_t, void*);
@@ -39,12 +38,12 @@ ScreenerContext ScreenerContext::create(const Config& config) {
   else{(*cb)(AsyncResult<ScreenerContext,std::string>(sctx,std::move(status),nullptr));} \
 }, new AsyncCallback<ScreenerContext,std::string>(callback))
 
-void ScreenerContext::screener_recommend_strategies(AsyncCallback<ScreenerContext, std::string> callback) const {
-  S_JSON(lb_screener_context_recommend_strategies, lb_screener_recommend_strategies_response_t, ctx_);
+void ScreenerContext::screener_recommend_strategies(const std::string& market, AsyncCallback<ScreenerContext, std::string> callback) const {
+  S_JSON(lb_screener_context_recommend_strategies, lb_screener_recommend_strategies_response_t, ctx_, market.c_str());
 }
 
-void ScreenerContext::screener_user_strategies(AsyncCallback<ScreenerContext, std::string> callback) const {
-  S_JSON(lb_screener_context_user_strategies, lb_screener_user_strategies_response_t, ctx_);
+void ScreenerContext::screener_user_strategies(const std::string& market, AsyncCallback<ScreenerContext, std::string> callback) const {
+  S_JSON(lb_screener_context_user_strategies, lb_screener_user_strategies_response_t, ctx_, market.c_str());
 }
 
 void ScreenerContext::screener_strategy(int64_t id, AsyncCallback<ScreenerContext, std::string> callback) const {
