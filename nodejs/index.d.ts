@@ -2067,13 +2067,25 @@ export declare class ScreenerContext {
   /** Create a new `ScreenerContext` */
   static new(config: Config): ScreenerContext
   /** Get recommended built-in screener strategies */
-  screenerRecommendStrategies(): Promise<ScreenerRecommendStrategiesResponse>
+  screenerRecommendStrategies(market: string): Promise<ScreenerRecommendStrategiesResponse>
   /** Get the current user's saved screener strategies */
-  screenerUserStrategies(): Promise<ScreenerUserStrategiesResponse>
+  screenerUserStrategies(market: string): Promise<ScreenerUserStrategiesResponse>
   /** Get detail for one screener strategy by ID */
   screenerStrategy(id: number): Promise<ScreenerStrategyResponse>
-  /** Search / screen securities using a strategy */
-  screenerSearch(market: string, strategyId: number | undefined | null, page: number, size: number): Promise<ScreenerSearchResponse>
+  /**
+   * Search / screen securities using a strategy or custom conditions.
+   *
+   * When `strategyId` is given (Mode A), the strategy is fetched from the AI
+   * endpoint and its filters drive the search.  The market is taken from the
+   * strategy response.
+   *
+   * When `strategyId` is `null` / `undefined` (Mode B), `conditions` must be
+   * `ScreenerCondition` objects and `market` is used directly.
+   *
+   * `filter_` is stripped from every `items[].indicators[].key` in the
+   * response before it is returned.
+   */
+  screenerSearch(market: string, strategyId: number | undefined | null, conditions: Array<ScreenerCondition>, show: Array<string>, page: number, size: number): Promise<ScreenerSearchResponse>
   /** Get all available screener indicator definitions */
   screenerIndicators(): Promise<ScreenerIndicatorsResponse>
 }
@@ -5105,6 +5117,21 @@ export interface ReplaceOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+}
+
+/** A filter condition for screener_search Mode B. */
+export interface ScreenerCondition {
+  /** Indicator key without filter_ prefix, e.g. "pettm", "roe", "macd_day" */
+  key: string
+  /** Lower bound (empty = no lower bound) */
+  min: string
+  /** Upper bound (empty = no upper bound) */
+  max: string
+  /**
+   * Technical indicator params as JSON string (empty object "{}" for
+   * fundamental indicators)
+   */
+  techValues: string
 }
 
 /** Screener indicator definitions response. `data` is a JSON string. */

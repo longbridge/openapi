@@ -105,3 +105,47 @@ impl From<lb::ScreenerIndicatorsResponse> for ScreenerIndicatorsResponse {
         }
     }
 }
+
+// ── ScreenerCondition ─────────────────────────────────────────────
+
+/// A filter condition for screener_search Mode B.
+#[pyclass(get_all, set_all, from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct ScreenerCondition {
+    /// Indicator key without filter_ prefix, e.g. "pettm", "roe", "macd_day"
+    pub key: String,
+    /// Lower bound (empty = no lower bound)
+    pub min: String,
+    /// Upper bound (empty = no upper bound)
+    pub max: String,
+    /// Technical indicator params as JSON string (empty object "{}" for
+    /// fundamental indicators)
+    pub tech_values: String,
+}
+
+#[pymethods]
+impl ScreenerCondition {
+    #[new]
+    #[pyo3(signature = (key, min="", max="", tech_values="{}"))]
+    pub fn new(key: String, min: &str, max: &str, tech_values: &str) -> Self {
+        Self {
+            key,
+            min: min.to_string(),
+            max: max.to_string(),
+            tech_values: tech_values.to_string(),
+        }
+    }
+}
+
+impl From<ScreenerCondition> for longbridge::screener::ScreenerCondition {
+    fn from(v: ScreenerCondition) -> Self {
+        let tv: serde_json::Value =
+            serde_json::from_str(&v.tech_values).unwrap_or(serde_json::json!({}));
+        Self {
+            key: v.key,
+            min: v.min,
+            max: v.max,
+            tech_values: tv,
+        }
+    }
+}

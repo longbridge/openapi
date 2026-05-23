@@ -873,8 +873,12 @@ pub struct OperatingItem {
 pub struct OperatingFinancial {
     /// Ticker code (may be empty)
     pub code: String,
-    /// Raw counter ID (may be empty)
-    pub counter_id: String,
+    /// Symbol in `CODE.MARKET` format (may be empty)
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
     /// Reporting currency
     pub currency: String,
     /// Company name

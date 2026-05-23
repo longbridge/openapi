@@ -335,9 +335,11 @@ public class SdkNative {
         public static native void freeScreenerContext(long context);
 
         public static native void screenerContextRecommendStrategies(long context,
+                        String market,
                         AsyncCallback callback);
 
         public static native void screenerContextUserStrategies(long context,
+                        String market,
                         AsyncCallback callback);
 
         public static native void screenerContextStrategy(long context, Object opts,

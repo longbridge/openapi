@@ -9570,6 +9570,8 @@ class OperatingFinancial:
 
     code: str
     """Ticker code"""
+    symbol: str
+    """Symbol in CODE.MARKET format (e.g. ``AAPL.US``)"""
     currency: str
     """Reporting currency"""
     name: str
@@ -10530,6 +10532,28 @@ class RankListResponse:
 
 # ── ScreenerContext ───────────────────────────────────────────────
 
+class ScreenerCondition:
+    """A filter condition for :meth:`ScreenerContext.screener_search` Mode B."""
+
+    key: str
+    """Indicator key without ``filter_`` prefix, e.g. ``"pettm"``, ``"roe"``, ``"macd_day"``"""
+    min: str
+    """Lower bound (empty string = no lower bound)"""
+    max: str
+    """Upper bound (empty string = no upper bound)"""
+    tech_values: str
+    """Technical indicator params as JSON string. Use ``"{}"`` for fundamental indicators.
+    Example: ``'{"category": "goldenfork", "period": "day"}'``"""
+
+    def __init__(
+        self,
+        key: str,
+        min: str = "",
+        max: str = "",
+        tech_values: str = "{}",
+    ) -> None: ...
+
+
 class ScreenerRecommendStrategiesResponse:
     """Recommended screener strategies response. ``data`` is a Python dict/list from JSON."""
 
@@ -10570,11 +10594,11 @@ class ScreenerContext:
 
     def __init__(self, config: Config) -> None: ...
 
-    def screener_recommend_strategies(self) -> ScreenerRecommendStrategiesResponse:
-        """Get recommended built-in screener strategies."""
+    def screener_recommend_strategies(self, market: str) -> ScreenerRecommendStrategiesResponse:
+        """Get preset built-in screener strategies."""
         ...
 
-    def screener_user_strategies(self) -> ScreenerUserStrategiesResponse:
+    def screener_user_strategies(self, market: str) -> ScreenerUserStrategiesResponse:
         """Get the current user's saved screener strategies."""
         ...
 
@@ -10586,10 +10610,23 @@ class ScreenerContext:
         self,
         market: str,
         strategy_id: Optional[int] = None,
-        page: int = 1,
+        conditions: List["ScreenerCondition"] = [],
+        show: List[str] = [],
+        page: int = 0,
         size: int = 20,
     ) -> ScreenerSearchResponse:
-        """Search / screen securities using a strategy."""
+        """Search / screen securities using a strategy or custom conditions.
+
+        When *strategy_id* is given (Mode A), the strategy is fetched from the AI
+        endpoint and its filters are forwarded to the search request.  The
+        ``market`` is taken from the strategy response.
+
+        When *strategy_id* is ``None`` (Mode B), *conditions* must be provided as
+        :class:`ScreenerCondition` objects and *market* is used directly.
+
+        ``filter_`` is stripped from every ``items[].indicators[].key`` in the
+        response before it is returned.
+        """
         ...
 
     def screener_indicators(self) -> ScreenerIndicatorsResponse:
@@ -10605,12 +10642,14 @@ class AsyncScreenerContext:
 
     def screener_recommend_strategies(
         self,
+        market: str,
     ) -> Awaitable[ScreenerRecommendStrategiesResponse]:
-        """Get recommended built-in screener strategies. Returns awaitable."""
+        """Get preset built-in screener strategies. Returns awaitable."""
         ...
 
     def screener_user_strategies(
         self,
+        market: str,
     ) -> Awaitable[ScreenerUserStrategiesResponse]:
         """Get the current user's saved screener strategies. Returns awaitable."""
         ...
@@ -10625,10 +10664,24 @@ class AsyncScreenerContext:
         self,
         market: str,
         strategy_id: Optional[int] = None,
-        page: int = 1,
+        conditions: List["ScreenerCondition"] = [],
+        show: List[str] = [],
+        page: int = 0,
         size: int = 20,
     ) -> Awaitable[ScreenerSearchResponse]:
-        """Search / screen securities using a strategy. Returns awaitable."""
+        """Search / screen securities using a strategy or custom conditions.
+        Returns awaitable.
+
+        When *strategy_id* is given (Mode A), the strategy is fetched from the AI
+        endpoint and its filters are forwarded to the search request.  The
+        ``market`` is taken from the strategy response.
+
+        When *strategy_id* is ``None`` (Mode B), *conditions* must be provided as
+        :class:`ScreenerCondition` objects and *market* is used directly.
+
+        ``filter_`` is stripped from every ``items[].indicators[].key`` in the
+        response before it is returned.
+        """
         ...
 
     def screener_indicators(self) -> Awaitable[ScreenerIndicatorsResponse]:

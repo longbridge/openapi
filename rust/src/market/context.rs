@@ -391,9 +391,27 @@ impl MarketContext {
     pub async fn rank_categories(&self) -> Result<RankCategoriesResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        let raw: serde_json::Value = self
+        let mut raw: serde_json::Value = self
             .get("/v1/quote/market/rank/categories", Empty {})
             .await?;
+        // Strip the "ib_" prefix from all key fields so callers get clean keys
+        // that can be passed back to rank_list without the prefix.
+        if let Some(tags) = raw["first_tags"].as_array_mut() {
+            for tag in tags.iter_mut() {
+                if let Some(k) = tag["key"].as_str() {
+                    let stripped = k.strip_prefix("ib_").unwrap_or(k).to_string();
+                    tag["key"] = serde_json::Value::String(stripped);
+                }
+                if let Some(subs) = tag["second_tags"].as_array_mut() {
+                    for sub in subs.iter_mut() {
+                        if let Some(sk) = sub["key"].as_str() {
+                            let stripped = sk.strip_prefix("ib_").unwrap_or(sk).to_string();
+                            sub["key"] = serde_json::Value::String(stripped);
+                        }
+                    }
+                }
+            }
+        }
         Ok(RankCategoriesResponse { data: raw })
     }
 
@@ -413,11 +431,18 @@ impl MarketContext {
             delay_bmp: &'static str,
             need_article: &'static str,
         }
+        let key_str = key.into();
+        // Add "ib_" prefix if the caller passed a clean key (without it).
+        let api_key = if key_str.starts_with("ib_") {
+            key_str
+        } else {
+            format!("ib_{key_str}")
+        };
         let raw: serde_json::Value = self
             .get(
                 "/v1/quote/market/rank/list",
                 Query {
-                    key: key.into(),
+                    key: api_key,
                     delay_bmp: "false",
                     need_article: if need_article { "true" } else { "false" },
                 },

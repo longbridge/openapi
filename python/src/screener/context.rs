@@ -21,19 +21,22 @@ impl ScreenerContext {
     }
 
     /// Get recommended built-in screener strategies.
-    fn screener_recommend_strategies(&self) -> PyResult<ScreenerRecommendStrategiesResponse> {
+    fn screener_recommend_strategies(
+        &self,
+        market: String,
+    ) -> PyResult<ScreenerRecommendStrategiesResponse> {
         Ok(self
             .ctx
-            .screener_recommend_strategies()
+            .screener_recommend_strategies(market)
             .map_err(ErrorNewType)?
             .into())
     }
 
     /// Get the current user's saved screener strategies.
-    fn screener_user_strategies(&self) -> PyResult<ScreenerUserStrategiesResponse> {
+    fn screener_user_strategies(&self, market: String) -> PyResult<ScreenerUserStrategiesResponse> {
         Ok(self
             .ctx
-            .screener_user_strategies()
+            .screener_user_strategies(market)
             .map_err(ErrorNewType)?
             .into())
     }
@@ -44,17 +47,21 @@ impl ScreenerContext {
     }
 
     /// Search / screen securities using a strategy.
-    #[pyo3(signature = (market, strategy_id = None, page = 1, size = 20))]
+    #[pyo3(signature = (market, strategy_id = None, conditions = vec![], show = vec![], page = 0, size = 20))]
     fn screener_search(
         &self,
         market: String,
         strategy_id: Option<i64>,
+        conditions: Vec<ScreenerCondition>,
+        show: Vec<String>,
         page: u32,
         size: u32,
     ) -> PyResult<ScreenerSearchResponse> {
+        let lb_conditions: Vec<longbridge::screener::ScreenerCondition> =
+            conditions.into_iter().map(Into::into).collect();
         Ok(self
             .ctx
-            .screener_search(market, strategy_id, page, size)
+            .screener_search(market, strategy_id, lb_conditions, show, page, size)
             .map_err(ErrorNewType)?
             .into())
     }
