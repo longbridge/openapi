@@ -1,0 +1,96 @@
+name: Release NodeJS SDK
+on:
+  push:
+    branches:
+      - release-nodejs
+
+jobs:
+  build-nodejs-sdk:
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - host: ubuntu-24.04
+          - host: ubuntu-24.04-arm
+          - host: macos-15
+          - host: macos-15-intel
+          - host: windows-latest
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        if: ${{ !matrix.settings.docker }}
+        with:
+          node-version: 24
+          check-latest: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        if: ${{ !matrix.settings.docker }}
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.settings.target }}
+
+      - name: Install dependencies
+        working-directory: nodejs
+        run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
+
+      - name: Build
+        if: ${{ matrix.settings.host != 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug
+
+      - name: Build
+        if: ${{ matrix.settings.host == 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug --target aarch64-apple-darwin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.settings.host }}
+          path: nodejs/longbridge.*.node
+
+  publish-nodejs-sdk:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    needs:
+      - build-nodejs-sdk
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update versions
+        run: node ./.github/misc/update_jssdk_version.mjs $(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml)
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          check-latest: true
+      - name: Install napi-rs/cli
+        run: npm install -g @napi-rs/cli
+      - name: Download all artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: ./nodejs/artifacts
+          pattern: bindings-*
+          merge-multiple: true
+      - name: Move artifacts
+        run: napi artifacts
+        working-directory: ./nodejs
+      - name: List packages
+        run: ls -R ./npm
+        shell: bash
+        working-directory: ./nodejs
+      - name: Publish
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          npm publish --access public
+        working-directory: ./nodejs
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
