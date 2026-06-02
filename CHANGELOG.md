@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.2]
+
+### Fixed
+
+- **All languages:** `CalendarEventsResponse` now exposes `next_date` cursor — callers can pass it as `start` (with the same `end`) to fetch the next page of `/v1/quote/finance_calendar` results
+- **All languages:** `CalendarEventInfo.symbol` now returns standard symbol format (e.g. `CRM.US`) instead of raw `counter_id` format (e.g. `ST/US/CRM`)
+
 ## [4.2.1]
 
 ### Changed

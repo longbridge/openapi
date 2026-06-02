@@ -48,6 +48,9 @@ impl CalendarContext {
 
     /// Get financial calendar events.
     ///
+    /// The endpoint is paginated via `next_date`. When the returned
+    /// `next_date` is non-empty, pass it as `start` to fetch the next page.
+    ///
     /// Path: `GET /v1/quote/finance_calendar`
     pub async fn finance_calendar(
         &self,
