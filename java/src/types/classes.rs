@@ -1261,7 +1261,8 @@ impl_java_class!(
     [
         date,
         #[java(objarray)]
-        list
+        list,
+        next_date
     ]
 );
 
