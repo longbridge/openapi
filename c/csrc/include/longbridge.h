@@ -7110,6 +7110,10 @@ typedef struct lb_calendar_events_response_t {
    * Number of elements in the `list` array.
    */
   uintptr_t num_list;
+  /**
+   * Pagination cursor; pass as start to fetch the next page, empty when there are no more pages.
+   */
+  const char *next_date;
 } lb_calendar_events_response_t;
 
 /**

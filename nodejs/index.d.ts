@@ -3385,6 +3385,8 @@ export interface CalendarEventsResponse {
   date: string
   /** Per-day event groups */
   list: Array<CalendarDateGroup>
+  /** Pagination cursor; pass as start to fetch the next page, empty when there are no more pages */
+  nextDate: string
 }
 
 export declare const enum CashFlowDirection {

@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
-use std::collections::HashSet;
-
 use longbridge_httpcli::{HttpClient, Json, Method};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{Config, Result, calendar::types::*};
@@ -50,8 +48,8 @@ impl CalendarContext {
 
     /// Get financial calendar events.
     ///
-    /// The endpoint is paginated via `next_date`; this method follows the
-    /// cursor automatically and returns the complete merged result.
+    /// The endpoint is paginated via `next_date`. When the returned
+    /// `next_date` is non-empty, pass it as `start` to fetch the next page.
     ///
     /// Path: `GET /v1/quote/finance_calendar`
     pub async fn finance_calendar(
@@ -71,7 +69,6 @@ impl CalendarContext {
             CalendarCategory::Meeting => "meeting",
             CalendarCategory::Merge => "merge",
         };
-
         #[derive(Serialize)]
         struct Query {
             date: String,
@@ -81,61 +78,20 @@ impl CalendarContext {
             #[serde(rename = "markets[]", skip_serializing_if = "Option::is_none")]
             markets: Option<String>,
         }
-
-        // Internal page type that captures the pagination cursor.
-        #[derive(Deserialize)]
-        struct Page {
-            date: String,
-            #[serde(default)]
-            list: Vec<CalendarDateGroup>,
-            #[serde(default)]
-            next_date: String,
-        }
-
-        let end = end.into();
-        let mut cursor = start.into();
-        let mut seen: HashSet<String> = HashSet::new();
-        let mut first_date = String::new();
-        let mut all_groups: Vec<CalendarDateGroup> = Vec::new();
-
-        loop {
-            let page = self
-                .0
-                .http_cli
-                .request(Method::GET, "/v1/quote/finance_calendar")
-                .query_params(Query {
-                    date: cursor,
-                    date_end: end.clone(),
-                    types: cat_str,
-                    markets: market.clone(),
-                })
-                .response::<Json<Page>>()
-                .send()
-                .with_subscriber(self.0.log_subscriber.clone())
-                .await?
-                .0;
-
-            if first_date.is_empty() {
-                first_date = page.date;
-            }
-
-            for mut grp in page.list {
-                grp.infos.retain(|info| seen.insert(info.id.clone()));
-                if !grp.infos.is_empty() {
-                    grp.count = grp.infos.len() as i32;
-                    all_groups.push(grp);
-                }
-            }
-
-            if page.next_date.is_empty() {
-                break;
-            }
-            cursor = page.next_date;
-        }
-
-        Ok(CalendarEventsResponse {
-            date: first_date,
-            list: all_groups,
-        })
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/quote/finance_calendar")
+            .query_params(Query {
+                date: start.into(),
+                date_end: end.into(),
+                types: cat_str,
+                markets: market,
+            })
+            .response::<Json<CalendarEventsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 }

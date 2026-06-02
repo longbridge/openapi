@@ -12,6 +12,9 @@ pub struct CalendarEventsResponse {
     pub date: String,
     /// Per-day event groups
     pub list: Vec<CalendarDateGroup>,
+    /// Pagination cursor; pass as `start` to fetch the next page, empty when there are no more pages
+    #[serde(default)]
+    pub next_date: String,
 }
 
 /// Events for one calendar date
