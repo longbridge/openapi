@@ -198,7 +198,8 @@ pub struct CCalendarEventsResponse {
     pub list: *const CCalendarDateGroup,
     /// Number of elements in the `list` array.
     pub num_list: usize,
-    /// Pagination cursor; pass as start to fetch the next page, empty when there are no more pages.
+    /// Pagination cursor; pass as start to fetch the next page, empty when
+    /// there are no more pages.
     pub next_date: *const c_char,
 }
 pub(crate) struct CCalendarEventsResponseOwned {
