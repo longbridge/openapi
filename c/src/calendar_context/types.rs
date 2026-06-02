@@ -198,16 +198,21 @@ pub struct CCalendarEventsResponse {
     pub list: *const CCalendarDateGroup,
     /// Number of elements in the `list` array.
     pub num_list: usize,
+    /// Pagination cursor; pass as start to fetch the next page, empty when
+    /// there are no more pages.
+    pub next_date: *const c_char,
 }
 pub(crate) struct CCalendarEventsResponseOwned {
     date: CString,
     list: CVec<CCalendarDateGroupOwned>,
+    next_date: CString,
 }
 impl From<CalendarEventsResponse> for CCalendarEventsResponseOwned {
     fn from(v: CalendarEventsResponse) -> Self {
         Self {
             date: v.date.into(),
             list: v.list.into(),
+            next_date: v.next_date.into(),
         }
     }
 }
@@ -218,6 +223,7 @@ impl ToFFI for CCalendarEventsResponseOwned {
             date: self.date.to_ffi_type(),
             list: self.list.to_ffi_type(),
             num_list: self.list.len(),
+            next_date: self.next_date.to_ffi_type(),
         }
     }
 }

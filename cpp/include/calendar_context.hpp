@@ -26,7 +26,8 @@ struct CalendarEventInfo { std::string symbol; std::string market; std::string c
 /// Calendar events grouped by date.
 struct CalendarDateGroup { std::string date; int32_t count; std::vector<CalendarEventInfo> infos; };
 /// Response for finance_calendar — events grouped by date within the requested range.
-struct CalendarEventsResponse { std::string date; std::vector<CalendarDateGroup> list; };
+/// Response for finance_calendar — events grouped by date within the requested range.
+struct CalendarEventsResponse { std::string date; std::vector<CalendarDateGroup> list; std::string next_date; };
 
 /// Financial calendar context — earnings, dividends, splits, IPOs, macro data.
 class CalendarContext {

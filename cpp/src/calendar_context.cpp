@@ -29,6 +29,7 @@ void CalendarContext::finance_calendar(CalendarCategory category, const std::str
         auto* r = (const lb_calendar_events_response_t*)res->data;
         CalendarEventsResponse resp;
         resp.date = r->date;
+        resp.next_date = r->next_date ? r->next_date : "";
         for (size_t i = 0; i < r->num_list; ++i) {
           CalendarDateGroup grp; grp.date = r->list[i].date; grp.count = r->list[i].count;
           for (size_t j = 0; j < r->list[i].num_infos; ++j) {

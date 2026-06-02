@@ -10759,6 +10759,8 @@ class CalendarEventsResponse:
     """Start date of the query window"""
     list: list[CalendarDateGroup]
     """Per-day event groups"""
+    next_date: str
+    """Pagination cursor; pass as start to fetch the next page, empty when there are no more pages"""
 
 
 class CalendarCategory:
