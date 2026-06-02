@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['broker_1766',['BROKER',['../classlongbridge_1_1quote_1_1_sub_flags.html#a50e96fd6c5dcb4204143132f61d461f0',1,'longbridge::quote::SubFlags']]],
-  ['broker_5fholding_1767',['broker_holding',['../classlongbridge_1_1market_1_1_market_context.html#a4e744a33dbd01a25612de792512c33e6',1,'longbridge::market::MarketContext']]],
-  ['broker_5fholding_5fdaily_1768',['broker_holding_daily',['../classlongbridge_1_1market_1_1_market_context.html#ad8727b81d40f5e47aed557ee61fce8e4',1,'longbridge::market::MarketContext']]],
-  ['broker_5fholding_5fdetail_1769',['broker_holding_detail',['../classlongbridge_1_1market_1_1_market_context.html#a69d465e1672ef29a569ea72ac7f2180e',1,'longbridge::market::MarketContext']]],
-  ['brokers_1770',['brokers',['../classlongbridge_1_1quote_1_1_quote_context.html#af818331256982c8132844bc0f38183fb',1,'longbridge::quote::QuoteContext']]],
-  ['build_1771',['build',['../classlongbridge_1_1_o_auth_builder.html#a637a26b824300d839c2fdf116ec633d9',1,'longbridge::OAuthBuilder']]],
-  ['business_5fsegments_1772',['business_segments',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#a2fa0b3866fefd946eedf54bebf6fa69f',1,'longbridge::fundamental::FundamentalContext']]],
-  ['business_5fsegments_5fhistory_1773',['business_segments_history',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#ab228f4beeec0c5ea05941331f51df31c',1,'longbridge::fundamental::FundamentalContext']]],
-  ['buyback_1774',['buyback',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#a9cda4a79b0e8c5f5f527aee5f88addf0',1,'longbridge::fundamental::FundamentalContext']]]
+  ['broker_1768',['BROKER',['../classlongbridge_1_1quote_1_1_sub_flags.html#a50e96fd6c5dcb4204143132f61d461f0',1,'longbridge::quote::SubFlags']]],
+  ['broker_5fholding_1769',['broker_holding',['../classlongbridge_1_1market_1_1_market_context.html#a4e744a33dbd01a25612de792512c33e6',1,'longbridge::market::MarketContext']]],
+  ['broker_5fholding_5fdaily_1770',['broker_holding_daily',['../classlongbridge_1_1market_1_1_market_context.html#ad8727b81d40f5e47aed557ee61fce8e4',1,'longbridge::market::MarketContext']]],
+  ['broker_5fholding_5fdetail_1771',['broker_holding_detail',['../classlongbridge_1_1market_1_1_market_context.html#a69d465e1672ef29a569ea72ac7f2180e',1,'longbridge::market::MarketContext']]],
+  ['brokers_1772',['brokers',['../classlongbridge_1_1quote_1_1_quote_context.html#af818331256982c8132844bc0f38183fb',1,'longbridge::quote::QuoteContext']]],
+  ['build_1773',['build',['../classlongbridge_1_1_o_auth_builder.html#a637a26b824300d839c2fdf116ec633d9',1,'longbridge::OAuthBuilder']]],
+  ['business_5fsegments_1774',['business_segments',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#a2fa0b3866fefd946eedf54bebf6fa69f',1,'longbridge::fundamental::FundamentalContext']]],
+  ['business_5fsegments_5fhistory_1775',['business_segments_history',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#ab228f4beeec0c5ea05941331f51df31c',1,'longbridge::fundamental::FundamentalContext']]],
+  ['buyback_1776',['buyback',['../classlongbridge_1_1fundamental_1_1_fundamental_context.html#a9cda4a79b0e8c5f5f527aee5f88addf0',1,'longbridge::fundamental::FundamentalContext']]]
 ];
