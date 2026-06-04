@@ -280,4 +280,14 @@ impl FundamentalContextSync {
                 .await
         })
     }
+
+    /// Get ETF asset allocation (holdings / regional / asset class /
+    /// industry)
+    pub fn etf_asset_allocation(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<AssetAllocationResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.etf_asset_allocation(symbol).await })
+    }
 }

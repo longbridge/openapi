@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **All languages:** `QuoteContext` gains `etf_asset_allocation(symbol)` — queries `GET /v1/quote/etf-asset-allocation` for ETF asset allocation grouped by element type (`Holdings` / `Regional` / `AssetClass` / `Industry`); returns `AssetAllocationResponse` with report date, position ratios, localized names, and per-holding detail
+- **All languages:** `FundamentalContext` gains `etf_asset_allocation(symbol)` — queries `GET /v1/quote/etf-asset-allocation` for ETF asset allocation grouped by element type (`Holdings` / `Regional` / `AssetClass` / `Industry`); returns `AssetAllocationResponse` with report date, position ratios, localized names, and per-holding detail
 
 ## [4.2.2]
 

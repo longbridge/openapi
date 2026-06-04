@@ -1347,73 +1347,6 @@ struct OptionVolumeDaily
   std::vector<OptionVolumeDailyStat> stats;
 };
 
-/// ETF asset allocation element type
-enum class ElementType
-{
-  /// Unknown
-  Unknown,
-  /// Holdings
-  Holdings,
-  /// Regional
-  Regional,
-  /// Asset class
-  AssetClass,
-  /// Industry
-  Industry,
-};
-
-/// Holding detail of an ETF asset allocation element (holdings only)
-struct HoldingDetail
-{
-  /// Industry ID
-  std::string industry_id;
-  /// Industry name
-  std::string industry_name;
-  /// Index counter ID (e.g. `BK/US/CP99000`)
-  std::string index;
-  /// Index name
-  std::string index_name;
-  /// Holding type (e.g. `E` for stock)
-  std::string holding_type;
-  /// Holding type name
-  std::string holding_type_name;
-};
-
-/// One element of an ETF asset allocation group
-struct AssetAllocationItem
-{
-  /// Element name
-  std::string name;
-  /// Security code (holdings only, e.g. `NVDA`)
-  std::string code;
-  /// Position ratio (e.g. `0.0861114`)
-  std::string position_ratio;
-  /// Security symbol (holdings only, e.g. `NVDA.US`)
-  std::string symbol;
-  /// Localized names (locale → name)
-  std::map<std::string, std::string> name_locales;
-  /// Holding detail (holdings only)
-  std::optional<HoldingDetail> holding_detail;
-};
-
-/// One ETF asset allocation group (grouped by element type)
-struct AssetAllocationGroup
-{
-  /// Report date (e.g. `20260601`)
-  std::string report_date;
-  /// Element type of this group
-  ElementType asset_type;
-  /// Elements
-  std::vector<AssetAllocationItem> lists;
-};
-
-/// ETF asset allocation response
-struct AssetAllocationResponse
-{
-  /// Asset allocation groups
-  std::vector<AssetAllocationGroup> info;
-};
-
 } // namespace quote
 
 namespace trade {
@@ -3339,6 +3272,73 @@ struct ValuationComparisonItem
 struct ValuationComparisonResponse
 {
   std::vector<ValuationComparisonItem> list;
+};
+
+/// ETF asset allocation element type
+enum class ElementType
+{
+  /// Unknown
+  Unknown,
+  /// Holdings
+  Holdings,
+  /// Regional
+  Regional,
+  /// Asset class
+  AssetClass,
+  /// Industry
+  Industry,
+};
+
+/// Holding detail of an ETF asset allocation element (holdings only)
+struct HoldingDetail
+{
+  /// Industry ID
+  std::string industry_id;
+  /// Industry name
+  std::string industry_name;
+  /// Index counter ID (e.g. `BK/US/CP99000`)
+  std::string index;
+  /// Index name
+  std::string index_name;
+  /// Holding type (e.g. `E` for stock)
+  std::string holding_type;
+  /// Holding type name
+  std::string holding_type_name;
+};
+
+/// One element of an ETF asset allocation group
+struct AssetAllocationItem
+{
+  /// Element name
+  std::string name;
+  /// Security code (holdings only, e.g. `NVDA`)
+  std::string code;
+  /// Position ratio (e.g. `0.0861114`)
+  std::string position_ratio;
+  /// Security symbol (holdings only, e.g. `NVDA.US`)
+  std::string symbol;
+  /// Localized names (locale → name)
+  std::map<std::string, std::string> name_locales;
+  /// Holding detail (holdings only)
+  std::optional<HoldingDetail> holding_detail;
+};
+
+/// One ETF asset allocation group (grouped by element type)
+struct AssetAllocationGroup
+{
+  /// Report date (e.g. `20260601`)
+  std::string report_date;
+  /// Element type of this group
+  ElementType asset_type;
+  /// Elements
+  std::vector<AssetAllocationItem> lists;
+};
+
+/// ETF asset allocation response
+struct AssetAllocationResponse
+{
+  /// Asset allocation groups
+  std::vector<AssetAllocationGroup> info;
 };
 
 } // namespace fundamental

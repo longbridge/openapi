@@ -632,26 +632,3 @@ pub enum CGranularity {
     #[c(remote = "Monthly")]
     GranularityMonthly,
 }
-
-/// ETF asset allocation element type
-#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
-#[c(remote = "longbridge::quote::ElementType")]
-#[allow(clippy::enum_variant_names)]
-#[repr(C)]
-pub enum CElementType {
-    /// Unknown
-    #[c(remote = "Unknown")]
-    ElementTypeUnknown,
-    /// Holdings
-    #[c(remote = "Holdings")]
-    ElementTypeHoldings,
-    /// Regional
-    #[c(remote = "Regional")]
-    ElementTypeRegional,
-    /// Asset class
-    #[c(remote = "AssetClass")]
-    ElementTypeAssetClass,
-    /// Industry
-    #[c(remote = "Industry")]
-    ElementTypeIndustry,
-}

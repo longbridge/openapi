@@ -169,5 +169,19 @@ void FundamentalContext::valuation_comparison(const std::string& s, const std::s
 
 #undef F_JSON_STRUCT
 
+void FundamentalContext::etf_asset_allocation(const std::string& symbol, AsyncCallback<FundamentalContext, AssetAllocationResponse> callback) const {
+  lb_fundamental_context_etf_asset_allocation(ctx_, symbol.c_str(),
+    [](auto res) {
+      auto cb = callback::get_async_callback<FundamentalContext, AssetAllocationResponse>(res->userdata);
+      FundamentalContext fctx((const lb_fundamental_context_t*)res->ctx); Status status(res->error);
+      if (status) {
+        auto r = convert::convert((const lb_asset_allocation_response_t*)res->data);
+        (*cb)(AsyncResult<FundamentalContext, AssetAllocationResponse>(fctx, std::move(status), &r));
+      } else {
+        (*cb)(AsyncResult<FundamentalContext, AssetAllocationResponse>(fctx, std::move(status), nullptr));
+      }
+    }, new AsyncCallback<FundamentalContext, AssetAllocationResponse>(callback));
+}
+
 } // namespace fundamental
 } // namespace longbridge

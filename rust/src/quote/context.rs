@@ -14,10 +14,10 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Error, Language, Market, Result,
     quote::{
-        AdjustType, AssetAllocationResponse, CalcIndex, Candlestick, CapitalDistributionResponse,
-        CapitalFlowLine, FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo,
-        MarketTemperature, MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily,
-        OptionVolumeStats, ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
+        AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+        FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily, OptionVolumeStats,
+        ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
         RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
         SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
         ShortPositionsItem, ShortPositionsResponse, ShortTradesItem, ShortTradesResponse,
@@ -2197,35 +2197,6 @@ impl QuoteContext {
             .await?;
 
         Ok(())
-    }
-
-    // ── etf_asset_allocation ──────────────────────────────────────
-
-    /// Get ETF asset allocation (holdings / regional / asset class /
-    /// industry).
-    ///
-    /// Path: `GET /v1/quote/etf-asset-allocation`
-    pub async fn etf_asset_allocation(
-        &self,
-        symbol: impl Into<String>,
-    ) -> Result<AssetAllocationResponse> {
-        use crate::utils::counter::symbol_to_counter_id;
-        #[derive(serde::Serialize)]
-        struct Query {
-            counter_id: String,
-        }
-        let resp = self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/quote/etf-asset-allocation")
-            .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
-            })
-            .response::<Json<AssetAllocationResponse>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(resp.0)
     }
 }
 
