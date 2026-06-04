@@ -71,11 +71,6 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::OptionVolumeStats>()?;
     parent.add_class::<types::OptionVolumeDaily>()?;
     parent.add_class::<types::OptionVolumeDailyStat>()?;
-    parent.add_class::<types::ElementType>()?;
-    parent.add_class::<types::HoldingDetail>()?;
-    parent.add_class::<types::AssetAllocationItem>()?;
-    parent.add_class::<types::AssetAllocationGroup>()?;
-    parent.add_class::<types::AssetAllocationResponse>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     parent.add_class::<context_async::AsyncQuoteContext>()?;

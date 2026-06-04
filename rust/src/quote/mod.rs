@@ -17,9 +17,6 @@ pub use push_types::{
 };
 pub use sub_flags::SubFlags;
 pub use types::{
-    AssetAllocationGroup,
-    AssetAllocationItem,
-    AssetAllocationResponse,
     Brokers,
     CalcIndex,
     Candlestick,
@@ -28,13 +25,11 @@ pub use types::{
     CapitalFlowLine,
     Depth,
     DerivativeType,
-    ElementType,
     FilingItem,
     FilterWarrantExpiryDate,
     FilterWarrantInOutBoundsType,
     Granularity,
     HistoryMarketTemperatureResponse,
-    HoldingDetail,
     IntradayLine,
     IssuerInfo,
     MarketTemperature,

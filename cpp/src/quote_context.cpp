@@ -1759,30 +1759,5 @@ QuoteContext::option_volume_daily(const std::string& symbol,
     new AsyncCallback<QuoteContext, OptionVolumeDaily>(callback));
 }
 
-void
-QuoteContext::etf_asset_allocation(
-  const std::string& symbol,
-  AsyncCallback<QuoteContext, AssetAllocationResponse> callback) const
-{
-  lb_quote_context_etf_asset_allocation(
-    ctx_,
-    symbol.c_str(),
-    [](auto res) {
-      auto callback_ptr =
-        callback::get_async_callback<QuoteContext, AssetAllocationResponse>(res->userdata);
-      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
-      Status status(res->error);
-      if (status) {
-        auto value = convert::convert((const lb_asset_allocation_response_t*)res->data);
-        (*callback_ptr)(
-          AsyncResult<QuoteContext, AssetAllocationResponse>(ctx, std::move(status), &value));
-      } else {
-        (*callback_ptr)(
-          AsyncResult<QuoteContext, AssetAllocationResponse>(ctx, std::move(status), nullptr));
-      }
-    },
-    new AsyncCallback<QuoteContext, AssetAllocationResponse>(callback));
-}
-
 } // namespace quote
 } // namespace longbridge

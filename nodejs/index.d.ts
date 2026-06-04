@@ -613,6 +613,11 @@ export declare class FundamentalContext {
   shareholderDetail(symbol: string, objectId: number): Promise<ShareholderDetailResponse>
   /** Get valuation comparison between a security and optional peers */
   valuationComparison(symbol: string, currency: string, comparisonSymbols?: Array<string> | undefined | null): Promise<ValuationComparisonResponse>
+  /**
+   * Get ETF asset allocation (holdings / regional / asset class /
+   * industry)
+   */
+  etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
 }
 
 /** Fund position */
@@ -2021,11 +2026,6 @@ export declare class QuoteContext {
   optionVolume(symbol: string): Promise<OptionVolumeStats>
   /** Get daily historical option volume */
   optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
-  /**
-   * Get ETF asset allocation (holdings / regional / asset class /
-   * industry)
-   */
-  etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
 }
 
 export declare class QuotePackageDetail {
