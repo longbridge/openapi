@@ -3178,6 +3178,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.FundamentalContext.valuation_comparison">valuation_comparison</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.FundamentalContext.etf_asset_allocation">etf_asset_allocation</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.ShareholderTopResponse">ShareholderTopResponse</a>
@@ -3241,6 +3243,68 @@
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.ValuationComparisonResponse">ValuationComparisonResponse</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ValuationComparisonResponse.list">list</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.ElementType">ElementType</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ElementType.Unknown">Unknown</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ElementType.Holdings">Holdings</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ElementType.Regional">Regional</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ElementType.AssetClass">AssetClass</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ElementType.Industry">Industry</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.HoldingDetail">HoldingDetail</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HoldingDetail.industry_id">industry_id</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HoldingDetail.industry_name">industry_name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HoldingDetail.index">index</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HoldingDetail.index_name">index_name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HoldingDetail.holding_type">holding_type</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HoldingDetail.holding_type_name">holding_type_name</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.AssetAllocationItem">AssetAllocationItem</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationItem.name">name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationItem.code">code</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationItem.position_ratio">position_ratio</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationItem.symbol">symbol</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationItem.name_locales">name_locales</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationItem.holding_detail">holding_detail</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.AssetAllocationGroup">AssetAllocationGroup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationGroup.report_date">report_date</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationGroup.asset_type">asset_type</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationGroup.lists">lists</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.AssetAllocationResponse">AssetAllocationResponse</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationResponse.info">info</a>
     </li>
         </ul>
     </li>
@@ -57101,6 +57165,72 @@ for d in dividends.list:
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.FundamentalContext.etf_asset_allocation" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">etf_asset_allocation</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">etf_asset_allocation(symbol: str) -&gt; AssetAllocationResponse</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get ETF asset allocation (holdings / regional / asset class / industry).</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>symbol</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>ETF security code (e.g. <code>"QQQ.US"</code>)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="AssetAllocationResponse (longbridge.openapi.AssetAllocationResponse)" href="#longbridge.openapi.AssetAllocationResponse">AssetAllocationResponse</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>AssetAllocationResponse</code> with allocation groups</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
 
 
   </div>
@@ -57829,6 +57959,844 @@ for d in dividends.list:
     <div class="doc doc-contents ">
 
         <p>Valuation comparison items</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.ElementType" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ElementType</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>ETF asset allocation element type.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.ElementType.Unknown" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Unknown</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ElementType (longbridge.openapi.ElementType)" href="#longbridge.openapi.ElementType">ElementType</a></code></p>
+
+
+
+        <p>Unknown</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.ElementType.Holdings" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Holdings</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ElementType (longbridge.openapi.ElementType)" href="#longbridge.openapi.ElementType">ElementType</a></code></p>
+
+
+
+        <p>Holdings</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.ElementType.Regional" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Regional</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ElementType (longbridge.openapi.ElementType)" href="#longbridge.openapi.ElementType">ElementType</a></code></p>
+
+
+
+        <p>Regional</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.ElementType.AssetClass" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">AssetClass</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ElementType (longbridge.openapi.ElementType)" href="#longbridge.openapi.ElementType">ElementType</a></code></p>
+
+
+
+        <p>Asset class</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.ElementType.Industry" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Industry</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ElementType (longbridge.openapi.ElementType)" href="#longbridge.openapi.ElementType">ElementType</a></code></p>
+
+
+
+        <p>Industry</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.HoldingDetail" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">HoldingDetail</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Holding detail of an ETF asset allocation element (holdings only).</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HoldingDetail.industry_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">industry_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">industry_id: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Industry ID</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HoldingDetail.industry_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">industry_name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">industry_name: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Industry name</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HoldingDetail.index" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">index</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">index: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Index counter ID (e.g. <code>BK/US/CP99000</code>)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HoldingDetail.index_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">index_name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">index_name: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Index name</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HoldingDetail.holding_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">holding_type</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">holding_type: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Holding type (e.g. <code>E</code> for stock)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HoldingDetail.holding_type_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">holding_type_name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">holding_type_name: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Holding type name</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.AssetAllocationItem" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">AssetAllocationItem</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>One element of an ETF asset allocation group.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationItem.name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">name: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Element name</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationItem.code" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">code</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">code: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Security code (holdings only, e.g. <code>NVDA</code>)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationItem.position_ratio" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">position_ratio</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">position_ratio: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Position ratio (e.g. <code>0.0861114</code>)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationItem.symbol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">symbol</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Security symbol (holdings only, e.g. <code>NVDA.US</code>)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationItem.name_locales" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">name_locales</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">name_locales: dict[str, str]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Localized names (locale → name)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationItem.holding_detail" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">holding_detail</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">holding_detail: Optional[HoldingDetail]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Holding detail (holdings only)</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.AssetAllocationGroup" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">AssetAllocationGroup</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>One ETF asset allocation group (grouped by element type).</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationGroup.report_date" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">report_date</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">report_date: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Report date (e.g. <code>20260601</code>)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationGroup.asset_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">asset_type</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">asset_type: Type[ElementType]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Element type of this group</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationGroup.lists" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">lists</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">lists: list[AssetAllocationItem]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Elements</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.AssetAllocationResponse" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">AssetAllocationResponse</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>ETF asset allocation response.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AssetAllocationResponse.info" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">info</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">info: list[AssetAllocationGroup]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Asset allocation groups</p>
 
     </div>
 

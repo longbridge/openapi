@@ -290,6 +290,18 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_valuation_comparison_response.html">ValuationComparisonResponse</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Valuation comparison response.  <a href="structlongbridge_1_1fundamental_1_1_valuation_comparison_response.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_holding_detail.html">HoldingDetail</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holding detail of an ETF asset allocation element (holdings only)  <a href="structlongbridge_1_1fundamental_1_1_holding_detail.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_item.html">AssetAllocationItem</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One element of an ETF asset allocation group.  <a href="structlongbridge_1_1fundamental_1_1_asset_allocation_item.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_group.html">AssetAllocationGroup</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One ETF asset allocation group (grouped by element type)  <a href="structlongbridge_1_1fundamental_1_1_asset_allocation_group.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_response.html">AssetAllocationResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETF asset allocation response.  <a href="structlongbridge_1_1fundamental_1_1_asset_allocation_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -323,8 +335,55 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a38917927db20dc1c4378f58271dde063"><td class="mdescLeft">&#160;</td><td class="mdescRight">Institutional analyst recommendation.  <a href="namespacelongbridge_1_1fundamental.html#a38917927db20dc1c4378f58271dde063">More...</a><br /></td></tr>
 <tr class="separator:a38917927db20dc1c4378f58271dde063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab99ed6944f47517aeb3b3d082700fbf"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbf">ElementType</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa063215beb567e666b3c937ae83163e92">Holdings</a>
+, <a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa9c1c6794d4b1fb6ed518d57daa87b628">Regional</a>
+, <a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfadccdd6982f285e01574e17e5c4c0ba2b">AssetClass</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa4fd0a37b0a02153b23bbb61d7915a429">Industry</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:aab99ed6944f47517aeb3b3d082700fbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETF asset allocation element type.  <a href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbf">More...</a><br /></td></tr>
+<tr class="separator:aab99ed6944f47517aeb3b3d082700fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="aab99ed6944f47517aeb3b3d082700fbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab99ed6944f47517aeb3b3d082700fbf">&#9670;&nbsp;</a></span>ElementType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbf">longbridge::fundamental::ElementType</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ETF asset allocation element type. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aab99ed6944f47517aeb3b3d082700fbfa88183b946cc5f0e8c96b2e66e1c74a7e"></a>Unknown&#160;</td><td class="fielddoc"><p>Unknown. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aab99ed6944f47517aeb3b3d082700fbfa063215beb567e666b3c937ae83163e92"></a>Holdings&#160;</td><td class="fielddoc"><p>Holdings. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aab99ed6944f47517aeb3b3d082700fbfa9c1c6794d4b1fb6ed518d57daa87b628"></a>Regional&#160;</td><td class="fielddoc"><p>Regional. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aab99ed6944f47517aeb3b3d082700fbfadccdd6982f285e01574e17e5c4c0ba2b"></a>AssetClass&#160;</td><td class="fielddoc"><p>Asset class. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aab99ed6944f47517aeb3b3d082700fbfa4fd0a37b0a02153b23bbb61d7915a429"></a>Industry&#160;</td><td class="fielddoc"><p>Industry. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
 <a id="ad2f8b2d896df58eb16ff5abb6d7931ff"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad2f8b2d896df58eb16ff5abb6d7931ff">&#9670;&nbsp;</a></span>FinancialReportKind</h2>
 

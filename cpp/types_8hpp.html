@@ -74,6 +74,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="decimal_8hpp_source.html">decimal.hpp</a>&quot;</code><br />
+<code>#include &lt;map&gt;</code><br />
 <code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 </div>
@@ -623,6 +624,18 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_valuation_comparison_response.html">longbridge::fundamental::ValuationComparisonResponse</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Valuation comparison response.  <a href="structlongbridge_1_1fundamental_1_1_valuation_comparison_response.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_holding_detail.html">longbridge::fundamental::HoldingDetail</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holding detail of an ETF asset allocation element (holdings only)  <a href="structlongbridge_1_1fundamental_1_1_holding_detail.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_item.html">longbridge::fundamental::AssetAllocationItem</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One element of an ETF asset allocation group.  <a href="structlongbridge_1_1fundamental_1_1_asset_allocation_item.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_group.html">longbridge::fundamental::AssetAllocationGroup</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One ETF asset allocation group (grouped by element type)  <a href="structlongbridge_1_1fundamental_1_1_asset_allocation_group.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_response.html">longbridge::fundamental::AssetAllocationResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETF asset allocation response.  <a href="structlongbridge_1_1fundamental_1_1_asset_allocation_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1alert_1_1_alert_item.html">longbridge::alert::AlertItem</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One price alert rule attached to a security.  <a href="structlongbridge_1_1alert_1_1_alert_item.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1138,6 +1151,17 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a38917927db20dc1c4378f58271dde063"><td class="mdescLeft">&#160;</td><td class="mdescRight">Institutional analyst recommendation.  <a href="namespacelongbridge_1_1fundamental.html#a38917927db20dc1c4378f58271dde063">More...</a><br /></td></tr>
 <tr class="separator:a38917927db20dc1c4378f58271dde063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab99ed6944f47517aeb3b3d082700fbf"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbf">longbridge::fundamental::ElementType</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::fundamental::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa063215beb567e666b3c937ae83163e92">longbridge::fundamental::Holdings</a>
+, <a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa9c1c6794d4b1fb6ed518d57daa87b628">longbridge::fundamental::Regional</a>
+, <a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfadccdd6982f285e01574e17e5c4c0ba2b">longbridge::fundamental::AssetClass</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbfa4fd0a37b0a02153b23bbb61d7915a429">longbridge::fundamental::Industry</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:aab99ed6944f47517aeb3b3d082700fbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETF asset allocation element type.  <a href="namespacelongbridge_1_1fundamental.html#aab99ed6944f47517aeb3b3d082700fbf">More...</a><br /></td></tr>
+<tr class="separator:aab99ed6944f47517aeb3b3d082700fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af19dcd9f79d3e3fbfe3ef6b90fb9a154"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1dca.html#af19dcd9f79d3e3fbfe3ef6b90fb9a154">longbridge::dca::DCAFrequency</a> { <a class="el" href="namespacelongbridge_1_1dca.html#af19dcd9f79d3e3fbfe3ef6b90fb9a154ac512b685438f41daa7386329a3b8f8d3">longbridge::dca::Daily</a> = 0
 , <a class="el" href="namespacelongbridge_1_1dca.html#af19dcd9f79d3e3fbfe3ef6b90fb9a154a6c25e6a6da95b3d583c6ec4c3f82ed4d">longbridge::dca::Weekly</a> = 1
 , <a class="el" href="namespacelongbridge_1_1dca.html#af19dcd9f79d3e3fbfe3ef6b90fb9a154a05226592534d8456e7b9594d5806c513">longbridge::dca::Fortnightly</a> = 2
