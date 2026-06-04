@@ -333,6 +333,11 @@ public:
                            int64_t timestamp,
                            uint32_t count,
                            AsyncCallback<QuoteContext, OptionVolumeDaily> callback) const;
+
+  /// Get ETF asset allocation (holdings / regional / asset class / industry)
+  void etf_asset_allocation(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, AssetAllocationResponse> callback) const;
 };
 
 } // namespace quote

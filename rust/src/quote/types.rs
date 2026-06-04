@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use longbridge_candlesticks::CandlestickComponents;
 use longbridge_proto::quote::{self, Period, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
@@ -2162,6 +2164,111 @@ pub enum PinnedMode {
     Add,
     /// Unpin (remove) the securities from the top of the group
     Remove,
+}
+
+// ── etf_asset_allocation ──────────────────────────────────────────
+
+/// ETF asset allocation element type
+#[derive(Debug, FromPrimitive, IntoPrimitive, Copy, Clone, Hash, Eq, PartialEq)]
+#[repr(i32)]
+pub enum ElementType {
+    /// Unknown
+    #[num_enum(default)]
+    Unknown = 0,
+    /// Holdings
+    Holdings = 1,
+    /// Regional
+    Regional = 2,
+    /// Asset class
+    AssetClass = 3,
+    /// Industry
+    Industry = 4,
+}
+
+impl Serialize for ElementType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_i32((*self).into())
+    }
+}
+
+impl<'de> Deserialize<'de> for ElementType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Ok(ElementType::from(i32::deserialize(deserializer)?))
+    }
+}
+
+/// Holding detail of an ETF asset allocation element (holdings only)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HoldingDetail {
+    /// Industry ID
+    #[serde(default)]
+    pub industry_id: String,
+    /// Industry name
+    #[serde(default)]
+    pub industry_name: String,
+    /// Index counter ID (e.g. `BK/US/CP99000`)
+    #[serde(default)]
+    pub index: String,
+    /// Index name
+    #[serde(default)]
+    pub index_name: String,
+    /// Holding type (e.g. `E` for stock)
+    #[serde(default)]
+    pub holding_type: String,
+    /// Holding type name
+    #[serde(default)]
+    pub holding_type_name: String,
+}
+
+/// One element of an ETF asset allocation group
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetAllocationItem {
+    /// Element name
+    pub name: String,
+    /// Security code (holdings only, e.g. `NVDA`)
+    #[serde(default)]
+    pub code: String,
+    /// Position ratio (e.g. `0.0861114`)
+    pub position_ratio: String,
+    /// Security symbol (holdings only, e.g. `NVDA.US`)
+    #[serde(
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol",
+        default
+    )]
+    pub symbol: String,
+    /// Localized names (locale → name, e.g. `zh-CN` → `英伟达`)
+    #[serde(rename = "name_locales_map", default)]
+    pub name_locales: HashMap<String, String>,
+    /// Holding detail (holdings only)
+    #[serde(default)]
+    pub holding_detail: Option<HoldingDetail>,
+}
+
+/// One ETF asset allocation group (grouped by element type)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetAllocationGroup {
+    /// Report date (e.g. `20260601`)
+    pub report_date: String,
+    /// Element type of this group
+    pub asset_type: ElementType,
+    /// Elements
+    #[serde(default)]
+    pub lists: Vec<AssetAllocationItem>,
+}
+
+/// Response for [`crate::QuoteContext::etf_asset_allocation`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetAllocationResponse {
+    /// Asset allocation groups
+    #[serde(default)]
+    pub info: Vec<AssetAllocationGroup>,
 }
 
 #[cfg(test)]

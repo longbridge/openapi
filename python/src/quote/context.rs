@@ -687,4 +687,17 @@ impl QuoteContext {
             .map_err(ErrorNewType)?
             .into())
     }
+
+    /// Get ETF asset allocation (holdings / regional / asset class /
+    /// industry)
+    fn etf_asset_allocation(
+        &self,
+        symbol: String,
+    ) -> PyResult<crate::quote::types::AssetAllocationResponse> {
+        Ok(self
+            .ctx
+            .etf_asset_allocation(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

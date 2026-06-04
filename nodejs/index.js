@@ -680,6 +680,7 @@ module.exports.DCAFrequency = nativeBinding.DCAFrequency
 module.exports.DCAStatus = nativeBinding.DCAStatus
 module.exports.DeductionStatus = nativeBinding.DeductionStatus
 module.exports.DerivativeType = nativeBinding.DerivativeType
+module.exports.ElementType = nativeBinding.ElementType
 module.exports.FilterWarrantExpiryDate = nativeBinding.FilterWarrantExpiryDate
 module.exports.FilterWarrantInOutBoundsType = nativeBinding.FilterWarrantInOutBoundsType
 module.exports.FinancialReportKind = nativeBinding.FinancialReportKind

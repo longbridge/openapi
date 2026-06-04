@@ -2335,6 +2335,54 @@ inline quote::OptionVolumeDaily convert(const lb_option_volume_daily_t* r) {
   for (size_t i = 0; i < r->num_stats; ++i) stats.push_back(convert(&r->stats[i]));
   return { std::move(stats) };
 }
+inline quote::ElementType convert(lb_element_type_t ty) {
+  switch (ty) {
+    case ElementTypeUnknown:
+      return quote::ElementType::Unknown;
+    case ElementTypeHoldings:
+      return quote::ElementType::Holdings;
+    case ElementTypeRegional:
+      return quote::ElementType::Regional;
+    case ElementTypeAssetClass:
+      return quote::ElementType::AssetClass;
+    case ElementTypeIndustry:
+      return quote::ElementType::Industry;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+inline quote::HoldingDetail convert(const lb_holding_detail_t* d) {
+  return { d->industry_id ? d->industry_id : "",
+           d->industry_name ? d->industry_name : "",
+           d->index ? d->index : "",
+           d->index_name ? d->index_name : "",
+           d->holding_type ? d->holding_type : "",
+           d->holding_type_name ? d->holding_type_name : "" };
+}
+inline quote::AssetAllocationItem convert(const lb_asset_allocation_item_t* item) {
+  std::map<std::string, std::string> name_locales;
+  for (size_t i = 0; i < item->num_name_locales; ++i) {
+    const auto& entry = item->name_locales[i];
+    name_locales.emplace(entry.locale ? entry.locale : "", entry.name ? entry.name : "");
+  }
+  return { item->name ? item->name : "",
+           item->code ? item->code : "",
+           item->position_ratio ? item->position_ratio : "",
+           item->symbol ? item->symbol : "",
+           std::move(name_locales),
+           item->holding_detail ? std::make_optional(convert(item->holding_detail))
+                                : std::nullopt };
+}
+inline quote::AssetAllocationGroup convert(const lb_asset_allocation_group_t* g) {
+  std::vector<quote::AssetAllocationItem> lists;
+  for (size_t i = 0; i < g->num_lists; ++i) lists.push_back(convert(&g->lists[i]));
+  return { g->report_date ? g->report_date : "", convert(g->asset_type), std::move(lists) };
+}
+inline quote::AssetAllocationResponse convert(const lb_asset_allocation_response_t* r) {
+  std::vector<quote::AssetAllocationGroup> info;
+  for (size_t i = 0; i < r->num_info; ++i) info.push_back(convert(&r->info[i]));
+  return { std::move(info) };
+}
 
 // ── MarketContext conversions ─────────────────────────────────────
 
