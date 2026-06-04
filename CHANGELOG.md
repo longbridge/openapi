@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All languages:** `FundamentalContext` gains `etf_asset_allocation(symbol)` — queries `GET /v1/quote/etf-asset-allocation` for ETF asset allocation grouped by element type (`Holdings` / `Regional` / `AssetClass` / `Industry`); returns `AssetAllocationResponse` with report date, position ratios, localized names, and per-holding detail
 - **Rust:** new public `longbridge::counter` module — `symbol_to_counter_id`, `index_symbol_to_counter_id`, `counter_id_to_symbol`, and `is_etf`, backed by the embedded ETF + index + warrant directory, so downstream consumers (CLI / MCP) no longer need their own copies
+- **Rust:** `QuoteContext` gains `symbol_to_counter_ids(symbols)` (batch conversion via `POST /v1/quote/symbol-to-counter-ids`) and `resolve_counter_ids(symbols)` (local-first resolution with remote fallback) — remotely resolved entries are persisted to `~/.longbridge/cache/counter-ids.json` (override with `LONGBRIDGE_CACHE_DIR`) and consulted by subsequent `counter` lookups, so symbols missing from the embedded directory (e.g. newly listed ETFs) resolve correctly after the first query
 
 ### Changed
 

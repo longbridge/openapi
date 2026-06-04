@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     sync::{Arc, RwLock},
     time::Duration,
 };
@@ -2197,6 +2198,81 @@ impl QuoteContext {
             .await?;
 
         Ok(())
+    }
+
+    // ── symbol_to_counter_ids ─────────────────────────────────────
+
+    /// Batch convert symbols to counter IDs via the remote API.
+    ///
+    /// Returns a map of `symbol → counter_id` (e.g. `DRAM.US` →
+    /// `ETF/US/DRAM`). Symbols the backend does not recognize are omitted
+    /// from the result.
+    ///
+    /// Path: `POST /v1/quote/symbol-to-counter-ids`
+    pub async fn symbol_to_counter_ids(
+        &self,
+        symbols: Vec<String>,
+    ) -> Result<HashMap<String, String>> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            ticker_regions: Vec<String>,
+        }
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            #[serde(default)]
+            list: HashMap<String, String>,
+        }
+
+        let resp = self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/quote/symbol-to-counter-ids")
+            .body(Json(Request {
+                ticker_regions: symbols,
+            }))
+            .response::<Json<Response>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(resp.0.list)
+    }
+
+    /// Resolve counter IDs for symbols, local-first with remote fallback.
+    ///
+    /// Symbols found in the embedded ETF / index / warrant directory (or in
+    /// the local cache of previous remote resolutions) are resolved without
+    /// network access. The remaining symbols are resolved in one batch via
+    /// [`symbol_to_counter_ids`](Self::symbol_to_counter_ids) and the results
+    /// are persisted to the local cache for subsequent lookups. Symbols the
+    /// backend does not recognize fall back to the default `ST/` conversion.
+    pub async fn resolve_counter_ids(
+        &self,
+        symbols: Vec<String>,
+    ) -> Result<HashMap<String, String>> {
+        use crate::utils::counter;
+
+        let mut result = HashMap::with_capacity(symbols.len());
+        let mut unknown = Vec::new();
+        for symbol in symbols {
+            match counter::lookup_counter_id(&symbol) {
+                Some(counter_id) => {
+                    result.insert(symbol, counter_id);
+                }
+                None => unknown.push(symbol),
+            }
+        }
+        if !unknown.is_empty() {
+            let resolved = self.symbol_to_counter_ids(unknown.clone()).await?;
+            counter::cache_counter_ids(&resolved);
+            for symbol in unknown {
+                let counter_id = resolved
+                    .get(&symbol)
+                    .cloned()
+                    .unwrap_or_else(|| counter::symbol_to_counter_id(&symbol));
+                result.insert(symbol, counter_id);
+            }
+        }
+        Ok(result)
     }
 }
 
