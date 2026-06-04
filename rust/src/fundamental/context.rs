@@ -806,4 +806,27 @@ impl FundamentalContext {
             .collect();
         Ok(ValuationComparisonResponse { list })
     }
+
+    // ── etf_asset_allocation ─────────────────────────────────────
+
+    /// Get ETF asset allocation (holdings / regional / asset class /
+    /// industry).
+    ///
+    /// Path: `GET /v1/quote/etf-asset-allocation`
+    pub async fn etf_asset_allocation(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<AssetAllocationResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        self.get(
+            "/v1/quote/etf-asset-allocation",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            },
+        )
+        .await
+    }
 }

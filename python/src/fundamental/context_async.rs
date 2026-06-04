@@ -303,4 +303,18 @@ impl AsyncFundamentalContext {
         })
         .map(|b| b.unbind())
     }
+
+    /// Get ETF asset allocation (holdings / regional / asset class /
+    /// industry). Returns awaitable.
+    fn etf_asset_allocation(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(AssetAllocationResponse::from(
+                ctx.etf_asset_allocation(symbol)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
 }

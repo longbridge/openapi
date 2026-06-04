@@ -1594,6 +1594,32 @@ typedef enum lb_asset_type_t {
   AssetTypeCrypto,
 } lb_asset_type_t;
 
+/**
+ * ETF asset allocation element type
+ */
+typedef enum lb_element_type_t {
+  /**
+   * Unknown
+   */
+  ElementTypeUnknown,
+  /**
+   * Holdings
+   */
+  ElementTypeHoldings,
+  /**
+   * Regional
+   */
+  ElementTypeRegional,
+  /**
+   * Asset class
+   */
+  ElementTypeAssetClass,
+  /**
+   * Industry
+   */
+  ElementTypeIndustry,
+} lb_element_type_t;
+
 typedef struct lb_alert_context_t lb_alert_context_t;
 
 /**
@@ -7111,7 +7137,8 @@ typedef struct lb_calendar_events_response_t {
    */
   uintptr_t num_list;
   /**
-   * Pagination cursor; pass as start to fetch the next page, empty when there are no more pages.
+   * Pagination cursor; pass as start to fetch the next page, empty when
+   * there are no more pages.
    */
   const char *next_date;
 } lb_calendar_events_response_t;
@@ -8319,6 +8346,120 @@ typedef struct lb_option_volume_daily_t {
 } lb_option_volume_daily_t;
 
 /**
+ * Localized name entry (locale → name)
+ */
+typedef struct lb_locale_name_t {
+  /**
+   * Locale (e.g. `zh-CN`)
+   */
+  const char *locale;
+  /**
+   * Localized name
+   */
+  const char *name;
+} lb_locale_name_t;
+
+/**
+ * Holding detail of an ETF asset allocation element (holdings only)
+ */
+typedef struct lb_holding_detail_t {
+  /**
+   * Industry ID
+   */
+  const char *industry_id;
+  /**
+   * Industry name
+   */
+  const char *industry_name;
+  /**
+   * Index counter ID (e.g. `BK/US/CP99000`)
+   */
+  const char *index;
+  /**
+   * Index name
+   */
+  const char *index_name;
+  /**
+   * Holding type (e.g. `E` for stock)
+   */
+  const char *holding_type;
+  /**
+   * Holding type name
+   */
+  const char *holding_type_name;
+} lb_holding_detail_t;
+
+/**
+ * One element of an ETF asset allocation group
+ */
+typedef struct lb_asset_allocation_item_t {
+  /**
+   * Element name
+   */
+  const char *name;
+  /**
+   * Security code (holdings only, e.g. `NVDA`)
+   */
+  const char *code;
+  /**
+   * Position ratio (e.g. `0.0861114`)
+   */
+  const char *position_ratio;
+  /**
+   * Security symbol (holdings only, e.g. `NVDA.US`)
+   */
+  const char *symbol;
+  /**
+   * Pointer to array of localized name entries
+   */
+  const struct lb_locale_name_t *name_locales;
+  /**
+   * Number of elements in the localized name array
+   */
+  uintptr_t num_name_locales;
+  /**
+   * Holding detail (holdings only, maybe null)
+   */
+  const struct lb_holding_detail_t *holding_detail;
+} lb_asset_allocation_item_t;
+
+/**
+ * One ETF asset allocation group (grouped by element type)
+ */
+typedef struct lb_asset_allocation_group_t {
+  /**
+   * Report date (e.g. `20260601`)
+   */
+  const char *report_date;
+  /**
+   * Element type of this group
+   */
+  enum lb_element_type_t asset_type;
+  /**
+   * Pointer to array of elements
+   */
+  const struct lb_asset_allocation_item_t *lists;
+  /**
+   * Number of elements in the array
+   */
+  uintptr_t num_lists;
+} lb_asset_allocation_group_t;
+
+/**
+ * ETF asset allocation response
+ */
+typedef struct lb_asset_allocation_response_t {
+  /**
+   * Pointer to array of asset allocation groups
+   */
+  const struct lb_asset_allocation_group_t *info;
+  /**
+   * Number of elements in the array
+   */
+  uintptr_t num_info;
+} lb_asset_allocation_response_t;
+
+/**
  * Top-shareholder list response. `data` is a NUL-terminated JSON string.
  */
 typedef struct lb_shareholder_top_response_t {
@@ -9399,6 +9540,15 @@ void lb_fundamental_context_valuation_comparison(const struct lb_fundamental_con
                                                  const char *currency,
                                                  const char *const *comparison_symbols,
                                                  uintptr_t num_comparison_symbols,
+                                                 lb_async_callback_t callback,
+                                                 void *userdata);
+
+/**
+ * Get ETF asset allocation (holdings / regional / asset class / industry).
+ * Returns `CAssetAllocationResponse`.
+ */
+void lb_fundamental_context_etf_asset_allocation(const struct lb_fundamental_context_t *ctx,
+                                                 const char *symbol,
                                                  lb_async_callback_t callback,
                                                  void *userdata);
 

@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0]
+
+### Added
+
+- **All languages:** `FundamentalContext` gains `etf_asset_allocation(symbol)` — queries `GET /v1/quote/etf-asset-allocation` for ETF asset allocation grouped by element type (`Holdings` / `Regional` / `AssetClass` / `Industry`); returns `AssetAllocationResponse` with report date, position ratios, localized names, and per-holding detail
+- **Rust:** new public `longbridge::counter` module — `symbol_to_counter_id`, `index_symbol_to_counter_id`, `counter_id_to_symbol`, and `is_etf`, backed by the embedded ETF + index + warrant directory, so downstream consumers (CLI / MCP) no longer need their own copies
+- **Rust:** `QuoteContext` gains `symbol_to_counter_ids(symbols)` (batch conversion via `POST /v1/quote/symbol-to-counter-ids`) and `resolve_counter_ids(symbols)` (local-first resolution with remote fallback) — remotely resolved entries are persisted to `~/.longbridge/cache/counter-ids.csv` (one counter_id per line, override the directory with `LONGBRIDGE_CACHE_DIR`) and consulted by subsequent `counter` lookups, so symbols missing from the embedded directory (e.g. newly listed ETFs) resolve correctly after the first query
+
+### Changed
+
+- `symbol_to_counter_id` now also consults the embedded index and warrant directories — e.g. `HSI.HK` → `IX/HK/HSI`, `10005.HK` → `WT/HK/10005`; leading zeros are stripped from numeric `.HK` codes (`00700.HK` → `ST/HK/700`, A-share codes are kept verbatim)
+
+### Fixed
+
+- Refreshed the embedded US ETF list (4574 → 7250 entries, from the instrument-management export) and added index (648) + warrant (17693) directories — newer ETFs (e.g. `DRAM.US`) were resolved to `ST/...` instead of `ETF/...` counter IDs, breaking ETF-specific APIs such as `etf_asset_allocation`
+
 ## [4.2.2]
 
 ### Fixed

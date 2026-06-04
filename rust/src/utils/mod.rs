@@ -1,1 +1,1 @@
-pub(crate) mod counter;
+pub mod counter;

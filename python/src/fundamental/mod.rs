@@ -69,6 +69,11 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<ValuationHistoryPoint>()?;
     parent.add_class::<ValuationComparisonItem>()?;
     parent.add_class::<ValuationComparisonResponse>()?;
+    parent.add_class::<ElementType>()?;
+    parent.add_class::<HoldingDetail>()?;
+    parent.add_class::<AssetAllocationItem>()?;
+    parent.add_class::<AssetAllocationGroup>()?;
+    parent.add_class::<AssetAllocationResponse>()?;
     parent.add_class::<context::FundamentalContext>()?;
     parent.add_class::<context_async::AsyncFundamentalContext>()?;
     Ok(())

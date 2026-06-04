@@ -661,3 +661,22 @@ pub unsafe extern "C" fn lb_fundamental_context_valuation_comparison(
         Ok(resp)
     });
 }
+
+/// Get ETF asset allocation (holdings / regional / asset class / industry).
+/// Returns `CAssetAllocationResponse`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_fundamental_context_etf_asset_allocation(
+    ctx: *const CFundamentalContext,
+    symbol: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let symbol = cstr_to_rust(symbol);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CAssetAllocationResponseOwned> = CCow::new(
+            CAssetAllocationResponseOwned::from(ctx_inner.etf_asset_allocation(symbol).await?),
+        );
+        Ok(resp)
+    });
+}
