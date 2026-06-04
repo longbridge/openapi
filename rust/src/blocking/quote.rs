@@ -1213,4 +1213,23 @@ impl QuoteContextSync {
         self.rt
             .call(move |ctx| async move { ctx.short_trades(symbol, count).await })
     }
+
+    /// Batch convert symbols to counter IDs via the remote API
+    pub fn symbol_to_counter_ids(
+        &self,
+        symbols: Vec<String>,
+    ) -> Result<std::collections::HashMap<String, String>> {
+        self.rt
+            .call(move |ctx| async move { ctx.symbol_to_counter_ids(symbols).await })
+    }
+
+    /// Resolve counter IDs for symbols, local-first with remote fallback and
+    /// local caching
+    pub fn resolve_counter_ids(
+        &self,
+        symbols: Vec<String>,
+    ) -> Result<std::collections::HashMap<String, String>> {
+        self.rt
+            .call(move |ctx| async move { ctx.resolve_counter_ids(symbols).await })
+    }
 }
