@@ -304,6 +304,12 @@ cpp_compat = true
 "COptionVolumeStats" = "lb_option_volume_stats_t"
 "COptionVolumeDailyStat" = "lb_option_volume_daily_stat_t"
 "COptionVolumeDaily" = "lb_option_volume_daily_t"
+"CElementType" = "lb_element_type_t"
+"CLocaleName" = "lb_locale_name_t"
+"CHoldingDetail" = "lb_holding_detail_t"
+"CAssetAllocationItem" = "lb_asset_allocation_item_t"
+"CAssetAllocationGroup" = "lb_asset_allocation_group_t"
+"CAssetAllocationResponse" = "lb_asset_allocation_response_t"
 # FundamentalContext new types
 "CShareholderTopResponse" = "lb_shareholder_top_response_t"
 "CShareholderDetailResponse" = "lb_shareholder_detail_response_t"
@@ -441,6 +447,9 @@ include = [
     "CShortTradesItem", "CShortTradesResponse",
     "COptionVolumeStats",
     "COptionVolumeDailyStat", "COptionVolumeDaily",
+    "CElementType",
+    "CLocaleName", "CHoldingDetail",
+    "CAssetAllocationItem", "CAssetAllocationGroup", "CAssetAllocationResponse",
     # FundamentalContext new types
     "CShareholderTopResponse", "CShareholderDetailResponse",
     "CValuationHistoryPoint", "CValuationComparisonItem", "CValuationComparisonResponse",

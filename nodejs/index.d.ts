@@ -2021,6 +2021,11 @@ export declare class QuoteContext {
   optionVolume(symbol: string): Promise<OptionVolumeStats>
   /** Get daily historical option volume */
   optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
+  /**
+   * Get ETF asset allocation (holdings / regional / asset class /
+   * industry)
+   */
+  etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
 }
 
 export declare class QuotePackageDetail {
@@ -3097,6 +3102,38 @@ export interface AnomalyResponse {
   changes: Array<AnomalyItem>
 }
 
+/** One ETF asset allocation group (grouped by element type) */
+export interface AssetAllocationGroup {
+  /** Report date (e.g. `20260601`) */
+  reportDate: string
+  /** Element type of this group */
+  assetType: ElementType
+  /** Elements */
+  lists: Array<AssetAllocationItem>
+}
+
+/** One element of an ETF asset allocation group */
+export interface AssetAllocationItem {
+  /** Element name */
+  name: string
+  /** Security code (holdings only, e.g. `NVDA`) */
+  code: string
+  /** Position ratio (e.g. `0.0861114`) */
+  positionRatio: string
+  /** Security symbol (holdings only, e.g. `NVDA.US`) */
+  symbol: string
+  /** Localized names (locale → name) */
+  nameLocales: Record<string, string>
+  /** Holding detail (holdings only) */
+  holdingDetail?: HoldingDetail
+}
+
+/** ETF asset allocation response */
+export interface AssetAllocationResponse {
+  /** Asset allocation groups */
+  info: Array<AssetAllocationGroup>
+}
+
 export declare const enum AssetType {
   /** Unknown */
   Unknown = 0,
@@ -3397,8 +3434,6 @@ export interface CalendarEventsResponse {
   date: string
   /** Per-day event groups */
   list: Array<CalendarDateGroup>
-  /** Pagination cursor; pass as start to fetch the next page, empty when there are no more pages */
-  nextDate: string
 }
 
 export declare const enum CashFlowDirection {
@@ -3844,6 +3879,20 @@ export interface DividendList {
   list: Array<DividendItem>
 }
 
+/** ETF asset allocation element type */
+export declare const enum ElementType {
+  /** Unknown */
+  Unknown = 0,
+  /** Holdings */
+  Holdings = 1,
+  /** Regional */
+  Regional = 2,
+  /** Asset class */
+  AssetClass = 3,
+  /** Industry */
+  Industry = 4
+}
+
 /** Options for get cash flow request */
 export interface EstimateMaxPurchaseQuantityOptions {
   symbol: string
@@ -4172,6 +4221,22 @@ export declare const enum Granularity {
   Weekly = 2,
   /** Monthly */
   Monthly = 3
+}
+
+/** Holding detail of an ETF asset allocation element (holdings only) */
+export interface HoldingDetail {
+  /** Industry ID */
+  industryId: string
+  /** Industry name */
+  industryName: string
+  /** Index counter ID (e.g. `BK/US/CP99000`) */
+  index: string
+  /** Index name */
+  indexName: string
+  /** Holding type (e.g. `E` for stock) */
+  holdingType: string
+  /** Holding type name */
+  holdingTypeName: string
 }
 
 /** Index constituents response */

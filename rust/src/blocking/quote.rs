@@ -6,8 +6,8 @@ use crate::{
     Config, Market, QuoteContext, Result,
     blocking::runtime::BlockingRuntime,
     quote::{
-        AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-        FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+        AdjustType, AssetAllocationResponse, CalcIndex, Candlestick, CapitalDistributionResponse,
+        CapitalFlowLine, FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
         HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
         MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily, OptionVolumeStats,
         ParticipantInfo, Period, PinnedMode, PushEvent, QuotePackageDetail, RealtimeQuote,
@@ -1212,5 +1212,15 @@ impl QuoteContextSync {
     ) -> Result<ShortTradesResponse> {
         self.rt
             .call(move |ctx| async move { ctx.short_trades(symbol, count).await })
+    }
+
+    /// Get ETF asset allocation (holdings / regional / asset class /
+    /// industry)
+    pub fn etf_asset_allocation(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<AssetAllocationResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.etf_asset_allocation(symbol).await })
     }
 }
