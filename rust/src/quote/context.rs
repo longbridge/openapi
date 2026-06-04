@@ -2263,7 +2263,7 @@ impl QuoteContext {
         }
         if !unknown.is_empty() {
             let resolved = self.symbol_to_counter_ids(unknown.clone()).await?;
-            counter::cache_counter_ids(&resolved);
+            counter::cache_counter_ids(resolved.values().map(String::as_str));
             for symbol in unknown {
                 let counter_id = resolved
                     .get(&symbol)

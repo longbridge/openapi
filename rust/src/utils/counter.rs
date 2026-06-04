@@ -11,7 +11,7 @@
 //! to a local cache file and consulted on subsequent lookups.
 
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashSet,
     path::PathBuf,
     sync::{OnceLock, RwLock},
 };
@@ -35,17 +35,18 @@ fn special_counter_ids() -> &'static HashSet<&'static str> {
 
 // ── remote-resolved counter_id cache ──────────────────────────────
 
-static CACHED_COUNTER_IDS: OnceLock<RwLock<HashMap<String, String>>> = OnceLock::new();
+static CACHED_COUNTER_IDS: OnceLock<RwLock<HashSet<String>>> = OnceLock::new();
 
 #[cfg(test)]
 static TEST_CACHE_DIR: OnceLock<PathBuf> = OnceLock::new();
 
-/// Cache file path: `$LONGBRIDGE_CACHE_DIR/counter-ids.json`, defaulting to
-/// `~/.longbridge/cache/counter-ids.json`.
+/// Cache file path: `$LONGBRIDGE_CACHE_DIR/counter-ids.csv`, defaulting to
+/// `~/.longbridge/cache/counter-ids.csv` (one counter_id per line, same
+/// format as the embedded directory files).
 fn cache_file_path() -> Option<PathBuf> {
     #[cfg(test)]
     if let Some(dir) = TEST_CACHE_DIR.get() {
-        return Some(dir.join("counter-ids.json"));
+        return Some(dir.join("counter-ids.csv"));
     }
     let dir = match std::env::var_os("LONGBRIDGE_CACHE_DIR") {
         Some(dir) => PathBuf::from(dir),
@@ -57,39 +58,51 @@ fn cache_file_path() -> Option<PathBuf> {
             PathBuf::from(home).join(".longbridge").join("cache")
         }
     };
-    Some(dir.join("counter-ids.json"))
+    Some(dir.join("counter-ids.csv"))
 }
 
-fn cached_counter_ids() -> &'static RwLock<HashMap<String, String>> {
+fn cached_counter_ids() -> &'static RwLock<HashSet<String>> {
     CACHED_COUNTER_IDS.get_or_init(|| {
-        let map = cache_file_path()
+        let set = cache_file_path()
             .and_then(|path| std::fs::read_to_string(path).ok())
-            .and_then(|s| serde_json::from_str(&s).ok())
+            .map(|s| {
+                s.lines()
+                    .map(str::trim)
+                    .filter(|line| !line.is_empty())
+                    .map(ToString::to_string)
+                    .collect()
+            })
             .unwrap_or_default();
-        RwLock::new(map)
+        RwLock::new(set)
     })
 }
 
-/// Merge remotely resolved `symbol → counter_id` entries into the local cache
-/// (in memory and on disk), so subsequent [`symbol_to_counter_id`] /
-/// [`lookup_counter_id`] calls resolve them without another network round
-/// trip.
-pub fn cache_counter_ids(entries: &HashMap<String, String>) {
-    if entries.is_empty() {
-        return;
-    }
-    let mut map = match cached_counter_ids().write() {
+/// Merge remotely resolved counter IDs into the local cache (in memory and
+/// on disk), so subsequent [`symbol_to_counter_id`] / [`lookup_counter_id`]
+/// calls resolve them without another network round trip.
+pub fn cache_counter_ids<'a>(counter_ids: impl IntoIterator<Item = &'a str>) {
+    let mut set = match cached_counter_ids().write() {
         Ok(guard) => guard,
         Err(poisoned) => poisoned.into_inner(),
     };
-    for (symbol, counter_id) in entries {
-        map.insert(symbol.to_uppercase(), counter_id.clone());
+    let before = set.len();
+    set.extend(
+        counter_ids
+            .into_iter()
+            .map(str::trim)
+            .filter(|id| !id.is_empty())
+            .map(ToString::to_string),
+    );
+    if set.len() == before {
+        return;
     }
-    if let (Some(path), Ok(json)) = (cache_file_path(), serde_json::to_string(&*map)) {
+    if let Some(path) = cache_file_path() {
         if let Some(parent) = path.parent() {
             let _ = std::fs::create_dir_all(parent);
         }
-        let _ = std::fs::write(path, json);
+        let mut lines: Vec<&str> = set.iter().map(String::as_str).collect();
+        lines.sort_unstable();
+        let _ = std::fs::write(path, lines.join("\n") + "\n");
     }
 }
 
@@ -119,7 +132,13 @@ pub fn lookup_counter_id(symbol: &str) -> Option<String> {
         Ok(guard) => guard,
         Err(poisoned) => poisoned.into_inner(),
     };
-    cached.get(&format!("{code}.{market}")).cloned()
+    for prefix in &["ETF", "IX", "WT", "ST"] {
+        let candidate = format!("{prefix}/{market}/{code}");
+        if cached.contains(candidate.as_str()) {
+            return Some(candidate);
+        }
+    }
+    None
 }
 
 /// Convert a user-supplied symbol (e.g. `TSLA.US`, `700.HK`, `.DJI.US`,
@@ -323,18 +342,22 @@ mod tests {
         assert_eq!(lookup_counter_id("FAKE9.US"), None);
         assert_eq!(symbol_to_counter_id("FAKE9.US"), "ST/US/FAKE9");
 
-        // After caching a remote-resolved entry, lookups return it
-        let entries = HashMap::from([("FAKE9.US".to_string(), "ETF/US/FAKE9".to_string())]);
-        cache_counter_ids(&entries);
+        // After caching remote-resolved entries, lookups return them —
+        // including backend-confirmed ST/ entries
+        cache_counter_ids(["ETF/US/FAKE9", "ST/US/FAKE8"]);
         assert_eq!(
             lookup_counter_id("FAKE9.US").as_deref(),
             Some("ETF/US/FAKE9")
         );
         assert_eq!(symbol_to_counter_id("FAKE9.US"), "ETF/US/FAKE9");
+        assert_eq!(
+            lookup_counter_id("FAKE8.US").as_deref(),
+            Some("ST/US/FAKE8")
+        );
 
-        // Persisted to disk
-        let saved = std::fs::read_to_string(dir.join("counter-ids.json")).unwrap();
-        assert!(saved.contains("ETF/US/FAKE9"));
+        // Persisted to disk as one counter_id per line
+        let saved = std::fs::read_to_string(dir.join("counter-ids.csv")).unwrap();
+        assert_eq!(saved, "ETF/US/FAKE9\nST/US/FAKE8\n");
         let _ = std::fs::remove_dir_all(&dir);
     }
 
