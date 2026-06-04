@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Refreshed the embedded US ETF list (4574 → 7144 entries) — newer ETFs (e.g. `DRAM.US`) were resolved to `ST/...` instead of `ETF/...` counter IDs, breaking ETF-specific APIs such as `etf_asset_allocation`
+- Refreshed the embedded US ETF list (4574 → 7250 entries, from the instrument-management export) — newer ETFs (e.g. `DRAM.US`) were resolved to `ST/...` instead of `ETF/...` counter IDs, breaking ETF-specific APIs such as `etf_asset_allocation`
 
 ## [4.2.2]
 
