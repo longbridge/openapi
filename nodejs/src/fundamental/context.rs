@@ -275,4 +275,16 @@ impl FundamentalContext {
             .map_err(ErrorNewType)?
             .into())
     }
+
+    /// Get ETF asset allocation (holdings / regional / asset class /
+    /// industry)
+    #[napi]
+    pub async fn etf_asset_allocation(&self, symbol: String) -> Result<AssetAllocationResponse> {
+        Ok(self
+            .ctx
+            .etf_asset_allocation(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

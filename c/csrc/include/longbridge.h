@@ -9544,6 +9544,15 @@ void lb_fundamental_context_valuation_comparison(const struct lb_fundamental_con
                                                  void *userdata);
 
 /**
+ * Get ETF asset allocation (holdings / regional / asset class / industry).
+ * Returns `CAssetAllocationResponse`.
+ */
+void lb_fundamental_context_etf_asset_allocation(const struct lb_fundamental_context_t *ctx,
+                                                 const char *symbol,
+                                                 lb_async_callback_t callback,
+                                                 void *userdata);
+
+/**
  * Create a HTTP client using API Key authentication
  *
  * @param http_url     HTTP endpoint URL, or NULL to use the default
@@ -10326,15 +10335,6 @@ void lb_quote_context_option_volume_daily(const struct lb_quote_context_t *ctx,
                                           uint32_t count,
                                           lb_async_callback_t callback,
                                           void *userdata);
-
-/**
- * Get ETF asset allocation (holdings / regional / asset class / industry).
- * Returns `CAssetAllocationResponse`.
- */
-void lb_quote_context_etf_asset_allocation(const struct lb_quote_context_t *ctx,
-                                           const char *symbol,
-                                           lb_async_callback_t callback,
-                                           void *userdata);
 
 const struct lb_screener_context_t *lb_screener_context_new(const struct lb_config_t *config);
 

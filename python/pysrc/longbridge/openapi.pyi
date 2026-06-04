@@ -4020,17 +4020,6 @@ class QuoteContext:
             :class:`ShortTradesResponse` with raw JSON data
         """
 
-    def etf_asset_allocation(self, symbol: str) -> AssetAllocationResponse:
-        """
-        Get ETF asset allocation (holdings / regional / asset class / industry).
-
-        Args:
-            symbol: ETF security code (e.g. ``"QQQ.US"``)
-
-        Returns:
-            :class:`AssetAllocationResponse` with allocation groups
-        """
-
 class AsyncQuoteContext:
     """
     Async quote context for use with asyncio. Create via `AsyncQuoteContext.create(config)` and await inside asyncio.
@@ -5380,21 +5369,6 @@ class AsyncQuoteContext:
 
         Returns:
             Awaitable resolving to :class:`ShortTradesResponse`
-        """
-        ...
-
-    def etf_asset_allocation(
-        self, symbol: str
-    ) -> Awaitable[AssetAllocationResponse]:
-        """
-        Get ETF asset allocation (holdings / regional / asset class / industry).
-        Returns awaitable.
-
-        Args:
-            symbol: ETF security code (e.g. ``"QQQ.US"``)
-
-        Returns:
-            Awaitable resolving to :class:`AssetAllocationResponse`
         """
         ...
 
@@ -9936,6 +9910,18 @@ class FundamentalContext:
         """
         ...
 
+    def etf_asset_allocation(self, symbol: str) -> "AssetAllocationResponse":
+        """
+        Get ETF asset allocation (holdings / regional / asset class / industry).
+
+        Args:
+            symbol: ETF security code (e.g. ``"QQQ.US"``)
+
+        Returns:
+            :class:`AssetAllocationResponse` with allocation groups
+        """
+        ...
+
 
 # ── FundamentalContext new response types ─────────────────────────
 
@@ -10006,6 +9992,77 @@ class ValuationComparisonResponse:
 
     list: List[ValuationComparisonItem]
     """Valuation comparison items"""
+
+
+class ElementType:
+    """ETF asset allocation element type."""
+
+    class Unknown(ElementType):
+        """Unknown"""
+
+    class Holdings(ElementType):
+        """Holdings"""
+
+    class Regional(ElementType):
+        """Regional"""
+
+    class AssetClass(ElementType):
+        """Asset class"""
+
+    class Industry(ElementType):
+        """Industry"""
+
+
+class HoldingDetail:
+    """Holding detail of an ETF asset allocation element (holdings only)."""
+
+    industry_id: str
+    """Industry ID"""
+    industry_name: str
+    """Industry name"""
+    index: str
+    """Index counter ID (e.g. ``BK/US/CP99000``)"""
+    index_name: str
+    """Index name"""
+    holding_type: str
+    """Holding type (e.g. ``E`` for stock)"""
+    holding_type_name: str
+    """Holding type name"""
+
+
+class AssetAllocationItem:
+    """One element of an ETF asset allocation group."""
+
+    name: str
+    """Element name"""
+    code: str
+    """Security code (holdings only, e.g. ``NVDA``)"""
+    position_ratio: str
+    """Position ratio (e.g. ``0.0861114``)"""
+    symbol: str
+    """Security symbol (holdings only, e.g. ``NVDA.US``)"""
+    name_locales: dict[str, str]
+    """Localized names (locale → name)"""
+    holding_detail: Optional[HoldingDetail]
+    """Holding detail (holdings only)"""
+
+
+class AssetAllocationGroup:
+    """One ETF asset allocation group (grouped by element type)."""
+
+    report_date: str
+    """Report date (e.g. ``20260601``)"""
+    asset_type: Type[ElementType]
+    """Element type of this group"""
+    lists: list[AssetAllocationItem]
+    """Elements"""
+
+
+class AssetAllocationResponse:
+    """ETF asset allocation response."""
+
+    info: list[AssetAllocationGroup]
+    """Asset allocation groups"""
 
 
 # ── MarketContext ─────────────────────────────────────────────────
@@ -11963,74 +12020,3 @@ class OptionVolumeDaily:
 
     stats: list[OptionVolumeDailyStat]
     """Daily option volume statistics"""
-
-
-class ElementType:
-    """ETF asset allocation element type."""
-
-    class Unknown(ElementType):
-        """Unknown"""
-
-    class Holdings(ElementType):
-        """Holdings"""
-
-    class Regional(ElementType):
-        """Regional"""
-
-    class AssetClass(ElementType):
-        """Asset class"""
-
-    class Industry(ElementType):
-        """Industry"""
-
-
-class HoldingDetail:
-    """Holding detail of an ETF asset allocation element (holdings only)."""
-
-    industry_id: str
-    """Industry ID"""
-    industry_name: str
-    """Industry name"""
-    index: str
-    """Index counter ID (e.g. ``BK/US/CP99000``)"""
-    index_name: str
-    """Index name"""
-    holding_type: str
-    """Holding type (e.g. ``E`` for stock)"""
-    holding_type_name: str
-    """Holding type name"""
-
-
-class AssetAllocationItem:
-    """One element of an ETF asset allocation group."""
-
-    name: str
-    """Element name"""
-    code: str
-    """Security code (holdings only, e.g. ``NVDA``)"""
-    position_ratio: str
-    """Position ratio (e.g. ``0.0861114``)"""
-    symbol: str
-    """Security symbol (holdings only, e.g. ``NVDA.US``)"""
-    name_locales: dict[str, str]
-    """Localized names (locale → name)"""
-    holding_detail: Optional[HoldingDetail]
-    """Holding detail (holdings only)"""
-
-
-class AssetAllocationGroup:
-    """One ETF asset allocation group (grouped by element type)."""
-
-    report_date: str
-    """Report date (e.g. ``20260601``)"""
-    asset_type: Type[ElementType]
-    """Element type of this group"""
-    lists: list[AssetAllocationItem]
-    """Elements"""
-
-
-class AssetAllocationResponse:
-    """ETF asset allocation response."""
-
-    info: list[AssetAllocationGroup]
-    """Asset allocation groups"""

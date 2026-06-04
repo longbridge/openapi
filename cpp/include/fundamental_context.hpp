@@ -175,6 +175,11 @@ public:
                             const std::string& currency,
                             const std::vector<std::string>* comparison_symbols,
                             AsyncCallback<FundamentalContext, ValuationComparisonResponse> callback) const;
+
+  /// Get ETF asset allocation (holdings / regional / asset class / industry)
+  void etf_asset_allocation(
+    const std::string& symbol,
+    AsyncCallback<FundamentalContext, AssetAllocationResponse> callback) const;
 };
 
 } // namespace fundamental

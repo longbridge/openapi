@@ -1,12 +1,11 @@
 use std::os::raw::c_char;
 
 use longbridge::quote::{
-    AssetAllocationGroup, AssetAllocationItem, AssetAllocationResponse, Brokers, Candlestick,
-    CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth, ElementType,
-    FilingItem, HistoryMarketTemperatureResponse, HoldingDetail, IntradayLine, IssuerInfo,
-    MarketTemperature, MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote,
-    OptionType, OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo,
-    Period, PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
+    Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
+    FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+    MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,
+    OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period,
+    PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
     QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers, SecurityCalcIndex,
     SecurityDepth, SecurityQuote, SecurityStaticInfo, ShortPositionsItem, ShortPositionsResponse,
     ShortTradesItem, ShortTradesResponse, StrikePriceInfo, Subscription, Trade, TradeDirection,
@@ -16,7 +15,7 @@ use longbridge::quote::{
 
 use crate::{
     quote_context::enum_types::{
-        CElementType, CGranularity, COptionDirection, COptionType, CPeriod, CSecuritiesUpdateMode,
+        CGranularity, COptionDirection, COptionType, CPeriod, CSecuritiesUpdateMode,
         CSecurityBoard, CTradeDirection, CTradeSession, CTradeStatus, CWarrantStatus, CWarrantType,
     },
     types::{CDate, CDecimal, CMarket, COption, CString, CTime, CVec, ToFFI},
@@ -3440,224 +3439,6 @@ impl ToFFI for COptionVolumeDailyOwned {
         COptionVolumeDaily {
             stats: self.stats.to_ffi_type(),
             num_stats: self.stats.len(),
-        }
-    }
-}
-
-// ── EtfAssetAllocation ────────────────────────────────────────────
-
-/// Localized name entry (locale → name)
-#[repr(C)]
-pub struct CLocaleName {
-    /// Locale (e.g. `zh-CN`)
-    pub locale: *const c_char,
-    /// Localized name
-    pub name: *const c_char,
-}
-
-pub(crate) struct CLocaleNameOwned {
-    locale: CString,
-    name: CString,
-}
-
-impl From<(String, String)> for CLocaleNameOwned {
-    fn from((locale, name): (String, String)) -> Self {
-        Self {
-            locale: locale.into(),
-            name: name.into(),
-        }
-    }
-}
-
-impl ToFFI for CLocaleNameOwned {
-    type FFIType = CLocaleName;
-    fn to_ffi_type(&self) -> Self::FFIType {
-        CLocaleName {
-            locale: self.locale.to_ffi_type(),
-            name: self.name.to_ffi_type(),
-        }
-    }
-}
-
-/// Holding detail of an ETF asset allocation element (holdings only)
-#[repr(C)]
-pub struct CHoldingDetail {
-    /// Industry ID
-    pub industry_id: *const c_char,
-    /// Industry name
-    pub industry_name: *const c_char,
-    /// Index counter ID (e.g. `BK/US/CP99000`)
-    pub index: *const c_char,
-    /// Index name
-    pub index_name: *const c_char,
-    /// Holding type (e.g. `E` for stock)
-    pub holding_type: *const c_char,
-    /// Holding type name
-    pub holding_type_name: *const c_char,
-}
-
-pub(crate) struct CHoldingDetailOwned {
-    industry_id: CString,
-    industry_name: CString,
-    index: CString,
-    index_name: CString,
-    holding_type: CString,
-    holding_type_name: CString,
-}
-
-impl From<HoldingDetail> for CHoldingDetailOwned {
-    fn from(v: HoldingDetail) -> Self {
-        Self {
-            industry_id: v.industry_id.into(),
-            industry_name: v.industry_name.into(),
-            index: v.index.into(),
-            index_name: v.index_name.into(),
-            holding_type: v.holding_type.into(),
-            holding_type_name: v.holding_type_name.into(),
-        }
-    }
-}
-
-impl ToFFI for CHoldingDetailOwned {
-    type FFIType = CHoldingDetail;
-    fn to_ffi_type(&self) -> Self::FFIType {
-        CHoldingDetail {
-            industry_id: self.industry_id.to_ffi_type(),
-            industry_name: self.industry_name.to_ffi_type(),
-            index: self.index.to_ffi_type(),
-            index_name: self.index_name.to_ffi_type(),
-            holding_type: self.holding_type.to_ffi_type(),
-            holding_type_name: self.holding_type_name.to_ffi_type(),
-        }
-    }
-}
-
-/// One element of an ETF asset allocation group
-#[repr(C)]
-pub struct CAssetAllocationItem {
-    /// Element name
-    pub name: *const c_char,
-    /// Security code (holdings only, e.g. `NVDA`)
-    pub code: *const c_char,
-    /// Position ratio (e.g. `0.0861114`)
-    pub position_ratio: *const c_char,
-    /// Security symbol (holdings only, e.g. `NVDA.US`)
-    pub symbol: *const c_char,
-    /// Pointer to array of localized name entries
-    pub name_locales: *const CLocaleName,
-    /// Number of elements in the localized name array
-    pub num_name_locales: usize,
-    /// Holding detail (holdings only, maybe null)
-    pub holding_detail: *const CHoldingDetail,
-}
-
-pub(crate) struct CAssetAllocationItemOwned {
-    name: CString,
-    code: CString,
-    position_ratio: CString,
-    symbol: CString,
-    name_locales: CVec<CLocaleNameOwned>,
-    holding_detail: COption<CHoldingDetailOwned>,
-}
-
-impl From<AssetAllocationItem> for CAssetAllocationItemOwned {
-    fn from(v: AssetAllocationItem) -> Self {
-        let mut name_locales = v.name_locales.into_iter().collect::<Vec<_>>();
-        name_locales.sort();
-        Self {
-            name: v.name.into(),
-            code: v.code.into(),
-            position_ratio: v.position_ratio.into(),
-            symbol: v.symbol.into(),
-            name_locales: name_locales.into(),
-            holding_detail: v.holding_detail.into(),
-        }
-    }
-}
-
-impl ToFFI for CAssetAllocationItemOwned {
-    type FFIType = CAssetAllocationItem;
-    fn to_ffi_type(&self) -> Self::FFIType {
-        CAssetAllocationItem {
-            name: self.name.to_ffi_type(),
-            code: self.code.to_ffi_type(),
-            position_ratio: self.position_ratio.to_ffi_type(),
-            symbol: self.symbol.to_ffi_type(),
-            name_locales: self.name_locales.to_ffi_type(),
-            num_name_locales: self.name_locales.len(),
-            holding_detail: self.holding_detail.to_ffi_type(),
-        }
-    }
-}
-
-/// One ETF asset allocation group (grouped by element type)
-#[repr(C)]
-pub struct CAssetAllocationGroup {
-    /// Report date (e.g. `20260601`)
-    pub report_date: *const c_char,
-    /// Element type of this group
-    pub asset_type: CElementType,
-    /// Pointer to array of elements
-    pub lists: *const CAssetAllocationItem,
-    /// Number of elements in the array
-    pub num_lists: usize,
-}
-
-pub(crate) struct CAssetAllocationGroupOwned {
-    report_date: CString,
-    asset_type: ElementType,
-    lists: CVec<CAssetAllocationItemOwned>,
-}
-
-impl From<AssetAllocationGroup> for CAssetAllocationGroupOwned {
-    fn from(v: AssetAllocationGroup) -> Self {
-        Self {
-            report_date: v.report_date.into(),
-            asset_type: v.asset_type,
-            lists: v.lists.into(),
-        }
-    }
-}
-
-impl ToFFI for CAssetAllocationGroupOwned {
-    type FFIType = CAssetAllocationGroup;
-    fn to_ffi_type(&self) -> Self::FFIType {
-        CAssetAllocationGroup {
-            report_date: self.report_date.to_ffi_type(),
-            asset_type: self.asset_type.into(),
-            lists: self.lists.to_ffi_type(),
-            num_lists: self.lists.len(),
-        }
-    }
-}
-
-/// ETF asset allocation response
-#[repr(C)]
-pub struct CAssetAllocationResponse {
-    /// Pointer to array of asset allocation groups
-    pub info: *const CAssetAllocationGroup,
-    /// Number of elements in the array
-    pub num_info: usize,
-}
-
-pub(crate) struct CAssetAllocationResponseOwned {
-    info: CVec<CAssetAllocationGroupOwned>,
-}
-
-impl From<AssetAllocationResponse> for CAssetAllocationResponseOwned {
-    fn from(v: AssetAllocationResponse) -> Self {
-        Self {
-            info: v.info.into(),
-        }
-    }
-}
-
-impl ToFFI for CAssetAllocationResponseOwned {
-    type FFIType = CAssetAllocationResponse;
-    fn to_ffi_type(&self) -> Self::FFIType {
-        CAssetAllocationResponse {
-            info: self.info.to_ffi_type(),
-            num_info: self.info.len(),
         }
     }
 }

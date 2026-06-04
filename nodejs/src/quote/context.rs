@@ -13,16 +13,16 @@ use crate::{
         },
         requests::{CreateWatchlistGroup, DeleteWatchlistGroup, UpdateWatchlistGroup},
         types::{
-            AdjustType, AssetAllocationResponse, CalcIndex, Candlestick,
-            CapitalDistributionResponse, CapitalFlowLine, FilingItem, FilterWarrantExpiryDate,
-            FilterWarrantInOutBoundsType, HistoryMarketTemperatureResponse, IntradayLine,
-            IssuerInfo, MarketTemperature, MarketTradingDays, MarketTradingSession, OptionQuote,
-            OptionVolumeDaily, OptionVolumeStats, ParticipantInfo, Period, PinnedMode,
-            QuotePackageDetail, RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex,
-            SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-            ShortPositionsResponse, ShortTradesResponse, SortOrderType, StrikePriceInfo, SubType,
-            SubTypes, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
-            WarrantStatus, WarrantType, WatchlistGroup,
+            AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+            FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+            HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+            MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily,
+            OptionVolumeStats, ParticipantInfo, Period, PinnedMode, QuotePackageDetail,
+            RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+            SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse,
+            ShortTradesResponse, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
+            Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
+            WarrantType, WatchlistGroup,
         },
     },
     time::{NaiveDate, NaiveDatetime},
@@ -1286,18 +1286,6 @@ impl QuoteContext {
         Ok(self
             .ctx
             .option_volume_daily(symbol, timestamp, count)
-            .await
-            .map_err(ErrorNewType)?
-            .into())
-    }
-
-    /// Get ETF asset allocation (holdings / regional / asset class /
-    /// industry)
-    #[napi]
-    pub async fn etf_asset_allocation(&self, symbol: String) -> Result<AssetAllocationResponse> {
-        Ok(self
-            .ctx
-            .etf_asset_allocation(symbol)
             .await
             .map_err(ErrorNewType)?
             .into())
