@@ -9922,7 +9922,7 @@ class FundamentalContext:
         """
         ...
 
-    def economic_indicator_list(
+    def macrodata_indicators(
         self,
         offset: int | None = None,
         limit: int | None = None,
@@ -9939,7 +9939,7 @@ class FundamentalContext:
         """
         ...
 
-    def economic_indicator(
+    def macrodata(
         self,
         indicator_code: str,
         start_time: int | None = None,
@@ -9950,7 +9950,7 @@ class FundamentalContext:
         Get historical data for a macroeconomic indicator.
 
         Args:
-            indicator_code: External vendor code from ``economic_indicator_list``
+            indicator_code: External vendor code from ``macrodata_indicators``
             start_time: Data start Unix timestamp (optional)
             end_time: Data end Unix timestamp (optional)
             limit: Max records to return (default 100, max 100)
@@ -10115,7 +10115,7 @@ class EconomicIndicatorInfo:
     """Metadata for one macroeconomic indicator."""
 
     indicator_code: str
-    """External vendor code (input to economic_indicator)"""
+    """External vendor code (input to macrodata)"""
     source_org: str
     country: str
     name: MultiLanguageText
@@ -10145,7 +10145,7 @@ class EconomicIndicatorData:
 
 
 class EconomicIndicatorResponse:
-    """Response for economic_indicator."""
+    """Response for macrodata."""
 
     info: EconomicIndicatorInfo
     data: list[EconomicIndicatorData]

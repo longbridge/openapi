@@ -319,7 +319,7 @@ impl AsyncFundamentalContext {
     }
 
     /// List macroeconomic indicators. Returns awaitable.
-    fn economic_indicator_list(
+    fn macrodata_indicators(
         &self,
         py: Python<'_>,
         offset: Option<i32>,
@@ -328,7 +328,7 @@ impl AsyncFundamentalContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(ctx
-                .economic_indicator_list(offset, limit)
+                .macrodata_indicators(offset, limit)
                 .await
                 .map_err(ErrorNewType)?
                 .into_iter()
@@ -339,7 +339,7 @@ impl AsyncFundamentalContext {
     }
 
     /// Get historical data for a macroeconomic indicator. Returns awaitable.
-    fn economic_indicator(
+    fn macrodata(
         &self,
         py: Python<'_>,
         indicator_code: String,
@@ -350,7 +350,7 @@ impl AsyncFundamentalContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(EconomicIndicatorResponse::from(
-                ctx.economic_indicator(indicator_code, start_time, end_time, limit)
+                ctx.macrodata(indicator_code, start_time, end_time, limit)
                     .await
                     .map_err(ErrorNewType)?,
             ))

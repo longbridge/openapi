@@ -619,9 +619,9 @@ export declare class FundamentalContext {
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
   /** List macroeconomic indicators */
-  economicIndicatorList(offset?: number | null, limit?: number | null): Promise<Array<EconomicIndicatorInfo>>
+  macrodataIndicators(offset?: number | null, limit?: number | null): Promise<Array<EconomicIndicatorInfo>>
   /** Get historical data for a macroeconomic indicator */
-  economicIndicator(indicatorCode: string, startTime?: bigint | null, endTime?: bigint | null, limit?: number | null): Promise<EconomicIndicatorResponse>
+  macrodata(indicatorCode: string, startTime?: bigint | null, endTime?: bigint | null, limit?: number | null): Promise<EconomicIndicatorResponse>
 }
 
 /** Fund position */
@@ -3171,7 +3171,7 @@ export interface EconomicIndicatorData {
   unit: MultiLanguageText
   unitPrefix: MultiLanguageText
 }
-/** Response for economicIndicator */
+/** Response for macrodata */
 export interface EconomicIndicatorResponse {
   info: EconomicIndicatorInfo
   data: Array<EconomicIndicatorData>

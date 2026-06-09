@@ -830,12 +830,12 @@ impl FundamentalContext {
         .await
     }
 
-    // ── economic_indicator ────────────────────────────────────────────────
+    // ── macrodata ────────────────────────────────────────────────
 
     /// List macroeconomic indicators.
     ///
     /// Path: `GET /v1/quote/macrodata`
-    pub async fn economic_indicator_list(
+    pub async fn macrodata_indicators(
         &self,
         offset: Option<i32>,
         limit: Option<i32>,
@@ -856,7 +856,7 @@ impl FundamentalContext {
     /// Get historical data for a macroeconomic indicator.
     ///
     /// Path: `GET /v1/quote/macrodata/{indicator_code}`
-    pub async fn economic_indicator(
+    pub async fn macrodata(
         &self,
         indicator_code: impl Into<String>,
         start_time: Option<i64>,

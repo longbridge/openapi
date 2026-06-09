@@ -264,7 +264,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextVa
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextEconomicIndicatorList(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacrodataIndicators(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -287,7 +287,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextEc
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextEconomicIndicator(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacrodata(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,

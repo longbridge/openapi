@@ -1563,7 +1563,7 @@ pub struct AssetAllocationResponse {
     pub info: Vec<AssetAllocationGroup>,
 }
 
-// ── economic_indicator ─────────────────────────────────────────────────────
+// ── macrodata ─────────────────────────────────────────────────────
 
 /// Localized text in simplified Chinese, traditional Chinese, and English
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -1582,7 +1582,7 @@ pub struct MultiLanguageText {
 /// Metadata for one macroeconomic indicator
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EconomicIndicatorInfo {
-    /// External vendor code (used as input to `economic_indicator`)
+    /// External vendor code (used as input to `macrodata`)
     pub indicator_code: String,
     /// Publishing organisation
     #[serde(default)]
@@ -1617,7 +1617,7 @@ pub struct EconomicIndicatorInfo {
     pub start_date: Option<OffsetDateTime>,
 }
 
-/// Response for [`crate::FundamentalContext::economic_indicator_list`]
+/// Response for [`crate::FundamentalContext::macrodata_list`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EconomicIndicatorListResponse {
     /// Indicator list
@@ -1657,7 +1657,7 @@ pub struct EconomicIndicatorData {
     pub unit_prefix: MultiLanguageText,
 }
 
-/// Response for [`crate::FundamentalContext::economic_indicator`]
+/// Response for [`crate::FundamentalContext::macrodata`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EconomicIndicatorResponse {
     /// Indicator metadata

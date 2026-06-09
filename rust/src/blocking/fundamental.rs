@@ -290,4 +290,28 @@ impl FundamentalContextSync {
         self.rt
             .call(move |ctx| async move { ctx.etf_asset_allocation(symbol).await })
     }
+
+    /// List macroeconomic indicators
+    pub fn macrodata_indicators(
+        &self,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<Vec<EconomicIndicatorInfo>> {
+        self.rt
+            .call(move |ctx| async move { ctx.macrodata_indicators(offset, limit).await })
+    }
+
+    /// Get historical data for a macroeconomic indicator
+    pub fn macrodata(
+        &self,
+        indicator_code: impl Into<String> + Send + 'static,
+        start_time: Option<i64>,
+        end_time: Option<i64>,
+        limit: Option<i32>,
+    ) -> Result<EconomicIndicatorResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.macrodata(indicator_code, start_time, end_time, limit)
+                .await
+        })
+    }
 }

@@ -336,16 +336,16 @@ public class FundamentalContext implements AutoCloseable {
     }
 
     /** List macroeconomic indicators. */
-    public CompletableFuture<EconomicIndicatorInfo[]> getEconomicIndicatorList(Integer offset, Integer limit) throws OpenApiException {
+    public CompletableFuture<EconomicIndicatorInfo[]> getMacrodataIndicators(Integer offset, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextEconomicIndicatorList(raw, offset, limit, callback);
+            SdkNative.fundamentalContextMacrodataIndicators(raw, offset, limit, callback);
         });
     }
 
     /** Get historical data for a macroeconomic indicator. */
-    public CompletableFuture<EconomicIndicatorResponse> getEconomicIndicator(String indicatorCode, Long startTime, Long endTime, Integer limit) throws OpenApiException {
+    public CompletableFuture<EconomicIndicatorResponse> getMacrodata(String indicatorCode, Long startTime, Long endTime, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextEconomicIndicator(raw, indicatorCode, startTime, endTime, limit, callback);
+            SdkNative.fundamentalContextMacrodata(raw, indicatorCode, startTime, endTime, limit, callback);
         });
     }
 }
