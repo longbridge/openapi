@@ -1608,9 +1608,13 @@ pub struct EconomicIndicatorInfo {
     /// Importance — higher is more important
     #[serde(default)]
     pub importance: i32,
-    /// Start date of data coverage (unix timestamp string)
-    #[serde(default)]
-    pub start_date: String,
+    /// Start date of data coverage
+    #[serde(
+        default,
+        with = "crate::serde_utils::timestamp_opt",
+        rename = "start_date"
+    )]
+    pub start_date: Option<OffsetDateTime>,
 }
 
 /// Response for [`crate::FundamentalContext::economic_indicator_list`]
@@ -1627,9 +1631,9 @@ pub struct EconomicIndicatorData {
     /// Statistical period (e.g. `2024-Q1`, `2024-03`)
     #[serde(default)]
     pub period: String,
-    /// Release timestamp (unix timestamp string)
-    #[serde(default)]
-    pub release_at: String,
+    /// Release datetime
+    #[serde(default, with = "crate::serde_utils::timestamp_opt")]
+    pub release_at: Option<OffsetDateTime>,
     /// Actual value
     #[serde(default)]
     pub actual_value: String,
@@ -1642,9 +1646,9 @@ pub struct EconomicIndicatorData {
     /// Revised value
     #[serde(default)]
     pub revised_value: String,
-    /// Next release timestamp (unix timestamp string)
-    #[serde(default)]
-    pub next_release_at: String,
+    /// Next release datetime
+    #[serde(default, with = "crate::serde_utils::timestamp_opt")]
+    pub next_release_at: Option<OffsetDateTime>,
     /// Unit (multilingual)
     #[serde(default)]
     pub unit: MultiLanguageText,

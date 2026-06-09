@@ -2000,7 +2000,7 @@ pub(crate) struct EconomicIndicatorInfo {
     pub category: String,
     pub describe: MultiLanguageText,
     pub importance: i32,
-    pub start_date: String,
+    pub start_date: Option<crate::time::PyOffsetDateTimeWrapper>,
 }
 
 impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
@@ -2015,7 +2015,7 @@ impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
             category: v.category,
             describe: v.describe.into(),
             importance: v.importance,
-            start_date: v.start_date,
+            start_date: v.start_date.map(crate::time::PyOffsetDateTimeWrapper),
         }
     }
 }
@@ -2025,12 +2025,12 @@ impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
 #[derive(Debug, Clone)]
 pub(crate) struct EconomicIndicatorData {
     pub period: String,
-    pub release_at: String,
+    pub release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
     pub actual_value: String,
     pub previous_value: String,
     pub forecast_value: String,
     pub revised_value: String,
-    pub next_release_at: String,
+    pub next_release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
     pub unit: MultiLanguageText,
     pub unit_prefix: MultiLanguageText,
 }
@@ -2039,12 +2039,12 @@ impl From<lb::EconomicIndicatorData> for EconomicIndicatorData {
     fn from(v: lb::EconomicIndicatorData) -> Self {
         Self {
             period: v.period,
-            release_at: v.release_at,
+            release_at: v.release_at.map(crate::time::PyOffsetDateTimeWrapper),
             actual_value: v.actual_value,
             previous_value: v.previous_value,
             forecast_value: v.forecast_value,
             revised_value: v.revised_value,
-            next_release_at: v.next_release_at,
+            next_release_at: v.next_release_at.map(crate::time::PyOffsetDateTimeWrapper),
             unit: v.unit.into(),
             unit_prefix: v.unit_prefix.into(),
         }

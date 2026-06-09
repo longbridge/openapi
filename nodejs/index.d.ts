@@ -3154,17 +3154,20 @@ export interface EconomicIndicatorInfo {
   category: string
   describe: MultiLanguageText
   importance: number
-  startDate: string
+  /** Start date of data coverage (unix timestamp in seconds; null if unset) */
+  startDate: bigint | null
 }
 /** One historical data point for a macroeconomic indicator */
 export interface EconomicIndicatorData {
   period: string
-  releaseAt: string
+  /** Release datetime (unix timestamp in seconds; null if unset) */
+  releaseAt: bigint | null
   actualValue: string
   previousValue: string
   forecastValue: string
   revisedValue: string
-  nextReleaseAt: string
+  /** Next release datetime (unix timestamp in seconds; null if unset) */
+  nextReleaseAt: bigint | null
   unit: MultiLanguageText
   unitPrefix: MultiLanguageText
 }

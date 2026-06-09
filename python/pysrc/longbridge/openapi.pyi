@@ -10125,8 +10125,8 @@ class EconomicIndicatorInfo:
     category: str
     describe: MultiLanguageText
     importance: int
-    start_date: str
-    """Start date of data coverage (unix timestamp string)"""
+    start_date: datetime | None
+    """Start date of data coverage"""
 
 
 class EconomicIndicatorData:
@@ -10134,12 +10134,12 @@ class EconomicIndicatorData:
 
     period: str
     """Statistical period (e.g. 2024-Q1, 2024-03)"""
-    release_at: str
+    release_at: datetime | None
     actual_value: str
     previous_value: str
     forecast_value: str
     revised_value: str
-    next_release_at: str
+    next_release_at: datetime | None
     unit: MultiLanguageText
     unit_prefix: MultiLanguageText
 
