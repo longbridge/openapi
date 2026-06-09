@@ -262,3 +262,53 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextVa
         Ok(())
     })
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextEconomicIndicatorList(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    offset: JObject,
+    limit: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
+        let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .economic_indicator_list(offset, limit)
+                .await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextEconomicIndicator(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    indicator_code: JObject,
+    start_time: JObject,
+    end_time: JObject,
+    limit: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let indicator_code: String = FromJValue::from_jvalue(env, indicator_code.into())?;
+        let start_time: Option<i64> = FromJValue::from_jvalue(env, start_time.into())?;
+        let end_time: Option<i64> = FromJValue::from_jvalue(env, end_time.into())?;
+        let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .economic_indicator(indicator_code, start_time, end_time, limit)
+                .await?)
+        })?;
+        Ok(())
+    })
+}

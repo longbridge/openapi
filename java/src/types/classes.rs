@@ -2698,6 +2698,55 @@ impl_java_class!(
     ]
 );
 
+impl_java_class!(
+    "com/longbridge/fundamental/MultiLanguageText",
+    longbridge::fundamental::MultiLanguageText,
+    [english, simplified_chinese, traditional_chinese]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/EconomicIndicatorInfo",
+    longbridge::fundamental::EconomicIndicatorInfo,
+    [
+        indicator_code,
+        source_org,
+        country,
+        name,
+        adjustment_factor,
+        periodicity,
+        category,
+        describe,
+        importance,
+        start_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/EconomicIndicatorData",
+    longbridge::fundamental::EconomicIndicatorData,
+    [
+        period,
+        release_at,
+        actual_value,
+        previous_value,
+        forecast_value,
+        revised_value,
+        next_release_at,
+        unit,
+        unit_prefix
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fundamental/EconomicIndicatorResponse",
+    longbridge::fundamental::EconomicIndicatorResponse,
+    [
+        info,
+        #[java(objarray)]
+        data
+    ]
+);
+
 // ── MarketContext: top movers / rank ──────────────────────────────
 
 impl_java_class!(

@@ -317,4 +317,44 @@ impl AsyncFundamentalContext {
         })
         .map(|b| b.unbind())
     }
+
+    /// List macroeconomic indicators. Returns awaitable.
+    fn economic_indicator_list(
+        &self,
+        py: Python<'_>,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(ctx
+                .economic_indicator_list(offset, limit)
+                .await
+                .map_err(ErrorNewType)?
+                .into_iter()
+                .map(EconomicIndicatorInfo::from)
+                .collect::<Vec<_>>())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get historical data for a macroeconomic indicator. Returns awaitable.
+    fn economic_indicator(
+        &self,
+        py: Python<'_>,
+        indicator_code: String,
+        start_time: Option<i64>,
+        end_time: Option<i64>,
+        limit: Option<i32>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(EconomicIndicatorResponse::from(
+                ctx.economic_indicator(indicator_code, start_time, end_time, limit)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
 }

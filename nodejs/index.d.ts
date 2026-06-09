@@ -618,6 +618,10 @@ export declare class FundamentalContext {
    * industry)
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
+  /** List macroeconomic indicators */
+  economicIndicatorList(offset?: number | null, limit?: number | null): Promise<Array<EconomicIndicatorInfo>>
+  /** Get historical data for a macroeconomic indicator */
+  economicIndicator(indicatorCode: string, startTime?: bigint | null, endTime?: bigint | null, limit?: number | null): Promise<EconomicIndicatorResponse>
 }
 
 /** Fund position */
@@ -3132,6 +3136,42 @@ export interface AssetAllocationItem {
 export interface AssetAllocationResponse {
   /** Asset allocation groups */
   info: Array<AssetAllocationGroup>
+}
+/** Localized text in simplified Chinese, traditional Chinese, and English */
+export interface MultiLanguageText {
+  english: string
+  simplifiedChinese: string
+  traditionalChinese: string
+}
+/** Metadata for one macroeconomic indicator */
+export interface EconomicIndicatorInfo {
+  indicatorCode: string
+  sourceOrg: string
+  country: string
+  name: MultiLanguageText
+  adjustmentFactor: string
+  periodicity: string
+  category: string
+  describe: MultiLanguageText
+  importance: number
+  startDate: string
+}
+/** One historical data point for a macroeconomic indicator */
+export interface EconomicIndicatorData {
+  period: string
+  releaseAt: string
+  actualValue: string
+  previousValue: string
+  forecastValue: string
+  revisedValue: string
+  nextReleaseAt: string
+  unit: MultiLanguageText
+  unitPrefix: MultiLanguageText
+}
+/** Response for economicIndicator */
+export interface EconomicIndicatorResponse {
+  info: EconomicIndicatorInfo
+  data: Array<EconomicIndicatorData>
 }
 
 export declare const enum AssetType {

@@ -9922,6 +9922,44 @@ class FundamentalContext:
         """
         ...
 
+    def economic_indicator_list(
+        self,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> list["EconomicIndicatorInfo"]:
+        """
+        List macroeconomic indicators.
+
+        Args:
+            offset: Pagination offset (default 0)
+            limit: Page size (default 100, max 1000)
+
+        Returns:
+            List of :class:`EconomicIndicatorInfo`
+        """
+        ...
+
+    def economic_indicator(
+        self,
+        indicator_code: str,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> "EconomicIndicatorResponse":
+        """
+        Get historical data for a macroeconomic indicator.
+
+        Args:
+            indicator_code: External vendor code from ``economic_indicator_list``
+            start_time: Data start Unix timestamp (optional)
+            end_time: Data end Unix timestamp (optional)
+            limit: Max records to return (default 100, max 100)
+
+        Returns:
+            :class:`EconomicIndicatorResponse`
+        """
+        ...
+
 
 # ── FundamentalContext new response types ─────────────────────────
 
@@ -10063,6 +10101,54 @@ class AssetAllocationResponse:
 
     info: list[AssetAllocationGroup]
     """Asset allocation groups"""
+
+
+class MultiLanguageText:
+    """Localized text in simplified Chinese, traditional Chinese, and English."""
+
+    english: str
+    simplified_chinese: str
+    traditional_chinese: str
+
+
+class EconomicIndicatorInfo:
+    """Metadata for one macroeconomic indicator."""
+
+    indicator_code: str
+    """External vendor code (input to economic_indicator)"""
+    source_org: str
+    country: str
+    name: MultiLanguageText
+    adjustment_factor: str
+    periodicity: str
+    """Release periodicity (e.g. monthly / quarterly)"""
+    category: str
+    describe: MultiLanguageText
+    importance: int
+    start_date: str
+    """Start date of data coverage (unix timestamp string)"""
+
+
+class EconomicIndicatorData:
+    """One historical data point for a macroeconomic indicator."""
+
+    period: str
+    """Statistical period (e.g. 2024-Q1, 2024-03)"""
+    release_at: str
+    actual_value: str
+    previous_value: str
+    forecast_value: str
+    revised_value: str
+    next_release_at: str
+    unit: MultiLanguageText
+    unit_prefix: MultiLanguageText
+
+
+class EconomicIndicatorResponse:
+    """Response for economic_indicator."""
+
+    info: EconomicIndicatorInfo
+    data: list[EconomicIndicatorData]
 
 
 # ── MarketContext ─────────────────────────────────────────────────

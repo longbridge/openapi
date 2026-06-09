@@ -1902,3 +1902,105 @@ impl From<lb::AssetAllocationResponse> for AssetAllocationResponse {
         }
     }
 }
+
+// ── economic_indicator ─────────────────────────────────────────────────────
+
+/// Localized text in simplified Chinese, traditional Chinese, and English
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone, Default)]
+pub struct MultiLanguageText {
+    pub english: String,
+    pub simplified_chinese: String,
+    pub traditional_chinese: String,
+}
+
+impl From<lb::MultiLanguageText> for MultiLanguageText {
+    fn from(v: lb::MultiLanguageText) -> Self {
+        Self {
+            english: v.english,
+            simplified_chinese: v.simplified_chinese,
+            traditional_chinese: v.traditional_chinese,
+        }
+    }
+}
+
+/// Metadata for one macroeconomic indicator
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct EconomicIndicatorInfo {
+    pub indicator_code: String,
+    pub source_org: String,
+    pub country: String,
+    pub name: MultiLanguageText,
+    pub adjustment_factor: String,
+    pub periodicity: String,
+    pub category: String,
+    pub describe: MultiLanguageText,
+    pub importance: i32,
+    pub start_date: String,
+}
+
+impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
+    fn from(v: lb::EconomicIndicatorInfo) -> Self {
+        Self {
+            indicator_code: v.indicator_code,
+            source_org: v.source_org,
+            country: v.country,
+            name: v.name.into(),
+            adjustment_factor: v.adjustment_factor,
+            periodicity: v.periodicity,
+            category: v.category,
+            describe: v.describe.into(),
+            importance: v.importance,
+            start_date: v.start_date,
+        }
+    }
+}
+
+/// One historical data point for a macroeconomic indicator
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct EconomicIndicatorData {
+    pub period: String,
+    pub release_at: String,
+    pub actual_value: String,
+    pub previous_value: String,
+    pub forecast_value: String,
+    pub revised_value: String,
+    pub next_release_at: String,
+    pub unit: MultiLanguageText,
+    pub unit_prefix: MultiLanguageText,
+}
+
+impl From<lb::EconomicIndicatorData> for EconomicIndicatorData {
+    fn from(v: lb::EconomicIndicatorData) -> Self {
+        Self {
+            period: v.period,
+            release_at: v.release_at,
+            actual_value: v.actual_value,
+            previous_value: v.previous_value,
+            forecast_value: v.forecast_value,
+            revised_value: v.revised_value,
+            next_release_at: v.next_release_at,
+            unit: v.unit.into(),
+            unit_prefix: v.unit_prefix.into(),
+        }
+    }
+}
+
+/// Response for economic_indicator
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct EconomicIndicatorResponse {
+    pub info: EconomicIndicatorInfo,
+    pub data: Vec<EconomicIndicatorData>,
+}
+
+impl From<lb::EconomicIndicatorResponse> for EconomicIndicatorResponse {
+    fn from(v: lb::EconomicIndicatorResponse) -> Self {
+        Self {
+            info: v.info.into(),
+            data: v.data.into_iter().map(Into::into).collect(),
+        }
+    }
+}

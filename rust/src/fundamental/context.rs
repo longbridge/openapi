@@ -829,4 +829,63 @@ impl FundamentalContext {
         )
         .await
     }
+
+    // ── economic_indicator ────────────────────────────────────────────────
+
+    /// List macroeconomic indicators.
+    ///
+    /// Path: `GET /v1/quote/macrodata`
+    pub async fn economic_indicator_list(
+        &self,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<Vec<EconomicIndicatorInfo>> {
+        #[derive(Serialize)]
+        struct Query {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            offset: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            limit: Option<i32>,
+        }
+        let resp: EconomicIndicatorListResponse = self
+            .get("/v1/quote/macrodata", Query { offset, limit })
+            .await?;
+        Ok(resp.data)
+    }
+
+    /// Get historical data for a macroeconomic indicator.
+    ///
+    /// Path: `GET /v1/quote/macrodata/{indicator_code}`
+    pub async fn economic_indicator(
+        &self,
+        indicator_code: impl Into<String>,
+        start_time: Option<i64>,
+        end_time: Option<i64>,
+        limit: Option<i32>,
+    ) -> Result<EconomicIndicatorResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            start_time: Option<i64>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            end_time: Option<i64>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            limit: Option<i32>,
+        }
+        let path = format!("/v1/quote/macrodata/{}", indicator_code.into());
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path)
+            .query_params(Query {
+                start_time,
+                end_time,
+                limit,
+            })
+            .response::<Json<EconomicIndicatorResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
 }

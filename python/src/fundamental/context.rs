@@ -208,4 +208,34 @@ impl FundamentalContext {
             .map_err(ErrorNewType)?
             .into())
     }
+
+    /// List macroeconomic indicators.
+    fn economic_indicator_list(
+        &self,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> PyResult<Vec<EconomicIndicatorInfo>> {
+        Ok(self
+            .ctx
+            .economic_indicator_list(offset, limit)
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(Into::into)
+            .collect())
+    }
+
+    /// Get historical data for a macroeconomic indicator.
+    fn economic_indicator(
+        &self,
+        indicator_code: String,
+        start_time: Option<i64>,
+        end_time: Option<i64>,
+        limit: Option<i32>,
+    ) -> PyResult<EconomicIndicatorResponse> {
+        Ok(self
+            .ctx
+            .economic_indicator(indicator_code, start_time, end_time, limit)
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

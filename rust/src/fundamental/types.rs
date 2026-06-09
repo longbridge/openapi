@@ -1562,3 +1562,103 @@ pub struct AssetAllocationResponse {
     #[serde(default)]
     pub info: Vec<AssetAllocationGroup>,
 }
+
+// ── economic_indicator ─────────────────────────────────────────────────────
+
+/// Localized text in simplified Chinese, traditional Chinese, and English
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct MultiLanguageText {
+    /// English
+    #[serde(default)]
+    pub english: String,
+    /// Simplified Chinese
+    #[serde(default)]
+    pub simplified_chinese: String,
+    /// Traditional Chinese
+    #[serde(default)]
+    pub traditional_chinese: String,
+}
+
+/// Metadata for one macroeconomic indicator
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EconomicIndicatorInfo {
+    /// External vendor code (used as input to `economic_indicator`)
+    pub indicator_code: String,
+    /// Publishing organisation
+    #[serde(default)]
+    pub source_org: String,
+    /// Country
+    #[serde(default)]
+    pub country: String,
+    /// Indicator name (multilingual)
+    #[serde(default)]
+    pub name: MultiLanguageText,
+    /// Adjustment factor
+    #[serde(default)]
+    pub adjustment_factor: String,
+    /// Release periodicity (e.g. `monthly` / `quarterly`)
+    #[serde(default)]
+    pub periodicity: String,
+    /// Indicator category
+    #[serde(default)]
+    pub category: String,
+    /// Description (multilingual)
+    #[serde(default)]
+    pub describe: MultiLanguageText,
+    /// Importance — higher is more important
+    #[serde(default)]
+    pub importance: i32,
+    /// Start date of data coverage (unix timestamp string)
+    #[serde(default)]
+    pub start_date: String,
+}
+
+/// Response for [`crate::FundamentalContext::economic_indicator_list`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EconomicIndicatorListResponse {
+    /// Indicator list
+    #[serde(default)]
+    pub data: Vec<EconomicIndicatorInfo>,
+}
+
+/// One historical data point for a macroeconomic indicator
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EconomicIndicatorData {
+    /// Statistical period (e.g. `2024-Q1`, `2024-03`)
+    #[serde(default)]
+    pub period: String,
+    /// Release timestamp (unix timestamp string)
+    #[serde(default)]
+    pub release_at: String,
+    /// Actual value
+    #[serde(default)]
+    pub actual_value: String,
+    /// Previous value
+    #[serde(default)]
+    pub previous_value: String,
+    /// Forecast value (market consensus)
+    #[serde(default)]
+    pub forecast_value: String,
+    /// Revised value
+    #[serde(default)]
+    pub revised_value: String,
+    /// Next release timestamp (unix timestamp string)
+    #[serde(default)]
+    pub next_release_at: String,
+    /// Unit (multilingual)
+    #[serde(default)]
+    pub unit: MultiLanguageText,
+    /// Unit prefix / data scale (multilingual, e.g. millions / billions)
+    #[serde(default)]
+    pub unit_prefix: MultiLanguageText,
+}
+
+/// Response for [`crate::FundamentalContext::economic_indicator`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EconomicIndicatorResponse {
+    /// Indicator metadata
+    pub info: EconomicIndicatorInfo,
+    /// Historical data points
+    #[serde(default)]
+    pub data: Vec<EconomicIndicatorData>,
+}

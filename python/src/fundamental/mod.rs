@@ -74,6 +74,10 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<AssetAllocationItem>()?;
     parent.add_class::<AssetAllocationGroup>()?;
     parent.add_class::<AssetAllocationResponse>()?;
+    parent.add_class::<MultiLanguageText>()?;
+    parent.add_class::<EconomicIndicatorInfo>()?;
+    parent.add_class::<EconomicIndicatorData>()?;
+    parent.add_class::<EconomicIndicatorResponse>()?;
     parent.add_class::<context::FundamentalContext>()?;
     parent.add_class::<context_async::AsyncFundamentalContext>()?;
     Ok(())
