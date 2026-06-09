@@ -343,7 +343,7 @@ public class FundamentalContext implements AutoCloseable {
     }
 
     /** Get historical data for a macroeconomic indicator. */
-    public CompletableFuture<EconomicIndicatorResponse> getMacrodata(String indicatorCode, Long startTime, Long endTime, Integer limit) throws OpenApiException {
+    public CompletableFuture<EconomicIndicatorResponse> getMacrodata(String indicatorCode, java.time.OffsetDateTime startTime, java.time.OffsetDateTime endTime, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.fundamentalContextMacrodata(raw, indicatorCode, startTime, endTime, limit, callback);
         });

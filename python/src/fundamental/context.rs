@@ -228,13 +228,18 @@ impl FundamentalContext {
     fn macrodata(
         &self,
         indicator_code: String,
-        start_time: Option<i64>,
-        end_time: Option<i64>,
+        start_time: Option<crate::time::PyOffsetDateTimeWrapper>,
+        end_time: Option<crate::time::PyOffsetDateTimeWrapper>,
         limit: Option<i32>,
     ) -> PyResult<EconomicIndicatorResponse> {
         Ok(self
             .ctx
-            .macrodata(indicator_code, start_time, end_time, limit)
+            .macrodata(
+                indicator_code,
+                start_time.map(|t| t.0),
+                end_time.map(|t| t.0),
+                limit,
+            )
             .map_err(ErrorNewType)?
             .into())
     }

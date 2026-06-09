@@ -9942,8 +9942,8 @@ class FundamentalContext:
     def macrodata(
         self,
         indicator_code: str,
-        start_time: int | None = None,
-        end_time: int | None = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
         limit: int | None = None,
     ) -> "EconomicIndicatorResponse":
         """

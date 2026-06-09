@@ -305,8 +305,8 @@ impl FundamentalContextSync {
     pub fn macrodata(
         &self,
         indicator_code: impl Into<String> + Send + 'static,
-        start_time: Option<i64>,
-        end_time: Option<i64>,
+        start_time: Option<OffsetDateTime>,
+        end_time: Option<OffsetDateTime>,
         limit: Option<i32>,
     ) -> Result<EconomicIndicatorResponse> {
         self.rt.call(move |ctx| async move {

@@ -314,9 +314,21 @@ impl FundamentalContext {
         end_time: Option<i64>,
         limit: Option<i32>,
     ) -> Result<EconomicIndicatorResponse> {
+        use time::OffsetDateTime;
         Ok(self
             .ctx
-            .macrodata(indicator_code, start_time, end_time, limit)
+            .macrodata(
+                indicator_code,
+                start_time
+                    .map(OffsetDateTime::from_unix_timestamp)
+                    .transpose()
+                    .map_err(|e| napi::Error::from_reason(e.to_string()))?,
+                end_time
+                    .map(OffsetDateTime::from_unix_timestamp)
+                    .transpose()
+                    .map_err(|e| napi::Error::from_reason(e.to_string()))?,
+                limit,
+            )
             .await
             .map_err(ErrorNewType)?
             .into())

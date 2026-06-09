@@ -300,13 +300,15 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let indicator_code: String = FromJValue::from_jvalue(env, indicator_code.into())?;
-        let start_time: Option<i64> = FromJValue::from_jvalue(env, start_time.into())?;
-        let end_time: Option<i64> = FromJValue::from_jvalue(env, end_time.into())?;
+        let start_time: Option<time::OffsetDateTime> =
+            FromJValue::from_jvalue(env, start_time.into())?;
+        let end_time: Option<time::OffsetDateTime> =
+            FromJValue::from_jvalue(env, end_time.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
             Ok(context
                 .ctx
-                .economic_indicator(indicator_code, start_time, end_time, limit)
+                .macrodata(indicator_code, start_time, end_time, limit)
                 .await?)
         })?;
         Ok(())
