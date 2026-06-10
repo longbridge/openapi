@@ -846,16 +846,27 @@ impl FundamentalContext {
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
-            country: Option<MacrodataCountry>,
+            country: Option<String>,
             #[serde(skip_serializing_if = "Option::is_none")]
             offset: Option<i32>,
             #[serde(skip_serializing_if = "Option::is_none")]
             limit: Option<i32>,
         }
+        let country_str = country.map(|c| {
+            match c {
+                MacrodataCountry::HongKong => "Hong Kong SAR China",
+                MacrodataCountry::China => "China (Mainland)",
+                MacrodataCountry::UnitedStates => "United States",
+                MacrodataCountry::EuroZone => "Euro Zone",
+                MacrodataCountry::Japan => "Japan",
+                MacrodataCountry::Singapore => "Singapore",
+            }
+            .to_string()
+        });
         self.get(
             "/v1/quote/macrodata",
             Query {
-                country,
+                country: country_str,
                 offset,
                 limit,
             },
