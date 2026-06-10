@@ -214,7 +214,7 @@ impl FundamentalContext {
         &self,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> PyResult<Vec<MacrodataIndicatorInfo>> {
+    ) -> PyResult<Vec<MacrodataIndicator>> {
         Ok(self
             .ctx
             .macrodata_indicators(offset, limit)

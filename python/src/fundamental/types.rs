@@ -1990,7 +1990,7 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
 /// Metadata for one macroeconomic indicator
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct MacrodataIndicatorInfo {
+pub(crate) struct MacrodataIndicator {
     pub indicator_code: String,
     pub source_org: String,
     pub country: String,
@@ -2003,8 +2003,8 @@ pub(crate) struct MacrodataIndicatorInfo {
     pub start_date: Option<crate::time::PyOffsetDateTimeWrapper>,
 }
 
-impl From<lb::MacrodataIndicatorInfo> for MacrodataIndicatorInfo {
-    fn from(v: lb::MacrodataIndicatorInfo) -> Self {
+impl From<lb::MacrodataIndicator> for MacrodataIndicator {
+    fn from(v: lb::MacrodataIndicator) -> Self {
         Self {
             indicator_code: v.indicator_code,
             source_org: v.source_org,
@@ -2023,7 +2023,7 @@ impl From<lb::MacrodataIndicatorInfo> for MacrodataIndicatorInfo {
 /// One historical data point for a macroeconomic indicator
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct MacrodataRecord {
+pub(crate) struct Macrodata {
     pub period: String,
     pub release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
     pub actual_value: String,
@@ -2035,8 +2035,8 @@ pub(crate) struct MacrodataRecord {
     pub unit_prefix: MultiLanguageText,
 }
 
-impl From<lb::MacrodataRecord> for MacrodataRecord {
-    fn from(v: lb::MacrodataRecord) -> Self {
+impl From<lb::Macrodata> for Macrodata {
+    fn from(v: lb::Macrodata) -> Self {
         Self {
             period: v.period,
             release_at: v.release_at.map(crate::time::PyOffsetDateTimeWrapper),
@@ -2055,8 +2055,8 @@ impl From<lb::MacrodataRecord> for MacrodataRecord {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct MacrodataResponse {
-    pub info: MacrodataIndicatorInfo,
-    pub data: Vec<MacrodataRecord>,
+    pub info: MacrodataIndicator,
+    pub data: Vec<Macrodata>,
 }
 
 impl From<lb::MacrodataResponse> for MacrodataResponse {

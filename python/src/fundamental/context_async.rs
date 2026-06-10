@@ -332,7 +332,7 @@ impl AsyncFundamentalContext {
                 .await
                 .map_err(ErrorNewType)?
                 .into_iter()
-                .map(MacrodataIndicatorInfo::from)
+                .map(MacrodataIndicator::from)
                 .collect::<Vec<_>>())
         })
         .map(|b| b.unbind())

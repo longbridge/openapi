@@ -336,7 +336,7 @@ public class FundamentalContext implements AutoCloseable {
     }
 
     /** List macroeconomic indicators. */
-    public CompletableFuture<MacrodataIndicatorInfo[]> getMacrodataIndicators(Integer offset, Integer limit) throws OpenApiException {
+    public CompletableFuture<MacrodataIndicator[]> getMacrodataIndicators(Integer offset, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.fundamentalContextMacrodataIndicators(raw, offset, limit, callback);
         });

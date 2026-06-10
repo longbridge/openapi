@@ -2705,8 +2705,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/MacrodataIndicatorInfo",
-    longbridge::fundamental::MacrodataIndicatorInfo,
+    "com/longbridge/fundamental/MacrodataIndicator",
+    longbridge::fundamental::MacrodataIndicator,
     [
         indicator_code,
         source_org,
@@ -2722,8 +2722,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/MacrodataRecord",
-    longbridge::fundamental::MacrodataRecord,
+    "com/longbridge/fundamental/Macrodata",
+    longbridge::fundamental::Macrodata,
     [
         period,
         release_at,

@@ -294,7 +294,7 @@ impl FundamentalContext {
         &self,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<Vec<MacrodataIndicatorInfo>> {
+    ) -> Result<Vec<MacrodataIndicator>> {
         Ok(self
             .ctx
             .macrodata_indicators(offset, limit)

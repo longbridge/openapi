@@ -1581,7 +1581,7 @@ pub struct MultiLanguageText {
 
 /// Metadata for one macroeconomic indicator
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MacrodataIndicatorInfo {
+pub struct MacrodataIndicator {
     /// External vendor code (used as input to `macrodata`)
     pub indicator_code: String,
     /// Publishing organisation
@@ -1622,12 +1622,12 @@ pub struct MacrodataIndicatorInfo {
 pub struct EconomicIndicatorListResponse {
     /// Indicator list
     #[serde(default)]
-    pub data: Vec<MacrodataIndicatorInfo>,
+    pub data: Vec<MacrodataIndicator>,
 }
 
 /// One historical data point for a macroeconomic indicator
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MacrodataRecord {
+pub struct Macrodata {
     /// Statistical period (e.g. `2024-Q1`, `2024-03`)
     #[serde(default)]
     pub period: String,
@@ -1661,8 +1661,8 @@ pub struct MacrodataRecord {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MacrodataResponse {
     /// Indicator metadata
-    pub info: MacrodataIndicatorInfo,
+    pub info: MacrodataIndicator,
     /// Historical data points
     #[serde(default)]
-    pub data: Vec<MacrodataRecord>,
+    pub data: Vec<Macrodata>,
 }

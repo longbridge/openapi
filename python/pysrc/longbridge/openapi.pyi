@@ -9926,7 +9926,7 @@ class FundamentalContext:
         self,
         offset: int | None = None,
         limit: int | None = None,
-    ) -> list["MacrodataIndicatorInfo"]:
+    ) -> list["MacrodataIndicator"]:
         """
         List macroeconomic indicators.
 
@@ -9935,7 +9935,7 @@ class FundamentalContext:
             limit: Page size (default 100, max 1000)
 
         Returns:
-            List of :class:`MacrodataIndicatorInfo`
+            List of :class:`MacrodataIndicator`
         """
         ...
 
@@ -10111,7 +10111,7 @@ class MultiLanguageText:
     traditional_chinese: str
 
 
-class MacrodataIndicatorInfo:
+class MacrodataIndicator:
     """Metadata for one macroeconomic indicator."""
 
     indicator_code: str
@@ -10129,7 +10129,7 @@ class MacrodataIndicatorInfo:
     """Start date of data coverage"""
 
 
-class MacrodataRecord:
+class Macrodata:
     """One historical data point for a macroeconomic indicator."""
 
     period: str
@@ -10147,8 +10147,8 @@ class MacrodataRecord:
 class MacrodataResponse:
     """Response for macrodata."""
 
-    info: MacrodataIndicatorInfo
-    data: list[MacrodataRecord]
+    info: MacrodataIndicator
+    data: list[Macrodata]
 
 
 # ── MarketContext ─────────────────────────────────────────────────

@@ -1927,7 +1927,7 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
 /// Metadata for one macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct MacrodataIndicatorInfo {
+pub struct MacrodataIndicator {
     pub indicator_code: String,
     pub source_org: String,
     pub country: String,
@@ -1941,8 +1941,8 @@ pub struct MacrodataIndicatorInfo {
     pub start_date: Option<i64>,
 }
 
-impl From<lb::MacrodataIndicatorInfo> for MacrodataIndicatorInfo {
-    fn from(v: lb::MacrodataIndicatorInfo) -> Self {
+impl From<lb::MacrodataIndicator> for MacrodataIndicator {
+    fn from(v: lb::MacrodataIndicator) -> Self {
         Self {
             indicator_code: v.indicator_code,
             source_org: v.source_org,
@@ -1961,7 +1961,7 @@ impl From<lb::MacrodataIndicatorInfo> for MacrodataIndicatorInfo {
 /// One historical data point for a macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct MacrodataRecord {
+pub struct Macrodata {
     pub period: String,
     /// Release datetime (unix timestamp in seconds; null if unset)
     pub release_at: Option<i64>,
@@ -1975,8 +1975,8 @@ pub struct MacrodataRecord {
     pub unit_prefix: MultiLanguageText,
 }
 
-impl From<lb::MacrodataRecord> for MacrodataRecord {
-    fn from(v: lb::MacrodataRecord) -> Self {
+impl From<lb::Macrodata> for Macrodata {
+    fn from(v: lb::Macrodata) -> Self {
         Self {
             period: v.period,
             release_at: v.release_at.map(|dt| dt.unix_timestamp()),
@@ -1995,8 +1995,8 @@ impl From<lb::MacrodataRecord> for MacrodataRecord {
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct MacrodataResponse {
-    pub info: MacrodataIndicatorInfo,
-    pub data: Vec<MacrodataRecord>,
+    pub info: MacrodataIndicator,
+    pub data: Vec<Macrodata>,
 }
 
 impl From<lb::MacrodataResponse> for MacrodataResponse {
