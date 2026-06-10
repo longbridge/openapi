@@ -855,18 +855,18 @@ impl FundamentalContext {
 
     /// Get historical data for a macroeconomic indicator.
     ///
-    /// `start_time` and `end_time` filter by release timestamp.
+    /// `start_date` and `end_date` are date strings in `"YYYY-MM-DD"` format.
+    /// `start_date` is sent as `YYYY-MM-DDT00:00:00Z`; `end_date` is sent as
+    /// `YYYY-MM-DDT23:59:59Z`.
     ///
     /// Path: `GET /v1/quote/macrodata/{indicator_code}`
     pub async fn macrodata(
         &self,
         indicator_code: impl Into<String>,
-        start_time: Option<OffsetDateTime>,
-        end_time: Option<OffsetDateTime>,
+        start_date: Option<impl Into<String>>,
+        end_date: Option<impl Into<String>>,
         limit: Option<i32>,
     ) -> Result<EconomicIndicatorResponse> {
-        use time::format_description::well_known::Rfc3339;
-
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -882,8 +882,8 @@ impl FundamentalContext {
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                start_time: start_time.map(|dt| dt.format(&Rfc3339).unwrap_or_default()),
-                end_time: end_time.map(|dt| dt.format(&Rfc3339).unwrap_or_default()),
+                start_time: start_date.map(|d| format!("{}T00:00:00Z", d.into())),
+                end_time: end_date.map(|d| format!("{}T23:59:59Z", d.into())),
                 limit,
             })
             .response::<Json<EconomicIndicatorResponse>>()

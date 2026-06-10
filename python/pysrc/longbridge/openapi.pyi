@@ -9942,8 +9942,8 @@ class FundamentalContext:
     def macrodata(
         self,
         indicator_code: str,
-        start_time: datetime | None = None,
-        end_time: datetime | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
         limit: int | None = None,
     ) -> "EconomicIndicatorResponse":
         """
@@ -9951,8 +9951,8 @@ class FundamentalContext:
 
         Args:
             indicator_code: External vendor code from ``macrodata_indicators``
-            start_time: Data start Unix timestamp (optional)
-            end_time: Data end Unix timestamp (optional)
+            start_date: Start date in ``"YYYY-MM-DD"`` format (optional)
+            end_date: End date in ``"YYYY-MM-DD"`` format (optional)
             limit: Max records to return (default 100, max 100)
 
         Returns:

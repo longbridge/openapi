@@ -621,7 +621,7 @@ export declare class FundamentalContext {
   /** List macroeconomic indicators */
   macrodataIndicators(offset?: number | null, limit?: number | null): Promise<Array<EconomicIndicatorInfo>>
   /** Get historical data for a macroeconomic indicator */
-  macrodata(indicatorCode: string, startTime?: bigint | null, endTime?: bigint | null, limit?: number | null): Promise<EconomicIndicatorResponse>
+  macrodata(indicatorCode: string, startDate?: string | null, endDate?: string | null, limit?: number | null): Promise<EconomicIndicatorResponse>
 }
 
 /** Fund position */

@@ -343,21 +343,16 @@ impl AsyncFundamentalContext {
         &self,
         py: Python<'_>,
         indicator_code: String,
-        start_time: Option<crate::time::PyOffsetDateTimeWrapper>,
-        end_time: Option<crate::time::PyOffsetDateTimeWrapper>,
+        start_date: Option<String>,
+        end_date: Option<String>,
         limit: Option<i32>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(EconomicIndicatorResponse::from(
-                ctx.macrodata(
-                    indicator_code,
-                    start_time.map(|t| t.0),
-                    end_time.map(|t| t.0),
-                    limit,
-                )
-                .await
-                .map_err(ErrorNewType)?,
+                ctx.macrodata(indicator_code, start_date, end_date, limit)
+                    .await
+                    .map_err(ErrorNewType)?,
             ))
         })
         .map(|b| b.unbind())

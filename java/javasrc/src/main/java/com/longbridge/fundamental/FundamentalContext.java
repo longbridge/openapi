@@ -342,10 +342,13 @@ public class FundamentalContext implements AutoCloseable {
         });
     }
 
-    /** Get historical data for a macroeconomic indicator. */
-    public CompletableFuture<EconomicIndicatorResponse> getMacrodata(String indicatorCode, java.time.OffsetDateTime startTime, java.time.OffsetDateTime endTime, Integer limit) throws OpenApiException {
+    /**
+     * Get historical data for a macroeconomic indicator.
+     * startDate and endDate are date strings in "YYYY-MM-DD" format.
+     */
+    public CompletableFuture<EconomicIndicatorResponse> getMacrodata(String indicatorCode, String startDate, String endDate, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextMacrodata(raw, indicatorCode, startTime, endTime, limit, callback);
+            SdkNative.fundamentalContextMacrodata(raw, indicatorCode, startDate, endDate, limit, callback);
         });
     }
 }

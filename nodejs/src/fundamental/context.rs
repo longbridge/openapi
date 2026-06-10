@@ -310,25 +310,13 @@ impl FundamentalContext {
     pub async fn macrodata(
         &self,
         indicator_code: String,
-        start_time: Option<i64>,
-        end_time: Option<i64>,
+        start_date: Option<String>,
+        end_date: Option<String>,
         limit: Option<i32>,
     ) -> Result<EconomicIndicatorResponse> {
-        use time::OffsetDateTime;
         Ok(self
             .ctx
-            .macrodata(
-                indicator_code,
-                start_time
-                    .map(OffsetDateTime::from_unix_timestamp)
-                    .transpose()
-                    .map_err(|e| napi::Error::from_reason(e.to_string()))?,
-                end_time
-                    .map(OffsetDateTime::from_unix_timestamp)
-                    .transpose()
-                    .map_err(|e| napi::Error::from_reason(e.to_string()))?,
-                limit,
-            )
+            .macrodata(indicator_code, start_date, end_date, limit)
             .await
             .map_err(ErrorNewType)?
             .into())
