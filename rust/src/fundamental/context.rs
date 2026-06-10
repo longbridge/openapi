@@ -834,7 +834,8 @@ impl FundamentalContext {
 
     /// List macroeconomic indicators.
     ///
-    /// Pass `country` to filter by country code (e.g. `MacrodataCountry::UnitedStates`).
+    /// Pass `country` to filter by country code (e.g.
+    /// `MacrodataCountry::UnitedStates`).
     ///
     /// Path: `GET /v1/quote/macrodata`
     pub async fn macrodata_indicators(

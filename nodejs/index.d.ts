@@ -619,9 +619,9 @@ export declare class FundamentalContext {
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
   /** List macroeconomic indicators */
-  macrodataIndicators(offset?: number | undefined | null, limit?: number | undefined | null): Promise<Array<MacrodataIndicator>>
+  macrodataIndicators(country?: MacrodataCountry | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacrodataIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
-  macrodata(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, limit?: number | undefined | null): Promise<MacrodataResponse>
+  macrodata(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacrodataResponse>
 }
 
 /** Fund position */
@@ -4492,6 +4492,22 @@ export interface Macrodata {
   unitPrefix: MultiLanguageText
 }
 
+/** Country code for filtering macroeconomic indicators */
+export declare const enum MacrodataCountry {
+  /** Hong Kong SAR China */
+  HongKong = 0,
+  /** China (Mainland) */
+  China = 1,
+  /** United States */
+  UnitedStates = 2,
+  /** Euro Zone */
+  EuroZone = 3,
+  /** Japan */
+  Japan = 4,
+  /** Singapore */
+  Singapore = 5
+}
+
 /** Metadata for one macroeconomic indicator */
 export interface MacrodataIndicator {
   indicatorCode: string
@@ -4507,10 +4523,17 @@ export interface MacrodataIndicator {
   startDate?: number
 }
 
-/** Response for economic_indicator */
+/** Response for macrodata_indicators */
+export interface MacrodataIndicatorListResponse {
+  data: Array<MacrodataIndicator>
+  count: number
+}
+
+/** Response for macrodata */
 export interface MacrodataResponse {
   info: MacrodataIndicator
   data: Array<Macrodata>
+  count: number
 }
 
 export declare const enum Market {

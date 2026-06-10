@@ -294,11 +294,12 @@ impl FundamentalContextSync {
     /// List macroeconomic indicators
     pub fn macrodata_indicators(
         &self,
+        country: Option<MacrodataCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<Vec<MacrodataIndicator>> {
+    ) -> Result<MacrodataIndicatorListResponse> {
         self.rt
-            .call(move |ctx| async move { ctx.macrodata_indicators(offset, limit).await })
+            .call(move |ctx| async move { ctx.macrodata_indicators(country, offset, limit).await })
     }
 
     /// Get historical data for a macroeconomic indicator
@@ -307,10 +308,11 @@ impl FundamentalContextSync {
         indicator_code: impl Into<String> + Send + 'static,
         start_date: Option<impl Into<String> + Send + 'static>,
         end_date: Option<impl Into<String> + Send + 'static>,
+        offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacrodataResponse> {
         self.rt.call(move |ctx| async move {
-            ctx.macrodata(indicator_code, start_date, end_date, limit)
+            ctx.macrodata(indicator_code, start_date, end_date, offset, limit)
                 .await
         })
     }
