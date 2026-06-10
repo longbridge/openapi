@@ -834,23 +834,26 @@ impl FundamentalContext {
 
     /// List macroeconomic indicators.
     ///
+    /// Pass `country` to filter by country code (e.g. `MacrodataCountry::UnitedStates`).
+    ///
     /// Path: `GET /v1/quote/macrodata`
     pub async fn macrodata_indicators(
         &self,
+        country: Option<MacrodataCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<Vec<MacrodataIndicator>> {
+    ) -> Result<MacrodataIndicatorListResponse> {
         #[derive(Serialize)]
         struct Query {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            country: Option<MacrodataCountry>,
             #[serde(skip_serializing_if = "Option::is_none")]
             offset: Option<i32>,
             #[serde(skip_serializing_if = "Option::is_none")]
             limit: Option<i32>,
         }
-        let resp: MacrodataIndicatorListResponse = self
-            .get("/v1/quote/macrodata", Query { offset, limit })
-            .await?;
-        Ok(resp.data)
+        self.get("/v1/quote/macrodata", Query { country, offset, limit })
+            .await
     }
 
     /// Get historical data for a macroeconomic indicator.
@@ -865,6 +868,7 @@ impl FundamentalContext {
         indicator_code: impl Into<String>,
         start_date: Option<impl Into<String>>,
         end_date: Option<impl Into<String>>,
+        offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacrodataResponse> {
         #[derive(Serialize)]
@@ -873,6 +877,8 @@ impl FundamentalContext {
             start_time: Option<String>,
             #[serde(skip_serializing_if = "Option::is_none")]
             end_time: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            offset: Option<i32>,
             #[serde(skip_serializing_if = "Option::is_none")]
             limit: Option<i32>,
         }
@@ -884,6 +890,7 @@ impl FundamentalContext {
             .query_params(Query {
                 start_time: start_date.map(|d| format!("{}T00:00:00Z", d.into())),
                 end_time: end_date.map(|d| format!("{}T23:59:59Z", d.into())),
+                offset,
                 limit,
             })
             .response::<Json<MacrodataResponse>>()

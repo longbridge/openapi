@@ -212,16 +212,15 @@ impl FundamentalContext {
     /// List macroeconomic indicators.
     fn macrodata_indicators(
         &self,
+        country: Option<MacrodataCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> PyResult<Vec<MacrodataIndicator>> {
+    ) -> PyResult<MacrodataIndicatorListResponse> {
         Ok(self
             .ctx
-            .macrodata_indicators(offset, limit)
+            .macrodata_indicators(country.map(Into::into), offset, limit)
             .map_err(ErrorNewType)?
-            .into_iter()
-            .map(Into::into)
-            .collect())
+            .into())
     }
 
     /// Get historical data for a macroeconomic indicator.
@@ -230,11 +229,12 @@ impl FundamentalContext {
         indicator_code: String,
         start_date: Option<String>,
         end_date: Option<String>,
+        offset: Option<i32>,
         limit: Option<i32>,
     ) -> PyResult<MacrodataResponse> {
         Ok(self
             .ctx
-            .macrodata(indicator_code, start_date, end_date, limit)
+            .macrodata(indicator_code, start_date, end_date, offset, limit)
             .map_err(ErrorNewType)?
             .into())
     }

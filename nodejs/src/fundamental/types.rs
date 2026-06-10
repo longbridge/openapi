@@ -1924,6 +1924,64 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
     }
 }
 
+/// Country code for filtering macroeconomic indicators
+#[napi_derive::napi]
+#[derive(Debug, Copy, Clone)]
+pub enum MacrodataCountry {
+    UnitedStates,
+    China,
+    EuroZone,
+    Japan,
+    UnitedKingdom,
+    Germany,
+    France,
+    Australia,
+    Canada,
+    SouthKorea,
+    India,
+    Brazil,
+    HongKong,
+    Singapore,
+}
+
+impl From<MacrodataCountry> for lb::MacrodataCountry {
+    fn from(v: MacrodataCountry) -> Self {
+        match v {
+            MacrodataCountry::UnitedStates => lb::MacrodataCountry::UnitedStates,
+            MacrodataCountry::China => lb::MacrodataCountry::China,
+            MacrodataCountry::EuroZone => lb::MacrodataCountry::EuroZone,
+            MacrodataCountry::Japan => lb::MacrodataCountry::Japan,
+            MacrodataCountry::UnitedKingdom => lb::MacrodataCountry::UnitedKingdom,
+            MacrodataCountry::Germany => lb::MacrodataCountry::Germany,
+            MacrodataCountry::France => lb::MacrodataCountry::France,
+            MacrodataCountry::Australia => lb::MacrodataCountry::Australia,
+            MacrodataCountry::Canada => lb::MacrodataCountry::Canada,
+            MacrodataCountry::SouthKorea => lb::MacrodataCountry::SouthKorea,
+            MacrodataCountry::India => lb::MacrodataCountry::India,
+            MacrodataCountry::Brazil => lb::MacrodataCountry::Brazil,
+            MacrodataCountry::HongKong => lb::MacrodataCountry::HongKong,
+            MacrodataCountry::Singapore => lb::MacrodataCountry::Singapore,
+        }
+    }
+}
+
+/// Response for macrodata_indicators
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct MacrodataIndicatorListResponse {
+    pub data: Vec<MacrodataIndicator>,
+    pub count: i32,
+}
+
+impl From<lb::MacrodataIndicatorListResponse> for MacrodataIndicatorListResponse {
+    fn from(v: lb::MacrodataIndicatorListResponse) -> Self {
+        Self {
+            data: v.data.into_iter().map(Into::into).collect(),
+            count: v.count,
+        }
+    }
+}
+
 /// Metadata for one macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
@@ -1991,12 +2049,13 @@ impl From<lb::Macrodata> for Macrodata {
     }
 }
 
-/// Response for economic_indicator
+/// Response for macrodata
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct MacrodataResponse {
     pub info: MacrodataIndicator,
     pub data: Vec<Macrodata>,
+    pub count: i32,
 }
 
 impl From<lb::MacrodataResponse> for MacrodataResponse {
@@ -2004,6 +2063,7 @@ impl From<lb::MacrodataResponse> for MacrodataResponse {
         Self {
             info: v.info.into(),
             data: v.data.into_iter().map(Into::into).collect(),
+            count: v.count,
         }
     }
 }

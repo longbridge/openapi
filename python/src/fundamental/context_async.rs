@@ -322,18 +322,17 @@ impl AsyncFundamentalContext {
     fn macrodata_indicators(
         &self,
         py: Python<'_>,
+        country: Option<MacrodataCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            Ok(ctx
-                .macrodata_indicators(offset, limit)
-                .await
-                .map_err(ErrorNewType)?
-                .into_iter()
-                .map(MacrodataIndicator::from)
-                .collect::<Vec<_>>())
+            Ok(MacrodataIndicatorListResponse::from(
+                ctx.macrodata_indicators(country.map(Into::into), offset, limit)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
         })
         .map(|b| b.unbind())
     }
@@ -345,12 +344,13 @@ impl AsyncFundamentalContext {
         indicator_code: String,
         start_date: Option<String>,
         end_date: Option<String>,
+        offset: Option<i32>,
         limit: Option<i32>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(MacrodataResponse::from(
-                ctx.macrodata(indicator_code, start_date, end_date, limit)
+                ctx.macrodata(indicator_code, start_date, end_date, offset, limit)
                     .await
                     .map_err(ErrorNewType)?,
             ))

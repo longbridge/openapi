@@ -75,6 +75,8 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<AssetAllocationGroup>()?;
     parent.add_class::<AssetAllocationResponse>()?;
     parent.add_class::<MultiLanguageText>()?;
+    parent.add_class::<MacrodataCountry>()?;
+    parent.add_class::<MacrodataIndicatorListResponse>()?;
     parent.add_class::<MacrodataIndicator>()?;
     parent.add_class::<Macrodata>()?;
     parent.add_class::<MacrodataResponse>()?;

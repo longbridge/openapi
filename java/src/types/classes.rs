@@ -2738,12 +2738,23 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/fundamental/MacrodataIndicatorListResponse",
+    longbridge::fundamental::MacrodataIndicatorListResponse,
+    [
+        #[java(objarray)]
+        data,
+        count
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/fundamental/MacrodataResponse",
     longbridge::fundamental::MacrodataResponse,
     [
         info,
         #[java(objarray)]
-        data
+        data,
+        count
     ]
 );
 

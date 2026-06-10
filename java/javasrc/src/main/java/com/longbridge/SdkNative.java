@@ -452,11 +452,11 @@ public class SdkNative {
                         AsyncCallback callback);
 
         public static native void fundamentalContextMacrodataIndicators(long context,
-                        Object offset, Object limit,
+                        Object country, Object offset, Object limit,
                         AsyncCallback callback);
 
         public static native void fundamentalContextMacrodata(long context,
-                        Object indicatorCode, Object startTime, Object endTime, Object limit,
+                        Object indicatorCode, Object startTime, Object endTime, Object offset, Object limit,
                         AsyncCallback callback);
 
         public static native void portfolioContextProfitAnalysisFlows(long context, Object opts,

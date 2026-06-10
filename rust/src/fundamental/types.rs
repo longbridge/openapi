@@ -1565,6 +1565,76 @@ pub struct AssetAllocationResponse {
 
 // ── macrodata ─────────────────────────────────────────────────────
 
+/// Country code for filtering macroeconomic indicators
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum MacrodataCountry {
+    /// United States
+    #[serde(rename = "US")]
+    UnitedStates,
+    /// China
+    #[serde(rename = "CN")]
+    China,
+    /// Euro Zone
+    #[serde(rename = "EU")]
+    EuroZone,
+    /// Japan
+    #[serde(rename = "JP")]
+    Japan,
+    /// United Kingdom
+    #[serde(rename = "UK")]
+    UnitedKingdom,
+    /// Germany
+    #[serde(rename = "DE")]
+    Germany,
+    /// France
+    #[serde(rename = "FR")]
+    France,
+    /// Australia
+    #[serde(rename = "AU")]
+    Australia,
+    /// Canada
+    #[serde(rename = "CA")]
+    Canada,
+    /// South Korea
+    #[serde(rename = "KR")]
+    SouthKorea,
+    /// India
+    #[serde(rename = "IN")]
+    India,
+    /// Brazil
+    #[serde(rename = "BR")]
+    Brazil,
+    /// Hong Kong
+    #[serde(rename = "HK")]
+    HongKong,
+    /// Singapore
+    #[serde(rename = "SG")]
+    Singapore,
+}
+
+/// Importance level of a macroeconomic indicator
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum MacrodataImportance {
+    /// Low importance
+    Low = 1,
+    /// Medium importance
+    Medium = 2,
+    /// High importance
+    High = 3,
+}
+
+impl MacrodataImportance {
+    /// Convert from raw API integer value
+    pub fn from_i32(v: i32) -> Option<Self> {
+        match v {
+            1 => Some(Self::Low),
+            2 => Some(Self::Medium),
+            3 => Some(Self::High),
+            _ => None,
+        }
+    }
+}
+
 /// Localized text in simplified Chinese, traditional Chinese, and English
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MultiLanguageText {
@@ -1617,12 +1687,15 @@ pub struct MacrodataIndicator {
     pub start_date: Option<OffsetDateTime>,
 }
 
-/// Response for [`crate::FundamentalContext::macrodata_list`]
+/// Response for [`crate::FundamentalContext::macrodata_indicators`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MacrodataIndicatorListResponse {
     /// Indicator list
     #[serde(default, rename = "list")]
     pub data: Vec<MacrodataIndicator>,
+    /// Total number of indicators matching the query
+    #[serde(default)]
+    pub count: i32,
 }
 
 /// One historical data point for a macroeconomic indicator
@@ -1666,4 +1739,7 @@ pub struct MacrodataResponse {
     /// Historical data points
     #[serde(default)]
     pub data: Vec<Macrodata>,
+    /// Total number of historical data points
+    #[serde(default)]
+    pub count: i32,
 }

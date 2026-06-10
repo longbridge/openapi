@@ -268,18 +268,38 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
+    country: JObject,
     offset: JObject,
     limit: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let country: Option<String> = FromJValue::from_jvalue(env, country.into())?;
+        let country = country.and_then(|s| {
+            use longbridge::fundamental::MacrodataCountry::*;
+            match s.as_str() {
+                "US" => Some(UnitedStates),
+                "CN" => Some(China),
+                "EU" => Some(EuroZone),
+                "JP" => Some(Japan),
+                "UK" => Some(UnitedKingdom),
+                "DE" => Some(Germany),
+                "FR" => Some(France),
+                "AU" => Some(Australia),
+                "CA" => Some(Canada),
+                "KR" => Some(SouthKorea),
+                "IN" => Some(India),
+                "BR" => Some(Brazil),
+                "HK" => Some(HongKong),
+                "SG" => Some(Singapore),
+                _ => None,
+            }
+        });
         let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(
-                context.ctx.macrodata_indicators(offset, limit).await?,
-            ))
+            Ok(context.ctx.macrodata_indicators(country, offset, limit).await?)
         })?;
         Ok(())
     })
@@ -293,6 +313,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
     indicator_code: JObject,
     start_time: JObject,
     end_time: JObject,
+    offset: JObject,
     limit: JObject,
     callback: JObject,
 ) {
@@ -301,11 +322,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         let indicator_code: String = FromJValue::from_jvalue(env, indicator_code.into())?;
         let start_date: Option<String> = FromJValue::from_jvalue(env, start_time.into())?;
         let end_date: Option<String> = FromJValue::from_jvalue(env, end_time.into())?;
+        let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
             Ok(context
                 .ctx
-                .macrodata(indicator_code, start_date, end_date, limit)
+                .macrodata(indicator_code, start_date, end_date, offset, limit)
                 .await?)
         })?;
         Ok(())
