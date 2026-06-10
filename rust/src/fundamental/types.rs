@@ -1603,7 +1603,7 @@ pub struct MacrodataIndicator {
     #[serde(default)]
     pub category: String,
     /// Description (multilingual)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub describe: MultiLanguageText,
     /// Importance — higher is more important
     #[serde(default)]
