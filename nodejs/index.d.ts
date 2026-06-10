@@ -619,9 +619,9 @@ export declare class FundamentalContext {
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
   /** List macroeconomic indicators */
-  macrodataIndicators(offset?: number | null, limit?: number | null): Promise<Array<MacrodataIndicator>>
+  macrodataIndicators(offset?: number | undefined | null, limit?: number | undefined | null): Promise<Array<MacrodataIndicator>>
   /** Get historical data for a macroeconomic indicator */
-  macrodata(indicatorCode: string, startDate?: string | null, endDate?: string | null, limit?: number | null): Promise<MacrodataResponse>
+  macrodata(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, limit?: number | undefined | null): Promise<MacrodataResponse>
 }
 
 /** Fund position */
@@ -3137,45 +3137,6 @@ export interface AssetAllocationResponse {
   /** Asset allocation groups */
   info: Array<AssetAllocationGroup>
 }
-/** Localized text in simplified Chinese, traditional Chinese, and English */
-export interface MultiLanguageText {
-  english: string
-  simplifiedChinese: string
-  traditionalChinese: string
-}
-/** Metadata for one macroeconomic indicator */
-export interface MacrodataIndicator {
-  indicatorCode: string
-  sourceOrg: string
-  country: string
-  name: MultiLanguageText
-  adjustmentFactor: string
-  periodicity: string
-  category: string
-  describe: MultiLanguageText
-  importance: number
-  /** Start date of data coverage (unix timestamp in seconds; null if unset) */
-  startDate: bigint | null
-}
-/** One historical data point for a macroeconomic indicator */
-export interface Macrodata {
-  period: string
-  /** Release datetime (unix timestamp in seconds; null if unset) */
-  releaseAt: bigint | null
-  actualValue: string
-  previousValue: string
-  forecastValue: string
-  revisedValue: string
-  /** Next release datetime (unix timestamp in seconds; null if unset) */
-  nextReleaseAt: bigint | null
-  unit: MultiLanguageText
-  unitPrefix: MultiLanguageText
-}
-/** Response for macrodata */
-export interface MacrodataResponse {
-  info: MacrodataIndicator
-  data: Array<Macrodata>
-}
 
 export declare const enum AssetType {
   /** Unknown */
@@ -4516,6 +4477,42 @@ export declare const enum Language {
   EN = 2
 }
 
+/** One historical data point for a macroeconomic indicator */
+export interface Macrodata {
+  period: string
+  /** Release datetime (unix timestamp in seconds; null if unset) */
+  releaseAt?: number
+  actualValue: string
+  previousValue: string
+  forecastValue: string
+  revisedValue: string
+  /** Next release datetime (unix timestamp in seconds; null if unset) */
+  nextReleaseAt?: number
+  unit: MultiLanguageText
+  unitPrefix: MultiLanguageText
+}
+
+/** Metadata for one macroeconomic indicator */
+export interface MacrodataIndicator {
+  indicatorCode: string
+  sourceOrg: string
+  country: string
+  name: MultiLanguageText
+  adjustmentFactor: string
+  periodicity: string
+  category: string
+  describe: MultiLanguageText
+  importance: number
+  /** Start date of data coverage (unix timestamp in seconds; null if unset) */
+  startDate?: number
+}
+
+/** Response for economic_indicator */
+export interface MacrodataResponse {
+  info: MacrodataIndicator
+  data: Array<Macrodata>
+}
+
 export declare const enum Market {
   /** Unknown */
   Unknown = 0,
@@ -4556,6 +4553,13 @@ export interface MarketTimeItem {
   subStatus: number
   /** Delayed-quote sub-status code */
   delaySubStatus: number
+}
+
+/** Localized text in simplified Chinese, traditional Chinese, and English */
+export interface MultiLanguageText {
+  english: string
+  simplifiedChinese: string
+  traditionalChinese: string
 }
 
 /** Options for listing topics created by the current authenticated user */
