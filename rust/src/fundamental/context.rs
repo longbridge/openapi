@@ -847,7 +847,7 @@ impl FundamentalContext {
             #[serde(skip_serializing_if = "Option::is_none")]
             limit: Option<i32>,
         }
-        let resp: EconomicIndicatorListResponse = self
+        let resp: MacrodataIndicatorListResponse = self
             .get("/v1/quote/macrodata", Query { offset, limit })
             .await?;
         Ok(resp.data)

@@ -1619,7 +1619,7 @@ pub struct MacrodataIndicator {
 
 /// Response for [`crate::FundamentalContext::macrodata_list`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EconomicIndicatorListResponse {
+pub struct MacrodataIndicatorListResponse {
     /// Indicator list
     #[serde(default, rename = "list")]
     pub data: Vec<MacrodataIndicator>,
