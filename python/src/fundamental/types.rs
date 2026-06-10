@@ -2013,6 +2013,23 @@ impl From<MacrodataCountry> for lb::MacrodataCountry {
 }
 
 
+/// Response for macrodata_indicators
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct MacrodataIndicatorListResponse {
+    pub data: Vec<MacrodataIndicator>,
+    pub count: i32,
+}
+
+impl From<lb::MacrodataIndicatorListResponse> for MacrodataIndicatorListResponse {
+    fn from(v: lb::MacrodataIndicatorListResponse) -> Self {
+        Self {
+            data: v.data.into_iter().map(Into::into).collect(),
+            count: v.count,
+        }
+    }
+}
+
 /// Metadata for one macroeconomic indicator
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
