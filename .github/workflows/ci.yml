@@ -302,7 +302,9 @@ jobs:
         uses: lukka/get-cmake@latest
 
       - name: Install cargo make
-        run: cargo install cargo-make
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-make
 
       - name: Check with clippy
         run: cargo clippy -p longbridge-c --all-features
