@@ -1565,26 +1565,26 @@ pub struct AssetAllocationResponse {
 
 // ── macrodata ─────────────────────────────────────────────────────
 
-/// Country code for filtering macroeconomic indicators
+/// Country for filtering macroeconomic indicators
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MacrodataCountry {
     /// Hong Kong SAR China
-    #[serde(rename = "HK")]
+    #[serde(rename = "Hong Kong SAR China")]
     HongKong,
     /// China (Mainland)
-    #[serde(rename = "CN")]
+    #[serde(rename = "China (Mainland)")]
     China,
     /// United States
-    #[serde(rename = "US")]
+    #[serde(rename = "United States")]
     UnitedStates,
     /// Euro Zone
-    #[serde(rename = "EU")]
+    #[serde(rename = "Euro Zone")]
     EuroZone,
     /// Japan
-    #[serde(rename = "JP")]
+    #[serde(rename = "Japan")]
     Japan,
     /// Singapore
-    #[serde(rename = "SG")]
+    #[serde(rename = "Singapore")]
     Singapore,
 }
 
