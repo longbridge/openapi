@@ -2012,7 +2012,6 @@ impl From<MacrodataCountry> for lb::MacrodataCountry {
     }
 }
 
-
 /// Response for macrodata_indicators
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]

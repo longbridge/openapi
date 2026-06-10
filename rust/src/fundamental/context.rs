@@ -852,8 +852,15 @@ impl FundamentalContext {
             #[serde(skip_serializing_if = "Option::is_none")]
             limit: Option<i32>,
         }
-        self.get("/v1/quote/macrodata", Query { country, offset, limit })
-            .await
+        self.get(
+            "/v1/quote/macrodata",
+            Query {
+                country,
+                offset,
+                limit,
+            },
+        )
+        .await
     }
 
     /// Get historical data for a macroeconomic indicator.

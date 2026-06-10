@@ -1955,7 +1955,6 @@ impl From<MacrodataCountry> for lb::MacrodataCountry {
     }
 }
 
-
 /// Metadata for one macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
