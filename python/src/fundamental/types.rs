@@ -1991,59 +1991,27 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
 #[pyclass]
 #[derive(Debug, Copy, Clone)]
 pub(crate) enum MacrodataCountry {
-    UnitedStates,
+    HongKong,
     China,
+    UnitedStates,
     EuroZone,
     Japan,
-    UnitedKingdom,
-    Germany,
-    France,
-    Australia,
-    Canada,
-    SouthKorea,
-    India,
-    Brazil,
-    HongKong,
     Singapore,
 }
 
 impl From<MacrodataCountry> for lb::MacrodataCountry {
     fn from(v: MacrodataCountry) -> Self {
         match v {
-            MacrodataCountry::UnitedStates => lb::MacrodataCountry::UnitedStates,
+            MacrodataCountry::HongKong => lb::MacrodataCountry::HongKong,
             MacrodataCountry::China => lb::MacrodataCountry::China,
+            MacrodataCountry::UnitedStates => lb::MacrodataCountry::UnitedStates,
             MacrodataCountry::EuroZone => lb::MacrodataCountry::EuroZone,
             MacrodataCountry::Japan => lb::MacrodataCountry::Japan,
-            MacrodataCountry::UnitedKingdom => lb::MacrodataCountry::UnitedKingdom,
-            MacrodataCountry::Germany => lb::MacrodataCountry::Germany,
-            MacrodataCountry::France => lb::MacrodataCountry::France,
-            MacrodataCountry::Australia => lb::MacrodataCountry::Australia,
-            MacrodataCountry::Canada => lb::MacrodataCountry::Canada,
-            MacrodataCountry::SouthKorea => lb::MacrodataCountry::SouthKorea,
-            MacrodataCountry::India => lb::MacrodataCountry::India,
-            MacrodataCountry::Brazil => lb::MacrodataCountry::Brazil,
-            MacrodataCountry::HongKong => lb::MacrodataCountry::HongKong,
             MacrodataCountry::Singapore => lb::MacrodataCountry::Singapore,
         }
     }
 }
 
-/// Response for macrodata_indicators
-#[pyclass(get_all, skip_from_py_object)]
-#[derive(Debug, Clone)]
-pub(crate) struct MacrodataIndicatorListResponse {
-    pub data: Vec<MacrodataIndicator>,
-    pub count: i32,
-}
-
-impl From<lb::MacrodataIndicatorListResponse> for MacrodataIndicatorListResponse {
-    fn from(v: lb::MacrodataIndicatorListResponse) -> Self {
-        Self {
-            data: v.data.into_iter().map(Into::into).collect(),
-            count: v.count,
-        }
-    }
-}
 
 /// Metadata for one macroeconomic indicator
 #[pyclass(get_all, skip_from_py_object)]

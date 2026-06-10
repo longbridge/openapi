@@ -279,19 +279,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         let country = country.and_then(|s| {
             use longbridge::fundamental::MacrodataCountry::*;
             match s.as_str() {
-                "US" => Some(UnitedStates),
+                "HK" => Some(HongKong),
                 "CN" => Some(China),
+                "US" => Some(UnitedStates),
                 "EU" => Some(EuroZone),
                 "JP" => Some(Japan),
-                "UK" => Some(UnitedKingdom),
-                "DE" => Some(Germany),
-                "FR" => Some(France),
-                "AU" => Some(Australia),
-                "CA" => Some(Canada),
-                "KR" => Some(SouthKorea),
-                "IN" => Some(India),
-                "BR" => Some(Brazil),
-                "HK" => Some(HongKong),
                 "SG" => Some(Singapore),
                 _ => None,
             }

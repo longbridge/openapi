@@ -1568,45 +1568,21 @@ pub struct AssetAllocationResponse {
 /// Country code for filtering macroeconomic indicators
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MacrodataCountry {
+    /// Hong Kong SAR China
+    #[serde(rename = "HK")]
+    HongKong,
+    /// China (Mainland)
+    #[serde(rename = "CN")]
+    China,
     /// United States
     #[serde(rename = "US")]
     UnitedStates,
-    /// China
-    #[serde(rename = "CN")]
-    China,
     /// Euro Zone
     #[serde(rename = "EU")]
     EuroZone,
     /// Japan
     #[serde(rename = "JP")]
     Japan,
-    /// United Kingdom
-    #[serde(rename = "UK")]
-    UnitedKingdom,
-    /// Germany
-    #[serde(rename = "DE")]
-    Germany,
-    /// France
-    #[serde(rename = "FR")]
-    France,
-    /// Australia
-    #[serde(rename = "AU")]
-    Australia,
-    /// Canada
-    #[serde(rename = "CA")]
-    Canada,
-    /// South Korea
-    #[serde(rename = "KR")]
-    SouthKorea,
-    /// India
-    #[serde(rename = "IN")]
-    India,
-    /// Brazil
-    #[serde(rename = "BR")]
-    Brazil,
-    /// Hong Kong
-    #[serde(rename = "HK")]
-    HongKong,
     /// Singapore
     #[serde(rename = "SG")]
     Singapore,
