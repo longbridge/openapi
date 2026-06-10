@@ -277,10 +277,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
-                .economic_indicator_list(offset, limit)
-                .await?)
+            Ok(context.ctx.macrodata_indicators(offset, limit).await?)
         })?;
         Ok(())
     })

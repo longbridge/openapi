@@ -296,7 +296,7 @@ impl FundamentalContextSync {
         &self,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<Vec<EconomicIndicatorInfo>> {
+    ) -> Result<Vec<MacrodataIndicator>> {
         self.rt
             .call(move |ctx| async move { ctx.macrodata_indicators(offset, limit).await })
     }
@@ -308,7 +308,7 @@ impl FundamentalContextSync {
         start_date: Option<impl Into<String> + Send + 'static>,
         end_date: Option<impl Into<String> + Send + 'static>,
         limit: Option<i32>,
-    ) -> Result<EconomicIndicatorResponse> {
+    ) -> Result<MacrodataResponse> {
         self.rt.call(move |ctx| async move {
             ctx.macrodata(indicator_code, start_date, end_date, limit)
                 .await
