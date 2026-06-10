@@ -1580,7 +1580,7 @@ pub struct MultiLanguageText {
 }
 
 /// Metadata for one macroeconomic indicator
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MacrodataIndicator {
     /// External vendor code (used as input to `macrodata`)
     pub indicator_code: String,
@@ -1591,7 +1591,7 @@ pub struct MacrodataIndicator {
     #[serde(default)]
     pub country: String,
     /// Indicator name (multilingual)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: MultiLanguageText,
     /// Adjustment factor
     #[serde(default)]
@@ -1626,7 +1626,7 @@ pub struct MacrodataIndicatorListResponse {
 }
 
 /// One historical data point for a macroeconomic indicator
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Macrodata {
     /// Statistical period (e.g. `2024-Q1`, `2024-03`)
     #[serde(default)]
@@ -1650,10 +1650,10 @@ pub struct Macrodata {
     #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
     pub next_release_at: Option<OffsetDateTime>,
     /// Unit (multilingual)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub unit: MultiLanguageText,
     /// Unit prefix / data scale (multilingual, e.g. millions / billions)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub unit_prefix: MultiLanguageText,
 }
 
@@ -1661,6 +1661,7 @@ pub struct Macrodata {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MacrodataResponse {
     /// Indicator metadata
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub info: MacrodataIndicator,
     /// Historical data points
     #[serde(default)]
