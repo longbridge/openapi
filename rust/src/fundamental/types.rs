@@ -1611,7 +1611,7 @@ pub struct MacrodataIndicator {
     /// Start date of data coverage
     #[serde(
         default,
-        with = "crate::serde_utils::timestamp_opt",
+        with = "crate::serde_utils::rfc3339_opt",
         rename = "start_date"
     )]
     pub start_date: Option<OffsetDateTime>,
@@ -1621,7 +1621,7 @@ pub struct MacrodataIndicator {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EconomicIndicatorListResponse {
     /// Indicator list
-    #[serde(default)]
+    #[serde(default, rename = "list")]
     pub data: Vec<MacrodataIndicator>,
 }
 
@@ -1632,7 +1632,7 @@ pub struct Macrodata {
     #[serde(default)]
     pub period: String,
     /// Release datetime
-    #[serde(default, with = "crate::serde_utils::timestamp_opt")]
+    #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
     pub release_at: Option<OffsetDateTime>,
     /// Actual value
     #[serde(default)]
@@ -1647,7 +1647,7 @@ pub struct Macrodata {
     #[serde(default)]
     pub revised_value: String,
     /// Next release datetime
-    #[serde(default, with = "crate::serde_utils::timestamp_opt")]
+    #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
     pub next_release_at: Option<OffsetDateTime>,
     /// Unit (multilingual)
     #[serde(default)]
