@@ -619,9 +619,9 @@ export declare class FundamentalContext {
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
   /** List macroeconomic indicators */
-  macrodataIndicators(offset?: number | null, limit?: number | null): Promise<Array<EconomicIndicatorInfo>>
+  macrodataIndicators(offset?: number | null, limit?: number | null): Promise<Array<MacrodataIndicatorInfo>>
   /** Get historical data for a macroeconomic indicator */
-  macrodata(indicatorCode: string, startDate?: string | null, endDate?: string | null, limit?: number | null): Promise<EconomicIndicatorResponse>
+  macrodata(indicatorCode: string, startDate?: string | null, endDate?: string | null, limit?: number | null): Promise<MacrodataResponse>
 }
 
 /** Fund position */
@@ -3144,7 +3144,7 @@ export interface MultiLanguageText {
   traditionalChinese: string
 }
 /** Metadata for one macroeconomic indicator */
-export interface EconomicIndicatorInfo {
+export interface MacrodataIndicatorInfo {
   indicatorCode: string
   sourceOrg: string
   country: string
@@ -3158,7 +3158,7 @@ export interface EconomicIndicatorInfo {
   startDate: bigint | null
 }
 /** One historical data point for a macroeconomic indicator */
-export interface EconomicIndicatorData {
+export interface MacrodataRecord {
   period: string
   /** Release datetime (unix timestamp in seconds; null if unset) */
   releaseAt: bigint | null
@@ -3172,9 +3172,9 @@ export interface EconomicIndicatorData {
   unitPrefix: MultiLanguageText
 }
 /** Response for macrodata */
-export interface EconomicIndicatorResponse {
-  info: EconomicIndicatorInfo
-  data: Array<EconomicIndicatorData>
+export interface MacrodataResponse {
+  info: MacrodataIndicatorInfo
+  data: Array<MacrodataRecord>
 }
 
 export declare const enum AssetType {

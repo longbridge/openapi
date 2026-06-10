@@ -336,7 +336,7 @@ public class FundamentalContext implements AutoCloseable {
     }
 
     /** List macroeconomic indicators. */
-    public CompletableFuture<EconomicIndicatorInfo[]> getMacrodataIndicators(Integer offset, Integer limit) throws OpenApiException {
+    public CompletableFuture<MacrodataIndicatorInfo[]> getMacrodataIndicators(Integer offset, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.fundamentalContextMacrodataIndicators(raw, offset, limit, callback);
         });
@@ -346,7 +346,7 @@ public class FundamentalContext implements AutoCloseable {
      * Get historical data for a macroeconomic indicator.
      * startDate and endDate are date strings in "YYYY-MM-DD" format.
      */
-    public CompletableFuture<EconomicIndicatorResponse> getMacrodata(String indicatorCode, String startDate, String endDate, Integer limit) throws OpenApiException {
+    public CompletableFuture<MacrodataResponse> getMacrodata(String indicatorCode, String startDate, String endDate, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.fundamentalContextMacrodata(raw, indicatorCode, startDate, endDate, limit, callback);
         });

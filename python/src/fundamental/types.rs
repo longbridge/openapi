@@ -1990,7 +1990,7 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
 /// Metadata for one macroeconomic indicator
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct EconomicIndicatorInfo {
+pub(crate) struct MacrodataIndicatorInfo {
     pub indicator_code: String,
     pub source_org: String,
     pub country: String,
@@ -2003,8 +2003,8 @@ pub(crate) struct EconomicIndicatorInfo {
     pub start_date: Option<crate::time::PyOffsetDateTimeWrapper>,
 }
 
-impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
-    fn from(v: lb::EconomicIndicatorInfo) -> Self {
+impl From<lb::MacrodataIndicatorInfo> for MacrodataIndicatorInfo {
+    fn from(v: lb::MacrodataIndicatorInfo) -> Self {
         Self {
             indicator_code: v.indicator_code,
             source_org: v.source_org,
@@ -2023,7 +2023,7 @@ impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
 /// One historical data point for a macroeconomic indicator
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct EconomicIndicatorData {
+pub(crate) struct MacrodataRecord {
     pub period: String,
     pub release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
     pub actual_value: String,
@@ -2035,8 +2035,8 @@ pub(crate) struct EconomicIndicatorData {
     pub unit_prefix: MultiLanguageText,
 }
 
-impl From<lb::EconomicIndicatorData> for EconomicIndicatorData {
-    fn from(v: lb::EconomicIndicatorData) -> Self {
+impl From<lb::MacrodataRecord> for MacrodataRecord {
+    fn from(v: lb::MacrodataRecord) -> Self {
         Self {
             period: v.period,
             release_at: v.release_at.map(crate::time::PyOffsetDateTimeWrapper),
@@ -2054,13 +2054,13 @@ impl From<lb::EconomicIndicatorData> for EconomicIndicatorData {
 /// Response for economic_indicator
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct EconomicIndicatorResponse {
-    pub info: EconomicIndicatorInfo,
-    pub data: Vec<EconomicIndicatorData>,
+pub(crate) struct MacrodataResponse {
+    pub info: MacrodataIndicatorInfo,
+    pub data: Vec<MacrodataRecord>,
 }
 
-impl From<lb::EconomicIndicatorResponse> for EconomicIndicatorResponse {
-    fn from(v: lb::EconomicIndicatorResponse) -> Self {
+impl From<lb::MacrodataResponse> for MacrodataResponse {
+    fn from(v: lb::MacrodataResponse) -> Self {
         Self {
             info: v.info.into(),
             data: v.data.into_iter().map(Into::into).collect(),

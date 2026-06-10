@@ -839,7 +839,7 @@ impl FundamentalContext {
         &self,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<Vec<EconomicIndicatorInfo>> {
+    ) -> Result<Vec<MacrodataIndicatorInfo>> {
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -866,7 +866,7 @@ impl FundamentalContext {
         start_date: Option<impl Into<String>>,
         end_date: Option<impl Into<String>>,
         limit: Option<i32>,
-    ) -> Result<EconomicIndicatorResponse> {
+    ) -> Result<MacrodataResponse> {
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -886,7 +886,7 @@ impl FundamentalContext {
                 end_time: end_date.map(|d| format!("{}T23:59:59Z", d.into())),
                 limit,
             })
-            .response::<Json<EconomicIndicatorResponse>>()
+            .response::<Json<MacrodataResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

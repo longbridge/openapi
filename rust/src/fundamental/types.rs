@@ -1581,7 +1581,7 @@ pub struct MultiLanguageText {
 
 /// Metadata for one macroeconomic indicator
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EconomicIndicatorInfo {
+pub struct MacrodataIndicatorInfo {
     /// External vendor code (used as input to `macrodata`)
     pub indicator_code: String,
     /// Publishing organisation
@@ -1622,12 +1622,12 @@ pub struct EconomicIndicatorInfo {
 pub struct EconomicIndicatorListResponse {
     /// Indicator list
     #[serde(default)]
-    pub data: Vec<EconomicIndicatorInfo>,
+    pub data: Vec<MacrodataIndicatorInfo>,
 }
 
 /// One historical data point for a macroeconomic indicator
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EconomicIndicatorData {
+pub struct MacrodataRecord {
     /// Statistical period (e.g. `2024-Q1`, `2024-03`)
     #[serde(default)]
     pub period: String,
@@ -1659,10 +1659,10 @@ pub struct EconomicIndicatorData {
 
 /// Response for [`crate::FundamentalContext::macrodata`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EconomicIndicatorResponse {
+pub struct MacrodataResponse {
     /// Indicator metadata
-    pub info: EconomicIndicatorInfo,
+    pub info: MacrodataIndicatorInfo,
     /// Historical data points
     #[serde(default)]
-    pub data: Vec<EconomicIndicatorData>,
+    pub data: Vec<MacrodataRecord>,
 }

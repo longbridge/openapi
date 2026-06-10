@@ -2705,8 +2705,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/EconomicIndicatorInfo",
-    longbridge::fundamental::EconomicIndicatorInfo,
+    "com/longbridge/fundamental/MacrodataIndicatorInfo",
+    longbridge::fundamental::MacrodataIndicatorInfo,
     [
         indicator_code,
         source_org,
@@ -2722,8 +2722,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/EconomicIndicatorData",
-    longbridge::fundamental::EconomicIndicatorData,
+    "com/longbridge/fundamental/MacrodataRecord",
+    longbridge::fundamental::MacrodataRecord,
     [
         period,
         release_at,
@@ -2738,8 +2738,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/EconomicIndicatorResponse",
-    longbridge::fundamental::EconomicIndicatorResponse,
+    "com/longbridge/fundamental/MacrodataResponse",
+    longbridge::fundamental::MacrodataResponse,
     [
         info,
         #[java(objarray)]

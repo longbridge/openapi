@@ -214,7 +214,7 @@ impl FundamentalContext {
         &self,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> PyResult<Vec<EconomicIndicatorInfo>> {
+    ) -> PyResult<Vec<MacrodataIndicatorInfo>> {
         Ok(self
             .ctx
             .macrodata_indicators(offset, limit)
@@ -231,7 +231,7 @@ impl FundamentalContext {
         start_date: Option<String>,
         end_date: Option<String>,
         limit: Option<i32>,
-    ) -> PyResult<EconomicIndicatorResponse> {
+    ) -> PyResult<MacrodataResponse> {
         Ok(self
             .ctx
             .macrodata(indicator_code, start_date, end_date, limit)

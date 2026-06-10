@@ -332,7 +332,7 @@ impl AsyncFundamentalContext {
                 .await
                 .map_err(ErrorNewType)?
                 .into_iter()
-                .map(EconomicIndicatorInfo::from)
+                .map(MacrodataIndicatorInfo::from)
                 .collect::<Vec<_>>())
         })
         .map(|b| b.unbind())
@@ -349,7 +349,7 @@ impl AsyncFundamentalContext {
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            Ok(EconomicIndicatorResponse::from(
+            Ok(MacrodataResponse::from(
                 ctx.macrodata(indicator_code, start_date, end_date, limit)
                     .await
                     .map_err(ErrorNewType)?,

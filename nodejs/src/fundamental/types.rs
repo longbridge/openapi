@@ -1927,7 +1927,7 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
 /// Metadata for one macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct EconomicIndicatorInfo {
+pub struct MacrodataIndicatorInfo {
     pub indicator_code: String,
     pub source_org: String,
     pub country: String,
@@ -1941,8 +1941,8 @@ pub struct EconomicIndicatorInfo {
     pub start_date: Option<i64>,
 }
 
-impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
-    fn from(v: lb::EconomicIndicatorInfo) -> Self {
+impl From<lb::MacrodataIndicatorInfo> for MacrodataIndicatorInfo {
+    fn from(v: lb::MacrodataIndicatorInfo) -> Self {
         Self {
             indicator_code: v.indicator_code,
             source_org: v.source_org,
@@ -1961,7 +1961,7 @@ impl From<lb::EconomicIndicatorInfo> for EconomicIndicatorInfo {
 /// One historical data point for a macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct EconomicIndicatorData {
+pub struct MacrodataRecord {
     pub period: String,
     /// Release datetime (unix timestamp in seconds; null if unset)
     pub release_at: Option<i64>,
@@ -1975,8 +1975,8 @@ pub struct EconomicIndicatorData {
     pub unit_prefix: MultiLanguageText,
 }
 
-impl From<lb::EconomicIndicatorData> for EconomicIndicatorData {
-    fn from(v: lb::EconomicIndicatorData) -> Self {
+impl From<lb::MacrodataRecord> for MacrodataRecord {
+    fn from(v: lb::MacrodataRecord) -> Self {
         Self {
             period: v.period,
             release_at: v.release_at.map(|dt| dt.unix_timestamp()),
@@ -1994,13 +1994,13 @@ impl From<lb::EconomicIndicatorData> for EconomicIndicatorData {
 /// Response for economic_indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct EconomicIndicatorResponse {
-    pub info: EconomicIndicatorInfo,
-    pub data: Vec<EconomicIndicatorData>,
+pub struct MacrodataResponse {
+    pub info: MacrodataIndicatorInfo,
+    pub data: Vec<MacrodataRecord>,
 }
 
-impl From<lb::EconomicIndicatorResponse> for EconomicIndicatorResponse {
-    fn from(v: lb::EconomicIndicatorResponse) -> Self {
+impl From<lb::MacrodataResponse> for MacrodataResponse {
+    fn from(v: lb::MacrodataResponse) -> Self {
         Self {
             info: v.info.into(),
             data: v.data.into_iter().map(Into::into).collect(),
