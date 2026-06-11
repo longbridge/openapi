@@ -10129,7 +10129,7 @@ class MacroeconomicIndicator:
     """Start date of data coverage"""
 
 
-class Macrodata:
+class Macroeconomic:
     """One historical data point for a macroeconomic indicator."""
 
     period: str
@@ -10148,7 +10148,7 @@ class MacroeconomicResponse:
     """Response for macroeconomic."""
 
     info: MacroeconomicIndicator
-    data: list[Macrodata]
+    data: list[Macroeconomic]
 
 
 # ── MarketContext ─────────────────────────────────────────────────

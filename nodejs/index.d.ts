@@ -4478,7 +4478,7 @@ export declare const enum Language {
 }
 
 /** One historical data point for a macroeconomic indicator */
-export interface Macrodata {
+export interface Macroeconomic {
   period: string
   /** Release datetime (unix timestamp in seconds; null if unset) */
   releaseAt?: number
@@ -4532,7 +4532,7 @@ export interface MacroeconomicIndicatorListResponse {
 /** Response for macroeconomic */
 export interface MacroeconomicResponse {
   info: MacroeconomicIndicator
-  data: Array<Macrodata>
+  data: Array<Macroeconomic>
   count: number
 }
 
