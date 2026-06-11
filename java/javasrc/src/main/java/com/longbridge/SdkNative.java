@@ -451,11 +451,11 @@ public class SdkNative {
                         Object opts,
                         AsyncCallback callback);
 
-        public static native void fundamentalContextMacrodataIndicators(long context,
+        public static native void fundamentalContextMacroeconomicIndicators(long context,
                         Object country, Object offset, Object limit,
                         AsyncCallback callback);
 
-        public static native void fundamentalContextMacrodata(long context,
+        public static native void fundamentalContextMacroeconomic(long context,
                         Object indicatorCode, Object startTime, Object endTime, Object offset, Object limit,
                         AsyncCallback callback);
 

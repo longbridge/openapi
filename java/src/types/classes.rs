@@ -2705,8 +2705,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/MacrodataIndicator",
-    longbridge::fundamental::MacrodataIndicator,
+    "com/longbridge/fundamental/MacroeconomicIndicator",
+    longbridge::fundamental::MacroeconomicIndicator,
     [
         indicator_code,
         source_org,
@@ -2738,8 +2738,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/MacrodataIndicatorListResponse",
-    longbridge::fundamental::MacrodataIndicatorListResponse,
+    "com/longbridge/fundamental/MacroeconomicIndicatorListResponse",
+    longbridge::fundamental::MacroeconomicIndicatorListResponse,
     [
         #[java(objarray)]
         data,
@@ -2748,8 +2748,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/MacrodataResponse",
-    longbridge::fundamental::MacrodataResponse,
+    "com/longbridge/fundamental/MacroeconomicResponse",
+    longbridge::fundamental::MacroeconomicResponse,
     [
         info,
         #[java(objarray)]

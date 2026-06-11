@@ -9922,11 +9922,11 @@ class FundamentalContext:
         """
         ...
 
-    def macrodata_indicators(
+    def macroeconomic_indicators(
         self,
         offset: int | None = None,
         limit: int | None = None,
-    ) -> list["MacrodataIndicator"]:
+    ) -> list["MacroeconomicIndicator"]:
         """
         List macroeconomic indicators.
 
@@ -9935,28 +9935,28 @@ class FundamentalContext:
             limit: Page size (default 100, max 1000)
 
         Returns:
-            List of :class:`MacrodataIndicator`
+            List of :class:`MacroeconomicIndicator`
         """
         ...
 
-    def macrodata(
+    def macroeconomic(
         self,
         indicator_code: str,
         start_date: str | None = None,
         end_date: str | None = None,
         limit: int | None = None,
-    ) -> "MacrodataResponse":
+    ) -> "MacroeconomicResponse":
         """
         Get historical data for a macroeconomic indicator.
 
         Args:
-            indicator_code: External vendor code from ``macrodata_indicators``
+            indicator_code: External vendor code from ``macroeconomic_indicators``
             start_date: Start date in ``"YYYY-MM-DD"`` format (optional)
             end_date: End date in ``"YYYY-MM-DD"`` format (optional)
             limit: Max records to return (default 100, max 100)
 
         Returns:
-            :class:`MacrodataResponse`
+            :class:`MacroeconomicResponse`
         """
         ...
 
@@ -10111,11 +10111,11 @@ class MultiLanguageText:
     traditional_chinese: str
 
 
-class MacrodataIndicator:
+class MacroeconomicIndicator:
     """Metadata for one macroeconomic indicator."""
 
     indicator_code: str
-    """External vendor code (input to macrodata)"""
+    """External vendor code (input to macroeconomic)"""
     source_org: str
     country: str
     name: MultiLanguageText
@@ -10144,10 +10144,10 @@ class Macrodata:
     unit_prefix: MultiLanguageText
 
 
-class MacrodataResponse:
-    """Response for macrodata."""
+class MacroeconomicResponse:
+    """Response for macroeconomic."""
 
-    info: MacrodataIndicator
+    info: MacroeconomicIndicator
     data: list[Macrodata]
 
 

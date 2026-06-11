@@ -830,20 +830,20 @@ impl FundamentalContext {
         .await
     }
 
-    // ── macrodata ────────────────────────────────────────────────
+    // ── macroeconomic ────────────────────────────────────────────────
 
     /// List macroeconomic indicators.
     ///
     /// Pass `country` to filter by country code (e.g.
-    /// `MacrodataCountry::UnitedStates`).
+    /// `MacroeconomicCountry::UnitedStates`).
     ///
     /// Path: `GET /v1/quote/macrodata`
-    pub async fn macrodata_indicators(
+    pub async fn macroeconomic_indicators(
         &self,
-        country: Option<MacrodataCountry>,
+        country: Option<MacroeconomicCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<MacrodataIndicatorListResponse> {
+    ) -> Result<MacroeconomicIndicatorListResponse> {
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -855,12 +855,12 @@ impl FundamentalContext {
         }
         let country_str = country.map(|c| {
             match c {
-                MacrodataCountry::HongKong => "Hong Kong SAR China",
-                MacrodataCountry::China => "China (Mainland)",
-                MacrodataCountry::UnitedStates => "United States",
-                MacrodataCountry::EuroZone => "Euro Zone",
-                MacrodataCountry::Japan => "Japan",
-                MacrodataCountry::Singapore => "Singapore",
+                MacroeconomicCountry::HongKong => "Hong Kong SAR China",
+                MacroeconomicCountry::China => "China (Mainland)",
+                MacroeconomicCountry::UnitedStates => "United States",
+                MacroeconomicCountry::EuroZone => "Euro Zone",
+                MacroeconomicCountry::Japan => "Japan",
+                MacroeconomicCountry::Singapore => "Singapore",
             }
             .to_string()
         });
@@ -882,14 +882,14 @@ impl FundamentalContext {
     /// `YYYY-MM-DDT23:59:59Z`.
     ///
     /// Path: `GET /v1/quote/macrodata/{indicator_code}`
-    pub async fn macrodata(
+    pub async fn macroeconomic(
         &self,
         indicator_code: impl Into<String>,
         start_date: Option<impl Into<String>>,
         end_date: Option<impl Into<String>>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<MacrodataResponse> {
+    ) -> Result<MacroeconomicResponse> {
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -912,7 +912,7 @@ impl FundamentalContext {
                 offset,
                 limit,
             })
-            .response::<Json<MacrodataResponse>>()
+            .response::<Json<MacroeconomicResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

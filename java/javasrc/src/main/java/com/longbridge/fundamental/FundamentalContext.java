@@ -339,9 +339,9 @@ public class FundamentalContext implements AutoCloseable {
      * List macroeconomic indicators.
      * country: ISO country code string (e.g. "US", "CN", "EU"); pass null for all countries.
      */
-    public CompletableFuture<MacrodataIndicatorListResponse> getMacrodataIndicators(String country, Integer offset, Integer limit) throws OpenApiException {
+    public CompletableFuture<MacroeconomicIndicatorListResponse> getMacroeconomicIndicators(String country, Integer offset, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextMacrodataIndicators(raw, country, offset, limit, callback);
+            SdkNative.fundamentalContextMacroeconomicIndicators(raw, country, offset, limit, callback);
         });
     }
 
@@ -349,9 +349,9 @@ public class FundamentalContext implements AutoCloseable {
      * Get historical data for a macroeconomic indicator.
      * startDate and endDate are date strings in "YYYY-MM-DD" format.
      */
-    public CompletableFuture<MacrodataResponse> getMacrodata(String indicatorCode, String startDate, String endDate, Integer offset, Integer limit) throws OpenApiException {
+    public CompletableFuture<MacroeconomicResponse> getMacroeconomic(String indicatorCode, String startDate, String endDate, Integer offset, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextMacrodata(raw, indicatorCode, startDate, endDate, offset, limit, callback);
+            SdkNative.fundamentalContextMacroeconomic(raw, indicatorCode, startDate, endDate, offset, limit, callback);
         });
     }
 }

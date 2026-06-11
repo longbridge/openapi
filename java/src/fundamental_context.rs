@@ -264,7 +264,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextVa
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacrodataIndicators(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacroeconomicIndicators(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -277,7 +277,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         let context = &*(context as *const ContextObj);
         let country: Option<String> = FromJValue::from_jvalue(env, country.into())?;
         let country = country.and_then(|s| {
-            use longbridge::fundamental::MacrodataCountry::*;
+            use longbridge::fundamental::MacroeconomicCountry::*;
             match s.as_str() {
                 "HK" | "Hong Kong SAR China" => Some(HongKong),
                 "CN" | "China (Mainland)" => Some(China),
@@ -293,7 +293,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         async_util::execute(env, callback, async move {
             Ok(context
                 .ctx
-                .macrodata_indicators(country, offset, limit)
+                .macroeconomic_indicators(country, offset, limit)
                 .await?)
         })?;
         Ok(())
@@ -301,7 +301,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacrodata(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacroeconomic(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -322,7 +322,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         async_util::execute(env, callback, async move {
             Ok(context
                 .ctx
-                .macrodata(indicator_code, start_date, end_date, offset, limit)
+                .macroeconomic(indicator_code, start_date, end_date, offset, limit)
                 .await?)
         })?;
         Ok(())

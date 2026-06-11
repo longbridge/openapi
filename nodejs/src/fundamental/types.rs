@@ -1927,7 +1927,7 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
 /// Country code for filtering macroeconomic indicators
 #[napi_derive::napi]
 #[derive(Debug, Copy, Clone)]
-pub enum MacrodataCountry {
+pub enum MacroeconomicCountry {
     /// Hong Kong SAR China
     HongKong,
     /// China (Mainland)
@@ -1942,29 +1942,29 @@ pub enum MacrodataCountry {
     Singapore,
 }
 
-impl From<MacrodataCountry> for lb::MacrodataCountry {
-    fn from(v: MacrodataCountry) -> Self {
+impl From<MacroeconomicCountry> for lb::MacroeconomicCountry {
+    fn from(v: MacroeconomicCountry) -> Self {
         match v {
-            MacrodataCountry::HongKong => lb::MacrodataCountry::HongKong,
-            MacrodataCountry::China => lb::MacrodataCountry::China,
-            MacrodataCountry::UnitedStates => lb::MacrodataCountry::UnitedStates,
-            MacrodataCountry::EuroZone => lb::MacrodataCountry::EuroZone,
-            MacrodataCountry::Japan => lb::MacrodataCountry::Japan,
-            MacrodataCountry::Singapore => lb::MacrodataCountry::Singapore,
+            MacroeconomicCountry::HongKong => lb::MacroeconomicCountry::HongKong,
+            MacroeconomicCountry::China => lb::MacroeconomicCountry::China,
+            MacroeconomicCountry::UnitedStates => lb::MacroeconomicCountry::UnitedStates,
+            MacroeconomicCountry::EuroZone => lb::MacroeconomicCountry::EuroZone,
+            MacroeconomicCountry::Japan => lb::MacroeconomicCountry::Japan,
+            MacroeconomicCountry::Singapore => lb::MacroeconomicCountry::Singapore,
         }
     }
 }
 
-/// Response for macrodata_indicators
+/// Response for macroeconomic_indicators
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct MacrodataIndicatorListResponse {
-    pub data: Vec<MacrodataIndicator>,
+pub struct MacroeconomicIndicatorListResponse {
+    pub data: Vec<MacroeconomicIndicator>,
     pub count: i32,
 }
 
-impl From<lb::MacrodataIndicatorListResponse> for MacrodataIndicatorListResponse {
-    fn from(v: lb::MacrodataIndicatorListResponse) -> Self {
+impl From<lb::MacroeconomicIndicatorListResponse> for MacroeconomicIndicatorListResponse {
+    fn from(v: lb::MacroeconomicIndicatorListResponse) -> Self {
         Self {
             data: v.data.into_iter().map(Into::into).collect(),
             count: v.count,
@@ -1975,7 +1975,7 @@ impl From<lb::MacrodataIndicatorListResponse> for MacrodataIndicatorListResponse
 /// Metadata for one macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct MacrodataIndicator {
+pub struct MacroeconomicIndicator {
     pub indicator_code: String,
     pub source_org: String,
     pub country: String,
@@ -1989,8 +1989,8 @@ pub struct MacrodataIndicator {
     pub start_date: Option<i64>,
 }
 
-impl From<lb::MacrodataIndicator> for MacrodataIndicator {
-    fn from(v: lb::MacrodataIndicator) -> Self {
+impl From<lb::MacroeconomicIndicator> for MacroeconomicIndicator {
+    fn from(v: lb::MacroeconomicIndicator) -> Self {
         Self {
             indicator_code: v.indicator_code,
             source_org: v.source_org,
@@ -2039,17 +2039,17 @@ impl From<lb::Macrodata> for Macrodata {
     }
 }
 
-/// Response for macrodata
+/// Response for macroeconomic
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct MacrodataResponse {
-    pub info: MacrodataIndicator,
+pub struct MacroeconomicResponse {
+    pub info: MacroeconomicIndicator,
     pub data: Vec<Macrodata>,
     pub count: i32,
 }
 
-impl From<lb::MacrodataResponse> for MacrodataResponse {
-    fn from(v: lb::MacrodataResponse) -> Self {
+impl From<lb::MacroeconomicResponse> for MacroeconomicResponse {
+    fn from(v: lb::MacroeconomicResponse) -> Self {
         Self {
             info: v.info.into(),
             data: v.data.into_iter().map(Into::into).collect(),

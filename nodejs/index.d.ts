@@ -619,9 +619,9 @@ export declare class FundamentalContext {
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
   /** List macroeconomic indicators */
-  macrodataIndicators(country?: MacrodataCountry | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacrodataIndicatorListResponse>
+  macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
-  macrodata(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacrodataResponse>
+  macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
 }
 
 /** Fund position */
@@ -4493,7 +4493,7 @@ export interface Macrodata {
 }
 
 /** Country code for filtering macroeconomic indicators */
-export declare const enum MacrodataCountry {
+export declare const enum MacroeconomicCountry {
   /** Hong Kong SAR China */
   HongKong = 0,
   /** China (Mainland) */
@@ -4509,7 +4509,7 @@ export declare const enum MacrodataCountry {
 }
 
 /** Metadata for one macroeconomic indicator */
-export interface MacrodataIndicator {
+export interface MacroeconomicIndicator {
   indicatorCode: string
   sourceOrg: string
   country: string
@@ -4523,15 +4523,15 @@ export interface MacrodataIndicator {
   startDate?: number
 }
 
-/** Response for macrodata_indicators */
-export interface MacrodataIndicatorListResponse {
-  data: Array<MacrodataIndicator>
+/** Response for macroeconomic_indicators */
+export interface MacroeconomicIndicatorListResponse {
+  data: Array<MacroeconomicIndicator>
   count: number
 }
 
-/** Response for macrodata */
-export interface MacrodataResponse {
-  info: MacrodataIndicator
+/** Response for macroeconomic */
+export interface MacroeconomicResponse {
+  info: MacroeconomicIndicator
   data: Array<Macrodata>
   count: number
 }

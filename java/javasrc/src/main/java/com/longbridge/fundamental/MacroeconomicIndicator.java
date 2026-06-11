@@ -1,7 +1,7 @@
 package com.longbridge.fundamental;
 
 /** Metadata for one macroeconomic indicator. */
-public class MacrodataIndicator {
+public class MacroeconomicIndicator {
     /** External vendor code (input to getEconomicIndicator). */
     public String indicatorCode;
     public String sourceOrg;

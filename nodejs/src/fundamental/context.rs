@@ -290,15 +290,15 @@ impl FundamentalContext {
 
     /// List macroeconomic indicators
     #[napi]
-    pub async fn macrodata_indicators(
+    pub async fn macroeconomic_indicators(
         &self,
-        country: Option<MacrodataCountry>,
+        country: Option<MacroeconomicCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<MacrodataIndicatorListResponse> {
+    ) -> Result<MacroeconomicIndicatorListResponse> {
         Ok(self
             .ctx
-            .macrodata_indicators(country.map(Into::into), offset, limit)
+            .macroeconomic_indicators(country.map(Into::into), offset, limit)
             .await
             .map_err(ErrorNewType)?
             .into())
@@ -306,17 +306,17 @@ impl FundamentalContext {
 
     /// Get historical data for a macroeconomic indicator
     #[napi]
-    pub async fn macrodata(
+    pub async fn macroeconomic(
         &self,
         indicator_code: String,
         start_date: Option<String>,
         end_date: Option<String>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<MacrodataResponse> {
+    ) -> Result<MacroeconomicResponse> {
         Ok(self
             .ctx
-            .macrodata(indicator_code, start_date, end_date, offset, limit)
+            .macroeconomic(indicator_code, start_date, end_date, offset, limit)
             .await
             .map_err(ErrorNewType)?
             .into())

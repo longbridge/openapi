@@ -1563,11 +1563,11 @@ pub struct AssetAllocationResponse {
     pub info: Vec<AssetAllocationGroup>,
 }
 
-// ── macrodata ─────────────────────────────────────────────────────
+// ── macroeconomic ─────────────────────────────────────────────────────
 
 /// Country for filtering macroeconomic indicators
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum MacrodataCountry {
+pub enum MacroeconomicCountry {
     /// Hong Kong SAR China
     #[serde(rename = "Hong Kong SAR China")]
     HongKong,
@@ -1590,7 +1590,7 @@ pub enum MacrodataCountry {
 
 /// Importance level of a macroeconomic indicator
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum MacrodataImportance {
+pub enum MacroeconomicImportance {
     /// Low importance
     Low = 1,
     /// Medium importance
@@ -1599,7 +1599,7 @@ pub enum MacrodataImportance {
     High = 3,
 }
 
-impl MacrodataImportance {
+impl MacroeconomicImportance {
     /// Convert from raw API integer value
     pub fn from_i32(v: i32) -> Option<Self> {
         match v {
@@ -1627,8 +1627,8 @@ pub struct MultiLanguageText {
 
 /// Metadata for one macroeconomic indicator
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct MacrodataIndicator {
-    /// External vendor code (used as input to `macrodata`)
+pub struct MacroeconomicIndicator {
+    /// External vendor code (used as input to `macroeconomic`)
     pub indicator_code: String,
     /// Publishing organisation
     #[serde(default)]
@@ -1663,12 +1663,12 @@ pub struct MacrodataIndicator {
     pub start_date: Option<OffsetDateTime>,
 }
 
-/// Response for [`crate::FundamentalContext::macrodata_indicators`]
+/// Response for [`crate::FundamentalContext::macroeconomic_indicators`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MacrodataIndicatorListResponse {
+pub struct MacroeconomicIndicatorListResponse {
     /// Indicator list
     #[serde(default, rename = "list")]
-    pub data: Vec<MacrodataIndicator>,
+    pub data: Vec<MacroeconomicIndicator>,
     /// Total number of indicators matching the query
     #[serde(default)]
     pub count: i32,
@@ -1706,12 +1706,12 @@ pub struct Macrodata {
     pub unit_prefix: MultiLanguageText,
 }
 
-/// Response for [`crate::FundamentalContext::macrodata`]
+/// Response for [`crate::FundamentalContext::macroeconomic`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MacrodataResponse {
+pub struct MacroeconomicResponse {
     /// Indicator metadata
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub info: MacrodataIndicator,
+    pub info: MacroeconomicIndicator,
     /// Historical data points
     #[serde(default)]
     pub data: Vec<Macrodata>,
