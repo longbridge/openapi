@@ -8,13 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **All languages:** `FundamentalContext` gains `macrodata_indicators(offset, limit)` — list all macroeconomic indicators via `GET /v1/quote/macrodata`
-- **All languages:** `FundamentalContext` gains `macrodata(indicator_code, start_date, end_date, limit)` — historical data for a specific indicator via `GET /v1/quote/macrodata/{indicator_code}`; `start_date` / `end_date` accept `"YYYY-MM-DD"` strings
-- New types: `MultiLanguageText`, `MacrodataIndicator`, `Macrodata`, `MacrodataResponse`
+- **All languages:** `FundamentalContext` gains `macroeconomic_indicators(country, offset, limit)` — list macroeconomic indicators via `GET /v1/quote/macrodata`; filter by country (`MacroeconomicCountry::HongKong / China / UnitedStates / EuroZone / Japan / Singapore`); response includes `count` (total matching)
+- **All languages:** `FundamentalContext` gains `macroeconomic(indicator_code, start_date, end_date, offset, limit)` — historical data for a specific indicator via `GET /v1/quote/macrodata/{indicator_code}`; `start_date` / `end_date` accept `"YYYY-MM-DD"` strings; response includes `count` (total data points)
+- New types: `MultiLanguageText`, `MacroeconomicCountry`, `MacroeconomicImportance`, `MacroeconomicIndicator`, `MacroeconomicIndicatorListResponse`, `Macroeconomic`, `MacroeconomicResponse`
 
 ### Fixed
 
-- `MacrodataIndicator.describe`: handle `null` response from API without deserializing error
+- `MacroeconomicIndicator.describe` / `name` / `MacroeconomicResponse.info`: handle `null` responses from API without deserializing error
 
 ## [4.3.0]
 
