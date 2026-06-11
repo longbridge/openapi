@@ -9922,6 +9922,44 @@ class FundamentalContext:
         """
         ...
 
+    def macroeconomic_indicators(
+        self,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> list["MacroeconomicIndicator"]:
+        """
+        List macroeconomic indicators.
+
+        Args:
+            offset: Pagination offset (default 0)
+            limit: Page size (default 100, max 1000)
+
+        Returns:
+            List of :class:`MacroeconomicIndicator`
+        """
+        ...
+
+    def macroeconomic(
+        self,
+        indicator_code: str,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        limit: int | None = None,
+    ) -> "MacroeconomicResponse":
+        """
+        Get historical data for a macroeconomic indicator.
+
+        Args:
+            indicator_code: External vendor code from ``macroeconomic_indicators``
+            start_date: Start date in ``"YYYY-MM-DD"`` format (optional)
+            end_date: End date in ``"YYYY-MM-DD"`` format (optional)
+            limit: Max records to return (default 100, max 100)
+
+        Returns:
+            :class:`MacroeconomicResponse`
+        """
+        ...
+
 
 # ── FundamentalContext new response types ─────────────────────────
 
@@ -10063,6 +10101,54 @@ class AssetAllocationResponse:
 
     info: list[AssetAllocationGroup]
     """Asset allocation groups"""
+
+
+class MultiLanguageText:
+    """Localized text in simplified Chinese, traditional Chinese, and English."""
+
+    english: str
+    simplified_chinese: str
+    traditional_chinese: str
+
+
+class MacroeconomicIndicator:
+    """Metadata for one macroeconomic indicator."""
+
+    indicator_code: str
+    """External vendor code (input to macroeconomic)"""
+    source_org: str
+    country: str
+    name: MultiLanguageText
+    adjustment_factor: str
+    periodicity: str
+    """Release periodicity (e.g. monthly / quarterly)"""
+    category: str
+    describe: MultiLanguageText
+    importance: int
+    start_date: datetime | None
+    """Start date of data coverage"""
+
+
+class Macroeconomic:
+    """One historical data point for a macroeconomic indicator."""
+
+    period: str
+    """Statistical period (e.g. 2024-Q1, 2024-03)"""
+    release_at: datetime | None
+    actual_value: str
+    previous_value: str
+    forecast_value: str
+    revised_value: str
+    next_release_at: datetime | None
+    unit: MultiLanguageText
+    unit_prefix: MultiLanguageText
+
+
+class MacroeconomicResponse:
+    """Response for macroeconomic."""
+
+    info: MacroeconomicIndicator
+    data: list[Macroeconomic]
 
 
 # ── MarketContext ─────────────────────────────────────────────────

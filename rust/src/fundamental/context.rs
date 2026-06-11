@@ -829,4 +829,93 @@ impl FundamentalContext {
         )
         .await
     }
+
+    // ── macroeconomic ────────────────────────────────────────────────
+
+    /// List macroeconomic indicators.
+    ///
+    /// Pass `country` to filter by country code (e.g.
+    /// `MacroeconomicCountry::UnitedStates`).
+    ///
+    /// Path: `GET /v1/quote/macrodata`
+    pub async fn macroeconomic_indicators(
+        &self,
+        country: Option<MacroeconomicCountry>,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<MacroeconomicIndicatorListResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            country: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            offset: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            limit: Option<i32>,
+        }
+        let country_str = country.map(|c| {
+            match c {
+                MacroeconomicCountry::HongKong => "Hong Kong SAR China",
+                MacroeconomicCountry::China => "China (Mainland)",
+                MacroeconomicCountry::UnitedStates => "United States",
+                MacroeconomicCountry::EuroZone => "Euro Zone",
+                MacroeconomicCountry::Japan => "Japan",
+                MacroeconomicCountry::Singapore => "Singapore",
+            }
+            .to_string()
+        });
+        self.get(
+            "/v1/quote/macrodata",
+            Query {
+                country: country_str,
+                offset,
+                limit,
+            },
+        )
+        .await
+    }
+
+    /// Get historical data for a macroeconomic indicator.
+    ///
+    /// `start_date` and `end_date` are date strings in `"YYYY-MM-DD"` format.
+    /// `start_date` is sent as `YYYY-MM-DDT00:00:00Z`; `end_date` is sent as
+    /// `YYYY-MM-DDT23:59:59Z`.
+    ///
+    /// Path: `GET /v1/quote/macrodata/{indicator_code}`
+    pub async fn macroeconomic(
+        &self,
+        indicator_code: impl Into<String>,
+        start_date: Option<impl Into<String>>,
+        end_date: Option<impl Into<String>>,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<MacroeconomicResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            start_time: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            end_time: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            offset: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            limit: Option<i32>,
+        }
+        let path = format!("/v1/quote/macrodata/{}", indicator_code.into());
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path)
+            .query_params(Query {
+                start_time: start_date.map(|d| format!("{}T00:00:00Z", d.into())),
+                end_time: end_date.map(|d| format!("{}T23:59:59Z", d.into())),
+                offset,
+                limit,
+            })
+            .response::<Json<MacroeconomicResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
 }
