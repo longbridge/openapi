@@ -1965,3 +1965,149 @@ impl From<lb::AssetAllocationResponse> for AssetAllocationResponse {
         }
     }
 }
+
+// ── economic_indicator ─────────────────────────────────────────────────────
+
+/// Localized text in simplified Chinese, traditional Chinese, and English
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct MultiLanguageText {
+    pub english: String,
+    pub simplified_chinese: String,
+    pub traditional_chinese: String,
+}
+
+impl From<lb::MultiLanguageText> for MultiLanguageText {
+    fn from(v: lb::MultiLanguageText) -> Self {
+        Self {
+            english: v.english,
+            simplified_chinese: v.simplified_chinese,
+            traditional_chinese: v.traditional_chinese,
+        }
+    }
+}
+
+/// Country code for filtering macroeconomic indicators
+#[pyclass]
+#[derive(Debug, Copy, Clone)]
+pub(crate) enum MacroeconomicCountry {
+    HongKong,
+    China,
+    UnitedStates,
+    EuroZone,
+    Japan,
+    Singapore,
+}
+
+impl From<MacroeconomicCountry> for lb::MacroeconomicCountry {
+    fn from(v: MacroeconomicCountry) -> Self {
+        match v {
+            MacroeconomicCountry::HongKong => lb::MacroeconomicCountry::HongKong,
+            MacroeconomicCountry::China => lb::MacroeconomicCountry::China,
+            MacroeconomicCountry::UnitedStates => lb::MacroeconomicCountry::UnitedStates,
+            MacroeconomicCountry::EuroZone => lb::MacroeconomicCountry::EuroZone,
+            MacroeconomicCountry::Japan => lb::MacroeconomicCountry::Japan,
+            MacroeconomicCountry::Singapore => lb::MacroeconomicCountry::Singapore,
+        }
+    }
+}
+
+/// Response for macroeconomic_indicators
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct MacroeconomicIndicatorListResponse {
+    pub data: Vec<MacroeconomicIndicator>,
+    pub count: i32,
+}
+
+impl From<lb::MacroeconomicIndicatorListResponse> for MacroeconomicIndicatorListResponse {
+    fn from(v: lb::MacroeconomicIndicatorListResponse) -> Self {
+        Self {
+            data: v.data.into_iter().map(Into::into).collect(),
+            count: v.count,
+        }
+    }
+}
+
+/// Metadata for one macroeconomic indicator
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct MacroeconomicIndicator {
+    pub indicator_code: String,
+    pub source_org: String,
+    pub country: String,
+    pub name: MultiLanguageText,
+    pub adjustment_factor: String,
+    pub periodicity: String,
+    pub category: String,
+    pub describe: MultiLanguageText,
+    pub importance: i32,
+    pub start_date: Option<crate::time::PyOffsetDateTimeWrapper>,
+}
+
+impl From<lb::MacroeconomicIndicator> for MacroeconomicIndicator {
+    fn from(v: lb::MacroeconomicIndicator) -> Self {
+        Self {
+            indicator_code: v.indicator_code,
+            source_org: v.source_org,
+            country: v.country,
+            name: v.name.into(),
+            adjustment_factor: v.adjustment_factor,
+            periodicity: v.periodicity,
+            category: v.category,
+            describe: v.describe.into(),
+            importance: v.importance,
+            start_date: v.start_date.map(crate::time::PyOffsetDateTimeWrapper),
+        }
+    }
+}
+
+/// One historical data point for a macroeconomic indicator
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct Macroeconomic {
+    pub period: String,
+    pub release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
+    pub actual_value: String,
+    pub previous_value: String,
+    pub forecast_value: String,
+    pub revised_value: String,
+    pub next_release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
+    pub unit: MultiLanguageText,
+    pub unit_prefix: MultiLanguageText,
+}
+
+impl From<lb::Macroeconomic> for Macroeconomic {
+    fn from(v: lb::Macroeconomic) -> Self {
+        Self {
+            period: v.period,
+            release_at: v.release_at.map(crate::time::PyOffsetDateTimeWrapper),
+            actual_value: v.actual_value,
+            previous_value: v.previous_value,
+            forecast_value: v.forecast_value,
+            revised_value: v.revised_value,
+            next_release_at: v.next_release_at.map(crate::time::PyOffsetDateTimeWrapper),
+            unit: v.unit.into(),
+            unit_prefix: v.unit_prefix.into(),
+        }
+    }
+}
+
+/// Response for macroeconomic
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct MacroeconomicResponse {
+    pub info: MacroeconomicIndicator,
+    pub data: Vec<Macroeconomic>,
+    pub count: i32,
+}
+
+impl From<lb::MacroeconomicResponse> for MacroeconomicResponse {
+    fn from(v: lb::MacroeconomicResponse) -> Self {
+        Self {
+            info: v.info.into(),
+            data: v.data.into_iter().map(Into::into).collect(),
+            count: v.count,
+        }
+    }
+}

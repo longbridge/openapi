@@ -462,3 +462,12 @@ where
         StringOrInt::String(s) => s.parse::<i64>().map_err(serde::de::Error::custom),
     }
 }
+
+/// Deserializer that maps a JSON `null` to the type's `Default` value.
+pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de> + Default,
+{
+    Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
+}

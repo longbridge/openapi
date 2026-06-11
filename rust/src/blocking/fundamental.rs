@@ -290,4 +290,31 @@ impl FundamentalContextSync {
         self.rt
             .call(move |ctx| async move { ctx.etf_asset_allocation(symbol).await })
     }
+
+    /// List macroeconomic indicators
+    pub fn macroeconomic_indicators(
+        &self,
+        country: Option<MacroeconomicCountry>,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<MacroeconomicIndicatorListResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.macroeconomic_indicators(country, offset, limit).await
+        })
+    }
+
+    /// Get historical data for a macroeconomic indicator
+    pub fn macroeconomic(
+        &self,
+        indicator_code: impl Into<String> + Send + 'static,
+        start_date: Option<impl Into<String> + Send + 'static>,
+        end_date: Option<impl Into<String> + Send + 'static>,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<MacroeconomicResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.macroeconomic(indicator_code, start_date, end_date, offset, limit)
+                .await
+        })
+    }
 }

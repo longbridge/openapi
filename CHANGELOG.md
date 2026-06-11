@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.1] - 2026-06-12
+
+### Added
+
+- **All languages:** `FundamentalContext` gains `macroeconomic_indicators(country, offset, limit)` — list macroeconomic indicators via `GET /v1/quote/macrodata`; filter by country (`MacroeconomicCountry::HongKong / China / UnitedStates / EuroZone / Japan / Singapore`); response includes `count` (total matching)
+- **All languages:** `FundamentalContext` gains `macroeconomic(indicator_code, start_date, end_date, offset, limit)` — historical data for a specific indicator via `GET /v1/quote/macrodata/{indicator_code}`; `start_date` / `end_date` accept `"YYYY-MM-DD"` strings; response includes `count` (total data points)
+- New types: `MultiLanguageText`, `MacroeconomicCountry`, `MacroeconomicImportance`, `MacroeconomicIndicator`, `MacroeconomicIndicatorListResponse`, `Macroeconomic`, `MacroeconomicResponse`
+
+### Fixed
+
+- `MacroeconomicIndicator.describe` / `name` / `MacroeconomicResponse.info`: handle `null` responses from API without deserializing error
+
 ## [4.3.0]
 
 ### Added
