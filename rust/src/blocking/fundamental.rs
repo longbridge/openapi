@@ -292,27 +292,28 @@ impl FundamentalContextSync {
     }
 
     /// List macroeconomic indicators
-    pub fn macrodata_indicators(
+    pub fn macroeconomic_indicators(
         &self,
-        country: Option<MacrodataCountry>,
+        country: Option<MacroeconomicCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<MacrodataIndicatorListResponse> {
-        self.rt
-            .call(move |ctx| async move { ctx.macrodata_indicators(country, offset, limit).await })
+    ) -> Result<MacroeconomicIndicatorListResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.macroeconomic_indicators(country, offset, limit).await
+        })
     }
 
     /// Get historical data for a macroeconomic indicator
-    pub fn macrodata(
+    pub fn macroeconomic(
         &self,
         indicator_code: impl Into<String> + Send + 'static,
         start_date: Option<impl Into<String> + Send + 'static>,
         end_date: Option<impl Into<String> + Send + 'static>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<MacrodataResponse> {
+    ) -> Result<MacroeconomicResponse> {
         self.rt.call(move |ctx| async move {
-            ctx.macrodata(indicator_code, start_date, end_date, offset, limit)
+            ctx.macroeconomic(indicator_code, start_date, end_date, offset, limit)
                 .await
         })
     }
