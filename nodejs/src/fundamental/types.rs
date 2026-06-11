@@ -2009,7 +2009,7 @@ impl From<lb::MacroeconomicIndicator> for MacroeconomicIndicator {
 /// One historical data point for a macroeconomic indicator
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
-pub struct Macrodata {
+pub struct Macroeconomic {
     pub period: String,
     /// Release datetime (unix timestamp in seconds; null if unset)
     pub release_at: Option<i64>,
@@ -2023,8 +2023,8 @@ pub struct Macrodata {
     pub unit_prefix: MultiLanguageText,
 }
 
-impl From<lb::Macrodata> for Macrodata {
-    fn from(v: lb::Macrodata) -> Self {
+impl From<lb::Macroeconomic> for Macroeconomic {
+    fn from(v: lb::Macroeconomic) -> Self {
         Self {
             period: v.period,
             release_at: v.release_at.map(|dt| dt.unix_timestamp()),
@@ -2044,7 +2044,7 @@ impl From<lb::Macrodata> for Macrodata {
 #[derive(Debug, Clone)]
 pub struct MacroeconomicResponse {
     pub info: MacroeconomicIndicator,
-    pub data: Vec<Macrodata>,
+    pub data: Vec<Macroeconomic>,
     pub count: i32,
 }
 

@@ -2722,8 +2722,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/fundamental/Macrodata",
-    longbridge::fundamental::Macrodata,
+    "com/longbridge/fundamental/Macroeconomic",
+    longbridge::fundamental::Macroeconomic,
     [
         period,
         release_at,

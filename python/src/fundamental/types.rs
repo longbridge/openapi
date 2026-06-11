@@ -2065,7 +2065,7 @@ impl From<lb::MacroeconomicIndicator> for MacroeconomicIndicator {
 /// One historical data point for a macroeconomic indicator
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct Macrodata {
+pub(crate) struct Macroeconomic {
     pub period: String,
     pub release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
     pub actual_value: String,
@@ -2077,8 +2077,8 @@ pub(crate) struct Macrodata {
     pub unit_prefix: MultiLanguageText,
 }
 
-impl From<lb::Macrodata> for Macrodata {
-    fn from(v: lb::Macrodata) -> Self {
+impl From<lb::Macroeconomic> for Macroeconomic {
+    fn from(v: lb::Macroeconomic) -> Self {
         Self {
             period: v.period,
             release_at: v.release_at.map(crate::time::PyOffsetDateTimeWrapper),
@@ -2098,7 +2098,7 @@ impl From<lb::Macrodata> for Macrodata {
 #[derive(Debug, Clone)]
 pub(crate) struct MacroeconomicResponse {
     pub info: MacroeconomicIndicator,
-    pub data: Vec<Macrodata>,
+    pub data: Vec<Macroeconomic>,
     pub count: i32,
 }
 

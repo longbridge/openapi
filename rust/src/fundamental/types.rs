@@ -1676,7 +1676,7 @@ pub struct MacroeconomicIndicatorListResponse {
 
 /// One historical data point for a macroeconomic indicator
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct Macrodata {
+pub struct Macroeconomic {
     /// Statistical period (e.g. `2024-Q1`, `2024-03`)
     #[serde(default)]
     pub period: String,
@@ -1714,7 +1714,7 @@ pub struct MacroeconomicResponse {
     pub info: MacroeconomicIndicator,
     /// Historical data points
     #[serde(default)]
-    pub data: Vec<Macrodata>,
+    pub data: Vec<Macroeconomic>,
     /// Total number of historical data points
     #[serde(default)]
     pub count: i32,
