@@ -462,4 +462,13 @@
 <a href=#462 id=462 data-nosnippet>462</a>        StringOrInt::String(s) =&gt; s.parse::&lt;i64&gt;().map_err(serde::de::Error::custom),
 <a href=#463 id=463 data-nosnippet>463</a>    }
 <a href=#464 id=464 data-nosnippet>464</a>}
+<a href=#465 id=465 data-nosnippet>465</a>
+<a href=#466 id=466 data-nosnippet>466</a><span class="doccomment">/// Deserializer that maps a JSON `null` to the type's `Default` value.
+<a href=#467 id=467 data-nosnippet>467</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>null_as_default&lt;<span class="lifetime">'de</span>, D, T&gt;(d: D) -&gt; <span class="prelude-ty">Result</span>&lt;T, D::Error&gt;
+<a href=#468 id=468 data-nosnippet>468</a><span class="kw">where
+<a href=#469 id=469 data-nosnippet>469</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#470 id=470 data-nosnippet>470</a>    T: Deserialize&lt;<span class="lifetime">'de</span>&gt; + Default,
+<a href=#471 id=471 data-nosnippet>471</a>{
+<a href=#472 id=472 data-nosnippet>472</a>    <span class="prelude-val">Ok</span>(Option::&lt;T&gt;::deserialize(d)<span class="question-mark">?</span>.unwrap_or_default())
+<a href=#473 id=473 data-nosnippet>473</a>}
 </code></pre></div></section></main></body></html>

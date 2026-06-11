@@ -3180,6 +3180,10 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.FundamentalContext.etf_asset_allocation">etf_asset_allocation</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.FundamentalContext.macroeconomic_indicators">macroeconomic_indicators</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.FundamentalContext.macroeconomic">macroeconomic</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.ShareholderTopResponse">ShareholderTopResponse</a>
@@ -3305,6 +3309,70 @@
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.AssetAllocationResponse">AssetAllocationResponse</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AssetAllocationResponse.info">info</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.MultiLanguageText">MultiLanguageText</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MultiLanguageText.english">english</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MultiLanguageText.simplified_chinese">simplified_chinese</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MultiLanguageText.traditional_chinese">traditional_chinese</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator">MacroeconomicIndicator</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.indicator_code">indicator_code</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.source_org">source_org</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.country">country</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.name">name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.adjustment_factor">adjustment_factor</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.periodicity">periodicity</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.category">category</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.describe">describe</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.importance">importance</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicIndicator.start_date">start_date</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.Macroeconomic">Macroeconomic</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.period">period</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.release_at">release_at</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.actual_value">actual_value</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.previous_value">previous_value</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.forecast_value">forecast_value</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.revised_value">revised_value</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.next_release_at">next_release_at</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.unit">unit</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Macroeconomic.unit_prefix">unit_prefix</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.MacroeconomicResponse">MacroeconomicResponse</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicResponse.info">info</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MacroeconomicResponse.data">data</a>
     </li>
         </ul>
     </li>
@@ -57231,6 +57299,180 @@ for d in dividends.list:
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.FundamentalContext.macroeconomic_indicators" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">macroeconomic_indicators</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">macroeconomic_indicators(offset: int | None = None, limit: int | None = None) -&gt; list[MacroeconomicIndicator]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>List macroeconomic indicators.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>offset</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Pagination offset (default 0)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>limit</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page size (default 100, max 1000)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="MacroeconomicIndicator (longbridge.openapi.MacroeconomicIndicator)" href="#longbridge.openapi.MacroeconomicIndicator">MacroeconomicIndicator</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>List of :class:<code>MacroeconomicIndicator</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.FundamentalContext.macroeconomic" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">macroeconomic</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">macroeconomic(indicator_code: str, start_date: str | None = None, end_date: str | None = None, limit: int | None = None) -&gt; MacroeconomicResponse</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get historical data for a macroeconomic indicator.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>indicator_code</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>External vendor code from <code>macroeconomic_indicators</code></p>
+              </div>
+            </li>
+            <li>
+              <b><code>start_date</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Start date in <code>"YYYY-MM-DD"</code> format (optional)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>end_date</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>End date in <code>"YYYY-MM-DD"</code> format (optional)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>limit</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Max records to return (default 100, max 100)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="MacroeconomicResponse (longbridge.openapi.MacroeconomicResponse)" href="#longbridge.openapi.MacroeconomicResponse">MacroeconomicResponse</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>MacroeconomicResponse</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
 
 
   </div>
@@ -58797,6 +59039,702 @@ for d in dividends.list:
     <div class="doc doc-contents ">
 
         <p>Asset allocation groups</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.MultiLanguageText" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">MultiLanguageText</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Localized text in simplified Chinese, traditional Chinese, and English.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MultiLanguageText.english" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">english</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">english: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MultiLanguageText.simplified_chinese" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">simplified_chinese</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">simplified_chinese: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MultiLanguageText.traditional_chinese" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">traditional_chinese</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">traditional_chinese: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.MacroeconomicIndicator" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">MacroeconomicIndicator</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Metadata for one macroeconomic indicator.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.indicator_code" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">indicator_code</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">indicator_code: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>External vendor code (input to macroeconomic)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.source_org" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">source_org</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">source_org: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.country" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">country</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">country: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">name: MultiLanguageText</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.adjustment_factor" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">adjustment_factor</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">adjustment_factor: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.periodicity" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">periodicity</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">periodicity: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Release periodicity (e.g. monthly / quarterly)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.category" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">category</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">category: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.describe" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">describe</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">describe: MultiLanguageText</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.importance" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">importance</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">importance: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicIndicator.start_date" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">start_date</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">start_date: datetime | None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Start date of data coverage</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.Macroeconomic" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Macroeconomic</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>One historical data point for a macroeconomic indicator.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.period" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">period</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">period: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Statistical period (e.g. 2024-Q1, 2024-03)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.release_at" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">release_at</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">release_at: datetime | None</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.actual_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">actual_value</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">actual_value: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.previous_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">previous_value</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">previous_value: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.forecast_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">forecast_value</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">forecast_value: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.revised_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">revised_value</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">revised_value: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.next_release_at" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">next_release_at</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">next_release_at: datetime | None</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.unit" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">unit</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">unit: MultiLanguageText</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Macroeconomic.unit_prefix" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">unit_prefix</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">unit_prefix: MultiLanguageText</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.MacroeconomicResponse" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">MacroeconomicResponse</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Response for macroeconomic.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicResponse.info" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">info</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">info: MacroeconomicIndicator</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.MacroeconomicResponse.data" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">data</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">data: list[Macroeconomic]</code></pre>
+
+    <div class="doc doc-contents ">
 
     </div>
 
