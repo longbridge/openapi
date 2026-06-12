@@ -254,7 +254,8 @@ impl FundamentalContext {
             .into())
     }
 
-    /// Get historical data for a macroeconomic indicator (v2) with sort support.
+    /// Get historical data for a macroeconomic indicator (v2) with sort
+    /// support.
     fn macroeconomic_v2(
         &self,
         indicator_code: String,

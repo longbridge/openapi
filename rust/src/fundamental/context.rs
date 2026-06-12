@@ -835,8 +835,9 @@ impl FundamentalContext {
     /// List macroeconomic indicators.
     ///
     /// `country` accepts a market code string (e.g. `"US"`, `"HK"`, `"ALL"`).
-    /// `keyword` optionally filters indicators by name (fuzzy, case-insensitive).
-    /// `offset` and `limit` are kept for backward compatibility but ignored by v2.
+    /// `keyword` optionally filters indicators by name (fuzzy,
+    /// case-insensitive). `offset` and `limit` are kept for backward
+    /// compatibility but ignored by v2.
     ///
     /// Path: `GET /v2/quote/macrodata`
     pub async fn macroeconomic_indicators(
@@ -926,11 +927,19 @@ impl FundamentalContext {
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacroeconomicResponse> {
-        self.macroeconomic_v2(indicator_code, start_date, end_date, offset, limit, None::<String>)
-            .await
+        self.macroeconomic_v2(
+            indicator_code,
+            start_date,
+            end_date,
+            offset,
+            limit,
+            None::<String>,
+        )
+        .await
     }
 
-    /// Get historical data for a macroeconomic indicator (v2) with sort support.
+    /// Get historical data for a macroeconomic indicator (v2) with sort
+    /// support.
     ///
     /// Path: `GET /v2/quote/macrodata/{indicator_id}`
     pub async fn macroeconomic_v2(
@@ -974,7 +983,15 @@ impl FundamentalContext {
             .0;
 
         let total = raw.total;
-        let detail = raw.indicator;
+        // Support both new format (indicator) and old format (indicator_data_list)
+        let detail = if raw.indicator.indicator_id != 0 {
+            raw.indicator
+        } else {
+            raw.indicator_data_list
+                .into_iter()
+                .next()
+                .unwrap_or_default()
+        };
         let unit_english = detail.unit.clone();
         let count = detail.indicator_data.len() as i32;
 

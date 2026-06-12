@@ -1775,12 +1775,16 @@ pub(crate) struct V2MacroIndicatorDetail {
     pub indicator_data: Vec<V2IndicatorDataDetail>,
 }
 
-/// v2 wire: response from GET /v2/quote/macrodata/:id (GetMacroIndicatorHistoryResp)
+/// v2 wire: response from GET /v2/quote/macrodata/:id
+/// Supports both old format (indicator_data_list) and new format (indicator).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub(crate) struct V2MacroIndicatorDataResponse {
-    /// Single indicator with paginated data points
+    /// New proto format: single indicator object
     #[serde(default)]
     pub indicator: V2MacroIndicatorDetail,
+    /// Old format: list of indicator details (currently returned by staging)
+    #[serde(default)]
+    pub indicator_data_list: Vec<V2MacroIndicatorDetail>,
     /// Total data points matching the query (for pagination)
     #[serde(default)]
     pub total: i32,

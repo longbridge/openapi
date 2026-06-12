@@ -358,7 +358,8 @@ impl AsyncFundamentalContext {
         .map(|b| b.unbind())
     }
 
-    /// List macroeconomic indicators (v2) with optional keyword filter. Returns awaitable.
+    /// List macroeconomic indicators (v2) with optional keyword filter. Returns
+    /// awaitable.
     fn macroeconomic_indicators_v2(
         &self,
         py: Python<'_>,
@@ -378,7 +379,8 @@ impl AsyncFundamentalContext {
         .map(|b| b.unbind())
     }
 
-    /// Get historical data for a macroeconomic indicator (v2) with sort support. Returns awaitable.
+    /// Get historical data for a macroeconomic indicator (v2) with sort
+    /// support. Returns awaitable.
     fn macroeconomic_v2(
         &self,
         py: Python<'_>,
