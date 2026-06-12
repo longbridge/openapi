@@ -856,14 +856,18 @@ impl FundamentalContext {
         &self,
         country: Option<MacroeconomicCountry>,
         keyword: Option<impl Into<String>>,
-        _offset: Option<i32>,
-        _limit: Option<i32>,
+        offset: Option<i32>,
+        limit: Option<i32>,
     ) -> Result<MacroeconomicIndicatorListResponse> {
         #[derive(Serialize)]
         struct Query {
             market: String,
             #[serde(skip_serializing_if = "Option::is_none")]
             keyword: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            offset: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            limit: Option<i32>,
         }
         let market = country
             .map(|c| match c {
@@ -883,10 +887,13 @@ impl FundamentalContext {
                 Query {
                     market,
                     keyword: keyword.map(|k| k.into()),
+                    offset,
+                    limit,
                 },
             )
             .await?;
 
+        let total = raw.total;
         let data = raw
             .indicator_list
             .into_iter()
@@ -900,7 +907,7 @@ impl FundamentalContext {
                 ..Default::default()
             })
             .collect::<Vec<_>>();
-        let count = data.len() as i32;
+        let count = if total > 0 { total } else { data.len() as i32 };
         Ok(MacroeconomicIndicatorListResponse { data, count })
     }
 
@@ -931,7 +938,7 @@ impl FundamentalContext {
         indicator_code: impl Into<String>,
         start_date: Option<impl Into<String>>,
         end_date: Option<impl Into<String>>,
-        _offset: Option<i32>,
+        offset: Option<i32>,
         limit: Option<i32>,
         sort: Option<impl Into<String>>,
     ) -> Result<MacroeconomicResponse> {
@@ -941,6 +948,8 @@ impl FundamentalContext {
             start_date: Option<String>,
             #[serde(skip_serializing_if = "Option::is_none")]
             end_date: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            offset: Option<i32>,
             #[serde(skip_serializing_if = "Option::is_none")]
             limit: Option<i32>,
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -954,6 +963,7 @@ impl FundamentalContext {
             .query_params(Query {
                 start_date: start_date.map(|d| d.into()),
                 end_date: end_date.map(|d| d.into()),
+                offset,
                 limit,
                 sort: sort.map(|s| s.into()),
             })
@@ -964,6 +974,7 @@ impl FundamentalContext {
             .0;
 
         // Take first indicator detail (single-indicator query)
+        let total = raw.total;
         let detail = raw.indicator_data_list.into_iter().next().unwrap_or_default();
         let unit_english = detail.unit.clone();
         let count = detail.indicator_data.len() as i32;
@@ -1015,6 +1026,7 @@ impl FundamentalContext {
             })
             .collect();
 
+        let count = if total > 0 { total } else { count };
         Ok(MacroeconomicResponse { info, data, count })
     }
 }

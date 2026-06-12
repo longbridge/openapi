@@ -1738,6 +1738,9 @@ pub(crate) struct V2MacroIndicator {
 pub(crate) struct V2MacroIndicatorListResponse {
     #[serde(default)]
     pub indicator_list: Vec<V2MacroIndicator>,
+    /// Total count for pagination
+    #[serde(default)]
+    pub total: i32,
 }
 
 /// v2 wire: one data point from GET /v2/quote/macrodata/:id
@@ -1777,4 +1780,7 @@ pub(crate) struct V2MacroIndicatorDetail {
 pub(crate) struct V2MacroIndicatorDataResponse {
     #[serde(default)]
     pub indicator_data_list: Vec<V2MacroIndicatorDetail>,
+    /// Total count for pagination
+    #[serde(default)]
+    pub total: i32,
 }
