@@ -983,15 +983,7 @@ impl FundamentalContext {
             .0;
 
         let total = raw.total;
-        // Support both new format (indicator) and old format (indicator_data_list)
-        let detail = if raw.indicator.indicator_id != 0 {
-            raw.indicator
-        } else {
-            raw.indicator_data_list
-                .into_iter()
-                .next()
-                .unwrap_or_default()
-        };
+        let detail = raw.indicator;
         let unit_english = detail.unit.clone();
         let count = detail.indicator_data.len() as i32;
 
