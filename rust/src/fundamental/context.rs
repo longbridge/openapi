@@ -974,7 +974,7 @@ impl FundamentalContext {
                 end_date: end_date.map(|d| d.into()),
                 offset,
                 limit,
-                sort: sort.map(|s| s.into()),
+                sort: Some(sort.map(|s| s.into()).unwrap_or_else(|| "desc".to_string())),
             })
             .response::<Json<V2MacroIndicatorDataResponse>>()
             .send()
