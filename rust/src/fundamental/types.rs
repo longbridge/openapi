@@ -1636,9 +1636,9 @@ pub struct MacroeconomicIndicator {
     /// Country
     #[serde(default)]
     pub country: String,
-    /// Indicator name (multilingual)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub name: MultiLanguageText,
+    /// Indicator name
+    #[serde(default)]
+    pub name: String,
     /// Adjustment factor
     #[serde(default)]
     pub adjustment_factor: String,
@@ -1648,9 +1648,9 @@ pub struct MacroeconomicIndicator {
     /// Indicator category
     #[serde(default)]
     pub category: String,
-    /// Description (multilingual)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub describe: MultiLanguageText,
+    /// Description
+    #[serde(default)]
+    pub describe: String,
     /// Importance — higher is more important
     #[serde(default)]
     pub importance: i32,

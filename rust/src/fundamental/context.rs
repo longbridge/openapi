@@ -901,15 +901,9 @@ impl FundamentalContext {
             .map(|ind| MacroeconomicIndicator {
                 indicator_code: ind.indicator_id.to_string(),
                 country: ind.market,
-                name: MultiLanguageText {
-                    english: ind.indicator_name,
-                    ..Default::default()
-                },
+                name: ind.indicator_name,
                 periodicity: ind.frequence,
-                describe: MultiLanguageText {
-                    english: ind.description,
-                    ..Default::default()
-                },
+                describe: ind.description,
                 importance: ind.importance,
                 ..Default::default()
             })

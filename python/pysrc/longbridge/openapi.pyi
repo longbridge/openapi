@@ -10118,12 +10118,12 @@ class MacroeconomicIndicator:
     """External vendor code (input to macroeconomic)"""
     source_org: str
     country: str
-    name: MultiLanguageText
+    name: str
     adjustment_factor: str
     periodicity: str
     """Release periodicity (e.g. monthly / quarterly)"""
     category: str
-    describe: MultiLanguageText
+    describe: str
     importance: int
     start_date: datetime | None
     """Start date of data coverage"""

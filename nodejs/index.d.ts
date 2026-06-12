@@ -4517,11 +4517,11 @@ export interface MacroeconomicIndicator {
   indicatorCode: string
   sourceOrg: string
   country: string
-  name: MultiLanguageText
+  name: string
   adjustmentFactor: string
   periodicity: string
   category: string
-  describe: MultiLanguageText
+  describe: string
   importance: number
   /** Start date of data coverage (unix timestamp in seconds; null if unset) */
   startDate?: number
