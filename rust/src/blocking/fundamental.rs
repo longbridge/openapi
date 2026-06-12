@@ -295,11 +295,13 @@ impl FundamentalContextSync {
     pub fn macroeconomic_indicators(
         &self,
         country: Option<MacroeconomicCountry>,
+        keyword: Option<impl Into<String> + Send + 'static>,
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacroeconomicIndicatorListResponse> {
         self.rt.call(move |ctx| async move {
-            ctx.macroeconomic_indicators(country, offset, limit).await
+            ctx.macroeconomic_indicators(country, keyword, offset, limit)
+                .await
         })
     }
 
