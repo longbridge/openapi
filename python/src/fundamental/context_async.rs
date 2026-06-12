@@ -358,48 +358,4 @@ impl AsyncFundamentalContext {
         })
         .map(|b| b.unbind())
     }
-
-    /// List macroeconomic indicators (v2) with optional keyword filter. Returns
-    /// awaitable.
-    fn macroeconomic_indicators_v2(
-        &self,
-        py: Python<'_>,
-        country: Option<MacroeconomicCountry>,
-        keyword: Option<String>,
-        offset: Option<i32>,
-        limit: Option<i32>,
-    ) -> PyResult<Py<PyAny>> {
-        let ctx = self.ctx.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            Ok(MacroeconomicIndicatorListResponse::from(
-                ctx.macroeconomic_indicators_v2(country.map(Into::into), keyword, offset, limit)
-                    .await
-                    .map_err(ErrorNewType)?,
-            ))
-        })
-        .map(|b| b.unbind())
-    }
-
-    /// Get historical data for a macroeconomic indicator (v2) with sort
-    /// support. Returns awaitable.
-    fn macroeconomic_v2(
-        &self,
-        py: Python<'_>,
-        indicator_code: String,
-        start_date: Option<String>,
-        end_date: Option<String>,
-        offset: Option<i32>,
-        limit: Option<i32>,
-        sort: Option<String>,
-    ) -> PyResult<Py<PyAny>> {
-        let ctx = self.ctx.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            Ok(MacroeconomicResponse::from(
-                ctx.macroeconomic_v2(indicator_code, start_date, end_date, offset, limit, sort)
-                    .await
-                    .map_err(ErrorNewType)?,
-            ))
-        })
-        .map(|b| b.unbind())
-    }
 }

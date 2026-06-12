@@ -322,40 +322,4 @@ impl FundamentalContext {
             .map_err(ErrorNewType)?
             .into())
     }
-
-    /// List macroeconomic indicators (v2) with optional keyword filter
-    #[napi]
-    pub async fn macroeconomic_indicators_v2(
-        &self,
-        country: Option<MacroeconomicCountry>,
-        keyword: Option<String>,
-        offset: Option<i32>,
-        limit: Option<i32>,
-    ) -> Result<MacroeconomicIndicatorListResponse> {
-        Ok(self
-            .ctx
-            .macroeconomic_indicators_v2(country.map(Into::into), keyword, offset, limit)
-            .await
-            .map_err(ErrorNewType)?
-            .into())
-    }
-
-    /// Get historical data for a macroeconomic indicator (v2) with sort support
-    #[napi]
-    pub async fn macroeconomic_v2(
-        &self,
-        indicator_code: String,
-        start_date: Option<String>,
-        end_date: Option<String>,
-        offset: Option<i32>,
-        limit: Option<i32>,
-        sort: Option<String>,
-    ) -> Result<MacroeconomicResponse> {
-        Ok(self
-            .ctx
-            .macroeconomic_v2(indicator_code, start_date, end_date, offset, limit, sort)
-            .await
-            .map_err(ErrorNewType)?
-            .into())
-    }
 }

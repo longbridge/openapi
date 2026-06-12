@@ -321,7 +321,7 @@ impl FundamentalContextSync {
     }
 
     /// List macroeconomic indicators (v2) with optional keyword filter
-    pub fn macroeconomic_indicators_v2(
+    pub(crate) fn macroeconomic_indicators_v2(
         &self,
         country: Option<MacroeconomicCountry>,
         keyword: Option<impl Into<String> + Send + 'static>,
@@ -335,7 +335,7 @@ impl FundamentalContextSync {
     }
 
     /// Get historical data for a macroeconomic indicator (v2) with sort support
-    pub fn macroeconomic_v2(
+    pub(crate) fn macroeconomic_v2(
         &self,
         indicator_code: impl Into<String> + Send + 'static,
         start_date: Option<impl Into<String> + Send + 'static>,

@@ -854,7 +854,7 @@ impl FundamentalContext {
     /// List macroeconomic indicators (v2) with optional keyword filter.
     ///
     /// Path: `GET /v2/quote/macrodata`
-    pub async fn macroeconomic_indicators_v2(
+    pub(crate) async fn macroeconomic_indicators_v2(
         &self,
         country: Option<MacroeconomicCountry>,
         keyword: Option<impl Into<String>>,
@@ -943,7 +943,7 @@ impl FundamentalContext {
     /// support.
     ///
     /// Path: `GET /v2/quote/macrodata/{indicator_id}`
-    pub async fn macroeconomic_v2(
+    pub(crate) async fn macroeconomic_v2(
         &self,
         indicator_code: impl Into<String>,
         start_date: Option<impl Into<String>>,

@@ -459,14 +459,6 @@ public class SdkNative {
                         Object indicatorCode, Object startTime, Object endTime, Object offset, Object limit,
                         AsyncCallback callback);
 
-        public static native void fundamentalContextMacroeconomicIndicatorsV2(long context,
-                        Object country, Object keyword, Object offset, Object limit,
-                        AsyncCallback callback);
-
-        public static native void fundamentalContextMacroeconomicV2(long context,
-                        Object indicatorCode, Object startDate, Object endDate, Object offset, Object limit, Object sort,
-                        AsyncCallback callback);
-
         public static native void portfolioContextProfitAnalysisFlows(long context, Object opts,
                         AsyncCallback callback);
 
