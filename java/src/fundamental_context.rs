@@ -328,3 +328,73 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         Ok(())
     })
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacroeconomicIndicatorsV2(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    country: JObject,
+    keyword: JObject,
+    offset: JObject,
+    limit: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let country: Option<String> = FromJValue::from_jvalue(env, country.into())?;
+        let country = country.and_then(|s| {
+            use longbridge::fundamental::MacroeconomicCountry::*;
+            match s.as_str() {
+                "HK" => Some(HongKong),
+                "CN" => Some(China),
+                "US" => Some(UnitedStates),
+                "EU" => Some(EuroZone),
+                "JP" => Some(Japan),
+                "SG" => Some(Singapore),
+                _ => None,
+            }
+        });
+        let keyword: Option<String> = FromJValue::from_jvalue(env, keyword.into())?;
+        let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
+        let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .macroeconomic_indicators_v2(country, keyword, offset, limit)
+                .await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMacroeconomicV2(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    indicator_code: JObject,
+    start_date: JObject,
+    end_date: JObject,
+    offset: JObject,
+    limit: JObject,
+    sort: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let indicator_code: String = FromJValue::from_jvalue(env, indicator_code.into())?;
+        let start_date: Option<String> = FromJValue::from_jvalue(env, start_date.into())?;
+        let end_date: Option<String> = FromJValue::from_jvalue(env, end_date.into())?;
+        let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
+        let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
+        let sort: Option<String> = FromJValue::from_jvalue(env, sort.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .macroeconomic_v2(indicator_code, start_date, end_date, offset, limit, sort)
+                .await?)
+        })?;
+        Ok(())
+    })
+}

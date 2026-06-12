@@ -354,4 +354,25 @@ public class FundamentalContext implements AutoCloseable {
             SdkNative.fundamentalContextMacroeconomic(raw, indicatorCode, startDate, endDate, offset, limit, callback);
         });
     }
+
+    /**
+     * List macroeconomic indicators (v2) with optional keyword filter.
+     * country: "HK","CN","US","EU","JP","SG" or null for ALL.
+     * keyword: optional fuzzy filter on indicator name.
+     */
+    public CompletableFuture<MacroeconomicIndicatorListResponse> getMacroeconomicIndicatorsV2(String country, String keyword, Integer offset, Integer limit) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextMacroeconomicIndicatorsV2(raw, country, keyword, offset, limit, callback);
+        });
+    }
+
+    /**
+     * Get historical data for a macroeconomic indicator (v2) with sort support.
+     * startDate / endDate: "YYYY-MM-DD". sort: "asc" or "desc".
+     */
+    public CompletableFuture<MacroeconomicResponse> getMacroeconomicV2(String indicatorCode, String startDate, String endDate, Integer offset, Integer limit, String sort) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextMacroeconomicV2(raw, indicatorCode, startDate, endDate, offset, limit, sort, callback);
+        });
+    }
 }

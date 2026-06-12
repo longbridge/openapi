@@ -834,54 +834,83 @@ impl FundamentalContext {
 
     /// List macroeconomic indicators.
     ///
-    /// Pass `country` to filter by country code (e.g.
-    /// `MacroeconomicCountry::UnitedStates`).
+    /// `country` accepts a market code string (e.g. `"US"`, `"HK"`, `"ALL"`).
+    /// `keyword` optionally filters indicators by name (fuzzy, case-insensitive).
+    /// `offset` and `limit` are kept for backward compatibility but ignored by v2.
     ///
-    /// Path: `GET /v1/quote/macrodata`
+    /// Path: `GET /v2/quote/macrodata`
     pub async fn macroeconomic_indicators(
         &self,
         country: Option<MacroeconomicCountry>,
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacroeconomicIndicatorListResponse> {
+        self.macroeconomic_indicators_v2(country, None::<String>, offset, limit)
+            .await
+    }
+
+    /// List macroeconomic indicators (v2) with optional keyword filter.
+    ///
+    /// Path: `GET /v2/quote/macrodata`
+    pub async fn macroeconomic_indicators_v2(
+        &self,
+        country: Option<MacroeconomicCountry>,
+        keyword: Option<impl Into<String>>,
+        _offset: Option<i32>,
+        _limit: Option<i32>,
+    ) -> Result<MacroeconomicIndicatorListResponse> {
         #[derive(Serialize)]
         struct Query {
+            market: String,
             #[serde(skip_serializing_if = "Option::is_none")]
-            country: Option<String>,
-            #[serde(skip_serializing_if = "Option::is_none")]
-            offset: Option<i32>,
-            #[serde(skip_serializing_if = "Option::is_none")]
-            limit: Option<i32>,
+            keyword: Option<String>,
         }
-        let country_str = country.map(|c| {
-            match c {
-                MacroeconomicCountry::HongKong => "Hong Kong SAR China",
-                MacroeconomicCountry::China => "China (Mainland)",
-                MacroeconomicCountry::UnitedStates => "United States",
-                MacroeconomicCountry::EuroZone => "Euro Zone",
-                MacroeconomicCountry::Japan => "Japan",
-                MacroeconomicCountry::Singapore => "Singapore",
-            }
-            .to_string()
-        });
-        self.get(
-            "/v1/quote/macrodata",
-            Query {
-                country: country_str,
-                offset,
-                limit,
-            },
-        )
-        .await
+        let market = country
+            .map(|c| match c {
+                MacroeconomicCountry::HongKong => "HK",
+                MacroeconomicCountry::China => "CN",
+                MacroeconomicCountry::UnitedStates => "US",
+                MacroeconomicCountry::EuroZone => "EU",
+                MacroeconomicCountry::Japan => "JP",
+                MacroeconomicCountry::Singapore => "SG",
+            })
+            .unwrap_or("ALL")
+            .to_string();
+
+        let raw: V2MacroIndicatorListResponse = self
+            .get(
+                "/v2/quote/macrodata",
+                Query {
+                    market,
+                    keyword: keyword.map(|k| k.into()),
+                },
+            )
+            .await?;
+
+        let data = raw
+            .indicator_list
+            .into_iter()
+            .map(|ind| MacroeconomicIndicator {
+                indicator_code: ind.indicator_id.to_string(),
+                country: ind.market,
+                name: MultiLanguageText {
+                    english: ind.indicator_name,
+                    ..Default::default()
+                },
+                ..Default::default()
+            })
+            .collect::<Vec<_>>();
+        let count = data.len() as i32;
+        Ok(MacroeconomicIndicatorListResponse { data, count })
     }
 
     /// Get historical data for a macroeconomic indicator.
     ///
-    /// `start_date` and `end_date` are date strings in `"YYYY-MM-DD"` format.
-    /// `start_date` is sent as `YYYY-MM-DDT00:00:00Z`; `end_date` is sent as
-    /// `YYYY-MM-DDT23:59:59Z`.
+    /// `indicator_code` is the indicator ID (integer as string in v2).
+    /// `start_date` and `end_date` are `"YYYY-MM-DD"` format.
+    /// `sort` can be `"asc"` or `"desc"` (new in v2).
     ///
-    /// Path: `GET /v1/quote/macrodata/{indicator_code}`
+    /// Path: `GET /v2/quote/macrodata/{indicator_id}`
     pub async fn macroeconomic(
         &self,
         indicator_code: impl Into<String>,
@@ -890,32 +919,102 @@ impl FundamentalContext {
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacroeconomicResponse> {
+        self.macroeconomic_v2(indicator_code, start_date, end_date, offset, limit, None::<String>)
+            .await
+    }
+
+    /// Get historical data for a macroeconomic indicator (v2) with sort support.
+    ///
+    /// Path: `GET /v2/quote/macrodata/{indicator_id}`
+    pub async fn macroeconomic_v2(
+        &self,
+        indicator_code: impl Into<String>,
+        start_date: Option<impl Into<String>>,
+        end_date: Option<impl Into<String>>,
+        _offset: Option<i32>,
+        limit: Option<i32>,
+        sort: Option<impl Into<String>>,
+    ) -> Result<MacroeconomicResponse> {
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
-            start_time: Option<String>,
+            start_date: Option<String>,
             #[serde(skip_serializing_if = "Option::is_none")]
-            end_time: Option<String>,
-            #[serde(skip_serializing_if = "Option::is_none")]
-            offset: Option<i32>,
+            end_date: Option<String>,
             #[serde(skip_serializing_if = "Option::is_none")]
             limit: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            sort: Option<String>,
         }
-        let path = format!("/v1/quote/macrodata/{}", indicator_code.into());
-        Ok(self
+        let path = format!("/v2/quote/macrodata/{}", indicator_code.into());
+        let raw: V2MacroIndicatorDataResponse = self
             .0
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                start_time: start_date.map(|d| format!("{}T00:00:00Z", d.into())),
-                end_time: end_date.map(|d| format!("{}T23:59:59Z", d.into())),
-                offset,
+                start_date: start_date.map(|d| d.into()),
+                end_date: end_date.map(|d| d.into()),
                 limit,
+                sort: sort.map(|s| s.into()),
             })
-            .response::<Json<MacroeconomicResponse>>()
+            .response::<Json<V2MacroIndicatorDataResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
-            .0)
+            .0;
+
+        // Take first indicator detail (single-indicator query)
+        let detail = raw.indicator_data_list.into_iter().next().unwrap_or_default();
+        let unit_english = detail.unit.clone();
+        let count = detail.indicator_data.len() as i32;
+
+        let info = MacroeconomicIndicator {
+            indicator_code: detail.indicator_id.to_string(),
+            country: detail.market,
+            name: MultiLanguageText {
+                english: detail.indicator_name,
+                ..Default::default()
+            },
+            describe: MultiLanguageText {
+                english: detail.description,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        let data = detail
+            .indicator_data
+            .into_iter()
+            .map(|d| {
+                use time::format_description::well_known::Rfc3339;
+                let release_at = time::OffsetDateTime::parse(&d.published_time, &Rfc3339)
+                    .ok()
+                    .or_else(|| {
+                        // Try without timezone suffix
+                        time::PrimitiveDateTime::parse(
+                            &d.published_time,
+                            &time::macros::format_description!(
+                                "[year]-[month]-[day]T[hour]:[minute]:[second]"
+                            ),
+                        )
+                        .ok()
+                        .map(|dt| dt.assume_utc())
+                    });
+                Macroeconomic {
+                    period: d.observation_date,
+                    release_at,
+                    actual_value: d.actual_data,
+                    previous_value: d.previous_data,
+                    forecast_value: d.estimated_data,
+                    unit: MultiLanguageText {
+                        english: unit_english.clone(),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }
+            })
+            .collect();
+
+        Ok(MacroeconomicResponse { info, data, count })
     }
 }
