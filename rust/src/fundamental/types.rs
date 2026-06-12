@@ -1775,12 +1775,13 @@ pub(crate) struct V2MacroIndicatorDetail {
     pub indicator_data: Vec<V2IndicatorDataDetail>,
 }
 
-/// v2 wire: response from GET /v2/quote/macrodata/:id
+/// v2 wire: response from GET /v2/quote/macrodata/:id (GetMacroIndicatorHistoryResp)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub(crate) struct V2MacroIndicatorDataResponse {
+    /// Single indicator with paginated data points
     #[serde(default)]
-    pub indicator_data_list: Vec<V2MacroIndicatorDetail>,
-    /// Total count for pagination
+    pub indicator: V2MacroIndicatorDetail,
+    /// Total data points matching the query (for pagination)
     #[serde(default)]
     pub total: i32,
 }

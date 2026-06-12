@@ -973,9 +973,8 @@ impl FundamentalContext {
             .await?
             .0;
 
-        // Take first indicator detail (single-indicator query)
         let total = raw.total;
-        let detail = raw.indicator_data_list.into_iter().next().unwrap_or_default();
+        let detail = raw.indicator;
         let unit_english = detail.unit.clone();
         let count = detail.indicator_data.len() as i32;
 
