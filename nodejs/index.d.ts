@@ -622,6 +622,10 @@ export declare class FundamentalContext {
   macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
+  /** List macroeconomic indicators (v2) with optional keyword filter */
+  macroeconomicIndicatorsV2(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
+  /** Get historical data for a macroeconomic indicator (v2) with sort support */
+  macroeconomicV2(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null, sort?: string | undefined | null): Promise<MacroeconomicResponse>
 }
 
 /** Fund position */
