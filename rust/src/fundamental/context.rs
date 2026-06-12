@@ -905,6 +905,12 @@ impl FundamentalContext {
                     english: ind.indicator_name,
                     ..Default::default()
                 },
+                periodicity: ind.periodicity,
+                describe: MultiLanguageText {
+                    english: ind.description,
+                    ..Default::default()
+                },
+                importance: ind.importance,
                 ..Default::default()
             })
             .collect::<Vec<_>>();

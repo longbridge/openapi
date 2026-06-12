@@ -1731,6 +1731,12 @@ pub(crate) struct V2MacroIndicator {
     pub indicator_name: String,
     #[serde(default)]
     pub market: String,
+    #[serde(default)]
+    pub periodicity: String,
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
+    pub importance: i32,
 }
 
 /// v2 wire: response from GET /v2/quote/macrodata
