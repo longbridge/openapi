@@ -990,14 +990,8 @@ impl FundamentalContext {
         let info = MacroeconomicIndicator {
             indicator_code: detail.indicator_id.to_string(),
             country: detail.market,
-            name: MultiLanguageText {
-                english: detail.indicator_name,
-                ..Default::default()
-            },
-            describe: MultiLanguageText {
-                english: detail.description,
-                ..Default::default()
-            },
+            name: detail.indicator_name,
+            describe: detail.description,
             ..Default::default()
         };
 
