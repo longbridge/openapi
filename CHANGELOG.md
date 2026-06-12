@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.2] - 2026-06-13
+
+### Added
+
+- **All languages:** `FundamentalContext.macroeconomic_indicators(country, keyword, offset, limit)` — `keyword` parameter for fuzzy-filtering indicators by name (case-insensitive)
+- **All languages:** `FundamentalContext.macroeconomic(indicator_code, start_date, end_date, offset, limit)` — GET `/v2/quote/macrodata/{indicator_id}`; defaults to `sort=desc`
+- `MacroeconomicIndicator` now includes `name` (string), `describe` (string), `periodicity`, `importance` from v2 API
+- `Macroeconomic` data points include `unit` (string) from v2 API
+
+### Changed
+
+- `MacroeconomicIndicator.name` and `.describe` changed from `MultiLanguageText` to `string`
+- `Macroeconomic.unit` and `.unit_prefix` changed from `MultiLanguageText` to `string`
+
 ## [4.3.1] - 2026-06-12
 
 ### Added
