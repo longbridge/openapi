@@ -8,15 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **All languages:** `FundamentalContext.macroeconomic_indicators(country, keyword, offset, limit)` — `keyword` parameter for fuzzy-filtering indicators by name (case-insensitive)
-- **All languages:** `FundamentalContext.macroeconomic(indicator_code, start_date, end_date, offset, limit)` — GET `/v2/quote/macrodata/{indicator_id}`; defaults to `sort=desc`
-- `MacroeconomicIndicator` now includes `name` (string), `describe` (string), `periodicity`, `importance` from v2 API
-- `Macroeconomic` data points include `unit` (string) from v2 API
+- **All languages:** `macroeconomic_indicators` gains `keyword` parameter for fuzzy name filtering
+- **All languages:** `macroeconomic` switches to `GET /v2/quote/macrodata/{id}`, defaults to `sort=desc`
 
 ### Changed
 
-- `MacroeconomicIndicator.name` and `.describe` changed from `MultiLanguageText` to `string`
-- `Macroeconomic.unit` and `.unit_prefix` changed from `MultiLanguageText` to `string`
+- `MacroeconomicIndicator.name` / `.describe`: `MultiLanguageText` → `string`
+- `Macroeconomic.unit` / `.unit_prefix`: `MultiLanguageText` → `string`
 
 ## [4.3.1] - 2026-06-12
 
