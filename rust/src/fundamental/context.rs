@@ -905,7 +905,7 @@ impl FundamentalContext {
                     english: ind.indicator_name,
                     ..Default::default()
                 },
-                periodicity: ind.periodicity,
+                periodicity: ind.frequence,
                 describe: MultiLanguageText {
                     english: ind.description,
                     ..Default::default()
