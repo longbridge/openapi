@@ -213,12 +213,13 @@ impl FundamentalContext {
     fn macroeconomic_indicators(
         &self,
         country: Option<MacroeconomicCountry>,
+        keyword: Option<String>,
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> PyResult<MacroeconomicIndicatorListResponse> {
         Ok(self
             .ctx
-            .macroeconomic_indicators(country.map(Into::into), offset, limit)
+            .macroeconomic_indicators(country.map(Into::into), keyword, offset, limit)
             .map_err(ErrorNewType)?
             .into())
     }

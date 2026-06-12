@@ -452,7 +452,7 @@ public class SdkNative {
                         AsyncCallback callback);
 
         public static native void fundamentalContextMacroeconomicIndicators(long context,
-                        Object country, Object offset, Object limit,
+                        Object country, Object keyword, Object offset, Object limit,
                         AsyncCallback callback);
 
         public static native void fundamentalContextMacroeconomic(long context,

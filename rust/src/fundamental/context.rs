@@ -843,10 +843,11 @@ impl FundamentalContext {
     pub async fn macroeconomic_indicators(
         &self,
         country: Option<MacroeconomicCountry>,
+        keyword: Option<impl Into<String>>,
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacroeconomicIndicatorListResponse> {
-        self.macroeconomic_indicators_v2(country, None::<String>, offset, limit)
+        self.macroeconomic_indicators_v2(country, keyword, offset, limit)
             .await
     }
 
