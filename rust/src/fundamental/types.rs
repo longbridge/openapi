@@ -1698,12 +1698,12 @@ pub struct Macroeconomic {
     /// Next release datetime
     #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
     pub next_release_at: Option<OffsetDateTime>,
-    /// Unit (multilingual)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub unit: MultiLanguageText,
-    /// Unit prefix / data scale (multilingual, e.g. millions / billions)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub unit_prefix: MultiLanguageText,
+    /// Unit
+    #[serde(default)]
+    pub unit: String,
+    /// Unit prefix / data scale (e.g. millions / billions)
+    #[serde(default)]
+    pub unit_prefix: String,
 }
 
 /// Response for [`crate::FundamentalContext::macroeconomic`]

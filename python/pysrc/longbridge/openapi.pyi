@@ -10140,8 +10140,8 @@ class Macroeconomic:
     forecast_value: str
     revised_value: str
     next_release_at: datetime | None
-    unit: MultiLanguageText
-    unit_prefix: MultiLanguageText
+    unit: str
+    unit_prefix: str
 
 
 class MacroeconomicResponse:

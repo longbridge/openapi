@@ -2019,8 +2019,8 @@ pub struct Macroeconomic {
     pub revised_value: String,
     /// Next release datetime (unix timestamp in seconds; null if unset)
     pub next_release_at: Option<i64>,
-    pub unit: MultiLanguageText,
-    pub unit_prefix: MultiLanguageText,
+    pub unit: String,
+    pub unit_prefix: String,
 }
 
 impl From<lb::Macroeconomic> for Macroeconomic {
@@ -2033,8 +2033,8 @@ impl From<lb::Macroeconomic> for Macroeconomic {
             forecast_value: v.forecast_value,
             revised_value: v.revised_value,
             next_release_at: v.next_release_at.map(|dt| dt.unix_timestamp()),
-            unit: v.unit.into(),
-            unit_prefix: v.unit_prefix.into(),
+            unit: v.unit,
+            unit_prefix: v.unit_prefix,
         }
     }
 }

@@ -4492,8 +4492,8 @@ export interface Macroeconomic {
   revisedValue: string
   /** Next release datetime (unix timestamp in seconds; null if unset) */
   nextReleaseAt?: number
-  unit: MultiLanguageText
-  unitPrefix: MultiLanguageText
+  unit: string
+  unitPrefix: string
 }
 
 /** Country code for filtering macroeconomic indicators */

@@ -2073,8 +2073,8 @@ pub(crate) struct Macroeconomic {
     pub forecast_value: String,
     pub revised_value: String,
     pub next_release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
-    pub unit: MultiLanguageText,
-    pub unit_prefix: MultiLanguageText,
+    pub unit: String,
+    pub unit_prefix: String,
 }
 
 impl From<lb::Macroeconomic> for Macroeconomic {
@@ -2087,8 +2087,8 @@ impl From<lb::Macroeconomic> for Macroeconomic {
             forecast_value: v.forecast_value,
             revised_value: v.revised_value,
             next_release_at: v.next_release_at.map(crate::time::PyOffsetDateTimeWrapper),
-            unit: v.unit.into(),
-            unit_prefix: v.unit_prefix.into(),
+            unit: v.unit,
+            unit_prefix: v.unit_prefix,
         }
     }
 }

@@ -1025,10 +1025,7 @@ impl FundamentalContext {
                     actual_value: d.actual_data,
                     previous_value: d.previous_data,
                     forecast_value: d.estimated_data,
-                    unit: MultiLanguageText {
-                        english: unit_english.clone(),
-                        ..Default::default()
-                    },
+                    unit: unit_english.clone(),
                     ..Default::default()
                 }
             })
