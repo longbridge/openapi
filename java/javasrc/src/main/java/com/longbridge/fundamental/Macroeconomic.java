@@ -10,6 +10,6 @@ public class Macroeconomic {
     public String forecastValue;
     public String revisedValue;
     public String nextReleaseAt;
-    public MultiLanguageText unit;
-    public MultiLanguageText unitPrefix;
+    public String unit;
+    public String unitPrefix;
 }

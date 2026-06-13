@@ -269,6 +269,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
     _class: JClass,
     context: i64,
     country: JObject,
+    keyword: JObject,
     offset: JObject,
     limit: JObject,
     callback: JObject,
@@ -288,12 +289,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
                 _ => None,
             }
         });
+        let keyword: Option<String> = FromJValue::from_jvalue(env, keyword.into())?;
         let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
             Ok(context
                 .ctx
-                .macroeconomic_indicators(country, offset, limit)
+                .macroeconomic_indicators(country, keyword, offset, limit)
                 .await?)
         })?;
         Ok(())

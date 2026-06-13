@@ -622,6 +622,10 @@ export declare class FundamentalContext {
   macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
+  /** List macroeconomic indicators (v2) with optional keyword filter */
+  macroeconomicIndicatorsV2(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
+  /** Get historical data for a macroeconomic indicator (v2) with sort support */
+  macroeconomicV2(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null, sort?: string | undefined | null): Promise<MacroeconomicResponse>
 }
 
 /** Fund position */
@@ -4488,8 +4492,8 @@ export interface Macroeconomic {
   revisedValue: string
   /** Next release datetime (unix timestamp in seconds; null if unset) */
   nextReleaseAt?: number
-  unit: MultiLanguageText
-  unitPrefix: MultiLanguageText
+  unit: string
+  unitPrefix: string
 }
 
 /** Country code for filtering macroeconomic indicators */
@@ -4513,11 +4517,11 @@ export interface MacroeconomicIndicator {
   indicatorCode: string
   sourceOrg: string
   country: string
-  name: MultiLanguageText
+  name: string
   adjustmentFactor: string
   periodicity: string
   category: string
-  describe: MultiLanguageText
+  describe: string
   importance: number
   /** Start date of data coverage (unix timestamp in seconds; null if unset) */
   startDate?: number

@@ -2036,11 +2036,11 @@ pub(crate) struct MacroeconomicIndicator {
     pub indicator_code: String,
     pub source_org: String,
     pub country: String,
-    pub name: MultiLanguageText,
+    pub name: String,
     pub adjustment_factor: String,
     pub periodicity: String,
     pub category: String,
-    pub describe: MultiLanguageText,
+    pub describe: String,
     pub importance: i32,
     pub start_date: Option<crate::time::PyOffsetDateTimeWrapper>,
 }
@@ -2051,11 +2051,11 @@ impl From<lb::MacroeconomicIndicator> for MacroeconomicIndicator {
             indicator_code: v.indicator_code,
             source_org: v.source_org,
             country: v.country,
-            name: v.name.into(),
+            name: v.name,
             adjustment_factor: v.adjustment_factor,
             periodicity: v.periodicity,
             category: v.category,
-            describe: v.describe.into(),
+            describe: v.describe,
             importance: v.importance,
             start_date: v.start_date.map(crate::time::PyOffsetDateTimeWrapper),
         }
@@ -2073,8 +2073,8 @@ pub(crate) struct Macroeconomic {
     pub forecast_value: String,
     pub revised_value: String,
     pub next_release_at: Option<crate::time::PyOffsetDateTimeWrapper>,
-    pub unit: MultiLanguageText,
-    pub unit_prefix: MultiLanguageText,
+    pub unit: String,
+    pub unit_prefix: String,
 }
 
 impl From<lb::Macroeconomic> for Macroeconomic {
@@ -2087,8 +2087,8 @@ impl From<lb::Macroeconomic> for Macroeconomic {
             forecast_value: v.forecast_value,
             revised_value: v.revised_value,
             next_release_at: v.next_release_at.map(crate::time::PyOffsetDateTimeWrapper),
-            unit: v.unit.into(),
-            unit_prefix: v.unit_prefix.into(),
+            unit: v.unit,
+            unit_prefix: v.unit_prefix,
         }
     }
 }
