@@ -295,11 +295,13 @@ impl FundamentalContextSync {
     pub fn macroeconomic_indicators(
         &self,
         country: Option<MacroeconomicCountry>,
+        keyword: Option<impl Into<String> + Send + 'static>,
         offset: Option<i32>,
         limit: Option<i32>,
     ) -> Result<MacroeconomicIndicatorListResponse> {
         self.rt.call(move |ctx| async move {
-            ctx.macroeconomic_indicators(country, offset, limit).await
+            ctx.macroeconomic_indicators(country, keyword, offset, limit)
+                .await
         })
     }
 
@@ -314,6 +316,36 @@ impl FundamentalContextSync {
     ) -> Result<MacroeconomicResponse> {
         self.rt.call(move |ctx| async move {
             ctx.macroeconomic(indicator_code, start_date, end_date, offset, limit)
+                .await
+        })
+    }
+
+    /// List macroeconomic indicators (v2) with optional keyword filter
+    pub(crate) fn macroeconomic_indicators_v2(
+        &self,
+        country: Option<MacroeconomicCountry>,
+        keyword: Option<impl Into<String> + Send + 'static>,
+        offset: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<MacroeconomicIndicatorListResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.macroeconomic_indicators_v2(country, keyword, offset, limit)
+                .await
+        })
+    }
+
+    /// Get historical data for a macroeconomic indicator (v2) with sort support
+    pub(crate) fn macroeconomic_v2(
+        &self,
+        indicator_code: impl Into<String> + Send + 'static,
+        start_date: Option<impl Into<String> + Send + 'static>,
+        end_date: Option<impl Into<String> + Send + 'static>,
+        offset: Option<i32>,
+        limit: Option<i32>,
+        sort: Option<impl Into<String> + Send + 'static>,
+    ) -> Result<MacroeconomicResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.macroeconomic_v2(indicator_code, start_date, end_date, offset, limit, sort)
                 .await
         })
     }

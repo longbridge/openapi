@@ -1636,9 +1636,9 @@ pub struct MacroeconomicIndicator {
     /// Country
     #[serde(default)]
     pub country: String,
-    /// Indicator name (multilingual)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub name: MultiLanguageText,
+    /// Indicator name
+    #[serde(default)]
+    pub name: String,
     /// Adjustment factor
     #[serde(default)]
     pub adjustment_factor: String,
@@ -1648,9 +1648,9 @@ pub struct MacroeconomicIndicator {
     /// Indicator category
     #[serde(default)]
     pub category: String,
-    /// Description (multilingual)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub describe: MultiLanguageText,
+    /// Description
+    #[serde(default)]
+    pub describe: String,
     /// Importance — higher is more important
     #[serde(default)]
     pub importance: i32,
@@ -1698,12 +1698,12 @@ pub struct Macroeconomic {
     /// Next release datetime
     #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
     pub next_release_at: Option<OffsetDateTime>,
-    /// Unit (multilingual)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub unit: MultiLanguageText,
-    /// Unit prefix / data scale (multilingual, e.g. millions / billions)
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub unit_prefix: MultiLanguageText,
+    /// Unit
+    #[serde(default)]
+    pub unit: String,
+    /// Unit prefix / data scale (e.g. millions / billions)
+    #[serde(default)]
+    pub unit_prefix: String,
 }
 
 /// Response for [`crate::FundamentalContext::macroeconomic`]
@@ -1718,4 +1718,78 @@ pub struct MacroeconomicResponse {
     /// Total number of historical data points
     #[serde(default)]
     pub count: i32,
+}
+
+// ── v2 wire types (internal, used for mapping to existing public types) ──────
+
+/// v2 wire: one indicator from GET /v2/quote/macrodata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicator {
+    #[serde(default)]
+    pub indicator_id: i32,
+    #[serde(default)]
+    pub indicator_name: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default)]
+    pub importance: i32,
+    #[serde(default)]
+    pub description: String,
+    /// Update frequency: day/week/month/quarter/half_year/year
+    #[serde(default)]
+    pub frequence: String,
+}
+
+/// v2 wire: response from GET /v2/quote/macrodata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicatorListResponse {
+    #[serde(default)]
+    pub indicator_list: Vec<V2MacroIndicator>,
+    /// Total count for pagination
+    #[serde(default)]
+    pub total: i32,
+}
+
+/// v2 wire: one data point from GET /v2/quote/macrodata/:id
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct V2IndicatorDataDetail {
+    #[serde(default)]
+    pub actual_data: String,
+    #[serde(default)]
+    pub previous_data: String,
+    #[serde(default)]
+    pub estimated_data: String,
+    #[serde(default)]
+    pub published_time: String,
+    #[serde(default)]
+    pub observation_date: String,
+}
+
+/// v2 wire: one indicator with data from GET /v2/quote/macrodata/:id
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicatorDetail {
+    #[serde(default)]
+    pub indicator_id: i32,
+    #[serde(default)]
+    pub indicator_name: String,
+    #[serde(default)]
+    pub unit: String,
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default)]
+    pub indicator_data: Vec<V2IndicatorDataDetail>,
+}
+
+/// v2 wire: response from GET /v2/quote/macrodata/:id
+/// (GetMacroIndicatorHistoryResp)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicatorDataResponse {
+    /// Single indicator with paginated data points
+    #[serde(default)]
+    pub indicator: V2MacroIndicatorDetail,
+    /// Total data points matching the query (for pagination)
+    #[serde(default)]
+    pub total: i32,
 }
