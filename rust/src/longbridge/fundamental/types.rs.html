@@ -1636,9 +1636,9 @@
 <a href=#1636 id=1636 data-nosnippet>1636</a>    <span class="doccomment">/// Country
 <a href=#1637 id=1637 data-nosnippet>1637</a>    </span><span class="attr">#[serde(default)]
 <a href=#1638 id=1638 data-nosnippet>1638</a>    </span><span class="kw">pub </span>country: String,
-<a href=#1639 id=1639 data-nosnippet>1639</a>    <span class="doccomment">/// Indicator name (multilingual)
-<a href=#1640 id=1640 data-nosnippet>1640</a>    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"crate::serde_utils::null_as_default"</span>)]
-<a href=#1641 id=1641 data-nosnippet>1641</a>    </span><span class="kw">pub </span>name: MultiLanguageText,
+<a href=#1639 id=1639 data-nosnippet>1639</a>    <span class="doccomment">/// Indicator name
+<a href=#1640 id=1640 data-nosnippet>1640</a>    </span><span class="attr">#[serde(default)]
+<a href=#1641 id=1641 data-nosnippet>1641</a>    </span><span class="kw">pub </span>name: String,
 <a href=#1642 id=1642 data-nosnippet>1642</a>    <span class="doccomment">/// Adjustment factor
 <a href=#1643 id=1643 data-nosnippet>1643</a>    </span><span class="attr">#[serde(default)]
 <a href=#1644 id=1644 data-nosnippet>1644</a>    </span><span class="kw">pub </span>adjustment_factor: String,
@@ -1648,9 +1648,9 @@
 <a href=#1648 id=1648 data-nosnippet>1648</a>    <span class="doccomment">/// Indicator category
 <a href=#1649 id=1649 data-nosnippet>1649</a>    </span><span class="attr">#[serde(default)]
 <a href=#1650 id=1650 data-nosnippet>1650</a>    </span><span class="kw">pub </span>category: String,
-<a href=#1651 id=1651 data-nosnippet>1651</a>    <span class="doccomment">/// Description (multilingual)
-<a href=#1652 id=1652 data-nosnippet>1652</a>    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"crate::serde_utils::null_as_default"</span>)]
-<a href=#1653 id=1653 data-nosnippet>1653</a>    </span><span class="kw">pub </span>describe: MultiLanguageText,
+<a href=#1651 id=1651 data-nosnippet>1651</a>    <span class="doccomment">/// Description
+<a href=#1652 id=1652 data-nosnippet>1652</a>    </span><span class="attr">#[serde(default)]
+<a href=#1653 id=1653 data-nosnippet>1653</a>    </span><span class="kw">pub </span>describe: String,
 <a href=#1654 id=1654 data-nosnippet>1654</a>    <span class="doccomment">/// Importance — higher is more important
 <a href=#1655 id=1655 data-nosnippet>1655</a>    </span><span class="attr">#[serde(default)]
 <a href=#1656 id=1656 data-nosnippet>1656</a>    </span><span class="kw">pub </span>importance: i32,
@@ -1698,12 +1698,12 @@
 <a href=#1698 id=1698 data-nosnippet>1698</a>    <span class="doccomment">/// Next release datetime
 <a href=#1699 id=1699 data-nosnippet>1699</a>    </span><span class="attr">#[serde(default, with = <span class="string">"crate::serde_utils::rfc3339_opt"</span>)]
 <a href=#1700 id=1700 data-nosnippet>1700</a>    </span><span class="kw">pub </span>next_release_at: <span class="prelude-ty">Option</span>&lt;OffsetDateTime&gt;,
-<a href=#1701 id=1701 data-nosnippet>1701</a>    <span class="doccomment">/// Unit (multilingual)
-<a href=#1702 id=1702 data-nosnippet>1702</a>    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"crate::serde_utils::null_as_default"</span>)]
-<a href=#1703 id=1703 data-nosnippet>1703</a>    </span><span class="kw">pub </span>unit: MultiLanguageText,
-<a href=#1704 id=1704 data-nosnippet>1704</a>    <span class="doccomment">/// Unit prefix / data scale (multilingual, e.g. millions / billions)
-<a href=#1705 id=1705 data-nosnippet>1705</a>    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"crate::serde_utils::null_as_default"</span>)]
-<a href=#1706 id=1706 data-nosnippet>1706</a>    </span><span class="kw">pub </span>unit_prefix: MultiLanguageText,
+<a href=#1701 id=1701 data-nosnippet>1701</a>    <span class="doccomment">/// Unit
+<a href=#1702 id=1702 data-nosnippet>1702</a>    </span><span class="attr">#[serde(default)]
+<a href=#1703 id=1703 data-nosnippet>1703</a>    </span><span class="kw">pub </span>unit: String,
+<a href=#1704 id=1704 data-nosnippet>1704</a>    <span class="doccomment">/// Unit prefix / data scale (e.g. millions / billions)
+<a href=#1705 id=1705 data-nosnippet>1705</a>    </span><span class="attr">#[serde(default)]
+<a href=#1706 id=1706 data-nosnippet>1706</a>    </span><span class="kw">pub </span>unit_prefix: String,
 <a href=#1707 id=1707 data-nosnippet>1707</a>}
 <a href=#1708 id=1708 data-nosnippet>1708</a>
 <a href=#1709 id=1709 data-nosnippet>1709</a><span class="doccomment">/// Response for [`crate::FundamentalContext::macroeconomic`]
@@ -1719,4 +1719,78 @@
 <a href=#1719 id=1719 data-nosnippet>1719</a>    </span><span class="attr">#[serde(default)]
 <a href=#1720 id=1720 data-nosnippet>1720</a>    </span><span class="kw">pub </span>count: i32,
 <a href=#1721 id=1721 data-nosnippet>1721</a>}
+<a href=#1722 id=1722 data-nosnippet>1722</a>
+<a href=#1723 id=1723 data-nosnippet>1723</a><span class="comment">// ── v2 wire types (internal, used for mapping to existing public types) ──────
+<a href=#1724 id=1724 data-nosnippet>1724</a>
+<a href=#1725 id=1725 data-nosnippet>1725</a></span><span class="doccomment">/// v2 wire: one indicator from GET /v2/quote/macrodata
+<a href=#1726 id=1726 data-nosnippet>1726</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#1727 id=1727 data-nosnippet>1727</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>V2MacroIndicator {
+<a href=#1728 id=1728 data-nosnippet>1728</a>    <span class="attr">#[serde(default)]
+<a href=#1729 id=1729 data-nosnippet>1729</a>    </span><span class="kw">pub </span>indicator_id: i32,
+<a href=#1730 id=1730 data-nosnippet>1730</a>    <span class="attr">#[serde(default)]
+<a href=#1731 id=1731 data-nosnippet>1731</a>    </span><span class="kw">pub </span>indicator_name: String,
+<a href=#1732 id=1732 data-nosnippet>1732</a>    <span class="attr">#[serde(default)]
+<a href=#1733 id=1733 data-nosnippet>1733</a>    </span><span class="kw">pub </span>market: String,
+<a href=#1734 id=1734 data-nosnippet>1734</a>    <span class="attr">#[serde(default)]
+<a href=#1735 id=1735 data-nosnippet>1735</a>    </span><span class="kw">pub </span>importance: i32,
+<a href=#1736 id=1736 data-nosnippet>1736</a>    <span class="attr">#[serde(default)]
+<a href=#1737 id=1737 data-nosnippet>1737</a>    </span><span class="kw">pub </span>description: String,
+<a href=#1738 id=1738 data-nosnippet>1738</a>    <span class="doccomment">/// Update frequency: day/week/month/quarter/half_year/year
+<a href=#1739 id=1739 data-nosnippet>1739</a>    </span><span class="attr">#[serde(default)]
+<a href=#1740 id=1740 data-nosnippet>1740</a>    </span><span class="kw">pub </span>frequence: String,
+<a href=#1741 id=1741 data-nosnippet>1741</a>}
+<a href=#1742 id=1742 data-nosnippet>1742</a>
+<a href=#1743 id=1743 data-nosnippet>1743</a><span class="doccomment">/// v2 wire: response from GET /v2/quote/macrodata
+<a href=#1744 id=1744 data-nosnippet>1744</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#1745 id=1745 data-nosnippet>1745</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>V2MacroIndicatorListResponse {
+<a href=#1746 id=1746 data-nosnippet>1746</a>    <span class="attr">#[serde(default)]
+<a href=#1747 id=1747 data-nosnippet>1747</a>    </span><span class="kw">pub </span>indicator_list: Vec&lt;V2MacroIndicator&gt;,
+<a href=#1748 id=1748 data-nosnippet>1748</a>    <span class="doccomment">/// Total count for pagination
+<a href=#1749 id=1749 data-nosnippet>1749</a>    </span><span class="attr">#[serde(default)]
+<a href=#1750 id=1750 data-nosnippet>1750</a>    </span><span class="kw">pub </span>total: i32,
+<a href=#1751 id=1751 data-nosnippet>1751</a>}
+<a href=#1752 id=1752 data-nosnippet>1752</a>
+<a href=#1753 id=1753 data-nosnippet>1753</a><span class="doccomment">/// v2 wire: one data point from GET /v2/quote/macrodata/:id
+<a href=#1754 id=1754 data-nosnippet>1754</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#1755 id=1755 data-nosnippet>1755</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>V2IndicatorDataDetail {
+<a href=#1756 id=1756 data-nosnippet>1756</a>    <span class="attr">#[serde(default)]
+<a href=#1757 id=1757 data-nosnippet>1757</a>    </span><span class="kw">pub </span>actual_data: String,
+<a href=#1758 id=1758 data-nosnippet>1758</a>    <span class="attr">#[serde(default)]
+<a href=#1759 id=1759 data-nosnippet>1759</a>    </span><span class="kw">pub </span>previous_data: String,
+<a href=#1760 id=1760 data-nosnippet>1760</a>    <span class="attr">#[serde(default)]
+<a href=#1761 id=1761 data-nosnippet>1761</a>    </span><span class="kw">pub </span>estimated_data: String,
+<a href=#1762 id=1762 data-nosnippet>1762</a>    <span class="attr">#[serde(default)]
+<a href=#1763 id=1763 data-nosnippet>1763</a>    </span><span class="kw">pub </span>published_time: String,
+<a href=#1764 id=1764 data-nosnippet>1764</a>    <span class="attr">#[serde(default)]
+<a href=#1765 id=1765 data-nosnippet>1765</a>    </span><span class="kw">pub </span>observation_date: String,
+<a href=#1766 id=1766 data-nosnippet>1766</a>}
+<a href=#1767 id=1767 data-nosnippet>1767</a>
+<a href=#1768 id=1768 data-nosnippet>1768</a><span class="doccomment">/// v2 wire: one indicator with data from GET /v2/quote/macrodata/:id
+<a href=#1769 id=1769 data-nosnippet>1769</a></span><span class="attr">#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+<a href=#1770 id=1770 data-nosnippet>1770</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>V2MacroIndicatorDetail {
+<a href=#1771 id=1771 data-nosnippet>1771</a>    <span class="attr">#[serde(default)]
+<a href=#1772 id=1772 data-nosnippet>1772</a>    </span><span class="kw">pub </span>indicator_id: i32,
+<a href=#1773 id=1773 data-nosnippet>1773</a>    <span class="attr">#[serde(default)]
+<a href=#1774 id=1774 data-nosnippet>1774</a>    </span><span class="kw">pub </span>indicator_name: String,
+<a href=#1775 id=1775 data-nosnippet>1775</a>    <span class="attr">#[serde(default)]
+<a href=#1776 id=1776 data-nosnippet>1776</a>    </span><span class="kw">pub </span>unit: String,
+<a href=#1777 id=1777 data-nosnippet>1777</a>    <span class="attr">#[serde(default)]
+<a href=#1778 id=1778 data-nosnippet>1778</a>    </span><span class="kw">pub </span>description: String,
+<a href=#1779 id=1779 data-nosnippet>1779</a>    <span class="attr">#[serde(default)]
+<a href=#1780 id=1780 data-nosnippet>1780</a>    </span><span class="kw">pub </span>market: String,
+<a href=#1781 id=1781 data-nosnippet>1781</a>    <span class="attr">#[serde(default)]
+<a href=#1782 id=1782 data-nosnippet>1782</a>    </span><span class="kw">pub </span>indicator_data: Vec&lt;V2IndicatorDataDetail&gt;,
+<a href=#1783 id=1783 data-nosnippet>1783</a>}
+<a href=#1784 id=1784 data-nosnippet>1784</a>
+<a href=#1785 id=1785 data-nosnippet>1785</a><span class="doccomment">/// v2 wire: response from GET /v2/quote/macrodata/:id
+<a href=#1786 id=1786 data-nosnippet>1786</a>/// (GetMacroIndicatorHistoryResp)
+<a href=#1787 id=1787 data-nosnippet>1787</a></span><span class="attr">#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+<a href=#1788 id=1788 data-nosnippet>1788</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>V2MacroIndicatorDataResponse {
+<a href=#1789 id=1789 data-nosnippet>1789</a>    <span class="doccomment">/// Single indicator with paginated data points
+<a href=#1790 id=1790 data-nosnippet>1790</a>    </span><span class="attr">#[serde(default)]
+<a href=#1791 id=1791 data-nosnippet>1791</a>    </span><span class="kw">pub </span>indicator: V2MacroIndicatorDetail,
+<a href=#1792 id=1792 data-nosnippet>1792</a>    <span class="doccomment">/// Total data points matching the query (for pagination)
+<a href=#1793 id=1793 data-nosnippet>1793</a>    </span><span class="attr">#[serde(default)]
+<a href=#1794 id=1794 data-nosnippet>1794</a>    </span><span class="kw">pub </span>total: i32,
+<a href=#1795 id=1795 data-nosnippet>1795</a>}
 </code></pre></div></section></main></body></html>

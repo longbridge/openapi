@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/fundamental/context.rs`."><title>context.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/fundamental/</div>context.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::sync::Arc;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/fundamental/context.rs`."><title>context.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/fundamental/</div>context.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::sync::Arc;
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>longbridge_httpcli::{HttpClient, Json, Method};
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>serde::{Serialize, de::DeserializeOwned};
@@ -834,89 +834,200 @@
 <a href=#834 id=834 data-nosnippet>834</a>
 <a href=#835 id=835 data-nosnippet>835</a>    </span><span class="doccomment">/// List macroeconomic indicators.
 <a href=#836 id=836 data-nosnippet>836</a>    ///
-<a href=#837 id=837 data-nosnippet>837</a>    /// Pass `country` to filter by country code (e.g.
-<a href=#838 id=838 data-nosnippet>838</a>    /// `MacroeconomicCountry::UnitedStates`).
-<a href=#839 id=839 data-nosnippet>839</a>    ///
-<a href=#840 id=840 data-nosnippet>840</a>    /// Path: `GET /v1/quote/macrodata`
-<a href=#841 id=841 data-nosnippet>841</a>    </span><span class="kw">pub async fn </span>macroeconomic_indicators(
-<a href=#842 id=842 data-nosnippet>842</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#843 id=843 data-nosnippet>843</a>        country: <span class="prelude-ty">Option</span>&lt;MacroeconomicCountry&gt;,
-<a href=#844 id=844 data-nosnippet>844</a>        offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#845 id=845 data-nosnippet>845</a>        limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#846 id=846 data-nosnippet>846</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MacroeconomicIndicatorListResponse&gt; {
-<a href=#847 id=847 data-nosnippet>847</a>        <span class="attr">#[derive(Serialize)]
-<a href=#848 id=848 data-nosnippet>848</a>        </span><span class="kw">struct </span>Query {
-<a href=#849 id=849 data-nosnippet>849</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#850 id=850 data-nosnippet>850</a>            </span>country: <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#851 id=851 data-nosnippet>851</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#852 id=852 data-nosnippet>852</a>            </span>offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#853 id=853 data-nosnippet>853</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#854 id=854 data-nosnippet>854</a>            </span>limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#855 id=855 data-nosnippet>855</a>        }
-<a href=#856 id=856 data-nosnippet>856</a>        <span class="kw">let </span>country_str = country.map(|c| {
-<a href=#857 id=857 data-nosnippet>857</a>            <span class="kw">match </span>c {
-<a href=#858 id=858 data-nosnippet>858</a>                MacroeconomicCountry::HongKong =&gt; <span class="string">"Hong Kong SAR China"</span>,
-<a href=#859 id=859 data-nosnippet>859</a>                MacroeconomicCountry::China =&gt; <span class="string">"China (Mainland)"</span>,
-<a href=#860 id=860 data-nosnippet>860</a>                MacroeconomicCountry::UnitedStates =&gt; <span class="string">"United States"</span>,
-<a href=#861 id=861 data-nosnippet>861</a>                MacroeconomicCountry::EuroZone =&gt; <span class="string">"Euro Zone"</span>,
-<a href=#862 id=862 data-nosnippet>862</a>                MacroeconomicCountry::Japan =&gt; <span class="string">"Japan"</span>,
-<a href=#863 id=863 data-nosnippet>863</a>                MacroeconomicCountry::Singapore =&gt; <span class="string">"Singapore"</span>,
-<a href=#864 id=864 data-nosnippet>864</a>            }
-<a href=#865 id=865 data-nosnippet>865</a>            .to_string()
-<a href=#866 id=866 data-nosnippet>866</a>        });
-<a href=#867 id=867 data-nosnippet>867</a>        <span class="self">self</span>.get(
-<a href=#868 id=868 data-nosnippet>868</a>            <span class="string">"/v1/quote/macrodata"</span>,
-<a href=#869 id=869 data-nosnippet>869</a>            Query {
-<a href=#870 id=870 data-nosnippet>870</a>                country: country_str,
-<a href=#871 id=871 data-nosnippet>871</a>                offset,
-<a href=#872 id=872 data-nosnippet>872</a>                limit,
-<a href=#873 id=873 data-nosnippet>873</a>            },
-<a href=#874 id=874 data-nosnippet>874</a>        )
-<a href=#875 id=875 data-nosnippet>875</a>        .<span class="kw">await
-<a href=#876 id=876 data-nosnippet>876</a>    </span>}
-<a href=#877 id=877 data-nosnippet>877</a>
-<a href=#878 id=878 data-nosnippet>878</a>    <span class="doccomment">/// Get historical data for a macroeconomic indicator.
-<a href=#879 id=879 data-nosnippet>879</a>    ///
-<a href=#880 id=880 data-nosnippet>880</a>    /// `start_date` and `end_date` are date strings in `"YYYY-MM-DD"` format.
-<a href=#881 id=881 data-nosnippet>881</a>    /// `start_date` is sent as `YYYY-MM-DDT00:00:00Z`; `end_date` is sent as
-<a href=#882 id=882 data-nosnippet>882</a>    /// `YYYY-MM-DDT23:59:59Z`.
-<a href=#883 id=883 data-nosnippet>883</a>    ///
-<a href=#884 id=884 data-nosnippet>884</a>    /// Path: `GET /v1/quote/macrodata/{indicator_code}`
-<a href=#885 id=885 data-nosnippet>885</a>    </span><span class="kw">pub async fn </span>macroeconomic(
-<a href=#886 id=886 data-nosnippet>886</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#887 id=887 data-nosnippet>887</a>        indicator_code: <span class="kw">impl </span>Into&lt;String&gt;,
-<a href=#888 id=888 data-nosnippet>888</a>        start_date: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
-<a href=#889 id=889 data-nosnippet>889</a>        end_date: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
-<a href=#890 id=890 data-nosnippet>890</a>        offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#891 id=891 data-nosnippet>891</a>        limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#892 id=892 data-nosnippet>892</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MacroeconomicResponse&gt; {
-<a href=#893 id=893 data-nosnippet>893</a>        <span class="attr">#[derive(Serialize)]
-<a href=#894 id=894 data-nosnippet>894</a>        </span><span class="kw">struct </span>Query {
-<a href=#895 id=895 data-nosnippet>895</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#896 id=896 data-nosnippet>896</a>            </span>start_time: <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#897 id=897 data-nosnippet>897</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#898 id=898 data-nosnippet>898</a>            </span>end_time: <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#899 id=899 data-nosnippet>899</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#900 id=900 data-nosnippet>900</a>            </span>offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#901 id=901 data-nosnippet>901</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#902 id=902 data-nosnippet>902</a>            </span>limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
-<a href=#903 id=903 data-nosnippet>903</a>        }
-<a href=#904 id=904 data-nosnippet>904</a>        <span class="kw">let </span>path = <span class="macro">format!</span>(<span class="string">"/v1/quote/macrodata/{}"</span>, indicator_code.into());
-<a href=#905 id=905 data-nosnippet>905</a>        <span class="prelude-val">Ok</span>(<span class="self">self
-<a href=#906 id=906 data-nosnippet>906</a>            </span>.<span class="number">0
-<a href=#907 id=907 data-nosnippet>907</a>            </span>.http_cli
-<a href=#908 id=908 data-nosnippet>908</a>            .request(Method::GET, path)
-<a href=#909 id=909 data-nosnippet>909</a>            .query_params(Query {
-<a href=#910 id=910 data-nosnippet>910</a>                start_time: start_date.map(|d| <span class="macro">format!</span>(<span class="string">"{}T00:00:00Z"</span>, d.into())),
-<a href=#911 id=911 data-nosnippet>911</a>                end_time: end_date.map(|d| <span class="macro">format!</span>(<span class="string">"{}T23:59:59Z"</span>, d.into())),
-<a href=#912 id=912 data-nosnippet>912</a>                offset,
-<a href=#913 id=913 data-nosnippet>913</a>                limit,
-<a href=#914 id=914 data-nosnippet>914</a>            })
-<a href=#915 id=915 data-nosnippet>915</a>            .response::&lt;Json&lt;MacroeconomicResponse&gt;&gt;()
-<a href=#916 id=916 data-nosnippet>916</a>            .send()
-<a href=#917 id=917 data-nosnippet>917</a>            .with_subscriber(<span class="self">self</span>.<span class="number">0</span>.log_subscriber.clone())
-<a href=#918 id=918 data-nosnippet>918</a>            .<span class="kw">await</span><span class="question-mark">?
-<a href=#919 id=919 data-nosnippet>919</a>            </span>.<span class="number">0</span>)
-<a href=#920 id=920 data-nosnippet>920</a>    }
-<a href=#921 id=921 data-nosnippet>921</a>}
+<a href=#837 id=837 data-nosnippet>837</a>    /// `country` accepts a market code string (e.g. `"US"`, `"HK"`, `"ALL"`).
+<a href=#838 id=838 data-nosnippet>838</a>    /// `keyword` optionally filters indicators by name (fuzzy,
+<a href=#839 id=839 data-nosnippet>839</a>    /// case-insensitive). `offset` and `limit` are kept for backward
+<a href=#840 id=840 data-nosnippet>840</a>    /// compatibility but ignored by v2.
+<a href=#841 id=841 data-nosnippet>841</a>    ///
+<a href=#842 id=842 data-nosnippet>842</a>    /// Path: `GET /v2/quote/macrodata`
+<a href=#843 id=843 data-nosnippet>843</a>    </span><span class="kw">pub async fn </span>macroeconomic_indicators(
+<a href=#844 id=844 data-nosnippet>844</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#845 id=845 data-nosnippet>845</a>        country: <span class="prelude-ty">Option</span>&lt;MacroeconomicCountry&gt;,
+<a href=#846 id=846 data-nosnippet>846</a>        keyword: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
+<a href=#847 id=847 data-nosnippet>847</a>        offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#848 id=848 data-nosnippet>848</a>        limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#849 id=849 data-nosnippet>849</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MacroeconomicIndicatorListResponse&gt; {
+<a href=#850 id=850 data-nosnippet>850</a>        <span class="self">self</span>.macroeconomic_indicators_v2(country, keyword, offset, limit)
+<a href=#851 id=851 data-nosnippet>851</a>            .<span class="kw">await
+<a href=#852 id=852 data-nosnippet>852</a>    </span>}
+<a href=#853 id=853 data-nosnippet>853</a>
+<a href=#854 id=854 data-nosnippet>854</a>    <span class="doccomment">/// List macroeconomic indicators (v2) with optional keyword filter.
+<a href=#855 id=855 data-nosnippet>855</a>    ///
+<a href=#856 id=856 data-nosnippet>856</a>    /// Path: `GET /v2/quote/macrodata`
+<a href=#857 id=857 data-nosnippet>857</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>macroeconomic_indicators_v2(
+<a href=#858 id=858 data-nosnippet>858</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#859 id=859 data-nosnippet>859</a>        country: <span class="prelude-ty">Option</span>&lt;MacroeconomicCountry&gt;,
+<a href=#860 id=860 data-nosnippet>860</a>        keyword: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
+<a href=#861 id=861 data-nosnippet>861</a>        offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#862 id=862 data-nosnippet>862</a>        limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#863 id=863 data-nosnippet>863</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MacroeconomicIndicatorListResponse&gt; {
+<a href=#864 id=864 data-nosnippet>864</a>        <span class="attr">#[derive(Serialize)]
+<a href=#865 id=865 data-nosnippet>865</a>        </span><span class="kw">struct </span>Query {
+<a href=#866 id=866 data-nosnippet>866</a>            market: String,
+<a href=#867 id=867 data-nosnippet>867</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#868 id=868 data-nosnippet>868</a>            </span>keyword: <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#869 id=869 data-nosnippet>869</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#870 id=870 data-nosnippet>870</a>            </span>offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#871 id=871 data-nosnippet>871</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#872 id=872 data-nosnippet>872</a>            </span>limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#873 id=873 data-nosnippet>873</a>        }
+<a href=#874 id=874 data-nosnippet>874</a>        <span class="kw">let </span>market = country
+<a href=#875 id=875 data-nosnippet>875</a>            .map(|c| <span class="kw">match </span>c {
+<a href=#876 id=876 data-nosnippet>876</a>                MacroeconomicCountry::HongKong =&gt; <span class="string">"HK"</span>,
+<a href=#877 id=877 data-nosnippet>877</a>                MacroeconomicCountry::China =&gt; <span class="string">"CN"</span>,
+<a href=#878 id=878 data-nosnippet>878</a>                MacroeconomicCountry::UnitedStates =&gt; <span class="string">"US"</span>,
+<a href=#879 id=879 data-nosnippet>879</a>                MacroeconomicCountry::EuroZone =&gt; <span class="string">"EU"</span>,
+<a href=#880 id=880 data-nosnippet>880</a>                MacroeconomicCountry::Japan =&gt; <span class="string">"JP"</span>,
+<a href=#881 id=881 data-nosnippet>881</a>                MacroeconomicCountry::Singapore =&gt; <span class="string">"SG"</span>,
+<a href=#882 id=882 data-nosnippet>882</a>            })
+<a href=#883 id=883 data-nosnippet>883</a>            .unwrap_or(<span class="string">"ALL"</span>)
+<a href=#884 id=884 data-nosnippet>884</a>            .to_string();
+<a href=#885 id=885 data-nosnippet>885</a>
+<a href=#886 id=886 data-nosnippet>886</a>        <span class="kw">let </span>raw: V2MacroIndicatorListResponse = <span class="self">self
+<a href=#887 id=887 data-nosnippet>887</a>            </span>.get(
+<a href=#888 id=888 data-nosnippet>888</a>                <span class="string">"/v2/quote/macrodata"</span>,
+<a href=#889 id=889 data-nosnippet>889</a>                Query {
+<a href=#890 id=890 data-nosnippet>890</a>                    market,
+<a href=#891 id=891 data-nosnippet>891</a>                    keyword: keyword.map(|k| k.into()),
+<a href=#892 id=892 data-nosnippet>892</a>                    offset,
+<a href=#893 id=893 data-nosnippet>893</a>                    limit,
+<a href=#894 id=894 data-nosnippet>894</a>                },
+<a href=#895 id=895 data-nosnippet>895</a>            )
+<a href=#896 id=896 data-nosnippet>896</a>            .<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#897 id=897 data-nosnippet>897</a>
+<a href=#898 id=898 data-nosnippet>898</a>        <span class="kw">let </span>total = raw.total;
+<a href=#899 id=899 data-nosnippet>899</a>        <span class="kw">let </span>data = raw
+<a href=#900 id=900 data-nosnippet>900</a>            .indicator_list
+<a href=#901 id=901 data-nosnippet>901</a>            .into_iter()
+<a href=#902 id=902 data-nosnippet>902</a>            .map(|ind| MacroeconomicIndicator {
+<a href=#903 id=903 data-nosnippet>903</a>                indicator_code: ind.indicator_id.to_string(),
+<a href=#904 id=904 data-nosnippet>904</a>                country: ind.market,
+<a href=#905 id=905 data-nosnippet>905</a>                name: ind.indicator_name,
+<a href=#906 id=906 data-nosnippet>906</a>                periodicity: ind.frequence,
+<a href=#907 id=907 data-nosnippet>907</a>                describe: ind.description,
+<a href=#908 id=908 data-nosnippet>908</a>                importance: ind.importance,
+<a href=#909 id=909 data-nosnippet>909</a>                ..Default::default()
+<a href=#910 id=910 data-nosnippet>910</a>            })
+<a href=#911 id=911 data-nosnippet>911</a>            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+<a href=#912 id=912 data-nosnippet>912</a>        <span class="kw">let </span>count = <span class="kw">if </span>total &gt; <span class="number">0 </span>{ total } <span class="kw">else </span>{ data.len() <span class="kw">as </span>i32 };
+<a href=#913 id=913 data-nosnippet>913</a>        <span class="prelude-val">Ok</span>(MacroeconomicIndicatorListResponse { data, count })
+<a href=#914 id=914 data-nosnippet>914</a>    }
+<a href=#915 id=915 data-nosnippet>915</a>
+<a href=#916 id=916 data-nosnippet>916</a>    <span class="doccomment">/// Get historical data for a macroeconomic indicator.
+<a href=#917 id=917 data-nosnippet>917</a>    ///
+<a href=#918 id=918 data-nosnippet>918</a>    /// `indicator_code` is the indicator ID (integer as string in v2).
+<a href=#919 id=919 data-nosnippet>919</a>    /// `start_date` and `end_date` are `"YYYY-MM-DD"` format.
+<a href=#920 id=920 data-nosnippet>920</a>    /// `sort` can be `"asc"` or `"desc"` (new in v2).
+<a href=#921 id=921 data-nosnippet>921</a>    ///
+<a href=#922 id=922 data-nosnippet>922</a>    /// Path: `GET /v2/quote/macrodata/{indicator_id}`
+<a href=#923 id=923 data-nosnippet>923</a>    </span><span class="kw">pub async fn </span>macroeconomic(
+<a href=#924 id=924 data-nosnippet>924</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#925 id=925 data-nosnippet>925</a>        indicator_code: <span class="kw">impl </span>Into&lt;String&gt;,
+<a href=#926 id=926 data-nosnippet>926</a>        start_date: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
+<a href=#927 id=927 data-nosnippet>927</a>        end_date: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
+<a href=#928 id=928 data-nosnippet>928</a>        offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#929 id=929 data-nosnippet>929</a>        limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#930 id=930 data-nosnippet>930</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MacroeconomicResponse&gt; {
+<a href=#931 id=931 data-nosnippet>931</a>        <span class="self">self</span>.macroeconomic_v2(
+<a href=#932 id=932 data-nosnippet>932</a>            indicator_code,
+<a href=#933 id=933 data-nosnippet>933</a>            start_date,
+<a href=#934 id=934 data-nosnippet>934</a>            end_date,
+<a href=#935 id=935 data-nosnippet>935</a>            offset,
+<a href=#936 id=936 data-nosnippet>936</a>            limit,
+<a href=#937 id=937 data-nosnippet>937</a>            None::&lt;String&gt;,
+<a href=#938 id=938 data-nosnippet>938</a>        )
+<a href=#939 id=939 data-nosnippet>939</a>        .<span class="kw">await
+<a href=#940 id=940 data-nosnippet>940</a>    </span>}
+<a href=#941 id=941 data-nosnippet>941</a>
+<a href=#942 id=942 data-nosnippet>942</a>    <span class="doccomment">/// Get historical data for a macroeconomic indicator (v2) with sort
+<a href=#943 id=943 data-nosnippet>943</a>    /// support.
+<a href=#944 id=944 data-nosnippet>944</a>    ///
+<a href=#945 id=945 data-nosnippet>945</a>    /// Path: `GET /v2/quote/macrodata/{indicator_id}`
+<a href=#946 id=946 data-nosnippet>946</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>macroeconomic_v2(
+<a href=#947 id=947 data-nosnippet>947</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#948 id=948 data-nosnippet>948</a>        indicator_code: <span class="kw">impl </span>Into&lt;String&gt;,
+<a href=#949 id=949 data-nosnippet>949</a>        start_date: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
+<a href=#950 id=950 data-nosnippet>950</a>        end_date: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
+<a href=#951 id=951 data-nosnippet>951</a>        offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#952 id=952 data-nosnippet>952</a>        limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#953 id=953 data-nosnippet>953</a>        sort: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;String&gt;&gt;,
+<a href=#954 id=954 data-nosnippet>954</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MacroeconomicResponse&gt; {
+<a href=#955 id=955 data-nosnippet>955</a>        <span class="attr">#[derive(Serialize)]
+<a href=#956 id=956 data-nosnippet>956</a>        </span><span class="kw">struct </span>Query {
+<a href=#957 id=957 data-nosnippet>957</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#958 id=958 data-nosnippet>958</a>            </span>start_date: <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#959 id=959 data-nosnippet>959</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#960 id=960 data-nosnippet>960</a>            </span>end_date: <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#961 id=961 data-nosnippet>961</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#962 id=962 data-nosnippet>962</a>            </span>offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#963 id=963 data-nosnippet>963</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#964 id=964 data-nosnippet>964</a>            </span>limit: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#965 id=965 data-nosnippet>965</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#966 id=966 data-nosnippet>966</a>            </span>sort: <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#967 id=967 data-nosnippet>967</a>        }
+<a href=#968 id=968 data-nosnippet>968</a>        <span class="kw">let </span>path = <span class="macro">format!</span>(<span class="string">"/v2/quote/macrodata/{}"</span>, indicator_code.into());
+<a href=#969 id=969 data-nosnippet>969</a>        <span class="kw">let </span>raw: V2MacroIndicatorDataResponse = <span class="self">self
+<a href=#970 id=970 data-nosnippet>970</a>            </span>.<span class="number">0
+<a href=#971 id=971 data-nosnippet>971</a>            </span>.http_cli
+<a href=#972 id=972 data-nosnippet>972</a>            .request(Method::GET, path)
+<a href=#973 id=973 data-nosnippet>973</a>            .query_params(Query {
+<a href=#974 id=974 data-nosnippet>974</a>                start_date: start_date.map(|d| d.into()),
+<a href=#975 id=975 data-nosnippet>975</a>                end_date: end_date.map(|d| d.into()),
+<a href=#976 id=976 data-nosnippet>976</a>                offset,
+<a href=#977 id=977 data-nosnippet>977</a>                limit,
+<a href=#978 id=978 data-nosnippet>978</a>                sort: <span class="prelude-val">Some</span>(sort.map(|s| s.into()).unwrap_or_else(|| <span class="string">"desc"</span>.to_string())),
+<a href=#979 id=979 data-nosnippet>979</a>            })
+<a href=#980 id=980 data-nosnippet>980</a>            .response::&lt;Json&lt;V2MacroIndicatorDataResponse&gt;&gt;()
+<a href=#981 id=981 data-nosnippet>981</a>            .send()
+<a href=#982 id=982 data-nosnippet>982</a>            .with_subscriber(<span class="self">self</span>.<span class="number">0</span>.log_subscriber.clone())
+<a href=#983 id=983 data-nosnippet>983</a>            .<span class="kw">await</span><span class="question-mark">?
+<a href=#984 id=984 data-nosnippet>984</a>            </span>.<span class="number">0</span>;
+<a href=#985 id=985 data-nosnippet>985</a>
+<a href=#986 id=986 data-nosnippet>986</a>        <span class="kw">let </span>total = raw.total;
+<a href=#987 id=987 data-nosnippet>987</a>        <span class="kw">let </span>detail = raw.indicator;
+<a href=#988 id=988 data-nosnippet>988</a>        <span class="kw">let </span>unit_english = detail.unit.clone();
+<a href=#989 id=989 data-nosnippet>989</a>        <span class="kw">let </span>count = detail.indicator_data.len() <span class="kw">as </span>i32;
+<a href=#990 id=990 data-nosnippet>990</a>
+<a href=#991 id=991 data-nosnippet>991</a>        <span class="kw">let </span>info = MacroeconomicIndicator {
+<a href=#992 id=992 data-nosnippet>992</a>            indicator_code: detail.indicator_id.to_string(),
+<a href=#993 id=993 data-nosnippet>993</a>            country: detail.market,
+<a href=#994 id=994 data-nosnippet>994</a>            name: detail.indicator_name,
+<a href=#995 id=995 data-nosnippet>995</a>            describe: detail.description,
+<a href=#996 id=996 data-nosnippet>996</a>            ..Default::default()
+<a href=#997 id=997 data-nosnippet>997</a>        };
+<a href=#998 id=998 data-nosnippet>998</a>
+<a href=#999 id=999 data-nosnippet>999</a>        <span class="kw">let </span>data = detail
+<a href=#1000 id=1000 data-nosnippet>1000</a>            .indicator_data
+<a href=#1001 id=1001 data-nosnippet>1001</a>            .into_iter()
+<a href=#1002 id=1002 data-nosnippet>1002</a>            .map(|d| {
+<a href=#1003 id=1003 data-nosnippet>1003</a>                <span class="kw">use </span>time::format_description::well_known::Rfc3339;
+<a href=#1004 id=1004 data-nosnippet>1004</a>                <span class="kw">let </span>release_at = time::OffsetDateTime::parse(<span class="kw-2">&amp;</span>d.published_time, <span class="kw-2">&amp;</span>Rfc3339)
+<a href=#1005 id=1005 data-nosnippet>1005</a>                    .ok()
+<a href=#1006 id=1006 data-nosnippet>1006</a>                    .or_else(|| {
+<a href=#1007 id=1007 data-nosnippet>1007</a>                        <span class="comment">// Try without timezone suffix
+<a href=#1008 id=1008 data-nosnippet>1008</a>                        </span>time::PrimitiveDateTime::parse(
+<a href=#1009 id=1009 data-nosnippet>1009</a>                            <span class="kw-2">&amp;</span>d.published_time,
+<a href=#1010 id=1010 data-nosnippet>1010</a>                            <span class="kw-2">&amp;</span><span class="macro">time::macros::format_description!</span>(
+<a href=#1011 id=1011 data-nosnippet>1011</a>                                <span class="string">"[year]-[month]-[day]T[hour]:[minute]:[second]"
+<a href=#1012 id=1012 data-nosnippet>1012</a>                            </span>),
+<a href=#1013 id=1013 data-nosnippet>1013</a>                        )
+<a href=#1014 id=1014 data-nosnippet>1014</a>                        .ok()
+<a href=#1015 id=1015 data-nosnippet>1015</a>                        .map(|dt| dt.assume_utc())
+<a href=#1016 id=1016 data-nosnippet>1016</a>                    });
+<a href=#1017 id=1017 data-nosnippet>1017</a>                Macroeconomic {
+<a href=#1018 id=1018 data-nosnippet>1018</a>                    period: d.observation_date,
+<a href=#1019 id=1019 data-nosnippet>1019</a>                    release_at,
+<a href=#1020 id=1020 data-nosnippet>1020</a>                    actual_value: d.actual_data,
+<a href=#1021 id=1021 data-nosnippet>1021</a>                    previous_value: d.previous_data,
+<a href=#1022 id=1022 data-nosnippet>1022</a>                    forecast_value: d.estimated_data,
+<a href=#1023 id=1023 data-nosnippet>1023</a>                    unit: unit_english.clone(),
+<a href=#1024 id=1024 data-nosnippet>1024</a>                    ..Default::default()
+<a href=#1025 id=1025 data-nosnippet>1025</a>                }
+<a href=#1026 id=1026 data-nosnippet>1026</a>            })
+<a href=#1027 id=1027 data-nosnippet>1027</a>            .collect();
+<a href=#1028 id=1028 data-nosnippet>1028</a>
+<a href=#1029 id=1029 data-nosnippet>1029</a>        <span class="kw">let </span>count = <span class="kw">if </span>total &gt; <span class="number">0 </span>{ total } <span class="kw">else </span>{ count };
+<a href=#1030 id=1030 data-nosnippet>1030</a>        <span class="prelude-val">Ok</span>(MacroeconomicResponse { info, data, count })
+<a href=#1031 id=1031 data-nosnippet>1031</a>    }
+<a href=#1032 id=1032 data-nosnippet>1032</a>}
 </code></pre></div></section></main></body></html>
