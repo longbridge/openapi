@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Remove unused `pub(crate)` blocking wrappers `macroeconomic_indicators_v2` / `macroeconomic_v2` from `FundamentalContextSync`; the public blocking methods already proxy through v2 via the async chain
+- **Python:** add `eq, eq_int, from_py_object` to `MacroeconomicCountry` pyclass to resolve pyo3 v0.28 deprecation of automatic `FromPyObject` for `Clone` types; also add `Hash, Eq, PartialEq` derives consistent with other argument enums in the file
 
 ## [4.3.2] - 2026-06-13
 
