@@ -7,9 +7,9 @@ use crate::{
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
         EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, MarginRatio, Order, OrderDetail, PushEvent, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
     },
 };
 
@@ -441,10 +441,10 @@ impl TradeContextSync {
     /// ```
     pub fn order_detail(
         &self,
-        order_id: impl Into<String> + Send + 'static,
+        options: impl Into<GetOrderDetailOptions> + Send + 'static,
     ) -> Result<OrderDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.order_detail(order_id).await })
+            .call(move |ctx| async move { ctx.order_detail(options).await })
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

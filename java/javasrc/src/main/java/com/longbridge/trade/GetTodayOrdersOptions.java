@@ -12,6 +12,7 @@ public class GetTodayOrdersOptions {
     private OrderSide side;
     private Market market;
     private String orderId;
+    private Boolean isAttached;
 
     /**
      * Filters by security symbol.
@@ -66,6 +67,25 @@ public class GetTodayOrdersOptions {
     public GetTodayOrdersOptions setOrderId(String orderId) {
         this.orderId = orderId;
         return this;
+    }
+
+    /**
+     * Filters to include only attached orders.
+     *
+     * @return this instance for chaining
+     */
+    public GetTodayOrdersOptions setIsAttached() {
+        this.isAttached = true;
+        return this;
+    }
+
+    /**
+     * Returns the is-attached filter.
+     *
+     * @return is-attached filter
+     */
+    public Boolean getIsAttached() {
+        return isAttached;
     }
 
 }

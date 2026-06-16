@@ -3,12 +3,13 @@ use std::os::raw::c_char;
 use longbridge::{
     Market,
     trade::{
-        AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,
-        EstimateMaxPurchaseQuantityResponse, Execution, FrozenTransactionFee, FundPosition,
-        FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderChargeDetail,
-        OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus,
-        OrderTag, OrderType, PushOrderChanged, StockPosition, StockPositionChannel,
-        StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
+        AccountBalance, AttachedOrderDetail, AttachedOrderType, BalanceType, CashFlow,
+        CashFlowDirection, CashInfo, EstimateMaxPurchaseQuantityResponse, Execution,
+        FrozenTransactionFee, FundPosition, FundPositionChannel, FundPositionsResponse,
+        MarginRatio, Order, OrderChargeDetail, OrderChargeFee, OrderChargeItem, OrderDetail,
+        OrderHistoryDetail, OrderSide, OrderStatus, OrderTag, OrderType, PushOrderChanged,
+        StockPosition, StockPositionChannel, StockPositionsResponse, SubmitOrderResponse,
+        TimeInForceType,
     },
 };
 use time::OffsetDateTime;
@@ -21,6 +22,290 @@ use crate::{
     },
     types::{CDate, CDecimal, CMarket, CString, CVec, ToFFI},
 };
+
+/// Attached order type
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CAttachedOrderType {
+    /// Take profit
+    AttachedOrderTypeProfitTaker = 0,
+    /// Stop loss
+    AttachedOrderTypeStopLoss = 1,
+    /// Bracket order
+    AttachedOrderTypeBracket = 2,
+}
+
+impl From<AttachedOrderType> for CAttachedOrderType {
+    fn from(value: AttachedOrderType) -> Self {
+        match value {
+            AttachedOrderType::ProfitTaker => CAttachedOrderType::AttachedOrderTypeProfitTaker,
+            AttachedOrderType::StopLoss => CAttachedOrderType::AttachedOrderTypeStopLoss,
+            AttachedOrderType::Bracket => CAttachedOrderType::AttachedOrderTypeBracket,
+        }
+    }
+}
+
+impl From<CAttachedOrderType> for AttachedOrderType {
+    fn from(value: CAttachedOrderType) -> Self {
+        match value {
+            CAttachedOrderType::AttachedOrderTypeProfitTaker => AttachedOrderType::ProfitTaker,
+            CAttachedOrderType::AttachedOrderTypeStopLoss => AttachedOrderType::StopLoss,
+            CAttachedOrderType::AttachedOrderTypeBracket => AttachedOrderType::Bracket,
+        }
+    }
+}
+
+/// Attached order detail
+#[repr(C)]
+pub struct CAttachedOrderDetail {
+    /// Attached order ID
+    pub order_id: *const c_char,
+    /// Display type: 1=take-profit, 2=stop-loss
+    pub attached_type_display: i32,
+    /// Trigger price (maybe null)
+    pub trigger_price: *const CDecimal,
+    /// Quantity
+    pub quantity: *const CDecimal,
+    /// Executed quantity
+    pub executed_qty: *const CDecimal,
+    /// Order status
+    pub status: COrderStatus,
+    /// Last updated time (unix timestamp)
+    pub updated_at: i64,
+    /// Whether withdrawn
+    pub withdrawn: bool,
+    /// GTD date (maybe null)
+    pub gtd: *const CDate,
+    /// Time in force type
+    pub time_in_force: CTimeInForceType,
+    /// Counter order ID
+    pub counter_id: *const c_char,
+    /// Trigger status
+    pub trigger_status: i32,
+    /// Executed amount
+    pub executed_amount: *const CDecimal,
+    /// Tag
+    pub tag: i32,
+    /// Submitted time (unix timestamp)
+    pub submitted_at: i64,
+    /// Executed price
+    pub executed_price: *const CDecimal,
+    /// Force RTH only (maybe null)
+    pub force_only_rth: *const COutsideRTH,
+    /// Whether reviewed
+    pub reviewed: bool,
+    /// Order type to submit after trigger
+    pub activate_order_type: COrderType,
+    /// RTH setting for activated order (maybe null)
+    pub activate_rth: *const COutsideRTH,
+    /// Submit price (maybe null)
+    pub submit_price: *const CDecimal,
+}
+
+#[derive(Debug)]
+pub(crate) struct CAttachedOrderDetailOwned {
+    order_id: CString,
+    attached_type_display: i32,
+    trigger_price: Option<CDecimal>,
+    quantity: CDecimal,
+    executed_qty: CDecimal,
+    status: OrderStatus,
+    updated_at: i64,
+    withdrawn: bool,
+    gtd: Option<CDate>,
+    time_in_force: TimeInForceType,
+    counter_id: CString,
+    trigger_status: i32,
+    executed_amount: CDecimal,
+    tag: i32,
+    submitted_at: i64,
+    executed_price: CDecimal,
+    force_only_rth: Option<COutsideRTH>,
+    reviewed: bool,
+    activate_order_type: OrderType,
+    activate_rth: Option<COutsideRTH>,
+    submit_price: Option<CDecimal>,
+}
+
+impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
+    fn from(detail: AttachedOrderDetail) -> Self {
+        let AttachedOrderDetail {
+            order_id,
+            attached_type_display,
+            trigger_price,
+            quantity,
+            executed_qty,
+            status,
+            updated_at,
+            withdrawn,
+            gtd,
+            time_in_force,
+            counter_id,
+            trigger_status,
+            executed_amount,
+            tag,
+            submitted_at,
+            executed_price,
+            force_only_rth,
+            reviewed,
+            activate_order_type,
+            activate_rth,
+            submit_price,
+        } = detail;
+        Self {
+            order_id: order_id.into(),
+            attached_type_display,
+            trigger_price: trigger_price.map(Into::into),
+            quantity: quantity.into(),
+            executed_qty: executed_qty.into(),
+            status,
+            updated_at: updated_at.unix_timestamp(),
+            withdrawn,
+            gtd: gtd.map(Into::into),
+            time_in_force,
+            counter_id: counter_id.into(),
+            trigger_status,
+            executed_amount: executed_amount.into(),
+            tag,
+            submitted_at: submitted_at.unix_timestamp(),
+            executed_price: executed_price.into(),
+            force_only_rth: force_only_rth.map(Into::into),
+            reviewed,
+            activate_order_type,
+            activate_rth: activate_rth.map(Into::into),
+            submit_price: submit_price.map(Into::into),
+        }
+    }
+}
+
+impl ToFFI for CAttachedOrderDetailOwned {
+    type FFIType = CAttachedOrderDetail;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CAttachedOrderDetailOwned {
+            order_id,
+            attached_type_display,
+            trigger_price,
+            quantity,
+            executed_qty,
+            status,
+            updated_at,
+            withdrawn,
+            gtd,
+            time_in_force,
+            counter_id,
+            trigger_status,
+            executed_amount,
+            tag,
+            submitted_at,
+            executed_price,
+            force_only_rth,
+            reviewed,
+            activate_order_type,
+            activate_rth,
+            submit_price,
+        } = self;
+        CAttachedOrderDetail {
+            order_id: order_id.to_ffi_type(),
+            attached_type_display: *attached_type_display,
+            trigger_price: trigger_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            quantity: quantity.to_ffi_type(),
+            executed_qty: executed_qty.to_ffi_type(),
+            status: (*status).into(),
+            updated_at: *updated_at,
+            withdrawn: *withdrawn,
+            gtd: gtd
+                .as_ref()
+                .map(|value| value as *const CDate)
+                .unwrap_or(std::ptr::null()),
+            time_in_force: (*time_in_force).into(),
+            counter_id: counter_id.to_ffi_type(),
+            trigger_status: *trigger_status,
+            executed_amount: executed_amount.to_ffi_type(),
+            tag: *tag,
+            submitted_at: *submitted_at,
+            executed_price: executed_price.to_ffi_type(),
+            force_only_rth: force_only_rth
+                .as_ref()
+                .map(|value| value as *const COutsideRTH)
+                .unwrap_or(std::ptr::null()),
+            reviewed: *reviewed,
+            activate_order_type: (*activate_order_type).into(),
+            activate_rth: activate_rth
+                .as_ref()
+                .map(|value| value as *const COutsideRTH)
+                .unwrap_or(std::ptr::null()),
+            submit_price: submit_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+        }
+    }
+}
+
+/// Options for submit attached order params
+#[derive(Debug)]
+#[repr(C)]
+pub struct CSubmitAttachedParams {
+    /// Attached order type
+    pub attached_order_type: CAttachedOrderType,
+    /// Take-profit trigger price (can be null)
+    pub profit_taker_price: *const CDecimal,
+    /// Stop-loss trigger price (can be null)
+    pub stop_loss_price: *const CDecimal,
+    /// Time in force type (can be null)
+    pub time_in_force: *const CTimeInForceType,
+    /// Expiry time unix timestamp (can be null)
+    pub expire_time: *const i64,
+    /// Order type to submit after trigger (can be null)
+    pub activate_order_type: *const COrderType,
+    /// Take-profit limit price (can be null)
+    pub profit_taker_submit_price: *const CDecimal,
+    /// Stop-loss limit price (can be null)
+    pub stop_loss_submit_price: *const CDecimal,
+    /// RTH setting for activated order (can be null)
+    pub activate_rth: *const COutsideRTH,
+}
+
+/// Options for replace attached order params
+#[derive(Debug)]
+#[repr(C)]
+pub struct CReplaceAttachedParams {
+    /// Attached order type
+    pub attached_order_type: CAttachedOrderType,
+    /// Take-profit trigger price (can be null)
+    pub profit_taker_price: *const CDecimal,
+    /// Stop-loss trigger price (can be null)
+    pub stop_loss_price: *const CDecimal,
+    /// Time in force type (can be null)
+    pub time_in_force: *const CTimeInForceType,
+    /// Expiry time unix timestamp (can be null)
+    pub expire_time: *const i64,
+    /// Order type to submit after trigger (can be null)
+    pub activate_order_type: *const COrderType,
+    /// Take-profit limit price (can be null)
+    pub profit_taker_submit_price: *const CDecimal,
+    /// Stop-loss limit price (can be null)
+    pub stop_loss_submit_price: *const CDecimal,
+    /// RTH setting for activated order (can be null)
+    pub activate_rth: *const COutsideRTH,
+    /// Take-profit order ID (can be null)
+    pub profit_taker_id: *const i64,
+    /// Stop-loss order ID (can be null)
+    pub stop_loss_id: *const i64,
+    /// Cancel all attached orders flag (can be null)
+    pub cancel_all_attached: *const bool,
+    /// Main order ID (can be null)
+    pub main_id: *const i64,
+    /// Quantity (can be null)
+    pub quantity: *const CDecimal,
+    /// Market price (can be null)
+    pub market_price: *const CDecimal,
+}
 
 /// Order changed message
 #[repr(C)]
@@ -405,6 +690,10 @@ pub struct COrder {
     pub monitor_price: *const CDecimal,
     /// Remark
     pub remark: *const c_char,
+    /// Attached orders
+    pub attached_orders: *const CAttachedOrderDetail,
+    /// Number of attached orders
+    pub num_attached_orders: usize,
 }
 
 #[derive(Debug)]
@@ -438,6 +727,7 @@ pub(crate) struct COrderOwned {
     trigger_count: Option<i32>,
     monitor_price: Option<CDecimal>,
     remark: CString,
+    attached_orders: CVec<CAttachedOrderDetailOwned>,
 }
 
 impl From<Order> for COrderOwned {
@@ -472,6 +762,7 @@ impl From<Order> for COrderOwned {
             trigger_count,
             monitor_price,
             remark,
+            attached_orders,
         } = order;
         COrderOwned {
             order_id: order_id.into(),
@@ -503,6 +794,7 @@ impl From<Order> for COrderOwned {
             trigger_count,
             monitor_price: monitor_price.map(Into::into),
             remark: remark.into(),
+            attached_orders: attached_orders.into(),
         }
     }
 }
@@ -541,6 +833,7 @@ impl ToFFI for COrderOwned {
             trigger_count,
             monitor_price,
             remark,
+            attached_orders,
         } = self;
         COrder {
             order_id: order_id.to_ffi_type(),
@@ -617,6 +910,8 @@ impl ToFFI for COrderOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
+            attached_orders: attached_orders.to_ffi_type(),
+            num_attached_orders: attached_orders.len(),
         }
     }
 }
@@ -657,6 +952,8 @@ pub struct CGetTodayOrdersOptions {
     pub market: *const CMarket,
     /// Order id (can be null)
     pub order_id: *const c_char,
+    /// Filter by attached order (can be null)
+    pub is_attached: *const bool,
 }
 
 /// Options for replace order request
@@ -685,6 +982,8 @@ pub struct CReplaceOrderOptions {
     pub monitor_price: *const CDecimal,
     /// Remark (can be null)
     pub remark: *const c_char,
+    /// Attached order parameters (can be null)
+    pub attached_params: *const CReplaceAttachedParams,
 }
 
 /// Options for submit order request
@@ -724,6 +1023,8 @@ pub struct CSubmitOrderOptions {
     pub monitor_price: *const CDecimal,
     /// Remark (Maximum 64 characters) (can be null)
     pub remark: *const c_char,
+    /// Attached order parameters (can be null)
+    pub attached_params: *const CSubmitAttachedParams,
 }
 
 /// Response for submit order request
@@ -1771,6 +2072,10 @@ pub struct COrderDetail {
     pub num_history: usize,
     /// Order charges
     pub charge_detail: COrderChargeDetail,
+    /// Attached orders
+    pub attached_orders: *const CAttachedOrderDetail,
+    /// Number of attached orders
+    pub num_attached_orders: usize,
 }
 
 #[derive(Debug)]
@@ -1815,6 +2120,7 @@ pub(crate) struct COrderDetailOwned {
     platform_deducted_currency: Option<CString>,
     history: CVec<COrderHistoryDetailOwned>,
     charge_detail: COrderChargeDetailOwned,
+    attached_orders: CVec<CAttachedOrderDetailOwned>,
 }
 
 impl From<OrderDetail> for COrderDetailOwned {
@@ -1860,6 +2166,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             platform_deducted_currency,
             history,
             charge_detail,
+            attached_orders,
         } = order;
         COrderDetailOwned {
             order_id: order_id.into(),
@@ -1902,6 +2209,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             platform_deducted_currency: platform_deducted_currency.map(Into::into),
             history: history.into(),
             charge_detail: charge_detail.into(),
+            attached_orders: attached_orders.into(),
         }
     }
 }
@@ -1951,6 +2259,7 @@ impl ToFFI for COrderDetailOwned {
             platform_deducted_currency,
             history,
             charge_detail,
+            attached_orders,
         } = self;
         COrderDetail {
             order_id: order_id.to_ffi_type(),
@@ -2057,6 +2366,8 @@ impl ToFFI for COrderDetailOwned {
             history: history.to_ffi_type(),
             num_history: history.len(),
             charge_detail: charge_detail.to_ffi_type(),
+            attached_orders: attached_orders.to_ffi_type(),
+            num_attached_orders: attached_orders.len(),
         }
     }
 }

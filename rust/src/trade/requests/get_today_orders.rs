@@ -18,6 +18,8 @@ pub struct GetTodayOrdersOptions {
     market: Option<Market>,
     #[serde(skip_serializing_if = "Option::is_none")]
     order_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    is_attached: Option<bool>,
 }
 
 impl GetTodayOrdersOptions {
@@ -73,6 +75,14 @@ impl GetTodayOrdersOptions {
     pub fn order_id(self, order_id: String) -> Self {
         Self {
             order_id: Some(order_id),
+            ..self
+        }
+    }
+
+    /// Filter by attached order
+    pub fn is_attached(self) -> Self {
+        Self {
+            is_attached: Some(true),
             ..self
         }
     }

@@ -575,6 +575,20 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get order detail for an attached order
+     *
+     * @param orderId Attached order ID
+     * @return A Future representing the result
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<OrderDetail> getOrderDetailAttached(String orderId)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextOrderDetailAttached(this.raw, orderId, callback);
+        });
+    }
+
+    /**
      * Estimating the maximum purchase quantity for Hong Kong and US stocks,
      * warrants, and options
      * 

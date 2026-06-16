@@ -234,6 +234,80 @@ pub enum OutsideRTH {
     Overnight,
 }
 
+/// Attached order type
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display, Serialize, Deserialize)]
+pub enum AttachedOrderType {
+    /// Take profit
+    #[strum(serialize = "PROFIT_TAKER")]
+    ProfitTaker,
+    /// Stop loss
+    #[strum(serialize = "STOP_LOSS")]
+    StopLoss,
+    /// Bracket order
+    #[strum(serialize = "BRACKET")]
+    Bracket,
+}
+
+/// Attached order detail
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AttachedOrderDetail {
+    /// Attached order ID
+    pub order_id: String,
+    /// Display type: 1=take-profit, 2=stop-loss
+    pub attached_type_display: i32,
+    /// Trigger price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub trigger_price: Option<Decimal>,
+    /// Quantity
+    pub quantity: Decimal,
+    /// Executed quantity
+    pub executed_qty: Decimal,
+    /// Order status
+    pub status: OrderStatus,
+    /// Last updated time (unix timestamp seconds)
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub updated_at: OffsetDateTime,
+    /// Whether withdrawn
+    pub withdrawn: bool,
+    /// GTD date
+    #[serde(with = "serde_utils::date_opt")]
+    pub gtd: Option<Date>,
+    /// Time in force
+    pub time_in_force: TimeInForceType,
+    /// Counter order ID
+    pub counter_id: String,
+    /// Trigger status (0=not activated,1=monitoring,2=cancelled,4=triggered)
+    pub trigger_status: i32,
+    /// Executed amount
+    pub executed_amount: Decimal,
+    /// Tag
+    pub tag: i32,
+    /// Submitted time (unix timestamp seconds)
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub submitted_at: OffsetDateTime,
+    /// Executed price
+    pub executed_price: Decimal,
+    /// Force RTH only
+    #[serde(with = "serde_utils::outside_rth")]
+    pub force_only_rth: Option<OutsideRTH>,
+    /// Whether reviewed
+    pub reviewed: bool,
+    /// Order type to submit after trigger
+    pub activate_order_type: OrderType,
+    /// RTH setting for activated order
+    #[serde(with = "serde_utils::outside_rth")]
+    pub activate_rth: Option<OutsideRTH>,
+    /// Submit price (limit price)
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub submit_price: Option<Decimal>,
+}
+
 /// Order
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Order {
@@ -320,6 +394,9 @@ pub struct Order {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Attached orders
+    #[serde(default)]
+    pub attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Commission-free Status
@@ -542,6 +619,9 @@ pub struct OrderDetail {
     pub history: Vec<OrderHistoryDetail>,
     /// Order charges
     pub charge_detail: OrderChargeDetail,
+    /// Attached orders
+    #[serde(default)]
+    pub attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Cash info
