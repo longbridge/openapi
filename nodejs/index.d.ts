@@ -619,13 +619,9 @@ export declare class FundamentalContext {
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
   /** List macroeconomic indicators */
-  macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
+  macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
-  /** List macroeconomic indicators (v2) with optional keyword filter */
-  macroeconomicIndicatorsV2(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
-  /** Get historical data for a macroeconomic indicator (v2) with sort support */
-  macroeconomicV2(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null, sort?: string | undefined | null): Promise<MacroeconomicResponse>
 }
 
 /** Fund position */
@@ -4566,13 +4562,13 @@ export interface MarketTimeItem {
   /** Market */
   market: Market
   /**
-   * Raw trade status code (101=PreOpen, 102/103/105=Trading, 104=LunchBreak,
-   * 106=PostTrading, 108=Closed, 201=PreMarket, 204=PostMarket)
+   * Raw market trade status code. See the market status definition for the
+   * complete code table.
    */
   tradeStatus: number
   /** Current market time (unix timestamp string) */
   timestamp: string
-  /** Delayed-quote trade status code */
+  /** Delayed-quote market trade status code */
   delayTradeStatus: number
   /** Delayed-quote market time (unix timestamp string) */
   delayTimestamp: string

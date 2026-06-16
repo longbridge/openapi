@@ -18,11 +18,12 @@ use crate::types::{CMarket, CString, CVec, ToFFI};
 pub struct CMarketTimeItem {
     /// Market identifier.
     pub market: CMarket,
-    /// Current trade status code for the market.
+    /// Current market trade status code. See the market status definition for
+    /// the complete code table.
     pub trade_status: i32,
     /// Timestamp of the current trade status as an ISO-8601 string.
     pub timestamp: *const c_char,
-    /// Delayed trade status code for the market.
+    /// Delayed market trade status code.
     pub delay_trade_status: i32,
     /// Timestamp of the delayed trade status as an ISO-8601 string.
     pub delay_timestamp: *const c_char,

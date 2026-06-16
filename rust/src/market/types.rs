@@ -35,76 +35,81 @@ pub enum TradeStatus {
     UNKNOWN = -1,
     /// Quote is not registered
     NO_REGISTER_QUOTE = 0,
-    /// Clearing
+    /// Clearing before the market opens.
     CLEAN = 101,
-    /// Opening auction
+    /// Opening auction.
     OPEN_BID = 102,
-    /// Morning break, currently used by VIX indexes
+    /// Morning break, currently used by VIX indexes.
     MORNING_CLOSING = 103,
-    /// Trading
+    /// Regular trading.
     TRADING = 105,
-    /// Midday break
+    /// Midday break.
     NOON_CLOSING = 106,
-    /// Closing auction
+    /// Closing auction.
     CLOSE_BID = 107,
-    /// Closed
+    /// Market closed.
     CLOSING = 108,
-    /// Dark pool waiting to open
+    /// Dark trading waiting to open.
     DARK_WAIT = 110,
-    /// Dark pool trading
+    /// Dark trading.
     DARK_TRADING = 111,
-    /// Dark pool closed
+    /// Dark trading closed.
     DARK_CLOSING = 112,
-    /// After-hours fixed-price trading
+    /// After-hours fixed-price trading.
     AFTER_FIX = 120,
-    /// Half-day market closed
+    /// Half-day market closed. Defined by the market status table but currently
+    /// unused.
     HALF_CLOSING = 121,
-    /// Not opened
+    /// Not opened because the exchange is waiting to open under special
+    /// conditions.
     NOT_OPENED = 122,
-    /// Realtime quotes
+    /// Temporary intraday break. The historical variant name is kept for
+    /// compatibility.
     REALTIME_QUOTE = 123,
-    /// US pre-market
+    /// US pre-market.
     US_PREV = 201,
-    /// US regular trading
+    /// US regular trading.
     US_TRADING = 202,
-    /// US post-market
+    /// US post-market.
     US_AFTER = 203,
-    /// US closed
+    /// US closed.
     US_CLOSING = 204,
-    /// US halted
+    /// US halted.
     US_STOP = 205,
-    /// US clearing before pre-market
+    /// US clearing plus pre-market.
     US_CLEAN = 206,
-    /// US overnight trading
+    /// US overnight trading.
     US_NIGHT = 207,
-    /// US pre-market clearing
+    /// US pre-market clearing alias returned by the quote engine.
     US_PREV_MARKET_CLEAN = 209,
-    /// US post-market clearing
+    /// US post-market clearing alias returned by the quote engine.
     US_AFTER_MARKET_CLEAN = 210,
-    /// Stock refresh
+    /// Stock refresh. Deprecated in the status definition.
     REFRESH = 1000,
-    /// Delisted
+    /// Delisted.
     DELIST = 1001,
-    /// Preparing to list
+    /// Preparing to list.
     PREPARE = 1002,
-    /// Code changed
+    /// Code changed.
     CODE_CHANGE = 1003,
-    /// Halted
+    /// Halted.
     STOP = 1004,
-    /// Waiting to open
+    /// Waiting to open, typically for a US IPO auction.
     WILL_OPEN = 1005,
-    /// Split or merge suspended
+    /// Split or merge suspended.
     COMMON_SUSPEND = 1006,
-    /// Expired
+    /// Expired.
     EXPIRE = 1007,
-    /// No quote
+    /// No quote data.
     NO_QUOTE = 1008,
-    /// Not listed
+    /// Not listed. The historical variant name is kept for compatibility.
     UNITED = 1009,
-    /// Trading halted
+    /// Terminated trading, usually for warrants.
     TRADING_HALT = 1010,
-    /// Waiting to list
+    /// Waiting to list, usually for new warrants.
     WAIT_LISTING = 1011,
+    /// Fuse.
+    FUSE = 2001,
 }
 
 impl From<i32> for TradeStatus {
@@ -165,7 +170,7 @@ impl TradeStatus {
             TradeStatus::DARK_CLOSING => "Closing",
             TradeStatus::AFTER_FIX => "After Fix",
             TradeStatus::NOT_OPENED => "Not Open",
-            TradeStatus::REALTIME_QUOTE => "Realtime Quotes",
+            TradeStatus::REALTIME_QUOTE => "Temporary Break",
             TradeStatus::US_PREV | TradeStatus::US_CLEAN => "Pre-Market",
             TradeStatus::US_AFTER => "Post-Market",
             TradeStatus::US_STOP | TradeStatus::STOP => "Stop",
@@ -178,9 +183,10 @@ impl TradeStatus {
             TradeStatus::COMMON_SUSPEND => "Common Suspend",
             TradeStatus::EXPIRE => "Expire",
             TradeStatus::NO_QUOTE => "No Quote",
-            TradeStatus::UNITED => "United",
-            TradeStatus::TRADING_HALT => "Trading Halt",
+            TradeStatus::UNITED => "Not Listed",
+            TradeStatus::TRADING_HALT => "Terminated",
             TradeStatus::WAIT_LISTING => "Wait Listing",
+            TradeStatus::FUSE => "Fuse",
         }
     }
 
@@ -288,11 +294,12 @@ pub struct MarketStatusResponse {
 pub struct MarketTimeItem {
     /// Market code
     pub market: Market,
-    /// Trade status
+    /// Market trade status. See [`TradeStatus`] for the code table.
     pub trade_status: TradeStatus,
     /// Current market time (unix timestamp string)
     pub timestamp: String,
-    /// Delayed-quote trade status
+    /// Delayed-quote market trade status. See [`TradeStatus`] for the code
+    /// table.
     pub delay_trade_status: TradeStatus,
     /// Delayed-quote market time (unix timestamp string)
     pub delay_timestamp: String,
@@ -360,16 +367,48 @@ mod tests {
         let cases = [
             (TradeStatus::MORNING_CLOSING, "Morning Break"),
             (TradeStatus::NOON_CLOSING, "Mid-Day Break"),
-            (TradeStatus::REALTIME_QUOTE, "Realtime Quotes"),
+            (TradeStatus::REALTIME_QUOTE, "Temporary Break"),
             (TradeStatus::US_STOP, "Stop"),
-            (TradeStatus::TRADING_HALT, "Trading Halt"),
+            (TradeStatus::TRADING_HALT, "Terminated"),
             (TradeStatus::WAIT_LISTING, "Wait Listing"),
+            (TradeStatus::FUSE, "Fuse"),
             (TradeStatus::UNKNOWN, "Unknown"),
             (TradeStatus::NO_REGISTER_QUOTE, "Unknown"),
         ];
 
         for (status, expected) in cases {
             assert_eq!(status.name(), expected, "status {status:?}");
+        }
+    }
+
+    #[test]
+    fn market_trade_status_codes_match_phase_definition_document() {
+        let codes = [
+            101, 102, 103, 105, 106, 107, 108, 110, 111, 112, 120, 121, 122, 123, 201, 202, 203,
+            204, 206, 207, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011,
+            2001,
+        ];
+
+        for code in codes {
+            assert_eq!(TradeStatus::from(code).code(), code, "status code {code}");
+        }
+    }
+
+    #[test]
+    fn market_trade_status_names_match_phase_definition_document() {
+        let cases = [
+            (123, "Temporary Break"),
+            (1009, "Not Listed"),
+            (1010, "Terminated"),
+            (2001, "Fuse"),
+        ];
+
+        for (code, expected) in cases {
+            assert_eq!(
+                TradeStatus::from(code).name(),
+                expected,
+                "status code {code}"
+            );
         }
     }
 
