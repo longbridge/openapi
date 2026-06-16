@@ -27,6 +27,19 @@ impl IntoJValue for i32 {
     }
 }
 
+impl JSignature for longbridge::market::TradeStatus {
+    fn signature() -> Cow<'static, str> {
+        i32::signature()
+    }
+}
+
+impl IntoJValue for longbridge::market::TradeStatus {
+    #[inline]
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        self.code().into_jvalue(env)
+    }
+}
+
 impl JSignature for i64 {
     fn signature() -> Cow<'static, str> {
         "J".into()
