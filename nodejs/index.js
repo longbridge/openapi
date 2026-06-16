@@ -689,6 +689,7 @@ module.exports.FlowDirection = nativeBinding.FlowDirection
 module.exports.Granularity = nativeBinding.Granularity
 module.exports.InstitutionRecommend = nativeBinding.InstitutionRecommend
 module.exports.Language = nativeBinding.Language
+module.exports.MacroeconomicCountry = nativeBinding.MacroeconomicCountry
 module.exports.Market = nativeBinding.Market
 module.exports.OptionDirection = nativeBinding.OptionDirection
 module.exports.OptionType = nativeBinding.OptionType

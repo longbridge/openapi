@@ -1562,3 +1562,234 @@ pub struct AssetAllocationResponse {
     #[serde(default)]
     pub info: Vec<AssetAllocationGroup>,
 }
+
+// ── macroeconomic ─────────────────────────────────────────────────────
+
+/// Country for filtering macroeconomic indicators
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum MacroeconomicCountry {
+    /// Hong Kong SAR China
+    #[serde(rename = "Hong Kong SAR China")]
+    HongKong,
+    /// China (Mainland)
+    #[serde(rename = "China (Mainland)")]
+    China,
+    /// United States
+    #[serde(rename = "United States")]
+    UnitedStates,
+    /// Euro Zone
+    #[serde(rename = "Euro Zone")]
+    EuroZone,
+    /// Japan
+    #[serde(rename = "Japan")]
+    Japan,
+    /// Singapore
+    #[serde(rename = "Singapore")]
+    Singapore,
+}
+
+/// Importance level of a macroeconomic indicator
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum MacroeconomicImportance {
+    /// Low importance
+    Low = 1,
+    /// Medium importance
+    Medium = 2,
+    /// High importance
+    High = 3,
+}
+
+impl MacroeconomicImportance {
+    /// Convert from raw API integer value
+    pub fn from_i32(v: i32) -> Option<Self> {
+        match v {
+            1 => Some(Self::Low),
+            2 => Some(Self::Medium),
+            3 => Some(Self::High),
+            _ => None,
+        }
+    }
+}
+
+/// Localized text in simplified Chinese, traditional Chinese, and English
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct MultiLanguageText {
+    /// English
+    #[serde(default)]
+    pub english: String,
+    /// Simplified Chinese
+    #[serde(default)]
+    pub simplified_chinese: String,
+    /// Traditional Chinese
+    #[serde(default)]
+    pub traditional_chinese: String,
+}
+
+/// Metadata for one macroeconomic indicator
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct MacroeconomicIndicator {
+    /// External vendor code (used as input to `macroeconomic`)
+    pub indicator_code: String,
+    /// Publishing organisation
+    #[serde(default)]
+    pub source_org: String,
+    /// Country
+    #[serde(default)]
+    pub country: String,
+    /// Indicator name
+    #[serde(default)]
+    pub name: String,
+    /// Adjustment factor
+    #[serde(default)]
+    pub adjustment_factor: String,
+    /// Release periodicity (e.g. `monthly` / `quarterly`)
+    #[serde(default)]
+    pub periodicity: String,
+    /// Indicator category
+    #[serde(default)]
+    pub category: String,
+    /// Description
+    #[serde(default)]
+    pub describe: String,
+    /// Importance — higher is more important
+    #[serde(default)]
+    pub importance: i32,
+    /// Start date of data coverage
+    #[serde(
+        default,
+        with = "crate::serde_utils::rfc3339_opt",
+        rename = "start_date"
+    )]
+    pub start_date: Option<OffsetDateTime>,
+}
+
+/// Response for [`crate::FundamentalContext::macroeconomic_indicators`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MacroeconomicIndicatorListResponse {
+    /// Indicator list
+    #[serde(default, rename = "list")]
+    pub data: Vec<MacroeconomicIndicator>,
+    /// Total number of indicators matching the query
+    #[serde(default)]
+    pub count: i32,
+}
+
+/// One historical data point for a macroeconomic indicator
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct Macroeconomic {
+    /// Statistical period (e.g. `2024-Q1`, `2024-03`)
+    #[serde(default)]
+    pub period: String,
+    /// Release datetime
+    #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
+    pub release_at: Option<OffsetDateTime>,
+    /// Actual value
+    #[serde(default)]
+    pub actual_value: String,
+    /// Previous value
+    #[serde(default)]
+    pub previous_value: String,
+    /// Forecast value (market consensus)
+    #[serde(default)]
+    pub forecast_value: String,
+    /// Revised value
+    #[serde(default)]
+    pub revised_value: String,
+    /// Next release datetime
+    #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
+    pub next_release_at: Option<OffsetDateTime>,
+    /// Unit
+    #[serde(default)]
+    pub unit: String,
+    /// Unit prefix / data scale (e.g. millions / billions)
+    #[serde(default)]
+    pub unit_prefix: String,
+}
+
+/// Response for [`crate::FundamentalContext::macroeconomic`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MacroeconomicResponse {
+    /// Indicator metadata
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub info: MacroeconomicIndicator,
+    /// Historical data points
+    #[serde(default)]
+    pub data: Vec<Macroeconomic>,
+    /// Total number of historical data points
+    #[serde(default)]
+    pub count: i32,
+}
+
+// ── v2 wire types (internal, used for mapping to existing public types) ──────
+
+/// v2 wire: one indicator from GET /v2/quote/macrodata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicator {
+    #[serde(default)]
+    pub indicator_id: i32,
+    #[serde(default)]
+    pub indicator_name: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default)]
+    pub importance: i32,
+    #[serde(default)]
+    pub description: String,
+    /// Update frequency: day/week/month/quarter/half_year/year
+    #[serde(default)]
+    pub frequence: String,
+}
+
+/// v2 wire: response from GET /v2/quote/macrodata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicatorListResponse {
+    #[serde(default)]
+    pub indicator_list: Vec<V2MacroIndicator>,
+    /// Total count for pagination
+    #[serde(default)]
+    pub total: i32,
+}
+
+/// v2 wire: one data point from GET /v2/quote/macrodata/:id
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct V2IndicatorDataDetail {
+    #[serde(default)]
+    pub actual_data: String,
+    #[serde(default)]
+    pub previous_data: String,
+    #[serde(default)]
+    pub estimated_data: String,
+    #[serde(default)]
+    pub published_time: String,
+    #[serde(default)]
+    pub observation_date: String,
+}
+
+/// v2 wire: one indicator with data from GET /v2/quote/macrodata/:id
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicatorDetail {
+    #[serde(default)]
+    pub indicator_id: i32,
+    #[serde(default)]
+    pub indicator_name: String,
+    #[serde(default)]
+    pub unit: String,
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default)]
+    pub indicator_data: Vec<V2IndicatorDataDetail>,
+}
+
+/// v2 wire: response from GET /v2/quote/macrodata/:id
+/// (GetMacroIndicatorHistoryResp)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub(crate) struct V2MacroIndicatorDataResponse {
+    /// Single indicator with paginated data points
+    #[serde(default)]
+    pub indicator: V2MacroIndicatorDetail,
+    /// Total data points matching the query (for pagination)
+    #[serde(default)]
+    pub total: i32,
+}

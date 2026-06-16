@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Rust:** `market::TradeStatus` models `/v1/quote/market-status` trade status codes, including engine-compatible normalization and display helpers.
+## [4.3.2] - 2026-06-13
+
+### Added
+
+- **All languages:** `macroeconomic_indicators` gains `keyword` parameter for fuzzy name filtering
+- **All languages:** `macroeconomic` switches to `GET /v2/quote/macrodata/{id}`, defaults to `sort=desc`
+
+### Changed
+
+- `MacroeconomicIndicator.name` / `.describe`: `MultiLanguageText` → `string`
+- `Macroeconomic.unit` / `.unit_prefix`: `MultiLanguageText` → `string`
+
+## [4.3.1] - 2026-06-12
+
+### Added
+
+- **All languages:** `FundamentalContext` gains `macroeconomic_indicators(country, offset, limit)` — list macroeconomic indicators via `GET /v1/quote/macrodata`; filter by country (`MacroeconomicCountry::HongKong / China / UnitedStates / EuroZone / Japan / Singapore`); response includes `count` (total matching)
+- **All languages:** `FundamentalContext` gains `macroeconomic(indicator_code, start_date, end_date, offset, limit)` — historical data for a specific indicator via `GET /v1/quote/macrodata/{indicator_code}`; `start_date` / `end_date` accept `"YYYY-MM-DD"` strings; response includes `count` (total data points)
+- New types: `MultiLanguageText`, `MacroeconomicCountry`, `MacroeconomicImportance`, `MacroeconomicIndicator`, `MacroeconomicIndicatorListResponse`, `Macroeconomic`, `MacroeconomicResponse`
+
+### Fixed
+
+- `MacroeconomicIndicator.describe` / `name` / `MacroeconomicResponse.info`: handle `null` responses from API without deserializing error
 
 ## [4.3.0]
 

@@ -618,6 +618,14 @@ export declare class FundamentalContext {
    * industry)
    */
   etfAssetAllocation(symbol: string): Promise<AssetAllocationResponse>
+  /** List macroeconomic indicators */
+  macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
+  /** Get historical data for a macroeconomic indicator */
+  macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
+  /** List macroeconomic indicators (v2) with optional keyword filter */
+  macroeconomicIndicatorsV2(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
+  /** Get historical data for a macroeconomic indicator (v2) with sort support */
+  macroeconomicV2(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null, sort?: string | undefined | null): Promise<MacroeconomicResponse>
 }
 
 /** Fund position */
@@ -4473,6 +4481,65 @@ export declare const enum Language {
   EN = 2
 }
 
+/** One historical data point for a macroeconomic indicator */
+export interface Macroeconomic {
+  period: string
+  /** Release datetime (unix timestamp in seconds; null if unset) */
+  releaseAt?: number
+  actualValue: string
+  previousValue: string
+  forecastValue: string
+  revisedValue: string
+  /** Next release datetime (unix timestamp in seconds; null if unset) */
+  nextReleaseAt?: number
+  unit: string
+  unitPrefix: string
+}
+
+/** Country code for filtering macroeconomic indicators */
+export declare const enum MacroeconomicCountry {
+  /** Hong Kong SAR China */
+  HongKong = 0,
+  /** China (Mainland) */
+  China = 1,
+  /** United States */
+  UnitedStates = 2,
+  /** Euro Zone */
+  EuroZone = 3,
+  /** Japan */
+  Japan = 4,
+  /** Singapore */
+  Singapore = 5
+}
+
+/** Metadata for one macroeconomic indicator */
+export interface MacroeconomicIndicator {
+  indicatorCode: string
+  sourceOrg: string
+  country: string
+  name: string
+  adjustmentFactor: string
+  periodicity: string
+  category: string
+  describe: string
+  importance: number
+  /** Start date of data coverage (unix timestamp in seconds; null if unset) */
+  startDate?: number
+}
+
+/** Response for macroeconomic_indicators */
+export interface MacroeconomicIndicatorListResponse {
+  data: Array<MacroeconomicIndicator>
+  count: number
+}
+
+/** Response for macroeconomic */
+export interface MacroeconomicResponse {
+  info: MacroeconomicIndicator
+  data: Array<Macroeconomic>
+  count: number
+}
+
 export declare const enum Market {
   /** Unknown */
   Unknown = 0,
@@ -4513,6 +4580,13 @@ export interface MarketTimeItem {
   subStatus: number
   /** Delayed-quote sub-status code */
   delaySubStatus: number
+}
+
+/** Localized text in simplified Chinese, traditional Chinese, and English */
+export interface MultiLanguageText {
+  english: string
+  simplifiedChinese: string
+  traditionalChinese: string
 }
 
 /** Options for listing topics created by the current authenticated user */

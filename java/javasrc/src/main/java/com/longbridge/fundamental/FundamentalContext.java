@@ -334,4 +334,30 @@ public class FundamentalContext implements AutoCloseable {
             SdkNative.fundamentalContextValuationComparison(raw, opts, callback);
         });
     }
+
+    /**
+     * List macroeconomic indicators.
+     * country: ISO country code string (e.g. "US", "CN", "EU"); pass null for all countries.
+     */
+    public CompletableFuture<MacroeconomicIndicatorListResponse> getMacroeconomicIndicators(String country, String keyword, Integer offset, Integer limit) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextMacroeconomicIndicators(raw, country, keyword, offset, limit, callback);
+        });
+    }
+
+    /**
+     * Get historical data for a macroeconomic indicator.
+     * startDate and endDate are date strings in "YYYY-MM-DD" format.
+     */
+    public CompletableFuture<MacroeconomicResponse> getMacroeconomic(String indicatorCode, String startDate, String endDate, Integer offset, Integer limit) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.fundamentalContextMacroeconomic(raw, indicatorCode, startDate, endDate, offset, limit, callback);
+        });
+    }
+
+    /**
+     * List macroeconomic indicators (v2) with optional keyword filter.
+     * country: "HK","CN","US","EU","JP","SG" or null for ALL.
+     * keyword: optional fuzzy filter on indicator name.
+     */
 }
