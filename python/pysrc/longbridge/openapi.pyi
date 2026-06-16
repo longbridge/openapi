@@ -5883,6 +5883,180 @@ class OutsideRTH:
         Overnight option
         """
 
+class AttachedOrderType:
+    """
+    Attached order type
+    """
+
+    class ProfitTaker(AttachedOrderType):
+        """
+        Take profit
+        """
+
+    class StopLoss(AttachedOrderType):
+        """
+        Stop loss
+        """
+
+    class Bracket(AttachedOrderType):
+        """
+        Bracket order
+        """
+
+class AttachedOrderDetail:
+    """
+    Attached order detail
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    attached_type_display: int
+    """
+    Attached type display (1=take-profit, 2=stop-loss)
+    """
+
+    trigger_price: Optional[Decimal]
+    """
+    Trigger price
+    """
+
+    quantity: Decimal
+    """
+    Quantity
+    """
+
+    executed_qty: Decimal
+    """
+    Executed quantity
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    updated_at: datetime
+    """
+    Last updated time
+    """
+
+    withdrawn: bool
+    """
+    Withdrawn
+    """
+
+    gtd: Optional[date]
+    """
+    Good till date
+    """
+
+    time_in_force: Type[TimeInForceType]
+    """
+    Time in force type
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    trigger_status: int
+    """
+    Trigger status
+    """
+
+    executed_amount: Decimal
+    """
+    Executed amount
+    """
+
+    tag: int
+    """
+    Tag
+    """
+
+    submitted_at: datetime
+    """
+    Submitted time
+    """
+
+    executed_price: Decimal
+    """
+    Executed price
+    """
+
+    force_only_rth: Optional[Type[OutsideRTH]]
+    """
+    Enable or disable outside regular trading hours (force only)
+    """
+
+    reviewed: bool
+    """
+    Reviewed
+    """
+
+    activate_order_type: Type[OrderType]
+    """
+    Activate order type
+    """
+
+    activate_rth: Optional[Type[OutsideRTH]]
+    """
+    Activate RTH
+    """
+
+    submit_price: Optional[Decimal]
+    """
+    Submit price
+    """
+
+class SubmitAttachedParams:
+    """
+    Submit attached order parameters
+    """
+
+    def __init__(
+        self,
+        attached_order_type: Type[AttachedOrderType],
+        *,
+        profit_taker_price: Optional[Decimal] = None,
+        stop_loss_price: Optional[Decimal] = None,
+        time_in_force: Optional[Type[TimeInForceType]] = None,
+        expire_time: Optional[int] = None,
+        activate_order_type: Optional[Type[OrderType]] = None,
+        profit_taker_submit_price: Optional[Decimal] = None,
+        stop_loss_submit_price: Optional[Decimal] = None,
+        activate_rth: Optional[Type[OutsideRTH]] = None,
+    ) -> None: ...
+
+class ReplaceAttachedParams:
+    """
+    Replace attached order parameters
+    """
+
+    def __init__(
+        self,
+        attached_order_type: Type[AttachedOrderType],
+        *,
+        profit_taker_price: Optional[Decimal] = None,
+        stop_loss_price: Optional[Decimal] = None,
+        time_in_force: Optional[Type[TimeInForceType]] = None,
+        expire_time: Optional[int] = None,
+        activate_order_type: Optional[Type[OrderType]] = None,
+        profit_taker_submit_price: Optional[Decimal] = None,
+        stop_loss_submit_price: Optional[Decimal] = None,
+        activate_rth: Optional[Type[OutsideRTH]] = None,
+        profit_taker_id: Optional[int] = None,
+        stop_loss_id: Optional[int] = None,
+        cancel_all_attached: Optional[bool] = None,
+        main_id: Optional[int] = None,
+        quantity: Optional[Decimal] = None,
+        market_price: Optional[Decimal] = None,
+    ) -> None: ...
+
 class Order:
     """
     Order
@@ -6031,6 +6205,11 @@ class Order:
     remark: str
     """
     Remark
+    """
+
+    attached_orders: List[AttachedOrderDetail]
+    """
+    Attached orders
     """
 
 class CommissionFreeStatus:
@@ -6411,6 +6590,11 @@ class OrderDetail:
     charge_detail: OrderChargeDetail
     """
     Order charges
+    """
+
+    attached_orders: List[AttachedOrderDetail]
+    """
+    Attached orders
     """
 
 class SubmitOrderResponse:
@@ -6970,6 +7154,7 @@ class TradeContext:
         side: Optional[Type[OrderSide]] = None,
         market: Optional[Type[Market]] = None,
         order_id: Optional[str] = None,
+        is_attached: bool = False,
     ) -> List[Order]:
         """
         Get today orders
@@ -6980,6 +7165,7 @@ class TradeContext:
             side: Filter by order side
             market: Filter by market type
             order_id: Filter by order id
+            is_attached: Include attached orders
 
         Returns:
             Order list
@@ -7017,6 +7203,7 @@ class TradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        attached_params: Optional[ReplaceAttachedParams] = None,
     ) -> None:
         """
         Replace order
@@ -7071,6 +7258,7 @@ class TradeContext:
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
+        attached_params: Optional[SubmitAttachedParams] = None,
     ) -> SubmitOrderResponse:
         """
         Submit order
@@ -7093,6 +7281,7 @@ class TradeContext:
             monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            attached_params: Attached order parameters
 
         Returns:
             Response
@@ -7288,12 +7477,13 @@ class TradeContext:
                 print(resp)
         """
 
-    def order_detail(self, order_id: str) -> OrderDetail:
+    def order_detail(self, order_id: str, is_attached: bool = False) -> OrderDetail:
         """
         Get order detail
 
         Args:
             order_id: Order id
+            is_attached: Include attached orders
 
         Returns:
             Order detail
@@ -7675,6 +7865,7 @@ class AsyncTradeContext:
         side: Optional[Type[OrderSide]] = None,
         market: Optional[Type[Market]] = None,
         order_id: Optional[str] = None,
+        is_attached: bool = False,
     ) -> Awaitable[List[Order]]:
         """
         Get today orders with optional filters. Returns an awaitable that resolves to order list.
@@ -7685,6 +7876,7 @@ class AsyncTradeContext:
             side: Filter by order side.
             market: Filter by market type.
             order_id: Filter by order ID.
+            is_attached: Include attached orders.
 
         Examples:
             ::
@@ -7729,6 +7921,7 @@ class AsyncTradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        attached_params: Optional[ReplaceAttachedParams] = None,
     ) -> Awaitable[None]:
         """
         Replace order. Returns an awaitable. Same parameters as sync TradeContext.replace_order.
@@ -7745,6 +7938,7 @@ class AsyncTradeContext:
             trigger_count: Trigger count.
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
+            attached_params: Attached order parameters.
 
         Examples:
             ::
@@ -7788,6 +7982,7 @@ class AsyncTradeContext:
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
+        attached_params: Optional[SubmitAttachedParams] = None,
     ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
@@ -7810,6 +8005,7 @@ class AsyncTradeContext:
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            attached_params: Attached order parameters.
 
         Examples:
             ::
@@ -8023,12 +8219,13 @@ class AsyncTradeContext:
         """
         ...
 
-    def order_detail(self, order_id: str) -> Awaitable[OrderDetail]:
+    def order_detail(self, order_id: str, is_attached: bool = False) -> Awaitable[OrderDetail]:
         """
         Get order detail by order_id. Returns an awaitable that resolves to order detail.
 
         Args:
             order_id: Order ID.
+            is_attached: Include attached orders.
 
         Examples:
             ::

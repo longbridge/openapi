@@ -70,6 +70,8 @@ using longbridge::quote::WarrantType;
 using longbridge::quote::WatchlistGroup;
 using longbridge::quote::WatchlistSecurity;
 using longbridge::trade::AccountBalance;
+using longbridge::trade::AttachedOrderDetail;
+using longbridge::trade::AttachedOrderType;
 using longbridge::trade::BalanceType;
 using longbridge::trade::CashFlow;
 using longbridge::trade::CashFlowDirection;
@@ -99,9 +101,11 @@ using longbridge::trade::OrderTag;
 using longbridge::trade::OrderType;
 using longbridge::trade::OutsideRTH;
 using longbridge::trade::PushOrderChanged;
+using longbridge::trade::ReplaceAttachedParams;
 using longbridge::trade::StockPosition;
 using longbridge::trade::StockPositionChannel;
 using longbridge::trade::StockPositionsResponse;
+using longbridge::trade::SubmitAttachedParams;
 using longbridge::trade::SubmitOrderResponse;
 using longbridge::trade::TimeInForceType;
 using longbridge::trade::TopicType;
@@ -1280,9 +1284,178 @@ convert(OutsideRTH status)
   }
 }
 
+inline AttachedOrderType
+convert(lb_attached_order_type_t ty)
+{
+  switch (ty) {
+    case AttachedOrderTypeUnknown:
+      return AttachedOrderType::Unknown;
+    case AttachedOrderTypeProfitTaker:
+      return AttachedOrderType::ProfitTaker;
+    case AttachedOrderTypeStopLoss:
+      return AttachedOrderType::StopLoss;
+    case AttachedOrderTypeBracket:
+      return AttachedOrderType::Bracket;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_attached_order_type_t
+convert(AttachedOrderType ty)
+{
+  switch (ty) {
+    case AttachedOrderType::Unknown:
+      return AttachedOrderTypeUnknown;
+    case AttachedOrderType::ProfitTaker:
+      return AttachedOrderTypeProfitTaker;
+    case AttachedOrderType::StopLoss:
+      return AttachedOrderTypeStopLoss;
+    case AttachedOrderType::Bracket:
+      return AttachedOrderTypeBracket;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline AttachedOrderDetail
+convert(const lb_attached_order_detail_t* detail)
+{
+  return AttachedOrderDetail{
+    detail->order_id,
+    detail->attached_type_display,
+    detail->trigger_price ? std::optional{ Decimal(detail->trigger_price) }
+                          : std::nullopt,
+    Decimal(detail->quantity),
+    Decimal(detail->executed_qty),
+    convert(detail->status),
+    detail->updated_at,
+    detail->withdrawn,
+    detail->gtd ? std::optional{ convert(detail->gtd) } : std::nullopt,
+    convert(detail->time_in_force),
+    detail->counter_id,
+    detail->trigger_status,
+    Decimal(detail->executed_amount),
+    detail->tag,
+    detail->submitted_at,
+    Decimal(detail->executed_price),
+    detail->force_only_rth ? std::optional{ convert(*detail->force_only_rth) }
+                           : std::nullopt,
+    detail->reviewed,
+    convert(detail->activate_order_type),
+    detail->activate_rth ? std::optional{ convert(*detail->activate_rth) }
+                         : std::nullopt,
+    detail->submit_price ? std::optional{ Decimal(detail->submit_price) }
+                         : std::nullopt,
+  };
+}
+
+struct CSubmitAttachedParamsStorage
+{
+  lb_time_in_force_type_t time_in_force;
+  lb_order_type_t activate_order_type;
+  lb_outside_rth_t activate_rth;
+  lb_submit_attached_params_t params;
+};
+
+inline CSubmitAttachedParamsStorage
+convert_submit_attached(const SubmitAttachedParams& src)
+{
+  CSubmitAttachedParamsStorage s{};
+  s.params.attached_order_type = convert(src.attached_order_type);
+  s.params.profit_taker_price =
+    src.profit_taker_price
+      ? (const lb_decimal_t*)src.profit_taker_price.value()
+      : nullptr;
+  s.params.stop_loss_price =
+    src.stop_loss_price ? (const lb_decimal_t*)src.stop_loss_price.value()
+                        : nullptr;
+  if (src.time_in_force) {
+    s.time_in_force = convert(*src.time_in_force);
+    s.params.time_in_force = &s.time_in_force;
+  }
+  s.params.expire_time = src.expire_time ? &*src.expire_time : nullptr;
+  if (src.activate_order_type) {
+    s.activate_order_type = convert(*src.activate_order_type);
+    s.params.activate_order_type = &s.activate_order_type;
+  }
+  s.params.profit_taker_submit_price =
+    src.profit_taker_submit_price
+      ? (const lb_decimal_t*)src.profit_taker_submit_price.value()
+      : nullptr;
+  s.params.stop_loss_submit_price =
+    src.stop_loss_submit_price
+      ? (const lb_decimal_t*)src.stop_loss_submit_price.value()
+      : nullptr;
+  if (src.activate_rth) {
+    s.activate_rth = convert(*src.activate_rth);
+    s.params.activate_rth = &s.activate_rth;
+  }
+  return s;
+}
+
+struct CReplaceAttachedParamsStorage
+{
+  lb_time_in_force_type_t time_in_force;
+  lb_order_type_t activate_order_type;
+  lb_outside_rth_t activate_rth;
+  lb_replace_attached_params_t params;
+};
+
+inline CReplaceAttachedParamsStorage
+convert_replace_attached(const ReplaceAttachedParams& src)
+{
+  CReplaceAttachedParamsStorage s{};
+  s.params.attached_order_type = convert(src.attached_order_type);
+  s.params.profit_taker_price =
+    src.profit_taker_price
+      ? (const lb_decimal_t*)src.profit_taker_price.value()
+      : nullptr;
+  s.params.stop_loss_price =
+    src.stop_loss_price ? (const lb_decimal_t*)src.stop_loss_price.value()
+                        : nullptr;
+  if (src.time_in_force) {
+    s.time_in_force = convert(*src.time_in_force);
+    s.params.time_in_force = &s.time_in_force;
+  }
+  s.params.expire_time = src.expire_time ? &*src.expire_time : nullptr;
+  if (src.activate_order_type) {
+    s.activate_order_type = convert(*src.activate_order_type);
+    s.params.activate_order_type = &s.activate_order_type;
+  }
+  s.params.profit_taker_submit_price =
+    src.profit_taker_submit_price
+      ? (const lb_decimal_t*)src.profit_taker_submit_price.value()
+      : nullptr;
+  s.params.stop_loss_submit_price =
+    src.stop_loss_submit_price
+      ? (const lb_decimal_t*)src.stop_loss_submit_price.value()
+      : nullptr;
+  if (src.activate_rth) {
+    s.activate_rth = convert(*src.activate_rth);
+    s.params.activate_rth = &s.activate_rth;
+  }
+  s.params.profit_taker_id =
+    src.profit_taker_id ? &*src.profit_taker_id : nullptr;
+  s.params.stop_loss_id = src.stop_loss_id ? &*src.stop_loss_id : nullptr;
+  s.params.cancel_all_attached =
+    src.cancel_all_attached ? &*src.cancel_all_attached : nullptr;
+  s.params.main_id = src.main_id ? &*src.main_id : nullptr;
+  s.params.quantity =
+    src.quantity ? (const lb_decimal_t*)src.quantity.value() : nullptr;
+  s.params.market_price =
+    src.market_price ? (const lb_decimal_t*)src.market_price.value() : nullptr;
+  return s;
+}
+
 inline Order
 convert(const lb_order_t* order)
 {
+  std::vector<AttachedOrderDetail> attached_orders;
+  std::transform(order->attached_orders,
+                 order->attached_orders + order->num_attached_orders,
+                 std::back_inserter(attached_orders),
+                 [](auto& item) { return convert(&item); });
   return Order{
     order->order_id,
     convert(order->status),
@@ -1324,7 +1497,8 @@ convert(const lb_order_t* order)
                          : std::nullopt,
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
-    order->remark
+    order->remark,
+    attached_orders,
   };
 }
 
@@ -1705,6 +1879,12 @@ convert(const lb_order_detail_t* order)
                  std::back_inserter(history),
                  [](auto item) { return convert(&item); });
 
+  std::vector<AttachedOrderDetail> attached_orders;
+  std::transform(order->attached_orders,
+                 order->attached_orders + order->num_attached_orders,
+                 std::back_inserter(attached_orders),
+                 [](auto& item) { return convert(&item); });
+
   return OrderDetail{
     order->order_id,
     convert(order->status),
@@ -1768,6 +1948,7 @@ convert(const lb_order_detail_t* order)
       : std::nullopt,
     history,
     convert(&order->charge_detail),
+    attached_orders,
   };
 }
 

@@ -74,6 +74,54 @@ export declare class AssetContext {
   statementDownloadUrl(req: GetStatementDownloadUrlRequest): Promise<GetStatementDownloadUrlResponse>
 }
 
+/** Attached order detail */
+export declare class AttachedOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Order ID */
+  get orderId(): string
+  /** Attached type display */
+  get attachedTypeDisplay(): number
+  /** Trigger price */
+  get triggerPrice(): Decimal | null
+  /** Submitted quantity */
+  get quantity(): Decimal
+  /** Executed quantity */
+  get executedQty(): Decimal
+  /** Order status */
+  get status(): OrderStatus
+  /** Last updated time */
+  get updatedAt(): Date
+  /** Whether withdrawn */
+  get withdrawn(): boolean
+  /** Good till date */
+  get gtd(): NaiveDate | null
+  /** Time in force type */
+  get timeInForce(): TimeInForceType
+  /** Counter ID */
+  get counterId(): string
+  /** Trigger status */
+  get triggerStatus(): number
+  /** Executed amount */
+  get executedAmount(): Decimal
+  /** Tag */
+  get tag(): number
+  /** Submitted time */
+  get submittedAt(): Date
+  /** Executed price */
+  get executedPrice(): Decimal
+  /** Force only RTH */
+  get forceOnlyRth(): OutsideRTH | null
+  /** Reviewed */
+  get reviewed(): boolean
+  /** Activate order type */
+  get activateOrderType(): OrderType
+  /** Activate RTH */
+  get activateRth(): OutsideRTH | null
+  /** Submit price */
+  get submitPrice(): Decimal | null
+}
+
 /** Brokers */
 export declare class Brokers {
   toString(): string
@@ -1041,6 +1089,8 @@ export declare class Order {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /** Attached orders */
+  get attachedOrders(): Array<AttachedOrderDetail>
 }
 
 /** Order charge detail */
@@ -1165,6 +1215,8 @@ export declare class OrderDetail {
   get history(): Array<OrderHistoryDetail>
   /** Order charges */
   get chargeDetail(): OrderChargeDetail
+  /** Attached orders */
+  get attachedOrders(): Array<AttachedOrderDetail>
 }
 
 /** Order history detail */
@@ -2812,6 +2864,7 @@ export declare class TradeContext {
    * ```
    */
   orderDetail(orderId: string): Promise<OrderDetail>
+  orderDetailAttached(orderId: string): Promise<OrderDetail>
   /**
    * Estimating the maximum purchase quantity for Hong Kong and US stocks,
    * warrants, and options
@@ -3194,6 +3247,16 @@ export declare const enum AssetType {
   Fund = 2,
   /** Crypto */
   Crypto = 3
+}
+
+/** Attached order type */
+export declare const enum AttachedOrderType {
+  /** Profit taker */
+  ProfitTaker = 0,
+  /** Stop loss */
+  StopLoss = 1,
+  /** Bracket */
+  Bracket = 2
 }
 
 export declare const enum BalanceType {
@@ -4274,6 +4337,8 @@ export interface GetTodayOrdersOptions {
   market?: Market
   /** Order id */
   orderId?: string
+  /** Filter attached orders only */
+  isAttached?: boolean
 }
 
 /** Data granularity */
@@ -5293,6 +5358,40 @@ export interface RecentBuybacks {
   netBuybackYieldTtm: string
 }
 
+/** Parameters for replacing an attached order */
+export interface ReplaceAttachedParams {
+  /** Attached order type */
+  attachedOrderType: AttachedOrderType
+  /** Profit taker price */
+  profitTakerPrice?: Decimal
+  /** Stop loss price */
+  stopLossPrice?: Decimal
+  /** Time in force type */
+  timeInForce?: TimeInForceType
+  /** Expire time (unix timestamp) */
+  expireTime?: number
+  /** Activate order type */
+  activateOrderType?: OrderType
+  /** Profit taker submit price */
+  profitTakerSubmitPrice?: Decimal
+  /** Stop loss submit price */
+  stopLossSubmitPrice?: Decimal
+  /** Activate RTH */
+  activateRth?: OutsideRTH
+  /** Profit taker order ID */
+  profitTakerId?: number
+  /** Stop loss order ID */
+  stopLossId?: number
+  /** Cancel all attached orders */
+  cancelAllAttached?: boolean
+  /** Main order ID */
+  mainId?: number
+  /** Quantity */
+  quantity?: Decimal
+  /** Market price */
+  marketPrice?: Decimal
+}
+
 /** Options for replace order request */
 export interface ReplaceOrderOptions {
   /** Order id */
@@ -5317,6 +5416,8 @@ export interface ReplaceOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+  /** Attached order parameters */
+  attachedParams?: ReplaceAttachedParams
 }
 
 /** A filter condition for screener_search Mode B. */
@@ -5669,6 +5770,28 @@ export interface StockRatings {
   ratingsJson: string
 }
 
+/** Parameters for submitting an attached order */
+export interface SubmitAttachedParams {
+  /** Attached order type */
+  attachedOrderType: AttachedOrderType
+  /** Profit taker price */
+  profitTakerPrice?: Decimal
+  /** Stop loss price */
+  stopLossPrice?: Decimal
+  /** Time in force type */
+  timeInForce?: TimeInForceType
+  /** Expire time (unix timestamp) */
+  expireTime?: number
+  /** Activate order type */
+  activateOrderType?: OrderType
+  /** Profit taker submit price */
+  profitTakerSubmitPrice?: Decimal
+  /** Stop loss submit price */
+  stopLossSubmitPrice?: Decimal
+  /** Activate RTH */
+  activateRth?: OutsideRTH
+}
+
 /** Options for submit order request */
 export interface SubmitOrderOptions {
   /** Security code */
@@ -5712,6 +5835,8 @@ export interface SubmitOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   clientRequestId?: string
+  /** Attached order parameters */
+  attachedParams?: SubmitAttachedParams
 }
 
 /** Quote type of subscription */

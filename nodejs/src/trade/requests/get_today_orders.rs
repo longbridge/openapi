@@ -16,6 +16,8 @@ pub struct GetTodayOrdersOptions {
     pub market: Option<Market>,
     /// Order id
     pub order_id: Option<String>,
+    /// Filter attached orders only
+    pub is_attached: Option<bool>,
 }
 
 impl From<GetTodayOrdersOptions> for longbridge::trade::GetTodayOrdersOptions {
@@ -36,6 +38,9 @@ impl From<GetTodayOrdersOptions> for longbridge::trade::GetTodayOrdersOptions {
         }
         if let Some(order_id) = opts.order_id {
             opts2 = opts2.order_id(order_id);
+        }
+        if opts.is_attached == Some(true) {
+            opts2 = opts2.is_attached();
         }
         opts2
     }

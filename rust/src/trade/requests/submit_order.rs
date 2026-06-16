@@ -4,7 +4,7 @@ use time::Date;
 
 use crate::{
     serde_utils,
-    trade::{OrderSide, OrderType, OutsideRTH, TimeInForceType},
+    trade::{AttachedOrderType, OrderSide, OrderType, OutsideRTH, TimeInForceType},
 };
 
 /// Options for submit order request
@@ -39,6 +39,8 @@ pub struct SubmitOrderOptions {
     remark: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     client_request_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    attached_params: Option<SubmitAttachedParams>,
 }
 
 impl SubmitOrderOptions {
@@ -69,6 +71,7 @@ impl SubmitOrderOptions {
             monitor_price: None,
             remark: None,
             client_request_id: None,
+            attached_params: None,
         }
     }
 
@@ -184,6 +187,109 @@ impl SubmitOrderOptions {
     pub fn client_request_id(self, id: impl Into<String>) -> Self {
         Self {
             client_request_id: Some(id.into()),
+            ..self
+        }
+    }
+
+    /// Set attached order parameters
+    pub fn attached_params(self, params: SubmitAttachedParams) -> Self {
+        Self {
+            attached_params: Some(params),
+            ..self
+        }
+    }
+}
+
+/// Attached order parameters for submit order
+#[derive(Debug, Serialize, Clone)]
+pub struct SubmitAttachedParams {
+    attached_order_type: AttachedOrderType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    time_in_force: Option<TimeInForceType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    expire_time: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    activate_order_type: Option<OrderType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_submit_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_submit_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    activate_rth: Option<OutsideRTH>,
+}
+
+impl SubmitAttachedParams {
+    /// Create new SubmitAttachedParams
+    pub fn new(attached_order_type: AttachedOrderType) -> Self {
+        Self {
+            attached_order_type,
+            profit_taker_price: None,
+            stop_loss_price: None,
+            time_in_force: None,
+            expire_time: None,
+            activate_order_type: None,
+            profit_taker_submit_price: None,
+            stop_loss_submit_price: None,
+            activate_rth: None,
+        }
+    }
+    /// Set the take-profit trigger price
+    pub fn profit_taker_price(self, v: Decimal) -> Self {
+        Self {
+            profit_taker_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the stop-loss trigger price
+    pub fn stop_loss_price(self, v: Decimal) -> Self {
+        Self {
+            stop_loss_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the time in force type
+    pub fn time_in_force(self, v: TimeInForceType) -> Self {
+        Self {
+            time_in_force: Some(v),
+            ..self
+        }
+    }
+    /// Set the expiry time (unix timestamp seconds)
+    pub fn expire_time(self, v: i64) -> Self {
+        Self {
+            expire_time: Some(v),
+            ..self
+        }
+    }
+    /// Set the order type to submit after trigger
+    pub fn activate_order_type(self, v: OrderType) -> Self {
+        Self {
+            activate_order_type: Some(v),
+            ..self
+        }
+    }
+    /// Set the take-profit limit price
+    pub fn profit_taker_submit_price(self, v: Decimal) -> Self {
+        Self {
+            profit_taker_submit_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the stop-loss limit price
+    pub fn stop_loss_submit_price(self, v: Decimal) -> Self {
+        Self {
+            stop_loss_submit_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the RTH setting for the activated order
+    pub fn activate_rth(self, v: OutsideRTH) -> Self {
+        Self {
+            activate_rth: Some(v),
             ..self
         }
     }

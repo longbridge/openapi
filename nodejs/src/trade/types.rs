@@ -195,6 +195,75 @@ pub struct AllExecutionsResponse {
     trades: Vec<Execution>,
 }
 
+/// Attached order type
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::trade::AttachedOrderType")]
+pub enum AttachedOrderType {
+    /// Profit taker
+    ProfitTaker,
+    /// Stop loss
+    StopLoss,
+    /// Bracket
+    Bracket,
+}
+
+/// Attached order detail
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::AttachedOrderDetail")]
+pub struct AttachedOrderDetail {
+    /// Order ID
+    order_id: String,
+    /// Attached type display
+    attached_type_display: i32,
+    /// Trigger price
+    #[js(opt)]
+    trigger_price: Option<Decimal>,
+    /// Submitted quantity
+    quantity: Decimal,
+    /// Executed quantity
+    executed_qty: Decimal,
+    /// Order status
+    status: OrderStatus,
+    /// Last updated time
+    #[js(datetime)]
+    updated_at: DateTime<Utc>,
+    /// Whether withdrawn
+    withdrawn: bool,
+    /// Good till date
+    #[js(opt)]
+    gtd: Option<NaiveDate>,
+    /// Time in force type
+    time_in_force: TimeInForceType,
+    /// Counter ID
+    counter_id: String,
+    /// Trigger status
+    trigger_status: i32,
+    /// Executed amount
+    executed_amount: Decimal,
+    /// Tag
+    tag: i32,
+    /// Submitted time
+    #[js(datetime)]
+    submitted_at: DateTime<Utc>,
+    /// Executed price
+    executed_price: Decimal,
+    /// Force only RTH
+    #[js(opt)]
+    force_only_rth: Option<OutsideRTH>,
+    /// Reviewed
+    reviewed: bool,
+    /// Activate order type
+    activate_order_type: OrderType,
+    /// Activate RTH
+    #[js(opt)]
+    activate_rth: Option<OutsideRTH>,
+    /// Submit price
+    #[js(opt)]
+    submit_price: Option<Decimal>,
+}
+
 /// Order
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
@@ -274,6 +343,9 @@ pub struct Order {
     monitor_price: Option<Decimal>,
     /// Remark
     remark: String,
+    /// Attached orders
+    #[js(array)]
+    attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Commission-free Status
@@ -493,6 +565,9 @@ pub struct OrderDetail {
     history: Vec<OrderHistoryDetail>,
     /// Order charges
     charge_detail: OrderChargeDetail,
+    /// Attached orders
+    #[js(array)]
+    attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Order changed message

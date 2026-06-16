@@ -4,9 +4,10 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, PushEvent,
         QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
@@ -453,10 +454,10 @@ impl TradeContextSync {
     /// ```
     pub fn order_detail(
         &self,
-        order_id: impl Into<String> + Send + 'static,
+        options: impl Into<GetOrderDetailOptions> + Send + 'static,
     ) -> Result<OrderDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.order_detail(order_id).await })
+            .call(move |ctx| async move { ctx.order_detail(options).await })
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

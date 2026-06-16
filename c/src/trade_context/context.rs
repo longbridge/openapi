@@ -3,10 +3,11 @@ use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 use longbridge::{
     TradeContext,
     trade::{
-        EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent,
-        ReplaceOrderOptions, SubmitOrderOptions,
+        AttachedOrderType, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+        GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent, ReplaceAttachedParams,
+        ReplaceOrderOptions, SubmitAttachedParams, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -377,6 +378,9 @@ pub unsafe extern "C" fn lb_trade_context_today_orders(
         if !(*opts).order_id.is_null() {
             opts2 = opts2.order_id(cstr_to_rust((*opts).order_id));
         }
+        if !(*opts).is_attached.is_null() && *(*opts).is_attached {
+            opts2 = opts2.is_attached();
+        }
     }
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<COrderOwned> = ctx_inner.today_orders(opts2).await?.into();
@@ -424,6 +428,54 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
     }
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
+    }
+    if !(*opts).attached_params.is_null() {
+        let ap = &*(*opts).attached_params;
+        let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
+        let mut rp = ReplaceAttachedParams::new(attached_order_type);
+        if !ap.profit_taker_price.is_null() {
+            rp = rp.profit_taker_price((*ap.profit_taker_price).value);
+        }
+        if !ap.stop_loss_price.is_null() {
+            rp = rp.stop_loss_price((*ap.stop_loss_price).value);
+        }
+        if !ap.time_in_force.is_null() {
+            rp = rp.time_in_force((*ap.time_in_force).into());
+        }
+        if !ap.expire_time.is_null() {
+            rp = rp.expire_time(*ap.expire_time);
+        }
+        if !ap.activate_order_type.is_null() {
+            rp = rp.activate_order_type((*ap.activate_order_type).into());
+        }
+        if !ap.profit_taker_submit_price.is_null() {
+            rp = rp.profit_taker_submit_price((*ap.profit_taker_submit_price).value);
+        }
+        if !ap.stop_loss_submit_price.is_null() {
+            rp = rp.stop_loss_submit_price((*ap.stop_loss_submit_price).value);
+        }
+        if !ap.activate_rth.is_null() {
+            rp = rp.activate_rth((*ap.activate_rth).into());
+        }
+        if !ap.profit_taker_id.is_null() {
+            rp = rp.profit_taker_id(*ap.profit_taker_id);
+        }
+        if !ap.stop_loss_id.is_null() {
+            rp = rp.stop_loss_id(*ap.stop_loss_id);
+        }
+        if !ap.cancel_all_attached.is_null() && *ap.cancel_all_attached {
+            rp = rp.cancel_all_attached();
+        }
+        if !ap.main_id.is_null() {
+            rp = rp.main_id(*ap.main_id);
+        }
+        if !ap.quantity.is_null() {
+            rp = rp.quantity((*ap.quantity).value);
+        }
+        if !ap.market_price.is_null() {
+            rp = rp.market_price((*ap.market_price).value);
+        }
+        opts2 = opts2.attached_params(rp);
     }
     execute_async(callback, ctx, userdata, async move {
         ctx_inner.replace_order(opts2).await?;
@@ -489,6 +541,36 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     }
     if !(*opts).client_request_id.is_null() {
         opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
+    }
+    if !(*opts).attached_params.is_null() {
+        let ap = &*(*opts).attached_params;
+        let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
+        let mut sp = SubmitAttachedParams::new(attached_order_type);
+        if !ap.profit_taker_price.is_null() {
+            sp = sp.profit_taker_price((*ap.profit_taker_price).value);
+        }
+        if !ap.stop_loss_price.is_null() {
+            sp = sp.stop_loss_price((*ap.stop_loss_price).value);
+        }
+        if !ap.time_in_force.is_null() {
+            sp = sp.time_in_force((*ap.time_in_force).into());
+        }
+        if !ap.expire_time.is_null() {
+            sp = sp.expire_time(*ap.expire_time);
+        }
+        if !ap.activate_order_type.is_null() {
+            sp = sp.activate_order_type((*ap.activate_order_type).into());
+        }
+        if !ap.profit_taker_submit_price.is_null() {
+            sp = sp.profit_taker_submit_price((*ap.profit_taker_submit_price).value);
+        }
+        if !ap.stop_loss_submit_price.is_null() {
+            sp = sp.stop_loss_submit_price((*ap.stop_loss_submit_price).value);
+        }
+        if !ap.activate_rth.is_null() {
+            sp = sp.activate_rth((*ap.activate_rth).into());
+        }
+        opts2 = opts2.attached_params(sp);
     }
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CSubmitOrderResponseOwned> = CCow::new(ctx_inner.submit_order(opts2).await?);
@@ -634,6 +716,26 @@ pub unsafe extern "C" fn lb_trade_context_order_detail(
     let order_id = cstr_to_rust(order_id);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<COrderDetailOwned> = CCow::new(ctx_inner.order_detail(order_id).await?);
+        Ok(resp)
+    });
+}
+
+/// Get order detail for attached order
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_order_detail_attached(
+    ctx: *const CTradeContext,
+    order_id: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let order_id = cstr_to_rust(order_id);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<COrderDetailOwned> = CCow::new(
+            ctx_inner
+                .order_detail(GetOrderDetailOptions::new(order_id).is_attached())
+                .await?,
+        );
         Ok(resp)
     });
 }

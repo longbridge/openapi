@@ -604,6 +604,15 @@ impl TradeContext {
         })
     }
 
+    #[napi]
+    pub async fn order_detail_attached(&self, order_id: String) -> Result<OrderDetail> {
+        self.ctx
+            .order_detail(longbridge::trade::GetOrderDetailOptions::new(order_id).is_attached())
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
     /// warrants, and options
     ///

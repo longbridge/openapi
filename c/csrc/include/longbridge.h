@@ -1115,6 +1115,24 @@ typedef enum lb_topic_type_t {
 } lb_topic_type_t;
 
 /**
+ * Attached order type
+ */
+typedef enum CAttachedOrderType {
+  /**
+   * Take profit
+   */
+  AttachedOrderTypeProfitTaker = 0,
+  /**
+   * Stop loss
+   */
+  AttachedOrderTypeStopLoss = 1,
+  /**
+   * Bracket order
+   */
+  AttachedOrderTypeBracket = 2,
+} CAttachedOrderType;
+
+/**
  * Time in force Type
  */
 typedef enum lb_time_in_force_type_t {
@@ -2299,7 +2317,77 @@ typedef struct lb_get_today_orders_options_t {
    * Order id (can be null)
    */
   const char *order_id;
+  /**
+   * Filter by attached order (can be null)
+   */
+  const bool *is_attached;
 } lb_get_today_orders_options_t;
+
+/**
+ * Options for replace attached order params
+ */
+typedef struct CReplaceAttachedParams {
+  /**
+   * Attached order type
+   */
+  enum CAttachedOrderType attached_order_type;
+  /**
+   * Take-profit trigger price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_price;
+  /**
+   * Stop-loss trigger price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_price;
+  /**
+   * Time in force type (can be null)
+   */
+  const enum lb_time_in_force_type_t *time_in_force;
+  /**
+   * Expiry time unix timestamp (can be null)
+   */
+  const int64_t *expire_time;
+  /**
+   * Order type to submit after trigger (can be null)
+   */
+  const enum lb_order_type_t *activate_order_type;
+  /**
+   * Take-profit limit price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_submit_price;
+  /**
+   * Stop-loss limit price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_submit_price;
+  /**
+   * RTH setting for activated order (can be null)
+   */
+  const enum lb_outside_rth_t *activate_rth;
+  /**
+   * Take-profit order ID (can be null)
+   */
+  const int64_t *profit_taker_id;
+  /**
+   * Stop-loss order ID (can be null)
+   */
+  const int64_t *stop_loss_id;
+  /**
+   * Cancel all attached orders flag (can be null)
+   */
+  const bool *cancel_all_attached;
+  /**
+   * Main order ID (can be null)
+   */
+  const int64_t *main_id;
+  /**
+   * Quantity (can be null)
+   */
+  const struct lb_decimal_t *quantity;
+  /**
+   * Market price (can be null)
+   */
+  const struct lb_decimal_t *market_price;
+} CReplaceAttachedParams;
 
 /**
  * Options for replace order request
@@ -2349,7 +2437,53 @@ typedef struct lb_replace_order_options_t {
    * Remark (can be null)
    */
   const char *remark;
+  /**
+   * Attached order parameters (can be null)
+   */
+  const struct CReplaceAttachedParams *attached_params;
 } lb_replace_order_options_t;
+
+/**
+ * Options for submit attached order params
+ */
+typedef struct CSubmitAttachedParams {
+  /**
+   * Attached order type
+   */
+  enum CAttachedOrderType attached_order_type;
+  /**
+   * Take-profit trigger price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_price;
+  /**
+   * Stop-loss trigger price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_price;
+  /**
+   * Time in force type (can be null)
+   */
+  const enum lb_time_in_force_type_t *time_in_force;
+  /**
+   * Expiry time unix timestamp (can be null)
+   */
+  const int64_t *expire_time;
+  /**
+   * Order type to submit after trigger (can be null)
+   */
+  const enum lb_order_type_t *activate_order_type;
+  /**
+   * Take-profit limit price (can be null)
+   */
+  const struct lb_decimal_t *profit_taker_submit_price;
+  /**
+   * Stop-loss limit price (can be null)
+   */
+  const struct lb_decimal_t *stop_loss_submit_price;
+  /**
+   * RTH setting for activated order (can be null)
+   */
+  const enum lb_outside_rth_t *activate_rth;
+} CSubmitAttachedParams;
 
 /**
  * Options for submit order request
@@ -2426,6 +2560,10 @@ typedef struct lb_submit_order_options_t {
    * The server caches this ID for 10 minutes.
    */
   const char *client_request_id;
+  /**
+   * Attached order parameters (can be null)
+   */
+  const struct CSubmitAttachedParams *attached_params;
 } lb_submit_order_options_t;
 
 /**
@@ -3246,6 +3384,96 @@ typedef struct lb_all_executions_response_t {
 } lb_all_executions_response_t;
 
 /**
+ * Attached order detail
+ */
+typedef struct CAttachedOrderDetail {
+  /**
+   * Attached order ID
+   */
+  const char *order_id;
+  /**
+   * Display type: 1=take-profit, 2=stop-loss
+   */
+  int32_t attached_type_display;
+  /**
+   * Trigger price (maybe null)
+   */
+  const struct lb_decimal_t *trigger_price;
+  /**
+   * Quantity
+   */
+  const struct lb_decimal_t *quantity;
+  /**
+   * Executed quantity
+   */
+  const struct lb_decimal_t *executed_qty;
+  /**
+   * Order status
+   */
+  enum lb_order_status_t status;
+  /**
+   * Last updated time (unix timestamp)
+   */
+  int64_t updated_at;
+  /**
+   * Whether withdrawn
+   */
+  bool withdrawn;
+  /**
+   * GTD date (maybe null)
+   */
+  const struct lb_date_t *gtd;
+  /**
+   * Time in force type
+   */
+  enum lb_time_in_force_type_t time_in_force;
+  /**
+   * Counter order ID
+   */
+  const char *counter_id;
+  /**
+   * Trigger status
+   */
+  int32_t trigger_status;
+  /**
+   * Executed amount
+   */
+  const struct lb_decimal_t *executed_amount;
+  /**
+   * Tag
+   */
+  int32_t tag;
+  /**
+   * Submitted time (unix timestamp)
+   */
+  int64_t submitted_at;
+  /**
+   * Executed price
+   */
+  const struct lb_decimal_t *executed_price;
+  /**
+   * Force RTH only (maybe null)
+   */
+  const enum lb_outside_rth_t *force_only_rth;
+  /**
+   * Whether reviewed
+   */
+  bool reviewed;
+  /**
+   * Order type to submit after trigger
+   */
+  enum lb_order_type_t activate_order_type;
+  /**
+   * RTH setting for activated order (maybe null)
+   */
+  const enum lb_outside_rth_t *activate_rth;
+  /**
+   * Submit price (maybe null)
+   */
+  const struct lb_decimal_t *submit_price;
+} CAttachedOrderDetail;
+
+/**
  * Order
  */
 typedef struct lb_order_t {
@@ -3365,6 +3593,14 @@ typedef struct lb_order_t {
    * Remark
    */
   const char *remark;
+  /**
+   * Attached orders
+   */
+  const struct CAttachedOrderDetail *attached_orders;
+  /**
+   * Number of attached orders
+   */
+  uintptr_t num_attached_orders;
 } lb_order_t;
 
 /**
@@ -3980,6 +4216,14 @@ typedef struct lb_order_detail_t {
    * Order charges
    */
   struct lb_order_charge_detail_t charge_detail;
+  /**
+   * Attached orders
+   */
+  const struct CAttachedOrderDetail *attached_orders;
+  /**
+   * Number of attached orders
+   */
+  uintptr_t num_attached_orders;
 } lb_order_detail_t;
 
 /**
@@ -10645,6 +10889,14 @@ void lb_trade_context_order_detail(const struct lb_trade_context_t *ctx,
                                    const char *order_id,
                                    lb_async_callback_t callback,
                                    void *userdata);
+
+/**
+ * Get order detail for attached order
+ */
+void lb_trade_context_order_detail_attached(const struct lb_trade_context_t *ctx,
+                                            const char *order_id,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
 
 /**
  * Get order detail
