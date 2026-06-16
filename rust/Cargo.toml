@@ -41,6 +41,7 @@ strum.workspace = true
 strum_macros.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
+serde_repr.workspace = true
 dotenv.workspace = true
 http.workspace = true
 comfy-table.workspace = true

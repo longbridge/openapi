@@ -41,9 +41,9 @@ impl From<lb::MarketTimeItem> for MarketTimeItem {
     fn from(v: lb::MarketTimeItem) -> Self {
         Self {
             market: v.market.into(),
-            trade_status: v.trade_status,
+            trade_status: v.trade_status.code(),
             timestamp: v.timestamp,
-            delay_trade_status: v.delay_trade_status,
+            delay_trade_status: v.delay_trade_status.code(),
             delay_timestamp: v.delay_timestamp,
             sub_status: v.sub_status,
             delay_sub_status: v.delay_sub_status,
