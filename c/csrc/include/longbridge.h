@@ -4575,7 +4575,8 @@ typedef struct lb_market_time_item_t {
    */
   enum lb_market_t market;
   /**
-   * Current trade status code for the market.
+   * Current market trade status code. See the market status definition for
+   * the complete code table.
    */
   int32_t trade_status;
   /**
@@ -4583,7 +4584,7 @@ typedef struct lb_market_time_item_t {
    */
   const char *timestamp;
   /**
-   * Delayed trade status code for the market.
+   * Delayed market trade status code.
    */
   int32_t delay_trade_status;
   /**

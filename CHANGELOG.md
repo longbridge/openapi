@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Rust:** `market::TradeStatus` models `/v1/quote/market-status` trade status codes, including engine-compatible normalization and display helpers.
+
+### Fixed
+
+- **All languages:** corrected market trade status documentation and aligned `market::TradeStatus` with the status definition table, including code `2001` and the `123`/`1009`/`1010` display names.
+
 ## [4.3.2] - 2026-06-13
 
 ### Added

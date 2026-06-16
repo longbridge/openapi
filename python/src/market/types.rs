@@ -217,11 +217,12 @@ impl From<lb::MarketStatusResponse> for MarketStatusResponse {
 pub(crate) struct MarketTimeItem {
     /// Market
     pub market: crate::types::Market,
-    /// Raw trade status code
+    /// Raw market trade status code. See the market status definition for the
+    /// complete code table.
     pub trade_status: i32,
     /// Current market time (unix timestamp string)
     pub timestamp: String,
-    /// Delayed-quote trade status code
+    /// Delayed-quote market trade status code
     pub delay_trade_status: i32,
     /// Delayed-quote time (unix timestamp string)
     pub delay_timestamp: String,
