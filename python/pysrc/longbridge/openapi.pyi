@@ -5862,6 +5862,11 @@ class AttachedOrderType:
     Attached order type
     """
 
+    class Unknown(AttachedOrderType):
+        """
+        Unknown
+        """
+
     class ProfitTaker(AttachedOrderType):
         """
         Take profit
@@ -5887,7 +5892,7 @@ class AttachedOrderDetail:
     Order ID
     """
 
-    attached_type_display: int
+    attached_type_display: Type[AttachedOrderType]
     """
     Attached type display (1=take-profit, 2=stop-loss)
     """
@@ -5937,7 +5942,7 @@ class AttachedOrderDetail:
     Counter ID
     """
 
-    trigger_status: int
+    trigger_status: Optional[Type[TriggerStatus]]
     """
     Trigger status
     """
@@ -5947,7 +5952,7 @@ class AttachedOrderDetail:
     Executed amount
     """
 
-    tag: int
+    tag: Type[OrderTag]
     """
     Tag
     """
@@ -5957,7 +5962,7 @@ class AttachedOrderDetail:
     Submitted time
     """
 
-    executed_price: Decimal
+    executed_price: Optional[Decimal]
     """
     Executed price
     """
@@ -6561,7 +6566,7 @@ class OrderDetail:
     Order history details
     """
 
-    charge_detail: OrderChargeDetail
+    charge_detail: Optional[OrderChargeDetail]
     """
     Order charges
     """

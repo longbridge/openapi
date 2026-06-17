@@ -1555,7 +1555,7 @@ enum class AttachedOrderType
 struct AttachedOrderDetail
 {
   std::string order_id;
-  int32_t attached_type_display;
+  AttachedOrderType attached_type_display;
   std::optional<Decimal> trigger_price;
   Decimal quantity;
   Decimal executed_qty;
@@ -1565,11 +1565,11 @@ struct AttachedOrderDetail
   std::optional<Date> gtd;
   TimeInForceType time_in_force;
   std::string counter_id;
-  int32_t trigger_status;
+  std::optional<TriggerStatus> trigger_status;
   Decimal executed_amount;
-  int32_t tag;
+  OrderTag tag;
   int64_t submitted_at;
-  Decimal executed_price;
+  std::optional<Decimal> executed_price;
   std::optional<OutsideRTH> force_only_rth;
   bool reviewed;
   OrderType activate_order_type;
@@ -2213,8 +2213,8 @@ struct OrderDetail
   std::optional<std::string> platform_deducted_currency;
   /// Order history details
   std::vector<OrderHistoryDetail> history;
-  /// Order charges
-  OrderChargeDetail charge_detail;
+  /// Order charges (maybe null)
+  std::optional<OrderChargeDetail> charge_detail;
   /// Attached orders
   std::vector<AttachedOrderDetail> attached_orders;
 };

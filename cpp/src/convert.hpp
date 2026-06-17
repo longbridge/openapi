@@ -1281,7 +1281,7 @@ convert(OutsideRTH status)
 }
 
 inline AttachedOrderType
-convert(lb_attached_order_type_t ty)
+convert(CAttachedOrderType ty)
 {
   switch (ty) {
     case AttachedOrderTypeUnknown:
@@ -1297,7 +1297,7 @@ convert(lb_attached_order_type_t ty)
   }
 }
 
-inline lb_attached_order_type_t
+inline CAttachedOrderType
 convert(AttachedOrderType ty)
 {
   switch (ty) {
@@ -1315,11 +1315,11 @@ convert(AttachedOrderType ty)
 }
 
 inline AttachedOrderDetail
-convert(const lb_attached_order_detail_t* detail)
+convert(const CAttachedOrderDetail* detail)
 {
   return AttachedOrderDetail{
     detail->order_id,
-    detail->attached_type_display,
+    convert(detail->attached_type_display),
     detail->trigger_price ? std::optional{ Decimal(detail->trigger_price) }
                           : std::nullopt,
     Decimal(detail->quantity),
@@ -1330,11 +1330,11 @@ convert(const lb_attached_order_detail_t* detail)
     detail->gtd ? std::optional{ convert(detail->gtd) } : std::nullopt,
     convert(detail->time_in_force),
     detail->counter_id,
-    detail->trigger_status,
+    detail->trigger_status ? std::optional{ convert(*detail->trigger_status) } : std::nullopt,
     Decimal(detail->executed_amount),
-    detail->tag,
+    convert(detail->tag),
     detail->submitted_at,
-    Decimal(detail->executed_price),
+    detail->executed_price ? std::optional{ Decimal(detail->executed_price) } : std::nullopt,
     detail->force_only_rth ? std::optional{ convert(*detail->force_only_rth) }
                            : std::nullopt,
     detail->reviewed,
@@ -1351,7 +1351,7 @@ struct CSubmitAttachedParamsStorage
   lb_time_in_force_type_t time_in_force;
   lb_order_type_t activate_order_type;
   lb_outside_rth_t activate_rth;
-  lb_submit_attached_params_t params;
+  CSubmitAttachedParams params;
 };
 
 inline CSubmitAttachedParamsStorage
@@ -1395,7 +1395,7 @@ struct CReplaceAttachedParamsStorage
   lb_time_in_force_type_t time_in_force;
   lb_order_type_t activate_order_type;
   lb_outside_rth_t activate_rth;
-  lb_replace_attached_params_t params;
+  CReplaceAttachedParams params;
 };
 
 inline CReplaceAttachedParamsStorage
@@ -1943,7 +1943,7 @@ convert(const lb_order_detail_t* order)
       ? std::optional{ std::string(order->platform_deducted_currency) }
       : std::nullopt,
     history,
-    convert(&order->charge_detail),
+    order->has_charge_detail ? std::optional{ convert(&order->charge_detail) } : std::nullopt,
     attached_orders,
   };
 }

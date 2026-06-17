@@ -459,6 +459,8 @@ impl_java_enum!(
     "com/longbridge/trade/AttachedOrderType",
     longbridge::trade::AttachedOrderType,
     [
+        #[java(remote = Unknown)]
+        UNKNOWN,
         #[java(remote = ProfitTaker)]
         PROFIT_TAKER,
         #[java(remote = StopLoss)]

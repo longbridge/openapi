@@ -247,7 +247,7 @@ public class SdkNative {
 
         public static native void tradeContextOrderDetail(long context, String orderId, AsyncCallback callback);
 
-        static native void tradeContextOrderDetailAttached(long context, String orderId, Object callback);
+        public static native void tradeContextOrderDetailAttached(long context, String orderId, Object callback);
 
         public static native void tradeContextEstimateMaxPurchaseQuantity(long context,
                         EstimateMaxPurchaseQuantityOptions opts,
