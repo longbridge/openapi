@@ -204,6 +204,8 @@ pub(crate) enum OutsideRTH {
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::trade::AttachedOrderType")]
 pub(crate) enum AttachedOrderType {
+    /// Unknown
+    Unknown,
     /// Take profit
     ProfitTaker,
     /// Stop loss
@@ -219,8 +221,8 @@ pub(crate) enum AttachedOrderType {
 pub(crate) struct AttachedOrderDetail {
     /// Order ID
     order_id: String,
-    /// Attached type display (1=take-profit, 2=stop-loss)
-    attached_type_display: i32,
+    /// Attached order type
+    attached_type_display: AttachedOrderType,
     /// Trigger price
     #[py(opt)]
     trigger_price: Option<PyDecimal>,
@@ -242,15 +244,17 @@ pub(crate) struct AttachedOrderDetail {
     /// Counter ID
     counter_id: String,
     /// Trigger status
-    trigger_status: i32,
+    #[py(opt)]
+    trigger_status: Option<TriggerStatus>,
     /// Executed amount
     executed_amount: PyDecimal,
     /// Tag
-    tag: i32,
+    tag: OrderTag,
     /// Submitted time
     submitted_at: PyOffsetDateTimeWrapper,
     /// Executed price
-    executed_price: PyDecimal,
+    #[py(opt)]
+    executed_price: Option<PyDecimal>,
     /// Enable or disable outside regular trading hours (force only)
     #[py(opt)]
     force_only_rth: Option<OutsideRTH>,
@@ -689,7 +693,8 @@ pub(crate) struct OrderDetail {
     #[py(array)]
     history: Vec<OrderHistoryDetail>,
     /// Order charges
-    charge_detail: OrderChargeDetail,
+    #[py(opt)]
+    charge_detail: Option<OrderChargeDetail>,
     /// Attached orders
     #[py(array)]
     attached_orders: Vec<AttachedOrderDetail>,

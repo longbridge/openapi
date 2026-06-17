@@ -25,7 +25,10 @@ pub struct SubmitOrderOptions {
     trailing_amount: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
     trailing_percent: Option<Decimal>,
-    #[serde(with = "serde_utils::date_opt")]
+    #[serde(
+        with = "serde_utils::date_opt",
+        skip_serializing_if = "Option::is_none"
+    )]
     expire_date: Option<Date>,
     #[serde(skip_serializing_if = "Option::is_none")]
     outside_rth: Option<OutsideRTH>,

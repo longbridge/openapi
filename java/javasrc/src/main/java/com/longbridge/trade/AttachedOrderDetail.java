@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
  */
 public class AttachedOrderDetail {
     private String orderId;
-    private int attachedTypeDisplay;
+    private AttachedOrderType attachedTypeDisplay;
     private BigDecimal triggerPrice;
     private BigDecimal quantity;
     private BigDecimal executedQty;
@@ -19,9 +19,9 @@ public class AttachedOrderDetail {
     private LocalDate gtd;
     private TimeInForceType timeInForce;
     private String counterId;
-    private int triggerStatus;
+    private TriggerStatus triggerStatus;
     private BigDecimal executedAmount;
-    private int tag;
+    private OrderTag tag;
     private OffsetDateTime submittedAt;
     private BigDecimal executedPrice;
     private OutsideRTH forceOnlyRth;
@@ -44,7 +44,7 @@ public class AttachedOrderDetail {
      *
      * @return attached type display
      */
-    public int getAttachedTypeDisplay() {
+    public AttachedOrderType getAttachedTypeDisplay() {
         return attachedTypeDisplay;
     }
 
@@ -134,7 +134,7 @@ public class AttachedOrderDetail {
      *
      * @return trigger status
      */
-    public int getTriggerStatus() {
+    public TriggerStatus getTriggerStatus() {
         return triggerStatus;
     }
 
@@ -152,7 +152,7 @@ public class AttachedOrderDetail {
      *
      * @return tag
      */
-    public int getTag() {
+    public OrderTag getTag() {
         return tag;
     }
 

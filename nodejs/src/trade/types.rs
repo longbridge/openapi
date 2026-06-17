@@ -200,6 +200,8 @@ pub struct AllExecutionsResponse {
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::trade::AttachedOrderType")]
 pub enum AttachedOrderType {
+    /// Unknown
+    Unknown,
     /// Profit taker
     ProfitTaker,
     /// Stop loss
@@ -215,8 +217,8 @@ pub enum AttachedOrderType {
 pub struct AttachedOrderDetail {
     /// Order ID
     order_id: String,
-    /// Attached type display
-    attached_type_display: i32,
+    /// Attached order type
+    attached_type_display: AttachedOrderType,
     /// Trigger price
     #[js(opt)]
     trigger_price: Option<Decimal>,
@@ -239,16 +241,18 @@ pub struct AttachedOrderDetail {
     /// Counter ID
     counter_id: String,
     /// Trigger status
-    trigger_status: i32,
+    #[js(opt)]
+    trigger_status: Option<TriggerStatus>,
     /// Executed amount
     executed_amount: Decimal,
     /// Tag
-    tag: i32,
+    tag: OrderTag,
     /// Submitted time
     #[js(datetime)]
     submitted_at: DateTime<Utc>,
     /// Executed price
-    executed_price: Decimal,
+    #[js(opt)]
+    executed_price: Option<Decimal>,
     /// Force only RTH
     #[js(opt)]
     force_only_rth: Option<OutsideRTH>,
@@ -564,7 +568,8 @@ pub struct OrderDetail {
     #[js(array)]
     history: Vec<OrderHistoryDetail>,
     /// Order charges
-    charge_detail: OrderChargeDetail,
+    #[js(opt)]
+    charge_detail: Option<OrderChargeDetail>,
     /// Attached orders
     #[js(array)]
     attached_orders: Vec<AttachedOrderDetail>,

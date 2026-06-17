@@ -1119,17 +1119,21 @@ typedef enum lb_topic_type_t {
  */
 typedef enum CAttachedOrderType {
   /**
+   * Unknown
+   */
+  AttachedOrderTypeUnknown = 0,
+  /**
    * Take profit
    */
-  AttachedOrderTypeProfitTaker = 0,
+  AttachedOrderTypeProfitTaker = 1,
   /**
    * Stop loss
    */
-  AttachedOrderTypeStopLoss = 1,
+  AttachedOrderTypeStopLoss = 2,
   /**
    * Bracket order
    */
-  AttachedOrderTypeBracket = 2,
+  AttachedOrderTypeBracket = 3,
 } CAttachedOrderType;
 
 /**
@@ -3392,9 +3396,9 @@ typedef struct CAttachedOrderDetail {
    */
   const char *order_id;
   /**
-   * Display type: 1=take-profit, 2=stop-loss
+   * Attached order type
    */
-  int32_t attached_type_display;
+  enum CAttachedOrderType attached_type_display;
   /**
    * Trigger price (maybe null)
    */
@@ -3432,9 +3436,9 @@ typedef struct CAttachedOrderDetail {
    */
   const char *counter_id;
   /**
-   * Trigger status
+   * Trigger status (maybe null)
    */
-  int32_t trigger_status;
+  const enum lb_trigger_status_t *trigger_status;
   /**
    * Executed amount
    */
@@ -3442,7 +3446,7 @@ typedef struct CAttachedOrderDetail {
   /**
    * Tag
    */
-  int32_t tag;
+  enum lb_order_tag_t tag;
   /**
    * Submitted time (unix timestamp)
    */
@@ -4213,7 +4217,11 @@ typedef struct lb_order_detail_t {
    */
   uintptr_t num_history;
   /**
-   * Order charges
+   * Whether charge_detail is valid (false when the order has no charge info)
+   */
+  bool has_charge_detail;
+  /**
+   * Order charges (only valid when has_charge_detail is true)
    */
   struct lb_order_charge_detail_t charge_detail;
   /**

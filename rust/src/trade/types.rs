@@ -236,8 +236,10 @@ pub enum OutsideRTH {
 }
 
 /// Attached order type
-#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
 pub enum AttachedOrderType {
+    /// Unknown
+    Unknown,
     /// Take profit
     #[strum(serialize = "PROFIT_TAKER")]
     ProfitTaker,
@@ -254,8 +256,8 @@ pub enum AttachedOrderType {
 pub struct AttachedOrderDetail {
     /// Attached order ID
     pub order_id: String,
-    /// Display type: 1=take-profit, 2=stop-loss
-    pub attached_type_display: i32,
+    /// Attached order type
+    pub attached_type_display: AttachedOrderType,
     /// Trigger price
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub trigger_price: Option<Decimal>,
@@ -280,12 +282,13 @@ pub struct AttachedOrderDetail {
     pub time_in_force: TimeInForceType,
     /// Counter order ID
     pub counter_id: String,
-    /// Trigger status (0=not activated,1=monitoring,2=cancelled,4=triggered)
-    pub trigger_status: i32,
+    /// Trigger status
+    #[serde(with = "serde_utils::trigger_status")]
+    pub trigger_status: Option<TriggerStatus>,
     /// Executed amount
     pub executed_amount: Decimal,
     /// Tag
-    pub tag: i32,
+    pub tag: OrderTag,
     /// Submitted time (unix timestamp seconds)
     #[serde(
         serialize_with = "time::serde::rfc3339::serialize",
@@ -293,7 +296,8 @@ pub struct AttachedOrderDetail {
     )]
     pub submitted_at: OffsetDateTime,
     /// Executed price
-    pub executed_price: Decimal,
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub executed_price: Option<Decimal>,
     /// Force RTH only
     #[serde(with = "serde_utils::outside_rth")]
     pub force_only_rth: Option<OutsideRTH>,
@@ -619,7 +623,7 @@ pub struct OrderDetail {
     /// Order history details
     pub history: Vec<OrderHistoryDetail>,
     /// Order charges
-    pub charge_detail: OrderChargeDetail,
+    pub charge_detail: Option<OrderChargeDetail>,
     /// Attached orders
     #[serde(default)]
     pub attached_orders: Vec<AttachedOrderDetail>,
@@ -871,6 +875,8 @@ impl_serde_for_enum_string!(
     DeductionStatus,
     ChargeCategoryCode
 );
+impl_serde_for_enum_string!(AttachedOrderType);
+impl_default_for_enum_string!(AttachedOrderType);
 impl_default_for_enum_string!(
     OrderType,
     OrderStatus,

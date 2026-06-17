@@ -28,17 +28,20 @@ use crate::{
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CAttachedOrderType {
+    /// Unknown
+    AttachedOrderTypeUnknown = 0,
     /// Take profit
-    AttachedOrderTypeProfitTaker = 0,
+    AttachedOrderTypeProfitTaker = 1,
     /// Stop loss
-    AttachedOrderTypeStopLoss = 1,
+    AttachedOrderTypeStopLoss = 2,
     /// Bracket order
-    AttachedOrderTypeBracket = 2,
+    AttachedOrderTypeBracket = 3,
 }
 
 impl From<AttachedOrderType> for CAttachedOrderType {
     fn from(value: AttachedOrderType) -> Self {
         match value {
+            AttachedOrderType::Unknown => CAttachedOrderType::AttachedOrderTypeUnknown,
             AttachedOrderType::ProfitTaker => CAttachedOrderType::AttachedOrderTypeProfitTaker,
             AttachedOrderType::StopLoss => CAttachedOrderType::AttachedOrderTypeStopLoss,
             AttachedOrderType::Bracket => CAttachedOrderType::AttachedOrderTypeBracket,
@@ -49,6 +52,7 @@ impl From<AttachedOrderType> for CAttachedOrderType {
 impl From<CAttachedOrderType> for AttachedOrderType {
     fn from(value: CAttachedOrderType) -> Self {
         match value {
+            CAttachedOrderType::AttachedOrderTypeUnknown => AttachedOrderType::Unknown,
             CAttachedOrderType::AttachedOrderTypeProfitTaker => AttachedOrderType::ProfitTaker,
             CAttachedOrderType::AttachedOrderTypeStopLoss => AttachedOrderType::StopLoss,
             CAttachedOrderType::AttachedOrderTypeBracket => AttachedOrderType::Bracket,
@@ -61,8 +65,8 @@ impl From<CAttachedOrderType> for AttachedOrderType {
 pub struct CAttachedOrderDetail {
     /// Attached order ID
     pub order_id: *const c_char,
-    /// Display type: 1=take-profit, 2=stop-loss
-    pub attached_type_display: i32,
+    /// Attached order type
+    pub attached_type_display: CAttachedOrderType,
     /// Trigger price (maybe null)
     pub trigger_price: *const CDecimal,
     /// Quantity
@@ -81,12 +85,12 @@ pub struct CAttachedOrderDetail {
     pub time_in_force: CTimeInForceType,
     /// Counter order ID
     pub counter_id: *const c_char,
-    /// Trigger status
-    pub trigger_status: i32,
+    /// Trigger status (maybe null)
+    pub trigger_status: *const CTriggerStatus,
     /// Executed amount
     pub executed_amount: *const CDecimal,
     /// Tag
-    pub tag: i32,
+    pub tag: COrderTag,
     /// Submitted time (unix timestamp)
     pub submitted_at: i64,
     /// Executed price
@@ -106,7 +110,7 @@ pub struct CAttachedOrderDetail {
 #[derive(Debug)]
 pub(crate) struct CAttachedOrderDetailOwned {
     order_id: CString,
-    attached_type_display: i32,
+    attached_type_display: AttachedOrderType,
     trigger_price: Option<CDecimal>,
     quantity: CDecimal,
     executed_qty: CDecimal,
@@ -116,11 +120,11 @@ pub(crate) struct CAttachedOrderDetailOwned {
     gtd: Option<CDate>,
     time_in_force: TimeInForceType,
     counter_id: CString,
-    trigger_status: i32,
+    trigger_status: Option<CTriggerStatus>,
     executed_amount: CDecimal,
-    tag: i32,
+    tag: OrderTag,
     submitted_at: i64,
-    executed_price: CDecimal,
+    executed_price: Option<CDecimal>,
     force_only_rth: Option<COutsideRTH>,
     reviewed: bool,
     activate_order_type: OrderType,
@@ -165,11 +169,11 @@ impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
             gtd: gtd.map(Into::into),
             time_in_force,
             counter_id: counter_id.into(),
-            trigger_status,
+            trigger_status: trigger_status.map(Into::into),
             executed_amount: executed_amount.into(),
             tag,
             submitted_at: submitted_at.unix_timestamp(),
-            executed_price: executed_price.into(),
+            executed_price: executed_price.map(Into::into),
             force_only_rth: force_only_rth.map(Into::into),
             reviewed,
             activate_order_type,
@@ -208,7 +212,7 @@ impl ToFFI for CAttachedOrderDetailOwned {
         } = self;
         CAttachedOrderDetail {
             order_id: order_id.to_ffi_type(),
-            attached_type_display: *attached_type_display,
+            attached_type_display: (*attached_type_display).into(),
             trigger_price: trigger_price
                 .as_ref()
                 .map(ToFFI::to_ffi_type)
@@ -224,11 +228,17 @@ impl ToFFI for CAttachedOrderDetailOwned {
                 .unwrap_or(std::ptr::null()),
             time_in_force: (*time_in_force).into(),
             counter_id: counter_id.to_ffi_type(),
-            trigger_status: *trigger_status,
+            trigger_status: trigger_status
+                .as_ref()
+                .map(|value| value as *const CTriggerStatus)
+                .unwrap_or(std::ptr::null()),
             executed_amount: executed_amount.to_ffi_type(),
-            tag: *tag,
+            tag: (*tag).into(),
             submitted_at: *submitted_at,
-            executed_price: executed_price.to_ffi_type(),
+            executed_price: executed_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
             force_only_rth: force_only_rth
                 .as_ref()
                 .map(|value| value as *const COutsideRTH)
@@ -2000,6 +2010,7 @@ impl ToFFI for COrderChargeItemOwned {
 }
 
 /// Order charge detail
+#[derive(Clone)]
 #[repr(C)]
 pub struct COrderChargeDetail {
     /// Total charges amount
@@ -2010,6 +2021,17 @@ pub struct COrderChargeDetail {
     pub items: *const COrderChargeItem,
     /// Number of items
     pub num_items: usize,
+}
+
+impl Default for COrderChargeDetail {
+    fn default() -> Self {
+        Self {
+            total_amount: std::ptr::null(),
+            currency: std::ptr::null(),
+            items: std::ptr::null(),
+            num_items: 0,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -2128,7 +2150,9 @@ pub struct COrderDetail {
     pub history: *const COrderHistoryDetail,
     /// Number of history
     pub num_history: usize,
-    /// Order charges
+    /// Whether charge_detail is valid (false when the order has no charge info)
+    pub has_charge_detail: bool,
+    /// Order charges (only valid when has_charge_detail is true)
     pub charge_detail: COrderChargeDetail,
     /// Attached orders
     pub attached_orders: *const CAttachedOrderDetail,
@@ -2177,7 +2201,7 @@ pub(crate) struct COrderDetailOwned {
     platform_deducted_amount: Option<CDecimal>,
     platform_deducted_currency: Option<CString>,
     history: CVec<COrderHistoryDetailOwned>,
-    charge_detail: COrderChargeDetailOwned,
+    charge_detail: Option<COrderChargeDetailOwned>,
     attached_orders: CVec<CAttachedOrderDetailOwned>,
 }
 
@@ -2266,7 +2290,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             platform_deducted_amount: platform_deducted_amount.map(Into::into),
             platform_deducted_currency: platform_deducted_currency.map(Into::into),
             history: history.into(),
-            charge_detail: charge_detail.into(),
+            charge_detail: charge_detail.map(Into::into),
             attached_orders: attached_orders.into(),
         }
     }
@@ -2423,7 +2447,11 @@ impl ToFFI for COrderDetailOwned {
                 .unwrap_or(std::ptr::null()),
             history: history.to_ffi_type(),
             num_history: history.len(),
-            charge_detail: charge_detail.to_ffi_type(),
+            has_charge_detail: charge_detail.is_some(),
+            charge_detail: charge_detail
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
             attached_orders: attached_orders.to_ffi_type(),
             num_attached_orders: attached_orders.len(),
         }

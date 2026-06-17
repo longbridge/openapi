@@ -80,8 +80,8 @@ export declare class AttachedOrderDetail {
   toJSON(): any
   /** Order ID */
   get orderId(): string
-  /** Attached type display */
-  get attachedTypeDisplay(): number
+  /** Attached order type */
+  get attachedTypeDisplay(): AttachedOrderType
   /** Trigger price */
   get triggerPrice(): Decimal | null
   /** Submitted quantity */
@@ -101,15 +101,15 @@ export declare class AttachedOrderDetail {
   /** Counter ID */
   get counterId(): string
   /** Trigger status */
-  get triggerStatus(): number
+  get triggerStatus(): TriggerStatus | null
   /** Executed amount */
   get executedAmount(): Decimal
   /** Tag */
-  get tag(): number
+  get tag(): OrderTag
   /** Submitted time */
   get submittedAt(): Date
   /** Executed price */
-  get executedPrice(): Decimal
+  get executedPrice(): Decimal | null
   /** Force only RTH */
   get forceOnlyRth(): OutsideRTH | null
   /** Reviewed */
@@ -1214,7 +1214,7 @@ export declare class OrderDetail {
   /** Order history details */
   get history(): Array<OrderHistoryDetail>
   /** Order charges */
-  get chargeDetail(): OrderChargeDetail
+  get chargeDetail(): OrderChargeDetail | null
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
 }
@@ -3251,12 +3251,14 @@ export declare const enum AssetType {
 
 /** Attached order type */
 export declare const enum AttachedOrderType {
+  /** Unknown */
+  Unknown = 0,
   /** Profit taker */
-  ProfitTaker = 0,
+  ProfitTaker = 1,
   /** Stop loss */
-  StopLoss = 1,
+  StopLoss = 2,
   /** Bracket */
-  Bracket = 2
+  Bracket = 3
 }
 
 export declare const enum BalanceType {
