@@ -71,9 +71,8 @@ public class GetTodayOrdersOptions {
 
     /**
      * When set together with order ID, indicates that the order ID is an
-     * attached sub-order ID. The server looks up using the attached order ID
-     * instead of treating it as a regular order ID. Has no effect without
-     * order ID.
+     * attached sub-order ID. The server returns the attached sub-order itself
+     * as an Order entry (not the parent order). Has no effect without order ID.
      *
      * @return this instance for chaining
      */
