@@ -16,7 +16,9 @@ pub struct GetTodayOrdersOptions {
     pub market: Option<Market>,
     /// Order id
     pub order_id: Option<String>,
-    /// Filter attached orders only
+    /// Indicate that the provided order_id is an attached order ID. When set,
+    /// the server looks up the order whose attached sub-order matches order_id,
+    /// rather than treating it as a regular order ID.
     pub is_attached: Option<bool>,
 }
 
