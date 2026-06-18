@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - New method `order_detail_attached(order_id)` — queries detail for an attached order by its own ID
   - `order_detail` now accepts `GetOrderDetailOptions` (with optional `is_attached` flag) in addition to a plain order ID string
 
+### Fixed
+
+- **All languages:** corrected market trade status documentation and aligned `market::TradeStatus` with the status definition table, including code `2001` and the `123`/`1009`/`1010` display names.
+
 ### Breaking changes
 
 - **All languages:** `OrderDetail.charge_detail` is now `Option<OrderChargeDetail>` (previously non-optional). Attached orders return `null` for this field; callers must handle the absent case.

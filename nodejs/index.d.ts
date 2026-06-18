@@ -4629,13 +4629,13 @@ export interface MarketTimeItem {
   /** Market */
   market: Market
   /**
-   * Raw trade status code (101=PreOpen, 102/103/105=Trading, 104=LunchBreak,
-   * 106=PostTrading, 108=Closed, 201=PreMarket, 204=PostMarket)
+   * Raw market trade status code. See the market status definition for the
+   * complete code table.
    */
   tradeStatus: number
   /** Current market time (unix timestamp string) */
   timestamp: string
-  /** Delayed-quote trade status code */
+  /** Delayed-quote market trade status code */
   delayTradeStatus: number
   /** Delayed-quote market time (unix timestamp string) */
   delayTimestamp: string

@@ -5,14 +5,13 @@ public class MarketTimeItem {
     /** Market. */
     public com.longbridge.Market market;
     /**
-     * Raw trade status code.
-     * 101=PreOpen, 102/103/105=Trading, 104=LunchBreak, 106=PostTrading,
-     * 108=Closed, 201=PreMarket, 204=PostMarket.
+     * Raw market trade status code.
+     * See the market status definition for the complete code table.
      */
     public int tradeStatus;
     /** Current market time (unix timestamp string). */
     public String timestamp;
-    /** Delayed-quote trade status code. */
+    /** Delayed-quote market trade status code. */
     public int delayTradeStatus;
     /** Delayed-quote market time (unix timestamp string). */
     public String delayTimestamp;

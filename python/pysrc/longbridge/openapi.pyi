@@ -10361,11 +10361,11 @@ class MarketTimeItem:
     market: Market
     """Market"""
     trade_status: int
-    """Raw trade status code (101=PreOpen, 102/105=Trading, 104=LunchBreak, 106=PostTrading, 108=Closed, 201=PreMarket, 204=PostMarket)"""
+    """Raw market trade status code. See the market status definition for the complete code table."""
     timestamp: str
     """Current market time (unix timestamp string)"""
     delay_trade_status: int
-    """Delayed-quote trade status code"""
+    """Delayed-quote market trade status code"""
     delay_timestamp: str
     """Delayed-quote market time (unix timestamp string)"""
     sub_status: int
