@@ -17,8 +17,8 @@ pub struct GetTodayOrdersOptions {
     /// Order id
     pub order_id: Option<String>,
     /// When set together with order_id, indicates that order_id is an attached
-    /// sub-order ID. The server looks up using the attached order ID instead of
-    /// treating it as a regular order ID. Has no effect without order_id.
+    /// sub-order ID. The server returns the attached sub-order itself as an
+    /// Order entry (not the parent order). Has no effect without order_id.
     pub is_attached: Option<bool>,
 }
 
