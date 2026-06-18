@@ -7170,7 +7170,7 @@ class TradeContext:
             side: Filter by order side
             market: Filter by market type
             order_id: Filter by order id
-            is_attached: Include attached orders
+            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID
 
         Returns:
             Order list
@@ -7488,7 +7488,7 @@ class TradeContext:
 
         Args:
             order_id: Order id
-            is_attached: Include attached orders
+            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID
 
         Returns:
             Order detail
@@ -7881,7 +7881,7 @@ class AsyncTradeContext:
             side: Filter by order side.
             market: Filter by market type.
             order_id: Filter by order ID.
-            is_attached: Include attached orders.
+            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID.
 
         Examples:
             ::
@@ -8230,7 +8230,7 @@ class AsyncTradeContext:
 
         Args:
             order_id: Order ID.
-            is_attached: Include attached orders.
+            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID.
 
         Examples:
             ::

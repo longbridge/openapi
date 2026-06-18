@@ -70,7 +70,9 @@ public class GetTodayOrdersOptions {
     }
 
     /**
-     * Filters to include only attached orders.
+     * Indicate that the provided order ID is an attached order ID.
+     * When set, the server looks up the order whose attached sub-order matches
+     * the given order ID, rather than treating it as a regular order ID.
      *
      * @return this instance for chaining
      */
@@ -80,9 +82,9 @@ public class GetTodayOrdersOptions {
     }
 
     /**
-     * Returns the is-attached filter.
+     * Returns whether the order ID is treated as an attached order ID.
      *
-     * @return is-attached filter
+     * @return is-attached flag
      */
     public Boolean getIsAttached() {
         return isAttached;
