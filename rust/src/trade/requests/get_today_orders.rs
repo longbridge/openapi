@@ -79,11 +79,11 @@ impl GetTodayOrdersOptions {
         }
     }
 
-    /// Indicate that the provided `order_id` is an attached order ID.
-    ///
-    /// When set, the server looks up the order whose attached sub-order matches
-    /// the given `order_id`, rather than treating `order_id` as a regular order
-    /// ID. This does **not** filter results to show only attached orders.
+    /// When set together with [`order_id`], indicates that `order_id` is an
+    /// attached sub-order ID. The server will look up using the attached order
+    /// ID instead of treating it as a regular order ID. Has no effect without
+    /// [`order_id`] and does **not** filter results to show only attached
+    /// orders.
     pub fn is_attached(self) -> Self {
         Self {
             is_attached: Some(true),

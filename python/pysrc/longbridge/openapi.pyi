@@ -7134,7 +7134,7 @@ class TradeContext:
             side: Filter by order side
             market: Filter by market type
             order_id: Filter by order id
-            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Returns:
             Order list
@@ -7450,7 +7450,7 @@ class TradeContext:
 
         Args:
             order_id: Order id
-            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Returns:
             Order detail
@@ -7774,7 +7774,7 @@ class AsyncTradeContext:
             side: Filter by order side.
             market: Filter by market type.
             order_id: Filter by order ID.
-            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID.
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id.
 
         Examples:
             ::
@@ -8121,7 +8121,7 @@ class AsyncTradeContext:
 
         Args:
             order_id: Order ID.
-            is_attached: Indicate that the provided order_id is an attached order ID. When set, the server looks up the order whose attached sub-order matches order_id, rather than treating it as a regular order ID.
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id.
 
         Examples:
             ::

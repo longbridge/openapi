@@ -16,11 +16,10 @@ impl GetOrderDetailOptions {
             is_attached: None,
         }
     }
-    /// Indicate that the provided `order_id` is an attached order ID.
+    /// Indicate that the provided `order_id` is an attached sub-order ID.
     ///
-    /// When set, the server looks up the order detail whose attached sub-order
-    /// matches the given `order_id`, rather than treating `order_id` as a
-    /// regular order ID.
+    /// When set, the server looks up the order detail using the attached order
+    /// ID instead of treating `order_id` as a regular order ID.
     pub fn is_attached(self) -> Self {
         Self {
             is_attached: Some(true),
