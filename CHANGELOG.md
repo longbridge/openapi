@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All languages:** attached order (take-profit / stop-loss) support for `submit_order` and `replace_order`
   - New types: `AttachedOrderType` (`ProfitTaker` / `StopLoss` / `Bracket`), `AttachedOrderDetail`, `SubmitAttachedParams`, `ReplaceAttachedParams`
   - `SubmitOrderOptions` / `ReplaceOrderOptions`: new `attached_params` field
-  - `GetTodayOrdersOptions`: new `is_attached` flag to filter by attached orders
+  - `GetTodayOrdersOptions`: new `is_attached` flag — when combined with `order_id`, treats `order_id` as an attached sub-order ID for lookup (has no effect without `order_id`)
   - `Order` / `OrderDetail`: new `attached_orders: Vec<AttachedOrderDetail>` field
   - New method `order_detail_attached(order_id)` — queries detail for an attached order by its own ID
   - `order_detail` now accepts `GetOrderDetailOptions` (with optional `is_attached` flag) in addition to a plain order ID string
