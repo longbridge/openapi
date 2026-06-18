@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Rust:** `market::TradeStatus` models `/v1/quote/market-status` trade status codes, including engine-compatible normalization and display helpers.
+- **All languages:** attached order (take-profit / stop-loss) support for `submit_order` and `replace_order`
+  - New types: `AttachedOrderType` (`ProfitTaker` / `StopLoss` / `Bracket`), `AttachedOrderDetail`, `SubmitAttachedParams`, `ReplaceAttachedParams`
+  - `SubmitOrderOptions` / `ReplaceOrderOptions`: new `attached_params` field
+  - `GetTodayOrdersOptions`: new `is_attached` flag to filter by attached orders
+  - `Order` / `OrderDetail`: new `attached_orders: Vec<AttachedOrderDetail>` field
+  - New method `order_detail_attached(order_id)` — queries detail for an attached order by its own ID
+  - `order_detail` now accepts `GetOrderDetailOptions` (with optional `is_attached` flag) in addition to a plain order ID string
+
+### Breaking changes
+
+- **All languages:** `OrderDetail.charge_detail` is now `Option<OrderChargeDetail>` (previously non-optional). Attached orders return `null` for this field; callers must handle the absent case.
+- **C SDK:** `lb_order_detail_t` gains a new `has_charge_detail: bool` field before `charge_detail`. Existing binaries must be recompiled; code that reads `charge_detail` directly should check `has_charge_detail` first.
+
 ## [4.3.2] - 2026-06-13
 
 ### Added
