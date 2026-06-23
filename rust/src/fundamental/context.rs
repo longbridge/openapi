@@ -993,6 +993,8 @@ impl FundamentalContext {
             country: detail.market,
             name: detail.indicator_name,
             describe: detail.description,
+            periodicity: detail.frequence,
+            importance: detail.importance,
             ..Default::default()
         };
 
