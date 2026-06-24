@@ -12,9 +12,10 @@ use crate::{
     trade::{
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
         FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio, Order, OrderDetail,
-        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
+        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, TopicType,
         core::{Command, Core},
     },
 };
@@ -763,20 +764,16 @@ impl TradeContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn order_detail(&self, order_id: impl Into<String>) -> Result<OrderDetail> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            order_id: String,
-        }
-
+    pub async fn order_detail(
+        &self,
+        options: impl Into<GetOrderDetailOptions>,
+    ) -> Result<OrderDetail> {
         Ok(self
             .0
             .http_cli
             .request(Method::GET, "/v1/trade/order")
             .response::<Json<OrderDetail>>()
-            .query_params(Request {
-                order_id: order_id.into(),
-            })
+            .query_params(options.into())
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

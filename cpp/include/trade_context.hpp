@@ -108,6 +108,11 @@ public:
   void order_detail(const std::string& order_id,
                     AsyncCallback<TradeContext, OrderDetail> callback) const;
 
+  /// Get order detail with attached orders
+  void order_detail_attached(
+    const std::string& order_id,
+    AsyncCallback<TradeContext, OrderDetail> callback) const;
+
   /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
   /// warrants, and options
   void estimate_max_purchase_quantity(

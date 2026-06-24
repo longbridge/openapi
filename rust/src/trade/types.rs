@@ -234,6 +234,84 @@ pub enum OutsideRTH {
     Overnight,
 }
 
+/// Attached order type
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum AttachedOrderType {
+    /// Unknown
+    Unknown,
+    /// Take profit
+    #[strum(serialize = "PROFIT_TAKER")]
+    ProfitTaker,
+    /// Stop loss
+    #[strum(serialize = "STOP_LOSS")]
+    StopLoss,
+    /// Bracket order
+    #[strum(serialize = "BRACKET")]
+    Bracket,
+}
+
+/// Attached order detail
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AttachedOrderDetail {
+    /// Attached order ID
+    pub order_id: String,
+    /// Attached order type
+    pub attached_type_display: AttachedOrderType,
+    /// Trigger price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub trigger_price: Option<Decimal>,
+    /// Quantity
+    pub quantity: Decimal,
+    /// Executed quantity
+    pub executed_qty: Decimal,
+    /// Order status
+    pub status: OrderStatus,
+    /// Last updated time (unix timestamp seconds)
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub updated_at: OffsetDateTime,
+    /// Whether withdrawn
+    pub withdrawn: bool,
+    /// GTD date
+    #[serde(with = "serde_utils::date_opt")]
+    pub gtd: Option<Date>,
+    /// Time in force
+    pub time_in_force: TimeInForceType,
+    /// Counter order ID
+    pub counter_id: String,
+    /// Trigger status
+    #[serde(with = "serde_utils::trigger_status")]
+    pub trigger_status: Option<TriggerStatus>,
+    /// Executed amount
+    pub executed_amount: Decimal,
+    /// Tag
+    pub tag: OrderTag,
+    /// Submitted time (unix timestamp seconds)
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub submitted_at: OffsetDateTime,
+    /// Executed price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub executed_price: Option<Decimal>,
+    /// Force RTH only
+    #[serde(with = "serde_utils::outside_rth")]
+    pub force_only_rth: Option<OutsideRTH>,
+    /// Whether reviewed
+    pub reviewed: bool,
+    /// Order type to submit after trigger
+    pub activate_order_type: OrderType,
+    /// RTH setting for activated order
+    #[serde(with = "serde_utils::outside_rth")]
+    pub activate_rth: Option<OutsideRTH>,
+    /// Submit price (limit price)
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub submit_price: Option<Decimal>,
+}
+
 /// Order
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Order {
@@ -320,6 +398,9 @@ pub struct Order {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Attached orders
+    #[serde(default)]
+    pub attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Commission-free Status
@@ -541,7 +622,10 @@ pub struct OrderDetail {
     /// Order history details
     pub history: Vec<OrderHistoryDetail>,
     /// Order charges
-    pub charge_detail: OrderChargeDetail,
+    pub charge_detail: Option<OrderChargeDetail>,
+    /// Attached orders
+    #[serde(default)]
+    pub attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Cash info
@@ -790,6 +874,8 @@ impl_serde_for_enum_string!(
     DeductionStatus,
     ChargeCategoryCode
 );
+impl_serde_for_enum_string!(AttachedOrderType);
+impl_default_for_enum_string!(AttachedOrderType);
 impl_default_for_enum_string!(
     OrderType,
     OrderStatus,

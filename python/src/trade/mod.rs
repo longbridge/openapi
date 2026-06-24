@@ -15,6 +15,10 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::TimeInForceType>()?;
     parent.add_class::<types::TriggerStatus>()?;
     parent.add_class::<types::OutsideRTH>()?;
+    parent.add_class::<types::AttachedOrderType>()?;
+    parent.add_class::<types::AttachedOrderDetail>()?;
+    parent.add_class::<types::SubmitAttachedParams>()?;
+    parent.add_class::<types::ReplaceAttachedParams>()?;
     parent.add_class::<types::Order>()?;
     parent.add_class::<types::PushOrderChanged>()?;
     parent.add_class::<types::MarginRatio>()?;

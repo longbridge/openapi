@@ -1,5 +1,5 @@
 use longbridge_python_macros::{PyEnum, PyObject};
-use pyo3::pyclass;
+use pyo3::{pyclass, pymethods};
 
 use crate::{
     decimal::PyDecimal,
@@ -196,6 +196,201 @@ pub(crate) enum OutsideRTH {
     Overnight,
 }
 
+/// Attached order type
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::AttachedOrderType")]
+pub(crate) enum AttachedOrderType {
+    /// Unknown
+    Unknown,
+    /// Take profit
+    ProfitTaker,
+    /// Stop loss
+    StopLoss,
+    /// Bracket order
+    Bracket,
+}
+
+/// Attached order detail
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::AttachedOrderDetail")]
+pub(crate) struct AttachedOrderDetail {
+    /// Order ID
+    order_id: String,
+    /// Attached order type
+    attached_type_display: AttachedOrderType,
+    /// Trigger price
+    #[py(opt)]
+    trigger_price: Option<PyDecimal>,
+    /// Quantity
+    quantity: PyDecimal,
+    /// Executed quantity
+    executed_qty: PyDecimal,
+    /// Order status
+    status: OrderStatus,
+    /// Last updated time
+    updated_at: PyOffsetDateTimeWrapper,
+    /// Withdrawn
+    withdrawn: bool,
+    /// Good till date
+    #[py(opt)]
+    gtd: Option<PyDateWrapper>,
+    /// Time in force type
+    time_in_force: TimeInForceType,
+    /// Counter ID
+    counter_id: String,
+    /// Trigger status
+    #[py(opt)]
+    trigger_status: Option<TriggerStatus>,
+    /// Executed amount
+    executed_amount: PyDecimal,
+    /// Tag
+    tag: OrderTag,
+    /// Submitted time
+    submitted_at: PyOffsetDateTimeWrapper,
+    /// Executed price
+    #[py(opt)]
+    executed_price: Option<PyDecimal>,
+    /// Enable or disable outside regular trading hours (force only)
+    #[py(opt)]
+    force_only_rth: Option<OutsideRTH>,
+    /// Reviewed
+    reviewed: bool,
+    /// Activate order type
+    activate_order_type: OrderType,
+    /// Activate RTH
+    #[py(opt)]
+    activate_rth: Option<OutsideRTH>,
+    /// Submit price
+    #[py(opt)]
+    submit_price: Option<PyDecimal>,
+}
+
+/// Submit attached order parameters
+#[pyclass(from_py_object)]
+#[derive(Clone)]
+pub(crate) struct SubmitAttachedParams(pub(crate) longbridge::trade::SubmitAttachedParams);
+
+#[pymethods]
+impl SubmitAttachedParams {
+    #[new]
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None))]
+    fn new(
+        attached_order_type: AttachedOrderType,
+        profit_taker_price: Option<PyDecimal>,
+        stop_loss_price: Option<PyDecimal>,
+        time_in_force: Option<TimeInForceType>,
+        expire_time: Option<i64>,
+        activate_order_type: Option<OrderType>,
+        profit_taker_submit_price: Option<PyDecimal>,
+        stop_loss_submit_price: Option<PyDecimal>,
+        activate_rth: Option<OutsideRTH>,
+    ) -> Self {
+        let mut p = longbridge::trade::SubmitAttachedParams::new(attached_order_type.into());
+        if let Some(v) = profit_taker_price {
+            p = p.profit_taker_price(v.into());
+        }
+        if let Some(v) = stop_loss_price {
+            p = p.stop_loss_price(v.into());
+        }
+        if let Some(v) = time_in_force {
+            p = p.time_in_force(v.into());
+        }
+        if let Some(v) = expire_time {
+            p = p.expire_time(v);
+        }
+        if let Some(v) = activate_order_type {
+            p = p.activate_order_type(v.into());
+        }
+        if let Some(v) = profit_taker_submit_price {
+            p = p.profit_taker_submit_price(v.into());
+        }
+        if let Some(v) = stop_loss_submit_price {
+            p = p.stop_loss_submit_price(v.into());
+        }
+        if let Some(v) = activate_rth {
+            p = p.activate_rth(v.into());
+        }
+        Self(p)
+    }
+}
+
+/// Replace attached order parameters
+#[pyclass(from_py_object)]
+#[derive(Clone)]
+pub(crate) struct ReplaceAttachedParams(pub(crate) longbridge::trade::ReplaceAttachedParams);
+
+#[pymethods]
+impl ReplaceAttachedParams {
+    #[new]
+    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None, profit_taker_id=None, stop_loss_id=None, cancel_all_attached=None, main_id=None, quantity=None, market_price=None))]
+    #[allow(clippy::too_many_arguments)]
+    fn new(
+        attached_order_type: AttachedOrderType,
+        profit_taker_price: Option<PyDecimal>,
+        stop_loss_price: Option<PyDecimal>,
+        time_in_force: Option<TimeInForceType>,
+        expire_time: Option<i64>,
+        activate_order_type: Option<OrderType>,
+        profit_taker_submit_price: Option<PyDecimal>,
+        stop_loss_submit_price: Option<PyDecimal>,
+        activate_rth: Option<OutsideRTH>,
+        profit_taker_id: Option<i64>,
+        stop_loss_id: Option<i64>,
+        cancel_all_attached: Option<bool>,
+        main_id: Option<i64>,
+        quantity: Option<PyDecimal>,
+        market_price: Option<PyDecimal>,
+    ) -> Self {
+        let mut p = longbridge::trade::ReplaceAttachedParams::new(attached_order_type.into());
+        if let Some(v) = profit_taker_price {
+            p = p.profit_taker_price(v.into());
+        }
+        if let Some(v) = stop_loss_price {
+            p = p.stop_loss_price(v.into());
+        }
+        if let Some(v) = time_in_force {
+            p = p.time_in_force(v.into());
+        }
+        if let Some(v) = expire_time {
+            p = p.expire_time(v);
+        }
+        if let Some(v) = activate_order_type {
+            p = p.activate_order_type(v.into());
+        }
+        if let Some(v) = profit_taker_submit_price {
+            p = p.profit_taker_submit_price(v.into());
+        }
+        if let Some(v) = stop_loss_submit_price {
+            p = p.stop_loss_submit_price(v.into());
+        }
+        if let Some(v) = activate_rth {
+            p = p.activate_rth(v.into());
+        }
+        if let Some(v) = profit_taker_id {
+            p = p.profit_taker_id(v);
+        }
+        if let Some(v) = stop_loss_id {
+            p = p.stop_loss_id(v);
+        }
+        if cancel_all_attached == Some(true) {
+            p = p.cancel_all_attached();
+        }
+        if let Some(v) = main_id {
+            p = p.main_id(v);
+        }
+        if let Some(v) = quantity {
+            p = p.quantity(v.into());
+        }
+        if let Some(v) = market_price {
+            p = p.market_price(v.into());
+        }
+        Self(p)
+    }
+}
+
 /// Order
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
@@ -274,6 +469,9 @@ pub(crate) struct Order {
     monitor_price: Option<PyDecimal>,
     /// Remark
     remark: String,
+    /// Attached orders
+    #[py(array)]
+    attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Commission-free Status
@@ -492,7 +690,11 @@ pub(crate) struct OrderDetail {
     #[py(array)]
     history: Vec<OrderHistoryDetail>,
     /// Order charges
-    charge_detail: OrderChargeDetail,
+    #[py(opt)]
+    charge_detail: Option<OrderChargeDetail>,
+    /// Attached orders
+    #[py(array)]
+    attached_orders: Vec<AttachedOrderDetail>,
 }
 
 /// Order changed message

@@ -11,14 +11,15 @@ pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, Trad
 pub use push_types::{PushEvent, PushOrderChanged, TopicType};
 pub use requests::{
     EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-    GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+    GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+    GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+    ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitOrderOptions,
 };
 pub use types::{
-    AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo, ChargeCategoryCode,
-    CommissionFreeStatus, DeductionStatus, Execution, FrozenTransactionFee, FundPosition,
-    FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderChargeDetail,
-    OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus,
-    OrderTag, OrderType, OutsideRTH, StockPosition, StockPositionChannel, StockPositionsResponse,
-    TimeInForceType, TriggerPriceType, TriggerStatus,
+    AccountBalance, AttachedOrderDetail, AttachedOrderType, BalanceType, CashFlow,
+    CashFlowDirection, CashInfo, ChargeCategoryCode, CommissionFreeStatus, DeductionStatus,
+    Execution, FrozenTransactionFee, FundPosition, FundPositionChannel, FundPositionsResponse,
+    MarginRatio, Order, OrderChargeDetail, OrderChargeFee, OrderChargeItem, OrderDetail,
+    OrderHistoryDetail, OrderSide, OrderStatus, OrderTag, OrderType, OutsideRTH, StockPosition,
+    StockPositionChannel, StockPositionsResponse, TimeInForceType, TriggerPriceType, TriggerStatus,
 };

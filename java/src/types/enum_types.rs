@@ -456,6 +456,21 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/trade/AttachedOrderType",
+    longbridge::trade::AttachedOrderType,
+    [
+        #[java(remote = Unknown)]
+        UNKNOWN,
+        #[java(remote = ProfitTaker)]
+        PROFIT_TAKER,
+        #[java(remote = StopLoss)]
+        STOP_LOSS,
+        #[java(remote = Bracket)]
+        BRACKET,
+    ]
+);
+
+impl_java_enum!(
     "com/longbridge/alert/AlertCondition",
     longbridge::alert::types::AlertCondition,
     [PriceRise, PriceFall, PercentRise, PercentFall]

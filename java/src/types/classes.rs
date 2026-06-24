@@ -586,6 +586,34 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/trade/AttachedOrderDetail",
+    longbridge::trade::AttachedOrderDetail,
+    [
+        order_id,
+        attached_type_display,
+        trigger_price,
+        quantity,
+        executed_qty,
+        status,
+        updated_at,
+        withdrawn,
+        gtd,
+        time_in_force,
+        counter_id,
+        trigger_status,
+        executed_amount,
+        tag,
+        submitted_at,
+        executed_price,
+        force_only_rth,
+        reviewed,
+        activate_order_type,
+        activate_rth,
+        submit_price
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/trade/PushOrderChanged",
     longbridge::trade::PushOrderChanged,
     [
@@ -657,7 +685,9 @@ impl_java_class!(
         #[java(set_as_opt = crate::types::JavaInteger)]
         trigger_count,
         monitor_price,
-        remark
+        remark,
+        #[java(objarray)]
+        attached_orders
     ]
 );
 
@@ -934,7 +964,9 @@ impl_java_class!(
         platform_deducted_currency,
         #[java(objarray)]
         history,
-        charge_detail
+        charge_detail,
+        #[java(objarray)]
+        attached_orders
     ]
 );
 
