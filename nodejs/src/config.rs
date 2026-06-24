@@ -31,6 +31,17 @@ pub struct ExtraConfigParams {
     pub enable_print_quote_packages: Option<bool>,
     /// Set the path of the log files (Default: `no logs`)
     pub log_path: Option<String>,
+    /// Enable paper trading mode (default: `false`).
+    ///
+    /// When `true`, all API calls target the paper trading (simulation)
+    /// environment.  The server validates the token: if it belongs to a
+    /// real-money account the server returns an error.
+    ///
+    /// When `false` (the default) the server imposes no restrictions — both
+    /// paper trading and real-money accounts are accepted.
+    ///
+    /// Paper trading users should set this to `true` as a safety guard.
+    pub enable_papertrading: Option<bool>,
 }
 
 fn apply_extra(
@@ -61,6 +72,9 @@ fn apply_extra(
         }
         if let Some(log_path) = extra.log_path {
             config.set_log_path(log_path);
+        }
+        if let Some(true) = extra.enable_papertrading {
+            config.set_enable_papertrading();
         }
     }
     config

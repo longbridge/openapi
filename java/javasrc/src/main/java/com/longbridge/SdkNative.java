@@ -52,6 +52,8 @@ public class SdkNative {
 
         public static native long configSetLogPath(long config, String logPath);
 
+        public static native long configSetEnablePapertrading(long config);
+
         public static native void configRefreshAccessToken(long config, OffsetDateTime expiredAt,
                         AsyncCallback callback);
 

@@ -295,6 +295,7 @@ class Config:
         push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime,
         enable_print_quote_packages: bool = True,
         log_path: Optional[str] = None,
+        enable_papertrading: bool = False,
     ) -> Config:
         """
         Create a new ``Config`` using API Key authentication.
@@ -303,7 +304,8 @@ class Config:
         (``LONGBRIDGE_HTTP_URL``, ``LONGBRIDGE_LANGUAGE``,
         ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
         ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
-        ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``).
+        ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``,
+        ``LONGBRIDGE_PAPERTRADING``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -323,6 +325,11 @@ class Config:
             enable_print_quote_packages: Print opened quote packages on
                 connect (default: ``True``)
             log_path: Path for log files (default: no logs)
+            enable_papertrading: When ``True``, all API calls target the
+                paper trading (simulation) environment.  The server validates
+                the token: if it belongs to a real-money account the server
+                returns an error.  Default: ``False`` (no restriction imposed
+                by server).
         """
 
     @classmethod
@@ -365,6 +372,7 @@ class Config:
         push_candlestick_mode: Optional[Type[PushCandlestickMode]] = None,
         enable_print_quote_packages: Optional[bool] = None,
         log_path: Optional[str] = None,
+        enable_papertrading: Optional[bool] = None,
     ) -> Config:
         """
         Create a new ``Config`` for OAuth 2.0 authentication.
@@ -376,7 +384,8 @@ class Config:
         (``LONGBRIDGE_HTTP_URL``, ``LONGBRIDGE_LANGUAGE``,
         ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
         ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
-        ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``).
+        ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``,
+        ``LONGBRIDGE_PAPERTRADING``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -395,6 +404,11 @@ class Config:
             enable_print_quote_packages: Print opened quote packages on
                 connect (optional)
             log_path: Path for log files (optional)
+            enable_papertrading: When ``True``, all API calls target the
+                paper trading (simulation) environment.  The server validates
+                the token: if it belongs to a real-money account the server
+                returns an error.  Default: ``None`` (no restriction imposed
+                by server).
 
         Returns:
             Config object
