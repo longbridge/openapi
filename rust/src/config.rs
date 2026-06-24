@@ -131,6 +131,7 @@ pub struct Config {
     pub(crate) log_path: Option<PathBuf>,
     /// Extra headers injected into every HTTP and WebSocket upgrade request.
     pub(crate) custom_headers: HashMap<String, String>,
+    pub(crate) enable_papertrading: bool,
 }
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
@@ -162,6 +163,7 @@ struct ConfigExtras {
     push_candlestick_mode: Option<PushCandlestickMode>,
     enable_print_quote_packages: bool,
     log_path: Option<PathBuf>,
+    enable_papertrading: bool,
 }
 
 impl ConfigExtras {
@@ -176,6 +178,7 @@ impl ConfigExtras {
         });
         let enable_print_quote_packages =
             env_var("PRINT_QUOTE_PACKAGES").as_deref().unwrap_or("true") == "true";
+        let enable_papertrading = env_var("PAPERTRADING").as_deref() == Some("true");
         Self {
             http_url: env_var("HTTP_URL"),
             quote_ws_url: env_var("QUOTE_WS_URL"),
@@ -185,6 +188,7 @@ impl ConfigExtras {
             push_candlestick_mode,
             enable_print_quote_packages,
             log_path: env_var("LOG_PATH").map(PathBuf::from),
+            enable_papertrading,
         }
     }
 }
@@ -223,6 +227,7 @@ impl Config {
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
             custom_headers: Default::default(),
+            enable_papertrading: extras.enable_papertrading,
         }
     }
 
@@ -272,6 +277,7 @@ impl Config {
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
             custom_headers: Default::default(),
+            enable_papertrading: extras.enable_papertrading,
         }
     }
 
@@ -327,6 +333,7 @@ impl Config {
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
             custom_headers: Default::default(),
+            enable_papertrading: extras.enable_papertrading,
         })
     }
 
@@ -402,6 +409,23 @@ impl Config {
         }
     }
 
+    /// Enable paper trading mode.
+    ///
+    /// When enabled, all API calls target the paper trading (simulation)
+    /// environment.  The server validates the token: if it belongs to a
+    /// real-money account the server returns an error.
+    ///
+    /// By default this option is disabled (`false`): the server imposes no
+    /// restrictions and accepts requests from both paper trading and real-money
+    /// accounts.
+    ///
+    /// Paper trading users should enable this option as a safety guard to avoid
+    /// accidentally submitting orders against their real-money account.
+    pub fn enable_papertrading(mut self) -> Self {
+        self.enable_papertrading = true;
+        self
+    }
+
     /// Create metadata for auth/reconnect request
     pub fn create_metadata(&self) -> HashMap<String, String> {
         let mut metadata = HashMap::new();
@@ -430,6 +454,9 @@ impl Config {
             HttpClient::new(config).header(header::ACCEPT_LANGUAGE, self.language.as_str());
         for (key, value) in &self.custom_headers {
             client = client.header(key.as_str(), value.as_str());
+        }
+        if self.enable_papertrading {
+            client = client.header("x-papertrading", "true");
         }
         client
     }
@@ -597,6 +624,13 @@ impl Config {
         self.enable_print_quote_packages = false;
     }
 
+    /// Enable paper trading mode in place.
+    ///
+    /// See [`Config::enable_papertrading`] for full semantics.
+    pub fn set_enable_papertrading(&mut self) {
+        self.enable_papertrading = true;
+    }
+
     /// Set the log path in place.
     pub fn set_log_path(&mut self, path: impl Into<PathBuf>) {
         self.log_path = Some(path.into());
@@ -659,5 +693,18 @@ mod tests {
         assert_eq!(config.enable_overnight, None);
         assert_eq!(config.push_candlestick_mode, None);
         assert!(config.enable_print_quote_packages);
+    }
+
+    #[test]
+    fn test_enable_papertrading_builder() {
+        let config = Config::from_apikey("key", "secret", "token").enable_papertrading();
+        assert!(config.enable_papertrading);
+    }
+
+    #[test]
+    fn test_enable_papertrading_setter() {
+        let mut config = Config::from_apikey("key", "secret", "token");
+        config.set_enable_papertrading();
+        assert!(config.enable_papertrading);
     }
 }

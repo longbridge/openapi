@@ -145,6 +145,7 @@ setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 | LONGBRIDGE_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                 |
 | LONGBRIDGE_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)        |
 | LONGBRIDGE_LOG_PATH              | Set the path of the log files (Default: `no logs`)                              |
+| LONGBRIDGE_PAPERTRADING          | Enable paper trading mode, `true` or `false` (Default: `false`). See [Paper Trading](#paper-trading). |
 
 Then create a config from the environment:
 
@@ -228,6 +229,40 @@ async function main() {
 }
 
 main();
+```
+
+## Paper Trading
+
+If your account is a **paper trading** (simulation) account and you want to
+place orders, you must explicitly enable paper trading mode.  When enabled, all
+API calls target the paper trading environment and the server validates the
+token — if the token belongs to a real-money account the server returns an
+error.
+
+By default this option is **off**: the server imposes no restrictions and
+accepts requests from both paper trading and real-money accounts.
+
+**Via environment variable** (applies automatically to all constructor methods):
+
+```bash
+export LONGBRIDGE_PAPERTRADING=true   # macOS / Linux
+```
+
+```powershell
+$env:LONGBRIDGE_PAPERTRADING = "true"   # Windows PowerShell
+```
+
+**Programmatically:**
+
+```javascript
+const { Config } = require('longbridge');
+
+const config = Config.fromApikey(
+  process.env.LONGBRIDGE_APP_KEY,
+  process.env.LONGBRIDGE_APP_SECRET,
+  process.env.LONGBRIDGE_ACCESS_TOKEN,
+  { enablePapertrading: true },
+);
 ```
 
 ## Troubleshooting

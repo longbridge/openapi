@@ -64,6 +64,8 @@ https://longbridge.github.io/openapi
 - Debugging
   - Enable logs via `LONGBRIDGE_LOG_PATH`.
   - If quotes connect but look empty, keep `LONGBRIDGE_PRINT_QUOTE_PACKAGES=true` to confirm opened quote packages.
+- Paper trading
+  - If your account is a paper trading (simulation) account and you want to place orders, set `LONGBRIDGE_PAPERTRADING=true`. When enabled, all API calls target the paper trading environment and the server validates the token — if the token belongs to a real-money account the server returns an error. When `false` (the default) the server imposes no restrictions.
 
 ## Minimal Verification
 
