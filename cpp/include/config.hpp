@@ -81,6 +81,18 @@ public:
   /// Enable overnight quote
   Config& enable_overnight();
 
+  /// Enable paper trading mode.
+  ///
+  /// When enabled, all API calls target the paper trading (simulation)
+  /// environment.  The server validates the token: if it belongs to a
+  /// real-money account the server returns an error.
+  ///
+  /// By default this option is disabled and the server imposes no restrictions
+  /// — both paper trading and real-money accounts are accepted.
+  ///
+  /// Paper trading users should call this method as a safety guard.
+  Config& enable_papertrading();
+
   /// Set the push candlestick mode
   Config& set_push_candlestick_mode(PushCandlestickMode mode);
 

@@ -9029,6 +9029,22 @@ void lb_config_set_push_candlestick_mode(struct lb_config_t *config,
 void lb_config_disable_print_quote_packages(struct lb_config_t *config);
 
 /**
+ * Enable paper trading mode.
+ *
+ * When enabled, all API calls target the paper trading (simulation)
+ * environment.  The server validates the token: if it belongs to a real-money
+ * account the server returns an error.
+ *
+ * When disabled (the default) the server imposes no restrictions — both
+ * paper trading and real-money accounts are accepted.
+ *
+ * Paper trading users should call this function as a safety guard.
+ *
+ * @param config  Config object
+ */
+void lb_config_enable_papertrading(struct lb_config_t *config);
+
+/**
  * Set the log file path
  *
  * @param config    Config object
