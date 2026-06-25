@@ -1988,7 +1988,7 @@ impl From<lb::MultiLanguageText> for MultiLanguageText {
 }
 
 /// Country code for filtering macroeconomic indicators
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Copy, Clone)]
 pub(crate) enum MacroeconomicCountry {
     HongKong,
