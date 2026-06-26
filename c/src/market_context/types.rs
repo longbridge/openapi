@@ -18,11 +18,12 @@ use crate::types::{CMarket, CString, CVec, ToFFI};
 pub struct CMarketTimeItem {
     /// Market identifier.
     pub market: CMarket,
-    /// Current trade status code for the market.
+    /// Current market trade status code. See the market status definition for
+    /// the complete code table.
     pub trade_status: i32,
     /// Timestamp of the current trade status as an ISO-8601 string.
     pub timestamp: *const c_char,
-    /// Delayed trade status code for the market.
+    /// Delayed market trade status code.
     pub delay_trade_status: i32,
     /// Timestamp of the delayed trade status as an ISO-8601 string.
     pub delay_timestamp: *const c_char,
@@ -46,9 +47,9 @@ impl From<MarketTimeItem> for CMarketTimeItemOwned {
     fn from(v: MarketTimeItem) -> Self {
         Self {
             market: v.market.into(),
-            trade_status: v.trade_status,
+            trade_status: v.trade_status.code(),
             timestamp: v.timestamp.into(),
-            delay_trade_status: v.delay_trade_status,
+            delay_trade_status: v.delay_trade_status.code(),
             delay_timestamp: v.delay_timestamp.into(),
             sub_status: v.sub_status,
             delay_sub_status: v.delay_sub_status,

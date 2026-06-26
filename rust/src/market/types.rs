@@ -2,11 +2,285 @@
 
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
+use strum_macros::{FromRepr, IntoStaticStr};
 use time::OffsetDateTime;
 
 use crate::{types::Market, utils::counter::deserialize_counter_id_as_symbol};
 
 // ── market_status ─────────────────────────────────────────────────
+
+/// Market trading status code.
+#[allow(non_camel_case_types)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    Hash,
+    PartialOrd,
+    Ord,
+    PartialEq,
+    Eq,
+    FromRepr,
+    IntoStaticStr,
+    Serialize_repr,
+    Deserialize_repr,
+)]
+#[repr(i32)]
+pub enum TradeStatus {
+    /// Unknown status
+    #[default]
+    #[serde(other)]
+    UNKNOWN = -1,
+    /// Quote is not registered
+    NO_REGISTER_QUOTE = 0,
+    /// Clearing before the market opens.
+    CLEAN = 101,
+    /// Opening auction.
+    OPEN_BID = 102,
+    /// Morning break, currently used by VIX indexes.
+    MORNING_CLOSING = 103,
+    /// Regular trading.
+    TRADING = 105,
+    /// Midday break.
+    NOON_CLOSING = 106,
+    /// Closing auction.
+    CLOSE_BID = 107,
+    /// Market closed.
+    CLOSING = 108,
+    /// Dark trading waiting to open.
+    DARK_WAIT = 110,
+    /// Dark trading.
+    DARK_TRADING = 111,
+    /// Dark trading closed.
+    DARK_CLOSING = 112,
+    /// After-hours fixed-price trading.
+    AFTER_FIX = 120,
+    /// Half-day market closed. Defined by the market status table but currently
+    /// unused.
+    HALF_CLOSING = 121,
+    /// Not opened because the exchange is waiting to open under special
+    /// conditions.
+    NOT_OPENED = 122,
+    /// Temporary intraday break. The historical variant name is kept for
+    /// compatibility.
+    REALTIME_QUOTE = 123,
+    /// US pre-market.
+    US_PREV = 201,
+    /// US regular trading.
+    US_TRADING = 202,
+    /// US post-market.
+    US_AFTER = 203,
+    /// US closed.
+    US_CLOSING = 204,
+    /// US halted.
+    US_STOP = 205,
+    /// US clearing plus pre-market.
+    US_CLEAN = 206,
+    /// US overnight trading.
+    US_NIGHT = 207,
+    /// US pre-market clearing alias returned by the quote engine.
+    US_PREV_MARKET_CLEAN = 209,
+    /// US post-market clearing alias returned by the quote engine.
+    US_AFTER_MARKET_CLEAN = 210,
+    /// Stock refresh. Deprecated in the status definition.
+    REFRESH = 1000,
+    /// Delisted.
+    DELIST = 1001,
+    /// Preparing to list.
+    PREPARE = 1002,
+    /// Code changed.
+    CODE_CHANGE = 1003,
+    /// Halted.
+    STOP = 1004,
+    /// Waiting to open, typically for a US IPO auction.
+    WILL_OPEN = 1005,
+    /// Split or merge suspended.
+    COMMON_SUSPEND = 1006,
+    /// Expired.
+    EXPIRE = 1007,
+    /// No quote data.
+    NO_QUOTE = 1008,
+    /// Not listed. The historical variant name is kept for compatibility.
+    UNITED = 1009,
+    /// Terminated trading, usually for warrants.
+    TRADING_HALT = 1010,
+    /// Waiting to list, usually for new warrants.
+    WAIT_LISTING = 1011,
+    /// Fuse.
+    FUSE = 2001,
+}
+
+impl From<i32> for TradeStatus {
+    fn from(value: i32) -> Self {
+        Self::from_repr(value).unwrap_or_default()
+    }
+}
+
+impl TradeStatus {
+    /// Converts an isize value to a market trading status.
+    pub fn from_isize(value: isize) -> TradeStatus {
+        (value as i32).into()
+    }
+
+    /// Returns the raw numeric status code.
+    pub fn code(self) -> i32 {
+        self as i32
+    }
+
+    /// Returns the static enum variant name.
+    pub fn as_static(self) -> &'static str {
+        self.into()
+    }
+
+    /// Returns a simplified label for key display states.
+    pub fn label(self) -> &'static str {
+        let status = self.normalize();
+        match status {
+            TradeStatus::US_PREV
+            | TradeStatus::US_TRADING
+            | TradeStatus::US_AFTER
+            | TradeStatus::US_NIGHT
+            | TradeStatus::US_CLOSING
+            | TradeStatus::TRADING
+            | TradeStatus::CLOSING => status.name(),
+            _ => "",
+        }
+    }
+
+    /// Returns the full English status name.
+    pub fn name(self) -> &'static str {
+        match self.normalize() {
+            TradeStatus::UNKNOWN | TradeStatus::NO_REGISTER_QUOTE => "Unknown",
+            TradeStatus::OPEN_BID => "Open Bid",
+            TradeStatus::MORNING_CLOSING => "Morning Break",
+            TradeStatus::TRADING | TradeStatus::US_TRADING | TradeStatus::US_AFTER_MARKET_CLEAN => {
+                "Trading"
+            }
+            TradeStatus::NOON_CLOSING => "Mid-Day Break",
+            TradeStatus::CLOSE_BID => "Close Bid",
+            TradeStatus::CLOSING
+            | TradeStatus::CLEAN
+            | TradeStatus::HALF_CLOSING
+            | TradeStatus::US_CLOSING
+            | TradeStatus::US_PREV_MARKET_CLEAN => "Closed",
+            TradeStatus::DARK_WAIT => "Dark Wait",
+            TradeStatus::DARK_TRADING => "Dark Trading",
+            TradeStatus::DARK_CLOSING => "Closing",
+            TradeStatus::AFTER_FIX => "After Fix",
+            TradeStatus::NOT_OPENED => "Not Open",
+            TradeStatus::REALTIME_QUOTE => "Temporary Break",
+            TradeStatus::US_PREV | TradeStatus::US_CLEAN => "Pre-Market",
+            TradeStatus::US_AFTER => "Post-Market",
+            TradeStatus::US_STOP | TradeStatus::STOP => "Stop",
+            TradeStatus::US_NIGHT => "Overnight",
+            TradeStatus::REFRESH => "Refresh",
+            TradeStatus::DELIST => "Delist",
+            TradeStatus::PREPARE => "Prepare",
+            TradeStatus::CODE_CHANGE => "Code Change",
+            TradeStatus::WILL_OPEN => "Will Open",
+            TradeStatus::COMMON_SUSPEND => "Common Suspend",
+            TradeStatus::EXPIRE => "Expire",
+            TradeStatus::NO_QUOTE => "No Quote",
+            TradeStatus::UNITED => "Not Listed",
+            TradeStatus::TRADING_HALT => "Terminated",
+            TradeStatus::WAIT_LISTING => "Wait Listing",
+            TradeStatus::FUSE => "Fuse",
+        }
+    }
+
+    /// Returns whether this is a US market status.
+    pub fn is_us_market(self) -> bool {
+        self.code() >= 200 && self.code() < 300
+    }
+
+    /// Returns whether this is a US pre/post-market status.
+    pub fn is_us_pre_post(self) -> bool {
+        self.is_us_prev() || self.is_us_after()
+    }
+
+    /// Returns whether this is a US overnight status.
+    pub fn is_us_night(self) -> bool {
+        matches!(self, TradeStatus::US_NIGHT)
+    }
+
+    /// Returns whether this is a US closed status.
+    pub fn is_us_closing(self) -> bool {
+        matches!(
+            self,
+            TradeStatus::US_CLOSING | TradeStatus::US_PREV_MARKET_CLEAN
+        )
+    }
+
+    /// Returns whether this is a closed status.
+    pub fn is_closing(self) -> bool {
+        matches!(
+            self,
+            TradeStatus::US_CLOSING
+                | TradeStatus::US_PREV_MARKET_CLEAN
+                | TradeStatus::CLOSING
+                | TradeStatus::HALF_CLOSING
+        )
+    }
+
+    /// Returns whether this is a US pre-market status.
+    pub fn is_us_prev(self) -> bool {
+        matches!(self, TradeStatus::US_PREV | TradeStatus::US_CLEAN)
+    }
+
+    /// Returns whether this is a US post-market status.
+    pub fn is_us_after(self) -> bool {
+        matches!(self, TradeStatus::US_AFTER)
+    }
+
+    /// Returns whether this is a trading status.
+    pub fn is_trading(self) -> bool {
+        matches!(
+            self,
+            TradeStatus::TRADING | TradeStatus::US_TRADING | TradeStatus::US_AFTER_MARKET_CLEAN
+        )
+    }
+
+    /// Returns whether this is a dark-pool status.
+    pub fn is_dark(self) -> bool {
+        matches!(
+            self,
+            TradeStatus::DARK_WAIT | TradeStatus::DARK_TRADING | TradeStatus::DARK_CLOSING
+        )
+    }
+
+    /// Returns whether this status allows trading.
+    pub fn allow_trading(self) -> bool {
+        matches!(
+            self,
+            TradeStatus::OPEN_BID
+                | TradeStatus::TRADING
+                | TradeStatus::CLOSE_BID
+                | TradeStatus::NOT_OPENED
+                | TradeStatus::NOON_CLOSING
+                | TradeStatus::US_TRADING
+                | TradeStatus::US_AFTER_MARKET_CLEAN
+        )
+    }
+
+    /// Normalizes clearing aliases to their display-equivalent status.
+    #[must_use]
+    pub fn normalize(self) -> Self {
+        match self {
+            TradeStatus::CLEAN => TradeStatus::CLOSING,
+            TradeStatus::US_PREV_MARKET_CLEAN => TradeStatus::US_CLOSING,
+            TradeStatus::US_CLEAN => TradeStatus::US_PREV,
+            TradeStatus::US_AFTER_MARKET_CLEAN => TradeStatus::US_TRADING,
+            _ => self,
+        }
+    }
+
+    /// Returns whether this is a special non-regular status.
+    pub fn is_special(self) -> bool {
+        self.code() < 100 || self == Self::US_STOP || self.code() >= 1000
+    }
+}
 
 /// Response for [`crate::MarketContext::market_status`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,19 +294,142 @@ pub struct MarketStatusResponse {
 pub struct MarketTimeItem {
     /// Market code
     pub market: Market,
-    /// Raw trade status code (101=PreOpen, 102/103/105=Trading, 104=LunchBreak,
-    /// 106=PostTrading, 108=Closed, 201=PreMarket, 204=PostMarket)
-    pub trade_status: i32,
+    /// Market trade status. See [`TradeStatus`] for the code table.
+    pub trade_status: TradeStatus,
     /// Current market time (unix timestamp string)
     pub timestamp: String,
-    /// Delayed-quote trade status code
-    pub delay_trade_status: i32,
+    /// Delayed-quote market trade status. See [`TradeStatus`] for the code
+    /// table.
+    pub delay_trade_status: TradeStatus,
     /// Delayed-quote market time (unix timestamp string)
     pub delay_timestamp: String,
     /// Sub-status code
     pub sub_status: i32,
     /// Delayed-quote sub-status code
     pub delay_sub_status: i32,
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::market::TradeStatus;
+
+    #[test]
+    fn market_trade_status_deserializes_numeric_codes() {
+        assert_eq!(
+            serde_json::from_str::<TradeStatus>("202")
+                .expect("202 should deserialize as market trade status"),
+            TradeStatus::US_TRADING
+        );
+        assert_eq!(
+            serde_json::from_str::<TradeStatus>("456")
+                .expect("unknown numeric status should deserialize"),
+            TradeStatus::UNKNOWN
+        );
+    }
+
+    #[test]
+    fn market_trade_status_serializes_as_numeric_code() {
+        let value = serde_json::to_string(&TradeStatus::US_CLEAN)
+            .expect("market trade status should serialize");
+        assert_eq!(value, "206");
+    }
+
+    #[test]
+    fn market_trade_status_normalizes_engine_aliases() {
+        assert_eq!(TradeStatus::CLEAN.normalize(), TradeStatus::CLOSING);
+        assert_eq!(TradeStatus::US_CLEAN.normalize(), TradeStatus::US_PREV);
+        assert_eq!(
+            TradeStatus::US_PREV_MARKET_CLEAN.normalize(),
+            TradeStatus::US_CLOSING
+        );
+        assert_eq!(
+            TradeStatus::US_AFTER_MARKET_CLEAN.normalize(),
+            TradeStatus::US_TRADING
+        );
+    }
+
+    #[test]
+    fn market_trade_status_label_matches_engine_simplified_display() {
+        assert_eq!(TradeStatus::US_PREV.label(), "Pre-Market");
+        assert_eq!(TradeStatus::US_CLEAN.label(), "Pre-Market");
+        assert_eq!(TradeStatus::US_AFTER.label(), "Post-Market");
+        assert_eq!(TradeStatus::US_CLOSING.label(), "Closed");
+        assert_eq!(TradeStatus::US_AFTER_MARKET_CLEAN.label(), "Trading");
+        assert_eq!(TradeStatus::US_TRADING.label(), "Trading");
+        assert_eq!(TradeStatus::TRADING.label(), "Trading");
+        assert_eq!(TradeStatus::CLEAN.label(), "Closed");
+        assert_eq!(TradeStatus::OPEN_BID.label(), "");
+        assert_eq!(TradeStatus::NOON_CLOSING.label(), "");
+    }
+
+    #[test]
+    fn market_trade_status_name_covers_full_status_set() {
+        let cases = [
+            (TradeStatus::MORNING_CLOSING, "Morning Break"),
+            (TradeStatus::NOON_CLOSING, "Mid-Day Break"),
+            (TradeStatus::REALTIME_QUOTE, "Temporary Break"),
+            (TradeStatus::US_STOP, "Stop"),
+            (TradeStatus::TRADING_HALT, "Terminated"),
+            (TradeStatus::WAIT_LISTING, "Wait Listing"),
+            (TradeStatus::FUSE, "Fuse"),
+            (TradeStatus::UNKNOWN, "Unknown"),
+            (TradeStatus::NO_REGISTER_QUOTE, "Unknown"),
+        ];
+
+        for (status, expected) in cases {
+            assert_eq!(status.name(), expected, "status {status:?}");
+        }
+    }
+
+    #[test]
+    fn market_trade_status_codes_match_phase_definition_document() {
+        let codes = [
+            101, 102, 103, 105, 106, 107, 108, 110, 111, 112, 120, 121, 122, 123, 201, 202, 203,
+            204, 206, 207, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011,
+            2001,
+        ];
+
+        for code in codes {
+            assert_eq!(TradeStatus::from(code).code(), code, "status code {code}");
+        }
+    }
+
+    #[test]
+    fn market_trade_status_names_match_phase_definition_document() {
+        let cases = [
+            (123, "Temporary Break"),
+            (1009, "Not Listed"),
+            (1010, "Terminated"),
+            (2001, "Fuse"),
+        ];
+
+        for (code, expected) in cases {
+            assert_eq!(
+                TradeStatus::from(code).name(),
+                expected,
+                "status code {code}"
+            );
+        }
+    }
+
+    #[test]
+    fn market_time_item_uses_market_trade_status_type() {
+        let item = serde_json::from_str::<crate::market::MarketTimeItem>(
+            r#"{
+                "market": "US",
+                "trade_status": 202,
+                "timestamp": "1717200000",
+                "delay_trade_status": 204,
+                "delay_timestamp": "1717200000",
+                "sub_status": 0,
+                "delay_sub_status": 0
+            }"#,
+        )
+        .expect("market time item should deserialize");
+
+        assert_eq!(item.trade_status, TradeStatus::US_TRADING);
+        assert_eq!(item.delay_trade_status, TradeStatus::US_CLOSING);
+    }
 }
 
 // ── broker_holding ────────────────────────────────────────────────
