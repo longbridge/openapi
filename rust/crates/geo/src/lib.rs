@@ -123,6 +123,22 @@ impl DcRegion {
             DcRegion::Ap => "ap",
         }
     }
+
+    /// Strip the region prefix (`us_` / `ap_`), and any leading `Bearer `, from
+    /// a credential, returning the bare token to transmit.
+    ///
+    /// The prefix is region metadata for [`from_credential`] / the
+    /// [`DC_REGION_HEADER`] — it is **not** part of the verifiable credential.
+    /// The gateway verifies the bare token and routes by the region header, so
+    /// the prefix must be removed before the token is sent (e.g. in an
+    /// `Authorization: Bearer …` header or a WebSocket auth handshake).
+    pub fn strip_region_prefix(credential: &str) -> &str {
+        let credential = credential.strip_prefix("Bearer ").unwrap_or(credential);
+        credential
+            .strip_prefix("us_")
+            .or_else(|| credential.strip_prefix("ap_"))
+            .unwrap_or(credential)
+    }
 }
 
 #[cfg(test)]
@@ -158,5 +174,15 @@ mod dc_region_tests {
     fn as_str_matches_header_value() {
         assert_eq!(DcRegion::Us.as_str(), "us");
         assert_eq!(DcRegion::Ap.as_str(), "ap");
+    }
+
+    #[test]
+    fn strip_region_prefix_removes_region_and_bearer() {
+        assert_eq!(DcRegion::strip_region_prefix("us_eyJabc"), "eyJabc");
+        assert_eq!(DcRegion::strip_region_prefix("ap_eyJabc"), "eyJabc");
+        assert_eq!(DcRegion::strip_region_prefix("Bearer us_eyJabc"), "eyJabc");
+        // Unprefixed tokens pass through unchanged.
+        assert_eq!(DcRegion::strip_region_prefix("eyJabc"), "eyJabc");
+        assert_eq!(DcRegion::strip_region_prefix("Bearer eyJabc"), "eyJabc");
     }
 }

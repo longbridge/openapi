@@ -237,8 +237,9 @@ where
             .and_then(|value| value.parse().ok())
             .unwrap_or_else(Timestamp::now);
 
-        // Resolve app_key, access_token, and optional app_secret from auth config
-        let (app_key, access_token, app_secret) = match &config.auth {
+        // Resolve app_key, access_token, optional app_secret, and the data-center
+        // region from the auth config.
+        let (app_key, access_token, app_secret, dc_region) = match &config.auth {
             AuthConfig::ApiKey {
                 app_key,
                 app_secret,
@@ -247,16 +248,24 @@ where
                 app_key.clone(),
                 access_token.clone(),
                 Some(app_secret.clone()),
+                DcRegion::from_credentials(&[app_key, access_token, app_secret]),
             ),
             AuthConfig::OAuth(oauth) => {
                 let token = oauth
                     .access_token()
                     .await
                     .map_err(|e| HttpClientError::OAuth(e.to_string()))?;
+                // The `us_`/`ap_` prefix is region metadata, not part of the
+                // verifiable bearer credential: derive the region from it, then
+                // strip it so the gateway verifies the bare token and routes by
+                // the `x-dc-region` header.
+                let region = DcRegion::from_credential(&token);
+                let bare = DcRegion::strip_region_prefix(&token);
                 (
                     oauth.client_id().to_string(),
-                    format!("Bearer {token}"),
+                    format!("Bearer {bare}"),
                     None,
+                    region,
                 )
             }
         };
@@ -278,20 +287,11 @@ where
             .header("Content-Type", "application/json; charset=utf-8");
 
         // Route to the data center matching the credential's region (us/ap),
-        // derived from the `us_`/`ap_` prefix on the OAuth token or — in legacy
-        // API-key mode — the app_key/app_secret/access_token. Skip when the
-        // caller already set the header explicitly (e.g. via custom headers).
+        // unless the caller already set the header explicitly (e.g. via custom
+        // headers).
         let region_already_set = default_headers.contains_key(DC_REGION_HEADER)
             || self.headers.contains_key(DC_REGION_HEADER);
         if !region_already_set {
-            let dc_region = match &config.auth {
-                AuthConfig::ApiKey {
-                    app_key,
-                    app_secret,
-                    access_token,
-                } => DcRegion::from_credentials(&[app_key, access_token, app_secret]),
-                AuthConfig::OAuth(_) => DcRegion::from_credential(&access_token),
-            };
             request_builder = request_builder.header(DC_REGION_HEADER, dc_region.as_str());
         }
 
