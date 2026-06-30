@@ -6,7 +6,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use longbridge_geo::is_cn;
+use longbridge_geo::{DC_REGION_HEADER, DcRegion, is_cn};
 use reqwest::{
     Method, StatusCode,
     header::{HeaderMap, HeaderName, HeaderValue},
@@ -276,6 +276,24 @@ where
             .header("Authorization", access_token_value)
             .header("X-Timestamp", timestamp.to_string())
             .header("Content-Type", "application/json; charset=utf-8");
+
+        // Route to the data center matching the credential's region (us/ap),
+        // derived from the `us_`/`ap_` prefix on the OAuth token or — in legacy
+        // API-key mode — the app_key/app_secret/access_token. Skip when the
+        // caller already set the header explicitly (e.g. via custom headers).
+        let region_already_set = default_headers.contains_key(DC_REGION_HEADER)
+            || self.headers.contains_key(DC_REGION_HEADER);
+        if !region_already_set {
+            let dc_region = match &config.auth {
+                AuthConfig::ApiKey {
+                    app_key,
+                    app_secret,
+                    access_token,
+                } => DcRegion::from_credentials(&[app_key, access_token, app_secret]),
+                AuthConfig::OAuth(_) => DcRegion::from_credential(&access_token),
+            };
+            request_builder = request_builder.header(DC_REGION_HEADER, dc_region.as_str());
+        }
 
         // set the request body
         if let Some(body) = &self.body {

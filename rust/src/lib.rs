@@ -45,6 +45,7 @@ pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
 pub use fundamental::FundamentalContext;
 pub use longbridge_httpcli as httpclient;
+pub use longbridge_httpcli::{DC_REGION_HEADER, DcRegion};
 pub use longbridge_wscli as wsclient;
 pub use market::MarketContext;
 pub use portfolio::PortfolioContext;
