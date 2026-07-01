@@ -255,15 +255,13 @@ where
                     .access_token()
                     .await
                     .map_err(|e| HttpClientError::OAuth(e.to_string()))?;
-                // The `us_`/`ap_` prefix is region metadata, not part of the
-                // verifiable bearer credential: derive the region from it, then
-                // strip it so the gateway verifies the bare token and routes by
-                // the `x-dc-region` header.
+                // Derive DC region from the token prefix (us_→US, others→AP).
+                // The token is sent as-is (including any prefix); the gateway
+                // accepts the full token and routes via the x-dc-region header.
                 let region = DcRegion::from_credential(&token);
-                let bare = DcRegion::strip_region_prefix(&token);
                 (
                     oauth.client_id().to_string(),
-                    format!("Bearer {bare}"),
+                    format!("Bearer {token}"),
                     None,
                     region,
                 )

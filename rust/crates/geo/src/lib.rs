@@ -124,20 +124,38 @@ impl DcRegion {
         }
     }
 
-    /// Strip the region prefix (`us_` / `ap_`), and any leading `Bearer `, from
-    /// a credential, returning the bare token to transmit.
+    /// Strip any leading `Bearer ` from a credential.
     ///
-    /// The prefix is region metadata for [`from_credential`] / the
-    /// [`DC_REGION_HEADER`] — it is **not** part of the verifiable credential.
-    /// The gateway verifies the bare token and routes by the region header, so
-    /// the prefix must be removed before the token is sent (e.g. in an
-    /// `Authorization: Bearer …` header or a WebSocket auth handshake).
+    /// Region prefixes (`hk_m_`, `us_m_`, `ap_m_`, …) are routing metadata
+    /// consumed by [`from_credential`] to derive the [`DC_REGION_HEADER`].
+    /// The gateway accepts the full prefixed token and routes via the header,
+    /// so **no region prefix is stripped** — only `Bearer ` is removed.
     pub fn strip_region_prefix(credential: &str) -> &str {
-        let credential = credential.strip_prefix("Bearer ").unwrap_or(credential);
-        credential
-            .strip_prefix("us_")
-            .or_else(|| credential.strip_prefix("ap_"))
-            .unwrap_or(credential)
+        credential.strip_prefix("Bearer ").unwrap_or(credential)
+    }
+
+    /// HTTP base URL for this region (staging environment).
+    pub fn http_url_staging(self) -> &'static str {
+        match self {
+            DcRegion::Us => "https://openapi-global.longbridge.xyz",
+            DcRegion::Ap => "https://openapi.longbridge.xyz",
+        }
+    }
+
+    /// Quote WebSocket URL for this region (staging environment).
+    pub fn quote_ws_url_staging(self) -> &'static str {
+        match self {
+            DcRegion::Us => "wss://openapi-global-quote.longbridge.xyz",
+            DcRegion::Ap => "wss://openapi-quote.longbridge.xyz",
+        }
+    }
+
+    /// Trade WebSocket URL for this region (staging environment).
+    pub fn trade_ws_url_staging(self) -> &'static str {
+        match self {
+            DcRegion::Us => "wss://openapi-global-trade.longbridge.xyz",
+            DcRegion::Ap => "wss://openapi-trade.longbridge.xyz",
+        }
     }
 }
 
@@ -177,12 +195,12 @@ mod dc_region_tests {
     }
 
     #[test]
-    fn strip_region_prefix_removes_region_and_bearer() {
-        assert_eq!(DcRegion::strip_region_prefix("us_eyJabc"), "eyJabc");
-        assert_eq!(DcRegion::strip_region_prefix("ap_eyJabc"), "eyJabc");
-        assert_eq!(DcRegion::strip_region_prefix("Bearer us_eyJabc"), "eyJabc");
-        // Unprefixed tokens pass through unchanged.
-        assert_eq!(DcRegion::strip_region_prefix("eyJabc"), "eyJabc");
+    fn strip_region_prefix_only_removes_bearer() {
+        // Region prefixes are kept as-is; only "Bearer " is stripped.
+        assert_eq!(DcRegion::strip_region_prefix("us_m_eyJabc"), "us_m_eyJabc");
+        assert_eq!(DcRegion::strip_region_prefix("hk_m_eyJabc"), "hk_m_eyJabc");
+        assert_eq!(DcRegion::strip_region_prefix("Bearer us_m_eyJabc"), "us_m_eyJabc");
         assert_eq!(DcRegion::strip_region_prefix("Bearer eyJabc"), "eyJabc");
+        assert_eq!(DcRegion::strip_region_prefix("eyJabc"), "eyJabc");
     }
 }
