@@ -199,7 +199,10 @@ mod dc_region_tests {
         // Region prefixes are kept as-is; only "Bearer " is stripped.
         assert_eq!(DcRegion::strip_region_prefix("us_m_eyJabc"), "us_m_eyJabc");
         assert_eq!(DcRegion::strip_region_prefix("hk_m_eyJabc"), "hk_m_eyJabc");
-        assert_eq!(DcRegion::strip_region_prefix("Bearer us_m_eyJabc"), "us_m_eyJabc");
+        assert_eq!(
+            DcRegion::strip_region_prefix("Bearer us_m_eyJabc"),
+            "us_m_eyJabc"
+        );
         assert_eq!(DcRegion::strip_region_prefix("Bearer eyJabc"), "eyJabc");
         assert_eq!(DcRegion::strip_region_prefix("eyJabc"), "eyJabc");
     }
