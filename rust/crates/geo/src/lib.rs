@@ -134,28 +134,22 @@ impl DcRegion {
         credential.strip_prefix("Bearer ").unwrap_or(credential)
     }
 
-    /// HTTP base URL for this region (staging environment).
-    pub fn http_url_staging(self) -> &'static str {
-        match self {
-            DcRegion::Us => "https://openapi-global.longbridge.xyz",
-            DcRegion::Ap => "https://openapi.longbridge.xyz",
-        }
+    /// HTTP base URL for the staging environment.
+    ///
+    /// Staging always uses the global endpoint; the data-center is selected
+    /// by the [`DC_REGION_HEADER`] (`ap` or `us`), not the hostname.
+    pub fn http_url_staging(_self: DcRegion) -> &'static str {
+        "https://openapi-global.longbridge.xyz"
     }
 
-    /// Quote WebSocket URL for this region (staging environment).
-    pub fn quote_ws_url_staging(self) -> &'static str {
-        match self {
-            DcRegion::Us => "wss://openapi-global-quote.longbridge.xyz",
-            DcRegion::Ap => "wss://openapi-quote.longbridge.xyz",
-        }
+    /// Quote WebSocket URL for the staging environment.
+    pub fn quote_ws_url_staging(_self: DcRegion) -> &'static str {
+        "wss://openapi-global-quote.longbridge.xyz"
     }
 
-    /// Trade WebSocket URL for this region (staging environment).
-    pub fn trade_ws_url_staging(self) -> &'static str {
-        match self {
-            DcRegion::Us => "wss://openapi-global-trade.longbridge.xyz",
-            DcRegion::Ap => "wss://openapi-trade.longbridge.xyz",
-        }
+    /// Trade WebSocket URL for the staging environment.
+    pub fn trade_ws_url_staging(_self: DcRegion) -> &'static str {
+        "wss://openapi-global-trade.longbridge.xyz"
     }
 }
 
