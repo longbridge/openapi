@@ -365,7 +365,7 @@ impl AsyncFundamentalContext {
     // ── US-market async methods ───────────────────────────────────────────────
 
     /// Get US company overview. US token required. Returns awaitable.
-    fn us_company_overview(&self, py: Python<'_>, counter_id: String) -> PyResult<Py<PyAny>> {
+    fn us_company_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USCompanyOverview::from(
@@ -378,7 +378,7 @@ impl AsyncFundamentalContext {
     }
 
     /// Get US valuation overview. US token required. Returns awaitable.
-    fn us_valuation_overview(&self, py: Python<'_>, counter_id: String) -> PyResult<Py<PyAny>> {
+    fn us_valuation_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USValuationOverview::from(
@@ -394,13 +394,13 @@ impl AsyncFundamentalContext {
     fn us_financial_overview(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx
-                .us_financial_overview(counter_id, report)
+                .us_financial_overview(symbol, report)
                 .await
                 .map_err(ErrorNewType)?;
             Python::attach(|py| {
@@ -416,14 +416,14 @@ impl AsyncFundamentalContext {
     fn us_financial_statement_v3(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         kind: String,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USFinancialStatement::from(
-                ctx.us_financial_statement_v3(counter_id, kind, report)
+                ctx.us_financial_statement_v3(symbol, kind, report)
                     .await
                     .map_err(ErrorNewType)?,
             ))
@@ -435,13 +435,13 @@ impl AsyncFundamentalContext {
     fn us_key_financial_metrics(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx
-                .us_key_financial_metrics(counter_id, report)
+                .us_key_financial_metrics(symbol, report)
                 .await
                 .map_err(ErrorNewType)?;
             Python::attach(|py| {
@@ -457,13 +457,13 @@ impl AsyncFundamentalContext {
     fn us_analyst_consensus(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx
-                .us_analyst_consensus(counter_id, report)
+                .us_analyst_consensus(symbol, report)
                 .await
                 .map_err(ErrorNewType)?;
             Python::attach(|py| {
@@ -476,7 +476,7 @@ impl AsyncFundamentalContext {
     }
 
     /// Get US ETF dividend info. Returns awaitable.
-    fn us_etf_dividend_info(&self, py: Python<'_>, counter_id: String) -> PyResult<Py<PyAny>> {
+    fn us_etf_dividend_info(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USETFDividendInfo::from(
@@ -489,7 +489,7 @@ impl AsyncFundamentalContext {
     }
 
     /// Get US company dividends. Returns awaitable.
-    fn us_company_dividends(&self, py: Python<'_>, counter_id: String) -> PyResult<Py<PyAny>> {
+    fn us_company_dividends(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USCompanyDividends::from(
@@ -505,15 +505,13 @@ impl AsyncFundamentalContext {
     fn us_etf_files(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         size: Option<u32>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USETFFilesResponse::from(
-                ctx.us_etf_files(counter_id, size)
-                    .await
-                    .map_err(ErrorNewType)?,
+                ctx.us_etf_files(symbol, size).await.map_err(ErrorNewType)?,
             ))
         })
         .map(|b| b.unbind())

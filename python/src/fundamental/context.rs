@@ -245,7 +245,7 @@ impl FundamentalContext {
     // ── US-market methods ─────────────────────────────────────────────────────
 
     /// Get US company overview. US token required.
-    fn us_company_overview(&self, counter_id: String) -> PyResult<USCompanyOverview> {
+    fn us_company_overview(&self, symbol: String) -> PyResult<USCompanyOverview> {
         Ok(self
             .ctx
             .us_company_overview(symbol)
@@ -254,7 +254,7 @@ impl FundamentalContext {
     }
 
     /// Get US valuation overview. US token required.
-    fn us_valuation_overview(&self, counter_id: String) -> PyResult<USValuationOverview> {
+    fn us_valuation_overview(&self, symbol: String) -> PyResult<USValuationOverview> {
         Ok(self
             .ctx
             .us_valuation_overview(symbol)
@@ -267,12 +267,12 @@ impl FundamentalContext {
     fn us_financial_overview(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let v = self
             .ctx
-            .us_financial_overview(counter_id, report)
+            .us_financial_overview(symbol, report)
             .map_err(ErrorNewType)?;
         pythonize::pythonize(py, &v)
             .map(|b| b.unbind())
@@ -283,13 +283,13 @@ impl FundamentalContext {
     /// required.
     fn us_financial_statement_v3(
         &self,
-        counter_id: String,
+        symbol: String,
         kind: String,
         report: String,
     ) -> PyResult<USFinancialStatement> {
         Ok(self
             .ctx
-            .us_financial_statement_v3(counter_id, kind, report)
+            .us_financial_statement_v3(symbol, kind, report)
             .map_err(ErrorNewType)?
             .into())
     }
@@ -298,12 +298,12 @@ impl FundamentalContext {
     fn us_key_financial_metrics(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let v = self
             .ctx
-            .us_key_financial_metrics(counter_id, report)
+            .us_key_financial_metrics(symbol, report)
             .map_err(ErrorNewType)?;
         pythonize::pythonize(py, &v)
             .map(|b| b.unbind())
@@ -314,12 +314,12 @@ impl FundamentalContext {
     fn us_analyst_consensus(
         &self,
         py: Python<'_>,
-        counter_id: String,
+        symbol: String,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let v = self
             .ctx
-            .us_analyst_consensus(counter_id, report)
+            .us_analyst_consensus(symbol, report)
             .map_err(ErrorNewType)?;
         pythonize::pythonize(py, &v)
             .map(|b| b.unbind())
@@ -327,7 +327,7 @@ impl FundamentalContext {
     }
 
     /// Get US ETF dividend history. US token required.
-    fn us_etf_dividend_info(&self, counter_id: String) -> PyResult<USETFDividendInfo> {
+    fn us_etf_dividend_info(&self, symbol: String) -> PyResult<USETFDividendInfo> {
         Ok(self
             .ctx
             .us_etf_dividend_info(symbol)
@@ -336,7 +336,7 @@ impl FundamentalContext {
     }
 
     /// Get US company historical dividends. US token required.
-    fn us_company_dividends(&self, counter_id: String) -> PyResult<USCompanyDividends> {
+    fn us_company_dividends(&self, symbol: String) -> PyResult<USCompanyDividends> {
         Ok(self
             .ctx
             .us_company_dividends(symbol)
@@ -345,10 +345,10 @@ impl FundamentalContext {
     }
 
     /// Get US ETF document list. `size`: None = all. US token required.
-    fn us_etf_files(&self, counter_id: String, size: Option<u32>) -> PyResult<USETFFilesResponse> {
+    fn us_etf_files(&self, symbol: String, size: Option<u32>) -> PyResult<USETFFilesResponse> {
         Ok(self
             .ctx
-            .us_etf_files(counter_id, size)
+            .us_etf_files(symbol, size)
             .map_err(ErrorNewType)?
             .into())
     }

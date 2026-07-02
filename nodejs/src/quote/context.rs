@@ -1293,7 +1293,7 @@ impl QuoteContext {
 
     /// Get US cryptocurrency market overview. US token required.
     #[napi]
-    pub async fn us_crypto_overview(&self, counter_id: String) -> Result<USCryptoOverview> {
+    pub async fn us_crypto_overview(&self, symbol: String) -> Result<USCryptoOverview> {
         Ok(self
             .ctx
             .us_crypto_overview(symbol)

@@ -691,7 +691,7 @@ impl QuoteContext {
     /// Get US cryptocurrency market overview. US token required.
     fn us_crypto_overview(
         &self,
-        counter_id: String,
+        symbol: String,
     ) -> PyResult<crate::quote::types::USCryptoOverview> {
         Ok(self
             .ctx

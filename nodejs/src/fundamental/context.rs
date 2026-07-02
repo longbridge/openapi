@@ -327,7 +327,7 @@ impl FundamentalContext {
 
     /// Get US company overview. US token required.
     #[napi]
-    pub async fn us_company_overview(&self, counter_id: String) -> Result<USCompanyOverview> {
+    pub async fn us_company_overview(&self, symbol: String) -> Result<USCompanyOverview> {
         Ok(self
             .ctx
             .us_company_overview(symbol)
@@ -338,7 +338,7 @@ impl FundamentalContext {
 
     /// Get US valuation overview. US token required.
     #[napi]
-    pub async fn us_valuation_overview(&self, counter_id: String) -> Result<USValuationOverview> {
+    pub async fn us_valuation_overview(&self, symbol: String) -> Result<USValuationOverview> {
         Ok(self
             .ctx
             .us_valuation_overview(symbol)
@@ -349,14 +349,10 @@ impl FundamentalContext {
 
     /// Get US financial overview (JSON string). US token required.
     #[napi]
-    pub async fn us_financial_overview(
-        &self,
-        counter_id: String,
-        report: String,
-    ) -> Result<String> {
+    pub async fn us_financial_overview(&self, symbol: String, report: String) -> Result<String> {
         let v = self
             .ctx
-            .us_financial_overview(counter_id, report)
+            .us_financial_overview(symbol, report)
             .await
             .map_err(ErrorNewType)?;
         serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
@@ -366,13 +362,13 @@ impl FundamentalContext {
     #[napi]
     pub async fn us_financial_statement_v3(
         &self,
-        counter_id: String,
+        symbol: String,
         kind: String,
         report: String,
     ) -> Result<USFinancialStatement> {
         Ok(self
             .ctx
-            .us_financial_statement_v3(counter_id, kind, report)
+            .us_financial_statement_v3(symbol, kind, report)
             .await
             .map_err(ErrorNewType)?
             .into())
@@ -380,14 +376,10 @@ impl FundamentalContext {
 
     /// Get US key financial metrics (JSON string). US token required.
     #[napi]
-    pub async fn us_key_financial_metrics(
-        &self,
-        counter_id: String,
-        report: String,
-    ) -> Result<String> {
+    pub async fn us_key_financial_metrics(&self, symbol: String, report: String) -> Result<String> {
         let v = self
             .ctx
-            .us_key_financial_metrics(counter_id, report)
+            .us_key_financial_metrics(symbol, report)
             .await
             .map_err(ErrorNewType)?;
         serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
@@ -395,10 +387,10 @@ impl FundamentalContext {
 
     /// Get US analyst consensus (JSON string). US token required.
     #[napi]
-    pub async fn us_analyst_consensus(&self, counter_id: String, report: String) -> Result<String> {
+    pub async fn us_analyst_consensus(&self, symbol: String, report: String) -> Result<String> {
         let v = self
             .ctx
-            .us_analyst_consensus(counter_id, report)
+            .us_analyst_consensus(symbol, report)
             .await
             .map_err(ErrorNewType)?;
         serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
@@ -406,7 +398,7 @@ impl FundamentalContext {
 
     /// Get US ETF dividend history. US token required.
     #[napi]
-    pub async fn us_etf_dividend_info(&self, counter_id: String) -> Result<USETFDividendInfo> {
+    pub async fn us_etf_dividend_info(&self, symbol: String) -> Result<USETFDividendInfo> {
         Ok(self
             .ctx
             .us_etf_dividend_info(symbol)
@@ -417,7 +409,7 @@ impl FundamentalContext {
 
     /// Get US company dividends. US token required.
     #[napi]
-    pub async fn us_company_dividends(&self, counter_id: String) -> Result<USCompanyDividends> {
+    pub async fn us_company_dividends(&self, symbol: String) -> Result<USCompanyDividends> {
         Ok(self
             .ctx
             .us_company_dividends(symbol)
@@ -430,12 +422,12 @@ impl FundamentalContext {
     #[napi]
     pub async fn us_etf_files(
         &self,
-        counter_id: String,
+        symbol: String,
         size: Option<u32>,
     ) -> Result<USETFFilesResponse> {
         Ok(self
             .ctx
-            .us_etf_files(counter_id, size)
+            .us_etf_files(symbol, size)
             .await
             .map_err(ErrorNewType)?
             .into())
