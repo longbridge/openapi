@@ -147,9 +147,13 @@ pub fn lookup_counter_id(symbol: &str) -> Option<String> {
 ///
 /// Leading-dot symbols (e.g. `.DJI.US`) are US market indexes and always map
 /// to `IX/`. All other symbols are checked against the embedded
+/// Known crypto exchange identifiers used as symbol suffixes.
+/// `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"`.
+const CRYPTO_EXCHANGES: &[&str] = &["HAS"];
+
 /// ETF + index + warrant set and the remote-resolved cache; a matching entry
-/// is returned as-is. Crypto symbols in `PAIR.EXCHANGE` format (non-standard
-/// market suffixes such as `HAS`) are converted to `VA/{EXCHANGE}/{PAIR}`.
+/// is returned as-is. Crypto symbols whose suffix matches a known exchange
+/// (e.g. `HAS`) are converted to `VA/{EXCHANGE}/{PAIR}`.
 /// Unmatched symbols default to `ST/`.
 pub fn symbol_to_counter_id(symbol: &str) -> String {
     if let Some((code, market)) = symbol.rsplit_once('.') {
@@ -157,10 +161,12 @@ pub fn symbol_to_counter_id(symbol: &str) -> String {
             return counter_id;
         }
         let market_upper = market.to_uppercase();
-        // Non-standard market suffixes are crypto exchange identifiers.
-        match market_upper.as_str() {
-            "US" | "HK" | "CN" | "SH" | "SZ" | "A" | "B" => {}
-            _ => return format!("VA/{market_upper}/{code}"),
+        // Known crypto exchange suffix → VA/{EXCHANGE}/{PAIR}
+        if CRYPTO_EXCHANGES
+            .iter()
+            .any(|e| e.eq_ignore_ascii_case(&market_upper))
+        {
+            return format!("VA/{market_upper}/{code}");
         }
         // Strip leading zeros from numeric HK codes (e.g. `00700` → `700`).
         let code = if market_upper == "HK" && code.chars().all(|c| c.is_ascii_digit()) {
