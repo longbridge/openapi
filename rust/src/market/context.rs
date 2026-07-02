@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
@@ -85,6 +85,26 @@ impl MarketContext {
             .0)
     }
 
+    /// Like [`get`](Self::get), but restricted to a single data center. Used by
+    /// region-limited endpoints (e.g. AP-only broker holdings).
+    async fn get_dc<R, Q>(&self, path: &'static str, query: Q, dc_restrict: DcRegion) -> Result<R>
+    where
+        R: DeserializeOwned + Send + Sync + 'static,
+        Q: Serialize + Send + Sync,
+    {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path)
+            .dc_restrict(dc_restrict)
+            .query_params(query)
+            .response::<Json<R>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
     async fn post<R, B>(&self, path: &'static str, body: B) -> Result<R>
     where
         R: DeserializeOwned + Send + Sync + 'static,
@@ -135,12 +155,13 @@ impl MarketContext {
             #[serde(rename = "type")]
             period: &'static str,
         }
-        self.get(
+        self.get_dc(
             "/v1/quote/broker-holding",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
                 period: period_str,
             },
+            DcRegion::Ap,
         )
         .await
     }
@@ -156,11 +177,12 @@ impl MarketContext {
         struct Query {
             counter_id: String,
         }
-        self.get(
+        self.get_dc(
             "/v1/quote/broker-holding/detail",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
             },
+            DcRegion::Ap,
         )
         .await
     }
@@ -178,12 +200,13 @@ impl MarketContext {
             counter_id: String,
             parti_number: String,
         }
-        self.get(
+        self.get_dc(
             "/v1/quote/broker-holding/daily",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
                 parti_number: broker_id.into(),
             },
+            DcRegion::Ap,
         )
         .await
     }

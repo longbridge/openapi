@@ -125,6 +125,7 @@ pub struct RequestBuilder<'a, T, Q, R> {
     headers: HeaderMap,
     body: Option<T>,
     query_params: Option<Q>,
+    dc_restrict: Option<DcRegion>,
     mark_resp: PhantomData<R>,
 }
 
@@ -137,6 +138,7 @@ impl<'a> RequestBuilder<'a, (), (), ()> {
             headers: Default::default(),
             body: None,
             query_params: None,
+            dc_restrict: None,
             mark_resp: PhantomData,
         }
     }
@@ -156,6 +158,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             headers: self.headers,
             body: Some(body),
             query_params: self.query_params,
+            dc_restrict: self.dc_restrict,
             mark_resp: self.mark_resp,
         }
     }
@@ -175,6 +178,19 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
         self
     }
 
+    /// Restrict this request to a single data center.
+    ///
+    /// When set, [`do_send`](Self::do_send) short-circuits with
+    /// [`HttpClientError::DcRegionRestricted`] if the session's region differs,
+    /// instead of forwarding a request the target data center cannot serve.
+    /// Call sites for region-limited endpoints declare their region here —
+    /// `Ap` for AP-only APIs, `Us` for US-only ones.
+    #[must_use]
+    pub fn dc_restrict(mut self, region: DcRegion) -> Self {
+        self.dc_restrict = Some(region);
+        self
+    }
+
     /// Set the query string
     #[must_use]
     pub fn query_params<Q2>(self, params: Q2) -> RequestBuilder<'a, T, Q2, R>
@@ -188,6 +204,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             headers: self.headers,
             body: self.body,
             query_params: Some(params),
+            dc_restrict: self.dc_restrict,
             mark_resp: self.mark_resp,
         }
     }
@@ -205,6 +222,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             headers: self.headers,
             body: self.body,
             query_params: self.query_params,
+            dc_restrict: self.dc_restrict,
             mark_resp: PhantomData,
         }
     }
@@ -267,6 +285,18 @@ where
                 )
             }
         };
+
+        // Short-circuit region-limited endpoints with a single unified error,
+        // instead of forwarding a request the target data center cannot serve.
+        if let Some(required) = self.dc_restrict
+            && !dc_region.allows(required)
+        {
+            return Err(HttpClientError::DcRegionRestricted {
+                path: self.path.clone(),
+                required,
+                current: dc_region,
+            });
+        }
 
         let app_key_value =
             HeaderValue::from_str(&app_key).map_err(|_| HttpClientError::InvalidApiKey)?;

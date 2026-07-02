@@ -124,6 +124,14 @@ impl DcRegion {
         }
     }
 
+    /// Whether this session may reach an API limited to `required`.
+    ///
+    /// `true` when the session's region matches the API's required region;
+    /// callers short-circuit with a unified error when it is `false`.
+    pub fn allows(self, required: DcRegion) -> bool {
+        self == required
+    }
+
     /// Strip any leading `Bearer ` from a credential.
     ///
     /// Region prefixes (`hk_m_`, `us_m_`, `ap_m_`, …) are routing metadata
@@ -132,6 +140,17 @@ impl DcRegion {
     /// so **no region prefix is stripped** — only `Bearer ` is removed.
     pub fn strip_region_prefix(credential: &str) -> &str {
         credential.strip_prefix("Bearer ").unwrap_or(credential)
+    }
+}
+
+impl std::fmt::Display for DcRegion {
+    /// Human-facing uppercase name (`AP`/`US`), for error messages and display.
+    /// The lowercase [`DC_REGION_HEADER`] value is [`as_str`](Self::as_str).
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            DcRegion::Us => "US",
+            DcRegion::Ap => "AP",
+        })
     }
 }
 
@@ -166,6 +185,23 @@ mod dc_region_tests {
 
     #[test]
     fn as_str_matches_header_value() {
+        assert_eq!(DcRegion::Us.as_str(), "us");
+        assert_eq!(DcRegion::Ap.as_str(), "ap");
+    }
+
+    #[test]
+    fn allows_matches_same_region() {
+        assert!(DcRegion::Ap.allows(DcRegion::Ap));
+        assert!(DcRegion::Us.allows(DcRegion::Us));
+        assert!(!DcRegion::Us.allows(DcRegion::Ap));
+        assert!(!DcRegion::Ap.allows(DcRegion::Us));
+    }
+
+    #[test]
+    fn display_is_uppercase() {
+        // Human-facing display is uppercase; the header value stays lowercase.
+        assert_eq!(DcRegion::Us.to_string(), "US");
+        assert_eq!(DcRegion::Ap.to_string(), "AP");
         assert_eq!(DcRegion::Us.as_str(), "us");
         assert_eq!(DcRegion::Ap.as_str(), "ap");
     }
