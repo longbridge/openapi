@@ -2290,7 +2290,9 @@ impl QuoteContext {
 
     /// Get cryptocurrency market overview.
     ///
-    /// `counter_id`: crypto counter_id, e.g. `"CY/US/BTC"`.
+    /// `symbol` accepts user-facing trading-pair format: `"BTCUSD"` or
+    /// `"BTC/USD"`. Both are converted to the internal `VA/HAS/BTCUSDT`
+    /// counter_id automatically (`/` removed, `USD` → `USDT`).
     ///
     /// Path: `GET /v1/gemini/us/crypto-overview`
     ///
@@ -2301,7 +2303,6 @@ impl QuoteContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<crate::quote::USCryptoOverview> {
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -2312,7 +2313,7 @@ impl QuoteContext {
             .request(Method::GET, "/v1/gemini/us/crypto-overview")
             .dc_restrict(DcRegion::Us)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: crypto_symbol_to_counter_id(&symbol.into()),
             })
             .response::<Json<crate::quote::USCryptoOverview>>()
             .send()
@@ -2327,4 +2328,13 @@ fn normalize_symbol(symbol: &str) -> &str {
         Some((_, market)) if market.eq_ignore_ascii_case("HK") => symbol.trim_start_matches('0'),
         _ => symbol,
     }
+}
+
+/// Convert a user-facing crypto trading-pair symbol to the internal
+/// `VA/HAS/…` counter_id.
+///
+/// Accepts `"BTCUSD"` or `"BTC/USD"` → `"VA/HAS/BTCUSD"`.
+/// Only the `/` separator is removed; no other transformation is applied.
+fn crypto_symbol_to_counter_id(symbol: &str) -> String {
+    format!("VA/HAS/{}", symbol.replace('/', ""))
 }
