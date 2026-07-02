@@ -5,7 +5,8 @@ use longbridge::{
     trade::{
         EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions,
+        ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -407,6 +408,69 @@ impl TradeContext {
             .order_detail(order_id)
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────
+
+    /// Query US order list (returns JSON string). US token required.
+    #[pyo3(signature = (account_channel, action, start_at, end_at, counter_ids, security_types, query_type, page, limit, query_version))]
+    #[allow(clippy::too_many_arguments)]
+    fn us_query_orders(
+        &self,
+        account_channel: String,
+        action: i32,
+        start_at: f64,
+        end_at: f64,
+        counter_ids: Vec<String>,
+        security_types: Vec<String>,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+        query_version: f64,
+    ) -> PyResult<String> {
+        let opts = QueryUSOrdersOptions {
+            account_channel,
+            action,
+            start_at,
+            end_at,
+            counter_ids,
+            security_types,
+            query_type,
+            page,
+            limit,
+            query_version,
+        };
+        let resp = self.ctx.us_query_orders(opts).map_err(ErrorNewType)?;
+        serde_json::to_string(&resp)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Get US order detail (returns JSON string). US token required.
+    fn us_order_detail(&self, order_id: String, is_attached: bool) -> PyResult<String> {
+        let resp = self
+            .ctx
+            .us_order_detail(order_id, is_attached)
+            .map_err(ErrorNewType)?;
+        serde_json::to_string(&resp)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+
+    /// Get US account asset overview. US token required.
+    fn us_asset_overview(&self) -> PyResult<crate::trade::types::USAssetOverview> {
+        Ok(self.ctx.us_asset_overview().map_err(ErrorNewType)?.into())
+    }
+
+    /// Get US realized P&L. US token required.
+    fn us_realized_pl(
+        &self,
+        currency: String,
+        category: Option<String>,
+    ) -> PyResult<crate::trade::types::USRealizedPL> {
+        Ok(self
+            .ctx
+            .us_realized_pl(currency, category)
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

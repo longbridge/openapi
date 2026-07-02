@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_wscli::WsClientError;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -14,7 +14,9 @@ use crate::{
         FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
         GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio, Order, OrderDetail,
-        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
+        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -829,6 +831,123 @@ impl TradeContext {
             .request(Method::GET, "/v1/trade/estimate/buy_limit")
             .query_params(opts)
             .response::<Json<EstimateMaxPurchaseQuantityResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    // ── US-market APIs ────────────────────────────────────────────────────────
+
+    /// Query the paginated US order list.
+    ///
+    /// Path: `POST /v1/orders/query`
+    ///
+    /// US token required.
+    pub async fn us_query_orders(
+        &self,
+        opts: QueryUSOrdersOptions,
+    ) -> Result<QueryUSOrdersResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/orders/query")
+            .dc_restrict(DcRegion::Us)
+            .body(Json(opts))
+            .response::<Json<QueryUSOrdersResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get US order detail, optionally including attached stop-loss/take-profit
+    /// sub-orders.
+    ///
+    /// Path: `GET /v3/orders/{order_id}`
+    ///
+    /// US token required.
+    pub async fn us_order_detail(
+        &self,
+        order_id: impl Into<String>,
+        is_attached: bool,
+    ) -> Result<USOrderDetailResponse> {
+        let order_id = order_id.into();
+        let path = format!("/v3/orders/{order_id}");
+
+        #[derive(Serialize)]
+        struct Query {
+            order_id_str: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            is_attached: Option<bool>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path.as_str())
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                order_id_str: order_id,
+                is_attached: if is_attached { Some(true) } else { None },
+            })
+            .response::<Json<USOrderDetailResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the full US account asset snapshot (stocks, options, crypto, buying
+    /// power).
+    ///
+    /// Path: `GET /v1/us/assets/overview`
+    ///
+    /// US token required.
+    pub async fn us_asset_overview(&self) -> Result<USAssetOverview> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/overview")
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USAssetOverview>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get realized profit-and-loss for the US account.
+    ///
+    /// `currency`: required, e.g. `"USD"`.
+    /// `category`: optional filter — `"ALL"`, `"STOCK"`, `"OPTION"`, or
+    /// `"CRYPTO"`.
+    ///
+    /// Path: `GET /v1/us/assets/pl/realized`
+    ///
+    /// US token required.
+    pub async fn us_realized_pl(
+        &self,
+        currency: impl Into<String>,
+        category: Option<impl Into<String>>,
+    ) -> Result<USRealizedPL> {
+        #[derive(Serialize)]
+        struct Query {
+            currency: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            category: Option<String>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/pl/realized")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                currency: currency.into(),
+                category: category.map(Into::into),
+            })
+            .response::<Json<USRealizedPL>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

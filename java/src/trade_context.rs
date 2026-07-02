@@ -4,7 +4,7 @@ use jni::{
     JNIEnv, JavaVM,
     errors::Result,
     objects::{GlobalRef, JClass, JObject, JString},
-    sys::jobjectArray,
+    sys::{jboolean, jobjectArray},
 };
 use longbridge::{
     Config, Decimal, Market, TradeContext,
@@ -12,8 +12,8 @@ use longbridge::{
         BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, ReplaceOrderOptions, SubmitOrderOptions,
-        TimeInForceType, TopicType,
+        OrderStatus, OrderType, OutsideRTH, PushEvent, QueryUSOrdersOptions, ReplaceOrderOptions,
+        SubmitOrderOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;
@@ -621,6 +621,111 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimate
         }
         async_util::execute(env, callback, async move {
             Ok(context.ctx.estimate_max_purchase_quantity(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+// ── US-market JNI stubs ──────────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsQueryOrders(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    account_channel: JObject,
+    action: i64,
+    start_at: i64,
+    end_at: i64,
+    counter_ids: JObject,
+    security_types: JObject,
+    query_type: i64,
+    page: i64,
+    limit: i64,
+    query_version: i64,
+    callback: JObject,
+) {
+    use crate::types::ObjectArray;
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let account_channel: String = FromJValue::from_jvalue(env, account_channel.into())?;
+        let counter_ids: ObjectArray<String> = FromJValue::from_jvalue(env, counter_ids.into())?;
+        let security_types: ObjectArray<String> =
+            FromJValue::from_jvalue(env, security_types.into())?;
+        let us_opts = QueryUSOrdersOptions {
+            account_channel,
+            action: action as i32,
+            start_at: start_at as f64,
+            end_at: end_at as f64,
+            counter_ids: counter_ids.0,
+            security_types: security_types.0,
+            query_type: query_type as i32,
+            page: page as i32,
+            limit: limit as i32,
+            query_version: query_version as f64,
+        };
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_query_orders(us_opts).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsOrderDetail(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JObject,
+    is_attached: jboolean,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        let is_attached = is_attached != 0;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_order_detail(order_id, is_attached).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsAssetOverview(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_asset_overview().await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsRealizedPl(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    currency: JObject,
+    category: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let currency: String = FromJValue::from_jvalue(env, currency.into())?;
+        let category: Option<String> = FromJValue::from_jvalue(env, category.into()).ok();
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_realized_pl(currency, category).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
     })

@@ -322,4 +322,114 @@ impl FundamentalContext {
             .map_err(ErrorNewType)?
             .into())
     }
+
+    // ── US-market methods ─────────────────────────────────────────────────────
+
+    /// Get US company overview. US token required.
+    #[napi]
+    pub async fn us_company_overview(&self, symbol: String) -> Result<USCompanyOverview> {
+        Ok(self
+            .ctx
+            .us_company_overview(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US valuation overview. US token required.
+    #[napi]
+    pub async fn us_valuation_overview(&self, symbol: String) -> Result<USValuationOverview> {
+        Ok(self
+            .ctx
+            .us_valuation_overview(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US financial overview (JSON string). US token required.
+    #[napi]
+    pub async fn us_financial_overview(&self, symbol: String, report: String) -> Result<String> {
+        let v = self
+            .ctx
+            .us_financial_overview(symbol, report)
+            .await
+            .map_err(ErrorNewType)?;
+        serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    /// Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required.
+    #[napi]
+    pub async fn us_financial_statement_v3(
+        &self,
+        symbol: String,
+        kind: String,
+        report: String,
+    ) -> Result<USFinancialStatement> {
+        Ok(self
+            .ctx
+            .us_financial_statement_v3(symbol, kind, report)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US key financial metrics (JSON string). US token required.
+    #[napi]
+    pub async fn us_key_financial_metrics(&self, symbol: String, report: String) -> Result<String> {
+        let v = self
+            .ctx
+            .us_key_financial_metrics(symbol, report)
+            .await
+            .map_err(ErrorNewType)?;
+        serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    /// Get US analyst consensus (JSON string). US token required.
+    #[napi]
+    pub async fn us_analyst_consensus(&self, symbol: String, report: String) -> Result<String> {
+        let v = self
+            .ctx
+            .us_analyst_consensus(symbol, report)
+            .await
+            .map_err(ErrorNewType)?;
+        serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    /// Get US ETF dividend history. US token required.
+    #[napi]
+    pub async fn us_etf_dividend_info(&self, symbol: String) -> Result<USETFDividendInfo> {
+        Ok(self
+            .ctx
+            .us_etf_dividend_info(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US company dividends. US token required.
+    #[napi]
+    pub async fn us_company_dividends(&self, symbol: String) -> Result<USCompanyDividends> {
+        Ok(self
+            .ctx
+            .us_company_dividends(symbol)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US ETF document list. size=None returns all. US token required.
+    #[napi]
+    pub async fn us_etf_files(
+        &self,
+        symbol: String,
+        size: Option<u32>,
+    ) -> Result<USETFFilesResponse> {
+        Ok(self
+            .ctx
+            .us_etf_files(symbol, size)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

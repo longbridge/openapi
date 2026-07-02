@@ -147,23 +147,34 @@ pub fn lookup_counter_id(symbol: &str) -> Option<String> {
 ///
 /// Leading-dot symbols (e.g. `.DJI.US`) are US market indexes and always map
 /// to `IX/`. All other symbols are checked against the embedded
+/// Known crypto exchange identifiers used as symbol suffixes.
+/// `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"`.
+const CRYPTO_EXCHANGES: &[&str] = &["HAS"];
+
 /// ETF + index + warrant set and the remote-resolved cache; a matching entry
-/// is returned as-is. Unmatched symbols default to `ST/`.
+/// is returned as-is. Crypto symbols whose suffix matches a known exchange
+/// (e.g. `HAS`) are converted to `VA/{EXCHANGE}/{PAIR}`.
+/// Unmatched symbols default to `ST/`.
 pub fn symbol_to_counter_id(symbol: &str) -> String {
     if let Some((code, market)) = symbol.rsplit_once('.') {
         if let Some(counter_id) = lookup_counter_id(symbol) {
             return counter_id;
         }
-        let market = market.to_uppercase();
+        let market_upper = market.to_uppercase();
+        // Known crypto exchange suffix → VA/{EXCHANGE}/{PAIR}
+        if CRYPTO_EXCHANGES
+            .iter()
+            .any(|e| e.eq_ignore_ascii_case(&market_upper))
+        {
+            return format!("VA/{market_upper}/{code}");
+        }
         // Strip leading zeros from numeric HK codes (e.g. `00700` → `700`).
-        // Other markets keep their codes verbatim (A-share codes such as
-        // `000001.SZ` have significant leading zeros).
-        let code = if market == "HK" && code.chars().all(|c| c.is_ascii_digit()) {
+        let code = if market_upper == "HK" && code.chars().all(|c| c.is_ascii_digit()) {
             code.trim_start_matches('0')
         } else {
             code
         };
-        format!("ST/{market}/{code}")
+        format!("ST/{market_upper}/{code}")
     } else {
         symbol.to_string()
     }
@@ -179,16 +190,21 @@ pub fn index_symbol_to_counter_id(symbol: &str) -> String {
     }
 }
 
-/// Convert a counter_id (e.g. `ST/US/TSLA`, `ETF/US/SPY`, `IX/US/.DJI`,
-/// `ST/HK/700`) back to a display symbol (e.g. `TSLA.US`, `SPY.US`,
-/// `.DJI.US`, `700.HK`).
+/// Convert a counter_id back to a display symbol.
 ///
-/// US index counter IDs (`IX/US/...`) preserve the leading dot in the code
-/// part (e.g. `IX/US/.DJI` → `.DJI.US`).
+/// - `ST/US/TSLA`    → `TSLA.US`
+/// - `ETF/US/SPY`    → `SPY.US`
+/// - `IX/US/.DJI`    → `.DJI.US`
+/// - `VA/HAS/BTCUSD` → `BTCUSD.HAS`  (crypto: `PAIR.EXCHANGE`)
 pub fn counter_id_to_symbol(counter_id: &str) -> String {
     let parts: Vec<&str> = counter_id.splitn(3, '/').collect();
     if parts.len() == 3 {
-        format!("{}.{}", parts[2], parts[1])
+        let (prefix, market, code) = (parts[0], parts[1], parts[2]);
+        if prefix.eq_ignore_ascii_case("VA") {
+            // Crypto: return PAIR.EXCHANGE format
+            return format!("{code}.{market}");
+        }
+        format!("{code}.{market}")
     } else {
         counter_id.to_string()
     }

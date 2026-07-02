@@ -5,8 +5,8 @@ use std::sync::Arc;
 use longbridge::trade::{
     EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
     GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
-    TradeContext,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions,
+    SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -482,6 +482,97 @@ impl AsyncTradeContext {
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    // ── US-market async methods ───────────────────────────────────────────
+
+    /// Query US order list (JSON string). US token required. Returns awaitable.
+    #[pyo3(signature = (account_channel, action, start_at, end_at, counter_ids, security_types, query_type, page, limit, query_version))]
+    #[allow(clippy::too_many_arguments)]
+    fn us_query_orders(
+        &self,
+        py: Python<'_>,
+        account_channel: String,
+        action: i32,
+        start_at: f64,
+        end_at: f64,
+        counter_ids: Vec<String>,
+        security_types: Vec<String>,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+        query_version: f64,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let opts = QueryUSOrdersOptions {
+            account_channel,
+            action,
+            start_at,
+            end_at,
+            counter_ids,
+            security_types,
+            query_type,
+            page,
+            limit,
+            query_version,
+        };
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
+            let s = serde_json::to_string(&resp)
+                .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            Ok(s)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US order detail (JSON string). US token required. Returns awaitable.
+    fn us_order_detail(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        is_attached: bool,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp = ctx
+                .us_order_detail(order_id, is_attached)
+                .await
+                .map_err(ErrorNewType)?;
+            let s = serde_json::to_string(&resp)
+                .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            Ok(s)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US account asset overview. US token required. Returns awaitable.
+    fn us_asset_overview(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USAssetOverview =
+                ctx.us_asset_overview().await.map_err(ErrorNewType)?.into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US realized P&L. US token required. Returns awaitable.
+    fn us_realized_pl(
+        &self,
+        py: Python<'_>,
+        currency: String,
+        category: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USRealizedPL = ctx
+                .us_realized_pl(currency, category)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
             Ok(r)
         })
         .map(|b| b.unbind())

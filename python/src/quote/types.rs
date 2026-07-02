@@ -1621,3 +1621,41 @@ impl From<longbridge::quote::OptionVolumeDailyStat> for OptionVolumeDailyStat {
         }
     }
 }
+
+/// US cryptocurrency market overview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USCryptoOverview {
+    pub name: String,
+    pub ticker: String,
+    pub currency: String,
+    pub all_time_high: String,
+    pub all_time_high_date: String,
+    pub all_time_low: String,
+    pub all_time_low_date: String,
+    pub ipo_date: String,
+    pub issue_price: String,
+    pub shares: String,
+    pub official_web_address: String,
+    /// Profile as JSON string
+    pub profile: String,
+}
+
+impl From<longbridge::quote::USCryptoOverview> for USCryptoOverview {
+    fn from(v: longbridge::quote::USCryptoOverview) -> Self {
+        Self {
+            name: v.name,
+            ticker: v.ticker,
+            currency: v.currency,
+            all_time_high: v.all_time_high,
+            all_time_high_date: v.all_time_high_date,
+            all_time_low: v.all_time_low,
+            all_time_low_date: v.all_time_low_date,
+            ipo_date: v.ipo_date,
+            issue_price: v.issue_price,
+            shares: v.shares,
+            official_web_address: v.official_web_address,
+            profile: serde_json::to_string(&v.profile).unwrap_or_default(),
+        }
+    }
+}

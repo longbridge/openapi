@@ -2,6 +2,9 @@ use std::sync::Arc;
 
 use longbridge::FundamentalContext;
 use pyo3::{prelude::*, types::PyType};
+// needed for us_financial_overview / us_key_financial_metrics / us_analyst_consensus
+#[allow(unused_imports)]
+use pythonize;
 
 use crate::{config::Config, error::ErrorNewType, fundamental::types::*};
 
@@ -354,6 +357,161 @@ impl AsyncFundamentalContext {
                 ctx.macroeconomic(indicator_code, start_date, end_date, offset, limit)
                     .await
                     .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    // ── US-market async methods ───────────────────────────────────────────────
+
+    /// Get US company overview. US token required. Returns awaitable.
+    fn us_company_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(USCompanyOverview::from(
+                ctx.us_company_overview(symbol)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US valuation overview. US token required. Returns awaitable.
+    fn us_valuation_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(USValuationOverview::from(
+                ctx.us_valuation_overview(symbol)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US financial overview (raw dict). Returns awaitable.
+    fn us_financial_overview(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        report: String,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx
+                .us_financial_overview(symbol, report)
+                .await
+                .map_err(ErrorNewType)?;
+            Python::attach(|py| {
+                pythonize::pythonize(py, &v)
+                    .map(|b| b.unbind())
+                    .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+            })
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US financial statement v3. Returns awaitable.
+    fn us_financial_statement_v3(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        kind: String,
+        report: String,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(USFinancialStatement::from(
+                ctx.us_financial_statement_v3(symbol, kind, report)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US key financial metrics (raw dict). Returns awaitable.
+    fn us_key_financial_metrics(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        report: String,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx
+                .us_key_financial_metrics(symbol, report)
+                .await
+                .map_err(ErrorNewType)?;
+            Python::attach(|py| {
+                pythonize::pythonize(py, &v)
+                    .map(|b| b.unbind())
+                    .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+            })
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US analyst consensus (raw dict). Returns awaitable.
+    fn us_analyst_consensus(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        report: String,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx
+                .us_analyst_consensus(symbol, report)
+                .await
+                .map_err(ErrorNewType)?;
+            Python::attach(|py| {
+                pythonize::pythonize(py, &v)
+                    .map(|b| b.unbind())
+                    .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+            })
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US ETF dividend info. Returns awaitable.
+    fn us_etf_dividend_info(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(USETFDividendInfo::from(
+                ctx.us_etf_dividend_info(symbol)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US company dividends. Returns awaitable.
+    fn us_company_dividends(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(USCompanyDividends::from(
+                ctx.us_company_dividends(symbol)
+                    .await
+                    .map_err(ErrorNewType)?,
+            ))
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US ETF files. Returns awaitable.
+    fn us_etf_files(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        size: Option<u32>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(USETFFilesResponse::from(
+                ctx.us_etf_files(symbol, size).await.map_err(ErrorNewType)?,
             ))
         })
         .map(|b| b.unbind())

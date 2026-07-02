@@ -1720,6 +1720,189 @@ pub struct MacroeconomicResponse {
     pub count: i32,
 }
 
+// ── US-market types
+// ───────────────────────────────────────────────────────────
+
+/// Industry rank tag returned by
+/// [`crate::FundamentalContext::us_company_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USRankTag {
+    /// Tag name
+    #[serde(default)]
+    pub name: String,
+    /// Change value
+    #[serde(default)]
+    pub chg: String,
+    /// Rank type identifier
+    #[serde(default)]
+    pub rank_type: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_company_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USCompanyOverview {
+    /// Company description
+    #[serde(default)]
+    pub intro: String,
+    /// Market cap
+    #[serde(default)]
+    pub market_cap: String,
+    /// Currency symbol (e.g. `$`)
+    #[serde(default)]
+    pub ccy_symbol: String,
+    /// Industry rank tags
+    #[serde(default)]
+    pub top_rank_tags: Vec<USRankTag>,
+    /// Deep-link URL to detail page
+    #[serde(default)]
+    pub detail_url: String,
+}
+
+/// Current valuation indicator detail.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USValuationIndicator {
+    /// Full-circle reference value
+    #[serde(default)]
+    pub circle: String,
+    /// Current partial value
+    #[serde(default)]
+    pub part: String,
+    /// Displayed metric value
+    #[serde(default)]
+    pub metric: String,
+    /// Metric type identifier
+    #[serde(default)]
+    pub metric_type: String,
+    /// Human-readable description
+    #[serde(default)]
+    pub desc: String,
+    /// Currency symbol
+    #[serde(default)]
+    pub ccy_symbol: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_valuation_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USValuationOverview {
+    /// Recommended valuation indicator (e.g. `PE`)
+    #[serde(default)]
+    pub indicator: String,
+    /// Current indicator detail
+    #[serde(default)]
+    pub current_indicator: USValuationIndicator,
+    /// Historical percentile range in years
+    #[serde(default)]
+    pub range: i32,
+    /// Data date string
+    #[serde(default)]
+    pub date: String,
+    /// AI summary text
+    #[serde(default)]
+    pub ai_summary: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_financial_statement_v3`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USFinancialStatement {
+    /// Revenue
+    #[serde(default)]
+    pub revenue: String,
+    /// Net income
+    #[serde(default)]
+    pub net_income: String,
+    /// Net margin
+    #[serde(default)]
+    pub net_margin: String,
+    /// Per-period data
+    #[serde(default)]
+    pub periods: Vec<serde_json::Value>,
+    /// Report currency
+    #[serde(default)]
+    pub currency: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_etf_dividend_info`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USETFDividendInfo {
+    /// Total dividend over trailing 12 months
+    #[serde(default)]
+    pub dividend_ttm: String,
+    /// Dividend yield over trailing 12 months
+    #[serde(default)]
+    pub dividend_yield_ttm: String,
+    /// Dividend frequency
+    #[serde(default)]
+    pub dividend_frequency: String,
+    /// Currency
+    #[serde(default)]
+    pub currency: String,
+    /// Per-fiscal-year dividend records
+    #[serde(default)]
+    pub fiscal_year_info: Vec<serde_json::Value>,
+}
+
+/// A single historical dividend payment.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USDividendItem {
+    /// Per-share dividend amount
+    #[serde(default)]
+    pub dividend: String,
+    /// Dividend type (e.g. cash dividend)
+    #[serde(default)]
+    pub dividend_type: String,
+    /// Ex-dividend date
+    #[serde(default)]
+    pub ex_date: String,
+    /// Payment date
+    #[serde(default)]
+    pub payment_date: String,
+    /// Record date
+    #[serde(default)]
+    pub record_date: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_company_dividends`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USCompanyDividends {
+    /// Total dividend over trailing 12 months
+    #[serde(default)]
+    pub dividend_ttm: String,
+    /// Dividend yield over trailing 12 months
+    #[serde(default)]
+    pub dividend_yield_ttm: String,
+    /// Number of dividend payments
+    #[serde(default)]
+    pub payouts: String,
+    /// Currency
+    #[serde(default)]
+    pub currency: String,
+    /// Individual payment records
+    #[serde(default)]
+    pub items: Vec<USDividendItem>,
+}
+
+/// A single file in an ETF document list.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USETFFile {
+    /// File name
+    #[serde(default)]
+    pub name: String,
+    /// File type (e.g. prospectus, annual report)
+    #[serde(default)]
+    pub file_type: String,
+    /// Download URL
+    #[serde(default)]
+    pub url: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_etf_files`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USETFFilesResponse {
+    /// List of ETF documents
+    #[serde(default)]
+    pub files: Vec<USETFFile>,
+}
+
 // ── v2 wire types (internal, used for mapping to existing public types) ──────
 
 /// v2 wire: one indicator from GET /v2/quote/macrodata

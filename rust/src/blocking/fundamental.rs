@@ -349,4 +349,95 @@ impl FundamentalContextSync {
                 .await
         })
     }
+
+    // ── US-market blocking wrappers ───────────────────────────────────────────
+
+    /// Get US company overview (blocking)
+    pub fn us_company_overview(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+    ) -> Result<USCompanyOverview> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_company_overview(counter_id).await })
+    }
+
+    /// Get US valuation overview snapshot (blocking)
+    pub fn us_valuation_overview(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+    ) -> Result<USValuationOverview> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_valuation_overview(counter_id).await })
+    }
+
+    /// Get US financial overview (blocking)
+    pub fn us_financial_overview(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+        report: impl Into<String> + Send + 'static,
+    ) -> Result<serde_json::Value> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_financial_overview(counter_id, report).await })
+    }
+
+    /// Get US financial statement v3 (blocking)
+    pub fn us_financial_statement_v3(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+        kind: impl Into<String> + Send + 'static,
+        report: impl Into<String> + Send + 'static,
+    ) -> Result<USFinancialStatement> {
+        self.rt.call(move |ctx| async move {
+            ctx.us_financial_statement_v3(counter_id, kind, report)
+                .await
+        })
+    }
+
+    /// Get US key financial metrics (blocking)
+    pub fn us_key_financial_metrics(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+        report: impl Into<String> + Send + 'static,
+    ) -> Result<serde_json::Value> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_key_financial_metrics(counter_id, report).await })
+    }
+
+    /// Get US analyst consensus estimates (blocking)
+    pub fn us_analyst_consensus(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+        report: impl Into<String> + Send + 'static,
+    ) -> Result<serde_json::Value> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_analyst_consensus(counter_id, report).await })
+    }
+
+    /// Get US ETF dividend history (blocking)
+    pub fn us_etf_dividend_info(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+    ) -> Result<USETFDividendInfo> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_etf_dividend_info(counter_id).await })
+    }
+
+    /// Get US company historical dividends (blocking)
+    pub fn us_company_dividends(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+    ) -> Result<USCompanyDividends> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_company_dividends(counter_id).await })
+    }
+
+    /// Get US ETF document list (blocking)
+    pub fn us_etf_files(
+        &self,
+        counter_id: impl Into<String> + Send + 'static,
+        size: Option<u32>,
+    ) -> Result<USETFFilesResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_etf_files(counter_id, size).await })
+    }
 }
