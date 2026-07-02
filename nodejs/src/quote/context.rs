@@ -21,8 +21,8 @@ use crate::{
             RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
             SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse,
             ShortTradesResponse, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
-            Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
-            WarrantType, WatchlistGroup,
+            Trade, TradeSessions, USCryptoOverview, WarrantInfo, WarrantQuote, WarrantSortBy,
+            WarrantStatus, WarrantType, WatchlistGroup,
         },
     },
     time::{NaiveDate, NaiveDatetime},
@@ -1286,6 +1286,17 @@ impl QuoteContext {
         Ok(self
             .ctx
             .option_volume_daily(symbol, timestamp, count)
+            .await
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US cryptocurrency market overview. US token required.
+    #[napi]
+    pub async fn us_crypto_overview(&self, counter_id: String) -> Result<USCryptoOverview> {
+        Ok(self
+            .ctx
+            .us_crypto_overview(counter_id)
             .await
             .map_err(ErrorNewType)?
             .into())

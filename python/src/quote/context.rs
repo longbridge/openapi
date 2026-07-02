@@ -687,4 +687,13 @@ impl QuoteContext {
             .map_err(ErrorNewType)?
             .into())
     }
+
+    /// Get US cryptocurrency market overview. US token required.
+    fn us_crypto_overview(&self, counter_id: String) -> PyResult<crate::quote::types::USCryptoOverview> {
+        Ok(self
+            .ctx
+            .us_crypto_overview(counter_id)
+            .map_err(ErrorNewType)?
+            .into())
+    }
 }

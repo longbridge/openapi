@@ -41,6 +41,14 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::StockPositionChannel>()?;
     parent.add_class::<types::StockPosition>()?;
 
+    parent.add_class::<types::USStockPosition>()?;
+    parent.add_class::<types::USOptionPosition>()?;
+    parent.add_class::<types::USCryptoPosition>()?;
+    parent.add_class::<types::USBuyPower>()?;
+    parent.add_class::<types::USAssetOverview>()?;
+    parent.add_class::<types::USRealizedPLItem>()?;
+    parent.add_class::<types::USRealizedPL>()?;
+
     parent.add_class::<context::TradeContext>()?;
     parent.add_class::<context_async::AsyncTradeContext>()?;
     Ok(())
