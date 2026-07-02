@@ -55,3 +55,15 @@ pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
 pub use trade::TradeContext;
 pub use types::Market;
+
+// ── US-market type re-exports ─────────────────────────────────────────────────
+pub use fundamental::types::{
+    USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
+    USETFFilesResponse, USFinancialStatement, USRankTag, USValuationIndicator, USValuationOverview,
+};
+pub use quote::USCryptoOverview;
+pub use trade::{
+    QueryUSOrdersOptions, QueryUSOrdersResponse, USAssetOverview, USAttachedOrder, USBuyPower,
+    USCryptoPosition, USOptionPosition, USOrderDetailResponse, USRealizedPL, USRealizedPLItem,
+    USStockPosition,
+};

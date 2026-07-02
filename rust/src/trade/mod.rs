@@ -21,4 +21,8 @@ pub use types::{
     OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus,
     OrderTag, OrderType, OutsideRTH, StockPosition, StockPositionChannel, StockPositionsResponse,
     TimeInForceType, TriggerPriceType, TriggerStatus,
+    // US-market types
+    QueryUSOrdersOptions, QueryUSOrdersResponse, USAssetOverview, USAttachedOrder, USBuyPower,
+    USCryptoPosition, USOptionPosition, USOrderDetailResponse, USRealizedPL, USRealizedPLItem,
+    USStockPosition,
 };

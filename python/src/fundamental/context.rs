@@ -5,6 +5,9 @@ use pyo3::prelude::*;
 
 use crate::{config::Config, error::ErrorNewType, fundamental::types::*};
 
+#[allow(unused_imports)]
+use pythonize;
+
 /// Fundamental data context (synchronous).
 #[pyclass]
 pub(crate) struct FundamentalContext {
@@ -238,5 +241,70 @@ impl FundamentalContext {
             .macroeconomic(indicator_code, start_date, end_date, offset, limit)
             .map_err(ErrorNewType)?
             .into())
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────────
+
+    /// Get US company overview. US token required.
+    fn us_company_overview(&self, counter_id: String) -> PyResult<USCompanyOverview> {
+        Ok(self.ctx.us_company_overview(counter_id).map_err(ErrorNewType)?.into())
+    }
+
+    /// Get US valuation overview. US token required.
+    fn us_valuation_overview(&self, counter_id: String) -> PyResult<USValuationOverview> {
+        Ok(self.ctx.us_valuation_overview(counter_id).map_err(ErrorNewType)?.into())
+    }
+
+    /// Get US financial overview. `report`: "annual" or "quarterly". US token required.
+    fn us_financial_overview(&self, py: Python<'_>, counter_id: String, report: String) -> PyResult<Py<PyAny>> {
+        let v = self.ctx.us_financial_overview(counter_id, report).map_err(ErrorNewType)?;
+        pythonize::pythonize(py, &v)
+            .map(|b| b.unbind())
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    }
+
+    /// Get US financial statement v3. `kind`: "IS"/"BS"/"CF". US token required.
+    fn us_financial_statement_v3(
+        &self,
+        counter_id: String,
+        kind: String,
+        report: String,
+    ) -> PyResult<USFinancialStatement> {
+        Ok(self
+            .ctx
+            .us_financial_statement_v3(counter_id, kind, report)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US key financial metrics. US token required.
+    fn us_key_financial_metrics(&self, py: Python<'_>, counter_id: String, report: String) -> PyResult<Py<PyAny>> {
+        let v = self.ctx.us_key_financial_metrics(counter_id, report).map_err(ErrorNewType)?;
+        pythonize::pythonize(py, &v)
+            .map(|b| b.unbind())
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    }
+
+    /// Get US analyst consensus estimates. US token required.
+    fn us_analyst_consensus(&self, py: Python<'_>, counter_id: String, report: String) -> PyResult<Py<PyAny>> {
+        let v = self.ctx.us_analyst_consensus(counter_id, report).map_err(ErrorNewType)?;
+        pythonize::pythonize(py, &v)
+            .map(|b| b.unbind())
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+    }
+
+    /// Get US ETF dividend history. US token required.
+    fn us_etf_dividend_info(&self, counter_id: String) -> PyResult<USETFDividendInfo> {
+        Ok(self.ctx.us_etf_dividend_info(counter_id).map_err(ErrorNewType)?.into())
+    }
+
+    /// Get US company historical dividends. US token required.
+    fn us_company_dividends(&self, counter_id: String) -> PyResult<USCompanyDividends> {
+        Ok(self.ctx.us_company_dividends(counter_id).map_err(ErrorNewType)?.into())
+    }
+
+    /// Get US ETF document list. `size`: None = all. US token required.
+    fn us_etf_files(&self, counter_id: String, size: Option<u32>) -> PyResult<USETFFilesResponse> {
+        Ok(self.ctx.us_etf_files(counter_id, size).map_err(ErrorNewType)?.into())
     }
 }

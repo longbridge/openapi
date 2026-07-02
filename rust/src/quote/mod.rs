@@ -75,6 +75,7 @@ pub use types::{
     WarrantSortBy,
     WarrantStatus,
     WarrantType,
+    USCryptoOverview,
     WatchlistGroup,
     WatchlistSecurity,
 };

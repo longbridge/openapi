@@ -804,6 +804,171 @@ impl_default_for_enum_string!(
     ChargeCategoryCode
 );
 
+// ── US-market types ───────────────────────────────────────────────────────────
+
+/// Request body for [`crate::TradeContext::us_query_orders`].
+#[derive(Debug, Clone, Serialize)]
+pub struct QueryUSOrdersOptions {
+    /// Account channel (injected by the framework)
+    pub account_channel: String,
+    /// Direction filter: 0 = all, 1 = buy, 2 = sell
+    pub action: i32,
+    /// Start timestamp (seconds)
+    pub start_at: f64,
+    /// End timestamp (seconds)
+    pub end_at: f64,
+    /// Counter-ID filter (empty = all)
+    pub counter_ids: Vec<String>,
+    /// Security-type filter (empty = all)
+    pub security_types: Vec<String>,
+    /// Status: 0 = all, 1 = pending, 2 = history
+    pub query_type: i32,
+    /// Page number (1-based)
+    pub page: i32,
+    /// Page size
+    pub limit: i32,
+    /// Epoch-seconds timestamp from the first request in a paging series
+    pub query_version: f64,
+}
+
+/// Response for [`crate::TradeContext::us_query_orders`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QueryUSOrdersResponse {
+    /// Order list (raw JSON for forward compatibility)
+    #[serde(default)]
+    pub orders: Vec<serde_json::Value>,
+}
+
+/// An attached take-profit or stop-loss sub-order.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USAttachedOrder {
+    /// Sub-order ID
+    #[serde(default)]
+    pub order_id: String,
+    /// Type: `TAKE_PROFIT` or `STOP_LOSS`
+    #[serde(default, rename = "type")]
+    pub order_type: String,
+    /// Direction: `BUY` or `SELL`
+    #[serde(default)]
+    pub side: String,
+    /// Limit price
+    #[serde(default)]
+    pub price: String,
+    /// Trailing stop amount
+    #[serde(default)]
+    pub trail_amount: String,
+    /// Trailing stop percentage
+    #[serde(default)]
+    pub trail_percent: String,
+    /// Order status
+    #[serde(default)]
+    pub status: String,
+}
+
+/// Response for [`crate::TradeContext::us_order_detail`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USOrderDetailResponse {
+    /// Raw order detail fields (pass-through)
+    #[serde(flatten)]
+    pub detail: serde_json::Value,
+    /// Attached stop-loss / take-profit orders (populated when `is_attached = true`)
+    #[serde(default)]
+    pub attached_orders: Vec<USAttachedOrder>,
+}
+
+/// A stock position in a US account.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USStockPosition {
+    #[serde(default)] pub symbol: String,
+    #[serde(default)] pub name: String,
+    #[serde(default)] pub quantity: String,
+    #[serde(default)] pub available_quantity: String,
+    #[serde(default)] pub currency: String,
+    #[serde(default)] pub cost_price: String,
+    #[serde(default)] pub market_value: String,
+    #[serde(default)] pub unrealized_pl: String,
+    #[serde(default)] pub unrealized_pl_ratio: String,
+    #[serde(default)] pub last_done: String,
+    #[serde(default)] pub prev_close: String,
+    #[serde(default)] pub change_rate: String,
+    /// Overnight/night-session last price (US-specific)
+    #[serde(default)] pub night_last_done: String,
+    /// Pre-market close price (US-specific)
+    #[serde(default)] pub pretrade_close: String,
+    /// Trading session status (US-specific)
+    #[serde(default)] pub trade_status: String,
+    /// Individual quantity after multi-leg exclusion (US-specific)
+    #[serde(default)] pub individual_quantity: String,
+}
+
+/// An option position in a US account.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USOptionPosition {
+    #[serde(default)] pub symbol: String,
+    #[serde(default)] pub strike_price: String,
+    #[serde(default)] pub due_date: String,
+    #[serde(default)] pub contract_multiplier: i32,
+    #[serde(default, rename = "type")] pub option_type: String,
+    #[serde(default)] pub quantity: String,
+    #[serde(default)] pub market_value: String,
+    #[serde(default)] pub unrealized_pl: String,
+}
+
+/// A cryptocurrency position in a US account.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USCryptoPosition {
+    #[serde(default)] pub symbol: String,
+    #[serde(default)] pub quantity: String,
+    #[serde(default)] pub market_value: String,
+    #[serde(default)] pub unrealized_pl: String,
+    #[serde(default)] pub cost_price: String,
+}
+
+/// Purchasing power breakdown for a US account.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USBuyPower {
+    #[serde(default)] pub cash_buy_power: String,
+    #[serde(default)] pub overnight_buy_power: String,
+    /// Day-trade buying power (margin accounts only)
+    #[serde(default)] pub day_trade_buy_power: String,
+    #[serde(default)] pub option_buy_power: String,
+    #[serde(default)] pub crypto_buy_power: String,
+}
+
+/// Response for [`crate::TradeContext::us_asset_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USAssetOverview {
+    #[serde(default)] pub account_type: String,
+    #[serde(default)] pub net_assets: String,
+    #[serde(default)] pub total_cash: String,
+    #[serde(default)] pub unrealized_pl: String,
+    #[serde(default)] pub positions: Vec<USStockPosition>,
+    #[serde(default)] pub option_positions: Vec<USOptionPosition>,
+    #[serde(default)] pub multi_legs: Vec<serde_json::Value>,
+    #[serde(default)] pub crypto_positions: Vec<USCryptoPosition>,
+    #[serde(default)] pub buy_power: USBuyPower,
+}
+
+/// A single realized P&L entry.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USRealizedPLItem {
+    #[serde(default)] pub symbol: String,
+    #[serde(default)] pub name: String,
+    #[serde(default)] pub category: String,
+    #[serde(default)] pub realized_pl: String,
+    #[serde(default)] pub quantity_sold: String,
+    #[serde(default)] pub avg_cost: String,
+    #[serde(default)] pub avg_sell_price: String,
+}
+
+/// Response for [`crate::TradeContext::us_realized_pl`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USRealizedPL {
+    #[serde(default)] pub total_realized_pl: String,
+    #[serde(default)] pub currency: String,
+    #[serde(default)] pub items: Vec<USRealizedPLItem>,
+}
+
 #[cfg(test)]
 mod tests {
     use time::macros::datetime;

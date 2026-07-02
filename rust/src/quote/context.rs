@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
@@ -2284,6 +2284,37 @@ impl QuoteContext {
             }
         }
         Ok(result)
+    }
+
+    // ── US-market APIs ────────────────────────────────────────────────────────
+
+    /// Get cryptocurrency market overview.
+    ///
+    /// `counter_id`: crypto counter_id, e.g. `"CY/US/BTC"`.
+    ///
+    /// Path: `GET /v1/gemini/crypto-overview`
+    ///
+    /// US token required — returns
+    /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`] for non-US credentials.
+    pub async fn us_crypto_overview(
+        &self,
+        counter_id: impl Into<String>,
+    ) -> Result<crate::quote::USCryptoOverview> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/gemini/crypto-overview")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query { counter_id: counter_id.into() })
+            .response::<Json<crate::quote::USCryptoOverview>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 }
 
