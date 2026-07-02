@@ -2292,7 +2292,7 @@ impl QuoteContext {
     ///
     /// `counter_id`: crypto counter_id, e.g. `"CY/US/BTC"`.
     ///
-    /// Path: `GET /v1/gemini/crypto-overview`
+    /// Path: `GET /v1/gemini/us/crypto-overview`
     ///
     /// US token required — returns
     /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`] for non-US
@@ -2309,7 +2309,7 @@ impl QuoteContext {
         Ok(self
             .0
             .http_cli
-            .request(Method::GET, "/v1/gemini/crypto-overview")
+            .request(Method::GET, "/v1/gemini/us/crypto-overview")
             .dc_restrict(DcRegion::Us)
             .query_params(Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
