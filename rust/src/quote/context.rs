@@ -2290,9 +2290,9 @@ impl QuoteContext {
 
     /// Get cryptocurrency market overview.
     ///
-    /// `symbol` accepts user-facing trading-pair format: `"BTCUSD"` or
-    /// `"BTC/USD"`. Both are converted to the internal `VA/HAS/BTCUSDT`
-    /// counter_id automatically (`/` removed, `USD` → `USDT`).
+    /// `symbol` must be in `PAIR.EXCHANGE` format, e.g. `"BTCUSD.HAS"` →
+    /// `"VA/HAS/BTCUSD"`. Uses `symbol_to_counter_id`, consistent with all
+    /// other symbol-based methods.
     ///
     /// Path: `GET /v1/gemini/us/crypto-overview`
     ///
@@ -2303,6 +2303,7 @@ impl QuoteContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<crate::quote::USCryptoOverview> {
+        use crate::utils::counter::symbol_to_counter_id;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -2313,7 +2314,7 @@ impl QuoteContext {
             .request(Method::GET, "/v1/gemini/us/crypto-overview")
             .dc_restrict(DcRegion::Us)
             .query_params(Query {
-                counter_id: crypto_symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol.into()),
             })
             .response::<Json<crate::quote::USCryptoOverview>>()
             .send()
@@ -2328,18 +2329,4 @@ fn normalize_symbol(symbol: &str) -> &str {
         Some((_, market)) if market.eq_ignore_ascii_case("HK") => symbol.trim_start_matches('0'),
         _ => symbol,
     }
-}
-
-/// Convert a crypto symbol in `PAIR.EXCHANGE` format to the internal
-/// `VA/{EXCHANGE}/{PAIR}` counter_id.
-///
-/// Example: `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"`.
-/// If no `.EXCHANGE` suffix is present the value is passed through unchanged.
-fn crypto_symbol_to_counter_id(symbol: &str) -> String {
-    if let Some(dot) = symbol.rfind('.') {
-        let pair = &symbol[..dot];
-        let exchange = symbol[dot + 1..].to_uppercase();
-        return format!("VA/{}/{}", exchange, pair);
-    }
-    symbol.to_string()
 }
