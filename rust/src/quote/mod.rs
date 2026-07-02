@@ -70,12 +70,12 @@ pub use types::{
     TradeSession,
     TradeSessions,
     TradingSessionInfo,
+    USCryptoOverview,
     WarrantInfo,
     WarrantQuote,
     WarrantSortBy,
     WarrantStatus,
     WarrantType,
-    USCryptoOverview,
     WatchlistGroup,
     WatchlistSecurity,
 };

@@ -44,26 +44,23 @@ pub use content::ContentContext;
 pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
 pub use fundamental::FundamentalContext;
-pub use longbridge_httpcli as httpclient;
-pub use longbridge_httpcli::{DC_REGION_HEADER, DcRegion};
-pub use longbridge_wscli as wsclient;
-pub use market::MarketContext;
-pub use portfolio::PortfolioContext;
-pub use quote::QuoteContext;
-pub use rust_decimal::Decimal;
-pub use screener::ScreenerContext;
-pub use sharelist::SharelistContext;
-pub use trade::TradeContext;
-pub use types::Market;
-
 // ── US-market type re-exports ─────────────────────────────────────────────────
 pub use fundamental::types::{
     USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
     USETFFilesResponse, USFinancialStatement, USRankTag, USValuationIndicator, USValuationOverview,
 };
-pub use quote::USCryptoOverview;
+pub use longbridge_httpcli as httpclient;
+pub use longbridge_httpcli::{DC_REGION_HEADER, DcRegion};
+pub use longbridge_wscli as wsclient;
+pub use market::MarketContext;
+pub use portfolio::PortfolioContext;
+pub use quote::{QuoteContext, USCryptoOverview};
+pub use rust_decimal::Decimal;
+pub use screener::ScreenerContext;
+pub use sharelist::SharelistContext;
 pub use trade::{
-    QueryUSOrdersOptions, QueryUSOrdersResponse, USAssetOverview, USAttachedOrder, USBuyPower,
-    USCryptoPosition, USOptionPosition, USOrderDetailResponse, USRealizedPL, USRealizedPLItem,
-    USStockPosition,
+    QueryUSOrdersOptions, QueryUSOrdersResponse, TradeContext, USAssetOverview, USAttachedOrder,
+    USBuyPower, USCryptoPosition, USOptionPosition, USOrderDetailResponse, USRealizedPL,
+    USRealizedPLItem, USStockPosition,
 };
+pub use types::Market;

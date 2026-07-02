@@ -1720,9 +1720,11 @@ pub struct MacroeconomicResponse {
     pub count: i32,
 }
 
-// ── US-market types ───────────────────────────────────────────────────────────
+// ── US-market types
+// ───────────────────────────────────────────────────────────
 
-/// Industry rank tag returned by [`crate::FundamentalContext::us_company_overview`].
+/// Industry rank tag returned by
+/// [`crate::FundamentalContext::us_company_overview`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USRankTag {
     /// Tag name

@@ -804,7 +804,8 @@ impl_default_for_enum_string!(
     ChargeCategoryCode
 );
 
-// ── US-market types ───────────────────────────────────────────────────────────
+// ── US-market types
+// ───────────────────────────────────────────────────────────
 
 /// Request body for [`crate::TradeContext::us_query_orders`].
 #[derive(Debug, Clone, Serialize)]
@@ -871,7 +872,8 @@ pub struct USOrderDetailResponse {
     /// Raw order detail fields (pass-through)
     #[serde(flatten)]
     pub detail: serde_json::Value,
-    /// Attached stop-loss / take-profit orders (populated when `is_attached = true`)
+    /// Attached stop-loss / take-profit orders (populated when `is_attached =
+    /// true`)
     #[serde(default)]
     pub attached_orders: Vec<USAttachedOrder>,
 }
@@ -879,94 +881,147 @@ pub struct USOrderDetailResponse {
 /// A stock position in a US account.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USStockPosition {
-    #[serde(default)] pub symbol: String,
-    #[serde(default)] pub name: String,
-    #[serde(default)] pub quantity: String,
-    #[serde(default)] pub available_quantity: String,
-    #[serde(default)] pub currency: String,
-    #[serde(default)] pub cost_price: String,
-    #[serde(default)] pub market_value: String,
-    #[serde(default)] pub unrealized_pl: String,
-    #[serde(default)] pub unrealized_pl_ratio: String,
-    #[serde(default)] pub last_done: String,
-    #[serde(default)] pub prev_close: String,
-    #[serde(default)] pub change_rate: String,
+    #[serde(default)]
+    pub symbol: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub quantity: String,
+    #[serde(default)]
+    pub available_quantity: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub cost_price: String,
+    #[serde(default)]
+    pub market_value: String,
+    #[serde(default)]
+    pub unrealized_pl: String,
+    #[serde(default)]
+    pub unrealized_pl_ratio: String,
+    #[serde(default)]
+    pub last_done: String,
+    #[serde(default)]
+    pub prev_close: String,
+    #[serde(default)]
+    pub change_rate: String,
     /// Overnight/night-session last price (US-specific)
-    #[serde(default)] pub night_last_done: String,
+    #[serde(default)]
+    pub night_last_done: String,
     /// Pre-market close price (US-specific)
-    #[serde(default)] pub pretrade_close: String,
+    #[serde(default)]
+    pub pretrade_close: String,
     /// Trading session status (US-specific)
-    #[serde(default)] pub trade_status: String,
+    #[serde(default)]
+    pub trade_status: String,
     /// Individual quantity after multi-leg exclusion (US-specific)
-    #[serde(default)] pub individual_quantity: String,
+    #[serde(default)]
+    pub individual_quantity: String,
 }
 
 /// An option position in a US account.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USOptionPosition {
-    #[serde(default)] pub symbol: String,
-    #[serde(default)] pub strike_price: String,
-    #[serde(default)] pub due_date: String,
-    #[serde(default)] pub contract_multiplier: i32,
-    #[serde(default, rename = "type")] pub option_type: String,
-    #[serde(default)] pub quantity: String,
-    #[serde(default)] pub market_value: String,
-    #[serde(default)] pub unrealized_pl: String,
+    #[serde(default)]
+    pub symbol: String,
+    #[serde(default)]
+    pub strike_price: String,
+    #[serde(default)]
+    pub due_date: String,
+    #[serde(default)]
+    pub contract_multiplier: i32,
+    #[serde(default, rename = "type")]
+    pub option_type: String,
+    #[serde(default)]
+    pub quantity: String,
+    #[serde(default)]
+    pub market_value: String,
+    #[serde(default)]
+    pub unrealized_pl: String,
 }
 
 /// A cryptocurrency position in a US account.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USCryptoPosition {
-    #[serde(default)] pub symbol: String,
-    #[serde(default)] pub quantity: String,
-    #[serde(default)] pub market_value: String,
-    #[serde(default)] pub unrealized_pl: String,
-    #[serde(default)] pub cost_price: String,
+    #[serde(default)]
+    pub symbol: String,
+    #[serde(default)]
+    pub quantity: String,
+    #[serde(default)]
+    pub market_value: String,
+    #[serde(default)]
+    pub unrealized_pl: String,
+    #[serde(default)]
+    pub cost_price: String,
 }
 
 /// Purchasing power breakdown for a US account.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USBuyPower {
-    #[serde(default)] pub cash_buy_power: String,
-    #[serde(default)] pub overnight_buy_power: String,
+    #[serde(default)]
+    pub cash_buy_power: String,
+    #[serde(default)]
+    pub overnight_buy_power: String,
     /// Day-trade buying power (margin accounts only)
-    #[serde(default)] pub day_trade_buy_power: String,
-    #[serde(default)] pub option_buy_power: String,
-    #[serde(default)] pub crypto_buy_power: String,
+    #[serde(default)]
+    pub day_trade_buy_power: String,
+    #[serde(default)]
+    pub option_buy_power: String,
+    #[serde(default)]
+    pub crypto_buy_power: String,
 }
 
 /// Response for [`crate::TradeContext::us_asset_overview`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USAssetOverview {
-    #[serde(default)] pub account_type: String,
-    #[serde(default)] pub net_assets: String,
-    #[serde(default)] pub total_cash: String,
-    #[serde(default)] pub unrealized_pl: String,
-    #[serde(default)] pub positions: Vec<USStockPosition>,
-    #[serde(default)] pub option_positions: Vec<USOptionPosition>,
-    #[serde(default)] pub multi_legs: Vec<serde_json::Value>,
-    #[serde(default)] pub crypto_positions: Vec<USCryptoPosition>,
-    #[serde(default)] pub buy_power: USBuyPower,
+    #[serde(default)]
+    pub account_type: String,
+    #[serde(default)]
+    pub net_assets: String,
+    #[serde(default)]
+    pub total_cash: String,
+    #[serde(default)]
+    pub unrealized_pl: String,
+    #[serde(default)]
+    pub positions: Vec<USStockPosition>,
+    #[serde(default)]
+    pub option_positions: Vec<USOptionPosition>,
+    #[serde(default)]
+    pub multi_legs: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub crypto_positions: Vec<USCryptoPosition>,
+    #[serde(default)]
+    pub buy_power: USBuyPower,
 }
 
 /// A single realized P&L entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USRealizedPLItem {
-    #[serde(default)] pub symbol: String,
-    #[serde(default)] pub name: String,
-    #[serde(default)] pub category: String,
-    #[serde(default)] pub realized_pl: String,
-    #[serde(default)] pub quantity_sold: String,
-    #[serde(default)] pub avg_cost: String,
-    #[serde(default)] pub avg_sell_price: String,
+    #[serde(default)]
+    pub symbol: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub category: String,
+    #[serde(default)]
+    pub realized_pl: String,
+    #[serde(default)]
+    pub quantity_sold: String,
+    #[serde(default)]
+    pub avg_cost: String,
+    #[serde(default)]
+    pub avg_sell_price: String,
 }
 
 /// Response for [`crate::TradeContext::us_realized_pl`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USRealizedPL {
-    #[serde(default)] pub total_realized_pl: String,
-    #[serde(default)] pub currency: String,
-    #[serde(default)] pub items: Vec<USRealizedPLItem>,
+    #[serde(default)]
+    pub total_realized_pl: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub items: Vec<USRealizedPLItem>,
 }
 
 #[cfg(test)]

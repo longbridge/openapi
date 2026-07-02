@@ -2295,7 +2295,8 @@ impl QuoteContext {
     /// Path: `GET /v1/gemini/crypto-overview`
     ///
     /// US token required — returns
-    /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`] for non-US credentials.
+    /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`] for non-US
+    /// credentials.
     pub async fn us_crypto_overview(
         &self,
         counter_id: impl Into<String>,
@@ -2309,7 +2310,9 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/gemini/crypto-overview")
             .dc_restrict(DcRegion::Us)
-            .query_params(Query { counter_id: counter_id.into() })
+            .query_params(Query {
+                counter_id: counter_id.into(),
+            })
             .response::<Json<crate::quote::USCryptoOverview>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())

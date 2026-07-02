@@ -462,7 +462,8 @@ impl TradeContextSync {
 
     /// Query the paginated US order list (blocking)
     pub fn us_query_orders(&self, opts: QueryUSOrdersOptions) -> Result<QueryUSOrdersResponse> {
-        self.rt.call(move |ctx| async move { ctx.us_query_orders(opts).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_query_orders(opts).await })
     }
 
     /// Get US order detail (blocking)
@@ -477,7 +478,8 @@ impl TradeContextSync {
 
     /// Get the full US account asset overview (blocking)
     pub fn us_asset_overview(&self) -> Result<USAssetOverview> {
-        self.rt.call(move |ctx| async move { ctx.us_asset_overview().await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_asset_overview().await })
     }
 
     /// Get realized P&L for the US account (blocking)

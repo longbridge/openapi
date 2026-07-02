@@ -429,8 +429,16 @@ impl TradeContext {
         query_version: f64,
     ) -> PyResult<String> {
         let opts = QueryUSOrdersOptions {
-            account_channel, action, start_at, end_at,
-            counter_ids, security_types, query_type, page, limit, query_version,
+            account_channel,
+            action,
+            start_at,
+            end_at,
+            counter_ids,
+            security_types,
+            query_type,
+            page,
+            limit,
+            query_version,
         };
         let resp = self.ctx.us_query_orders(opts).map_err(ErrorNewType)?;
         serde_json::to_string(&resp)
@@ -439,7 +447,10 @@ impl TradeContext {
 
     /// Get US order detail (returns JSON string). US token required.
     fn us_order_detail(&self, order_id: String, is_attached: bool) -> PyResult<String> {
-        let resp = self.ctx.us_order_detail(order_id, is_attached).map_err(ErrorNewType)?;
+        let resp = self
+            .ctx
+            .us_order_detail(order_id, is_attached)
+            .map_err(ErrorNewType)?;
         serde_json::to_string(&resp)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
@@ -455,7 +466,11 @@ impl TradeContext {
         currency: String,
         category: Option<String>,
     ) -> PyResult<crate::trade::types::USRealizedPL> {
-        Ok(self.ctx.us_realized_pl(currency, category).map_err(ErrorNewType)?.into())
+        Ok(self
+            .ctx
+            .us_realized_pl(currency, category)
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

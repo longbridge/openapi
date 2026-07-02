@@ -1057,7 +1057,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/stock-info/company-overview`
     ///
-    /// US token required — returns [`longbridge_httpcli::HttpClientError::DcRegionRestricted`]
+    /// US token required — returns
+    /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`]
     /// for non-US credentials.
     pub async fn us_company_overview(
         &self,
@@ -1069,7 +1070,9 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/company-overview",
-            Query { counter_id: counter_id.into() },
+            Query {
+                counter_id: counter_id.into(),
+            },
             DcRegion::Us,
         )
         .await
@@ -1090,7 +1093,9 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/valuation-overview",
-            Query { counter_id: counter_id.into() },
+            Query {
+                counter_id: counter_id.into(),
+            },
             DcRegion::Us,
         )
         .await
@@ -1115,7 +1120,10 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/finn-overview",
-            Query { counter_id: counter_id.into(), report: report.into() },
+            Query {
+                counter_id: counter_id.into(),
+                report: report.into(),
+            },
             DcRegion::Us,
         )
         .await
@@ -1123,8 +1131,8 @@ impl FundamentalContext {
 
     /// Get US financial statement detail (IS / BS / CF).
     ///
-    /// `kind`: `"IS"` (income statement), `"BS"` (balance sheet), `"CF"` (cash flow).
-    /// `report`: `"annual"` or `"quarterly"`.
+    /// `kind`: `"IS"` (income statement), `"BS"` (balance sheet), `"CF"` (cash
+    /// flow). `report`: `"annual"` or `"quarterly"`.
     ///
     /// Path: `GET /v1/us/quote/financials/statements`
     ///
@@ -1172,7 +1180,10 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/fin-keyfactor",
-            Query { counter_id: counter_id.into(), report: report.into() },
+            Query {
+                counter_id: counter_id.into(),
+                report: report.into(),
+            },
             DcRegion::Us,
         )
         .await
@@ -1197,7 +1208,10 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/fin-consensus",
-            Query { counter_id: counter_id.into(), report: report.into() },
+            Query {
+                counter_id: counter_id.into(),
+                report: report.into(),
+            },
             DcRegion::Us,
         )
         .await
@@ -1218,7 +1232,9 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/etf-dividend-info",
-            Query { counter_id: counter_id.into() },
+            Query {
+                counter_id: counter_id.into(),
+            },
             DcRegion::Us,
         )
         .await
@@ -1239,7 +1255,9 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/company-dividends",
-            Query { counter_id: counter_id.into() },
+            Query {
+                counter_id: counter_id.into(),
+            },
             DcRegion::Us,
         )
         .await
@@ -1247,7 +1265,8 @@ impl FundamentalContext {
 
     /// Get ETF document list (prospectus, annual reports, etc.).
     ///
-    /// `size`: number of files to return; `None` returns all (server default 0 = all).
+    /// `size`: number of files to return; `None` returns all (server default 0
+    /// = all).
     ///
     /// Path: `GET /v1/stock-info/etf-files`
     ///
@@ -1265,7 +1284,10 @@ impl FundamentalContext {
         }
         self.get_dc(
             "/v1/stock-info/etf-files",
-            Query { counter_id: counter_id.into(), size },
+            Query {
+                counter_id: counter_id.into(),
+                size,
+            },
             DcRegion::Us,
         )
         .await

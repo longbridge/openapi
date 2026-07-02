@@ -798,25 +798,43 @@ pub(crate) struct EstimateMaxPurchaseQuantityResponse {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USStockPosition {
-    pub symbol: String, pub name: String, pub quantity: String,
-    pub available_quantity: String, pub currency: String,
-    pub cost_price: String, pub market_value: String,
-    pub unrealized_pl: String, pub unrealized_pl_ratio: String,
-    pub last_done: String, pub prev_close: String, pub change_rate: String,
-    pub night_last_done: String, pub pretrade_close: String,
-    pub trade_status: String, pub individual_quantity: String,
+    pub symbol: String,
+    pub name: String,
+    pub quantity: String,
+    pub available_quantity: String,
+    pub currency: String,
+    pub cost_price: String,
+    pub market_value: String,
+    pub unrealized_pl: String,
+    pub unrealized_pl_ratio: String,
+    pub last_done: String,
+    pub prev_close: String,
+    pub change_rate: String,
+    pub night_last_done: String,
+    pub pretrade_close: String,
+    pub trade_status: String,
+    pub individual_quantity: String,
 }
 
 impl From<longbridge::trade::USStockPosition> for USStockPosition {
     fn from(v: longbridge::trade::USStockPosition) -> Self {
         Self {
-            symbol: v.symbol, name: v.name, quantity: v.quantity,
-            available_quantity: v.available_quantity, currency: v.currency,
-            cost_price: v.cost_price, market_value: v.market_value,
-            unrealized_pl: v.unrealized_pl, unrealized_pl_ratio: v.unrealized_pl_ratio,
-            last_done: v.last_done, prev_close: v.prev_close, change_rate: v.change_rate,
-            night_last_done: v.night_last_done, pretrade_close: v.pretrade_close,
-            trade_status: v.trade_status, individual_quantity: v.individual_quantity,
+            symbol: v.symbol,
+            name: v.name,
+            quantity: v.quantity,
+            available_quantity: v.available_quantity,
+            currency: v.currency,
+            cost_price: v.cost_price,
+            market_value: v.market_value,
+            unrealized_pl: v.unrealized_pl,
+            unrealized_pl_ratio: v.unrealized_pl_ratio,
+            last_done: v.last_done,
+            prev_close: v.prev_close,
+            change_rate: v.change_rate,
+            night_last_done: v.night_last_done,
+            pretrade_close: v.pretrade_close,
+            trade_status: v.trade_status,
+            individual_quantity: v.individual_quantity,
         }
     }
 }
@@ -825,17 +843,27 @@ impl From<longbridge::trade::USStockPosition> for USStockPosition {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USOptionPosition {
-    pub symbol: String, pub strike_price: String, pub due_date: String,
-    pub contract_multiplier: i32, pub option_type: String,
-    pub quantity: String, pub market_value: String, pub unrealized_pl: String,
+    pub symbol: String,
+    pub strike_price: String,
+    pub due_date: String,
+    pub contract_multiplier: i32,
+    pub option_type: String,
+    pub quantity: String,
+    pub market_value: String,
+    pub unrealized_pl: String,
 }
 
 impl From<longbridge::trade::USOptionPosition> for USOptionPosition {
     fn from(v: longbridge::trade::USOptionPosition) -> Self {
         Self {
-            symbol: v.symbol, strike_price: v.strike_price, due_date: v.due_date,
-            contract_multiplier: v.contract_multiplier, option_type: v.option_type,
-            quantity: v.quantity, market_value: v.market_value, unrealized_pl: v.unrealized_pl,
+            symbol: v.symbol,
+            strike_price: v.strike_price,
+            due_date: v.due_date,
+            contract_multiplier: v.contract_multiplier,
+            option_type: v.option_type,
+            quantity: v.quantity,
+            market_value: v.market_value,
+            unrealized_pl: v.unrealized_pl,
         }
     }
 }
@@ -844,15 +872,21 @@ impl From<longbridge::trade::USOptionPosition> for USOptionPosition {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USCryptoPosition {
-    pub symbol: String, pub quantity: String, pub market_value: String,
-    pub unrealized_pl: String, pub cost_price: String,
+    pub symbol: String,
+    pub quantity: String,
+    pub market_value: String,
+    pub unrealized_pl: String,
+    pub cost_price: String,
 }
 
 impl From<longbridge::trade::USCryptoPosition> for USCryptoPosition {
     fn from(v: longbridge::trade::USCryptoPosition) -> Self {
         Self {
-            symbol: v.symbol, quantity: v.quantity, market_value: v.market_value,
-            unrealized_pl: v.unrealized_pl, cost_price: v.cost_price,
+            symbol: v.symbol,
+            quantity: v.quantity,
+            market_value: v.market_value,
+            unrealized_pl: v.unrealized_pl,
+            cost_price: v.cost_price,
         }
     }
 }
@@ -861,16 +895,20 @@ impl From<longbridge::trade::USCryptoPosition> for USCryptoPosition {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone, Default)]
 pub(crate) struct USBuyPower {
-    pub cash_buy_power: String, pub overnight_buy_power: String,
-    pub day_trade_buy_power: String, pub option_buy_power: String,
+    pub cash_buy_power: String,
+    pub overnight_buy_power: String,
+    pub day_trade_buy_power: String,
+    pub option_buy_power: String,
     pub crypto_buy_power: String,
 }
 
 impl From<longbridge::trade::USBuyPower> for USBuyPower {
     fn from(v: longbridge::trade::USBuyPower) -> Self {
         Self {
-            cash_buy_power: v.cash_buy_power, overnight_buy_power: v.overnight_buy_power,
-            day_trade_buy_power: v.day_trade_buy_power, option_buy_power: v.option_buy_power,
+            cash_buy_power: v.cash_buy_power,
+            overnight_buy_power: v.overnight_buy_power,
+            day_trade_buy_power: v.day_trade_buy_power,
+            option_buy_power: v.option_buy_power,
             crypto_buy_power: v.crypto_buy_power,
         }
     }
@@ -880,8 +918,10 @@ impl From<longbridge::trade::USBuyPower> for USBuyPower {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USAssetOverview {
-    pub account_type: String, pub net_assets: String,
-    pub total_cash: String, pub unrealized_pl: String,
+    pub account_type: String,
+    pub net_assets: String,
+    pub total_cash: String,
+    pub unrealized_pl: String,
     pub positions: Vec<USStockPosition>,
     pub option_positions: Vec<USOptionPosition>,
     pub multi_legs: String,
@@ -892,8 +932,10 @@ pub(crate) struct USAssetOverview {
 impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
     fn from(v: longbridge::trade::USAssetOverview) -> Self {
         Self {
-            account_type: v.account_type, net_assets: v.net_assets,
-            total_cash: v.total_cash, unrealized_pl: v.unrealized_pl,
+            account_type: v.account_type,
+            net_assets: v.net_assets,
+            total_cash: v.total_cash,
+            unrealized_pl: v.unrealized_pl,
             positions: v.positions.into_iter().map(Into::into).collect(),
             option_positions: v.option_positions.into_iter().map(Into::into).collect(),
             multi_legs: serde_json::to_string(&v.multi_legs).unwrap_or_default(),
@@ -907,17 +949,25 @@ impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USRealizedPLItem {
-    pub symbol: String, pub name: String, pub category: String,
-    pub realized_pl: String, pub quantity_sold: String,
-    pub avg_cost: String, pub avg_sell_price: String,
+    pub symbol: String,
+    pub name: String,
+    pub category: String,
+    pub realized_pl: String,
+    pub quantity_sold: String,
+    pub avg_cost: String,
+    pub avg_sell_price: String,
 }
 
 impl From<longbridge::trade::USRealizedPLItem> for USRealizedPLItem {
     fn from(v: longbridge::trade::USRealizedPLItem) -> Self {
         Self {
-            symbol: v.symbol, name: v.name, category: v.category,
-            realized_pl: v.realized_pl, quantity_sold: v.quantity_sold,
-            avg_cost: v.avg_cost, avg_sell_price: v.avg_sell_price,
+            symbol: v.symbol,
+            name: v.name,
+            category: v.category,
+            realized_pl: v.realized_pl,
+            quantity_sold: v.quantity_sold,
+            avg_cost: v.avg_cost,
+            avg_sell_price: v.avg_sell_price,
         }
     }
 }

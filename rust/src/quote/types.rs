@@ -2164,7 +2164,8 @@ pub enum PinnedMode {
     Remove,
 }
 
-// ── US-market types ───────────────────────────────────────────────────────────
+// ── US-market types
+// ───────────────────────────────────────────────────────────
 
 /// Market overview for a single cryptocurrency.
 ///

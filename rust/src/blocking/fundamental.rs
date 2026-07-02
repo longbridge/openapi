@@ -357,7 +357,8 @@ impl FundamentalContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
     ) -> Result<USCompanyOverview> {
-        self.rt.call(move |ctx| async move { ctx.us_company_overview(counter_id).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_company_overview(counter_id).await })
     }
 
     /// Get US valuation overview snapshot (blocking)
@@ -365,7 +366,8 @@ impl FundamentalContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
     ) -> Result<USValuationOverview> {
-        self.rt.call(move |ctx| async move { ctx.us_valuation_overview(counter_id).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_valuation_overview(counter_id).await })
     }
 
     /// Get US financial overview (blocking)
@@ -374,7 +376,8 @@ impl FundamentalContextSync {
         counter_id: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
     ) -> Result<serde_json::Value> {
-        self.rt.call(move |ctx| async move { ctx.us_financial_overview(counter_id, report).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_financial_overview(counter_id, report).await })
     }
 
     /// Get US financial statement v3 (blocking)
@@ -385,7 +388,8 @@ impl FundamentalContextSync {
         report: impl Into<String> + Send + 'static,
     ) -> Result<USFinancialStatement> {
         self.rt.call(move |ctx| async move {
-            ctx.us_financial_statement_v3(counter_id, kind, report).await
+            ctx.us_financial_statement_v3(counter_id, kind, report)
+                .await
         })
     }
 
@@ -414,7 +418,8 @@ impl FundamentalContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
     ) -> Result<USETFDividendInfo> {
-        self.rt.call(move |ctx| async move { ctx.us_etf_dividend_info(counter_id).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_etf_dividend_info(counter_id).await })
     }
 
     /// Get US company historical dividends (blocking)
@@ -422,7 +427,8 @@ impl FundamentalContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
     ) -> Result<USCompanyDividends> {
-        self.rt.call(move |ctx| async move { ctx.us_company_dividends(counter_id).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_company_dividends(counter_id).await })
     }
 
     /// Get US ETF document list (blocking)
@@ -431,6 +437,7 @@ impl FundamentalContextSync {
         counter_id: impl Into<String> + Send + 'static,
         size: Option<u32>,
     ) -> Result<USETFFilesResponse> {
-        self.rt.call(move |ctx| async move { ctx.us_etf_files(counter_id, size).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_etf_files(counter_id, size).await })
     }
 }

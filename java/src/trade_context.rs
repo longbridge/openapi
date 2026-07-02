@@ -650,7 +650,8 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsQueryO
         let context = &*(context as *const ContextObj);
         let account_channel: String = FromJValue::from_jvalue(env, account_channel.into())?;
         let counter_ids: ObjectArray<String> = FromJValue::from_jvalue(env, counter_ids.into())?;
-        let security_types: ObjectArray<String> = FromJValue::from_jvalue(env, security_types.into())?;
+        let security_types: ObjectArray<String> =
+            FromJValue::from_jvalue(env, security_types.into())?;
         let us_opts = QueryUSOrdersOptions {
             account_channel,
             action: action as i32,

@@ -331,8 +331,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
     })
 }
 
-// ── US-market JNI stubs ───────────────────────────────────────────────────────
-// All US APIs return JSON strings; Java callers parse with Gson/Jackson.
+// ── US-market JNI stubs
+// ─────────────────────────────────────────────────────── All US APIs return
+// JSON strings; Java callers parse with Gson/Jackson.
 
 macro_rules! us_counter_id_method {
     ($jni_name:ident, $method:ident) => {
@@ -382,13 +383,34 @@ macro_rules! us_counter_id_report_method {
     };
 }
 
-us_counter_id_method!(Java_com_longbridge_SdkNative_fundamentalContextUsCompanyOverview, us_company_overview);
-us_counter_id_method!(Java_com_longbridge_SdkNative_fundamentalContextUsValuationOverview, us_valuation_overview);
-us_counter_id_report_method!(Java_com_longbridge_SdkNative_fundamentalContextUsFinancialOverview, us_financial_overview);
-us_counter_id_report_method!(Java_com_longbridge_SdkNative_fundamentalContextUsKeyFinancialMetrics, us_key_financial_metrics);
-us_counter_id_report_method!(Java_com_longbridge_SdkNative_fundamentalContextUsAnalystConsensus, us_analyst_consensus);
-us_counter_id_method!(Java_com_longbridge_SdkNative_fundamentalContextUsEtfDividendInfo, us_etf_dividend_info);
-us_counter_id_method!(Java_com_longbridge_SdkNative_fundamentalContextUsCompanyDividends, us_company_dividends);
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsCompanyOverview,
+    us_company_overview
+);
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsValuationOverview,
+    us_valuation_overview
+);
+us_counter_id_report_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsFinancialOverview,
+    us_financial_overview
+);
+us_counter_id_report_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsKeyFinancialMetrics,
+    us_key_financial_metrics
+);
+us_counter_id_report_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsAnalystConsensus,
+    us_analyst_consensus
+);
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsEtfDividendInfo,
+    us_etf_dividend_info
+);
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsCompanyDividends,
+    us_company_dividends
+);
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUsFinancialStatementV3(
@@ -406,7 +428,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
         let kind: String = FromJValue::from_jvalue(env, kind.into())?;
         let report: String = FromJValue::from_jvalue(env, report.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.us_financial_statement_v3(counter_id, kind, report).await?;
+            let resp = context
+                .ctx
+                .us_financial_statement_v3(counter_id, kind, report)
+                .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
@@ -427,7 +452,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
         let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let size: Option<i32> = FromJValue::from_jvalue(env, size.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.us_etf_files(counter_id, size.map(|s| s as u32)).await?;
+            let resp = context
+                .ctx
+                .us_etf_files(counter_id, size.map(|s| s as u32))
+                .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())

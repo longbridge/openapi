@@ -1240,6 +1240,7 @@ impl QuoteContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
     ) -> Result<USCryptoOverview> {
-        self.rt.call(move |ctx| async move { ctx.us_crypto_overview(counter_id).await })
+        self.rt
+            .call(move |ctx| async move { ctx.us_crypto_overview(counter_id).await })
     }
 }

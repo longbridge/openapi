@@ -2058,7 +2058,8 @@ impl From<lb::MacroeconomicResponse> for MacroeconomicResponse {
     }
 }
 
-// ── US-market types ───────────────────────────────────────────────────────────
+// ── US-market types
+// ───────────────────────────────────────────────────────────
 
 use longbridge::fundamental::types as lb_us;
 
@@ -2073,7 +2074,11 @@ pub struct USRankTag {
 
 impl From<lb_us::USRankTag> for USRankTag {
     fn from(v: lb_us::USRankTag) -> Self {
-        Self { name: v.name, chg: v.chg, rank_type: v.rank_type }
+        Self {
+            name: v.name,
+            chg: v.chg,
+            rank_type: v.rank_type,
+        }
     }
 }
 
@@ -2115,8 +2120,12 @@ pub struct USValuationIndicator {
 impl From<lb_us::USValuationIndicator> for USValuationIndicator {
     fn from(v: lb_us::USValuationIndicator) -> Self {
         Self {
-            circle: v.circle, part: v.part, metric: v.metric,
-            metric_type: v.metric_type, desc: v.desc, ccy_symbol: v.ccy_symbol,
+            circle: v.circle,
+            part: v.part,
+            metric: v.metric,
+            metric_type: v.metric_type,
+            desc: v.desc,
+            ccy_symbol: v.ccy_symbol,
         }
     }
 }
@@ -2158,8 +2167,11 @@ pub struct USFinancialStatement {
 impl From<lb_us::USFinancialStatement> for USFinancialStatement {
     fn from(v: lb_us::USFinancialStatement) -> Self {
         Self {
-            revenue: v.revenue, net_income: v.net_income,
-            net_margin: v.net_margin, periods: v.periods, currency: v.currency,
+            revenue: v.revenue,
+            net_income: v.net_income,
+            net_margin: v.net_margin,
+            periods: v.periods,
+            currency: v.currency,
         }
     }
 }
@@ -2178,8 +2190,10 @@ pub struct USETFDividendInfo {
 impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
     fn from(v: lb_us::USETFDividendInfo) -> Self {
         Self {
-            dividend_ttm: v.dividend_ttm, dividend_yield_ttm: v.dividend_yield_ttm,
-            dividend_frequency: v.dividend_frequency, currency: v.currency,
+            dividend_ttm: v.dividend_ttm,
+            dividend_yield_ttm: v.dividend_yield_ttm,
+            dividend_frequency: v.dividend_frequency,
+            currency: v.currency,
             fiscal_year_info: v.fiscal_year_info,
         }
     }
@@ -2199,8 +2213,11 @@ pub struct USDividendItem {
 impl From<lb_us::USDividendItem> for USDividendItem {
     fn from(v: lb_us::USDividendItem) -> Self {
         Self {
-            dividend: v.dividend, dividend_type: v.dividend_type,
-            ex_date: v.ex_date, payment_date: v.payment_date, record_date: v.record_date,
+            dividend: v.dividend,
+            dividend_type: v.dividend_type,
+            ex_date: v.ex_date,
+            payment_date: v.payment_date,
+            record_date: v.record_date,
         }
     }
 }
@@ -2219,8 +2236,10 @@ pub struct USCompanyDividends {
 impl From<lb_us::USCompanyDividends> for USCompanyDividends {
     fn from(v: lb_us::USCompanyDividends) -> Self {
         Self {
-            dividend_ttm: v.dividend_ttm, dividend_yield_ttm: v.dividend_yield_ttm,
-            payouts: v.payouts, currency: v.currency,
+            dividend_ttm: v.dividend_ttm,
+            dividend_yield_ttm: v.dividend_yield_ttm,
+            payouts: v.payouts,
+            currency: v.currency,
             items: v.items.into_iter().map(Into::into).collect(),
         }
     }
@@ -2237,7 +2256,11 @@ pub struct USETFFile {
 
 impl From<lb_us::USETFFile> for USETFFile {
     fn from(v: lb_us::USETFFile) -> Self {
-        Self { name: v.name, file_type: v.file_type, url: v.url }
+        Self {
+            name: v.name,
+            file_type: v.file_type,
+            url: v.url,
+        }
     }
 }
 
@@ -2250,6 +2273,8 @@ pub struct USETFFilesResponse {
 
 impl From<lb_us::USETFFilesResponse> for USETFFilesResponse {
     fn from(v: lb_us::USETFFilesResponse) -> Self {
-        Self { files: v.files.into_iter().map(Into::into).collect() }
+        Self {
+            files: v.files.into_iter().map(Into::into).collect(),
+        }
     }
 }

@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use longbridge::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent, QueryUSOrdersOptions};
+use longbridge::trade::{
+    GetFundPositionsOptions, GetStockPositionsOptions, PushEvent, QueryUSOrdersOptions,
+};
 use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
@@ -509,15 +511,29 @@ impl TradeContext {
     pub fn us_query_orders<'env>(
         &self,
         env: &'env Env,
-        account_channel: String, action: i32,
-        start_at: f64, end_at: f64,
-        counter_ids: Vec<String>, security_types: Vec<String>,
-        query_type: i32, page: i32, limit: i32, query_version: f64,
+        account_channel: String,
+        action: i32,
+        start_at: f64,
+        end_at: f64,
+        counter_ids: Vec<String>,
+        security_types: Vec<String>,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+        query_version: f64,
     ) -> Result<PromiseRaw<'env, String>> {
         let ctx = self.ctx.clone();
         let opts = QueryUSOrdersOptions {
-            account_channel, action, start_at, end_at,
-            counter_ids, security_types, query_type, page, limit, query_version,
+            account_channel,
+            action,
+            start_at,
+            end_at,
+            counter_ids,
+            security_types,
+            query_type,
+            page,
+            limit,
+            query_version,
         };
         env.spawn_future(async move {
             let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
@@ -535,18 +551,24 @@ impl TradeContext {
     ) -> Result<PromiseRaw<'env, String>> {
         let ctx = self.ctx.clone();
         env.spawn_future(async move {
-            let resp = ctx.us_order_detail(order_id, is_attached).await.map_err(ErrorNewType)?;
+            let resp = ctx
+                .us_order_detail(order_id, is_attached)
+                .await
+                .map_err(ErrorNewType)?;
             serde_json::to_string(&resp).map_err(|e| napi::Error::from_reason(e.to_string()))
         })
     }
 
     /// Get US account asset overview. US token required.
     #[napi]
-    pub fn us_asset_overview<'env>(&self, env: &'env Env) -> Result<PromiseRaw<'env, crate::trade::types::USAssetOverview>> {
+    pub fn us_asset_overview<'env>(
+        &self,
+        env: &'env Env,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USAssetOverview>> {
         let ctx = self.ctx.clone();
-        env.spawn_future(async move {
-            Ok(ctx.us_asset_overview().await.map_err(ErrorNewType)?.into())
-        })
+        env.spawn_future(
+            async move { Ok(ctx.us_asset_overview().await.map_err(ErrorNewType)?.into()) },
+        )
     }
 
     /// Get US realized P&L. US token required.
@@ -559,7 +581,11 @@ impl TradeContext {
     ) -> Result<PromiseRaw<'env, crate::trade::types::USRealizedPL>> {
         let ctx = self.ctx.clone();
         env.spawn_future(async move {
-            Ok(ctx.us_realized_pl(currency, category).await.map_err(ErrorNewType)?.into())
+            Ok(ctx
+                .us_realized_pl(currency, category)
+                .await
+                .map_err(ErrorNewType)?
+                .into())
         })
     }
 

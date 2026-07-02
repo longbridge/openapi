@@ -2112,7 +2112,8 @@ impl From<lb::MacroeconomicResponse> for MacroeconomicResponse {
     }
 }
 
-// ── US-market types ───────────────────────────────────────────────────────────
+// ── US-market types
+// ───────────────────────────────────────────────────────────
 
 use longbridge::fundamental::types as lb_us;
 
@@ -2127,7 +2128,11 @@ pub(crate) struct USRankTag {
 
 impl From<lb_us::USRankTag> for USRankTag {
     fn from(v: lb_us::USRankTag) -> Self {
-        Self { name: v.name, chg: v.chg, rank_type: v.rank_type }
+        Self {
+            name: v.name,
+            chg: v.chg,
+            rank_type: v.rank_type,
+        }
     }
 }
 
@@ -2305,7 +2310,11 @@ pub(crate) struct USETFFile {
 
 impl From<lb_us::USETFFile> for USETFFile {
     fn from(v: lb_us::USETFFile) -> Self {
-        Self { name: v.name, file_type: v.file_type, url: v.url }
+        Self {
+            name: v.name,
+            file_type: v.file_type,
+            url: v.url,
+        }
     }
 }
 
@@ -2318,6 +2327,8 @@ pub(crate) struct USETFFilesResponse {
 
 impl From<lb_us::USETFFilesResponse> for USETFFilesResponse {
     fn from(v: lb_us::USETFFilesResponse) -> Self {
-        Self { files: v.files.into_iter().map(Into::into).collect() }
+        Self {
+            files: v.files.into_iter().map(Into::into).collect(),
+        }
     }
 }

@@ -896,7 +896,8 @@ impl AsyncQuoteContext {
         .map(|b| b.unbind())
     }
 
-    /// Get US cryptocurrency market overview. US token required. Returns awaitable.
+    /// Get US cryptocurrency market overview. US token required. Returns
+    /// awaitable.
     fn us_crypto_overview(&self, py: Python<'_>, counter_id: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

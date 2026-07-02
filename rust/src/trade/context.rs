@@ -861,7 +861,8 @@ impl TradeContext {
             .0)
     }
 
-    /// Get US order detail, optionally including attached stop-loss/take-profit sub-orders.
+    /// Get US order detail, optionally including attached stop-loss/take-profit
+    /// sub-orders.
     ///
     /// Path: `GET /v3/orders/{order_id}`
     ///
@@ -897,7 +898,8 @@ impl TradeContext {
             .0)
     }
 
-    /// Get the full US account asset snapshot (stocks, options, crypto, buying power).
+    /// Get the full US account asset snapshot (stocks, options, crypto, buying
+    /// power).
     ///
     /// Path: `GET /v1/us/assets/overview`
     ///
@@ -918,7 +920,8 @@ impl TradeContext {
     /// Get realized profit-and-loss for the US account.
     ///
     /// `currency`: required, e.g. `"USD"`.
-    /// `category`: optional filter — `"ALL"`, `"STOCK"`, `"OPTION"`, or `"CRYPTO"`.
+    /// `category`: optional filter — `"ALL"`, `"STOCK"`, `"OPTION"`, or
+    /// `"CRYPTO"`.
     ///
     /// Path: `GET /v1/us/assets/pl/realized`
     ///
