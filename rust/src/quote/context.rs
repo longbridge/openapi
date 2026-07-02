@@ -2330,11 +2330,18 @@ fn normalize_symbol(symbol: &str) -> &str {
     }
 }
 
-/// Convert a user-facing crypto trading-pair symbol to the internal
-/// `VA/HAS/…` counter_id.
+/// Convert a user-facing crypto symbol to the internal `VA/{EXCHANGE}/{PAIR}`
+/// counter_id.
 ///
-/// Accepts `"BTCUSD"` or `"BTC/USD"` → `"VA/HAS/BTCUSD"`.
-/// Only the `/` separator is removed; no other transformation is applied.
+/// Supported formats:
+/// - `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"` (`{PAIR}.{EXCHANGE}`)
+/// - `"BTCUSD"`     → `"VA/HAS/BTCUSD"` (default exchange `HAS`)
+/// - `"BTC/USD"`    → `"VA/HAS/BTCUSD"` (slash removed, default exchange `HAS`)
 fn crypto_symbol_to_counter_id(symbol: &str) -> String {
+    if let Some(dot) = symbol.rfind('.') {
+        let pair = symbol[..dot].replace('/', "");
+        let exchange = symbol[dot + 1..].to_uppercase();
+        return format!("VA/{}/{}", exchange, pair);
+    }
     format!("VA/HAS/{}", symbol.replace('/', ""))
 }
