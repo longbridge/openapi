@@ -2330,18 +2330,16 @@ fn normalize_symbol(symbol: &str) -> &str {
     }
 }
 
-/// Convert a user-facing crypto symbol to the internal `VA/{EXCHANGE}/{PAIR}`
-/// counter_id.
+/// Convert a crypto symbol in `PAIR.EXCHANGE` format to the internal
+/// `VA/{EXCHANGE}/{PAIR}` counter_id.
 ///
-/// Supported formats:
-/// - `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"` (`{PAIR}.{EXCHANGE}`)
-/// - `"BTCUSD"`     → `"VA/HAS/BTCUSD"` (default exchange `HAS`)
-/// - `"BTC/USD"`    → `"VA/HAS/BTCUSD"` (slash removed, default exchange `HAS`)
+/// Example: `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"`.
+/// If no `.EXCHANGE` suffix is present the value is passed through unchanged.
 fn crypto_symbol_to_counter_id(symbol: &str) -> String {
     if let Some(dot) = symbol.rfind('.') {
-        let pair = symbol[..dot].replace('/', "");
+        let pair = &symbol[..dot];
         let exchange = symbol[dot + 1..].to_uppercase();
         return format!("VA/{}/{}", exchange, pair);
     }
-    format!("VA/HAS/{}", symbol.replace('/', ""))
+    symbol.to_string()
 }
