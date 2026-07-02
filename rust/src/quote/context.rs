@@ -2299,8 +2299,9 @@ impl QuoteContext {
     /// credentials.
     pub async fn us_crypto_overview(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
     ) -> Result<crate::quote::USCryptoOverview> {
+        use crate::utils::counter::symbol_to_counter_id;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -2311,7 +2312,7 @@ impl QuoteContext {
             .request(Method::GET, "/v1/gemini/crypto-overview")
             .dc_restrict(DcRegion::Us)
             .query_params(Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
             })
             .response::<Json<crate::quote::USCryptoOverview>>()
             .send()

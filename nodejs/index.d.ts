@@ -623,23 +623,23 @@ export declare class FundamentalContext {
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
   /** Get US company overview. US token required. counterID format: "ST/US/AAPL" */
-  usCompanyOverview(counterId: string): Promise<USCompanyOverview>
+  usCompanyOverview(symbol: string): Promise<USCompanyOverview>
   /** Get US valuation snapshot (PE/PB/PS). US token required. */
-  usValuationOverview(counterId: string): Promise<USValuationOverview>
+  usValuationOverview(symbol: string): Promise<USValuationOverview>
   /** Get US financial overview (revenue/net income/EPS). Returns JSON string. US token required. */
-  usFinancialOverview(counterId: string, report: string): Promise<string>
+  usFinancialOverview(symbol: string, report: string): Promise<string>
   /** Get US financial statement (IS/BS/CF). kind: "IS" | "BS" | "CF". US token required. */
-  usFinancialStatementV3(counterId: string, kind: string, report: string): Promise<USFinancialStatement>
+  usFinancialStatementV3(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
   /** Get US key financial metrics (ROE/margins). Returns JSON string. US token required. */
-  usKeyFinancialMetrics(counterId: string, report: string): Promise<string>
+  usKeyFinancialMetrics(symbol: string, report: string): Promise<string>
   /** Get US analyst consensus estimates. Returns JSON string. US token required. */
-  usAnalystConsensus(counterId: string, report: string): Promise<string>
+  usAnalystConsensus(symbol: string, report: string): Promise<string>
   /** Get US ETF dividend history. US token required. */
-  usEtfDividendInfo(counterId: string): Promise<USETFDividendInfo>
+  usEtfDividendInfo(symbol: string): Promise<USETFDividendInfo>
   /** Get US company historical dividends. US token required. */
-  usCompanyDividends(counterId: string): Promise<USCompanyDividends>
+  usCompanyDividends(symbol: string): Promise<USCompanyDividends>
   /** Get US ETF document list. size=null returns all. US token required. */
-  usEtfFiles(counterId: string, size?: number | undefined | null): Promise<USETFFilesResponse>
+  usEtfFiles(symbol: string, size?: number | undefined | null): Promise<USETFFilesResponse>
 }
 
 /** Fund position */
@@ -2049,7 +2049,7 @@ export declare class QuoteContext {
   /** Get daily historical option volume */
   optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
   /** Get US cryptocurrency market overview. counterID format: "CY/US/BTC". US token required. */
-  usCryptoOverview(counterId: string): Promise<USCryptoOverview>
+  usCryptoOverview(symbol: string): Promise<USCryptoOverview>
 }
 
 export declare class QuotePackageDetail {

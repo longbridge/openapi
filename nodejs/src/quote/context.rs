@@ -1296,7 +1296,7 @@ impl QuoteContext {
     pub async fn us_crypto_overview(&self, counter_id: String) -> Result<USCryptoOverview> {
         Ok(self
             .ctx
-            .us_crypto_overview(counter_id)
+            .us_crypto_overview(symbol)
             .await
             .map_err(ErrorNewType)?
             .into())

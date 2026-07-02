@@ -330,7 +330,7 @@ impl FundamentalContext {
     pub async fn us_company_overview(&self, counter_id: String) -> Result<USCompanyOverview> {
         Ok(self
             .ctx
-            .us_company_overview(counter_id)
+            .us_company_overview(symbol)
             .await
             .map_err(ErrorNewType)?
             .into())
@@ -341,7 +341,7 @@ impl FundamentalContext {
     pub async fn us_valuation_overview(&self, counter_id: String) -> Result<USValuationOverview> {
         Ok(self
             .ctx
-            .us_valuation_overview(counter_id)
+            .us_valuation_overview(symbol)
             .await
             .map_err(ErrorNewType)?
             .into())
@@ -409,7 +409,7 @@ impl FundamentalContext {
     pub async fn us_etf_dividend_info(&self, counter_id: String) -> Result<USETFDividendInfo> {
         Ok(self
             .ctx
-            .us_etf_dividend_info(counter_id)
+            .us_etf_dividend_info(symbol)
             .await
             .map_err(ErrorNewType)?
             .into())
@@ -420,7 +420,7 @@ impl FundamentalContext {
     pub async fn us_company_dividends(&self, counter_id: String) -> Result<USCompanyDividends> {
         Ok(self
             .ctx
-            .us_company_dividends(counter_id)
+            .us_company_dividends(symbol)
             .await
             .map_err(ErrorNewType)?
             .into())

@@ -902,7 +902,7 @@ impl AsyncQuoteContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: crate::quote::types::USCryptoOverview = ctx
-                .us_crypto_overview(counter_id)
+                .us_crypto_overview(symbol)
                 .await
                 .map_err(ErrorNewType)?
                 .into();

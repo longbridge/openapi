@@ -248,7 +248,7 @@ impl FundamentalContext {
     fn us_company_overview(&self, counter_id: String) -> PyResult<USCompanyOverview> {
         Ok(self
             .ctx
-            .us_company_overview(counter_id)
+            .us_company_overview(symbol)
             .map_err(ErrorNewType)?
             .into())
     }
@@ -257,7 +257,7 @@ impl FundamentalContext {
     fn us_valuation_overview(&self, counter_id: String) -> PyResult<USValuationOverview> {
         Ok(self
             .ctx
-            .us_valuation_overview(counter_id)
+            .us_valuation_overview(symbol)
             .map_err(ErrorNewType)?
             .into())
     }
@@ -330,7 +330,7 @@ impl FundamentalContext {
     fn us_etf_dividend_info(&self, counter_id: String) -> PyResult<USETFDividendInfo> {
         Ok(self
             .ctx
-            .us_etf_dividend_info(counter_id)
+            .us_etf_dividend_info(symbol)
             .map_err(ErrorNewType)?
             .into())
     }
@@ -339,7 +339,7 @@ impl FundamentalContext {
     fn us_company_dividends(&self, counter_id: String) -> PyResult<USCompanyDividends> {
         Ok(self
             .ctx
-            .us_company_dividends(counter_id)
+            .us_company_dividends(symbol)
             .map_err(ErrorNewType)?
             .into())
     }

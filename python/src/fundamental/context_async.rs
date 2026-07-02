@@ -369,7 +369,7 @@ impl AsyncFundamentalContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USCompanyOverview::from(
-                ctx.us_company_overview(counter_id)
+                ctx.us_company_overview(symbol)
                     .await
                     .map_err(ErrorNewType)?,
             ))
@@ -382,7 +382,7 @@ impl AsyncFundamentalContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USValuationOverview::from(
-                ctx.us_valuation_overview(counter_id)
+                ctx.us_valuation_overview(symbol)
                     .await
                     .map_err(ErrorNewType)?,
             ))
@@ -480,7 +480,7 @@ impl AsyncFundamentalContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USETFDividendInfo::from(
-                ctx.us_etf_dividend_info(counter_id)
+                ctx.us_etf_dividend_info(symbol)
                     .await
                     .map_err(ErrorNewType)?,
             ))
@@ -493,7 +493,7 @@ impl AsyncFundamentalContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USCompanyDividends::from(
-                ctx.us_company_dividends(counter_id)
+                ctx.us_company_dividends(symbol)
                     .await
                     .map_err(ErrorNewType)?,
             ))

@@ -4020,7 +4020,7 @@ class QuoteContext:
             :class:`ShortTradesResponse` with raw JSON data
         """
 
-    def us_crypto_overview(self, counter_id: str) -> "USCryptoOverview":
+    def us_crypto_overview(self, symbol: str) -> "USCryptoOverview":
         """Get US cryptocurrency market overview. US token required.
 
         Args:
@@ -5383,7 +5383,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def us_crypto_overview(self, counter_id: str) -> "Awaitable[USCryptoOverview]":
+    def us_crypto_overview(self, symbol: str) -> "Awaitable[USCryptoOverview]":
         """Get US cryptocurrency market overview. US token required. Returns awaitable.
 
         Args:
@@ -10119,7 +10119,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_company_overview(self, counter_id: str) -> "USCompanyOverview":
+    def us_company_overview(self, symbol: str) -> "USCompanyOverview":
         """Get US company overview. US token required.
 
         Args:
@@ -10130,7 +10130,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_valuation_overview(self, counter_id: str) -> "USValuationOverview":
+    def us_valuation_overview(self, symbol: str) -> "USValuationOverview":
         """Get US valuation overview. US token required.
 
         Args:
@@ -10141,7 +10141,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_financial_overview(self, counter_id: str, report: str) -> Any:
+    def us_financial_overview(self, symbol: str, report: str) -> Any:
         """Get US financial overview (revenue, net income, EPS, cash flow). US token required.
 
         Args:
@@ -10153,7 +10153,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_financial_statement_v3(self, counter_id: str, kind: str, report: str) -> "USFinancialStatement":
+    def us_financial_statement_v3(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
@@ -10166,7 +10166,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_key_financial_metrics(self, counter_id: str, report: str) -> Any:
+    def us_key_financial_metrics(self, symbol: str, report: str) -> Any:
         """Get US key financial metrics (ROE, margins, debt ratio). US token required.
 
         Args:
@@ -10178,7 +10178,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_analyst_consensus(self, counter_id: str, report: str) -> Any:
+    def us_analyst_consensus(self, symbol: str, report: str) -> Any:
         """Get US analyst consensus estimates (EPS, revenue forecasts). US token required.
 
         Args:
@@ -10190,7 +10190,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_etf_dividend_info(self, counter_id: str) -> "USETFDividendInfo":
+    def us_etf_dividend_info(self, symbol: str) -> "USETFDividendInfo":
         """Get US ETF dividend history. US token required.
 
         Args:
@@ -10201,7 +10201,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_company_dividends(self, counter_id: str) -> "USCompanyDividends":
+    def us_company_dividends(self, symbol: str) -> "USCompanyDividends":
         """Get US company historical dividends. US token required.
 
         Args:
@@ -10212,7 +10212,7 @@ class FundamentalContext:
         """
         ...
 
-    def us_etf_files(self, counter_id: str, size: Optional[int] = None) -> "USETFFilesResponse":
+    def us_etf_files(self, symbol: str, size: Optional[int] = None) -> "USETFFilesResponse":
         """Get US ETF document list. US token required.
 
         Args:

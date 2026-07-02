@@ -1062,7 +1062,7 @@ impl FundamentalContext {
     /// for non-US credentials.
     pub async fn us_company_overview(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
     ) -> Result<USCompanyOverview> {
         #[derive(Serialize)]
         struct Query {
@@ -1071,7 +1071,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/company-overview",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
             },
             DcRegion::Us,
         )
@@ -1085,7 +1085,7 @@ impl FundamentalContext {
     /// US token required.
     pub async fn us_valuation_overview(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
     ) -> Result<USValuationOverview> {
         #[derive(Serialize)]
         struct Query {
@@ -1094,7 +1094,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/valuation-overview",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
             },
             DcRegion::Us,
         )
@@ -1110,7 +1110,7 @@ impl FundamentalContext {
     /// US token required. Returns raw JSON for maximum flexibility.
     pub async fn us_financial_overview(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<serde_json::Value> {
         #[derive(Serialize)]
@@ -1121,7 +1121,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/finn-overview",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
                 report: report.into(),
             },
             DcRegion::Us,
@@ -1139,7 +1139,7 @@ impl FundamentalContext {
     /// US token required.
     pub async fn us_financial_statement_v3(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
         kind: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<USFinancialStatement> {
@@ -1152,7 +1152,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/quote/financials/statements",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
                 kind: kind.into(),
                 report: report.into(),
             },
@@ -1170,7 +1170,7 @@ impl FundamentalContext {
     /// US token required. Returns raw JSON.
     pub async fn us_key_financial_metrics(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<serde_json::Value> {
         #[derive(Serialize)]
@@ -1181,7 +1181,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/fin-keyfactor",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
                 report: report.into(),
             },
             DcRegion::Us,
@@ -1198,7 +1198,7 @@ impl FundamentalContext {
     /// US token required. Returns raw JSON.
     pub async fn us_analyst_consensus(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<serde_json::Value> {
         #[derive(Serialize)]
@@ -1209,7 +1209,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/fin-consensus",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
                 report: report.into(),
             },
             DcRegion::Us,
@@ -1224,7 +1224,7 @@ impl FundamentalContext {
     /// US token required.
     pub async fn us_etf_dividend_info(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
     ) -> Result<USETFDividendInfo> {
         #[derive(Serialize)]
         struct Query {
@@ -1233,7 +1233,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/etf-dividend-info",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
             },
             DcRegion::Us,
         )
@@ -1247,7 +1247,7 @@ impl FundamentalContext {
     /// US token required.
     pub async fn us_company_dividends(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
     ) -> Result<USCompanyDividends> {
         #[derive(Serialize)]
         struct Query {
@@ -1256,7 +1256,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/company-dividends",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
             },
             DcRegion::Us,
         )
@@ -1273,7 +1273,7 @@ impl FundamentalContext {
     /// US token required.
     pub async fn us_etf_files(
         &self,
-        counter_id: impl Into<String>,
+        symbol: impl Into<String>,
         size: Option<u32>,
     ) -> Result<USETFFilesResponse> {
         #[derive(Serialize)]
@@ -1285,7 +1285,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/stock-info/etf-files",
             Query {
-                counter_id: counter_id.into(),
+                counter_id: symbol_to_counter_id(&symbol.into()),
                 size,
             },
             DcRegion::Us,

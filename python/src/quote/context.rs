@@ -695,7 +695,7 @@ impl QuoteContext {
     ) -> PyResult<crate::quote::types::USCryptoOverview> {
         Ok(self
             .ctx
-            .us_crypto_overview(counter_id)
+            .us_crypto_overview(symbol)
             .map_err(ErrorNewType)?
             .into())
     }
