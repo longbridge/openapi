@@ -668,6 +668,17 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {
+        // Broker queue is served only by the AP data center; short-circuit a
+        // non-AP session with the same unified error the HTTP path returns.
+        let current = self.0.http_cli.dc_region().await;
+        if !current.allows(longbridge_httpcli::DcRegion::Ap) {
+            return Err(longbridge_httpcli::HttpClientError::DcRegionRestricted {
+                path: "quote/brokers (WebSocket)".to_string(),
+                required: longbridge_httpcli::DcRegion::Ap,
+                current,
+            }
+            .into());
+        }
         let resp: quote::SecurityBrokersResponse = self
             .request(
                 cmd_code::GET_SECURITY_BROKERS,
