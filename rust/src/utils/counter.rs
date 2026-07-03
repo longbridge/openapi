@@ -150,7 +150,7 @@ pub fn lookup_counter_id(symbol: &str) -> Option<String> {
 /// Known crypto exchange identifiers used as symbol suffixes.
 /// e.g. `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"`, `"BTCUSD.BKKT"` →
 /// `"VA/BKKT/BTCUSD"`.
-const CRYPTO_EXCHANGES: &[&str] = &["HAS", "BKKT"];
+const CRYPTO_EXCHANGES: &[&str] = &["HAS", "OSL", "BKKT"];
 
 /// ETF + index + warrant set and the remote-resolved cache; a matching entry
 /// is returned as-is. Crypto symbols whose suffix matches a known exchange
