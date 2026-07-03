@@ -827,7 +827,6 @@ pub(crate) struct USCryptoEntry {
     pub average_cost: String,
     pub symbol: String,
     pub currency: String,
-    pub industry_symbol: String,
     pub industry_name: String,
 }
 
@@ -838,7 +837,6 @@ impl From<longbridge::trade::USCryptoEntry> for USCryptoEntry {
             average_cost: v.average_cost,
             symbol: v.symbol,
             currency: v.currency,
-            industry_symbol: v.industry_symbol,
             industry_name: v.industry_name,
         }
     }

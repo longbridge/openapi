@@ -912,13 +912,6 @@ pub struct USCryptoEntry {
     pub symbol: String,
     #[serde(default)]
     pub currency: String,
-    /// Industry symbol converted from `industry_counter_id`.
-    #[serde(
-        default,
-        rename = "industry_counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
-    pub industry_symbol: String,
     #[serde(default)]
     pub industry_name: String,
 }
