@@ -1637,6 +1637,10 @@ pub(crate) struct USCryptoOverview {
     pub issue_price: String,
     pub shares: String,
     pub official_web_address: String,
+    pub counter_id: String,
+    pub base_asset: String,
+    pub logo: String,
+    pub wiki_url: String,
     /// Profile as JSON string
     pub profile: String,
 }
@@ -1655,6 +1659,10 @@ impl From<longbridge::quote::USCryptoOverview> for USCryptoOverview {
             issue_price: v.issue_price,
             shares: v.shares,
             official_web_address: v.official_web_address,
+            counter_id: v.counter_id,
+            base_asset: v.base_asset,
+            logo: v.logo,
+            wiki_url: v.wiki_url,
             profile: serde_json::to_string(&v.profile).unwrap_or_default(),
         }
     }

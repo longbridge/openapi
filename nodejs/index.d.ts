@@ -2823,7 +2823,7 @@ export declare class TradeContext {
   /** Query US order list (paginated). Returns JSON string. US token required. */
   usQueryOrders(accountChannel: string, action: number, startAt: number, endAt: number, counterIds: string[], securityTypes: string[], queryType: number, page: number, limit: number, queryVersion: number): Promise<string>
   /** Get US order detail. isAttached=true includes take-profit/stop-loss sub-orders. Returns JSON string. US token required. */
-  usOrderDetail(orderId: string): Promise<string>
+  usOrderDetail(orderId: string): Promise<USOrderDetailResponse>
   /** Get US account asset overview (stocks/options/crypto/buy power). US token required. */
   usAssetOverview(): Promise<USAssetOverview>
   /** Get US realized P&L. category: "ALL"|"STOCK"|"OPTION"|"CRYPTO". US token required. */
@@ -6088,6 +6088,21 @@ export declare const enum WarrantType {
   Inline = 5
 }
 
+export interface USOrderHistory {
+  execType: number
+  status: string
+  price: string
+  qty: string
+  time: string
+  msg: string
+}
+
+export interface USOrderDetailResponse {
+  order: Record<string, unknown>
+  orderHistories: Array<USOrderHistory>
+  currentAttachedOrder: Record<string, unknown> | null
+}
+
 // ── US-market types ────────────────────────────────────────────────────────
 
 export interface USRankTag {
@@ -6164,8 +6179,10 @@ export interface USETFFilesResponse {
 }
 
 export interface USCryptoOverview {
+  counterId: string
   name: string
   ticker: string
+  baseAsset: string
   currency: string
   allTimeHigh: string
   allTimeHighDate: string
@@ -6175,7 +6192,10 @@ export interface USCryptoOverview {
   issuePrice: string
   shares: string
   officialWebAddress: string
-  profile: unknown
+  logo: string
+  wikiUrl: string
+  /** Profile / description as a JSON string */
+  profile: string
 }
 
 export interface USCashEntry {
@@ -6190,15 +6210,16 @@ export interface USCashEntry {
 export interface USCryptoEntry {
   assetType: string
   averageCost: string
-  counterId: string
+  /** User-facing symbol, e.g. "BTCUSD.BKKT" */
+  symbol: string
   currency: string
-  industryCounterId: string
   industryName: string
 }
 
 export interface USAssetOverview {
   accountType: string
-  assetTimestamp: string
+  /** Unix timestamp (seconds) */
+  assetTimestamp: number
   cashBuyPower: string
   cashList: Array<USCashEntry>
   cryptoList: Array<USCryptoEntry>

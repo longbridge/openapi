@@ -4024,7 +4024,7 @@ class QuoteContext:
         """Get US cryptocurrency market overview. US token required.
 
         Args:
-            counter_id: Crypto counter_id, e.g. ``"CY/US/BTC"``
+            symbol: Trading-pair symbol, e.g. ``"BTCUSD.BKKT"``
 
         Returns:
             :class:`USCryptoOverview`
@@ -5387,7 +5387,7 @@ class AsyncQuoteContext:
         """Get US cryptocurrency market overview. US token required. Returns awaitable.
 
         Args:
-            counter_id: Crypto counter_id, e.g. ``"CY/US/BTC"``
+            symbol: Trading-pair symbol, e.g. ``"BTCUSD.BKKT"``
 
         Returns:
             Awaitable resolving to :class:`USCryptoOverview`
@@ -12442,7 +12442,7 @@ class USAssetOverview:
 
     account_type: str
     """Account type code"""
-    asset_timestamp: str
+    asset_timestamp: int
     """Snapshot timestamp (Unix seconds string)"""
     cash_buy_power: str
     """Available cash buying power"""
