@@ -1238,9 +1238,9 @@ impl QuoteContextSync {
     /// Get cryptocurrency market overview (blocking)
     pub fn us_crypto_overview(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
     ) -> Result<USCryptoOverview> {
         self.rt
-            .call(move |ctx| async move { ctx.us_crypto_overview(counter_id).await })
+            .call(move |ctx| async move { ctx.us_crypto_overview(symbol).await })
     }
 }

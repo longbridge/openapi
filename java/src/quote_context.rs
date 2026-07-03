@@ -1288,14 +1288,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUsCrypto
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    counter_id: JObject,
+    symbol: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
-        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.us_crypto_overview(counter_id).await?;
+            let resp = context.ctx.us_crypto_overview(symbol).await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())

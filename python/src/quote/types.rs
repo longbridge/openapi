@@ -1664,7 +1664,7 @@ impl From<longbridge::quote::USCryptoOverview> for USCryptoOverview {
             base_asset: v.base_asset,
             logo: v.logo,
             wiki_url: v.wiki_url,
-            profile: serde_json::to_string(&v.profile).unwrap_or_default(),
+            profile: v.profile,
         }
     }
 }

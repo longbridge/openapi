@@ -12377,10 +12377,14 @@ class OptionVolumeDaily:
 class USCryptoOverview:
     """US cryptocurrency market overview. Returned by QuoteContext.us_crypto_overview."""
 
+    symbol: str
+    """User-facing trading-pair symbol, e.g. ``"BTCUSD.BKKT"``"""
     name: str
     """Cryptocurrency full name"""
     ticker: str
-    """Ticker symbol"""
+    """Ticker / pair code, e.g. ``"BTCUSD"``"""
+    base_asset: str
+    """Base asset code, e.g. ``"BTC"``"""
     currency: str
     """Quote currency"""
     all_time_high: str
@@ -12399,6 +12403,10 @@ class USCryptoOverview:
     """Total supply"""
     official_web_address: str
     """Official website URL"""
+    logo: str
+    """Logo image URL"""
+    wiki_url: str
+    """In-app wiki URL"""
     profile: str
     """Extended profile as JSON string"""
 
