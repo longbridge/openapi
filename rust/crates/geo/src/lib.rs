@@ -133,13 +133,27 @@ impl DcRegion {
     }
 
     /// Strip any leading `Bearer ` from a credential.
+    /// Strip the routing prefix from a credential before sending it in the
+    /// `Authorization` header.
     ///
-    /// Region prefixes (`hk_m_`, `us_m_`, `ap_m_`, …) are routing metadata
-    /// consumed by [`from_credential`] to derive the [`DC_REGION_HEADER`].
-    /// The gateway accepts the full prefixed token and routes via the header,
-    /// so **no region prefix is stripped** — only `Bearer ` is removed.
+    /// Access tokens carry a data-center prefix (`us_m_`, `hk_m_`, `ap_m_`,
+    /// …) that is routing metadata consumed by [`from_credential`]. The gateway
+    /// validates only the bare JWT (`eyJ…`); sending the full prefixed string
+    /// causes JWT header decode failure (`invalid character '\xba'`).
+    ///
+    /// Stripping order:
+    /// 1. Remove any leading `Bearer ` OAuth wrapper.
+    /// 2. Remove everything before the JWT start (`eyJ`).
+    ///
+    /// App keys (hex strings, no `eyJ`) are returned unchanged.
     pub fn strip_region_prefix(credential: &str) -> &str {
-        credential.strip_prefix("Bearer ").unwrap_or(credential)
+        let credential = credential.strip_prefix("Bearer ").unwrap_or(credential);
+        if let Some(idx) = credential.find("eyJ") {
+            if idx > 0 {
+                return &credential[idx..];
+            }
+        }
+        credential
     }
 }
 
@@ -207,15 +221,20 @@ mod dc_region_tests {
     }
 
     #[test]
-    fn strip_region_prefix_only_removes_bearer() {
-        // Region prefixes are kept as-is; only "Bearer " is stripped.
-        assert_eq!(DcRegion::strip_region_prefix("us_m_eyJabc"), "us_m_eyJabc");
-        assert_eq!(DcRegion::strip_region_prefix("hk_m_eyJabc"), "hk_m_eyJabc");
+    fn strip_region_prefix_strips_routing_prefix_before_jwt() {
+        // Region prefix (e.g. "us_m_") is stripped; the bare JWT is returned.
+        assert_eq!(DcRegion::strip_region_prefix("us_m_eyJabc"), "eyJabc");
+        assert_eq!(DcRegion::strip_region_prefix("hk_m_eyJabc"), "eyJabc");
         assert_eq!(
             DcRegion::strip_region_prefix("Bearer us_m_eyJabc"),
-            "us_m_eyJabc"
+            "eyJabc"
         );
         assert_eq!(DcRegion::strip_region_prefix("Bearer eyJabc"), "eyJabc");
+        // Already-bare JWT and app keys are returned unchanged.
         assert_eq!(DcRegion::strip_region_prefix("eyJabc"), "eyJabc");
+        assert_eq!(
+            DcRegion::strip_region_prefix("f56dd0886267f801"),
+            "f56dd0886267f801"
+        );
     }
 }
