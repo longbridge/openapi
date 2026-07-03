@@ -825,9 +825,9 @@ impl From<longbridge::trade::USCashEntry> for USCashEntry {
 pub(crate) struct USCryptoEntry {
     pub asset_type: String,
     pub average_cost: String,
-    pub counter_id: String,
+    pub symbol: String,
     pub currency: String,
-    pub industry_counter_id: String,
+    pub industry_symbol: String,
     pub industry_name: String,
 }
 
@@ -836,9 +836,9 @@ impl From<longbridge::trade::USCryptoEntry> for USCryptoEntry {
         Self {
             asset_type: v.asset_type,
             average_cost: v.average_cost,
-            counter_id: v.counter_id,
+            symbol: v.symbol,
             currency: v.currency,
-            industry_counter_id: v.industry_counter_id,
+            industry_symbol: v.industry_symbol,
             industry_name: v.industry_name,
         }
     }
@@ -849,7 +849,7 @@ impl From<longbridge::trade::USCryptoEntry> for USCryptoEntry {
 #[derive(Debug, Clone, Default)]
 pub(crate) struct USAssetOverview {
     pub account_type: String,
-    pub asset_timestamp: String,
+    pub asset_timestamp: i64,
     pub cash_buy_power: String,
     pub cash_list: Vec<USCashEntry>,
     pub crypto_list: Vec<USCryptoEntry>,
@@ -859,7 +859,10 @@ impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
     fn from(v: longbridge::trade::USAssetOverview) -> Self {
         Self {
             account_type: v.account_type,
-            asset_timestamp: v.asset_timestamp,
+            asset_timestamp: v
+                .asset_timestamp
+                .map(|t| t.unix_timestamp())
+                .unwrap_or_default(),
             cash_buy_power: v.cash_buy_power,
             cash_list: v.cash_list.into_iter().map(Into::into).collect(),
             crypto_list: v.crypto_list.into_iter().map(Into::into).collect(),
