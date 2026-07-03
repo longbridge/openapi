@@ -12403,145 +12403,82 @@ class USCryptoOverview:
     """Extended profile as JSON string"""
 
 
-class USStockPosition:
-    """A stock holding in the US account."""
+class USCashEntry:
+    """One cash currency entry in USAssetOverview."""
 
-    symbol: str
-    """Security symbol"""
-    name: str
-    """Security name"""
-    quantity: str
-    """Total quantity held"""
-    available_quantity: str
-    """Available (tradable) quantity"""
+    currency: str
+    """Currency code, e.g. ``"USD"``"""
+    frozen_buy_cash: str
+    """Cash frozen for pending buy orders"""
+    outstanding: str
+    """Unsettled cash (positive = receivable, negative = payable)"""
+    settled_cash: str
+    """Settled cash balance"""
+    total_amount: str
+    """Total cash amount"""
+    total_cash: str
+    """Total available cash"""
+
+
+class USCryptoEntry:
+    """One cryptocurrency holding in USAssetOverview."""
+
+    asset_type: str
+    """Asset type, e.g. ``"CRYPTO"``"""
+    average_cost: str
+    """Average cost price"""
+    counter_id: str
+    """Internal counter_id, e.g. ``"VA/BKKT/BTCUSD"``"""
     currency: str
     """Settlement currency"""
-    cost_price: str
-    """Average cost price"""
-    market_value: str
-    """Current market value"""
-    unrealized_pl: str
-    """Unrealized profit/loss"""
-    unrealized_pl_ratio: str
-    """Unrealized P&L ratio"""
-    last_done: str
-    """Last trade price"""
-    prev_close: str
-    """Previous close price"""
-    change_rate: str
-    """Price change rate"""
-    night_last_done: str
-    """After-hours last trade price"""
-    pretrade_close: str
-    """Pre-trade close price"""
-    trade_status: str
-    """Trade status code"""
-    individual_quantity: str
-    """Individual account quantity"""
-
-
-class USOptionPosition:
-    """An option holding in the US account."""
-
-    symbol: str
-    """Option contract symbol"""
-    strike_price: str
-    """Strike price"""
-    due_date: str
-    """Expiry date"""
-    contract_multiplier: int
-    """Contract multiplier (typically 100)"""
-    option_type: str
-    """Option type: ``"call"`` or ``"put"``"""
-    quantity: str
-    """Quantity held"""
-    market_value: str
-    """Current market value"""
-    unrealized_pl: str
-    """Unrealized profit/loss"""
-
-
-class USCryptoPosition:
-    """A cryptocurrency holding in the US account."""
-
-    symbol: str
-    """Cryptocurrency symbol"""
-    quantity: str
-    """Quantity held"""
-    market_value: str
-    """Current market value"""
-    unrealized_pl: str
-    """Unrealized profit/loss"""
-    cost_price: str
-    """Average cost price"""
-
-
-class USBuyPower:
-    """Purchasing power breakdown for a US account."""
-
-    cash_buy_power: str
-    """Cash buying power"""
-    overnight_buy_power: str
-    """Overnight buying power"""
-    day_trade_buy_power: str
-    """Day-trade buying power"""
-    option_buy_power: str
-    """Option buying power"""
-    crypto_buy_power: str
-    """Crypto buying power"""
+    industry_counter_id: str
+    """Industry counter_id"""
+    industry_name: str
+    """Industry name"""
 
 
 class USAssetOverview:
-    """Full US account asset snapshot. Returned by TradeContext.us_asset_overview."""
+    """US account asset snapshot. Returned by TradeContext.us_asset_overview."""
 
     account_type: str
-    """Account type string"""
-    net_assets: str
-    """Total net assets"""
-    total_cash: str
-    """Total cash balance"""
-    unrealized_pl: str
-    """Total unrealized profit/loss"""
-    positions: List[USStockPosition]
-    """Stock positions"""
-    option_positions: List[USOptionPosition]
-    """Option positions"""
-    multi_legs: str
-    """Multi-leg positions as JSON string"""
-    crypto_positions: List[USCryptoPosition]
+    """Account type code"""
+    asset_timestamp: str
+    """Snapshot timestamp (Unix seconds string)"""
+    cash_buy_power: str
+    """Available cash buying power"""
+    cash_list: List[USCashEntry]
+    """Cash balances by currency"""
+    crypto_list: List[USCryptoEntry]
     """Cryptocurrency positions"""
-    buy_power: USBuyPower
-    """Purchasing power breakdown"""
 
 
-class USRealizedPLItem:
-    """A single realized P&L entry by symbol."""
+class USRealizedPLMetric:
+    """One time-period metric within a USRealizedPLEntry."""
 
-    symbol: str
-    """Security symbol"""
-    name: str
-    """Security name"""
-    category: str
-    """Asset category"""
-    realized_pl: str
-    """Realized profit/loss"""
-    quantity_sold: str
-    """Total quantity sold"""
-    avg_cost: str
-    """Average cost price"""
-    avg_sell_price: str
-    """Average sell price"""
+    amount: str
+    """Realized P&L amount"""
+    period: int
+    """Period code (server-defined)"""
+    rate: str
+    """Realized P&L rate"""
+
+
+class USRealizedPLEntry:
+    """One asset-category entry in USRealizedPL. category: 0=all, 1=stock, 2=option, 3=crypto."""
+
+    category: int
+    """Asset category code"""
+    currency: str
+    """Currency"""
+    metrics: List[USRealizedPLMetric]
+    """Time-period metrics"""
 
 
 class USRealizedPL:
     """Realized P&L response for a US account. Returned by TradeContext.us_realized_pl."""
 
-    total_realized_pl: str
-    """Total realized profit/loss"""
-    currency: str
-    """Currency"""
-    items: List[USRealizedPLItem]
-    """Per-symbol breakdown"""
+    realized_pl_list: List[USRealizedPLEntry]
+    """Per-category realized P&L entries"""
 
 
 class USRankTag:

@@ -6178,76 +6178,44 @@ export interface USCryptoOverview {
   profile: unknown
 }
 
-export interface USStockPosition {
-  symbol: string
-  name: string
-  quantity: string
-  availableQuantity: string
+export interface USCashEntry {
   currency: string
-  costPrice: string
-  marketValue: string
-  unrealizedPl: string
-  unrealizedPlRatio: string
-  lastDone: string
-  prevClose: string
-  changeRate: string
-  nightLastDone: string
-  pretradeClose: string
-  tradeStatus: string
-  individualQuantity: string
+  frozenBuyCash: string
+  outstanding: string
+  settledCash: string
+  totalAmount: string
+  totalCash: string
 }
 
-export interface USOptionPosition {
-  symbol: string
-  strikePrice: string
-  dueDate: string
-  contractMultiplier: number
-  optionType: string
-  quantity: string
-  marketValue: string
-  unrealizedPl: string
-}
-
-export interface USCryptoPosition {
-  symbol: string
-  quantity: string
-  marketValue: string
-  unrealizedPl: string
-  costPrice: string
-}
-
-export interface USBuyPower {
-  cashBuyPower: string
-  overnightBuyPower: string
-  dayTradeBuyPower: string
-  optionBuyPower: string
-  cryptoBuyPower: string
+export interface USCryptoEntry {
+  assetType: string
+  averageCost: string
+  counterId: string
+  currency: string
+  industryCounterId: string
+  industryName: string
 }
 
 export interface USAssetOverview {
   accountType: string
-  netAssets: string
-  totalCash: string
-  unrealizedPl: string
-  positions: Array<USStockPosition>
-  optionPositions: Array<USOptionPosition>
-  multiLegs: Array<unknown>
-  cryptoPositions: Array<USCryptoPosition>
-  buyPower: USBuyPower
+  assetTimestamp: string
+  cashBuyPower: string
+  cashList: Array<USCashEntry>
+  cryptoList: Array<USCryptoEntry>
 }
 
-export interface USRealizedPLItem {
-  symbol: string
-  name: string
-  category: string
-  realizedPl: string
-  quantitySold: string
-  avgCost: string
-  avgSellPrice: string
+export interface USRealizedPLMetric {
+  amount: string
+  period: number
+  rate: string
+}
+
+export interface USRealizedPLEntry {
+  category: number
+  currency: string
+  metrics: Array<USRealizedPLMetric>
 }
 
 export interface USRealizedPL {
-  totalRealizedPl: string
-  currency: string
-  items: Array<USRealizedPLItem>
+  realizedPlList: Array<USRealizedPLEntry>
 }
