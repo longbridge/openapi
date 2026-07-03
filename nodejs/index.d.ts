@@ -2823,7 +2823,7 @@ export declare class TradeContext {
   /** Query US order list (paginated). Returns JSON string. US token required. */
   usQueryOrders(accountChannel: string, action: number, startAt: number, endAt: number, counterIds: string[], securityTypes: string[], queryType: number, page: number, limit: number, queryVersion: number): Promise<string>
   /** Get US order detail. isAttached=true includes take-profit/stop-loss sub-orders. Returns JSON string. US token required. */
-  usOrderDetail(orderId: string, isAttached: boolean): Promise<string>
+  usOrderDetail(orderId: string): Promise<string>
   /** Get US account asset overview (stocks/options/crypto/buy power). US token required. */
   usAssetOverview(): Promise<USAssetOverview>
   /** Get US realized P&L. category: "ALL"|"STOCK"|"OPTION"|"CRYPTO". US token required. */

@@ -470,10 +470,9 @@ impl TradeContextSync {
     pub fn us_order_detail(
         &self,
         order_id: impl Into<String> + Send + 'static,
-        is_attached: bool,
     ) -> Result<USOrderDetailResponse> {
         self.rt
-            .call(move |ctx| async move { ctx.us_order_detail(order_id, is_attached).await })
+            .call(move |ctx| async move { ctx.us_order_detail(order_id).await })
     }
 
     /// Get the full US account asset overview (blocking)

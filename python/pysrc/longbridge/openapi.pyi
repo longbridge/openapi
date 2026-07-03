@@ -7373,7 +7373,7 @@ class TradeContext:
         """
         ...
 
-    def us_order_detail(self, order_id: str, is_attached: bool) -> str:
+    def us_order_detail(self, order_id: str) -> str:
         """Get US order detail. Returns JSON string. US token required.
 
         When ``is_attached`` is ``True``, attached take-profit/stop-loss
@@ -8108,7 +8108,7 @@ class AsyncTradeContext:
         """
         ...
 
-    def us_order_detail(self, order_id: str, is_attached: bool) -> "Awaitable[str]":
+    def us_order_detail(self, order_id: str) -> "Awaitable[str]":
         """Get US order detail. Returns awaitable JSON string. US token required.
 
         When ``is_attached`` is ``True``, attached take-profit/stop-loss

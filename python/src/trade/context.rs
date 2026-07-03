@@ -446,11 +446,8 @@ impl TradeContext {
     }
 
     /// Get US order detail (returns JSON string). US token required.
-    fn us_order_detail(&self, order_id: String, is_attached: bool) -> PyResult<String> {
-        let resp = self
-            .ctx
-            .us_order_detail(order_id, is_attached)
-            .map_err(ErrorNewType)?;
+    fn us_order_detail(&self, order_id: String) -> PyResult<String> {
+        let resp = self.ctx.us_order_detail(order_id).map_err(ErrorNewType)?;
         serde_json::to_string(&resp)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }

@@ -547,14 +547,10 @@ impl TradeContext {
         &self,
         env: &'env Env,
         order_id: String,
-        is_attached: bool,
     ) -> Result<PromiseRaw<'env, String>> {
         let ctx = self.ctx.clone();
         env.spawn_future(async move {
-            let resp = ctx
-                .us_order_detail(order_id, is_attached)
-                .await
-                .map_err(ErrorNewType)?;
+            let resp = ctx.us_order_detail(order_id).await.map_err(ErrorNewType)?;
             serde_json::to_string(&resp).map_err(|e| napi::Error::from_reason(e.to_string()))
         })
     }

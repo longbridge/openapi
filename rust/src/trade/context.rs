@@ -861,36 +861,23 @@ impl TradeContext {
             .0)
     }
 
-    /// Get US order detail, optionally including attached stop-loss/take-profit
-    /// sub-orders.
+    /// Get US order detail.
     ///
-    /// Path: `GET /v3/orders/{order_id}`
+    /// Path: `GET /v1/orders/{order_id}`
     ///
     /// US token required.
     pub async fn us_order_detail(
         &self,
         order_id: impl Into<String>,
-        is_attached: bool,
     ) -> Result<USOrderDetailResponse> {
         let order_id = order_id.into();
-        let path = format!("/v3/orders/{order_id}");
-
-        #[derive(Serialize)]
-        struct Query {
-            order_id_str: String,
-            #[serde(skip_serializing_if = "Option::is_none")]
-            is_attached: Option<bool>,
-        }
+        let path = format!("/v1/orders/{order_id}");
 
         Ok(self
             .0
             .http_cli
             .request(Method::GET, path.as_str())
             .dc_restrict(DcRegion::Us)
-            .query_params(Query {
-                order_id_str: order_id,
-                is_attached: if is_attached { Some(true) } else { None },
-            })
             .response::<Json<USOrderDetailResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
