@@ -878,150 +878,89 @@ pub struct USOrderDetailResponse {
     pub attached_orders: Vec<USAttachedOrder>,
 }
 
-/// A stock position in a US account.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct USStockPosition {
-    #[serde(default)]
-    pub symbol: String,
-    #[serde(default)]
-    pub name: String,
-    #[serde(default)]
-    pub quantity: String,
-    #[serde(default)]
-    pub available_quantity: String,
+/// One cash currency entry in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashEntry {
     #[serde(default)]
     pub currency: String,
     #[serde(default)]
-    pub cost_price: String,
+    pub frozen_buy_cash: String,
     #[serde(default)]
-    pub market_value: String,
+    pub outstanding: String,
     #[serde(default)]
-    pub unrealized_pl: String,
+    pub settled_cash: String,
     #[serde(default)]
-    pub unrealized_pl_ratio: String,
+    pub total_amount: String,
     #[serde(default)]
-    pub last_done: String,
-    #[serde(default)]
-    pub prev_close: String,
-    #[serde(default)]
-    pub change_rate: String,
-    /// Overnight/night-session last price (US-specific)
-    #[serde(default)]
-    pub night_last_done: String,
-    /// Pre-market close price (US-specific)
-    #[serde(default)]
-    pub pretrade_close: String,
-    /// Trading session status (US-specific)
-    #[serde(default)]
-    pub trade_status: String,
-    /// Individual quantity after multi-leg exclusion (US-specific)
-    #[serde(default)]
-    pub individual_quantity: String,
+    pub total_cash: String,
 }
 
-/// An option position in a US account.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct USOptionPosition {
-    #[serde(default)]
-    pub symbol: String,
-    #[serde(default)]
-    pub strike_price: String,
-    #[serde(default)]
-    pub due_date: String,
-    #[serde(default)]
-    pub contract_multiplier: i32,
-    #[serde(default, rename = "type")]
-    pub option_type: String,
-    #[serde(default)]
-    pub quantity: String,
-    #[serde(default)]
-    pub market_value: String,
-    #[serde(default)]
-    pub unrealized_pl: String,
-}
-
-/// A cryptocurrency position in a US account.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct USCryptoPosition {
-    #[serde(default)]
-    pub symbol: String,
-    #[serde(default)]
-    pub quantity: String,
-    #[serde(default)]
-    pub market_value: String,
-    #[serde(default)]
-    pub unrealized_pl: String,
-    #[serde(default)]
-    pub cost_price: String,
-}
-
-/// Purchasing power breakdown for a US account.
+/// One cryptocurrency holding in [`USAssetOverview`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct USBuyPower {
+pub struct USCryptoEntry {
     #[serde(default)]
-    pub cash_buy_power: String,
+    pub asset_type: String,
     #[serde(default)]
-    pub overnight_buy_power: String,
-    /// Day-trade buying power (margin accounts only)
+    pub average_cost: String,
+    /// Internal counter_id, e.g. `"VA/BKKT/BTCUSD"`.
     #[serde(default)]
-    pub day_trade_buy_power: String,
+    pub counter_id: String,
     #[serde(default)]
-    pub option_buy_power: String,
+    pub currency: String,
     #[serde(default)]
-    pub crypto_buy_power: String,
+    pub industry_counter_id: String,
+    #[serde(default)]
+    pub industry_name: String,
 }
 
 /// Response for [`crate::TradeContext::us_asset_overview`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Field names match the actual API response from `GET /v1/us/assets/overview`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAssetOverview {
     #[serde(default)]
     pub account_type: String,
     #[serde(default)]
-    pub net_assets: String,
+    pub asset_timestamp: String,
+    /// Cash buying power (top-level convenience field).
     #[serde(default)]
-    pub total_cash: String,
+    pub cash_buy_power: String,
     #[serde(default)]
-    pub unrealized_pl: String,
+    pub cash_list: Vec<USCashEntry>,
     #[serde(default)]
-    pub positions: Vec<USStockPosition>,
-    #[serde(default)]
-    pub option_positions: Vec<USOptionPosition>,
-    #[serde(default)]
-    pub multi_legs: Vec<serde_json::Value>,
-    #[serde(default)]
-    pub crypto_positions: Vec<USCryptoPosition>,
-    #[serde(default)]
-    pub buy_power: USBuyPower,
+    pub crypto_list: Vec<USCryptoEntry>,
 }
 
-/// A single realized P&L entry.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct USRealizedPLItem {
+/// One time-period metric in a [`USRealizedPLEntry`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPLMetric {
     #[serde(default)]
-    pub symbol: String,
+    pub amount: String,
+    /// Period code (server-defined; 2 = current month observed in testing).
     #[serde(default)]
-    pub name: String,
+    pub period: i32,
     #[serde(default)]
-    pub category: String,
-    #[serde(default)]
-    pub realized_pl: String,
-    #[serde(default)]
-    pub quantity_sold: String,
-    #[serde(default)]
-    pub avg_cost: String,
-    #[serde(default)]
-    pub avg_sell_price: String,
+    pub rate: String,
 }
 
-/// Response for [`crate::TradeContext::us_realized_pl`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct USRealizedPL {
+/// One asset-category entry in [`USRealizedPL`].
+/// `category`: 0 = all, 1 = stock, 2 = option, 3 = crypto (server-defined).
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPLEntry {
     #[serde(default)]
-    pub total_realized_pl: String,
+    pub category: i32,
     #[serde(default)]
     pub currency: String,
     #[serde(default)]
-    pub items: Vec<USRealizedPLItem>,
+    pub metrics: Vec<USRealizedPLMetric>,
+}
+
+/// Response for [`crate::TradeContext::us_realized_pl`].
+/// Field name matches the actual API response from `GET
+/// /v1/us/assets/pl/realized`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPL {
+    #[serde(default)]
+    pub realized_pl_list: Vec<USRealizedPLEntry>,
 }
 
 #[cfg(test)]

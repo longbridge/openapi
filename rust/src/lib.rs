@@ -60,7 +60,7 @@ pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
 pub use trade::{
     QueryUSOrdersOptions, QueryUSOrdersResponse, TradeContext, USAssetOverview, USAttachedOrder,
-    USBuyPower, USCryptoPosition, USOptionPosition, USOrderDetailResponse, USRealizedPL,
-    USRealizedPLItem, USStockPosition,
+    USCashEntry, USCryptoEntry, USOrderDetailResponse, USRealizedPL, USRealizedPLEntry,
+    USRealizedPLMetric,
 };
 pub use types::Market;
