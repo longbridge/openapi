@@ -13,10 +13,10 @@ use crate::{
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
         FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio, Order, OrderDetail,
-        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders, MarginRatio, Order,
+        OrderDetail, OrderSide, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse,
+        ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
+        USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -844,16 +844,61 @@ impl TradeContext {
     /// Path: `POST /v1/orders/query`
     ///
     /// US token required.
-    pub async fn us_query_orders(
-        &self,
-        opts: QueryUSOrdersOptions,
-    ) -> Result<QueryUSOrdersResponse> {
+    pub async fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        use crate::utils::counter::symbol_to_counter_id;
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs() as i64;
+
+        let action = match opts.side {
+            OrderSide::Buy => 1,
+            OrderSide::Sell => 2,
+            _ => 0,
+        };
+
+        let counter_ids = opts
+            .symbol
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .map(|s| vec![symbol_to_counter_id(s)])
+            .unwrap_or_default();
+
+        let start_at = if opts.start_at == 0 {
+            (now - 90 * 24 * 3600) as f64
+        } else {
+            opts.start_at as f64
+        };
+        let end_at = if opts.end_at == 0 {
+            now as f64
+        } else {
+            opts.end_at as f64
+        };
+        let page = if opts.page <= 0 { 1 } else { opts.page };
+        let limit = if opts.limit <= 0 { 20 } else { opts.limit };
+
+        let body = super::types::USQueryOrdersBody {
+            account_channel: String::new(),
+            action,
+            start_at,
+            end_at,
+            counter_ids,
+            security_types: vec![],
+            query_type: opts.query_type,
+            page,
+            limit,
+            query_version: now as f64,
+        };
+
         Ok(self
             .0
             .http_cli
             .request(Method::POST, "/v1/orders/query")
             .dc_restrict(DcRegion::Us)
-            .body(Json(opts))
+            .body(Json(body))
             .response::<Json<QueryUSOrdersResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())

@@ -28,6 +28,8 @@ pub use types::{
     FundPosition,
     FundPositionChannel,
     FundPositionsResponse,
+    // US-market types
+    GetUSHistoryOrders,
     MarginRatio,
     Order,
     OrderChargeDetail,
@@ -40,7 +42,6 @@ pub use types::{
     OrderTag,
     OrderType,
     OutsideRTH,
-    // US-market types
     QueryUSOrdersOptions,
     QueryUSOrdersResponse,
     StockPosition,

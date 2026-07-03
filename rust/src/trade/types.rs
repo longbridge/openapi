@@ -807,28 +807,48 @@ impl_default_for_enum_string!(
 // ── US-market types
 // ───────────────────────────────────────────────────────────
 
-/// Request body for [`crate::TradeContext::us_query_orders`].
-#[derive(Debug, Clone, Serialize)]
-pub struct QueryUSOrdersOptions {
-    /// Account channel (injected by the framework)
-    pub account_channel: String,
-    /// Direction filter: 0 = all, 1 = buy, 2 = sell
-    pub action: i32,
-    /// Start timestamp (seconds)
-    pub start_at: f64,
-    /// End timestamp (seconds)
-    pub end_at: f64,
-    /// Counter-ID filter (empty = all)
-    pub counter_ids: Vec<String>,
-    /// Security-type filter (empty = all)
-    pub security_types: Vec<String>,
-    /// Status: 0 = all, 1 = pending, 2 = history
+/// Request for [`crate::TradeContext::us_query_orders`], modelled after
+/// [`crate::GetHistoryOrdersOptions`] for HK/CN orders.
+///
+/// `query_type`: 0 = all (includes Rejected), 1 = pending, 2 = history (filled
+/// only). Default 0 matches what the app shows as "past orders".
+///
+/// `symbol` accepts a user-facing symbol e.g. `"AAPL.US"` or `"DOGEUSD.BKKT"`.
+/// The SDK converts it to the internal `counter_id` format automatically.
+#[derive(Debug, Clone, Default)]
+pub struct GetUSHistoryOrders {
+    /// Optional symbol filter, e.g. `"AAPL.US"`. Converted to counter_id
+    /// internally.
+    pub symbol: Option<String>,
+    /// Direction filter. [`crate::OrderSide::Unknown`] = all (default).
+    pub side: OrderSide,
+    /// Start timestamp (seconds). Defaults to 90 days ago.
+    pub start_at: i64,
+    /// End timestamp (seconds). Defaults to now.
+    pub end_at: i64,
+    /// 0 = all, 1 = pending, 2 = history (filled only). Default 0.
     pub query_type: i32,
-    /// Page number (1-based)
+    /// Page number, 1-based. Default 1.
     pub page: i32,
-    /// Page size
+    /// Page size. Default 20.
     pub limit: i32,
-    /// Epoch-seconds timestamp from the first request in a paging series
+}
+
+/// Alias kept for backward compatibility.
+pub type QueryUSOrdersOptions = GetUSHistoryOrders;
+
+/// Internal JSON body sent to POST /v1/orders/query.
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct USQueryOrdersBody {
+    pub account_channel: String,
+    pub action: i32,
+    pub start_at: f64,
+    pub end_at: f64,
+    pub counter_ids: Vec<String>,
+    pub security_types: Vec<String>,
+    pub query_type: i32,
+    pub page: i32,
+    pub limit: i32,
     pub query_version: f64,
 }
 

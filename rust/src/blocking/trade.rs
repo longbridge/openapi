@@ -7,10 +7,11 @@ use crate::{
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
         EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, OrderDetail, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse,
-        ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, SubmitOrderResponse,
-        TopicType, TradeContext, USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        GetUSHistoryOrders, MarginRatio, Order, OrderDetail, PushEvent, QueryUSOrdersOptions,
+        QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
+        SubmitOrderResponse, TopicType, TradeContext, USAssetOverview, USOrderDetailResponse,
+        USRealizedPL,
     },
 };
 
@@ -461,7 +462,7 @@ impl TradeContextSync {
     // ── US-market blocking wrappers ───────────────────────────────────────────
 
     /// Query the paginated US order list (blocking)
-    pub fn us_query_orders(&self, opts: QueryUSOrdersOptions) -> Result<QueryUSOrdersResponse> {
+    pub fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
         self.rt
             .call(move |ctx| async move { ctx.us_query_orders(opts).await })
     }
