@@ -2821,6 +2821,11 @@ export declare class TradeContext {
    */
   estimateMaxPurchaseQuantity(opts: EstimateMaxPurchaseQuantityOptions): Promise<EstimateMaxPurchaseQuantityResponse>
   /** Query US order list (paginated). Returns JSON string. US token required. */
+  /**
+   * Query US order list. Returns JSON string with shape `{orders: USOrder[], total_count: number}`.
+   * queryType: 0=all (incl. Rejected), 1=pending, 2=history (filled only).
+   * US token required.
+   */
   usQueryOrders(accountChannel: string, action: number, startAt: number, endAt: number, counterIds: string[], securityTypes: string[], queryType: number, page: number, limit: number, queryVersion: number): Promise<string>
   /** Get US order detail. isAttached=true includes take-profit/stop-loss sub-orders. Returns JSON string. US token required. */
   usOrderDetail(orderId: string): Promise<USOrderDetailResponse>

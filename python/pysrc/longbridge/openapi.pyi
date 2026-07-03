@@ -7374,10 +7374,17 @@ class TradeContext:
         ...
 
     def us_order_detail(self, order_id: str) -> str:
-        """Get US order detail. Returns JSON string. US token required.
+        """Get US order detail. US token required.
 
-        When ``is_attached`` is ``True``, attached take-profit/stop-loss
-        sub-orders are included in the response.
+        Returns a JSON string with shape::
+
+            {
+              "order": {...},
+              "order_histories": [...],
+              "current_attached_order": null
+            }
+
+        Path: ``GET /v1/orders/{order_id}`` (no query parameters).
 
         Args:
             order_id: Order ID
@@ -8109,10 +8116,17 @@ class AsyncTradeContext:
         ...
 
     def us_order_detail(self, order_id: str) -> "Awaitable[str]":
-        """Get US order detail. Returns awaitable JSON string. US token required.
+        """Get US order detail (async). US token required.
 
-        When ``is_attached`` is ``True``, attached take-profit/stop-loss
-        sub-orders are included in the response.
+        Returns a JSON string with shape::
+
+            {
+              "order": {...},
+              "order_histories": [...],
+              "current_attached_order": null
+            }
+
+        Path: ``GET /v1/orders/{order_id}`` (no query parameters).
 
         Args:
             order_id: Order ID
