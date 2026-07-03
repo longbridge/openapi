@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use longbridge_geo::DcRegion;
 use reqwest::StatusCode;
 
 use crate::qs::QsError;
@@ -33,6 +34,20 @@ pub enum HttpClientError {
     /// Request timeout
     #[error("request timeout")]
     RequestTimeout,
+
+    /// The requested API is restricted to one data center and cannot be reached
+    /// from a session in a different region.
+    #[error(
+        "this API ({path}) is only available in the {required} data center and is not supported for your {current}-region account"
+    )]
+    DcRegionRestricted {
+        /// The restricted API path (or WebSocket command) that was requested.
+        path: String,
+        /// The data center this API is limited to.
+        required: DcRegion,
+        /// The session's current data-center region.
+        current: DcRegion,
+    },
 
     /// OpenAPI error
     #[error("openapi error: code={code}: {message}")]

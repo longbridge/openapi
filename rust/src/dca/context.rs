@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
@@ -55,6 +55,8 @@ impl DCAContext {
             .0
             .http_cli
             .request(Method::GET, path)
+            // Recurring investment (DCA) is served only by the AP data center.
+            .dc_restrict(DcRegion::Ap)
             .query_params(query)
             .response::<Json<R>>()
             .send()
@@ -72,6 +74,8 @@ impl DCAContext {
             .0
             .http_cli
             .request(Method::POST, path)
+            // Recurring investment (DCA) is served only by the AP data center.
+            .dc_restrict(DcRegion::Ap)
             .body(Json(body))
             .response::<Json<R>>()
             .send()

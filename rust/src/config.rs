@@ -7,7 +7,9 @@ use std::{
 };
 
 pub(crate) use http::{HeaderName, HeaderValue, Request, header};
-use longbridge_httpcli::{HttpClient, HttpClientConfig, Json, Method, is_cn};
+use longbridge_httpcli::{
+    DC_REGION_HEADER, DcRegion, HttpClient, HttpClientConfig, Json, Method, is_cn,
+};
 use longbridge_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use serde::{Deserialize, Serialize};
@@ -498,7 +500,29 @@ impl Config {
             .block_on(self.refresh_access_token(expired_at))
     }
 
-    fn create_ws_request(&self, url: &str) -> tokio_tungstenite::tungstenite::Result<Request<()>> {
+    /// Resolve the data-center region from the auth credentials. For OAuth the
+    /// access token is resolved (and refreshed if needed); for legacy API-key
+    /// mode the `app_key`/`app_secret`/`access_token` prefixes are inspected.
+    async fn auth_dc_region(&self) -> DcRegion {
+        match &self.auth {
+            AuthMode::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => DcRegion::from_credentials(&[app_key, access_token, app_secret]),
+            AuthMode::OAuth(oauth) => oauth
+                .access_token()
+                .await
+                .map(|token| DcRegion::from_credential(&token))
+                .unwrap_or(DcRegion::Ap),
+        }
+    }
+
+    fn create_ws_request(
+        &self,
+        url: &str,
+        dc_region: DcRegion,
+    ) -> tokio_tungstenite::tungstenite::Result<Request<()>> {
         let mut request = url.into_client_request()?;
         request.headers_mut().append(
             header::ACCEPT_LANGUAGE,
@@ -512,21 +536,34 @@ impl Config {
                 request.headers_mut().append(name, val);
             }
         }
+        // Route the upgrade to the data center matching the credential's region,
+        // unless the caller already set the header via a custom header.
+        if !self
+            .custom_headers
+            .keys()
+            .any(|key| key.eq_ignore_ascii_case(DC_REGION_HEADER))
+        {
+            request.headers_mut().append(
+                HeaderName::from_static(DC_REGION_HEADER),
+                HeaderValue::from_static(dc_region.as_str()),
+            );
+        }
         Ok(request)
     }
 
     pub(crate) async fn create_quote_ws_request(
         &self,
     ) -> (&str, tokio_tungstenite::tungstenite::Result<Request<()>>) {
+        let dc_region = self.auth_dc_region().await;
         match self.quote_ws_url.as_deref() {
-            Some(url) => (url, self.create_ws_request(url)),
+            Some(url) => (url, self.create_ws_request(url, dc_region)),
             None => {
                 let url = if is_cn().await {
                     DEFAULT_QUOTE_WS_URL_CN
                 } else {
                     DEFAULT_QUOTE_WS_URL
                 };
-                (url, self.create_ws_request(url))
+                (url, self.create_ws_request(url, dc_region))
             }
         }
     }
@@ -534,15 +571,16 @@ impl Config {
     pub(crate) async fn create_trade_ws_request(
         &self,
     ) -> (&str, tokio_tungstenite::tungstenite::Result<Request<()>>) {
+        let dc_region = self.auth_dc_region().await;
         match self.trade_ws_url.as_deref() {
-            Some(url) => (url, self.create_ws_request(url)),
+            Some(url) => (url, self.create_ws_request(url, dc_region)),
             None => {
                 let url = if is_cn().await {
                     DEFAULT_TRADE_WS_URL_CN
                 } else {
                     DEFAULT_TRADE_WS_URL
                 };
-                (url, self.create_ws_request(url))
+                (url, self.create_ws_request(url, dc_region))
             }
         }
     }
@@ -560,6 +598,17 @@ impl Config {
     pub fn header(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
         self.custom_headers.insert(key.into(), value.into());
         self
+    }
+
+    /// Override the data-center region for every HTTP and WebSocket request by
+    /// setting the [`DC_REGION_HEADER`](crate::DC_REGION_HEADER) explicitly.
+    ///
+    /// This is rarely needed: the region is otherwise derived automatically
+    /// from the auth credentials' prefix (`us_`/`ap_`). Use this only to
+    /// force a specific data center regardless of the credential.
+    #[must_use]
+    pub fn dc_region(self, region: DcRegion) -> Self {
+        self.header(DC_REGION_HEADER, region.as_str())
     }
 
     /// Set the HTTP endpoint URL in place.
