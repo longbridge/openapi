@@ -264,10 +264,7 @@ where
                 access_token,
             } => (
                 app_key.clone(),
-                // Strip data-center routing prefix (e.g. "us_m_") before
-                // sending. The prefix is routing metadata for dc_region
-                // detection; the gateway validates only the bare JWT ("eyJ…").
-                DcRegion::strip_region_prefix(access_token).to_string(),
+                access_token.clone(),
                 Some(app_secret.clone()),
                 DcRegion::from_credentials(&[app_key, access_token, app_secret]),
             ),
