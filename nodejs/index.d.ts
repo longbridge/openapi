@@ -6113,7 +6113,7 @@ export interface USOrderDetailResponse {
 export interface USRankTag {
   name: string
   chg: string
-  rankType: string
+  rankType: number
 }
 
 export interface USCompanyOverview {

@@ -2069,7 +2069,7 @@ use longbridge::fundamental::types as lb_us;
 pub struct USRankTag {
     pub name: String,
     pub chg: String,
-    pub rank_type: String,
+    pub rank_type: i32,
 }
 
 impl From<lb_us::USRankTag> for USRankTag {

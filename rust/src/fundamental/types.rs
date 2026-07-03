@@ -1735,7 +1735,7 @@ pub struct USRankTag {
     pub chg: String,
     /// Rank type identifier
     #[serde(default)]
-    pub rank_type: String,
+    pub rank_type: i32,
 }
 
 /// Response for [`crate::FundamentalContext::us_company_overview`].

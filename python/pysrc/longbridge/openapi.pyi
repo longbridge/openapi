@@ -12510,7 +12510,7 @@ class USRankTag:
     """Tag name"""
     chg: str
     """Change value"""
-    rank_type: str
+    rank_type: int
     """Rank type"""
 
 
