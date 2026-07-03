@@ -6179,7 +6179,7 @@ export interface USETFFilesResponse {
 }
 
 export interface USCryptoOverview {
-  counterId: string
+  symbol: string
   name: string
   ticker: string
   baseAsset: string

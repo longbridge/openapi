@@ -2202,9 +2202,14 @@ pub struct USCryptoOverview {
     /// Circulating supply
     #[serde(default)]
     pub shares: String,
-    /// Internal counter_id (e.g. `"VA/BKKT/BTCUSD"`)
-    #[serde(default)]
-    pub counter_id: String,
+    /// User-facing symbol (e.g. `"BTCUSD.BKKT"`), converted from the API's
+    /// `counter_id` field (e.g. `"VA/BKKT/BTCUSD"`).
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
     /// Base asset code (e.g. `"BTC"`)
     #[serde(default)]
     pub base_asset: String,

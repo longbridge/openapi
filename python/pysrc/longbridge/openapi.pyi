@@ -12427,7 +12427,7 @@ class USCryptoEntry:
     """Asset type, e.g. ``"CRYPTO"``"""
     average_cost: str
     """Average cost price"""
-    counter_id: str
+    symbol: str
     """Internal counter_id, e.g. ``"VA/BKKT/BTCUSD"``"""
     currency: str
     """Settlement currency"""
