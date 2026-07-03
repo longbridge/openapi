@@ -902,13 +902,23 @@ pub struct USCryptoEntry {
     pub asset_type: String,
     #[serde(default)]
     pub average_cost: String,
-    /// Internal counter_id, e.g. `"VA/BKKT/BTCUSD"`.
-    #[serde(default)]
-    pub counter_id: String,
+    /// User-facing trading-pair symbol (e.g. `"BTCUSD.BKKT"`), converted from
+    /// the API's `counter_id` field (e.g. `"VA/BKKT/BTCUSD"`).
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
     #[serde(default)]
     pub currency: String,
-    #[serde(default)]
-    pub industry_counter_id: String,
+    /// Industry symbol converted from `industry_counter_id`.
+    #[serde(
+        default,
+        rename = "industry_counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub industry_symbol: String,
     #[serde(default)]
     pub industry_name: String,
 }
@@ -919,8 +929,9 @@ pub struct USCryptoEntry {
 pub struct USAssetOverview {
     #[serde(default)]
     pub account_type: String,
-    #[serde(default)]
-    pub asset_timestamp: String,
+    /// Account snapshot timestamp (Unix-second string → OffsetDateTime).
+    #[serde(default, with = "crate::serde_utils::timestamp_opt")]
+    pub asset_timestamp: Option<time::OffsetDateTime>,
     /// Cash buying power (top-level convenience field).
     #[serde(default)]
     pub cash_buy_power: String,
