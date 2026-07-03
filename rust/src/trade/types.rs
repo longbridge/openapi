@@ -833,49 +833,46 @@ pub struct QueryUSOrdersOptions {
 }
 
 /// Response for [`crate::TradeContext::us_query_orders`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct QueryUSOrdersResponse {
-    /// Order list (raw JSON for forward compatibility)
+    /// Order list (raw JSON for forward compatibility).
+    /// Order ID field is `id` (not `order_id`).
     #[serde(default)]
     pub orders: Vec<serde_json::Value>,
+    /// Total number of orders matching the query.
+    #[serde(default)]
+    pub total_count: i32,
 }
 
-/// An attached take-profit or stop-loss sub-order.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct USAttachedOrder {
-    /// Sub-order ID
+/// One order state-transition entry in [`USOrderDetailResponse`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USOrderHistory {
     #[serde(default)]
-    pub order_id: String,
-    /// Type: `TAKE_PROFIT` or `STOP_LOSS`
-    #[serde(default, rename = "type")]
-    pub order_type: String,
-    /// Direction: `BUY` or `SELL`
-    #[serde(default)]
-    pub side: String,
-    /// Limit price
-    #[serde(default)]
-    pub price: String,
-    /// Trailing stop amount
-    #[serde(default)]
-    pub trail_amount: String,
-    /// Trailing stop percentage
-    #[serde(default)]
-    pub trail_percent: String,
-    /// Order status
+    pub exec_type: i32,
     #[serde(default)]
     pub status: String,
+    #[serde(default)]
+    pub price: String,
+    #[serde(default)]
+    pub qty: String,
+    #[serde(default)]
+    pub time: String,
+    #[serde(default)]
+    pub msg: String,
 }
 
 /// Response for [`crate::TradeContext::us_order_detail`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Path: `GET /v1/orders/{order_id}`
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USOrderDetailResponse {
-    /// Raw order detail fields (pass-through)
-    #[serde(flatten)]
-    pub detail: serde_json::Value,
-    /// Attached stop-loss / take-profit orders (populated when `is_attached =
-    /// true`)
+    /// Full order object (raw JSON — field set varies by order type).
+    pub order: serde_json::Value,
+    /// Order state-transition history.
     #[serde(default)]
-    pub attached_orders: Vec<USAttachedOrder>,
+    pub order_histories: Vec<USOrderHistory>,
+    /// Current attached stop-loss/take-profit sub-order, if any.
+    #[serde(default)]
+    pub current_attached_order: serde_json::Value,
 }
 
 /// One cash currency entry in [`USAssetOverview`].

@@ -2202,12 +2202,24 @@ pub struct USCryptoOverview {
     /// Circulating supply
     #[serde(default)]
     pub shares: String,
+    /// Internal counter_id (e.g. `"VA/BKKT/BTCUSD"`)
+    #[serde(default)]
+    pub counter_id: String,
+    /// Base asset code (e.g. `"BTC"`)
+    #[serde(default)]
+    pub base_asset: String,
     /// Official website URL
     #[serde(default)]
     pub official_web_address: String,
-    /// Multi-language profile / description
+    /// Logo image URL
     #[serde(default)]
-    pub profile: serde_json::Value,
+    pub logo: String,
+    /// In-app wiki URL
+    #[serde(default)]
+    pub wiki_url: String,
+    /// Multi-language profile / description (JSON string)
+    #[serde(default)]
+    pub profile: String,
 }
 
 #[cfg(test)]
