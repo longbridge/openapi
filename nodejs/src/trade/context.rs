@@ -507,35 +507,33 @@ impl TradeContext {
     // ── US-market methods ─────────────────────────────────────────────────
 
     /// Query US order list. Returns JSON string. US token required.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
     #[napi]
     pub fn us_query_orders<'env>(
         &self,
         env: &'env Env,
-        account_channel: String,
+        symbol: Option<String>,
         action: i32,
-        start_at: f64,
-        end_at: f64,
-        counter_ids: Vec<String>,
-        security_types: Vec<String>,
+        start_at: i64,
+        end_at: i64,
         query_type: i32,
         page: i32,
         limit: i32,
-        query_version: f64,
     ) -> Result<PromiseRaw<'env, String>> {
         let ctx = self.ctx.clone();
         let opts = longbridge::trade::GetUSHistoryOrders {
-                symbol: if counter_ids.is_empty() { None } else { Some(counter_ids[0].clone()) },
-                side: match action {
-                    1 => longbridge::trade::OrderSide::Buy,
-                    2 => longbridge::trade::OrderSide::Sell,
-                    _ => longbridge::trade::OrderSide::Unknown,
-                },
-                start_at: start_at as i64,
-                end_at: end_at as i64,
-                query_type,
-                page,
-                limit,
-            };
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
         env.spawn_future(async move {
             let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
             serde_json::to_string(&resp).map_err(|e| napi::Error::from_reason(e.to_string()))

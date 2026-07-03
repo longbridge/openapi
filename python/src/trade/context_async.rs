@@ -490,36 +490,33 @@ impl AsyncTradeContext {
     // ── US-market async methods ───────────────────────────────────────────
 
     /// Query US order list (JSON string). US token required. Returns awaitable.
-    #[pyo3(signature = (account_channel, action, start_at, end_at, counter_ids, security_types, query_type, page, limit, query_version))]
-    #[allow(clippy::too_many_arguments)]
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[pyo3(signature = (symbol = None, action = 0, start_at = 0, end_at = 0, query_type = 0, page = 1, limit = 20))]
     fn us_query_orders(
         &self,
         py: Python<'_>,
-        account_channel: String,
+        symbol: Option<String>,
         action: i32,
-        start_at: f64,
-        end_at: f64,
-        counter_ids: Vec<String>,
-        security_types: Vec<String>,
+        start_at: i64,
+        end_at: i64,
         query_type: i32,
         page: i32,
         limit: i32,
-        query_version: f64,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let opts = longbridge::trade::GetUSHistoryOrders {
-                symbol: if counter_ids.is_empty() { None } else { Some(counter_ids[0].clone()) },
-                side: match action {
-                    1 => longbridge::trade::OrderSide::Buy,
-                    2 => longbridge::trade::OrderSide::Sell,
-                    _ => longbridge::trade::OrderSide::Unknown,
-                },
-                start_at: start_at as i64,
-                end_at: end_at as i64,
-                query_type,
-                page,
-                limit,
-            };
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
             let s = serde_json::to_string(&resp)

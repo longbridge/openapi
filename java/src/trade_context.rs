@@ -633,36 +633,34 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsQueryO
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    account_channel: JObject,
+    symbol: JObject,
     action: i64,
     start_at: i64,
     end_at: i64,
-    counter_ids: JObject,
-    security_types: JObject,
     query_type: i64,
     page: i64,
     limit: i64,
-    query_version: i64,
     callback: JObject,
 ) {
-    use crate::types::ObjectArray;
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
-        let account_channel: String = FromJValue::from_jvalue(env, account_channel.into())?;
-        let counter_ids: ObjectArray<String> = FromJValue::from_jvalue(env, counter_ids.into())?;
-        let security_types: ObjectArray<String> =
-            FromJValue::from_jvalue(env, security_types.into())?;
-        let us_opts = QueryUSOrdersOptions {
-            account_channel,
-            action: action as i32,
-            start_at: start_at as f64,
-            end_at: end_at as f64,
-            counter_ids: counter_ids.0,
-            security_types: security_types.0,
+        let symbol_str: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let us_opts = longbridge::trade::GetUSHistoryOrders {
+            symbol: if symbol_str.is_empty() {
+                None
+            } else {
+                Some(symbol_str)
+            },
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
             query_type: query_type as i32,
             page: page as i32,
             limit: limit as i32,
-            query_version: query_version as f64,
         };
         async_util::execute(env, callback, async move {
             let resp = context.ctx.us_query_orders(us_opts).await?;

@@ -2823,10 +2823,12 @@ export declare class TradeContext {
   /** Query US order list (paginated). Returns JSON string. US token required. */
   /**
    * Query US order list. Returns JSON string with shape `{orders: USOrder[], total_count: number}`.
+   * symbol: user-facing symbol e.g. "AAPL.US" (optional).
+   * action: 0=all, 1=buy, 2=sell.
    * queryType: 0=all (incl. Rejected), 1=pending, 2=history (filled only).
    * US token required.
    */
-  usQueryOrders(accountChannel: string, action: number, startAt: number, endAt: number, counterIds: string[], securityTypes: string[], queryType: number, page: number, limit: number, queryVersion: number): Promise<string>
+  usQueryOrders(symbol?: string | null, action?: number, startAt?: number, endAt?: number, queryType?: number, page?: number, limit?: number): Promise<string>
   /** Get US order detail. isAttached=true includes take-profit/stop-loss sub-orders. Returns JSON string. US token required. */
   usOrderDetail(orderId: string): Promise<USOrderDetailResponse>
   /** Get US account asset overview (stocks/options/crypto/buy power). US token required. */
