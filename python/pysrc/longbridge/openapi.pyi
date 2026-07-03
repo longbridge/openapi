@@ -7343,16 +7343,13 @@ class TradeContext:
 
     def us_query_orders(
         self,
-        account_channel: str,
-        action: int,
-        start_at: float,
-        end_at: float,
-        counter_ids: list,
-        security_types: list,
-        query_type: int,
-        page: int,
-        limit: int,
-        query_version: float,
+        symbol: Optional[str] = None,
+        action: int = 0,
+        start_at: int = 0,
+        end_at: int = 0,
+        query_type: int = 0,
+        page: int = 1,
+        limit: int = 20,
     ) -> str:
         """Query US order list (paginated). Returns JSON string. US token required.
 
@@ -8085,16 +8082,13 @@ class AsyncTradeContext:
 
     def us_query_orders(
         self,
-        account_channel: str,
-        action: int,
-        start_at: float,
-        end_at: float,
-        counter_ids: list,
-        security_types: list,
-        query_type: int,
-        page: int,
-        limit: int,
-        query_version: float,
+        symbol: Optional[str] = None,
+        action: int = 0,
+        start_at: int = 0,
+        end_at: int = 0,
+        query_type: int = 0,
+        page: int = 1,
+        limit: int = 20,
     ) -> "Awaitable[str]":
         """Query US order list (paginated). Returns awaitable JSON string. US token required.
 
