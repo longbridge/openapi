@@ -148,8 +148,9 @@ pub fn lookup_counter_id(symbol: &str) -> Option<String> {
 /// Leading-dot symbols (e.g. `.DJI.US`) are US market indexes and always map
 /// to `IX/`. All other symbols are checked against the embedded
 /// Known crypto exchange identifiers used as symbol suffixes.
-/// `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"`.
-const CRYPTO_EXCHANGES: &[&str] = &["HAS"];
+/// e.g. `"BTCUSD.HAS"` → `"VA/HAS/BTCUSD"`, `"BTCUSD.BKKT"` →
+/// `"VA/BKKT/BTCUSD"`.
+const CRYPTO_EXCHANGES: &[&str] = &["HAS", "BKKT"];
 
 /// ETF + index + warrant set and the remote-resolved cache; a matching entry
 /// is returned as-is. Crypto symbols whose suffix matches a known exchange
