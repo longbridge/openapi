@@ -13,10 +13,10 @@ use crate::{
         AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
         FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders, MarginRatio, Order,
-        OrderDetail, OrderSide, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse,
-        ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
-        USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders,
+        GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
+        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -958,11 +958,7 @@ impl TradeContext {
     /// Path: `GET /v1/us/assets/pl/realized`
     ///
     /// US token required.
-    pub async fn us_realized_pl(
-        &self,
-        currency: impl Into<String>,
-        category: Option<impl Into<String>>,
-    ) -> Result<USRealizedPL> {
+    pub async fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
         #[derive(Serialize)]
         struct Query {
             currency: String,
@@ -970,15 +966,23 @@ impl TradeContext {
             category: Option<String>,
         }
 
+        let currency = if opts.currency.is_empty() {
+            "USD".to_string()
+        } else {
+            opts.currency
+        };
+        let category = if opts.category.is_empty() {
+            None
+        } else {
+            Some(opts.category)
+        };
+
         Ok(self
             .0
             .http_cli
             .request(Method::GET, "/v1/us/assets/pl/realized")
             .dc_restrict(DcRegion::Us)
-            .query_params(Query {
-                currency: currency.into(),
-                category: category.map(Into::into),
-            })
+            .query_params(Query { currency, category })
             .response::<Json<USRealizedPL>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())

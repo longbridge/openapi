@@ -30,6 +30,7 @@ pub use types::{
     FundPositionsResponse,
     // US-market types
     GetUSHistoryOrders,
+    GetUSRealizedPLOptions,
     MarginRatio,
     Order,
     OrderChargeDetail,

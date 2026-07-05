@@ -975,6 +975,16 @@ pub struct USRealizedPLEntry {
     pub metrics: Vec<USRealizedPLMetric>,
 }
 
+/// Request for [`crate::TradeContext::us_realized_pl`], modelled after
+/// [`crate::GetUSHistoryOrders`].
+#[derive(Debug, Clone, Default)]
+pub struct GetUSRealizedPLOptions {
+    /// Currency, e.g. `"USD"`. Defaults to `"USD"` if empty.
+    pub currency: String,
+    /// Asset category filter: `""` = all, `"STOCK"`, `"OPTION"`, `"CRYPTO"`.
+    pub category: String,
+}
+
 /// Response for [`crate::TradeContext::us_realized_pl`].
 /// Field name matches the actual API response from `GET
 /// /v1/us/assets/pl/realized`.

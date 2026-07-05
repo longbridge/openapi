@@ -8,10 +8,10 @@ use crate::{
         EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, MarginRatio, Order, OrderDetail, PushEvent, QueryUSOrdersOptions,
-        QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
-        SubmitOrderResponse, TopicType, TradeContext, USAssetOverview, USOrderDetailResponse,
-        USRealizedPL,
+        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, PushEvent,
+        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -483,12 +483,8 @@ impl TradeContextSync {
     }
 
     /// Get realized P&L for the US account (blocking)
-    pub fn us_realized_pl(
-        &self,
-        currency: impl Into<String> + Send + 'static,
-        category: Option<impl Into<String> + Send + 'static>,
-    ) -> Result<USRealizedPL> {
+    pub fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
         self.rt
-            .call(move |ctx| async move { ctx.us_realized_pl(currency, category).await })
+            .call(move |ctx| async move { ctx.us_realized_pl(opts).await })
     }
 }

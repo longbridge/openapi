@@ -59,8 +59,8 @@ pub use rust_decimal::Decimal;
 pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
 pub use trade::{
-    GetUSHistoryOrders, QueryUSOrdersOptions, QueryUSOrdersResponse, TradeContext, USAssetOverview,
-    USCashEntry, USCryptoEntry, USOrderDetailResponse, USOrderHistory, USRealizedPL,
-    USRealizedPLEntry, USRealizedPLMetric,
+    GetUSHistoryOrders, GetUSRealizedPLOptions, QueryUSOrdersOptions, QueryUSOrdersResponse,
+    TradeContext, USAssetOverview, USCashEntry, USCryptoEntry, USOrderDetailResponse,
+    USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
 };
 pub use types::Market;

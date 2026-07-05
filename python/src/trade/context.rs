@@ -462,7 +462,7 @@ impl TradeContext {
     ) -> PyResult<crate::trade::types::USRealizedPL> {
         Ok(self
             .ctx
-            .us_realized_pl(currency, category)
+            .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions { currency, category: category.unwrap_or_default() })
             .map_err(ErrorNewType)?
             .into())
     }
