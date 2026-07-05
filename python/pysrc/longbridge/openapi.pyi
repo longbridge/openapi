@@ -7354,16 +7354,13 @@ class TradeContext:
         """Query US order list (paginated). Returns JSON string. US token required.
 
         Args:
-            account_channel: Account channel (e.g. ``"regular"``)
-            action: Order action filter
-            start_at: Start timestamp (unix seconds)
-            end_at: End timestamp (unix seconds)
-            counter_ids: Filter by counter IDs
-            security_types: Filter by security types (``"stock"``, ``"option"``, ``"crypto"``)
-            query_type: Query type code
-            page: Page number (1-based)
+            symbol: Optional symbol filter, e.g. ``"AAPL.US"``
+            action: Direction filter: 0=all, 1=buy, 2=sell
+            start_at: Start timestamp (unix seconds); 0 = last 90 days
+            end_at: End timestamp (unix seconds); 0 = now
+            query_type: 0=all (incl. Rejected), 1=pending, 2=history (filled only)
+            page: Page number, 1-based
             limit: Page size
-            query_version: Query version (pass ``0`` for latest)
 
         Returns:
             JSON string with order list
@@ -8093,16 +8090,13 @@ class AsyncTradeContext:
         """Query US order list (paginated). Returns awaitable JSON string. US token required.
 
         Args:
-            account_channel: Account channel (e.g. ``"regular"``)
-            action: Order action filter
-            start_at: Start timestamp (unix seconds)
-            end_at: End timestamp (unix seconds)
-            counter_ids: Filter by counter IDs
-            security_types: Filter by security types (``"stock"``, ``"option"``, ``"crypto"``)
-            query_type: Query type code
-            page: Page number (1-based)
+            symbol: Optional symbol filter, e.g. ``"AAPL.US"``
+            action: Direction filter: 0=all, 1=buy, 2=sell
+            start_at: Start timestamp (unix seconds); 0 = last 90 days
+            end_at: End timestamp (unix seconds); 0 = now
+            query_type: 0=all (incl. Rejected), 1=pending, 2=history (filled only)
+            page: Page number, 1-based
             limit: Page size
-            query_version: Query version (pass ``0`` for latest)
 
         Returns:
             Awaitable resolving to JSON string with order list
