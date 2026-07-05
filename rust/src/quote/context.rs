@@ -2290,15 +2290,12 @@ impl QuoteContext {
 
     /// Get cryptocurrency market overview.
     ///
-    /// `symbol` must be in `PAIR.EXCHANGE` format, e.g. `"BTCUSD.HAS"` →
-    /// `"VA/HAS/BTCUSD"`. Uses `symbol_to_counter_id`, consistent with all
-    /// other symbol-based methods.
+    /// `symbol` must be in `PAIR.EXCHANGE` format, e.g. `"BTCUSD.BKKT"`.
+    /// US DC uses **BKKT** exchange; pass the exchange suffix explicitly.
     ///
     /// Path: `GET /v1/gemini/us/crypto-overview`
     ///
-    /// US token required — returns
-    /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`] for non-US
-    /// credentials.
+    /// US token required.
     pub async fn us_crypto_overview(
         &self,
         symbol: impl Into<String>,
