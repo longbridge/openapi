@@ -2290,8 +2290,9 @@ impl QuoteContext {
 
     /// Get cryptocurrency market overview.
     ///
-    /// `symbol` must be in `PAIR.EXCHANGE` format, e.g. `"BTCUSD.BKKT"`.
-    /// US DC uses **BKKT** exchange; pass the exchange suffix explicitly.
+    /// `symbol` must be in `PAIR.EXCHANGE` format.
+    /// US DC uses the **BKKT** exchange: e.g. `"BTCUSD.BKKT"` →
+    /// `"VA/BKKT/BTCUSD"`. Pass the exchange suffix explicitly.
     ///
     /// Path: `GET /v1/gemini/us/crypto-overview`
     ///
