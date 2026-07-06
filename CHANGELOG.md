@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **All languages:** `submit_order` gains optional `client_request_id` parameter for idempotency control. When provided, the server caches the request ID for 10 minutes and returns the original response for duplicate submissions instead of creating a new order.
+
 ## [4.3.3] - 2026-06-26
 
 ### Added
