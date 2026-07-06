@@ -2440,6 +2440,12 @@ typedef struct lb_submit_order_options_t {
    * Remark (Maximum 64 characters) (can be null)
    */
   const char *remark;
+  /**
+   * Idempotent request ID for preventing duplicate orders (can be null).
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  const char *client_request_id;
 } lb_submit_order_options_t;
 
 /**

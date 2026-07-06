@@ -431,6 +431,7 @@ TradeContext::submit_order(
     nullptr,
     nullptr,
     opts.remark ? opts.remark->c_str() : nullptr,
+    nullptr,
   };
   lb_date_t expire_date;
   lb_outside_rth_t outside_rth;
@@ -466,6 +467,9 @@ TradeContext::submit_order(
   if (opts.outside_rth) {
     outside_rth = convert(*opts.outside_rth);
     opts2.outside_rth = &outside_rth;
+  }
+  if (opts.client_request_id) {
+    opts2.client_request_id = opts.client_request_id->c_str();
   }
 
   lb_trade_context_submit_order(

@@ -291,7 +291,7 @@ impl AsyncTradeContext {
     }
 
     /// Submit order. Returns awaitable.
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -312,6 +312,7 @@ impl AsyncTradeContext {
         trigger_count: Option<i32>,
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
+        client_request_id: Option<String>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = SubmitOrderOptions::new(
@@ -353,6 +354,9 @@ impl AsyncTradeContext {
         }
         if let Some(r) = remark {
             opts = opts.remark(r);
+        }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
         }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: SubmitOrderResponse = ctx

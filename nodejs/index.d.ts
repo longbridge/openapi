@@ -4011,6 +4011,19 @@ export interface ExtraConfigParams {
   enablePrintQuotePackages?: boolean
   /** Set the path of the log files (Default: `no logs`) */
   logPath?: string
+  /**
+   * Enable paper trading mode (default: `false`).
+   *
+   * When `true`, all API calls target the paper trading (simulation)
+   * environment.  The server validates the token: if it belongs to a
+   * real-money account the server returns an error.
+   *
+   * When `false` (the default) the server imposes no restrictions — both
+   * paper trading and real-money accounts are accepted.
+   *
+   * Paper trading users should set this to `true` as a safety guard.
+   */
+  enablePapertrading?: boolean
 }
 
 /** Filter warrant expiry date type */
@@ -5678,6 +5691,12 @@ export interface SubmitOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+  /**
+   * Client request ID for idempotency control.
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  clientRequestId?: string
 }
 
 /** Quote type of subscription */

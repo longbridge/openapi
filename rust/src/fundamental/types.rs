@@ -1962,6 +1962,10 @@ pub(crate) struct V2MacroIndicatorDetail {
     #[serde(default)]
     pub market: String,
     #[serde(default)]
+    pub frequence: String,
+    #[serde(default)]
+    pub importance: i32,
+    #[serde(default)]
     pub indicator_data: Vec<V2IndicatorDataDetail>,
 }
 

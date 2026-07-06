@@ -1751,6 +1751,10 @@ struct SubmitOrderOptions
   std::optional<Decimal> monitor_price;
   /// Remark (Maximum 64 characters)
   std::optional<std::string> remark;
+  /// Idempotent request ID for preventing duplicate orders.
+  /// If not specified, idempotency control is skipped.
+  /// The server caches this ID for 10 minutes.
+  std::optional<std::string> client_request_id;
 };
 
 /// Response for submit order request
