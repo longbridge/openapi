@@ -563,7 +563,10 @@ impl AsyncTradeContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: crate::trade::types::USRealizedPL = ctx
-                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions { currency, category: category.unwrap_or_default() })
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
                 .await
                 .map_err(ErrorNewType)?
                 .into();

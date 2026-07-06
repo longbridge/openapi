@@ -577,7 +577,10 @@ impl TradeContext {
         let ctx = self.ctx.clone();
         env.spawn_future(async move {
             Ok(ctx
-                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions { currency, category: category.unwrap_or_default() })
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
                 .await
                 .map_err(ErrorNewType)?
                 .into())

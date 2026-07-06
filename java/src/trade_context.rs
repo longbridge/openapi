@@ -724,7 +724,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsRealiz
         let currency: String = FromJValue::from_jvalue(env, currency.into())?;
         let category: Option<String> = FromJValue::from_jvalue(env, category.into()).ok();
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.us_realized_pl(longbridge::trade::GetUSRealizedPLOptions { currency, category: category.unwrap_or_default() }).await?;
+            let resp = context
+                .ctx
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
