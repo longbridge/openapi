@@ -417,6 +417,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
         if let Some(remark) = remark {
             new_opts = new_opts.remark(remark);
         }
+        let client_request_id: Option<String> = get_field(env, &opts, "clientRequestId")?;
+        if let Some(id) = client_request_id {
+            new_opts = new_opts.client_request_id(id);
+        }
 
         async_util::execute(env, callback, async move {
             Ok(context.ctx.submit_order(new_opts).await?)

@@ -446,6 +446,9 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
     }
+    if !(*opts).client_request_id.is_null() {
+        opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
+    }
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CSubmitOrderResponseOwned> = CCow::new(ctx_inner.submit_order(opts2).await?);
         Ok(resp)

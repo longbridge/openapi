@@ -7034,6 +7034,7 @@ class TradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
     ) -> SubmitOrderResponse:
         """
         Submit order
@@ -7055,6 +7056,7 @@ class TradeContext:
             trigger_count: Trigger count
             monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
 
         Returns:
             Response
@@ -7680,6 +7682,7 @@ class AsyncTradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
     ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
@@ -7701,6 +7704,7 @@ class AsyncTradeContext:
             trigger_count: Trigger count.
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
 
         Examples:
             ::

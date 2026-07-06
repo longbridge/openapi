@@ -724,6 +724,10 @@ pub struct CSubmitOrderOptions {
     pub monitor_price: *const CDecimal,
     /// Remark (Maximum 64 characters) (can be null)
     pub remark: *const c_char,
+    /// Idempotent request ID for preventing duplicate orders (can be null).
+    /// If not specified, idempotency control is skipped.
+    /// The server caches this ID for 10 minutes.
+    pub client_request_id: *const c_char,
 }
 
 /// Response for submit order request

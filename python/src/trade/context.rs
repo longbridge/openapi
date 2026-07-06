@@ -255,7 +255,7 @@ impl TradeContext {
     }
 
     /// Submit order
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -275,6 +275,7 @@ impl TradeContext {
         trigger_count: Option<i32>,
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
+        client_request_id: Option<String>,
     ) -> PyResult<SubmitOrderResponse> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
@@ -316,6 +317,9 @@ impl TradeContext {
         }
         if let Some(remark) = remark {
             opts = opts.remark(remark);
+        }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
         }
 
         self.ctx
