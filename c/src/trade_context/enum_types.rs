@@ -216,6 +216,9 @@ pub enum COutsideRTH {
     /// Overnight
     #[c(remote = "Overnight")]
     OutsideRTHOvernight,
+    /// Overnight option
+    #[c(remote = "OptionPreMarket")]
+    OutsideRTHOptionPreMarket,
 }
 
 /// Time in force Type

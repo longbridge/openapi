@@ -4,12 +4,13 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+        AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio, Order, OrderDetail,
+        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
+        SubmitOrderResponse, TopicType, TradeContext,
     },
 };
 
@@ -109,6 +110,15 @@ impl TradeContextSync {
     ) -> Result<Vec<Execution>> {
         self.rt
             .call(move |ctx| async move { ctx.today_executions(options).await })
+    }
+
+    /// Get all executions
+    pub fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
+    ) -> Result<AllExecutionsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.all_executions(options).await })
     }
 
     /// Get history orders

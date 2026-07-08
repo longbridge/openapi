@@ -1389,6 +1389,30 @@ struct GetTodayExecutionsOptions
   std::optional<std::string> order_id;
 };
 
+/// Options for get all executions request
+struct GetAllExecutionsOptions
+{
+  /// Security code
+  std::optional<std::string> symbol;
+  /// Order id
+  std::optional<std::string> order_id;
+  /// Start time
+  std::optional<int64_t> start_at;
+  /// End time
+  std::optional<int64_t> end_at;
+  /// Page number
+  std::optional<uint64_t> page;
+};
+
+/// All executions response
+struct AllExecutionsResponse
+{
+  /// Has more records
+  bool has_more;
+  /// Executions
+  std::vector<Execution> trades;
+};
+
 /// Order status
 enum class OrderStatus
 {
@@ -1536,6 +1560,8 @@ enum class OutsideRTH
   AnyTime,
   /// Overnight
   Overnight,
+  /// Overnight option
+  OptionPreMarket,
 };
 
 /// Order

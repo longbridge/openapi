@@ -3,7 +3,7 @@ use std::os::raw::c_char;
 use longbridge::{
     Market,
     trade::{
-        AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,
+        AccountBalance, AllExecutionsResponse, BalanceType, CashFlow, CashFlowDirection, CashInfo,
         EstimateMaxPurchaseQuantityResponse, Execution, FrozenTransactionFee, FundPosition,
         FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderChargeDetail,
         OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus,
@@ -342,6 +342,60 @@ pub struct CGetTodayExecutionsOptions {
     pub symbol: *const c_char,
     /// Order id (can be null)
     pub order_id: *const c_char,
+}
+
+/// Options for get all executions request
+#[repr(C)]
+pub struct CGetAllExecutionsOptions {
+    /// Security code (can be null)
+    pub symbol: *const c_char,
+    /// Order id (can be null)
+    pub order_id: *const c_char,
+    /// Start time (can be null)
+    pub start_at: *const i64,
+    /// End time (can be null)
+    pub end_at: *const i64,
+    /// Page number (can be null)
+    pub page: *const u64,
+}
+
+/// All executions response
+#[repr(C)]
+pub struct CAllExecutionsResponse {
+    /// Has more records
+    pub has_more: bool,
+    /// Executions
+    pub trades: *const CExecution,
+    /// Number of executions
+    pub num_trades: usize,
+}
+
+pub(crate) struct CAllExecutionsResponseOwned {
+    pub has_more: bool,
+    pub trades: CVec<CExecutionOwned>,
+}
+
+impl From<AllExecutionsResponse> for CAllExecutionsResponseOwned {
+    fn from(resp: AllExecutionsResponse) -> Self {
+        let AllExecutionsResponse { has_more, trades } = resp;
+        Self {
+            has_more,
+            trades: trades.into(),
+        }
+    }
+}
+
+impl ToFFI for CAllExecutionsResponseOwned {
+    type FFIType = CAllExecutionsResponse;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CAllExecutionsResponseOwned { has_more, trades } = self;
+        CAllExecutionsResponse {
+            has_more: *has_more,
+            trades: trades.to_ffi_type(),
+            num_trades: trades.len(),
+        }
+    }
 }
 
 /// Order

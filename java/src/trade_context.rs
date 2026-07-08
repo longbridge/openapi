@@ -9,11 +9,11 @@ use jni::{
 use longbridge::{
     Config, Decimal, Market, TradeContext,
     trade::{
-        BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, ReplaceOrderOptions, SubmitOrderOptions,
-        TimeInForceType, TopicType,
+        BalanceType, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+        GetHistoryOrdersOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
+        ReplaceOrderOptions, SubmitOrderOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;
@@ -208,6 +208,49 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
         };
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(context.ctx.today_executions(opts).await?))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAllExecutions(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let opts = if !opts.is_null() {
+            let mut new_opts = GetAllExecutionsOptions::new();
+            let symbol: Option<String> = get_field(env, &opts, "symbol")?;
+            if let Some(symbol) = symbol {
+                new_opts = new_opts.symbol(symbol);
+            }
+            let order_id: Option<String> = get_field(env, &opts, "orderId")?;
+            if let Some(order_id) = order_id {
+                new_opts = new_opts.order_id(order_id);
+            }
+            let start_at: Option<OffsetDateTime> = get_field(env, &opts, "startAt")?;
+            if let Some(start_at) = start_at {
+                new_opts = new_opts.start_at(start_at);
+            }
+            let end_at: Option<OffsetDateTime> = get_field(env, &opts, "endAt")?;
+            if let Some(end_at) = end_at {
+                new_opts = new_opts.end_at(end_at);
+            }
+            let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
+            if let Some(page) = page {
+                new_opts = new_opts.page(i32::from(page) as u64);
+            }
+            Some(new_opts)
+        } else {
+            None
+        };
+        async_util::execute(env, callback, async move {
+            Ok(context.ctx.all_executions(opts).await?)
         })?;
         Ok(())
     })

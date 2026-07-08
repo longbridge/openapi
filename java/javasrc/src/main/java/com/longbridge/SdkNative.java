@@ -219,6 +219,9 @@ public class SdkNative {
         public static native void tradeContextTodayExecutions(long context, GetTodayExecutionsOptions opts,
                         AsyncCallback callback);
 
+        public static native void tradeContextAllExecutions(long context, GetAllExecutionsOptions opts,
+                        AsyncCallback callback);
+
         public static native void tradeContextHistoryOrders(long context, GetHistoryOrdersOptions opts,
                         AsyncCallback callback);
 

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **All languages:** `submit_order` gains optional `client_request_id` parameter for idempotency control. When provided, the server caches the request ID for 10 minutes and returns the original response for duplicate submissions instead of creating a new order.
+- **All languages:** new `all_executions` method (`GET /v3/trade/execution/all`) queries today and historical executions in a single call with pagination support (`page` parameter, `has_more` in response).
+- **All languages:** `OutsideRTH` enum gains `OptionPreMarket` variant for overnight option orders.
 
 ## [4.3.3] - 2026-06-26
 

@@ -3,9 +3,10 @@ use std::sync::Arc;
 use longbridge::{
     blocking::TradeContextSync,
     trade::{
-        EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+        EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -19,10 +20,10 @@ use crate::{
     trade::{
         push::handle_push_event,
         types::{
-            AccountBalance, BalanceType, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, OrderSide, OrderStatus,
-            OrderType, OutsideRTH, StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
-            TopicType,
+            AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
+            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
+            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            StockPositionsResponse, SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
     types::Market,
@@ -129,6 +130,40 @@ impl TradeContext {
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Get all executions
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<AllExecutionsResponse> {
+        let mut opts = GetAllExecutionsOptions::new();
+
+        if let Some(symbol) = symbol {
+            opts = opts.symbol(symbol);
+        }
+        if let Some(order_id) = order_id {
+            opts = opts.order_id(order_id);
+        }
+        if let Some(start_at) = start_at {
+            opts = opts.start_at(start_at.0);
+        }
+        if let Some(end_at) = end_at {
+            opts = opts.end_at(end_at.0);
+        }
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+
+        self.ctx
+            .all_executions(Some(opts))
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get history orders

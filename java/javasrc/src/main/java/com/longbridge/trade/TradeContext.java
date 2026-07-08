@@ -167,6 +167,20 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get all executions
+     *
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<AllExecutionsResponse> getAllExecutions(GetAllExecutionsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextAllExecutions(this.raw, opts, callback);
+        });
+    }
+
+    /**
      * Get history orders
      * 
      * <pre>

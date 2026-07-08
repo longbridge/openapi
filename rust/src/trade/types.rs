@@ -132,6 +132,16 @@ pub struct Execution {
     pub price: Decimal,
 }
 
+/// Response for get all executions request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AllExecutionsResponse {
+    /// Has more records
+    pub has_more: bool,
+    /// Execution list
+    #[serde(default)]
+    pub trades: Vec<Execution>,
+}
+
 /// Order side
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
 pub enum OrderSide {
@@ -232,6 +242,9 @@ pub enum OutsideRTH {
     /// Overnight
     #[strum(serialize = "OVERNIGHT")]
     Overnight,
+    /// Overnight option
+    #[strum(serialize = "OPTION_PRE_MARKET")]
+    OptionPreMarket,
 }
 
 /// Order

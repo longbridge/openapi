@@ -14,7 +14,7 @@ pub enum TopicType {
 
 /// Trade
 #[napi_derive::napi]
-#[derive(Debug, JsObject)]
+#[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::trade::Execution")]
 pub struct Execution {
     /// Order ID
@@ -191,6 +191,20 @@ pub enum OutsideRTH {
     AnyTime,
     /// Overnight
     Overnight,
+    /// Overnight option
+    OptionPreMarket,
+}
+
+/// Response for get all executions request
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::AllExecutionsResponse")]
+pub struct AllExecutionsResponse {
+    /// Has more records
+    has_more: bool,
+    /// Execution list
+    #[js(array)]
+    trades: Vec<Execution>,
 }
 
 /// Order

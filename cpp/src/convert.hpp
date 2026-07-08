@@ -77,6 +77,7 @@ using longbridge::trade::CashInfo;
 using longbridge::trade::ChargeCategoryCode;
 using longbridge::trade::CommissionFreeStatus;
 using longbridge::trade::DeductionStatus;
+using longbridge::trade::AllExecutionsResponse;
 using longbridge::trade::Execution;
 using longbridge::trade::FrozenTransactionFee;
 using longbridge::trade::FundPosition;
@@ -967,6 +968,18 @@ convert(const lb_execution_t* info)
   };
 }
 
+inline AllExecutionsResponse
+convert(const lb_all_executions_response_t* resp)
+{
+  AllExecutionsResponse result;
+  result.has_more = resp->has_more;
+  std::transform(resp->trades,
+                 resp->trades + resp->num_trades,
+                 std::back_inserter(result.trades),
+                 [](auto row) { return convert(&row); });
+  return result;
+}
+
 inline OrderStatus
 convert(lb_order_status_t status)
 {
@@ -1254,6 +1267,8 @@ convert(lb_outside_rth_t status)
       return OutsideRTH::AnyTime;
     case OutsideRTHOvernight:
       return OutsideRTH::Overnight;
+    case OutsideRTHOptionPreMarket:
+      return OutsideRTH::OptionPreMarket;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1271,6 +1286,8 @@ convert(OutsideRTH status)
       return OutsideRTHAnyTime;
     case OutsideRTH::Overnight:
       return OutsideRTHOvernight;
+    case OutsideRTH::OptionPreMarket:
+      return OutsideRTHOptionPreMarket;
     default:
       throw std::invalid_argument("unreachable");
   }

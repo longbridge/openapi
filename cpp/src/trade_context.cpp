@@ -219,6 +219,45 @@ TradeContext::today_executions(
     new AsyncCallback<TradeContext, std::vector<Execution>>(callback));
 }
 
+/// Get all executions
+void
+TradeContext::all_executions(
+  const std::optional<GetAllExecutionsOptions>& opts,
+  AsyncCallback<TradeContext, AllExecutionsResponse> callback) const
+{
+  lb_get_all_executions_options_t opts2 = { nullptr, nullptr, nullptr, nullptr, nullptr };
+
+  if (opts) {
+    opts2.symbol = opts->symbol ? opts->symbol->c_str() : nullptr;
+    opts2.order_id = opts->order_id ? opts->order_id->c_str() : nullptr;
+    opts2.start_at = opts->start_at ? (const int64_t*)&opts->start_at.value() : nullptr;
+    opts2.end_at = opts->end_at ? (const int64_t*)&opts->end_at.value() : nullptr;
+    opts2.page = opts->page ? &opts->page.value() : nullptr;
+  }
+
+  lb_trade_context_all_executions(
+    ctx_,
+    (const lb_get_all_executions_options_t*)&opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, AllExecutionsResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        AllExecutionsResponse resp =
+          convert((const lb_all_executions_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, AllExecutionsResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, AllExecutionsResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, AllExecutionsResponse>(callback));
+}
+
 /// Get history orders
 void
 TradeContext::history_orders(
