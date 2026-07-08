@@ -1741,6 +1741,17 @@ pub struct USRankTag {
     pub highlight_text: String,
 }
 
+/// One entry in [`USCompanyOverview`]'s sharelist field.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USSharelistItem {
+    #[serde(default)]
+    pub chg: String,
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub name: String,
+}
+
 /// Response for [`crate::FundamentalContext::us_company_overview`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USCompanyOverview {
@@ -1755,7 +1766,7 @@ pub struct USCompanyOverview {
     #[serde(default)]
     pub detail_url: String,
     #[serde(default)]
-    pub share_list: Vec<serde_json::Value>,
+    pub share_list: Vec<USSharelistItem>,
 }
 
 /// One valuation metric entry within [`USValuationOverview`].
@@ -2202,6 +2213,30 @@ pub struct USAIChatData {
     pub workflow_type: String,
 }
 
+/// Actual vs estimated value for one consensus metric.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USConsensusEstimate {
+    #[serde(default)]
+    pub actual: String,
+    #[serde(default)]
+    pub estimate: String,
+}
+
+/// One fiscal-year entry in [`USAnalystConsensus`]'s list.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USConsensusItem {
+    #[serde(default)]
+    pub ebit: USConsensusEstimate,
+    #[serde(default)]
+    pub eps: USConsensusEstimate,
+    #[serde(default)]
+    pub fiscal_year: i64,
+    #[serde(default)]
+    pub report_txt: String,
+    #[serde(default)]
+    pub revenue: USConsensusEstimate,
+}
+
 /// Response for [`crate::FundamentalContext::us_analyst_consensus`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAnalystConsensus {
@@ -2213,12 +2248,11 @@ pub struct USAnalystConsensus {
     pub currency: String,
     #[serde(default)]
     pub report: String,
-    /// Consensus detail — array; element shape varies by report type.
     #[serde(default)]
-    pub list: Vec<serde_json::Value>,
-    /// Option consensus — array; element shape varies by report type.
+    pub list: Vec<USConsensusItem>,
+    /// Option consensus type identifiers (e.g. "call", "put").
     #[serde(default)]
-    pub opt_reports: Vec<serde_json::Value>,
+    pub opt_reports: Vec<String>,
     #[serde(default)]
     pub h5_data: serde_json::Value,
 }

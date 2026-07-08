@@ -6181,13 +6181,24 @@ export interface USAIChatData {
   chatType: string
   workflowType: string
 }
+export interface USConsensusEstimate {
+  actual: string
+  estimate: string
+}
+export interface USConsensusItem {
+  ebit: USConsensusEstimate
+  eps: USConsensusEstimate
+  fiscalYear: number
+  reportTxt: string
+  revenue: USConsensusEstimate
+}
 export interface USAnalystConsensus {
   aiSummary: string
   aichatData: USAIChatData
   currency: string
   report: string
-  list: Array<unknown>
-  optReports: Array<unknown>
+  list: Array<USConsensusItem>
+  optReports: Array<string>
   h5Data: unknown
 }
 
@@ -6202,13 +6213,19 @@ export interface USRankTag {
   highlightText: string
 }
 
+export interface USSharelistItem {
+  chg: string
+  id: string
+  name: string
+}
+
 export interface USCompanyOverview {
   intro: string
   marketCap: string
   ccySymbol: string
   topRankTags: Array<USRankTag>
   detailUrl: string
-  shareList: Array<unknown>
+  shareList: Array<USSharelistItem>
 }
 
 export interface USValuationMetric {

@@ -2088,6 +2088,21 @@ impl From<lb_us::USRankTag> for USRankTag {
     }
 }
 
+/// One entry in USCompanyOverview.share_list.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USSharelistItem {
+    pub chg: String,
+    pub id: String,
+    pub name: String,
+}
+
+impl From<lb_us::USSharelistItem> for USSharelistItem {
+    fn from(v: lb_us::USSharelistItem) -> Self {
+        Self { chg: v.chg, id: v.id, name: v.name }
+    }
+}
+
 /// US company overview
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
@@ -2097,7 +2112,7 @@ pub struct USCompanyOverview {
     pub ccy_symbol: String,
     pub top_rank_tags: Vec<USRankTag>,
     pub detail_url: String,
-    pub share_list: Vec<serde_json::Value>,
+    pub share_list: Vec<USSharelistItem>,
 }
 
 impl From<lb_us::USCompanyOverview> for USCompanyOverview {
@@ -2108,7 +2123,7 @@ impl From<lb_us::USCompanyOverview> for USCompanyOverview {
             ccy_symbol: v.ccy_symbol,
             top_rank_tags: v.top_rank_tags.into_iter().map(Into::into).collect(),
             detail_url: v.detail_url,
-            share_list: v.share_list,
+            share_list: v.share_list.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -2633,6 +2648,43 @@ impl From<lb_us::USAIChatData> for USAIChatData {
     }
 }
 
+/// Actual vs estimated value for one consensus metric.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USConsensusEstimate {
+    pub actual: String,
+    pub estimate: String,
+}
+
+impl From<lb_us::USConsensusEstimate> for USConsensusEstimate {
+    fn from(v: lb_us::USConsensusEstimate) -> Self {
+        Self { actual: v.actual, estimate: v.estimate }
+    }
+}
+
+/// One fiscal-year entry in USAnalystConsensus.list.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USConsensusItem {
+    pub ebit: USConsensusEstimate,
+    pub eps: USConsensusEstimate,
+    pub fiscal_year: i64,
+    pub report_txt: String,
+    pub revenue: USConsensusEstimate,
+}
+
+impl From<lb_us::USConsensusItem> for USConsensusItem {
+    fn from(v: lb_us::USConsensusItem) -> Self {
+        Self {
+            ebit: v.ebit.into(),
+            eps: v.eps.into(),
+            fiscal_year: v.fiscal_year,
+            report_txt: v.report_txt,
+            revenue: v.revenue.into(),
+        }
+    }
+}
+
 /// US analyst consensus estimates and AI analysis.
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
@@ -2641,8 +2693,8 @@ pub struct USAnalystConsensus {
     pub aichat_data: USAIChatData,
     pub currency: String,
     pub report: String,
-    pub list: Vec<serde_json::Value>,
-    pub opt_reports: Vec<serde_json::Value>,
+    pub list: Vec<USConsensusItem>,
+    pub opt_reports: Vec<String>,
     pub h5_data: serde_json::Value,
 }
 
@@ -2653,7 +2705,7 @@ impl From<lb_us::USAnalystConsensus> for USAnalystConsensus {
             aichat_data: v.aichat_data.into(),
             currency: v.currency,
             report: v.report,
-            list: v.list,
+            list: v.list.into_iter().map(Into::into).collect(),
             opt_reports: v.opt_reports,
             h5_data: v.h5_data,
         }

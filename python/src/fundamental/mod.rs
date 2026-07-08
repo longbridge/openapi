@@ -82,6 +82,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<MacroeconomicResponse>()?;
     // US-market types
     parent.add_class::<USRankTag>()?;
+    parent.add_class::<USSharelistItem>()?;
     parent.add_class::<USCompanyOverview>()?;
     parent.add_class::<USValuationMetric>()?;
     parent.add_class::<USValuationOverview>()?;
@@ -105,6 +106,8 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<USKeyMetricItem>()?;
     parent.add_class::<USKeyFinancialMetrics>()?;
     parent.add_class::<USAIChatData>()?;
+    parent.add_class::<USConsensusEstimate>()?;
+    parent.add_class::<USConsensusItem>()?;
     parent.add_class::<USAnalystConsensus>()?;
     parent.add_class::<context::FundamentalContext>()?;
     parent.add_class::<context_async::AsyncFundamentalContext>()?;

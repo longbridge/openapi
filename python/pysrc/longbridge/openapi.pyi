@@ -12590,14 +12590,29 @@ class USAIChatData:
     chat_type: str
     workflow_type: str
 
+class USConsensusEstimate:
+    """Actual vs estimated value for one consensus metric."""
+    actual: str
+    estimate: str
+
+
+class USConsensusItem:
+    """One fiscal-year entry in USAnalystConsensus.list."""
+    ebit: "USConsensusEstimate"
+    eps: "USConsensusEstimate"
+    fiscal_year: int
+    report_txt: str
+    revenue: "USConsensusEstimate"
+
+
 class USAnalystConsensus:
     """US analyst consensus estimates and AI analysis."""
     ai_summary: str
     aichat_data: "USAIChatData"
     currency: str
     report: str
-    list: List[Any]
-    opt_reports: List[Any]
+    list: List["USConsensusItem"]
+    opt_reports: List[str]
     h5_data: Any
 
 
@@ -12690,6 +12705,13 @@ class USRankTag:
     highlight_text: str
 
 
+class USSharelistItem:
+    """One entry in USCompanyOverview.share_list."""
+    chg: str
+    id: str
+    name: str
+
+
 class USCompanyOverview:
     """US company overview. Returned by FundamentalContext.us_company_overview."""
 
@@ -12698,7 +12720,7 @@ class USCompanyOverview:
     ccy_symbol: str
     top_rank_tags: List[USRankTag]
     detail_url: str
-    share_list: List[Any]
+    share_list: List["USSharelistItem"]
 
 
 class USValuationMetric:
