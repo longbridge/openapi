@@ -3,6 +3,7 @@ use pyo3::pyclass;
 
 use crate::{
     decimal::PyDecimal,
+    fundamental::types::JsonValue,
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
     types::Market,
 };
@@ -928,7 +929,6 @@ pub(crate) struct USAssetOverview {
     pub stock_list: Vec<USStockEntry>,
     pub option_list: Vec<JsonValue>,
     pub crypto_list: Vec<USCryptoEntry>,
-    pub multi_leg: JsonValue,
 }
 
 impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
@@ -946,7 +946,6 @@ impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
             stock_list: v.stock_list.into_iter().map(Into::into).collect(),
             option_list: v.option_list.into_iter().map(JsonValue).collect(),
             crypto_list: v.crypto_list.into_iter().map(Into::into).collect(),
-            multi_leg: JsonValue(v.multi_leg),
         }
     }
 }
