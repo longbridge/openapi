@@ -12,6 +12,8 @@ use crate::{
         QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
         SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext, USAssetOverview,
         USOrderDetailResponse, USRealizedPL,
+    AllExecutionsResponse, GetAllExecutionsOptions,
+
     },
 };
 
@@ -111,6 +113,15 @@ impl TradeContextSync {
     ) -> Result<Vec<Execution>> {
         self.rt
             .call(move |ctx| async move { ctx.today_executions(options).await })
+    }
+
+    /// Get all executions
+    pub fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
+    ) -> Result<AllExecutionsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.all_executions(options).await })
     }
 
     /// Get history orders

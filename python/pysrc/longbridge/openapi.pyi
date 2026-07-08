@@ -5699,6 +5699,21 @@ class Execution:
     Executed price
     """
 
+class AllExecutionsResponse:
+    """
+    Response for get all executions request
+    """
+
+    has_more: bool
+    """
+    Has more records
+    """
+
+    trades: List[Execution]
+    """
+    Execution list
+    """
+
 class PushOrderChanged:
     """
     Order changed message
@@ -5877,6 +5892,11 @@ class OutsideRTH:
     class Overnight(OutsideRTH):
         """
         Overnight
+        """
+
+    class OptionPreMarket(OutsideRTH):
+        """
+        Overnight option
         """
 
 class Order:
@@ -6903,6 +6923,28 @@ class TradeContext:
                 print(resp)
         """
 
+    def all_executions(
+        self,
+        symbol: Optional[str] = None,
+        order_id: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+        page: Optional[int] = None,
+    ) -> AllExecutionsResponse:
+        """
+        Get all executions
+
+        Args:
+            symbol: Filter by security code
+            order_id: Filter by Order ID
+            start_at: Start time
+            end_at: End time
+            page: Page number, starting from 1
+
+        Returns:
+            All executions response
+        """
+
     def history_orders(
         self,
         symbol: Optional[str] = None,
@@ -7588,6 +7630,29 @@ class AsyncTradeContext:
                     print(resp)
 
                 asyncio.run(main())
+        """
+        ...
+
+    def all_executions(
+        self,
+        symbol: Optional[str] = None,
+        order_id: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+        page: Optional[int] = None,
+    ) -> Awaitable[AllExecutionsResponse]:
+        """
+        Get all executions. Returns awaitable.
+
+        Args:
+            symbol: Filter by security code
+            order_id: Filter by Order ID
+            start_at: Start time
+            end_at: End time
+            page: Page number, starting from 1
+
+        Returns:
+            Awaitable resolving to AllExecutionsResponse
         """
         ...
 

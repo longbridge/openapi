@@ -1180,6 +1180,10 @@ typedef enum lb_outside_rth_t {
    * Overnight
    */
   OutsideRTHOvernight,
+  /**
+   * Overnight option
+   */
+  OutsideRTHOptionPreMarket,
 } lb_outside_rth_t;
 
 /**
@@ -2258,6 +2262,32 @@ typedef struct lb_get_today_executions_options_t {
 } lb_get_today_executions_options_t;
 
 /**
+ * Options for get all executions request
+ */
+typedef struct lb_get_all_executions_options_t {
+  /**
+   * Security code (can be null)
+   */
+  const char *symbol;
+  /**
+   * Order id (can be null)
+   */
+  const char *order_id;
+  /**
+   * Start time (can be null)
+   */
+  const int64_t *start_at;
+  /**
+   * End time (can be null)
+   */
+  const int64_t *end_at;
+  /**
+   * Page number (can be null)
+   */
+  const uint64_t *page;
+} lb_get_all_executions_options_t;
+
+/**
  * Options for get history orders request
  */
 typedef struct lb_get_history_orders_options_t {
@@ -3246,6 +3276,24 @@ typedef struct lb_execution_t {
    */
   const struct lb_decimal_t *price;
 } lb_execution_t;
+
+/**
+ * All executions response
+ */
+typedef struct lb_all_executions_response_t {
+  /**
+   * Has more records
+   */
+  bool has_more;
+  /**
+   * Executions
+   */
+  const struct lb_execution_t *trades;
+  /**
+   * Number of executions
+   */
+  uintptr_t num_trades;
+} lb_all_executions_response_t;
 
 /**
  * Order
@@ -10529,6 +10577,16 @@ void lb_trade_context_today_executions(const struct lb_trade_context_t *ctx,
                                        const struct lb_get_today_executions_options_t *opts,
                                        lb_async_callback_t callback,
                                        void *userdata);
+
+/**
+ * Get all executions
+ *
+ * @param[in] opts Options for get all executions request (can be null)
+ */
+void lb_trade_context_all_executions(const struct lb_trade_context_t *ctx,
+                                     const struct lb_get_all_executions_options_t *opts,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
 
 /**
  * Get history orders

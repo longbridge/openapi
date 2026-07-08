@@ -12,4 +12,6 @@ public enum OutsideRTH {
     AnyTime,
     /** Overnight session */
     Overnight,
+    /** Overnight option */
+    OptionPreMarket,
 }

@@ -18,7 +18,7 @@ pub(crate) enum TopicType {
 
 /// Trade
 #[pyclass(skip_from_py_object)]
-#[derive(Debug, PyObject)]
+#[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::trade::Execution")]
 pub(crate) struct Execution {
     /// Order ID
@@ -33,6 +33,18 @@ pub(crate) struct Execution {
     quantity: PyDecimal,
     /// Executed price
     price: PyDecimal,
+}
+
+/// Response for get all executions request
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longbridge::trade::AllExecutionsResponse")]
+pub(crate) struct AllExecutionsResponse {
+    /// Has more records
+    has_more: bool,
+    /// Execution list
+    #[py(array)]
+    trades: Vec<Execution>,
 }
 
 #[pyclass(eq, eq_int, from_py_object)]
@@ -194,6 +206,8 @@ pub(crate) enum OutsideRTH {
     AnyTime,
     /// Overnight
     Overnight,
+    /// Overnight option
+    OptionPreMarket,
 }
 
 /// Order

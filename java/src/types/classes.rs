@@ -624,6 +624,16 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/trade/AllExecutionsResponse",
+    longbridge::trade::AllExecutionsResponse,
+    [
+        has_more,
+        #[java(objarray)]
+        trades
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/trade/Order",
     longbridge::trade::Order,
     [

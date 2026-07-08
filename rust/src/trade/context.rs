@@ -17,6 +17,8 @@ use crate::{
         GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
         QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
         SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
+    AllExecutionsResponse, GetAllExecutionsOptions,
+
         core::{Command, Core},
     },
 };
@@ -272,6 +274,25 @@ impl TradeContext {
             .await?
             .0
             .trades)
+    }
+
+    /// Get all executions
+    ///
+    /// Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
+    pub async fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>>,
+    ) -> Result<AllExecutionsResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v3/trade/execution/all")
+            .query_params(options.into().unwrap_or_default())
+            .response::<Json<AllExecutionsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 
     /// Get history orders

@@ -54,6 +54,16 @@ export declare class AlertContext {
   delete(alertIds: Array<string>): Promise<void>
 }
 
+/** Response for get all executions request */
+export declare class AllExecutionsResponse {
+  toString(): string
+  toJSON(): any
+  /** Has more records */
+  get hasMore(): boolean
+  /** Execution list */
+  get trades(): Array<Execution>
+}
+
 /** Asset context */
 export declare class AssetContext {
   /** Create a new `AssetContext` */
@@ -2584,6 +2594,8 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
+  /** Get all executions */
+  allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
    *
@@ -4011,19 +4023,6 @@ export interface ExtraConfigParams {
   enablePrintQuotePackages?: boolean
   /** Set the path of the log files (Default: `no logs`) */
   logPath?: string
-  /**
-   * Enable paper trading mode (default: `false`).
-   *
-   * When `true`, all API calls target the paper trading (simulation)
-   * environment.  The server validates the token: if it belongs to a
-   * real-money account the server returns an error.
-   *
-   * When `false` (the default) the server imposes no restrictions — both
-   * paper trading and real-money accounts are accepted.
-   *
-   * Paper trading users should set this to `true` as a safety guard.
-   */
-  enablePapertrading?: boolean
 }
 
 /** Filter warrant expiry date type */
@@ -4169,6 +4168,20 @@ export interface FundHolder {
 export interface FundHolders {
   /** Funds and ETFs holding the queried security */
   lists: Array<FundHolder>
+}
+
+/** Options for get all executions request */
+export interface GetAllExecutionsOptions {
+  /** Security symbol */
+  symbol?: string
+  /** Order id */
+  orderId?: string
+  /** Start time */
+  startAt?: Date
+  /** End time */
+  endAt?: Date
+  /** Page number */
+  page?: number
 }
 
 /** Options for get cash flow request */
@@ -4865,7 +4878,9 @@ export declare const enum OutsideRTH {
   /** Any time */
   AnyTime = 2,
   /** Overnight */
-  Overnight = 3
+  Overnight = 3,
+  /** Overnight option */
+  OptionPreMarket = 4
 }
 
 /** Candlestick period */

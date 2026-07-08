@@ -395,6 +395,7 @@ if (!nativeBinding) {
 module.exports = nativeBinding
 module.exports.AccountBalance = nativeBinding.AccountBalance
 module.exports.AlertContext = nativeBinding.AlertContext
+module.exports.AllExecutionsResponse = nativeBinding.AllExecutionsResponse
 module.exports.AssetContext = nativeBinding.AssetContext
 module.exports.Brokers = nativeBinding.Brokers
 module.exports.CalendarContext = nativeBinding.CalendarContext

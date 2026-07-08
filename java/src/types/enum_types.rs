@@ -422,7 +422,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longbridge/trade/OutsideRTH",
     longbridge::trade::OutsideRTH,
-    [Unknown, RTHOnly, AnyTime, Overnight]
+    [Unknown, RTHOnly, AnyTime, Overnight, OptionPreMarket]
 );
 
 impl_java_enum!(
