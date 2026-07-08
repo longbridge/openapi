@@ -1210,6 +1210,65 @@ pub struct USCryptoEntry {
     pub industry_name: String,
 }
 
+/// One stock/equity position in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USStockEntry {
+    /// Ticker code returned by the API (e.g. `"AAPL"`). See `full_symbol` for
+    /// the qualified form.
+    #[serde(default)]
+    pub symbol: String,
+    /// Qualified user-facing symbol (e.g. `"AAPL.US"`), converted from
+    /// `counter_id`.
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub full_symbol: String,
+    #[serde(default)]
+    pub asset_type: String,
+    #[serde(default)]
+    pub quantity: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub average_cost: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default)]
+    pub trade_status: String,
+    #[serde(default)]
+    pub prev_close: String,
+    #[serde(default)]
+    pub last_done: String,
+    #[serde(default)]
+    pub market_price: String,
+    #[serde(default)]
+    pub pretrade_close: String,
+    #[serde(default)]
+    pub stock_invest_of_today: String,
+    #[serde(default)]
+    pub today_pl: String,
+    #[serde(default)]
+    pub pretrade_stock_invest_of_today: String,
+    #[serde(default)]
+    pub pretrade_today_pl: String,
+    #[serde(default)]
+    pub night_last_done: String,
+    #[serde(default)]
+    pub night_prev_close: String,
+    #[serde(default)]
+    pub position_side: String,
+    #[serde(default)]
+    pub open_position_time: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub industry_counter_id: String,
+    #[serde(default)]
+    pub industry_name: String,
+}
+
 /// Response for [`crate::TradeContext::us_asset_overview`].
 /// Field names match the actual API response from `GET /v1/us/assets/overview`.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -1223,9 +1282,19 @@ pub struct USAssetOverview {
     #[serde(default)]
     pub cash_buy_power: String,
     #[serde(default)]
+    pub overnight_buy_power: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
     pub cash_list: Vec<USCashEntry>,
     #[serde(default)]
+    pub stock_list: Vec<USStockEntry>,
+    #[serde(default)]
+    pub option_list: Vec<serde_json::Value>,
+    #[serde(default)]
     pub crypto_list: Vec<USCryptoEntry>,
+    #[serde(default)]
+    pub multi_leg: serde_json::Value,
 }
 
 /// One time-period metric in a [`USRealizedPLEntry`].

@@ -66,4 +66,5 @@ pub use types::{
     USRealizedPL,
     USRealizedPLEntry,
     USRealizedPLMetric,
+    USStockEntry,
 };
