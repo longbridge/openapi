@@ -3,12 +3,10 @@
 use std::sync::Arc;
 
 use longbridge::trade::{
-    EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-    GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions,
-    SubmitOrderOptions, TradeContext,
-    GetAllExecutionsOptions,
-
+    EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
+    GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+    GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+    QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -575,8 +573,11 @@ impl AsyncTradeContext {
     fn us_order_detail(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let resp: crate::trade::types::USOrderDetailResponse =
-                ctx.us_order_detail(order_id).await.map_err(ErrorNewType)?.into();
+            let resp: crate::trade::types::USOrderDetailResponse = ctx
+                .us_order_detail(order_id)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
             Ok(resp)
         })
         .map(|b| b.unbind())

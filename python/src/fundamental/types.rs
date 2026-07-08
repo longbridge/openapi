@@ -2153,7 +2153,11 @@ pub(crate) struct USSharelistItem {
 
 impl From<lb_us::USSharelistItem> for USSharelistItem {
     fn from(v: lb_us::USSharelistItem) -> Self {
-        Self { chg: v.chg, id: v.id, name: v.name }
+        Self {
+            chg: v.chg,
+            id: v.id,
+            name: v.name,
+        }
     }
 }
 
@@ -2221,7 +2225,11 @@ pub(crate) struct USValuationOverview {
 impl From<lb_us::USValuationOverview> for USValuationOverview {
     fn from(v: lb_us::USValuationOverview) -> Self {
         Self {
-            metrics: v.metrics.into_iter().map(|(k, val)| (k, val.into())).collect(),
+            metrics: v
+                .metrics
+                .into_iter()
+                .map(|(k, val)| (k, val.into()))
+                .collect(),
             indicator: v.indicator,
             range: v.range,
             date: v.date,
@@ -2483,7 +2491,11 @@ impl From<lb_us::USCompanyDividends> for USCompanyDividends {
             recent_dividends: v.recent_dividends.into(),
             dividend_history: v.dividend_history.into_iter().map(Into::into).collect(),
             payout_ratios: v.payout_ratios.into_iter().map(Into::into).collect(),
-            dividend_payout_history: v.dividend_payout_history.into_iter().map(Into::into).collect(),
+            dividend_payout_history: v
+                .dividend_payout_history
+                .into_iter()
+                .map(Into::into)
+                .collect(),
         }
     }
 }
@@ -2712,7 +2724,10 @@ pub(crate) struct USConsensusEstimate {
 
 impl From<lb_us::USConsensusEstimate> for USConsensusEstimate {
     fn from(v: lb_us::USConsensusEstimate) -> Self {
-        Self { actual: v.actual, estimate: v.estimate }
+        Self {
+            actual: v.actual,
+            estimate: v.estimate,
+        }
     }
 }
 

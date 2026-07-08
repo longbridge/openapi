@@ -3,12 +3,10 @@ use std::sync::Arc;
 use longbridge::{
     blocking::TradeContextSync,
     trade::{
-        EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions,
-    GetAllExecutionsOptions,
-
-        ReplaceOrderOptions, SubmitOrderOptions,
+        EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -483,8 +481,15 @@ impl TradeContext {
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
     /// Get US order detail. US token required.
-    fn us_order_detail(&self, order_id: String) -> PyResult<crate::trade::types::USOrderDetailResponse> {
-        Ok(self.ctx.us_order_detail(order_id).map_err(ErrorNewType)?.into())
+    fn us_order_detail(
+        &self,
+        order_id: String,
+    ) -> PyResult<crate::trade::types::USOrderDetailResponse> {
+        Ok(self
+            .ctx
+            .us_order_detail(order_id)
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Get US account asset overview. US token required.

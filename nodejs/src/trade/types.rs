@@ -963,12 +963,21 @@ pub struct USOrderHistory {
 impl From<longbridge::trade::USOrderHistory> for USOrderHistory {
     fn from(v: longbridge::trade::USOrderHistory) -> Self {
         Self {
-            exec_type: v.exec_type, status: v.status, price: v.price, qty: v.qty,
-            time: v.time, msg: v.msg, is_manually: v.is_manually,
-            opp_party_id: v.opp_party_id, trd_match_id: v.trd_match_id,
-            operator: v.operator, op_entrust_way: v.op_entrust_way,
+            exec_type: v.exec_type,
+            status: v.status,
+            price: v.price,
+            qty: v.qty,
+            time: v.time,
+            msg: v.msg,
+            is_manually: v.is_manually,
+            opp_party_id: v.opp_party_id,
+            trd_match_id: v.trd_match_id,
+            operator: v.operator,
+            op_entrust_way: v.op_entrust_way,
             cxl_rej_response_to: v.cxl_rej_response_to,
-            withdrawal_reason: v.withdrawal_reason, opp_name: v.opp_name, exec_id: v.exec_id,
+            withdrawal_reason: v.withdrawal_reason,
+            opp_name: v.opp_name,
+            exec_id: v.exec_id,
         }
     }
 }
@@ -984,7 +993,11 @@ pub struct USButtonControl {
 
 impl From<longbridge::trade::USButtonControl> for USButtonControl {
     fn from(v: longbridge::trade::USButtonControl) -> Self {
-        Self { withdraw: v.withdraw, replace: v.replace, exceptionable: v.exceptionable }
+        Self {
+            withdraw: v.withdraw,
+            replace: v.replace,
+            exceptionable: v.exceptionable,
+        }
     }
 }
 
@@ -999,7 +1012,11 @@ pub struct USChargeItem {
 
 impl From<longbridge::trade::USChargeItem> for USChargeItem {
     fn from(v: longbridge::trade::USChargeItem) -> Self {
-        Self { code: v.code, name: v.name, fees: v.fees }
+        Self {
+            code: v.code,
+            name: v.name,
+            fees: v.fees,
+        }
     }
 }
 
@@ -1015,7 +1032,8 @@ pub struct USChargeDetail {
 impl From<longbridge::trade::USChargeDetail> for USChargeDetail {
     fn from(v: longbridge::trade::USChargeDetail) -> Self {
         Self {
-            currency: v.currency, total_amount: v.total_amount,
+            currency: v.currency,
+            total_amount: v.total_amount,
             items: v.items.into_iter().map(Into::into).collect(),
         }
     }
@@ -1044,12 +1062,20 @@ pub struct USAttachedOrder {
 impl From<longbridge::trade::USAttachedOrder> for USAttachedOrder {
     fn from(v: longbridge::trade::USAttachedOrder) -> Self {
         Self {
-            attached_type_display: v.attached_type_display, executed_qty: v.executed_qty,
-            quantity: v.quantity, status: v.status, trigger_price: v.trigger_price,
-            order_id: v.order_id, gtd: v.gtd, time_in_force: v.time_in_force,
-            tag: v.tag, activate_order_type: v.activate_order_type,
-            activate_rth: v.activate_rth, submit_price: v.submit_price,
-            counter_id: v.counter_id, withdrawn: v.withdrawn,
+            attached_type_display: v.attached_type_display,
+            executed_qty: v.executed_qty,
+            quantity: v.quantity,
+            status: v.status,
+            trigger_price: v.trigger_price,
+            order_id: v.order_id,
+            gtd: v.gtd,
+            time_in_force: v.time_in_force,
+            tag: v.tag,
+            activate_order_type: v.activate_order_type,
+            activate_rth: v.activate_rth,
+            submit_price: v.submit_price,
+            counter_id: v.counter_id,
+            withdrawn: v.withdrawn,
         }
     }
 }
@@ -1141,39 +1167,79 @@ pub struct USOrderDetail {
 impl From<longbridge::trade::USOrderDetail> for USOrderDetail {
     fn from(v: longbridge::trade::USOrderDetail) -> Self {
         Self {
-            id: v.id, aaid: v.aaid, account_channel: v.account_channel, action: v.action,
-            counter_id: v.counter_id, underlying_counter_id: v.underlying_counter_id,
-            security_type: v.security_type, name: v.name, currency: v.currency,
-            trade_currency: v.trade_currency, order_type: v.order_type, status: v.status,
-            price: v.price, quantity: v.quantity, executed_qty: v.executed_qty,
-            executed_price: v.executed_price, executed_amount: v.executed_amount,
-            operate_direction: v.operate_direction, time_in_force: v.time_in_force,
-            gtd: v.gtd, tag: v.tag, msg: v.msg, force_only_rth: v.force_only_rth,
-            submitted_at: v.submitted_at, done_at: v.done_at,
-            trigger_price: v.trigger_price, trigger_at: v.trigger_at,
-            trigger_status: v.trigger_status, trigger_exchange: v.trigger_exchange,
-            trigger_last_done: v.trigger_last_done, trigger_count: v.trigger_count,
-            tailing_amount: v.tailing_amount, tailing_percent: v.tailing_percent,
-            limit_offset: v.limit_offset, limit_depth_level: v.limit_depth_level,
-            market_price: v.market_price, submitted_amount: v.submitted_amount,
-            estimated_fee: v.estimated_fee, free_status: v.free_status,
-            free_amount: v.free_amount, free_currency: v.free_currency,
-            deductions_status: v.deductions_status, deductions_amount: v.deductions_amount,
+            id: v.id,
+            aaid: v.aaid,
+            account_channel: v.account_channel,
+            action: v.action,
+            counter_id: v.counter_id,
+            underlying_counter_id: v.underlying_counter_id,
+            security_type: v.security_type,
+            name: v.name,
+            currency: v.currency,
+            trade_currency: v.trade_currency,
+            order_type: v.order_type,
+            status: v.status,
+            price: v.price,
+            quantity: v.quantity,
+            executed_qty: v.executed_qty,
+            executed_price: v.executed_price,
+            executed_amount: v.executed_amount,
+            operate_direction: v.operate_direction,
+            time_in_force: v.time_in_force,
+            gtd: v.gtd,
+            tag: v.tag,
+            msg: v.msg,
+            force_only_rth: v.force_only_rth,
+            submitted_at: v.submitted_at,
+            done_at: v.done_at,
+            trigger_price: v.trigger_price,
+            trigger_at: v.trigger_at,
+            trigger_status: v.trigger_status,
+            trigger_exchange: v.trigger_exchange,
+            trigger_last_done: v.trigger_last_done,
+            trigger_count: v.trigger_count,
+            tailing_amount: v.tailing_amount,
+            tailing_percent: v.tailing_percent,
+            limit_offset: v.limit_offset,
+            limit_depth_level: v.limit_depth_level,
+            market_price: v.market_price,
+            submitted_amount: v.submitted_amount,
+            estimated_fee: v.estimated_fee,
+            free_status: v.free_status,
+            free_amount: v.free_amount,
+            free_currency: v.free_currency,
+            deductions_status: v.deductions_status,
+            deductions_amount: v.deductions_amount,
             deductions_currency: v.deductions_currency,
             platform_deductions_status: v.platform_deductions_status,
             platform_deductions_amount: v.platform_deductions_amount,
             platform_deductions_currency: v.platform_deductions_currency,
-            display_account: v.display_account, settlement_account: v.settlement_account,
-            settlement_channel: v.settlement_channel, customer_name: v.customer_name,
-            real_name: v.real_name, en_name: v.en_name, joint_real_name: v.joint_real_name,
-            joint_en_name: v.joint_en_name, org_id: v.org_id, bcan: v.bcan,
-            op_entrust_way: v.op_entrust_way, op_entrust_way_name: v.op_entrust_way_name,
-            remark: v.remark, notice: v.notice, short_sell_type: v.short_sell_type,
-            ploy_type: v.ploy_type, ploy_id: v.ploy_id, ploy_status: v.ploy_status,
-            trend: v.trend, withdrawal_reason: v.withdrawal_reason,
-            activate_order_type: v.activate_order_type, activate_rth: v.activate_rth,
-            submit_price: v.submit_price, contract_direction: v.contract_direction,
-            strike_price: v.strike_price, contract_size: v.contract_size,
+            display_account: v.display_account,
+            settlement_account: v.settlement_account,
+            settlement_channel: v.settlement_channel,
+            customer_name: v.customer_name,
+            real_name: v.real_name,
+            en_name: v.en_name,
+            joint_real_name: v.joint_real_name,
+            joint_en_name: v.joint_en_name,
+            org_id: v.org_id,
+            bcan: v.bcan,
+            op_entrust_way: v.op_entrust_way,
+            op_entrust_way_name: v.op_entrust_way_name,
+            remark: v.remark,
+            notice: v.notice,
+            short_sell_type: v.short_sell_type,
+            ploy_type: v.ploy_type,
+            ploy_id: v.ploy_id,
+            ploy_status: v.ploy_status,
+            trend: v.trend,
+            withdrawal_reason: v.withdrawal_reason,
+            activate_order_type: v.activate_order_type,
+            activate_rth: v.activate_rth,
+            submit_price: v.submit_price,
+            contract_direction: v.contract_direction,
+            strike_price: v.strike_price,
+            contract_size: v.contract_size,
             monitor_price: v.monitor_price,
             button_control: v.button_control.into(),
             charge_detail: v.charge_detail.map(Into::into),

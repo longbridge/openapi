@@ -562,7 +562,11 @@ impl TradeContext {
     ) -> Result<PromiseRaw<'env, crate::trade::types::USOrderDetailResponse>> {
         let ctx = self.ctx.clone();
         env.spawn_future(async move {
-            Ok(ctx.us_order_detail(order_id).await.map_err(ErrorNewType)?.into())
+            Ok(ctx
+                .us_order_detail(order_id)
+                .await
+                .map_err(ErrorNewType)?
+                .into())
         })
     }
 

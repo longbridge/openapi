@@ -9,13 +9,11 @@ use jni::{
 use longbridge::{
     Config, Decimal, Market, TradeContext,
     trade::{
-        BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, QueryUSOrdersOptions, ReplaceOrderOptions,
-        SubmitOrderOptions, TimeInForceType, TopicType,
-    GetAllExecutionsOptions,
-
+        BalanceType, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+        GetHistoryOrdersOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
+        QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;
