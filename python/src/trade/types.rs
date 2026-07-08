@@ -856,6 +856,65 @@ impl From<longbridge::trade::USCryptoEntry> for USCryptoEntry {
     }
 }
 
+/// One stock/equity position in USAssetOverview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USStockEntry {
+    pub symbol: String,
+    pub full_symbol: String,
+    pub asset_type: String,
+    pub quantity: String,
+    pub currency: String,
+    pub average_cost: String,
+    pub market: String,
+    pub trade_status: String,
+    pub prev_close: String,
+    pub last_done: String,
+    pub market_price: String,
+    pub pretrade_close: String,
+    pub stock_invest_of_today: String,
+    pub today_pl: String,
+    pub pretrade_stock_invest_of_today: String,
+    pub pretrade_today_pl: String,
+    pub night_last_done: String,
+    pub night_prev_close: String,
+    pub position_side: String,
+    pub open_position_time: String,
+    pub name: String,
+    pub industry_counter_id: String,
+    pub industry_name: String,
+}
+
+impl From<longbridge::trade::USStockEntry> for USStockEntry {
+    fn from(v: longbridge::trade::USStockEntry) -> Self {
+        Self {
+            symbol: v.symbol,
+            full_symbol: v.full_symbol,
+            asset_type: v.asset_type,
+            quantity: v.quantity,
+            currency: v.currency,
+            average_cost: v.average_cost,
+            market: v.market,
+            trade_status: v.trade_status,
+            prev_close: v.prev_close,
+            last_done: v.last_done,
+            market_price: v.market_price,
+            pretrade_close: v.pretrade_close,
+            stock_invest_of_today: v.stock_invest_of_today,
+            today_pl: v.today_pl,
+            pretrade_stock_invest_of_today: v.pretrade_stock_invest_of_today,
+            pretrade_today_pl: v.pretrade_today_pl,
+            night_last_done: v.night_last_done,
+            night_prev_close: v.night_prev_close,
+            position_side: v.position_side,
+            open_position_time: v.open_position_time,
+            name: v.name,
+            industry_counter_id: v.industry_counter_id,
+            industry_name: v.industry_name,
+        }
+    }
+}
+
 /// US account asset snapshot
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone, Default)]
@@ -863,8 +922,13 @@ pub(crate) struct USAssetOverview {
     pub account_type: String,
     pub asset_timestamp: i64,
     pub cash_buy_power: String,
+    pub overnight_buy_power: String,
+    pub currency: String,
     pub cash_list: Vec<USCashEntry>,
+    pub stock_list: Vec<USStockEntry>,
+    pub option_list: Vec<JsonValue>,
     pub crypto_list: Vec<USCryptoEntry>,
+    pub multi_leg: JsonValue,
 }
 
 impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
@@ -876,8 +940,13 @@ impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
                 .map(|t| t.unix_timestamp())
                 .unwrap_or_default(),
             cash_buy_power: v.cash_buy_power,
+            overnight_buy_power: v.overnight_buy_power,
+            currency: v.currency,
             cash_list: v.cash_list.into_iter().map(Into::into).collect(),
+            stock_list: v.stock_list.into_iter().map(Into::into).collect(),
+            option_list: v.option_list.into_iter().map(JsonValue).collect(),
             crypto_list: v.crypto_list.into_iter().map(Into::into).collect(),
+            multi_leg: JsonValue(v.multi_leg),
         }
     }
 }

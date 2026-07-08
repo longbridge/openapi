@@ -6518,13 +6518,43 @@ export interface USCryptoEntry {
   industryName: string
 }
 
+export interface USStockEntry {
+  symbol: string
+  fullSymbol: string
+  assetType: string
+  quantity: string
+  currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
+  industryName: string
+}
 export interface USAssetOverview {
   accountType: string
   /** Unix timestamp (seconds) */
   assetTimestamp: number
   cashBuyPower: string
+  overnightBuyPower: string
+  currency: string
   cashList: Array<USCashEntry>
+  stockList: Array<USStockEntry>
+  optionList: Array<unknown>
   cryptoList: Array<USCryptoEntry>
+  multiLeg: unknown
 }
 
 export interface USRealizedPLMetric {

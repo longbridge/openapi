@@ -44,6 +44,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
 
     parent.add_class::<types::USCashEntry>()?;
     parent.add_class::<types::USCryptoEntry>()?;
+    parent.add_class::<types::USStockEntry>()?;
     parent.add_class::<types::USAssetOverview>()?;
     parent.add_class::<types::USRealizedPLMetric>()?;
     parent.add_class::<types::USRealizedPLEntry>()?;

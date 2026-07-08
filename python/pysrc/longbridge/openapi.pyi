@@ -12693,19 +12693,59 @@ class USCryptoEntry:
     """Industry name"""
 
 
+class USStockEntry:
+    """One stock/equity position in USAssetOverview."""
+
+    symbol: str
+    """Ticker code, e.g. ``"AAPL"``"""
+    full_symbol: str
+    """Qualified symbol, e.g. ``"AAPL.US"``"""
+    asset_type: str
+    quantity: str
+    currency: str
+    average_cost: str
+    market: str
+    trade_status: str
+    prev_close: str
+    last_done: str
+    market_price: str
+    pretrade_close: str
+    stock_invest_of_today: str
+    today_pl: str
+    pretrade_stock_invest_of_today: str
+    pretrade_today_pl: str
+    night_last_done: str
+    night_prev_close: str
+    position_side: str
+    open_position_time: str
+    name: str
+    industry_counter_id: str
+    industry_name: str
+
+
 class USAssetOverview:
     """US account asset snapshot. Returned by TradeContext.us_asset_overview."""
 
     account_type: str
     """Account type code"""
     asset_timestamp: int
-    """Snapshot timestamp (Unix seconds string)"""
+    """Snapshot timestamp (Unix seconds)"""
     cash_buy_power: str
     """Available cash buying power"""
+    overnight_buy_power: str
+    """Overnight buying power"""
+    currency: str
+    """Account currency"""
     cash_list: List[USCashEntry]
     """Cash balances by currency"""
+    stock_list: List["USStockEntry"]
+    """Stock/equity positions"""
+    option_list: List[Any]
+    """Option positions"""
     crypto_list: List[USCryptoEntry]
     """Cryptocurrency positions"""
+    multi_leg: Any
+    """Multi-leg positions"""
 
 
 class USRealizedPLMetric:
