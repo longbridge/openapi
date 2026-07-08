@@ -6240,6 +6240,7 @@ export interface USFinancialStatementPeriod {
   fields: Array<USFinancialStatementField>
   fpEnd: string
   reportTxt: string
+  rptDate: string
 }
 export interface USFinancialStatement {
   currency: string

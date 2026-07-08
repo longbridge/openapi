@@ -12758,6 +12758,7 @@ class USFinancialStatementPeriod:
     fields: List["USFinancialStatementField"]
     fp_end: str
     report_txt: str
+    rpt_date: str
 
 
 class USFinancialStatement:

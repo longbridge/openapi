@@ -1835,6 +1835,8 @@ pub struct USFinancialStatementPeriod {
     pub fp_end: String,
     #[serde(default)]
     pub report_txt: String,
+    #[serde(default)]
+    pub rpt_date: String,
 }
 
 /// Response for [`crate::FundamentalContext::us_financial_statement`].

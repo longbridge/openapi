@@ -2191,6 +2191,7 @@ pub struct USFinancialStatementPeriod {
     pub fields: Vec<USFinancialStatementField>,
     pub fp_end: String,
     pub report_txt: String,
+    pub rpt_date: String,
 }
 
 impl From<lb_us::USFinancialStatementPeriod> for USFinancialStatementPeriod {
@@ -2201,6 +2202,7 @@ impl From<lb_us::USFinancialStatementPeriod> for USFinancialStatementPeriod {
             fields: v.fields.into_iter().map(Into::into).collect(),
             fp_end: v.fp_end,
             report_txt: v.report_txt,
+            rpt_date: v.rpt_date,
         }
     }
 }
