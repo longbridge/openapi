@@ -530,14 +530,13 @@ impl AsyncTradeContext {
         .map(|b| b.unbind())
     }
 
-    /// Get US order detail (JSON string). US token required. Returns awaitable.
+    /// Get US order detail. US token required. Returns awaitable.
     fn us_order_detail(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let resp = ctx.us_order_detail(order_id).await.map_err(ErrorNewType)?;
-            let s = serde_json::to_string(&resp)
-                .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-            Ok(s)
+            let resp: crate::trade::types::USOrderDetailResponse =
+                ctx.us_order_detail(order_id).await.map_err(ErrorNewType)?.into();
+            Ok(resp)
         })
         .map(|b| b.unbind())
     }

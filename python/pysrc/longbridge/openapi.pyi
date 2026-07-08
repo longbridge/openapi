@@ -7369,25 +7369,14 @@ class TradeContext:
         """
         ...
 
-    def us_order_detail(self, order_id: str) -> str:
+    def us_order_detail(self, order_id: str) -> "USOrderDetailResponse":
         """Get US order detail. US token required.
-
-        Returns a JSON string with shape::
-
-            {
-              "order": {...},
-              "order_histories": [...],
-              "current_attached_order": null
-            }
-
-        Path: ``GET /v1/orders/{order_id}`` (no query parameters).
 
         Args:
             order_id: Order ID
-            is_attached: Whether to include attached sub-orders
 
         Returns:
-            JSON string with order detail
+            :class:`USOrderDetailResponse`
         """
         ...
 
@@ -8107,25 +8096,14 @@ class AsyncTradeContext:
         """
         ...
 
-    def us_order_detail(self, order_id: str) -> "Awaitable[str]":
+    def us_order_detail(self, order_id: str) -> "Awaitable[USOrderDetailResponse]":
         """Get US order detail (async). US token required.
-
-        Returns a JSON string with shape::
-
-            {
-              "order": {...},
-              "order_histories": [...],
-              "current_attached_order": null
-            }
-
-        Path: ``GET /v1/orders/{order_id}`` (no query parameters).
 
         Args:
             order_id: Order ID
-            is_attached: Whether to include attached sub-orders
 
         Returns:
-            Awaitable resolving to JSON string with order detail
+            Awaitable[:class:`USOrderDetailResponse`]
         """
         ...
 
@@ -12692,6 +12670,153 @@ class USRealizedPL:
 
     realized_pl_list: List[USRealizedPLEntry]
     """Per-category realized P&L entries"""
+
+
+class USOrderHistory:
+    """One order state-transition entry within USOrderDetail."""
+    exec_type: int
+    status: str
+    price: str
+    qty: str
+    time: str
+    msg: str
+    is_manually: bool
+    opp_party_id: str
+    trd_match_id: str
+    operator: str
+    op_entrust_way: str
+    cxl_rej_response_to: int
+    withdrawal_reason: str
+    opp_name: str
+    exec_id: str
+
+
+class USButtonControl:
+    """Action-button state for an order."""
+    withdraw: int
+    replace: int
+    exceptionable: List[str]
+
+
+class USChargeItem:
+    """One fee category within USChargeDetail."""
+    code: int
+    name: str
+    fees: List[str]
+
+
+class USChargeDetail:
+    """Fee breakdown for an order."""
+    currency: str
+    total_amount: str
+    items: List["USChargeItem"]
+
+
+class USAttachedOrder:
+    """One bracket/conditional sub-order attached to a main order."""
+    attached_type_display: int
+    executed_qty: str
+    quantity: str
+    status: str
+    trigger_price: str
+    order_id: str
+    gtd: str
+    time_in_force: int
+    tag: int
+    activate_order_type: str
+    activate_rth: int
+    submit_price: str
+    counter_id: str
+    withdrawn: bool
+
+
+class USOrderDetail:
+    """Full typed order object within USOrderDetailResponse."""
+    id: str
+    aaid: str
+    account_channel: str
+    action: int
+    counter_id: str
+    underlying_counter_id: str
+    security_type: str
+    name: str
+    currency: str
+    trade_currency: str
+    order_type: str
+    status: str
+    price: str
+    quantity: str
+    executed_qty: str
+    executed_price: str
+    executed_amount: str
+    operate_direction: str
+    time_in_force: int
+    gtd: str
+    tag: int
+    msg: str
+    force_only_rth: int
+    submitted_at: str
+    done_at: str
+    trigger_price: str
+    trigger_at: str
+    trigger_status: int
+    trigger_exchange: str
+    trigger_last_done: str
+    trigger_count: int
+    tailing_amount: str
+    tailing_percent: str
+    limit_offset: str
+    limit_depth_level: int
+    market_price: str
+    submitted_amount: str
+    estimated_fee: str
+    free_status: int
+    free_amount: str
+    free_currency: str
+    deductions_status: int
+    deductions_amount: str
+    deductions_currency: str
+    platform_deductions_status: int
+    platform_deductions_amount: str
+    platform_deductions_currency: str
+    display_account: str
+    settlement_account: str
+    settlement_channel: str
+    customer_name: str
+    real_name: str
+    en_name: str
+    joint_real_name: str
+    joint_en_name: str
+    org_id: str
+    bcan: str
+    op_entrust_way: int
+    op_entrust_way_name: str
+    remark: str
+    notice: str
+    short_sell_type: int
+    ploy_type: str
+    ploy_id: str
+    ploy_status: str
+    trend: int
+    withdrawal_reason: str
+    activate_order_type: str
+    activate_rth: int
+    submit_price: str
+    contract_direction: str
+    strike_price: str
+    contract_size: str
+    monitor_price: str
+    button_control: "USButtonControl"
+    charge_detail: Optional["USChargeDetail"]
+    attached_orders: List["USAttachedOrder"]
+    order_histories: List["USOrderHistory"]
+
+
+class USOrderDetailResponse:
+    """Response for TradeContext.us_order_detail."""
+    order: Optional["USOrderDetail"]
+    current_attached_order: Optional["USOrderDetail"]
+    current_millisecond: str
 
 
 class USRankTag:

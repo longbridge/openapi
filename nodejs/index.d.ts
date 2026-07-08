@@ -6121,12 +6121,131 @@ export interface USOrderHistory {
   qty: string
   time: string
   msg: string
+  isManually: boolean
+  oppPartyId: string
+  trdMatchId: string
+  operator: string
+  opEntrustWay: string
+  cxlRejResponseTo: number
+  withdrawalReason: string
+  oppName: string
+  execId: string
 }
-
-export interface USOrderDetailResponse {
-  order: Record<string, unknown>
+export interface USButtonControl {
+  withdraw: number
+  replace: number
+  exceptionable: Array<string>
+}
+export interface USChargeItem {
+  code: number
+  name: string
+  fees: Array<string>
+}
+export interface USChargeDetail {
+  currency: string
+  totalAmount: string
+  items: Array<USChargeItem>
+}
+export interface USAttachedOrder {
+  attachedTypeDisplay: number
+  executedQty: string
+  quantity: string
+  status: string
+  triggerPrice: string
+  orderId: string
+  gtd: string
+  timeInForce: number
+  tag: number
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  counterId: string
+  withdrawn: boolean
+}
+export interface USOrderDetail {
+  id: string
+  aaid: string
+  accountChannel: string
+  action: number
+  counterId: string
+  underlyingCounterId: string
+  securityType: string
+  name: string
+  currency: string
+  tradeCurrency: string
+  orderType: string
+  status: string
+  price: string
+  quantity: string
+  executedQty: string
+  executedPrice: string
+  executedAmount: string
+  operateDirection: string
+  timeInForce: number
+  gtd: string
+  tag: number
+  msg: string
+  forceOnlyRth: number
+  submittedAt: string
+  doneAt: string
+  triggerPrice: string
+  triggerAt: string
+  triggerStatus: number
+  triggerExchange: string
+  triggerLastDone: string
+  triggerCount: number
+  tailingAmount: string
+  tailingPercent: string
+  limitOffset: string
+  limitDepthLevel: number
+  marketPrice: string
+  submittedAmount: string
+  estimatedFee: string
+  freeStatus: number
+  freeAmount: string
+  freeCurrency: string
+  deductionsStatus: number
+  deductionsAmount: string
+  deductionsCurrency: string
+  platformDeductionsStatus: number
+  platformDeductionsAmount: string
+  platformDeductionsCurrency: string
+  displayAccount: string
+  settlementAccount: string
+  settlementChannel: string
+  customerName: string
+  realName: string
+  enName: string
+  jointRealName: string
+  jointEnName: string
+  orgId: string
+  bcan: string
+  opEntrustWay: number
+  opEntrustWayName: string
+  remark: string
+  notice: string
+  shortSellType: number
+  ployType: string
+  ployId: string
+  ployStatus: string
+  trend: number
+  withdrawalReason: string
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  contractDirection: string
+  strikePrice: string
+  contractSize: string
+  monitorPrice: string
+  buttonControl: USButtonControl
+  chargeDetail: USChargeDetail | null
+  attachedOrders: Array<USAttachedOrder>
   orderHistories: Array<USOrderHistory>
-  currentAttachedOrder: Record<string, unknown> | null
+}
+export interface USOrderDetailResponse {
+  order: USOrderDetail | null
+  currentAttachedOrder: USOrderDetail | null
+  currentMillisecond: string
 }
 
 export interface USReportPeriod {

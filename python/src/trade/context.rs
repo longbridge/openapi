@@ -446,11 +446,9 @@ impl TradeContext {
         serde_json::to_string(&resp)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
     }
-    /// Get US order detail (returns JSON string). US token required.
-    fn us_order_detail(&self, order_id: String) -> PyResult<String> {
-        let resp = self.ctx.us_order_detail(order_id).map_err(ErrorNewType)?;
-        serde_json::to_string(&resp)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    /// Get US order detail. US token required.
+    fn us_order_detail(&self, order_id: String) -> PyResult<crate::trade::types::USOrderDetailResponse> {
+        Ok(self.ctx.us_order_detail(order_id).map_err(ErrorNewType)?.into())
     }
 
     /// Get US account asset overview. US token required.

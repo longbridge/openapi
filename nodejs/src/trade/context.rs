@@ -540,17 +540,16 @@ impl TradeContext {
         })
     }
 
-    /// Get US order detail. Returns JSON string. US token required.
+    /// Get US order detail. US token required.
     #[napi]
     pub fn us_order_detail<'env>(
         &self,
         env: &'env Env,
         order_id: String,
-    ) -> Result<PromiseRaw<'env, String>> {
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USOrderDetailResponse>> {
         let ctx = self.ctx.clone();
         env.spawn_future(async move {
-            let resp = ctx.us_order_detail(order_id).await.map_err(ErrorNewType)?;
-            serde_json::to_string(&resp).map_err(|e| napi::Error::from_reason(e.to_string()))
+            Ok(ctx.us_order_detail(order_id).await.map_err(ErrorNewType)?.into())
         })
     }
 
