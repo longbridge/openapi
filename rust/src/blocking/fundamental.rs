@@ -388,8 +388,7 @@ impl FundamentalContextSync {
         report: impl Into<String> + Send + 'static,
     ) -> Result<USFinancialStatement> {
         self.rt.call(move |ctx| async move {
-            ctx.us_financial_statement(counter_id, kind, report)
-                .await
+            ctx.us_financial_statement(counter_id, kind, report).await
         })
     }
 
