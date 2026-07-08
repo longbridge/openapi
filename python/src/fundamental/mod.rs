@@ -83,7 +83,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     // US-market types
     parent.add_class::<USRankTag>()?;
     parent.add_class::<USCompanyOverview>()?;
-    parent.add_class::<USValuationIndicator>()?;
+    parent.add_class::<USValuationMetric>()?;
     parent.add_class::<USValuationOverview>()?;
     parent.add_class::<USFinancialStatementField>()?;
     parent.add_class::<USFinancialStatementPeriod>()?;

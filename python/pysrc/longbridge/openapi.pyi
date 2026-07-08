@@ -12682,59 +12682,46 @@ class USRealizedPL:
 class USRankTag:
     """A rank tag entry for a US company overview."""
 
-    name: str
-    """Tag name"""
-    chg: str
-    """Change value"""
+    key: str
+    location: int
+    title: str
+    text: str
     rank_type: int
-    """Rank type"""
+    highlight_text: str
 
 
 class USCompanyOverview:
     """US company overview. Returned by FundamentalContext.us_company_overview."""
 
     intro: str
-    """Company introduction"""
     market_cap: str
-    """Market capitalisation"""
     ccy_symbol: str
-    """Currency symbol"""
     top_rank_tags: List[USRankTag]
-    """Top rank tags"""
     detail_url: str
-    """Detail URL"""
+    share_list: List[Any]
 
 
-class USValuationIndicator:
-    """A single US valuation indicator entry."""
+class USValuationMetric:
+    """One valuation metric in USValuationOverview.metrics (e.g. key="pe")."""
 
     circle: str
-    """Gauge circle value"""
     part: str
-    """Gauge part label"""
     metric: str
-    """Metric value"""
-    metric_type: str
-    """Metric type label"""
     desc: str
-    """Description"""
-    ccy_symbol: str
-    """Currency symbol"""
+    industry_median: str
 
 
 class USValuationOverview:
     """US valuation overview. Returned by FundamentalContext.us_valuation_overview."""
 
+    metrics: dict
+    """Map of metric key (e.g. ``"pe"``) to :class:`USValuationMetric`"""
     indicator: str
-    """Overall valuation indicator"""
-    current_indicator: USValuationIndicator
-    """Current indicator detail"""
     range: int
-    """Valuation range score"""
     date: str
-    """Date of snapshot"""
+    ccy_symbol: str
+    aichat_data: "USAIChatData"
     ai_summary: str
-    """AI-generated valuation summary"""
 
 
 class USFinancialStatementField:
@@ -12772,14 +12759,13 @@ class USFinancialStatement:
 
 
 class USFiscalYearDividend:
-    """Per-fiscal-year dividend records for a US ETF."""
+    """Per-fiscal-year dividend row for a US ETF."""
 
-    year: str
-    """Fiscal year, e.g. ``"2023"``"""
-    total_dividend: str
-    """Total dividend for the fiscal year"""
-    records: List["USDividendItem"]
-    """Individual dividend payment records"""
+    dividend: str
+    dividend_yield: str
+    fiscal_year: str
+    currency: str
+    fiscal_year_range: str
 
 
 class USETFDividendInfo:
@@ -12865,12 +12851,11 @@ class USCompanyDividends:
 class USETFFile:
     """A single ETF document entry."""
 
-    name: str
-    """Document name"""
-    file_type: str
-    """File type (e.g. ``"pdf"``)"""
-    url: str
-    """Download URL"""
+    file_name: str
+    file_path: str
+    update_date: str
+    code: str
+    format: str
 
 
 class USETFFilesResponse:

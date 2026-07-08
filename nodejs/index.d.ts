@@ -6194,9 +6194,12 @@ export interface USAnalystConsensus {
 // ── US-market types ────────────────────────────────────────────────────────
 
 export interface USRankTag {
-  name: string
-  chg: string
+  key: string
+  location: number
+  title: string
+  text: string
   rankType: number
+  highlightText: string
 }
 
 export interface USCompanyOverview {
@@ -6205,22 +6208,24 @@ export interface USCompanyOverview {
   ccySymbol: string
   topRankTags: Array<USRankTag>
   detailUrl: string
+  shareList: Array<unknown>
 }
 
-export interface USValuationIndicator {
+export interface USValuationMetric {
   circle: string
   part: string
   metric: string
-  metricType: string
   desc: string
-  ccySymbol: string
+  industryMedian: string
 }
 
 export interface USValuationOverview {
+  metrics: Record<string, USValuationMetric>
   indicator: string
-  currentIndicator: USValuationIndicator
   range: number
   date: string
+  ccySymbol: string
+  aichatData: USAIChatData
   aiSummary: string
 }
 
@@ -6250,9 +6255,11 @@ export interface USFinancialStatement {
 }
 
 export interface USFiscalYearDividend {
-  year: string
-  totalDividend: string
-  records: Array<USDividendItem>
+  dividend: string
+  dividendYield: string
+  fiscalYear: string
+  currency: string
+  fiscalYearRange: string
 }
 
 export interface USETFDividendInfo {
@@ -6311,9 +6318,11 @@ export interface USCompanyDividends {
 }
 
 export interface USETFFile {
-  name: string
-  fileType: string
-  url: string
+  fileName: string
+  filePath: string
+  updateDate: string
+  code: string
+  format: string
 }
 
 export interface USETFFilesResponse {

@@ -47,7 +47,7 @@ pub use fundamental::FundamentalContext;
 // ── US-market type re-exports ─────────────────────────────────────────────────
 pub use fundamental::types::{
     USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
-    USETFFilesResponse, USFinancialStatement, USRankTag, USValuationIndicator, USValuationOverview,
+    USETFFilesResponse, USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
 };
 pub use longbridge_httpcli as httpclient;
 pub use longbridge_httpcli::{DC_REGION_HEADER, DcRegion};

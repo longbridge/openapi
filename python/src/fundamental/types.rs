@@ -2121,17 +2121,23 @@ use longbridge::fundamental::types as lb_us;
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USRankTag {
-    pub name: String,
-    pub chg: String,
+    pub key: String,
+    pub location: i32,
+    pub title: String,
+    pub text: String,
     pub rank_type: i32,
+    pub highlight_text: String,
 }
 
 impl From<lb_us::USRankTag> for USRankTag {
     fn from(v: lb_us::USRankTag) -> Self {
         Self {
-            name: v.name,
-            chg: v.chg,
+            key: v.key,
+            location: v.location,
+            title: v.title,
+            text: v.text,
             rank_type: v.rank_type,
+            highlight_text: v.highlight_text,
         }
     }
 }
@@ -2145,6 +2151,7 @@ pub(crate) struct USCompanyOverview {
     pub ccy_symbol: String,
     pub top_rank_tags: Vec<USRankTag>,
     pub detail_url: String,
+    pub share_list: Vec<JsonValue>,
 }
 
 impl From<lb_us::USCompanyOverview> for USCompanyOverview {
@@ -2155,31 +2162,30 @@ impl From<lb_us::USCompanyOverview> for USCompanyOverview {
             ccy_symbol: v.ccy_symbol,
             top_rank_tags: v.top_rank_tags.into_iter().map(Into::into).collect(),
             detail_url: v.detail_url,
+            share_list: v.share_list.into_iter().map(JsonValue).collect(),
         }
     }
 }
 
-/// US valuation indicator
+/// One valuation metric entry in USValuationOverview.metrics
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct USValuationIndicator {
+pub(crate) struct USValuationMetric {
     pub circle: String,
     pub part: String,
     pub metric: String,
-    pub metric_type: String,
     pub desc: String,
-    pub ccy_symbol: String,
+    pub industry_median: String,
 }
 
-impl From<lb_us::USValuationIndicator> for USValuationIndicator {
-    fn from(v: lb_us::USValuationIndicator) -> Self {
+impl From<lb_us::USValuationMetric> for USValuationMetric {
+    fn from(v: lb_us::USValuationMetric) -> Self {
         Self {
             circle: v.circle,
             part: v.part,
             metric: v.metric,
-            metric_type: v.metric_type,
             desc: v.desc,
-            ccy_symbol: v.ccy_symbol,
+            industry_median: v.industry_median,
         }
     }
 }
@@ -2188,20 +2194,24 @@ impl From<lb_us::USValuationIndicator> for USValuationIndicator {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USValuationOverview {
+    pub metrics: std::collections::HashMap<String, USValuationMetric>,
     pub indicator: String,
-    pub current_indicator: USValuationIndicator,
     pub range: i32,
     pub date: String,
+    pub ccy_symbol: String,
+    pub aichat_data: USAIChatData,
     pub ai_summary: String,
 }
 
 impl From<lb_us::USValuationOverview> for USValuationOverview {
     fn from(v: lb_us::USValuationOverview) -> Self {
         Self {
+            metrics: v.metrics.into_iter().map(|(k, val)| (k, val.into())).collect(),
             indicator: v.indicator,
-            current_indicator: v.current_indicator.into(),
             range: v.range,
             date: v.date,
+            ccy_symbol: v.ccy_symbol,
+            aichat_data: v.aichat_data.into(),
             ai_summary: v.ai_summary,
         }
     }
@@ -2305,21 +2315,25 @@ impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
     }
 }
 
-/// Per-fiscal-year dividend records for a US ETF.
+/// Per-fiscal-year dividend row for a US ETF.
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USFiscalYearDividend {
-    pub year: String,
-    pub total_dividend: String,
-    pub records: Vec<USDividendItem>,
+    pub dividend: String,
+    pub dividend_yield: String,
+    pub fiscal_year: String,
+    pub currency: String,
+    pub fiscal_year_range: String,
 }
 
 impl From<lb_us::USFiscalYearDividend> for USFiscalYearDividend {
     fn from(v: lb_us::USFiscalYearDividend) -> Self {
         Self {
-            year: v.year,
-            total_dividend: v.total_dividend,
-            records: v.records.into_iter().map(Into::into).collect(),
+            dividend: v.dividend,
+            dividend_yield: v.dividend_yield,
+            fiscal_year: v.fiscal_year,
+            currency: v.currency,
+            fiscal_year_range: v.fiscal_year_range,
         }
     }
 }
@@ -2463,17 +2477,21 @@ impl From<lb_us::USCompanyDividends> for USCompanyDividends {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USETFFile {
-    pub name: String,
-    pub file_type: String,
-    pub url: String,
+    pub file_name: String,
+    pub file_path: String,
+    pub update_date: String,
+    pub code: String,
+    pub format: String,
 }
 
 impl From<lb_us::USETFFile> for USETFFile {
     fn from(v: lb_us::USETFFile) -> Self {
         Self {
-            name: v.name,
-            file_type: v.file_type,
-            url: v.url,
+            file_name: v.file_name,
+            file_path: v.file_path,
+            update_date: v.update_date,
+            code: v.code,
+            format: v.format,
         }
     }
 }
