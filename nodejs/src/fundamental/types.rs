@@ -2153,13 +2153,65 @@ impl From<lb_us::USValuationOverview> for USValuationOverview {
     }
 }
 
+/// One financial field within a USFinancialStatementPeriod.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialStatementField {
+    pub display_order: i32,
+    pub field: String,
+    pub id: String,
+    pub level: i64,
+    pub name: String,
+    pub value: String,
+    pub value_type: String,
+    pub yoy: String,
+}
+
+impl From<lb_us::USFinancialStatementField> for USFinancialStatementField {
+    fn from(v: lb_us::USFinancialStatementField) -> Self {
+        Self {
+            display_order: v.display_order,
+            field: v.field,
+            id: v.id,
+            level: v.level,
+            name: v.name,
+            value: v.value,
+            value_type: v.value_type,
+            yoy: v.yoy,
+        }
+    }
+}
+
+/// One reporting period in USFinancialStatement.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialStatementPeriod {
+    pub ff_period: String,
+    pub ff_year: i32,
+    pub fields: Vec<USFinancialStatementField>,
+    pub fp_end: String,
+    pub report_txt: String,
+}
+
+impl From<lb_us::USFinancialStatementPeriod> for USFinancialStatementPeriod {
+    fn from(v: lb_us::USFinancialStatementPeriod) -> Self {
+        Self {
+            ff_period: v.ff_period,
+            ff_year: v.ff_year,
+            fields: v.fields.into_iter().map(Into::into).collect(),
+            fp_end: v.fp_end,
+            report_txt: v.report_txt,
+        }
+    }
+}
+
 /// US financial statement
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct USFinancialStatement {
     pub currency: String,
     pub report: String,
-    pub list: Vec<serde_json::Value>,
+    pub list: Vec<USFinancialStatementPeriod>,
     pub empty_fields: Vec<String>,
 }
 
@@ -2168,7 +2220,7 @@ impl From<lb_us::USFinancialStatement> for USFinancialStatement {
         Self {
             currency: v.currency,
             report: v.report,
-            list: v.list,
+            list: v.list.into_iter().map(Into::into).collect(),
             empty_fields: v.empty_fields,
         }
     }

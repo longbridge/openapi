@@ -6224,10 +6224,27 @@ export interface USValuationOverview {
   aiSummary: string
 }
 
+export interface USFinancialStatementField {
+  displayOrder: number
+  field: string
+  id: string
+  level: number
+  name: string
+  value: string
+  valueType: string
+  yoy: string
+}
+export interface USFinancialStatementPeriod {
+  ffPeriod: string
+  ffYear: number
+  fields: Array<USFinancialStatementField>
+  fpEnd: string
+  reportTxt: string
+}
 export interface USFinancialStatement {
   currency: string
   report: string
-  list: Array<unknown>
+  list: Array<USFinancialStatementPeriod>
   emptyFields: Array<string>
 }
 

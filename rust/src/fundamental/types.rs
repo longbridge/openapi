@@ -1801,21 +1801,51 @@ pub struct USValuationOverview {
     pub ai_summary: String,
 }
 
+/// One financial field within a [`USFinancialStatementPeriod`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialStatementField {
+    #[serde(default)]
+    pub display_order: i32,
+    #[serde(default)]
+    pub field: String,
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub level: i64,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub value: String,
+    #[serde(default)]
+    pub value_type: String,
+    #[serde(default)]
+    pub yoy: String,
+}
+
+/// One reporting period in [`USFinancialStatement`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialStatementPeriod {
+    #[serde(default)]
+    pub ff_period: String,
+    #[serde(default)]
+    pub ff_year: i32,
+    #[serde(default)]
+    pub fields: Vec<USFinancialStatementField>,
+    #[serde(default)]
+    pub fp_end: String,
+    #[serde(default)]
+    pub report_txt: String,
+}
+
 /// Response for [`crate::FundamentalContext::us_financial_statement`].
-/// `list` contains the statement line items; element shape varies by `kind`
-/// ("IS", "BS", "CF") and is preserved as raw JSON.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatement {
-    /// Report currency
     #[serde(default)]
     pub currency: String,
-    /// Report period type ("annual" or "quarterly")
     #[serde(default)]
     pub report: String,
-    /// Statement line items; shape varies by kind
     #[serde(default)]
-    pub list: Vec<serde_json::Value>,
-    /// Metric keys that could not be populated
+    pub list: Vec<USFinancialStatementPeriod>,
     #[serde(default)]
     pub empty_fields: Vec<String>,
 }

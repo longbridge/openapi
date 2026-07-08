@@ -12737,17 +12737,36 @@ class USValuationOverview:
     """AI-generated valuation summary"""
 
 
+class USFinancialStatementField:
+    """One financial line item within a USFinancialStatementPeriod."""
+
+    display_order: int
+    field: str
+    id: str
+    level: int
+    name: str
+    value: str
+    value_type: str
+    yoy: str
+
+
+class USFinancialStatementPeriod:
+    """One reporting period in USFinancialStatement."""
+
+    ff_period: str
+    ff_year: int
+    fields: List["USFinancialStatementField"]
+    fp_end: str
+    report_txt: str
+
+
 class USFinancialStatement:
     """US financial statement (IS/BS/CF). Returned by FundamentalContext.us_financial_statement."""
 
     currency: str
-    """Report currency"""
     report: str
-    """Report period type: ``"annual"`` or ``"quarterly"``"""
-    list: List[Any]
-    """Statement line items; element shape varies by kind (IS/BS/CF)"""
+    list: List["USFinancialStatementPeriod"]
     empty_fields: List[str]
-    """Metric keys that could not be populated"""
     """Currency"""
 
 
