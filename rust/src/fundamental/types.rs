@@ -1980,3 +1980,142 @@ pub(crate) struct V2MacroIndicatorDataResponse {
     #[serde(default)]
     pub total: i32,
 }
+
+// ── US financial overview ─────────────────────────────────────────────────
+
+/// One reporting-period window shared by IS/BS/CF entries.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USReportPeriod {
+    #[serde(default)]
+    pub start_date: String,
+    #[serde(default)]
+    pub end_date: String,
+    #[serde(default)]
+    pub report_txt: String,
+}
+
+/// One income-statement entry in [`USFinancialOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialISItem {
+    #[serde(default)]
+    pub revenue: String,
+    #[serde(default)]
+    pub net_income: String,
+    #[serde(default)]
+    pub net_margin: String,
+    #[serde(default)]
+    pub report: USReportPeriod,
+}
+
+/// One balance-sheet entry in [`USFinancialOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialBSItem {
+    #[serde(default)]
+    pub debt_assets_ratio: String,
+    #[serde(default)]
+    pub total_assets: String,
+    #[serde(default)]
+    pub total_liabilities: String,
+    #[serde(default)]
+    pub report: USReportPeriod,
+}
+
+/// One cash-flow entry in [`USFinancialOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialCFItem {
+    #[serde(default)]
+    pub operating: String,
+    #[serde(default)]
+    pub investing: String,
+    #[serde(default)]
+    pub financing: String,
+    #[serde(default)]
+    pub report: USReportPeriod,
+}
+
+/// Response for [`crate::FundamentalContext::us_financial_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialOverview {
+    #[serde(default)]
+    pub ccy_symbol: String,
+    #[serde(default)]
+    pub report_type: String,
+    #[serde(default)]
+    pub is_list: Vec<USFinancialISItem>,
+    #[serde(default)]
+    pub bs_list: Vec<USFinancialBSItem>,
+    #[serde(default)]
+    pub cf_list: Vec<USFinancialCFItem>,
+}
+
+// ── US key financial metrics ──────────────────────────────────────────────
+
+/// One period entry in [`USKeyFinancialMetrics`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USKeyMetricItem {
+    #[serde(default)]
+    pub ff_period: String,
+    #[serde(default)]
+    pub ff_year: i32,
+    #[serde(default)]
+    pub fp_end: String,
+    #[serde(default)]
+    pub report_txt: String,
+    #[serde(default)]
+    pub rpt_date: String,
+    /// Metric values — shape varies per field configuration.
+    #[serde(default)]
+    pub fields: serde_json::Value,
+}
+
+/// Response for [`crate::FundamentalContext::us_key_financial_metrics`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USKeyFinancialMetrics {
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub report: String,
+    #[serde(default)]
+    pub empty_fields: Vec<String>,
+    #[serde(default)]
+    pub list: Vec<USKeyMetricItem>,
+}
+
+// ── US analyst consensus ──────────────────────────────────────────────────
+
+/// AI chat context embedded in [`USAnalystConsensus`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAIChatData {
+    #[serde(default)]
+    pub agent_id: String,
+    #[serde(default)]
+    pub handoff_agent_id: String,
+    #[serde(default)]
+    pub symbol: String,
+    #[serde(default)]
+    pub text: String,
+    #[serde(default, rename = "type")]
+    pub chat_type: String,
+    #[serde(default)]
+    pub workflow_type: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_analyst_consensus`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAnalystConsensus {
+    #[serde(default)]
+    pub ai_summary: String,
+    #[serde(default)]
+    pub aichat_data: USAIChatData,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub report: String,
+    /// Consensus detail — shape determined by production data.
+    #[serde(default)]
+    pub list: serde_json::Value,
+    #[serde(default)]
+    pub opt_reports: serde_json::Value,
+    #[serde(default)]
+    pub h5_data: serde_json::Value,
+}

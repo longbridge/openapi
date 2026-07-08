@@ -1114,7 +1114,7 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
         report: impl Into<String>,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<USFinancialOverview> {
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1174,7 +1174,7 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
         report: impl Into<String>,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<USKeyFinancialMetrics> {
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1202,7 +1202,7 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
         report: impl Into<String>,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<USAnalystConsensus> {
         #[derive(Serialize)]
         struct Query {
             counter_id: String,

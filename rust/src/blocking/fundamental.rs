@@ -375,7 +375,7 @@ impl FundamentalContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<USFinancialOverview> {
         self.rt
             .call(move |ctx| async move { ctx.us_financial_overview(counter_id, report).await })
     }
@@ -398,7 +398,7 @@ impl FundamentalContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<USKeyFinancialMetrics> {
         self.rt
             .call(move |ctx| async move { ctx.us_key_financial_metrics(counter_id, report).await })
     }
@@ -408,7 +408,7 @@ impl FundamentalContextSync {
         &self,
         counter_id: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<USAnalystConsensus> {
         self.rt
             .call(move |ctx| async move { ctx.us_analyst_consensus(counter_id, report).await })
     }
