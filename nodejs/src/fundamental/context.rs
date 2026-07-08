@@ -347,15 +347,19 @@ impl FundamentalContext {
             .into())
     }
 
-    /// Get US financial overview (JSON string). US token required.
+    /// Get US financial overview. US token required.
     #[napi]
-    pub async fn us_financial_overview(&self, symbol: String, report: String) -> Result<String> {
-        let v = self
+    pub async fn us_financial_overview(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> Result<USFinancialOverview> {
+        Ok(self
             .ctx
             .us_financial_overview(symbol, report)
             .await
-            .map_err(ErrorNewType)?;
-        serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required.
@@ -374,26 +378,34 @@ impl FundamentalContext {
             .into())
     }
 
-    /// Get US key financial metrics (JSON string). US token required.
+    /// Get US key financial metrics. US token required.
     #[napi]
-    pub async fn us_key_financial_metrics(&self, symbol: String, report: String) -> Result<String> {
-        let v = self
+    pub async fn us_key_financial_metrics(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> Result<USKeyFinancialMetrics> {
+        Ok(self
             .ctx
             .us_key_financial_metrics(symbol, report)
             .await
-            .map_err(ErrorNewType)?;
-        serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
+            .map_err(ErrorNewType)?
+            .into())
     }
 
-    /// Get US analyst consensus (JSON string). US token required.
+    /// Get US analyst consensus estimates. US token required.
     #[napi]
-    pub async fn us_analyst_consensus(&self, symbol: String, report: String) -> Result<String> {
-        let v = self
+    pub async fn us_analyst_consensus(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> Result<USAnalystConsensus> {
+        Ok(self
             .ctx
             .us_analyst_consensus(symbol, report)
             .await
-            .map_err(ErrorNewType)?;
-        serde_json::to_string(&v).map_err(|e| napi::Error::from_reason(e.to_string()))
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Get US ETF dividend history. US token required.

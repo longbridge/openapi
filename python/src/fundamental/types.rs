@@ -2332,3 +2332,206 @@ impl From<lb_us::USETFFilesResponse> for USETFFilesResponse {
         }
     }
 }
+
+/// One reporting-period window shared by IS/BS/CF entries.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USReportPeriod {
+    pub start_date: String,
+    pub end_date: String,
+    pub report_txt: String,
+}
+
+impl From<lb_us::USReportPeriod> for USReportPeriod {
+    fn from(v: lb_us::USReportPeriod) -> Self {
+        Self {
+            start_date: v.start_date,
+            end_date: v.end_date,
+            report_txt: v.report_txt,
+        }
+    }
+}
+
+/// One income-statement entry in USFinancialOverview.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USFinancialISItem {
+    pub revenue: String,
+    pub net_income: String,
+    pub net_margin: String,
+    pub report: USReportPeriod,
+}
+
+impl From<lb_us::USFinancialISItem> for USFinancialISItem {
+    fn from(v: lb_us::USFinancialISItem) -> Self {
+        Self {
+            revenue: v.revenue,
+            net_income: v.net_income,
+            net_margin: v.net_margin,
+            report: v.report.into(),
+        }
+    }
+}
+
+/// One balance-sheet entry in USFinancialOverview.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USFinancialBSItem {
+    pub debt_assets_ratio: String,
+    pub total_assets: String,
+    pub total_liabilities: String,
+    pub report: USReportPeriod,
+}
+
+impl From<lb_us::USFinancialBSItem> for USFinancialBSItem {
+    fn from(v: lb_us::USFinancialBSItem) -> Self {
+        Self {
+            debt_assets_ratio: v.debt_assets_ratio,
+            total_assets: v.total_assets,
+            total_liabilities: v.total_liabilities,
+            report: v.report.into(),
+        }
+    }
+}
+
+/// One cash-flow entry in USFinancialOverview.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USFinancialCFItem {
+    pub operating: String,
+    pub investing: String,
+    pub financing: String,
+    pub report: USReportPeriod,
+}
+
+impl From<lb_us::USFinancialCFItem> for USFinancialCFItem {
+    fn from(v: lb_us::USFinancialCFItem) -> Self {
+        Self {
+            operating: v.operating,
+            investing: v.investing,
+            financing: v.financing,
+            report: v.report.into(),
+        }
+    }
+}
+
+/// US financial overview — income statement, balance sheet, and cash flow.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USFinancialOverview {
+    pub ccy_symbol: String,
+    pub report_type: String,
+    pub is_list: Vec<USFinancialISItem>,
+    pub bs_list: Vec<USFinancialBSItem>,
+    pub cf_list: Vec<USFinancialCFItem>,
+}
+
+impl From<lb_us::USFinancialOverview> for USFinancialOverview {
+    fn from(v: lb_us::USFinancialOverview) -> Self {
+        Self {
+            ccy_symbol: v.ccy_symbol,
+            report_type: v.report_type,
+            is_list: v.is_list.into_iter().map(Into::into).collect(),
+            bs_list: v.bs_list.into_iter().map(Into::into).collect(),
+            cf_list: v.cf_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One period entry in USKeyFinancialMetrics.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USKeyMetricItem {
+    pub ff_period: String,
+    pub ff_year: i32,
+    pub fp_end: String,
+    pub report_txt: String,
+    pub rpt_date: String,
+    pub fields: JsonValue,
+}
+
+impl From<lb_us::USKeyMetricItem> for USKeyMetricItem {
+    fn from(v: lb_us::USKeyMetricItem) -> Self {
+        Self {
+            ff_period: v.ff_period,
+            ff_year: v.ff_year,
+            fp_end: v.fp_end,
+            report_txt: v.report_txt,
+            rpt_date: v.rpt_date,
+            fields: JsonValue(v.fields),
+        }
+    }
+}
+
+/// US key financial metrics — ratios and indicators per reporting period.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USKeyFinancialMetrics {
+    pub currency: String,
+    pub report: String,
+    pub empty_fields: Vec<String>,
+    pub list: Vec<USKeyMetricItem>,
+}
+
+impl From<lb_us::USKeyFinancialMetrics> for USKeyFinancialMetrics {
+    fn from(v: lb_us::USKeyFinancialMetrics) -> Self {
+        Self {
+            currency: v.currency,
+            report: v.report,
+            empty_fields: v.empty_fields,
+            list: v.list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// AI chat context embedded in USAnalystConsensus.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USAIChatData {
+    pub agent_id: String,
+    pub handoff_agent_id: String,
+    pub symbol: String,
+    pub text: String,
+    pub chat_type: String,
+    pub workflow_type: String,
+}
+
+impl From<lb_us::USAIChatData> for USAIChatData {
+    fn from(v: lb_us::USAIChatData) -> Self {
+        Self {
+            agent_id: v.agent_id,
+            handoff_agent_id: v.handoff_agent_id,
+            symbol: v.symbol,
+            text: v.text,
+            chat_type: v.chat_type,
+            workflow_type: v.workflow_type,
+        }
+    }
+}
+
+/// US analyst consensus estimates and AI analysis.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USAnalystConsensus {
+    pub ai_summary: String,
+    pub aichat_data: USAIChatData,
+    pub currency: String,
+    pub report: String,
+    pub list: JsonValue,
+    pub opt_reports: JsonValue,
+    pub h5_data: JsonValue,
+}
+
+impl From<lb_us::USAnalystConsensus> for USAnalystConsensus {
+    fn from(v: lb_us::USAnalystConsensus) -> Self {
+        Self {
+            ai_summary: v.ai_summary,
+            aichat_data: v.aichat_data.into(),
+            currency: v.currency,
+            report: v.report,
+            list: JsonValue(v.list),
+            opt_reports: JsonValue(v.opt_reports),
+            h5_data: JsonValue(v.h5_data),
+        }
+    }
+}

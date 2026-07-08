@@ -266,17 +266,14 @@ impl FundamentalContext {
     /// required.
     fn us_financial_overview(
         &self,
-        py: Python<'_>,
         symbol: String,
         report: String,
-    ) -> PyResult<Py<PyAny>> {
-        let v = self
+    ) -> PyResult<USFinancialOverview> {
+        Ok(self
             .ctx
             .us_financial_overview(symbol, report)
-            .map_err(ErrorNewType)?;
-        pythonize::pythonize(py, &v)
-            .map(|b| b.unbind())
-            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Get US financial statement v3. `kind`: "IS"/"BS"/"CF". US token
@@ -297,33 +294,23 @@ impl FundamentalContext {
     /// Get US key financial metrics. US token required.
     fn us_key_financial_metrics(
         &self,
-        py: Python<'_>,
         symbol: String,
         report: String,
-    ) -> PyResult<Py<PyAny>> {
-        let v = self
+    ) -> PyResult<USKeyFinancialMetrics> {
+        Ok(self
             .ctx
             .us_key_financial_metrics(symbol, report)
-            .map_err(ErrorNewType)?;
-        pythonize::pythonize(py, &v)
-            .map(|b| b.unbind())
-            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Get US analyst consensus estimates. US token required.
-    fn us_analyst_consensus(
-        &self,
-        py: Python<'_>,
-        symbol: String,
-        report: String,
-    ) -> PyResult<Py<PyAny>> {
-        let v = self
+    fn us_analyst_consensus(&self, symbol: String, report: String) -> PyResult<USAnalystConsensus> {
+        Ok(self
             .ctx
             .us_analyst_consensus(symbol, report)
-            .map_err(ErrorNewType)?;
-        pythonize::pythonize(py, &v)
-            .map(|b| b.unbind())
-            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Get US ETF dividend history. US token required.

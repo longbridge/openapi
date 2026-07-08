@@ -91,6 +91,15 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<USCompanyDividends>()?;
     parent.add_class::<USETFFile>()?;
     parent.add_class::<USETFFilesResponse>()?;
+    parent.add_class::<USReportPeriod>()?;
+    parent.add_class::<USFinancialISItem>()?;
+    parent.add_class::<USFinancialBSItem>()?;
+    parent.add_class::<USFinancialCFItem>()?;
+    parent.add_class::<USFinancialOverview>()?;
+    parent.add_class::<USKeyMetricItem>()?;
+    parent.add_class::<USKeyFinancialMetrics>()?;
+    parent.add_class::<USAIChatData>()?;
+    parent.add_class::<USAnalystConsensus>()?;
     parent.add_class::<context::FundamentalContext>()?;
     parent.add_class::<context_async::AsyncFundamentalContext>()?;
     Ok(())
