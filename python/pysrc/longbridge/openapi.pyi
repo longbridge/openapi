@@ -10220,7 +10220,7 @@ class FundamentalContext:
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            report: ``"annual"`` or ``"quarterly"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
             :class:`USKeyFinancialMetrics`
@@ -10232,7 +10232,7 @@ class FundamentalContext:
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            report: ``"annual"`` or ``"quarterly"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
             :class:`USAnalystConsensus`
@@ -10333,7 +10333,7 @@ class AsyncFundamentalContext:
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            report: ``"annual"`` or ``"quarterly"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
             Awaitable[:class:`USKeyFinancialMetrics`]
@@ -10345,7 +10345,7 @@ class AsyncFundamentalContext:
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            report: ``"annual"`` or ``"quarterly"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
             Awaitable[:class:`USAnalystConsensus`]

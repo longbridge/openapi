@@ -640,9 +640,9 @@ export declare class FundamentalContext {
   usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
   /** Get US financial statement. kind: "IS"|"BS"|"CF". report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
   usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
-  /** Get US key financial metrics (ROE/margins). Returns JSON string. US token required. */
+  /** Get US key financial metrics. report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
   usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
-  /** Get US analyst consensus estimates. Returns JSON string. US token required. */
+  /** Get US analyst consensus estimates. report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
   usAnalystConsensus(symbol: string, report: string): Promise<USAnalystConsensus>
   /** Get US ETF dividend history. US token required. */
   usEtfDividendInfo(symbol: string): Promise<USETFDividendInfo>
