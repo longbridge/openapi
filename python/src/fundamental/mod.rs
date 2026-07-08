@@ -91,6 +91,9 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<USFiscalYearDividend>()?;
     parent.add_class::<USETFDividendInfo>()?;
     parent.add_class::<USDividendItem>()?;
+    parent.add_class::<USRecentDividend>()?;
+    parent.add_class::<USDividendHistoryItem>()?;
+    parent.add_class::<USDividendPayoutRecord>()?;
     parent.add_class::<USCompanyDividends>()?;
     parent.add_class::<USETFFile>()?;
     parent.add_class::<USETFFilesResponse>()?;

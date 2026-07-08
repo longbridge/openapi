@@ -1906,24 +1906,84 @@ pub struct USDividendItem {
     pub record_date: String,
 }
 
-/// Response for [`crate::FundamentalContext::us_company_dividends`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct USCompanyDividends {
-    /// Total dividend over trailing 12 months
+/// Trailing-12-month dividend summary within [`USCompanyDividends`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRecentDividend {
     #[serde(default)]
     pub dividend_ttm: String,
-    /// Dividend yield over trailing 12 months
     #[serde(default)]
     pub dividend_yield_ttm: String,
-    /// Number of dividend payments
     #[serde(default)]
     pub payouts: String,
-    /// Currency
     #[serde(default)]
     pub currency: String,
-    /// Individual payment records
+}
+
+/// One fiscal-year row in the dividend history or payout-ratio table.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USDividendHistoryItem {
     #[serde(default)]
-    pub items: Vec<USDividendItem>,
+    pub fiscal_year: String,
+    #[serde(default)]
+    pub fiscal_year_range: String,
+    #[serde(default)]
+    pub total_shareholder_yield: String,
+    #[serde(default)]
+    pub dividend: String,
+    #[serde(default)]
+    pub dividend_yield: String,
+    #[serde(default)]
+    pub dividend_growth_rate: String,
+    #[serde(default)]
+    pub dividend_payout_ratio: String,
+    #[serde(default)]
+    pub dividend_to_cashflow_ratio: String,
+    #[serde(default)]
+    pub net_buyback: String,
+    #[serde(default)]
+    pub net_buyback_yield: String,
+    #[serde(default)]
+    pub net_buyback_growth_rate: String,
+    #[serde(default)]
+    pub net_buyback_payout_ratio: String,
+    #[serde(default)]
+    pub net_buyback_to_cashflow_ratio: String,
+    #[serde(default)]
+    pub currency: String,
+}
+
+/// One actual dividend payment event in [`USCompanyDividends`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USDividendPayoutRecord {
+    #[serde(default)]
+    pub dividend: String,
+    #[serde(default)]
+    pub dividend_type: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub ex_date: String,
+    #[serde(default)]
+    pub payment_date: String,
+    #[serde(default)]
+    pub record_date: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub start_time_unix: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_company_dividends`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCompanyDividends {
+    #[serde(default)]
+    pub recent_dividends: USRecentDividend,
+    #[serde(default)]
+    pub dividend_history: Vec<USDividendHistoryItem>,
+    #[serde(default)]
+    pub payout_ratios: Vec<USDividendHistoryItem>,
+    #[serde(default)]
+    pub dividend_payout_history: Vec<USDividendPayoutRecord>,
 }
 
 /// A single file in an ETF document list.

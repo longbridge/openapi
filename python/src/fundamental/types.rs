@@ -2347,25 +2347,114 @@ impl From<lb_us::USDividendItem> for USDividendItem {
     }
 }
 
-/// US company historical dividends
+/// TTM dividend summary within USCompanyDividends.
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
-pub(crate) struct USCompanyDividends {
+pub(crate) struct USRecentDividend {
     pub dividend_ttm: String,
     pub dividend_yield_ttm: String,
     pub payouts: String,
     pub currency: String,
-    pub items: Vec<USDividendItem>,
 }
 
-impl From<lb_us::USCompanyDividends> for USCompanyDividends {
-    fn from(v: lb_us::USCompanyDividends) -> Self {
+impl From<lb_us::USRecentDividend> for USRecentDividend {
+    fn from(v: lb_us::USRecentDividend) -> Self {
         Self {
             dividend_ttm: v.dividend_ttm,
             dividend_yield_ttm: v.dividend_yield_ttm,
             payouts: v.payouts,
             currency: v.currency,
-            items: v.items.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One fiscal-year row in dividend_history or payout_ratios.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USDividendHistoryItem {
+    pub fiscal_year: String,
+    pub fiscal_year_range: String,
+    pub total_shareholder_yield: String,
+    pub dividend: String,
+    pub dividend_yield: String,
+    pub dividend_growth_rate: String,
+    pub dividend_payout_ratio: String,
+    pub dividend_to_cashflow_ratio: String,
+    pub net_buyback: String,
+    pub net_buyback_yield: String,
+    pub net_buyback_growth_rate: String,
+    pub net_buyback_payout_ratio: String,
+    pub net_buyback_to_cashflow_ratio: String,
+    pub currency: String,
+}
+
+impl From<lb_us::USDividendHistoryItem> for USDividendHistoryItem {
+    fn from(v: lb_us::USDividendHistoryItem) -> Self {
+        Self {
+            fiscal_year: v.fiscal_year,
+            fiscal_year_range: v.fiscal_year_range,
+            total_shareholder_yield: v.total_shareholder_yield,
+            dividend: v.dividend,
+            dividend_yield: v.dividend_yield,
+            dividend_growth_rate: v.dividend_growth_rate,
+            dividend_payout_ratio: v.dividend_payout_ratio,
+            dividend_to_cashflow_ratio: v.dividend_to_cashflow_ratio,
+            net_buyback: v.net_buyback,
+            net_buyback_yield: v.net_buyback_yield,
+            net_buyback_growth_rate: v.net_buyback_growth_rate,
+            net_buyback_payout_ratio: v.net_buyback_payout_ratio,
+            net_buyback_to_cashflow_ratio: v.net_buyback_to_cashflow_ratio,
+            currency: v.currency,
+        }
+    }
+}
+
+/// One actual dividend payment event.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USDividendPayoutRecord {
+    pub dividend: String,
+    pub dividend_type: String,
+    pub currency: String,
+    pub ex_date: String,
+    pub payment_date: String,
+    pub record_date: String,
+    pub title: String,
+    pub start_time_unix: String,
+}
+
+impl From<lb_us::USDividendPayoutRecord> for USDividendPayoutRecord {
+    fn from(v: lb_us::USDividendPayoutRecord) -> Self {
+        Self {
+            dividend: v.dividend,
+            dividend_type: v.dividend_type,
+            currency: v.currency,
+            ex_date: v.ex_date,
+            payment_date: v.payment_date,
+            record_date: v.record_date,
+            title: v.title,
+            start_time_unix: v.start_time_unix,
+        }
+    }
+}
+
+/// US company historical dividends
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USCompanyDividends {
+    pub recent_dividends: USRecentDividend,
+    pub dividend_history: Vec<USDividendHistoryItem>,
+    pub payout_ratios: Vec<USDividendHistoryItem>,
+    pub dividend_payout_history: Vec<USDividendPayoutRecord>,
+}
+
+impl From<lb_us::USCompanyDividends> for USCompanyDividends {
+    fn from(v: lb_us::USCompanyDividends) -> Self {
+        Self {
+            recent_dividends: v.recent_dividends.into(),
+            dividend_history: v.dividend_history.into_iter().map(Into::into).collect(),
+            payout_ratios: v.payout_ratios.into_iter().map(Into::into).collect(),
+            dividend_payout_history: v.dividend_payout_history.into_iter().map(Into::into).collect(),
         }
     }
 }

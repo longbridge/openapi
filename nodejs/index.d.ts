@@ -6271,12 +6271,43 @@ export interface USDividendItem {
   recordDate: string
 }
 
-export interface USCompanyDividends {
+export interface USRecentDividend {
   dividendTtm: string
   dividendYieldTtm: string
   payouts: string
   currency: string
-  items: Array<USDividendItem>
+}
+export interface USDividendHistoryItem {
+  fiscalYear: string
+  fiscalYearRange: string
+  totalShareholderYield: string
+  dividend: string
+  dividendYield: string
+  dividendGrowthRate: string
+  dividendPayoutRatio: string
+  dividendToCashflowRatio: string
+  netBuyback: string
+  netBuybackYield: string
+  netBuybackGrowthRate: string
+  netBuybackPayoutRatio: string
+  netBuybackToCashflowRatio: string
+  currency: string
+}
+export interface USDividendPayoutRecord {
+  dividend: string
+  dividendType: string
+  currency: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+  title: string
+  startTimeUnix: string
+}
+export interface USCompanyDividends {
+  recentDividends: USRecentDividend
+  dividendHistory: Array<USDividendHistoryItem>
+  payoutRatios: Array<USDividendHistoryItem>
+  dividendPayoutHistory: Array<USDividendPayoutRecord>
 }
 
 export interface USETFFile {

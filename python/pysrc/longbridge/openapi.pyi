@@ -12812,19 +12812,54 @@ class USDividendItem:
     """Record date"""
 
 
+class USRecentDividend:
+    """Trailing-12-month dividend summary."""
+
+    dividend_ttm: str
+    dividend_yield_ttm: str
+    payouts: str
+    currency: str
+
+
+class USDividendHistoryItem:
+    """One fiscal-year row in dividend_history or payout_ratios."""
+
+    fiscal_year: str
+    fiscal_year_range: str
+    total_shareholder_yield: str
+    dividend: str
+    dividend_yield: str
+    dividend_growth_rate: str
+    dividend_payout_ratio: str
+    dividend_to_cashflow_ratio: str
+    net_buyback: str
+    net_buyback_yield: str
+    net_buyback_growth_rate: str
+    net_buyback_payout_ratio: str
+    net_buyback_to_cashflow_ratio: str
+    currency: str
+
+
+class USDividendPayoutRecord:
+    """One actual dividend payment event."""
+
+    dividend: str
+    dividend_type: str
+    currency: str
+    ex_date: str
+    payment_date: str
+    record_date: str
+    title: str
+    start_time_unix: str
+
+
 class USCompanyDividends:
     """US company historical dividends. Returned by FundamentalContext.us_company_dividends."""
 
-    dividend_ttm: str
-    """TTM dividend per share"""
-    dividend_yield_ttm: str
-    """TTM dividend yield"""
-    payouts: str
-    """Number of payouts"""
-    currency: str
-    """Currency"""
-    items: List[USDividendItem]
-    """Historical dividend records"""
+    recent_dividends: "USRecentDividend"
+    dividend_history: List["USDividendHistoryItem"]
+    payout_ratios: List["USDividendHistoryItem"]
+    dividend_payout_history: List["USDividendPayoutRecord"]
 
 
 class USETFFile:
