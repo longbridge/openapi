@@ -10165,7 +10165,7 @@ class FundamentalContext:
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
             kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
-            report: ``"annual"`` or ``"quarterly"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
             :class:`USFinancialStatement`
@@ -10278,7 +10278,7 @@ class AsyncFundamentalContext:
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
             kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
-            report: ``"annual"`` or ``"quarterly"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
             Awaitable[:class:`USFinancialStatement`]
