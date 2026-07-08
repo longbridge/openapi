@@ -6174,7 +6174,7 @@ export interface USAttachedOrder {
   activateOrderType: string
   activateRth: number
   submitPrice: string
-  counterId: string
+  symbol: string
   withdrawn: boolean
 }
 export interface USOrderDetail {
@@ -6182,8 +6182,8 @@ export interface USOrderDetail {
   aaid: string
   accountChannel: string
   action: number
-  counterId: string
-  underlyingCounterId: string
+  symbol: string
+  underlyingSymbol: string
   securityType: string
   name: string
   currency: string

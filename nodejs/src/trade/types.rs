@@ -1055,7 +1055,7 @@ pub struct USAttachedOrder {
     pub activate_order_type: String,
     pub activate_rth: i32,
     pub submit_price: String,
-    pub counter_id: String,
+    pub symbol: String,
     pub withdrawn: bool,
 }
 
@@ -1074,7 +1074,7 @@ impl From<longbridge::trade::USAttachedOrder> for USAttachedOrder {
             activate_order_type: v.activate_order_type,
             activate_rth: v.activate_rth,
             submit_price: v.submit_price,
-            counter_id: v.counter_id,
+            symbol: v.symbol,
             withdrawn: v.withdrawn,
         }
     }
@@ -1088,8 +1088,8 @@ pub struct USOrderDetail {
     pub aaid: String,
     pub account_channel: String,
     pub action: i32,
-    pub counter_id: String,
-    pub underlying_counter_id: String,
+    pub symbol: String,
+    pub underlying_symbol: String,
     pub security_type: String,
     pub name: String,
     pub currency: String,
@@ -1171,8 +1171,8 @@ impl From<longbridge::trade::USOrderDetail> for USOrderDetail {
             aaid: v.aaid,
             account_channel: v.account_channel,
             action: v.action,
-            counter_id: v.counter_id,
-            underlying_counter_id: v.underlying_counter_id,
+            symbol: v.symbol,
+            underlying_symbol: v.underlying_symbol,
             security_type: v.security_type,
             name: v.name,
             currency: v.currency,

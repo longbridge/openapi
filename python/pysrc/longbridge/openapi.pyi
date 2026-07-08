@@ -12791,7 +12791,7 @@ class USAttachedOrder:
     activate_order_type: str
     activate_rth: int
     submit_price: str
-    counter_id: str
+    symbol: str
     withdrawn: bool
 
 
@@ -12801,8 +12801,8 @@ class USOrderDetail:
     aaid: str
     account_channel: str
     action: int
-    counter_id: str
-    underlying_counter_id: str
+    symbol: str
+    underlying_symbol: str
     security_type: str
     name: str
     currency: str

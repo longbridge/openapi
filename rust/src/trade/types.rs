@@ -972,8 +972,14 @@ pub struct USAttachedOrder {
     pub activate_rth: i32,
     #[serde(default)]
     pub submit_price: String,
-    #[serde(default)]
-    pub counter_id: String,
+    /// User-facing trading symbol (e.g. `"NKE.US"`), converted from
+    /// `counter_id`.
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
     #[serde(default)]
     pub withdrawn: bool,
 }
@@ -992,10 +998,22 @@ pub struct USOrderDetail {
     pub account_channel: String,
     #[serde(default)]
     pub action: i32,
-    #[serde(default)]
-    pub counter_id: String,
-    #[serde(default)]
-    pub underlying_counter_id: String,
+    /// User-facing trading symbol (e.g. `"NKE.US"`), converted from
+    /// `counter_id`.
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// User-facing underlying symbol (options only), converted from
+    /// `underlying_counter_id`.
+    #[serde(
+        default,
+        rename = "underlying_counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub underlying_symbol: String,
     #[serde(default)]
     pub security_type: String,
     #[serde(default)]
