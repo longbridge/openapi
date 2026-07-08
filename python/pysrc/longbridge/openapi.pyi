@@ -12926,7 +12926,7 @@ class USValuationMetric:
 class USValuationOverview:
     """US valuation overview. Returned by FundamentalContext.us_valuation_overview."""
 
-    metrics: dict
+    metrics: Dict[str, "USValuationMetric"]
     """Map of metric key (e.g. ``"pe"``) to :class:`USValuationMetric`"""
     indicator: str
     range: int
