@@ -2598,7 +2598,7 @@ pub struct USKeyMetricItem {
     pub fp_end: String,
     pub report_txt: String,
     pub rpt_date: String,
-    pub fields: serde_json::Value,
+    pub fields: Vec<serde_json::Value>,
 }
 
 impl From<lb_us::USKeyMetricItem> for USKeyMetricItem {

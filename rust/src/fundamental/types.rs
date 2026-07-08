@@ -2178,7 +2178,7 @@ pub struct USKeyMetricItem {
     pub rpt_date: String,
     /// Metric values — shape varies per field configuration.
     #[serde(default)]
-    pub fields: serde_json::Value,
+    pub fields: Vec<serde_json::Value>,
 }
 
 /// Response for [`crate::FundamentalContext::us_key_financial_metrics`].

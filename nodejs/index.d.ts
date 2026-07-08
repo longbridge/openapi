@@ -6299,7 +6299,7 @@ export interface USKeyMetricItem {
   fpEnd: string
   reportTxt: string
   rptDate: string
-  fields: unknown
+  fields: Array<unknown>
 }
 export interface USKeyFinancialMetrics {
   currency: string

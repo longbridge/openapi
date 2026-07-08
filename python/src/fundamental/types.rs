@@ -2652,7 +2652,7 @@ pub(crate) struct USKeyMetricItem {
     pub fp_end: String,
     pub report_txt: String,
     pub rpt_date: String,
-    pub fields: JsonValue,
+    pub fields: Vec<JsonValue>,
 }
 
 impl From<lb_us::USKeyMetricItem> for USKeyMetricItem {
@@ -2663,7 +2663,7 @@ impl From<lb_us::USKeyMetricItem> for USKeyMetricItem {
             fp_end: v.fp_end,
             report_txt: v.report_txt,
             rpt_date: v.rpt_date,
-            fields: JsonValue(v.fields),
+            fields: v.fields.into_iter().map(JsonValue).collect(),
         }
     }
 }

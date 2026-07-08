@@ -12615,7 +12615,7 @@ class USKeyMetricItem:
     fp_end: str
     report_txt: str
     rpt_date: str
-    fields: Any
+    fields: List[Any]
 
 class USKeyFinancialMetrics:
     """US key financial metrics (ROE, margins, debt ratio) by period."""
