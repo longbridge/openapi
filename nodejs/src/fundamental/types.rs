@@ -2176,6 +2176,25 @@ impl From<lb_us::USFinancialStatement> for USFinancialStatement {
     }
 }
 
+/// Per-fiscal-year dividend records for a US ETF.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFiscalYearDividend {
+    pub year: String,
+    pub total_dividend: String,
+    pub records: Vec<USDividendItem>,
+}
+
+impl From<lb_us::USFiscalYearDividend> for USFiscalYearDividend {
+    fn from(v: lb_us::USFiscalYearDividend) -> Self {
+        Self {
+            year: v.year,
+            total_dividend: v.total_dividend,
+            records: v.records.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 /// US ETF dividend info
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
@@ -2184,7 +2203,7 @@ pub struct USETFDividendInfo {
     pub dividend_yield_ttm: String,
     pub dividend_frequency: String,
     pub currency: String,
-    pub fiscal_year_info: Vec<serde_json::Value>,
+    pub fiscal_year_info: Vec<USFiscalYearDividend>,
 }
 
 impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
@@ -2194,7 +2213,7 @@ impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
             dividend_yield_ttm: v.dividend_yield_ttm,
             dividend_frequency: v.dividend_frequency,
             currency: v.currency,
-            fiscal_year_info: v.fiscal_year_info,
+            fiscal_year_info: v.fiscal_year_info.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -2463,8 +2482,8 @@ pub struct USAnalystConsensus {
     pub aichat_data: USAIChatData,
     pub currency: String,
     pub report: String,
-    pub list: serde_json::Value,
-    pub opt_reports: serde_json::Value,
+    pub list: Vec<serde_json::Value>,
+    pub opt_reports: Vec<serde_json::Value>,
     pub h5_data: serde_json::Value,
 }
 

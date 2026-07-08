@@ -629,7 +629,7 @@ export declare class FundamentalContext {
   /** Get US financial overview (revenue/net income/EPS). Returns JSON string. US token required. */
   usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
   /** Get US financial statement (IS/BS/CF). kind: "IS" | "BS" | "CF". US token required. */
-  usFinancialStatementV3(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
+  usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
   /** Get US key financial metrics (ROE/margins). Returns JSON string. US token required. */
   usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
   /** Get US analyst consensus estimates. Returns JSON string. US token required. */
@@ -6186,8 +6186,8 @@ export interface USAnalystConsensus {
   aichatData: USAIChatData
   currency: string
   report: string
-  list: unknown
-  optReports: unknown
+  list: Array<unknown>
+  optReports: Array<unknown>
   h5Data: unknown
 }
 
@@ -6232,12 +6232,18 @@ export interface USFinancialStatement {
   currency: string
 }
 
+export interface USFiscalYearDividend {
+  year: string
+  totalDividend: string
+  records: Array<USDividendItem>
+}
+
 export interface USETFDividendInfo {
   dividendTtm: string
   dividendYieldTtm: string
   dividendFrequency: string
   currency: string
-  fiscalYearInfo: Array<unknown>
+  fiscalYearInfo: Array<USFiscalYearDividend>
 }
 
 export interface USDividendItem {

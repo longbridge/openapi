@@ -381,14 +381,14 @@ impl FundamentalContextSync {
     }
 
     /// Get US financial statement v3 (blocking)
-    pub fn us_financial_statement_v3(
+    pub fn us_financial_statement(
         &self,
         counter_id: impl Into<String> + Send + 'static,
         kind: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
     ) -> Result<USFinancialStatement> {
         self.rt.call(move |ctx| async move {
-            ctx.us_financial_statement_v3(counter_id, kind, report)
+            ctx.us_financial_statement(counter_id, kind, report)
                 .await
         })
     }

@@ -10129,7 +10129,7 @@ class FundamentalContext:
         """Get US company overview. US token required.
 
         Args:
-            counter_id: Counter ID, e.g. ``"ST/US/AAPL"``
+            symbol: Symbol, e.g. ``"AAPL.US"``
 
         Returns:
             :class:`USCompanyOverview`
@@ -10140,30 +10140,30 @@ class FundamentalContext:
         """Get US valuation overview. US token required.
 
         Args:
-            counter_id: Counter ID, e.g. ``"ST/US/AAPL"``
+            symbol: Symbol, e.g. ``"AAPL.US"``
 
         Returns:
             :class:`USValuationOverview`
         """
         ...
 
-    def us_financial_overview(self, symbol: str, report: str) -> Any:
+    def us_financial_overview(self, symbol: str, report: str) -> "USFinancialOverview":
         """Get US financial overview (revenue, net income, EPS, cash flow). US token required.
 
         Args:
-            counter_id: Counter ID, e.g. ``"ST/US/AAPL"``
+            symbol: Symbol, e.g. ``"AAPL.US"``
             report: ``"annual"`` or ``"quarterly"``
 
         Returns:
-            Dict with financial overview data
+            :class:`USFinancialOverview`
         """
         ...
 
-    def us_financial_statement_v3(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
+    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
-            counter_id: Counter ID, e.g. ``"ST/US/AAPL"``
+            symbol: Symbol, e.g. ``"AAPL.US"``
             kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
             report: ``"annual"`` or ``"quarterly"``
 
@@ -10172,27 +10172,27 @@ class FundamentalContext:
         """
         ...
 
-    def us_key_financial_metrics(self, symbol: str, report: str) -> Any:
+    def us_key_financial_metrics(self, symbol: str, report: str) -> "USKeyFinancialMetrics":
         """Get US key financial metrics (ROE, margins, debt ratio). US token required.
 
         Args:
-            counter_id: Counter ID, e.g. ``"ST/US/AAPL"``
+            symbol: Symbol, e.g. ``"AAPL.US"``
             report: ``"annual"`` or ``"quarterly"``
 
         Returns:
-            Dict with key metrics
+            :class:`USKeyFinancialMetrics`
         """
         ...
 
-    def us_analyst_consensus(self, symbol: str, report: str) -> Any:
+    def us_analyst_consensus(self, symbol: str, report: str) -> "USAnalystConsensus":
         """Get US analyst consensus estimates (EPS, revenue forecasts). US token required.
 
         Args:
-            counter_id: Counter ID, e.g. ``"ST/US/AAPL"``
+            symbol: Symbol, e.g. ``"AAPL.US"``
             report: ``"annual"`` or ``"quarterly"``
 
         Returns:
-            Dict with consensus estimates
+            :class:`USAnalystConsensus`
         """
         ...
 
@@ -10200,7 +10200,7 @@ class FundamentalContext:
         """Get US ETF dividend history. US token required.
 
         Args:
-            counter_id: ETF counter ID, e.g. ``"ST/US/SPY"``
+            symbol: ETF symbol, e.g. ``"SPY.US"``
 
         Returns:
             :class:`USETFDividendInfo`
@@ -10211,7 +10211,7 @@ class FundamentalContext:
         """Get US company historical dividends. US token required.
 
         Args:
-            counter_id: Counter ID, e.g. ``"ST/US/AAPL"``
+            symbol: Symbol, e.g. ``"AAPL.US"``
 
         Returns:
             :class:`USCompanyDividends`
@@ -10222,11 +10222,124 @@ class FundamentalContext:
         """Get US ETF document list. US token required.
 
         Args:
-            counter_id: ETF counter ID, e.g. ``"ST/US/SPY"``
+            symbol: ETF symbol, e.g. ``"SPY.US"``
             size: Number of files to return; ``None`` returns all
 
         Returns:
             :class:`USETFFilesResponse`
+        """
+        ...
+
+
+class AsyncFundamentalContext:
+    """Async fundamental data context for use with asyncio. All I/O methods return awaitables."""
+
+    def __init__(self, config: "Config") -> None:
+        """Create an AsyncFundamentalContext."""
+        ...
+
+    def us_company_overview(self, symbol: str) -> "Awaitable[USCompanyOverview]":
+        """Get US company overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USCompanyOverview`]
+        """
+        ...
+
+    def us_valuation_overview(self, symbol: str) -> "Awaitable[USValuationOverview]":
+        """Get US valuation overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USValuationOverview`]
+        """
+        ...
+
+    def us_financial_overview(self, symbol: str, report: str) -> "Awaitable[USFinancialOverview]":
+        """Get US financial overview (revenue, net income, EPS, cash flow). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            Awaitable[:class:`USFinancialOverview`]
+        """
+        ...
+
+    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "Awaitable[USFinancialStatement]":
+        """Get US financial statement detail (IS/BS/CF). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            Awaitable[:class:`USFinancialStatement`]
+        """
+        ...
+
+    def us_key_financial_metrics(self, symbol: str, report: str) -> "Awaitable[USKeyFinancialMetrics]":
+        """Get US key financial metrics (ROE, margins, debt ratio). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            Awaitable[:class:`USKeyFinancialMetrics`]
+        """
+        ...
+
+    def us_analyst_consensus(self, symbol: str, report: str) -> "Awaitable[USAnalystConsensus]":
+        """Get US analyst consensus estimates (EPS, revenue forecasts). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            Awaitable[:class:`USAnalystConsensus`]
+        """
+        ...
+
+    def us_etf_dividend_info(self, symbol: str) -> "Awaitable[USETFDividendInfo]":
+        """Get US ETF dividend history. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+
+        Returns:
+            Awaitable[:class:`USETFDividendInfo`]
+        """
+        ...
+
+    def us_company_dividends(self, symbol: str) -> "Awaitable[USCompanyDividends]":
+        """Get US company historical dividends. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USCompanyDividends`]
+        """
+        ...
+
+    def us_etf_files(self, symbol: str, size: Optional[int] = None) -> "Awaitable[USETFFilesResponse]":
+        """Get US ETF document list. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+            size: Number of files to return; ``None`` returns all
+
+        Returns:
+            Awaitable[:class:`USETFFilesResponse`]
         """
         ...
 
@@ -12483,8 +12596,8 @@ class USAnalystConsensus:
     aichat_data: "USAIChatData"
     currency: str
     report: str
-    list: Any
-    opt_reports: Any
+    list: List[Any]
+    opt_reports: List[Any]
     h5_data: Any
 
 
@@ -12625,7 +12738,7 @@ class USValuationOverview:
 
 
 class USFinancialStatement:
-    """US financial statement (IS/BS/CF). Returned by FundamentalContext.us_financial_statement_v3."""
+    """US financial statement (IS/BS/CF). Returned by FundamentalContext.us_financial_statement."""
 
     revenue: str
     """Revenue"""
@@ -12639,6 +12752,17 @@ class USFinancialStatement:
     """Currency"""
 
 
+class USFiscalYearDividend:
+    """Per-fiscal-year dividend records for a US ETF."""
+
+    year: str
+    """Fiscal year, e.g. ``"2023"``"""
+    total_dividend: str
+    """Total dividend for the fiscal year"""
+    records: List["USDividendItem"]
+    """Individual dividend payment records"""
+
+
 class USETFDividendInfo:
     """US ETF dividend history. Returned by FundamentalContext.us_etf_dividend_info."""
 
@@ -12650,8 +12774,8 @@ class USETFDividendInfo:
     """Distribution frequency"""
     currency: str
     """Currency"""
-    fiscal_year_info: list
-    """Fiscal year dividend data as a list of dicts"""
+    fiscal_year_info: List["USFiscalYearDividend"]
+    """Per-fiscal-year dividend records"""
 
 
 class USDividendItem:

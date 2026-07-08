@@ -86,6 +86,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<USValuationIndicator>()?;
     parent.add_class::<USValuationOverview>()?;
     parent.add_class::<USFinancialStatement>()?;
+    parent.add_class::<USFiscalYearDividend>()?;
     parent.add_class::<USETFDividendInfo>()?;
     parent.add_class::<USDividendItem>()?;
     parent.add_class::<USCompanyDividends>()?;

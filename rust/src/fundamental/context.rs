@@ -1139,7 +1139,7 @@ impl FundamentalContext {
     /// Path: `GET /v1/us/quote/financials/statements`
     ///
     /// US token required.
-    pub async fn us_financial_statement_v3(
+    pub async fn us_financial_statement(
         &self,
         symbol: impl Into<String>,
         kind: impl Into<String>,

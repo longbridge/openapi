@@ -2238,7 +2238,7 @@ pub(crate) struct USETFDividendInfo {
     pub dividend_yield_ttm: String,
     pub dividend_frequency: String,
     pub currency: String,
-    pub fiscal_year_info: Vec<JsonValue>,
+    pub fiscal_year_info: Vec<USFiscalYearDividend>,
 }
 
 impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
@@ -2248,7 +2248,26 @@ impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
             dividend_yield_ttm: v.dividend_yield_ttm,
             dividend_frequency: v.dividend_frequency,
             currency: v.currency,
-            fiscal_year_info: v.fiscal_year_info.into_iter().map(JsonValue).collect(),
+            fiscal_year_info: v.fiscal_year_info.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Per-fiscal-year dividend records for a US ETF.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct USFiscalYearDividend {
+    pub year: String,
+    pub total_dividend: String,
+    pub records: Vec<USDividendItem>,
+}
+
+impl From<lb_us::USFiscalYearDividend> for USFiscalYearDividend {
+    fn from(v: lb_us::USFiscalYearDividend) -> Self {
+        Self {
+            year: v.year,
+            total_dividend: v.total_dividend,
+            records: v.records.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -2517,8 +2536,8 @@ pub(crate) struct USAnalystConsensus {
     pub aichat_data: USAIChatData,
     pub currency: String,
     pub report: String,
-    pub list: JsonValue,
-    pub opt_reports: JsonValue,
+    pub list: Vec<JsonValue>,
+    pub opt_reports: Vec<JsonValue>,
     pub h5_data: JsonValue,
 }
 
@@ -2529,8 +2548,8 @@ impl From<lb_us::USAnalystConsensus> for USAnalystConsensus {
             aichat_data: v.aichat_data.into(),
             currency: v.currency,
             report: v.report,
-            list: JsonValue(v.list),
-            opt_reports: JsonValue(v.opt_reports),
+            list: v.list.into_iter().map(JsonValue).collect(),
+            opt_reports: v.opt_reports.into_iter().map(JsonValue).collect(),
             h5_data: JsonValue(v.h5_data),
         }
     }

@@ -1801,7 +1801,7 @@ pub struct USValuationOverview {
     pub ai_summary: String,
 }
 
-/// Response for [`crate::FundamentalContext::us_financial_statement_v3`].
+/// Response for [`crate::FundamentalContext::us_financial_statement`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USFinancialStatement {
     /// Revenue
@@ -1821,6 +1821,20 @@ pub struct USFinancialStatement {
     pub currency: String,
 }
 
+/// Per-fiscal-year dividend records for a US ETF.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFiscalYearDividend {
+    /// Fiscal year (e.g. "2023")
+    #[serde(default)]
+    pub year: String,
+    /// Total dividend for the fiscal year
+    #[serde(default)]
+    pub total_dividend: String,
+    /// Individual dividend payment records
+    #[serde(default)]
+    pub records: Vec<USDividendItem>,
+}
+
 /// Response for [`crate::FundamentalContext::us_etf_dividend_info`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USETFDividendInfo {
@@ -1838,7 +1852,7 @@ pub struct USETFDividendInfo {
     pub currency: String,
     /// Per-fiscal-year dividend records
     #[serde(default)]
-    pub fiscal_year_info: Vec<serde_json::Value>,
+    pub fiscal_year_info: Vec<USFiscalYearDividend>,
 }
 
 /// A single historical dividend payment.
@@ -2111,11 +2125,12 @@ pub struct USAnalystConsensus {
     pub currency: String,
     #[serde(default)]
     pub report: String,
-    /// Consensus detail — shape determined by production data.
+    /// Consensus detail — array; element shape varies by report type.
     #[serde(default)]
-    pub list: serde_json::Value,
+    pub list: Vec<serde_json::Value>,
+    /// Option consensus — array; element shape varies by report type.
     #[serde(default)]
-    pub opt_reports: serde_json::Value,
+    pub opt_reports: Vec<serde_json::Value>,
     #[serde(default)]
     pub h5_data: serde_json::Value,
 }

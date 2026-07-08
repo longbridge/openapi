@@ -364,7 +364,7 @@ impl FundamentalContext {
 
     /// Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required.
     #[napi]
-    pub async fn us_financial_statement_v3(
+    pub async fn us_financial_statement(
         &self,
         symbol: String,
         kind: String,
@@ -372,7 +372,7 @@ impl FundamentalContext {
     ) -> Result<USFinancialStatement> {
         Ok(self
             .ctx
-            .us_financial_statement_v3(symbol, kind, report)
+            .us_financial_statement(symbol, kind, report)
             .await
             .map_err(ErrorNewType)?
             .into())

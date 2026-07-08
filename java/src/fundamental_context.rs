@@ -430,7 +430,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
         async_util::execute(env, callback, async move {
             let resp = context
                 .ctx
-                .us_financial_statement_v3(counter_id, kind, report)
+                .us_financial_statement(counter_id, kind, report)
                 .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
