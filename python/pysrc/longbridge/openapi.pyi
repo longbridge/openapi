@@ -12744,8 +12744,6 @@ class USAssetOverview:
     """Option positions"""
     crypto_list: List[USCryptoEntry]
     """Cryptocurrency positions"""
-    multi_leg: Any
-    """Multi-leg positions"""
 
 
 class USRealizedPLMetric:
