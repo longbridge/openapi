@@ -2157,21 +2157,19 @@ impl From<lb_us::USValuationOverview> for USValuationOverview {
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct USFinancialStatement {
-    pub revenue: String,
-    pub net_income: String,
-    pub net_margin: String,
-    pub periods: Vec<serde_json::Value>,
     pub currency: String,
+    pub report: String,
+    pub list: Vec<serde_json::Value>,
+    pub empty_fields: Vec<String>,
 }
 
 impl From<lb_us::USFinancialStatement> for USFinancialStatement {
     fn from(v: lb_us::USFinancialStatement) -> Self {
         Self {
-            revenue: v.revenue,
-            net_income: v.net_income,
-            net_margin: v.net_margin,
-            periods: v.periods,
             currency: v.currency,
+            report: v.report,
+            list: v.list,
+            empty_fields: v.empty_fields,
         }
     }
 }

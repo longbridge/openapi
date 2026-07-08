@@ -6225,11 +6225,10 @@ export interface USValuationOverview {
 }
 
 export interface USFinancialStatement {
-  revenue: string
-  netIncome: string
-  netMargin: string
-  periods: Array<unknown>
   currency: string
+  report: string
+  list: Array<unknown>
+  emptyFields: Array<string>
 }
 
 export interface USFiscalYearDividend {

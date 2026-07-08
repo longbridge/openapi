@@ -1802,23 +1802,22 @@ pub struct USValuationOverview {
 }
 
 /// Response for [`crate::FundamentalContext::us_financial_statement`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// `list` contains the statement line items; element shape varies by `kind`
+/// ("IS", "BS", "CF") and is preserved as raw JSON.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatement {
-    /// Revenue
-    #[serde(default)]
-    pub revenue: String,
-    /// Net income
-    #[serde(default)]
-    pub net_income: String,
-    /// Net margin
-    #[serde(default)]
-    pub net_margin: String,
-    /// Per-period data
-    #[serde(default)]
-    pub periods: Vec<serde_json::Value>,
     /// Report currency
     #[serde(default)]
     pub currency: String,
+    /// Report period type ("annual" or "quarterly")
+    #[serde(default)]
+    pub report: String,
+    /// Statement line items; shape varies by kind
+    #[serde(default)]
+    pub list: Vec<serde_json::Value>,
+    /// Metric keys that could not be populated
+    #[serde(default)]
+    pub empty_fields: Vec<String>,
 }
 
 /// Per-fiscal-year dividend records for a US ETF.

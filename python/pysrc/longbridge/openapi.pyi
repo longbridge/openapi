@@ -12740,15 +12740,14 @@ class USValuationOverview:
 class USFinancialStatement:
     """US financial statement (IS/BS/CF). Returned by FundamentalContext.us_financial_statement."""
 
-    revenue: str
-    """Revenue"""
-    net_income: str
-    """Net income"""
-    net_margin: str
-    """Net margin"""
-    periods: list
-    """Per-period data as a list of dicts"""
     currency: str
+    """Report currency"""
+    report: str
+    """Report period type: ``"annual"`` or ``"quarterly"``"""
+    list: List[Any]
+    """Statement line items; element shape varies by kind (IS/BS/CF)"""
+    empty_fields: List[str]
+    """Metric keys that could not be populated"""
     """Currency"""
 
 

@@ -2211,21 +2211,19 @@ impl From<lb_us::USValuationOverview> for USValuationOverview {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct USFinancialStatement {
-    pub revenue: String,
-    pub net_income: String,
-    pub net_margin: String,
-    pub periods: Vec<JsonValue>,
     pub currency: String,
+    pub report: String,
+    pub list: Vec<JsonValue>,
+    pub empty_fields: Vec<String>,
 }
 
 impl From<lb_us::USFinancialStatement> for USFinancialStatement {
     fn from(v: lb_us::USFinancialStatement) -> Self {
         Self {
-            revenue: v.revenue,
-            net_income: v.net_income,
-            net_margin: v.net_margin,
-            periods: v.periods.into_iter().map(JsonValue).collect(),
             currency: v.currency,
+            report: v.report,
+            list: v.list.into_iter().map(JsonValue).collect(),
+            empty_fields: v.empty_fields,
         }
     }
 }
