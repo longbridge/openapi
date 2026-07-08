@@ -12417,6 +12417,77 @@ class USCryptoOverview:
     """Extended profile as JSON string"""
 
 
+class USReportPeriod:
+    """One reporting period window."""
+    start_date: str
+    end_date: str
+    report_txt: str
+
+class USFinancialISItem:
+    """One income-statement entry."""
+    revenue: str
+    net_income: str
+    net_margin: str
+    report: "USReportPeriod"
+
+class USFinancialBSItem:
+    """One balance-sheet entry."""
+    debt_assets_ratio: str
+    total_assets: str
+    total_liabilities: str
+    report: "USReportPeriod"
+
+class USFinancialCFItem:
+    """One cash-flow entry."""
+    operating: str
+    investing: str
+    financing: str
+    report: "USReportPeriod"
+
+class USFinancialOverview:
+    """US financial overview (IS + BS + CF by period)."""
+    ccy_symbol: str
+    report_type: str
+    is_list: List["USFinancialISItem"]
+    bs_list: List["USFinancialBSItem"]
+    cf_list: List["USFinancialCFItem"]
+
+class USKeyMetricItem:
+    """One period entry in key financial metrics."""
+    ff_period: str
+    ff_year: int
+    fp_end: str
+    report_txt: str
+    rpt_date: str
+    fields: Any
+
+class USKeyFinancialMetrics:
+    """US key financial metrics (ROE, margins, debt ratio) by period."""
+    currency: str
+    report: str
+    empty_fields: List[str]
+    list: List["USKeyMetricItem"]
+
+class USAIChatData:
+    """AI chat context in analyst consensus."""
+    agent_id: str
+    handoff_agent_id: str
+    symbol: str
+    text: str
+    chat_type: str
+    workflow_type: str
+
+class USAnalystConsensus:
+    """US analyst consensus estimates and AI analysis."""
+    ai_summary: str
+    aichat_data: "USAIChatData"
+    currency: str
+    report: str
+    list: Any
+    opt_reports: Any
+    h5_data: Any
+
+
 class USCashEntry:
     """One cash currency entry in USAssetOverview."""
 

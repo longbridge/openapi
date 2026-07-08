@@ -627,13 +627,13 @@ export declare class FundamentalContext {
   /** Get US valuation snapshot (PE/PB/PS). US token required. */
   usValuationOverview(symbol: string): Promise<USValuationOverview>
   /** Get US financial overview (revenue/net income/EPS). Returns JSON string. US token required. */
-  usFinancialOverview(symbol: string, report: string): Promise<string>
+  usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
   /** Get US financial statement (IS/BS/CF). kind: "IS" | "BS" | "CF". US token required. */
   usFinancialStatementV3(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
   /** Get US key financial metrics (ROE/margins). Returns JSON string. US token required. */
-  usKeyFinancialMetrics(symbol: string, report: string): Promise<string>
+  usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
   /** Get US analyst consensus estimates. Returns JSON string. US token required. */
-  usAnalystConsensus(symbol: string, report: string): Promise<string>
+  usAnalystConsensus(symbol: string, report: string): Promise<USAnalystConsensus>
   /** Get US ETF dividend history. US token required. */
   usEtfDividendInfo(symbol: string): Promise<USETFDividendInfo>
   /** Get US company historical dividends. US token required. */
@@ -6127,6 +6127,68 @@ export interface USOrderDetailResponse {
   order: Record<string, unknown>
   orderHistories: Array<USOrderHistory>
   currentAttachedOrder: Record<string, unknown> | null
+}
+
+export interface USReportPeriod {
+  startDate: string
+  endDate: string
+  reportTxt: string
+}
+export interface USFinancialISItem {
+  revenue: string
+  netIncome: string
+  netMargin: string
+  report: USReportPeriod
+}
+export interface USFinancialBSItem {
+  debtAssetsRatio: string
+  totalAssets: string
+  totalLiabilities: string
+  report: USReportPeriod
+}
+export interface USFinancialCFItem {
+  operating: string
+  investing: string
+  financing: string
+  report: USReportPeriod
+}
+export interface USFinancialOverview {
+  ccySymbol: string
+  reportType: string
+  isList: Array<USFinancialISItem>
+  bsList: Array<USFinancialBSItem>
+  cfList: Array<USFinancialCFItem>
+}
+export interface USKeyMetricItem {
+  ffPeriod: string
+  ffYear: number
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+  fields: unknown
+}
+export interface USKeyFinancialMetrics {
+  currency: string
+  report: string
+  emptyFields: Array<string>
+  list: Array<USKeyMetricItem>
+}
+export interface USAIChatData {
+  agentId: string
+  handoffAgentId: string
+  symbol: string
+  text: string
+  chatType: string
+  workflowType: string
+}
+export interface USAnalystConsensus {
+  aiSummary: string
+  aichatData: USAIChatData
+  currency: string
+  report: string
+  list: unknown
+  optReports: unknown
+  h5Data: unknown
 }
 
 // ── US-market types ────────────────────────────────────────────────────────
