@@ -5587,36 +5587,6 @@ class OrderTag:
         Grey Order
         """
 
-    class MarginCall(OrderTag):
-        """
-        Force Selling
-        """
-
-    class Offline(OrderTag):
-        """
-        OTC
-        """
-
-    class Creditor(OrderTag):
-        """
-        Option Exercise Long
-        """
-
-    class Debtor(OrderTag):
-        """
-        Option Exercise Short
-        """
-
-    class NonExercise(OrderTag):
-        """
-        Wavier Of Option Exercise
-        """
-
-    class AllocatedSub(OrderTag):
-        """
-        Trade Allocation
-        """
-
 class TriggerStatus:
     """
     Trigger status

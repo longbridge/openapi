@@ -177,23 +177,11 @@ pub enum OrderTag {
     #[strum(serialize = "Normal")]
     Normal,
     /// Long term Order
-    #[strum(serialize = "GTC")]
+    #[strum(serialize = "Gtc")]
     LongTerm,
     /// Grey Order
     #[strum(serialize = "Grey")]
     Grey,
-    /// Force Selling
-    MarginCall,
-    /// OTC
-    Offline,
-    /// Option Exercise Long
-    Creditor,
-    /// Option Exercise Short
-    Debtor,
-    /// Wavier Of Option Exercise
-    NonExercise,
-    /// Trade Allocation
-    AllocatedSub,
 }
 
 /// Time in force Type
