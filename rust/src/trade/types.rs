@@ -850,7 +850,7 @@ pub struct GetUSHistoryOrders {
 /// Alias kept for backward compatibility.
 pub type QueryUSOrdersOptions = GetUSHistoryOrders;
 
-/// Internal JSON body sent to POST /v1/orders/query.
+/// Internal JSON body sent to POST /v1/us/orders/query.
 #[derive(Debug, Clone, Serialize)]
 pub(crate) struct USQueryOrdersBody {
     pub account_channel: String,
@@ -1160,7 +1160,7 @@ pub struct USOrderDetail {
 }
 
 /// Response for [`crate::TradeContext::us_order_detail`].
-/// Path: `GET /v1/orders/{order_id}`
+/// Path: `GET /v1/us/orders/{order_id}`
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USOrderDetailResponse {
     /// Full typed order object; None only on error.

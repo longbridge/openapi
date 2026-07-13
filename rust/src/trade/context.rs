@@ -861,7 +861,7 @@ impl TradeContext {
 
     /// Query the paginated US order list.
     ///
-    /// Path: `POST /v1/orders/query`
+    /// Path: `POST /v1/us/orders/query`
     ///
     /// US token required.
     pub async fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
@@ -916,7 +916,7 @@ impl TradeContext {
         Ok(self
             .0
             .http_cli
-            .request(Method::POST, "/v1/orders/query")
+            .request(Method::POST, "/v1/us/orders/query")
             .dc_restrict(DcRegion::Us)
             .body(Json(body))
             .response::<Json<QueryUSOrdersResponse>>()
@@ -928,7 +928,7 @@ impl TradeContext {
 
     /// Get US order detail.
     ///
-    /// Path: `GET /v1/orders/{order_id}`
+    /// Path: `GET /v1/us/orders/{order_id}`
     ///
     /// US token required.
     pub async fn us_order_detail(
@@ -936,7 +936,7 @@ impl TradeContext {
         order_id: impl Into<String>,
     ) -> Result<USOrderDetailResponse> {
         let order_id = order_id.into();
-        let path = format!("/v1/orders/{order_id}");
+        let path = format!("/v1/us/orders/{order_id}");
 
         Ok(self
             .0

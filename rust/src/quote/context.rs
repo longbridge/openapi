@@ -2294,7 +2294,7 @@ impl QuoteContext {
     /// US DC uses the **BKKT** exchange: e.g. `"BTCUSD.BKKT"` →
     /// `"VA/BKKT/BTCUSD"`. Pass the exchange suffix explicitly.
     ///
-    /// Path: `GET /v1/gemini/us/crypto-overview`
+    /// Path: `GET /v1/us/gemini/crypto-overview`
     ///
     /// US token required.
     pub async fn us_crypto_overview(
@@ -2309,7 +2309,7 @@ impl QuoteContext {
         Ok(self
             .0
             .http_cli
-            .request(Method::GET, "/v1/gemini/us/crypto-overview")
+            .request(Method::GET, "/v1/us/gemini/crypto-overview")
             .dc_restrict(DcRegion::Us)
             .query_params(Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),

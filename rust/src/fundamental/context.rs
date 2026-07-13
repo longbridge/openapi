@@ -1057,7 +1057,7 @@ impl FundamentalContext {
 
     /// Get US company overview.
     ///
-    /// Path: `GET /v1/stock-info/company-overview`
+    /// Path: `GET /v1/us/stock-info/company-overview`
     ///
     /// US token required — returns
     /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`]
@@ -1071,7 +1071,7 @@ impl FundamentalContext {
             counter_id: String,
         }
         self.get_dc(
-            "/v1/stock-info/company-overview",
+            "/v1/us/stock-info/company-overview",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
             },
@@ -1082,7 +1082,7 @@ impl FundamentalContext {
 
     /// Get US valuation overview snapshot.
     ///
-    /// Path: `GET /v1/stock-info/valuation-overview`
+    /// Path: `GET /v1/us/stock-info/valuation-overview`
     ///
     /// US token required.
     pub async fn us_valuation_overview(
@@ -1094,7 +1094,7 @@ impl FundamentalContext {
             counter_id: String,
         }
         self.get_dc(
-            "/v1/stock-info/valuation-overview",
+            "/v1/us/stock-info/valuation-overview",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
             },
@@ -1107,7 +1107,7 @@ impl FundamentalContext {
     ///
     /// `report`: `"annual"` or `"quarterly"`.
     ///
-    /// Path: `GET /v1/stock-info/finn-overview`
+    /// Path: `GET /v1/us/stock-info/finn-overview`
     ///
     /// US token required. Returns raw JSON for maximum flexibility.
     pub async fn us_financial_overview(
@@ -1121,7 +1121,7 @@ impl FundamentalContext {
             report: String,
         }
         self.get_dc(
-            "/v1/stock-info/finn-overview",
+            "/v1/us/stock-info/finn-overview",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
                 report: report.into(),
@@ -1167,7 +1167,7 @@ impl FundamentalContext {
     ///
     /// `report`: `"annual"` or `"quarterly"`.
     ///
-    /// Path: `GET /v1/stock-info/fin-keyfactor`
+    /// Path: `GET /v1/us/stock-info/fin-keyfactor`
     ///
     /// US token required. Returns raw JSON.
     pub async fn us_key_financial_metrics(
@@ -1181,7 +1181,7 @@ impl FundamentalContext {
             report: String,
         }
         self.get_dc(
-            "/v1/stock-info/fin-keyfactor",
+            "/v1/us/stock-info/fin-keyfactor",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
                 report: report.into(),
@@ -1195,7 +1195,7 @@ impl FundamentalContext {
     ///
     /// `report`: `"annual"` or `"quarterly"`.
     ///
-    /// Path: `GET /v1/stock-info/fin-consensus`
+    /// Path: `GET /v1/us/stock-info/fin-consensus`
     ///
     /// US token required. Returns raw JSON.
     pub async fn us_analyst_consensus(
@@ -1209,7 +1209,7 @@ impl FundamentalContext {
             report: String,
         }
         self.get_dc(
-            "/v1/stock-info/fin-consensus",
+            "/v1/us/stock-info/fin-consensus",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
                 report: report.into(),
@@ -1221,7 +1221,7 @@ impl FundamentalContext {
 
     /// Get ETF dividend history.
     ///
-    /// Path: `GET /v1/stock-info/etf-dividend-info`
+    /// Path: `GET /v1/us/stock-info/etf-dividend-info`
     ///
     /// US token required.
     pub async fn us_etf_dividend_info(
@@ -1233,7 +1233,7 @@ impl FundamentalContext {
             counter_id: String,
         }
         self.get_dc(
-            "/v1/stock-info/etf-dividend-info",
+            "/v1/us/stock-info/etf-dividend-info",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
             },
@@ -1244,7 +1244,7 @@ impl FundamentalContext {
 
     /// Get company historical dividend payments.
     ///
-    /// Path: `GET /v1/stock-info/company-dividends`
+    /// Path: `GET /v1/us/stock-info/company-dividends`
     ///
     /// US token required.
     pub async fn us_company_dividends(
@@ -1256,7 +1256,7 @@ impl FundamentalContext {
             counter_id: String,
         }
         self.get_dc(
-            "/v1/stock-info/company-dividends",
+            "/v1/us/stock-info/company-dividends",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
             },
@@ -1270,7 +1270,7 @@ impl FundamentalContext {
     /// `size`: number of files to return; `None` returns all (server default 0
     /// = all).
     ///
-    /// Path: `GET /v1/stock-info/etf-files`
+    /// Path: `GET /v1/us/stock-info/etf-files`
     ///
     /// US token required.
     pub async fn us_etf_files(
@@ -1285,7 +1285,7 @@ impl FundamentalContext {
             size: Option<u32>,
         }
         self.get_dc(
-            "/v1/stock-info/etf-files",
+            "/v1/us/stock-info/etf-files",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
                 size,
