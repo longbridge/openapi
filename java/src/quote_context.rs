@@ -1282,3 +1282,22 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionVo
         Ok(())
     })
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextUsCryptoOverview(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_crypto_overview(symbol).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}

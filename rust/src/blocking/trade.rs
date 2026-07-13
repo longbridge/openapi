@@ -8,9 +8,11 @@ use crate::{
         EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio, Order, OrderDetail,
-        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
-        SubmitOrderResponse, TopicType, TradeContext,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders,
+        GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, PushEvent, QueryUSOrdersOptions,
+        QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
+        SubmitOrderResponse, TopicType, TradeContext, USAssetOverview, USOrderDetailResponse,
+        USRealizedPL,
     },
 };
 
@@ -465,5 +467,34 @@ impl TradeContextSync {
     ) -> Result<EstimateMaxPurchaseQuantityResponse> {
         self.rt
             .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
+    }
+
+    // ── US-market blocking wrappers ───────────────────────────────────────────
+
+    /// Query the paginated US order list (blocking)
+    pub fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_query_orders(opts).await })
+    }
+
+    /// Get US order detail (blocking)
+    pub fn us_order_detail(
+        &self,
+        order_id: impl Into<String> + Send + 'static,
+    ) -> Result<USOrderDetailResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_order_detail(order_id).await })
+    }
+
+    /// Get the full US account asset overview (blocking)
+    pub fn us_asset_overview(&self) -> Result<USAssetOverview> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_asset_overview().await })
+    }
+
+    /// Get realized P&L for the US account (blocking)
+    pub fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_realized_pl(opts).await })
     }
 }

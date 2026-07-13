@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
@@ -2284,6 +2284,41 @@ impl QuoteContext {
             }
         }
         Ok(result)
+    }
+
+    // ── US-market APIs ────────────────────────────────────────────────────────
+
+    /// Get cryptocurrency market overview.
+    ///
+    /// `symbol` must be in `PAIR.EXCHANGE` format.
+    /// US DC uses the **BKKT** exchange: e.g. `"BTCUSD.BKKT"` →
+    /// `"VA/BKKT/BTCUSD"`. Pass the exchange suffix explicitly.
+    ///
+    /// Path: `GET /v1/us/gemini/crypto-overview`
+    ///
+    /// US token required.
+    pub async fn us_crypto_overview(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<crate::quote::USCryptoOverview> {
+        use crate::utils::counter::symbol_to_counter_id;
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/gemini/crypto-overview")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            })
+            .response::<Json<crate::quote::USCryptoOverview>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 }
 

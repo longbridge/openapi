@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_wscli::WsClientError;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -13,9 +13,11 @@ use crate::{
         AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityOptions,
         Execution, FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, TopicType,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
+        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -849,6 +851,159 @@ impl TradeContext {
             .request(Method::GET, "/v1/trade/estimate/buy_limit")
             .query_params(opts)
             .response::<Json<EstimateMaxPurchaseQuantityResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    // ── US-market APIs ────────────────────────────────────────────────────────
+
+    /// Query the paginated US order list.
+    ///
+    /// Path: `POST /v1/us/orders/query`
+    ///
+    /// US token required.
+    pub async fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        use crate::utils::counter::symbol_to_counter_id;
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs() as i64;
+
+        let action = match opts.side {
+            OrderSide::Buy => 1,
+            OrderSide::Sell => 2,
+            _ => 0,
+        };
+
+        let counter_ids = opts
+            .symbol
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .map(|s| vec![symbol_to_counter_id(s)])
+            .unwrap_or_default();
+
+        let start_at = if opts.start_at == 0 {
+            (now - 90 * 24 * 3600) as f64
+        } else {
+            opts.start_at as f64
+        };
+        let end_at = if opts.end_at == 0 {
+            now as f64
+        } else {
+            opts.end_at as f64
+        };
+        let page = if opts.page <= 0 { 1 } else { opts.page };
+        let limit = if opts.limit <= 0 { 20 } else { opts.limit };
+
+        let body = super::types::USQueryOrdersBody {
+            account_channel: String::new(),
+            action,
+            start_at,
+            end_at,
+            counter_ids,
+            security_types: vec![],
+            query_type: opts.query_type,
+            page,
+            limit,
+            query_version: now as f64,
+        };
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/us/orders/query")
+            .dc_restrict(DcRegion::Us)
+            .body(Json(body))
+            .response::<Json<QueryUSOrdersResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get US order detail.
+    ///
+    /// Path: `GET /v1/us/orders/{order_id}`
+    ///
+    /// US token required.
+    pub async fn us_order_detail(
+        &self,
+        order_id: impl Into<String>,
+    ) -> Result<USOrderDetailResponse> {
+        let order_id = order_id.into();
+        let path = format!("/v1/us/orders/{order_id}");
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path.as_str())
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USOrderDetailResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the full US account asset snapshot (stocks, options, crypto, buying
+    /// power).
+    ///
+    /// Path: `GET /v1/us/assets/overview`
+    ///
+    /// US token required.
+    pub async fn us_asset_overview(&self) -> Result<USAssetOverview> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/overview")
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USAssetOverview>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get realized profit-and-loss for the US account.
+    ///
+    /// `currency`: required, e.g. `"USD"`.
+    /// `category`: optional filter — `"ALL"`, `"STOCK"`, `"OPTION"`, or
+    /// `"CRYPTO"`.
+    ///
+    /// Path: `GET /v1/us/assets/pl/realized`
+    ///
+    /// US token required.
+    pub async fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
+        #[derive(Serialize)]
+        struct Query {
+            currency: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            category: Option<String>,
+        }
+
+        let currency = if opts.currency.is_empty() {
+            "USD".to_string()
+        } else {
+            opts.currency
+        };
+        let category = if opts.category.is_empty() {
+            None
+        } else {
+            Some(opts.category)
+        };
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/pl/realized")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query { currency, category })
+            .response::<Json<USRealizedPL>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

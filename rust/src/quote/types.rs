@@ -2164,6 +2164,69 @@ pub enum PinnedMode {
     Remove,
 }
 
+// ── US-market types
+// ───────────────────────────────────────────────────────────
+
+/// Market overview for a single cryptocurrency.
+///
+/// Returned by [`crate::QuoteContext::us_crypto_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USCryptoOverview {
+    /// Full name (e.g. `"Bitcoin"`)
+    #[serde(default)]
+    pub name: String,
+    /// Ticker symbol (e.g. `"BTC"`)
+    #[serde(default)]
+    pub ticker: String,
+    /// Pricing currency
+    #[serde(default)]
+    pub currency: String,
+    /// All-time high price
+    #[serde(default)]
+    pub all_time_high: String,
+    /// All-time high date
+    #[serde(default)]
+    pub all_time_high_date: String,
+    /// All-time low price
+    #[serde(default)]
+    pub all_time_low: String,
+    /// All-time low date
+    #[serde(default)]
+    pub all_time_low_date: String,
+    /// Listing date
+    #[serde(default)]
+    pub ipo_date: String,
+    /// Issue price
+    #[serde(default)]
+    pub issue_price: String,
+    /// Circulating supply
+    #[serde(default)]
+    pub shares: String,
+    /// User-facing symbol (e.g. `"BTCUSD.BKKT"`), converted from the API's
+    /// `counter_id` field (e.g. `"VA/BKKT/BTCUSD"`).
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// Base asset code (e.g. `"BTC"`)
+    #[serde(default)]
+    pub base_asset: String,
+    /// Official website URL
+    #[serde(default)]
+    pub official_web_address: String,
+    /// Logo image URL
+    #[serde(default)]
+    pub logo: String,
+    /// In-app wiki URL
+    #[serde(default)]
+    pub wiki_url: String,
+    /// Multi-language profile / description (JSON string)
+    #[serde(default)]
+    pub profile: String,
+}
+
 #[cfg(test)]
 mod tests {
     use serde::Deserialize;

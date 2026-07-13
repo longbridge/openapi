@@ -4034,6 +4034,17 @@ class QuoteContext:
             :class:`ShortTradesResponse` with raw JSON data
         """
 
+    def us_crypto_overview(self, symbol: str) -> "USCryptoOverview":
+        """Get US cryptocurrency market overview. US token required.
+
+        Args:
+            symbol: Trading-pair symbol, e.g. ``"BTCUSD.BKKT"``
+
+        Returns:
+            :class:`USCryptoOverview`
+        """
+        ...
+
 class AsyncQuoteContext:
     """
     Async quote context for use with asyncio. Create via `AsyncQuoteContext.create(config)` and await inside asyncio.
@@ -5383,6 +5394,17 @@ class AsyncQuoteContext:
 
         Returns:
             Awaitable resolving to :class:`ShortTradesResponse`
+        """
+        ...
+
+    def us_crypto_overview(self, symbol: str) -> "Awaitable[USCryptoOverview]":
+        """Get US cryptocurrency market overview. US token required. Returns awaitable.
+
+        Args:
+            symbol: Trading-pair symbol, e.g. ``"BTCUSD.BKKT"``
+
+        Returns:
+            Awaitable resolving to :class:`USCryptoOverview`
         """
         ...
 
@@ -7347,6 +7369,65 @@ class TradeContext:
                 print(resp)
         """
 
+    def us_query_orders(
+        self,
+        symbol: Optional[str] = None,
+        action: int = 0,
+        start_at: int = 0,
+        end_at: int = 0,
+        query_type: int = 0,
+        page: int = 1,
+        limit: int = 20,
+    ) -> str:
+        """Query US order list (paginated). Returns JSON string. US token required.
+
+        Args:
+            symbol: Optional symbol filter, e.g. ``"AAPL.US"``
+            action: Direction filter: 0=all, 1=buy, 2=sell
+            start_at: Start timestamp (unix seconds); 0 = last 90 days
+            end_at: End timestamp (unix seconds); 0 = now
+            query_type: 0=all (incl. Rejected), 1=pending, 2=history (filled only)
+            page: Page number, 1-based
+            limit: Page size
+
+        Returns:
+            JSON string with order list
+        """
+        ...
+
+    def us_order_detail(self, order_id: str) -> "USOrderDetailResponse":
+        """Get US order detail. US token required.
+
+        Args:
+            order_id: Order ID
+
+        Returns:
+            :class:`USOrderDetailResponse`
+        """
+        ...
+
+    def us_asset_overview(self) -> "USAssetOverview":
+        """Get US account asset overview. US token required.
+
+        Returns:
+            :class:`USAssetOverview` with stock, option, and crypto positions
+            plus purchasing power
+        """
+        ...
+
+    def us_realized_pl(self, currency: str, category: Optional[str] = None) -> "USRealizedPL":
+        """Get realized P&L for the US account. US token required.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``)
+            category: Asset category filter: ``"ALL"``, ``"STOCK"``,
+                ``"OPTION"``, or ``"CRYPTO"``; ``None`` for all
+
+        Returns:
+            :class:`USRealizedPL`
+        """
+        ...
+
 class AsyncTradeContext:
     """
     Async trade context for use with asyncio. Create via `AsyncTradeContext.create(config)` and await inside asyncio.
@@ -8035,6 +8116,64 @@ class AsyncTradeContext:
                     print(resp)
 
                 asyncio.run(main())
+        """
+        ...
+
+    def us_query_orders(
+        self,
+        symbol: Optional[str] = None,
+        action: int = 0,
+        start_at: int = 0,
+        end_at: int = 0,
+        query_type: int = 0,
+        page: int = 1,
+        limit: int = 20,
+    ) -> "Awaitable[str]":
+        """Query US order list (paginated). Returns awaitable JSON string. US token required.
+
+        Args:
+            symbol: Optional symbol filter, e.g. ``"AAPL.US"``
+            action: Direction filter: 0=all, 1=buy, 2=sell
+            start_at: Start timestamp (unix seconds); 0 = last 90 days
+            end_at: End timestamp (unix seconds); 0 = now
+            query_type: 0=all (incl. Rejected), 1=pending, 2=history (filled only)
+            page: Page number, 1-based
+            limit: Page size
+
+        Returns:
+            Awaitable resolving to JSON string with order list
+        """
+        ...
+
+    def us_order_detail(self, order_id: str) -> "Awaitable[USOrderDetailResponse]":
+        """Get US order detail (async). US token required.
+
+        Args:
+            order_id: Order ID
+
+        Returns:
+            Awaitable[:class:`USOrderDetailResponse`]
+        """
+        ...
+
+    def us_asset_overview(self) -> "Awaitable[USAssetOverview]":
+        """Get US account asset overview. US token required. Returns awaitable.
+
+        Returns:
+            Awaitable resolving to :class:`USAssetOverview`
+        """
+        ...
+
+    def us_realized_pl(self, currency: str, category: Optional[str] = None) -> "Awaitable[USRealizedPL]":
+        """Get realized P&L for the US account. US token required. Returns awaitable.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``)
+            category: Asset category filter: ``"ALL"``, ``"STOCK"``,
+                ``"OPTION"``, or ``"CRYPTO"``; ``None`` for all
+
+        Returns:
+            Awaitable resolving to :class:`USRealizedPL`
         """
         ...
 
@@ -10010,6 +10149,224 @@ class FundamentalContext:
 
         Returns:
             :class:`MacroeconomicResponse`
+        """
+        ...
+
+    def us_company_overview(self, symbol: str) -> "USCompanyOverview":
+        """Get US company overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`USCompanyOverview`
+        """
+        ...
+
+    def us_valuation_overview(self, symbol: str) -> "USValuationOverview":
+        """Get US valuation overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`USValuationOverview`
+        """
+        ...
+
+    def us_financial_overview(self, symbol: str, report: str) -> "USFinancialOverview":
+        """Get US financial overview (revenue, net income, EPS, cash flow). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            :class:`USFinancialOverview`
+        """
+        ...
+
+    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
+        """Get US financial statement detail (IS/BS/CF). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            :class:`USFinancialStatement`
+        """
+        ...
+
+    def us_key_financial_metrics(self, symbol: str, report: str) -> "USKeyFinancialMetrics":
+        """Get US key financial metrics (ROE, margins, debt ratio). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            :class:`USKeyFinancialMetrics`
+        """
+        ...
+
+    def us_analyst_consensus(self, symbol: str, report: str) -> "USAnalystConsensus":
+        """Get US analyst consensus estimates (EPS, revenue forecasts). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            :class:`USAnalystConsensus`
+        """
+        ...
+
+    def us_etf_dividend_info(self, symbol: str) -> "USETFDividendInfo":
+        """Get US ETF dividend history. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+
+        Returns:
+            :class:`USETFDividendInfo`
+        """
+        ...
+
+    def us_company_dividends(self, symbol: str) -> "USCompanyDividends":
+        """Get US company historical dividends. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`USCompanyDividends`
+        """
+        ...
+
+    def us_etf_files(self, symbol: str, size: Optional[int] = None) -> "USETFFilesResponse":
+        """Get US ETF document list. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+            size: Number of files to return; ``None`` returns all
+
+        Returns:
+            :class:`USETFFilesResponse`
+        """
+        ...
+
+
+class AsyncFundamentalContext:
+    """Async fundamental data context for use with asyncio. All I/O methods return awaitables."""
+
+    def __init__(self, config: "Config") -> None:
+        """Create an AsyncFundamentalContext."""
+        ...
+
+    def us_company_overview(self, symbol: str) -> "Awaitable[USCompanyOverview]":
+        """Get US company overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USCompanyOverview`]
+        """
+        ...
+
+    def us_valuation_overview(self, symbol: str) -> "Awaitable[USValuationOverview]":
+        """Get US valuation overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USValuationOverview`]
+        """
+        ...
+
+    def us_financial_overview(self, symbol: str, report: str) -> "Awaitable[USFinancialOverview]":
+        """Get US financial overview (revenue, net income, EPS, cash flow). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            Awaitable[:class:`USFinancialOverview`]
+        """
+        ...
+
+    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "Awaitable[USFinancialStatement]":
+        """Get US financial statement detail (IS/BS/CF). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            Awaitable[:class:`USFinancialStatement`]
+        """
+        ...
+
+    def us_key_financial_metrics(self, symbol: str, report: str) -> "Awaitable[USKeyFinancialMetrics]":
+        """Get US key financial metrics (ROE, margins, debt ratio). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            Awaitable[:class:`USKeyFinancialMetrics`]
+        """
+        ...
+
+    def us_analyst_consensus(self, symbol: str, report: str) -> "Awaitable[USAnalystConsensus]":
+        """Get US analyst consensus estimates (EPS, revenue forecasts). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            Awaitable[:class:`USAnalystConsensus`]
+        """
+        ...
+
+    def us_etf_dividend_info(self, symbol: str) -> "Awaitable[USETFDividendInfo]":
+        """Get US ETF dividend history. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+
+        Returns:
+            Awaitable[:class:`USETFDividendInfo`]
+        """
+        ...
+
+    def us_company_dividends(self, symbol: str) -> "Awaitable[USCompanyDividends]":
+        """Get US company historical dividends. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USCompanyDividends`]
+        """
+        ...
+
+    def us_etf_files(self, symbol: str, size: Optional[int] = None) -> "Awaitable[USETFFilesResponse]":
+        """Get US ETF document list. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+            size: Number of files to return; ``None`` returns all
+
+        Returns:
+            Awaitable[:class:`USETFFilesResponse`]
         """
         ...
 
@@ -12159,3 +12516,584 @@ class OptionVolumeDaily:
 
     stats: list[OptionVolumeDailyStat]
     """Daily option volume statistics"""
+
+
+# ── US-market API types ────────────────────────────────────────────
+
+class USCryptoOverview:
+    """US cryptocurrency market overview. Returned by QuoteContext.us_crypto_overview."""
+
+    symbol: str
+    """User-facing trading-pair symbol, e.g. ``"BTCUSD.BKKT"``"""
+    name: str
+    """Cryptocurrency full name"""
+    ticker: str
+    """Ticker / pair code, e.g. ``"BTCUSD"``"""
+    base_asset: str
+    """Base asset code, e.g. ``"BTC"``"""
+    currency: str
+    """Quote currency"""
+    all_time_high: str
+    """All-time high price"""
+    all_time_high_date: str
+    """All-time high date"""
+    all_time_low: str
+    """All-time low price"""
+    all_time_low_date: str
+    """All-time low date"""
+    ipo_date: str
+    """IPO / genesis date"""
+    issue_price: str
+    """Issue price"""
+    shares: str
+    """Total supply"""
+    official_web_address: str
+    """Official website URL"""
+    logo: str
+    """Logo image URL"""
+    wiki_url: str
+    """In-app wiki URL"""
+    profile: str
+    """Extended profile as JSON string"""
+
+
+class USReportPeriod:
+    """One reporting period window."""
+    start_date: str
+    end_date: str
+    report_txt: str
+
+class USFinancialISItem:
+    """One income-statement entry."""
+    revenue: str
+    net_income: str
+    net_margin: str
+    report: "USReportPeriod"
+
+class USFinancialBSItem:
+    """One balance-sheet entry."""
+    debt_assets_ratio: str
+    total_assets: str
+    total_liabilities: str
+    report: "USReportPeriod"
+
+class USFinancialCFItem:
+    """One cash-flow entry."""
+    operating: str
+    investing: str
+    financing: str
+    report: "USReportPeriod"
+
+class USFinancialOverview:
+    """US financial overview (IS + BS + CF by period)."""
+    ccy_symbol: str
+    report_type: str
+    is_list: List["USFinancialISItem"]
+    bs_list: List["USFinancialBSItem"]
+    cf_list: List["USFinancialCFItem"]
+
+class USKeyMetricItem:
+    """One period entry in key financial metrics."""
+    ff_period: str
+    ff_year: int
+    fp_end: str
+    report_txt: str
+    rpt_date: str
+    fields: List[Any]
+
+class USKeyFinancialMetrics:
+    """US key financial metrics (ROE, margins, debt ratio) by period."""
+    currency: str
+    report: str
+    empty_fields: List[str]
+    list: List["USKeyMetricItem"]
+
+class USAIChatData:
+    """AI chat context in analyst consensus."""
+    agent_id: str
+    handoff_agent_id: str
+    symbol: str
+    text: str
+    chat_type: str
+    workflow_type: str
+
+class USConsensusEstimate:
+    """Actual vs estimated value for one consensus metric."""
+    actual: str
+    estimate: str
+
+
+class USConsensusItem:
+    """One fiscal-year entry in USAnalystConsensus.list."""
+    ebit: "USConsensusEstimate"
+    eps: "USConsensusEstimate"
+    fiscal_year: int
+    report_txt: str
+    revenue: "USConsensusEstimate"
+
+
+class USAnalystConsensus:
+    """US analyst consensus estimates and AI analysis."""
+    ai_summary: str
+    aichat_data: "USAIChatData"
+    currency: str
+    report: str
+    list: List["USConsensusItem"]
+    opt_reports: List[str]
+    h5_data: Any
+
+
+class USCashEntry:
+    """One cash currency entry in USAssetOverview."""
+
+    currency: str
+    """Currency code, e.g. ``"USD"``"""
+    frozen_buy_cash: str
+    """Cash frozen for pending buy orders"""
+    outstanding: str
+    """Unsettled cash (positive = receivable, negative = payable)"""
+    settled_cash: str
+    """Settled cash balance"""
+    total_amount: str
+    """Total cash amount"""
+    total_cash: str
+    """Total available cash"""
+
+
+class USCryptoEntry:
+    """One cryptocurrency holding in USAssetOverview."""
+
+    asset_type: str
+    """Asset type, e.g. ``"CRYPTO"``"""
+    average_cost: str
+    """Average cost price"""
+    symbol: str
+    """Internal counter_id, e.g. ``"VA/BKKT/BTCUSD"``"""
+    currency: str
+    """Settlement currency"""
+    industry_counter_id: str
+    """Industry counter_id"""
+    industry_name: str
+    """Industry name"""
+
+
+class USStockEntry:
+    """One stock/equity position in USAssetOverview."""
+
+    symbol: str
+    """Ticker code, e.g. ``"AAPL"``"""
+    full_symbol: str
+    """Qualified symbol, e.g. ``"AAPL.US"``"""
+    asset_type: str
+    quantity: str
+    currency: str
+    average_cost: str
+    market: str
+    trade_status: str
+    prev_close: str
+    last_done: str
+    market_price: str
+    pretrade_close: str
+    stock_invest_of_today: str
+    today_pl: str
+    pretrade_stock_invest_of_today: str
+    pretrade_today_pl: str
+    night_last_done: str
+    night_prev_close: str
+    position_side: str
+    open_position_time: str
+    name: str
+    industry_counter_id: str
+    industry_name: str
+
+
+class USAssetOverview:
+    """US account asset snapshot. Returned by TradeContext.us_asset_overview."""
+
+    account_type: str
+    """Account type code"""
+    asset_timestamp: int
+    """Snapshot timestamp (Unix seconds)"""
+    cash_buy_power: str
+    """Available cash buying power"""
+    overnight_buy_power: str
+    """Overnight buying power"""
+    currency: str
+    """Account currency"""
+    cash_list: List[USCashEntry]
+    """Cash balances by currency"""
+    stock_list: List["USStockEntry"]
+    """Stock/equity positions"""
+    option_list: List[Any]
+    """Option positions"""
+    crypto_list: List[USCryptoEntry]
+    """Cryptocurrency positions"""
+
+
+class USRealizedPLMetric:
+    """One time-period metric within a USRealizedPLEntry."""
+
+    amount: str
+    """Realized P&L amount"""
+    period: int
+    """Period code (server-defined)"""
+    rate: str
+    """Realized P&L rate"""
+
+
+class USRealizedPLEntry:
+    """One asset-category entry in USRealizedPL. category: 0=all, 1=stock, 2=option, 3=crypto."""
+
+    category: int
+    """Asset category code"""
+    currency: str
+    """Currency"""
+    metrics: List[USRealizedPLMetric]
+    """Time-period metrics"""
+
+
+class USRealizedPL:
+    """Realized P&L response for a US account. Returned by TradeContext.us_realized_pl."""
+
+    realized_pl_list: List[USRealizedPLEntry]
+    """Per-category realized P&L entries"""
+
+
+class USOrderHistory:
+    """One order state-transition entry within USOrderDetail."""
+    exec_type: int
+    status: str
+    price: str
+    qty: str
+    time: str
+    msg: str
+    is_manually: bool
+    opp_party_id: str
+    trd_match_id: str
+    operator: str
+    op_entrust_way: str
+    cxl_rej_response_to: int
+    withdrawal_reason: str
+    opp_name: str
+    exec_id: str
+
+
+class USButtonControl:
+    """Action-button state for an order."""
+    withdraw: int
+    replace: int
+    exceptionable: List[str]
+
+
+class USChargeItem:
+    """One fee category within USChargeDetail."""
+    code: int
+    name: str
+    fees: List[str]
+
+
+class USChargeDetail:
+    """Fee breakdown for an order."""
+    currency: str
+    total_amount: str
+    items: List["USChargeItem"]
+
+
+class USAttachedOrder:
+    """One bracket/conditional sub-order attached to a main order."""
+    attached_type_display: int
+    executed_qty: str
+    quantity: str
+    status: str
+    trigger_price: str
+    order_id: str
+    gtd: str
+    time_in_force: int
+    tag: int
+    activate_order_type: str
+    activate_rth: int
+    submit_price: str
+    symbol: str
+    withdrawn: bool
+
+
+class USOrderDetail:
+    """Full typed order object within USOrderDetailResponse."""
+    id: str
+    aaid: str
+    account_channel: str
+    action: int
+    symbol: str
+    underlying_symbol: str
+    security_type: str
+    name: str
+    currency: str
+    trade_currency: str
+    order_type: str
+    status: str
+    price: str
+    quantity: str
+    executed_qty: str
+    executed_price: str
+    executed_amount: str
+    operate_direction: str
+    time_in_force: int
+    gtd: str
+    tag: int
+    msg: str
+    force_only_rth: int
+    submitted_at: str
+    done_at: str
+    trigger_price: str
+    trigger_at: str
+    trigger_status: int
+    trigger_exchange: str
+    trigger_last_done: str
+    trigger_count: int
+    tailing_amount: str
+    tailing_percent: str
+    limit_offset: str
+    limit_depth_level: int
+    market_price: str
+    submitted_amount: str
+    estimated_fee: str
+    free_status: int
+    free_amount: str
+    free_currency: str
+    deductions_status: int
+    deductions_amount: str
+    deductions_currency: str
+    platform_deductions_status: int
+    platform_deductions_amount: str
+    platform_deductions_currency: str
+    display_account: str
+    settlement_account: str
+    settlement_channel: str
+    customer_name: str
+    real_name: str
+    en_name: str
+    joint_real_name: str
+    joint_en_name: str
+    org_id: str
+    bcan: str
+    op_entrust_way: int
+    op_entrust_way_name: str
+    remark: str
+    notice: str
+    short_sell_type: int
+    ploy_type: str
+    ploy_id: str
+    ploy_status: str
+    trend: int
+    withdrawal_reason: str
+    activate_order_type: str
+    activate_rth: int
+    submit_price: str
+    contract_direction: str
+    strike_price: str
+    contract_size: str
+    monitor_price: str
+    button_control: "USButtonControl"
+    charge_detail: Optional["USChargeDetail"]
+    attached_orders: List["USAttachedOrder"]
+    order_histories: List["USOrderHistory"]
+
+
+class USOrderDetailResponse:
+    """Response for TradeContext.us_order_detail."""
+    order: Optional["USOrderDetail"]
+    current_attached_order: Optional["USOrderDetail"]
+    current_millisecond: str
+
+
+class USRankTag:
+    """A rank tag entry for a US company overview."""
+
+    key: str
+    location: int
+    title: str
+    text: str
+    rank_type: int
+    highlight_text: str
+
+
+class USSharelistItem:
+    """One entry in USCompanyOverview.share_list."""
+    chg: str
+    id: str
+    name: str
+
+
+class USCompanyOverview:
+    """US company overview. Returned by FundamentalContext.us_company_overview."""
+
+    intro: str
+    market_cap: str
+    ccy_symbol: str
+    top_rank_tags: List[USRankTag]
+    detail_url: str
+    share_list: List["USSharelistItem"]
+
+
+class USValuationMetric:
+    """One valuation metric in USValuationOverview.metrics (e.g. key="pe")."""
+
+    circle: str
+    part: str
+    metric: str
+    desc: str
+    industry_median: str
+
+
+class USValuationOverview:
+    """US valuation overview. Returned by FundamentalContext.us_valuation_overview."""
+
+    metrics: Dict[str, "USValuationMetric"]
+    """Map of metric key (e.g. ``"pe"``) to :class:`USValuationMetric`"""
+    indicator: str
+    range: int
+    date: str
+    ccy_symbol: str
+    aichat_data: "USAIChatData"
+    ai_summary: str
+
+
+class USFinancialStatementField:
+    """One financial line item within a USFinancialStatementPeriod."""
+
+    display_order: int
+    field: str
+    id: str
+    level: int
+    name: str
+    value: str
+    value_type: str
+    yoy: str
+
+
+class USFinancialStatementPeriod:
+    """One reporting period in USFinancialStatement."""
+
+    ff_period: str
+    ff_year: int
+    fields: List["USFinancialStatementField"]
+    fp_end: str
+    report_txt: str
+    rpt_date: str
+
+
+class USFinancialStatement:
+    """US financial statement (IS/BS/CF). Returned by FundamentalContext.us_financial_statement."""
+
+    currency: str
+    report: str
+    list: List["USFinancialStatementPeriod"]
+    empty_fields: List[str]
+    """Currency"""
+
+
+class USFiscalYearDividend:
+    """Per-fiscal-year dividend row for a US ETF."""
+
+    dividend: str
+    dividend_yield: str
+    fiscal_year: str
+    currency: str
+    fiscal_year_range: str
+
+
+class USETFDividendInfo:
+    """US ETF dividend history. Returned by FundamentalContext.us_etf_dividend_info."""
+
+    dividend_ttm: str
+    """TTM dividend per share"""
+    dividend_yield_ttm: str
+    """TTM dividend yield"""
+    dividend_frequency: str
+    """Distribution frequency"""
+    currency: str
+    """Currency"""
+    fiscal_year_info: List["USFiscalYearDividend"]
+    """Per-fiscal-year dividend records"""
+
+
+class USDividendItem:
+    """A single US dividend payment record."""
+
+    dividend: str
+    """Dividend per share"""
+    dividend_type: str
+    """Dividend type"""
+    ex_date: str
+    """Ex-dividend date"""
+    payment_date: str
+    """Payment date"""
+    record_date: str
+    """Record date"""
+
+
+class USRecentDividend:
+    """Trailing-12-month dividend summary."""
+
+    dividend_ttm: str
+    dividend_yield_ttm: str
+    payouts: str
+    currency: str
+
+
+class USDividendHistoryItem:
+    """One fiscal-year row in dividend_history or payout_ratios."""
+
+    fiscal_year: str
+    fiscal_year_range: str
+    total_shareholder_yield: str
+    dividend: str
+    dividend_yield: str
+    dividend_growth_rate: str
+    dividend_payout_ratio: str
+    dividend_to_cashflow_ratio: str
+    net_buyback: str
+    net_buyback_yield: str
+    net_buyback_growth_rate: str
+    net_buyback_payout_ratio: str
+    net_buyback_to_cashflow_ratio: str
+    currency: str
+
+
+class USDividendPayoutRecord:
+    """One actual dividend payment event."""
+
+    dividend: str
+    dividend_type: str
+    currency: str
+    ex_date: str
+    payment_date: str
+    record_date: str
+    title: str
+    start_time_unix: str
+
+
+class USCompanyDividends:
+    """US company historical dividends. Returned by FundamentalContext.us_company_dividends."""
+
+    recent_dividends: "USRecentDividend"
+    dividend_history: List["USDividendHistoryItem"]
+    payout_ratios: List["USDividendHistoryItem"]
+    dividend_payout_history: List["USDividendPayoutRecord"]
+
+
+class USETFFile:
+    """A single ETF document entry."""
+
+    file_name: str
+    file_path: str
+    update_date: str
+    code: str
+    format: str
+
+
+class USETFFilesResponse:
+    """US ETF document list. Returned by FundamentalContext.us_etf_files."""
+
+    files: List[USETFFile]
+    """Document entries"""

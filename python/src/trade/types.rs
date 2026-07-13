@@ -3,6 +3,7 @@ use pyo3::pyclass;
 
 use crate::{
     decimal::PyDecimal,
+    fundamental::types::JsonValue,
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
     types::Market,
 };
@@ -792,4 +793,529 @@ pub(crate) struct EstimateMaxPurchaseQuantityResponse {
     pub cash_max_qty: PyDecimal,
     /// Margin available quantity
     pub margin_max_qty: PyDecimal,
+}
+
+// ── US-market types ──────────────────────────────────────────────────────────
+
+/// One cash currency entry in USAssetOverview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USCashEntry {
+    pub currency: String,
+    pub frozen_buy_cash: String,
+    pub outstanding: String,
+    pub settled_cash: String,
+    pub total_amount: String,
+    pub total_cash: String,
+}
+
+impl From<longbridge::trade::USCashEntry> for USCashEntry {
+    fn from(v: longbridge::trade::USCashEntry) -> Self {
+        Self {
+            currency: v.currency,
+            frozen_buy_cash: v.frozen_buy_cash,
+            outstanding: v.outstanding,
+            settled_cash: v.settled_cash,
+            total_amount: v.total_amount,
+            total_cash: v.total_cash,
+        }
+    }
+}
+
+/// One cryptocurrency holding in USAssetOverview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USCryptoEntry {
+    pub asset_type: String,
+    pub average_cost: String,
+    pub symbol: String,
+    pub currency: String,
+    pub industry_name: String,
+}
+
+impl From<longbridge::trade::USCryptoEntry> for USCryptoEntry {
+    fn from(v: longbridge::trade::USCryptoEntry) -> Self {
+        Self {
+            asset_type: v.asset_type,
+            average_cost: v.average_cost,
+            symbol: v.symbol,
+            currency: v.currency,
+            industry_name: v.industry_name,
+        }
+    }
+}
+
+/// One stock/equity position in USAssetOverview
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USStockEntry {
+    pub symbol: String,
+    pub full_symbol: String,
+    pub asset_type: String,
+    pub quantity: String,
+    pub currency: String,
+    pub average_cost: String,
+    pub market: String,
+    pub trade_status: String,
+    pub prev_close: String,
+    pub last_done: String,
+    pub market_price: String,
+    pub pretrade_close: String,
+    pub stock_invest_of_today: String,
+    pub today_pl: String,
+    pub pretrade_stock_invest_of_today: String,
+    pub pretrade_today_pl: String,
+    pub night_last_done: String,
+    pub night_prev_close: String,
+    pub position_side: String,
+    pub open_position_time: String,
+    pub name: String,
+    pub industry_counter_id: String,
+    pub industry_name: String,
+}
+
+impl From<longbridge::trade::USStockEntry> for USStockEntry {
+    fn from(v: longbridge::trade::USStockEntry) -> Self {
+        Self {
+            symbol: v.symbol,
+            full_symbol: v.full_symbol,
+            asset_type: v.asset_type,
+            quantity: v.quantity,
+            currency: v.currency,
+            average_cost: v.average_cost,
+            market: v.market,
+            trade_status: v.trade_status,
+            prev_close: v.prev_close,
+            last_done: v.last_done,
+            market_price: v.market_price,
+            pretrade_close: v.pretrade_close,
+            stock_invest_of_today: v.stock_invest_of_today,
+            today_pl: v.today_pl,
+            pretrade_stock_invest_of_today: v.pretrade_stock_invest_of_today,
+            pretrade_today_pl: v.pretrade_today_pl,
+            night_last_done: v.night_last_done,
+            night_prev_close: v.night_prev_close,
+            position_side: v.position_side,
+            open_position_time: v.open_position_time,
+            name: v.name,
+            industry_counter_id: v.industry_counter_id,
+            industry_name: v.industry_name,
+        }
+    }
+}
+
+/// US account asset snapshot
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USAssetOverview {
+    pub account_type: String,
+    pub asset_timestamp: i64,
+    pub cash_buy_power: String,
+    pub overnight_buy_power: String,
+    pub currency: String,
+    pub cash_list: Vec<USCashEntry>,
+    pub stock_list: Vec<USStockEntry>,
+    pub option_list: Vec<JsonValue>,
+    pub crypto_list: Vec<USCryptoEntry>,
+}
+
+impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
+    fn from(v: longbridge::trade::USAssetOverview) -> Self {
+        Self {
+            account_type: v.account_type,
+            asset_timestamp: v
+                .asset_timestamp
+                .map(|t| t.unix_timestamp())
+                .unwrap_or_default(),
+            cash_buy_power: v.cash_buy_power,
+            overnight_buy_power: v.overnight_buy_power,
+            currency: v.currency,
+            cash_list: v.cash_list.into_iter().map(Into::into).collect(),
+            stock_list: v.stock_list.into_iter().map(Into::into).collect(),
+            option_list: v.option_list.into_iter().map(JsonValue).collect(),
+            crypto_list: v.crypto_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One time-period metric in USRealizedPLEntry
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USRealizedPLMetric {
+    pub amount: String,
+    pub period: i32,
+    pub rate: String,
+}
+
+impl From<longbridge::trade::USRealizedPLMetric> for USRealizedPLMetric {
+    fn from(v: longbridge::trade::USRealizedPLMetric) -> Self {
+        Self {
+            amount: v.amount,
+            period: v.period,
+            rate: v.rate,
+        }
+    }
+}
+
+/// One asset-category entry in USRealizedPL
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USRealizedPLEntry {
+    pub category: i32,
+    pub currency: String,
+    pub metrics: Vec<USRealizedPLMetric>,
+}
+
+impl From<longbridge::trade::USRealizedPLEntry> for USRealizedPLEntry {
+    fn from(v: longbridge::trade::USRealizedPLEntry) -> Self {
+        Self {
+            category: v.category,
+            currency: v.currency,
+            metrics: v.metrics.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Realized P&L response for a US account
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USRealizedPL {
+    pub realized_pl_list: Vec<USRealizedPLEntry>,
+}
+
+impl From<longbridge::trade::USRealizedPL> for USRealizedPL {
+    fn from(v: longbridge::trade::USRealizedPL) -> Self {
+        Self {
+            realized_pl_list: v.realized_pl_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One order state-transition entry within USOrderDetail.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USOrderHistory {
+    pub exec_type: i32,
+    pub status: String,
+    pub price: String,
+    pub qty: String,
+    pub time: String,
+    pub msg: String,
+    pub is_manually: bool,
+    pub opp_party_id: String,
+    pub trd_match_id: String,
+    pub operator: String,
+    pub op_entrust_way: String,
+    pub cxl_rej_response_to: i32,
+    pub withdrawal_reason: String,
+    pub opp_name: String,
+    pub exec_id: String,
+}
+
+impl From<longbridge::trade::USOrderHistory> for USOrderHistory {
+    fn from(v: longbridge::trade::USOrderHistory) -> Self {
+        Self {
+            exec_type: v.exec_type,
+            status: v.status,
+            price: v.price,
+            qty: v.qty,
+            time: v.time,
+            msg: v.msg,
+            is_manually: v.is_manually,
+            opp_party_id: v.opp_party_id,
+            trd_match_id: v.trd_match_id,
+            operator: v.operator,
+            op_entrust_way: v.op_entrust_way,
+            cxl_rej_response_to: v.cxl_rej_response_to,
+            withdrawal_reason: v.withdrawal_reason,
+            opp_name: v.opp_name,
+            exec_id: v.exec_id,
+        }
+    }
+}
+
+/// Action-button state for an order.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USButtonControl {
+    pub withdraw: i32,
+    pub replace: i32,
+    pub exceptionable: Vec<String>,
+}
+
+impl From<longbridge::trade::USButtonControl> for USButtonControl {
+    fn from(v: longbridge::trade::USButtonControl) -> Self {
+        Self {
+            withdraw: v.withdraw,
+            replace: v.replace,
+            exceptionable: v.exceptionable,
+        }
+    }
+}
+
+/// One fee category within USChargeDetail.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USChargeItem {
+    pub code: i32,
+    pub name: String,
+    pub fees: Vec<String>,
+}
+
+impl From<longbridge::trade::USChargeItem> for USChargeItem {
+    fn from(v: longbridge::trade::USChargeItem) -> Self {
+        Self {
+            code: v.code,
+            name: v.name,
+            fees: v.fees,
+        }
+    }
+}
+
+/// Fee breakdown for an order.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USChargeDetail {
+    pub currency: String,
+    pub total_amount: String,
+    pub items: Vec<USChargeItem>,
+}
+
+impl From<longbridge::trade::USChargeDetail> for USChargeDetail {
+    fn from(v: longbridge::trade::USChargeDetail) -> Self {
+        Self {
+            currency: v.currency,
+            total_amount: v.total_amount,
+            items: v.items.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One bracket/conditional sub-order attached to a main order.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USAttachedOrder {
+    pub attached_type_display: i32,
+    pub executed_qty: String,
+    pub quantity: String,
+    pub status: String,
+    pub trigger_price: String,
+    pub order_id: String,
+    pub gtd: String,
+    pub time_in_force: i32,
+    pub tag: i32,
+    pub activate_order_type: String,
+    pub activate_rth: i32,
+    pub submit_price: String,
+    pub symbol: String,
+    pub withdrawn: bool,
+}
+
+impl From<longbridge::trade::USAttachedOrder> for USAttachedOrder {
+    fn from(v: longbridge::trade::USAttachedOrder) -> Self {
+        Self {
+            attached_type_display: v.attached_type_display,
+            executed_qty: v.executed_qty,
+            quantity: v.quantity,
+            status: v.status,
+            trigger_price: v.trigger_price,
+            order_id: v.order_id,
+            gtd: v.gtd,
+            time_in_force: v.time_in_force,
+            tag: v.tag,
+            activate_order_type: v.activate_order_type,
+            activate_rth: v.activate_rth,
+            submit_price: v.submit_price,
+            symbol: v.symbol,
+            withdrawn: v.withdrawn,
+        }
+    }
+}
+
+/// Full typed order object within USOrderDetailResponse.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USOrderDetail {
+    pub id: String,
+    pub aaid: String,
+    pub account_channel: String,
+    pub action: i32,
+    pub symbol: String,
+    pub underlying_symbol: String,
+    pub security_type: String,
+    pub name: String,
+    pub currency: String,
+    pub trade_currency: String,
+    pub order_type: String,
+    pub status: String,
+    pub price: String,
+    pub quantity: String,
+    pub executed_qty: String,
+    pub executed_price: String,
+    pub executed_amount: String,
+    pub operate_direction: String,
+    pub time_in_force: i32,
+    pub gtd: String,
+    pub tag: i32,
+    pub msg: String,
+    pub force_only_rth: i32,
+    pub submitted_at: String,
+    pub done_at: String,
+    pub trigger_price: String,
+    pub trigger_at: String,
+    pub trigger_status: i32,
+    pub trigger_exchange: String,
+    pub trigger_last_done: String,
+    pub trigger_count: i32,
+    pub tailing_amount: String,
+    pub tailing_percent: String,
+    pub limit_offset: String,
+    pub limit_depth_level: i32,
+    pub market_price: String,
+    pub submitted_amount: String,
+    pub estimated_fee: String,
+    pub free_status: i32,
+    pub free_amount: String,
+    pub free_currency: String,
+    pub deductions_status: i32,
+    pub deductions_amount: String,
+    pub deductions_currency: String,
+    pub platform_deductions_status: i32,
+    pub platform_deductions_amount: String,
+    pub platform_deductions_currency: String,
+    pub display_account: String,
+    pub settlement_account: String,
+    pub settlement_channel: String,
+    pub customer_name: String,
+    pub real_name: String,
+    pub en_name: String,
+    pub joint_real_name: String,
+    pub joint_en_name: String,
+    pub org_id: String,
+    pub bcan: String,
+    pub op_entrust_way: i32,
+    pub op_entrust_way_name: String,
+    pub remark: String,
+    pub notice: String,
+    pub short_sell_type: i32,
+    pub ploy_type: String,
+    pub ploy_id: String,
+    pub ploy_status: String,
+    pub trend: i32,
+    pub withdrawal_reason: String,
+    pub activate_order_type: String,
+    pub activate_rth: i32,
+    pub submit_price: String,
+    pub contract_direction: String,
+    pub strike_price: String,
+    pub contract_size: String,
+    pub monitor_price: String,
+    pub button_control: USButtonControl,
+    pub charge_detail: Option<USChargeDetail>,
+    pub attached_orders: Vec<USAttachedOrder>,
+    pub order_histories: Vec<USOrderHistory>,
+}
+
+impl From<longbridge::trade::USOrderDetail> for USOrderDetail {
+    fn from(v: longbridge::trade::USOrderDetail) -> Self {
+        Self {
+            id: v.id,
+            aaid: v.aaid,
+            account_channel: v.account_channel,
+            action: v.action,
+            symbol: v.symbol,
+            underlying_symbol: v.underlying_symbol,
+            security_type: v.security_type,
+            name: v.name,
+            currency: v.currency,
+            trade_currency: v.trade_currency,
+            order_type: v.order_type,
+            status: v.status,
+            price: v.price,
+            quantity: v.quantity,
+            executed_qty: v.executed_qty,
+            executed_price: v.executed_price,
+            executed_amount: v.executed_amount,
+            operate_direction: v.operate_direction,
+            time_in_force: v.time_in_force,
+            gtd: v.gtd,
+            tag: v.tag,
+            msg: v.msg,
+            force_only_rth: v.force_only_rth,
+            submitted_at: v.submitted_at,
+            done_at: v.done_at,
+            trigger_price: v.trigger_price,
+            trigger_at: v.trigger_at,
+            trigger_status: v.trigger_status,
+            trigger_exchange: v.trigger_exchange,
+            trigger_last_done: v.trigger_last_done,
+            trigger_count: v.trigger_count,
+            tailing_amount: v.tailing_amount,
+            tailing_percent: v.tailing_percent,
+            limit_offset: v.limit_offset,
+            limit_depth_level: v.limit_depth_level,
+            market_price: v.market_price,
+            submitted_amount: v.submitted_amount,
+            estimated_fee: v.estimated_fee,
+            free_status: v.free_status,
+            free_amount: v.free_amount,
+            free_currency: v.free_currency,
+            deductions_status: v.deductions_status,
+            deductions_amount: v.deductions_amount,
+            deductions_currency: v.deductions_currency,
+            platform_deductions_status: v.platform_deductions_status,
+            platform_deductions_amount: v.platform_deductions_amount,
+            platform_deductions_currency: v.platform_deductions_currency,
+            display_account: v.display_account,
+            settlement_account: v.settlement_account,
+            settlement_channel: v.settlement_channel,
+            customer_name: v.customer_name,
+            real_name: v.real_name,
+            en_name: v.en_name,
+            joint_real_name: v.joint_real_name,
+            joint_en_name: v.joint_en_name,
+            org_id: v.org_id,
+            bcan: v.bcan,
+            op_entrust_way: v.op_entrust_way,
+            op_entrust_way_name: v.op_entrust_way_name,
+            remark: v.remark,
+            notice: v.notice,
+            short_sell_type: v.short_sell_type,
+            ploy_type: v.ploy_type,
+            ploy_id: v.ploy_id,
+            ploy_status: v.ploy_status,
+            trend: v.trend,
+            withdrawal_reason: v.withdrawal_reason,
+            activate_order_type: v.activate_order_type,
+            activate_rth: v.activate_rth,
+            submit_price: v.submit_price,
+            contract_direction: v.contract_direction,
+            strike_price: v.strike_price,
+            contract_size: v.contract_size,
+            monitor_price: v.monitor_price,
+            button_control: v.button_control.into(),
+            charge_detail: v.charge_detail.map(Into::into),
+            attached_orders: v.attached_orders.into_iter().map(Into::into).collect(),
+            order_histories: v.order_histories.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Response for us_order_detail.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct USOrderDetailResponse {
+    pub order: Option<USOrderDetail>,
+    pub current_attached_order: Option<USOrderDetail>,
+    pub current_millisecond: String,
+}
+
+impl From<longbridge::trade::USOrderDetailResponse> for USOrderDetailResponse {
+    fn from(v: longbridge::trade::USOrderDetailResponse) -> Self {
+        Self {
+            order: v.order.map(Into::into),
+            current_attached_order: v.current_attached_order.map(Into::into),
+            current_millisecond: v.current_millisecond,
+        }
+    }
 }

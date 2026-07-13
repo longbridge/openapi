@@ -6,7 +6,7 @@ use longbridge::{
         EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        ReplaceOrderOptions, SubmitOrderOptions,
+        QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -446,6 +446,71 @@ impl TradeContext {
             .order_detail(order_id)
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────
+
+    /// Query US order list (returns JSON string). US token required.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[pyo3(signature = (symbol = None, action = 0, start_at = 0, end_at = 0, query_type = 0, page = 1, limit = 20))]
+    fn us_query_orders(
+        &self,
+        symbol: Option<String>,
+        action: i32,
+        start_at: i64,
+        end_at: i64,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+    ) -> PyResult<String> {
+        let opts = longbridge::trade::GetUSHistoryOrders {
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
+        let resp = self.ctx.us_query_orders(opts).map_err(ErrorNewType)?;
+        serde_json::to_string(&resp)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+    /// Get US order detail. US token required.
+    fn us_order_detail(
+        &self,
+        order_id: String,
+    ) -> PyResult<crate::trade::types::USOrderDetailResponse> {
+        Ok(self
+            .ctx
+            .us_order_detail(order_id)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US account asset overview. US token required.
+    fn us_asset_overview(&self) -> PyResult<crate::trade::types::USAssetOverview> {
+        Ok(self.ctx.us_asset_overview().map_err(ErrorNewType)?.into())
+    }
+
+    /// Get US realized P&L. US token required.
+    fn us_realized_pl(
+        &self,
+        currency: String,
+        category: Option<String>,
+    ) -> PyResult<crate::trade::types::USRealizedPL> {
+        Ok(self
+            .ctx
+            .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                currency,
+                category: category.unwrap_or_default(),
+            })
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

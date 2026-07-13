@@ -895,4 +895,19 @@ impl AsyncQuoteContext {
         })
         .map(|b| b.unbind())
     }
+
+    /// Get US cryptocurrency market overview. US token required. Returns
+    /// awaitable.
+    fn us_crypto_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::quote::types::USCryptoOverview = ctx
+                .us_crypto_overview(symbol)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
 }

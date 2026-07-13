@@ -1720,6 +1720,302 @@ pub struct MacroeconomicResponse {
     pub count: i32,
 }
 
+// ── US-market types
+// ───────────────────────────────────────────────────────────
+
+/// Industry rank tag returned by
+/// [`crate::FundamentalContext::us_company_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USRankTag {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub location: i32,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub text: String,
+    #[serde(default)]
+    pub rank_type: i32,
+    #[serde(default)]
+    pub highlight_text: String,
+}
+
+/// One entry in [`USCompanyOverview`]'s sharelist field.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USSharelistItem {
+    #[serde(default)]
+    pub chg: String,
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub name: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_company_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USCompanyOverview {
+    #[serde(default)]
+    pub intro: String,
+    #[serde(default)]
+    pub market_cap: String,
+    #[serde(default)]
+    pub ccy_symbol: String,
+    #[serde(default)]
+    pub top_rank_tags: Vec<USRankTag>,
+    #[serde(default)]
+    pub detail_url: String,
+    #[serde(default)]
+    pub share_list: Vec<USSharelistItem>,
+}
+
+/// One valuation metric entry within [`USValuationOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USValuationMetric {
+    #[serde(default)]
+    pub circle: String,
+    #[serde(default)]
+    pub part: String,
+    #[serde(default)]
+    pub metric: String,
+    #[serde(default)]
+    pub desc: String,
+    #[serde(default)]
+    pub industry_median: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_valuation_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USValuationOverview {
+    /// Map of metric key (e.g. "pe") to its valuation data
+    #[serde(default)]
+    pub metrics: std::collections::HashMap<String, USValuationMetric>,
+    /// Active indicator key (e.g. "pe")
+    #[serde(default)]
+    pub indicator: String,
+    /// Historical percentile range in years
+    #[serde(default)]
+    pub range: i32,
+    /// Data date string
+    #[serde(default)]
+    pub date: String,
+    #[serde(default)]
+    pub ccy_symbol: String,
+    #[serde(default)]
+    pub aichat_data: USAIChatData,
+    #[serde(default)]
+    pub ai_summary: String,
+}
+
+/// One financial field within a [`USFinancialStatementPeriod`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialStatementField {
+    #[serde(default)]
+    pub display_order: i32,
+    #[serde(default)]
+    pub field: String,
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub level: i64,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub value: String,
+    #[serde(default)]
+    pub value_type: String,
+    #[serde(default)]
+    pub yoy: String,
+}
+
+/// One reporting period in [`USFinancialStatement`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialStatementPeriod {
+    #[serde(default)]
+    pub ff_period: String,
+    #[serde(default)]
+    pub ff_year: i32,
+    #[serde(default)]
+    pub fields: Vec<USFinancialStatementField>,
+    #[serde(default)]
+    pub fp_end: String,
+    #[serde(default)]
+    pub report_txt: String,
+    #[serde(default)]
+    pub rpt_date: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_financial_statement`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialStatement {
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub report: String,
+    #[serde(default)]
+    pub list: Vec<USFinancialStatementPeriod>,
+    #[serde(default)]
+    pub empty_fields: Vec<String>,
+}
+
+/// Per-fiscal-year dividend records for a US ETF.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFiscalYearDividend {
+    #[serde(default)]
+    pub dividend: String,
+    #[serde(default)]
+    pub dividend_yield: String,
+    #[serde(default)]
+    pub fiscal_year: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub fiscal_year_range: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_etf_dividend_info`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USETFDividendInfo {
+    /// Total dividend over trailing 12 months
+    #[serde(default)]
+    pub dividend_ttm: String,
+    /// Dividend yield over trailing 12 months
+    #[serde(default)]
+    pub dividend_yield_ttm: String,
+    /// Dividend frequency
+    #[serde(default)]
+    pub dividend_frequency: String,
+    /// Currency
+    #[serde(default)]
+    pub currency: String,
+    /// Per-fiscal-year dividend records
+    #[serde(default)]
+    pub fiscal_year_info: Vec<USFiscalYearDividend>,
+}
+
+/// A single historical dividend payment.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USDividendItem {
+    /// Per-share dividend amount
+    #[serde(default)]
+    pub dividend: String,
+    /// Dividend type (e.g. cash dividend)
+    #[serde(default)]
+    pub dividend_type: String,
+    /// Ex-dividend date
+    #[serde(default)]
+    pub ex_date: String,
+    /// Payment date
+    #[serde(default)]
+    pub payment_date: String,
+    /// Record date
+    #[serde(default)]
+    pub record_date: String,
+}
+
+/// Trailing-12-month dividend summary within [`USCompanyDividends`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRecentDividend {
+    #[serde(default)]
+    pub dividend_ttm: String,
+    #[serde(default)]
+    pub dividend_yield_ttm: String,
+    #[serde(default)]
+    pub payouts: String,
+    #[serde(default)]
+    pub currency: String,
+}
+
+/// One fiscal-year row in the dividend history or payout-ratio table.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USDividendHistoryItem {
+    #[serde(default)]
+    pub fiscal_year: String,
+    #[serde(default)]
+    pub fiscal_year_range: String,
+    #[serde(default)]
+    pub total_shareholder_yield: String,
+    #[serde(default)]
+    pub dividend: String,
+    #[serde(default)]
+    pub dividend_yield: String,
+    #[serde(default)]
+    pub dividend_growth_rate: String,
+    #[serde(default)]
+    pub dividend_payout_ratio: String,
+    #[serde(default)]
+    pub dividend_to_cashflow_ratio: String,
+    #[serde(default)]
+    pub net_buyback: String,
+    #[serde(default)]
+    pub net_buyback_yield: String,
+    #[serde(default)]
+    pub net_buyback_growth_rate: String,
+    #[serde(default)]
+    pub net_buyback_payout_ratio: String,
+    #[serde(default)]
+    pub net_buyback_to_cashflow_ratio: String,
+    #[serde(default)]
+    pub currency: String,
+}
+
+/// One actual dividend payment event in [`USCompanyDividends`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USDividendPayoutRecord {
+    #[serde(default)]
+    pub dividend: String,
+    #[serde(default)]
+    pub dividend_type: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub ex_date: String,
+    #[serde(default)]
+    pub payment_date: String,
+    #[serde(default)]
+    pub record_date: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub start_time_unix: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_company_dividends`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCompanyDividends {
+    #[serde(default)]
+    pub recent_dividends: USRecentDividend,
+    #[serde(default)]
+    pub dividend_history: Vec<USDividendHistoryItem>,
+    #[serde(default)]
+    pub payout_ratios: Vec<USDividendHistoryItem>,
+    #[serde(default)]
+    pub dividend_payout_history: Vec<USDividendPayoutRecord>,
+}
+
+/// A single file in an ETF document list.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USETFFile {
+    #[serde(default)]
+    pub file_name: String,
+    #[serde(default)]
+    pub file_path: String,
+    #[serde(default)]
+    pub update_date: String,
+    #[serde(default)]
+    pub code: String,
+    #[serde(default)]
+    pub format: String,
+}
+
+/// Response for [`crate::FundamentalContext::us_etf_files`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct USETFFilesResponse {
+    /// List of ETF documents
+    #[serde(default)]
+    pub files: Vec<USETFFile>,
+}
+
 // ── v2 wire types (internal, used for mapping to existing public types) ──────
 
 /// v2 wire: one indicator from GET /v2/quote/macrodata
@@ -1796,4 +2092,167 @@ pub(crate) struct V2MacroIndicatorDataResponse {
     /// Total data points matching the query (for pagination)
     #[serde(default)]
     pub total: i32,
+}
+
+// ── US financial overview ─────────────────────────────────────────────────
+
+/// One reporting-period window shared by IS/BS/CF entries.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USReportPeriod {
+    #[serde(default)]
+    pub start_date: String,
+    #[serde(default)]
+    pub end_date: String,
+    #[serde(default)]
+    pub report_txt: String,
+}
+
+/// One income-statement entry in [`USFinancialOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialISItem {
+    #[serde(default)]
+    pub revenue: String,
+    #[serde(default)]
+    pub net_income: String,
+    #[serde(default)]
+    pub net_margin: String,
+    #[serde(default)]
+    pub report: USReportPeriod,
+}
+
+/// One balance-sheet entry in [`USFinancialOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialBSItem {
+    #[serde(default)]
+    pub debt_assets_ratio: String,
+    #[serde(default)]
+    pub total_assets: String,
+    #[serde(default)]
+    pub total_liabilities: String,
+    #[serde(default)]
+    pub report: USReportPeriod,
+}
+
+/// One cash-flow entry in [`USFinancialOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialCFItem {
+    #[serde(default)]
+    pub operating: String,
+    #[serde(default)]
+    pub investing: String,
+    #[serde(default)]
+    pub financing: String,
+    #[serde(default)]
+    pub report: USReportPeriod,
+}
+
+/// Response for [`crate::FundamentalContext::us_financial_overview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USFinancialOverview {
+    #[serde(default)]
+    pub ccy_symbol: String,
+    #[serde(default)]
+    pub report_type: String,
+    #[serde(default)]
+    pub is_list: Vec<USFinancialISItem>,
+    #[serde(default)]
+    pub bs_list: Vec<USFinancialBSItem>,
+    #[serde(default)]
+    pub cf_list: Vec<USFinancialCFItem>,
+}
+
+// ── US key financial metrics ──────────────────────────────────────────────
+
+/// One period entry in [`USKeyFinancialMetrics`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USKeyMetricItem {
+    #[serde(default)]
+    pub ff_period: String,
+    #[serde(default)]
+    pub ff_year: i32,
+    #[serde(default)]
+    pub fp_end: String,
+    #[serde(default)]
+    pub report_txt: String,
+    #[serde(default)]
+    pub rpt_date: String,
+    /// Metric values — shape varies per field configuration.
+    #[serde(default)]
+    pub fields: Vec<serde_json::Value>,
+}
+
+/// Response for [`crate::FundamentalContext::us_key_financial_metrics`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USKeyFinancialMetrics {
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub report: String,
+    #[serde(default)]
+    pub empty_fields: Vec<String>,
+    #[serde(default)]
+    pub list: Vec<USKeyMetricItem>,
+}
+
+// ── US analyst consensus ──────────────────────────────────────────────────
+
+/// AI chat context embedded in [`USAnalystConsensus`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAIChatData {
+    #[serde(default)]
+    pub agent_id: String,
+    #[serde(default)]
+    pub handoff_agent_id: String,
+    #[serde(default)]
+    pub symbol: String,
+    #[serde(default)]
+    pub text: String,
+    #[serde(default, rename = "type")]
+    pub chat_type: String,
+    #[serde(default)]
+    pub workflow_type: String,
+}
+
+/// Actual vs estimated value for one consensus metric.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USConsensusEstimate {
+    #[serde(default)]
+    pub actual: String,
+    #[serde(default)]
+    pub estimate: String,
+}
+
+/// One fiscal-year entry in [`USAnalystConsensus`]'s list.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USConsensusItem {
+    #[serde(default)]
+    pub ebit: USConsensusEstimate,
+    #[serde(default)]
+    pub eps: USConsensusEstimate,
+    #[serde(default)]
+    pub fiscal_year: i64,
+    #[serde(default)]
+    pub report_txt: String,
+    #[serde(default)]
+    pub revenue: USConsensusEstimate,
+}
+
+/// Response for [`crate::FundamentalContext::us_analyst_consensus`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAnalystConsensus {
+    #[serde(default)]
+    pub ai_summary: String,
+    #[serde(default)]
+    pub aichat_data: USAIChatData,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub report: String,
+    #[serde(default)]
+    pub list: Vec<USConsensusItem>,
+    /// Option consensus type identifiers (e.g. "call", "put").
+    #[serde(default)]
+    pub opt_reports: Vec<String>,
+    #[serde(default)]
+    pub h5_data: serde_json::Value,
 }

@@ -6,7 +6,7 @@ use longbridge::trade::{
     EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
     GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
     GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-    ReplaceOrderOptions, SubmitOrderOptions, TradeContext,
+    QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -525,6 +525,92 @@ impl AsyncTradeContext {
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    // ── US-market async methods ───────────────────────────────────────────
+
+    /// Query US order list (JSON string). US token required. Returns awaitable.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[pyo3(signature = (symbol = None, action = 0, start_at = 0, end_at = 0, query_type = 0, page = 1, limit = 20))]
+    fn us_query_orders(
+        &self,
+        py: Python<'_>,
+        symbol: Option<String>,
+        action: i32,
+        start_at: i64,
+        end_at: i64,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::GetUSHistoryOrders {
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
+            let s = serde_json::to_string(&resp)
+                .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+            Ok(s)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US order detail. US token required. Returns awaitable.
+    fn us_order_detail(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp: crate::trade::types::USOrderDetailResponse = ctx
+                .us_order_detail(order_id)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(resp)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US account asset overview. US token required. Returns awaitable.
+    fn us_asset_overview(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USAssetOverview =
+                ctx.us_asset_overview().await.map_err(ErrorNewType)?.into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get US realized P&L. US token required. Returns awaitable.
+    fn us_realized_pl(
+        &self,
+        py: Python<'_>,
+        currency: String,
+        category: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USRealizedPL = ctx
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into();
             Ok(r)
         })
         .map(|b| b.unbind())

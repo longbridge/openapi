@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use longbridge::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
+use longbridge::trade::{
+    GetFundPositionsOptions, GetStockPositionsOptions, PushEvent, QueryUSOrdersOptions,
+};
 use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 
@@ -513,6 +515,92 @@ impl TradeContext {
             .await
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────
+
+    /// Query US order list. Returns JSON string. US token required.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[napi]
+    pub fn us_query_orders<'env>(
+        &self,
+        env: &'env Env,
+        symbol: Option<String>,
+        action: i32,
+        start_at: i64,
+        end_at: i64,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+    ) -> Result<PromiseRaw<'env, String>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::GetUSHistoryOrders {
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
+        env.spawn_future(async move {
+            let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
+            serde_json::to_string(&resp).map_err(|e| napi::Error::from_reason(e.to_string()))
+        })
+    }
+
+    /// Get US order detail. US token required.
+    #[napi]
+    pub fn us_order_detail<'env>(
+        &self,
+        env: &'env Env,
+        order_id: String,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USOrderDetailResponse>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_order_detail(order_id)
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get US account asset overview. US token required.
+    #[napi]
+    pub fn us_asset_overview<'env>(
+        &self,
+        env: &'env Env,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USAssetOverview>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(
+            async move { Ok(ctx.us_asset_overview().await.map_err(ErrorNewType)?.into()) },
+        )
+    }
+
+    /// Get US realized P&L. US token required.
+    #[napi]
+    pub fn us_realized_pl<'env>(
+        &self,
+        env: &'env Env,
+        currency: String,
+        category: Option<String>,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USRealizedPL>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
