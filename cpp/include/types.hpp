@@ -1,8 +1,10 @@
 #pragma once
 
 #include "decimal.hpp"
+#include <cstdint>
 #include <map>
 #include <optional>
+#include <string>
 #include <vector>
 
 namespace longbridge {
@@ -2319,13 +2321,112 @@ struct CreateTopicOptions
 // ── MarketContext types ───────────────────────────────────────────
 namespace market {
 
+/// Market trading status code.
+enum class TradeStatus : int32_t
+{
+  /// Unknown status
+  UNKNOWN = -1,
+  /// Quote is not registered
+  NO_REGISTER_QUOTE = 0,
+  /// Clearing before the market opens
+  CLEAN = 101,
+  /// Opening auction
+  OPEN_BID = 102,
+  /// Morning break, currently used by VIX indexes
+  MORNING_CLOSING = 103,
+  /// Regular trading
+  TRADING = 105,
+  /// Midday break
+  NOON_CLOSING = 106,
+  /// Closing auction
+  CLOSE_BID = 107,
+  /// Market closed
+  CLOSING = 108,
+  /// Dark trading waiting to open
+  DARK_WAIT = 110,
+  /// Dark trading
+  DARK_TRADING = 111,
+  /// Dark trading closed
+  DARK_CLOSING = 112,
+  /// After-hours fixed-price trading
+  AFTER_FIX = 120,
+  /// Half-day market closed
+  HALF_CLOSING = 121,
+  /// Not opened because the exchange is waiting to open under special conditions
+  NOT_OPENED = 122,
+  /// Temporary intraday break
+  REALTIME_QUOTE = 123,
+  /// US pre-market
+  US_PREV = 201,
+  /// US regular trading
+  US_TRADING = 202,
+  /// US post-market
+  US_AFTER = 203,
+  /// US closed
+  US_CLOSING = 204,
+  /// US halted
+  US_STOP = 205,
+  /// US clearing plus pre-market
+  US_CLEAN = 206,
+  /// US overnight trading
+  US_NIGHT = 207,
+  /// US pre-market clearing alias returned by the quote engine
+  US_PREV_MARKET_CLEAN = 209,
+  /// US post-market clearing alias returned by the quote engine
+  US_AFTER_MARKET_CLEAN = 210,
+  /// Stock refresh. Deprecated in the status definition
+  REFRESH = 1000,
+  /// Delisted
+  DELIST = 1001,
+  /// Preparing to list
+  PREPARE = 1002,
+  /// Code changed
+  CODE_CHANGE = 1003,
+  /// Halted
+  STOP = 1004,
+  /// Waiting to open, typically for a US IPO auction
+  WILL_OPEN = 1005,
+  /// Split or merge suspended
+  COMMON_SUSPEND = 1006,
+  /// Expired
+  EXPIRE = 1007,
+  /// No quote data
+  NO_QUOTE = 1008,
+  /// Not listed
+  UNITED = 1009,
+  /// Terminated trading, usually for warrants
+  TRADING_HALT = 1010,
+  /// Waiting to list, usually for new warrants
+  WAIT_LISTING = 1011,
+  /// Fuse
+  FUSE = 2001,
+};
+
+TradeStatus from_trade_status_code(int32_t value);
+int32_t code(TradeStatus status);
+const char* trade_status_as_string(TradeStatus status);
+const char* label(TradeStatus status);
+const char* name(TradeStatus status);
+bool is_us_market(TradeStatus status);
+bool is_us_pre_post(TradeStatus status);
+bool is_us_night(TradeStatus status);
+bool is_us_closing(TradeStatus status);
+bool is_closing(TradeStatus status);
+bool is_us_prev(TradeStatus status);
+bool is_us_after(TradeStatus status);
+bool is_trading(TradeStatus status);
+bool is_dark(TradeStatus status);
+bool allow_trading(TradeStatus status);
+TradeStatus normalize(TradeStatus status);
+bool is_special(TradeStatus status);
+
 /// Current trading status and timestamps for one market.
 struct MarketTimeItem
 {
   longbridge::Market market;
-  int32_t trade_status;
+  TradeStatus trade_status;
   std::string timestamp;
-  int32_t delay_trade_status;
+  TradeStatus delay_trade_status;
   std::string delay_timestamp;
   int32_t sub_status;
   int32_t delay_sub_status;

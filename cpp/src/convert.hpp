@@ -2391,7 +2391,13 @@ inline fundamental::AssetAllocationResponse convert(const lb_asset_allocation_re
 // ── MarketContext conversions ─────────────────────────────────────
 
 inline market::MarketTimeItem convert(const lb_market_time_item_t* item) {
-  return { convert(item->market), item->trade_status, item->timestamp, item->delay_trade_status, item->delay_timestamp, item->sub_status, item->delay_sub_status };
+  return { convert(item->market),
+           market::from_trade_status_code(item->trade_status),
+           item->timestamp,
+           market::from_trade_status_code(item->delay_trade_status),
+           item->delay_timestamp,
+           item->sub_status,
+           item->delay_sub_status };
 }
 inline market::MarketStatusResponse convert(const lb_market_status_response_t* r) {
   std::vector<market::MarketTimeItem> v;

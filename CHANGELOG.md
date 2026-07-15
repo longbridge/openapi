@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Rust:** `market::TradeStatus` models `/v1/quote/market-status` trade status codes, including engine-compatible normalization and display helpers.
+- **C++:** `market::TradeStatus` models `/v1/quote/market-status` trade status codes, with status-code conversion, normalization, display helpers, and typed `MarketTimeItem` status fields.
 
 ### Fixed
 
