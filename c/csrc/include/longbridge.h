@@ -1975,8 +1975,10 @@ typedef struct lb_conversation_stream_event_t {
    */
   const struct lb_message_payload_t *message;
   /**
-   * Non-null when `kind` is `WorkflowFinished` — this is always the last
-   * event of a stream
+   * Non-null when `kind` is `WorkflowFinished`, carrying the run's
+   * outcome — not necessarily the last event of the stream, since the
+   * server may still emit a few more housekeeping events (`kind` `Other`)
+   * before actually closing the connection
    */
   const struct lb_conversation_response_t *workflow_finished;
   /**
@@ -9334,8 +9336,11 @@ void lb_agent_context_continue_conversation(const struct lb_agent_context_t *ctx
 
 /**
  * Start a conversation with the specified Agent, calling `event_callback`
- * for every run-progress event observed over SSE. Once the stream ends (the
- * last event is always `WorkflowFinished`), `callback` is invoked with the
+ * for every run-progress event observed over SSE. A `WorkflowFinished`
+ * event carries the run's outcome, but isn't necessarily the last one seen —
+ * the server may still emit a few more housekeeping events (surfaced as
+ * `Other`, e.g. a `chat_title_updated`) before actually closing the
+ * connection. Once the stream truly ends, `callback` is invoked with the
  * final `CConversationResponse` — same as `lb_agent_context_conversation`,
  * just arrived at via the streamed path.
  *

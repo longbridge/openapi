@@ -655,8 +655,10 @@ pub struct CConversationStreamEvent {
     pub chat_started: *const CChatStartedPayload,
     /// Non-null when `kind` is `Message`
     pub message: *const CMessagePayload,
-    /// Non-null when `kind` is `WorkflowFinished` — this is always the last
-    /// event of a stream
+    /// Non-null when `kind` is `WorkflowFinished`, carrying the run's
+    /// outcome — not necessarily the last event of the stream, since the
+    /// server may still emit a few more housekeeping events (`kind` `Other`)
+    /// before actually closing the connection
     pub workflow_finished: *const CConversationResponse,
     /// Non-null when `kind` is `Other`; the SSE envelope's `event` field (the
     /// event type name), e.g. `"workflow_started"`, `"ping"`,

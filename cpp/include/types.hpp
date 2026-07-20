@@ -3857,8 +3857,10 @@ struct ConversationStreamEvent
   std::optional<ChatStartedPayload> chat_started;
   /// Populated when `kind` is `Message`
   std::optional<MessagePayload> message;
-  /// Populated when `kind` is `WorkflowFinished` — this is always the last
-  /// event of a stream
+  /// Populated when `kind` is `WorkflowFinished`, carrying the run's
+  /// outcome — not necessarily the last event of the stream, since the
+  /// server may still emit a few more housekeeping events (`kind` `Other`)
+  /// before actually closing the connection
   std::optional<ConversationResponse> workflow_finished;
   /// Populated when `kind` is `Other`; the SSE envelope's `event` field (the
   /// event type name), e.g. `"workflow_started"`, `"ping"`,

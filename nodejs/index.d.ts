@@ -3859,7 +3859,12 @@ export interface ConversationStreamEvent {
   chatStarted?: ChatStartedPayload
   /** Set when `kind` is `"message"` */
   message?: MessagePayload
-  /** Set when `kind` is `"workflow_finished"` — the last event of a stream */
+  /**
+   * Set when `kind` is `"workflow_finished"`, carrying the run's outcome
+   * — not necessarily the last event of the stream, since the server may
+   * still emit a few more housekeeping events (`kind` `"other"`) before
+   * actually closing the connection
+   */
   workflowFinished?: ConversationResponse
   /**
    * Set when `kind` is `"other"` — the SSE envelope's `event` field (the

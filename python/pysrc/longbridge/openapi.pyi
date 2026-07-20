@@ -13290,7 +13290,10 @@ class ConversationStreamEvent:
     """Set when kind == "message" """
     workflow_finished: ConversationResponse | None
     """Set when kind == "workflow_finished" (the run finished — succeeded,
-    interrupted, failed, or stopped; this is always the last event)"""
+    interrupted, failed, or stopped). Carries the run's outcome, but isn't
+    necessarily the last event of the stream — the server may still emit a
+    few more housekeeping events (kind == "other", e.g. a
+    chat_title_updated) before actually closing the connection."""
     other_event: str | None
     """Set when kind == "other": the SSE envelope's ``event`` field (the event
     type name), e.g. "workflow_started", "ping", "chat_finished",
@@ -13402,8 +13405,12 @@ class AgentContext:
     ) -> Iterator[ConversationStreamEvent]:
         """
         Start a conversation with the specified Agent, returning an iterator
-        of run-progress events. The last item is always a
-        ConversationStreamEvent with ``kind == "workflow_finished"``.
+        of run-progress events. A ConversationStreamEvent with
+        ``kind == "workflow_finished"`` carries the run's outcome, but isn't
+        necessarily the last item — the server may still emit a few more
+        housekeeping events (``kind == "other"``, e.g. a
+        ``chat_title_updated``) before actually closing the connection, so
+        keep iterating to the end rather than stopping as soon as you see it.
 
         Args:
             agent_id: Agent UID

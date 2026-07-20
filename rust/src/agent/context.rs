@@ -204,9 +204,14 @@ impl AgentContext {
     }
 
     /// Start a conversation with the specified Agent, returning a [`Stream`] of
-    /// run-progress events over SSE. The last item is always a
-    /// [`ConversationStreamEvent::WorkflowFinished`] (unless the stream itself
-    /// errors first).
+    /// run-progress events over SSE. A
+    /// [`ConversationStreamEvent::WorkflowFinished`] event carries the
+    /// run's outcome (unless the stream errors first), but
+    /// it isn't necessarily the last item — the server may still emit a few
+    /// more housekeeping events (surfaced as
+    /// [`ConversationStreamEvent::Other`], e.g. a `chat_title_updated`) before
+    /// actually closing the connection, so keep draining the stream until it
+    /// ends rather than stopping as soon as you see it.
     ///
     /// Path: `POST /v1/ai/agents/{id}/conversations` (`Accept:
     /// text/event-stream`)
