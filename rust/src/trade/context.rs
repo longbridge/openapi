@@ -738,6 +738,8 @@ impl TradeContext {
     /// # });
     /// ```
     pub async fn margin_ratio(&self, symbol: impl Into<String>) -> Result<MarginRatio> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         #[derive(Debug, Serialize)]
         struct Request {
             symbol: String,

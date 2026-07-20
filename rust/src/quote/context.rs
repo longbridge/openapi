@@ -622,6 +622,8 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn depth(&self, symbol: impl Into<String>) -> Result<SecurityDepth> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         let resp: quote::SecurityDepthResponse = self
             .request(
                 cmd_code::GET_SECURITY_DEPTH,
@@ -668,6 +670,8 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         // Broker queue is served only by the AP data center; short-circuit a
         // non-AP session with the same unified error the HTTP path returns.
         let current = self.0.http_cli.dc_region().await;
@@ -759,6 +763,8 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn trades(&self, symbol: impl Into<String>, count: usize) -> Result<Vec<Trade>> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         let resp: quote::SecurityTradeResponse = self
             .request(
                 cmd_code::GET_SECURITY_TRADES,
@@ -1310,6 +1316,8 @@ impl QuoteContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     pub async fn capital_flow(&self, symbol: impl Into<String>) -> Result<Vec<CapitalFlowLine>> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         self.request::<_, quote::CapitalFlowIntradayResponse>(
             cmd_code::GET_CAPITAL_FLOW_INTRADAY,
             quote::CapitalFlowIntradayRequest {
@@ -1621,6 +1629,8 @@ impl QuoteContext {
 
     /// Get filings list
     pub async fn filings(&self, symbol: impl Into<String>) -> Result<Vec<FilingItem>> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         #[derive(Debug, Serialize)]
         struct Request {
             symbol: String,
@@ -1823,6 +1833,8 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn realtime_depth(&self, symbol: impl Into<String>) -> Result<SecurityDepth> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         let (reply_tx, reply_rx) = oneshot::channel();
         self.0
             .command_tx
@@ -1917,6 +1929,8 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn realtime_brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {
+        use crate::utils::counter::validate_and_convert;
+        let symbol = validate_and_convert(symbol)?;
         let (reply_tx, reply_rx) = oneshot::channel();
         self.0
             .command_tx
@@ -2066,7 +2080,8 @@ impl QuoteContext {
     ///
     /// Path: `GET /v1/quote/option-volume-stats`
     pub async fn option_volume(&self, symbol: impl Into<String>) -> Result<OptionVolumeStats> {
-        use crate::utils::counter::symbol_to_counter_id;
+        use crate::utils::counter::{symbol_to_counter_id, validate_and_convert};
+        let symbol = validate_and_convert(symbol)?;
         #[derive(serde::Serialize)]
         struct Query {
             underlying_counter_id: String,
@@ -2076,7 +2091,7 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats")
             .query_params(Query {
-                underlying_counter_id: symbol_to_counter_id(&symbol.into()),
+                underlying_counter_id: symbol_to_counter_id(&symbol),
             })
             .response::<Json<OptionVolumeStats>>()
             .send()
