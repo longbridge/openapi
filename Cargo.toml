@@ -43,6 +43,7 @@ tracing-appender = "0.2.3"
 time-tz = "2.0.0"
 num-traits = "0.2.19"
 reqwest = { version = "0.12.23", default-features = false }
+eventsource-stream = "0.2.3"
 parking_lot = "0.12.4"
 hmac = "0.12.1"
 sha1 = "0.10.6"

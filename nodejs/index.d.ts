@@ -30,6 +30,101 @@ export declare class AccountBalance {
   get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 
+/**
+ * AI Agent conversation context.
+ *
+ * Reference: <https://open.longbridge.com/en/docs/ai/chat/conversation>
+ */
+export declare class AgentContext {
+  /** Create a new AgentContext. */
+  static new(config: Config): AgentContext
+  /**
+   * List the Workspaces the current account belongs to.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.workspaces();
+   * console.log(resp);
+   * ```
+   */
+  workspaces(): Promise<WorkspacesResponse>
+  /**
+   * List the Agents in the specified Workspace.
+   *
+   * `page`/`limit` control pagination; `name` fuzzy-searches by Agent name.
+   * All three are optional.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.agents(workspaceId);
+   * console.log(resp);
+   * ```
+   */
+  agents(workspaceId: string, page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
+   * Start a conversation with the specified Agent, blocking until the run
+   * succeeds, is interrupted, or fails.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversation(agentId, "How has Tesla stock performed recently?");
+   * console.log(resp);
+   * ```
+   */
+  conversation(agentId: string, query: string, chatUid?: string | undefined | null): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, blocking until the run succeeds, is
+   * interrupted again, or fails.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversation(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>): Promise<ConversationResponse>
+  /**
+   * Start a conversation with the specified Agent, invoking `callback` for
+   * every progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes (this is the same shape
+   * `conversation` returns).
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversationStreamed(
+   *   agentId,
+   *   "How has Tesla stock performed recently?",
+   *   undefined,
+   *   (err, event) => console.log(event),
+   * );
+   * console.log(resp);
+   * ```
+   */
+  conversationStreamed(agentId: string, query: string, chatUid: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, invoking `callback` for every
+   * progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversationStreamed(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+}
+
 /** Price alert management context. */
 export declare class AlertContext {
   /** Create a new AlertContext. */
@@ -3054,6 +3149,44 @@ export declare const enum AdjustType {
   ForwardAdjust = 1
 }
 
+/** An Agent in a Workspace */
+export interface Agent {
+  /** Agent UID, used as the path parameter of `AgentContext.conversation` */
+  uid: string
+  /** Agent name */
+  name: string
+  /** Agent description */
+  description: string
+  /** Agent mode, e.g. `chat` */
+  mode: string
+  /** Icon URL */
+  icon: string
+  /** Whether published; only published Agents can start conversations */
+  isPublished: boolean
+  /** Publish time, Unix timestamp in seconds; 0 if unpublished */
+  publishedAt: number
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Present when a conversation run failed */
+export interface AgentError {
+  /** Error code */
+  code: number
+  /** Error message */
+  message: string
+}
+
+/** Response for `AgentContext.agents` */
+export interface AgentsResponse {
+  /** Agent list */
+  agents: Array<Agent>
+  /** Total number of matching Agents */
+  total: number
+}
+
 /** A/H premium intraday response */
 export interface AhPremiumIntraday {
   /** Intraday data points */
@@ -3567,6 +3700,14 @@ export declare const enum ChargeCategoryCode {
   Third = 2
 }
 
+/** Payload of a `chat_started` stream event */
+export interface ChatStartedPayload {
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+}
+
 /** Commission-free Status */
 export declare const enum CommissionFreeStatus {
   /** Unknown */
@@ -3715,6 +3856,80 @@ export interface ConstituentStock {
   chg?: string
   /** Raw trade status code */
   tradeStatus: number
+}
+
+/**
+ * Response for `AgentContext.conversation`,
+ * `AgentContext.continueConversation`, and the final result of the streamed
+ * counterparts
+ */
+export interface ConversationResponse {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Final run status */
+  status: ConversationStatus
+  /** Final answer text; valid when `status` is `succeeded` */
+  answer: string
+  /** Sources referenced by the answer */
+  references?: Array<Reference>
+  /** Run duration in seconds */
+  elapsedTime: number
+  /** Present only when `status` is `interrupted` */
+  interrupt?: Interrupt
+  /** Present only when the run failed */
+  error?: AgentError
+}
+
+/** Final run status of a conversation */
+export declare const enum ConversationStatus {
+  /** The run completed successfully */
+  Succeeded = 0,
+  /** The run is paused, waiting for `AgentContext.continueConversation` */
+  Interrupted = 1,
+  /** The run failed */
+  Failed = 2,
+  /** The run was stopped */
+  Stopped = 3
+}
+
+/**
+ * One event observed while streaming `AgentContext.conversationStreamed` or
+ * `AgentContext.continueConversationStreamed`.
+ *
+ * Design note: the Rust core models this as an enum with a per-variant
+ * payload (`longbridge::agent::ConversationStreamEvent`), but napi-rs has no
+ * ergonomic equivalent of a Rust/Serde "enum with data" for a plain
+ * `#[napi(object)]` value, and there's no existing precedent for reifying one
+ * as a single JS value in this codebase (the closest analogue,
+ * `trade::PushEvent`, is dispatched to separate per-variant JS callbacks
+ * instead). We instead mirror the common "discriminant + optional per-kind
+ * fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
+ * `"chat_started" | "message" | "workflow_finished" | "other"`, and exactly
+ * one of `chatStarted` / `message` / `workflowFinished` / `other` is set,
+ * matching `kind`.
+ */
+export interface ConversationStreamEvent {
+  /**
+   * Discriminant: one of `"chat_started"`, `"message"`,
+   * `"workflow_finished"`, or `"other"`
+   */
+  kind: string
+  /** Set when `kind` is `"chat_started"` */
+  chatStarted?: ChatStartedPayload
+  /** Set when `kind` is `"message"` */
+  message?: MessagePayload
+  /** Set when `kind` is `"workflow_finished"` — the last event of a stream */
+  workflowFinished?: ConversationResponse
+  /**
+   * Set when `kind` is `"other"` — raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  other?: any
 }
 
 /** One corporate action event */
@@ -4579,6 +4794,23 @@ export declare const enum InstitutionRecommend {
   NoOpinion = 7
 }
 
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `AgentContext.continueConversation`
+ */
+export interface Interrupt {
+  /** ID of the node that triggered the interrupt */
+  nodeId: string
+  /** Tool call ID of this inquiry; used as the answer key when continuing */
+  toolCallId: string
+  /** Questions you need to answer */
+  questions: Array<Question>
+  /** ID of the paused message */
+  messageId: number
+  /** ID of the owning conversation */
+  chatId: number
+}
+
 /** Investor relations response */
 export interface InvestRelations {
   /** Link to IR page */
@@ -4717,6 +4949,12 @@ export interface MarketTimeItem {
   subStatus: number
   /** Delayed-quote sub-status code */
   delaySubStatus: number
+}
+
+/** Payload of a `message` stream event */
+export interface MessagePayload {
+  /** Incremental answer text */
+  text: string
 }
 
 /** Localized text in simplified Chinese, traditional Chinese, and English */
@@ -5252,6 +5490,22 @@ export declare const enum PushCandlestickMode {
   Confirmed = 1
 }
 
+/** One question the Agent needs you to answer */
+export interface Question {
+  /** Question text */
+  question: string
+  /** Options; empty means free-form answer */
+  options: Array<QuestionOption>
+  /** Whether multiple options may be selected */
+  multiSelect: boolean
+}
+
+/** One option of a `Question` */
+export interface QuestionOption {
+  /** Option text */
+  description: string
+}
+
 /** Rank categories response. `data` is a JSON string. */
 export interface RankCategoriesResponse {
   /** Raw rank categories data (JSON string) */
@@ -5393,6 +5647,16 @@ export interface ReplaceAttachedParams {
   quantity?: Decimal
   /** Market price */
   marketPrice?: Decimal
+}
+
+/** A source referenced by the answer */
+export interface Reference {
+  /** Reference index */
+  index: number
+  /** Reference title */
+  title: string
+  /** Reference URL */
+  url: string
 }
 
 /** Options for replace order request */
@@ -6761,4 +7025,22 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+/** A Workspace the current account belongs to */
+export interface Workspace {
+  /** Workspace ID */
+  id: string
+  /** Workspace name */
+  name: string
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Response for `AgentContext.workspaces` */
+export interface WorkspacesResponse {
+  /** Workspaces the current account belongs to */
+  workspaces: Array<Workspace>
 }

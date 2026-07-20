@@ -23,6 +23,7 @@ pub use utils::counter;
 pub mod blocking;
 
 pub use longbridge_oauth as oauth;
+pub mod agent;
 pub mod alert;
 pub mod asset;
 pub mod calendar;
@@ -36,6 +37,7 @@ pub mod screener;
 pub mod sharelist;
 pub mod trade;
 
+pub use agent::AgentContext;
 pub use alert::AlertContext;
 pub use asset::AssetContext;
 pub use calendar::CalendarContext;

@@ -167,9 +167,15 @@
   </profiles>
 
   <properties>
-    <java.version>1.08</java.version>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
+    <!--
+      Bumped from 8 to 9: the agent package's streaming API exposes
+      java.util.concurrent.Flow (JDK 9+ Reactive Streams) and
+      ConversationStreamSubscription relies on java.lang.ref.Cleaner (also
+      JDK 9+) to free its native handle once unreachable.
+    -->
+    <java.version>9</java.version>
+    <maven.compiler.source>9</maven.compiler.source>
+    <maven.compiler.target>9</maven.compiler.target>
     <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
   </properties>
 </project>
