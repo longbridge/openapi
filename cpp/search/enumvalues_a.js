@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['macrodata_2885',['MacroData',['../namespacelongbridge_1_1calendar.html#a8648be6517036379f5152d356943e0d8a4b5872981b72067718f3949b9ff62a40',1,'longbridge::calendar']]],
-  ['margincall_2886',['MarginCall',['../namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da092e068018f610d4d8209c9d89a5ec07',1,'longbridge::trade']]],
+  ['macrodata_2886',['MacroData',['../namespacelongbridge_1_1calendar.html#a8648be6517036379f5152d356943e0d8a4b5872981b72067718f3949b9ff62a40',1,'longbridge::calendar']]],
   ['min1_2887',['Min1',['../namespacelongbridge_1_1market.html#a631b9e2d2e53971d0b7710234b47beacab24f6123111e5fd9d9444fcd337dcbd6',1,'longbridge::market::Min1()'],['../namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4ab24f6123111e5fd9d9444fcd337dcbd6',1,'longbridge::quote::Min1()']]],
   ['min10_2888',['Min10',['../namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4ace206c54e65dc9a89cb29403ca50d88c',1,'longbridge::quote']]],
   ['min120_2889',['Min120',['../namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4a9032908ff892830a1efce0be6eac3af7',1,'longbridge::quote']]],

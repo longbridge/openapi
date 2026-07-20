@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/serde_utils.rs`."><title>serde_utils.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/</div>serde_utils.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![allow(dead_code)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/serde_utils.rs`."><title>serde_utils.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/</div>serde_utils.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![allow(dead_code)]
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span>std::str::FromStr;
 <a href=#4 id=4 data-nosnippet>4</a>
@@ -6,7 +6,7 @@
 <a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span>time::{Date, OffsetDateTime};
 <a href=#7 id=7 data-nosnippet>7</a>
 <a href=#8 id=8 data-nosnippet>8</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>date_opt {
-<a href=#9 id=9 data-nosnippet>9</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#9 id=9 data-nosnippet>9</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#10 id=10 data-nosnippet>10</a>
 <a href=#11 id=11 data-nosnippet>11</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize&lt;<span class="lifetime">'de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Date&gt;, D::Error&gt;
 <a href=#12 id=12 data-nosnippet>12</a>    <span class="kw">where
@@ -41,7 +41,7 @@
 <a href=#41 id=41 data-nosnippet>41</a>}
 <a href=#42 id=42 data-nosnippet>42</a>
 <a href=#43 id=43 data-nosnippet>43</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>timestamp {
-<a href=#44 id=44 data-nosnippet>44</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#44 id=44 data-nosnippet>44</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#45 id=45 data-nosnippet>45</a>
 <a href=#46 id=46 data-nosnippet>46</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize&lt;<span class="lifetime">'de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;OffsetDateTime, D::Error&gt;
 <a href=#47 id=47 data-nosnippet>47</a>    <span class="kw">where
@@ -61,7 +61,7 @@
 <a href=#61 id=61 data-nosnippet>61</a>}
 <a href=#62 id=62 data-nosnippet>62</a>
 <a href=#63 id=63 data-nosnippet>63</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>timestamp_opt {
-<a href=#64 id=64 data-nosnippet>64</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#64 id=64 data-nosnippet>64</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#65 id=65 data-nosnippet>65</a>
 <a href=#66 id=66 data-nosnippet>66</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize&lt;<span class="lifetime">'de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;OffsetDateTime&gt;, D::Error&gt;
 <a href=#67 id=67 data-nosnippet>67</a>    <span class="kw">where
@@ -98,7 +98,7 @@
 <a href=#98 id=98 data-nosnippet>98</a>}
 <a href=#99 id=99 data-nosnippet>99</a>
 <a href=#100 id=100 data-nosnippet>100</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>rfc3339_opt {
-<a href=#101 id=101 data-nosnippet>101</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#101 id=101 data-nosnippet>101</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#102 id=102 data-nosnippet>102</a>
 <a href=#103 id=103 data-nosnippet>103</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize&lt;<span class="lifetime">'de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;OffsetDateTime&gt;, D::Error&gt;
 <a href=#104 id=104 data-nosnippet>104</a>    <span class="kw">where
@@ -135,7 +135,7 @@
 <a href=#135 id=135 data-nosnippet>135</a>}
 <a href=#136 id=136 data-nosnippet>136</a>
 <a href=#137 id=137 data-nosnippet>137</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>risk_level {
-<a href=#138 id=138 data-nosnippet>138</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#138 id=138 data-nosnippet>138</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#139 id=139 data-nosnippet>139</a>
 <a href=#140 id=140 data-nosnippet>140</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span>i32, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#141 id=141 data-nosnippet>141</a>    <span class="kw">where
@@ -162,7 +162,7 @@
 <a href=#162 id=162 data-nosnippet>162</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>decimal_empty_is_0 {
 <a href=#163 id=163 data-nosnippet>163</a>    <span class="kw">use </span>rust_decimal::Decimal;
 <a href=#164 id=164 data-nosnippet>164</a>
-<a href=#165 id=165 data-nosnippet>165</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#165 id=165 data-nosnippet>165</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#166 id=166 data-nosnippet>166</a>
 <a href=#167 id=167 data-nosnippet>167</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span>Decimal, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#168 id=168 data-nosnippet>168</a>    <span class="kw">where
@@ -188,7 +188,7 @@
 <a href=#188 id=188 data-nosnippet>188</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>decimal_opt_empty_is_none {
 <a href=#189 id=189 data-nosnippet>189</a>    <span class="kw">use </span>rust_decimal::Decimal;
 <a href=#190 id=190 data-nosnippet>190</a>
-<a href=#191 id=191 data-nosnippet>191</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#191 id=191 data-nosnippet>191</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#192 id=192 data-nosnippet>192</a>
 <a href=#193 id=193 data-nosnippet>193</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Decimal&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#194 id=194 data-nosnippet>194</a>    <span class="kw">where
@@ -217,7 +217,7 @@
 <a href=#217 id=217 data-nosnippet>217</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>decimal_opt_str_is_none {
 <a href=#218 id=218 data-nosnippet>218</a>    <span class="kw">use </span>rust_decimal::Decimal;
 <a href=#219 id=219 data-nosnippet>219</a>
-<a href=#220 id=220 data-nosnippet>220</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#220 id=220 data-nosnippet>220</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#221 id=221 data-nosnippet>221</a>
 <a href=#222 id=222 data-nosnippet>222</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Decimal&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#223 id=223 data-nosnippet>223</a>    <span class="kw">where
@@ -244,7 +244,7 @@
 <a href=#244 id=244 data-nosnippet>244</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>decimal_opt_0_is_none {
 <a href=#245 id=245 data-nosnippet>245</a>    <span class="kw">use </span>rust_decimal::Decimal;
 <a href=#246 id=246 data-nosnippet>246</a>
-<a href=#247 id=247 data-nosnippet>247</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#247 id=247 data-nosnippet>247</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#248 id=248 data-nosnippet>248</a>
 <a href=#249 id=249 data-nosnippet>249</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Decimal&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#250 id=250 data-nosnippet>250</a>    <span class="kw">where
@@ -267,7 +267,7 @@
 <a href=#267 id=267 data-nosnippet>267</a>}
 <a href=#268 id=268 data-nosnippet>268</a>
 <a href=#269 id=269 data-nosnippet>269</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>trigger_status {
-<a href=#270 id=270 data-nosnippet>270</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#270 id=270 data-nosnippet>270</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#271 id=271 data-nosnippet>271</a>    <span class="kw">use </span><span class="kw">crate</span>::trade::TriggerStatus;
 <a href=#272 id=272 data-nosnippet>272</a>
 <a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(
@@ -298,7 +298,7 @@
 <a href=#298 id=298 data-nosnippet>298</a>}
 <a href=#299 id=299 data-nosnippet>299</a>
 <a href=#300 id=300 data-nosnippet>300</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>outside_rth {
-<a href=#301 id=301 data-nosnippet>301</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#301 id=301 data-nosnippet>301</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#302 id=302 data-nosnippet>302</a>    <span class="kw">use </span><span class="kw">crate</span>::trade::OutsideRTH;
 <a href=#303 id=303 data-nosnippet>303</a>
 <a href=#304 id=304 data-nosnippet>304</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;OutsideRTH&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
@@ -326,7 +326,7 @@
 <a href=#326 id=326 data-nosnippet>326</a>}
 <a href=#327 id=327 data-nosnippet>327</a>
 <a href=#328 id=328 data-nosnippet>328</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>symbol_opt {
-<a href=#329 id=329 data-nosnippet>329</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#329 id=329 data-nosnippet>329</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#330 id=330 data-nosnippet>330</a>
 <a href=#331 id=331 data-nosnippet>331</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#332 id=332 data-nosnippet>332</a>    <span class="kw">where
@@ -351,7 +351,7 @@
 <a href=#351 id=351 data-nosnippet>351</a>}
 <a href=#352 id=352 data-nosnippet>352</a>
 <a href=#353 id=353 data-nosnippet>353</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>int64_str {
-<a href=#354 id=354 data-nosnippet>354</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#354 id=354 data-nosnippet>354</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#355 id=355 data-nosnippet>355</a>
 <a href=#356 id=356 data-nosnippet>356</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span>i64, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#357 id=357 data-nosnippet>357</a>    <span class="kw">where
@@ -370,7 +370,7 @@
 <a href=#370 id=370 data-nosnippet>370</a>}
 <a href=#371 id=371 data-nosnippet>371</a>
 <a href=#372 id=372 data-nosnippet>372</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>int64_str_empty_is_none {
-<a href=#373 id=373 data-nosnippet>373</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#373 id=373 data-nosnippet>373</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#374 id=374 data-nosnippet>374</a>
 <a href=#375 id=375 data-nosnippet>375</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize&lt;<span class="lifetime">'de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;, D::Error&gt;
 <a href=#376 id=376 data-nosnippet>376</a>    <span class="kw">where
@@ -400,7 +400,7 @@
 <a href=#400 id=400 data-nosnippet>400</a>
 <a href=#401 id=401 data-nosnippet>401</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>int32_opt_0_is_none {
 <a href=#402 id=402 data-nosnippet>402</a>
-<a href=#403 id=403 data-nosnippet>403</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#403 id=403 data-nosnippet>403</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#404 id=404 data-nosnippet>404</a>
 <a href=#405 id=405 data-nosnippet>405</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;i32&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
 <a href=#406 id=406 data-nosnippet>406</a>    <span class="kw">where
@@ -469,6 +469,6 @@
 <a href=#469 id=469 data-nosnippet>469</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
 <a href=#470 id=470 data-nosnippet>470</a>    T: Deserialize&lt;<span class="lifetime">'de</span>&gt; + Default,
 <a href=#471 id=471 data-nosnippet>471</a>{
-<a href=#472 id=472 data-nosnippet>472</a>    <span class="prelude-val">Ok</span>(Option::&lt;T&gt;::deserialize(d)<span class="question-mark">?</span>.unwrap_or_default())
+<a href=#472 id=472 data-nosnippet>472</a>    <span class="prelude-val">Ok</span>(<span class="prelude-ty">Option</span>::&lt;T&gt;::deserialize(d)<span class="question-mark">?</span>.unwrap_or_default())
 <a href=#473 id=473 data-nosnippet>473</a>}
 </code></pre></div></section></main></body></html>

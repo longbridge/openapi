@@ -104,10 +104,27 @@ Data Fields</h2></td></tr>
 <tr class="separator:a92ab50a8dface7bbd9e7ba54e112b444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__submit__order__options__t.html#a9a51a4c0d5faa2f4386a52affa7e12d7">remark</a></td></tr>
 <tr class="separator:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bef6ba609dfe06b42ed6fc78797486e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__submit__order__options__t.html#a2bef6ba609dfe06b42ed6fc78797486e">client_request_id</a></td></tr>
+<tr class="separator:a2bef6ba609dfe06b42ed6fc78797486e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for submit order request </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a2bef6ba609dfe06b42ed6fc78797486e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bef6ba609dfe06b42ed6fc78797486e">&#9670;&nbsp;</a></span>client_request_id</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* client_request_id</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Idempotent request ID for preventing duplicate orders (can be null). If not specified, idempotency control is skipped. The server caches this ID for 10 minutes. </p>
+
+</div>
+</div>
 <a id="a7fb84bb99fa3b1abf8d0a37d7091e857"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7fb84bb99fa3b1abf8d0a37d7091e857">&#9670;&nbsp;</a></span>expire_date</h2>
 

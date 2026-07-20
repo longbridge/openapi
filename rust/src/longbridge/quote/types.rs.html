@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/quote/types.rs`."><title>types.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/quote/</div>types.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>longbridge_candlesticks::CandlestickComponents;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/quote/types.rs`."><title>types.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/quote/</div>types.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>longbridge_candlesticks::CandlestickComponents;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>longbridge_proto::quote::{<span class="self">self</span>, Period, TradeStatus};
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>rust_decimal::Decimal;
@@ -6,7 +6,7 @@
 <a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span>strum_macros::{Display, EnumString};
 <a href=#7 id=7 data-nosnippet>7</a><span class="kw">use </span>time::{Date, OffsetDateTime, Time};
 <a href=#8 id=8 data-nosnippet>8</a>
-<a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>crate::{
+<a href=#9 id=9 data-nosnippet>9</a><span class="kw">use crate</span>::{
 <a href=#10 id=10 data-nosnippet>10</a>    Error, Market, <span class="prelude-ty">Result</span>,
 <a href=#11 id=11 data-nosnippet>11</a>    quote::{SubFlags, utils::parse_date},
 <a href=#12 id=12 data-nosnippet>12</a>    serde_utils,
@@ -2164,55 +2164,118 @@
 <a href=#2164 id=2164 data-nosnippet>2164</a>    </span>Remove,
 <a href=#2165 id=2165 data-nosnippet>2165</a>}
 <a href=#2166 id=2166 data-nosnippet>2166</a>
-<a href=#2167 id=2167 data-nosnippet>2167</a><span class="attr">#[cfg(test)]
-<a href=#2168 id=2168 data-nosnippet>2168</a></span><span class="kw">mod </span>tests {
-<a href=#2169 id=2169 data-nosnippet>2169</a>    <span class="kw">use </span>serde::Deserialize;
-<a href=#2170 id=2170 data-nosnippet>2170</a>
-<a href=#2171 id=2171 data-nosnippet>2171</a>    <span class="kw">use </span>crate::{Market, quote::WatchlistGroup};
-<a href=#2172 id=2172 data-nosnippet>2172</a>
-<a href=#2173 id=2173 data-nosnippet>2173</a>    <span class="attr">#[test]
-<a href=#2174 id=2174 data-nosnippet>2174</a>    </span><span class="kw">fn </span>watch_list() {
-<a href=#2175 id=2175 data-nosnippet>2175</a>        <span class="attr">#[derive(Debug, Deserialize)]
-<a href=#2176 id=2176 data-nosnippet>2176</a>        </span><span class="kw">struct </span>Response {
-<a href=#2177 id=2177 data-nosnippet>2177</a>            groups: Vec&lt;WatchlistGroup&gt;,
-<a href=#2178 id=2178 data-nosnippet>2178</a>        }
-<a href=#2179 id=2179 data-nosnippet>2179</a>
-<a href=#2180 id=2180 data-nosnippet>2180</a>        <span class="kw">let </span>json = <span class="string">r#"
-<a href=#2181 id=2181 data-nosnippet>2181</a>        {
-<a href=#2182 id=2182 data-nosnippet>2182</a>            "groups": [
-<a href=#2183 id=2183 data-nosnippet>2183</a>                {
-<a href=#2184 id=2184 data-nosnippet>2184</a>                    "id": "1",
-<a href=#2185 id=2185 data-nosnippet>2185</a>                    "name": "Test",
-<a href=#2186 id=2186 data-nosnippet>2186</a>                    "securities": [
-<a href=#2187 id=2187 data-nosnippet>2187</a>                        {
-<a href=#2188 id=2188 data-nosnippet>2188</a>                            "symbol": "AAPL",
-<a href=#2189 id=2189 data-nosnippet>2189</a>                            "market": "US",
-<a href=#2190 id=2190 data-nosnippet>2190</a>                            "name": "Apple Inc.",
-<a href=#2191 id=2191 data-nosnippet>2191</a>                            "watched_price": "150.0",
-<a href=#2192 id=2192 data-nosnippet>2192</a>                            "watched_at": "1633036800"
-<a href=#2193 id=2193 data-nosnippet>2193</a>                        }
-<a href=#2194 id=2194 data-nosnippet>2194</a>                    ]
-<a href=#2195 id=2195 data-nosnippet>2195</a>                }
-<a href=#2196 id=2196 data-nosnippet>2196</a>            ]
-<a href=#2197 id=2197 data-nosnippet>2197</a>        }
-<a href=#2198 id=2198 data-nosnippet>2198</a>        "#</span>;
-<a href=#2199 id=2199 data-nosnippet>2199</a>
-<a href=#2200 id=2200 data-nosnippet>2200</a>        <span class="kw">let </span>response: Response = serde_json::from_str(json).unwrap();
-<a href=#2201 id=2201 data-nosnippet>2201</a>        <span class="macro">assert_eq!</span>(response.groups.len(), <span class="number">1</span>);
-<a href=#2202 id=2202 data-nosnippet>2202</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].id, <span class="number">1</span>);
-<a href=#2203 id=2203 data-nosnippet>2203</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].name, <span class="string">"Test"</span>);
-<a href=#2204 id=2204 data-nosnippet>2204</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities.len(), <span class="number">1</span>);
-<a href=#2205 id=2205 data-nosnippet>2205</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].symbol, <span class="string">"AAPL"</span>);
-<a href=#2206 id=2206 data-nosnippet>2206</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].market, Market::US);
-<a href=#2207 id=2207 data-nosnippet>2207</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].name, <span class="string">"Apple Inc."</span>);
-<a href=#2208 id=2208 data-nosnippet>2208</a>        <span class="macro">assert_eq!</span>(
-<a href=#2209 id=2209 data-nosnippet>2209</a>            response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].watched_price,
-<a href=#2210 id=2210 data-nosnippet>2210</a>            <span class="prelude-val">Some</span>(<span class="macro">decimal!</span>(<span class="number">150.0</span>))
-<a href=#2211 id=2211 data-nosnippet>2211</a>        );
-<a href=#2212 id=2212 data-nosnippet>2212</a>        <span class="macro">assert_eq!</span>(
-<a href=#2213 id=2213 data-nosnippet>2213</a>            response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].watched_at.unix_timestamp(),
-<a href=#2214 id=2214 data-nosnippet>2214</a>            <span class="number">1633036800
-<a href=#2215 id=2215 data-nosnippet>2215</a>        </span>);
-<a href=#2216 id=2216 data-nosnippet>2216</a>    }
-<a href=#2217 id=2217 data-nosnippet>2217</a>}
+<a href=#2167 id=2167 data-nosnippet>2167</a><span class="comment">// ── US-market types
+<a href=#2168 id=2168 data-nosnippet>2168</a>// ───────────────────────────────────────────────────────────
+<a href=#2169 id=2169 data-nosnippet>2169</a>
+<a href=#2170 id=2170 data-nosnippet>2170</a></span><span class="doccomment">/// Market overview for a single cryptocurrency.
+<a href=#2171 id=2171 data-nosnippet>2171</a>///
+<a href=#2172 id=2172 data-nosnippet>2172</a>/// Returned by [`crate::QuoteContext::us_crypto_overview`].
+<a href=#2173 id=2173 data-nosnippet>2173</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#2174 id=2174 data-nosnippet>2174</a></span><span class="kw">pub struct </span>USCryptoOverview {
+<a href=#2175 id=2175 data-nosnippet>2175</a>    <span class="doccomment">/// Full name (e.g. `"Bitcoin"`)
+<a href=#2176 id=2176 data-nosnippet>2176</a>    </span><span class="attr">#[serde(default)]
+<a href=#2177 id=2177 data-nosnippet>2177</a>    </span><span class="kw">pub </span>name: String,
+<a href=#2178 id=2178 data-nosnippet>2178</a>    <span class="doccomment">/// Ticker symbol (e.g. `"BTC"`)
+<a href=#2179 id=2179 data-nosnippet>2179</a>    </span><span class="attr">#[serde(default)]
+<a href=#2180 id=2180 data-nosnippet>2180</a>    </span><span class="kw">pub </span>ticker: String,
+<a href=#2181 id=2181 data-nosnippet>2181</a>    <span class="doccomment">/// Pricing currency
+<a href=#2182 id=2182 data-nosnippet>2182</a>    </span><span class="attr">#[serde(default)]
+<a href=#2183 id=2183 data-nosnippet>2183</a>    </span><span class="kw">pub </span>currency: String,
+<a href=#2184 id=2184 data-nosnippet>2184</a>    <span class="doccomment">/// All-time high price
+<a href=#2185 id=2185 data-nosnippet>2185</a>    </span><span class="attr">#[serde(default)]
+<a href=#2186 id=2186 data-nosnippet>2186</a>    </span><span class="kw">pub </span>all_time_high: String,
+<a href=#2187 id=2187 data-nosnippet>2187</a>    <span class="doccomment">/// All-time high date
+<a href=#2188 id=2188 data-nosnippet>2188</a>    </span><span class="attr">#[serde(default)]
+<a href=#2189 id=2189 data-nosnippet>2189</a>    </span><span class="kw">pub </span>all_time_high_date: String,
+<a href=#2190 id=2190 data-nosnippet>2190</a>    <span class="doccomment">/// All-time low price
+<a href=#2191 id=2191 data-nosnippet>2191</a>    </span><span class="attr">#[serde(default)]
+<a href=#2192 id=2192 data-nosnippet>2192</a>    </span><span class="kw">pub </span>all_time_low: String,
+<a href=#2193 id=2193 data-nosnippet>2193</a>    <span class="doccomment">/// All-time low date
+<a href=#2194 id=2194 data-nosnippet>2194</a>    </span><span class="attr">#[serde(default)]
+<a href=#2195 id=2195 data-nosnippet>2195</a>    </span><span class="kw">pub </span>all_time_low_date: String,
+<a href=#2196 id=2196 data-nosnippet>2196</a>    <span class="doccomment">/// Listing date
+<a href=#2197 id=2197 data-nosnippet>2197</a>    </span><span class="attr">#[serde(default)]
+<a href=#2198 id=2198 data-nosnippet>2198</a>    </span><span class="kw">pub </span>ipo_date: String,
+<a href=#2199 id=2199 data-nosnippet>2199</a>    <span class="doccomment">/// Issue price
+<a href=#2200 id=2200 data-nosnippet>2200</a>    </span><span class="attr">#[serde(default)]
+<a href=#2201 id=2201 data-nosnippet>2201</a>    </span><span class="kw">pub </span>issue_price: String,
+<a href=#2202 id=2202 data-nosnippet>2202</a>    <span class="doccomment">/// Circulating supply
+<a href=#2203 id=2203 data-nosnippet>2203</a>    </span><span class="attr">#[serde(default)]
+<a href=#2204 id=2204 data-nosnippet>2204</a>    </span><span class="kw">pub </span>shares: String,
+<a href=#2205 id=2205 data-nosnippet>2205</a>    <span class="doccomment">/// User-facing symbol (e.g. `"BTCUSD.BKKT"`), converted from the API's
+<a href=#2206 id=2206 data-nosnippet>2206</a>    /// `counter_id` field (e.g. `"VA/BKKT/BTCUSD"`).
+<a href=#2207 id=2207 data-nosnippet>2207</a>    </span><span class="attr">#[serde(
+<a href=#2208 id=2208 data-nosnippet>2208</a>        default,
+<a href=#2209 id=2209 data-nosnippet>2209</a>        rename = <span class="string">"counter_id"</span>,
+<a href=#2210 id=2210 data-nosnippet>2210</a>        deserialize_with = <span class="string">"crate::utils::counter::deserialize_counter_id_as_symbol"
+<a href=#2211 id=2211 data-nosnippet>2211</a>    </span>)]
+<a href=#2212 id=2212 data-nosnippet>2212</a>    </span><span class="kw">pub </span>symbol: String,
+<a href=#2213 id=2213 data-nosnippet>2213</a>    <span class="doccomment">/// Base asset code (e.g. `"BTC"`)
+<a href=#2214 id=2214 data-nosnippet>2214</a>    </span><span class="attr">#[serde(default)]
+<a href=#2215 id=2215 data-nosnippet>2215</a>    </span><span class="kw">pub </span>base_asset: String,
+<a href=#2216 id=2216 data-nosnippet>2216</a>    <span class="doccomment">/// Official website URL
+<a href=#2217 id=2217 data-nosnippet>2217</a>    </span><span class="attr">#[serde(default)]
+<a href=#2218 id=2218 data-nosnippet>2218</a>    </span><span class="kw">pub </span>official_web_address: String,
+<a href=#2219 id=2219 data-nosnippet>2219</a>    <span class="doccomment">/// Logo image URL
+<a href=#2220 id=2220 data-nosnippet>2220</a>    </span><span class="attr">#[serde(default)]
+<a href=#2221 id=2221 data-nosnippet>2221</a>    </span><span class="kw">pub </span>logo: String,
+<a href=#2222 id=2222 data-nosnippet>2222</a>    <span class="doccomment">/// In-app wiki URL
+<a href=#2223 id=2223 data-nosnippet>2223</a>    </span><span class="attr">#[serde(default)]
+<a href=#2224 id=2224 data-nosnippet>2224</a>    </span><span class="kw">pub </span>wiki_url: String,
+<a href=#2225 id=2225 data-nosnippet>2225</a>    <span class="doccomment">/// Multi-language profile / description (JSON string)
+<a href=#2226 id=2226 data-nosnippet>2226</a>    </span><span class="attr">#[serde(default)]
+<a href=#2227 id=2227 data-nosnippet>2227</a>    </span><span class="kw">pub </span>profile: String,
+<a href=#2228 id=2228 data-nosnippet>2228</a>}
+<a href=#2229 id=2229 data-nosnippet>2229</a>
+<a href=#2230 id=2230 data-nosnippet>2230</a><span class="attr">#[cfg(test)]
+<a href=#2231 id=2231 data-nosnippet>2231</a></span><span class="kw">mod </span>tests {
+<a href=#2232 id=2232 data-nosnippet>2232</a>    <span class="kw">use </span>serde::Deserialize;
+<a href=#2233 id=2233 data-nosnippet>2233</a>
+<a href=#2234 id=2234 data-nosnippet>2234</a>    <span class="kw">use crate</span>::{Market, quote::WatchlistGroup};
+<a href=#2235 id=2235 data-nosnippet>2235</a>
+<a href=#2236 id=2236 data-nosnippet>2236</a>    <span class="attr">#[test]
+<a href=#2237 id=2237 data-nosnippet>2237</a>    </span><span class="kw">fn </span>watch_list() {
+<a href=#2238 id=2238 data-nosnippet>2238</a>        <span class="attr">#[derive(Debug, Deserialize)]
+<a href=#2239 id=2239 data-nosnippet>2239</a>        </span><span class="kw">struct </span>Response {
+<a href=#2240 id=2240 data-nosnippet>2240</a>            groups: Vec&lt;WatchlistGroup&gt;,
+<a href=#2241 id=2241 data-nosnippet>2241</a>        }
+<a href=#2242 id=2242 data-nosnippet>2242</a>
+<a href=#2243 id=2243 data-nosnippet>2243</a>        <span class="kw">let </span>json = <span class="string">r#"
+<a href=#2244 id=2244 data-nosnippet>2244</a>        {
+<a href=#2245 id=2245 data-nosnippet>2245</a>            "groups": [
+<a href=#2246 id=2246 data-nosnippet>2246</a>                {
+<a href=#2247 id=2247 data-nosnippet>2247</a>                    "id": "1",
+<a href=#2248 id=2248 data-nosnippet>2248</a>                    "name": "Test",
+<a href=#2249 id=2249 data-nosnippet>2249</a>                    "securities": [
+<a href=#2250 id=2250 data-nosnippet>2250</a>                        {
+<a href=#2251 id=2251 data-nosnippet>2251</a>                            "symbol": "AAPL",
+<a href=#2252 id=2252 data-nosnippet>2252</a>                            "market": "US",
+<a href=#2253 id=2253 data-nosnippet>2253</a>                            "name": "Apple Inc.",
+<a href=#2254 id=2254 data-nosnippet>2254</a>                            "watched_price": "150.0",
+<a href=#2255 id=2255 data-nosnippet>2255</a>                            "watched_at": "1633036800"
+<a href=#2256 id=2256 data-nosnippet>2256</a>                        }
+<a href=#2257 id=2257 data-nosnippet>2257</a>                    ]
+<a href=#2258 id=2258 data-nosnippet>2258</a>                }
+<a href=#2259 id=2259 data-nosnippet>2259</a>            ]
+<a href=#2260 id=2260 data-nosnippet>2260</a>        }
+<a href=#2261 id=2261 data-nosnippet>2261</a>        "#</span>;
+<a href=#2262 id=2262 data-nosnippet>2262</a>
+<a href=#2263 id=2263 data-nosnippet>2263</a>        <span class="kw">let </span>response: Response = serde_json::from_str(json).unwrap();
+<a href=#2264 id=2264 data-nosnippet>2264</a>        <span class="macro">assert_eq!</span>(response.groups.len(), <span class="number">1</span>);
+<a href=#2265 id=2265 data-nosnippet>2265</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].id, <span class="number">1</span>);
+<a href=#2266 id=2266 data-nosnippet>2266</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].name, <span class="string">"Test"</span>);
+<a href=#2267 id=2267 data-nosnippet>2267</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities.len(), <span class="number">1</span>);
+<a href=#2268 id=2268 data-nosnippet>2268</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].symbol, <span class="string">"AAPL"</span>);
+<a href=#2269 id=2269 data-nosnippet>2269</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].market, Market::US);
+<a href=#2270 id=2270 data-nosnippet>2270</a>        <span class="macro">assert_eq!</span>(response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].name, <span class="string">"Apple Inc."</span>);
+<a href=#2271 id=2271 data-nosnippet>2271</a>        <span class="macro">assert_eq!</span>(
+<a href=#2272 id=2272 data-nosnippet>2272</a>            response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].watched_price,
+<a href=#2273 id=2273 data-nosnippet>2273</a>            <span class="prelude-val">Some</span>(<span class="macro">decimal!</span>(<span class="number">150.0</span>))
+<a href=#2274 id=2274 data-nosnippet>2274</a>        );
+<a href=#2275 id=2275 data-nosnippet>2275</a>        <span class="macro">assert_eq!</span>(
+<a href=#2276 id=2276 data-nosnippet>2276</a>            response.groups[<span class="number">0</span>].securities[<span class="number">0</span>].watched_at.unix_timestamp(),
+<a href=#2277 id=2277 data-nosnippet>2277</a>            <span class="number">1633036800
+<a href=#2278 id=2278 data-nosnippet>2278</a>        </span>);
+<a href=#2279 id=2279 data-nosnippet>2279</a>    }
+<a href=#2280 id=2280 data-nosnippet>2280</a>}
 </code></pre></div></section></main></body></html>

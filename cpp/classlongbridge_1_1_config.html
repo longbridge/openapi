@@ -105,6 +105,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab8623671c7476e2c146f49dce58dc0ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#ab8623671c7476e2c146f49dce58dc0ce">enable_overnight</a> ()</td></tr>
 <tr class="memdesc:ab8623671c7476e2c146f49dce58dc0ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable overnight quote.  <a href="classlongbridge_1_1_config.html#ab8623671c7476e2c146f49dce58dc0ce">More...</a><br /></td></tr>
 <tr class="separator:ab8623671c7476e2c146f49dce58dc0ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc672e5b8672461abe2a17973ae58855"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#adc672e5b8672461abe2a17973ae58855">enable_papertrading</a> ()</td></tr>
+<tr class="separator:adc672e5b8672461abe2a17973ae58855"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e7a5514baa91edd70c41b516f49b633"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#a2e7a5514baa91edd70c41b516f49b633">set_push_candlestick_mode</a> (<a class="el" href="namespacelongbridge.html#aad376e5dd35664b8b6533d6dacef015a">PushCandlestickMode</a> mode)</td></tr>
 <tr class="memdesc:a2e7a5514baa91edd70c41b516f49b633"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the push candlestick mode.  <a href="classlongbridge_1_1_config.html#a2e7a5514baa91edd70c41b516f49b633">More...</a><br /></td></tr>
 <tr class="separator:a2e7a5514baa91edd70c41b516f49b633"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -259,6 +261,27 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Enable overnight quote. </p>
+
+</div>
+</div>
+<a id="adc672e5b8672461abe2a17973ae58855"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc672e5b8672461abe2a17973ae58855">&#9670;&nbsp;</a></span>enable_papertrading()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classlongbridge_1_1_config.html">Config</a>&amp; longbridge::Config::enable_papertrading </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enable paper trading mode.</p>
+<p>When enabled, all API calls target the paper trading (simulation) environment. The server validates the token: if it belongs to a real-money account the server returns an error.</p>
+<p>By default this option is disabled and the server imposes no restrictions — both paper trading and real-money accounts are accepted.</p>
+<p>Paper trading users should call this method as a safety guard. </p>
 
 </div>
 </div>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['market_2766',['Market',['../namespacelongbridge.html#ac23c9164f0ed3247af35cd39ec1f0619',1,'longbridge']]]
+  ['market_2770',['Market',['../namespacelongbridge.html#ac23c9164f0ed3247af35cd39ec1f0619',1,'longbridge']]]
 ];

@@ -235,6 +235,12 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_get_today_executions_options.html">longbridge::trade::GetTodayExecutionsOptions</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for get today executions request.  <a href="structlongbridge_1_1trade_1_1_get_today_executions_options.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_get_all_executions_options.html">longbridge::trade::GetAllExecutionsOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for get all executions request.  <a href="structlongbridge_1_1trade_1_1_get_all_executions_options.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_all_executions_response.html">longbridge::trade::AllExecutionsResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">All executions response.  <a href="structlongbridge_1_1trade_1_1_all_executions_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_order.html">longbridge::trade::Order</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structlongbridge_1_1trade_1_1_order.html" title="Order.">Order</a>.  <a href="structlongbridge_1_1trade_1_1_order.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1059,20 +1065,10 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ae7d41371b5280feed3513fe83f92685a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order type.  <a href="namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685a">More...</a><br /></td></tr>
 <tr class="separator:ae7d41371b5280feed3513fe83f92685a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0bacdb62061ce21c3c544864104c8e3d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3d">longbridge::trade::OrderTag</a> { <br />
-&#160;&#160;<a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::trade::Unknown</a>
+<tr class="memitem:a0bacdb62061ce21c3c544864104c8e3d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3d">longbridge::trade::OrderTag</a> { <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::trade::Unknown</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da960b44c579bc2f6818d2daaf9e4c16f0">longbridge::trade::Normal</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da068cb1d7a701350fb9029fc2a87c0957">longbridge::trade::LongTerm</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3dacaf3a042a037c064b7513ed640c22f77">longbridge::trade::Grey</a>
-, <br />
-&#160;&#160;<a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da092e068018f610d4d8209c9d89a5ec07">longbridge::trade::MarginCall</a>
-, <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da8d9da4bc0e49a50e09ac9f7e56789d39">longbridge::trade::Offline</a>
-, <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da603ac10e8531bb8cfcc0e3e2a52ef027">longbridge::trade::Creditor</a>
-, <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da98767816fd8bfd0e01b6ca8d208790b9">longbridge::trade::Debtor</a>
-, <br />
-&#160;&#160;<a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da6970d208d1beb0f5170769b30c430e3e">longbridge::trade::NonExercise</a>
-, <a class="el" href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3da79d43b20e3908abab83eeb19af215004">longbridge::trade::AllocatedSub</a>
-<br />
  }</td></tr>
 <tr class="memdesc:a0bacdb62061ce21c3c544864104c8e3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order tag.  <a href="namespacelongbridge_1_1trade.html#a0bacdb62061ce21c3c544864104c8e3d">More...</a><br /></td></tr>
 <tr class="separator:a0bacdb62061ce21c3c544864104c8e3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1090,10 +1086,14 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a5f3b72857c03c6a3faa2a102efa91952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trigger status.  <a href="namespacelongbridge_1_1trade.html#a5f3b72857c03c6a3faa2a102efa91952">More...</a><br /></td></tr>
 <tr class="separator:a5f3b72857c03c6a3faa2a102efa91952"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a508bac29dd591e908e6754f6bea0cdc1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1">longbridge::trade::OutsideRTH</a> { <a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::trade::Unknown</a>
+<tr class="memitem:a508bac29dd591e908e6754f6bea0cdc1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1">longbridge::trade::OutsideRTH</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::trade::Unknown</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1a9aa44991eceb76ce61084c18021a6cb6">longbridge::trade::RTHOnly</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1aaa8ec6efcb9945cb6100703d26630461">longbridge::trade::AnyTime</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1a60d2e80b9b8ac1b2afaf1d7181b725c2">longbridge::trade::Overnight</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1ac3b3a1c7e52f69b85c5f5873370cfd40">longbridge::trade::OptionPreMarket</a>
+<br />
  }</td></tr>
 <tr class="memdesc:a508bac29dd591e908e6754f6bea0cdc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable outside regular trading hours.  <a href="namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1">More...</a><br /></td></tr>
 <tr class="separator:a508bac29dd591e908e6754f6bea0cdc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
