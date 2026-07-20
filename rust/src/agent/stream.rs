@@ -86,6 +86,15 @@ impl ConversationStreamSubscription {
     /// from `stream` once demand is available, and dispatches
     /// `on_next`/`on_error`/`on_complete` (each of these is expected to call
     /// back into the JVM via a JNI `Subscriber` reference).
+    ///
+    /// Drains all the way to the stream's natural end rather than stopping as
+    /// soon as a [`ConversationStreamEvent::WorkflowFinished`] is seen —
+    /// against the real API, the server sometimes emits a few more
+    /// housekeeping events (e.g. a `chat_title_updated`-shaped
+    /// [`ConversationStreamEvent::Other`]) after `workflow_finished` and
+    /// before actually closing the connection, so stopping early would
+    /// silently drop them and abandon the connection while the server still
+    /// had something to say.
     pub fn spawn<S, F1, F2, F3>(stream: S, on_next: F1, on_error: F2, on_complete: F3) -> Self
     where
         S: Stream<Item = Result<ConversationStreamEvent>> + Send + 'static,
@@ -105,13 +114,7 @@ impl ConversationStreamSubscription {
                 match stream.next().await {
                     Some(Ok(event)) => {
                         demand2.0.fetch_sub(1, Ordering::AcqRel);
-                        let is_final =
-                            matches!(event, ConversationStreamEvent::WorkflowFinished(_));
                         on_next(event);
-                        if is_final {
-                            on_complete();
-                            break;
-                        }
                     }
                     Some(Err(err)) => {
                         on_error(err);

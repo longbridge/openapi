@@ -102,8 +102,12 @@ impl AgentContext {
     }
 
     /// Start a conversation with the specified Agent, returning an iterator of
-    /// run-progress events. The last item is always a `ConversationStreamEvent`
-    /// with `kind == "workflow_finished"`.
+    /// run-progress events. A `ConversationStreamEvent` with
+    /// `kind == "workflow_finished"` carries the run's outcome, but isn't
+    /// necessarily the last item — the server may still emit a few more
+    /// housekeeping events (`kind == "other"`, e.g. a `chat_title_updated`)
+    /// before actually closing the connection, so keep iterating to the end
+    /// rather than stopping as soon as you see it.
     #[pyo3(signature = (agent_id, query, chat_uid = None))]
     fn conversation_streamed(
         &self,

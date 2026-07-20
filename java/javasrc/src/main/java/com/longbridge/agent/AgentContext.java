@@ -127,9 +127,14 @@ public class AgentContext implements AutoCloseable {
 
     /**
      * Start a conversation with the specified Agent, returning a
-     * {@link Flow.Publisher} of run-progress events over SSE. The last event
-     * is always a {@link WorkflowFinishedEvent} (unless the stream itself
-     * errors first, delivered via {@code Flow.Subscriber#onError}).
+     * {@link Flow.Publisher} of run-progress events over SSE. A
+     * {@link WorkflowFinishedEvent} carries the run's outcome (unless the
+     * stream itself errors first, delivered via
+     * {@code Flow.Subscriber#onError}), but it isn't necessarily the last
+     * event delivered — the server may still emit a few more housekeeping
+     * events (as an {@link OtherEvent}, e.g. a {@code chat_title_updated})
+     * before actually closing the connection, so keep consuming until
+     * {@code onComplete} rather than stopping as soon as you see it.
      * <p>
      * This method itself performs no I/O — it returns a cold
      * {@link Flow.Publisher} immediately; the HTTP/SSE connection is only
