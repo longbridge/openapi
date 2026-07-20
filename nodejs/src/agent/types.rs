@@ -308,7 +308,8 @@ impl From<lb::MessagePayload> for MessagePayload {
 /// fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
 /// `"chat_started" | "message" | "workflow_finished" | "other"`, and exactly
 /// one of `chatStarted` / `message` / `workflowFinished` / `other` is set,
-/// matching `kind`.
+/// matching `kind`. When `kind` is `"other"`, `otherEvent` additionally
+/// carries the SSE envelope's `event` field (the event type name).
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct ConversationStreamEvent {
@@ -321,6 +322,11 @@ pub struct ConversationStreamEvent {
     pub message: Option<MessagePayload>,
     /// Set when `kind` is `"workflow_finished"` — the last event of a stream
     pub workflow_finished: Option<ConversationResponse>,
+    /// Set when `kind` is `"other"` — the SSE envelope's `event` field (the
+    /// event type name), e.g. `"workflow_started"`, `"ping"`,
+    /// `"chat_finished"`, `"chat_title_updated"` (observed against the real
+    /// API; not documented)
+    pub other_event: Option<String>,
     /// Set when `kind` is `"other"` — raw JSON of an event type not
     /// recognized by this SDK version
     pub other: Option<serde_json::Value>,
@@ -333,6 +339,7 @@ impl From<lb::ConversationStreamEvent> for ConversationStreamEvent {
                 chat_started: Some(payload.into()),
                 message: None,
                 workflow_finished: None,
+                other_event: None,
                 other: None,
             },
             lb::ConversationStreamEvent::Message(payload) => Self {
@@ -340,6 +347,7 @@ impl From<lb::ConversationStreamEvent> for ConversationStreamEvent {
                 chat_started: None,
                 message: Some(payload.into()),
                 workflow_finished: None,
+                other_event: None,
                 other: None,
             },
             lb::ConversationStreamEvent::WorkflowFinished(resp) => Self {
@@ -347,14 +355,16 @@ impl From<lb::ConversationStreamEvent> for ConversationStreamEvent {
                 chat_started: None,
                 message: None,
                 workflow_finished: Some(resp.into()),
+                other_event: None,
                 other: None,
             },
-            lb::ConversationStreamEvent::Other(value) => Self {
+            lb::ConversationStreamEvent::Other { event, data } => Self {
                 kind: "other".to_string(),
                 chat_started: None,
                 message: None,
                 workflow_finished: None,
-                other: Some(value),
+                other_event: Some(event),
+                other: Some(data),
             },
         }
     }

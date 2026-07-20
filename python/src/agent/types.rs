@@ -280,7 +280,8 @@ impl From<longbridge::agent::MessagePayload> for MessagePayload {
 /// the discriminant (one of `"chat_started"`, `"message"`,
 /// `"workflow_finished"`, `"other"`) and exactly one of
 /// `chat_started`/`message`/`workflow_finished`/`other` is set, matching
-/// `kind`.
+/// `kind`. When `kind` is `"other"`, `other_event` additionally carries the
+/// SSE envelope's `event` field (the event type name).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ConversationStreamEvent {
@@ -288,6 +289,7 @@ pub(crate) struct ConversationStreamEvent {
     pub chat_started: Option<ChatStartedPayload>,
     pub message: Option<MessagePayload>,
     pub workflow_finished: Option<ConversationResponse>,
+    pub other_event: Option<String>,
     pub other: Option<JsonValue>,
 }
 
@@ -301,6 +303,7 @@ impl From<longbridge::agent::ConversationStreamEvent> for ConversationStreamEven
                 chat_started: Some(payload.into()),
                 message: None,
                 workflow_finished: None,
+                other_event: None,
                 other: None,
             },
             E::Message(payload) => Self {
@@ -308,6 +311,7 @@ impl From<longbridge::agent::ConversationStreamEvent> for ConversationStreamEven
                 chat_started: None,
                 message: Some(payload.into()),
                 workflow_finished: None,
+                other_event: None,
                 other: None,
             },
             E::WorkflowFinished(resp) => Self {
@@ -315,14 +319,16 @@ impl From<longbridge::agent::ConversationStreamEvent> for ConversationStreamEven
                 chat_started: None,
                 message: None,
                 workflow_finished: Some(resp.into()),
+                other_event: None,
                 other: None,
             },
-            E::Other(value) => Self {
+            E::Other { event, data } => Self {
                 kind: "other".to_string(),
                 chat_started: None,
                 message: None,
                 workflow_finished: None,
-                other: Some(JsonValue(value)),
+                other_event: Some(event),
+                other: Some(JsonValue(data)),
             },
         }
     }
