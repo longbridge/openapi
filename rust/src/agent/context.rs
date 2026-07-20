@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use futures_util::{Stream, StreamExt};
 use longbridge_httpcli::{HttpClient, Json, Method};
@@ -6,6 +6,13 @@ use serde::{Deserialize, Serialize};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{Config, Result, agent::types::*};
+
+/// The shared httpclient default (30s) is tuned for fast REST calls and is
+/// too tight here: in blocking mode the server holds the connection silent
+/// until the whole LLM turn is done, and that can legitimately take longer.
+/// Only agent calls get this longer budget — every other domain keeps the
+/// 30s default.
+const AGENT_REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
 
 struct InnerAgentContext {
     http_cli: HttpClient,
@@ -155,6 +162,7 @@ impl AgentContext {
                 query: query.into(),
                 chat_uid: chat_uid.into(),
             }))
+            .timeout(AGENT_REQUEST_TIMEOUT)
             .response::<Json<ConversationResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
@@ -196,6 +204,7 @@ impl AgentContext {
             .body(Json(Body {
                 answers_by_tool_call: answers,
             }))
+            .timeout(AGENT_REQUEST_TIMEOUT)
             .response::<Json<ConversationResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
@@ -240,6 +249,7 @@ impl AgentContext {
                 query: query.into(),
                 chat_uid: chat_uid.into(),
             }))
+            .timeout(AGENT_REQUEST_TIMEOUT)
             .send_events()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?;
@@ -285,6 +295,7 @@ impl AgentContext {
             .body(Json(Body {
                 answers_by_tool_call: answers,
             }))
+            .timeout(AGENT_REQUEST_TIMEOUT)
             .send_events()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?;

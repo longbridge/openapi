@@ -129,6 +129,7 @@ pub struct RequestBuilder<'a, T, Q, R> {
     body: Option<T>,
     query_params: Option<Q>,
     dc_restrict: Option<DcRegion>,
+    timeout: Option<Duration>,
     mark_resp: PhantomData<R>,
 }
 
@@ -142,6 +143,7 @@ impl<'a> RequestBuilder<'a, (), (), ()> {
             body: None,
             query_params: None,
             dc_restrict: None,
+            timeout: None,
             mark_resp: PhantomData,
         }
     }
@@ -162,6 +164,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             body: Some(body),
             query_params: self.query_params,
             dc_restrict: self.dc_restrict,
+            timeout: self.timeout,
             mark_resp: self.mark_resp,
         }
     }
@@ -194,6 +197,17 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
         self
     }
 
+    /// Override the default request timeout ([`REQUEST_TIMEOUT`], 30s) for
+    /// this call. Most endpoints respond quickly and should stick with the
+    /// default; this exists for the rare domain where a slower backend (e.g.
+    /// an LLM-backed one) makes the shared default too tight, without
+    /// changing that default for every other endpoint.
+    #[must_use]
+    pub fn timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = Some(timeout);
+        self
+    }
+
     /// Set the query string
     #[must_use]
     pub fn query_params<Q2>(self, params: Q2) -> RequestBuilder<'a, T, Q2, R>
@@ -208,6 +222,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             body: self.body,
             query_params: Some(params),
             dc_restrict: self.dc_restrict,
+            timeout: self.timeout,
             mark_resp: self.mark_resp,
         }
     }
@@ -226,6 +241,7 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
             body: self.body,
             query_params: self.query_params,
             dc_restrict: self.dc_restrict,
+            timeout: self.timeout,
             mark_resp: PhantomData,
         }
     }
@@ -406,9 +422,10 @@ where
         let request = self.build_request().await?;
 
         let s = Instant::now();
+        let timeout = self.timeout.unwrap_or(REQUEST_TIMEOUT);
 
         // send request
-        let (status, trace_id, text) = tokio::time::timeout(REQUEST_TIMEOUT, async move {
+        let (status, trace_id, text) = tokio::time::timeout(timeout, async move {
             let resp = http_cli
                 .execute(request)
                 .await
@@ -480,14 +497,18 @@ where
         self,
     ) -> HttpClientResult<Pin<Box<dyn Stream<Item = HttpClientResult<SseEvent>> + Send>>> {
         let http_cli = self.client.http_cli.clone();
+        let timeout = self.timeout.unwrap_or(REQUEST_TIMEOUT);
         let mut request = self.build_request().await?;
         request
             .headers_mut()
             .insert(ACCEPT, HeaderValue::from_static("text/event-stream"));
 
-        let resp = http_cli
-            .execute(request)
+        // Only bounds establishing the connection (getting a status/headers
+        // back), not the subsequent event-by-event reads below — those can
+        // legitimately take as long as the agent takes to answer.
+        let resp = tokio::time::timeout(timeout, http_cli.execute(request))
             .await
+            .map_err(|_| HttpClientError::RequestTimeout)?
             .map_err(|err| HttpClientError::Http(err.into()))?;
         let status = resp.status();
 
