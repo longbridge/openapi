@@ -52,6 +52,8 @@ public class SdkNative {
 
         public static native long configSetLogPath(long config, String logPath);
 
+        public static native long configSetEnablePapertrading(long config);
+
         public static native void configRefreshAccessToken(long config, OffsetDateTime expiredAt,
                         AsyncCallback callback);
 
@@ -217,6 +219,9 @@ public class SdkNative {
                         AsyncCallback callback);
 
         public static native void tradeContextTodayExecutions(long context, GetTodayExecutionsOptions opts,
+                        AsyncCallback callback);
+
+        public static native void tradeContextAllExecutions(long context, GetAllExecutionsOptions opts,
                         AsyncCallback callback);
 
         public static native void tradeContextHistoryOrders(long context, GetHistoryOrdersOptions opts,

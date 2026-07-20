@@ -52,6 +52,7 @@ impl Config {
         push_candlestick_mode = PushCandlestickMode::Realtime,
         enable_print_quote_packages = true,
         log_path = None,
+        enable_papertrading = false,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn from_apikey(
@@ -66,6 +67,7 @@ impl Config {
         push_candlestick_mode: PushCandlestickMode,
         enable_print_quote_packages: bool,
         log_path: Option<String>,
+        enable_papertrading: bool,
     ) -> Self {
         let mut config = longbridge::Config::from_apikey(app_key, app_secret, access_token);
 
@@ -90,6 +92,9 @@ impl Config {
         config.set_push_candlestick_mode(push_candlestick_mode.into());
         if let Some(log_path) = log_path {
             config.set_log_path(log_path);
+        }
+        if enable_papertrading {
+            config.set_enable_papertrading();
         }
 
         Self(config)
@@ -167,6 +172,7 @@ impl Config {
         push_candlestick_mode = None,
         enable_print_quote_packages = None,
         log_path = None,
+        enable_papertrading = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn from_oauth(
@@ -180,6 +186,7 @@ impl Config {
         push_candlestick_mode: Option<PushCandlestickMode>,
         enable_print_quote_packages: Option<bool>,
         log_path: Option<String>,
+        enable_papertrading: Option<bool>,
     ) -> Self {
         let mut config = longbridge::Config::from_oauth(oauth.0.clone());
 
@@ -206,6 +213,9 @@ impl Config {
         }
         if let Some(log_path) = log_path {
             config.set_log_path(log_path);
+        }
+        if let Some(true) = enable_papertrading {
+            config.set_enable_papertrading();
         }
 
         Self(config)

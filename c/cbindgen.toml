@@ -75,6 +75,8 @@ cpp_compat = true
 "CExecution" = "lb_execution_t"
 "CGetHistoryExecutionsOptions" = "lb_get_history_executions_options_t"
 "CGetTodayExecutionsOptions" = "lb_get_today_executions_options_t"
+"CGetAllExecutionsOptions" = "lb_get_all_executions_options_t"
+"CAllExecutionsResponse" = "lb_all_executions_response_t"
 "COrder" = "lb_order_t"
 "CGetHistoryOrdersOptions" = "lb_get_history_orders_options_t"
 "CGetTodayOrdersOptions" = "lb_get_today_orders_options_t"
@@ -352,6 +354,7 @@ include = [
     "CCapitalDistributionResponse",
     "CRealtimeQuote",
     "CExecution",
+    "CAllExecutionsResponse",
     "COrder",
     "CFrozenTransactionFee",
     "CAccountBalance",

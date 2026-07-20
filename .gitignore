@@ -3,6 +3,7 @@
 .vscode
 *.log
 cmake.build
+.claude/
 build
 
 # Eclipse IDE

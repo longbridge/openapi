@@ -53,6 +53,11 @@ public:
     const std::optional<GetTodayExecutionsOptions>& opts,
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
 
+  /// Get all executions
+  void all_executions(
+    const std::optional<GetAllExecutionsOptions>& opts,
+    AsyncCallback<TradeContext, AllExecutionsResponse> callback) const;
+
   /// Get history orders
   void history_orders(
     const std::optional<GetHistoryOrdersOptions>& opts,

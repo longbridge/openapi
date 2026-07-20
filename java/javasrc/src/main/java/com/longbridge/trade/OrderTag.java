@@ -12,16 +12,4 @@ public enum OrderTag {
     LongTerm,
     /** Grey market order */
     Grey,
-    /** Margin call order */
-    MarginCall,
-    /** Offline order */
-    Offline,
-    /** Creditor order */
-    Creditor,
-    /** Debtor order */
-    Debtor,
-    /** Non-exercise order */
-    NonExercise,
-    /** Allocated sub order */
-    AllocatedSub,
 }

@@ -71,6 +71,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::OptionVolumeStats>()?;
     parent.add_class::<types::OptionVolumeDaily>()?;
     parent.add_class::<types::OptionVolumeDailyStat>()?;
+    parent.add_class::<types::USCryptoOverview>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     parent.add_class::<context_async::AsyncQuoteContext>()?;

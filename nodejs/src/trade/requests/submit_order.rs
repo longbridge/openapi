@@ -42,6 +42,10 @@ pub struct SubmitOrderOptions<'env> {
     pub monitor_price: Option<ClassInstance<'env, Decimal>>,
     /// Remark (Maximum 64 characters)
     pub remark: Option<String>,
+    /// Client request ID for idempotency control.
+    /// If not specified, idempotency control is skipped.
+    /// The server caches this ID for 10 minutes.
+    pub client_request_id: Option<String>,
 }
 
 impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
@@ -86,6 +90,9 @@ impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOpti
         }
         if let Some(remark) = opts.remark {
             opts2 = opts2.remark(remark);
+        }
+        if let Some(id) = opts.client_request_id {
+            opts2 = opts2.client_request_id(id);
         }
         opts2
     }

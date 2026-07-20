@@ -132,6 +132,16 @@ pub struct Execution {
     pub price: Decimal,
 }
 
+/// Response for get all executions request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AllExecutionsResponse {
+    /// Has more records
+    pub has_more: bool,
+    /// Execution list
+    #[serde(default)]
+    pub trades: Vec<Execution>,
+}
+
 /// Order side
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
 pub enum OrderSide {
@@ -167,23 +177,11 @@ pub enum OrderTag {
     #[strum(serialize = "Normal")]
     Normal,
     /// Long term Order
-    #[strum(serialize = "GTC")]
+    #[strum(serialize = "Gtc")]
     LongTerm,
     /// Grey Order
     #[strum(serialize = "Grey")]
     Grey,
-    /// Force Selling
-    MarginCall,
-    /// OTC
-    Offline,
-    /// Option Exercise Long
-    Creditor,
-    /// Option Exercise Short
-    Debtor,
-    /// Wavier Of Option Exercise
-    NonExercise,
-    /// Trade Allocation
-    AllocatedSub,
 }
 
 /// Time in force Type
@@ -232,6 +230,9 @@ pub enum OutsideRTH {
     /// Overnight
     #[strum(serialize = "OVERNIGHT")]
     Overnight,
+    /// Overnight option
+    #[strum(serialize = "OPTION_PRE_MARKET")]
+    OptionPreMarket,
 }
 
 /// Order
@@ -803,6 +804,529 @@ impl_default_for_enum_string!(
     DeductionStatus,
     ChargeCategoryCode
 );
+
+// ── US-market types
+// ───────────────────────────────────────────────────────────
+
+/// Request for [`crate::TradeContext::us_query_orders`], modelled after
+/// [`crate::GetHistoryOrdersOptions`] for HK/CN orders.
+///
+/// `query_type`: 0 = all (includes Rejected), 1 = pending, 2 = history (filled
+/// only). Default 0 matches what the app shows as "past orders".
+///
+/// `symbol` accepts a user-facing symbol e.g. `"AAPL.US"` or `"DOGEUSD.BKKT"`.
+/// The SDK converts it to the internal `counter_id` format automatically.
+#[derive(Debug, Clone, Default)]
+pub struct GetUSHistoryOrders {
+    /// Optional symbol filter, e.g. `"AAPL.US"`. Converted to counter_id
+    /// internally.
+    pub symbol: Option<String>,
+    /// Direction filter. [`crate::OrderSide::Unknown`] = all (default).
+    pub side: OrderSide,
+    /// Start timestamp (seconds). Defaults to 90 days ago.
+    pub start_at: i64,
+    /// End timestamp (seconds). Defaults to now.
+    pub end_at: i64,
+    /// 0 = all, 1 = pending, 2 = history (filled only). Default 0.
+    pub query_type: i32,
+    /// Page number, 1-based. Default 1.
+    pub page: i32,
+    /// Page size. Default 20.
+    pub limit: i32,
+}
+
+/// Alias kept for backward compatibility.
+pub type QueryUSOrdersOptions = GetUSHistoryOrders;
+
+/// Internal JSON body sent to POST /v1/us/orders/query.
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct USQueryOrdersBody {
+    pub account_channel: String,
+    pub action: i32,
+    pub start_at: f64,
+    pub end_at: f64,
+    pub counter_ids: Vec<String>,
+    pub security_types: Vec<String>,
+    pub query_type: i32,
+    pub page: i32,
+    pub limit: i32,
+    pub query_version: f64,
+}
+
+/// Response for [`crate::TradeContext::us_query_orders`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct QueryUSOrdersResponse {
+    /// Order list (raw JSON for forward compatibility).
+    /// Order ID field is `id` (not `order_id`).
+    #[serde(default)]
+    pub orders: Vec<serde_json::Value>,
+    /// Total number of orders matching the query.
+    #[serde(default)]
+    pub total_count: i32,
+}
+
+/// One order state-transition entry within [`USOrderDetail`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USOrderHistory {
+    #[serde(default)]
+    pub exec_type: i32,
+    #[serde(default)]
+    pub status: String,
+    #[serde(default)]
+    pub price: String,
+    #[serde(default)]
+    pub qty: String,
+    #[serde(default)]
+    pub time: String,
+    #[serde(default)]
+    pub msg: String,
+    #[serde(default)]
+    pub is_manually: bool,
+    #[serde(default)]
+    pub opp_party_id: String,
+    #[serde(default)]
+    pub trd_match_id: String,
+    #[serde(default)]
+    pub operator: String,
+    #[serde(default)]
+    pub op_entrust_way: String,
+    #[serde(default)]
+    pub cxl_rej_response_to: i32,
+    #[serde(default)]
+    pub withdrawal_reason: String,
+    #[serde(default)]
+    pub opp_name: String,
+    #[serde(default)]
+    pub exec_id: String,
+}
+
+/// Action-button state for an order.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USButtonControl {
+    #[serde(default)]
+    pub withdraw: i32,
+    #[serde(default)]
+    pub replace: i32,
+    #[serde(default)]
+    pub exceptionable: Vec<String>,
+}
+
+/// One fee category within [`USChargeDetail`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USChargeItem {
+    #[serde(default)]
+    pub code: i32,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub fees: Vec<String>,
+}
+
+/// Fee breakdown for an order.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USChargeDetail {
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub total_amount: String,
+    #[serde(default)]
+    pub items: Vec<USChargeItem>,
+}
+
+/// One bracket/conditional sub-order attached to a main order.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAttachedOrder {
+    #[serde(default)]
+    pub attached_type_display: i32,
+    #[serde(default)]
+    pub executed_qty: String,
+    #[serde(default)]
+    pub quantity: String,
+    #[serde(default)]
+    pub status: String,
+    #[serde(default)]
+    pub trigger_price: String,
+    #[serde(default)]
+    pub order_id: String,
+    #[serde(default)]
+    pub gtd: String,
+    #[serde(default)]
+    pub time_in_force: i32,
+    #[serde(default)]
+    pub tag: i32,
+    #[serde(default)]
+    pub activate_order_type: String,
+    #[serde(default)]
+    pub activate_rth: i32,
+    #[serde(default)]
+    pub submit_price: String,
+    /// User-facing trading symbol (e.g. `"NKE.US"`), converted from
+    /// `counter_id`.
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    #[serde(default)]
+    pub withdrawn: bool,
+}
+
+/// Full typed order object within [`USOrderDetailResponse`].
+/// `submitted_at` and `done_at` are raw unix-second strings.
+/// `order_histories` is nested inside this object, not at the response top
+/// level.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USOrderDetail {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub aaid: String,
+    #[serde(default)]
+    pub account_channel: String,
+    #[serde(default)]
+    pub action: i32,
+    /// User-facing trading symbol (e.g. `"NKE.US"`), converted from
+    /// `counter_id`.
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    /// User-facing underlying symbol (options only), converted from
+    /// `underlying_counter_id`.
+    #[serde(
+        default,
+        rename = "underlying_counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub underlying_symbol: String,
+    #[serde(default)]
+    pub security_type: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub trade_currency: String,
+    #[serde(default)]
+    pub order_type: String,
+    #[serde(default)]
+    pub status: String,
+    #[serde(default)]
+    pub price: String,
+    #[serde(default)]
+    pub quantity: String,
+    #[serde(default)]
+    pub executed_qty: String,
+    #[serde(default)]
+    pub executed_price: String,
+    #[serde(default)]
+    pub executed_amount: String,
+    #[serde(default)]
+    pub operate_direction: String,
+    #[serde(default)]
+    pub time_in_force: i32,
+    #[serde(default)]
+    pub gtd: String,
+    #[serde(default)]
+    pub tag: i32,
+    #[serde(default)]
+    pub msg: String,
+    #[serde(default)]
+    pub force_only_rth: i32,
+    #[serde(default)]
+    pub submitted_at: String,
+    #[serde(default)]
+    pub done_at: String,
+    #[serde(default)]
+    pub trigger_price: String,
+    #[serde(default)]
+    pub trigger_at: String,
+    #[serde(default)]
+    pub trigger_status: i32,
+    #[serde(default)]
+    pub trigger_exchange: String,
+    #[serde(default)]
+    pub trigger_last_done: String,
+    #[serde(default)]
+    pub trigger_count: i32,
+    #[serde(default)]
+    pub tailing_amount: String,
+    #[serde(default)]
+    pub tailing_percent: String,
+    #[serde(default)]
+    pub limit_offset: String,
+    #[serde(default)]
+    pub limit_depth_level: i32,
+    #[serde(default)]
+    pub market_price: String,
+    #[serde(default)]
+    pub submitted_amount: String,
+    #[serde(default)]
+    pub estimated_fee: String,
+    #[serde(default)]
+    pub free_status: i32,
+    #[serde(default)]
+    pub free_amount: String,
+    #[serde(default)]
+    pub free_currency: String,
+    #[serde(default)]
+    pub deductions_status: i32,
+    #[serde(default)]
+    pub deductions_amount: String,
+    #[serde(default)]
+    pub deductions_currency: String,
+    #[serde(default)]
+    pub platform_deductions_status: i32,
+    #[serde(default)]
+    pub platform_deductions_amount: String,
+    #[serde(default)]
+    pub platform_deductions_currency: String,
+    #[serde(default)]
+    pub display_account: String,
+    #[serde(default)]
+    pub settlement_account: String,
+    #[serde(default)]
+    pub settlement_channel: String,
+    #[serde(default)]
+    pub customer_name: String,
+    #[serde(default)]
+    pub real_name: String,
+    #[serde(default)]
+    pub en_name: String,
+    #[serde(default)]
+    pub joint_real_name: String,
+    #[serde(default)]
+    pub joint_en_name: String,
+    #[serde(default)]
+    pub org_id: String,
+    #[serde(default)]
+    pub bcan: String,
+    #[serde(default)]
+    pub op_entrust_way: i32,
+    #[serde(default)]
+    pub op_entrust_way_name: String,
+    #[serde(default)]
+    pub remark: String,
+    #[serde(default)]
+    pub notice: String,
+    #[serde(default)]
+    pub short_sell_type: i32,
+    #[serde(default)]
+    pub ploy_type: String,
+    #[serde(default)]
+    pub ploy_id: String,
+    #[serde(default)]
+    pub ploy_status: String,
+    #[serde(default)]
+    pub trend: i32,
+    #[serde(default)]
+    pub withdrawal_reason: String,
+    #[serde(default)]
+    pub activate_order_type: String,
+    #[serde(default)]
+    pub activate_rth: i32,
+    #[serde(default)]
+    pub submit_price: String,
+    #[serde(default)]
+    pub contract_direction: String,
+    #[serde(default)]
+    pub strike_price: String,
+    #[serde(default)]
+    pub contract_size: String,
+    #[serde(default)]
+    pub monitor_price: String,
+    #[serde(default)]
+    pub button_control: USButtonControl,
+    pub charge_detail: Option<USChargeDetail>,
+    #[serde(default)]
+    pub attached_orders: Vec<USAttachedOrder>,
+    #[serde(default)]
+    pub order_histories: Vec<USOrderHistory>,
+}
+
+/// Response for [`crate::TradeContext::us_order_detail`].
+/// Path: `GET /v1/us/orders/{order_id}`
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USOrderDetailResponse {
+    /// Full typed order object; None only on error.
+    pub order: Option<USOrderDetail>,
+    /// Active bracket/conditional sub-order, or None.
+    pub current_attached_order: Option<USOrderDetail>,
+    /// Server response timestamp (milliseconds string).
+    #[serde(default)]
+    pub current_millisecond: String,
+}
+
+/// One cash currency entry in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashEntry {
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub frozen_buy_cash: String,
+    #[serde(default)]
+    pub outstanding: String,
+    #[serde(default)]
+    pub settled_cash: String,
+    #[serde(default)]
+    pub total_amount: String,
+    #[serde(default)]
+    pub total_cash: String,
+}
+
+/// One cryptocurrency holding in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCryptoEntry {
+    #[serde(default)]
+    pub asset_type: String,
+    #[serde(default)]
+    pub average_cost: String,
+    /// User-facing trading-pair symbol (e.g. `"BTCUSD.BKKT"`), converted from
+    /// the API's `counter_id` field (e.g. `"VA/BKKT/BTCUSD"`).
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub symbol: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub industry_name: String,
+}
+
+/// One stock/equity position in [`USAssetOverview`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USStockEntry {
+    /// Ticker code returned by the API (e.g. `"AAPL"`). See `full_symbol` for
+    /// the qualified form.
+    #[serde(default)]
+    pub symbol: String,
+    /// Qualified user-facing symbol (e.g. `"AAPL.US"`), converted from
+    /// `counter_id`.
+    #[serde(
+        default,
+        rename = "counter_id",
+        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
+    )]
+    pub full_symbol: String,
+    #[serde(default)]
+    pub asset_type: String,
+    #[serde(default)]
+    pub quantity: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub average_cost: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default)]
+    pub trade_status: String,
+    #[serde(default)]
+    pub prev_close: String,
+    #[serde(default)]
+    pub last_done: String,
+    #[serde(default)]
+    pub market_price: String,
+    #[serde(default)]
+    pub pretrade_close: String,
+    #[serde(default)]
+    pub stock_invest_of_today: String,
+    #[serde(default)]
+    pub today_pl: String,
+    #[serde(default)]
+    pub pretrade_stock_invest_of_today: String,
+    #[serde(default)]
+    pub pretrade_today_pl: String,
+    #[serde(default)]
+    pub night_last_done: String,
+    #[serde(default)]
+    pub night_prev_close: String,
+    #[serde(default)]
+    pub position_side: String,
+    #[serde(default)]
+    pub open_position_time: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub industry_counter_id: String,
+    #[serde(default)]
+    pub industry_name: String,
+}
+
+/// Response for [`crate::TradeContext::us_asset_overview`].
+/// Field names match the actual API response from `GET /v1/us/assets/overview`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAssetOverview {
+    #[serde(default)]
+    pub account_type: String,
+    /// Account snapshot timestamp (Unix-second string → OffsetDateTime).
+    #[serde(default, with = "crate::serde_utils::timestamp_opt")]
+    pub asset_timestamp: Option<time::OffsetDateTime>,
+    /// Cash buying power (top-level convenience field).
+    #[serde(default)]
+    pub cash_buy_power: String,
+    #[serde(default)]
+    pub overnight_buy_power: String,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub cash_list: Vec<USCashEntry>,
+    #[serde(default)]
+    pub stock_list: Vec<USStockEntry>,
+    #[serde(default)]
+    pub option_list: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub crypto_list: Vec<USCryptoEntry>,
+    #[serde(default)]
+    pub multi_leg: serde_json::Value,
+}
+
+/// One time-period metric in a [`USRealizedPLEntry`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPLMetric {
+    #[serde(default)]
+    pub amount: String,
+    /// Period code (server-defined; 2 = current month observed in testing).
+    #[serde(default)]
+    pub period: i32,
+    #[serde(default)]
+    pub rate: String,
+}
+
+/// One asset-category entry in [`USRealizedPL`].
+/// `category`: 0 = all, 1 = stock, 2 = option, 3 = crypto (server-defined).
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPLEntry {
+    #[serde(default)]
+    pub category: i32,
+    #[serde(default)]
+    pub currency: String,
+    #[serde(default)]
+    pub metrics: Vec<USRealizedPLMetric>,
+}
+
+/// Request for [`crate::TradeContext::us_realized_pl`], modelled after
+/// [`crate::GetUSHistoryOrders`].
+#[derive(Debug, Clone, Default)]
+pub struct GetUSRealizedPLOptions {
+    /// Currency, e.g. `"USD"`. Defaults to `"USD"` if empty.
+    pub currency: String,
+    /// Asset category filter: `""` = all, `"STOCK"`, `"OPTION"`, `"CRYPTO"`.
+    pub category: String,
+}
+
+/// Response for [`crate::TradeContext::us_realized_pl`].
+/// Field name matches the actual API response from `GET
+/// /v1/us/assets/pl/realized`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USRealizedPL {
+    #[serde(default)]
+    pub realized_pl_list: Vec<USRealizedPLEntry>,
+}
 
 #[cfg(test)]
 mod tests {

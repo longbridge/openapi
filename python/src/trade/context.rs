@@ -3,9 +3,10 @@ use std::sync::Arc;
 use longbridge::{
     blocking::TradeContextSync,
     trade::{
-        EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+        EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -19,10 +20,10 @@ use crate::{
     trade::{
         push::handle_push_event,
         types::{
-            AccountBalance, BalanceType, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, OrderSide, OrderStatus,
-            OrderType, OutsideRTH, StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
-            TopicType,
+            AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
+            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
+            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            StockPositionsResponse, SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
     types::Market,
@@ -129,6 +130,40 @@ impl TradeContext {
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Get all executions
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<AllExecutionsResponse> {
+        let mut opts = GetAllExecutionsOptions::new();
+
+        if let Some(symbol) = symbol {
+            opts = opts.symbol(symbol);
+        }
+        if let Some(order_id) = order_id {
+            opts = opts.order_id(order_id);
+        }
+        if let Some(start_at) = start_at {
+            opts = opts.start_at(start_at.0);
+        }
+        if let Some(end_at) = end_at {
+            opts = opts.end_at(end_at.0);
+        }
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+
+        self.ctx
+            .all_executions(Some(opts))
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get history orders
@@ -255,7 +290,7 @@ impl TradeContext {
     }
 
     /// Submit order
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -275,6 +310,7 @@ impl TradeContext {
         trigger_count: Option<i32>,
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
+        client_request_id: Option<String>,
     ) -> PyResult<SubmitOrderResponse> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
@@ -316,6 +352,9 @@ impl TradeContext {
         }
         if let Some(remark) = remark {
             opts = opts.remark(remark);
+        }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
         }
 
         self.ctx
@@ -407,6 +446,71 @@ impl TradeContext {
             .order_detail(order_id)
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────
+
+    /// Query US order list (returns JSON string). US token required.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[pyo3(signature = (symbol = None, action = 0, start_at = 0, end_at = 0, query_type = 0, page = 1, limit = 20))]
+    fn us_query_orders(
+        &self,
+        symbol: Option<String>,
+        action: i32,
+        start_at: i64,
+        end_at: i64,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+    ) -> PyResult<String> {
+        let opts = longbridge::trade::GetUSHistoryOrders {
+            symbol,
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
+        let resp = self.ctx.us_query_orders(opts).map_err(ErrorNewType)?;
+        serde_json::to_string(&resp)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+    }
+    /// Get US order detail. US token required.
+    fn us_order_detail(
+        &self,
+        order_id: String,
+    ) -> PyResult<crate::trade::types::USOrderDetailResponse> {
+        Ok(self
+            .ctx
+            .us_order_detail(order_id)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US account asset overview. US token required.
+    fn us_asset_overview(&self) -> PyResult<crate::trade::types::USAssetOverview> {
+        Ok(self.ctx.us_asset_overview().map_err(ErrorNewType)?.into())
+    }
+
+    /// Get US realized P&L. US token required.
+    fn us_realized_pl(
+        &self,
+        currency: String,
+        category: Option<String>,
+    ) -> PyResult<crate::trade::types::USRealizedPL> {
+        Ok(self
+            .ctx
+            .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                currency,
+                category: category.unwrap_or_default(),
+            })
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

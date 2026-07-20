@@ -166,6 +166,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetLogPath(
     })
 }
 
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnablePapertrading(
+    mut env: JNIEnv,
+    _class: JClass,
+    config: jlong,
+) -> jlong {
+    jni_result(&mut env, config, |_env| {
+        (*(config as *mut Config)).set_enable_papertrading();
+        Ok(config)
+    })
+}
+
 // ── Async operations
 // ──────────────────────────────────────────────────────────
 

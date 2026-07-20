@@ -2,6 +2,8 @@ use std::sync::Arc;
 
 use longbridge::blocking::FundamentalContextSync;
 use pyo3::prelude::*;
+#[allow(unused_imports)]
+use pythonize;
 
 use crate::{config::Config, error::ErrorNewType, fundamental::types::*};
 
@@ -236,6 +238,104 @@ impl FundamentalContext {
         Ok(self
             .ctx
             .macroeconomic(indicator_code, start_date, end_date, offset, limit)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────────
+
+    /// Get US company overview. US token required.
+    fn us_company_overview(&self, symbol: String) -> PyResult<USCompanyOverview> {
+        Ok(self
+            .ctx
+            .us_company_overview(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US valuation overview. US token required.
+    fn us_valuation_overview(&self, symbol: String) -> PyResult<USValuationOverview> {
+        Ok(self
+            .ctx
+            .us_valuation_overview(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US financial overview. `report`: "annual" or "quarterly". US token
+    /// required.
+    fn us_financial_overview(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> PyResult<USFinancialOverview> {
+        Ok(self
+            .ctx
+            .us_financial_overview(symbol, report)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US financial statement v3. `kind`: "IS"/"BS"/"CF". US token
+    /// required.
+    fn us_financial_statement(
+        &self,
+        symbol: String,
+        kind: String,
+        report: String,
+    ) -> PyResult<USFinancialStatement> {
+        Ok(self
+            .ctx
+            .us_financial_statement(symbol, kind, report)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US key financial metrics. US token required.
+    fn us_key_financial_metrics(
+        &self,
+        symbol: String,
+        report: String,
+    ) -> PyResult<USKeyFinancialMetrics> {
+        Ok(self
+            .ctx
+            .us_key_financial_metrics(symbol, report)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US analyst consensus estimates. US token required.
+    fn us_analyst_consensus(&self, symbol: String, report: String) -> PyResult<USAnalystConsensus> {
+        Ok(self
+            .ctx
+            .us_analyst_consensus(symbol, report)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US ETF dividend history. US token required.
+    fn us_etf_dividend_info(&self, symbol: String) -> PyResult<USETFDividendInfo> {
+        Ok(self
+            .ctx
+            .us_etf_dividend_info(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US company historical dividends. US token required.
+    fn us_company_dividends(&self, symbol: String) -> PyResult<USCompanyDividends> {
+        Ok(self
+            .ctx
+            .us_company_dividends(symbol)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get US ETF document list. `size`: None = all. US token required.
+    fn us_etf_files(&self, symbol: String, size: Option<u32>) -> PyResult<USETFFilesResponse> {
+        Ok(self
+            .ctx
+            .us_etf_files(symbol, size)
             .map_err(ErrorNewType)?
             .into())
     }

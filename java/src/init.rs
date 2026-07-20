@@ -170,6 +170,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::FilingItem,
         longbridge::trade::PushOrderChanged,
         longbridge::trade::Execution,
+        longbridge::trade::AllExecutionsResponse,
         longbridge::trade::Order,
         longbridge::trade::SubmitOrderResponse,
         longbridge::trade::CashInfo,

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
@@ -72,6 +72,26 @@ impl FundamentalContext {
             .0
             .http_cli
             .request(Method::GET, path)
+            .query_params(query)
+            .response::<Json<R>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Like [`get`](Self::get), but restricted to a single data center. Used by
+    /// region-limited endpoints (e.g. AP-only fundamentals).
+    async fn get_dc<R, Q>(&self, path: &'static str, query: Q, dc_restrict: DcRegion) -> Result<R>
+    where
+        R: DeserializeOwned + Send + Sync + 'static,
+        Q: Serialize + Send + Sync,
+    {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path)
+            .dc_restrict(dc_restrict)
             .query_params(query)
             .response::<Json<R>>()
             .send()
@@ -466,11 +486,12 @@ impl FundamentalContext {
         struct Query {
             counter_id: String,
         }
-        self.get(
+        self.get_dc(
             "/v1/quote/operatings",
             Query {
                 counter_id: symbol_to_counter_id(&symbol.into()),
             },
+            DcRegion::Ap,
         )
         .await
     }
@@ -1030,5 +1051,247 @@ impl FundamentalContext {
 
         let count = if total > 0 { total } else { count };
         Ok(MacroeconomicResponse { info, data, count })
+    }
+
+    // ── US-market APIs (US token required) ────────────────────────────────────
+
+    /// Get US company overview.
+    ///
+    /// Path: `GET /v1/us/stock-info/company-overview`
+    ///
+    /// US token required — returns
+    /// [`longbridge_httpcli::HttpClientError::DcRegionRestricted`]
+    /// for non-US credentials.
+    pub async fn us_company_overview(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<USCompanyOverview> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/company-overview",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get US valuation overview snapshot.
+    ///
+    /// Path: `GET /v1/us/stock-info/valuation-overview`
+    ///
+    /// US token required.
+    pub async fn us_valuation_overview(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<USValuationOverview> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/valuation-overview",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get US financial overview (revenue, net income, EPS, cash flow).
+    ///
+    /// `report`: `"annual"` or `"quarterly"`.
+    ///
+    /// Path: `GET /v1/us/stock-info/finn-overview`
+    ///
+    /// US token required. Returns raw JSON for maximum flexibility.
+    pub async fn us_financial_overview(
+        &self,
+        symbol: impl Into<String>,
+        report: impl Into<String>,
+    ) -> Result<USFinancialOverview> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            report: String,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/finn-overview",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                report: report.into(),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get US financial statement detail (IS / BS / CF).
+    ///
+    /// `kind`: `"IS"` (income statement), `"BS"` (balance sheet), `"CF"` (cash
+    /// flow). `report`: `"annual"` or `"quarterly"`.
+    ///
+    /// Path: `GET /v1/us/quote/financials/statements`
+    ///
+    /// US token required.
+    pub async fn us_financial_statement(
+        &self,
+        symbol: impl Into<String>,
+        kind: impl Into<String>,
+        report: impl Into<String>,
+    ) -> Result<USFinancialStatement> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            kind: String,
+            report: String,
+        }
+        self.get_dc(
+            "/v1/us/quote/financials/statements",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                kind: kind.into(),
+                report: report.into(),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get key financial metrics (ROE, margins, leverage ratios).
+    ///
+    /// `report`: `"annual"` or `"quarterly"`.
+    ///
+    /// Path: `GET /v1/us/stock-info/fin-keyfactor`
+    ///
+    /// US token required. Returns raw JSON.
+    pub async fn us_key_financial_metrics(
+        &self,
+        symbol: impl Into<String>,
+        report: impl Into<String>,
+    ) -> Result<USKeyFinancialMetrics> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            report: String,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/fin-keyfactor",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                report: report.into(),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get analyst consensus estimates (EPS and revenue forecasts).
+    ///
+    /// `report`: `"annual"` or `"quarterly"`.
+    ///
+    /// Path: `GET /v1/us/stock-info/fin-consensus`
+    ///
+    /// US token required. Returns raw JSON.
+    pub async fn us_analyst_consensus(
+        &self,
+        symbol: impl Into<String>,
+        report: impl Into<String>,
+    ) -> Result<USAnalystConsensus> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            report: String,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/fin-consensus",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                report: report.into(),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get ETF dividend history.
+    ///
+    /// Path: `GET /v1/us/stock-info/etf-dividend-info`
+    ///
+    /// US token required.
+    pub async fn us_etf_dividend_info(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<USETFDividendInfo> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/etf-dividend-info",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get company historical dividend payments.
+    ///
+    /// Path: `GET /v1/us/stock-info/company-dividends`
+    ///
+    /// US token required.
+    pub async fn us_company_dividends(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<USCompanyDividends> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/company-dividends",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            },
+            DcRegion::Us,
+        )
+        .await
+    }
+
+    /// Get ETF document list (prospectus, annual reports, etc.).
+    ///
+    /// `size`: number of files to return; `None` returns all (server default 0
+    /// = all).
+    ///
+    /// Path: `GET /v1/us/stock-info/etf-files`
+    ///
+    /// US token required.
+    pub async fn us_etf_files(
+        &self,
+        symbol: impl Into<String>,
+        size: Option<u32>,
+    ) -> Result<USETFFilesResponse> {
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            size: Option<u32>,
+        }
+        self.get_dc(
+            "/v1/us/stock-info/etf-files",
+            Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+                size,
+            },
+            DcRegion::Us,
+        )
+        .await
     }
 }

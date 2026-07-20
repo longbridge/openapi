@@ -2057,3 +2057,672 @@ impl From<lb::MacroeconomicResponse> for MacroeconomicResponse {
         }
     }
 }
+
+// ── US-market types
+// ───────────────────────────────────────────────────────────
+
+use longbridge::fundamental::types as lb_us;
+
+/// Industry rank tag
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USRankTag {
+    pub key: String,
+    pub location: i32,
+    pub title: String,
+    pub text: String,
+    pub rank_type: i32,
+    pub highlight_text: String,
+}
+
+impl From<lb_us::USRankTag> for USRankTag {
+    fn from(v: lb_us::USRankTag) -> Self {
+        Self {
+            key: v.key,
+            location: v.location,
+            title: v.title,
+            text: v.text,
+            rank_type: v.rank_type,
+            highlight_text: v.highlight_text,
+        }
+    }
+}
+
+/// One entry in USCompanyOverview.share_list.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USSharelistItem {
+    pub chg: String,
+    pub id: String,
+    pub name: String,
+}
+
+impl From<lb_us::USSharelistItem> for USSharelistItem {
+    fn from(v: lb_us::USSharelistItem) -> Self {
+        Self {
+            chg: v.chg,
+            id: v.id,
+            name: v.name,
+        }
+    }
+}
+
+/// US company overview
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USCompanyOverview {
+    pub intro: String,
+    pub market_cap: String,
+    pub ccy_symbol: String,
+    pub top_rank_tags: Vec<USRankTag>,
+    pub detail_url: String,
+    pub share_list: Vec<USSharelistItem>,
+}
+
+impl From<lb_us::USCompanyOverview> for USCompanyOverview {
+    fn from(v: lb_us::USCompanyOverview) -> Self {
+        Self {
+            intro: v.intro,
+            market_cap: v.market_cap,
+            ccy_symbol: v.ccy_symbol,
+            top_rank_tags: v.top_rank_tags.into_iter().map(Into::into).collect(),
+            detail_url: v.detail_url,
+            share_list: v.share_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One valuation metric entry in USValuationOverview.metrics
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USValuationMetric {
+    pub circle: String,
+    pub part: String,
+    pub metric: String,
+    pub desc: String,
+    pub industry_median: String,
+}
+
+impl From<lb_us::USValuationMetric> for USValuationMetric {
+    fn from(v: lb_us::USValuationMetric) -> Self {
+        Self {
+            circle: v.circle,
+            part: v.part,
+            metric: v.metric,
+            desc: v.desc,
+            industry_median: v.industry_median,
+        }
+    }
+}
+
+/// US valuation overview
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USValuationOverview {
+    pub metrics: std::collections::HashMap<String, USValuationMetric>,
+    pub indicator: String,
+    pub range: i32,
+    pub date: String,
+    pub ccy_symbol: String,
+    pub aichat_data: USAIChatData,
+    pub ai_summary: String,
+}
+
+impl From<lb_us::USValuationOverview> for USValuationOverview {
+    fn from(v: lb_us::USValuationOverview) -> Self {
+        Self {
+            metrics: v
+                .metrics
+                .into_iter()
+                .map(|(k, val)| (k, val.into()))
+                .collect(),
+            indicator: v.indicator,
+            range: v.range,
+            date: v.date,
+            ccy_symbol: v.ccy_symbol,
+            aichat_data: v.aichat_data.into(),
+            ai_summary: v.ai_summary,
+        }
+    }
+}
+
+/// One financial field within a USFinancialStatementPeriod.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialStatementField {
+    pub display_order: i32,
+    pub field: String,
+    pub id: String,
+    pub level: i64,
+    pub name: String,
+    pub value: String,
+    pub value_type: String,
+    pub yoy: String,
+}
+
+impl From<lb_us::USFinancialStatementField> for USFinancialStatementField {
+    fn from(v: lb_us::USFinancialStatementField) -> Self {
+        Self {
+            display_order: v.display_order,
+            field: v.field,
+            id: v.id,
+            level: v.level,
+            name: v.name,
+            value: v.value,
+            value_type: v.value_type,
+            yoy: v.yoy,
+        }
+    }
+}
+
+/// One reporting period in USFinancialStatement.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialStatementPeriod {
+    pub ff_period: String,
+    pub ff_year: i32,
+    pub fields: Vec<USFinancialStatementField>,
+    pub fp_end: String,
+    pub report_txt: String,
+    pub rpt_date: String,
+}
+
+impl From<lb_us::USFinancialStatementPeriod> for USFinancialStatementPeriod {
+    fn from(v: lb_us::USFinancialStatementPeriod) -> Self {
+        Self {
+            ff_period: v.ff_period,
+            ff_year: v.ff_year,
+            fields: v.fields.into_iter().map(Into::into).collect(),
+            fp_end: v.fp_end,
+            report_txt: v.report_txt,
+            rpt_date: v.rpt_date,
+        }
+    }
+}
+
+/// US financial statement
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialStatement {
+    pub currency: String,
+    pub report: String,
+    pub list: Vec<USFinancialStatementPeriod>,
+    pub empty_fields: Vec<String>,
+}
+
+impl From<lb_us::USFinancialStatement> for USFinancialStatement {
+    fn from(v: lb_us::USFinancialStatement) -> Self {
+        Self {
+            currency: v.currency,
+            report: v.report,
+            list: v.list.into_iter().map(Into::into).collect(),
+            empty_fields: v.empty_fields,
+        }
+    }
+}
+
+/// Per-fiscal-year dividend row for a US ETF.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFiscalYearDividend {
+    pub dividend: String,
+    pub dividend_yield: String,
+    pub fiscal_year: String,
+    pub currency: String,
+    pub fiscal_year_range: String,
+}
+
+impl From<lb_us::USFiscalYearDividend> for USFiscalYearDividend {
+    fn from(v: lb_us::USFiscalYearDividend) -> Self {
+        Self {
+            dividend: v.dividend,
+            dividend_yield: v.dividend_yield,
+            fiscal_year: v.fiscal_year,
+            currency: v.currency,
+            fiscal_year_range: v.fiscal_year_range,
+        }
+    }
+}
+
+/// US ETF dividend info
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USETFDividendInfo {
+    pub dividend_ttm: String,
+    pub dividend_yield_ttm: String,
+    pub dividend_frequency: String,
+    pub currency: String,
+    pub fiscal_year_info: Vec<USFiscalYearDividend>,
+}
+
+impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
+    fn from(v: lb_us::USETFDividendInfo) -> Self {
+        Self {
+            dividend_ttm: v.dividend_ttm,
+            dividend_yield_ttm: v.dividend_yield_ttm,
+            dividend_frequency: v.dividend_frequency,
+            currency: v.currency,
+            fiscal_year_info: v.fiscal_year_info.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// US dividend item
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USDividendItem {
+    pub dividend: String,
+    pub dividend_type: String,
+    pub ex_date: String,
+    pub payment_date: String,
+    pub record_date: String,
+}
+
+impl From<lb_us::USDividendItem> for USDividendItem {
+    fn from(v: lb_us::USDividendItem) -> Self {
+        Self {
+            dividend: v.dividend,
+            dividend_type: v.dividend_type,
+            ex_date: v.ex_date,
+            payment_date: v.payment_date,
+            record_date: v.record_date,
+        }
+    }
+}
+
+/// TTM dividend summary within USCompanyDividends.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USRecentDividend {
+    pub dividend_ttm: String,
+    pub dividend_yield_ttm: String,
+    pub payouts: String,
+    pub currency: String,
+}
+
+impl From<lb_us::USRecentDividend> for USRecentDividend {
+    fn from(v: lb_us::USRecentDividend) -> Self {
+        Self {
+            dividend_ttm: v.dividend_ttm,
+            dividend_yield_ttm: v.dividend_yield_ttm,
+            payouts: v.payouts,
+            currency: v.currency,
+        }
+    }
+}
+
+/// One fiscal-year row in dividend_history or payout_ratios.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USDividendHistoryItem {
+    pub fiscal_year: String,
+    pub fiscal_year_range: String,
+    pub total_shareholder_yield: String,
+    pub dividend: String,
+    pub dividend_yield: String,
+    pub dividend_growth_rate: String,
+    pub dividend_payout_ratio: String,
+    pub dividend_to_cashflow_ratio: String,
+    pub net_buyback: String,
+    pub net_buyback_yield: String,
+    pub net_buyback_growth_rate: String,
+    pub net_buyback_payout_ratio: String,
+    pub net_buyback_to_cashflow_ratio: String,
+    pub currency: String,
+}
+
+impl From<lb_us::USDividendHistoryItem> for USDividendHistoryItem {
+    fn from(v: lb_us::USDividendHistoryItem) -> Self {
+        Self {
+            fiscal_year: v.fiscal_year,
+            fiscal_year_range: v.fiscal_year_range,
+            total_shareholder_yield: v.total_shareholder_yield,
+            dividend: v.dividend,
+            dividend_yield: v.dividend_yield,
+            dividend_growth_rate: v.dividend_growth_rate,
+            dividend_payout_ratio: v.dividend_payout_ratio,
+            dividend_to_cashflow_ratio: v.dividend_to_cashflow_ratio,
+            net_buyback: v.net_buyback,
+            net_buyback_yield: v.net_buyback_yield,
+            net_buyback_growth_rate: v.net_buyback_growth_rate,
+            net_buyback_payout_ratio: v.net_buyback_payout_ratio,
+            net_buyback_to_cashflow_ratio: v.net_buyback_to_cashflow_ratio,
+            currency: v.currency,
+        }
+    }
+}
+
+/// One actual dividend payment event.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USDividendPayoutRecord {
+    pub dividend: String,
+    pub dividend_type: String,
+    pub currency: String,
+    pub ex_date: String,
+    pub payment_date: String,
+    pub record_date: String,
+    pub title: String,
+    pub start_time_unix: String,
+}
+
+impl From<lb_us::USDividendPayoutRecord> for USDividendPayoutRecord {
+    fn from(v: lb_us::USDividendPayoutRecord) -> Self {
+        Self {
+            dividend: v.dividend,
+            dividend_type: v.dividend_type,
+            currency: v.currency,
+            ex_date: v.ex_date,
+            payment_date: v.payment_date,
+            record_date: v.record_date,
+            title: v.title,
+            start_time_unix: v.start_time_unix,
+        }
+    }
+}
+
+/// US company dividends
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USCompanyDividends {
+    pub recent_dividends: USRecentDividend,
+    pub dividend_history: Vec<USDividendHistoryItem>,
+    pub payout_ratios: Vec<USDividendHistoryItem>,
+    pub dividend_payout_history: Vec<USDividendPayoutRecord>,
+}
+
+impl From<lb_us::USCompanyDividends> for USCompanyDividends {
+    fn from(v: lb_us::USCompanyDividends) -> Self {
+        Self {
+            recent_dividends: v.recent_dividends.into(),
+            dividend_history: v.dividend_history.into_iter().map(Into::into).collect(),
+            payout_ratios: v.payout_ratios.into_iter().map(Into::into).collect(),
+            dividend_payout_history: v
+                .dividend_payout_history
+                .into_iter()
+                .map(Into::into)
+                .collect(),
+        }
+    }
+}
+
+/// US ETF file
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USETFFile {
+    pub file_name: String,
+    pub file_path: String,
+    pub update_date: String,
+    pub code: String,
+    pub format: String,
+}
+
+impl From<lb_us::USETFFile> for USETFFile {
+    fn from(v: lb_us::USETFFile) -> Self {
+        Self {
+            file_name: v.file_name,
+            file_path: v.file_path,
+            update_date: v.update_date,
+            code: v.code,
+            format: v.format,
+        }
+    }
+}
+
+/// US ETF files response
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USETFFilesResponse {
+    pub files: Vec<USETFFile>,
+}
+
+impl From<lb_us::USETFFilesResponse> for USETFFilesResponse {
+    fn from(v: lb_us::USETFFilesResponse) -> Self {
+        Self {
+            files: v.files.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One reporting-period window shared by IS/BS/CF entries.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USReportPeriod {
+    pub start_date: String,
+    pub end_date: String,
+    pub report_txt: String,
+}
+
+impl From<lb_us::USReportPeriod> for USReportPeriod {
+    fn from(v: lb_us::USReportPeriod) -> Self {
+        Self {
+            start_date: v.start_date,
+            end_date: v.end_date,
+            report_txt: v.report_txt,
+        }
+    }
+}
+
+/// One income-statement entry in USFinancialOverview.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialISItem {
+    pub revenue: String,
+    pub net_income: String,
+    pub net_margin: String,
+    pub report: USReportPeriod,
+}
+
+impl From<lb_us::USFinancialISItem> for USFinancialISItem {
+    fn from(v: lb_us::USFinancialISItem) -> Self {
+        Self {
+            revenue: v.revenue,
+            net_income: v.net_income,
+            net_margin: v.net_margin,
+            report: v.report.into(),
+        }
+    }
+}
+
+/// One balance-sheet entry in USFinancialOverview.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialBSItem {
+    pub debt_assets_ratio: String,
+    pub total_assets: String,
+    pub total_liabilities: String,
+    pub report: USReportPeriod,
+}
+
+impl From<lb_us::USFinancialBSItem> for USFinancialBSItem {
+    fn from(v: lb_us::USFinancialBSItem) -> Self {
+        Self {
+            debt_assets_ratio: v.debt_assets_ratio,
+            total_assets: v.total_assets,
+            total_liabilities: v.total_liabilities,
+            report: v.report.into(),
+        }
+    }
+}
+
+/// One cash-flow entry in USFinancialOverview.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialCFItem {
+    pub operating: String,
+    pub investing: String,
+    pub financing: String,
+    pub report: USReportPeriod,
+}
+
+impl From<lb_us::USFinancialCFItem> for USFinancialCFItem {
+    fn from(v: lb_us::USFinancialCFItem) -> Self {
+        Self {
+            operating: v.operating,
+            investing: v.investing,
+            financing: v.financing,
+            report: v.report.into(),
+        }
+    }
+}
+
+/// US financial overview — income statement, balance sheet, and cash flow.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USFinancialOverview {
+    pub ccy_symbol: String,
+    pub report_type: String,
+    pub is_list: Vec<USFinancialISItem>,
+    pub bs_list: Vec<USFinancialBSItem>,
+    pub cf_list: Vec<USFinancialCFItem>,
+}
+
+impl From<lb_us::USFinancialOverview> for USFinancialOverview {
+    fn from(v: lb_us::USFinancialOverview) -> Self {
+        Self {
+            ccy_symbol: v.ccy_symbol,
+            report_type: v.report_type,
+            is_list: v.is_list.into_iter().map(Into::into).collect(),
+            bs_list: v.bs_list.into_iter().map(Into::into).collect(),
+            cf_list: v.cf_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One period entry in USKeyFinancialMetrics.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USKeyMetricItem {
+    pub ff_period: String,
+    pub ff_year: i32,
+    pub fp_end: String,
+    pub report_txt: String,
+    pub rpt_date: String,
+    pub fields: Vec<serde_json::Value>,
+}
+
+impl From<lb_us::USKeyMetricItem> for USKeyMetricItem {
+    fn from(v: lb_us::USKeyMetricItem) -> Self {
+        Self {
+            ff_period: v.ff_period,
+            ff_year: v.ff_year,
+            fp_end: v.fp_end,
+            report_txt: v.report_txt,
+            rpt_date: v.rpt_date,
+            fields: v.fields,
+        }
+    }
+}
+
+/// US key financial metrics — ratios and indicators per reporting period.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USKeyFinancialMetrics {
+    pub currency: String,
+    pub report: String,
+    pub empty_fields: Vec<String>,
+    pub list: Vec<USKeyMetricItem>,
+}
+
+impl From<lb_us::USKeyFinancialMetrics> for USKeyFinancialMetrics {
+    fn from(v: lb_us::USKeyFinancialMetrics) -> Self {
+        Self {
+            currency: v.currency,
+            report: v.report,
+            empty_fields: v.empty_fields,
+            list: v.list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// AI chat context embedded in USAnalystConsensus.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USAIChatData {
+    pub agent_id: String,
+    pub handoff_agent_id: String,
+    pub symbol: String,
+    pub text: String,
+    pub chat_type: String,
+    pub workflow_type: String,
+}
+
+impl From<lb_us::USAIChatData> for USAIChatData {
+    fn from(v: lb_us::USAIChatData) -> Self {
+        Self {
+            agent_id: v.agent_id,
+            handoff_agent_id: v.handoff_agent_id,
+            symbol: v.symbol,
+            text: v.text,
+            chat_type: v.chat_type,
+            workflow_type: v.workflow_type,
+        }
+    }
+}
+
+/// Actual vs estimated value for one consensus metric.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USConsensusEstimate {
+    pub actual: String,
+    pub estimate: String,
+}
+
+impl From<lb_us::USConsensusEstimate> for USConsensusEstimate {
+    fn from(v: lb_us::USConsensusEstimate) -> Self {
+        Self {
+            actual: v.actual,
+            estimate: v.estimate,
+        }
+    }
+}
+
+/// One fiscal-year entry in USAnalystConsensus.list.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USConsensusItem {
+    pub ebit: USConsensusEstimate,
+    pub eps: USConsensusEstimate,
+    pub fiscal_year: i64,
+    pub report_txt: String,
+    pub revenue: USConsensusEstimate,
+}
+
+impl From<lb_us::USConsensusItem> for USConsensusItem {
+    fn from(v: lb_us::USConsensusItem) -> Self {
+        Self {
+            ebit: v.ebit.into(),
+            eps: v.eps.into(),
+            fiscal_year: v.fiscal_year,
+            report_txt: v.report_txt,
+            revenue: v.revenue.into(),
+        }
+    }
+}
+
+/// US analyst consensus estimates and AI analysis.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct USAnalystConsensus {
+    pub ai_summary: String,
+    pub aichat_data: USAIChatData,
+    pub currency: String,
+    pub report: String,
+    pub list: Vec<USConsensusItem>,
+    pub opt_reports: Vec<String>,
+    pub h5_data: serde_json::Value,
+}
+
+impl From<lb_us::USAnalystConsensus> for USAnalystConsensus {
+    fn from(v: lb_us::USAnalystConsensus) -> Self {
+        Self {
+            ai_summary: v.ai_summary,
+            aichat_data: v.aichat_data.into(),
+            currency: v.currency,
+            report: v.report,
+            list: v.list.into_iter().map(Into::into).collect(),
+            opt_reports: v.opt_reports,
+            h5_data: v.h5_data,
+        }
+    }
+}

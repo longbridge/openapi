@@ -7,7 +7,9 @@ use std::{
 };
 
 pub(crate) use http::{HeaderName, HeaderValue, Request, header};
-use longbridge_httpcli::{HttpClient, HttpClientConfig, Json, Method, is_cn};
+use longbridge_httpcli::{
+    DC_REGION_HEADER, DcRegion, HttpClient, HttpClientConfig, Json, Method, is_cn,
+};
 use longbridge_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use serde::{Deserialize, Serialize};
@@ -131,6 +133,7 @@ pub struct Config {
     pub(crate) log_path: Option<PathBuf>,
     /// Extra headers injected into every HTTP and WebSocket upgrade request.
     pub(crate) custom_headers: HashMap<String, String>,
+    pub(crate) enable_papertrading: bool,
 }
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
@@ -162,6 +165,7 @@ struct ConfigExtras {
     push_candlestick_mode: Option<PushCandlestickMode>,
     enable_print_quote_packages: bool,
     log_path: Option<PathBuf>,
+    enable_papertrading: bool,
 }
 
 impl ConfigExtras {
@@ -176,6 +180,7 @@ impl ConfigExtras {
         });
         let enable_print_quote_packages =
             env_var("PRINT_QUOTE_PACKAGES").as_deref().unwrap_or("true") == "true";
+        let enable_papertrading = env_var("PAPERTRADING").as_deref() == Some("true");
         Self {
             http_url: env_var("HTTP_URL"),
             quote_ws_url: env_var("QUOTE_WS_URL"),
@@ -185,6 +190,7 @@ impl ConfigExtras {
             push_candlestick_mode,
             enable_print_quote_packages,
             log_path: env_var("LOG_PATH").map(PathBuf::from),
+            enable_papertrading,
         }
     }
 }
@@ -223,6 +229,7 @@ impl Config {
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
             custom_headers: Default::default(),
+            enable_papertrading: extras.enable_papertrading,
         }
     }
 
@@ -272,6 +279,7 @@ impl Config {
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
             custom_headers: Default::default(),
+            enable_papertrading: extras.enable_papertrading,
         }
     }
 
@@ -327,6 +335,7 @@ impl Config {
             enable_print_quote_packages: extras.enable_print_quote_packages,
             log_path: extras.log_path,
             custom_headers: Default::default(),
+            enable_papertrading: extras.enable_papertrading,
         })
     }
 
@@ -402,6 +411,23 @@ impl Config {
         }
     }
 
+    /// Enable paper trading mode.
+    ///
+    /// When enabled, all API calls target the paper trading (simulation)
+    /// environment.  The server validates the token: if it belongs to a
+    /// real-money account the server returns an error.
+    ///
+    /// By default this option is disabled (`false`): the server imposes no
+    /// restrictions and accepts requests from both paper trading and real-money
+    /// accounts.
+    ///
+    /// Paper trading users should enable this option as a safety guard to avoid
+    /// accidentally submitting orders against their real-money account.
+    pub fn enable_papertrading(mut self) -> Self {
+        self.enable_papertrading = true;
+        self
+    }
+
     /// Create metadata for auth/reconnect request
     pub fn create_metadata(&self) -> HashMap<String, String> {
         let mut metadata = HashMap::new();
@@ -430,6 +456,9 @@ impl Config {
             HttpClient::new(config).header(header::ACCEPT_LANGUAGE, self.language.as_str());
         for (key, value) in &self.custom_headers {
             client = client.header(key.as_str(), value.as_str());
+        }
+        if self.enable_papertrading {
+            client = client.header("x-papertrading", "true");
         }
         client
     }
@@ -498,7 +527,29 @@ impl Config {
             .block_on(self.refresh_access_token(expired_at))
     }
 
-    fn create_ws_request(&self, url: &str) -> tokio_tungstenite::tungstenite::Result<Request<()>> {
+    /// Resolve the data-center region from the auth credentials. For OAuth the
+    /// access token is resolved (and refreshed if needed); for legacy API-key
+    /// mode the `app_key`/`app_secret`/`access_token` prefixes are inspected.
+    async fn auth_dc_region(&self) -> DcRegion {
+        match &self.auth {
+            AuthMode::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => DcRegion::from_credentials(&[app_key, access_token, app_secret]),
+            AuthMode::OAuth(oauth) => oauth
+                .access_token()
+                .await
+                .map(|token| DcRegion::from_credential(&token))
+                .unwrap_or(DcRegion::Ap),
+        }
+    }
+
+    fn create_ws_request(
+        &self,
+        url: &str,
+        dc_region: DcRegion,
+    ) -> tokio_tungstenite::tungstenite::Result<Request<()>> {
         let mut request = url.into_client_request()?;
         request.headers_mut().append(
             header::ACCEPT_LANGUAGE,
@@ -512,21 +563,34 @@ impl Config {
                 request.headers_mut().append(name, val);
             }
         }
+        // Route the upgrade to the data center matching the credential's region,
+        // unless the caller already set the header via a custom header.
+        if !self
+            .custom_headers
+            .keys()
+            .any(|key| key.eq_ignore_ascii_case(DC_REGION_HEADER))
+        {
+            request.headers_mut().append(
+                HeaderName::from_static(DC_REGION_HEADER),
+                HeaderValue::from_static(dc_region.as_str()),
+            );
+        }
         Ok(request)
     }
 
     pub(crate) async fn create_quote_ws_request(
         &self,
     ) -> (&str, tokio_tungstenite::tungstenite::Result<Request<()>>) {
+        let dc_region = self.auth_dc_region().await;
         match self.quote_ws_url.as_deref() {
-            Some(url) => (url, self.create_ws_request(url)),
+            Some(url) => (url, self.create_ws_request(url, dc_region)),
             None => {
                 let url = if is_cn().await {
                     DEFAULT_QUOTE_WS_URL_CN
                 } else {
                     DEFAULT_QUOTE_WS_URL
                 };
-                (url, self.create_ws_request(url))
+                (url, self.create_ws_request(url, dc_region))
             }
         }
     }
@@ -534,15 +598,16 @@ impl Config {
     pub(crate) async fn create_trade_ws_request(
         &self,
     ) -> (&str, tokio_tungstenite::tungstenite::Result<Request<()>>) {
+        let dc_region = self.auth_dc_region().await;
         match self.trade_ws_url.as_deref() {
-            Some(url) => (url, self.create_ws_request(url)),
+            Some(url) => (url, self.create_ws_request(url, dc_region)),
             None => {
                 let url = if is_cn().await {
                     DEFAULT_TRADE_WS_URL_CN
                 } else {
                     DEFAULT_TRADE_WS_URL
                 };
-                (url, self.create_ws_request(url))
+                (url, self.create_ws_request(url, dc_region))
             }
         }
     }
@@ -560,6 +625,17 @@ impl Config {
     pub fn header(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
         self.custom_headers.insert(key.into(), value.into());
         self
+    }
+
+    /// Override the data-center region for every HTTP and WebSocket request by
+    /// setting the [`DC_REGION_HEADER`](crate::DC_REGION_HEADER) explicitly.
+    ///
+    /// This is rarely needed: the region is otherwise derived automatically
+    /// from the auth credentials' prefix (`us_`/`ap_`). Use this only to
+    /// force a specific data center regardless of the credential.
+    #[must_use]
+    pub fn dc_region(self, region: DcRegion) -> Self {
+        self.header(DC_REGION_HEADER, region.as_str())
     }
 
     /// Set the HTTP endpoint URL in place.
@@ -595,6 +671,13 @@ impl Config {
     /// Disable printing quote packages in place.
     pub fn set_dont_print_quote_packages(&mut self) {
         self.enable_print_quote_packages = false;
+    }
+
+    /// Enable paper trading mode in place.
+    ///
+    /// See [`Config::enable_papertrading`] for full semantics.
+    pub fn set_enable_papertrading(&mut self) {
+        self.enable_papertrading = true;
     }
 
     /// Set the log path in place.
@@ -659,5 +742,18 @@ mod tests {
         assert_eq!(config.enable_overnight, None);
         assert_eq!(config.push_candlestick_mode, None);
         assert!(config.enable_print_quote_packages);
+    }
+
+    #[test]
+    fn test_enable_papertrading_builder() {
+        let config = Config::from_apikey("key", "secret", "token").enable_papertrading();
+        assert!(config.enable_papertrading);
+    }
+
+    #[test]
+    fn test_enable_papertrading_setter() {
+        let mut config = Config::from_apikey("key", "secret", "token");
+        config.set_enable_papertrading();
+        assert!(config.enable_papertrading);
     }
 }

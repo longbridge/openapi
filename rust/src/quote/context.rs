@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
@@ -668,6 +668,17 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {
+        // Broker queue is served only by the AP data center; short-circuit a
+        // non-AP session with the same unified error the HTTP path returns.
+        let current = self.0.http_cli.dc_region().await;
+        if !current.allows(longbridge_httpcli::DcRegion::Ap) {
+            return Err(longbridge_httpcli::HttpClientError::DcRegionRestricted {
+                path: "quote/brokers (WebSocket)".to_string(),
+                required: longbridge_httpcli::DcRegion::Ap,
+                current,
+            }
+            .into());
+        }
         let resp: quote::SecurityBrokersResponse = self
             .request(
                 cmd_code::GET_SECURITY_BROKERS,
@@ -2273,6 +2284,41 @@ impl QuoteContext {
             }
         }
         Ok(result)
+    }
+
+    // ── US-market APIs ────────────────────────────────────────────────────────
+
+    /// Get cryptocurrency market overview.
+    ///
+    /// `symbol` must be in `PAIR.EXCHANGE` format.
+    /// US DC uses the **BKKT** exchange: e.g. `"BTCUSD.BKKT"` →
+    /// `"VA/BKKT/BTCUSD"`. Pass the exchange suffix explicitly.
+    ///
+    /// Path: `GET /v1/us/gemini/crypto-overview`
+    ///
+    /// US token required.
+    pub async fn us_crypto_overview(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<crate::quote::USCryptoOverview> {
+        use crate::utils::counter::symbol_to_counter_id;
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/gemini/crypto-overview")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            })
+            .response::<Json<crate::quote::USCryptoOverview>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 }
 

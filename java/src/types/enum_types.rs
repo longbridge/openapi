@@ -387,18 +387,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longbridge/trade/OrderTag",
     longbridge::trade::OrderTag,
-    [
-        Unknown,
-        Normal,
-        LongTerm,
-        Grey,
-        MarginCall,
-        Offline,
-        Creditor,
-        Debtor,
-        NonExercise,
-        AllocatedSub,
-    ]
+    [Unknown, Normal, LongTerm, Grey,]
 );
 
 impl_java_enum!(
@@ -422,7 +411,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longbridge/trade/OutsideRTH",
     longbridge::trade::OutsideRTH,
-    [Unknown, RTHOnly, AnyTime, Overnight]
+    [Unknown, RTHOnly, AnyTime, Overnight, OptionPreMarket]
 );
 
 impl_java_enum!(

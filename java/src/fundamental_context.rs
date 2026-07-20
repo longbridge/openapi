@@ -330,3 +330,134 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         Ok(())
     })
 }
+
+// ── US-market JNI stubs
+// ─────────────────────────────────────────────────────── All US APIs return
+// JSON strings; Java callers parse with Gson/Jackson.
+
+macro_rules! us_counter_id_method {
+    ($jni_name:ident, $method:ident) => {
+        #[unsafe(no_mangle)]
+        pub unsafe extern "system" fn $jni_name(
+            mut env: JNIEnv,
+            _class: JClass,
+            context: i64,
+            counter_id: JObject,
+            callback: JObject,
+        ) {
+            jni_result(&mut env, (), |env| {
+                let context = &*(context as *const ContextObj);
+                let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+                async_util::execute(env, callback, async move {
+                    let resp = context.ctx.$method(counter_id).await?;
+                    Ok(serde_json::to_string(&resp).unwrap_or_default())
+                })?;
+                Ok(())
+            })
+        }
+    };
+}
+
+macro_rules! us_counter_id_report_method {
+    ($jni_name:ident, $method:ident) => {
+        #[unsafe(no_mangle)]
+        pub unsafe extern "system" fn $jni_name(
+            mut env: JNIEnv,
+            _class: JClass,
+            context: i64,
+            counter_id: JObject,
+            report: JObject,
+            callback: JObject,
+        ) {
+            jni_result(&mut env, (), |env| {
+                let context = &*(context as *const ContextObj);
+                let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+                let report: String = FromJValue::from_jvalue(env, report.into())?;
+                async_util::execute(env, callback, async move {
+                    let resp = context.ctx.$method(counter_id, report).await?;
+                    Ok(serde_json::to_string(&resp).unwrap_or_default())
+                })?;
+                Ok(())
+            })
+        }
+    };
+}
+
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsCompanyOverview,
+    us_company_overview
+);
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsValuationOverview,
+    us_valuation_overview
+);
+us_counter_id_report_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsFinancialOverview,
+    us_financial_overview
+);
+us_counter_id_report_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsKeyFinancialMetrics,
+    us_key_financial_metrics
+);
+us_counter_id_report_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsAnalystConsensus,
+    us_analyst_consensus
+);
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsEtfDividendInfo,
+    us_etf_dividend_info
+);
+us_counter_id_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextUsCompanyDividends,
+    us_company_dividends
+);
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUsFinancialStatementV3(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    counter_id: JObject,
+    kind: JObject,
+    report: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+        let kind: String = FromJValue::from_jvalue(env, kind.into())?;
+        let report: String = FromJValue::from_jvalue(env, report.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .us_financial_statement(counter_id, kind, report)
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUsEtfFiles(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    counter_id: JObject,
+    size: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+        let size: Option<i32> = FromJValue::from_jvalue(env, size.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .us_etf_files(counter_id, size.map(|s| s as u32))
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}

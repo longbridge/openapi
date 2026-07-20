@@ -54,6 +54,16 @@ export declare class AlertContext {
   delete(alertIds: Array<string>): Promise<void>
 }
 
+/** Response for get all executions request */
+export declare class AllExecutionsResponse {
+  toString(): string
+  toJSON(): any
+  /** Has more records */
+  get hasMore(): boolean
+  /** Execution list */
+  get trades(): Array<Execution>
+}
+
 /** Asset context */
 export declare class AssetContext {
   /** Create a new `AssetContext` */
@@ -622,6 +632,24 @@ export declare class FundamentalContext {
   macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
+  /** Get US company overview. US token required. counterID format: "ST/US/AAPL" */
+  usCompanyOverview(symbol: string): Promise<USCompanyOverview>
+  /** Get US valuation snapshot (PE/PB/PS). US token required. */
+  usValuationOverview(symbol: string): Promise<USValuationOverview>
+  /** Get US financial overview (revenue/net income/EPS). Returns JSON string. US token required. */
+  usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
+  /** Get US financial statement. kind: "IS"|"BS"|"CF". report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
+  usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
+  /** Get US key financial metrics. report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
+  usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
+  /** Get US analyst consensus estimates. report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
+  usAnalystConsensus(symbol: string, report: string): Promise<USAnalystConsensus>
+  /** Get US ETF dividend history. US token required. */
+  usEtfDividendInfo(symbol: string): Promise<USETFDividendInfo>
+  /** Get US company historical dividends. US token required. */
+  usCompanyDividends(symbol: string): Promise<USCompanyDividends>
+  /** Get US ETF document list. size=null returns all. US token required. */
+  usEtfFiles(symbol: string, size?: number | undefined | null): Promise<USETFFilesResponse>
 }
 
 /** Fund position */
@@ -2030,6 +2058,8 @@ export declare class QuoteContext {
   optionVolume(symbol: string): Promise<OptionVolumeStats>
   /** Get daily historical option volume */
   optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
+  /** Get US cryptocurrency market overview. counterID format: "CY/US/BTC". US token required. */
+  usCryptoOverview(symbol: string): Promise<USCryptoOverview>
 }
 
 export declare class QuotePackageDetail {
@@ -2564,6 +2594,8 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
+  /** Get all executions */
+  allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
    *
@@ -2800,6 +2832,21 @@ export declare class TradeContext {
    * ```
    */
   estimateMaxPurchaseQuantity(opts: EstimateMaxPurchaseQuantityOptions): Promise<EstimateMaxPurchaseQuantityResponse>
+  /** Query US order list (paginated). Returns JSON string. US token required. */
+  /**
+   * Query US order list. Returns JSON string with shape `{orders: USOrder[], total_count: number}`.
+   * symbol: user-facing symbol e.g. "AAPL.US" (optional).
+   * action: 0=all, 1=buy, 2=sell.
+   * queryType: 0=all (incl. Rejected), 1=pending, 2=history (filled only).
+   * US token required.
+   */
+  usQueryOrders(symbol?: string | null, action?: number, startAt?: number, endAt?: number, queryType?: number, page?: number, limit?: number): Promise<string>
+  /** Get US order detail. isAttached=true includes take-profit/stop-loss sub-orders. Returns JSON string. US token required. */
+  usOrderDetail(orderId: string): Promise<USOrderDetailResponse>
+  /** Get US account asset overview (stocks/options/crypto/buy power). US token required. */
+  usAssetOverview(): Promise<USAssetOverview>
+  /** Get US realized P&L. category: "ALL"|"STOCK"|"OPTION"|"CRYPTO". US token required. */
+  usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
 }
 
 /** The information of trading session */
@@ -4123,6 +4170,20 @@ export interface FundHolders {
   lists: Array<FundHolder>
 }
 
+/** Options for get all executions request */
+export interface GetAllExecutionsOptions {
+  /** Security symbol */
+  symbol?: string
+  /** Order id */
+  orderId?: string
+  /** Start time */
+  startAt?: Date
+  /** End time */
+  endAt?: Date
+  /** Page number */
+  page?: number
+}
+
 /** Options for get cash flow request */
 export interface GetCashFlowOptions {
   /** Start time */
@@ -4817,7 +4878,9 @@ export declare const enum OutsideRTH {
   /** Any time */
   AnyTime = 2,
   /** Overnight */
-  Overnight = 3
+  Overnight = 3,
+  /** Overnight option */
+  OptionPreMarket = 4
 }
 
 /** Candlestick period */
@@ -5643,6 +5706,12 @@ export interface SubmitOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+  /**
+   * Client request ID for idempotency control.
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  clientRequestId?: string
 }
 
 /** Quote type of subscription */
@@ -6058,4 +6127,448 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+export interface USOrderHistory {
+  execType: number
+  status: string
+  price: string
+  qty: string
+  time: string
+  msg: string
+  isManually: boolean
+  oppPartyId: string
+  trdMatchId: string
+  operator: string
+  opEntrustWay: string
+  cxlRejResponseTo: number
+  withdrawalReason: string
+  oppName: string
+  execId: string
+}
+export interface USButtonControl {
+  withdraw: number
+  replace: number
+  exceptionable: Array<string>
+}
+export interface USChargeItem {
+  code: number
+  name: string
+  fees: Array<string>
+}
+export interface USChargeDetail {
+  currency: string
+  totalAmount: string
+  items: Array<USChargeItem>
+}
+export interface USAttachedOrder {
+  attachedTypeDisplay: number
+  executedQty: string
+  quantity: string
+  status: string
+  triggerPrice: string
+  orderId: string
+  gtd: string
+  timeInForce: number
+  tag: number
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  symbol: string
+  withdrawn: boolean
+}
+export interface USOrderDetail {
+  id: string
+  aaid: string
+  accountChannel: string
+  action: number
+  symbol: string
+  underlyingSymbol: string
+  securityType: string
+  name: string
+  currency: string
+  tradeCurrency: string
+  orderType: string
+  status: string
+  price: string
+  quantity: string
+  executedQty: string
+  executedPrice: string
+  executedAmount: string
+  operateDirection: string
+  timeInForce: number
+  gtd: string
+  tag: number
+  msg: string
+  forceOnlyRth: number
+  submittedAt: string
+  doneAt: string
+  triggerPrice: string
+  triggerAt: string
+  triggerStatus: number
+  triggerExchange: string
+  triggerLastDone: string
+  triggerCount: number
+  tailingAmount: string
+  tailingPercent: string
+  limitOffset: string
+  limitDepthLevel: number
+  marketPrice: string
+  submittedAmount: string
+  estimatedFee: string
+  freeStatus: number
+  freeAmount: string
+  freeCurrency: string
+  deductionsStatus: number
+  deductionsAmount: string
+  deductionsCurrency: string
+  platformDeductionsStatus: number
+  platformDeductionsAmount: string
+  platformDeductionsCurrency: string
+  displayAccount: string
+  settlementAccount: string
+  settlementChannel: string
+  customerName: string
+  realName: string
+  enName: string
+  jointRealName: string
+  jointEnName: string
+  orgId: string
+  bcan: string
+  opEntrustWay: number
+  opEntrustWayName: string
+  remark: string
+  notice: string
+  shortSellType: number
+  ployType: string
+  ployId: string
+  ployStatus: string
+  trend: number
+  withdrawalReason: string
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  contractDirection: string
+  strikePrice: string
+  contractSize: string
+  monitorPrice: string
+  buttonControl: USButtonControl
+  chargeDetail: USChargeDetail | null
+  attachedOrders: Array<USAttachedOrder>
+  orderHistories: Array<USOrderHistory>
+}
+export interface USOrderDetailResponse {
+  order: USOrderDetail | null
+  currentAttachedOrder: USOrderDetail | null
+  currentMillisecond: string
+}
+
+export interface USReportPeriod {
+  startDate: string
+  endDate: string
+  reportTxt: string
+}
+export interface USFinancialISItem {
+  revenue: string
+  netIncome: string
+  netMargin: string
+  report: USReportPeriod
+}
+export interface USFinancialBSItem {
+  debtAssetsRatio: string
+  totalAssets: string
+  totalLiabilities: string
+  report: USReportPeriod
+}
+export interface USFinancialCFItem {
+  operating: string
+  investing: string
+  financing: string
+  report: USReportPeriod
+}
+export interface USFinancialOverview {
+  ccySymbol: string
+  reportType: string
+  isList: Array<USFinancialISItem>
+  bsList: Array<USFinancialBSItem>
+  cfList: Array<USFinancialCFItem>
+}
+export interface USKeyMetricItem {
+  ffPeriod: string
+  ffYear: number
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+  fields: Array<unknown>
+}
+export interface USKeyFinancialMetrics {
+  currency: string
+  report: string
+  emptyFields: Array<string>
+  list: Array<USKeyMetricItem>
+}
+export interface USAIChatData {
+  agentId: string
+  handoffAgentId: string
+  symbol: string
+  text: string
+  chatType: string
+  workflowType: string
+}
+export interface USConsensusEstimate {
+  actual: string
+  estimate: string
+}
+export interface USConsensusItem {
+  ebit: USConsensusEstimate
+  eps: USConsensusEstimate
+  fiscalYear: number
+  reportTxt: string
+  revenue: USConsensusEstimate
+}
+export interface USAnalystConsensus {
+  aiSummary: string
+  aichatData: USAIChatData
+  currency: string
+  report: string
+  list: Array<USConsensusItem>
+  optReports: Array<string>
+  h5Data: unknown
+}
+
+// ── US-market types ────────────────────────────────────────────────────────
+
+export interface USRankTag {
+  key: string
+  location: number
+  title: string
+  text: string
+  rankType: number
+  highlightText: string
+}
+
+export interface USSharelistItem {
+  chg: string
+  id: string
+  name: string
+}
+
+export interface USCompanyOverview {
+  intro: string
+  marketCap: string
+  ccySymbol: string
+  topRankTags: Array<USRankTag>
+  detailUrl: string
+  shareList: Array<USSharelistItem>
+}
+
+export interface USValuationMetric {
+  circle: string
+  part: string
+  metric: string
+  desc: string
+  industryMedian: string
+}
+
+export interface USValuationOverview {
+  metrics: Record<string, USValuationMetric>
+  indicator: string
+  range: number
+  date: string
+  ccySymbol: string
+  aichatData: USAIChatData
+  aiSummary: string
+}
+
+export interface USFinancialStatementField {
+  displayOrder: number
+  field: string
+  id: string
+  level: number
+  name: string
+  value: string
+  valueType: string
+  yoy: string
+}
+export interface USFinancialStatementPeriod {
+  ffPeriod: string
+  ffYear: number
+  fields: Array<USFinancialStatementField>
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+}
+export interface USFinancialStatement {
+  currency: string
+  report: string
+  list: Array<USFinancialStatementPeriod>
+  emptyFields: Array<string>
+}
+
+export interface USFiscalYearDividend {
+  dividend: string
+  dividendYield: string
+  fiscalYear: string
+  currency: string
+  fiscalYearRange: string
+}
+
+export interface USETFDividendInfo {
+  dividendTtm: string
+  dividendYieldTtm: string
+  dividendFrequency: string
+  currency: string
+  fiscalYearInfo: Array<USFiscalYearDividend>
+}
+
+export interface USDividendItem {
+  dividend: string
+  dividendType: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+}
+
+export interface USRecentDividend {
+  dividendTtm: string
+  dividendYieldTtm: string
+  payouts: string
+  currency: string
+}
+export interface USDividendHistoryItem {
+  fiscalYear: string
+  fiscalYearRange: string
+  totalShareholderYield: string
+  dividend: string
+  dividendYield: string
+  dividendGrowthRate: string
+  dividendPayoutRatio: string
+  dividendToCashflowRatio: string
+  netBuyback: string
+  netBuybackYield: string
+  netBuybackGrowthRate: string
+  netBuybackPayoutRatio: string
+  netBuybackToCashflowRatio: string
+  currency: string
+}
+export interface USDividendPayoutRecord {
+  dividend: string
+  dividendType: string
+  currency: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+  title: string
+  startTimeUnix: string
+}
+export interface USCompanyDividends {
+  recentDividends: USRecentDividend
+  dividendHistory: Array<USDividendHistoryItem>
+  payoutRatios: Array<USDividendHistoryItem>
+  dividendPayoutHistory: Array<USDividendPayoutRecord>
+}
+
+export interface USETFFile {
+  fileName: string
+  filePath: string
+  updateDate: string
+  code: string
+  format: string
+}
+
+export interface USETFFilesResponse {
+  files: Array<USETFFile>
+}
+
+export interface USCryptoOverview {
+  symbol: string
+  name: string
+  ticker: string
+  baseAsset: string
+  currency: string
+  allTimeHigh: string
+  allTimeHighDate: string
+  allTimeLow: string
+  allTimeLowDate: string
+  ipoDate: string
+  issuePrice: string
+  shares: string
+  officialWebAddress: string
+  logo: string
+  wikiUrl: string
+  /** Profile / description as a JSON string */
+  profile: string
+}
+
+export interface USCashEntry {
+  currency: string
+  frozenBuyCash: string
+  outstanding: string
+  settledCash: string
+  totalAmount: string
+  totalCash: string
+}
+
+export interface USCryptoEntry {
+  assetType: string
+  averageCost: string
+  /** User-facing symbol, e.g. "BTCUSD.BKKT" */
+  symbol: string
+  currency: string
+  industryName: string
+}
+
+export interface USStockEntry {
+  symbol: string
+  fullSymbol: string
+  assetType: string
+  quantity: string
+  currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
+  industryName: string
+}
+export interface USAssetOverview {
+  accountType: string
+  /** Unix timestamp (seconds) */
+  assetTimestamp: number
+  cashBuyPower: string
+  overnightBuyPower: string
+  currency: string
+  cashList: Array<USCashEntry>
+  stockList: Array<USStockEntry>
+  optionList: Array<unknown>
+  cryptoList: Array<USCryptoEntry>
+  multiLeg: unknown
+}
+
+export interface USRealizedPLMetric {
+  amount: string
+  period: number
+  rate: string
+}
+
+export interface USRealizedPLEntry {
+  category: number
+  currency: string
+  metrics: Array<USRealizedPLMetric>
+}
+
+export interface USRealizedPL {
+  realizedPlList: Array<USRealizedPLEntry>
 }

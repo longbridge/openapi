@@ -4,7 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.4.0] - 2026-07-20
+
+### Added
+
+- **All languages:** **US market APIs** — 14 new interfaces for US-region accounts (requires `us_` token):
+  - Fundamental: `us_company_overview`, `us_valuation_overview`, `us_financial_overview`, `us_financial_statement`, `us_key_financial_metrics`, `us_analyst_consensus`, `us_etf_dividend_info`, `us_company_dividends`, `us_etf_files`
+  - Quote: `us_crypto_overview` (e.g. `BTCUSD.BKKT`)
+  - Trade: `us_asset_overview`, `us_realized_pl`, `us_query_orders`, `us_order_detail`
+- **All languages:** **DC-region routing** — `x-dc-region` header auto-derived from token prefix (`us_` → US, others → AP)
+- **All languages:** `submit_order` gains optional `client_request_id` for idempotency control.
+- **All languages:** new `all_executions` (`GET /v3/trade/execution/all`) with pagination.
+- **All languages:** `OutsideRTH` enum gains `OptionPreMarket` for overnight option orders.
+- **All languages:** paper trading mode support via `Config`.
+
+### Changed
+
+- **All languages:** `OrderTag` enum: `GTC` renamed to `Gtc`; undocumented variants removed.
 
 ## [4.3.3] - 2026-06-26
 

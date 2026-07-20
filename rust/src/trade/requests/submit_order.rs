@@ -37,6 +37,8 @@ pub struct SubmitOrderOptions {
     monitor_price: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
     remark: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    client_request_id: Option<String>,
 }
 
 impl SubmitOrderOptions {
@@ -66,6 +68,7 @@ impl SubmitOrderOptions {
             trigger_count: None,
             monitor_price: None,
             remark: None,
+            client_request_id: None,
         }
     }
 
@@ -169,6 +172,18 @@ impl SubmitOrderOptions {
     pub fn remark(self, remark: impl Into<String>) -> Self {
         Self {
             remark: Some(remark.into()),
+            ..self
+        }
+    }
+
+    /// Set the client request ID for idempotency control.
+    /// If not specified, idempotency control is skipped.
+    /// The server caches this ID for 10 minutes; requests with the same ID
+    /// within that period return the original response without creating a new
+    /// order.
+    pub fn client_request_id(self, id: impl Into<String>) -> Self {
+        Self {
+            client_request_id: Some(id.into()),
             ..self
         }
     }

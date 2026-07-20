@@ -188,6 +188,25 @@ public class Config implements AutoCloseable {
     }
 
     /**
+     * Enable paper trading mode.
+     *
+     * <p>When enabled, all API calls target the paper trading (simulation)
+     * environment.  The server validates the token: if it belongs to a real-money
+     * account the server returns an error.
+     *
+     * <p>By default this option is disabled and the server imposes no restrictions
+     * — requests from both paper trading and real-money accounts are accepted.
+     *
+     * <p>Paper trading users should call this method as a safety guard.
+     *
+     * @return this object
+     */
+    public Config enablePapertrading() {
+        this.raw = SdkNative.configSetEnablePapertrading(this.raw);
+        return this;
+    }
+
+    /**
      * Gets a new {@code access_token}.
      *
      * <p>This method is only available when using <b>Legacy API Key</b>

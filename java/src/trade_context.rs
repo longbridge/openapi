@@ -4,16 +4,16 @@ use jni::{
     JNIEnv, JavaVM,
     errors::Result,
     objects::{GlobalRef, JClass, JObject, JString},
-    sys::jobjectArray,
+    sys::{jboolean, jobjectArray},
 };
 use longbridge::{
     Config, Decimal, Market, TradeContext,
     trade::{
-        BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, ReplaceOrderOptions, SubmitOrderOptions,
-        TimeInForceType, TopicType,
+        BalanceType, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+        GetHistoryOrdersOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
+        QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;
@@ -208,6 +208,49 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
         };
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(context.ctx.today_executions(opts).await?))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAllExecutions(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let opts = if !opts.is_null() {
+            let mut new_opts = GetAllExecutionsOptions::new();
+            let symbol: Option<String> = get_field(env, &opts, "symbol")?;
+            if let Some(symbol) = symbol {
+                new_opts = new_opts.symbol(symbol);
+            }
+            let order_id: Option<String> = get_field(env, &opts, "orderId")?;
+            if let Some(order_id) = order_id {
+                new_opts = new_opts.order_id(order_id);
+            }
+            let start_at: Option<OffsetDateTime> = get_field(env, &opts, "startAt")?;
+            if let Some(start_at) = start_at {
+                new_opts = new_opts.start_at(start_at);
+            }
+            let end_at: Option<OffsetDateTime> = get_field(env, &opts, "endAt")?;
+            if let Some(end_at) = end_at {
+                new_opts = new_opts.end_at(end_at);
+            }
+            let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
+            if let Some(page) = page {
+                new_opts = new_opts.page(i32::from(page) as u64);
+            }
+            Some(new_opts)
+        } else {
+            None
+        };
+        async_util::execute(env, callback, async move {
+            Ok(context.ctx.all_executions(opts).await?)
         })?;
         Ok(())
     })
@@ -417,6 +460,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
         if let Some(remark) = remark {
             new_opts = new_opts.remark(remark);
         }
+        let client_request_id: Option<String> = get_field(env, &opts, "clientRequestId")?;
+        if let Some(id) = client_request_id {
+            new_opts = new_opts.client_request_id(id);
+        }
 
         async_util::execute(env, callback, async move {
             Ok(context.ctx.submit_order(new_opts).await?)
@@ -621,6 +668,113 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimate
         }
         async_util::execute(env, callback, async move {
             Ok(context.ctx.estimate_max_purchase_quantity(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+// ── US-market JNI stubs ──────────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsQueryOrders(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    action: i64,
+    start_at: i64,
+    end_at: i64,
+    query_type: i64,
+    page: i64,
+    limit: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let symbol_str: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let us_opts = longbridge::trade::GetUSHistoryOrders {
+            symbol: if symbol_str.is_empty() {
+                None
+            } else {
+                Some(symbol_str)
+            },
+            side: match action {
+                1 => longbridge::trade::OrderSide::Buy,
+                2 => longbridge::trade::OrderSide::Sell,
+                _ => longbridge::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type: query_type as i32,
+            page: page as i32,
+            limit: limit as i32,
+        };
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_query_orders(us_opts).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsOrderDetail(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_order_detail(order_id).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsAssetOverview(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        async_util::execute(env, callback, async move {
+            let resp = context.ctx.us_asset_overview().await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsRealizedPl(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    currency: JObject,
+    category: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let currency: String = FromJValue::from_jvalue(env, currency.into())?;
+        let category: Option<String> = FromJValue::from_jvalue(env, category.into()).ok();
+        async_util::execute(env, callback, async move {
+            let resp = context
+                .ctx
+                .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
     })
