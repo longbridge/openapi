@@ -3065,6 +3065,7 @@ inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event
       break;
     case Other:
       event.kind = agent::ConversationStreamEventKind::Other;
+      event.other_event = std::string(e->other_event);
       event.other_json = std::string(e->other_json);
       break;
     default:

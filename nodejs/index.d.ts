@@ -3846,7 +3846,8 @@ export declare const enum ConversationStatus {
  * fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
  * `"chat_started" | "message" | "workflow_finished" | "other"`, and exactly
  * one of `chatStarted` / `message` / `workflowFinished` / `other` is set,
- * matching `kind`.
+ * matching `kind`. When `kind` is `"other"`, `otherEvent` additionally
+ * carries the SSE envelope's `event` field (the event type name).
  */
 export interface ConversationStreamEvent {
   /**
@@ -3860,6 +3861,13 @@ export interface ConversationStreamEvent {
   message?: MessagePayload
   /** Set when `kind` is `"workflow_finished"` — the last event of a stream */
   workflowFinished?: ConversationResponse
+  /**
+   * Set when `kind` is `"other"` — the SSE envelope's `event` field (the
+   * event type name), e.g. `"workflow_started"`, `"ping"`,
+   * `"chat_finished"`, `"chat_title_updated"` (observed against the real
+   * API; not documented)
+   */
+  otherEvent?: string
   /**
    * Set when `kind` is `"other"` — raw JSON of an event type not
    * recognized by this SDK version

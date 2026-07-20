@@ -325,8 +325,19 @@ pub enum ConversationStreamEvent {
     /// event of a stream
     WorkflowFinished(ConversationResponse),
     /// An event type not recognized by this SDK version, carried as raw JSON so
-    /// callers aren't broken by future additions to the API
-    Other(serde_json::Value),
+    /// callers aren't broken by future additions to the API. Live testing
+    /// against the real API shows there are more event types than the docs'
+    /// example covers (e.g. a workflow-started event right after
+    /// `chat_started`, a message-end event carrying `error`/`error_message`
+    /// fields, and a post-completion chat-title event) — `event` is the SSE
+    /// envelope's discriminator string (e.g. `"workflow_started"`) so callers
+    /// can at least tell these apart instead of getting an opaque blob.
+    Other {
+        /// The SSE envelope's `event` field (the event type name)
+        event: String,
+        /// The SSE envelope's `data` field
+        data: serde_json::Value,
+    },
 }
 
 #[cfg(test)]

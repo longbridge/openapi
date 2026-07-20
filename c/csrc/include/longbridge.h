@@ -1980,6 +1980,13 @@ typedef struct lb_conversation_stream_event_t {
    */
   const struct lb_conversation_response_t *workflow_finished;
   /**
+   * Non-null when `kind` is `Other`; the SSE envelope's `event` field (the
+   * event type name), e.g. `"workflow_started"`, `"ping"`,
+   * `"chat_finished"`, `"chat_title_updated"` (observed against the real
+   * API; not documented)
+   */
+  const char *other_event;
+  /**
    * Non-null when `kind` is `Other`; raw JSON of an event type not
    * recognized by this SDK version
    */

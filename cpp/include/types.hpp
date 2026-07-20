@@ -3860,6 +3860,11 @@ struct ConversationStreamEvent
   /// Populated when `kind` is `WorkflowFinished` — this is always the last
   /// event of a stream
   std::optional<ConversationResponse> workflow_finished;
+  /// Populated when `kind` is `Other`; the SSE envelope's `event` field (the
+  /// event type name), e.g. `"workflow_started"`, `"ping"`,
+  /// `"chat_finished"`, `"chat_title_updated"` (observed against the real
+  /// API; not documented)
+  std::optional<std::string> other_event;
   /// Populated when `kind` is `Other`; raw JSON of an event type not
   /// recognized by this SDK version
   std::optional<std::string> other_json;

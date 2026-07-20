@@ -3039,13 +3039,15 @@ impl_java_class!(
 );
 
 /// JNI-side wrapper for
-/// [`longbridge::agent::ConversationStreamEvent::Other`], carrying the raw
-/// event JSON as a string (same convention as `AlertItem.valueMap`).
+/// [`longbridge::agent::ConversationStreamEvent::Other`], carrying the SSE
+/// envelope's `event` type name alongside the raw event JSON as a string
+/// (same convention as `AlertItem.valueMap`).
 pub(crate) struct OtherEvent {
+    pub(crate) event: String,
     pub(crate) json: serde_json::Value,
 }
 
-impl_java_class!("com/longbridge/agent/OtherEvent", OtherEvent, [json]);
+impl_java_class!("com/longbridge/agent/OtherEvent", OtherEvent, [event, json]);
 
 /// `ConversationStreamEvent` is an enum-with-payload, so unlike every type
 /// above it can't go through `impl_java_class!` (which only knows how to
@@ -3070,7 +3072,7 @@ impl crate::types::IntoJValue for longbridge::agent::ConversationStreamEvent {
                 response: ConversationResponse::from(resp),
             }
             .into_jvalue(env),
-            Other(value) => OtherEvent { json: value }.into_jvalue(env),
+            Other { event, data } => OtherEvent { event, json: data }.into_jvalue(env),
         }
     }
 }

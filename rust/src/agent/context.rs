@@ -56,7 +56,10 @@ fn map_conversation_event(
                 payload,
             ))
         }
-        _ => ConversationStreamEvent::Other(envelope.data),
+        _ => ConversationStreamEvent::Other {
+            event: envelope.event,
+            data: envelope.data,
+        },
     })
 }
 
@@ -338,8 +341,9 @@ mod tests {
         let mut started = None;
         let json = r#"{"event":"some_future_event","data":{"foo":"bar"}}"#;
         match map_conversation_event(sse(json), &mut started).unwrap() {
-            ConversationStreamEvent::Other(value) => {
-                assert_eq!(value["foo"], "bar");
+            ConversationStreamEvent::Other { event, data } => {
+                assert_eq!(event, "some_future_event");
+                assert_eq!(data["foo"], "bar");
             }
             other => panic!("unexpected event: {other:?}"),
         }

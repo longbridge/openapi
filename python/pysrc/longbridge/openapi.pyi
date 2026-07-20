@@ -13291,6 +13291,10 @@ class ConversationStreamEvent:
     workflow_finished: ConversationResponse | None
     """Set when kind == "workflow_finished" (the run finished — succeeded,
     interrupted, failed, or stopped; this is always the last event)"""
+    other_event: str | None
+    """Set when kind == "other": the SSE envelope's ``event`` field (the event
+    type name), e.g. "workflow_started", "ping", "chat_finished",
+    "chat_title_updated" (observed against the real API; not documented)"""
     other: Any | None
     """Set when kind == "other": raw JSON payload of an event type not
     recognized by this SDK version"""

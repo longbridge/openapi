@@ -658,6 +658,11 @@ pub struct CConversationStreamEvent {
     /// Non-null when `kind` is `WorkflowFinished` — this is always the last
     /// event of a stream
     pub workflow_finished: *const CConversationResponse,
+    /// Non-null when `kind` is `Other`; the SSE envelope's `event` field (the
+    /// event type name), e.g. `"workflow_started"`, `"ping"`,
+    /// `"chat_finished"`, `"chat_title_updated"` (observed against the real
+    /// API; not documented)
+    pub other_event: *const c_char,
     /// Non-null when `kind` is `Other`; raw JSON of an event type not
     /// recognized by this SDK version
     pub other_json: *const c_char,
@@ -667,7 +672,7 @@ pub(crate) enum CConversationStreamEventOwned {
     ChatStarted(CCow<CChatStartedPayloadOwned>),
     Message(CCow<CMessagePayloadOwned>),
     WorkflowFinished(CCow<CConversationResponseOwned>),
-    Other(CString),
+    Other { event: CString, json: CString },
 }
 
 impl From<ConversationStreamEvent> for CConversationStreamEventOwned {
@@ -680,10 +685,12 @@ impl From<ConversationStreamEvent> for CConversationStreamEventOwned {
             }
             // `Other` carries an arbitrary `serde_json::Value` (events from
             // future SDK versions we don't recognize yet) — re-serialize it
-            // to a JSON string so C callers can still inspect it.
-            ConversationStreamEvent::Other(value) => {
-                Self::Other(serde_json::to_string(&value).unwrap_or_default().into())
-            }
+            // to a JSON string so C callers can still inspect it, alongside
+            // the discriminating `event` type name.
+            ConversationStreamEvent::Other { event, data } => Self::Other {
+                event: event.into(),
+                json: serde_json::to_string(&data).unwrap_or_default().into(),
+            },
         }
     }
 }
@@ -698,6 +705,7 @@ impl ToFFI for CConversationStreamEventOwned {
                 chat_started: payload.to_ffi_type(),
                 message: std::ptr::null(),
                 workflow_finished: std::ptr::null(),
+                other_event: std::ptr::null(),
                 other_json: std::ptr::null(),
             },
             Self::Message(payload) => CConversationStreamEvent {
@@ -705,6 +713,7 @@ impl ToFFI for CConversationStreamEventOwned {
                 chat_started: std::ptr::null(),
                 message: payload.to_ffi_type(),
                 workflow_finished: std::ptr::null(),
+                other_event: std::ptr::null(),
                 other_json: std::ptr::null(),
             },
             Self::WorkflowFinished(resp) => CConversationStreamEvent {
@@ -712,13 +721,15 @@ impl ToFFI for CConversationStreamEventOwned {
                 chat_started: std::ptr::null(),
                 message: std::ptr::null(),
                 workflow_finished: resp.to_ffi_type(),
+                other_event: std::ptr::null(),
                 other_json: std::ptr::null(),
             },
-            Self::Other(json) => CConversationStreamEvent {
+            Self::Other { event, json } => CConversationStreamEvent {
                 kind: CConversationStreamEventType::Other,
                 chat_started: std::ptr::null(),
                 message: std::ptr::null(),
                 workflow_finished: std::ptr::null(),
+                other_event: event.to_ffi_type(),
                 other_json: json.to_ffi_type(),
             },
         }

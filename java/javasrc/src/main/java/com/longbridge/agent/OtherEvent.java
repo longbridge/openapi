@@ -5,7 +5,20 @@ package com.longbridge.agent;
  * so callers aren't broken by future additions to the API.
  */
 public final class OtherEvent extends ConversationStreamEvent {
+    private String event;
     private String json;
+
+    /**
+     * Returns the SSE envelope's {@code event} field (the event type name),
+     * e.g. {@code "workflow_started"}, {@code "ping"}, {@code "chat_finished"},
+     * {@code "chat_title_updated"} (observed against the real API; not
+     * documented).
+     *
+     * @return event type name
+     */
+    public String getEvent() {
+        return event;
+    }
 
     /**
      * Returns the raw event payload as JSON text.
@@ -18,6 +31,6 @@ public final class OtherEvent extends ConversationStreamEvent {
 
     @Override
     public String toString() {
-        return "OtherEvent [json=" + json + "]";
+        return "OtherEvent [event=" + event + ", json=" + json + "]";
     }
 }
