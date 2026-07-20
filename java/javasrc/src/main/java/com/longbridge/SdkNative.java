@@ -2,6 +2,7 @@ package com.longbridge;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.concurrent.Flow;
 import java.util.function.Consumer;
 import org.scijava.nativelib.NativeLoader;
 
@@ -469,6 +470,29 @@ public class SdkNative {
 
         public static native void quoteContextUpdatePinned(long context, Object req,
                         AsyncCallback callback);
+
+        // ── AgentContext ──────────────────────────────────────────────
+
+        public static native long newAgentContext(long config);
+        public static native void freeAgentContext(long context);
+
+        public static native void agentContextWorkspaces(long context, AsyncCallback callback);
+        public static native void agentContextAgents(long context, String workspaceId, Object opts,
+                        AsyncCallback callback);
+        public static native void agentContextConversation(long context, String agentId, String query,
+                        String chatUid, AsyncCallback callback);
+        public static native void agentContextContinueConversation(long context, String agentId, String chatUid,
+                        String messageId, String answersByToolCallJson, AsyncCallback callback);
+
+        public static native void agentContextConversationStreamSubscribe(long context, String agentId, String query,
+                        String chatUid, Flow.Subscriber<?> subscriber);
+        public static native void agentContextContinueConversationStreamSubscribe(long context, String agentId,
+                        String chatUid, String messageId, String answersByToolCallJson,
+                        Flow.Subscriber<?> subscriber);
+
+        public static native void conversationStreamSubscriptionRequest(long handle, long n);
+        public static native void conversationStreamSubscriptionCancel(long handle);
+        public static native void freeConversationStreamSubscription(long handle);
 
         static {
                 try {

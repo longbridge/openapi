@@ -1,6 +1,16 @@
 from datetime import date, datetime, time
 from decimal import Decimal
-from typing import Any, Awaitable, Callable, Coroutine, List, Optional, Type
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Coroutine,
+    Iterator,
+    List,
+    Optional,
+    Type,
+)
 
 class ErrorKind:
     """
@@ -13097,3 +13107,473 @@ class USETFFilesResponse:
 
     files: List[USETFFile]
     """Document entries"""
+
+# ── AI Agent ──────────────────────────────────────────────────────
+
+class Workspace:
+    """A Workspace the current account belongs to."""
+
+    id: str
+    """Workspace ID"""
+    name: str
+    """Workspace name"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+
+class WorkspacesResponse:
+    """Response for AgentContext.workspaces / AsyncAgentContext.workspaces."""
+
+    workspaces: list[Workspace]
+    """Workspaces the current account belongs to"""
+
+class Agent:
+    """An Agent in a Workspace."""
+
+    uid: str
+    """Agent UID, used as the ``agent_id`` argument of
+    AgentContext.conversation"""
+    name: str
+    """Agent name"""
+    description: str
+    """Agent description"""
+    mode: str
+    """Agent mode, e.g. ``"chat"``"""
+    icon: str
+    """Icon URL"""
+    is_published: bool
+    """Whether published; only published Agents can start conversations"""
+    published_at: int
+    """Publish time, Unix timestamp in seconds; 0 if unpublished"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+
+class AgentsResponse:
+    """Response for AgentContext.agents / AsyncAgentContext.agents."""
+
+    agents: list[Agent]
+    """Agent list"""
+    total: int
+    """Total number of matching Agents"""
+
+class ConversationStatus:
+    """Final run status of a conversation."""
+
+    class Succeeded(ConversationStatus):
+        """The run completed successfully"""
+
+        ...
+
+    class Interrupted(ConversationStatus):
+        """The run is paused, waiting for AgentContext.continue_conversation"""
+
+        ...
+
+    class Failed(ConversationStatus):
+        """The run failed"""
+
+        ...
+
+    class Stopped(ConversationStatus):
+        """The run was stopped"""
+
+        ...
+
+class Reference:
+    """A source referenced by the answer."""
+
+    index: int
+    """Reference index"""
+    title: str
+    """Reference title"""
+    url: str
+    """Reference URL"""
+
+class QuestionOption:
+    """One option of a Question."""
+
+    description: str
+    """Option text"""
+
+class Question:
+    """One question the Agent needs you to answer."""
+
+    question: str
+    """Question text"""
+    options: list[QuestionOption]
+    """Options; empty means free-form answer"""
+    multi_select: bool
+    """Whether multiple options may be selected"""
+
+class Interrupt:
+    """Present when a conversation run is interrupted, waiting for
+    AgentContext.continue_conversation."""
+
+    node_id: str
+    """ID of the node that triggered the interrupt"""
+    tool_call_id: str
+    """Tool call ID of this inquiry; used as the answer key when continuing"""
+    questions: list[Question]
+    """Questions you need to answer"""
+    message_id: int
+    """ID of the paused message"""
+    chat_id: int
+    """ID of the owning conversation"""
+
+class AgentError:
+    """Present when a conversation run failed."""
+
+    code: int
+    """Error code"""
+    message: str
+    """Error message"""
+
+class ConversationResponse:
+    """
+    Response for AgentContext.conversation / AgentContext.continue_conversation,
+    and the final result of the streamed counterparts.
+    """
+
+    chat_uid: str
+    """Conversation identifier, used for follow-up questions and
+    troubleshooting"""
+    message_id: str
+    """Message ID of this round"""
+    status: ConversationStatus
+    """Final run status"""
+    answer: str
+    """Final answer text; valid when status is ConversationStatus.Succeeded"""
+    references: list[Reference] | None
+    """Sources referenced by the answer"""
+    elapsed_time: float
+    """Run duration in seconds"""
+    interrupt: Interrupt | None
+    """Present only when status is ConversationStatus.Interrupted"""
+    error: AgentError | None
+    """Present only when the run failed"""
+
+class ChatStartedPayload:
+    """Payload of a ``chat_started`` stream event."""
+
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+
+class MessagePayload:
+    """Payload of a ``message`` stream event."""
+
+    text: str
+    """Incremental answer text"""
+
+class ConversationStreamEvent:
+    """
+    One event observed while streaming
+    AgentContext.conversation_streamed / continue_conversation_streamed (or
+    the Async counterparts).
+
+    ``kind`` is the discriminant — one of ``"chat_started"``, ``"message"``,
+    ``"workflow_finished"``, ``"other"`` — and exactly one of
+    ``chat_started`` / ``message`` / ``workflow_finished`` / ``other`` is set,
+    matching ``kind``.
+    """
+
+    kind: str
+    """Discriminant: ``"chat_started"``, ``"message"``,
+    ``"workflow_finished"``, or ``"other"``"""
+    chat_started: ChatStartedPayload | None
+    """Set when kind == "chat_started" """
+    message: MessagePayload | None
+    """Set when kind == "message" """
+    workflow_finished: ConversationResponse | None
+    """Set when kind == "workflow_finished" (the run finished — succeeded,
+    interrupted, failed, or stopped; this is always the last event)"""
+    other: Any | None
+    """Set when kind == "other": raw JSON payload of an event type not
+    recognized by this SDK version"""
+
+class ConversationStreamIter:
+    """
+    Blocking iterator of ConversationStreamEvent, returned by
+    AgentContext.conversation_streamed / continue_conversation_streamed. Use
+    with a plain ``for`` loop.
+    """
+
+    def __iter__(self) -> "ConversationStreamIter": ...
+    def __next__(self) -> ConversationStreamEvent: ...
+
+class AgentContext:
+    """
+    AI Agent conversation context.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, AgentContext
+
+            config = Config.from_env()
+            ctx = AgentContext(config)
+
+            workspaces = ctx.workspaces()
+            agents = ctx.agents(workspaces.workspaces[0].id)
+            resp = ctx.conversation(
+                agents.agents[0].uid, "How has Tesla stock performed recently?"
+            )
+            print(resp)
+
+            for event in ctx.conversation_streamed(
+                agents.agents[0].uid, "How has Tesla stock performed recently?"
+            ):
+                print(event)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create an AgentContext."""
+        ...
+
+    def workspaces(self) -> WorkspacesResponse:
+        """List the Workspaces the current account belongs to."""
+        ...
+
+    def agents(
+        self,
+        workspace_id: str,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> AgentsResponse:
+        """
+        List the Agents in the specified Workspace.
+
+        Args:
+            workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def conversation(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> ConversationResponse:
+        """
+        Start a conversation with the specified Agent, blocking until the run
+        succeeds, is interrupted, or fails.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> ConversationResponse:
+        """
+        Resume an interrupted conversation, blocking until the run succeeds,
+        is interrupted again, or fails.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+    def conversation_streamed(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> Iterator[ConversationStreamEvent]:
+        """
+        Start a conversation with the specified Agent, returning an iterator
+        of run-progress events. The last item is always a
+        ConversationStreamEvent with ``kind == "workflow_finished"``.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation_streamed(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Iterator[ConversationStreamEvent]:
+        """
+        Resume an interrupted conversation, returning an iterator of
+        run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+class AsyncConversationStreamIter:
+    """
+    Async iterator of ConversationStreamEvent, returned (once awaited) by
+    AsyncAgentContext.conversation_streamed / continue_conversation_streamed.
+    Use with ``async for``.
+    """
+
+    def __aiter__(self) -> "AsyncConversationStreamIter": ...
+    async def __anext__(self) -> ConversationStreamEvent: ...
+
+class AsyncAgentContext:
+    """
+    Async AI Agent conversation context for use with asyncio. Create via
+    AsyncAgentContext.create(config); all I/O methods return awaitables.
+
+    Examples:
+        ::
+
+            import asyncio
+            from longbridge.openapi import Config, AsyncAgentContext
+
+            async def main():
+                config = Config.from_env()
+                ctx = AsyncAgentContext.create(config)
+
+                workspaces = await ctx.workspaces()
+                agents = await ctx.agents(workspaces.workspaces[0].id)
+                resp = await ctx.conversation(
+                    agents.agents[0].uid, "How has Tesla stock performed recently?"
+                )
+                print(resp)
+
+                stream = await ctx.conversation_streamed(
+                    agents.agents[0].uid, "How has Tesla stock performed recently?"
+                )
+                async for event in stream:
+                    print(event)
+
+            asyncio.run(main())
+    """
+
+    @classmethod
+    def create(
+        cls: Type[AsyncAgentContext], config: Config
+    ) -> AsyncAgentContext:
+        """Create an async AI Agent context."""
+        ...
+
+    def workspaces(self) -> Awaitable[WorkspacesResponse]:
+        """List the Workspaces the current account belongs to. Returns
+        awaitable."""
+        ...
+
+    def agents(
+        self,
+        workspace_id: str,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> Awaitable[AgentsResponse]:
+        """
+        List the Agents in the specified Workspace. Returns awaitable.
+
+        Args:
+            workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def conversation(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> Awaitable[ConversationResponse]:
+        """
+        Start a conversation with the specified Agent, blocking until the run
+        succeeds, is interrupted, or fails. Returns awaitable.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Awaitable[ConversationResponse]:
+        """
+        Resume an interrupted conversation, blocking until the run succeeds,
+        is interrupted again, or fails. Returns awaitable.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+    def conversation_streamed(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> Awaitable[AsyncConversationStreamIter]:
+        """
+        Start a conversation with the specified Agent. Returns an awaitable
+        that resolves to an AsyncConversationStreamIter; use ``async for`` on
+        it to consume run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation_streamed(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Awaitable[AsyncConversationStreamIter]:
+        """
+        Resume an interrupted conversation. Returns an awaitable that resolves
+        to an AsyncConversationStreamIter; use ``async for`` on it to consume
+        run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...

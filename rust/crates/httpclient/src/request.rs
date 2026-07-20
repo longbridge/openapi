@@ -3,13 +3,16 @@ use std::{
     error::Error,
     fmt::Debug,
     marker::PhantomData,
+    pin::Pin,
     time::{Duration, Instant},
 };
 
+use eventsource_stream::{Event as SseEvent, Eventsource};
+use futures_util::{Stream, StreamExt};
 use longbridge_geo::{DC_REGION_HEADER, DcRegion, is_cn};
 use reqwest::{
     Method, StatusCode,
-    header::{HeaderMap, HeaderName, HeaderValue},
+    header::{ACCEPT, HeaderMap, HeaderName, HeaderValue},
 };
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
@@ -228,11 +231,34 @@ impl<'a, T, Q, R> RequestBuilder<'a, T, Q, R> {
     }
 }
 
+/// Parse the `{code, message, data}` OpenAPI response envelope, given the HTTP
+/// status and trace id already extracted from the response. Shared by the
+/// blocking (`do_send`) and streaming (`send_events`) request paths, since both
+/// can receive this envelope as an error body (streaming responses only use SSE
+/// framing once the server has committed to a 200 status).
+fn parse_response_envelope(
+    status: StatusCode,
+    trace_id: &str,
+    text: &str,
+) -> HttpClientResult<Box<serde_json::value::RawValue>> {
+    match serde_json::from_str::<OpenApiResponse>(text) {
+        Ok(resp) if resp.code == 0 => resp.data.ok_or(HttpClientError::UnexpectedResponse),
+        Ok(resp) => Err(HttpClientError::OpenApi {
+            code: resp.code,
+            message: resp.message,
+            trace_id: trace_id.to_string(),
+        }),
+        Err(err) if status == StatusCode::OK => {
+            Err(HttpClientError::DeserializeResponseBody(err.to_string()))
+        }
+        Err(_) => Err(HttpClientError::BadStatus(status)),
+    }
+}
+
 impl<T, Q, R> RequestBuilder<'_, T, Q, R>
 where
     T: ToPayload,
     Q: Serialize + Send,
-    R: FromPayload,
 {
     async fn http_url(&self) -> &str {
         if let Some(url) = self.client.config.http_url.as_deref() {
@@ -242,7 +268,10 @@ where
         if is_cn().await { HTTP_URL_CN } else { HTTP_URL }
     }
 
-    async fn do_send(&self) -> HttpClientResult<R> {
+    /// Resolve auth/dc-region, build and sign the underlying
+    /// [`reqwest::Request`]. Shared by both the blocking (`do_send`) and
+    /// streaming (`send_events`) request paths.
+    async fn build_request(&self) -> HttpClientResult<reqwest::Request> {
         let HttpClient {
             http_cli,
             config,
@@ -362,6 +391,20 @@ where
             tracing::info!(method = %request.method(), url = %request.url(), "http request");
         }
 
+        Ok(request)
+    }
+}
+
+impl<T, Q, R> RequestBuilder<'_, T, Q, R>
+where
+    T: ToPayload,
+    Q: Serialize + Send,
+    R: FromPayload,
+{
+    async fn do_send(&self) -> HttpClientResult<R> {
+        let http_cli = &self.client.http_cli;
+        let request = self.build_request().await?;
+
         let s = Instant::now();
 
         // send request
@@ -388,20 +431,9 @@ where
 
         tracing::info!(duration = ?s.elapsed(), body = %text.as_str(), "http response");
 
-        let resp = match serde_json::from_str::<OpenApiResponse>(&text) {
-            Ok(resp) if resp.code == 0 => resp.data.ok_or(HttpClientError::UnexpectedResponse),
-            Ok(resp) => Err(HttpClientError::OpenApi {
-                code: resp.code,
-                message: resp.message,
-                trace_id,
-            }),
-            Err(err) if status == StatusCode::OK => {
-                Err(HttpClientError::DeserializeResponseBody(err.to_string()))
-            }
-            Err(_) => Err(HttpClientError::BadStatus(status)),
-        }?;
+        let data = parse_response_envelope(status, &trace_id, &text)?;
 
-        R::parse_from_bytes(resp.get().as_bytes())
+        R::parse_from_bytes(data.get().as_bytes())
             .map_err(|err| HttpClientError::DeserializeResponseBody(err.to_string()))
     }
 
@@ -430,5 +462,61 @@ where
             }
             Err(err) => Err(err),
         }
+    }
+}
+
+impl<T, Q> RequestBuilder<'_, T, Q, ()>
+where
+    T: ToPayload,
+    Q: Serialize + Send,
+{
+    /// Send the request with `Accept: text/event-stream` and return a stream of
+    /// parsed SSE events, instead of buffering the full response body like
+    /// [`send`](RequestBuilder::send) does. There's no automatic 429 retry here
+    /// — once a stream starts delivering events it can't be replayed as a
+    /// whole; a failure is handed back to the caller to decide whether to
+    /// start a new call.
+    pub async fn send_events(
+        self,
+    ) -> HttpClientResult<Pin<Box<dyn Stream<Item = HttpClientResult<SseEvent>> + Send>>> {
+        let http_cli = self.client.http_cli.clone();
+        let mut request = self.build_request().await?;
+        request
+            .headers_mut()
+            .insert(ACCEPT, HeaderValue::from_static("text/event-stream"));
+
+        let resp = http_cli
+            .execute(request)
+            .await
+            .map_err(|err| HttpClientError::Http(err.into()))?;
+        let status = resp.status();
+
+        if status != StatusCode::OK {
+            // Error responses are still a one-shot JSON body ({code, message}), not SSE.
+            let trace_id = resp
+                .headers()
+                .get("x-trace-id")
+                .and_then(|value| value.to_str().ok())
+                .unwrap_or_default()
+                .to_string();
+            let text = resp
+                .text()
+                .await
+                .map_err(|err| HttpClientError::Http(err.into()))?;
+            return Err(match parse_response_envelope(status, &trace_id, &text) {
+                Ok(_) => HttpClientError::UnexpectedResponse,
+                Err(err) => err,
+            });
+        }
+
+        let stream = resp.bytes_stream().eventsource().map(|item| {
+            item.map_err(|err| match err {
+                eventsource_stream::EventStreamError::Transport(err) => {
+                    HttpClientError::Http(err.into())
+                }
+                err => HttpClientError::Sse(err.to_string()),
+            })
+        });
+        Ok(Box::pin(stream))
     }
 }

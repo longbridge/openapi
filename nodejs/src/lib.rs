@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+mod agent;
 mod alert;
 mod asset;
 mod calendar;

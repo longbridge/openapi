@@ -47,6 +47,55 @@
 #define LB_WATCHLIST_GROUP_SECURITIES 2
 
 /**
+ * Kind of a [`crate::agent_context::types::CConversationStreamEvent`]. Only
+ * the field matching this kind is non-null, all others are null.
+ */
+typedef enum lb_conversation_stream_event_type_t {
+  /**
+   * The run has started; `chat_started` is non-null
+   */
+  ChatStarted,
+  /**
+   * An incremental piece of the answer; `message` is non-null
+   */
+  Message,
+  /**
+   * The run finished (succeeded, interrupted, failed, or stopped);
+   * `workflow_finished` is non-null
+   */
+  WorkflowFinished,
+  /**
+   * An event type not recognized by this SDK version; `other_json` is
+   * non-null and contains the raw event JSON
+   */
+  Other,
+} lb_conversation_stream_event_type_t;
+
+/**
+ * Final run status of a conversation
+ */
+typedef enum lb_conversation_status_t {
+  /**
+   * The run completed successfully
+   */
+  ConversationStatusSucceeded,
+  /**
+   * The run is paused, waiting for
+   * `lb_agent_context_continue_conversation`/
+   * `lb_agent_context_continue_conversation_streamed`
+   */
+  ConversationStatusInterrupted,
+  /**
+   * The run failed
+   */
+  ConversationStatusFailed,
+  /**
+   * The run was stopped
+   */
+  ConversationStatusStopped,
+} lb_conversation_status_t;
+
+/**
  * Alert trigger condition
  */
 typedef enum lb_alert_condition_t {
@@ -1600,6 +1649,11 @@ typedef enum lb_element_type_t {
   ElementTypeIndustry,
 } lb_element_type_t;
 
+/**
+ * AI Agent conversation context
+ */
+typedef struct lb_agent_context_t lb_agent_context_t;
+
 typedef struct lb_alert_context_t lb_alert_context_t;
 
 /**
@@ -1674,6 +1728,280 @@ typedef struct lb_async_result_t {
 typedef void (*lb_async_callback_t)(const struct lb_async_result_t*);
 
 /**
+ * Options for `lb_agent_context_agents` (all fields can be null)
+ */
+typedef struct lb_get_agents_options_t {
+  /**
+   * Page number, starts at 1 (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+  /**
+   * Fuzzy search by Agent name (can be null)
+   */
+  const char *name;
+} lb_get_agents_options_t;
+
+/**
+ * One answer to a [`CInterrupt`] question, used as an entry of
+ * [`CAnswersByToolCallEntry::answers`]
+ */
+typedef struct lb_answer_question_t {
+  /**
+   * Question text, must match `CQuestion::question` verbatim
+   */
+  const char *question;
+  /**
+   * Your answer text
+   */
+  const char *answer;
+} lb_answer_question_t;
+
+/**
+ * Answers for one `tool_call_id`, used as an entry of the `answers` array of
+ * `lb_agent_context_continue_conversation`/
+ * `lb_agent_context_continue_conversation_streamed`.
+ *
+ * The Rust core's `AnswersByToolCall` is a
+ * `HashMap<String, HashMap<String, String>>` keyed by `tool_call_id`, then by
+ * question text. Since C has no native map type, it's flattened into an
+ * array of `(tool_call_id, [(question, answer)])` entries — this array of
+ * `CAnswersByToolCallEntry` mirrors the outer map, and each entry's
+ * `answers` array (of `CAnswerQuestion`) mirrors the inner map.
+ */
+typedef struct lb_answers_by_tool_call_entry_t {
+  /**
+   * Tool call ID, see [`CInterrupt::tool_call_id`]
+   */
+  const char *tool_call_id;
+  /**
+   * Answers to the questions raised for this tool call
+   */
+  const struct lb_answer_question_t *answers;
+  /**
+   * Number of answers
+   */
+  uintptr_t num_answers;
+} lb_answers_by_tool_call_entry_t;
+
+/**
+ * Payload of a `ChatStarted` conversation stream event
+ */
+typedef struct lb_chat_started_payload_t {
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+} lb_chat_started_payload_t;
+
+/**
+ * Payload of a `Message` conversation stream event
+ */
+typedef struct lb_message_payload_t {
+  /**
+   * Incremental answer text
+   */
+  const char *text;
+} lb_message_payload_t;
+
+/**
+ * A source referenced by the answer
+ */
+typedef struct lb_reference_t {
+  /**
+   * Reference index
+   */
+  int32_t index;
+  /**
+   * Reference title
+   */
+  const char *title;
+  /**
+   * Reference URL
+   */
+  const char *url;
+} lb_reference_t;
+
+/**
+ * One option of a [`CQuestion`]
+ */
+typedef struct lb_question_option_t {
+  /**
+   * Option text
+   */
+  const char *description;
+} lb_question_option_t;
+
+/**
+ * One question the Agent needs you to answer
+ */
+typedef struct lb_question_t {
+  /**
+   * Question text
+   */
+  const char *question;
+  /**
+   * Options; empty means free-form answer
+   */
+  const struct lb_question_option_t *options;
+  /**
+   * Number of options
+   */
+  uintptr_t num_options;
+  /**
+   * Whether multiple options may be selected
+   */
+  bool multi_select;
+} lb_question_t;
+
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `lb_agent_context_continue_conversation`
+ */
+typedef struct lb_interrupt_t {
+  /**
+   * ID of the node that triggered the interrupt
+   */
+  const char *node_id;
+  /**
+   * Tool call ID of this inquiry; used as the answer key when continuing
+   */
+  const char *tool_call_id;
+  /**
+   * Questions you need to answer
+   */
+  const struct lb_question_t *questions;
+  /**
+   * Number of questions
+   */
+  uintptr_t num_questions;
+  /**
+   * ID of the paused message
+   */
+  int64_t message_id;
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+} lb_interrupt_t;
+
+/**
+ * Present when a conversation run failed
+ */
+typedef struct lb_agent_error_t {
+  /**
+   * Error code
+   */
+  int32_t code;
+  /**
+   * Error message
+   */
+  const char *message;
+} lb_agent_error_t;
+
+/**
+ * Response for `lb_agent_context_conversation`,
+ * `lb_agent_context_continue_conversation`, and the final result of the
+ * streamed counterparts
+ */
+typedef struct lb_conversation_response_t {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * Final run status
+   */
+  enum lb_conversation_status_t status;
+  /**
+   * Final answer text; valid when `status` is
+   * `ConversationStatusSucceeded`
+   */
+  const char *answer;
+  /**
+   * Sources referenced by the answer
+   */
+  const struct lb_reference_t *references;
+  /**
+   * Number of references
+   */
+  uintptr_t num_references;
+  /**
+   * Run duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Present only when `status` is `ConversationStatusInterrupted` (can be
+   * null)
+   */
+  const struct lb_interrupt_t *interrupt;
+  /**
+   * Present only when the run failed (can be null)
+   */
+  const struct lb_agent_error_t *error;
+} lb_conversation_response_t;
+
+/**
+ * One event observed while streaming `lb_agent_context_conversation_streamed`
+ * or `lb_agent_context_continue_conversation_streamed`.
+ *
+ * This is a tagged union: `kind` tells you which of `chat_started`/
+ * `message`/`workflow_finished`/`other_json` is non-null; the other three are
+ * always null.
+ */
+typedef struct lb_conversation_stream_event_t {
+  /**
+   * Discriminant, tells you which field below is populated
+   */
+  enum lb_conversation_stream_event_type_t kind;
+  /**
+   * Non-null when `kind` is `ChatStarted`
+   */
+  const struct lb_chat_started_payload_t *chat_started;
+  /**
+   * Non-null when `kind` is `Message`
+   */
+  const struct lb_message_payload_t *message;
+  /**
+   * Non-null when `kind` is `WorkflowFinished` — this is always the last
+   * event of a stream
+   */
+  const struct lb_conversation_response_t *workflow_finished;
+  /**
+   * Non-null when `kind` is `Other`; raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  const char *other_json;
+} lb_conversation_stream_event_t;
+
+/**
+ * Called once for every event observed while streaming a conversation. See
+ * `lb_agent_context_conversation_streamed`/
+ * `lb_agent_context_continue_conversation_streamed`.
+ *
+ * Unlike the `lb_xxx_context_set_on_xxx` push callbacks, this callback is
+ * scoped to a single streamed call — it's supplied directly as an argument
+ * and is never stored on the context.
+ */
+typedef void (*lb_conversation_event_callback_t)(const struct lb_agent_context_t*,
+                                                 const struct lb_conversation_stream_event_t*,
+                                                 void*);
+
+typedef void (*lb_free_userdata_func_t)(void*);
+
+/**
  * A single alert indicator configuration for a symbol.
  */
 typedef struct lb_alert_item_t {
@@ -1722,8 +2050,6 @@ typedef struct lb_http_header_t {
   const char *name;
   const char *value;
 } lb_http_header_t;
-
-typedef void (*lb_free_userdata_func_t)(void*);
 
 /**
  * Quote message
@@ -8839,9 +9165,223 @@ typedef struct lb_screener_indicators_response_t {
   const char *data;
 } lb_screener_indicators_response_t;
 
+/**
+ * A Workspace the current account belongs to
+ */
+typedef struct lb_workspace_t {
+  /**
+   * Workspace ID
+   */
+  const char *id;
+  /**
+   * Workspace name
+   */
+  const char *name;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_workspace_t;
+
+/**
+ * Response for `lb_agent_context_workspaces`
+ */
+typedef struct lb_workspaces_response_t {
+  /**
+   * Workspaces the current account belongs to
+   */
+  const struct lb_workspace_t *workspaces;
+  /**
+   * Number of workspaces
+   */
+  uintptr_t num_workspaces;
+} lb_workspaces_response_t;
+
+/**
+ * An Agent in a Workspace
+ */
+typedef struct lb_agent_t {
+  /**
+   * Agent UID, used as the path parameter of
+   * `lb_agent_context_conversation`
+   */
+  const char *uid;
+  /**
+   * Agent name
+   */
+  const char *name;
+  /**
+   * Agent description
+   */
+  const char *description;
+  /**
+   * Agent mode, e.g. `chat`
+   */
+  const char *mode;
+  /**
+   * Icon URL
+   */
+  const char *icon;
+  /**
+   * Whether published; only published Agents can start conversations
+   */
+  bool is_published;
+  /**
+   * Publish time, Unix timestamp in seconds; 0 if unpublished
+   */
+  int64_t published_at;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_agent_t;
+
+/**
+ * Response for `lb_agent_context_agents`
+ */
+typedef struct lb_agents_response_t {
+  /**
+   * Agent list
+   */
+  const struct lb_agent_t *agents;
+  /**
+   * Number of agents in the array
+   */
+  uintptr_t num_agents;
+  /**
+   * Total number of matching Agents
+   */
+  int32_t total;
+} lb_agents_response_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+const struct lb_agent_context_t *lb_agent_context_new(const struct lb_config_t *config);
+
+void lb_agent_context_retain(const struct lb_agent_context_t *ctx);
+
+void lb_agent_context_release(const struct lb_agent_context_t *ctx);
+
+uintptr_t lb_agent_context_ref_count(const struct lb_agent_context_t *ctx);
+
+/**
+ * List the Workspaces the current account belongs to. Returns
+ * `CWorkspacesResponse`.
+ */
+void lb_agent_context_workspaces(const struct lb_agent_context_t *ctx,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * List the Agents in the specified Workspace. Returns `CAgentsResponse`.
+ *
+ * @param[in] opts Options for get agents request (can be null)
+ */
+void lb_agent_context_agents(const struct lb_agent_context_t *ctx,
+                             const char *workspace_id,
+                             const struct lb_get_agents_options_t *opts,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Start a conversation with the specified Agent, blocking until the run
+ * succeeds, is interrupted, or fails. Returns `CConversationResponse`.
+ *
+ * @param[in] chat_uid Existing conversation identifier to continue within
+ *                      (can be null to start a brand-new conversation)
+ */
+void lb_agent_context_conversation(const struct lb_agent_context_t *ctx,
+                                   const char *agent_id,
+                                   const char *query,
+                                   const char *chat_uid,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
+
+/**
+ * Resume an interrupted conversation, blocking until the run succeeds, is
+ * interrupted again, or fails. Returns `CConversationResponse`.
+ *
+ * @param[in] answers      Answers keyed by `tool_call_id`, see
+ *                         `CAnswersByToolCallEntry` (can be null if
+ *                         `num_answers` is 0)
+ * @param[in] num_answers  Number of entries in `answers`
+ */
+void lb_agent_context_continue_conversation(const struct lb_agent_context_t *ctx,
+                                            const char *agent_id,
+                                            const char *chat_uid,
+                                            const char *message_id,
+                                            const struct lb_answers_by_tool_call_entry_t *answers,
+                                            uintptr_t num_answers,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Start a conversation with the specified Agent, calling `event_callback`
+ * for every run-progress event observed over SSE. Once the stream ends (the
+ * last event is always `WorkflowFinished`), `callback` is invoked with the
+ * final `CConversationResponse` — same as `lb_agent_context_conversation`,
+ * just arrived at via the streamed path.
+ *
+ * @param[in] chat_uid            Existing conversation identifier to
+ *                                continue within (can be null to start a
+ *                                brand-new conversation)
+ * @param[in] event_callback      Called once per stream event, on an
+ *                                internal worker thread
+ * @param[in] event_userdata      Opaque pointer forwarded to
+ *                                `event_callback`
+ * @param[in] event_free_userdata Called exactly once, after the stream ends
+ *                                (successfully or not), to free
+ *                                `event_userdata` (can be null)
+ */
+void lb_agent_context_conversation_streamed(const struct lb_agent_context_t *ctx,
+                                            const char *agent_id,
+                                            const char *query,
+                                            const char *chat_uid,
+                                            lb_conversation_event_callback_t event_callback,
+                                            void *event_userdata,
+                                            lb_free_userdata_func_t event_free_userdata,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Resume an interrupted conversation, calling `event_callback` for every
+ * run-progress event observed over SSE, then `callback` with the final
+ * `CConversationResponse` once the stream ends — same shape as
+ * `lb_agent_context_conversation_streamed`.
+ *
+ * @param[in] answers             Answers keyed by `tool_call_id`, see
+ *                                `CAnswersByToolCallEntry` (can be null if
+ *                                `num_answers` is 0)
+ * @param[in] num_answers         Number of entries in `answers`
+ * @param[in] event_callback      Called once per stream event, on an
+ *                                internal worker thread
+ * @param[in] event_userdata      Opaque pointer forwarded to
+ *                                `event_callback`
+ * @param[in] event_free_userdata Called exactly once, after the stream ends
+ *                                (successfully or not), to free
+ *                                `event_userdata` (can be null)
+ */
+void lb_agent_context_continue_conversation_streamed(const struct lb_agent_context_t *ctx,
+                                                     const char *agent_id,
+                                                     const char *chat_uid,
+                                                     const char *message_id,
+                                                     const struct lb_answers_by_tool_call_entry_t *answers,
+                                                     uintptr_t num_answers,
+                                                     lb_conversation_event_callback_t event_callback,
+                                                     void *event_userdata,
+                                                     lb_free_userdata_func_t event_free_userdata,
+                                                     lb_async_callback_t callback,
+                                                     void *userdata);
 
 const struct lb_alert_context_t *lb_alert_context_new(const struct lb_config_t *config);
 

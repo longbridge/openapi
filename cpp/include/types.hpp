@@ -3653,4 +3653,218 @@ struct SharelistDetail
 
 } // namespace sharelist
 
+namespace agent {
+
+/// A Workspace the current account belongs to.
+struct Workspace
+{
+  /// Workspace ID
+  std::string id;
+  /// Workspace name
+  std::string name;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Response for AgentContext::workspaces.
+struct WorkspacesResponse
+{
+  /// Workspaces the current account belongs to
+  std::vector<Workspace> workspaces;
+};
+
+/// An Agent in a Workspace.
+struct Agent
+{
+  /// Agent UID, used as the path parameter of AgentContext::conversation
+  std::string uid;
+  /// Agent name
+  std::string name;
+  /// Agent description
+  std::string description;
+  /// Agent mode, e.g. "chat"
+  std::string mode;
+  /// Icon URL
+  std::string icon;
+  /// Whether published; only published Agents can start conversations
+  bool is_published;
+  /// Publish time, Unix timestamp in seconds; 0 if unpublished
+  int64_t published_at;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Response for AgentContext::agents.
+struct AgentsResponse
+{
+  /// Agent list
+  std::vector<Agent> agents;
+  /// Total number of matching Agents
+  int32_t total;
+};
+
+/// Options for AgentContext::agents (all fields optional).
+struct GetAgentsOptions
+{
+  /// Page number, starts at 1
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+  /// Fuzzy search by Agent name
+  std::optional<std::string> name;
+};
+
+/// A source referenced by the answer.
+struct Reference
+{
+  /// Reference index
+  int32_t index;
+  /// Reference title
+  std::string title;
+  /// Reference URL
+  std::string url;
+};
+
+/// One option of a Question.
+struct QuestionOption
+{
+  /// Option text
+  std::string description;
+};
+
+/// One question the Agent needs you to answer.
+struct Question
+{
+  /// Question text
+  std::string question;
+  /// Options; empty means free-form answer
+  std::vector<QuestionOption> options;
+  /// Whether multiple options may be selected
+  bool multi_select;
+};
+
+/// Present when a conversation run is interrupted, waiting for
+/// AgentContext::continue_conversation.
+struct Interrupt
+{
+  /// ID of the node that triggered the interrupt
+  std::string node_id;
+  /// Tool call ID of this inquiry; used as the answer key when continuing
+  std::string tool_call_id;
+  /// Questions you need to answer
+  std::vector<Question> questions;
+  /// ID of the paused message
+  int64_t message_id;
+  /// ID of the owning conversation
+  int64_t chat_id;
+};
+
+/// Present when a conversation run failed.
+struct AgentError
+{
+  /// Error code
+  int32_t code;
+  /// Error message
+  std::string message;
+};
+
+/// Final run status of a conversation.
+enum class ConversationStatus
+{
+  /// The run completed successfully
+  Succeeded,
+  /// The run is paused, waiting for AgentContext::continue_conversation
+  Interrupted,
+  /// The run failed
+  Failed,
+  /// The run was stopped
+  Stopped,
+};
+
+/// Response for AgentContext::conversation, AgentContext::continue_conversation,
+/// and the final result of the streamed counterparts.
+struct ConversationResponse
+{
+  /// Conversation identifier, used for follow-up questions and
+  /// troubleshooting
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// Final run status
+  ConversationStatus status;
+  /// Final answer text; valid when status is ConversationStatus::Succeeded
+  std::string answer;
+  /// Sources referenced by the answer
+  std::vector<Reference> references;
+  /// Run duration in seconds
+  double elapsed_time;
+  /// Present only when status is ConversationStatus::Interrupted
+  std::optional<Interrupt> interrupt;
+  /// Present only when the run failed
+  std::optional<AgentError> error;
+};
+
+/// Payload of a ChatStarted conversation stream event.
+struct ChatStartedPayload
+{
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+};
+
+/// Payload of a Message conversation stream event.
+struct MessagePayload
+{
+  /// Incremental answer text
+  std::string text;
+};
+
+/// Kind of a ConversationStreamEvent. Only the field matching this kind is
+/// populated, the others are `std::nullopt`.
+enum class ConversationStreamEventKind
+{
+  /// The run has started; `chat_started` is populated
+  ChatStarted,
+  /// An incremental piece of the answer; `message` is populated
+  Message,
+  /// The run finished (succeeded, interrupted, failed, or stopped);
+  /// `workflow_finished` is populated
+  WorkflowFinished,
+  /// An event type not recognized by this SDK version; `other_json` is
+  /// populated with the raw event JSON
+  Other,
+};
+
+/// One event observed while streaming AgentContext::conversation_streamed or
+/// AgentContext::continue_conversation_streamed.
+///
+/// This mirrors the C layer's tagged-union `lb_conversation_stream_event_t`:
+/// `kind` tells you which of `chat_started`/`message`/`workflow_finished`/
+/// `other_json` is populated. A plain discriminated struct is used here
+/// (rather than `std::variant` or a JSON library) since neither has any
+/// precedent elsewhere in this C++ binding, and this shape converts directly
+/// from the C tagged union.
+struct ConversationStreamEvent
+{
+  /// Discriminant, tells you which field below is populated
+  ConversationStreamEventKind kind;
+  /// Populated when `kind` is `ChatStarted`
+  std::optional<ChatStartedPayload> chat_started;
+  /// Populated when `kind` is `Message`
+  std::optional<MessagePayload> message;
+  /// Populated when `kind` is `WorkflowFinished` — this is always the last
+  /// event of a stream
+  std::optional<ConversationResponse> workflow_finished;
+  /// Populated when `kind` is `Other`; raw JSON of an event type not
+  /// recognized by this SDK version
+  std::optional<std::string> other_json;
+};
+
+} // namespace agent
+
 } // namespace longbridge

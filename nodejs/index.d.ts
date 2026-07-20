@@ -30,6 +30,101 @@ export declare class AccountBalance {
   get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 
+/**
+ * AI Agent conversation context.
+ *
+ * Reference: <https://open.longbridge.com/en/docs/ai/chat/conversation>
+ */
+export declare class AgentContext {
+  /** Create a new AgentContext. */
+  static new(config: Config): AgentContext
+  /**
+   * List the Workspaces the current account belongs to.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.workspaces();
+   * console.log(resp);
+   * ```
+   */
+  workspaces(): Promise<WorkspacesResponse>
+  /**
+   * List the Agents in the specified Workspace.
+   *
+   * `page`/`limit` control pagination; `name` fuzzy-searches by Agent name.
+   * All three are optional.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.agents(workspaceId);
+   * console.log(resp);
+   * ```
+   */
+  agents(workspaceId: string, page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
+   * Start a conversation with the specified Agent, blocking until the run
+   * succeeds, is interrupted, or fails.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversation(agentId, "How has Tesla stock performed recently?");
+   * console.log(resp);
+   * ```
+   */
+  conversation(agentId: string, query: string, chatUid?: string | undefined | null): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, blocking until the run succeeds, is
+   * interrupted again, or fails.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversation(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>): Promise<ConversationResponse>
+  /**
+   * Start a conversation with the specified Agent, invoking `callback` for
+   * every progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes (this is the same shape
+   * `conversation` returns).
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversationStreamed(
+   *   agentId,
+   *   "How has Tesla stock performed recently?",
+   *   undefined,
+   *   (err, event) => console.log(event),
+   * );
+   * console.log(resp);
+   * ```
+   */
+  conversationStreamed(agentId: string, query: string, chatUid: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, invoking `callback` for every
+   * progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversationStreamed(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+}
+
 /** Price alert management context. */
 export declare class AlertContext {
   /** Create a new AlertContext. */
@@ -632,23 +727,23 @@ export declare class FundamentalContext {
   macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
-  /** Get US company overview. US token required. counterID format: "ST/US/AAPL" */
+  /** Get US company overview. US token required. */
   usCompanyOverview(symbol: string): Promise<USCompanyOverview>
-  /** Get US valuation snapshot (PE/PB/PS). US token required. */
+  /** Get US valuation overview. US token required. */
   usValuationOverview(symbol: string): Promise<USValuationOverview>
-  /** Get US financial overview (revenue/net income/EPS). Returns JSON string. US token required. */
+  /** Get US financial overview. US token required. */
   usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
-  /** Get US financial statement. kind: "IS"|"BS"|"CF". report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
+  /** Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required. */
   usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
-  /** Get US key financial metrics. report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
+  /** Get US key financial metrics. US token required. */
   usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
-  /** Get US analyst consensus estimates. report: "q1"|"qf"|"saf"|"3q"|"af". US token required. */
+  /** Get US analyst consensus estimates. US token required. */
   usAnalystConsensus(symbol: string, report: string): Promise<USAnalystConsensus>
   /** Get US ETF dividend history. US token required. */
   usEtfDividendInfo(symbol: string): Promise<USETFDividendInfo>
-  /** Get US company historical dividends. US token required. */
+  /** Get US company dividends. US token required. */
   usCompanyDividends(symbol: string): Promise<USCompanyDividends>
-  /** Get US ETF document list. size=null returns all. US token required. */
+  /** Get US ETF document list. size=None returns all. US token required. */
   usEtfFiles(symbol: string, size?: number | undefined | null): Promise<USETFFilesResponse>
 }
 
@@ -2058,7 +2153,7 @@ export declare class QuoteContext {
   optionVolume(symbol: string): Promise<OptionVolumeStats>
   /** Get daily historical option volume */
   optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
-  /** Get US cryptocurrency market overview. counterID format: "CY/US/BTC". US token required. */
+  /** Get US cryptocurrency market overview. US token required. */
   usCryptoOverview(symbol: string): Promise<USCryptoOverview>
 }
 
@@ -2813,6 +2908,17 @@ export declare class TradeContext {
    */
   orderDetail(orderId: string): Promise<OrderDetail>
   /**
+   * Query US order list. Returns JSON string. US token required.
+   * symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+   */
+  usQueryOrders(symbol: string | undefined | null, action: number, startAt: number, endAt: number, queryType: number, page: number, limit: number): Promise<string>
+  /** Get US order detail. US token required. */
+  usOrderDetail(orderId: string): Promise<USOrderDetailResponse>
+  /** Get US account asset overview. US token required. */
+  usAssetOverview(): Promise<USAssetOverview>
+  /** Get US realized P&L. US token required. */
+  usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
+  /**
    * Estimating the maximum purchase quantity for Hong Kong and US stocks,
    * warrants, and options
    *
@@ -2832,21 +2938,6 @@ export declare class TradeContext {
    * ```
    */
   estimateMaxPurchaseQuantity(opts: EstimateMaxPurchaseQuantityOptions): Promise<EstimateMaxPurchaseQuantityResponse>
-  /** Query US order list (paginated). Returns JSON string. US token required. */
-  /**
-   * Query US order list. Returns JSON string with shape `{orders: USOrder[], total_count: number}`.
-   * symbol: user-facing symbol e.g. "AAPL.US" (optional).
-   * action: 0=all, 1=buy, 2=sell.
-   * queryType: 0=all (incl. Rejected), 1=pending, 2=history (filled only).
-   * US token required.
-   */
-  usQueryOrders(symbol?: string | null, action?: number, startAt?: number, endAt?: number, queryType?: number, page?: number, limit?: number): Promise<string>
-  /** Get US order detail. isAttached=true includes take-profit/stop-loss sub-orders. Returns JSON string. US token required. */
-  usOrderDetail(orderId: string): Promise<USOrderDetailResponse>
-  /** Get US account asset overview (stocks/options/crypto/buy power). US token required. */
-  usAssetOverview(): Promise<USAssetOverview>
-  /** Get US realized P&L. category: "ALL"|"STOCK"|"OPTION"|"CRYPTO". US token required. */
-  usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
 }
 
 /** The information of trading session */
@@ -3003,6 +3094,44 @@ export declare const enum AdjustType {
   NoAdjust = 0,
   /** Adjust forward */
   ForwardAdjust = 1
+}
+
+/** An Agent in a Workspace */
+export interface Agent {
+  /** Agent UID, used as the path parameter of `AgentContext.conversation` */
+  uid: string
+  /** Agent name */
+  name: string
+  /** Agent description */
+  description: string
+  /** Agent mode, e.g. `chat` */
+  mode: string
+  /** Icon URL */
+  icon: string
+  /** Whether published; only published Agents can start conversations */
+  isPublished: boolean
+  /** Publish time, Unix timestamp in seconds; 0 if unpublished */
+  publishedAt: number
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Present when a conversation run failed */
+export interface AgentError {
+  /** Error code */
+  code: number
+  /** Error message */
+  message: string
+}
+
+/** Response for `AgentContext.agents` */
+export interface AgentsResponse {
+  /** Agent list */
+  agents: Array<Agent>
+  /** Total number of matching Agents */
+  total: number
 }
 
 /** A/H premium intraday response */
@@ -3506,6 +3635,14 @@ export declare const enum ChargeCategoryCode {
   Third = 2
 }
 
+/** Payload of a `chat_started` stream event */
+export interface ChatStartedPayload {
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+}
+
 /** Commission-free Status */
 export declare const enum CommissionFreeStatus {
   /** Unknown */
@@ -3654,6 +3791,80 @@ export interface ConstituentStock {
   chg?: string
   /** Raw trade status code */
   tradeStatus: number
+}
+
+/**
+ * Response for `AgentContext.conversation`,
+ * `AgentContext.continueConversation`, and the final result of the streamed
+ * counterparts
+ */
+export interface ConversationResponse {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Final run status */
+  status: ConversationStatus
+  /** Final answer text; valid when `status` is `succeeded` */
+  answer: string
+  /** Sources referenced by the answer */
+  references?: Array<Reference>
+  /** Run duration in seconds */
+  elapsedTime: number
+  /** Present only when `status` is `interrupted` */
+  interrupt?: Interrupt
+  /** Present only when the run failed */
+  error?: AgentError
+}
+
+/** Final run status of a conversation */
+export declare const enum ConversationStatus {
+  /** The run completed successfully */
+  Succeeded = 0,
+  /** The run is paused, waiting for `AgentContext.continueConversation` */
+  Interrupted = 1,
+  /** The run failed */
+  Failed = 2,
+  /** The run was stopped */
+  Stopped = 3
+}
+
+/**
+ * One event observed while streaming `AgentContext.conversationStreamed` or
+ * `AgentContext.continueConversationStreamed`.
+ *
+ * Design note: the Rust core models this as an enum with a per-variant
+ * payload (`longbridge::agent::ConversationStreamEvent`), but napi-rs has no
+ * ergonomic equivalent of a Rust/Serde "enum with data" for a plain
+ * `#[napi(object)]` value, and there's no existing precedent for reifying one
+ * as a single JS value in this codebase (the closest analogue,
+ * `trade::PushEvent`, is dispatched to separate per-variant JS callbacks
+ * instead). We instead mirror the common "discriminant + optional per-kind
+ * fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
+ * `"chat_started" | "message" | "workflow_finished" | "other"`, and exactly
+ * one of `chatStarted` / `message` / `workflowFinished` / `other` is set,
+ * matching `kind`.
+ */
+export interface ConversationStreamEvent {
+  /**
+   * Discriminant: one of `"chat_started"`, `"message"`,
+   * `"workflow_finished"`, or `"other"`
+   */
+  kind: string
+  /** Set when `kind` is `"chat_started"` */
+  chatStarted?: ChatStartedPayload
+  /** Set when `kind` is `"message"` */
+  message?: MessagePayload
+  /** Set when `kind` is `"workflow_finished"` — the last event of a stream */
+  workflowFinished?: ConversationResponse
+  /**
+   * Set when `kind` is `"other"` — raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  other?: any
 }
 
 /** One corporate action event */
@@ -4023,6 +4234,19 @@ export interface ExtraConfigParams {
   enablePrintQuotePackages?: boolean
   /** Set the path of the log files (Default: `no logs`) */
   logPath?: string
+  /**
+   * Enable paper trading mode (default: `false`).
+   *
+   * When `true`, all API calls target the paper trading (simulation)
+   * environment.  The server validates the token: if it belongs to a
+   * real-money account the server returns an error.
+   *
+   * When `false` (the default) the server imposes no restrictions — both
+   * paper trading and real-money accounts are accepted.
+   *
+   * Paper trading users should set this to `true` as a safety guard.
+   */
+  enablePapertrading?: boolean
 }
 
 /** Filter warrant expiry date type */
@@ -4499,6 +4723,23 @@ export declare const enum InstitutionRecommend {
   NoOpinion = 7
 }
 
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `AgentContext.continueConversation`
+ */
+export interface Interrupt {
+  /** ID of the node that triggered the interrupt */
+  nodeId: string
+  /** Tool call ID of this inquiry; used as the answer key when continuing */
+  toolCallId: string
+  /** Questions you need to answer */
+  questions: Array<Question>
+  /** ID of the paused message */
+  messageId: number
+  /** ID of the owning conversation */
+  chatId: number
+}
+
 /** Investor relations response */
 export interface InvestRelations {
   /** Link to IR page */
@@ -4637,6 +4878,12 @@ export interface MarketTimeItem {
   subStatus: number
   /** Delayed-quote sub-status code */
   delaySubStatus: number
+}
+
+/** Payload of a `message` stream event */
+export interface MessagePayload {
+  /** Incremental answer text */
+  text: string
 }
 
 /** Localized text in simplified Chinese, traditional Chinese, and English */
@@ -4823,19 +5070,7 @@ export declare const enum OrderTag {
   /** Long term Order */
   LongTerm = 2,
   /** Grey Order */
-  Grey = 3,
-  /** Force Selling */
-  MarginCall = 4,
-  /** OTC */
-  Offline = 5,
-  /** Option Exercise Long */
-  Creditor = 6,
-  /** Option Exercise Short */
-  Debtor = 7,
-  /** Wavier Of Option Exercise */
-  NonExercise = 8,
-  /** Trade Allocation */
-  AllocatedSub = 9
+  Grey = 3
 }
 
 export declare const enum OrderType {
@@ -5184,6 +5419,22 @@ export declare const enum PushCandlestickMode {
   Confirmed = 1
 }
 
+/** One question the Agent needs you to answer */
+export interface Question {
+  /** Question text */
+  question: string
+  /** Options; empty means free-form answer */
+  options: Array<QuestionOption>
+  /** Whether multiple options may be selected */
+  multiSelect: boolean
+}
+
+/** One option of a `Question` */
+export interface QuestionOption {
+  /** Option text */
+  description: string
+}
+
 /** Rank categories response. `data` is a JSON string. */
 export interface RankCategoriesResponse {
   /** Raw rank categories data (JSON string) */
@@ -5291,6 +5542,16 @@ export interface RecentBuybacks {
   currency: string
   netBuybackTtm: string
   netBuybackYieldTtm: string
+}
+
+/** A source referenced by the answer */
+export interface Reference {
+  /** Reference index */
+  index: number
+  /** Reference title */
+  title: string
+  /** Reference URL */
+  url: string
 }
 
 /** Options for replace order request */
@@ -5909,6 +6170,512 @@ export interface UpdateWatchlistGroup {
   mode: SecuritiesUpdateMode
 }
 
+/** AI chat context embedded in USAnalystConsensus. */
+export interface UsaiChatData {
+  agentId: string
+  handoffAgentId: string
+  symbol: string
+  text: string
+  chatType: string
+  workflowType: string
+}
+
+/** US analyst consensus estimates and AI analysis. */
+export interface UsAnalystConsensus {
+  aiSummary: string
+  aichatData: UsaiChatData
+  currency: string
+  report: string
+  list: Array<UsConsensusItem>
+  optReports: Array<string>
+  h5Data: any
+}
+
+/** US account asset snapshot */
+export interface UsAssetOverview {
+  accountType: string
+  assetTimestamp: number
+  cashBuyPower: string
+  overnightBuyPower: string
+  currency: string
+  cashList: Array<UsCashEntry>
+  stockList: Array<UsStockEntry>
+  optionList: Array<any>
+  cryptoList: Array<UsCryptoEntry>
+  multiLeg: any
+}
+
+/** One bracket/conditional sub-order attached to a main order. */
+export interface UsAttachedOrder {
+  attachedTypeDisplay: number
+  executedQty: string
+  quantity: string
+  status: string
+  triggerPrice: string
+  orderId: string
+  gtd: string
+  timeInForce: number
+  tag: number
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  symbol: string
+  withdrawn: boolean
+}
+
+/** Action-button state for an order. */
+export interface UsButtonControl {
+  withdraw: number
+  replace: number
+  exceptionable: Array<string>
+}
+
+/** One cash currency entry in USAssetOverview */
+export interface UsCashEntry {
+  currency: string
+  frozenBuyCash: string
+  outstanding: string
+  settledCash: string
+  totalAmount: string
+  totalCash: string
+}
+
+/** Fee breakdown for an order. */
+export interface UsChargeDetail {
+  currency: string
+  totalAmount: string
+  items: Array<UsChargeItem>
+}
+
+/** One fee category within USChargeDetail. */
+export interface UsChargeItem {
+  code: number
+  name: string
+  fees: Array<string>
+}
+
+/** US company dividends */
+export interface UsCompanyDividends {
+  recentDividends: UsRecentDividend
+  dividendHistory: Array<UsDividendHistoryItem>
+  payoutRatios: Array<UsDividendHistoryItem>
+  dividendPayoutHistory: Array<UsDividendPayoutRecord>
+}
+
+/** US company overview */
+export interface UsCompanyOverview {
+  intro: string
+  marketCap: string
+  ccySymbol: string
+  topRankTags: Array<UsRankTag>
+  detailUrl: string
+  shareList: Array<UsSharelistItem>
+}
+
+/** Actual vs estimated value for one consensus metric. */
+export interface UsConsensusEstimate {
+  actual: string
+  estimate: string
+}
+
+/** One fiscal-year entry in USAnalystConsensus.list. */
+export interface UsConsensusItem {
+  ebit: UsConsensusEstimate
+  eps: UsConsensusEstimate
+  fiscalYear: number
+  reportTxt: string
+  revenue: UsConsensusEstimate
+}
+
+/** One cryptocurrency holding in USAssetOverview */
+export interface UsCryptoEntry {
+  assetType: string
+  averageCost: string
+  symbol: string
+  currency: string
+  industryName: string
+}
+
+/** US cryptocurrency market overview */
+export interface UsCryptoOverview {
+  name: string
+  ticker: string
+  currency: string
+  allTimeHigh: string
+  allTimeHighDate: string
+  allTimeLow: string
+  allTimeLowDate: string
+  ipoDate: string
+  issuePrice: string
+  shares: string
+  officialWebAddress: string
+  /** User-facing symbol (e.g. "BTCUSD.BKKT"), converted from counter_id */
+  symbol: string
+  baseAsset: string
+  logo: string
+  wikiUrl: string
+  /** Profile serialized as JSON string */
+  profile: string
+}
+
+/** One fiscal-year row in dividend_history or payout_ratios. */
+export interface UsDividendHistoryItem {
+  fiscalYear: string
+  fiscalYearRange: string
+  totalShareholderYield: string
+  dividend: string
+  dividendYield: string
+  dividendGrowthRate: string
+  dividendPayoutRatio: string
+  dividendToCashflowRatio: string
+  netBuyback: string
+  netBuybackYield: string
+  netBuybackGrowthRate: string
+  netBuybackPayoutRatio: string
+  netBuybackToCashflowRatio: string
+  currency: string
+}
+
+/** US dividend item */
+export interface UsDividendItem {
+  dividend: string
+  dividendType: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+}
+
+/** One actual dividend payment event. */
+export interface UsDividendPayoutRecord {
+  dividend: string
+  dividendType: string
+  currency: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+  title: string
+  startTimeUnix: string
+}
+
+/** US ETF dividend info */
+export interface UsetfDividendInfo {
+  dividendTtm: string
+  dividendYieldTtm: string
+  dividendFrequency: string
+  currency: string
+  fiscalYearInfo: Array<UsFiscalYearDividend>
+}
+
+/** US ETF file */
+export interface UsetfFile {
+  fileName: string
+  filePath: string
+  updateDate: string
+  code: string
+  format: string
+}
+
+/** US ETF files response */
+export interface UsetfFilesResponse {
+  files: Array<UsetfFile>
+}
+
+/** One balance-sheet entry in USFinancialOverview. */
+export interface UsFinancialBsItem {
+  debtAssetsRatio: string
+  totalAssets: string
+  totalLiabilities: string
+  report: UsReportPeriod
+}
+
+/** One cash-flow entry in USFinancialOverview. */
+export interface UsFinancialCfItem {
+  operating: string
+  investing: string
+  financing: string
+  report: UsReportPeriod
+}
+
+/** One income-statement entry in USFinancialOverview. */
+export interface UsFinancialIsItem {
+  revenue: string
+  netIncome: string
+  netMargin: string
+  report: UsReportPeriod
+}
+
+/** US financial overview — income statement, balance sheet, and cash flow. */
+export interface UsFinancialOverview {
+  ccySymbol: string
+  reportType: string
+  isList: Array<UsFinancialIsItem>
+  bsList: Array<UsFinancialBsItem>
+  cfList: Array<UsFinancialCfItem>
+}
+
+/** US financial statement */
+export interface UsFinancialStatement {
+  currency: string
+  report: string
+  list: Array<UsFinancialStatementPeriod>
+  emptyFields: Array<string>
+}
+
+/** One financial field within a USFinancialStatementPeriod. */
+export interface UsFinancialStatementField {
+  displayOrder: number
+  field: string
+  id: string
+  level: number
+  name: string
+  value: string
+  valueType: string
+  yoy: string
+}
+
+/** One reporting period in USFinancialStatement. */
+export interface UsFinancialStatementPeriod {
+  ffPeriod: string
+  ffYear: number
+  fields: Array<UsFinancialStatementField>
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+}
+
+/** Per-fiscal-year dividend row for a US ETF. */
+export interface UsFiscalYearDividend {
+  dividend: string
+  dividendYield: string
+  fiscalYear: string
+  currency: string
+  fiscalYearRange: string
+}
+
+/** US key financial metrics — ratios and indicators per reporting period. */
+export interface UsKeyFinancialMetrics {
+  currency: string
+  report: string
+  emptyFields: Array<string>
+  list: Array<UsKeyMetricItem>
+}
+
+/** One period entry in USKeyFinancialMetrics. */
+export interface UsKeyMetricItem {
+  ffPeriod: string
+  ffYear: number
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+  fields: Array<any>
+}
+
+/** Full typed order object within USOrderDetailResponse. */
+export interface UsOrderDetail {
+  id: string
+  aaid: string
+  accountChannel: string
+  action: number
+  symbol: string
+  underlyingSymbol: string
+  securityType: string
+  name: string
+  currency: string
+  tradeCurrency: string
+  orderType: string
+  status: string
+  price: string
+  quantity: string
+  executedQty: string
+  executedPrice: string
+  executedAmount: string
+  operateDirection: string
+  timeInForce: number
+  gtd: string
+  tag: number
+  msg: string
+  forceOnlyRth: number
+  submittedAt: string
+  doneAt: string
+  triggerPrice: string
+  triggerAt: string
+  triggerStatus: number
+  triggerExchange: string
+  triggerLastDone: string
+  triggerCount: number
+  tailingAmount: string
+  tailingPercent: string
+  limitOffset: string
+  limitDepthLevel: number
+  marketPrice: string
+  submittedAmount: string
+  estimatedFee: string
+  freeStatus: number
+  freeAmount: string
+  freeCurrency: string
+  deductionsStatus: number
+  deductionsAmount: string
+  deductionsCurrency: string
+  platformDeductionsStatus: number
+  platformDeductionsAmount: string
+  platformDeductionsCurrency: string
+  displayAccount: string
+  settlementAccount: string
+  settlementChannel: string
+  customerName: string
+  realName: string
+  enName: string
+  jointRealName: string
+  jointEnName: string
+  orgId: string
+  bcan: string
+  opEntrustWay: number
+  opEntrustWayName: string
+  remark: string
+  notice: string
+  shortSellType: number
+  ployType: string
+  ployId: string
+  ployStatus: string
+  trend: number
+  withdrawalReason: string
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  contractDirection: string
+  strikePrice: string
+  contractSize: string
+  monitorPrice: string
+  buttonControl: UsButtonControl
+  chargeDetail?: UsChargeDetail
+  attachedOrders: Array<UsAttachedOrder>
+  orderHistories: Array<UsOrderHistory>
+}
+
+/** Response for us_order_detail. */
+export interface UsOrderDetailResponse {
+  order?: UsOrderDetail
+  currentAttachedOrder?: UsOrderDetail
+  currentMillisecond: string
+}
+
+/** One order state-transition entry within USOrderDetail. */
+export interface UsOrderHistory {
+  execType: number
+  status: string
+  price: string
+  qty: string
+  time: string
+  msg: string
+  isManually: boolean
+  oppPartyId: string
+  trdMatchId: string
+  operator: string
+  opEntrustWay: string
+  cxlRejResponseTo: number
+  withdrawalReason: string
+  oppName: string
+  execId: string
+}
+
+/** Industry rank tag */
+export interface UsRankTag {
+  key: string
+  location: number
+  title: string
+  text: string
+  rankType: number
+  highlightText: string
+}
+
+/** Realized P&L response for a US account */
+export interface UsRealizedPl {
+  realizedPlList: Array<UsRealizedPlEntry>
+}
+
+/** One asset-category entry in USRealizedPL */
+export interface UsRealizedPlEntry {
+  category: number
+  currency: string
+  metrics: Array<UsRealizedPlMetric>
+}
+
+/** One time-period metric in USRealizedPLEntry */
+export interface UsRealizedPlMetric {
+  amount: string
+  period: number
+  rate: string
+}
+
+/** TTM dividend summary within USCompanyDividends. */
+export interface UsRecentDividend {
+  dividendTtm: string
+  dividendYieldTtm: string
+  payouts: string
+  currency: string
+}
+
+/** One reporting-period window shared by IS/BS/CF entries. */
+export interface UsReportPeriod {
+  startDate: string
+  endDate: string
+  reportTxt: string
+}
+
+/** One entry in USCompanyOverview.share_list. */
+export interface UsSharelistItem {
+  chg: string
+  id: string
+  name: string
+}
+
+/** One stock/equity position in USAssetOverview */
+export interface UsStockEntry {
+  symbol: string
+  fullSymbol: string
+  assetType: string
+  quantity: string
+  currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
+  industryName: string
+}
+
+/** One valuation metric entry in USValuationOverview.metrics */
+export interface UsValuationMetric {
+  circle: string
+  part: string
+  metric: string
+  desc: string
+  industryMedian: string
+}
+
+/** US valuation overview */
+export interface UsValuationOverview {
+  metrics: Record<string, UsValuationMetric>
+  indicator: string
+  range: number
+  date: string
+  ccySymbol: string
+  aichatData: USAIChatData
+  aiSummary: string
+}
+
 /** One security's valuation comparison item. */
 export interface ValuationComparisonItem {
   /** Symbol (e.g. `"AAPL.US"`) */
@@ -6129,446 +6896,20 @@ export declare const enum WarrantType {
   Inline = 5
 }
 
-export interface USOrderHistory {
-  execType: number
-  status: string
-  price: string
-  qty: string
-  time: string
-  msg: string
-  isManually: boolean
-  oppPartyId: string
-  trdMatchId: string
-  operator: string
-  opEntrustWay: string
-  cxlRejResponseTo: number
-  withdrawalReason: string
-  oppName: string
-  execId: string
-}
-export interface USButtonControl {
-  withdraw: number
-  replace: number
-  exceptionable: Array<string>
-}
-export interface USChargeItem {
-  code: number
-  name: string
-  fees: Array<string>
-}
-export interface USChargeDetail {
-  currency: string
-  totalAmount: string
-  items: Array<USChargeItem>
-}
-export interface USAttachedOrder {
-  attachedTypeDisplay: number
-  executedQty: string
-  quantity: string
-  status: string
-  triggerPrice: string
-  orderId: string
-  gtd: string
-  timeInForce: number
-  tag: number
-  activateOrderType: string
-  activateRth: number
-  submitPrice: string
-  symbol: string
-  withdrawn: boolean
-}
-export interface USOrderDetail {
+/** A Workspace the current account belongs to */
+export interface Workspace {
+  /** Workspace ID */
   id: string
-  aaid: string
-  accountChannel: string
-  action: number
-  symbol: string
-  underlyingSymbol: string
-  securityType: string
+  /** Workspace name */
   name: string
-  currency: string
-  tradeCurrency: string
-  orderType: string
-  status: string
-  price: string
-  quantity: string
-  executedQty: string
-  executedPrice: string
-  executedAmount: string
-  operateDirection: string
-  timeInForce: number
-  gtd: string
-  tag: number
-  msg: string
-  forceOnlyRth: number
-  submittedAt: string
-  doneAt: string
-  triggerPrice: string
-  triggerAt: string
-  triggerStatus: number
-  triggerExchange: string
-  triggerLastDone: string
-  triggerCount: number
-  tailingAmount: string
-  tailingPercent: string
-  limitOffset: string
-  limitDepthLevel: number
-  marketPrice: string
-  submittedAmount: string
-  estimatedFee: string
-  freeStatus: number
-  freeAmount: string
-  freeCurrency: string
-  deductionsStatus: number
-  deductionsAmount: string
-  deductionsCurrency: string
-  platformDeductionsStatus: number
-  platformDeductionsAmount: string
-  platformDeductionsCurrency: string
-  displayAccount: string
-  settlementAccount: string
-  settlementChannel: string
-  customerName: string
-  realName: string
-  enName: string
-  jointRealName: string
-  jointEnName: string
-  orgId: string
-  bcan: string
-  opEntrustWay: number
-  opEntrustWayName: string
-  remark: string
-  notice: string
-  shortSellType: number
-  ployType: string
-  ployId: string
-  ployStatus: string
-  trend: number
-  withdrawalReason: string
-  activateOrderType: string
-  activateRth: number
-  submitPrice: string
-  contractDirection: string
-  strikePrice: string
-  contractSize: string
-  monitorPrice: string
-  buttonControl: USButtonControl
-  chargeDetail: USChargeDetail | null
-  attachedOrders: Array<USAttachedOrder>
-  orderHistories: Array<USOrderHistory>
-}
-export interface USOrderDetailResponse {
-  order: USOrderDetail | null
-  currentAttachedOrder: USOrderDetail | null
-  currentMillisecond: string
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
 }
 
-export interface USReportPeriod {
-  startDate: string
-  endDate: string
-  reportTxt: string
-}
-export interface USFinancialISItem {
-  revenue: string
-  netIncome: string
-  netMargin: string
-  report: USReportPeriod
-}
-export interface USFinancialBSItem {
-  debtAssetsRatio: string
-  totalAssets: string
-  totalLiabilities: string
-  report: USReportPeriod
-}
-export interface USFinancialCFItem {
-  operating: string
-  investing: string
-  financing: string
-  report: USReportPeriod
-}
-export interface USFinancialOverview {
-  ccySymbol: string
-  reportType: string
-  isList: Array<USFinancialISItem>
-  bsList: Array<USFinancialBSItem>
-  cfList: Array<USFinancialCFItem>
-}
-export interface USKeyMetricItem {
-  ffPeriod: string
-  ffYear: number
-  fpEnd: string
-  reportTxt: string
-  rptDate: string
-  fields: Array<unknown>
-}
-export interface USKeyFinancialMetrics {
-  currency: string
-  report: string
-  emptyFields: Array<string>
-  list: Array<USKeyMetricItem>
-}
-export interface USAIChatData {
-  agentId: string
-  handoffAgentId: string
-  symbol: string
-  text: string
-  chatType: string
-  workflowType: string
-}
-export interface USConsensusEstimate {
-  actual: string
-  estimate: string
-}
-export interface USConsensusItem {
-  ebit: USConsensusEstimate
-  eps: USConsensusEstimate
-  fiscalYear: number
-  reportTxt: string
-  revenue: USConsensusEstimate
-}
-export interface USAnalystConsensus {
-  aiSummary: string
-  aichatData: USAIChatData
-  currency: string
-  report: string
-  list: Array<USConsensusItem>
-  optReports: Array<string>
-  h5Data: unknown
-}
-
-// ── US-market types ────────────────────────────────────────────────────────
-
-export interface USRankTag {
-  key: string
-  location: number
-  title: string
-  text: string
-  rankType: number
-  highlightText: string
-}
-
-export interface USSharelistItem {
-  chg: string
-  id: string
-  name: string
-}
-
-export interface USCompanyOverview {
-  intro: string
-  marketCap: string
-  ccySymbol: string
-  topRankTags: Array<USRankTag>
-  detailUrl: string
-  shareList: Array<USSharelistItem>
-}
-
-export interface USValuationMetric {
-  circle: string
-  part: string
-  metric: string
-  desc: string
-  industryMedian: string
-}
-
-export interface USValuationOverview {
-  metrics: Record<string, USValuationMetric>
-  indicator: string
-  range: number
-  date: string
-  ccySymbol: string
-  aichatData: USAIChatData
-  aiSummary: string
-}
-
-export interface USFinancialStatementField {
-  displayOrder: number
-  field: string
-  id: string
-  level: number
-  name: string
-  value: string
-  valueType: string
-  yoy: string
-}
-export interface USFinancialStatementPeriod {
-  ffPeriod: string
-  ffYear: number
-  fields: Array<USFinancialStatementField>
-  fpEnd: string
-  reportTxt: string
-  rptDate: string
-}
-export interface USFinancialStatement {
-  currency: string
-  report: string
-  list: Array<USFinancialStatementPeriod>
-  emptyFields: Array<string>
-}
-
-export interface USFiscalYearDividend {
-  dividend: string
-  dividendYield: string
-  fiscalYear: string
-  currency: string
-  fiscalYearRange: string
-}
-
-export interface USETFDividendInfo {
-  dividendTtm: string
-  dividendYieldTtm: string
-  dividendFrequency: string
-  currency: string
-  fiscalYearInfo: Array<USFiscalYearDividend>
-}
-
-export interface USDividendItem {
-  dividend: string
-  dividendType: string
-  exDate: string
-  paymentDate: string
-  recordDate: string
-}
-
-export interface USRecentDividend {
-  dividendTtm: string
-  dividendYieldTtm: string
-  payouts: string
-  currency: string
-}
-export interface USDividendHistoryItem {
-  fiscalYear: string
-  fiscalYearRange: string
-  totalShareholderYield: string
-  dividend: string
-  dividendYield: string
-  dividendGrowthRate: string
-  dividendPayoutRatio: string
-  dividendToCashflowRatio: string
-  netBuyback: string
-  netBuybackYield: string
-  netBuybackGrowthRate: string
-  netBuybackPayoutRatio: string
-  netBuybackToCashflowRatio: string
-  currency: string
-}
-export interface USDividendPayoutRecord {
-  dividend: string
-  dividendType: string
-  currency: string
-  exDate: string
-  paymentDate: string
-  recordDate: string
-  title: string
-  startTimeUnix: string
-}
-export interface USCompanyDividends {
-  recentDividends: USRecentDividend
-  dividendHistory: Array<USDividendHistoryItem>
-  payoutRatios: Array<USDividendHistoryItem>
-  dividendPayoutHistory: Array<USDividendPayoutRecord>
-}
-
-export interface USETFFile {
-  fileName: string
-  filePath: string
-  updateDate: string
-  code: string
-  format: string
-}
-
-export interface USETFFilesResponse {
-  files: Array<USETFFile>
-}
-
-export interface USCryptoOverview {
-  symbol: string
-  name: string
-  ticker: string
-  baseAsset: string
-  currency: string
-  allTimeHigh: string
-  allTimeHighDate: string
-  allTimeLow: string
-  allTimeLowDate: string
-  ipoDate: string
-  issuePrice: string
-  shares: string
-  officialWebAddress: string
-  logo: string
-  wikiUrl: string
-  /** Profile / description as a JSON string */
-  profile: string
-}
-
-export interface USCashEntry {
-  currency: string
-  frozenBuyCash: string
-  outstanding: string
-  settledCash: string
-  totalAmount: string
-  totalCash: string
-}
-
-export interface USCryptoEntry {
-  assetType: string
-  averageCost: string
-  /** User-facing symbol, e.g. "BTCUSD.BKKT" */
-  symbol: string
-  currency: string
-  industryName: string
-}
-
-export interface USStockEntry {
-  symbol: string
-  fullSymbol: string
-  assetType: string
-  quantity: string
-  currency: string
-  averageCost: string
-  market: string
-  tradeStatus: string
-  prevClose: string
-  lastDone: string
-  marketPrice: string
-  pretradeClose: string
-  stockInvestOfToday: string
-  todayPl: string
-  pretradeStockInvestOfToday: string
-  pretradeTodayPl: string
-  nightLastDone: string
-  nightPrevClose: string
-  positionSide: string
-  openPositionTime: string
-  name: string
-  industryCounterId: string
-  industryName: string
-}
-export interface USAssetOverview {
-  accountType: string
-  /** Unix timestamp (seconds) */
-  assetTimestamp: number
-  cashBuyPower: string
-  overnightBuyPower: string
-  currency: string
-  cashList: Array<USCashEntry>
-  stockList: Array<USStockEntry>
-  optionList: Array<unknown>
-  cryptoList: Array<USCryptoEntry>
-  multiLeg: unknown
-}
-
-export interface USRealizedPLMetric {
-  amount: string
-  period: number
-  rate: string
-}
-
-export interface USRealizedPLEntry {
-  category: number
-  currency: string
-  metrics: Array<USRealizedPLMetric>
-}
-
-export interface USRealizedPL {
-  realizedPlList: Array<USRealizedPLEntry>
+/** Response for `AgentContext.workspaces` */
+export interface WorkspacesResponse {
+  /** Workspaces the current account belongs to */
+  workspaces: Array<Workspace>
 }

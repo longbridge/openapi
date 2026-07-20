@@ -20,6 +20,7 @@ pub(crate) static TIME_LOCALDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new(
 pub(crate) static TIME_ZONE_ID: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DERIVATIVE_TYPE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static CONVERSATION_STREAM_SUBSCRIPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 
 fn init_timezone_id(env: &mut JNIEnv) {
     let utc = env.new_string("UTC").unwrap();
@@ -68,7 +69,11 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         (TIME_LOCALTIME_CLASS, "java/time/LocalTime"),
         (TIME_LOCALDATETIME_CLASS, "java/time/LocalDateTime"),
         (DERIVATIVE_TYPE_CLASS, "com/longbridge/quote/DerivativeType"),
-        (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException")
+        (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException"),
+        (
+            CONVERSATION_STREAM_SUBSCRIPTION_CLASS,
+            "com/longbridge/agent/ConversationStreamSubscription"
+        )
     );
 
     init_timezone_id(&mut env);
@@ -124,7 +129,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::types::DCAStatus,
         longbridge::alert::types::AlertCondition,
         longbridge::alert::types::AlertFrequency,
-        longbridge::calendar::types::CalendarCategory
+        longbridge::calendar::types::CalendarCategory,
+        longbridge::agent::ConversationStatus
     );
 
     // classes
@@ -408,6 +414,21 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::portfolio::FlowItem,
         longbridge::portfolio::ProfitAnalysisFlows,
         // DCAContext
-        longbridge::dca::DcaCreateResult
+        longbridge::dca::DcaCreateResult,
+        // AgentContext
+        longbridge::agent::Workspace,
+        longbridge::agent::WorkspacesResponse,
+        longbridge::agent::Agent,
+        longbridge::agent::AgentsResponse,
+        longbridge::agent::Reference,
+        longbridge::agent::QuestionOption,
+        longbridge::agent::Question,
+        longbridge::agent::Interrupt,
+        longbridge::agent::AgentError,
+        longbridge::agent::ChatStartedPayload,
+        longbridge::agent::MessagePayload,
+        crate::types::ConversationResponse,
+        crate::types::WorkflowFinishedEvent,
+        crate::types::OtherEvent
     );
 }

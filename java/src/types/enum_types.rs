@@ -515,3 +515,8 @@ impl_java_enum!(
         NoOpinion
     ]
 );
+impl_java_enum!(
+    "com/longbridge/agent/ConversationStatus",
+    longbridge::agent::ConversationStatus,
+    [Succeeded, Interrupted, Failed, Stopped]
+);

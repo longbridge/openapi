@@ -394,6 +394,7 @@ if (!nativeBinding) {
 
 module.exports = nativeBinding
 module.exports.AccountBalance = nativeBinding.AccountBalance
+module.exports.AgentContext = nativeBinding.AgentContext
 module.exports.AlertContext = nativeBinding.AlertContext
 module.exports.AllExecutionsResponse = nativeBinding.AllExecutionsResponse
 module.exports.AssetContext = nativeBinding.AssetContext
@@ -494,6 +495,7 @@ module.exports.CalendarCategory = nativeBinding.CalendarCategory
 module.exports.CashFlowDirection = nativeBinding.CashFlowDirection
 module.exports.ChargeCategoryCode = nativeBinding.ChargeCategoryCode
 module.exports.CommissionFreeStatus = nativeBinding.CommissionFreeStatus
+module.exports.ConversationStatus = nativeBinding.ConversationStatus
 module.exports.DCAFrequency = nativeBinding.DCAFrequency
 module.exports.DCAStatus = nativeBinding.DCAStatus
 module.exports.DeductionStatus = nativeBinding.DeductionStatus

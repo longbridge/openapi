@@ -2976,6 +2976,103 @@ inline sharelist::SharelistDetail convert(const lb_sharelist_detail_t* r) {
   return { convert(&r->sharelist), convert(&r->scopes) };
 }
 
+// ── AgentContext ──────────────────────────────────────────────────
+
+inline agent::Workspace convert(const lb_workspace_t* w) {
+  return { w->id, w->name, w->created_at, w->updated_at };
+}
+inline agent::WorkspacesResponse convert(const lb_workspaces_response_t* r) {
+  std::vector<agent::Workspace> workspaces;
+  for (size_t i = 0; i < r->num_workspaces; ++i) workspaces.push_back(convert(&r->workspaces[i]));
+  return { std::move(workspaces) };
+}
+inline agent::Agent convert(const lb_agent_t* a) {
+  return { a->uid, a->name, a->description, a->mode, a->icon, a->is_published,
+           a->published_at, a->created_at, a->updated_at };
+}
+inline agent::AgentsResponse convert(const lb_agents_response_t* r) {
+  std::vector<agent::Agent> agents;
+  for (size_t i = 0; i < r->num_agents; ++i) agents.push_back(convert(&r->agents[i]));
+  return { std::move(agents), r->total };
+}
+inline agent::ConversationStatus convert(lb_conversation_status_t status) {
+  switch (status) {
+    case ConversationStatusSucceeded:
+      return agent::ConversationStatus::Succeeded;
+    case ConversationStatusInterrupted:
+      return agent::ConversationStatus::Interrupted;
+    case ConversationStatusFailed:
+      return agent::ConversationStatus::Failed;
+    case ConversationStatusStopped:
+      return agent::ConversationStatus::Stopped;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+inline agent::Reference convert(const lb_reference_t* r) {
+  return { r->index, r->title, r->url };
+}
+inline agent::QuestionOption convert(const lb_question_option_t* o) {
+  return { o->description };
+}
+inline agent::Question convert(const lb_question_t* q) {
+  std::vector<agent::QuestionOption> options;
+  for (size_t i = 0; i < q->num_options; ++i) options.push_back(convert(&q->options[i]));
+  return { q->question, std::move(options), q->multi_select };
+}
+inline agent::Interrupt convert(const lb_interrupt_t* i) {
+  std::vector<agent::Question> questions;
+  for (size_t j = 0; j < i->num_questions; ++j) questions.push_back(convert(&i->questions[j]));
+  return { i->node_id, i->tool_call_id, std::move(questions), i->message_id, i->chat_id };
+}
+inline agent::AgentError convert(const lb_agent_error_t* e) {
+  return { e->code, e->message };
+}
+inline agent::ConversationResponse convert(const lb_conversation_response_t* r) {
+  std::vector<agent::Reference> references;
+  for (size_t i = 0; i < r->num_references; ++i) references.push_back(convert(&r->references[i]));
+  return {
+    r->chat_uid,
+    r->message_id,
+    convert(r->status),
+    r->answer,
+    std::move(references),
+    r->elapsed_time,
+    r->interrupt ? std::optional<agent::Interrupt>(convert(r->interrupt)) : std::nullopt,
+    r->error ? std::optional<agent::AgentError>(convert(r->error)) : std::nullopt,
+  };
+}
+inline agent::ChatStartedPayload convert(const lb_chat_started_payload_t* p) {
+  return { p->chat_uid, p->message_id };
+}
+inline agent::MessagePayload convert(const lb_message_payload_t* p) {
+  return { p->text };
+}
+inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event_t* e) {
+  agent::ConversationStreamEvent event{};
+  switch (e->kind) {
+    case ChatStarted:
+      event.kind = agent::ConversationStreamEventKind::ChatStarted;
+      event.chat_started = convert(e->chat_started);
+      break;
+    case Message:
+      event.kind = agent::ConversationStreamEventKind::Message;
+      event.message = convert(e->message);
+      break;
+    case WorkflowFinished:
+      event.kind = agent::ConversationStreamEventKind::WorkflowFinished;
+      event.workflow_finished = convert(e->workflow_finished);
+      break;
+    case Other:
+      event.kind = agent::ConversationStreamEventKind::Other;
+      event.other_json = std::string(e->other_json);
+      break;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+  return event;
+}
+
 } // namespace convert
 
 } // namespace longbridge
