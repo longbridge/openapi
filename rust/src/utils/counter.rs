@@ -111,6 +111,20 @@ pub fn cache_counter_ids<'a>(counter_ids: impl IntoIterator<Item = &'a str>) {
 /// when the symbol is unknown locally — i.e. [`symbol_to_counter_id`] would
 /// fall back to the default `ST/` prefix, which may be wrong for newly
 /// listed ETFs / indexes / warrants.
+/// Returns `Ok(())` if `symbol` is in the required `CODE.MARKET` format
+/// (e.g. `"AAPL.US"`, `"BTCUSD.BKKT"`), or an `Err` describing the problem.
+///
+/// Bare tickers such as `"AXTI"` are rejected.
+pub fn validate_symbol(symbol: &str) -> crate::Result<()> {
+    let dot = symbol.rfind('.');
+    match dot {
+        Some(i) if i > 0 && i < symbol.len() - 1 => Ok(()),
+        _ => Err(crate::Error::InvalidSecuritySymbol {
+            symbol: format!("{symbol} (expected CODE.MARKET format, e.g. \"AAPL.US\")"),
+        }),
+    }
+}
+
 pub fn lookup_counter_id(symbol: &str) -> Option<String> {
     let (code, market) = symbol.rsplit_once('.')?;
     let market = market.to_uppercase();

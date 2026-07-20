@@ -7,7 +7,7 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result,
     fundamental::types::*,
-    utils::counter::{counter_id_to_symbol, symbol_to_counter_id},
+    utils::counter::{counter_id_to_symbol, symbol_to_counter_id, validate_symbol},
 };
 
 /// Convert a Unix-seconds string to RFC 3339.
@@ -1066,6 +1066,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<USCompanyOverview> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1073,7 +1075,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/company-overview",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
             DcRegion::Us,
         )
@@ -1089,6 +1091,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<USValuationOverview> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1096,7 +1100,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/valuation-overview",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
             DcRegion::Us,
         )
@@ -1115,6 +1119,8 @@ impl FundamentalContext {
         symbol: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<USFinancialOverview> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1123,7 +1129,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/finn-overview",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 report: report.into(),
             },
             DcRegion::Us,
@@ -1145,6 +1151,8 @@ impl FundamentalContext {
         kind: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<USFinancialStatement> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1154,7 +1162,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/quote/financials/statements",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 kind: kind.into(),
                 report: report.into(),
             },
@@ -1175,6 +1183,8 @@ impl FundamentalContext {
         symbol: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<USKeyFinancialMetrics> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1183,7 +1193,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/fin-keyfactor",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 report: report.into(),
             },
             DcRegion::Us,
@@ -1203,6 +1213,8 @@ impl FundamentalContext {
         symbol: impl Into<String>,
         report: impl Into<String>,
     ) -> Result<USAnalystConsensus> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1211,7 +1223,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/fin-consensus",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 report: report.into(),
             },
             DcRegion::Us,
@@ -1228,6 +1240,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<USETFDividendInfo> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1235,7 +1249,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/etf-dividend-info",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
             DcRegion::Us,
         )
@@ -1251,6 +1265,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<USCompanyDividends> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1258,7 +1274,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/company-dividends",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
             DcRegion::Us,
         )
@@ -1278,6 +1294,8 @@ impl FundamentalContext {
         symbol: impl Into<String>,
         size: Option<u32>,
     ) -> Result<USETFFilesResponse> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -1287,7 +1305,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/us/stock-info/etf-files",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 size,
             },
             DcRegion::Us,

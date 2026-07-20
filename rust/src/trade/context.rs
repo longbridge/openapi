@@ -867,7 +867,7 @@ impl TradeContext {
     pub async fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
+        use crate::utils::counter::{symbol_to_counter_id, validate_symbol};
 
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -880,12 +880,12 @@ impl TradeContext {
             _ => 0,
         };
 
-        let counter_ids = opts
-            .symbol
-            .as_deref()
-            .filter(|s| !s.is_empty())
-            .map(|s| vec![symbol_to_counter_id(s)])
-            .unwrap_or_default();
+        let counter_ids = if let Some(s) = opts.symbol.as_deref().filter(|s| !s.is_empty()) {
+            validate_symbol(s)?;
+            vec![symbol_to_counter_id(s)]
+        } else {
+            vec![]
+        };
 
         let start_at = if opts.start_at == 0 {
             (now - 90 * 24 * 3600) as f64
