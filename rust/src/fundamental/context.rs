@@ -111,6 +111,8 @@ impl FundamentalContext {
         kind: FinancialReportKind,
         period: Option<FinancialReportPeriod>,
     ) -> Result<FinancialReports> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         let kind_str = match kind {
             FinancialReportKind::IncomeStatement => "IS",
             FinancialReportKind::BalanceSheet => "BS",
@@ -136,7 +138,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/financial-reports",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 kind: kind_str,
                 report: period_str,
             },
@@ -151,11 +153,13 @@ impl FundamentalContext {
     /// Path: `GET /v1/quote/institution-rating-latest` +
     ///       `GET /v1/quote/institution-ratings`
     pub async fn institution_rating(&self, symbol: impl Into<String>) -> Result<InstitutionRating> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
         }
-        let cid = symbol_to_counter_id(&symbol.into());
+        let cid = symbol_to_counter_id(&symbol);
         let q = Query { counter_id: cid };
         let (latest, summary) = tokio::join!(
             self.get::<InstitutionRatingLatest, _>(
@@ -184,6 +188,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<InstitutionRatingDetail> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -191,7 +197,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/institution-ratings/detail",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -203,6 +209,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/dividends`
     pub async fn dividend(&self, symbol: impl Into<String>) -> Result<DividendList> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -210,7 +218,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/dividends",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -220,6 +228,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/dividends/details`
     pub async fn dividend_detail(&self, symbol: impl Into<String>) -> Result<DividendList> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -227,7 +237,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/dividends/details",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -239,6 +249,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/forecast-eps`
     pub async fn forecast_eps(&self, symbol: impl Into<String>) -> Result<ForecastEps> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -246,7 +258,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/forecast-eps",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -258,6 +270,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/financial-consensus-detail`
     pub async fn consensus(&self, symbol: impl Into<String>) -> Result<FinancialConsensus> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -265,7 +279,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/financial-consensus-detail",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -277,6 +291,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/valuation`
     pub async fn valuation(&self, symbol: impl Into<String>) -> Result<ValuationData> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -286,7 +302,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/valuation",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 indicator: "pe",
                 range: "1",
             },
@@ -301,6 +317,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<ValuationHistoryResponse> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -308,7 +326,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/valuation/detail",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -323,6 +341,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<IndustryValuationList> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -330,7 +350,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/industry-valuation-comparison",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -343,6 +363,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<IndustryValuationDist> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -350,7 +372,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/industry-valuation-distribution",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -362,6 +384,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/comp-overview`
     pub async fn company(&self, symbol: impl Into<String>) -> Result<CompanyOverview> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -369,7 +393,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/comp-overview",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -381,6 +405,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/company-professionals`
     pub async fn executive(&self, symbol: impl Into<String>) -> Result<ExecutiveList> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_ids: String,
@@ -388,7 +414,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/company-professionals",
             Query {
-                counter_ids: symbol_to_counter_id(&symbol.into()),
+                counter_ids: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -400,6 +426,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/shareholders`
     pub async fn shareholder(&self, symbol: impl Into<String>) -> Result<ShareholderList> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -407,7 +435,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/shareholders",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -419,6 +447,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/fund-holders`
     pub async fn fund_holder(&self, symbol: impl Into<String>) -> Result<FundHolders> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -426,7 +456,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/fund-holders",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -438,6 +468,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/company-act`
     pub async fn corp_action(&self, symbol: impl Into<String>) -> Result<CorpActions> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -447,7 +479,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/company-act",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 req_type: "1",
                 version: "3",
             },
@@ -461,6 +493,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/invest-relations`
     pub async fn invest_relation(&self, symbol: impl Into<String>) -> Result<InvestRelations> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -469,7 +503,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/invest-relations",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 count: "0",
             },
         )
@@ -482,6 +516,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/operatings`
     pub async fn operating(&self, symbol: impl Into<String>) -> Result<OperatingList> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -489,7 +525,7 @@ impl FundamentalContext {
         self.get_dc(
             "/v1/quote/operatings",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
             DcRegion::Ap,
         )
@@ -502,6 +538,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/buy-backs`
     pub async fn buyback(&self, symbol: impl Into<String>) -> Result<BuybackData> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -509,7 +547,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/buy-backs",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -521,6 +559,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/ratings`
     pub async fn ratings(&self, symbol: impl Into<String>) -> Result<StockRatings> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -528,7 +568,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/ratings",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -540,6 +580,8 @@ impl FundamentalContext {
     ///
     /// Path: `GET /v1/quote/fundamentals/business-segments`
     pub async fn business_segments(&self, symbol: impl Into<String>) -> Result<BusinessSegments> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -547,7 +589,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/fundamentals/business-segments",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -562,6 +604,8 @@ impl FundamentalContext {
         report: Option<&'static str>,
         cate: Option<String>,
     ) -> Result<BusinessSegmentsHistory> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -573,7 +617,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/fundamentals/business-segments/history",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 report,
                 cate,
             },
@@ -590,6 +634,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<ShareholderTopResponse> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -598,7 +644,7 @@ impl FundamentalContext {
             .get(
                 "/v1/quote/shareholders/top",
                 Query {
-                    counter_id: symbol_to_counter_id(&symbol.into()),
+                    counter_id: symbol_to_counter_id(&symbol),
                 },
             )
             .await?;
@@ -614,6 +660,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<InstitutionRatingViews> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -621,7 +669,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/ratings/institutional",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await
@@ -637,6 +685,8 @@ impl FundamentalContext {
         symbol: impl Into<String>,
         object_id: i64,
     ) -> Result<ShareholderDetailResponse> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -646,7 +696,7 @@ impl FundamentalContext {
             .get(
                 "/v1/quote/shareholders/holding",
                 Query {
-                    counter_id: symbol_to_counter_id(&symbol.into()),
+                    counter_id: symbol_to_counter_id(&symbol),
                     object_id: object_id.to_string(),
                 },
             )
@@ -734,6 +784,8 @@ impl FundamentalContext {
         fiscal_year: Option<i32>,
         fiscal_period: Option<&'static str>,
     ) -> Result<FinancialReportSnapshot> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -747,7 +799,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/financials/earnings-snapshot",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 report,
                 fiscal_year,
                 fiscal_period,
@@ -767,6 +819,8 @@ impl FundamentalContext {
         currency: impl Into<String>,
         comparison_symbols: Option<Vec<String>>,
     ) -> Result<ValuationComparisonResponse> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -782,7 +836,7 @@ impl FundamentalContext {
             .get(
                 "/v1/quote/compare/valuation",
                 Query {
-                    counter_id: symbol_to_counter_id(&symbol.into()),
+                    counter_id: symbol_to_counter_id(&symbol),
                     currency: currency.into(),
                     comparison_counter_ids,
                 },
@@ -838,6 +892,8 @@ impl FundamentalContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<AssetAllocationResponse> {
+        let symbol: String = symbol.into();
+        validate_symbol(&symbol)?;
         #[derive(Serialize)]
         struct Query {
             counter_id: String,
@@ -845,7 +901,7 @@ impl FundamentalContext {
         self.get(
             "/v1/quote/etf-asset-allocation",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
             },
         )
         .await

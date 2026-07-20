@@ -115,6 +115,15 @@ pub fn cache_counter_ids<'a>(counter_ids: impl IntoIterator<Item = &'a str>) {
 /// (e.g. `"AAPL.US"`, `"BTCUSD.BKKT"`), or an `Err` describing the problem.
 ///
 /// Bare tickers such as `"AXTI"` are rejected.
+/// Validates `symbol`, converts it to a `String`, and returns it.
+/// Convenience wrapper that validates and consumes `impl Into<String>` in one
+/// step.
+pub fn validate_and_convert(symbol: impl Into<String>) -> crate::Result<String> {
+    let s = symbol.into();
+    validate_symbol(&s)?;
+    Ok(s)
+}
+
 pub fn validate_symbol(symbol: &str) -> crate::Result<()> {
     let dot = symbol.rfind('.');
     match dot {
