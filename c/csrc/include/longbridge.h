@@ -56,14 +56,35 @@ typedef enum lb_conversation_stream_event_type_t {
    */
   ChatStarted,
   /**
+   * Observed right after `ChatStarted` on every run seen so far;
+   * `workflow_started` is non-null
+   */
+  WorkflowStarted,
+  /**
    * An incremental piece of the answer; `message` is non-null
    */
   Message,
+  /**
+   * A heartbeat with no payload, observed at arbitrary points in the
+   * stream (including in between `Message` chunks); every field below is
+   * null
+   */
+  Ping,
+  /**
+   * Observed once all `Message` events for this round have been sent;
+   * `chat_finished` is non-null
+   */
+  ChatFinished,
   /**
    * The run finished (succeeded, interrupted, failed, or stopped);
    * `workflow_finished` is non-null
    */
   WorkflowFinished,
+  /**
+   * The server auto-generating a short title for the conversation;
+   * `chat_title_updated` is non-null
+   */
+  ChatTitleUpdated,
   /**
    * An event type not recognized by this SDK version; `other_json` is
    * non-null and contains the raw event JSON
@@ -1802,6 +1823,51 @@ typedef struct lb_chat_started_payload_t {
 } lb_chat_started_payload_t;
 
 /**
+ * `inputs` of a `WorkflowStarted` conversation stream event
+ */
+typedef struct lb_workflow_started_inputs_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * The question that was asked
+   */
+  const char *query;
+} lb_workflow_started_inputs_t;
+
+/**
+ * Payload of a `WorkflowStarted` conversation stream event, observed right
+ * after `ChatStarted` on every run seen so far
+ */
+typedef struct lb_workflow_started_payload_t {
+  /**
+   * Whether this run's answer was served from a cache
+   */
+  bool hit_cache;
+  /**
+   * Echoes the run's inputs
+   */
+  const struct lb_workflow_started_inputs_t *inputs;
+  /**
+   * Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Internal workflow run ID
+   */
+  int64_t workflow_id;
+} lb_workflow_started_payload_t;
+
+/**
  * Payload of a `Message` conversation stream event
  */
 typedef struct lb_message_payload_t {
@@ -1810,6 +1876,34 @@ typedef struct lb_message_payload_t {
    */
   const char *text;
 } lb_message_payload_t;
+
+/**
+ * Payload of a `ChatFinished` conversation stream event, observed once all
+ * `Message` events for this round have been sent, shortly before
+ * `WorkflowFinished`
+ */
+typedef struct lb_chat_finished_payload_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * Empty string in every run observed so far
+   */
+  const char *error;
+  /**
+   * Empty string in every run observed so far
+   */
+  const char *error_message;
+} lb_chat_finished_payload_t;
 
 /**
  * A source referenced by the answer
@@ -1954,12 +2048,41 @@ typedef struct lb_conversation_response_t {
 } lb_conversation_response_t;
 
 /**
+ * Payload of a `ChatTitleUpdated` conversation stream event — the server
+ * auto-generates a short title for the conversation as a UI convenience.
+ * Can arrive before *or* after `WorkflowFinished`; not tied to the run's
+ * outcome.
+ */
+typedef struct lb_chat_title_updated_payload_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Where the title came from, e.g. `"ai_generated"`
+   */
+  const char *source;
+  /**
+   * The new (possibly truncated) title
+   */
+  const char *title;
+  /**
+   * Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_chat_title_updated_payload_t;
+
+/**
  * One event observed while streaming `lb_agent_context_conversation_streamed`
  * or `lb_agent_context_continue_conversation_streamed`.
  *
- * This is a tagged union: `kind` tells you which of `chat_started`/
- * `message`/`workflow_finished`/`other_json` is non-null; the other three are
- * always null.
+ * This is a tagged union: `kind` tells you which one field below is
+ * non-null; all others are always null. When `kind` is `Ping` (a
+ * heartbeat with no payload), every field below is null.
  */
 typedef struct lb_conversation_stream_event_t {
   /**
@@ -1971,21 +2094,34 @@ typedef struct lb_conversation_stream_event_t {
    */
   const struct lb_chat_started_payload_t *chat_started;
   /**
+   * Non-null when `kind` is `WorkflowStarted`, observed right after
+   * `ChatStarted` on every run seen so far
+   */
+  const struct lb_workflow_started_payload_t *workflow_started;
+  /**
    * Non-null when `kind` is `Message`
    */
   const struct lb_message_payload_t *message;
   /**
+   * Non-null when `kind` is `ChatFinished`, observed once all `Message`
+   * events for this round have been sent
+   */
+  const struct lb_chat_finished_payload_t *chat_finished;
+  /**
    * Non-null when `kind` is `WorkflowFinished`, carrying the run's
    * outcome — not necessarily the last event of the stream, since the
-   * server may still emit a few more housekeeping events (`kind` `Other`)
-   * before actually closing the connection
+   * server may still emit a few more housekeeping events before actually
+   * closing the connection
    */
   const struct lb_conversation_response_t *workflow_finished;
   /**
+   * Non-null when `kind` is `ChatTitleUpdated`, the server auto-generating
+   * a short title for the conversation
+   */
+  const struct lb_chat_title_updated_payload_t *chat_title_updated;
+  /**
    * Non-null when `kind` is `Other`; the SSE envelope's `event` field (the
-   * event type name), e.g. `"workflow_started"`, `"ping"`,
-   * `"chat_finished"`, `"chat_title_updated"` (observed against the real
-   * API; not documented)
+   * event type name)
    */
   const char *other_event;
   /**
@@ -9338,11 +9474,11 @@ void lb_agent_context_continue_conversation(const struct lb_agent_context_t *ctx
  * Start a conversation with the specified Agent, calling `event_callback`
  * for every run-progress event observed over SSE. A `WorkflowFinished`
  * event carries the run's outcome, but isn't necessarily the last one seen —
- * the server may still emit a few more housekeeping events (surfaced as
- * `Other`, e.g. a `chat_title_updated`) before actually closing the
- * connection. Once the stream truly ends, `callback` is invoked with the
- * final `CConversationResponse` — same as `lb_agent_context_conversation`,
- * just arrived at via the streamed path.
+ * the server may still emit a few more housekeeping events (e.g. a
+ * `ChatTitleUpdated`) before actually closing the connection. Once the
+ * stream truly ends, `callback` is invoked with the final
+ * `CConversationResponse` — same as `lb_agent_context_conversation`, just
+ * arrived at via the streamed path.
  *
  * @param[in] chat_uid            Existing conversation identifier to
  *                                continue within (can be null to start a

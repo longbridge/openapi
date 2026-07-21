@@ -132,9 +132,9 @@ public class AgentContext implements AutoCloseable {
      * stream itself errors first, delivered via
      * {@code Flow.Subscriber#onError}), but it isn't necessarily the last
      * event delivered — the server may still emit a few more housekeeping
-     * events (as an {@link OtherEvent}, e.g. a {@code chat_title_updated})
-     * before actually closing the connection, so keep consuming until
-     * {@code onComplete} rather than stopping as soon as you see it.
+     * events (e.g. a {@link ChatTitleUpdatedEvent}) before actually closing
+     * the connection, so keep consuming until {@code onComplete} rather than
+     * stopping as soon as you see it.
      * <p>
      * This method itself performs no I/O — it returns a cold
      * {@link Flow.Publisher} immediately; the HTTP/SSE connection is only

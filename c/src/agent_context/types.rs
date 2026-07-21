@@ -1,9 +1,10 @@
 use std::os::raw::c_char;
 
 use longbridge::agent::{
-    Agent, AgentError, AgentsResponse, ChatStartedPayload, ConversationResponse,
-    ConversationStreamEvent, Interrupt, MessagePayload, Question, QuestionOption, Reference,
-    Workspace, WorkspacesResponse,
+    Agent, AgentError, AgentsResponse, ChatFinishedPayload, ChatStartedPayload,
+    ChatTitleUpdatedPayload, ConversationResponse, ConversationStreamEvent, Interrupt,
+    MessagePayload, Question, QuestionOption, Reference, WorkflowStartedInputs,
+    WorkflowStartedPayload, Workspace, WorkspacesResponse,
 };
 
 use crate::{
@@ -641,29 +642,284 @@ impl ToFFI for CMessagePayloadOwned {
     }
 }
 
+/// `inputs` of a `WorkflowStarted` conversation stream event
+#[repr(C)]
+pub struct CWorkflowStartedInputs {
+    /// ID of the owning conversation
+    pub chat_id: i64,
+    /// Conversation identifier
+    pub chat_uid: *const c_char,
+    /// Message ID of this round
+    pub message_id: *const c_char,
+    /// The question that was asked
+    pub query: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CWorkflowStartedInputsOwned {
+    chat_id: i64,
+    chat_uid: CString,
+    message_id: CString,
+    query: CString,
+}
+
+impl From<WorkflowStartedInputs> for CWorkflowStartedInputsOwned {
+    fn from(v: WorkflowStartedInputs) -> Self {
+        let WorkflowStartedInputs {
+            chat_id,
+            chat_uid,
+            message_id,
+            query,
+        } = v;
+        Self {
+            chat_id,
+            chat_uid: chat_uid.into(),
+            message_id: message_id.into(),
+            query: query.into(),
+        }
+    }
+}
+
+impl ToFFI for CWorkflowStartedInputsOwned {
+    type FFIType = CWorkflowStartedInputs;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CWorkflowStartedInputsOwned {
+            chat_id,
+            chat_uid,
+            message_id,
+            query,
+        } = self;
+        CWorkflowStartedInputs {
+            chat_id: *chat_id,
+            chat_uid: chat_uid.to_ffi_type(),
+            message_id: message_id.to_ffi_type(),
+            query: query.to_ffi_type(),
+        }
+    }
+}
+
+/// Payload of a `WorkflowStarted` conversation stream event, observed right
+/// after `ChatStarted` on every run seen so far
+#[repr(C)]
+pub struct CWorkflowStartedPayload {
+    /// Whether this run's answer was served from a cache
+    pub hit_cache: bool,
+    /// Echoes the run's inputs
+    pub inputs: *const CWorkflowStartedInputs,
+    /// Unix timestamp in seconds
+    pub started_at: i64,
+    /// Internal workflow run ID
+    pub workflow_id: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CWorkflowStartedPayloadOwned {
+    hit_cache: bool,
+    inputs: CCow<CWorkflowStartedInputsOwned>,
+    started_at: i64,
+    workflow_id: i64,
+}
+
+impl From<WorkflowStartedPayload> for CWorkflowStartedPayloadOwned {
+    fn from(v: WorkflowStartedPayload) -> Self {
+        let WorkflowStartedPayload {
+            hit_cache,
+            inputs,
+            started_at,
+            workflow_id,
+        } = v;
+        Self {
+            hit_cache,
+            inputs: CCow::new(inputs),
+            started_at,
+            workflow_id,
+        }
+    }
+}
+
+impl ToFFI for CWorkflowStartedPayloadOwned {
+    type FFIType = CWorkflowStartedPayload;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CWorkflowStartedPayloadOwned {
+            hit_cache,
+            inputs,
+            started_at,
+            workflow_id,
+        } = self;
+        CWorkflowStartedPayload {
+            hit_cache: *hit_cache,
+            inputs: inputs.to_ffi_type(),
+            started_at: *started_at,
+            workflow_id: *workflow_id,
+        }
+    }
+}
+
+/// Payload of a `ChatFinished` conversation stream event, observed once all
+/// `Message` events for this round have been sent, shortly before
+/// `WorkflowFinished`
+#[repr(C)]
+pub struct CChatFinishedPayload {
+    /// ID of the owning conversation
+    pub chat_id: i64,
+    /// Conversation identifier
+    pub chat_uid: *const c_char,
+    /// Message ID of this round
+    pub message_id: *const c_char,
+    /// Empty string in every run observed so far
+    pub error: *const c_char,
+    /// Empty string in every run observed so far
+    pub error_message: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CChatFinishedPayloadOwned {
+    chat_id: i64,
+    chat_uid: CString,
+    message_id: CString,
+    error: CString,
+    error_message: CString,
+}
+
+impl From<ChatFinishedPayload> for CChatFinishedPayloadOwned {
+    fn from(v: ChatFinishedPayload) -> Self {
+        let ChatFinishedPayload {
+            chat_id,
+            chat_uid,
+            message_id,
+            error,
+            error_message,
+        } = v;
+        Self {
+            chat_id,
+            chat_uid: chat_uid.into(),
+            message_id: message_id.into(),
+            error: error.into(),
+            error_message: error_message.into(),
+        }
+    }
+}
+
+impl ToFFI for CChatFinishedPayloadOwned {
+    type FFIType = CChatFinishedPayload;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CChatFinishedPayloadOwned {
+            chat_id,
+            chat_uid,
+            message_id,
+            error,
+            error_message,
+        } = self;
+        CChatFinishedPayload {
+            chat_id: *chat_id,
+            chat_uid: chat_uid.to_ffi_type(),
+            message_id: message_id.to_ffi_type(),
+            error: error.to_ffi_type(),
+            error_message: error_message.to_ffi_type(),
+        }
+    }
+}
+
+/// Payload of a `ChatTitleUpdated` conversation stream event — the server
+/// auto-generates a short title for the conversation as a UI convenience.
+/// Can arrive before *or* after `WorkflowFinished`; not tied to the run's
+/// outcome.
+#[repr(C)]
+pub struct CChatTitleUpdatedPayload {
+    /// ID of the owning conversation
+    pub chat_id: i64,
+    /// Conversation identifier
+    pub chat_uid: *const c_char,
+    /// Where the title came from, e.g. `"ai_generated"`
+    pub source: *const c_char,
+    /// The new (possibly truncated) title
+    pub title: *const c_char,
+    /// Unix timestamp in seconds
+    pub updated_at: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CChatTitleUpdatedPayloadOwned {
+    chat_id: i64,
+    chat_uid: CString,
+    source: CString,
+    title: CString,
+    updated_at: i64,
+}
+
+impl From<ChatTitleUpdatedPayload> for CChatTitleUpdatedPayloadOwned {
+    fn from(v: ChatTitleUpdatedPayload) -> Self {
+        let ChatTitleUpdatedPayload {
+            chat_id,
+            chat_uid,
+            source,
+            title,
+            updated_at,
+        } = v;
+        Self {
+            chat_id,
+            chat_uid: chat_uid.into(),
+            source: source.into(),
+            title: title.into(),
+            updated_at,
+        }
+    }
+}
+
+impl ToFFI for CChatTitleUpdatedPayloadOwned {
+    type FFIType = CChatTitleUpdatedPayload;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CChatTitleUpdatedPayloadOwned {
+            chat_id,
+            chat_uid,
+            source,
+            title,
+            updated_at,
+        } = self;
+        CChatTitleUpdatedPayload {
+            chat_id: *chat_id,
+            chat_uid: chat_uid.to_ffi_type(),
+            source: source.to_ffi_type(),
+            title: title.to_ffi_type(),
+            updated_at: *updated_at,
+        }
+    }
+}
+
 /// One event observed while streaming `lb_agent_context_conversation_streamed`
 /// or `lb_agent_context_continue_conversation_streamed`.
 ///
-/// This is a tagged union: `kind` tells you which of `chat_started`/
-/// `message`/`workflow_finished`/`other_json` is non-null; the other three are
-/// always null.
+/// This is a tagged union: `kind` tells you which one field below is
+/// non-null; all others are always null. When `kind` is `Ping` (a
+/// heartbeat with no payload), every field below is null.
 #[repr(C)]
 pub struct CConversationStreamEvent {
     /// Discriminant, tells you which field below is populated
     pub kind: CConversationStreamEventType,
     /// Non-null when `kind` is `ChatStarted`
     pub chat_started: *const CChatStartedPayload,
+    /// Non-null when `kind` is `WorkflowStarted`, observed right after
+    /// `ChatStarted` on every run seen so far
+    pub workflow_started: *const CWorkflowStartedPayload,
     /// Non-null when `kind` is `Message`
     pub message: *const CMessagePayload,
+    /// Non-null when `kind` is `ChatFinished`, observed once all `Message`
+    /// events for this round have been sent
+    pub chat_finished: *const CChatFinishedPayload,
     /// Non-null when `kind` is `WorkflowFinished`, carrying the run's
     /// outcome — not necessarily the last event of the stream, since the
-    /// server may still emit a few more housekeeping events (`kind` `Other`)
-    /// before actually closing the connection
+    /// server may still emit a few more housekeeping events before actually
+    /// closing the connection
     pub workflow_finished: *const CConversationResponse,
+    /// Non-null when `kind` is `ChatTitleUpdated`, the server auto-generating
+    /// a short title for the conversation
+    pub chat_title_updated: *const CChatTitleUpdatedPayload,
     /// Non-null when `kind` is `Other`; the SSE envelope's `event` field (the
-    /// event type name), e.g. `"workflow_started"`, `"ping"`,
-    /// `"chat_finished"`, `"chat_title_updated"` (observed against the real
-    /// API; not documented)
+    /// event type name)
     pub other_event: *const c_char,
     /// Non-null when `kind` is `Other`; raw JSON of an event type not
     /// recognized by this SDK version
@@ -672,8 +928,12 @@ pub struct CConversationStreamEvent {
 
 pub(crate) enum CConversationStreamEventOwned {
     ChatStarted(CCow<CChatStartedPayloadOwned>),
+    WorkflowStarted(CCow<CWorkflowStartedPayloadOwned>),
     Message(CCow<CMessagePayloadOwned>),
+    Ping,
+    ChatFinished(CCow<CChatFinishedPayloadOwned>),
     WorkflowFinished(CCow<CConversationResponseOwned>),
+    ChatTitleUpdated(CCow<CChatTitleUpdatedPayloadOwned>),
     Other { event: CString, json: CString },
 }
 
@@ -681,9 +941,19 @@ impl From<ConversationStreamEvent> for CConversationStreamEventOwned {
     fn from(v: ConversationStreamEvent) -> Self {
         match v {
             ConversationStreamEvent::ChatStarted(payload) => Self::ChatStarted(CCow::new(payload)),
+            ConversationStreamEvent::WorkflowStarted(payload) => {
+                Self::WorkflowStarted(CCow::new(payload))
+            }
             ConversationStreamEvent::Message(payload) => Self::Message(CCow::new(payload)),
+            ConversationStreamEvent::Ping => Self::Ping,
+            ConversationStreamEvent::ChatFinished(payload) => {
+                Self::ChatFinished(CCow::new(payload))
+            }
             ConversationStreamEvent::WorkflowFinished(resp) => {
                 Self::WorkflowFinished(CCow::new(resp))
+            }
+            ConversationStreamEvent::ChatTitleUpdated(payload) => {
+                Self::ChatTitleUpdated(CCow::new(payload))
             }
             // `Other` carries an arbitrary `serde_json::Value` (events from
             // future SDK versions we don't recognize yet) — re-serialize it
@@ -705,32 +975,88 @@ impl ToFFI for CConversationStreamEventOwned {
             Self::ChatStarted(payload) => CConversationStreamEvent {
                 kind: CConversationStreamEventType::ChatStarted,
                 chat_started: payload.to_ffi_type(),
+                workflow_started: std::ptr::null(),
                 message: std::ptr::null(),
+                chat_finished: std::ptr::null(),
                 workflow_finished: std::ptr::null(),
+                chat_title_updated: std::ptr::null(),
+                other_event: std::ptr::null(),
+                other_json: std::ptr::null(),
+            },
+            Self::WorkflowStarted(payload) => CConversationStreamEvent {
+                kind: CConversationStreamEventType::WorkflowStarted,
+                chat_started: std::ptr::null(),
+                workflow_started: payload.to_ffi_type(),
+                message: std::ptr::null(),
+                chat_finished: std::ptr::null(),
+                workflow_finished: std::ptr::null(),
+                chat_title_updated: std::ptr::null(),
                 other_event: std::ptr::null(),
                 other_json: std::ptr::null(),
             },
             Self::Message(payload) => CConversationStreamEvent {
                 kind: CConversationStreamEventType::Message,
                 chat_started: std::ptr::null(),
+                workflow_started: std::ptr::null(),
                 message: payload.to_ffi_type(),
+                chat_finished: std::ptr::null(),
                 workflow_finished: std::ptr::null(),
+                chat_title_updated: std::ptr::null(),
+                other_event: std::ptr::null(),
+                other_json: std::ptr::null(),
+            },
+            Self::Ping => CConversationStreamEvent {
+                kind: CConversationStreamEventType::Ping,
+                chat_started: std::ptr::null(),
+                workflow_started: std::ptr::null(),
+                message: std::ptr::null(),
+                chat_finished: std::ptr::null(),
+                workflow_finished: std::ptr::null(),
+                chat_title_updated: std::ptr::null(),
+                other_event: std::ptr::null(),
+                other_json: std::ptr::null(),
+            },
+            Self::ChatFinished(payload) => CConversationStreamEvent {
+                kind: CConversationStreamEventType::ChatFinished,
+                chat_started: std::ptr::null(),
+                workflow_started: std::ptr::null(),
+                message: std::ptr::null(),
+                chat_finished: payload.to_ffi_type(),
+                workflow_finished: std::ptr::null(),
+                chat_title_updated: std::ptr::null(),
                 other_event: std::ptr::null(),
                 other_json: std::ptr::null(),
             },
             Self::WorkflowFinished(resp) => CConversationStreamEvent {
                 kind: CConversationStreamEventType::WorkflowFinished,
                 chat_started: std::ptr::null(),
+                workflow_started: std::ptr::null(),
                 message: std::ptr::null(),
+                chat_finished: std::ptr::null(),
                 workflow_finished: resp.to_ffi_type(),
+                chat_title_updated: std::ptr::null(),
+                other_event: std::ptr::null(),
+                other_json: std::ptr::null(),
+            },
+            Self::ChatTitleUpdated(payload) => CConversationStreamEvent {
+                kind: CConversationStreamEventType::ChatTitleUpdated,
+                chat_started: std::ptr::null(),
+                workflow_started: std::ptr::null(),
+                message: std::ptr::null(),
+                chat_finished: std::ptr::null(),
+                workflow_finished: std::ptr::null(),
+                chat_title_updated: payload.to_ffi_type(),
                 other_event: std::ptr::null(),
                 other_json: std::ptr::null(),
             },
             Self::Other { event, json } => CConversationStreamEvent {
                 kind: CConversationStreamEventType::Other,
                 chat_started: std::ptr::null(),
+                workflow_started: std::ptr::null(),
                 message: std::ptr::null(),
+                chat_finished: std::ptr::null(),
                 workflow_finished: std::ptr::null(),
+                chat_title_updated: std::ptr::null(),
                 other_event: event.to_ffi_type(),
                 other_json: json.to_ffi_type(),
             },

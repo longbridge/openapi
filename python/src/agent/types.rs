@@ -270,6 +270,98 @@ impl From<longbridge::agent::MessagePayload> for MessagePayload {
     }
 }
 
+/// `inputs` of a `workflow_started` stream event
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct WorkflowStartedInputs {
+    pub chat_id: i64,
+    pub chat_uid: String,
+    pub message_id: String,
+    pub query: String,
+}
+
+impl From<longbridge::agent::WorkflowStartedInputs> for WorkflowStartedInputs {
+    fn from(v: longbridge::agent::WorkflowStartedInputs) -> Self {
+        Self {
+            chat_id: v.chat_id,
+            chat_uid: v.chat_uid,
+            message_id: v.message_id,
+            query: v.query,
+        }
+    }
+}
+
+/// Payload of a `workflow_started` stream event, observed right after
+/// `chat_started`
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct WorkflowStartedPayload {
+    pub hit_cache: bool,
+    pub inputs: WorkflowStartedInputs,
+    pub started_at: i64,
+    pub workflow_id: i64,
+}
+
+impl From<longbridge::agent::WorkflowStartedPayload> for WorkflowStartedPayload {
+    fn from(v: longbridge::agent::WorkflowStartedPayload) -> Self {
+        Self {
+            hit_cache: v.hit_cache,
+            inputs: v.inputs.into(),
+            started_at: v.started_at,
+            workflow_id: v.workflow_id,
+        }
+    }
+}
+
+/// Payload of a `chat_finished` stream event, observed once all `message`
+/// events for this round have been sent, shortly before `workflow_finished`
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct ChatFinishedPayload {
+    pub chat_id: i64,
+    pub chat_uid: String,
+    pub message_id: String,
+    pub error: String,
+    pub error_message: String,
+}
+
+impl From<longbridge::agent::ChatFinishedPayload> for ChatFinishedPayload {
+    fn from(v: longbridge::agent::ChatFinishedPayload) -> Self {
+        Self {
+            chat_id: v.chat_id,
+            chat_uid: v.chat_uid,
+            message_id: v.message_id,
+            error: v.error,
+            error_message: v.error_message,
+        }
+    }
+}
+
+/// Payload of a `chat_title_updated` stream event — the server auto-generates
+/// a short title for the conversation as a UI convenience. Can arrive before
+/// *or* after `workflow_finished`; not tied to the run's outcome.
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone, Default)]
+pub(crate) struct ChatTitleUpdatedPayload {
+    pub chat_id: i64,
+    pub chat_uid: String,
+    pub source: String,
+    pub title: String,
+    pub updated_at: i64,
+}
+
+impl From<longbridge::agent::ChatTitleUpdatedPayload> for ChatTitleUpdatedPayload {
+    fn from(v: longbridge::agent::ChatTitleUpdatedPayload) -> Self {
+        Self {
+            chat_id: v.chat_id,
+            chat_uid: v.chat_uid,
+            source: v.source,
+            title: v.title,
+            updated_at: v.updated_at,
+        }
+    }
+}
+
 /// One event observed while streaming
 /// `AgentContext.conversation_streamed`/`continue_conversation_streamed` (or
 /// the `Async` counterparts).
@@ -277,18 +369,24 @@ impl From<longbridge::agent::MessagePayload> for MessagePayload {
 /// There's no existing precedent in this codebase for exposing a Rust
 /// enum-with-payload to Python, so this flattens
 /// `longbridge::agent::ConversationStreamEvent` into a single class: `kind` is
-/// the discriminant (one of `"chat_started"`, `"message"`,
-/// `"workflow_finished"`, `"other"`) and exactly one of
-/// `chat_started`/`message`/`workflow_finished`/`other` is set, matching
-/// `kind`. When `kind` is `"other"`, `other_event` additionally carries the
+/// the discriminant (one of `"chat_started"`, `"workflow_started"`,
+/// `"message"`, `"ping"`, `"chat_finished"`, `"workflow_finished"`,
+/// `"chat_title_updated"`, `"other"`) and exactly one of
+/// `chat_started`/`workflow_started`/`message`/`chat_finished`/
+/// `workflow_finished`/`chat_title_updated`/`other` is set, matching `kind` —
+/// except `"ping"`, a heartbeat with no payload, for which every payload field
+/// is `None`. When `kind` is `"other"`, `other_event` additionally carries the
 /// SSE envelope's `event` field (the event type name).
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ConversationStreamEvent {
     pub kind: String,
     pub chat_started: Option<ChatStartedPayload>,
+    pub workflow_started: Option<WorkflowStartedPayload>,
     pub message: Option<MessagePayload>,
+    pub chat_finished: Option<ChatFinishedPayload>,
     pub workflow_finished: Option<ConversationResponse>,
+    pub chat_title_updated: Option<ChatTitleUpdatedPayload>,
     pub other_event: Option<String>,
     pub other: Option<JsonValue>,
 }
@@ -301,32 +399,88 @@ impl From<longbridge::agent::ConversationStreamEvent> for ConversationStreamEven
             E::ChatStarted(payload) => Self {
                 kind: "chat_started".to_string(),
                 chat_started: Some(payload.into()),
+                workflow_started: None,
                 message: None,
+                chat_finished: None,
                 workflow_finished: None,
+                chat_title_updated: None,
+                other_event: None,
+                other: None,
+            },
+            E::WorkflowStarted(payload) => Self {
+                kind: "workflow_started".to_string(),
+                chat_started: None,
+                workflow_started: Some(payload.into()),
+                message: None,
+                chat_finished: None,
+                workflow_finished: None,
+                chat_title_updated: None,
                 other_event: None,
                 other: None,
             },
             E::Message(payload) => Self {
                 kind: "message".to_string(),
                 chat_started: None,
+                workflow_started: None,
                 message: Some(payload.into()),
+                chat_finished: None,
                 workflow_finished: None,
+                chat_title_updated: None,
+                other_event: None,
+                other: None,
+            },
+            E::Ping => Self {
+                kind: "ping".to_string(),
+                chat_started: None,
+                workflow_started: None,
+                message: None,
+                chat_finished: None,
+                workflow_finished: None,
+                chat_title_updated: None,
+                other_event: None,
+                other: None,
+            },
+            E::ChatFinished(payload) => Self {
+                kind: "chat_finished".to_string(),
+                chat_started: None,
+                workflow_started: None,
+                message: None,
+                chat_finished: Some(payload.into()),
+                workflow_finished: None,
+                chat_title_updated: None,
                 other_event: None,
                 other: None,
             },
             E::WorkflowFinished(resp) => Self {
                 kind: "workflow_finished".to_string(),
                 chat_started: None,
+                workflow_started: None,
                 message: None,
+                chat_finished: None,
                 workflow_finished: Some(resp.into()),
+                chat_title_updated: None,
+                other_event: None,
+                other: None,
+            },
+            E::ChatTitleUpdated(payload) => Self {
+                kind: "chat_title_updated".to_string(),
+                chat_started: None,
+                workflow_started: None,
+                message: None,
+                chat_finished: None,
+                workflow_finished: None,
+                chat_title_updated: Some(payload.into()),
                 other_event: None,
                 other: None,
             },
             E::Other { event, data } => Self {
                 kind: "other".to_string(),
                 chat_started: None,
+                workflow_started: None,
                 message: None,
+                chat_finished: None,
                 workflow_finished: None,
+                chat_title_updated: None,
                 other_event: Some(event),
                 other: Some(JsonValue(data)),
             },

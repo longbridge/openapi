@@ -13269,35 +13269,110 @@ class MessagePayload:
     text: str
     """Incremental answer text"""
 
+class WorkflowStartedInputs:
+    """
+    ``inputs`` of a ``workflow_started`` stream event.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+    query: str
+    """The question that was asked"""
+
+class WorkflowStartedPayload:
+    """
+    Payload of a ``workflow_started`` stream event, observed right after
+    ``chat_started``.
+    """
+
+    hit_cache: bool
+    """Whether this run's answer was served from a cache"""
+    inputs: WorkflowStartedInputs
+    """Echoes the run's inputs"""
+    started_at: int
+    """Unix timestamp in seconds"""
+    workflow_id: int
+    """Internal workflow run ID"""
+
+class ChatFinishedPayload:
+    """
+    Payload of a ``chat_finished`` stream event, observed once all
+    ``message`` events for this round have been sent, shortly before
+    ``workflow_finished``.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+    error: str
+    """Empty string in every run observed so far"""
+    error_message: str
+    """Empty string in every run observed so far"""
+
+class ChatTitleUpdatedPayload:
+    """
+    Payload of a ``chat_title_updated`` stream event — the server
+    auto-generates a short title for the conversation as a UI convenience.
+    Can arrive before *or* after ``workflow_finished``; not tied to the run's
+    outcome.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    source: str
+    """Where the title came from, e.g. ``"ai_generated"``"""
+    title: str
+    """The new (possibly truncated) title"""
+    updated_at: int
+    """Unix timestamp in seconds"""
+
 class ConversationStreamEvent:
     """
     One event observed while streaming
     AgentContext.conversation_streamed / continue_conversation_streamed (or
     the Async counterparts).
 
-    ``kind`` is the discriminant — one of ``"chat_started"``, ``"message"``,
-    ``"workflow_finished"``, ``"other"`` — and exactly one of
-    ``chat_started`` / ``message`` / ``workflow_finished`` / ``other`` is set,
-    matching ``kind``.
+    ``kind`` is the discriminant — one of ``"chat_started"``,
+    ``"workflow_started"``, ``"message"``, ``"ping"``, ``"chat_finished"``,
+    ``"workflow_finished"``, ``"chat_title_updated"``, ``"other"`` — and
+    exactly one of ``chat_started`` / ``workflow_started`` / ``message`` /
+    ``chat_finished`` / ``workflow_finished`` / ``chat_title_updated`` /
+    ``other`` is set, matching ``kind`` — except ``"ping"``, a heartbeat with
+    no payload, for which every payload field is ``None``.
     """
 
     kind: str
-    """Discriminant: ``"chat_started"``, ``"message"``,
-    ``"workflow_finished"``, or ``"other"``"""
+    """Discriminant: ``"chat_started"``, ``"workflow_started"``,
+    ``"message"``, ``"ping"``, ``"chat_finished"``, ``"workflow_finished"``,
+    ``"chat_title_updated"``, or ``"other"``"""
     chat_started: ChatStartedPayload | None
     """Set when kind == "chat_started" """
+    workflow_started: WorkflowStartedPayload | None
+    """Set when kind == "workflow_started" """
     message: MessagePayload | None
     """Set when kind == "message" """
+    chat_finished: ChatFinishedPayload | None
+    """Set when kind == "chat_finished" """
     workflow_finished: ConversationResponse | None
     """Set when kind == "workflow_finished" (the run finished — succeeded,
     interrupted, failed, or stopped). Carries the run's outcome, but isn't
     necessarily the last event of the stream — the server may still emit a
-    few more housekeeping events (kind == "other", e.g. a
-    chat_title_updated) before actually closing the connection."""
+    few more housekeeping events (e.g. kind == "chat_title_updated") before
+    actually closing the connection."""
+    chat_title_updated: ChatTitleUpdatedPayload | None
+    """Set when kind == "chat_title_updated" """
     other_event: str | None
     """Set when kind == "other": the SSE envelope's ``event`` field (the event
-    type name), e.g. "workflow_started", "ping", "chat_finished",
-    "chat_title_updated" (observed against the real API; not documented)"""
+    type name)"""
     other: Any | None
     """Set when kind == "other": raw JSON payload of an event type not
     recognized by this SDK version"""
@@ -13408,9 +13483,9 @@ class AgentContext:
         of run-progress events. A ConversationStreamEvent with
         ``kind == "workflow_finished"`` carries the run's outcome, but isn't
         necessarily the last item — the server may still emit a few more
-        housekeeping events (``kind == "other"``, e.g. a
-        ``chat_title_updated``) before actually closing the connection, so
-        keep iterating to the end rather than stopping as soon as you see it.
+        housekeeping events (e.g. ``kind == "chat_title_updated"``) before
+        actually closing the connection, so keep iterating to the end rather
+        than stopping as soon as you see it.
 
         Args:
             agent_id: Agent UID

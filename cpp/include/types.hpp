@@ -3824,17 +3824,92 @@ struct MessagePayload
   std::string text;
 };
 
+/// `inputs` of a WorkflowStarted conversation stream event.
+struct WorkflowStartedInputs
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// The question that was asked
+  std::string query;
+};
+
+/// Payload of a WorkflowStarted conversation stream event, observed right
+/// after ChatStarted on every run seen so far.
+struct WorkflowStartedPayload
+{
+  /// Whether this run's answer was served from a cache
+  bool hit_cache;
+  /// Echoes the run's inputs
+  WorkflowStartedInputs inputs;
+  /// Unix timestamp in seconds
+  int64_t started_at;
+  /// Internal workflow run ID
+  int64_t workflow_id;
+};
+
+/// Payload of a ChatFinished conversation stream event, observed once all
+/// Message events for this round have been sent, shortly before
+/// WorkflowFinished.
+struct ChatFinishedPayload
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// Empty string in every run observed so far
+  std::string error;
+  /// Empty string in every run observed so far
+  std::string error_message;
+};
+
+/// Payload of a ChatTitleUpdated conversation stream event — the server
+/// auto-generates a short title for the conversation as a UI convenience.
+/// Can arrive before *or* after WorkflowFinished; not tied to the run's
+/// outcome.
+struct ChatTitleUpdatedPayload
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Where the title came from, e.g. "ai_generated"
+  std::string source;
+  /// The new (possibly truncated) title
+  std::string title;
+  /// Unix timestamp in seconds
+  int64_t updated_at;
+};
+
 /// Kind of a ConversationStreamEvent. Only the field matching this kind is
 /// populated, the others are `std::nullopt`.
 enum class ConversationStreamEventKind
 {
   /// The run has started; `chat_started` is populated
   ChatStarted,
+  /// Observed right after `ChatStarted` on every run seen so far;
+  /// `workflow_started` is populated
+  WorkflowStarted,
   /// An incremental piece of the answer; `message` is populated
   Message,
+  /// A heartbeat with no payload, observed at arbitrary points in the
+  /// stream (including in between `Message` chunks); every field below is
+  /// `std::nullopt`
+  Ping,
+  /// Observed once all `Message` events for this round have been sent;
+  /// `chat_finished` is populated
+  ChatFinished,
   /// The run finished (succeeded, interrupted, failed, or stopped);
   /// `workflow_finished` is populated
   WorkflowFinished,
+  /// The server auto-generating a short title for the conversation;
+  /// `chat_title_updated` is populated
+  ChatTitleUpdated,
   /// An event type not recognized by this SDK version; `other_json` is
   /// populated with the raw event JSON
   Other,
@@ -3844,28 +3919,36 @@ enum class ConversationStreamEventKind
 /// AgentContext::continue_conversation_streamed.
 ///
 /// This mirrors the C layer's tagged-union `lb_conversation_stream_event_t`:
-/// `kind` tells you which of `chat_started`/`message`/`workflow_finished`/
-/// `other_json` is populated. A plain discriminated struct is used here
-/// (rather than `std::variant` or a JSON library) since neither has any
-/// precedent elsewhere in this C++ binding, and this shape converts directly
-/// from the C tagged union.
+/// `kind` tells you which of `chat_started`/`workflow_started`/`message`/
+/// `chat_finished`/`workflow_finished`/`chat_title_updated`/`other_json` is
+/// populated. A plain discriminated struct is used here (rather than
+/// `std::variant` or a JSON library) since neither has any precedent
+/// elsewhere in this C++ binding, and this shape converts directly from the
+/// C tagged union.
 struct ConversationStreamEvent
 {
   /// Discriminant, tells you which field below is populated
   ConversationStreamEventKind kind;
   /// Populated when `kind` is `ChatStarted`
   std::optional<ChatStartedPayload> chat_started;
+  /// Populated when `kind` is `WorkflowStarted`, observed right after
+  /// `ChatStarted` on every run seen so far
+  std::optional<WorkflowStartedPayload> workflow_started;
   /// Populated when `kind` is `Message`
   std::optional<MessagePayload> message;
+  /// Populated when `kind` is `ChatFinished`, observed once all `Message`
+  /// events for this round have been sent
+  std::optional<ChatFinishedPayload> chat_finished;
   /// Populated when `kind` is `WorkflowFinished`, carrying the run's
   /// outcome — not necessarily the last event of the stream, since the
-  /// server may still emit a few more housekeeping events (`kind` `Other`)
-  /// before actually closing the connection
+  /// server may still emit a few more housekeeping events before actually
+  /// closing the connection
   std::optional<ConversationResponse> workflow_finished;
+  /// Populated when `kind` is `ChatTitleUpdated`, the server auto-generating
+  /// a short title for the conversation
+  std::optional<ChatTitleUpdatedPayload> chat_title_updated;
   /// Populated when `kind` is `Other`; the SSE envelope's `event` field (the
-  /// event type name), e.g. `"workflow_started"`, `"ping"`,
-  /// `"chat_finished"`, `"chat_title_updated"` (observed against the real
-  /// API; not documented)
+  /// event type name)
   std::optional<std::string> other_event;
   /// Populated when `kind` is `Other`; raw JSON of an event type not
   /// recognized by this SDK version

@@ -3048,6 +3048,18 @@ inline agent::ChatStartedPayload convert(const lb_chat_started_payload_t* p) {
 inline agent::MessagePayload convert(const lb_message_payload_t* p) {
   return { p->text };
 }
+inline agent::WorkflowStartedInputs convert(const lb_workflow_started_inputs_t* i) {
+  return { i->chat_id, i->chat_uid, i->message_id, i->query };
+}
+inline agent::WorkflowStartedPayload convert(const lb_workflow_started_payload_t* p) {
+  return { p->hit_cache, convert(p->inputs), p->started_at, p->workflow_id };
+}
+inline agent::ChatFinishedPayload convert(const lb_chat_finished_payload_t* p) {
+  return { p->chat_id, p->chat_uid, p->message_id, p->error, p->error_message };
+}
+inline agent::ChatTitleUpdatedPayload convert(const lb_chat_title_updated_payload_t* p) {
+  return { p->chat_id, p->chat_uid, p->source, p->title, p->updated_at };
+}
 inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event_t* e) {
   agent::ConversationStreamEvent event{};
   switch (e->kind) {
@@ -3055,13 +3067,28 @@ inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event
       event.kind = agent::ConversationStreamEventKind::ChatStarted;
       event.chat_started = convert(e->chat_started);
       break;
+    case WorkflowStarted:
+      event.kind = agent::ConversationStreamEventKind::WorkflowStarted;
+      event.workflow_started = convert(e->workflow_started);
+      break;
     case Message:
       event.kind = agent::ConversationStreamEventKind::Message;
       event.message = convert(e->message);
       break;
+    case Ping:
+      event.kind = agent::ConversationStreamEventKind::Ping;
+      break;
+    case ChatFinished:
+      event.kind = agent::ConversationStreamEventKind::ChatFinished;
+      event.chat_finished = convert(e->chat_finished);
+      break;
     case WorkflowFinished:
       event.kind = agent::ConversationStreamEventKind::WorkflowFinished;
       event.workflow_finished = convert(e->workflow_finished);
+      break;
+    case ChatTitleUpdated:
+      event.kind = agent::ConversationStreamEventKind::ChatTitleUpdated;
+      event.chat_title_updated = convert(e->chat_title_updated);
       break;
     case Other:
       event.kind = agent::ConversationStreamEventKind::Other;

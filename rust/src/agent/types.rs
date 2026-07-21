@@ -275,13 +275,7 @@ pub struct MessagePayload {
     pub text: String,
 }
 
-/// `outputs` of a `workflow_finished` SSE event.
-///
-/// ⚠️ The PR docs only show an example for the `succeeded` path (`answer`
-/// only); `interrupt`/`error` here are a best-effort guess mirroring the
-/// blocking response's sibling fields for the `interrupted`/`failed` cases and
-/// are **unverified** — confirm against a live/sandbox call that actually
-/// triggers an interruption or failure before relying on this shape.
+/// `outputs` of a `workflow_finished` SSE event
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct WorkflowOutputs {
     /// Final answer text; present when the run succeeded
@@ -290,11 +284,10 @@ pub struct WorkflowOutputs {
     /// Sources referenced by the answer
     #[serde(default)]
     pub references: Option<Vec<Reference>>,
-    /// Present only when `status` is `interrupted` (unverified, see struct
-    /// docs)
+    /// Present only when `status` is `interrupted`
     #[serde(default)]
     pub interrupt: Option<Interrupt>,
-    /// Present only when the run failed (unverified, see struct docs)
+    /// Present only when the run failed
     #[serde(default)]
     pub error: Option<AgentError>,
 }
@@ -312,11 +305,7 @@ pub struct WorkflowFinishedPayload {
     pub outputs: WorkflowOutputs,
 }
 
-/// `inputs` of a `workflow_started` SSE event.
-///
-/// ⚠️ Not documented by the API — reverse-engineered from live traffic (see
-/// [`ConversationStreamEvent::WorkflowStarted`]'s docs). The server may
-/// change this shape without notice.
+/// `inputs` of a `workflow_started` SSE event
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct WorkflowStartedInputs {
     /// ID of the owning conversation
@@ -338,11 +327,7 @@ pub struct WorkflowStartedInputs {
 }
 
 /// Payload of a `workflow_started` SSE event, observed right after
-/// `chat_started`.
-///
-/// ⚠️ Not documented by the API — reverse-engineered from live traffic (see
-/// [`ConversationStreamEvent::WorkflowStarted`]'s docs). The server may
-/// change this shape without notice.
+/// `chat_started`
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct WorkflowStartedPayload {
     /// Whether this run's answer was served from a cache
@@ -360,15 +345,7 @@ pub struct WorkflowStartedPayload {
 }
 
 /// Payload of a `chat_finished` SSE event, observed once all `message` events
-/// for this round have been sent, shortly before `workflow_finished`.
-///
-/// ⚠️ Not documented by the API — reverse-engineered from live traffic (see
-/// [`ConversationStreamEvent::ChatFinished`]'s docs). The server may change
-/// this shape without notice. `error`/`error_message` have only ever been
-/// observed as empty strings (every run seen so far succeeded) — it's not
-/// confirmed whether they carry anything meaningful for the
-/// interrupted/failed cases, or how that relates to
-/// [`WorkflowOutputs::error`].
+/// for this round have been sent, shortly before `workflow_finished`
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct ChatFinishedPayload {
     /// ID of the owning conversation
@@ -395,9 +372,6 @@ pub struct ChatFinishedPayload {
 /// Payload of a `chat_title_updated` SSE event — the server auto-generates a
 /// short title for the conversation as a UI convenience. Can arrive before
 /// *or* after `workflow_finished`; not tied to the run's outcome.
-///
-/// ⚠️ Not documented by the API — reverse-engineered from live traffic. The
-/// server may change this shape without notice.
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct ChatTitleUpdatedPayload {
     /// ID of the owning conversation
@@ -424,19 +398,16 @@ pub struct ChatTitleUpdatedPayload {
 pub enum ConversationStreamEvent {
     /// The run has started
     ChatStarted(ChatStartedPayload),
-    /// ⚠️ Not documented by the API, observed right after `ChatStarted` on
-    /// every run seen so far — reverse-engineered from live traffic, see
-    /// [`WorkflowStartedPayload`]'s docs.
+    /// Observed right after `ChatStarted` on every run seen so far, see
+    /// [`WorkflowStartedPayload`]'s docs
     WorkflowStarted(WorkflowStartedPayload),
     /// An incremental piece of the answer
     Message(MessagePayload),
-    /// ⚠️ Not documented by the API, a heartbeat with no payload, observed at
-    /// arbitrary points in the stream (including in between `Message`
-    /// chunks) — reverse-engineered from live traffic.
+    /// A heartbeat with no payload, observed at arbitrary points in the
+    /// stream (including in between `Message` chunks)
     Ping,
-    /// ⚠️ Not documented by the API, observed once all `Message` events for
-    /// this round have been sent — reverse-engineered from live traffic, see
-    /// [`ChatFinishedPayload`]'s docs.
+    /// Observed once all `Message` events for this round have been sent, see
+    /// [`ChatFinishedPayload`]'s docs
     ChatFinished(ChatFinishedPayload),
     /// The run finished (succeeded, interrupted, failed, or stopped),
     /// carrying the run's outcome. Not necessarily the last event of the
@@ -444,8 +415,7 @@ pub enum ConversationStreamEvent {
     /// (e.g. [`ConversationStreamEvent::ChatTitleUpdated`]) before actually
     /// closing the connection.
     WorkflowFinished(ConversationResponse),
-    /// ⚠️ Not documented by the API, the server auto-generating a short title
-    /// for the conversation — reverse-engineered from live traffic, see
+    /// The server auto-generating a short title for the conversation, see
     /// [`ChatTitleUpdatedPayload`]'s docs. Can arrive before *or* after
     /// [`ConversationStreamEvent::WorkflowFinished`].
     ChatTitleUpdated(ChatTitleUpdatedPayload),

@@ -184,11 +184,11 @@ pub unsafe extern "C" fn lb_agent_context_continue_conversation(
 /// Start a conversation with the specified Agent, calling `event_callback`
 /// for every run-progress event observed over SSE. A `WorkflowFinished`
 /// event carries the run's outcome, but isn't necessarily the last one seen —
-/// the server may still emit a few more housekeeping events (surfaced as
-/// `Other`, e.g. a `chat_title_updated`) before actually closing the
-/// connection. Once the stream truly ends, `callback` is invoked with the
-/// final `CConversationResponse` — same as `lb_agent_context_conversation`,
-/// just arrived at via the streamed path.
+/// the server may still emit a few more housekeeping events (e.g. a
+/// `ChatTitleUpdated`) before actually closing the connection. Once the
+/// stream truly ends, `callback` is invoked with the final
+/// `CConversationResponse` — same as `lb_agent_context_conversation`, just
+/// arrived at via the streamed path.
 ///
 /// @param[in] chat_uid            Existing conversation identifier to
 ///                                continue within (can be null to start a

@@ -2970,10 +2970,43 @@ impl_java_class!(
     [chat_uid, message_id]
 );
 
+// JNI-side view of `longbridge::agent::WorkflowStartedInputs`, the `inputs`
+// sub-object of a `workflow_started` event — mapped to its own Java class
+// the same way `Interrupt`/`Question` nest inside `ConversationResponse`
+// above.
+impl_java_class!(
+    "com/longbridge/agent/WorkflowStartedInputs",
+    longbridge::agent::WorkflowStartedInputs,
+    [chat_id, chat_uid, message_id, query]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/WorkflowStartedEvent",
+    longbridge::agent::WorkflowStartedPayload,
+    [hit_cache, inputs, started_at, workflow_id]
+);
+
 impl_java_class!(
     "com/longbridge/agent/MessageEvent",
     longbridge::agent::MessagePayload,
     [text]
+);
+
+/// JNI-side marker for
+/// [`longbridge::agent::ConversationStreamEvent::Ping`], which — unlike
+/// every other variant — carries no payload at all. `impl_java_class!` works
+/// fine against a zero-field struct, so this is used instead of hand-writing
+/// a bespoke JNI object constructor for the one variant with nothing to
+/// carry. See the manual `IntoJValue` for `ConversationStreamEvent` below,
+/// the only place this type is used.
+pub(crate) struct PingEvent {}
+
+impl_java_class!("com/longbridge/agent/PingEvent", PingEvent, []);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatFinishedEvent",
+    longbridge::agent::ChatFinishedPayload,
+    [chat_id, chat_uid, message_id, error, error_message]
 );
 
 /// JNI-side view of [`longbridge::agent::ConversationResponse`], with
@@ -3038,6 +3071,12 @@ impl_java_class!(
     [response]
 );
 
+impl_java_class!(
+    "com/longbridge/agent/ChatTitleUpdatedEvent",
+    longbridge::agent::ChatTitleUpdatedPayload,
+    [chat_id, chat_uid, source, title, updated_at]
+);
+
 /// JNI-side wrapper for
 /// [`longbridge::agent::ConversationStreamEvent::Other`], carrying the SSE
 /// envelope's `event` type name alongside the raw event JSON as a string
@@ -3054,11 +3093,12 @@ impl_java_class!("com/longbridge/agent/OtherEvent", OtherEvent, [event, json]);
 /// build a single Java class by reflecting named struct fields onto it).
 /// Instead each variant is modeled as its own Java subclass of the
 /// `ConversationStreamEvent` sealed-style hierarchy
-/// (`ChatStartedEvent`/`MessageEvent`/`WorkflowFinishedEvent`/`OtherEvent`),
-/// and this manual `IntoJValue` picks the right one — the resulting object
-/// reference is passed to `Flow.Subscriber.onNext(Object)` as-is (generics
-/// are erased on the Java side, so any subclass of the sealed base is a
-/// valid argument there).
+/// (`ChatStartedEvent`/`WorkflowStartedEvent`/`MessageEvent`/`PingEvent`/
+/// `ChatFinishedEvent`/`WorkflowFinishedEvent`/`ChatTitleUpdatedEvent`/
+/// `OtherEvent`), and this manual `IntoJValue` picks the right one — the
+/// resulting object reference is passed to `Flow.Subscriber.onNext(Object)`
+/// as-is (generics are erased on the Java side, so any subclass of the
+/// sealed base is a valid argument there).
 impl crate::types::IntoJValue for longbridge::agent::ConversationStreamEvent {
     fn into_jvalue<'a>(
         self,
@@ -3067,11 +3107,15 @@ impl crate::types::IntoJValue for longbridge::agent::ConversationStreamEvent {
         use longbridge::agent::ConversationStreamEvent::*;
         match self {
             ChatStarted(payload) => payload.into_jvalue(env),
+            WorkflowStarted(payload) => payload.into_jvalue(env),
             Message(payload) => payload.into_jvalue(env),
+            Ping => PingEvent {}.into_jvalue(env),
+            ChatFinished(payload) => payload.into_jvalue(env),
             WorkflowFinished(resp) => WorkflowFinishedEvent {
                 response: ConversationResponse::from(resp),
             }
             .into_jvalue(env),
+            ChatTitleUpdated(payload) => payload.into_jvalue(env),
             Other { event, data } => OtherEvent { event, json: data }.into_jvalue(env),
         }
     }

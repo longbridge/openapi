@@ -3,8 +3,8 @@ package com.longbridge.agent;
 /**
  * The run finished (succeeded, interrupted, failed, or stopped), carrying the
  * run's outcome. Not necessarily the last event of the stream — the server
- * may still emit a few more housekeeping events (as an {@link OtherEvent},
- * e.g. a {@code chat_title_updated}) before actually closing the connection
+ * may still emit a few more housekeeping events (e.g. a
+ * {@link ChatTitleUpdatedEvent}) before actually closing the connection
  * (unless the stream itself errors first, delivered instead via
  * {@code Flow.Subscriber#onError}).
  */

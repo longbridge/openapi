@@ -3635,12 +3635,47 @@ export declare const enum ChargeCategoryCode {
   Third = 2
 }
 
+/**
+ * Payload of a `chat_finished` stream event, observed once all `message`
+ * events for this round have been sent, shortly before `workflow_finished`
+ */
+export interface ChatFinishedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Empty string in every run observed so far */
+  error: string
+  /** Empty string in every run observed so far */
+  errorMessage: string
+}
+
 /** Payload of a `chat_started` stream event */
 export interface ChatStartedPayload {
   /** Conversation identifier */
   chatUid: string
   /** Message ID of this round */
   messageId: string
+}
+
+/**
+ * Payload of a `chat_title_updated` stream event — the server auto-generates
+ * a short title for the conversation as a UI convenience. Can arrive before
+ * *or* after `workflow_finished`; not tied to the run's outcome.
+ */
+export interface ChatTitleUpdatedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Where the title came from, e.g. `"ai_generated"` */
+  source: string
+  /** The new (possibly truncated) title */
+  title: string
+  /** Unix timestamp in seconds */
+  updatedAt: number
 }
 
 /** Commission-free Status */
@@ -3844,21 +3879,30 @@ export declare const enum ConversationStatus {
  * `trade::PushEvent`, is dispatched to separate per-variant JS callbacks
  * instead). We instead mirror the common "discriminant + optional per-kind
  * fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
- * `"chat_started" | "message" | "workflow_finished" | "other"`, and exactly
- * one of `chatStarted` / `message` / `workflowFinished` / `other` is set,
- * matching `kind`. When `kind` is `"other"`, `otherEvent` additionally
- * carries the SSE envelope's `event` field (the event type name).
+ * `"chat_started" | "workflow_started" | "message" | "ping" |
+ * "chat_finished" | "workflow_finished" | "chat_title_updated" | "other"`,
+ * and exactly one of `chatStarted` / `workflowStarted` / `message` /
+ * `chatFinished` / `workflowFinished` / `chatTitleUpdated` / `other` is set,
+ * matching `kind` — except `"ping"`, a heartbeat with no payload, for which
+ * every payload field is `None`. When `kind` is `"other"`, `otherEvent`
+ * additionally carries the SSE envelope's `event` field (the event type
+ * name).
  */
 export interface ConversationStreamEvent {
   /**
-   * Discriminant: one of `"chat_started"`, `"message"`,
-   * `"workflow_finished"`, or `"other"`
+   * Discriminant: one of `"chat_started"`, `"workflow_started"`,
+   * `"message"`, `"ping"`, `"chat_finished"`, `"workflow_finished"`,
+   * `"chat_title_updated"`, or `"other"`
    */
   kind: string
   /** Set when `kind` is `"chat_started"` */
   chatStarted?: ChatStartedPayload
+  /** Set when `kind` is `"workflow_started"` */
+  workflowStarted?: WorkflowStartedPayload
   /** Set when `kind` is `"message"` */
   message?: MessagePayload
+  /** Set when `kind` is `"chat_finished"` */
+  chatFinished?: ChatFinishedPayload
   /**
    * Set when `kind` is `"workflow_finished"`, carrying the run's outcome
    * — not necessarily the last event of the stream, since the server may
@@ -3866,11 +3910,11 @@ export interface ConversationStreamEvent {
    * actually closing the connection
    */
   workflowFinished?: ConversationResponse
+  /** Set when `kind` is `"chat_title_updated"` */
+  chatTitleUpdated?: ChatTitleUpdatedPayload
   /**
    * Set when `kind` is `"other"` — the SSE envelope's `event` field (the
-   * event type name), e.g. `"workflow_started"`, `"ping"`,
-   * `"chat_finished"`, `"chat_title_updated"` (observed against the real
-   * API; not documented)
+   * event type name)
    */
   otherEvent?: string
   /**
@@ -6907,6 +6951,33 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+/** `inputs` of a `workflow_started` stream event */
+export interface WorkflowStartedInputs {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** The question that was asked */
+  query: string
+}
+
+/**
+ * Payload of a `workflow_started` stream event, observed right after
+ * `chat_started`
+ */
+export interface WorkflowStartedPayload {
+  /** Whether this run's answer was served from a cache */
+  hitCache: boolean
+  /** Echoes the run's inputs */
+  inputs: WorkflowStartedInputs
+  /** Unix timestamp in seconds */
+  startedAt: number
+  /** Internal workflow run ID */
+  workflowId: number
 }
 
 /** A Workspace the current account belongs to */

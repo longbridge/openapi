@@ -426,9 +426,14 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::agent::Interrupt,
         longbridge::agent::AgentError,
         longbridge::agent::ChatStartedPayload,
+        longbridge::agent::WorkflowStartedInputs,
+        longbridge::agent::WorkflowStartedPayload,
         longbridge::agent::MessagePayload,
+        crate::types::PingEvent,
+        longbridge::agent::ChatFinishedPayload,
         crate::types::ConversationResponse,
         crate::types::WorkflowFinishedEvent,
+        longbridge::agent::ChatTitleUpdatedPayload,
         crate::types::OtherEvent
     );
 }
