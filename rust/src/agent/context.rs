@@ -56,6 +56,16 @@ fn map_conversation_event(
             ConversationStreamEvent::ChatStarted(payload)
         }
         "message" => ConversationStreamEvent::Message(serde_json::from_value(envelope.data)?),
+        "workflow_started" => {
+            ConversationStreamEvent::WorkflowStarted(serde_json::from_value(envelope.data)?)
+        }
+        "ping" => ConversationStreamEvent::Ping,
+        "chat_finished" => {
+            ConversationStreamEvent::ChatFinished(serde_json::from_value(envelope.data)?)
+        }
+        "chat_title_updated" => {
+            ConversationStreamEvent::ChatTitleUpdated(serde_json::from_value(envelope.data)?)
+        }
         "workflow_finished" => {
             let payload: WorkflowFinishedPayload = serde_json::from_value(envelope.data)?;
             ConversationStreamEvent::WorkflowFinished(ConversationResponse::from_stream_parts(
@@ -314,6 +324,13 @@ mod tests {
     const MESSAGE: &str = r#"{"event":"message","workflow_run_id":"wr_1","data":{"text":"Tesla"}}"#;
     const WORKFLOW_FINISHED: &str = r#"{"event":"workflow_finished","workflow_run_id":"wr_1","data":{"status":"succeeded","elapsed_time":3.21,"outputs":{"answer":"Tesla (TSLA.US) recently..."}}}"#;
 
+    // The four event types below aren't in the docs — captured verbatim from
+    // real traffic during manual live testing (see conversation history).
+    const WORKFLOW_STARTED: &str = r#"{"event":"workflow_started","workflow_run_id":"wr_1","data":{"hit_cache":false,"inputs":{"chat_id":834552,"chat_uid":"ct_9f2c1a5b","message_id":42,"query":"How has Tesla stock performed recently?"},"started_at":1784545150,"workflow_id":176476}}"#;
+    const PING: &str = r#"{"event":"ping","workflow_run_id":"wr_1","data":null}"#;
+    const CHAT_FINISHED: &str = r#"{"event":"chat_finished","workflow_run_id":"wr_1","data":{"chat_id":834552,"chat_uid":"ct_9f2c1a5b","error":"","error_message":"","message_id":42}}"#;
+    const CHAT_TITLE_UPDATED: &str = r#"{"event":"chat_title_updated","workflow_run_id":"wr_1","data":{"chat_id":834552,"chat_uid":"ct_9f2c1a5b","source":"ai_generated","title":"Tesla stock performance","updated_at":1784546957}}"#;
+
     fn sse(data: &str) -> longbridge_httpcli::HttpClientResult<longbridge_httpcli::SseEvent> {
         Ok(longbridge_httpcli::SseEvent {
             event: "message".to_string(),
@@ -336,8 +353,37 @@ mod tests {
         }
         assert_eq!(started, Some(("ct_9f2c1a5b".to_string(), "42".to_string())));
 
+        // The real event stream is richer than the docs' three-event example
+        // — this exercises the fuller, real-world sequence, including
+        // `chat_title_updated` arriving *after* `workflow_finished` (observed
+        // live; see the "drain to the stream's natural end" fix).
+        match map_conversation_event(sse(WORKFLOW_STARTED), &mut started).unwrap() {
+            ConversationStreamEvent::WorkflowStarted(payload) => {
+                assert!(!payload.hit_cache);
+                assert_eq!(payload.inputs.chat_uid, "ct_9f2c1a5b");
+                assert_eq!(payload.inputs.message_id, "42");
+                assert_eq!(payload.workflow_id, 176476);
+            }
+            other => panic!("unexpected event: {other:?}"),
+        }
+
         match map_conversation_event(sse(MESSAGE), &mut started).unwrap() {
             ConversationStreamEvent::Message(payload) => assert_eq!(payload.text, "Tesla"),
+            other => panic!("unexpected event: {other:?}"),
+        }
+
+        match map_conversation_event(sse(PING), &mut started).unwrap() {
+            ConversationStreamEvent::Ping => {}
+            other => panic!("unexpected event: {other:?}"),
+        }
+
+        match map_conversation_event(sse(CHAT_FINISHED), &mut started).unwrap() {
+            ConversationStreamEvent::ChatFinished(payload) => {
+                assert_eq!(payload.chat_uid, "ct_9f2c1a5b");
+                assert_eq!(payload.message_id, "42");
+                assert_eq!(payload.error, "");
+                assert_eq!(payload.error_message, "");
+            }
             other => panic!("unexpected event: {other:?}"),
         }
 
@@ -347,6 +393,16 @@ mod tests {
                 assert_eq!(resp.message_id, "42");
                 assert_eq!(resp.status, ConversationStatus::Succeeded);
                 assert_eq!(resp.answer, "Tesla (TSLA.US) recently...");
+            }
+            other => panic!("unexpected event: {other:?}"),
+        }
+
+        // Arrives *after* workflow_finished in this (real, observed) ordering.
+        match map_conversation_event(sse(CHAT_TITLE_UPDATED), &mut started).unwrap() {
+            ConversationStreamEvent::ChatTitleUpdated(payload) => {
+                assert_eq!(payload.chat_uid, "ct_9f2c1a5b");
+                assert_eq!(payload.source, "ai_generated");
+                assert_eq!(payload.title, "Tesla stock performance");
             }
             other => panic!("unexpected event: {other:?}"),
         }
