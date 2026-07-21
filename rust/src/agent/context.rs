@@ -38,6 +38,10 @@ struct SseEnvelope {
     event: String,
     #[serde(default)]
     data: serde_json::Value,
+    /// Only present on `plan_changed`, as a sibling of `data` rather than a
+    /// field inside it — see [`PlanChangedPayload::tool_name`].
+    #[serde(default)]
+    tool_name: Option<String>,
 }
 
 /// Parse one raw SSE frame into a [`ConversationStreamEvent`], threading the
@@ -60,6 +64,56 @@ fn map_conversation_event(
             ConversationStreamEvent::WorkflowStarted(serde_json::from_value(envelope.data)?)
         }
         "ping" => ConversationStreamEvent::Ping,
+        "thinking_started" => {
+            ConversationStreamEvent::ThinkingStarted(serde_json::from_value(envelope.data)?)
+        }
+        "thinking_finished" => {
+            ConversationStreamEvent::ThinkingFinished(serde_json::from_value(envelope.data)?)
+        }
+        "node_tool_use_started" => {
+            ConversationStreamEvent::NodeToolUseStarted(serde_json::from_value(envelope.data)?)
+        }
+        "node_tool_use_finished" => {
+            ConversationStreamEvent::NodeToolUseFinished(serde_json::from_value(envelope.data)?)
+        }
+        "subagent_started" => {
+            ConversationStreamEvent::SubagentStarted(serde_json::from_value(envelope.data)?)
+        }
+        "subagent_progress" => {
+            ConversationStreamEvent::SubagentProgress(serde_json::from_value(envelope.data)?)
+        }
+        "subagent_finished" => {
+            ConversationStreamEvent::SubagentFinished(serde_json::from_value(envelope.data)?)
+        }
+        "agent_tool_started" => {
+            ConversationStreamEvent::AgentToolStarted(serde_json::from_value(envelope.data)?)
+        }
+        "agent_tool_progress" => {
+            ConversationStreamEvent::AgentToolProgress(serde_json::from_value(envelope.data)?)
+        }
+        "agent_tool_finished" => {
+            ConversationStreamEvent::AgentToolFinished(serde_json::from_value(envelope.data)?)
+        }
+        "human_interaction_required" => {
+            let interrupt: Interrupt = serde_json::from_value(envelope.data)?;
+            ConversationStreamEvent::HumanInteractionRequired(
+                ConversationResponse::from_stream_interrupt(started.clone(), interrupt),
+            )
+        }
+        "query_masked" => {
+            ConversationStreamEvent::QueryMasked(serde_json::from_value(envelope.data)?)
+        }
+        "plan_changed" => {
+            let mut payload: PlanChangedPayload = serde_json::from_value(envelope.data)?;
+            payload.tool_name = envelope.tool_name.clone().unwrap_or_default();
+            ConversationStreamEvent::PlanChanged(payload)
+        }
+        "context_compress_started" => {
+            ConversationStreamEvent::ContextCompressStarted(serde_json::from_value(envelope.data)?)
+        }
+        "context_compress_finished" => {
+            ConversationStreamEvent::ContextCompressFinished(serde_json::from_value(envelope.data)?)
+        }
         "chat_finished" => {
             ConversationStreamEvent::ChatFinished(serde_json::from_value(envelope.data)?)
         }
@@ -223,14 +277,16 @@ impl AgentContext {
     }
 
     /// Start a conversation with the specified Agent, returning a [`Stream`] of
-    /// run-progress events over SSE. A
-    /// [`ConversationStreamEvent::WorkflowFinished`] event carries the
-    /// run's outcome (unless the stream errors first), but
-    /// it isn't necessarily the last item — the server may still emit a few
-    /// more housekeeping events (surfaced as
-    /// [`ConversationStreamEvent::Other`], e.g. a `chat_title_updated`) before
-    /// actually closing the connection, so keep draining the stream until it
-    /// ends rather than stopping as soon as you see it.
+    /// run-progress events over SSE. The run's outcome is carried by a
+    /// [`ConversationStreamEvent::WorkflowFinished`] event (succeeded, failed,
+    /// or stopped) or, if the Agent needs more input from you, a
+    /// [`ConversationStreamEvent::HumanInteractionRequired`] event instead —
+    /// an interrupted run never emits `WorkflowFinished`. Neither is
+    /// necessarily the last item — the server may still emit a few more
+    /// housekeeping events (e.g.
+    /// [`ConversationStreamEvent::ChatTitleUpdated`]) before actually closing
+    /// the connection, so keep draining the stream until it ends rather than
+    /// stopping as soon as you see one.
     ///
     /// Path: `POST /v1/ai/agents/{id}/conversations` (`Accept:
     /// text/event-stream`)
@@ -416,6 +472,52 @@ mod tests {
             ConversationStreamEvent::Other { event, data } => {
                 assert_eq!(event, "some_future_event");
                 assert_eq!(data["foo"], "bar");
+            }
+            other => panic!("unexpected event: {other:?}"),
+        }
+    }
+
+    // https://github.com/longbridge/developers/pull/1176 — an interrupted
+    // run's stream never emits `workflow_finished`; `human_interaction_required`
+    // is the terminal event instead.
+    const HUMAN_INTERACTION_REQUIRED: &str = r#"{"event":"human_interaction_required","workflow_run_id":"wr_1","data":{"node_id":"n_ask_human","tool_call_id":"call_abc123","questions":[{"question":"Which time range would you like to check?","options":[{"description":"Past week"},{"description":"Past month"}],"multi_select":false}],"message_id":43,"chat_id":1001}}"#;
+
+    #[test]
+    fn map_conversation_event_interrupted_sequence_has_no_workflow_finished() {
+        let mut started = None;
+        map_conversation_event(sse(CHAT_STARTED), &mut started).unwrap();
+        map_conversation_event(sse(WORKFLOW_STARTED), &mut started).unwrap();
+
+        match map_conversation_event(sse(HUMAN_INTERACTION_REQUIRED), &mut started).unwrap() {
+            ConversationStreamEvent::HumanInteractionRequired(resp) => {
+                assert_eq!(resp.chat_uid, "ct_9f2c1a5b");
+                assert_eq!(resp.message_id, "42");
+                assert_eq!(resp.status, ConversationStatus::Interrupted);
+                let interrupt = resp.interrupt.expect("interrupt");
+                assert_eq!(interrupt.node_id, "n_ask_human");
+                assert_eq!(interrupt.tool_call_id, "call_abc123");
+            }
+            other => panic!("unexpected event: {other:?}"),
+        }
+
+        // The stream still ends with `chat_finished`, just never emits
+        // `workflow_finished`.
+        match map_conversation_event(sse(CHAT_FINISHED), &mut started).unwrap() {
+            ConversationStreamEvent::ChatFinished(_) => {}
+            other => panic!("unexpected event: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn map_conversation_event_plan_changed_picks_up_sibling_tool_name() {
+        let mut started = None;
+        // `tool_name` sits outside `data`, as a sibling of `event`/`data` in
+        // the raw envelope.
+        let json = r#"{"event":"plan_changed","workflow_run_id":"wr_1","tool_name":"planner","data":{"node_id":"n_plan","started_at":1752048000}}"#;
+        match map_conversation_event(sse(json), &mut started).unwrap() {
+            ConversationStreamEvent::PlanChanged(payload) => {
+                assert_eq!(payload.node_id, "n_plan");
+                assert_eq!(payload.tool_name, "planner");
             }
             other => panic!("unexpected event: {other:?}"),
         }

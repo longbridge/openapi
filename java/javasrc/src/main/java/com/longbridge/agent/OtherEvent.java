@@ -11,9 +11,8 @@ public final class OtherEvent extends ConversationStreamEvent {
     /**
      * Returns the SSE envelope's {@code event} field (the event type name) of
      * whatever event type this SDK version doesn't yet recognize as one of
-     * {@link ChatStartedEvent}, {@link WorkflowStartedEvent},
-     * {@link MessageEvent}, {@link PingEvent}, {@link ChatFinishedEvent},
-     * {@link WorkflowFinishedEvent}, or {@link ChatTitleUpdatedEvent}.
+     * the other {@link ConversationStreamEvent} subclasses (see its class
+     * documentation for the full list).
      *
      * @return event type name
      */

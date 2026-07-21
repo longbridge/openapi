@@ -13,8 +13,11 @@ use crate::{
 
 /// Drive a conversation event stream to completion, invoking `on_event` for
 /// every event, and returning the final [`ConversationResponse`] once a
-/// [`ConversationStreamEvent::WorkflowFinished`] event is observed (or an error
-/// if the stream ends before that happens).
+/// [`ConversationStreamEvent::WorkflowFinished`] or
+/// [`ConversationStreamEvent::HumanInteractionRequired`] event is observed
+/// (or an error if the stream ends before either happens). An interrupted
+/// run emits `HumanInteractionRequired` instead of `WorkflowFinished`, never
+/// both, so exactly one of the two is expected per run.
 ///
 /// Used by binding layers that are call-scoped-callback shaped (C, C++,
 /// Node.js) — every other binding either pulls synchronously
@@ -31,8 +34,12 @@ where
     let mut final_response = None;
     while let Some(event) = stream.next().await {
         let event = event?;
-        if let ConversationStreamEvent::WorkflowFinished(ref resp) = event {
-            final_response = Some(resp.clone());
+        match &event {
+            ConversationStreamEvent::WorkflowFinished(resp)
+            | ConversationStreamEvent::HumanInteractionRequired(resp) => {
+                final_response = Some(resp.clone());
+            }
+            _ => {}
         }
         on_event(event);
     }
@@ -142,5 +149,56 @@ impl ConversationStreamSubscription {
     /// Called from `Flow.Subscription.cancel()`.
     pub fn cancel(&self) {
         self.abort.abort();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use futures_util::stream;
+
+    use super::*;
+    use crate::agent::types::{ChatFinishedPayload, ChatStartedPayload, Interrupt};
+
+    // Regression test for the interrupted-run gap:
+    // https://github.com/longbridge/developers/pull/1176 confirms an
+    // interrupted run never emits `WorkflowFinished` — before this fix,
+    // `drive_conversation_stream` would run to the end of such a stream
+    // without ever setting `final_response` and return
+    // `Error::ConversationStreamEnded`.
+    #[tokio::test]
+    async fn drive_conversation_stream_terminates_on_human_interaction_required() {
+        let interrupt_resp = ConversationResponse::from_stream_interrupt(
+            Some(("ct_1".to_string(), "1".to_string())),
+            Interrupt {
+                node_id: "n_ask_human".to_string(),
+                tool_call_id: "call_1".to_string(),
+                questions: vec![],
+                message_id: 1,
+                chat_id: 1,
+            },
+        );
+        let events: Vec<Result<ConversationStreamEvent>> = vec![
+            Ok(ConversationStreamEvent::ChatStarted(ChatStartedPayload {
+                chat_uid: "ct_1".to_string(),
+                message_id: "1".to_string(),
+            })),
+            Ok(ConversationStreamEvent::HumanInteractionRequired(
+                interrupt_resp,
+            )),
+            Ok(ConversationStreamEvent::ChatFinished(
+                ChatFinishedPayload::default(),
+            )),
+        ];
+
+        let mut seen = 0;
+        let resp = drive_conversation_stream(stream::iter(events), |_| seen += 1)
+            .await
+            .unwrap();
+        assert_eq!(seen, 3);
+        assert_eq!(
+            resp.status,
+            crate::agent::types::ConversationStatus::Interrupted
+        );
+        assert!(resp.interrupt.is_some());
     }
 }
