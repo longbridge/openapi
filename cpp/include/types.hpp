@@ -3653,4 +3653,731 @@ struct SharelistDetail
 
 } // namespace sharelist
 
+namespace agent {
+
+/// A Workspace the current account belongs to.
+struct Workspace
+{
+  /// Workspace ID
+  std::string id;
+  /// Workspace name
+  std::string name;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Response for AgentContext::workspaces.
+struct WorkspacesResponse
+{
+  /// Workspaces the current account belongs to
+  std::vector<Workspace> workspaces;
+};
+
+/// An Agent in a Workspace.
+struct Agent
+{
+  /// Agent UID, used as the path parameter of AgentContext::conversation
+  std::string uid;
+  /// Agent name
+  std::string name;
+  /// Agent description
+  std::string description;
+  /// Agent mode, e.g. "chat"
+  std::string mode;
+  /// Icon URL
+  std::string icon;
+  /// Whether published; only published Agents can start conversations
+  bool is_published;
+  /// Publish time, Unix timestamp in seconds; 0 if unpublished
+  int64_t published_at;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Response for AgentContext::agents.
+struct AgentsResponse
+{
+  /// Agent list
+  std::vector<Agent> agents;
+  /// Total number of matching Agents
+  int32_t total;
+};
+
+/// Options for AgentContext::agents (all fields optional).
+struct GetAgentsOptions
+{
+  /// Page number, starts at 1
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+  /// Fuzzy search by Agent name
+  std::optional<std::string> name;
+};
+
+/// A source referenced by the answer.
+struct Reference
+{
+  /// Reference index
+  int32_t index;
+  /// Reference title
+  std::string title;
+  /// Reference URL
+  std::string url;
+};
+
+/// One option of a Question.
+struct QuestionOption
+{
+  /// Option text
+  std::string description;
+};
+
+/// One question the Agent needs you to answer.
+struct Question
+{
+  /// Question text
+  std::string question;
+  /// Options; empty means free-form answer
+  std::vector<QuestionOption> options;
+  /// Whether multiple options may be selected
+  bool multi_select;
+};
+
+/// Present when a conversation run is interrupted, waiting for
+/// AgentContext::continue_conversation.
+struct Interrupt
+{
+  /// ID of the node that triggered the interrupt
+  std::string node_id;
+  /// Tool call ID of this inquiry; used as the answer key when continuing
+  std::string tool_call_id;
+  /// Questions you need to answer
+  std::vector<Question> questions;
+  /// ID of the paused message
+  int64_t message_id;
+  /// ID of the owning conversation
+  int64_t chat_id;
+};
+
+/// Present when a conversation run failed.
+struct AgentError
+{
+  /// Error code
+  int32_t code;
+  /// Error message
+  std::string message;
+};
+
+/// Final run status of a conversation.
+enum class ConversationStatus
+{
+  /// The run completed successfully
+  Succeeded,
+  /// The run is paused, waiting for AgentContext::continue_conversation
+  Interrupted,
+  /// The run failed
+  Failed,
+  /// The run was stopped
+  Stopped,
+};
+
+/// Response for AgentContext::conversation, AgentContext::continue_conversation,
+/// and the final result of the streamed counterparts.
+struct ConversationResponse
+{
+  /// Conversation identifier, used for follow-up questions and
+  /// troubleshooting
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// Final run status
+  ConversationStatus status;
+  /// Final answer text; valid when status is ConversationStatus::Succeeded
+  std::string answer;
+  /// Sources referenced by the answer
+  std::vector<Reference> references;
+  /// Run duration in seconds
+  double elapsed_time;
+  /// Present only when status is ConversationStatus::Interrupted
+  std::optional<Interrupt> interrupt;
+  /// Present only when the run failed
+  std::optional<AgentError> error;
+};
+
+/// Payload of a ChatStarted conversation stream event.
+struct ChatStartedPayload
+{
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+};
+
+/// Payload of a Message conversation stream event — an incremental text
+/// chunk. This is the highest-frequency event; concatenate text fragments
+/// in arrival order.
+struct MessagePayload
+{
+  /// Incremental text fragment
+  std::string text;
+  /// answer — final answer text; think — reasoning process; process —
+  /// stage progress description
+  std::string message_type;
+  /// Identifier of the stream segment this fragment belongs to. Fragments
+  /// with the same key form one continuous block — group by key when
+  /// rendering
+  std::string key;
+  /// Time this segment started, Unix timestamp in seconds
+  int64_t started_at;
+  /// Stage identifier; only present when message_type is "process"
+  std::string stage;
+  /// Stage title while running; only present when message_type is
+  /// "process"
+  std::string stage_title;
+  /// Stage title after it finishes; only present when message_type is
+  /// "process"
+  std::string stage_finished_title;
+  /// Extra payload attached to the fragment, as a JSON string; empty when
+  /// absent
+  std::string outputs_json;
+};
+
+/// `inputs` of a WorkflowStarted conversation stream event.
+struct WorkflowStartedInputs
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// The question that was asked
+  std::string query;
+};
+
+/// Payload of a WorkflowStarted conversation stream event, observed right
+/// after ChatStarted on every run seen so far.
+struct WorkflowStartedPayload
+{
+  /// Whether this run's answer was served from a cache
+  bool hit_cache;
+  /// Echoes the run's inputs
+  WorkflowStartedInputs inputs;
+  /// Unix timestamp in seconds
+  int64_t started_at;
+  /// Internal workflow run ID
+  int64_t workflow_id;
+};
+
+/// Payload of a ThinkingStarted conversation stream event — the Agent has
+/// entered the reasoning phase (analyzing the question, planning tool
+/// calls). Between this and ThinkingFinished, Message events with
+/// message_type == "think" and tool-call events may arrive.
+struct ThinkingStartedPayload
+{
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+};
+
+/// Payload of a ThinkingFinished conversation stream event — the reasoning
+/// phase is over; answer text (Message with message_type == "answer")
+/// follows.
+struct ThinkingFinishedPayload
+{
+  /// Finish time, Unix timestamp in seconds
+  int64_t finished_at;
+  /// Reasoning duration in seconds
+  int32_t elapsed_time;
+};
+
+/// Payload of a NodeToolUseStarted conversation stream event — an ordinary
+/// tool call has started. Match it to its NodeToolUseFinished counterpart
+/// by tool_use_id.
+struct NodeToolUseStartedPayload
+{
+  /// Unique ID of this call; matches the finished event
+  std::string tool_use_id;
+  /// Localized display name of the tool
+  std::string tool_name;
+  /// Locale-stable tool identifier; use this for logic keyed on the tool
+  /// kind
+  std::string tool_func_name;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Progress text suitable for direct display, e.g. "Searching the
+  /// web..."
+  std::string tips;
+  /// Short tags accompanying tips; may be empty
+  std::vector<std::string> tip_chips;
+  /// Round number. Calls in the same round (same iteration) run in
+  /// parallel
+  int32_t iteration;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+};
+
+/// outputs of a NodeToolUseFinished conversation stream event — only
+/// carries fields meant for display.
+struct NodeToolUseOutputs
+{
+  /// Sources referenced by the tool result
+  std::vector<Reference> references;
+  /// Domains of the referenced sources
+  std::vector<std::string> reference_domains;
+  /// The query the tool executed; empty when absent
+  std::string query;
+  /// Raw response text of the tool; empty when absent
+  std::string text;
+  /// Parsed request arguments, as a JSON string; empty when absent
+  std::string tool_args_json;
+  /// Structured result, as a JSON string; present only for selected tools,
+  /// empty when absent
+  std::string data_json;
+};
+
+/// Payload of a NodeToolUseFinished conversation stream event — the tool
+/// call has ended.
+struct NodeToolUseFinishedPayload
+{
+  /// Matches the tool_use_id of the started event
+  std::string tool_use_id;
+  /// succeeded / failed
+  std::string status;
+  /// Error description on failure
+  std::string error;
+  /// Call duration in seconds
+  double elapsed_time;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Localized display name
+  std::string tool_name;
+  /// Locale-stable tool identifier
+  std::string tool_func_name;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Tool category
+  std::string tool_type;
+  /// Progress text
+  std::string tips;
+  /// Short tags; may be empty
+  std::vector<std::string> tip_chips;
+  /// Round number
+  int32_t iteration;
+  /// true if the call happened during the thinking phase
+  bool is_thinking;
+  /// Filtered call results, for display
+  NodeToolUseOutputs outputs;
+};
+
+/// Payload of a SubagentStarted conversation stream event. When the Agent
+/// spawns a subagent to work on a sub-task, the subagent's lifecycle is
+/// reported with this dedicated event family instead of NodeToolUse*.
+struct SubagentStartedPayload
+{
+  /// ID of the node that spawned the subagent
+  std::string node_id;
+  /// Unique ID of this spawn; matches the finished event
+  std::string tool_use_id;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Goal assigned to the subagent
+  std::string goal;
+  /// Full task prompt given to the subagent
+  std::string prompt;
+  /// Subagent identifier; may be empty
+  std::string subagent_id;
+  /// Tools granted to the subagent, as a JSON array string; empty when
+  /// absent
+  std::string tools_json;
+};
+
+/// Payload of a SubagentProgress conversation stream event, emitted every
+/// time the subagent calls one of its own tools. Use it to render a live
+/// timeline inside the subagent card.
+struct SubagentProgressPayload
+{
+  /// ID of the node that spawned the subagent
+  std::string node_id;
+  /// tool_use_id of the owning SubagentStarted event
+  std::string parent_tool_call_id;
+  /// Name of the tool the subagent called
+  std::string subagent_tool_name;
+  /// Arguments of that call, as a JSON string
+  std::string subagent_tool_args;
+  /// Status of that call: running / succeeded / failed
+  std::string subagent_status;
+  /// Duration of that call in milliseconds
+  int64_t subagent_duration_ms;
+  /// The subagent's internal round number
+  int32_t subagent_iteration;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+};
+
+/// outputs of a SubagentFinished conversation stream event.
+struct SubagentOutputs
+{
+  /// The goal that was assigned to the subagent; empty when absent
+  std::string goal;
+  /// The subagent's result; empty when absent
+  std::string result;
+  /// Timeline of tool calls the subagent made, as a JSON array string;
+  /// empty when absent
+  std::string subagent_tools_json;
+};
+
+/// Payload of a SubagentFinished conversation stream event.
+struct SubagentFinishedPayload
+{
+  /// ID of the node that spawned the subagent
+  std::string node_id;
+  /// Matches the tool_use_id of SubagentStarted
+  std::string tool_use_id;
+  /// succeeded / failed
+  std::string status;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Total subagent duration in seconds
+  double elapsed_time;
+  /// Error description on failure
+  std::string error;
+  /// Subagent result: goal, result, and the timeline of tool calls it made
+  SubagentOutputs outputs;
+};
+
+/// Payload of an AgentToolStarted conversation stream event. When the Agent
+/// delegates to another Agent as a tool, that inner run is reported with
+/// the AgentTool* family — the shape mirrors the subagent events.
+struct AgentToolStartedPayload
+{
+  /// ID of the calling node
+  std::string node_id;
+  /// Unique ID of this call; matches the finished event
+  std::string tool_use_id;
+  /// Identifier of the Agent being called
+  std::string agent_tool_name;
+  /// Display title; may be empty
+  std::string title;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Localized display name
+  std::string tool_name;
+  /// Progress text; may be empty
+  std::string tips;
+  /// Short tags; may be empty
+  std::vector<std::string> tip_chips;
+  /// true if called during the thinking phase
+  bool is_thinking;
+};
+
+/// Payload of an AgentToolProgress conversation stream event, emitted for
+/// each inner tool call the delegated Agent makes.
+struct AgentToolProgressPayload
+{
+  /// ID of the calling node
+  std::string node_id;
+  /// tool_use_id of the owning AgentToolStarted event
+  std::string parent_tool_call_id;
+  /// Identifier of the Agent being called
+  std::string agent_tool_name;
+  /// Name of the inner tool the delegated Agent called
+  std::string inner_tool_name;
+  /// Arguments of that inner call, as a JSON string
+  std::string inner_tool_args;
+  /// Status of the inner call: running / succeeded / failed
+  std::string status;
+  /// Duration of the inner call in milliseconds
+  int64_t duration_ms;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// true if during the thinking phase
+  bool is_thinking;
+};
+
+/// Payload of an AgentToolFinished conversation stream event.
+struct AgentToolFinishedPayload
+{
+  /// ID of the calling node
+  std::string node_id;
+  /// Matches the tool_use_id of AgentToolStarted
+  std::string tool_use_id;
+  /// Identifier of the Agent being called
+  std::string agent_tool_name;
+  /// succeeded / failed
+  std::string status;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Total duration in seconds
+  double elapsed_time;
+  /// Error description on failure
+  std::string error;
+  /// Call arguments as a JSON string
+  std::string tool_args;
+  /// Result of the delegated Agent, as a JSON string; empty when absent
+  std::string outputs_json;
+  /// Tool category
+  std::string tool_type;
+  /// Progress text; may be empty
+  std::string tips;
+  /// Short tags; may be empty
+  std::vector<std::string> tip_chips;
+  /// true if during the thinking phase
+  bool is_thinking;
+};
+
+/// Payload of a QueryMasked conversation stream event — sensitive content
+/// in the user query was masked before processing. Display masked_query
+/// instead of the original query.
+struct QueryMaskedPayload
+{
+  /// The original user query
+  std::string raw_query;
+  /// The masked query
+  std::string masked_query;
+};
+
+/// Payload of a PlanChanged conversation stream event — the Agent created
+/// or updated its task plan.
+struct PlanChangedPayload
+{
+  /// ID of the planning node
+  std::string node_id;
+  /// Time of the change, Unix timestamp in seconds
+  int64_t started_at;
+  /// The current plan content, as a JSON string; empty when absent
+  std::string outputs_json;
+  /// Identifies the planning tool
+  std::string tool_name;
+};
+
+/// Payload of a ContextCompressStarted conversation stream event, marking
+/// the start of a context-compression pass triggered by a long
+/// conversation. Unlike other events, started_at here is an RFC 3339
+/// string.
+struct ContextCompressStartedPayload
+{
+  /// Start time, RFC 3339
+  std::string started_at;
+  /// Compression input summary, as a JSON string; empty when absent
+  std::string inputs_json;
+};
+
+/// Payload of a ContextCompressFinished conversation stream event. Unlike
+/// other events, created_at here is an RFC 3339 string.
+struct ContextCompressFinishedPayload
+{
+  /// Finish time, RFC 3339
+  std::string created_at;
+  /// Compression input summary, as a JSON string; empty when absent
+  std::string inputs_json;
+  /// Compression result summary, as a JSON string; empty when absent
+  std::string outputs_json;
+};
+
+/// Payload of a ChatFinished conversation stream event, observed once all
+/// Message events for this round have been sent, shortly before
+/// WorkflowFinished.
+struct ChatFinishedPayload
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Message ID of this round
+  std::string message_id;
+  /// Empty string in every run observed so far
+  std::string error;
+  /// Empty string in every run observed so far
+  std::string error_message;
+};
+
+/// Payload of a ChatTitleUpdated conversation stream event — the server
+/// auto-generates a short title for the conversation as a UI convenience.
+/// Can arrive before *or* after WorkflowFinished; not tied to the run's
+/// outcome.
+struct ChatTitleUpdatedPayload
+{
+  /// ID of the owning conversation
+  int64_t chat_id;
+  /// Conversation identifier
+  std::string chat_uid;
+  /// Where the title came from, e.g. "ai_generated"
+  std::string source;
+  /// The new (possibly truncated) title
+  std::string title;
+  /// Unix timestamp in seconds
+  int64_t updated_at;
+};
+
+/// Kind of a ConversationStreamEvent. Only the field matching this kind is
+/// populated, the others are `std::nullopt`.
+enum class ConversationStreamEventKind
+{
+  /// The run has started; `chat_started` is populated
+  ChatStarted,
+  /// Observed right after `ChatStarted` on every run seen so far;
+  /// `workflow_started` is populated
+  WorkflowStarted,
+  /// An incremental piece of the answer; `message` is populated
+  Message,
+  /// A heartbeat with no payload, observed at arbitrary points in the
+  /// stream (including in between `Message` chunks); every field below is
+  /// `std::nullopt`
+  Ping,
+  /// The Agent has entered the reasoning phase; `thinking_started` is
+  /// populated
+  ThinkingStarted,
+  /// The reasoning phase is over; `thinking_finished` is populated
+  ThinkingFinished,
+  /// An ordinary tool call has started; `node_tool_use_started` is
+  /// populated
+  NodeToolUseStarted,
+  /// An ordinary tool call has ended; `node_tool_use_finished` is
+  /// populated
+  NodeToolUseFinished,
+  /// The Agent has spawned a subagent to work on a sub-task;
+  /// `subagent_started` is populated
+  SubagentStarted,
+  /// The subagent has called one of its own tools; `subagent_progress` is
+  /// populated
+  SubagentProgress,
+  /// The subagent has finished its sub-task; `subagent_finished` is
+  /// populated
+  SubagentFinished,
+  /// The Agent has delegated to another Agent as a tool;
+  /// `agent_tool_started` is populated
+  AgentToolStarted,
+  /// The delegated Agent has called one of its own tools;
+  /// `agent_tool_progress` is populated
+  AgentToolProgress,
+  /// The delegated Agent's run has finished; `agent_tool_finished` is
+  /// populated
+  AgentToolFinished,
+  /// The run is paused: the Agent needs more information or confirmation
+  /// from you; `human_interaction_required` is populated. Unlike
+  /// `WorkflowFinished`, this is emitted instead of (never alongside)
+  /// `WorkflowFinished` for the same run
+  HumanInteractionRequired,
+  /// Sensitive content in the user query was masked before processing;
+  /// `query_masked` is populated
+  QueryMasked,
+  /// The Agent created or updated its task plan; `plan_changed` is
+  /// populated
+  PlanChanged,
+  /// A context-compression pass has started; `context_compress_started`
+  /// is populated
+  ContextCompressStarted,
+  /// The context-compression pass has finished;
+  /// `context_compress_finished` is populated
+  ContextCompressFinished,
+  /// Observed once all `Message` events for this round have been sent;
+  /// `chat_finished` is populated
+  ChatFinished,
+  /// The run finished successfully, with a failure, or stopped by the
+  /// user; `workflow_finished` is populated. Never emitted for an
+  /// interrupted run — see `HumanInteractionRequired` for that case
+  WorkflowFinished,
+  /// The server auto-generating a short title for the conversation;
+  /// `chat_title_updated` is populated
+  ChatTitleUpdated,
+  /// An event type not recognized by this SDK version; `other_json` is
+  /// populated with the raw event JSON
+  Other,
+};
+
+/// One event observed while streaming AgentContext::conversation_streamed or
+/// AgentContext::continue_conversation_streamed.
+///
+/// This mirrors the C layer's tagged-union `lb_conversation_stream_event_t`:
+/// `kind` tells you which one of the payload fields below is populated (all
+/// others are `std::nullopt`; when `kind` is `Ping`, none of them are). A
+/// plain discriminated struct is used here (rather than `std::variant` or a
+/// JSON library) since neither has any precedent elsewhere in this C++
+/// binding, and this shape converts directly from the C tagged union.
+struct ConversationStreamEvent
+{
+  /// Discriminant, tells you which field below is populated
+  ConversationStreamEventKind kind;
+  /// Populated when `kind` is `ChatStarted`
+  std::optional<ChatStartedPayload> chat_started;
+  /// Populated when `kind` is `WorkflowStarted`, observed right after
+  /// `ChatStarted` on every run seen so far
+  std::optional<WorkflowStartedPayload> workflow_started;
+  /// Populated when `kind` is `Message`
+  std::optional<MessagePayload> message;
+  /// Populated when `kind` is `ThinkingStarted`, the Agent entering the
+  /// reasoning phase
+  std::optional<ThinkingStartedPayload> thinking_started;
+  /// Populated when `kind` is `ThinkingFinished`, the reasoning phase
+  /// ending
+  std::optional<ThinkingFinishedPayload> thinking_finished;
+  /// Populated when `kind` is `NodeToolUseStarted`, an ordinary tool call
+  /// starting
+  std::optional<NodeToolUseStartedPayload> node_tool_use_started;
+  /// Populated when `kind` is `NodeToolUseFinished`, an ordinary tool call
+  /// ending
+  std::optional<NodeToolUseFinishedPayload> node_tool_use_finished;
+  /// Populated when `kind` is `SubagentStarted`, the Agent spawning a
+  /// subagent to work on a sub-task
+  std::optional<SubagentStartedPayload> subagent_started;
+  /// Populated when `kind` is `SubagentProgress`, the subagent calling one
+  /// of its own tools
+  std::optional<SubagentProgressPayload> subagent_progress;
+  /// Populated when `kind` is `SubagentFinished`, the subagent finishing
+  /// its sub-task
+  std::optional<SubagentFinishedPayload> subagent_finished;
+  /// Populated when `kind` is `AgentToolStarted`, the Agent delegating to
+  /// another Agent as a tool
+  std::optional<AgentToolStartedPayload> agent_tool_started;
+  /// Populated when `kind` is `AgentToolProgress`, the delegated Agent
+  /// calling one of its own tools
+  std::optional<AgentToolProgressPayload> agent_tool_progress;
+  /// Populated when `kind` is `AgentToolFinished`, the delegated Agent's
+  /// run finishing
+  std::optional<AgentToolFinishedPayload> agent_tool_finished;
+  /// Populated when `kind` is `HumanInteractionRequired`, carrying the
+  /// run's outcome for an interrupted run. Unlike `workflow_finished`, this
+  /// is populated instead of (never alongside) `workflow_finished` for the
+  /// same run
+  std::optional<ConversationResponse> human_interaction_required;
+  /// Populated when `kind` is `QueryMasked`, sensitive content in the user
+  /// query having been masked before processing
+  std::optional<QueryMaskedPayload> query_masked;
+  /// Populated when `kind` is `PlanChanged`, the Agent creating or
+  /// updating its task plan
+  std::optional<PlanChangedPayload> plan_changed;
+  /// Populated when `kind` is `ContextCompressStarted`, a
+  /// context-compression pass starting
+  std::optional<ContextCompressStartedPayload> context_compress_started;
+  /// Populated when `kind` is `ContextCompressFinished`, a
+  /// context-compression pass finishing
+  std::optional<ContextCompressFinishedPayload> context_compress_finished;
+  /// Populated when `kind` is `ChatFinished`, observed once all `Message`
+  /// events for this round have been sent
+  std::optional<ChatFinishedPayload> chat_finished;
+  /// Populated when `kind` is `WorkflowFinished`, carrying the run's
+  /// outcome — not necessarily the last event of the stream, since the
+  /// server may still emit a few more housekeeping events before actually
+  /// closing the connection. Never populated for an interrupted run — see
+  /// `human_interaction_required` for that case
+  std::optional<ConversationResponse> workflow_finished;
+  /// Populated when `kind` is `ChatTitleUpdated`, the server auto-generating
+  /// a short title for the conversation
+  std::optional<ChatTitleUpdatedPayload> chat_title_updated;
+  /// Populated when `kind` is `Other`; the SSE envelope's `event` field (the
+  /// event type name)
+  std::optional<std::string> other_event;
+  /// Populated when `kind` is `Other`; raw JSON of an event type not
+  /// recognized by this SDK version
+  std::optional<std::string> other_json;
+};
+
+} // namespace agent
+
 } // namespace longbridge

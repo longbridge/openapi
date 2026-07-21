@@ -47,6 +47,153 @@
 #define LB_WATCHLIST_GROUP_SECURITIES 2
 
 /**
+ * Kind of a [`crate::agent_context::types::CConversationStreamEvent`]. Only
+ * the field matching this kind is non-null, all others are null.
+ */
+typedef enum lb_conversation_stream_event_type_t {
+  /**
+   * The run has started; `chat_started` is non-null
+   */
+  ChatStarted,
+  /**
+   * Observed right after `ChatStarted` on every run seen so far;
+   * `workflow_started` is non-null
+   */
+  WorkflowStarted,
+  /**
+   * An incremental piece of the answer; `message` is non-null
+   */
+  Message,
+  /**
+   * A heartbeat with no payload, observed at arbitrary points in the
+   * stream (including in between `Message` chunks); every field below is
+   * null
+   */
+  Ping,
+  /**
+   * The Agent has entered the reasoning phase; `thinking_started` is
+   * non-null
+   */
+  ThinkingStarted,
+  /**
+   * The reasoning phase is over; `thinking_finished` is non-null
+   */
+  ThinkingFinished,
+  /**
+   * An ordinary tool call has started; `node_tool_use_started` is
+   * non-null
+   */
+  NodeToolUseStarted,
+  /**
+   * An ordinary tool call has ended; `node_tool_use_finished` is
+   * non-null
+   */
+  NodeToolUseFinished,
+  /**
+   * The Agent has spawned a subagent to work on a sub-task;
+   * `subagent_started` is non-null
+   */
+  SubagentStarted,
+  /**
+   * The subagent has called one of its own tools; `subagent_progress` is
+   * non-null
+   */
+  SubagentProgress,
+  /**
+   * The subagent has finished its sub-task; `subagent_finished` is
+   * non-null
+   */
+  SubagentFinished,
+  /**
+   * The Agent has delegated to another Agent as a tool;
+   * `agent_tool_started` is non-null
+   */
+  AgentToolStarted,
+  /**
+   * The delegated Agent has called one of its own tools;
+   * `agent_tool_progress` is non-null
+   */
+  AgentToolProgress,
+  /**
+   * The delegated Agent's run has finished; `agent_tool_finished` is
+   * non-null
+   */
+  AgentToolFinished,
+  /**
+   * The run is paused: the Agent needs more information or confirmation
+   * from you; `human_interaction_required` is non-null. Unlike
+   * `WorkflowFinished`, this is emitted instead of (never alongside)
+   * `WorkflowFinished` for the same run
+   */
+  HumanInteractionRequired,
+  /**
+   * Sensitive content in the user query was masked before processing;
+   * `query_masked` is non-null
+   */
+  QueryMasked,
+  /**
+   * The Agent created or updated its task plan; `plan_changed` is
+   * non-null
+   */
+  PlanChanged,
+  /**
+   * A context-compression pass has started; `context_compress_started`
+   * is non-null
+   */
+  ContextCompressStarted,
+  /**
+   * The context-compression pass has finished;
+   * `context_compress_finished` is non-null
+   */
+  ContextCompressFinished,
+  /**
+   * Observed once all `Message` events for this round have been sent;
+   * `chat_finished` is non-null
+   */
+  ChatFinished,
+  /**
+   * The run finished successfully, with a failure, or stopped by the
+   * user; `workflow_finished` is non-null. Never emitted for an
+   * interrupted run — see `HumanInteractionRequired` for that case
+   */
+  WorkflowFinished,
+  /**
+   * The server auto-generating a short title for the conversation;
+   * `chat_title_updated` is non-null
+   */
+  ChatTitleUpdated,
+  /**
+   * An event type not recognized by this SDK version; `other_json` is
+   * non-null and contains the raw event JSON
+   */
+  Other,
+} lb_conversation_stream_event_type_t;
+
+/**
+ * Final run status of a conversation
+ */
+typedef enum lb_conversation_status_t {
+  /**
+   * The run completed successfully
+   */
+  ConversationStatusSucceeded,
+  /**
+   * The run is paused, waiting for
+   * `lb_agent_context_continue_conversation`/
+   * `lb_agent_context_continue_conversation_streamed`
+   */
+  ConversationStatusInterrupted,
+  /**
+   * The run failed
+   */
+  ConversationStatusFailed,
+  /**
+   * The run was stopped
+   */
+  ConversationStatusStopped,
+} lb_conversation_status_t;
+
+/**
  * Alert trigger condition
  */
 typedef enum lb_alert_condition_t {
@@ -1600,6 +1747,11 @@ typedef enum lb_element_type_t {
   ElementTypeIndustry,
 } lb_element_type_t;
 
+/**
+ * AI Agent conversation context
+ */
+typedef struct lb_agent_context_t lb_agent_context_t;
+
 typedef struct lb_alert_context_t lb_alert_context_t;
 
 /**
@@ -1674,6 +1826,1063 @@ typedef struct lb_async_result_t {
 typedef void (*lb_async_callback_t)(const struct lb_async_result_t*);
 
 /**
+ * Options for `lb_agent_context_agents` (all fields can be null)
+ */
+typedef struct lb_get_agents_options_t {
+  /**
+   * Page number, starts at 1 (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+  /**
+   * Fuzzy search by Agent name (can be null)
+   */
+  const char *name;
+} lb_get_agents_options_t;
+
+/**
+ * One answer to a [`CInterrupt`] question, used as an entry of
+ * [`CAnswersByToolCallEntry::answers`]
+ */
+typedef struct lb_answer_question_t {
+  /**
+   * Question text, must match `CQuestion::question` verbatim
+   */
+  const char *question;
+  /**
+   * Your answer text
+   */
+  const char *answer;
+} lb_answer_question_t;
+
+/**
+ * Answers for one `tool_call_id`, used as an entry of the `answers` array of
+ * `lb_agent_context_continue_conversation`/
+ * `lb_agent_context_continue_conversation_streamed`.
+ *
+ * The Rust core's `AnswersByToolCall` is a
+ * `HashMap<String, HashMap<String, String>>` keyed by `tool_call_id`, then by
+ * question text. Since C has no native map type, it's flattened into an
+ * array of `(tool_call_id, [(question, answer)])` entries — this array of
+ * `CAnswersByToolCallEntry` mirrors the outer map, and each entry's
+ * `answers` array (of `CAnswerQuestion`) mirrors the inner map.
+ */
+typedef struct lb_answers_by_tool_call_entry_t {
+  /**
+   * Tool call ID, see [`CInterrupt::tool_call_id`]
+   */
+  const char *tool_call_id;
+  /**
+   * Answers to the questions raised for this tool call
+   */
+  const struct lb_answer_question_t *answers;
+  /**
+   * Number of answers
+   */
+  uintptr_t num_answers;
+} lb_answers_by_tool_call_entry_t;
+
+/**
+ * Payload of a `ChatStarted` conversation stream event
+ */
+typedef struct lb_chat_started_payload_t {
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+} lb_chat_started_payload_t;
+
+/**
+ * `inputs` of a `WorkflowStarted` conversation stream event
+ */
+typedef struct lb_workflow_started_inputs_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * The question that was asked
+   */
+  const char *query;
+} lb_workflow_started_inputs_t;
+
+/**
+ * Payload of a `WorkflowStarted` conversation stream event, observed right
+ * after `ChatStarted` on every run seen so far
+ */
+typedef struct lb_workflow_started_payload_t {
+  /**
+   * Whether this run's answer was served from a cache
+   */
+  bool hit_cache;
+  /**
+   * Echoes the run's inputs
+   */
+  const struct lb_workflow_started_inputs_t *inputs;
+  /**
+   * Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Internal workflow run ID
+   */
+  int64_t workflow_id;
+} lb_workflow_started_payload_t;
+
+/**
+ * Payload of a `Message` conversation stream event — an incremental text
+ * chunk. This is the highest-frequency event; concatenate `text` fragments
+ * in arrival order.
+ */
+typedef struct lb_message_payload_t {
+  /**
+   * Incremental text fragment
+   */
+  const char *text;
+  /**
+   * `answer` — final answer text; `think` — reasoning process; `process`
+   * — stage progress description
+   */
+  const char *message_type;
+  /**
+   * Identifier of the stream segment this fragment belongs to. Fragments
+   * with the same `key` form one continuous block — group by `key` when
+   * rendering
+   */
+  const char *key;
+  /**
+   * Time this segment started, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Stage identifier; only present when `message_type` is `"process"`
+   */
+  const char *stage;
+  /**
+   * Stage title while running; only present when `message_type` is
+   * `"process"`
+   */
+  const char *stage_title;
+  /**
+   * Stage title after it finishes; only present when `message_type` is
+   * `"process"`
+   */
+  const char *stage_finished_title;
+  /**
+   * Extra payload attached to the fragment, as a JSON string; empty when
+   * absent
+   */
+  const char *outputs_json;
+} lb_message_payload_t;
+
+/**
+ * Payload of a `ThinkingStarted` conversation stream event — the Agent has
+ * entered the reasoning phase (analyzing the question, planning tool
+ * calls). Between this and `ThinkingFinished`, `Message` events with
+ * `message_type == "think"` and tool-call events may arrive.
+ */
+typedef struct lb_thinking_started_payload_t {
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+} lb_thinking_started_payload_t;
+
+/**
+ * Payload of a `ThinkingFinished` conversation stream event — the
+ * reasoning phase is over; answer text (`Message` with `message_type ==
+ * "answer"`) follows.
+ */
+typedef struct lb_thinking_finished_payload_t {
+  /**
+   * Finish time, Unix timestamp in seconds
+   */
+  int64_t finished_at;
+  /**
+   * Reasoning duration in seconds
+   */
+  int32_t elapsed_time;
+} lb_thinking_finished_payload_t;
+
+/**
+ * Payload of a `NodeToolUseStarted` conversation stream event — an
+ * ordinary tool call has started. Match it to its `NodeToolUseFinished`
+ * counterpart by `tool_use_id`.
+ */
+typedef struct lb_node_tool_use_started_payload_t {
+  /**
+   * Unique ID of this call; matches the finished event
+   */
+  const char *tool_use_id;
+  /**
+   * Localized display name of the tool
+   */
+  const char *tool_name;
+  /**
+   * Locale-stable tool identifier; use this for logic keyed on the tool
+   * kind
+   */
+  const char *tool_func_name;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Progress text suitable for direct display, e.g. `"Searching the
+   * web…"`
+   */
+  const char *tips;
+  /**
+   * Short tags accompanying `tips`; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * Round number. Calls in the same round (same `iteration`) run in
+   * parallel
+   */
+  int32_t iteration;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+} lb_node_tool_use_started_payload_t;
+
+/**
+ * A source referenced by the answer
+ */
+typedef struct lb_reference_t {
+  /**
+   * Reference index
+   */
+  int32_t index;
+  /**
+   * Reference title
+   */
+  const char *title;
+  /**
+   * Reference URL
+   */
+  const char *url;
+} lb_reference_t;
+
+/**
+ * `outputs` of a `NodeToolUseFinished` conversation stream event — only
+ * carries fields meant for display
+ */
+typedef struct lb_node_tool_use_outputs_t {
+  /**
+   * Sources referenced by the tool result
+   */
+  const struct lb_reference_t *references;
+  /**
+   * Number of references
+   */
+  uintptr_t num_references;
+  /**
+   * Domains of the referenced sources
+   */
+  const char *const *reference_domains;
+  /**
+   * Number of reference domains
+   */
+  uintptr_t num_reference_domains;
+  /**
+   * The query the tool executed; empty when absent
+   */
+  const char *query;
+  /**
+   * Raw response text of the tool; empty when absent
+   */
+  const char *text;
+  /**
+   * Parsed request arguments, as a JSON string; empty when absent
+   */
+  const char *tool_args_json;
+  /**
+   * Structured result, as a JSON string; present only for selected
+   * tools, empty when absent
+   */
+  const char *data_json;
+} lb_node_tool_use_outputs_t;
+
+/**
+ * Payload of a `NodeToolUseFinished` conversation stream event — the tool
+ * call has ended.
+ */
+typedef struct lb_node_tool_use_finished_payload_t {
+  /**
+   * Matches the `tool_use_id` of the started event
+   */
+  const char *tool_use_id;
+  /**
+   * `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Error description on failure
+   */
+  const char *error;
+  /**
+   * Call duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Localized display name
+   */
+  const char *tool_name;
+  /**
+   * Locale-stable tool identifier
+   */
+  const char *tool_func_name;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Tool category
+   */
+  const char *tool_type;
+  /**
+   * Progress text
+   */
+  const char *tips;
+  /**
+   * Short tags; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * Round number
+   */
+  int32_t iteration;
+  /**
+   * `true` if the call happened during the thinking phase
+   */
+  bool is_thinking;
+  /**
+   * Filtered call results, for display
+   */
+  const struct lb_node_tool_use_outputs_t *outputs;
+} lb_node_tool_use_finished_payload_t;
+
+/**
+ * Payload of a `SubagentStarted` conversation stream event. When the Agent
+ * spawns a subagent to work on a sub-task, the subagent's lifecycle is
+ * reported with this dedicated event family instead of `NodeToolUse*`.
+ */
+typedef struct lb_subagent_started_payload_t {
+  /**
+   * ID of the node that spawned the subagent
+   */
+  const char *node_id;
+  /**
+   * Unique ID of this spawn; matches the finished event
+   */
+  const char *tool_use_id;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Goal assigned to the subagent
+   */
+  const char *goal;
+  /**
+   * Full task prompt given to the subagent
+   */
+  const char *prompt;
+  /**
+   * Subagent identifier; may be empty
+   */
+  const char *subagent_id;
+  /**
+   * Tools granted to the subagent, as a JSON array string; empty when
+   * absent
+   */
+  const char *tools_json;
+} lb_subagent_started_payload_t;
+
+/**
+ * Payload of a `SubagentProgress` conversation stream event, emitted every
+ * time the subagent calls one of its own tools. Use it to render a live
+ * timeline inside the subagent card.
+ */
+typedef struct lb_subagent_progress_payload_t {
+  /**
+   * ID of the node that spawned the subagent
+   */
+  const char *node_id;
+  /**
+   * `tool_use_id` of the owning `SubagentStarted` event
+   */
+  const char *parent_tool_call_id;
+  /**
+   * Name of the tool the subagent called
+   */
+  const char *subagent_tool_name;
+  /**
+   * Arguments of that call, as a JSON string
+   */
+  const char *subagent_tool_args;
+  /**
+   * Status of that call: `running` / `succeeded` / `failed`
+   */
+  const char *subagent_status;
+  /**
+   * Duration of that call in milliseconds
+   */
+  int64_t subagent_duration_ms;
+  /**
+   * The subagent's internal round number
+   */
+  int32_t subagent_iteration;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+} lb_subagent_progress_payload_t;
+
+/**
+ * `outputs` of a `SubagentFinished` conversation stream event
+ */
+typedef struct lb_subagent_outputs_t {
+  /**
+   * The goal that was assigned to the subagent; empty when absent
+   */
+  const char *goal;
+  /**
+   * The subagent's result; empty when absent
+   */
+  const char *result;
+  /**
+   * Timeline of tool calls the subagent made, as a JSON array string;
+   * empty when absent
+   */
+  const char *subagent_tools_json;
+} lb_subagent_outputs_t;
+
+/**
+ * Payload of a `SubagentFinished` conversation stream event
+ */
+typedef struct lb_subagent_finished_payload_t {
+  /**
+   * ID of the node that spawned the subagent
+   */
+  const char *node_id;
+  /**
+   * Matches the `tool_use_id` of `SubagentStarted`
+   */
+  const char *tool_use_id;
+  /**
+   * `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Total subagent duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Error description on failure
+   */
+  const char *error;
+  /**
+   * Subagent result: `goal`, `result`, and the timeline of tool calls it
+   * made
+   */
+  const struct lb_subagent_outputs_t *outputs;
+} lb_subagent_finished_payload_t;
+
+/**
+ * Payload of an `AgentToolStarted` conversation stream event. When the
+ * Agent delegates to another Agent as a tool, that inner run is reported
+ * with the `AgentTool*` family — the shape mirrors the subagent events.
+ */
+typedef struct lb_agent_tool_started_payload_t {
+  /**
+   * ID of the calling node
+   */
+  const char *node_id;
+  /**
+   * Unique ID of this call; matches the finished event
+   */
+  const char *tool_use_id;
+  /**
+   * Identifier of the Agent being called
+   */
+  const char *agent_tool_name;
+  /**
+   * Display title; may be empty
+   */
+  const char *title;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Localized display name
+   */
+  const char *tool_name;
+  /**
+   * Progress text; may be empty
+   */
+  const char *tips;
+  /**
+   * Short tags; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * `true` if called during the thinking phase
+   */
+  bool is_thinking;
+} lb_agent_tool_started_payload_t;
+
+/**
+ * Payload of an `AgentToolProgress` conversation stream event, emitted for
+ * each inner tool call the delegated Agent makes.
+ */
+typedef struct lb_agent_tool_progress_payload_t {
+  /**
+   * ID of the calling node
+   */
+  const char *node_id;
+  /**
+   * `tool_use_id` of the owning `AgentToolStarted` event
+   */
+  const char *parent_tool_call_id;
+  /**
+   * Identifier of the Agent being called
+   */
+  const char *agent_tool_name;
+  /**
+   * Name of the inner tool the delegated Agent called
+   */
+  const char *inner_tool_name;
+  /**
+   * Arguments of that inner call, as a JSON string
+   */
+  const char *inner_tool_args;
+  /**
+   * Status of the inner call: `running` / `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Duration of the inner call in milliseconds
+   */
+  int64_t duration_ms;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * `true` if during the thinking phase
+   */
+  bool is_thinking;
+} lb_agent_tool_progress_payload_t;
+
+/**
+ * Payload of an `AgentToolFinished` conversation stream event
+ */
+typedef struct lb_agent_tool_finished_payload_t {
+  /**
+   * ID of the calling node
+   */
+  const char *node_id;
+  /**
+   * Matches the `tool_use_id` of `AgentToolStarted`
+   */
+  const char *tool_use_id;
+  /**
+   * Identifier of the Agent being called
+   */
+  const char *agent_tool_name;
+  /**
+   * `succeeded` / `failed`
+   */
+  const char *status;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Total duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Error description on failure
+   */
+  const char *error;
+  /**
+   * Call arguments as a JSON string
+   */
+  const char *tool_args;
+  /**
+   * Result of the delegated Agent, as a JSON string; empty when absent
+   */
+  const char *outputs_json;
+  /**
+   * Tool category
+   */
+  const char *tool_type;
+  /**
+   * Progress text; may be empty
+   */
+  const char *tips;
+  /**
+   * Short tags; may be empty
+   */
+  const char *const *tip_chips;
+  /**
+   * Number of tags in `tip_chips`
+   */
+  uintptr_t num_tip_chips;
+  /**
+   * `true` if during the thinking phase
+   */
+  bool is_thinking;
+} lb_agent_tool_finished_payload_t;
+
+/**
+ * One option of a [`CQuestion`]
+ */
+typedef struct lb_question_option_t {
+  /**
+   * Option text
+   */
+  const char *description;
+} lb_question_option_t;
+
+/**
+ * One question the Agent needs you to answer
+ */
+typedef struct lb_question_t {
+  /**
+   * Question text
+   */
+  const char *question;
+  /**
+   * Options; empty means free-form answer
+   */
+  const struct lb_question_option_t *options;
+  /**
+   * Number of options
+   */
+  uintptr_t num_options;
+  /**
+   * Whether multiple options may be selected
+   */
+  bool multi_select;
+} lb_question_t;
+
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `lb_agent_context_continue_conversation`
+ */
+typedef struct lb_interrupt_t {
+  /**
+   * ID of the node that triggered the interrupt
+   */
+  const char *node_id;
+  /**
+   * Tool call ID of this inquiry; used as the answer key when continuing
+   */
+  const char *tool_call_id;
+  /**
+   * Questions you need to answer
+   */
+  const struct lb_question_t *questions;
+  /**
+   * Number of questions
+   */
+  uintptr_t num_questions;
+  /**
+   * ID of the paused message
+   */
+  int64_t message_id;
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+} lb_interrupt_t;
+
+/**
+ * Present when a conversation run failed
+ */
+typedef struct lb_agent_error_t {
+  /**
+   * Error code
+   */
+  int32_t code;
+  /**
+   * Error message
+   */
+  const char *message;
+} lb_agent_error_t;
+
+/**
+ * Response for `lb_agent_context_conversation`,
+ * `lb_agent_context_continue_conversation`, and the final result of the
+ * streamed counterparts
+ */
+typedef struct lb_conversation_response_t {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * Final run status
+   */
+  enum lb_conversation_status_t status;
+  /**
+   * Final answer text; valid when `status` is
+   * `ConversationStatusSucceeded`
+   */
+  const char *answer;
+  /**
+   * Sources referenced by the answer
+   */
+  const struct lb_reference_t *references;
+  /**
+   * Number of references
+   */
+  uintptr_t num_references;
+  /**
+   * Run duration in seconds
+   */
+  double elapsed_time;
+  /**
+   * Present only when `status` is `ConversationStatusInterrupted` (can be
+   * null)
+   */
+  const struct lb_interrupt_t *interrupt;
+  /**
+   * Present only when the run failed (can be null)
+   */
+  const struct lb_agent_error_t *error;
+} lb_conversation_response_t;
+
+/**
+ * Payload of a `QueryMasked` conversation stream event — sensitive content
+ * in the user query was masked before processing. Display `masked_query`
+ * instead of the original query.
+ */
+typedef struct lb_query_masked_payload_t {
+  /**
+   * The original user query
+   */
+  const char *raw_query;
+  /**
+   * The masked query
+   */
+  const char *masked_query;
+} lb_query_masked_payload_t;
+
+/**
+ * Payload of a `PlanChanged` conversation stream event — the Agent created
+ * or updated its task plan.
+ */
+typedef struct lb_plan_changed_payload_t {
+  /**
+   * ID of the planning node
+   */
+  const char *node_id;
+  /**
+   * Time of the change, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * The current plan content, as a JSON string; empty when absent
+   */
+  const char *outputs_json;
+  /**
+   * Identifies the planning tool
+   */
+  const char *tool_name;
+} lb_plan_changed_payload_t;
+
+/**
+ * Payload of a `ContextCompressStarted` conversation stream event, marking
+ * the start of a context-compression pass triggered by a long
+ * conversation. Unlike other events, `started_at` here is an RFC 3339
+ * string.
+ */
+typedef struct lb_context_compress_started_payload_t {
+  /**
+   * Start time, RFC 3339
+   */
+  const char *started_at;
+  /**
+   * Compression input summary, as a JSON string; empty when absent
+   */
+  const char *inputs_json;
+} lb_context_compress_started_payload_t;
+
+/**
+ * Payload of a `ContextCompressFinished` conversation stream event. Unlike
+ * other events, `created_at` here is an RFC 3339 string.
+ */
+typedef struct lb_context_compress_finished_payload_t {
+  /**
+   * Finish time, RFC 3339
+   */
+  const char *created_at;
+  /**
+   * Compression input summary, as a JSON string; empty when absent
+   */
+  const char *inputs_json;
+  /**
+   * Compression result summary, as a JSON string; empty when absent
+   */
+  const char *outputs_json;
+} lb_context_compress_finished_payload_t;
+
+/**
+ * Payload of a `ChatFinished` conversation stream event, observed once all
+ * `Message` events for this round have been sent, shortly before
+ * `WorkflowFinished`
+ */
+typedef struct lb_chat_finished_payload_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Message ID of this round
+   */
+  const char *message_id;
+  /**
+   * Empty string in every run observed so far
+   */
+  const char *error;
+  /**
+   * Empty string in every run observed so far
+   */
+  const char *error_message;
+} lb_chat_finished_payload_t;
+
+/**
+ * Payload of a `ChatTitleUpdated` conversation stream event — the server
+ * auto-generates a short title for the conversation as a UI convenience.
+ * Can arrive before *or* after `WorkflowFinished`; not tied to the run's
+ * outcome.
+ */
+typedef struct lb_chat_title_updated_payload_t {
+  /**
+   * ID of the owning conversation
+   */
+  int64_t chat_id;
+  /**
+   * Conversation identifier
+   */
+  const char *chat_uid;
+  /**
+   * Where the title came from, e.g. `"ai_generated"`
+   */
+  const char *source;
+  /**
+   * The new (possibly truncated) title
+   */
+  const char *title;
+  /**
+   * Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_chat_title_updated_payload_t;
+
+/**
+ * One event observed while streaming `lb_agent_context_conversation_streamed`
+ * or `lb_agent_context_continue_conversation_streamed`.
+ *
+ * This is a tagged union: `kind` tells you which one field below is
+ * non-null; all others are always null. When `kind` is `Ping` (a
+ * heartbeat with no payload), every field below is null.
+ */
+typedef struct lb_conversation_stream_event_t {
+  /**
+   * Discriminant, tells you which field below is populated
+   */
+  enum lb_conversation_stream_event_type_t kind;
+  /**
+   * Non-null when `kind` is `ChatStarted`
+   */
+  const struct lb_chat_started_payload_t *chat_started;
+  /**
+   * Non-null when `kind` is `WorkflowStarted`, observed right after
+   * `ChatStarted` on every run seen so far
+   */
+  const struct lb_workflow_started_payload_t *workflow_started;
+  /**
+   * Non-null when `kind` is `Message`
+   */
+  const struct lb_message_payload_t *message;
+  /**
+   * Non-null when `kind` is `ThinkingStarted`, the Agent entering the
+   * reasoning phase
+   */
+  const struct lb_thinking_started_payload_t *thinking_started;
+  /**
+   * Non-null when `kind` is `ThinkingFinished`, the reasoning phase
+   * ending
+   */
+  const struct lb_thinking_finished_payload_t *thinking_finished;
+  /**
+   * Non-null when `kind` is `NodeToolUseStarted`, an ordinary tool call
+   * starting
+   */
+  const struct lb_node_tool_use_started_payload_t *node_tool_use_started;
+  /**
+   * Non-null when `kind` is `NodeToolUseFinished`, an ordinary tool call
+   * ending
+   */
+  const struct lb_node_tool_use_finished_payload_t *node_tool_use_finished;
+  /**
+   * Non-null when `kind` is `SubagentStarted`, the Agent spawning a
+   * subagent to work on a sub-task
+   */
+  const struct lb_subagent_started_payload_t *subagent_started;
+  /**
+   * Non-null when `kind` is `SubagentProgress`, the subagent calling one
+   * of its own tools
+   */
+  const struct lb_subagent_progress_payload_t *subagent_progress;
+  /**
+   * Non-null when `kind` is `SubagentFinished`, the subagent finishing
+   * its sub-task
+   */
+  const struct lb_subagent_finished_payload_t *subagent_finished;
+  /**
+   * Non-null when `kind` is `AgentToolStarted`, the Agent delegating to
+   * another Agent as a tool
+   */
+  const struct lb_agent_tool_started_payload_t *agent_tool_started;
+  /**
+   * Non-null when `kind` is `AgentToolProgress`, the delegated Agent
+   * calling one of its own tools
+   */
+  const struct lb_agent_tool_progress_payload_t *agent_tool_progress;
+  /**
+   * Non-null when `kind` is `AgentToolFinished`, the delegated Agent's
+   * run finishing
+   */
+  const struct lb_agent_tool_finished_payload_t *agent_tool_finished;
+  /**
+   * Non-null when `kind` is `HumanInteractionRequired`, carrying the
+   * run's outcome for an interrupted run. Unlike `WorkflowFinished`, this
+   * is emitted instead of (never alongside) `WorkflowFinished` for the
+   * same run
+   */
+  const struct lb_conversation_response_t *human_interaction_required;
+  /**
+   * Non-null when `kind` is `QueryMasked`, sensitive content in the user
+   * query having been masked before processing
+   */
+  const struct lb_query_masked_payload_t *query_masked;
+  /**
+   * Non-null when `kind` is `PlanChanged`, the Agent creating or
+   * updating its task plan
+   */
+  const struct lb_plan_changed_payload_t *plan_changed;
+  /**
+   * Non-null when `kind` is `ContextCompressStarted`, a
+   * context-compression pass starting
+   */
+  const struct lb_context_compress_started_payload_t *context_compress_started;
+  /**
+   * Non-null when `kind` is `ContextCompressFinished`, a
+   * context-compression pass finishing
+   */
+  const struct lb_context_compress_finished_payload_t *context_compress_finished;
+  /**
+   * Non-null when `kind` is `ChatFinished`, observed once all `Message`
+   * events for this round have been sent
+   */
+  const struct lb_chat_finished_payload_t *chat_finished;
+  /**
+   * Non-null when `kind` is `WorkflowFinished`, carrying the run's
+   * outcome — not necessarily the last event of the stream, since the
+   * server may still emit a few more housekeeping events before actually
+   * closing the connection
+   */
+  const struct lb_conversation_response_t *workflow_finished;
+  /**
+   * Non-null when `kind` is `ChatTitleUpdated`, the server auto-generating
+   * a short title for the conversation
+   */
+  const struct lb_chat_title_updated_payload_t *chat_title_updated;
+  /**
+   * Non-null when `kind` is `Other`; the SSE envelope's `event` field (the
+   * event type name)
+   */
+  const char *other_event;
+  /**
+   * Non-null when `kind` is `Other`; raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  const char *other_json;
+} lb_conversation_stream_event_t;
+
+/**
+ * Called once for every event observed while streaming a conversation. See
+ * `lb_agent_context_conversation_streamed`/
+ * `lb_agent_context_continue_conversation_streamed`.
+ *
+ * Unlike the `lb_xxx_context_set_on_xxx` push callbacks, this callback is
+ * scoped to a single streamed call — it's supplied directly as an argument
+ * and is never stored on the context.
+ */
+typedef void (*lb_conversation_event_callback_t)(const struct lb_agent_context_t*,
+                                                 const struct lb_conversation_stream_event_t*,
+                                                 void*);
+
+typedef void (*lb_free_userdata_func_t)(void*);
+
+/**
  * A single alert indicator configuration for a symbol.
  */
 typedef struct lb_alert_item_t {
@@ -1722,8 +2931,6 @@ typedef struct lb_http_header_t {
   const char *name;
   const char *value;
 } lb_http_header_t;
-
-typedef void (*lb_free_userdata_func_t)(void*);
 
 /**
  * Quote message
@@ -8839,9 +10046,226 @@ typedef struct lb_screener_indicators_response_t {
   const char *data;
 } lb_screener_indicators_response_t;
 
+/**
+ * A Workspace the current account belongs to
+ */
+typedef struct lb_workspace_t {
+  /**
+   * Workspace ID
+   */
+  const char *id;
+  /**
+   * Workspace name
+   */
+  const char *name;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_workspace_t;
+
+/**
+ * Response for `lb_agent_context_workspaces`
+ */
+typedef struct lb_workspaces_response_t {
+  /**
+   * Workspaces the current account belongs to
+   */
+  const struct lb_workspace_t *workspaces;
+  /**
+   * Number of workspaces
+   */
+  uintptr_t num_workspaces;
+} lb_workspaces_response_t;
+
+/**
+ * An Agent in a Workspace
+ */
+typedef struct lb_agent_t {
+  /**
+   * Agent UID, used as the path parameter of
+   * `lb_agent_context_conversation`
+   */
+  const char *uid;
+  /**
+   * Agent name
+   */
+  const char *name;
+  /**
+   * Agent description
+   */
+  const char *description;
+  /**
+   * Agent mode, e.g. `chat`
+   */
+  const char *mode;
+  /**
+   * Icon URL
+   */
+  const char *icon;
+  /**
+   * Whether published; only published Agents can start conversations
+   */
+  bool is_published;
+  /**
+   * Publish time, Unix timestamp in seconds; 0 if unpublished
+   */
+  int64_t published_at;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+} lb_agent_t;
+
+/**
+ * Response for `lb_agent_context_agents`
+ */
+typedef struct lb_agents_response_t {
+  /**
+   * Agent list
+   */
+  const struct lb_agent_t *agents;
+  /**
+   * Number of agents in the array
+   */
+  uintptr_t num_agents;
+  /**
+   * Total number of matching Agents
+   */
+  int32_t total;
+} lb_agents_response_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+const struct lb_agent_context_t *lb_agent_context_new(const struct lb_config_t *config);
+
+void lb_agent_context_retain(const struct lb_agent_context_t *ctx);
+
+void lb_agent_context_release(const struct lb_agent_context_t *ctx);
+
+uintptr_t lb_agent_context_ref_count(const struct lb_agent_context_t *ctx);
+
+/**
+ * List the Workspaces the current account belongs to. Returns
+ * `CWorkspacesResponse`.
+ */
+void lb_agent_context_workspaces(const struct lb_agent_context_t *ctx,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * List the Agents in the specified Workspace. Returns `CAgentsResponse`.
+ *
+ * @param[in] opts Options for get agents request (can be null)
+ */
+void lb_agent_context_agents(const struct lb_agent_context_t *ctx,
+                             const char *workspace_id,
+                             const struct lb_get_agents_options_t *opts,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Start a conversation with the specified Agent, blocking until the run
+ * succeeds, is interrupted, or fails. Returns `CConversationResponse`.
+ *
+ * @param[in] chat_uid Existing conversation identifier to continue within
+ *                      (can be null to start a brand-new conversation)
+ */
+void lb_agent_context_conversation(const struct lb_agent_context_t *ctx,
+                                   const char *agent_id,
+                                   const char *query,
+                                   const char *chat_uid,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
+
+/**
+ * Resume an interrupted conversation, blocking until the run succeeds, is
+ * interrupted again, or fails. Returns `CConversationResponse`.
+ *
+ * @param[in] answers      Answers keyed by `tool_call_id`, see
+ *                         `CAnswersByToolCallEntry` (can be null if
+ *                         `num_answers` is 0)
+ * @param[in] num_answers  Number of entries in `answers`
+ */
+void lb_agent_context_continue_conversation(const struct lb_agent_context_t *ctx,
+                                            const char *agent_id,
+                                            const char *chat_uid,
+                                            const char *message_id,
+                                            const struct lb_answers_by_tool_call_entry_t *answers,
+                                            uintptr_t num_answers,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Start a conversation with the specified Agent, calling `event_callback`
+ * for every run-progress event observed over SSE. A `WorkflowFinished`
+ * event carries the run's outcome, but isn't necessarily the last one seen —
+ * the server may still emit a few more housekeeping events (e.g. a
+ * `ChatTitleUpdated`) before actually closing the connection. Once the
+ * stream truly ends, `callback` is invoked with the final
+ * `CConversationResponse` — same as `lb_agent_context_conversation`, just
+ * arrived at via the streamed path.
+ *
+ * @param[in] chat_uid            Existing conversation identifier to
+ *                                continue within (can be null to start a
+ *                                brand-new conversation)
+ * @param[in] event_callback      Called once per stream event, on an
+ *                                internal worker thread
+ * @param[in] event_userdata      Opaque pointer forwarded to
+ *                                `event_callback`
+ * @param[in] event_free_userdata Called exactly once, after the stream ends
+ *                                (successfully or not), to free
+ *                                `event_userdata` (can be null)
+ */
+void lb_agent_context_conversation_streamed(const struct lb_agent_context_t *ctx,
+                                            const char *agent_id,
+                                            const char *query,
+                                            const char *chat_uid,
+                                            lb_conversation_event_callback_t event_callback,
+                                            void *event_userdata,
+                                            lb_free_userdata_func_t event_free_userdata,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Resume an interrupted conversation, calling `event_callback` for every
+ * run-progress event observed over SSE, then `callback` with the final
+ * `CConversationResponse` once the stream ends — same shape as
+ * `lb_agent_context_conversation_streamed`.
+ *
+ * @param[in] answers             Answers keyed by `tool_call_id`, see
+ *                                `CAnswersByToolCallEntry` (can be null if
+ *                                `num_answers` is 0)
+ * @param[in] num_answers         Number of entries in `answers`
+ * @param[in] event_callback      Called once per stream event, on an
+ *                                internal worker thread
+ * @param[in] event_userdata      Opaque pointer forwarded to
+ *                                `event_callback`
+ * @param[in] event_free_userdata Called exactly once, after the stream ends
+ *                                (successfully or not), to free
+ *                                `event_userdata` (can be null)
+ */
+void lb_agent_context_continue_conversation_streamed(const struct lb_agent_context_t *ctx,
+                                                     const char *agent_id,
+                                                     const char *chat_uid,
+                                                     const char *message_id,
+                                                     const struct lb_answers_by_tool_call_entry_t *answers,
+                                                     uintptr_t num_answers,
+                                                     lb_conversation_event_callback_t event_callback,
+                                                     void *event_userdata,
+                                                     lb_free_userdata_func_t event_free_userdata,
+                                                     lb_async_callback_t callback,
+                                                     void *userdata);
 
 const struct lb_alert_context_t *lb_alert_context_new(const struct lb_config_t *config);
 

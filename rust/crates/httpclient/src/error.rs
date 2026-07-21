@@ -92,6 +92,10 @@ pub enum HttpClientError {
     /// OAuth error
     #[error("oauth error: {0}")]
     OAuth(String),
+
+    /// Server-sent events stream error
+    #[error("sse stream error: {0}")]
+    Sse(String),
 }
 
 /// Represents an HTTP error

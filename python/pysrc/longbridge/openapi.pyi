@@ -1,6 +1,16 @@
 from datetime import date, datetime, time
 from decimal import Decimal
-from typing import Any, Awaitable, Callable, Coroutine, List, Optional, Type
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Coroutine,
+    Iterator,
+    List,
+    Optional,
+    Type,
+)
 
 class ErrorKind:
     """
@@ -13097,3 +13107,984 @@ class USETFFilesResponse:
 
     files: List[USETFFile]
     """Document entries"""
+
+# ── AI Agent ──────────────────────────────────────────────────────
+
+class Workspace:
+    """A Workspace the current account belongs to."""
+
+    id: str
+    """Workspace ID"""
+    name: str
+    """Workspace name"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+
+class WorkspacesResponse:
+    """Response for AgentContext.workspaces / AsyncAgentContext.workspaces."""
+
+    workspaces: list[Workspace]
+    """Workspaces the current account belongs to"""
+
+class Agent:
+    """An Agent in a Workspace."""
+
+    uid: str
+    """Agent UID, used as the ``agent_id`` argument of
+    AgentContext.conversation"""
+    name: str
+    """Agent name"""
+    description: str
+    """Agent description"""
+    mode: str
+    """Agent mode, e.g. ``"chat"``"""
+    icon: str
+    """Icon URL"""
+    is_published: bool
+    """Whether published; only published Agents can start conversations"""
+    published_at: int
+    """Publish time, Unix timestamp in seconds; 0 if unpublished"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+
+class AgentsResponse:
+    """Response for AgentContext.agents / AsyncAgentContext.agents."""
+
+    agents: list[Agent]
+    """Agent list"""
+    total: int
+    """Total number of matching Agents"""
+
+class ConversationStatus:
+    """Final run status of a conversation."""
+
+    class Succeeded(ConversationStatus):
+        """The run completed successfully"""
+
+        ...
+
+    class Interrupted(ConversationStatus):
+        """The run is paused, waiting for AgentContext.continue_conversation"""
+
+        ...
+
+    class Failed(ConversationStatus):
+        """The run failed"""
+
+        ...
+
+    class Stopped(ConversationStatus):
+        """The run was stopped"""
+
+        ...
+
+class Reference:
+    """A source referenced by the answer."""
+
+    index: int
+    """Reference index"""
+    title: str
+    """Reference title"""
+    url: str
+    """Reference URL"""
+
+class QuestionOption:
+    """One option of a Question."""
+
+    description: str
+    """Option text"""
+
+class Question:
+    """One question the Agent needs you to answer."""
+
+    question: str
+    """Question text"""
+    options: list[QuestionOption]
+    """Options; empty means free-form answer"""
+    multi_select: bool
+    """Whether multiple options may be selected"""
+
+class Interrupt:
+    """Present when a conversation run is interrupted, waiting for
+    AgentContext.continue_conversation."""
+
+    node_id: str
+    """ID of the node that triggered the interrupt"""
+    tool_call_id: str
+    """Tool call ID of this inquiry; used as the answer key when continuing"""
+    questions: list[Question]
+    """Questions you need to answer"""
+    message_id: int
+    """ID of the paused message"""
+    chat_id: int
+    """ID of the owning conversation"""
+
+class AgentError:
+    """Present when a conversation run failed."""
+
+    code: int
+    """Error code"""
+    message: str
+    """Error message"""
+
+class ConversationResponse:
+    """
+    Response for AgentContext.conversation / AgentContext.continue_conversation,
+    and the final result of the streamed counterparts.
+    """
+
+    chat_uid: str
+    """Conversation identifier, used for follow-up questions and
+    troubleshooting"""
+    message_id: str
+    """Message ID of this round"""
+    status: ConversationStatus
+    """Final run status"""
+    answer: str
+    """Final answer text; valid when status is ConversationStatus.Succeeded"""
+    references: list[Reference] | None
+    """Sources referenced by the answer"""
+    elapsed_time: float
+    """Run duration in seconds"""
+    interrupt: Interrupt | None
+    """Present only when status is ConversationStatus.Interrupted"""
+    error: AgentError | None
+    """Present only when the run failed"""
+
+class ChatStartedPayload:
+    """Payload of a ``chat_started`` stream event."""
+
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+
+class MessagePayload:
+    """
+    Payload of a ``message`` stream event — an incremental text chunk. This
+    is the highest-frequency event; concatenate ``text`` fragments in
+    arrival order.
+    """
+
+    text: str
+    """Incremental text fragment"""
+    message_type: str
+    """``"answer"`` — final answer text; ``"think"`` — reasoning process;
+    ``"process"`` — stage progress description"""
+    key: str
+    """Identifier of the stream segment this fragment belongs to. Fragments
+    with the same key form one continuous block — group by key when
+    rendering"""
+    started_at: int
+    """Time this segment started, Unix timestamp in seconds"""
+    stage: str
+    """Stage identifier; only present when message_type is ``"process"``"""
+    stage_title: str
+    """Stage title while running; only present when message_type is
+    ``"process"``"""
+    stage_finished_title: str
+    """Stage title after it finishes; only present when message_type is
+    ``"process"``"""
+    outputs: Any | None
+    """Extra payload attached to the fragment; usually absent"""
+
+class WorkflowStartedInputs:
+    """
+    ``inputs`` of a ``workflow_started`` stream event.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+    query: str
+    """The question that was asked"""
+
+class WorkflowStartedPayload:
+    """
+    Payload of a ``workflow_started`` stream event, observed right after
+    ``chat_started``.
+    """
+
+    hit_cache: bool
+    """Whether this run's answer was served from a cache"""
+    inputs: WorkflowStartedInputs
+    """Echoes the run's inputs"""
+    started_at: int
+    """Unix timestamp in seconds"""
+    workflow_id: int
+    """Internal workflow run ID"""
+
+class ChatFinishedPayload:
+    """
+    Payload of a ``chat_finished`` stream event, observed once all
+    ``message`` events for this round have been sent, shortly before
+    ``workflow_finished``.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+    error: str
+    """Empty string in every run observed so far"""
+    error_message: str
+    """Empty string in every run observed so far"""
+
+class ChatTitleUpdatedPayload:
+    """
+    Payload of a ``chat_title_updated`` stream event — the server
+    auto-generates a short title for the conversation as a UI convenience.
+    Can arrive before *or* after ``workflow_finished``; not tied to the run's
+    outcome.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    source: str
+    """Where the title came from, e.g. ``"ai_generated"``"""
+    title: str
+    """The new (possibly truncated) title"""
+    updated_at: int
+    """Unix timestamp in seconds"""
+
+class ThinkingStartedPayload:
+    """
+    Payload of a ``thinking_started`` stream event — the Agent has entered
+    the reasoning phase (analyzing the question, planning tool calls).
+    Between this and ``thinking_finished``, ``message`` events with
+    ``message_type == "think"`` and tool-call events may arrive.
+    """
+
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+
+class ThinkingFinishedPayload:
+    """
+    Payload of a ``thinking_finished`` stream event — the reasoning phase is
+    over; answer text (``message`` with ``message_type == "answer"``)
+    follows.
+    """
+
+    finished_at: int
+    """Finish time, Unix timestamp in seconds"""
+    elapsed_time: int
+    """Reasoning duration in seconds"""
+
+class NodeToolUseStartedPayload:
+    """
+    Payload of a ``node_tool_use_started`` stream event — an ordinary tool
+    call has started. Match it to its ``node_tool_use_finished`` counterpart
+    by ``tool_use_id``.
+    """
+
+    tool_use_id: str
+    """Unique ID of this call; matches the finished event"""
+    tool_name: str
+    """Localized display name of the tool"""
+    tool_func_name: str
+    """Locale-stable tool identifier; use this for logic keyed on the tool
+    kind"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    tips: str
+    """Progress text suitable for direct display, e.g. ``"Searching the
+    web..."``"""
+    tip_chips: list[str]
+    """Short tags accompanying tips; may be empty"""
+    iteration: int
+    """Round number. Calls in the same round (same iteration) run in
+    parallel"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+
+class NodeToolUseOutputs:
+    """``outputs`` of a NodeToolUseFinishedPayload — only carries fields
+    meant for display."""
+
+    references: list[Reference] | None
+    """Sources referenced by the tool result"""
+    reference_domains: list[str] | None
+    """Domains of the referenced sources"""
+    query: str | None
+    """The query the tool executed"""
+    text: str | None
+    """Raw response text of the tool"""
+    tool_args: Any | None
+    """Parsed request arguments"""
+    data: Any | None
+    """Structured result; present only for selected tools"""
+
+class NodeToolUseFinishedPayload:
+    """Payload of a ``node_tool_use_finished`` stream event — the tool call
+    has ended."""
+
+    tool_use_id: str
+    """Matches the tool_use_id of the started event"""
+    status: str
+    """``"succeeded"`` / ``"failed"``"""
+    error: str
+    """Error description on failure"""
+    elapsed_time: float
+    """Call duration in seconds"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    tool_name: str
+    """Localized display name"""
+    tool_func_name: str
+    """Locale-stable tool identifier"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    tool_type: str
+    """Tool category"""
+    tips: str
+    """Progress text"""
+    tip_chips: list[str]
+    """Short tags; may be empty"""
+    iteration: int
+    """Round number"""
+    is_thinking: bool
+    """True if the call happened during the thinking phase"""
+    outputs: NodeToolUseOutputs
+    """Filtered call results, for display"""
+
+class SubagentStartedPayload:
+    """
+    Payload of a ``subagent_started`` stream event. When the Agent spawns a
+    subagent to work on a sub-task, the subagent's lifecycle is reported
+    with this dedicated event family instead of ``node_tool_use_*``.
+    """
+
+    node_id: str
+    """ID of the node that spawned the subagent"""
+    tool_use_id: str
+    """Unique ID of this spawn; matches the finished event"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    goal: str
+    """Goal assigned to the subagent"""
+    prompt: str
+    """Full task prompt given to the subagent"""
+    subagent_id: str
+    """Subagent identifier; may be empty"""
+    tools: list[Any]
+    """Tools granted to the subagent; may be empty"""
+
+class SubagentProgressPayload:
+    """
+    Payload of a ``subagent_progress`` stream event, emitted every time the
+    subagent calls one of its own tools. Use it to render a live timeline
+    inside the subagent card.
+    """
+
+    node_id: str
+    """ID of the node that spawned the subagent"""
+    parent_tool_call_id: str
+    """tool_use_id of the owning SubagentStarted event"""
+    subagent_tool_name: str
+    """Name of the tool the subagent called"""
+    subagent_tool_args: str
+    """Arguments of that call, as a JSON string"""
+    subagent_status: str
+    """Status of that call: ``"running"`` / ``"succeeded"`` / ``"failed"``"""
+    subagent_duration_ms: int
+    """Duration of that call in milliseconds"""
+    subagent_iteration: int
+    """The subagent's internal round number"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+
+class SubagentOutputs:
+    """``outputs`` of a SubagentFinishedPayload."""
+
+    goal: str | None
+    """The goal that was assigned to the subagent"""
+    result: str | None
+    """The subagent's result"""
+    subagent_tools: list[Any] | None
+    """Timeline of tool calls the subagent made"""
+
+class SubagentFinishedPayload:
+    """Payload of a ``subagent_finished`` stream event."""
+
+    node_id: str
+    """ID of the node that spawned the subagent"""
+    tool_use_id: str
+    """Matches the tool_use_id of SubagentStarted"""
+    status: str
+    """``"succeeded"`` / ``"failed"``"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    elapsed_time: float
+    """Total subagent duration in seconds"""
+    error: str
+    """Error description on failure"""
+    outputs: SubagentOutputs
+    """Subagent result: goal, result, and the timeline of tool calls it
+    made"""
+
+class AgentToolStartedPayload:
+    """
+    Payload of an ``agent_tool_started`` stream event. When the Agent
+    delegates to another Agent as a tool, that inner run is reported with
+    the ``agent_tool_*`` family — the shape mirrors the subagent events.
+    """
+
+    node_id: str
+    """ID of the calling node"""
+    tool_use_id: str
+    """Unique ID of this call; matches the finished event"""
+    agent_tool_name: str
+    """Identifier of the Agent being called"""
+    title: str
+    """Display title; may be empty"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    tool_name: str
+    """Localized display name"""
+    tips: str
+    """Progress text; may be empty"""
+    tip_chips: list[str]
+    """Short tags; may be empty"""
+    is_thinking: bool
+    """True if called during the thinking phase"""
+
+class AgentToolProgressPayload:
+    """
+    Payload of an ``agent_tool_progress`` stream event, emitted for each
+    inner tool call the delegated Agent makes.
+    """
+
+    node_id: str
+    """ID of the calling node"""
+    parent_tool_call_id: str
+    """tool_use_id of the owning AgentToolStarted event"""
+    agent_tool_name: str
+    """Identifier of the Agent being called"""
+    inner_tool_name: str
+    """Name of the inner tool the delegated Agent called"""
+    inner_tool_args: str
+    """Arguments of that inner call, as a JSON string"""
+    status: str
+    """Status of the inner call: ``"running"`` / ``"succeeded"`` /
+    ``"failed"``"""
+    duration_ms: int
+    """Duration of the inner call in milliseconds"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    is_thinking: bool
+    """True if during the thinking phase"""
+
+class AgentToolFinishedPayload:
+    """Payload of an ``agent_tool_finished`` stream event."""
+
+    node_id: str
+    """ID of the calling node"""
+    tool_use_id: str
+    """Matches the tool_use_id of AgentToolStarted"""
+    agent_tool_name: str
+    """Identifier of the Agent being called"""
+    status: str
+    """``"succeeded"`` / ``"failed"``"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    elapsed_time: float
+    """Total duration in seconds"""
+    error: str
+    """Error description on failure"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    outputs: Any | None
+    """Result of the delegated Agent"""
+    tool_type: str
+    """Tool category"""
+    tips: str
+    """Progress text; may be empty"""
+    tip_chips: list[str]
+    """Short tags; may be empty"""
+    is_thinking: bool
+    """True if during the thinking phase"""
+
+class QueryMaskedPayload:
+    """
+    Payload of a ``query_masked`` stream event — sensitive content in the
+    user query was masked before processing. Display masked_query instead
+    of the original query.
+    """
+
+    raw_query: str
+    """The original user query"""
+    masked_query: str
+    """The masked query"""
+
+class PlanChangedPayload:
+    """Payload of a ``plan_changed`` stream event — the Agent created or
+    updated its task plan."""
+
+    node_id: str
+    """ID of the planning node"""
+    started_at: int
+    """Time of the change, Unix timestamp in seconds"""
+    outputs: Any | None
+    """The current plan content"""
+    tool_name: str
+    """Identifies the planning tool"""
+
+class ContextCompressStartedPayload:
+    """
+    Payload of a ``context_compress_started`` stream event, marking the
+    start of a context-compression pass triggered by a long conversation.
+    Unlike other events, the timestamp here is an RFC 3339 string.
+    """
+
+    started_at: str
+    """Start time, RFC 3339"""
+    inputs: Any | None
+    """Compression input summary"""
+
+class ContextCompressFinishedPayload:
+    """
+    Payload of a ``context_compress_finished`` stream event. Unlike other
+    events, the timestamp here is an RFC 3339 string.
+    """
+
+    created_at: str
+    """Finish time, RFC 3339"""
+    inputs: Any | None
+    """Compression input summary"""
+    outputs: Any | None
+    """Compression result summary"""
+
+class ConversationStreamEvent:
+    """
+    One event observed while streaming
+    AgentContext.conversation_streamed / continue_conversation_streamed (or
+    the Async counterparts).
+
+    A run always begins with ``kind == "chat_started"`` and ends with
+    ``kind == "chat_finished"``. What happens in between depends on the
+    outcome:
+
+    - Succeeded: ``chat_started`` -> ``workflow_started`` ->
+      ``thinking_started`` -> ``message`` (message_type == "think") ... ->
+      ``node_tool_use_started`` / ``node_tool_use_finished`` ... ->
+      ``thinking_finished`` -> ``message`` (message_type == "answer") ... ->
+      ``workflow_finished`` (status == "succeeded") -> ``chat_finished``
+    - Interrupted (the Agent needs your input; resume via
+      ``continue_conversation_streamed``): ``chat_started`` ->
+      ``workflow_started`` -> ... -> ``human_interaction_required`` ->
+      ``chat_finished``. An interrupted run does **not** emit
+      ``workflow_finished``, and resuming it does **not** emit
+      ``workflow_started`` again.
+    - Failed: ``chat_started`` -> ``workflow_started`` -> ... ->
+      ``workflow_finished`` (status == "failed") -> ``chat_finished``
+
+    ``kind`` is the discriminant — one of ``"chat_started"``,
+    ``"workflow_started"``, ``"message"``, ``"ping"``,
+    ``"thinking_started"``, ``"thinking_finished"``,
+    ``"node_tool_use_started"``, ``"node_tool_use_finished"``,
+    ``"subagent_started"``, ``"subagent_progress"``, ``"subagent_finished"``,
+    ``"agent_tool_started"``, ``"agent_tool_progress"``,
+    ``"agent_tool_finished"``, ``"human_interaction_required"``,
+    ``"query_masked"``, ``"plan_changed"``, ``"context_compress_started"``,
+    ``"context_compress_finished"``, ``"chat_finished"``,
+    ``"workflow_finished"``, ``"chat_title_updated"``, ``"other"`` — and
+    exactly one of the payload fields below sharing that name is set,
+    matching ``kind`` — except ``"ping"``, a heartbeat with no payload, for
+    which every payload field is ``None``.
+
+    For a plain question-and-answer integration you only need to handle
+    four kinds — everything else is optional progress display:
+    ``"message"`` with ``message_type == "answer"`` (append ``text`` to the
+    answer being displayed), ``"human_interaction_required"`` (show the
+    questions and call ``continue_conversation`` /
+    ``continue_conversation_streamed`` with the answers),
+    ``"workflow_finished"`` (read the final outcome), and
+    ``"chat_finished"`` (the stream is over).
+    """
+
+    kind: str
+    """Discriminant: ``"chat_started"``, ``"workflow_started"``,
+    ``"message"``, ``"ping"``, ``"thinking_started"``,
+    ``"thinking_finished"``, ``"node_tool_use_started"``,
+    ``"node_tool_use_finished"``, ``"subagent_started"``,
+    ``"subagent_progress"``, ``"subagent_finished"``,
+    ``"agent_tool_started"``, ``"agent_tool_progress"``,
+    ``"agent_tool_finished"``, ``"human_interaction_required"``,
+    ``"query_masked"``, ``"plan_changed"``, ``"context_compress_started"``,
+    ``"context_compress_finished"``, ``"chat_finished"``,
+    ``"workflow_finished"``, ``"chat_title_updated"``, or ``"other"``"""
+    chat_started: ChatStartedPayload | None
+    """Set when kind == "chat_started" """
+    workflow_started: WorkflowStartedPayload | None
+    """Set when kind == "workflow_started". Observed right after
+    chat_started on every run seen so far. Not emitted when resuming an
+    interrupted run."""
+    message: MessagePayload | None
+    """Set when kind == "message": an incremental piece of the answer"""
+    thinking_started: ThinkingStartedPayload | None
+    """Set when kind == "thinking_started": the Agent has entered the
+    reasoning phase"""
+    thinking_finished: ThinkingFinishedPayload | None
+    """Set when kind == "thinking_finished": the reasoning phase is over"""
+    node_tool_use_started: NodeToolUseStartedPayload | None
+    """Set when kind == "node_tool_use_started": an ordinary tool call has
+    started"""
+    node_tool_use_finished: NodeToolUseFinishedPayload | None
+    """Set when kind == "node_tool_use_finished": an ordinary tool call has
+    ended"""
+    subagent_started: SubagentStartedPayload | None
+    """Set when kind == "subagent_started": the Agent has spawned a
+    subagent to work on a sub-task"""
+    subagent_progress: SubagentProgressPayload | None
+    """Set when kind == "subagent_progress": the subagent has called one of
+    its own tools"""
+    subagent_finished: SubagentFinishedPayload | None
+    """Set when kind == "subagent_finished": the subagent has finished its
+    sub-task"""
+    agent_tool_started: AgentToolStartedPayload | None
+    """Set when kind == "agent_tool_started": the Agent has delegated to
+    another Agent as a tool"""
+    agent_tool_progress: AgentToolProgressPayload | None
+    """Set when kind == "agent_tool_progress": the delegated Agent has
+    called one of its own tools"""
+    agent_tool_finished: AgentToolFinishedPayload | None
+    """Set when kind == "agent_tool_finished": the delegated Agent's run has
+    finished"""
+    human_interaction_required: ConversationResponse | None
+    """Set when kind == "human_interaction_required": the run is paused —
+    the Agent needs more information or confirmation from you. Carries the
+    same ConversationResponse shape as workflow_finished (status ==
+    ConversationStatus.Interrupted, with interrupt set) — an interrupted
+    run never emits workflow_finished at all, so this is the terminal event
+    carrying the run's outcome for that case instead. Resume via
+    continue_conversation / continue_conversation_streamed using
+    ConversationResponse.interrupt."""
+    query_masked: QueryMaskedPayload | None
+    """Set when kind == "query_masked": sensitive content in the user query
+    was masked before processing"""
+    plan_changed: PlanChangedPayload | None
+    """Set when kind == "plan_changed": the Agent created or updated its
+    task plan"""
+    context_compress_started: ContextCompressStartedPayload | None
+    """Set when kind == "context_compress_started": a context-compression
+    pass has started (long conversations trigger this)"""
+    context_compress_finished: ContextCompressFinishedPayload | None
+    """Set when kind == "context_compress_finished": the context-compression
+    pass has finished"""
+    chat_finished: ChatFinishedPayload | None
+    """Set when kind == "chat_finished" """
+    workflow_finished: ConversationResponse | None
+    """Set when kind == "workflow_finished" (the run finished — succeeded or
+    failed; never emitted for an interrupted run, see
+    human_interaction_required). Carries the run's outcome, but isn't
+    necessarily the last event of the stream — the server may still emit a
+    few more housekeeping events (e.g. kind == "chat_title_updated") before
+    actually closing the connection."""
+    chat_title_updated: ChatTitleUpdatedPayload | None
+    """Set when kind == "chat_title_updated" """
+    other_event: str | None
+    """Set when kind == "other": the SSE envelope's ``event`` field (the event
+    type name)"""
+    other: Any | None
+    """Set when kind == "other": raw JSON payload of an event type not
+    recognized by this SDK version"""
+
+class ConversationStreamIter:
+    """
+    Blocking iterator of ConversationStreamEvent, returned by
+    AgentContext.conversation_streamed / continue_conversation_streamed. Use
+    with a plain ``for`` loop.
+    """
+
+    def __iter__(self) -> "ConversationStreamIter": ...
+    def __next__(self) -> ConversationStreamEvent: ...
+
+class AgentContext:
+    """
+    AI Agent conversation context.
+
+    Examples:
+        ::
+
+            from longbridge.openapi import Config, AgentContext
+
+            config = Config.from_env()
+            ctx = AgentContext(config)
+
+            workspaces = ctx.workspaces()
+            agents = ctx.agents(workspaces.workspaces[0].id)
+            resp = ctx.conversation(
+                agents.agents[0].uid, "How has Tesla stock performed recently?"
+            )
+            print(resp)
+
+            for event in ctx.conversation_streamed(
+                agents.agents[0].uid, "How has Tesla stock performed recently?"
+            ):
+                print(event)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create an AgentContext."""
+        ...
+
+    def workspaces(self) -> WorkspacesResponse:
+        """List the Workspaces the current account belongs to."""
+        ...
+
+    def agents(
+        self,
+        workspace_id: str,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> AgentsResponse:
+        """
+        List the Agents in the specified Workspace.
+
+        Args:
+            workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def conversation(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> ConversationResponse:
+        """
+        Start a conversation with the specified Agent, blocking until the run
+        succeeds, is interrupted, or fails.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> ConversationResponse:
+        """
+        Resume an interrupted conversation, blocking until the run succeeds,
+        is interrupted again, or fails.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+    def conversation_streamed(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> Iterator[ConversationStreamEvent]:
+        """
+        Start a conversation with the specified Agent, returning an iterator
+        of run-progress events. A ConversationStreamEvent with
+        ``kind == "workflow_finished"`` carries the run's outcome, but isn't
+        necessarily the last item — the server may still emit a few more
+        housekeeping events (e.g. ``kind == "chat_title_updated"``) before
+        actually closing the connection, so keep iterating to the end rather
+        than stopping as soon as you see it.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation_streamed(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Iterator[ConversationStreamEvent]:
+        """
+        Resume an interrupted conversation, returning an iterator of
+        run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+class AsyncConversationStreamIter:
+    """
+    Async iterator of ConversationStreamEvent, returned (once awaited) by
+    AsyncAgentContext.conversation_streamed / continue_conversation_streamed.
+    Use with ``async for``.
+    """
+
+    def __aiter__(self) -> "AsyncConversationStreamIter": ...
+    async def __anext__(self) -> ConversationStreamEvent: ...
+
+class AsyncAgentContext:
+    """
+    Async AI Agent conversation context for use with asyncio. Create via
+    AsyncAgentContext.create(config); all I/O methods return awaitables.
+
+    Examples:
+        ::
+
+            import asyncio
+            from longbridge.openapi import Config, AsyncAgentContext
+
+            async def main():
+                config = Config.from_env()
+                ctx = AsyncAgentContext.create(config)
+
+                workspaces = await ctx.workspaces()
+                agents = await ctx.agents(workspaces.workspaces[0].id)
+                resp = await ctx.conversation(
+                    agents.agents[0].uid, "How has Tesla stock performed recently?"
+                )
+                print(resp)
+
+                stream = await ctx.conversation_streamed(
+                    agents.agents[0].uid, "How has Tesla stock performed recently?"
+                )
+                async for event in stream:
+                    print(event)
+
+            asyncio.run(main())
+    """
+
+    @classmethod
+    def create(
+        cls: Type[AsyncAgentContext], config: Config
+    ) -> AsyncAgentContext:
+        """Create an async AI Agent context."""
+        ...
+
+    def workspaces(self) -> Awaitable[WorkspacesResponse]:
+        """List the Workspaces the current account belongs to. Returns
+        awaitable."""
+        ...
+
+    def agents(
+        self,
+        workspace_id: str,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> Awaitable[AgentsResponse]:
+        """
+        List the Agents in the specified Workspace. Returns awaitable.
+
+        Args:
+            workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def conversation(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> Awaitable[ConversationResponse]:
+        """
+        Start a conversation with the specified Agent, blocking until the run
+        succeeds, is interrupted, or fails. Returns awaitable.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Awaitable[ConversationResponse]:
+        """
+        Resume an interrupted conversation, blocking until the run succeeds,
+        is interrupted again, or fails. Returns awaitable.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+    def conversation_streamed(
+        self, agent_id: str, query: str, chat_uid: str | None = None
+    ) -> Awaitable[AsyncConversationStreamIter]:
+        """
+        Start a conversation with the specified Agent. Returns an awaitable
+        that resolves to an AsyncConversationStreamIter; use ``async for`` on
+        it to consume run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+        """
+        ...
+
+    def continue_conversation_streamed(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Awaitable[AsyncConversationStreamIter]:
+        """
+        Resume an interrupted conversation. Returns an awaitable that resolves
+        to an AsyncConversationStreamIter; use ``async for`` on it to consume
+        run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...

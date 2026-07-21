@@ -19,6 +19,7 @@ longbridge = { workspace = true, features = ["blocking"] }
 longbridge-python-macros = { path = "crates/macros" }
 pyo3-async-runtimes = { workspace = true }
 
+futures-util.workspace = true
 parking_lot.workspace = true
 pyo3 = { workspace = true, features = [
     "extension-module",

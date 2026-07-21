@@ -1,5 +1,6 @@
 //! Longbridge OpenAPI SDK blocking API
 
+mod agent;
 mod alert;
 mod asset;
 mod calendar;
@@ -15,6 +16,7 @@ mod screener;
 mod sharelist;
 mod trade;
 
+pub use agent::AgentContextSync;
 pub use alert::AlertContextSync;
 pub use asset::AssetContextSync;
 pub use calendar::CalendarContextSync;

@@ -1,0 +1,48 @@
+mod context;
+mod context_async;
+mod types;
+
+use pyo3::prelude::*;
+
+pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
+    parent.add_class::<types::Workspace>()?;
+    parent.add_class::<types::WorkspacesResponse>()?;
+    parent.add_class::<types::Agent>()?;
+    parent.add_class::<types::AgentsResponse>()?;
+    parent.add_class::<types::ConversationStatus>()?;
+    parent.add_class::<types::Reference>()?;
+    parent.add_class::<types::QuestionOption>()?;
+    parent.add_class::<types::Question>()?;
+    parent.add_class::<types::Interrupt>()?;
+    parent.add_class::<types::AgentError>()?;
+    parent.add_class::<types::ConversationResponse>()?;
+    parent.add_class::<types::ChatStartedPayload>()?;
+    parent.add_class::<types::MessagePayload>()?;
+    parent.add_class::<types::WorkflowStartedInputs>()?;
+    parent.add_class::<types::WorkflowStartedPayload>()?;
+    parent.add_class::<types::ChatFinishedPayload>()?;
+    parent.add_class::<types::ChatTitleUpdatedPayload>()?;
+    parent.add_class::<types::ThinkingStartedPayload>()?;
+    parent.add_class::<types::ThinkingFinishedPayload>()?;
+    parent.add_class::<types::NodeToolUseStartedPayload>()?;
+    parent.add_class::<types::NodeToolUseOutputs>()?;
+    parent.add_class::<types::NodeToolUseFinishedPayload>()?;
+    parent.add_class::<types::SubagentStartedPayload>()?;
+    parent.add_class::<types::SubagentProgressPayload>()?;
+    parent.add_class::<types::SubagentOutputs>()?;
+    parent.add_class::<types::SubagentFinishedPayload>()?;
+    parent.add_class::<types::AgentToolStartedPayload>()?;
+    parent.add_class::<types::AgentToolProgressPayload>()?;
+    parent.add_class::<types::AgentToolFinishedPayload>()?;
+    parent.add_class::<types::QueryMaskedPayload>()?;
+    parent.add_class::<types::PlanChangedPayload>()?;
+    parent.add_class::<types::ContextCompressStartedPayload>()?;
+    parent.add_class::<types::ContextCompressFinishedPayload>()?;
+    parent.add_class::<types::ConversationStreamEvent>()?;
+
+    parent.add_class::<context::AgentContext>()?;
+    parent.add_class::<context::ConversationStreamIter>()?;
+    parent.add_class::<context_async::AsyncAgentContext>()?;
+    parent.add_class::<context_async::AsyncConversationStreamIter>()?;
+    Ok(())
+}

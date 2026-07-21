@@ -2976,6 +2976,260 @@ inline sharelist::SharelistDetail convert(const lb_sharelist_detail_t* r) {
   return { convert(&r->sharelist), convert(&r->scopes) };
 }
 
+// ── AgentContext ──────────────────────────────────────────────────
+
+inline agent::Workspace convert(const lb_workspace_t* w) {
+  return { w->id, w->name, w->created_at, w->updated_at };
+}
+inline agent::WorkspacesResponse convert(const lb_workspaces_response_t* r) {
+  std::vector<agent::Workspace> workspaces;
+  for (size_t i = 0; i < r->num_workspaces; ++i) workspaces.push_back(convert(&r->workspaces[i]));
+  return { std::move(workspaces) };
+}
+inline agent::Agent convert(const lb_agent_t* a) {
+  return { a->uid, a->name, a->description, a->mode, a->icon, a->is_published,
+           a->published_at, a->created_at, a->updated_at };
+}
+inline agent::AgentsResponse convert(const lb_agents_response_t* r) {
+  std::vector<agent::Agent> agents;
+  for (size_t i = 0; i < r->num_agents; ++i) agents.push_back(convert(&r->agents[i]));
+  return { std::move(agents), r->total };
+}
+inline agent::ConversationStatus convert(lb_conversation_status_t status) {
+  switch (status) {
+    case ConversationStatusSucceeded:
+      return agent::ConversationStatus::Succeeded;
+    case ConversationStatusInterrupted:
+      return agent::ConversationStatus::Interrupted;
+    case ConversationStatusFailed:
+      return agent::ConversationStatus::Failed;
+    case ConversationStatusStopped:
+      return agent::ConversationStatus::Stopped;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+inline agent::Reference convert(const lb_reference_t* r) {
+  return { r->index, r->title, r->url };
+}
+inline agent::QuestionOption convert(const lb_question_option_t* o) {
+  return { o->description };
+}
+inline agent::Question convert(const lb_question_t* q) {
+  std::vector<agent::QuestionOption> options;
+  for (size_t i = 0; i < q->num_options; ++i) options.push_back(convert(&q->options[i]));
+  return { q->question, std::move(options), q->multi_select };
+}
+inline agent::Interrupt convert(const lb_interrupt_t* i) {
+  std::vector<agent::Question> questions;
+  for (size_t j = 0; j < i->num_questions; ++j) questions.push_back(convert(&i->questions[j]));
+  return { i->node_id, i->tool_call_id, std::move(questions), i->message_id, i->chat_id };
+}
+inline agent::AgentError convert(const lb_agent_error_t* e) {
+  return { e->code, e->message };
+}
+inline agent::ConversationResponse convert(const lb_conversation_response_t* r) {
+  std::vector<agent::Reference> references;
+  for (size_t i = 0; i < r->num_references; ++i) references.push_back(convert(&r->references[i]));
+  return {
+    r->chat_uid,
+    r->message_id,
+    convert(r->status),
+    r->answer,
+    std::move(references),
+    r->elapsed_time,
+    r->interrupt ? std::optional<agent::Interrupt>(convert(r->interrupt)) : std::nullopt,
+    r->error ? std::optional<agent::AgentError>(convert(r->error)) : std::nullopt,
+  };
+}
+inline agent::ChatStartedPayload convert(const lb_chat_started_payload_t* p) {
+  return { p->chat_uid, p->message_id };
+}
+inline agent::MessagePayload convert(const lb_message_payload_t* p) {
+  return { p->text, p->message_type, p->key, p->started_at, p->stage, p->stage_title,
+           p->stage_finished_title, p->outputs_json };
+}
+inline agent::WorkflowStartedInputs convert(const lb_workflow_started_inputs_t* i) {
+  return { i->chat_id, i->chat_uid, i->message_id, i->query };
+}
+inline agent::WorkflowStartedPayload convert(const lb_workflow_started_payload_t* p) {
+  return { p->hit_cache, convert(p->inputs), p->started_at, p->workflow_id };
+}
+inline agent::ThinkingStartedPayload convert(const lb_thinking_started_payload_t* p) {
+  return { p->started_at };
+}
+inline agent::ThinkingFinishedPayload convert(const lb_thinking_finished_payload_t* p) {
+  return { p->finished_at, p->elapsed_time };
+}
+inline agent::NodeToolUseStartedPayload convert(const lb_node_tool_use_started_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->tool_use_id, p->tool_name, p->tool_func_name, p->tool_args, p->tips,
+           std::move(tip_chips), p->iteration, p->started_at };
+}
+inline agent::NodeToolUseOutputs convert(const lb_node_tool_use_outputs_t* o) {
+  std::vector<agent::Reference> references;
+  for (size_t i = 0; i < o->num_references; ++i) references.push_back(convert(&o->references[i]));
+  std::vector<std::string> reference_domains(o->reference_domains,
+                                              o->reference_domains + o->num_reference_domains);
+  return { std::move(references), std::move(reference_domains), o->query, o->text,
+           o->tool_args_json, o->data_json };
+}
+inline agent::NodeToolUseFinishedPayload convert(const lb_node_tool_use_finished_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->tool_use_id, p->status, p->error, p->elapsed_time, p->started_at, p->tool_name,
+           p->tool_func_name, p->tool_args, p->tool_type, p->tips, std::move(tip_chips),
+           p->iteration, p->is_thinking, convert(p->outputs) };
+}
+inline agent::SubagentStartedPayload convert(const lb_subagent_started_payload_t* p) {
+  return { p->node_id, p->tool_use_id, p->started_at, p->goal, p->prompt, p->subagent_id,
+           p->tools_json };
+}
+inline agent::SubagentProgressPayload convert(const lb_subagent_progress_payload_t* p) {
+  return { p->node_id, p->parent_tool_call_id, p->subagent_tool_name, p->subagent_tool_args,
+           p->subagent_status, p->subagent_duration_ms, p->subagent_iteration, p->started_at };
+}
+inline agent::SubagentOutputs convert(const lb_subagent_outputs_t* o) {
+  return { o->goal, o->result, o->subagent_tools_json };
+}
+inline agent::SubagentFinishedPayload convert(const lb_subagent_finished_payload_t* p) {
+  return { p->node_id, p->tool_use_id, p->status, p->started_at, p->elapsed_time, p->error,
+           convert(p->outputs) };
+}
+inline agent::AgentToolStartedPayload convert(const lb_agent_tool_started_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->node_id, p->tool_use_id, p->agent_tool_name, p->title, p->started_at, p->tool_args,
+           p->tool_name, p->tips, std::move(tip_chips), p->is_thinking };
+}
+inline agent::AgentToolProgressPayload convert(const lb_agent_tool_progress_payload_t* p) {
+  return { p->node_id, p->parent_tool_call_id, p->agent_tool_name, p->inner_tool_name,
+           p->inner_tool_args, p->status, p->duration_ms, p->started_at, p->is_thinking };
+}
+inline agent::AgentToolFinishedPayload convert(const lb_agent_tool_finished_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->node_id, p->tool_use_id, p->agent_tool_name, p->status, p->started_at,
+           p->elapsed_time, p->error, p->tool_args, p->outputs_json, p->tool_type, p->tips,
+           std::move(tip_chips), p->is_thinking };
+}
+inline agent::QueryMaskedPayload convert(const lb_query_masked_payload_t* p) {
+  return { p->raw_query, p->masked_query };
+}
+inline agent::PlanChangedPayload convert(const lb_plan_changed_payload_t* p) {
+  return { p->node_id, p->started_at, p->outputs_json, p->tool_name };
+}
+inline agent::ContextCompressStartedPayload convert(const lb_context_compress_started_payload_t* p) {
+  return { p->started_at, p->inputs_json };
+}
+inline agent::ContextCompressFinishedPayload convert(
+  const lb_context_compress_finished_payload_t* p) {
+  return { p->created_at, p->inputs_json, p->outputs_json };
+}
+inline agent::ChatFinishedPayload convert(const lb_chat_finished_payload_t* p) {
+  return { p->chat_id, p->chat_uid, p->message_id, p->error, p->error_message };
+}
+inline agent::ChatTitleUpdatedPayload convert(const lb_chat_title_updated_payload_t* p) {
+  return { p->chat_id, p->chat_uid, p->source, p->title, p->updated_at };
+}
+inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event_t* e) {
+  agent::ConversationStreamEvent event{};
+  switch (e->kind) {
+    case ChatStarted:
+      event.kind = agent::ConversationStreamEventKind::ChatStarted;
+      event.chat_started = convert(e->chat_started);
+      break;
+    case WorkflowStarted:
+      event.kind = agent::ConversationStreamEventKind::WorkflowStarted;
+      event.workflow_started = convert(e->workflow_started);
+      break;
+    case Message:
+      event.kind = agent::ConversationStreamEventKind::Message;
+      event.message = convert(e->message);
+      break;
+    case Ping:
+      event.kind = agent::ConversationStreamEventKind::Ping;
+      break;
+    case ThinkingStarted:
+      event.kind = agent::ConversationStreamEventKind::ThinkingStarted;
+      event.thinking_started = convert(e->thinking_started);
+      break;
+    case ThinkingFinished:
+      event.kind = agent::ConversationStreamEventKind::ThinkingFinished;
+      event.thinking_finished = convert(e->thinking_finished);
+      break;
+    case NodeToolUseStarted:
+      event.kind = agent::ConversationStreamEventKind::NodeToolUseStarted;
+      event.node_tool_use_started = convert(e->node_tool_use_started);
+      break;
+    case NodeToolUseFinished:
+      event.kind = agent::ConversationStreamEventKind::NodeToolUseFinished;
+      event.node_tool_use_finished = convert(e->node_tool_use_finished);
+      break;
+    case SubagentStarted:
+      event.kind = agent::ConversationStreamEventKind::SubagentStarted;
+      event.subagent_started = convert(e->subagent_started);
+      break;
+    case SubagentProgress:
+      event.kind = agent::ConversationStreamEventKind::SubagentProgress;
+      event.subagent_progress = convert(e->subagent_progress);
+      break;
+    case SubagentFinished:
+      event.kind = agent::ConversationStreamEventKind::SubagentFinished;
+      event.subagent_finished = convert(e->subagent_finished);
+      break;
+    case AgentToolStarted:
+      event.kind = agent::ConversationStreamEventKind::AgentToolStarted;
+      event.agent_tool_started = convert(e->agent_tool_started);
+      break;
+    case AgentToolProgress:
+      event.kind = agent::ConversationStreamEventKind::AgentToolProgress;
+      event.agent_tool_progress = convert(e->agent_tool_progress);
+      break;
+    case AgentToolFinished:
+      event.kind = agent::ConversationStreamEventKind::AgentToolFinished;
+      event.agent_tool_finished = convert(e->agent_tool_finished);
+      break;
+    case HumanInteractionRequired:
+      event.kind = agent::ConversationStreamEventKind::HumanInteractionRequired;
+      event.human_interaction_required = convert(e->human_interaction_required);
+      break;
+    case QueryMasked:
+      event.kind = agent::ConversationStreamEventKind::QueryMasked;
+      event.query_masked = convert(e->query_masked);
+      break;
+    case PlanChanged:
+      event.kind = agent::ConversationStreamEventKind::PlanChanged;
+      event.plan_changed = convert(e->plan_changed);
+      break;
+    case ContextCompressStarted:
+      event.kind = agent::ConversationStreamEventKind::ContextCompressStarted;
+      event.context_compress_started = convert(e->context_compress_started);
+      break;
+    case ContextCompressFinished:
+      event.kind = agent::ConversationStreamEventKind::ContextCompressFinished;
+      event.context_compress_finished = convert(e->context_compress_finished);
+      break;
+    case ChatFinished:
+      event.kind = agent::ConversationStreamEventKind::ChatFinished;
+      event.chat_finished = convert(e->chat_finished);
+      break;
+    case WorkflowFinished:
+      event.kind = agent::ConversationStreamEventKind::WorkflowFinished;
+      event.workflow_finished = convert(e->workflow_finished);
+      break;
+    case ChatTitleUpdated:
+      event.kind = agent::ConversationStreamEventKind::ChatTitleUpdated;
+      event.chat_title_updated = convert(e->chat_title_updated);
+      break;
+    case Other:
+      event.kind = agent::ConversationStreamEventKind::Other;
+      event.other_event = std::string(e->other_event);
+      event.other_json = std::string(e->other_json);
+      break;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+  return event;
+}
+
 } // namespace convert
 
 } // namespace longbridge
