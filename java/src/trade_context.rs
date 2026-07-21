@@ -9,7 +9,7 @@ use jni::{
 use longbridge::{
     Config, Decimal, Market, TradeContext,
     trade::{
-        AttachedOrderType, BalanceType, EstimateMaxPurchaseQuantityOptions,
+        AttachedOrderType, BalanceType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
@@ -634,6 +634,27 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOr
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(context.ctx.cancel_order(order_id).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOrderAttached(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .cancel_order(CancelOrderOptions::new(order_id).is_attached())
+                .await?)
         })?;
         Ok(())
     })

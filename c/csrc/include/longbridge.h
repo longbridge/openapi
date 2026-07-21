@@ -10845,6 +10845,14 @@ void lb_trade_context_cancel_order(const struct lb_trade_context_t *ctx,
                                    void *userdata);
 
 /**
+ * Cancel attached order
+ */
+void lb_trade_context_cancel_order_attached(const struct lb_trade_context_t *ctx,
+                                            const char *order_id,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
  * Get account balance
  */
 void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,

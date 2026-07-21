@@ -3,10 +3,11 @@ use std::sync::Arc;
 use longbridge::{
     blocking::TradeContextSync,
     trade::{
-        EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-        GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+        CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+        GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions,
+        ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -378,8 +379,13 @@ impl TradeContext {
     }
 
     /// Cancel order
-    fn cancel_order(&self, order_id: String) -> PyResult<()> {
-        self.ctx.cancel_order(order_id).map_err(ErrorNewType)?;
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn cancel_order(&self, order_id: String, is_attached: bool) -> PyResult<()> {
+        let mut opts = CancelOrderOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
+        self.ctx.cancel_order(opts).map_err(ErrorNewType)?;
         Ok(())
     }
 

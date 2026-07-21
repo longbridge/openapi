@@ -2766,7 +2766,7 @@ export declare class TradeContext {
    * await ctx.cancelOrder("709043056541253632");
    * ```
    */
-  cancelOrder(orderId: string): Promise<void>
+  cancelOrder(orderId: string, isAttached?: boolean | undefined | null): Promise<void>
   /**
    * Get account balance
    *

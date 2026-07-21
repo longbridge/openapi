@@ -10,14 +10,15 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result, serde_utils,
     trade::{
-        AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        Execution, FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
-        OrderDetail, OrderSide, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse,
-        ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
-        USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
+        EstimateMaxPurchaseQuantityOptions, Execution, FundPositionsResponse,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
+        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -522,20 +523,13 @@ impl TradeContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn cancel_order(&self, order_id: impl Into<String>) -> Result<()> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            order_id: String,
-        }
-
+    pub async fn cancel_order(&self, options: impl Into<CancelOrderOptions>) -> Result<()> {
         Ok(self
             .0
             .http_cli
             .request(Method::DELETE, "/v1/trade/order")
             .response::<Json<EmptyResponse>>()
-            .query_params(Request {
-                order_id: order_id.into(),
-            })
+            .query_params(options.into())
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await

@@ -3,11 +3,11 @@
 use std::sync::Arc;
 
 use longbridge::trade::{
-    EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
-    GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-    GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-    GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
-    TradeContext,
+    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+    GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+    GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions,
+    SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -425,10 +425,20 @@ impl AsyncTradeContext {
     }
 
     /// Cancel order. Returns awaitable.
-    fn cancel_order(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn cancel_order(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        is_attached: bool,
+    ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
+        let mut opts = CancelOrderOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            ctx.cancel_order(order_id).await.map_err(ErrorNewType)?;
+            ctx.cancel_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
         })
         .map(|b| b.unbind())

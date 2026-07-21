@@ -554,20 +554,24 @@ TradeContext::submit_order(
 
 void
 TradeContext::cancel_order(const std::string& order_id,
-                           AsyncCallback<TradeContext, void> callback) const
+                           AsyncCallback<TradeContext, void> callback,
+                           bool is_attached) const
 {
-  lb_trade_context_cancel_order(
-    ctx_,
-    order_id.c_str(),
-    [](auto res) {
-      auto callback_ptr =
-        callback::get_async_callback<TradeContext, void>(res->userdata);
-      (*callback_ptr)(AsyncResult<TradeContext, void>(
-        TradeContext((const lb_trade_context_t*)res->ctx),
-        Status(res->error),
-        nullptr));
-    },
-    new AsyncCallback<TradeContext, void>(callback));
+  auto trampoline = [](auto res) {
+    auto callback_ptr =
+      callback::get_async_callback<TradeContext, void>(res->userdata);
+    (*callback_ptr)(AsyncResult<TradeContext, void>(
+      TradeContext((const lb_trade_context_t*)res->ctx),
+      Status(res->error),
+      nullptr));
+  };
+  auto* userdata = new AsyncCallback<TradeContext, void>(callback);
+  if (is_attached) {
+    lb_trade_context_cancel_order_attached(
+      ctx_, order_id.c_str(), trampoline, userdata);
+  } else {
+    lb_trade_context_cancel_order(ctx_, order_id.c_str(), trampoline, userdata);
+  }
 }
 
 void

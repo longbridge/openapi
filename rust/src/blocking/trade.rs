@@ -4,15 +4,15 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse,
-        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, PushEvent,
-        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
+        EstimateMaxPurchaseQuantityOptions, EstimateMaxPurchaseQuantityResponse, Execution,
+        FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
+        OrderDetail, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+        USAssetOverview, USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -291,9 +291,12 @@ impl TradeContextSync {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn cancel_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
+    pub fn cancel_order(
+        &self,
+        options: impl Into<CancelOrderOptions> + Send + 'static,
+    ) -> Result<()> {
         self.rt
-            .call(move |ctx| async move { ctx.cancel_order(order_id).await })
+            .call(move |ctx| async move { ctx.cancel_order(options).await })
     }
 
     /// Get account balance

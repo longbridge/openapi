@@ -1,3 +1,4 @@
+mod cancel_order;
 mod estimate_max_purchase_quantity;
 mod get_all_executions;
 mod get_cash_flow;
@@ -11,6 +12,7 @@ mod get_today_orders;
 mod replace_order;
 mod submit_order;
 
+pub use cancel_order::CancelOrderOptions;
 pub use estimate_max_purchase_quantity::EstimateMaxPurchaseQuantityOptions;
 pub use get_all_executions::GetAllExecutionsOptions;
 pub use get_cash_flow::GetCashFlowOptions;

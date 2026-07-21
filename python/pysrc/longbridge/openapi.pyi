@@ -7315,12 +7315,13 @@ class TradeContext:
                 print(resp)
         """
 
-    def cancel_order(self, order_id: str) -> None:
+    def cancel_order(self, order_id: str, is_attached: bool = False) -> None:
         """
         Cancel order
 
         Args:
             order_id: Order ID
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Examples:
             ::
@@ -8046,12 +8047,13 @@ class AsyncTradeContext:
         """
         ...
 
-    def cancel_order(self, order_id: str) -> Awaitable[None]:
+    def cancel_order(self, order_id: str, is_attached: bool = False) -> Awaitable[None]:
         """
         Cancel order by order_id. Returns an awaitable.
 
         Args:
             order_id: Order ID.
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Examples:
             ::

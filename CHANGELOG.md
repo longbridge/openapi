@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Order` / `OrderDetail`: new `attached_orders: Vec<AttachedOrderDetail>` field
   - New method `order_detail_attached(order_id)` — queries detail for an attached order by its own ID
   - `order_detail` now accepts `GetOrderDetailOptions` (with optional `is_attached` flag) in addition to a plain order ID string
+  - `cancel_order` gains an `is_attached` flag to cancel an attached sub-order by its own order ID (Rust: `CancelOrderOptions`; Python: `is_attached` keyword arg; Node.js: optional `isAttached` param; C++/Java: `is_attached` overload/default parameter; C: new `lb_trade_context_cancel_order_attached`)
 
 ### Breaking changes
 

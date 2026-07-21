@@ -353,8 +353,27 @@ public class TradeContext implements AutoCloseable {
      * @throws OpenApiException If an error occurs
      */
     public CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
+        return cancelOrder(orderId, false);
+    }
+
+    /**
+     * Cancel order
+     *
+     * @param orderId    Order ID
+     * @param isAttached When set together with orderId, indicates that orderId is
+     *                   an attached sub-order ID. The server will look up using
+     *                   the attached order ID instead of treating it as a regular
+     *                   order ID.
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> cancelOrder(String orderId, boolean isAttached) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextCancelOrder(this.raw, orderId, callback);
+            if (isAttached) {
+                SdkNative.tradeContextCancelOrderAttached(this.raw, orderId, callback);
+            } else {
+                SdkNative.tradeContextCancelOrder(this.raw, orderId, callback);
+            }
         });
     }
 

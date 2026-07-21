@@ -3,11 +3,11 @@ use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 use longbridge::{
     TradeContext,
     trade::{
-        AttachedOrderType, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
-        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
-        GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent, ReplaceAttachedParams,
-        ReplaceOrderOptions, SubmitAttachedParams, SubmitOrderOptions,
+        AttachedOrderType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent,
+        ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -590,6 +590,24 @@ pub unsafe extern "C" fn lb_trade_context_cancel_order(
     let order_id = cstr_to_rust(order_id);
     execute_async(callback, ctx, userdata, async move {
         ctx_inner.cancel_order(order_id).await?;
+        Ok(())
+    });
+}
+
+/// Cancel attached order
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_cancel_order_attached(
+    ctx: *const CTradeContext,
+    order_id: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let order_id = cstr_to_rust(order_id);
+    execute_async(callback, ctx, userdata, async move {
+        ctx_inner
+            .cancel_order(CancelOrderOptions::new(order_id).is_attached())
+            .await?;
         Ok(())
     });
 }

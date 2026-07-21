@@ -10,11 +10,11 @@ mod types;
 pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, TradeContext};
 pub use push_types::{PushEvent, PushOrderChanged, TopicType};
 pub use requests::{
-    EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
-    GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-    GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-    GetTodayOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams,
-    SubmitOrderOptions,
+    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+    GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+    GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions,
+    SubmitAttachedParams, SubmitOrderOptions,
 };
 pub use types::{
     AccountBalance,
