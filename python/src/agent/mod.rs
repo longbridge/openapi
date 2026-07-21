@@ -18,6 +18,10 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::ConversationResponse>()?;
     parent.add_class::<types::ChatStartedPayload>()?;
     parent.add_class::<types::MessagePayload>()?;
+    parent.add_class::<types::WorkflowStartedInputs>()?;
+    parent.add_class::<types::WorkflowStartedPayload>()?;
+    parent.add_class::<types::ChatFinishedPayload>()?;
+    parent.add_class::<types::ChatTitleUpdatedPayload>()?;
     parent.add_class::<types::ConversationStreamEvent>()?;
 
     parent.add_class::<context::AgentContext>()?;

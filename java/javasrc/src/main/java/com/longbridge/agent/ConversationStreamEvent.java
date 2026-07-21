@@ -23,8 +23,12 @@ package com.longbridge.agent;
  * }</pre>
  *
  * @see ChatStartedEvent
+ * @see WorkflowStartedEvent
  * @see MessageEvent
+ * @see PingEvent
+ * @see ChatFinishedEvent
  * @see WorkflowFinishedEvent
+ * @see ChatTitleUpdatedEvent
  * @see OtherEvent
  */
 public abstract class ConversationStreamEvent {

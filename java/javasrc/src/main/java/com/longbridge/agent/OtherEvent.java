@@ -9,10 +9,11 @@ public final class OtherEvent extends ConversationStreamEvent {
     private String json;
 
     /**
-     * Returns the SSE envelope's {@code event} field (the event type name),
-     * e.g. {@code "workflow_started"}, {@code "ping"}, {@code "chat_finished"},
-     * {@code "chat_title_updated"} (observed against the real API; not
-     * documented).
+     * Returns the SSE envelope's {@code event} field (the event type name) of
+     * whatever event type this SDK version doesn't yet recognize as one of
+     * {@link ChatStartedEvent}, {@link WorkflowStartedEvent},
+     * {@link MessageEvent}, {@link PingEvent}, {@link ChatFinishedEvent},
+     * {@link WorkflowFinishedEvent}, or {@link ChatTitleUpdatedEvent}.
      *
      * @return event type name
      */

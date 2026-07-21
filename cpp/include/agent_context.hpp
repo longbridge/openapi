@@ -68,9 +68,9 @@ public:
   /// Start a conversation with the specified Agent, calling `on_event` for
   /// every run-progress event observed over SSE. A `WorkflowFinished` event
   /// carries the run's outcome, but isn't necessarily the last one seen —
-  /// the server may still emit a few more housekeeping events (`Other`, e.g.
-  /// a `chat_title_updated`) before actually closing the connection. Once
-  /// the stream truly ends, `callback` is invoked with the final
+  /// the server may still emit a few more housekeeping events (e.g.
+  /// `ChatTitleUpdated`) before actually closing the connection. Once the
+  /// stream truly ends, `callback` is invoked with the final
   /// ConversationResponse — same as `conversation`, just arrived at via the
   /// streamed path.
   ///
