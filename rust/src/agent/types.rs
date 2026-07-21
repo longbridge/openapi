@@ -312,6 +312,111 @@ pub struct WorkflowFinishedPayload {
     pub outputs: WorkflowOutputs,
 }
 
+/// `inputs` of a `workflow_started` SSE event.
+///
+/// ⚠️ Not documented by the API — reverse-engineered from live traffic (see
+/// [`ConversationStreamEvent::WorkflowStarted`]'s docs). The server may
+/// change this shape without notice.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct WorkflowStartedInputs {
+    /// ID of the owning conversation
+    #[serde(default)]
+    pub chat_id: i64,
+    /// Conversation identifier
+    #[serde(default)]
+    pub chat_uid: String,
+    /// Message ID of this round (observed as a raw JSON number; accepts a
+    /// string too, see [`ChatStartedPayload::message_id`])
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::deserialize_string_or_int_as_string"
+    )]
+    pub message_id: String,
+    /// The question that was asked
+    #[serde(default)]
+    pub query: String,
+}
+
+/// Payload of a `workflow_started` SSE event, observed right after
+/// `chat_started`.
+///
+/// ⚠️ Not documented by the API — reverse-engineered from live traffic (see
+/// [`ConversationStreamEvent::WorkflowStarted`]'s docs). The server may
+/// change this shape without notice.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct WorkflowStartedPayload {
+    /// Whether this run's answer was served from a cache
+    #[serde(default)]
+    pub hit_cache: bool,
+    /// Echoes the run's inputs
+    #[serde(default)]
+    pub inputs: WorkflowStartedInputs,
+    /// Unix timestamp in seconds
+    #[serde(default)]
+    pub started_at: i64,
+    /// Internal workflow run ID
+    #[serde(default)]
+    pub workflow_id: i64,
+}
+
+/// Payload of a `chat_finished` SSE event, observed once all `message` events
+/// for this round have been sent, shortly before `workflow_finished`.
+///
+/// ⚠️ Not documented by the API — reverse-engineered from live traffic (see
+/// [`ConversationStreamEvent::ChatFinished`]'s docs). The server may change
+/// this shape without notice. `error`/`error_message` have only ever been
+/// observed as empty strings (every run seen so far succeeded) — it's not
+/// confirmed whether they carry anything meaningful for the
+/// interrupted/failed cases, or how that relates to
+/// [`WorkflowOutputs::error`].
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct ChatFinishedPayload {
+    /// ID of the owning conversation
+    #[serde(default)]
+    pub chat_id: i64,
+    /// Conversation identifier
+    #[serde(default)]
+    pub chat_uid: String,
+    /// Message ID of this round (observed as a raw JSON number; accepts a
+    /// string too, see [`ChatStartedPayload::message_id`])
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::deserialize_string_or_int_as_string"
+    )]
+    pub message_id: String,
+    /// Empty string in every run observed so far
+    #[serde(default)]
+    pub error: String,
+    /// Empty string in every run observed so far
+    #[serde(default)]
+    pub error_message: String,
+}
+
+/// Payload of a `chat_title_updated` SSE event — the server auto-generates a
+/// short title for the conversation as a UI convenience. Can arrive before
+/// *or* after `workflow_finished`; not tied to the run's outcome.
+///
+/// ⚠️ Not documented by the API — reverse-engineered from live traffic. The
+/// server may change this shape without notice.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct ChatTitleUpdatedPayload {
+    /// ID of the owning conversation
+    #[serde(default)]
+    pub chat_id: i64,
+    /// Conversation identifier
+    #[serde(default)]
+    pub chat_uid: String,
+    /// Where the title came from, e.g. `"ai_generated"`
+    #[serde(default)]
+    pub source: String,
+    /// The new (possibly truncated) title
+    #[serde(default)]
+    pub title: String,
+    /// Unix timestamp in seconds
+    #[serde(default)]
+    pub updated_at: i64,
+}
+
 /// One event observed while streaming
 /// [`crate::AgentContext::conversation_streamed`]
 /// or [`crate::AgentContext::continue_conversation_streamed`]
@@ -319,19 +424,35 @@ pub struct WorkflowFinishedPayload {
 pub enum ConversationStreamEvent {
     /// The run has started
     ChatStarted(ChatStartedPayload),
+    /// ⚠️ Not documented by the API, observed right after `ChatStarted` on
+    /// every run seen so far — reverse-engineered from live traffic, see
+    /// [`WorkflowStartedPayload`]'s docs.
+    WorkflowStarted(WorkflowStartedPayload),
     /// An incremental piece of the answer
     Message(MessagePayload),
-    /// The run finished (succeeded, interrupted, failed, or stopped) — the last
-    /// event of a stream
+    /// ⚠️ Not documented by the API, a heartbeat with no payload, observed at
+    /// arbitrary points in the stream (including in between `Message`
+    /// chunks) — reverse-engineered from live traffic.
+    Ping,
+    /// ⚠️ Not documented by the API, observed once all `Message` events for
+    /// this round have been sent — reverse-engineered from live traffic, see
+    /// [`ChatFinishedPayload`]'s docs.
+    ChatFinished(ChatFinishedPayload),
+    /// The run finished (succeeded, interrupted, failed, or stopped),
+    /// carrying the run's outcome. Not necessarily the last event of the
+    /// stream — the server may still emit a few more housekeeping events
+    /// (e.g. [`ConversationStreamEvent::ChatTitleUpdated`]) before actually
+    /// closing the connection.
     WorkflowFinished(ConversationResponse),
-    /// An event type not recognized by this SDK version, carried as raw JSON so
-    /// callers aren't broken by future additions to the API. Live testing
-    /// against the real API shows there are more event types than the docs'
-    /// example covers (e.g. a workflow-started event right after
-    /// `chat_started`, a message-end event carrying `error`/`error_message`
-    /// fields, and a post-completion chat-title event) — `event` is the SSE
-    /// envelope's discriminator string (e.g. `"workflow_started"`) so callers
-    /// can at least tell these apart instead of getting an opaque blob.
+    /// ⚠️ Not documented by the API, the server auto-generating a short title
+    /// for the conversation — reverse-engineered from live traffic, see
+    /// [`ChatTitleUpdatedPayload`]'s docs. Can arrive before *or* after
+    /// [`ConversationStreamEvent::WorkflowFinished`].
+    ChatTitleUpdated(ChatTitleUpdatedPayload),
+    /// An event type not recognized by this SDK version, carried as raw JSON
+    /// so callers aren't broken by future additions to the API. `event` is
+    /// the SSE envelope's discriminator string, so callers can at least tell
+    /// these apart instead of getting an opaque blob.
     Other {
         /// The SSE envelope's `event` field (the event type name)
         event: String,
