@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use longbridge_geo::DcRegion;
-use reqwest::StatusCode;
+use reqwest::{StatusCode, header::HeaderMap};
 
 use crate::qs::QsError;
 
@@ -75,6 +75,19 @@ pub enum HttpClientError {
     /// Bad status
     #[error("status error: {0}")]
     BadStatus(StatusCode),
+
+    /// An HTTP response that could not be parsed as an OpenAPI response.
+    #[error("unexpected HTTP response: status={status}, trace_id={trace_id}, body={body}")]
+    UnexpectedHttpResponse {
+        /// HTTP response status.
+        status: StatusCode,
+        /// Upstream trace ID, when present.
+        trace_id: String,
+        /// Original HTTP response headers.
+        headers: Box<HeaderMap>,
+        /// Original HTTP response body.
+        body: String,
+    },
 
     /// Http error
     #[error(transparent)]
