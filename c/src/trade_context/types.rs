@@ -3,9 +3,9 @@ use std::os::raw::c_char;
 use longbridge::{
     Market,
     trade::{
-        AccountBalance, AllExecutionsResponse, AttachedOrderDetail, AttachedOrderType,
-        BalanceType, CashFlow, CashFlowDirection, CashInfo, EstimateMaxPurchaseQuantityResponse,
-        Execution, FrozenTransactionFee, FundPosition, FundPositionChannel, FundPositionsResponse,
+        AccountBalance, AllExecutionsResponse, AttachedOrderDetail, AttachedOrderType, BalanceType,
+        CashFlow, CashFlowDirection, CashInfo, EstimateMaxPurchaseQuantityResponse, Execution,
+        FrozenTransactionFee, FundPosition, FundPositionChannel, FundPositionsResponse,
         MarginRatio, Order, OrderChargeDetail, OrderChargeFee, OrderChargeItem, OrderDetail,
         OrderHistoryDetail, OrderSide, OrderStatus, OrderTag, OrderType, PushOrderChanged,
         StockPosition, StockPositionChannel, StockPositionsResponse, SubmitOrderResponse,
