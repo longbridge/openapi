@@ -66,13 +66,15 @@ public:
                              AsyncCallback<AgentContext, ConversationResponse> callback) const;
 
   /// Start a conversation with the specified Agent, calling `on_event` for
-  /// every run-progress event observed over SSE. A `WorkflowFinished` event
-  /// carries the run's outcome, but isn't necessarily the last one seen —
-  /// the server may still emit a few more housekeeping events (e.g.
-  /// `ChatTitleUpdated`) before actually closing the connection. Once the
-  /// stream truly ends, `callback` is invoked with the final
-  /// ConversationResponse — same as `conversation`, just arrived at via the
-  /// streamed path.
+  /// every run-progress event observed over SSE. A succeeded, failed, or
+  /// stopped run carries its outcome in a `WorkflowFinished` event; an
+  /// interrupted run carries it in a `HumanInteractionRequired` event
+  /// instead — the two are never emitted for the same run. Either way, the
+  /// carrying event isn't necessarily the last one seen — the server may
+  /// still emit a few more housekeeping events (e.g. `ChatTitleUpdated`)
+  /// before actually closing the connection. Once the stream truly ends,
+  /// `callback` is invoked with the final ConversationResponse — same as
+  /// `conversation`, just arrived at via the streamed path.
   ///
   /// @param chat_uid Existing conversation identifier to continue within
   ///                 (`std::nullopt` to start a brand-new conversation)

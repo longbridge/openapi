@@ -26,6 +26,21 @@ package com.longbridge.agent;
  * @see WorkflowStartedEvent
  * @see MessageEvent
  * @see PingEvent
+ * @see ThinkingStartedEvent
+ * @see ThinkingFinishedEvent
+ * @see NodeToolUseStartedEvent
+ * @see NodeToolUseFinishedEvent
+ * @see SubagentStartedEvent
+ * @see SubagentProgressEvent
+ * @see SubagentFinishedEvent
+ * @see AgentToolStartedEvent
+ * @see AgentToolProgressEvent
+ * @see AgentToolFinishedEvent
+ * @see HumanInteractionRequiredEvent
+ * @see QueryMaskedEvent
+ * @see PlanChangedEvent
+ * @see ContextCompressStartedEvent
+ * @see ContextCompressFinishedEvent
  * @see ChatFinishedEvent
  * @see WorkflowFinishedEvent
  * @see ChatTitleUpdatedEvent

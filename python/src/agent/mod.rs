@@ -22,6 +22,22 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::WorkflowStartedPayload>()?;
     parent.add_class::<types::ChatFinishedPayload>()?;
     parent.add_class::<types::ChatTitleUpdatedPayload>()?;
+    parent.add_class::<types::ThinkingStartedPayload>()?;
+    parent.add_class::<types::ThinkingFinishedPayload>()?;
+    parent.add_class::<types::NodeToolUseStartedPayload>()?;
+    parent.add_class::<types::NodeToolUseOutputs>()?;
+    parent.add_class::<types::NodeToolUseFinishedPayload>()?;
+    parent.add_class::<types::SubagentStartedPayload>()?;
+    parent.add_class::<types::SubagentProgressPayload>()?;
+    parent.add_class::<types::SubagentOutputs>()?;
+    parent.add_class::<types::SubagentFinishedPayload>()?;
+    parent.add_class::<types::AgentToolStartedPayload>()?;
+    parent.add_class::<types::AgentToolProgressPayload>()?;
+    parent.add_class::<types::AgentToolFinishedPayload>()?;
+    parent.add_class::<types::QueryMaskedPayload>()?;
+    parent.add_class::<types::PlanChangedPayload>()?;
+    parent.add_class::<types::ContextCompressStartedPayload>()?;
+    parent.add_class::<types::ContextCompressFinishedPayload>()?;
     parent.add_class::<types::ConversationStreamEvent>()?;
 
     parent.add_class::<context::AgentContext>()?;
