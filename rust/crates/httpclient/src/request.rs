@@ -365,12 +365,13 @@ where
         let s = Instant::now();
 
         // send request
-        let (status, trace_id, text) = tokio::time::timeout(REQUEST_TIMEOUT, async move {
+        let (status, trace_id, headers, text) = tokio::time::timeout(REQUEST_TIMEOUT, async move {
             let resp = http_cli
                 .execute(request)
                 .await
                 .map_err(|err| HttpClientError::Http(err.into()))?;
             let status = resp.status();
+            let headers = resp.headers().clone();
             let trace_id = resp
                 .headers()
                 .get("x-trace-id")
@@ -381,7 +382,7 @@ where
                 .text()
                 .await
                 .map_err(|err| HttpClientError::Http(err.into()))?;
-            Ok::<_, HttpClientError>((status, trace_id, text))
+            Ok::<_, HttpClientError>((status, trace_id, headers, text))
         })
         .await
         .map_err(|_| HttpClientError::RequestTimeout)??;
@@ -398,7 +399,12 @@ where
             Err(err) if status == StatusCode::OK => {
                 Err(HttpClientError::DeserializeResponseBody(err.to_string()))
             }
-            Err(_) => Err(HttpClientError::BadStatus(status)),
+            Err(_) => Err(HttpClientError::UnexpectedHttpResponse {
+                status,
+                trace_id,
+                headers: Box::new(headers),
+                body: text,
+            }),
         }?;
 
         R::parse_from_bytes(resp.get().as_bytes())
@@ -409,7 +415,8 @@ where
     pub async fn send(self) -> HttpClientResult<R> {
         match self.do_send().await {
             Ok(resp) => Ok(resp),
-            Err(HttpClientError::BadStatus(StatusCode::TOO_MANY_REQUESTS)) => {
+            Err(err) if is_too_many_requests(&err) => {
+                let mut last_error = err;
                 let mut retry_delay = RETRY_INITIAL_DELAY;
 
                 for _ in 0..RETRY_COUNT {
@@ -417,7 +424,8 @@ where
 
                     match self.do_send().await {
                         Ok(resp) => return Ok(resp),
-                        Err(HttpClientError::BadStatus(StatusCode::TOO_MANY_REQUESTS)) => {
+                        Err(err) if is_too_many_requests(&err) => {
+                            last_error = err;
                             retry_delay =
                                 Duration::from_secs_f32(retry_delay.as_secs_f32() * RETRY_FACTOR);
                             continue;
@@ -426,9 +434,73 @@ where
                     }
                 }
 
-                Err(HttpClientError::BadStatus(StatusCode::TOO_MANY_REQUESTS))
+                Err(last_error)
             }
             Err(err) => Err(err),
         }
+    }
+}
+
+fn is_too_many_requests(err: &HttpClientError) -> bool {
+    matches!(
+        err,
+        HttpClientError::BadStatus(StatusCode::TOO_MANY_REQUESTS)
+            | HttpClientError::UnexpectedHttpResponse {
+                status: StatusCode::TOO_MANY_REQUESTS,
+                ..
+            }
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use reqwest::{StatusCode, header::HeaderMap};
+
+    use super::is_too_many_requests;
+    use crate::HttpClientError;
+
+    #[test]
+    fn unexpected_http_response_preserves_original_context() {
+        let mut headers = HeaderMap::new();
+        headers.insert("server", "awselb/2.0".parse().unwrap());
+        let body = "<html><body>Too many IPs in X-Forwarded-For header.</body></html>";
+        let err = HttpClientError::UnexpectedHttpResponse {
+            status: StatusCode::from_u16(463).unwrap(),
+            trace_id: "trace-463".to_string(),
+            headers: Box::new(headers),
+            body: body.to_string(),
+        };
+
+        let HttpClientError::UnexpectedHttpResponse {
+            status,
+            trace_id,
+            headers,
+            body: preserved_body,
+        } = &err
+        else {
+            panic!("unexpected error variant");
+        };
+        assert_eq!(status.as_u16(), 463);
+        assert_eq!(trace_id, "trace-463");
+        assert_eq!(headers["server"], "awselb/2.0");
+        assert_eq!(preserved_body, body);
+        assert_eq!(
+            err.to_string(),
+            format!(
+                "unexpected HTTP response: status=463 <unknown status code>, trace_id=trace-463, body={body}"
+            )
+        );
+    }
+
+    #[test]
+    fn rich_rate_limit_response_remains_retryable() {
+        let err = HttpClientError::UnexpectedHttpResponse {
+            status: StatusCode::TOO_MANY_REQUESTS,
+            trace_id: String::new(),
+            headers: Box::new(HeaderMap::new()),
+            body: "rate limited".to_string(),
+        };
+
+        assert!(is_too_many_requests(&err));
     }
 }

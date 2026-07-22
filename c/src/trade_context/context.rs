@@ -19,14 +19,14 @@ use crate::{
     trade_context::{
         enum_types::CTopicType,
         types::{
-            CAccountBalanceOwned, CAllExecutionsResponseOwned, CCashFlowOwned,
-            CEstimateMaxPurchaseQuantityOptions, CEstimateMaxPurchaseQuantityResponseOwned,
-            CExecutionOwned, CFundPositionsResponseOwned, CGetAllExecutionsOptions,
-            CGetCashFlowOptions, CGetFundPositionsOptions, CGetHistoryExecutionsOptions,
-            CGetHistoryOrdersOptions, CGetStockPositionsOptions, CGetTodayExecutionsOptions,
-            CGetTodayOrdersOptions, CMarginRatioOwned, COrderDetailOwned, COrderOwned,
-            CPushOrderChanged, CPushOrderChangedOwned, CReplaceOrderOptions,
-            CStockPositionsResponseOwned, CSubmitOrderOptions, CSubmitOrderResponseOwned,
+            CAccountBalanceOwned, CCashFlowOwned, CEstimateMaxPurchaseQuantityOptions,
+            CEstimateMaxPurchaseQuantityResponseOwned, CExecutionOwned,
+            CFundPositionsResponseOwned, CGetCashFlowOptions, CGetFundPositionsOptions,
+            CGetHistoryExecutionsOptions, CGetHistoryOrdersOptions, CGetStockPositionsOptions,
+            CGetTodayExecutionsOptions, CGetTodayOrdersOptions, CMarginRatioOwned,
+            COrderDetailOwned, COrderOwned, CPushOrderChanged, CPushOrderChangedOwned,
+            CReplaceOrderOptions, CStockPositionsResponseOwned, CSubmitOrderOptions,
+            CSubmitOrderResponseOwned,
         },
     },
     types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
@@ -264,45 +264,46 @@ pub unsafe extern "C" fn lb_trade_context_today_executions(
     });
 }
 
-/// Get all executions
-///
-/// @param[in] opts Options for get all executions request (can be null)
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_trade_context_all_executions(
-    ctx: *const CTradeContext,
-    opts: *const CGetAllExecutionsOptions,
-    callback: CAsyncCallback,
-    userdata: *mut c_void,
-) {
-    let ctx_inner = (*ctx).ctx.clone();
-    let mut opts2 = GetAllExecutionsOptions::new();
-    if !opts.is_null() {
-        if !(*opts).symbol.is_null() {
-            opts2 = opts2.symbol(cstr_to_rust((*opts).symbol));
-        }
-        if !(*opts).order_id.is_null() {
-            opts2 = opts2.order_id(cstr_to_rust((*opts).order_id));
-        }
-        if !(*opts).start_at.is_null() {
-            opts2 = opts2.start_at(
-                OffsetDateTime::from_unix_timestamp(*(*opts).start_at).expect("invalid start at"),
-            );
-        }
-        if !(*opts).end_at.is_null() {
-            opts2 = opts2.end_at(
-                OffsetDateTime::from_unix_timestamp(*(*opts).end_at).expect("invalid end at"),
-            );
-        }
-        if !(*opts).page.is_null() {
-            opts2 = opts2.page(*(*opts).page);
-        }
-    }
-    execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CAllExecutionsResponseOwned> =
-            CCow::new(ctx_inner.all_executions(opts2).await?);
-        Ok(resp)
-    });
-}
+// TODO: temporarily disabled — restore when API is available
+// Get all executions
+//
+// @param[in] opts Options for get all executions request (can be null)
+// #[unsafe(no_mangle)]
+// pub unsafe extern "C" fn lb_trade_context_all_executions(
+// ctx: *const CTradeContext,
+// opts: *const CGetAllExecutionsOptions,
+// callback: CAsyncCallback,
+// userdata: *mut c_void,
+// ) {
+// let ctx_inner = (*ctx).ctx.clone();
+// let mut opts2 = GetAllExecutionsOptions::new();
+// if !opts.is_null() {
+// if !(*opts).symbol.is_null() {
+// opts2 = opts2.symbol(cstr_to_rust((*opts).symbol));
+// }
+// if !(*opts).order_id.is_null() {
+// opts2 = opts2.order_id(cstr_to_rust((*opts).order_id));
+// }
+// if !(*opts).start_at.is_null() {
+// opts2 = opts2.start_at(
+// OffsetDateTime::from_unix_timestamp(*(*opts).start_at).expect("invalid start
+// at"), );
+// }
+// if !(*opts).end_at.is_null() {
+// opts2 = opts2.end_at(
+// OffsetDateTime::from_unix_timestamp(*(*opts).end_at).expect("invalid end
+// at"), );
+// }
+// if !(*opts).page.is_null() {
+// opts2 = opts2.page(*(*opts).page);
+// }
+// }
+// execute_async(callback, ctx, userdata, async move {
+// let resp: CCow<CAllExecutionsResponseOwned> =
+// CCow::new(ctx_inner.all_executions(opts2).await?);
+// Ok(resp)
+// });
+// }
 
 /// Get history orders
 ///

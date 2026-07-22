@@ -4,15 +4,14 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse,
-        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders,
-        GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, PushEvent, QueryUSOrdersOptions,
-        QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions,
-        SubmitOrderResponse, TopicType, TradeContext, USAssetOverview, USOrderDetailResponse,
-        USRealizedPL,
+        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, PushEvent,
+        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -114,14 +113,15 @@ impl TradeContextSync {
             .call(move |ctx| async move { ctx.today_executions(options).await })
     }
 
-    /// Get all executions
-    pub fn all_executions(
-        &self,
-        options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
-    ) -> Result<AllExecutionsResponse> {
-        self.rt
-            .call(move |ctx| async move { ctx.all_executions(options).await })
-    }
+    // TODO: temporarily disabled — restore when API is available
+    // Get all executions
+    // pub fn all_executions(
+    // &self,
+    // options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
+    // ) -> Result<AllExecutionsResponse> {
+    // self.rt
+    // .call(move |ctx| async move { ctx.all_executions(options).await })
+    // }
 
     /// Get history orders
     ///
