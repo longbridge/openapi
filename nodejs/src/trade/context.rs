@@ -367,11 +367,12 @@ impl TradeContext {
     /// await ctx.cancelOrder("709043056541253632");
     /// ```
     #[napi]
-    pub async fn cancel_order(&self, order_id: String) -> Result<()> {
-        self.ctx
-            .cancel_order(order_id)
-            .await
-            .map_err(ErrorNewType)?;
+    pub async fn cancel_order(&self, order_id: String, is_attached: Option<bool>) -> Result<()> {
+        let mut opts = longbridge::trade::CancelOrderOptions::new(order_id);
+        if is_attached.unwrap_or(false) {
+            opts = opts.is_attached();
+        }
+        self.ctx.cancel_order(opts).await.map_err(ErrorNewType)?;
         Ok(())
     }
 
@@ -602,6 +603,15 @@ impl TradeContext {
                 .map_err(ErrorNewType)?
                 .into())
         })
+    }
+
+    #[napi]
+    pub async fn order_detail_attached(&self, order_id: String) -> Result<OrderDetail> {
+        self.ctx
+            .order_detail(longbridge::trade::GetOrderDetailOptions::new(order_id).is_attached())
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

@@ -4,14 +4,15 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
+        AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
+        EstimateMaxPurchaseQuantityOptions, EstimateMaxPurchaseQuantityResponse, Execution,
+        FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, PushEvent,
-        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
+        OrderDetail, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+        USAssetOverview, USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -290,9 +291,12 @@ impl TradeContextSync {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn cancel_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
+    pub fn cancel_order(
+        &self,
+        options: impl Into<CancelOrderOptions> + Send + 'static,
+    ) -> Result<()> {
         self.rt
-            .call(move |ctx| async move { ctx.cancel_order(order_id).await })
+            .call(move |ctx| async move { ctx.cancel_order(options).await })
     }
 
     /// Get account balance
@@ -453,10 +457,10 @@ impl TradeContextSync {
     /// ```
     pub fn order_detail(
         &self,
-        order_id: impl Into<String> + Send + 'static,
+        options: impl Into<GetOrderDetailOptions> + Send + 'static,
     ) -> Result<OrderDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.order_detail(order_id).await })
+            .call(move |ctx| async move { ctx.order_detail(options).await })
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

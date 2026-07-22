@@ -18,6 +18,7 @@ public class ReplaceOrderOptions {
     private Integer triggerCount;
     private BigDecimal monitorPrice;
     private String remark;
+    private ReplaceAttachedParams attachedParams;
 
     /**
      * Constructs options for replacing an order.
@@ -127,6 +128,26 @@ public class ReplaceOrderOptions {
     public ReplaceOrderOptions setRemark(String remark) {
         this.remark = remark;
         return this;
+    }
+
+    /**
+     * Sets the attached order parameters.
+     *
+     * @param attachedParams attached order parameters
+     * @return this instance for chaining
+     */
+    public ReplaceOrderOptions setAttachedParams(ReplaceAttachedParams attachedParams) {
+        this.attachedParams = attachedParams;
+        return this;
+    }
+
+    /**
+     * Returns the attached order parameters.
+     *
+     * @return attached order parameters
+     */
+    public ReplaceAttachedParams getAttachedParams() {
+        return attachedParams;
     }
 
 }
