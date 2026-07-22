@@ -6,8 +6,8 @@ use longbridge::trade::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions,
-    SubmitOrderOptions, TradeContext,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+    TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -163,45 +163,44 @@ impl AsyncTradeContext {
         .map(|b| b.unbind())
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions. Returns awaitable.
-    // #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at =
-    // None, page = None))] fn all_executions(
-    // &self,
-    // py: Python<'_>,
-    // symbol: Option<String>,
-    // order_id: Option<String>,
-    // start_at: Option<PyOffsetDateTimeWrapper>,
-    // end_at: Option<PyOffsetDateTimeWrapper>,
-    // page: Option<u64>,
-    // ) -> PyResult<Py<PyAny>> {
-    // let ctx = self.ctx.clone();
-    // let mut opts = GetAllExecutionsOptions::new();
-    // if let Some(s) = symbol {
-    // opts = opts.symbol(s);
-    // }
-    // if let Some(o) = order_id {
-    // opts = opts.order_id(o);
-    // }
-    // if let Some(s) = start_at {
-    // opts = opts.start_at(s.0);
-    // }
-    // if let Some(e) = end_at {
-    // opts = opts.end_at(e.0);
-    // }
-    // if let Some(p) = page {
-    // opts = opts.page(p);
-    // }
-    // pyo3_async_runtimes::tokio::future_into_py(py, async move {
-    // let r: AllExecutionsResponse = ctx
-    // .all_executions(Some(opts))
-    // .await
-    // .map_err(ErrorNewType)?
-    // .try_into()?;
-    // Ok(r)
-    // })
-    // .map(|b| b.unbind())
-    // }
+    /// Get all executions. Returns awaitable.
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        py: Python<'_>,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetAllExecutionsOptions::new();
+        if let Some(s) = symbol {
+            opts = opts.symbol(s);
+        }
+        if let Some(o) = order_id {
+            opts = opts.order_id(o);
+        }
+        if let Some(s) = start_at {
+            opts = opts.start_at(s.0);
+        }
+        if let Some(e) = end_at {
+            opts = opts.end_at(e.0);
+        }
+        if let Some(p) = page {
+            opts = opts.page(p);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: AllExecutionsResponse = ctx
+                .all_executions(Some(opts))
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
 
     /// Get history orders. Returns awaitable.
     #[allow(clippy::too_many_arguments)]

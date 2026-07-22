@@ -6,8 +6,7 @@ use longbridge::{
         CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
         GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
         GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions,
-        ReplaceOrderOptions, SubmitOrderOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -134,40 +133,39 @@ impl TradeContext {
             .collect()
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions
-    // #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at =
-    // None, page = None))] fn all_executions(
-    // &self,
-    // symbol: Option<String>,
-    // order_id: Option<String>,
-    // start_at: Option<PyOffsetDateTimeWrapper>,
-    // end_at: Option<PyOffsetDateTimeWrapper>,
-    // page: Option<u64>,
-    // ) -> PyResult<AllExecutionsResponse> {
-    // let mut opts = GetAllExecutionsOptions::new();
-    //
-    // if let Some(symbol) = symbol {
-    // opts = opts.symbol(symbol);
-    // }
-    // if let Some(order_id) = order_id {
-    // opts = opts.order_id(order_id);
-    // }
-    // if let Some(start_at) = start_at {
-    // opts = opts.start_at(start_at.0);
-    // }
-    // if let Some(end_at) = end_at {
-    // opts = opts.end_at(end_at.0);
-    // }
-    // if let Some(page) = page {
-    // opts = opts.page(page);
-    // }
-    //
-    // self.ctx
-    // .all_executions(Some(opts))
-    // .map_err(ErrorNewType)?
-    // .try_into()
-    // }
+    /// Get all executions
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<AllExecutionsResponse> {
+        let mut opts = GetAllExecutionsOptions::new();
+
+        if let Some(symbol) = symbol {
+            opts = opts.symbol(symbol);
+        }
+        if let Some(order_id) = order_id {
+            opts = opts.order_id(order_id);
+        }
+        if let Some(start_at) = start_at {
+            opts = opts.start_at(start_at.0);
+        }
+        if let Some(end_at) = end_at {
+            opts = opts.end_at(end_at.0);
+        }
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+
+        self.ctx
+            .all_executions(Some(opts))
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
 
     /// Get history orders
     #[pyo3(signature = (symbol = None, status = None, side = None, market = None, start_at = None, end_at = None))]
