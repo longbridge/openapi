@@ -6907,27 +6907,15 @@ class TradeContext:
                 print(resp)
         """
 
-    def all_executions(
-        self,
-        symbol: Optional[str] = None,
-        order_id: Optional[str] = None,
-        start_at: Optional[datetime] = None,
-        end_at: Optional[datetime] = None,
-        page: Optional[int] = None,
-    ) -> AllExecutionsResponse:
-        """
-        Get all executions
-
-        Args:
-            symbol: Filter by security code
-            order_id: Filter by Order ID
-            start_at: Start time
-            end_at: End time
-            page: Page number, starting from 1
-
-        Returns:
-            All executions response
-        """
+    # TODO: temporarily disabled — restore when API is available
+    # def all_executions(
+    #     self,
+    #     symbol: Optional[str] = None,
+    #     order_id: Optional[str] = None,
+    #     start_at: Optional[datetime] = None,
+    #     end_at: Optional[datetime] = None,
+    #     page: Optional[int] = None,
+    # ) -> AllExecutionsResponse: ...
 
     def history_orders(
         self,
@@ -7617,28 +7605,15 @@ class AsyncTradeContext:
         """
         ...
 
-    def all_executions(
-        self,
-        symbol: Optional[str] = None,
-        order_id: Optional[str] = None,
-        start_at: Optional[datetime] = None,
-        end_at: Optional[datetime] = None,
-        page: Optional[int] = None,
-    ) -> Awaitable[AllExecutionsResponse]:
-        """
-        Get all executions. Returns awaitable.
-
-        Args:
-            symbol: Filter by security code
-            order_id: Filter by Order ID
-            start_at: Start time
-            end_at: End time
-            page: Page number, starting from 1
-
-        Returns:
-            Awaitable resolving to AllExecutionsResponse
-        """
-        ...
+    # TODO: temporarily disabled — restore when API is available
+    # def all_executions(
+    #     self,
+    #     symbol: Optional[str] = None,
+    #     order_id: Optional[str] = None,
+    #     start_at: Optional[datetime] = None,
+    #     end_at: Optional[datetime] = None,
+    #     page: Optional[int] = None,
+    # ) -> Awaitable[AllExecutionsResponse]: ...
 
     def history_orders(
         self,

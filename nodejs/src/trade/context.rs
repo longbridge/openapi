@@ -11,13 +11,13 @@ use crate::{
     error::ErrorNewType,
     trade::{
         requests::{
-            EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
-            GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions,
-            GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+            EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetHistoryExecutionsOptions,
+            GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+            ReplaceOrderOptions, SubmitOrderOptions,
         },
         types::{
-            AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityResponse,
-            Execution, FundPositionsResponse, MarginRatio, Order, OrderDetail, PushOrderChanged,
+            AccountBalance, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
+            FundPositionsResponse, MarginRatio, Order, OrderDetail, PushOrderChanged,
             StockPositionsResponse, SubmitOrderResponse, TopicType,
         },
     },
@@ -195,18 +195,19 @@ impl TradeContext {
             .collect()
     }
 
-    /// Get all executions
-    #[napi]
-    pub async fn all_executions(
-        &self,
-        opts: Option<GetAllExecutionsOptions>,
-    ) -> Result<AllExecutionsResponse> {
-        self.ctx
-            .all_executions(opts.map(Into::into))
-            .await
-            .map_err(ErrorNewType)?
-            .try_into()
-    }
+    // TODO: temporarily disabled — restore when API is available
+    // Get all executions
+    // #[napi]
+    // pub async fn all_executions(
+    // &self,
+    // opts: Option<GetAllExecutionsOptions>,
+    // ) -> Result<AllExecutionsResponse> {
+    // self.ctx
+    // .all_executions(opts.map(Into::into))
+    // .await
+    // .map_err(ErrorNewType)?
+    // .try_into()
+    // }
 
     /// Get history orders
     ///

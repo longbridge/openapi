@@ -10,14 +10,13 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result, serde_utils,
     trade::{
-        AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityOptions,
-        Execution, FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
+        FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders,
+        GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
+        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -275,24 +274,25 @@ impl TradeContext {
             .trades)
     }
 
-    /// Get all executions
-    ///
-    /// Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
-    pub async fn all_executions(
-        &self,
-        options: impl Into<Option<GetAllExecutionsOptions>>,
-    ) -> Result<AllExecutionsResponse> {
-        Ok(self
-            .0
-            .http_cli
-            .request(Method::GET, "/v3/trade/execution/all")
-            .query_params(options.into().unwrap_or_default())
-            .response::<Json<AllExecutionsResponse>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?
-            .0)
-    }
+    // TODO: temporarily disabled — restore when API is available
+    // Get all executions
+    //
+    // Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
+    // pub async fn all_executions(
+    // &self,
+    // options: impl Into<Option<GetAllExecutionsOptions>>,
+    // ) -> Result<AllExecutionsResponse> {
+    // Ok(self
+    // .0
+    // .http_cli
+    // .request(Method::GET, "/v3/trade/execution/all")
+    // .query_params(options.into().unwrap_or_default())
+    // .response::<Json<AllExecutionsResponse>>()
+    // .send()
+    // .with_subscriber(self.0.log_subscriber.clone())
+    // .await?
+    // .0)
+    // }
 
     /// Get history orders
     ///
