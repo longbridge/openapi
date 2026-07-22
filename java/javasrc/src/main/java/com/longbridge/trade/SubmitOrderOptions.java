@@ -25,6 +25,7 @@ public class SubmitOrderOptions {
     private BigDecimal monitorPrice;
     private String remark;
     private String clientRequestId;
+    private SubmitAttachedParams attachedParams;
 
     /**
      * Constructs options for submitting an order.
@@ -180,5 +181,25 @@ public class SubmitOrderOptions {
     public SubmitOrderOptions setClientRequestId(String clientRequestId) {
         this.clientRequestId = clientRequestId;
         return this;
+    }
+
+    /**
+     * Sets the attached order parameters.
+     *
+     * @param attachedParams attached order parameters
+     * @return this instance for chaining
+     */
+    public SubmitOrderOptions setAttachedParams(SubmitAttachedParams attachedParams) {
+        this.attachedParams = attachedParams;
+        return this;
+    }
+
+    /**
+     * Returns the attached order parameters.
+     *
+     * @return attached order parameters
+     */
+    public SubmitAttachedParams getAttachedParams() {
+        return attachedParams;
     }
 }

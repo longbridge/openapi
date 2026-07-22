@@ -10,12 +10,13 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result, serde_utils,
     trade::{
-        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
-        FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders,
-        GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
-        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
+        EstimateMaxPurchaseQuantityOptions, Execution, FundPositionsResponse,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
         SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
@@ -274,25 +275,24 @@ impl TradeContext {
             .trades)
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions
-    //
-    // Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
-    // pub async fn all_executions(
-    // &self,
-    // options: impl Into<Option<GetAllExecutionsOptions>>,
-    // ) -> Result<AllExecutionsResponse> {
-    // Ok(self
-    // .0
-    // .http_cli
-    // .request(Method::GET, "/v3/trade/execution/all")
-    // .query_params(options.into().unwrap_or_default())
-    // .response::<Json<AllExecutionsResponse>>()
-    // .send()
-    // .with_subscriber(self.0.log_subscriber.clone())
-    // .await?
-    // .0)
-    // }
+    /// Get all executions
+    ///
+    /// Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
+    pub async fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>>,
+    ) -> Result<AllExecutionsResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v3/trade/execution/all")
+            .query_params(options.into().unwrap_or_default())
+            .response::<Json<AllExecutionsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
 
     /// Get history orders
     ///
@@ -521,20 +521,13 @@ impl TradeContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn cancel_order(&self, order_id: impl Into<String>) -> Result<()> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            order_id: String,
-        }
-
+    pub async fn cancel_order(&self, options: impl Into<CancelOrderOptions>) -> Result<()> {
         Ok(self
             .0
             .http_cli
             .request(Method::DELETE, "/v1/trade/order")
             .response::<Json<EmptyResponse>>()
-            .query_params(Request {
-                order_id: order_id.into(),
-            })
+            .query_params(options.into())
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await
@@ -785,20 +778,16 @@ impl TradeContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn order_detail(&self, order_id: impl Into<String>) -> Result<OrderDetail> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            order_id: String,
-        }
-
+    pub async fn order_detail(
+        &self,
+        options: impl Into<GetOrderDetailOptions>,
+    ) -> Result<OrderDetail> {
         Ok(self
             .0
             .http_cli
             .request(Method::GET, "/v1/trade/order")
             .response::<Json<OrderDetail>>()
-            .query_params(Request {
-                order_id: order_id.into(),
-            })
+            .query_params(options.into())
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

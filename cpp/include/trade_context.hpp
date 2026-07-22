@@ -53,13 +53,10 @@ public:
     const std::optional<GetTodayExecutionsOptions>& opts,
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
 
-  // TODO: temporarily disabled — restore when API is available
-  /*
   /// Get all executions
   void all_executions(
     const std::optional<GetAllExecutionsOptions>& opts,
     AsyncCallback<TradeContext, AllExecutionsResponse> callback) const;
-  */
 
   /// Get history orders
   void history_orders(
@@ -82,7 +79,8 @@ public:
 
   /// Cancel order
   void cancel_order(const std::string& order_id,
-                    AsyncCallback<TradeContext, void> callback) const;
+                    AsyncCallback<TradeContext, void> callback,
+                    bool is_attached = false) const;
 
   /// Get account balance with currency
   void account_balance(
@@ -115,6 +113,11 @@ public:
   /// Get order detail
   void order_detail(const std::string& order_id,
                     AsyncCallback<TradeContext, OrderDetail> callback) const;
+
+  /// Get order detail with attached orders
+  void order_detail_attached(
+    const std::string& order_id,
+    AsyncCallback<TradeContext, OrderDetail> callback) const;
 
   /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
   /// warrants, and options

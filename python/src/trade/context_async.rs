@@ -3,8 +3,9 @@
 use std::sync::Arc;
 
 use longbridge::trade::{
-    EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-    GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
+    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+    GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+    GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
     GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     TradeContext,
 };
@@ -20,10 +21,11 @@ use crate::{
         context::Callbacks,
         push::handle_push_event,
         types::{
-            AccountBalance, BalanceType, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, OrderSide, OrderStatus,
-            OrderType, OutsideRTH, StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
-            TopicType,
+            AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
+            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
+            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
+            SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
     types::Market,
@@ -161,45 +163,44 @@ impl AsyncTradeContext {
         .map(|b| b.unbind())
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions. Returns awaitable.
-    // #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at =
-    // None, page = None))] fn all_executions(
-    // &self,
-    // py: Python<'_>,
-    // symbol: Option<String>,
-    // order_id: Option<String>,
-    // start_at: Option<PyOffsetDateTimeWrapper>,
-    // end_at: Option<PyOffsetDateTimeWrapper>,
-    // page: Option<u64>,
-    // ) -> PyResult<Py<PyAny>> {
-    // let ctx = self.ctx.clone();
-    // let mut opts = GetAllExecutionsOptions::new();
-    // if let Some(s) = symbol {
-    // opts = opts.symbol(s);
-    // }
-    // if let Some(o) = order_id {
-    // opts = opts.order_id(o);
-    // }
-    // if let Some(s) = start_at {
-    // opts = opts.start_at(s.0);
-    // }
-    // if let Some(e) = end_at {
-    // opts = opts.end_at(e.0);
-    // }
-    // if let Some(p) = page {
-    // opts = opts.page(p);
-    // }
-    // pyo3_async_runtimes::tokio::future_into_py(py, async move {
-    // let r: AllExecutionsResponse = ctx
-    // .all_executions(Some(opts))
-    // .await
-    // .map_err(ErrorNewType)?
-    // .try_into()?;
-    // Ok(r)
-    // })
-    // .map(|b| b.unbind())
-    // }
+    /// Get all executions. Returns awaitable.
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        py: Python<'_>,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetAllExecutionsOptions::new();
+        if let Some(s) = symbol {
+            opts = opts.symbol(s);
+        }
+        if let Some(o) = order_id {
+            opts = opts.order_id(o);
+        }
+        if let Some(s) = start_at {
+            opts = opts.start_at(s.0);
+        }
+        if let Some(e) = end_at {
+            opts = opts.end_at(e.0);
+        }
+        if let Some(p) = page {
+            opts = opts.page(p);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: AllExecutionsResponse = ctx
+                .all_executions(Some(opts))
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
 
     /// Get history orders. Returns awaitable.
     #[allow(clippy::too_many_arguments)]
@@ -242,7 +243,8 @@ impl AsyncTradeContext {
     }
 
     /// Get today orders. Returns awaitable.
-    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, order_id = None))]
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, order_id = None, is_attached = false))]
     fn today_orders(
         &self,
         py: Python<'_>,
@@ -251,6 +253,7 @@ impl AsyncTradeContext {
         side: Option<OrderSide>,
         market: Option<Market>,
         order_id: Option<String>,
+        is_attached: bool,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = GetTodayOrdersOptions::new();
@@ -267,6 +270,9 @@ impl AsyncTradeContext {
         if let Some(o) = order_id {
             opts = opts.order_id(o);
         }
+        if is_attached {
+            opts = opts.is_attached();
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx.today_orders(Some(opts)).await.map_err(ErrorNewType)?;
             v.into_iter()
@@ -277,7 +283,7 @@ impl AsyncTradeContext {
     }
 
     /// Replace order. Returns awaitable.
-    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
+    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, attached_params = None))]
     #[allow(clippy::too_many_arguments)]
     fn replace_order(
         &self,
@@ -293,6 +299,7 @@ impl AsyncTradeContext {
         trigger_count: Option<i32>,
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
+        attached_params: Option<ReplaceAttachedParams>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = ReplaceOrderOptions::new(order_id, quantity.into());
@@ -323,6 +330,9 @@ impl AsyncTradeContext {
         if let Some(r) = remark {
             opts = opts.remark(r);
         }
+        if let Some(p) = attached_params {
+            opts = opts.attached_params(p.0);
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             ctx.replace_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
@@ -331,7 +341,7 @@ impl AsyncTradeContext {
     }
 
     /// Submit order. Returns awaitable.
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None, attached_params = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -353,6 +363,7 @@ impl AsyncTradeContext {
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
         client_request_id: Option<String>,
+        attached_params: Option<SubmitAttachedParams>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = SubmitOrderOptions::new(
@@ -398,6 +409,9 @@ impl AsyncTradeContext {
         if let Some(id) = client_request_id {
             opts = opts.client_request_id(id);
         }
+        if let Some(p) = attached_params {
+            opts = opts.attached_params(p.0);
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: SubmitOrderResponse = ctx
                 .submit_order(opts)
@@ -410,10 +424,20 @@ impl AsyncTradeContext {
     }
 
     /// Cancel order. Returns awaitable.
-    fn cancel_order(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn cancel_order(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        is_attached: bool,
+    ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
+        let mut opts = CancelOrderOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            ctx.cancel_order(order_id).await.map_err(ErrorNewType)?;
+            ctx.cancel_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
         })
         .map(|b| b.unbind())
@@ -518,11 +542,21 @@ impl AsyncTradeContext {
     }
 
     /// Get order detail. Returns awaitable.
-    fn order_detail(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn order_detail(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        is_attached: bool,
+    ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
+        let mut opts = GetOrderDetailOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: OrderDetail = ctx
-                .order_detail(order_id)
+                .order_detail(opts)
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;

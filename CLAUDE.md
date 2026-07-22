@@ -50,6 +50,16 @@ When you add, remove, or change any `#[pyclass]`/`#[pymethods]` definitions in
 signatures, type annotations, and docstrings in sync with the Rust
 implementation.
 
+To build and install the Python SDK locally (from the `python/` directory):
+
+```bash
+maturin develop
+```
+
+`python/pyproject.toml` uses `dynamic = ["version"]` — maturin reads the
+version from `python/Cargo.toml` automatically. Do **not** add a hardcoded
+`version` field to `pyproject.toml`.
+
 ## After modifying the C SDK (`c/`)
 
 `c/csrc/include/longbridge.h` is **auto-generated** by `cbindgen` during the

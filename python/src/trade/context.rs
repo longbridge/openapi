@@ -3,8 +3,9 @@ use std::sync::Arc;
 use longbridge::{
     blocking::TradeContextSync,
     trade::{
-        EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
+        CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+        GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
         GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
     },
 };
@@ -19,10 +20,11 @@ use crate::{
     trade::{
         push::handle_push_event,
         types::{
-            AccountBalance, BalanceType, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, OrderSide, OrderStatus,
-            OrderType, OutsideRTH, StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
-            TopicType,
+            AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
+            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
+            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
+            SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
     types::Market,
@@ -131,40 +133,39 @@ impl TradeContext {
             .collect()
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions
-    // #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at =
-    // None, page = None))] fn all_executions(
-    // &self,
-    // symbol: Option<String>,
-    // order_id: Option<String>,
-    // start_at: Option<PyOffsetDateTimeWrapper>,
-    // end_at: Option<PyOffsetDateTimeWrapper>,
-    // page: Option<u64>,
-    // ) -> PyResult<AllExecutionsResponse> {
-    // let mut opts = GetAllExecutionsOptions::new();
-    //
-    // if let Some(symbol) = symbol {
-    // opts = opts.symbol(symbol);
-    // }
-    // if let Some(order_id) = order_id {
-    // opts = opts.order_id(order_id);
-    // }
-    // if let Some(start_at) = start_at {
-    // opts = opts.start_at(start_at.0);
-    // }
-    // if let Some(end_at) = end_at {
-    // opts = opts.end_at(end_at.0);
-    // }
-    // if let Some(page) = page {
-    // opts = opts.page(page);
-    // }
-    //
-    // self.ctx
-    // .all_executions(Some(opts))
-    // .map_err(ErrorNewType)?
-    // .try_into()
-    // }
+    /// Get all executions
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<AllExecutionsResponse> {
+        let mut opts = GetAllExecutionsOptions::new();
+
+        if let Some(symbol) = symbol {
+            opts = opts.symbol(symbol);
+        }
+        if let Some(order_id) = order_id {
+            opts = opts.order_id(order_id);
+        }
+        if let Some(start_at) = start_at {
+            opts = opts.start_at(start_at.0);
+        }
+        if let Some(end_at) = end_at {
+            opts = opts.end_at(end_at.0);
+        }
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+
+        self.ctx
+            .all_executions(Some(opts))
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
 
     /// Get history orders
     #[pyo3(signature = (symbol = None, status = None, side = None, market = None, start_at = None, end_at = None))]
@@ -205,7 +206,7 @@ impl TradeContext {
     }
 
     /// Get today orders
-    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, order_id = None))]
+    #[pyo3(signature = (symbol = None, status = None, side = None, market = None, order_id = None, is_attached = false))]
     fn today_orders(
         &self,
         symbol: Option<String>,
@@ -213,6 +214,7 @@ impl TradeContext {
         side: Option<OrderSide>,
         market: Option<Market>,
         order_id: Option<String>,
+        is_attached: bool,
     ) -> PyResult<Vec<Order>> {
         let mut opts = GetTodayOrdersOptions::new();
 
@@ -229,6 +231,9 @@ impl TradeContext {
         if let Some(order_id) = order_id {
             opts = opts.order_id(order_id);
         }
+        if is_attached {
+            opts = opts.is_attached();
+        }
 
         self.ctx
             .today_orders(Some(opts))
@@ -239,7 +244,7 @@ impl TradeContext {
     }
 
     /// Replace order
-    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
+    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, attached_params = None))]
     #[allow(clippy::too_many_arguments)]
     fn replace_order(
         &self,
@@ -254,6 +259,7 @@ impl TradeContext {
         trigger_count: Option<i32>,
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
+        attached_params: Option<ReplaceAttachedParams>,
     ) -> PyResult<()> {
         let mut opts = ReplaceOrderOptions::new(order_id, quantity.into());
 
@@ -284,13 +290,16 @@ impl TradeContext {
         if let Some(remark) = remark {
             opts = opts.remark(remark);
         }
+        if let Some(p) = attached_params {
+            opts = opts.attached_params(p.0);
+        }
 
         self.ctx.replace_order(opts).map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Submit order
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None, attached_params = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -311,6 +320,7 @@ impl TradeContext {
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
         client_request_id: Option<String>,
+        attached_params: Option<SubmitAttachedParams>,
     ) -> PyResult<SubmitOrderResponse> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
@@ -356,6 +366,9 @@ impl TradeContext {
         if let Some(id) = client_request_id {
             opts = opts.client_request_id(id);
         }
+        if let Some(p) = attached_params {
+            opts = opts.attached_params(p.0);
+        }
 
         self.ctx
             .submit_order(opts)
@@ -364,8 +377,13 @@ impl TradeContext {
     }
 
     /// Cancel order
-    fn cancel_order(&self, order_id: String) -> PyResult<()> {
-        self.ctx.cancel_order(order_id).map_err(ErrorNewType)?;
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn cancel_order(&self, order_id: String, is_attached: bool) -> PyResult<()> {
+        let mut opts = CancelOrderOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
+        self.ctx.cancel_order(opts).map_err(ErrorNewType)?;
         Ok(())
     }
 
@@ -441,9 +459,14 @@ impl TradeContext {
     }
 
     /// Get order detail
-    fn order_detail(&self, order_id: String) -> PyResult<OrderDetail> {
+    #[pyo3(signature = (order_id, is_attached = false))]
+    fn order_detail(&self, order_id: String, is_attached: bool) -> PyResult<OrderDetail> {
+        let mut opts = GetOrderDetailOptions::new(order_id);
+        if is_attached {
+            opts = opts.is_attached();
+        }
         self.ctx
-            .order_detail(order_id)
+            .order_detail(opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
