@@ -16,9 +16,8 @@ use crate::{
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -276,25 +275,24 @@ impl TradeContext {
             .trades)
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions
-    //
-    // Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
-    // pub async fn all_executions(
-    // &self,
-    // options: impl Into<Option<GetAllExecutionsOptions>>,
-    // ) -> Result<AllExecutionsResponse> {
-    // Ok(self
-    // .0
-    // .http_cli
-    // .request(Method::GET, "/v3/trade/execution/all")
-    // .query_params(options.into().unwrap_or_default())
-    // .response::<Json<AllExecutionsResponse>>()
-    // .send()
-    // .with_subscriber(self.0.log_subscriber.clone())
-    // .await?
-    // .0)
-    // }
+    /// Get all executions
+    ///
+    /// Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
+    pub async fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>>,
+    ) -> Result<AllExecutionsResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v3/trade/execution/all")
+            .query_params(options.into().unwrap_or_default())
+            .response::<Json<AllExecutionsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
 
     /// Get history orders
     ///

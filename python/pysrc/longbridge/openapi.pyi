@@ -7096,15 +7096,27 @@ class TradeContext:
                 print(resp)
         """
 
-    # TODO: temporarily disabled — restore when API is available
-    # def all_executions(
-    #     self,
-    #     symbol: Optional[str] = None,
-    #     order_id: Optional[str] = None,
-    #     start_at: Optional[datetime] = None,
-    #     end_at: Optional[datetime] = None,
-    #     page: Optional[int] = None,
-    # ) -> AllExecutionsResponse: ...
+    def all_executions(
+        self,
+        symbol: Optional[str] = None,
+        order_id: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+        page: Optional[int] = None,
+    ) -> AllExecutionsResponse:
+        """
+        Get all executions
+
+        Args:
+            symbol: Filter by security code
+            order_id: Filter by order ID
+            start_at: Start time filter
+            end_at: End time filter
+            page: Page number
+
+        Returns:
+            All executions response
+        """
 
     def history_orders(
         self,
@@ -7801,15 +7813,25 @@ class AsyncTradeContext:
         """
         ...
 
-    # TODO: temporarily disabled — restore when API is available
-    # def all_executions(
-    #     self,
-    #     symbol: Optional[str] = None,
-    #     order_id: Optional[str] = None,
-    #     start_at: Optional[datetime] = None,
-    #     end_at: Optional[datetime] = None,
-    #     page: Optional[int] = None,
-    # ) -> Awaitable[AllExecutionsResponse]: ...
+    def all_executions(
+        self,
+        symbol: Optional[str] = None,
+        order_id: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+        page: Optional[int] = None,
+    ) -> Awaitable[AllExecutionsResponse]:
+        """
+        Get all executions. Returns an awaitable that resolves to AllExecutionsResponse.
+
+        Args:
+            symbol: Filter by security code.
+            order_id: Filter by order ID.
+            start_at: Start time filter.
+            end_at: End time filter.
+            page: Page number.
+        """
+        ...
 
     def history_orders(
         self,
