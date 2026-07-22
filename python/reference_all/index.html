@@ -2080,8 +2080,6 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.today_executions">today_executions</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.all_executions">all_executions</a>
-    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.history_orders">history_orders</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.today_orders">today_orders</a>
@@ -2129,8 +2127,6 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.history_executions">history_executions</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.today_executions">today_executions</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.all_executions">all_executions</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.history_orders">history_orders</a>
     </li>
@@ -40951,114 +40947,6 @@ print(resp)</code></pre>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="longbridge.openapi.TradeContext.all_executions" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">all_executions</span>
-
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">all_executions(symbol: Optional[str] = None, order_id: Optional[str] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None, page: Optional[int] = None) -&gt; AllExecutionsResponse</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Get all executions</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>symbol</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Filter by security code</p>
-              </div>
-            </li>
-            <li>
-              <b><code>order_id</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Filter by Order ID</p>
-              </div>
-            </li>
-            <li>
-              <b><code>start_at</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Start time</p>
-              </div>
-            </li>
-            <li>
-              <b><code>end_at</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>End time</p>
-              </div>
-            </li>
-            <li>
-              <b><code>page</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Page number, starting from 1</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Returns:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-                  <code><a class="autorefs autorefs-internal" title="AllExecutionsResponse (longbridge.openapi.AllExecutionsResponse)" href="#longbridge.openapi.AllExecutionsResponse">AllExecutionsResponse</a></code>
-              –
-              <div class="doc-md-description">
-                <p>All executions response</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="longbridge.openapi.TradeContext.history_orders" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">history_orders</span>
 
@@ -43229,114 +43117,6 @@ async def main():
 
 asyncio.run(main())</code></pre>
 
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="longbridge.openapi.AsyncTradeContext.all_executions" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">all_executions</span>
-
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">all_executions(symbol: Optional[str] = None, order_id: Optional[str] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None, page: Optional[int] = None) -&gt; Awaitable[AllExecutionsResponse]</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Get all executions. Returns awaitable.</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>symbol</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Filter by security code</p>
-              </div>
-            </li>
-            <li>
-              <b><code>order_id</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Filter by Order ID</p>
-              </div>
-            </li>
-            <li>
-              <b><code>start_at</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Start time</p>
-              </div>
-            </li>
-            <li>
-              <b><code>end_at</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>End time</p>
-              </div>
-            </li>
-            <li>
-              <b><code>page</code></b>
-                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>, default:
-                      <code>None</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Page number, starting from 1</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Returns:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-                  <code><a class="autorefs autorefs-external" title="typing.Awaitable" href="https://docs.python.org/3/library/typing.html#typing.Awaitable">Awaitable</a>[<a class="autorefs autorefs-internal" title="AllExecutionsResponse (longbridge.openapi.AllExecutionsResponse)" href="#longbridge.openapi.AllExecutionsResponse">AllExecutionsResponse</a>]</code>
-              –
-              <div class="doc-md-description">
-                <p>Awaitable resolving to AllExecutionsResponse</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
 
     </div>
 
