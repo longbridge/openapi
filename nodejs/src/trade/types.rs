@@ -30,6 +30,8 @@ pub struct Execution {
     quantity: Decimal,
     /// Executed price
     price: Decimal,
+    /// Order side
+    side: OrderSide,
 }
 
 #[napi_derive::napi]

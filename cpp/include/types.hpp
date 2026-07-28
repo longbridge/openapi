@@ -1360,6 +1360,17 @@ enum class TopicType
   Private,
 };
 
+/// Order side
+enum class OrderSide
+{
+  /// Unknown
+  Unknown,
+  /// Buy
+  Buy,
+  /// Sell
+  Sell,
+};
+
 /// Exexution
 struct Execution
 {
@@ -1369,6 +1380,8 @@ struct Execution
   int64_t trade_done_at;
   Decimal quantity;
   Decimal price;
+  /// Order side
+  OrderSide side;
 };
 
 /// Options for get history executions request
@@ -1454,17 +1467,6 @@ enum class OrderStatus
   Expired,
   /// Partial Withdrawal
   PartialWithdrawal,
-};
-
-/// Order side
-enum class OrderSide
-{
-  /// Unknown
-  Unknown,
-  /// Buy
-  Buy,
-  /// Sell
-  Sell,
 };
 
 /// Order type

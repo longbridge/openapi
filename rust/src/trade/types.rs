@@ -130,6 +130,8 @@ pub struct Execution {
     pub quantity: Decimal,
     /// Executed price
     pub price: Decimal,
+    /// Order side
+    pub side: OrderSide,
 }
 
 /// Response for get all executions request

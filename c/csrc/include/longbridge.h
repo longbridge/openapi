@@ -4682,6 +4682,10 @@ typedef struct lb_execution_t {
    * Executed price
    */
   const struct lb_decimal_t *price;
+  /**
+   * Order side
+   */
+  enum lb_order_side_t side;
 } lb_execution_t;
 
 /**

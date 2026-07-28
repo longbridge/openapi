@@ -5743,6 +5743,11 @@ class Execution:
     Executed price
     """
 
+    side: OrderSide
+    """
+    Order side
+    """
+
 class AllExecutionsResponse:
     """
     Response for get all executions request

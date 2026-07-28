@@ -700,6 +700,8 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
+  /** Order side */
+  get side(): OrderSide
 }
 
 /** Filing item */

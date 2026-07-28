@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **All languages:** `Execution` gains a `side` field (`OrderSide`) — the buy/sell direction of the fill, now returned by the `today_executions`, `history_executions`, and `all_executions` responses
+
 ### Fixed
 
 - **All languages:** the AI Agent streamed conversation no longer errors mid-run when the server sends an explicit `"outputs": null`. `WorkflowFinishedPayload.outputs`, `NodeToolUseFinishedPayload.outputs`, and `SubagentFinishedPayload.outputs` were annotated `#[serde(default)]`, which only covers a *missing* key, not an explicit `null` — so a `workflow_finished` / `node_tool_use_finished` / `subagent_finished` event carrying `null` outputs failed to deserialize and aborted the whole event stream (`invalid type: null, expected struct WorkflowOutputs`). These fields now map `null` to the type's default

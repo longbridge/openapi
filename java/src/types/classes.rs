@@ -648,7 +648,15 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/trade/Execution",
     longbridge::trade::Execution,
-    [order_id, trade_id, symbol, trade_done_at, quantity, price]
+    [
+        order_id,
+        trade_id,
+        symbol,
+        trade_done_at,
+        quantity,
+        price,
+        side
+    ]
 );
 
 impl_java_class!(
