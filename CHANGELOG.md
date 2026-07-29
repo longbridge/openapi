@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.4.1] - 2026-07-22
 
+### Added
+
+- **All languages:** paper trading mode support via `Config`.
+
 ### Changed
 
 - **All languages:** `all_executions` temporarily disabled pending API availability.
@@ -44,7 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All languages:** `submit_order` gains optional `client_request_id` for idempotency control.
 - **All languages:** new `all_executions` (`GET /v3/trade/execution/all`) with pagination.
 - **All languages:** `OutsideRTH` enum gains `OptionPreMarket` for overnight option orders.
-- **All languages:** paper trading mode support via `Config`.
 
 ### Changed
 
