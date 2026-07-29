@@ -20,8 +20,9 @@ use jni::{
 
 pub(crate) use self::{
     classes::{
-        CreateWatchlistGroupResponse, SecurityCalcIndex, StockPosition, StockPositionChannel,
-        StockPositionsResponse,
+        ConversationResponse, CreateWatchlistGroupResponse, HumanInteractionRequiredEvent,
+        NodeToolUseOutputs, OtherEvent, PingEvent, SecurityCalcIndex, StockPosition,
+        StockPositionChannel, StockPositionsResponse, SubagentOutputs, WorkflowFinishedEvent,
     },
     object_array::ObjectArray,
     primary_array::PrimaryArray,

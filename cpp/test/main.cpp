@@ -35,6 +35,17 @@ main(int argc, char const* argv[])
     }
   });
 
+  agent::AgentContext agent_ctx = agent::AgentContext::create(config);
+
+  agent_ctx.workspaces([](auto res) {
+    if (!res) {
+      std::cout << "failed to list workspaces: " << *res.status().message()
+                << std::endl;
+      return;
+    }
+    std::cout << "workspaces: " << res->workspaces.size() << std::endl;
+  });
+
   std::cin.get();
   return 0;
 }

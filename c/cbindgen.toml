@@ -332,6 +332,47 @@ cpp_compat = true
 "CScreenerStrategyResponse" = "lb_screener_strategy_response_t"
 "CScreenerSearchResponse" = "lb_screener_search_response_t"
 "CScreenerIndicatorsResponse" = "lb_screener_indicators_response_t"
+# AgentContext
+"CAgentContext" = "lb_agent_context_t"
+"COnConversationEventCallback" = "lb_conversation_event_callback_t"
+"CConversationStatus" = "lb_conversation_status_t"
+"CConversationStreamEventType" = "lb_conversation_stream_event_type_t"
+"CWorkspace" = "lb_workspace_t"
+"CWorkspacesResponse" = "lb_workspaces_response_t"
+"CAgent" = "lb_agent_t"
+"CAgentsResponse" = "lb_agents_response_t"
+"CGetAgentsOptions" = "lb_get_agents_options_t"
+"CReference" = "lb_reference_t"
+"CQuestionOption" = "lb_question_option_t"
+"CQuestion" = "lb_question_t"
+"CInterrupt" = "lb_interrupt_t"
+"CAgentError" = "lb_agent_error_t"
+"CConversationResponse" = "lb_conversation_response_t"
+"CChatStartedPayload" = "lb_chat_started_payload_t"
+"CWorkflowStartedInputs" = "lb_workflow_started_inputs_t"
+"CWorkflowStartedPayload" = "lb_workflow_started_payload_t"
+"CMessagePayload" = "lb_message_payload_t"
+"CThinkingStartedPayload" = "lb_thinking_started_payload_t"
+"CThinkingFinishedPayload" = "lb_thinking_finished_payload_t"
+"CNodeToolUseStartedPayload" = "lb_node_tool_use_started_payload_t"
+"CNodeToolUseOutputs" = "lb_node_tool_use_outputs_t"
+"CNodeToolUseFinishedPayload" = "lb_node_tool_use_finished_payload_t"
+"CSubagentStartedPayload" = "lb_subagent_started_payload_t"
+"CSubagentProgressPayload" = "lb_subagent_progress_payload_t"
+"CSubagentOutputs" = "lb_subagent_outputs_t"
+"CSubagentFinishedPayload" = "lb_subagent_finished_payload_t"
+"CAgentToolStartedPayload" = "lb_agent_tool_started_payload_t"
+"CAgentToolProgressPayload" = "lb_agent_tool_progress_payload_t"
+"CAgentToolFinishedPayload" = "lb_agent_tool_finished_payload_t"
+"CQueryMaskedPayload" = "lb_query_masked_payload_t"
+"CPlanChangedPayload" = "lb_plan_changed_payload_t"
+"CContextCompressStartedPayload" = "lb_context_compress_started_payload_t"
+"CContextCompressFinishedPayload" = "lb_context_compress_finished_payload_t"
+"CChatFinishedPayload" = "lb_chat_finished_payload_t"
+"CChatTitleUpdatedPayload" = "lb_chat_title_updated_payload_t"
+"CConversationStreamEvent" = "lb_conversation_stream_event_t"
+"CAnswerQuestion" = "lb_answer_question_t"
+"CAnswersByToolCallEntry" = "lb_answers_by_tool_call_entry_t"
 
 [export]
 include = [
@@ -464,4 +505,8 @@ include = [
     "CScreenerContext",
     "CScreenerRecommendStrategiesResponse", "CScreenerUserStrategiesResponse",
     "CScreenerStrategyResponse", "CScreenerSearchResponse", "CScreenerIndicatorsResponse",
+    # AgentContext: only reachable via the type-erased `void*` completion
+    # callback data pointer, not from any genuinely-typed function signature,
+    # so cbindgen can't discover them transitively — force their emission.
+    "CWorkspace", "CWorkspacesResponse", "CAgent", "CAgentsResponse",
 ]

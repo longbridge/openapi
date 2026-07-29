@@ -4,6 +4,7 @@ set(SOURCES
     src/config.cpp
     src/content_context.cpp
     src/decimal.cpp
+    src/agent_context.cpp
     src/alert_context.cpp
     src/dca_context.cpp
     src/sharelist_context.cpp

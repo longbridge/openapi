@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agent_context.hpp"
 #include "asset_context.hpp"
 #include "config.hpp"
 #include "decimal.hpp"

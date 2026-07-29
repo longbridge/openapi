@@ -71,6 +71,10 @@ pub enum Error {
     /// OAuth error
     #[error("oauth error: {0}")]
     OAuth(String),
+
+    /// A conversation event stream ended before a final result was observed
+    #[error("conversation stream ended before a final result was observed")]
+    ConversationStreamEnded,
 }
 
 impl Error {
@@ -130,7 +134,8 @@ impl Error {
             | Error::ParseField { .. }
             | Error::UnknownCommand(_)
             | Error::HttpClient(_)
-            | Error::WsClient(_) => SimpleError::Other(self.to_string()),
+            | Error::WsClient(_)
+            | Error::ConversationStreamEnded => SimpleError::Other(self.to_string()),
             #[cfg(feature = "blocking")]
             Error::Blocking(_) => SimpleError::Other(self.to_string()),
             Error::OAuth(msg) => SimpleError::OAuth(msg),

@@ -30,6 +30,101 @@ export declare class AccountBalance {
   get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 
+/**
+ * AI Agent conversation context.
+ *
+ * Reference: <https://open.longbridge.com/en/docs/ai/chat/conversation>
+ */
+export declare class AgentContext {
+  /** Create a new AgentContext. */
+  static new(config: Config): AgentContext
+  /**
+   * List the Workspaces the current account belongs to.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.workspaces();
+   * console.log(resp);
+   * ```
+   */
+  workspaces(): Promise<WorkspacesResponse>
+  /**
+   * List the Agents in the specified Workspace.
+   *
+   * `page`/`limit` control pagination; `name` fuzzy-searches by Agent name.
+   * All three are optional.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.agents(workspaceId);
+   * console.log(resp);
+   * ```
+   */
+  agents(workspaceId: string, page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
+   * Start a conversation with the specified Agent, blocking until the run
+   * succeeds, is interrupted, or fails.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversation(agentId, "How has Tesla stock performed recently?");
+   * console.log(resp);
+   * ```
+   */
+  conversation(agentId: string, query: string, chatUid?: string | undefined | null): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, blocking until the run succeeds, is
+   * interrupted again, or fails.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversation(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>): Promise<ConversationResponse>
+  /**
+   * Start a conversation with the specified Agent, invoking `callback` for
+   * every progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes (this is the same shape
+   * `conversation` returns).
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longbridge');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversationStreamed(
+   *   agentId,
+   *   "How has Tesla stock performed recently?",
+   *   undefined,
+   *   (err, event) => console.log(event),
+   * );
+   * console.log(resp);
+   * ```
+   */
+  conversationStreamed(agentId: string, query: string, chatUid: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, invoking `callback` for every
+   * progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversationStreamed(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+}
+
 /** Price alert management context. */
 export declare class AlertContext {
   /** Create a new AlertContext. */
@@ -2646,8 +2741,6 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
-  /** Get all executions */
-  allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
    *
@@ -3052,6 +3145,127 @@ export declare const enum AdjustType {
   NoAdjust = 0,
   /** Adjust forward */
   ForwardAdjust = 1
+}
+
+/** An Agent in a Workspace */
+export interface Agent {
+  /** Agent UID, used as the path parameter of `AgentContext.conversation` */
+  uid: string
+  /** Agent name */
+  name: string
+  /** Agent description */
+  description: string
+  /** Agent mode, e.g. `chat` */
+  mode: string
+  /** Icon URL */
+  icon: string
+  /** Whether published; only published Agents can start conversations */
+  isPublished: boolean
+  /** Publish time, Unix timestamp in seconds; 0 if unpublished */
+  publishedAt: number
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Present when a conversation run failed */
+export interface AgentError {
+  /** Error code */
+  code: number
+  /** Error message */
+  message: string
+}
+
+/** Response for `AgentContext.agents` */
+export interface AgentsResponse {
+  /** Agent list */
+  agents: Array<Agent>
+  /** Total number of matching Agents */
+  total: number
+}
+
+/** Payload of an `agent_tool_finished` stream event */
+export interface AgentToolFinishedPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** Matches the `toolUseId` of `AgentToolStarted` */
+  toolUseId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Total duration in seconds */
+  elapsedTime: number
+  /** Error description on failure */
+  error: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Result of the delegated Agent */
+  outputs?: any
+  /** Tool category */
+  toolType: string
+  /** Progress text; may be omitted */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** `true` if during the thinking phase */
+  isThinking: boolean
+}
+
+/**
+ * Payload of an `agent_tool_progress` stream event, emitted for each inner
+ * tool call the delegated Agent makes.
+ */
+export interface AgentToolProgressPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** `toolUseId` of the owning `AgentToolStarted` event */
+  parentToolCallId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** Name of the inner tool the delegated Agent called */
+  innerToolName: string
+  /** Arguments of that inner call, as a JSON string */
+  innerToolArgs: string
+  /** Status of the inner call: `running` / `succeeded` / `failed` */
+  status: string
+  /** Duration of the inner call in milliseconds */
+  durationMs: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** `true` if during the thinking phase */
+  isThinking: boolean
+}
+
+/**
+ * Payload of an `agent_tool_started` stream event. When the Agent delegates
+ * to another Agent as a tool, that inner run is reported with the
+ * `agentTool*` family — the shape mirrors the subagent events.
+ */
+export interface AgentToolStartedPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** Unique ID of this call; matches the finished event */
+  toolUseId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** Display title; may be omitted */
+  title: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Localized display name */
+  toolName: string
+  /** Progress text; may be omitted */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** `true` if called during the thinking phase */
+  isThinking: boolean
 }
 
 /** A/H premium intraday response */
@@ -3567,6 +3781,49 @@ export declare const enum ChargeCategoryCode {
   Third = 2
 }
 
+/**
+ * Payload of a `chat_finished` stream event, observed once all `message`
+ * events for this round have been sent, shortly before `workflow_finished`
+ */
+export interface ChatFinishedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Empty string in every run observed so far */
+  error: string
+  /** Empty string in every run observed so far */
+  errorMessage: string
+}
+
+/** Payload of a `chat_started` stream event */
+export interface ChatStartedPayload {
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+}
+
+/**
+ * Payload of a `chat_title_updated` stream event — the server auto-generates
+ * a short title for the conversation as a UI convenience. Can arrive before
+ * *or* after `workflow_finished`; not tied to the run's outcome.
+ */
+export interface ChatTitleUpdatedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Where the title came from, e.g. `"ai_generated"` */
+  source: string
+  /** The new (possibly truncated) title */
+  title: string
+  /** Unix timestamp in seconds */
+  updatedAt: number
+}
+
 /** Commission-free Status */
 export declare const enum CommissionFreeStatus {
   /** Unknown */
@@ -3715,6 +3972,179 @@ export interface ConstituentStock {
   chg?: string
   /** Raw trade status code */
   tradeStatus: number
+}
+
+/**
+ * Payload of a `context_compress_finished` stream event. Unlike other
+ * events, the timestamp here is an RFC 3339 string.
+ */
+export interface ContextCompressFinishedPayload {
+  /** Finish time, RFC 3339 */
+  createdAt: string
+  /** Compression input summary */
+  inputs?: any
+  /** Compression result summary */
+  outputs?: any
+}
+
+/**
+ * Payload of a `context_compress_started` stream event, marking the start
+ * of a context-compression pass triggered by a long conversation. Unlike
+ * other events, the timestamp here is an RFC 3339 string.
+ */
+export interface ContextCompressStartedPayload {
+  /** Start time, RFC 3339 */
+  startedAt: string
+  /** Compression input summary */
+  inputs?: any
+}
+
+/**
+ * Response for `AgentContext.conversation`,
+ * `AgentContext.continueConversation`, and the final result of the streamed
+ * counterparts
+ */
+export interface ConversationResponse {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Final run status */
+  status: ConversationStatus
+  /** Final answer text; valid when `status` is `succeeded` */
+  answer: string
+  /** Sources referenced by the answer */
+  references?: Array<Reference>
+  /** Run duration in seconds */
+  elapsedTime: number
+  /** Present only when `status` is `interrupted` */
+  interrupt?: Interrupt
+  /** Present only when the run failed */
+  error?: AgentError
+}
+
+/** Final run status of a conversation */
+export declare const enum ConversationStatus {
+  /** The run completed successfully */
+  Succeeded = 0,
+  /** The run is paused, waiting for `AgentContext.continueConversation` */
+  Interrupted = 1,
+  /** The run failed */
+  Failed = 2,
+  /** The run was stopped */
+  Stopped = 3
+}
+
+/**
+ * One event observed while streaming `AgentContext.conversationStreamed` or
+ * `AgentContext.continueConversationStreamed`.
+ *
+ * Design note: the Rust core models this as an enum with a per-variant
+ * payload (`longbridge::agent::ConversationStreamEvent`), but napi-rs has no
+ * ergonomic equivalent of a Rust/Serde "enum with data" for a plain
+ * `#[napi(object)]` value, and there's no existing precedent for reifying one
+ * as a single JS value in this codebase (the closest analogue,
+ * `trade::PushEvent`, is dispatched to separate per-variant JS callbacks
+ * instead). We instead mirror the common "discriminant + optional per-kind
+ * fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
+ * `"chat_started" | "workflow_started" | "message" | "ping" |
+ * "thinking_started" | "thinking_finished" | "node_tool_use_started" |
+ * "node_tool_use_finished" | "subagent_started" | "subagent_progress" |
+ * "subagent_finished" | "agent_tool_started" | "agent_tool_progress" |
+ * "agent_tool_finished" | "human_interaction_required" | "query_masked" |
+ * "plan_changed" | "context_compress_started" | "context_compress_finished" |
+ * "chat_finished" | "workflow_finished" | "chat_title_updated" | "other"`,
+ * and exactly one of `chatStarted` / `workflowStarted` / `message` /
+ * `thinkingStarted` / `thinkingFinished` / `nodeToolUseStarted` /
+ * `nodeToolUseFinished` / `subagentStarted` / `subagentProgress` /
+ * `subagentFinished` / `agentToolStarted` / `agentToolProgress` /
+ * `agentToolFinished` / `humanInteractionRequired` / `queryMasked` /
+ * `planChanged` / `contextCompressStarted` / `contextCompressFinished` /
+ * `chatFinished` / `workflowFinished` / `chatTitleUpdated` / `other` is set,
+ * matching `kind` — except `"ping"`, a heartbeat with no payload, for which
+ * every payload field is `None`. When `kind` is `"other"`, `otherEvent`
+ * additionally carries the SSE envelope's `event` field (the event type
+ * name).
+ */
+export interface ConversationStreamEvent {
+  /**
+   * Discriminant: one of `"chat_started"`, `"workflow_started"`,
+   * `"message"`, `"ping"`, `"thinking_started"`, `"thinking_finished"`,
+   * `"node_tool_use_started"`, `"node_tool_use_finished"`,
+   * `"subagent_started"`, `"subagent_progress"`, `"subagent_finished"`,
+   * `"agent_tool_started"`, `"agent_tool_progress"`,
+   * `"agent_tool_finished"`, `"human_interaction_required"`,
+   * `"query_masked"`, `"plan_changed"`, `"context_compress_started"`,
+   * `"context_compress_finished"`, `"chat_finished"`,
+   * `"workflow_finished"`, `"chat_title_updated"`, or `"other"`
+   */
+  kind: string
+  /** Set when `kind` is `"chat_started"` */
+  chatStarted?: ChatStartedPayload
+  /** Set when `kind` is `"workflow_started"` */
+  workflowStarted?: WorkflowStartedPayload
+  /** Set when `kind` is `"message"` */
+  message?: MessagePayload
+  /** Set when `kind` is `"thinking_started"` */
+  thinkingStarted?: ThinkingStartedPayload
+  /** Set when `kind` is `"thinking_finished"` */
+  thinkingFinished?: ThinkingFinishedPayload
+  /** Set when `kind` is `"node_tool_use_started"` */
+  nodeToolUseStarted?: NodeToolUseStartedPayload
+  /** Set when `kind` is `"node_tool_use_finished"` */
+  nodeToolUseFinished?: NodeToolUseFinishedPayload
+  /** Set when `kind` is `"subagent_started"` */
+  subagentStarted?: SubagentStartedPayload
+  /** Set when `kind` is `"subagent_progress"` */
+  subagentProgress?: SubagentProgressPayload
+  /** Set when `kind` is `"subagent_finished"` */
+  subagentFinished?: SubagentFinishedPayload
+  /** Set when `kind` is `"agent_tool_started"` */
+  agentToolStarted?: AgentToolStartedPayload
+  /** Set when `kind` is `"agent_tool_progress"` */
+  agentToolProgress?: AgentToolProgressPayload
+  /** Set when `kind` is `"agent_tool_finished"` */
+  agentToolFinished?: AgentToolFinishedPayload
+  /**
+   * Set when `kind` is `"human_interaction_required"`, carrying the run's
+   * outcome for an interrupted run — the same `ConversationResponse` shape
+   * `workflowFinished` carries for the other outcomes. Unlike
+   * `workflowFinished`, this is set instead of (never alongside)
+   * `workflowFinished` for the same run.
+   */
+  humanInteractionRequired?: ConversationResponse
+  /** Set when `kind` is `"query_masked"` */
+  queryMasked?: QueryMaskedPayload
+  /** Set when `kind` is `"plan_changed"` */
+  planChanged?: PlanChangedPayload
+  /** Set when `kind` is `"context_compress_started"` */
+  contextCompressStarted?: ContextCompressStartedPayload
+  /** Set when `kind` is `"context_compress_finished"` */
+  contextCompressFinished?: ContextCompressFinishedPayload
+  /** Set when `kind` is `"chat_finished"` */
+  chatFinished?: ChatFinishedPayload
+  /**
+   * Set when `kind` is `"workflow_finished"`, carrying the run's outcome
+   * — not necessarily the last event of the stream, since the server may
+   * still emit a few more housekeeping events (`kind` `"other"`) before
+   * actually closing the connection
+   */
+  workflowFinished?: ConversationResponse
+  /** Set when `kind` is `"chat_title_updated"` */
+  chatTitleUpdated?: ChatTitleUpdatedPayload
+  /**
+   * Set when `kind` is `"other"` — the SSE envelope's `event` field (the
+   * event type name)
+   */
+  otherEvent?: string
+  /**
+   * Set when `kind` is `"other"` — raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  other?: any
 }
 
 /** One corporate action event */
@@ -4579,6 +5009,23 @@ export declare const enum InstitutionRecommend {
   NoOpinion = 7
 }
 
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `AgentContext.continueConversation`
+ */
+export interface Interrupt {
+  /** ID of the node that triggered the interrupt */
+  nodeId: string
+  /** Tool call ID of this inquiry; used as the answer key when continuing */
+  toolCallId: string
+  /** Questions you need to answer */
+  questions: Array<Question>
+  /** ID of the paused message */
+  messageId: number
+  /** ID of the owning conversation */
+  chatId: number
+}
+
 /** Investor relations response */
 export interface InvestRelations {
   /** Link to IR page */
@@ -4719,6 +5166,43 @@ export interface MarketTimeItem {
   delaySubStatus: number
 }
 
+/**
+ * Payload of a `message` stream event — an incremental text chunk. This is
+ * the highest-frequency event; concatenate `text` fragments in arrival
+ * order.
+ */
+export interface MessagePayload {
+  /** Incremental text fragment */
+  text: string
+  /**
+   * `answer` — final answer text; `think` — reasoning process; `process`
+   * — stage progress description
+   */
+  messageType: string
+  /**
+   * Identifier of the stream segment this fragment belongs to. Fragments
+   * with the same `key` form one continuous block — group by `key` when
+   * rendering
+   */
+  key: string
+  /** Time this segment started, Unix timestamp in seconds */
+  startedAt: number
+  /** Stage identifier; only present when `messageType` is `"process"` */
+  stage: string
+  /**
+   * Stage title while running; only present when `messageType` is
+   * `"process"`
+   */
+  stageTitle: string
+  /**
+   * Stage title after it finishes; only present when `messageType` is
+   * `"process"`
+   */
+  stageFinishedTitle: string
+  /** Extra payload attached to the fragment; usually absent */
+  outputs?: any
+}
+
 /** Localized text in simplified Chinese, traditional Chinese, and English */
 export interface MultiLanguageText {
   english: string
@@ -4734,6 +5218,93 @@ export interface MyTopicsRequest {
   size?: number
   /** Filter by topic type: "article" or "post"; empty returns all */
   topicType?: string
+}
+
+/**
+ * Payload of a `node_tool_use_finished` stream event — the tool call has
+ * ended.
+ */
+export interface NodeToolUseFinishedPayload {
+  /** Matches the `toolUseId` of the started event */
+  toolUseId: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Error description on failure */
+  error: string
+  /** Call duration in seconds */
+  elapsedTime: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Localized display name */
+  toolName: string
+  /** Locale-stable tool identifier */
+  toolFuncName: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Tool category */
+  toolType: string
+  /** Progress text */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** Round number */
+  iteration: number
+  /** `true` if the call happened during the thinking phase */
+  isThinking: boolean
+  /** Filtered call results, for display */
+  outputs: NodeToolUseOutputs
+}
+
+/**
+ * `outputs` of a `NodeToolUseFinishedPayload` — only carries fields meant
+ * for display
+ */
+export interface NodeToolUseOutputs {
+  /** Sources referenced by the tool result */
+  references?: Array<Reference>
+  /** Domains of the referenced sources */
+  referenceDomains?: Array<string>
+  /** The query the tool executed */
+  query?: string
+  /** Raw response text of the tool */
+  text?: string
+  /** Parsed request arguments */
+  toolArgs?: any
+  /** Structured result; present only for selected tools */
+  data?: any
+}
+
+/**
+ * Payload of a `node_tool_use_started` stream event — an ordinary tool call
+ * has started. Match it to its `NodeToolUseFinished` counterpart by
+ * `toolUseId`.
+ */
+export interface NodeToolUseStartedPayload {
+  /** Unique ID of this call; matches the finished event */
+  toolUseId: string
+  /** Localized display name of the tool */
+  toolName: string
+  /**
+   * Locale-stable tool identifier; use this for logic keyed on the tool
+   * kind
+   */
+  toolFuncName: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /**
+   * Progress text suitable for direct display, e.g. `"Searching the
+   * web…"`
+   */
+  tips: string
+  /** Short tags accompanying `tips`; may be omitted */
+  tipChips: Array<string>
+  /**
+   * Round number. Calls in the same round (same `iteration`) run in
+   * parallel
+   */
+  iteration: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
 }
 
 /** Key financial metrics from an operating report */
@@ -5001,6 +5572,21 @@ export declare const enum PinnedMode {
   Remove = 1
 }
 
+/**
+ * Payload of a `plan_changed` stream event — the Agent created or updated
+ * its task plan.
+ */
+export interface PlanChangedPayload {
+  /** ID of the planning node */
+  nodeId: string
+  /** Time of the change, Unix timestamp in seconds */
+  startedAt: number
+  /** The current plan content */
+  outputs?: any
+  /** Identifies the planning tool */
+  toolName: string
+}
+
 /** One executive / board member */
 export interface Professional {
   /** Internal wiki ID */
@@ -5252,6 +5838,34 @@ export declare const enum PushCandlestickMode {
   Confirmed = 1
 }
 
+/**
+ * Payload of a `query_masked` stream event — sensitive content in the user
+ * query was masked before processing. Display `maskedQuery` instead of the
+ * original query.
+ */
+export interface QueryMaskedPayload {
+  /** The original user query */
+  rawQuery: string
+  /** The masked query */
+  maskedQuery: string
+}
+
+/** One question the Agent needs you to answer */
+export interface Question {
+  /** Question text */
+  question: string
+  /** Options; empty means free-form answer */
+  options: Array<QuestionOption>
+  /** Whether multiple options may be selected */
+  multiSelect: boolean
+}
+
+/** One option of a `Question` */
+export interface QuestionOption {
+  /** Option text */
+  description: string
+}
+
 /** Rank categories response. `data` is a JSON string. */
 export interface RankCategoriesResponse {
   /** Raw rank categories data (JSON string) */
@@ -5359,6 +5973,16 @@ export interface RecentBuybacks {
   currency: string
   netBuybackTtm: string
   netBuybackYieldTtm: string
+}
+
+/** A source referenced by the answer */
+export interface Reference {
+  /** Reference index */
+  index: number
+  /** Reference title */
+  title: string
+  /** Reference URL */
+  url: string
 }
 
 /** Parameters for replacing an attached order */
@@ -5773,6 +6397,83 @@ export interface StockRatings {
   ratingsJson: string
 }
 
+/** Payload of a `subagent_finished` stream event */
+export interface SubagentFinishedPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** Matches the `toolUseId` of `SubagentStarted` */
+  toolUseId: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Total subagent duration in seconds */
+  elapsedTime: number
+  /** Error description on failure */
+  error: string
+  /**
+   * Subagent result: `goal`, `result`, and the timeline of tool calls it
+   * made
+   */
+  outputs: SubagentOutputs
+}
+
+/** `outputs` of a `SubagentFinishedPayload` */
+export interface SubagentOutputs {
+  /** The goal that was assigned to the subagent */
+  goal?: string
+  /** The subagent's result */
+  result?: string
+  /** Timeline of tool calls the subagent made */
+  subagentTools?: Array<any>
+}
+
+/**
+ * Payload of a `subagent_progress` stream event, emitted every time the
+ * subagent calls one of its own tools. Use it to render a live timeline
+ * inside the subagent card.
+ */
+export interface SubagentProgressPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** `toolUseId` of the owning `SubagentStarted` event */
+  parentToolCallId: string
+  /** Name of the tool the subagent called */
+  subagentToolName: string
+  /** Arguments of that call, as a JSON string */
+  subagentToolArgs: string
+  /** Status of that call: `running` / `succeeded` / `failed` */
+  subagentStatus: string
+  /** Duration of that call in milliseconds */
+  subagentDurationMs: number
+  /** The subagent's internal round number */
+  subagentIteration: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+}
+
+/**
+ * Payload of a `subagent_started` stream event. When the Agent spawns a
+ * subagent to work on a sub-task, the subagent's lifecycle is reported with
+ * this dedicated event family instead of `nodeToolUse*`.
+ */
+export interface SubagentStartedPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** Unique ID of this spawn; matches the finished event */
+  toolUseId: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Goal assigned to the subagent */
+  goal: string
+  /** Full task prompt given to the subagent */
+  prompt: string
+  /** Subagent identifier; may be omitted */
+  subagentId: string
+  /** Tools granted to the subagent; may be omitted */
+  tools: Array<any>
+}
+
 /** Parameters for submitting an attached order */
 export interface SubmitAttachedParams {
   /** Attached order type */
@@ -5852,6 +6553,28 @@ export declare const enum SubType {
   Brokers = 2,
   /** Trade */
   Trade = 3
+}
+
+/**
+ * Payload of a `thinking_finished` stream event — the reasoning phase is
+ * over; answer text (`Message` with `messageType == "answer"`) follows.
+ */
+export interface ThinkingFinishedPayload {
+  /** Finish time, Unix timestamp in seconds */
+  finishedAt: number
+  /** Reasoning duration in seconds */
+  elapsedTime: number
+}
+
+/**
+ * Payload of a `thinking_started` stream event — the Agent has entered the
+ * reasoning phase (analyzing the question, planning tool calls). Between
+ * this and `ThinkingFinished`, `Message` events with `messageType ==
+ * "think"` and tool-call events may arrive.
+ */
+export interface ThinkingStartedPayload {
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
 }
 
 /** Time in force type */
@@ -6761,4 +7484,49 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+/** `inputs` of a `workflow_started` stream event */
+export interface WorkflowStartedInputs {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** The question that was asked */
+  query: string
+}
+
+/**
+ * Payload of a `workflow_started` stream event, observed right after
+ * `chat_started`
+ */
+export interface WorkflowStartedPayload {
+  /** Whether this run's answer was served from a cache */
+  hitCache: boolean
+  /** Echoes the run's inputs */
+  inputs: WorkflowStartedInputs
+  /** Unix timestamp in seconds */
+  startedAt: number
+  /** Internal workflow run ID */
+  workflowId: number
+}
+
+/** A Workspace the current account belongs to */
+export interface Workspace {
+  /** Workspace ID */
+  id: string
+  /** Workspace name */
+  name: string
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Response for `AgentContext.workspaces` */
+export interface WorkspacesResponse {
+  /** Workspaces the current account belongs to */
+  workspaces: Array<Workspace>
 }
