@@ -81,4 +81,5 @@ public class GetHistoryOrdersOptions {
         this.endAt = endAt;
         return this;
     }
+
 }

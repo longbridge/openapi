@@ -238,6 +238,9 @@ public class SdkNative {
 
         public static native void tradeContextCancelOrder(long context, String orderId, AsyncCallback callback);
 
+        public static native void tradeContextCancelOrderAttached(long context, String orderId,
+                        AsyncCallback callback);
+
         public static native void tradeContextAccountBalance(long context, String currency, AsyncCallback callback);
 
         public static native void tradeContextCashFlow(long context, GetCashFlowOptions opts, AsyncCallback callback);
@@ -251,6 +254,8 @@ public class SdkNative {
         public static native void tradeContextMarginRatio(long context, String symbol, AsyncCallback callback);
 
         public static native void tradeContextOrderDetail(long context, String orderId, AsyncCallback callback);
+
+        public static native void tradeContextOrderDetailAttached(long context, String orderId, Object callback);
 
         public static native void tradeContextEstimateMaxPurchaseQuantity(long context,
                         EstimateMaxPurchaseQuantityOptions opts,

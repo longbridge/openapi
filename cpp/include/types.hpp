@@ -1552,6 +1552,79 @@ enum class OutsideRTH
   OptionPreMarket,
 };
 
+/// Attached order type
+enum class AttachedOrderType
+{
+  /// Unknown
+  Unknown,
+  /// Take profit
+  ProfitTaker,
+  /// Stop loss
+  StopLoss,
+  /// Bracket order
+  Bracket,
+};
+
+/// Attached order detail
+struct AttachedOrderDetail
+{
+  std::string order_id;
+  AttachedOrderType attached_type_display;
+  std::optional<Decimal> trigger_price;
+  Decimal quantity;
+  Decimal executed_qty;
+  OrderStatus status;
+  int64_t updated_at;
+  bool withdrawn;
+  std::optional<Date> gtd;
+  TimeInForceType time_in_force;
+  std::string counter_id;
+  std::optional<TriggerStatus> trigger_status;
+  Decimal executed_amount;
+  OrderTag tag;
+  int64_t submitted_at;
+  std::optional<Decimal> executed_price;
+  std::optional<OutsideRTH> force_only_rth;
+  bool reviewed;
+  OrderType activate_order_type;
+  std::optional<OutsideRTH> activate_rth;
+  std::optional<Decimal> submit_price;
+};
+
+/// Submit attached order params
+struct SubmitAttachedParams
+{
+  AttachedOrderType attached_order_type;
+  std::optional<Decimal> profit_taker_price;
+  std::optional<Decimal> stop_loss_price;
+  std::optional<TimeInForceType> time_in_force;
+  std::optional<int64_t> expire_time;
+  std::optional<OrderType> activate_order_type;
+  std::optional<Decimal> profit_taker_submit_price;
+  std::optional<Decimal> stop_loss_submit_price;
+  std::optional<OutsideRTH> activate_rth;
+};
+
+/// Replace attached order params
+struct ReplaceAttachedParams
+{
+  AttachedOrderType attached_order_type;
+  std::optional<Decimal> profit_taker_price;
+  std::optional<Decimal> stop_loss_price;
+  std::optional<TimeInForceType> time_in_force;
+  std::optional<int64_t> expire_time;
+  std::optional<OrderType> activate_order_type;
+  std::optional<Decimal> profit_taker_submit_price;
+  std::optional<Decimal> stop_loss_submit_price;
+  std::optional<OutsideRTH> activate_rth;
+  std::optional<int64_t> profit_taker_id;
+  std::optional<int64_t> stop_loss_id;
+  std::optional<bool> cancel_all_attached;
+  std::optional<int64_t> main_id;
+  std::optional<Decimal> quantity;
+  std::optional<Decimal> market_price;
+};
+
 /// Order
 struct Order
 {
@@ -1613,6 +1686,8 @@ struct Order
   std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
+  /// Attached orders
+  std::vector<AttachedOrderDetail> attached_orders;
 };
 
 /// Order changed message
@@ -1700,6 +1775,8 @@ struct GetTodayOrdersOptions
   std::optional<Market> market;
   /// Order id
   std::optional<std::string> order_id;
+  /// Whether to include attached orders
+  std::optional<bool> is_attached;
 };
 
 /// Options for replace order request
@@ -1727,6 +1804,8 @@ struct ReplaceOrderOptions
   std::optional<Decimal> monitor_price;
   /// Remark
   std::optional<std::string> remark;
+  /// Attached order params
+  std::optional<ReplaceAttachedParams> attached_params;
 };
 
 /// Options for submit order request
@@ -1769,6 +1848,8 @@ struct SubmitOrderOptions
   /// If not specified, idempotency control is skipped.
   /// The server caches this ID for 10 minutes.
   std::optional<std::string> client_request_id;
+  /// Attached order params
+  std::optional<SubmitAttachedParams> attached_params;
 };
 
 /// Response for submit order request
@@ -2150,8 +2231,10 @@ struct OrderDetail
   std::optional<std::string> platform_deducted_currency;
   /// Order history details
   std::vector<OrderHistoryDetail> history;
-  /// Order charges
-  OrderChargeDetail charge_detail;
+  /// Order charges (maybe null)
+  std::optional<OrderChargeDetail> charge_detail;
+  /// Attached orders
+  std::vector<AttachedOrderDetail> attached_orders;
 };
 
 /// Options for estimate maximum purchase quantity

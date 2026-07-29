@@ -1,6 +1,8 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
 
+use crate::trade::{AttachedOrderType, OrderType, OutsideRTH, TimeInForceType};
+
 /// Options for replace order request
 #[derive(Debug, Serialize, Clone)]
 pub struct ReplaceOrderOptions {
@@ -24,6 +26,8 @@ pub struct ReplaceOrderOptions {
     monitor_price: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
     remark: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    attached_params: Option<ReplaceAttachedParams>,
 }
 
 impl ReplaceOrderOptions {
@@ -42,6 +46,7 @@ impl ReplaceOrderOptions {
             trigger_count: None,
             monitor_price: None,
             remark: None,
+            attached_params: None,
         }
     }
 
@@ -131,6 +136,169 @@ impl ReplaceOrderOptions {
     pub fn remark(self, remark: impl Into<String>) -> Self {
         Self {
             remark: Some(remark.into()),
+            ..self
+        }
+    }
+
+    /// Set attached order parameters
+    pub fn attached_params(self, params: ReplaceAttachedParams) -> Self {
+        Self {
+            attached_params: Some(params),
+            ..self
+        }
+    }
+}
+
+/// Attached order parameters for replace order
+#[derive(Debug, Serialize, Clone)]
+pub struct ReplaceAttachedParams {
+    attached_order_type: AttachedOrderType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    time_in_force: Option<TimeInForceType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    expire_time: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    activate_order_type: Option<OrderType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_submit_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_submit_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    activate_rth: Option<OutsideRTH>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_id: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_id: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cancel_all_attached: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    main_id: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    quantity: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    market_price: Option<Decimal>,
+}
+
+impl ReplaceAttachedParams {
+    /// Create new ReplaceAttachedParams
+    pub fn new(attached_order_type: AttachedOrderType) -> Self {
+        Self {
+            attached_order_type,
+            profit_taker_price: None,
+            stop_loss_price: None,
+            time_in_force: None,
+            expire_time: None,
+            activate_order_type: None,
+            profit_taker_submit_price: None,
+            stop_loss_submit_price: None,
+            activate_rth: None,
+            profit_taker_id: None,
+            stop_loss_id: None,
+            cancel_all_attached: None,
+            main_id: None,
+            quantity: None,
+            market_price: None,
+        }
+    }
+    /// Set the take-profit trigger price
+    pub fn profit_taker_price(self, v: Decimal) -> Self {
+        Self {
+            profit_taker_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the stop-loss trigger price
+    pub fn stop_loss_price(self, v: Decimal) -> Self {
+        Self {
+            stop_loss_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the time in force type
+    pub fn time_in_force(self, v: TimeInForceType) -> Self {
+        Self {
+            time_in_force: Some(v),
+            ..self
+        }
+    }
+    /// Set the expiry time (unix timestamp seconds)
+    pub fn expire_time(self, v: i64) -> Self {
+        Self {
+            expire_time: Some(v),
+            ..self
+        }
+    }
+    /// Set the order type to submit after trigger
+    pub fn activate_order_type(self, v: OrderType) -> Self {
+        Self {
+            activate_order_type: Some(v),
+            ..self
+        }
+    }
+    /// Set the take-profit limit price
+    pub fn profit_taker_submit_price(self, v: Decimal) -> Self {
+        Self {
+            profit_taker_submit_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the stop-loss limit price
+    pub fn stop_loss_submit_price(self, v: Decimal) -> Self {
+        Self {
+            stop_loss_submit_price: Some(v),
+            ..self
+        }
+    }
+    /// Set the RTH setting for the activated order
+    pub fn activate_rth(self, v: OutsideRTH) -> Self {
+        Self {
+            activate_rth: Some(v),
+            ..self
+        }
+    }
+    /// Set the take-profit order ID (for modifying existing attached order)
+    pub fn profit_taker_id(self, v: i64) -> Self {
+        Self {
+            profit_taker_id: Some(v),
+            ..self
+        }
+    }
+    /// Set the stop-loss order ID (for modifying existing attached order)
+    pub fn stop_loss_id(self, v: i64) -> Self {
+        Self {
+            stop_loss_id: Some(v),
+            ..self
+        }
+    }
+    /// Cancel all attached orders
+    pub fn cancel_all_attached(self) -> Self {
+        Self {
+            cancel_all_attached: Some(true),
+            ..self
+        }
+    }
+    /// Set the main order ID
+    pub fn main_id(self, v: i64) -> Self {
+        Self {
+            main_id: Some(v),
+            ..self
+        }
+    }
+    /// Set the quantity
+    pub fn quantity(self, v: Decimal) -> Self {
+        Self {
+            quantity: Some(v),
+            ..self
+        }
+    }
+    /// Set the market price
+    pub fn market_price(self, v: Decimal) -> Self {
+        Self {
+            market_price: Some(v),
             ..self
         }
     }

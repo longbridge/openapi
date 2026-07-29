@@ -16,6 +16,10 @@ pub struct GetTodayOrdersOptions {
     pub market: Option<Market>,
     /// Order id
     pub order_id: Option<String>,
+    /// When set together with order_id, indicates that order_id is an attached
+    /// sub-order ID. The server returns the attached sub-order itself as an
+    /// Order entry (not the parent order). Has no effect without order_id.
+    pub is_attached: Option<bool>,
 }
 
 impl From<GetTodayOrdersOptions> for longbridge::trade::GetTodayOrdersOptions {
@@ -36,6 +40,9 @@ impl From<GetTodayOrdersOptions> for longbridge::trade::GetTodayOrdersOptions {
         }
         if let Some(order_id) = opts.order_id {
             opts2 = opts2.order_id(order_id);
+        }
+        if opts.is_attached == Some(true) {
+            opts2 = opts2.is_attached();
         }
         opts2
     }

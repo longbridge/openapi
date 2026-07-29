@@ -37,6 +37,7 @@ public class Order {
     private Integer triggerCount;
     private BigDecimal monitorPrice;
     private String remark;
+    private AttachedOrderDetail[] attachedOrders = new AttachedOrderDetail[0];
 
     /**
      * Returns the order ID.
@@ -297,6 +298,15 @@ public class Order {
      */
     public BigDecimal getMonitorPrice() {
         return monitorPrice;
+    }
+
+    /**
+     * Returns the attached orders.
+     *
+     * @return attached orders
+     */
+    public AttachedOrderDetail[] getAttachedOrders() {
+        return attachedOrders;
     }
 
     @Override

@@ -49,6 +49,7 @@ public class OrderDetail {
     private String platformDeductedCurrency;
     private OrderHistoryDetail[] history;
     private OrderChargeDetail chargeDetail;
+    private AttachedOrderDetail[] attachedOrders = new AttachedOrderDetail[0];
 
     /**
      * Returns the order ID.
@@ -408,6 +409,15 @@ public class OrderDetail {
      */
     public OrderChargeDetail getChargeDetail() {
         return chargeDetail;
+    }
+
+    /**
+     * Returns the attached orders.
+     *
+     * @return attached orders
+     */
+    public AttachedOrderDetail[] getAttachedOrders() {
+        return attachedOrders;
     }
 
     @Override
