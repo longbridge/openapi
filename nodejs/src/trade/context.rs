@@ -1,8 +1,6 @@
 use std::sync::Arc;
 
-use longbridge::trade::{
-    GetFundPositionsOptions, GetStockPositionsOptions, PushEvent, QueryUSOrdersOptions,
-};
+use longbridge::trade::{GetFundPositionsOptions, GetStockPositionsOptions, PushEvent};
 use napi::{Result, bindgen_prelude::*, threadsafe_function::ThreadsafeFunctionCallMode};
 use parking_lot::Mutex;
 

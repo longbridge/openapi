@@ -219,18 +219,6 @@ jobs:
         working-directory: nodejs
         run: yarn build:debug --target aarch64-apple-darwin
 
-      - name: Move artifacts
-        run: |
-          mkdir -p artifacts
-          mv longbridge.*.node artifacts/
-          yarn artifacts
-        working-directory: ./nodejs
-
-      - name: List packages
-        run: ls -R ./npm
-        shell: bash
-        working-directory: ./nodejs
-
   check-java-sdk:
     needs:
       - check-format
