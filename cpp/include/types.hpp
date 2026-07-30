@@ -1324,22 +1324,24 @@ struct ShortTradesResponse
 
 struct OptionVolumeStats
 {
-  std::string c;
-  std::string p;
+  std::string symbol;
+  int64_t call_volume;
+  int64_t put_volume;
+  int64_t call_open_interest;
+  int64_t put_open_interest;
+  double pc_vol;
+  double pc_oi;
 };
 
 struct OptionVolumeDailyStat
 {
-  std::string symbol;
-  std::string timestamp;
-  std::string total_volume;
-  std::string total_put_volume;
-  std::string total_call_volume;
-  std::string put_call_volume_ratio;
-  std::string total_open_interest;
-  std::string total_put_open_interest;
-  std::string total_call_open_interest;
-  std::string put_call_open_interest_ratio;
+  Date date;
+  int64_t call_volume;
+  int64_t put_volume;
+  int64_t call_open_interest;
+  int64_t put_open_interest;
+  double pc_vol;
+  double pc_oi;
 };
 
 struct OptionVolumeDaily

@@ -2508,12 +2508,12 @@ inline quote::ShortTradesResponse convert(const lb_short_trades_response_t* r) {
   return { std::move(items) };
 }
 inline quote::OptionVolumeStats convert(const lb_option_volume_stats_t* s) {
-  return { s->c, s->p };
+  return { s->symbol, s->call_volume, s->put_volume, s->call_open_interest, s->put_open_interest,
+           s->pc_vol, s->pc_oi };
 }
 inline quote::OptionVolumeDailyStat convert(const lb_option_volume_daily_stat_t* s) {
-  return { s->symbol, s->timestamp, s->total_volume, s->total_put_volume, s->total_call_volume,
-           s->put_call_volume_ratio, s->total_open_interest, s->total_put_open_interest,
-           s->total_call_open_interest, s->put_call_open_interest_ratio };
+  return { convert(&s->date), s->call_volume, s->put_volume, s->call_open_interest,
+           s->put_open_interest, s->pc_vol, s->pc_oi };
 }
 inline quote::OptionVolumeDaily convert(const lb_option_volume_daily_t* r) {
   std::vector<quote::OptionVolumeDailyStat> stats;
