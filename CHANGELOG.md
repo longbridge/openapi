@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Node.js SDK:** remove musl (x86_64-unknown-linux-musl) target support
+
 ## [4.4.2] - 2026-07-30
 
 ### Added
