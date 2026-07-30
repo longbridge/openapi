@@ -152,12 +152,33 @@ Data Fields</h2></td></tr>
 <tr class="separator:a8a216560b51b91dcb7b7520b167d649d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9effb03e7a05ce8b289cc9b47f89b151"><td class="memItemLeft" align="right" valign="top">uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#a9effb03e7a05ce8b289cc9b47f89b151">num_history</a></td></tr>
 <tr class="separator:a9effb03e7a05ce8b289cc9b47f89b151"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8f73fc15a223dffe4fbe55a740a6f56"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#aa8f73fc15a223dffe4fbe55a740a6f56">has_charge_detail</a></td></tr>
+<tr class="separator:aa8f73fc15a223dffe4fbe55a740a6f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8a5655f414ed5c2589ecdff2645567e"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structlb__order__charge__detail__t.html">lb_order_charge_detail_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#ad8a5655f414ed5c2589ecdff2645567e">charge_detail</a></td></tr>
 <tr class="separator:ad8a5655f414ed5c2589ecdff2645567e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2df2b7231e8705c75a1c42aa9e1f13f9"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="struct_c_attached_order_detail.html">CAttachedOrderDetail</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#a2df2b7231e8705c75a1c42aa9e1f13f9">attached_orders</a></td></tr>
+<tr class="separator:a2df2b7231e8705c75a1c42aa9e1f13f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a715ecc6ae36e21ec9972072a3fe2ed74"><td class="memItemLeft" align="right" valign="top">uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#a715ecc6ae36e21ec9972072a3fe2ed74">num_attached_orders</a></td></tr>
+<tr class="separator:a715ecc6ae36e21ec9972072a3fe2ed74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Order detail </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a2df2b7231e8705c75a1c42aa9e1f13f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2df2b7231e8705c75a1c42aa9e1f13f9">&#9670;&nbsp;</a></span>attached_orders</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="struct_c_attached_order_detail.html">CAttachedOrderDetail</a>* attached_orders</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Attached orders </p>
+
+</div>
+</div>
 <a id="ad8a5655f414ed5c2589ecdff2645567e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad8a5655f414ed5c2589ecdff2645567e">&#9670;&nbsp;</a></span>charge_detail</h2>
 
@@ -169,7 +190,7 @@ Data Fields</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Order charges </p>
+<p>Order charges (only valid when has_charge_detail is true) </p>
 
 </div>
 </div>
@@ -323,6 +344,21 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
+<a id="aa8f73fc15a223dffe4fbe55a740a6f56"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8f73fc15a223dffe4fbe55a740a6f56">&#9670;&nbsp;</a></span>has_charge_detail</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_charge_detail</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether charge_detail is valid (false when the order has no charge info) </p>
+
+</div>
+</div>
 <a id="a8a216560b51b91dcb7b7520b167d649d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8a216560b51b91dcb7b7520b167d649d">&#9670;&nbsp;</a></span>history</h2>
 
@@ -410,6 +446,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Rejected Message or remark </p>
+
+</div>
+</div>
+<a id="a715ecc6ae36e21ec9972072a3fe2ed74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a715ecc6ae36e21ec9972072a3fe2ed74">&#9670;&nbsp;</a></span>num_attached_orders</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uintptr_t num_attached_orders</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Number of attached orders </p>
 
 </div>
 </div>

@@ -1,4 +1,5 @@
 com.longbridge
+com.longbridge.agent
 com.longbridge.alert
 com.longbridge.asset
 com.longbridge.calendar

@@ -1,0 +1,232 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ConversationStreamEvent | Longbridge OpenAPI SDK</title><meta name="description" content="Documentation for Longbridge OpenAPI SDK"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">Longbridge OpenAPI SDK</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="" aria-current="page">ConversationStreamEvent</a></li></ul>
+<h1>Interface ConversationStreamEvent</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>One event observed while streaming <code>AgentContext.conversationStreamed</code> or
+<code>AgentContext.continueConversationStreamed</code>.</p>
+<p>Design note: the Rust core models this as an enum with a per-variant
+payload (<code>longbridge::agent::ConversationStreamEvent</code>), but napi-rs has no
+ergonomic equivalent of a Rust/Serde &quot;enum with data&quot; for a plain
+<code>#[napi(object)]</code> value, and there's no existing precedent for reifying one
+as a single JS value in this codebase (the closest analogue,
+<code>trade::PushEvent</code>, is dispatched to separate per-variant JS callbacks
+instead). We instead mirror the common &quot;discriminant + optional per-kind
+fields&quot; shape used for tagged unions in plain JS/JSON: <code>kind</code> is one of
+<code>&quot;chat_started&quot; | &quot;workflow_started&quot; | &quot;message&quot; | &quot;ping&quot; | &quot;thinking_started&quot; | &quot;thinking_finished&quot; | &quot;node_tool_use_started&quot; | &quot;node_tool_use_finished&quot; | &quot;subagent_started&quot; | &quot;subagent_progress&quot; | &quot;subagent_finished&quot; | &quot;agent_tool_started&quot; | &quot;agent_tool_progress&quot; | &quot;agent_tool_finished&quot; | &quot;human_interaction_required&quot; | &quot;query_masked&quot; | &quot;plan_changed&quot; | &quot;context_compress_started&quot; | &quot;context_compress_finished&quot; | &quot;chat_finished&quot; | &quot;workflow_finished&quot; | &quot;chat_title_updated&quot; | &quot;other&quot;</code>,
+and exactly one of <code>chatStarted</code> / <code>workflowStarted</code> / <code>message</code> /
+<code>thinkingStarted</code> / <code>thinkingFinished</code> / <code>nodeToolUseStarted</code> /
+<code>nodeToolUseFinished</code> / <code>subagentStarted</code> / <code>subagentProgress</code> /
+<code>subagentFinished</code> / <code>agentToolStarted</code> / <code>agentToolProgress</code> /
+<code>agentToolFinished</code> / <code>humanInteractionRequired</code> / <code>queryMasked</code> /
+<code>planChanged</code> / <code>contextCompressStarted</code> / <code>contextCompressFinished</code> /
+<code>chatFinished</code> / <code>workflowFinished</code> / <code>chatTitleUpdated</code> / <code>other</code> is set,
+matching <code>kind</code> — except <code>&quot;ping&quot;</code>, a heartbeat with no payload, for which
+every payload field is <code>None</code>. When <code>kind</code> is <code>&quot;other&quot;</code>, <code>otherEvent</code>
+additionally carries the SSE envelope's <code>event</code> field (the event type
+name).</p>
+</div></section>
+<div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">ConversationStreamEvent</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#kind">kind</a><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#chatstarted">chatStarted</a><span class="tsd-signature-symbol">?:</span> <a href="ChatStartedPayload.html" class="tsd-signature-type tsd-kind-interface">ChatStartedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#workflowstarted">workflowStarted</a><span class="tsd-signature-symbol">?:</span> <a href="WorkflowStartedPayload.html" class="tsd-signature-type tsd-kind-interface">WorkflowStartedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#message">message</a><span class="tsd-signature-symbol">?:</span> <a href="MessagePayload.html" class="tsd-signature-type tsd-kind-interface">MessagePayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#thinkingstarted">thinkingStarted</a><span class="tsd-signature-symbol">?:</span> <a href="ThinkingStartedPayload.html" class="tsd-signature-type tsd-kind-interface">ThinkingStartedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#thinkingfinished">thinkingFinished</a><span class="tsd-signature-symbol">?:</span> <a href="ThinkingFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">ThinkingFinishedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#nodetoolusestarted">nodeToolUseStarted</a><span class="tsd-signature-symbol">?:</span> <a href="NodeToolUseStartedPayload.html" class="tsd-signature-type tsd-kind-interface">NodeToolUseStartedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#nodetoolusefinished">nodeToolUseFinished</a><span class="tsd-signature-symbol">?:</span> <a href="NodeToolUseFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">NodeToolUseFinishedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#subagentstarted">subagentStarted</a><span class="tsd-signature-symbol">?:</span> <a href="SubagentStartedPayload.html" class="tsd-signature-type tsd-kind-interface">SubagentStartedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#subagentprogress">subagentProgress</a><span class="tsd-signature-symbol">?:</span> <a href="SubagentProgressPayload.html" class="tsd-signature-type tsd-kind-interface">SubagentProgressPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#subagentfinished">subagentFinished</a><span class="tsd-signature-symbol">?:</span> <a href="SubagentFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">SubagentFinishedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#agenttoolstarted">agentToolStarted</a><span class="tsd-signature-symbol">?:</span> <a href="AgentToolStartedPayload.html" class="tsd-signature-type tsd-kind-interface">AgentToolStartedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#agenttoolprogress">agentToolProgress</a><span class="tsd-signature-symbol">?:</span> <a href="AgentToolProgressPayload.html" class="tsd-signature-type tsd-kind-interface">AgentToolProgressPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#agenttoolfinished">agentToolFinished</a><span class="tsd-signature-symbol">?:</span> <a href="AgentToolFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">AgentToolFinishedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#humaninteractionrequired">humanInteractionRequired</a><span class="tsd-signature-symbol">?:</span> <a href="ConversationResponse.html" class="tsd-signature-type tsd-kind-interface">ConversationResponse</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#querymasked">queryMasked</a><span class="tsd-signature-symbol">?:</span> <a href="QueryMaskedPayload.html" class="tsd-signature-type tsd-kind-interface">QueryMaskedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#planchanged">planChanged</a><span class="tsd-signature-symbol">?:</span> <a href="PlanChangedPayload.html" class="tsd-signature-type tsd-kind-interface">PlanChangedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#contextcompressstarted">contextCompressStarted</a><span class="tsd-signature-symbol">?:</span> <a href="ContextCompressStartedPayload.html" class="tsd-signature-type tsd-kind-interface">ContextCompressStartedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#contextcompressfinished">contextCompressFinished</a><span class="tsd-signature-symbol">?:</span> <a href="ContextCompressFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">ContextCompressFinishedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#chatfinished">chatFinished</a><span class="tsd-signature-symbol">?:</span> <a href="ChatFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">ChatFinishedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#workflowfinished">workflowFinished</a><span class="tsd-signature-symbol">?:</span> <a href="ConversationResponse.html" class="tsd-signature-type tsd-kind-interface">ConversationResponse</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#chattitleupdated">chatTitleUpdated</a><span class="tsd-signature-symbol">?:</span> <a href="ChatTitleUpdatedPayload.html" class="tsd-signature-type tsd-kind-interface">ChatTitleUpdatedPayload</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#otherevent">otherEvent</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#other">other</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h5 class="tsd-index-heading uppercase">Index</h5></summary>
+<div class="tsd-accordion-details">
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="properties">Properties<a href="#properties" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#kind" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kind</span></a>
+<a href="#chatstarted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>chat<wbr/>Started?</span></a>
+<a href="#workflowstarted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>workflow<wbr/>Started?</span></a>
+<a href="#message" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>message?</span></a>
+<a href="#thinkingstarted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>thinking<wbr/>Started?</span></a>
+<a href="#thinkingfinished" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>thinking<wbr/>Finished?</span></a>
+<a href="#nodetoolusestarted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>node<wbr/>Tool<wbr/>Use<wbr/>Started?</span></a>
+<a href="#nodetoolusefinished" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>node<wbr/>Tool<wbr/>Use<wbr/>Finished?</span></a>
+<a href="#subagentstarted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>subagent<wbr/>Started?</span></a>
+<a href="#subagentprogress" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>subagent<wbr/>Progress?</span></a>
+<a href="#subagentfinished" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>subagent<wbr/>Finished?</span></a>
+<a href="#agenttoolstarted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>agent<wbr/>Tool<wbr/>Started?</span></a>
+<a href="#agenttoolprogress" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>agent<wbr/>Tool<wbr/>Progress?</span></a>
+<a href="#agenttoolfinished" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>agent<wbr/>Tool<wbr/>Finished?</span></a>
+<a href="#humaninteractionrequired" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>human<wbr/>Interaction<wbr/>Required?</span></a>
+<a href="#querymasked" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>query<wbr/>Masked?</span></a>
+<a href="#planchanged" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>plan<wbr/>Changed?</span></a>
+<a href="#contextcompressstarted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>context<wbr/>Compress<wbr/>Started?</span></a>
+<a href="#contextcompressfinished" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>context<wbr/>Compress<wbr/>Finished?</span></a>
+<a href="#chatfinished" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>chat<wbr/>Finished?</span></a>
+<a href="#workflowfinished" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>workflow<wbr/>Finished?</span></a>
+<a href="#chattitleupdated" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>chat<wbr/>Title<wbr/>Updated?</span></a>
+<a href="#otherevent" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>other<wbr/>Event?</span></a>
+<a href="#other" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>other?</span></a>
+</div></section></div></details></section></section>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="kind"><span>kind</span><a href="#kind" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">kind</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>Discriminant: one of <code>&quot;chat_started&quot;</code>, <code>&quot;workflow_started&quot;</code>,
+<code>&quot;message&quot;</code>, <code>&quot;ping&quot;</code>, <code>&quot;thinking_started&quot;</code>, <code>&quot;thinking_finished&quot;</code>,
+<code>&quot;node_tool_use_started&quot;</code>, <code>&quot;node_tool_use_finished&quot;</code>,
+<code>&quot;subagent_started&quot;</code>, <code>&quot;subagent_progress&quot;</code>, <code>&quot;subagent_finished&quot;</code>,
+<code>&quot;agent_tool_started&quot;</code>, <code>&quot;agent_tool_progress&quot;</code>,
+<code>&quot;agent_tool_finished&quot;</code>, <code>&quot;human_interaction_required&quot;</code>,
+<code>&quot;query_masked&quot;</code>, <code>&quot;plan_changed&quot;</code>, <code>&quot;context_compress_started&quot;</code>,
+<code>&quot;context_compress_finished&quot;</code>, <code>&quot;chat_finished&quot;</code>,
+<code>&quot;workflow_finished&quot;</code>, <code>&quot;chat_title_updated&quot;</code>, or <code>&quot;other&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="chatstarted"><code class="tsd-tag">Optional</code><span>chat<wbr/>Started</span><a href="#chatstarted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">chatStarted</span><span class="tsd-signature-symbol">?:</span> <a href="ChatStartedPayload.html" class="tsd-signature-type tsd-kind-interface">ChatStartedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;chat_started&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="workflowstarted"><code class="tsd-tag">Optional</code><span>workflow<wbr/>Started</span><a href="#workflowstarted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">workflowStarted</span><span class="tsd-signature-symbol">?:</span> <a href="WorkflowStartedPayload.html" class="tsd-signature-type tsd-kind-interface">WorkflowStartedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;workflow_started&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="message"><code class="tsd-tag">Optional</code><span>message</span><a href="#message" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">message</span><span class="tsd-signature-symbol">?:</span> <a href="MessagePayload.html" class="tsd-signature-type tsd-kind-interface">MessagePayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;message&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="thinkingstarted"><code class="tsd-tag">Optional</code><span>thinking<wbr/>Started</span><a href="#thinkingstarted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">thinkingStarted</span><span class="tsd-signature-symbol">?:</span> <a href="ThinkingStartedPayload.html" class="tsd-signature-type tsd-kind-interface">ThinkingStartedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;thinking_started&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="thinkingfinished"><code class="tsd-tag">Optional</code><span>thinking<wbr/>Finished</span><a href="#thinkingfinished" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">thinkingFinished</span><span class="tsd-signature-symbol">?:</span> <a href="ThinkingFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">ThinkingFinishedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;thinking_finished&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="nodetoolusestarted"><code class="tsd-tag">Optional</code><span>node<wbr/>Tool<wbr/>Use<wbr/>Started</span><a href="#nodetoolusestarted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">nodeToolUseStarted</span><span class="tsd-signature-symbol">?:</span> <a href="NodeToolUseStartedPayload.html" class="tsd-signature-type tsd-kind-interface">NodeToolUseStartedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;node_tool_use_started&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="nodetoolusefinished"><code class="tsd-tag">Optional</code><span>node<wbr/>Tool<wbr/>Use<wbr/>Finished</span><a href="#nodetoolusefinished" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">nodeToolUseFinished</span><span class="tsd-signature-symbol">?:</span> <a href="NodeToolUseFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">NodeToolUseFinishedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;node_tool_use_finished&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="subagentstarted"><code class="tsd-tag">Optional</code><span>subagent<wbr/>Started</span><a href="#subagentstarted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">subagentStarted</span><span class="tsd-signature-symbol">?:</span> <a href="SubagentStartedPayload.html" class="tsd-signature-type tsd-kind-interface">SubagentStartedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;subagent_started&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="subagentprogress"><code class="tsd-tag">Optional</code><span>subagent<wbr/>Progress</span><a href="#subagentprogress" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">subagentProgress</span><span class="tsd-signature-symbol">?:</span> <a href="SubagentProgressPayload.html" class="tsd-signature-type tsd-kind-interface">SubagentProgressPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;subagent_progress&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="subagentfinished"><code class="tsd-tag">Optional</code><span>subagent<wbr/>Finished</span><a href="#subagentfinished" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">subagentFinished</span><span class="tsd-signature-symbol">?:</span> <a href="SubagentFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">SubagentFinishedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;subagent_finished&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="agenttoolstarted"><code class="tsd-tag">Optional</code><span>agent<wbr/>Tool<wbr/>Started</span><a href="#agenttoolstarted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">agentToolStarted</span><span class="tsd-signature-symbol">?:</span> <a href="AgentToolStartedPayload.html" class="tsd-signature-type tsd-kind-interface">AgentToolStartedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;agent_tool_started&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="agenttoolprogress"><code class="tsd-tag">Optional</code><span>agent<wbr/>Tool<wbr/>Progress</span><a href="#agenttoolprogress" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">agentToolProgress</span><span class="tsd-signature-symbol">?:</span> <a href="AgentToolProgressPayload.html" class="tsd-signature-type tsd-kind-interface">AgentToolProgressPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;agent_tool_progress&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="agenttoolfinished"><code class="tsd-tag">Optional</code><span>agent<wbr/>Tool<wbr/>Finished</span><a href="#agenttoolfinished" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">agentToolFinished</span><span class="tsd-signature-symbol">?:</span> <a href="AgentToolFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">AgentToolFinishedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;agent_tool_finished&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="humaninteractionrequired"><code class="tsd-tag">Optional</code><span>human<wbr/>Interaction<wbr/>Required</span><a href="#humaninteractionrequired" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">humanInteractionRequired</span><span class="tsd-signature-symbol">?:</span> <a href="ConversationResponse.html" class="tsd-signature-type tsd-kind-interface">ConversationResponse</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;human_interaction_required&quot;</code>, carrying the run's
+outcome for an interrupted run — the same <code>ConversationResponse</code> shape
+<code>workflowFinished</code> carries for the other outcomes. Unlike
+<code>workflowFinished</code>, this is set instead of (never alongside)
+<code>workflowFinished</code> for the same run.</p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="querymasked"><code class="tsd-tag">Optional</code><span>query<wbr/>Masked</span><a href="#querymasked" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">queryMasked</span><span class="tsd-signature-symbol">?:</span> <a href="QueryMaskedPayload.html" class="tsd-signature-type tsd-kind-interface">QueryMaskedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;query_masked&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="planchanged"><code class="tsd-tag">Optional</code><span>plan<wbr/>Changed</span><a href="#planchanged" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">planChanged</span><span class="tsd-signature-symbol">?:</span> <a href="PlanChangedPayload.html" class="tsd-signature-type tsd-kind-interface">PlanChangedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;plan_changed&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="contextcompressstarted"><code class="tsd-tag">Optional</code><span>context<wbr/>Compress<wbr/>Started</span><a href="#contextcompressstarted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">contextCompressStarted</span><span class="tsd-signature-symbol">?:</span> <a href="ContextCompressStartedPayload.html" class="tsd-signature-type tsd-kind-interface">ContextCompressStartedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;context_compress_started&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="contextcompressfinished"><code class="tsd-tag">Optional</code><span>context<wbr/>Compress<wbr/>Finished</span><a href="#contextcompressfinished" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">contextCompressFinished</span><span class="tsd-signature-symbol">?:</span> <a href="ContextCompressFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">ContextCompressFinishedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;context_compress_finished&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="chatfinished"><code class="tsd-tag">Optional</code><span>chat<wbr/>Finished</span><a href="#chatfinished" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">chatFinished</span><span class="tsd-signature-symbol">?:</span> <a href="ChatFinishedPayload.html" class="tsd-signature-type tsd-kind-interface">ChatFinishedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;chat_finished&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="workflowfinished"><code class="tsd-tag">Optional</code><span>workflow<wbr/>Finished</span><a href="#workflowfinished" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">workflowFinished</span><span class="tsd-signature-symbol">?:</span> <a href="ConversationResponse.html" class="tsd-signature-type tsd-kind-interface">ConversationResponse</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;workflow_finished&quot;</code>, carrying the run's outcome
+— not necessarily the last event of the stream, since the server may
+still emit a few more housekeeping events (<code>kind</code> <code>&quot;other&quot;</code>) before
+actually closing the connection</p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="chattitleupdated"><code class="tsd-tag">Optional</code><span>chat<wbr/>Title<wbr/>Updated</span><a href="#chattitleupdated" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">chatTitleUpdated</span><span class="tsd-signature-symbol">?:</span> <a href="ChatTitleUpdatedPayload.html" class="tsd-signature-type tsd-kind-interface">ChatTitleUpdatedPayload</a></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;chat_title_updated&quot;</code></p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="otherevent"><code class="tsd-tag">Optional</code><span>other<wbr/>Event</span><a href="#otherevent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">otherEvent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;other&quot;</code> — the SSE envelope's <code>event</code> field (the
+event type name)</p>
+</div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="other"><code class="tsd-tag">Optional</code><span>other</span><a href="#other" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">other</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">any</span></div>
+<div class="tsd-comment tsd-typography"><p>Set when <code>kind</code> is <code>&quot;other&quot;</code> — raw JSON of an event type not
+recognized by this SDK version</p>
+</div></section></section></details></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
+<div><a href="#kind"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kind</span></a><a href="#chatstarted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>chat<wbr/>Started</span></a><a href="#workflowstarted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>workflow<wbr/>Started</span></a><a href="#message"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>message</span></a><a href="#thinkingstarted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>thinking<wbr/>Started</span></a><a href="#thinkingfinished"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>thinking<wbr/>Finished</span></a><a href="#nodetoolusestarted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>node<wbr/>Tool<wbr/>Use<wbr/>Started</span></a><a href="#nodetoolusefinished"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>node<wbr/>Tool<wbr/>Use<wbr/>Finished</span></a><a href="#subagentstarted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>subagent<wbr/>Started</span></a><a href="#subagentprogress"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>subagent<wbr/>Progress</span></a><a href="#subagentfinished"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>subagent<wbr/>Finished</span></a><a href="#agenttoolstarted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>agent<wbr/>Tool<wbr/>Started</span></a><a href="#agenttoolprogress"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>agent<wbr/>Tool<wbr/>Progress</span></a><a href="#agenttoolfinished"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>agent<wbr/>Tool<wbr/>Finished</span></a><a href="#humaninteractionrequired"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>human<wbr/>Interaction<wbr/>Required</span></a><a href="#querymasked"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>query<wbr/>Masked</span></a><a href="#planchanged"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>plan<wbr/>Changed</span></a><a href="#contextcompressstarted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>context<wbr/>Compress<wbr/>Started</span></a><a href="#contextcompressfinished"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>context<wbr/>Compress<wbr/>Finished</span></a><a href="#chatfinished"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>chat<wbr/>Finished</span></a><a href="#workflowfinished"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>workflow<wbr/>Finished</span></a><a href="#chattitleupdated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>chat<wbr/>Title<wbr/>Updated</span></a><a href="#otherevent"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>other<wbr/>Event</span></a><a href="#other"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>other</span></a></div></details></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../modules.html">Longbridge OpenAPI SDK</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>

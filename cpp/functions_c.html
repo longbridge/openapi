@@ -64,9 +64,6 @@ $(function() {
 <div class="textblock">Here is a list of all class members with links to the classes they belong to:</div>
 
 <h3><a id="index_c"></a>- c -</h3><ul>
-<li>c
-: <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_stats.html#a224337ce134deb1b420e115fc6fa1d8d">longbridge::quote::OptionVolumeStats</a>
-</li>
 <li>calc_date()
 : <a class="el" href="classlongbridge_1_1dca_1_1_d_c_a_context.html#af1b44536375869ec05b112507ee87eaa">longbridge::dca::DCAContext</a>
 </li>
@@ -74,7 +71,11 @@ $(function() {
 : <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a32d25607adb4304ffa334dc3467b0d0d">longbridge::quote::QuoteContext</a>
 </li>
 <li>CalendarContext()
-: <a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html#a523a6dd217f79ae6e91b02b4d828bbb1">longbridge::calendar::CalendarContext</a>
+: <a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html#a676dd7452a4a1c836742f87ed47328dc">longbridge::calendar::CalendarContext</a>
+</li>
+<li>call_open_interest
+: <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_daily_stat.html#ad98c2ae7d105a0fd207106290691e319">longbridge::quote::OptionVolumeDailyStat</a>
+, <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_stats.html#a9cab97dd9738cc978e4b90aab2a8f07a">longbridge::quote::OptionVolumeStats</a>
 </li>
 <li>call_price
 : <a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#a544fae9b1a3ec882d105af67a4f44c2f">longbridge::quote::SecurityCalcIndex</a>
@@ -84,8 +85,15 @@ $(function() {
 <li>call_symbol
 : <a class="el" href="structlongbridge_1_1quote_1_1_strike_price_info.html#addbdab64e4197931465aceb3477ff610">longbridge::quote::StrikePriceInfo</a>
 </li>
+<li>call_volume
+: <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_daily_stat.html#aaed4ee2465ee633f54eefe82501aa01f">longbridge::quote::OptionVolumeDailyStat</a>
+, <a class="el" href="structlongbridge_1_1quote_1_1_option_volume_stats.html#a9e2b7cd156bfbb210115359be4e1b913">longbridge::quote::OptionVolumeStats</a>
+</li>
+<li>cancel_all_attached
+: <a class="el" href="structlongbridge_1_1trade_1_1_replace_attached_params.html#a34fc319d90d75510253500ca8e008517">longbridge::trade::ReplaceAttachedParams</a>
+</li>
 <li>cancel_order()
-: <a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html#ae8474241533b66f192e8353520cbd7d4">longbridge::trade::TradeContext</a>
+: <a class="el" href="classlongbridge_1_1trade_1_1_trade_context.html#ab4cd666992da522c857924575df25270">longbridge::trade::TradeContext</a>
 </li>
 <li>candlestick
 : <a class="el" href="structlongbridge_1_1quote_1_1_push_candlestick.html#ac95dd1a0222e3c460fc78767edf56278">longbridge::quote::PushCandlestick</a>
@@ -155,10 +163,32 @@ $(function() {
 , <a class="el" href="structlongbridge_1_1trade_1_1_stock_positions_response.html#af89e9f1d7f481f0bc7e6dc59367c5979">longbridge::trade::StockPositionsResponse</a>
 </li>
 <li>charge_detail
-: <a class="el" href="structlongbridge_1_1trade_1_1_order_detail.html#a91f242c46ae2b22eefa82ffb403d973c">longbridge::trade::OrderDetail</a>
+: <a class="el" href="structlongbridge_1_1trade_1_1_order_detail.html#afc00bed80e69e632ad1bc58161b00acc">longbridge::trade::OrderDetail</a>
 </li>
 <li>chart_uid
 : <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_event_info.html#ab73db4eb943d95759314d1f672214c44">longbridge::calendar::CalendarEventInfo</a>
+</li>
+<li>chat_finished
+: <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html#ad8f1d74777a51ba9a7aad34b8baab56b">longbridge::agent::ConversationStreamEvent</a>
+</li>
+<li>chat_id
+: <a class="el" href="structlongbridge_1_1agent_1_1_chat_finished_payload.html#adf67d4484275f533e45f4c94eb5b89c0">longbridge::agent::ChatFinishedPayload</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_chat_title_updated_payload.html#ac29dbe0f2b9c182d2d8372d925044938">longbridge::agent::ChatTitleUpdatedPayload</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_interrupt.html#a5bd638b7a85c0ad1b1e24db07a73139d">longbridge::agent::Interrupt</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_workflow_started_inputs.html#ade51e953ab4a3edaa63b0bf0948c7101">longbridge::agent::WorkflowStartedInputs</a>
+</li>
+<li>chat_started
+: <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html#a62c6b96b3d6385265114ceb81f61c139">longbridge::agent::ConversationStreamEvent</a>
+</li>
+<li>chat_title_updated
+: <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html#ad5ed588bbfc2c477be0e2217e86485b0">longbridge::agent::ConversationStreamEvent</a>
+</li>
+<li>chat_uid
+: <a class="el" href="structlongbridge_1_1agent_1_1_chat_finished_payload.html#a579e20370c9b24950707deb46fafe836">longbridge::agent::ChatFinishedPayload</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a01cb73469e526ab915608d7ba3d99657">longbridge::agent::ChatStartedPayload</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_chat_title_updated_payload.html#aea3acd8c8fc9d056e121a0c82d2be987">longbridge::agent::ChatTitleUpdatedPayload</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html#a0560fa995cfafe945d06c89d323bc4c9">longbridge::agent::ConversationResponse</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_workflow_started_inputs.html#ac8a897dcb56c42240f921a1879ecd021">longbridge::agent::WorkflowStartedInputs</a>
 </li>
 <li>check_support()
 : <a class="el" href="classlongbridge_1_1dca_1_1_d_c_a_context.html#ab6059139c4dcee35409ee54e8e2f1a67">longbridge::dca::DCAContext</a>
@@ -205,7 +235,8 @@ $(function() {
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_snapshot_forecast_metric.html#a97b5ce30147e4a3665a8090fb6a542b4">longbridge::fundamental::SnapshotForecastMetric</a>
 </li>
 <li>code
-: <a class="el" href="structlongbridge_1_1alert_1_1_alert_symbol_group.html#a3f45782ebd64c6fc4205239bfbc00cb6">longbridge::alert::AlertSymbolGroup</a>
+: <a class="el" href="structlongbridge_1_1agent_1_1_agent_error.html#a85b57319270cb8fc49c9dbc8e50babbd">longbridge::agent::AgentError</a>
+, <a class="el" href="structlongbridge_1_1alert_1_1_alert_symbol_group.html#a3f45782ebd64c6fc4205239bfbc00cb6">longbridge::alert::AlertSymbolGroup</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_item.html#acc97865f0aa82f8c3e8bfbe3a1757f11">longbridge::fundamental::AssetAllocationItem</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_fund_holder.html#a0858a018193b90bac7833637d27a74b3">longbridge::fundamental::FundHolder</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_shareholder_stock.html#acfeae44fa12b365a0a7d3b2322e84539">longbridge::fundamental::ShareholderStock</a>
@@ -249,7 +280,7 @@ $(function() {
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_invest_security.html#aee54a7bb22a4afc053b6b47ae60d31dd">longbridge::fundamental::InvestSecurity</a>
 </li>
 <li>Config()
-: <a class="el" href="classlongbridge_1_1_config.html#a5d149ecb4bc592c75b6f88384a37b8a6">longbridge::Config</a>
+: <a class="el" href="classlongbridge_1_1_config.html#afa36adac2575818a4560a580bed4ef95">longbridge::Config</a>
 </li>
 <li>consensus()
 : <a class="el" href="classlongbridge_1_1fundamental_1_1_fundamental_context.html#a0c05c327e9c61a6d44d15760488da5d7">longbridge::fundamental::FundamentalContext</a>
@@ -270,6 +301,18 @@ $(function() {
 : <a class="el" href="structlongbridge_1_1_async_result.html#a400d195d4d584ede3132cc25a3068c81">longbridge::AsyncResult&lt; Ctx, T &gt;</a>
 , <a class="el" href="structlongbridge_1_1_push_event.html#abbd878a343e65bad5e7980f83c025c36">longbridge::PushEvent&lt; Ctx, T &gt;</a>
 </li>
+<li>context_compress_finished
+: <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html#abcea6e08ccf8981ddb2a6fe84e26707a">longbridge::agent::ConversationStreamEvent</a>
+</li>
+<li>context_compress_started
+: <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html#a8514999a9792a10e997fd305790ab87f">longbridge::agent::ConversationStreamEvent</a>
+</li>
+<li>continue_conversation()
+: <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a0119ec50b75603f6ae09c6e5bf202e3b">longbridge::agent::AgentContext</a>
+</li>
+<li>continue_conversation_streamed()
+: <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#aa113fb1146759467079829a9e36d81e0">longbridge::agent::AgentContext</a>
+</li>
 <li>contract_multiplier
 : <a class="el" href="structlongbridge_1_1quote_1_1_option_quote.html#a3f40aad43d1f2df8142d10e2280754f9">longbridge::quote::OptionQuote</a>
 </li>
@@ -278,6 +321,12 @@ $(function() {
 </li>
 <li>contract_type
 : <a class="el" href="structlongbridge_1_1quote_1_1_option_quote.html#a5ad9e1c3904b842bcbcf6e89387368a4">longbridge::quote::OptionQuote</a>
+</li>
+<li>conversation()
+: <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a7b3733fd09205bfeb4902ec6b2284840">longbridge::agent::AgentContext</a>
+</li>
+<li>conversation_streamed()
+: <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#aa1bb0ff63badb886a30012675894fa7e">longbridge::agent::AgentContext</a>
 </li>
 <li>conversion_ratio
 : <a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#a1c28908bf496cbce40e3b850f709b4b3">longbridge::quote::SecurityCalcIndex</a>
@@ -305,6 +354,7 @@ $(function() {
 <li>counter_id
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_industry_peer_node.html#a6fb1eb7eb6d03f915f057405e0e913d6">longbridge::fundamental::IndustryPeerNode</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_industry_rank_item.html#ad443df128a69a6fd55109c684dd6d9e2">longbridge::fundamental::IndustryRankItem</a>
+, <a class="el" href="structlongbridge_1_1trade_1_1_attached_order_detail.html#a107d0c19fac2ae0b248cffbbe9b4e408">longbridge::trade::AttachedOrderDetail</a>
 </li>
 <li>counter_name
 : <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_event_info.html#aa890f2ddbe3f9a43b7768a0c283f9410">longbridge::calendar::CalendarEventInfo</a>
@@ -313,7 +363,8 @@ $(function() {
 : <a class="el" href="structlongbridge_1_1sharelist_1_1_sharelist_info.html#a60507042ce2df23004da4c1b015920bd">longbridge::sharelist::SharelistInfo</a>
 </li>
 <li>create()
-: <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html#a80248f2dbc44774e5862cafe18fddf74">longbridge::alert::AlertContext</a>
+: <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#ae7b783cf7fba67dd3b2232842f2fcbea">longbridge::agent::AgentContext</a>
+, <a class="el" href="classlongbridge_1_1alert_1_1_alert_context.html#a80248f2dbc44774e5862cafe18fddf74">longbridge::alert::AlertContext</a>
 , <a class="el" href="classlongbridge_1_1asset_1_1_asset_context.html#addf2a7ec158b04ae6242b8bd5f47af8a">longbridge::asset::AssetContext</a>
 , <a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html#aa9a78435c92d633c6a3a08d2ad459c9a">longbridge::calendar::CalendarContext</a>
 , <a class="el" href="classlongbridge_1_1content_1_1_content_context.html#aa0ec94f1a02f5d6105ca9df51a892175">longbridge::content::ContentContext</a>
@@ -339,7 +390,10 @@ $(function() {
 : <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#afbcabe6c545c05d1d4fcefe0b9a66aea">longbridge::quote::QuoteContext</a>
 </li>
 <li>created_at
-: <a class="el" href="structlongbridge_1_1content_1_1_owned_topic.html#a66eca67befbafeb147dcb4ba99631f6e">longbridge::content::OwnedTopic</a>
+: <a class="el" href="structlongbridge_1_1agent_1_1_agent.html#a0dc16a8495e833b3f9498a54c073bd8c">longbridge::agent::Agent</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_context_compress_finished_payload.html#a6c220d968034f8b21973bff4a159215c">longbridge::agent::ContextCompressFinishedPayload</a>
+, <a class="el" href="structlongbridge_1_1agent_1_1_workspace.html#a5dfcef99459be48bebff3c8bd2f5999a">longbridge::agent::Workspace</a>
+, <a class="el" href="structlongbridge_1_1content_1_1_owned_topic.html#a66eca67befbafeb147dcb4ba99631f6e">longbridge::content::OwnedTopic</a>
 , <a class="el" href="structlongbridge_1_1dca_1_1_dca_history_record.html#a6a116ef3dd311548c99681302b704266">longbridge::dca::DcaHistoryRecord</a>
 , <a class="el" href="structlongbridge_1_1dca_1_1_dca_plan.html#aba977ede29d218b68e5603b3dfc83a80">longbridge::dca::DcaPlan</a>
 , <a class="el" href="structlongbridge_1_1sharelist_1_1_sharelist_info.html#a06f1eaf456b440141c1d18fbc22e45b8">longbridge::sharelist::SharelistInfo</a>
