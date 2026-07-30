@@ -4812,18 +4812,12 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeStats.put_volume">put_volume</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeStats.call_open_interest">call_open_interest</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeStats.put_open_interest">put_open_interest</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeStats.pc_vol">pc_vol</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeStats.pc_oi">pc_oi</a>
-    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat">OptionVolumeDailyStat</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.symbol">symbol</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.date">date</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.call_volume">call_volume</a>
@@ -4833,6 +4827,10 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.call_open_interest">call_open_interest</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.put_open_interest">put_open_interest</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.total_volume">total_volume</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.total_open_interest">total_open_interest</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionVolumeDailyStat.pc_vol">pc_vol</a>
     </li>
@@ -81517,98 +81515,6 @@ for sl in lists.sharelists:
 
 </div>
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="longbridge.openapi.OptionVolumeStats.call_open_interest" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">call_open_interest</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">call_open_interest: int</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Total call open interest</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="longbridge.openapi.OptionVolumeStats.put_open_interest" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">put_open_interest</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">put_open_interest: int</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Total put open interest</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="longbridge.openapi.OptionVolumeStats.pc_vol" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">pc_vol</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">pc_vol: float</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Put/call volume ratio</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="longbridge.openapi.OptionVolumeStats.pc_oi" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">pc_oi</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">pc_oi: float</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Put/call open interest ratio</p>
-
-    </div>
-
-</div>
-
 
 
 
@@ -81654,6 +81560,29 @@ for sl in lists.sharelists:
 
 
 
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OptionVolumeDailyStat.symbol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">symbol</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Underlying security symbol</p>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-attribute">
 
@@ -81765,6 +81694,52 @@ for sl in lists.sharelists:
     <div class="doc doc-contents ">
 
         <p>Put open interest</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OptionVolumeDailyStat.total_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">total_volume</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">total_volume: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Total options volume (calls + puts)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OptionVolumeDailyStat.total_open_interest" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">total_open_interest</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">total_open_interest: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Total open interest (calls + puts)</p>
 
     </div>
 

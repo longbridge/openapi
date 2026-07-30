@@ -72,6 +72,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
+<tr class="memitem:ac32b11cac3faae6f478b0b81553f261a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#ac32b11cac3faae6f478b0b81553f261a">symbol</a></td></tr>
+<tr class="separator:ac32b11cac3faae6f478b0b81553f261a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19b0489b519578815d513f4215255a97"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structlb__date__t.html">lb_date_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#a19b0489b519578815d513f4215255a97">date</a></td></tr>
 <tr class="separator:a19b0489b519578815d513f4215255a97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58abb6435fbcd8f0d138d9732b35c9bc"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#a58abb6435fbcd8f0d138d9732b35c9bc">call_volume</a></td></tr>
@@ -82,6 +84,10 @@ Data Fields</h2></td></tr>
 <tr class="separator:ad4638fbb8c665e1f4d51ed7585d3a146"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a193970f9e6376a35b83506aea5b848db"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#a193970f9e6376a35b83506aea5b848db">put_open_interest</a></td></tr>
 <tr class="separator:a193970f9e6376a35b83506aea5b848db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace6b0e9f50395106cdf0ed93ed17ac12"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#ace6b0e9f50395106cdf0ed93ed17ac12">total_volume</a></td></tr>
+<tr class="separator:ace6b0e9f50395106cdf0ed93ed17ac12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4513c59d6a3e647148c6df83c8d6c9a3"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#a4513c59d6a3e647148c6df83c8d6c9a3">total_open_interest</a></td></tr>
+<tr class="separator:a4513c59d6a3e647148c6df83c8d6c9a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3928b20f86eff0231b4e91c56beada25"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#a3928b20f86eff0231b4e91c56beada25">pc_vol</a></td></tr>
 <tr class="separator:a3928b20f86eff0231b4e91c56beada25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a667073634b75bc30bddd17dbfbfc1669"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__option__volume__daily__stat__t.html#a667073634b75bc30bddd17dbfbfc1669">pc_oi</a></td></tr>
@@ -192,6 +198,51 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Put volume </p>
+
+</div>
+</div>
+<a id="ac32b11cac3faae6f478b0b81553f261a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac32b11cac3faae6f478b0b81553f261a">&#9670;&nbsp;</a></span>symbol</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* symbol</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Underlying security symbol </p>
+
+</div>
+</div>
+<a id="a4513c59d6a3e647148c6df83c8d6c9a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4513c59d6a3e647148c6df83c8d6c9a3">&#9670;&nbsp;</a></span>total_open_interest</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t total_open_interest</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Total open interest (calls + puts) </p>
+
+</div>
+</div>
+<a id="ace6b0e9f50395106cdf0ed93ed17ac12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace6b0e9f50395106cdf0ed93ed17ac12">&#9670;&nbsp;</a></span>total_volume</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t total_volume</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Total options volume (calls + puts) </p>
 
 </div>
 </div>
