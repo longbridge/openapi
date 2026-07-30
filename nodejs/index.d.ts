@@ -1122,6 +1122,36 @@ export declare class OptionQuote {
   get underlyingSymbol(): string
 }
 
+/** Daily option volume response */
+export declare class OptionVolumeDaily {
+  toString(): string
+  toJSON(): any
+  /** Underlying security symbol */
+  get symbol(): string
+  /** Daily stats */
+  get stats(): Array<OptionVolumeDailyStat>
+}
+
+/** One day's option volume stat */
+export declare class OptionVolumeDailyStat {
+  toString(): string
+  toJSON(): any
+  /** Trading date */
+  get date(): NaiveDate
+  /** Call volume */
+  get callVolume(): number
+  /** Put volume */
+  get putVolume(): number
+  /** Call open interest */
+  get callOpenInterest(): number
+  /** Put open interest */
+  get putOpenInterest(): number
+  /** Put/call volume ratio */
+  get pcVol(): number
+  /** Put/call OI ratio */
+  get pcOi(): number
+}
+
 /** Order */
 export declare class Order {
   toString(): string
@@ -5379,42 +5409,22 @@ export declare const enum OptionType {
   Europe = 2
 }
 
-/** Daily option volume response */
-export interface OptionVolumeDaily {
-  /** Daily stats */
-  stats: Array<OptionVolumeDailyStat>
-}
-
-/** One day's option volume stat */
-export interface OptionVolumeDailyStat {
-  /** Symbol */
-  symbol: string
-  /** Timestamp string */
-  timestamp: string
-  /** Total volume */
-  totalVolume: string
-  /** Put volume */
-  totalPutVolume: string
-  /** Call volume */
-  totalCallVolume: string
-  /** Put/call volume ratio */
-  putCallVolumeRatio: string
-  /** Total OI */
-  totalOpenInterest: string
-  /** Put OI */
-  totalPutOpenInterest: string
-  /** Call OI */
-  totalCallOpenInterest: string
-  /** Put/call OI ratio */
-  putCallOpenInterestRatio: string
-}
-
 /** Option volume stats response */
 export interface OptionVolumeStats {
-  /** Call volume */
-  c: string
-  /** Put volume */
-  p: string
+  /** Underlying security symbol */
+  symbol: string
+  /** Total call volume */
+  callVolume: number
+  /** Total put volume */
+  putVolume: number
+  /** Total call open interest */
+  callOpenInterest: number
+  /** Total put open interest */
+  putOpenInterest: number
+  /** Put/call volume ratio */
+  pcVol: number
+  /** Put/call open interest ratio */
+  pcOi: number
 }
 
 export declare const enum OrderSide {
@@ -6761,7 +6771,7 @@ export interface UpdateWatchlistGroup {
 }
 
 /** AI chat context embedded in USAnalystConsensus. */
-export interface UsaiChatData {
+export interface USAIChatData {
   agentId: string
   handoffAgentId: string
   symbol: string
@@ -6771,32 +6781,32 @@ export interface UsaiChatData {
 }
 
 /** US analyst consensus estimates and AI analysis. */
-export interface UsAnalystConsensus {
+export interface USAnalystConsensus {
   aiSummary: string
-  aichatData: UsaiChatData
+  aichatData: USAIChatData
   currency: string
   report: string
-  list: Array<UsConsensusItem>
+  list: Array<USConsensusItem>
   optReports: Array<string>
   h5Data: any
 }
 
 /** US account asset snapshot */
-export interface UsAssetOverview {
+export interface USAssetOverview {
   accountType: string
   assetTimestamp: number
   cashBuyPower: string
   overnightBuyPower: string
   currency: string
-  cashList: Array<UsCashEntry>
-  stockList: Array<UsStockEntry>
+  cashList: Array<USCashEntry>
+  stockList: Array<USStockEntry>
   optionList: Array<any>
-  cryptoList: Array<UsCryptoEntry>
+  cryptoList: Array<USCryptoEntry>
   multiLeg: any
 }
 
 /** One bracket/conditional sub-order attached to a main order. */
-export interface UsAttachedOrder {
+export interface USAttachedOrder {
   attachedTypeDisplay: number
   executedQty: string
   quantity: string
@@ -6814,14 +6824,14 @@ export interface UsAttachedOrder {
 }
 
 /** Action-button state for an order. */
-export interface UsButtonControl {
+export interface USButtonControl {
   withdraw: number
   replace: number
   exceptionable: Array<string>
 }
 
 /** One cash currency entry in USAssetOverview */
-export interface UsCashEntry {
+export interface USCashEntry {
   currency: string
   frozenBuyCash: string
   outstanding: string
@@ -6831,54 +6841,54 @@ export interface UsCashEntry {
 }
 
 /** Fee breakdown for an order. */
-export interface UsChargeDetail {
+export interface USChargeDetail {
   currency: string
   totalAmount: string
-  items: Array<UsChargeItem>
+  items: Array<USChargeItem>
 }
 
 /** One fee category within USChargeDetail. */
-export interface UsChargeItem {
+export interface USChargeItem {
   code: number
   name: string
   fees: Array<string>
 }
 
 /** US company dividends */
-export interface UsCompanyDividends {
-  recentDividends: UsRecentDividend
-  dividendHistory: Array<UsDividendHistoryItem>
-  payoutRatios: Array<UsDividendHistoryItem>
-  dividendPayoutHistory: Array<UsDividendPayoutRecord>
+export interface USCompanyDividends {
+  recentDividends: USRecentDividend
+  dividendHistory: Array<USDividendHistoryItem>
+  payoutRatios: Array<USDividendHistoryItem>
+  dividendPayoutHistory: Array<USDividendPayoutRecord>
 }
 
 /** US company overview */
-export interface UsCompanyOverview {
+export interface USCompanyOverview {
   intro: string
   marketCap: string
   ccySymbol: string
-  topRankTags: Array<UsRankTag>
+  topRankTags: Array<USRankTag>
   detailUrl: string
-  shareList: Array<UsSharelistItem>
+  shareList: Array<USSharelistItem>
 }
 
 /** Actual vs estimated value for one consensus metric. */
-export interface UsConsensusEstimate {
+export interface USConsensusEstimate {
   actual: string
   estimate: string
 }
 
 /** One fiscal-year entry in USAnalystConsensus.list. */
-export interface UsConsensusItem {
-  ebit: UsConsensusEstimate
-  eps: UsConsensusEstimate
+export interface USConsensusItem {
+  ebit: USConsensusEstimate
+  eps: USConsensusEstimate
   fiscalYear: number
   reportTxt: string
-  revenue: UsConsensusEstimate
+  revenue: USConsensusEstimate
 }
 
 /** One cryptocurrency holding in USAssetOverview */
-export interface UsCryptoEntry {
+export interface USCryptoEntry {
   assetType: string
   averageCost: string
   symbol: string
@@ -6887,7 +6897,7 @@ export interface UsCryptoEntry {
 }
 
 /** US cryptocurrency market overview */
-export interface UsCryptoOverview {
+export interface USCryptoOverview {
   name: string
   ticker: string
   currency: string
@@ -6909,7 +6919,7 @@ export interface UsCryptoOverview {
 }
 
 /** One fiscal-year row in dividend_history or payout_ratios. */
-export interface UsDividendHistoryItem {
+export interface USDividendHistoryItem {
   fiscalYear: string
   fiscalYearRange: string
   totalShareholderYield: string
@@ -6927,7 +6937,7 @@ export interface UsDividendHistoryItem {
 }
 
 /** US dividend item */
-export interface UsDividendItem {
+export interface USDividendItem {
   dividend: string
   dividendType: string
   exDate: string
@@ -6936,7 +6946,7 @@ export interface UsDividendItem {
 }
 
 /** One actual dividend payment event. */
-export interface UsDividendPayoutRecord {
+export interface USDividendPayoutRecord {
   dividend: string
   dividendType: string
   currency: string
@@ -6948,16 +6958,16 @@ export interface UsDividendPayoutRecord {
 }
 
 /** US ETF dividend info */
-export interface UsetfDividendInfo {
+export interface USETFDividendInfo {
   dividendTtm: string
   dividendYieldTtm: string
   dividendFrequency: string
   currency: string
-  fiscalYearInfo: Array<UsFiscalYearDividend>
+  fiscalYearInfo: Array<USFiscalYearDividend>
 }
 
 /** US ETF file */
-export interface UsetfFile {
+export interface USETFFile {
   fileName: string
   filePath: string
   updateDate: string
@@ -6966,53 +6976,53 @@ export interface UsetfFile {
 }
 
 /** US ETF files response */
-export interface UsetfFilesResponse {
-  files: Array<UsetfFile>
+export interface USETFFilesResponse {
+  files: Array<USETFFile>
 }
 
 /** One balance-sheet entry in USFinancialOverview. */
-export interface UsFinancialBsItem {
+export interface USFinancialBSItem {
   debtAssetsRatio: string
   totalAssets: string
   totalLiabilities: string
-  report: UsReportPeriod
+  report: USReportPeriod
 }
 
 /** One cash-flow entry in USFinancialOverview. */
-export interface UsFinancialCfItem {
+export interface USFinancialCFItem {
   operating: string
   investing: string
   financing: string
-  report: UsReportPeriod
+  report: USReportPeriod
 }
 
 /** One income-statement entry in USFinancialOverview. */
-export interface UsFinancialIsItem {
+export interface USFinancialISItem {
   revenue: string
   netIncome: string
   netMargin: string
-  report: UsReportPeriod
+  report: USReportPeriod
 }
 
 /** US financial overview — income statement, balance sheet, and cash flow. */
-export interface UsFinancialOverview {
+export interface USFinancialOverview {
   ccySymbol: string
   reportType: string
-  isList: Array<UsFinancialIsItem>
-  bsList: Array<UsFinancialBsItem>
-  cfList: Array<UsFinancialCfItem>
+  isList: Array<USFinancialISItem>
+  bsList: Array<USFinancialBSItem>
+  cfList: Array<USFinancialCFItem>
 }
 
 /** US financial statement */
-export interface UsFinancialStatement {
+export interface USFinancialStatement {
   currency: string
   report: string
-  list: Array<UsFinancialStatementPeriod>
+  list: Array<USFinancialStatementPeriod>
   emptyFields: Array<string>
 }
 
 /** One financial field within a USFinancialStatementPeriod. */
-export interface UsFinancialStatementField {
+export interface USFinancialStatementField {
   displayOrder: number
   field: string
   id: string
@@ -7024,17 +7034,17 @@ export interface UsFinancialStatementField {
 }
 
 /** One reporting period in USFinancialStatement. */
-export interface UsFinancialStatementPeriod {
+export interface USFinancialStatementPeriod {
   ffPeriod: string
   ffYear: number
-  fields: Array<UsFinancialStatementField>
+  fields: Array<USFinancialStatementField>
   fpEnd: string
   reportTxt: string
   rptDate: string
 }
 
 /** Per-fiscal-year dividend row for a US ETF. */
-export interface UsFiscalYearDividend {
+export interface USFiscalYearDividend {
   dividend: string
   dividendYield: string
   fiscalYear: string
@@ -7043,15 +7053,15 @@ export interface UsFiscalYearDividend {
 }
 
 /** US key financial metrics — ratios and indicators per reporting period. */
-export interface UsKeyFinancialMetrics {
+export interface USKeyFinancialMetrics {
   currency: string
   report: string
   emptyFields: Array<string>
-  list: Array<UsKeyMetricItem>
+  list: Array<USKeyMetricItem>
 }
 
 /** One period entry in USKeyFinancialMetrics. */
-export interface UsKeyMetricItem {
+export interface USKeyMetricItem {
   ffPeriod: string
   ffYear: number
   fpEnd: string
@@ -7061,7 +7071,7 @@ export interface UsKeyMetricItem {
 }
 
 /** Full typed order object within USOrderDetailResponse. */
-export interface UsOrderDetail {
+export interface USOrderDetail {
   id: string
   aaid: string
   accountChannel: string
@@ -7136,21 +7146,21 @@ export interface UsOrderDetail {
   strikePrice: string
   contractSize: string
   monitorPrice: string
-  buttonControl: UsButtonControl
-  chargeDetail?: UsChargeDetail
-  attachedOrders: Array<UsAttachedOrder>
-  orderHistories: Array<UsOrderHistory>
+  buttonControl: USButtonControl
+  chargeDetail?: USChargeDetail
+  attachedOrders: Array<USAttachedOrder>
+  orderHistories: Array<USOrderHistory>
 }
 
 /** Response for us_order_detail. */
-export interface UsOrderDetailResponse {
-  order?: UsOrderDetail
-  currentAttachedOrder?: UsOrderDetail
+export interface USOrderDetailResponse {
+  order?: USOrderDetail
+  currentAttachedOrder?: USOrderDetail
   currentMillisecond: string
 }
 
 /** One order state-transition entry within USOrderDetail. */
-export interface UsOrderHistory {
+export interface USOrderHistory {
   execType: number
   status: string
   price: string
@@ -7169,7 +7179,7 @@ export interface UsOrderHistory {
 }
 
 /** Industry rank tag */
-export interface UsRankTag {
+export interface USRankTag {
   key: string
   location: number
   title: string
@@ -7179,26 +7189,26 @@ export interface UsRankTag {
 }
 
 /** Realized P&L response for a US account */
-export interface UsRealizedPl {
-  realizedPlList: Array<UsRealizedPlEntry>
+export interface USRealizedPL {
+  realizedPlList: Array<USRealizedPLEntry>
 }
 
 /** One asset-category entry in USRealizedPL */
-export interface UsRealizedPlEntry {
+export interface USRealizedPLEntry {
   category: number
   currency: string
-  metrics: Array<UsRealizedPlMetric>
+  metrics: Array<USRealizedPLMetric>
 }
 
 /** One time-period metric in USRealizedPLEntry */
-export interface UsRealizedPlMetric {
+export interface USRealizedPLMetric {
   amount: string
   period: number
   rate: string
 }
 
 /** TTM dividend summary within USCompanyDividends. */
-export interface UsRecentDividend {
+export interface USRecentDividend {
   dividendTtm: string
   dividendYieldTtm: string
   payouts: string
@@ -7206,21 +7216,21 @@ export interface UsRecentDividend {
 }
 
 /** One reporting-period window shared by IS/BS/CF entries. */
-export interface UsReportPeriod {
+export interface USReportPeriod {
   startDate: string
   endDate: string
   reportTxt: string
 }
 
 /** One entry in USCompanyOverview.share_list. */
-export interface UsSharelistItem {
+export interface USSharelistItem {
   chg: string
   id: string
   name: string
 }
 
 /** One stock/equity position in USAssetOverview */
-export interface UsStockEntry {
+export interface USStockEntry {
   symbol: string
   fullSymbol: string
   assetType: string
@@ -7247,7 +7257,7 @@ export interface UsStockEntry {
 }
 
 /** One valuation metric entry in USValuationOverview.metrics */
-export interface UsValuationMetric {
+export interface USValuationMetric {
   circle: string
   part: string
   metric: string
@@ -7256,8 +7266,8 @@ export interface UsValuationMetric {
 }
 
 /** US valuation overview */
-export interface UsValuationOverview {
-  metrics: Record<string, UsValuationMetric>
+export interface USValuationOverview {
+  metrics: Record<string, USValuationMetric>
   indicator: string
   range: number
   date: string

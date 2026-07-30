@@ -881,7 +881,7 @@ pub struct EstimateMaxPurchaseQuantityResponse {
 // ── US-market types ──────────────────────────────────────────────────────────
 
 /// One cash currency entry in USAssetOverview
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USCashEntry")]
 #[derive(Debug, Clone, Default)]
 pub struct USCashEntry {
     pub currency: String,
@@ -906,7 +906,7 @@ impl From<longbridge::trade::USCashEntry> for USCashEntry {
 }
 
 /// One cryptocurrency holding in USAssetOverview
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USCryptoEntry")]
 #[derive(Debug, Clone, Default)]
 pub struct USCryptoEntry {
     pub asset_type: String,
@@ -929,7 +929,7 @@ impl From<longbridge::trade::USCryptoEntry> for USCryptoEntry {
 }
 
 /// One stock/equity position in USAssetOverview
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USStockEntry")]
 #[derive(Debug, Clone, Default)]
 pub struct USStockEntry {
     pub symbol: String,
@@ -988,7 +988,7 @@ impl From<longbridge::trade::USStockEntry> for USStockEntry {
 }
 
 /// US account asset snapshot
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USAssetOverview")]
 #[derive(Debug, Clone, Default)]
 pub struct USAssetOverview {
     pub account_type: String,
@@ -1024,7 +1024,7 @@ impl From<longbridge::trade::USAssetOverview> for USAssetOverview {
 }
 
 /// One time-period metric in USRealizedPLEntry
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USRealizedPLMetric")]
 #[derive(Debug, Clone, Default)]
 pub struct USRealizedPLMetric {
     pub amount: String,
@@ -1043,7 +1043,7 @@ impl From<longbridge::trade::USRealizedPLMetric> for USRealizedPLMetric {
 }
 
 /// One asset-category entry in USRealizedPL
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USRealizedPLEntry")]
 #[derive(Debug, Clone, Default)]
 pub struct USRealizedPLEntry {
     pub category: i32,
@@ -1062,7 +1062,7 @@ impl From<longbridge::trade::USRealizedPLEntry> for USRealizedPLEntry {
 }
 
 /// Realized P&L response for a US account
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USRealizedPL")]
 #[derive(Debug, Clone, Default)]
 pub struct USRealizedPL {
     pub realized_pl_list: Vec<USRealizedPLEntry>,
@@ -1077,7 +1077,7 @@ impl From<longbridge::trade::USRealizedPL> for USRealizedPL {
 }
 
 /// One order state-transition entry within USOrderDetail.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USOrderHistory")]
 #[derive(Debug, Clone, Default)]
 pub struct USOrderHistory {
     pub exec_type: i32,
@@ -1120,7 +1120,7 @@ impl From<longbridge::trade::USOrderHistory> for USOrderHistory {
 }
 
 /// Action-button state for an order.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USButtonControl")]
 #[derive(Debug, Clone, Default)]
 pub struct USButtonControl {
     pub withdraw: i32,
@@ -1139,7 +1139,7 @@ impl From<longbridge::trade::USButtonControl> for USButtonControl {
 }
 
 /// One fee category within USChargeDetail.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USChargeItem")]
 #[derive(Debug, Clone, Default)]
 pub struct USChargeItem {
     pub code: i32,
@@ -1158,7 +1158,7 @@ impl From<longbridge::trade::USChargeItem> for USChargeItem {
 }
 
 /// Fee breakdown for an order.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USChargeDetail")]
 #[derive(Debug, Clone, Default)]
 pub struct USChargeDetail {
     pub currency: String,
@@ -1177,7 +1177,7 @@ impl From<longbridge::trade::USChargeDetail> for USChargeDetail {
 }
 
 /// One bracket/conditional sub-order attached to a main order.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USAttachedOrder")]
 #[derive(Debug, Clone, Default)]
 pub struct USAttachedOrder {
     pub attached_type_display: i32,
@@ -1218,7 +1218,7 @@ impl From<longbridge::trade::USAttachedOrder> for USAttachedOrder {
 }
 
 /// Full typed order object within USOrderDetailResponse.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USOrderDetail")]
 #[derive(Debug, Clone, Default)]
 pub struct USOrderDetail {
     pub id: String,
@@ -1387,7 +1387,7 @@ impl From<longbridge::trade::USOrderDetail> for USOrderDetail {
 }
 
 /// Response for us_order_detail.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USOrderDetailResponse")]
 #[derive(Debug, Clone, Default)]
 pub struct USOrderDetailResponse {
     pub order: Option<USOrderDetail>,

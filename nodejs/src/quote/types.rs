@@ -1657,7 +1657,7 @@ pub struct OptionVolumeDailyStat {
 }
 
 /// US cryptocurrency market overview
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USCryptoOverview")]
 #[derive(Debug, Clone)]
 pub struct USCryptoOverview {
     pub name: String,

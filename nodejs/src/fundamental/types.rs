@@ -2064,7 +2064,7 @@ impl From<lb::MacroeconomicResponse> for MacroeconomicResponse {
 use longbridge::fundamental::types as lb_us;
 
 /// Industry rank tag
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USRankTag")]
 #[derive(Debug, Clone)]
 pub struct USRankTag {
     pub key: String,
@@ -2089,7 +2089,7 @@ impl From<lb_us::USRankTag> for USRankTag {
 }
 
 /// One entry in USCompanyOverview.share_list.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USSharelistItem")]
 #[derive(Debug, Clone)]
 pub struct USSharelistItem {
     pub chg: String,
@@ -2108,7 +2108,7 @@ impl From<lb_us::USSharelistItem> for USSharelistItem {
 }
 
 /// US company overview
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USCompanyOverview")]
 #[derive(Debug, Clone)]
 pub struct USCompanyOverview {
     pub intro: String,
@@ -2133,7 +2133,7 @@ impl From<lb_us::USCompanyOverview> for USCompanyOverview {
 }
 
 /// One valuation metric entry in USValuationOverview.metrics
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USValuationMetric")]
 #[derive(Debug, Clone)]
 pub struct USValuationMetric {
     pub circle: String,
@@ -2156,7 +2156,7 @@ impl From<lb_us::USValuationMetric> for USValuationMetric {
 }
 
 /// US valuation overview
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USValuationOverview")]
 #[derive(Debug, Clone)]
 pub struct USValuationOverview {
     pub metrics: std::collections::HashMap<String, USValuationMetric>,
@@ -2187,7 +2187,7 @@ impl From<lb_us::USValuationOverview> for USValuationOverview {
 }
 
 /// One financial field within a USFinancialStatementPeriod.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFinancialStatementField")]
 #[derive(Debug, Clone)]
 pub struct USFinancialStatementField {
     pub display_order: i32,
@@ -2216,7 +2216,7 @@ impl From<lb_us::USFinancialStatementField> for USFinancialStatementField {
 }
 
 /// One reporting period in USFinancialStatement.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFinancialStatementPeriod")]
 #[derive(Debug, Clone)]
 pub struct USFinancialStatementPeriod {
     pub ff_period: String,
@@ -2241,7 +2241,7 @@ impl From<lb_us::USFinancialStatementPeriod> for USFinancialStatementPeriod {
 }
 
 /// US financial statement
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFinancialStatement")]
 #[derive(Debug, Clone)]
 pub struct USFinancialStatement {
     pub currency: String,
@@ -2262,7 +2262,7 @@ impl From<lb_us::USFinancialStatement> for USFinancialStatement {
 }
 
 /// Per-fiscal-year dividend row for a US ETF.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFiscalYearDividend")]
 #[derive(Debug, Clone)]
 pub struct USFiscalYearDividend {
     pub dividend: String,
@@ -2285,7 +2285,7 @@ impl From<lb_us::USFiscalYearDividend> for USFiscalYearDividend {
 }
 
 /// US ETF dividend info
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USETFDividendInfo")]
 #[derive(Debug, Clone)]
 pub struct USETFDividendInfo {
     pub dividend_ttm: String,
@@ -2308,7 +2308,7 @@ impl From<lb_us::USETFDividendInfo> for USETFDividendInfo {
 }
 
 /// US dividend item
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USDividendItem")]
 #[derive(Debug, Clone)]
 pub struct USDividendItem {
     pub dividend: String,
@@ -2331,7 +2331,7 @@ impl From<lb_us::USDividendItem> for USDividendItem {
 }
 
 /// TTM dividend summary within USCompanyDividends.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USRecentDividend")]
 #[derive(Debug, Clone)]
 pub struct USRecentDividend {
     pub dividend_ttm: String,
@@ -2352,7 +2352,7 @@ impl From<lb_us::USRecentDividend> for USRecentDividend {
 }
 
 /// One fiscal-year row in dividend_history or payout_ratios.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USDividendHistoryItem")]
 #[derive(Debug, Clone)]
 pub struct USDividendHistoryItem {
     pub fiscal_year: String,
@@ -2393,7 +2393,7 @@ impl From<lb_us::USDividendHistoryItem> for USDividendHistoryItem {
 }
 
 /// One actual dividend payment event.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USDividendPayoutRecord")]
 #[derive(Debug, Clone)]
 pub struct USDividendPayoutRecord {
     pub dividend: String,
@@ -2422,7 +2422,7 @@ impl From<lb_us::USDividendPayoutRecord> for USDividendPayoutRecord {
 }
 
 /// US company dividends
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USCompanyDividends")]
 #[derive(Debug, Clone)]
 pub struct USCompanyDividends {
     pub recent_dividends: USRecentDividend,
@@ -2447,7 +2447,7 @@ impl From<lb_us::USCompanyDividends> for USCompanyDividends {
 }
 
 /// US ETF file
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USETFFile")]
 #[derive(Debug, Clone)]
 pub struct USETFFile {
     pub file_name: String,
@@ -2470,7 +2470,7 @@ impl From<lb_us::USETFFile> for USETFFile {
 }
 
 /// US ETF files response
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USETFFilesResponse")]
 #[derive(Debug, Clone)]
 pub struct USETFFilesResponse {
     pub files: Vec<USETFFile>,
@@ -2485,7 +2485,7 @@ impl From<lb_us::USETFFilesResponse> for USETFFilesResponse {
 }
 
 /// One reporting-period window shared by IS/BS/CF entries.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USReportPeriod")]
 #[derive(Debug, Clone)]
 pub struct USReportPeriod {
     pub start_date: String,
@@ -2504,7 +2504,7 @@ impl From<lb_us::USReportPeriod> for USReportPeriod {
 }
 
 /// One income-statement entry in USFinancialOverview.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFinancialISItem")]
 #[derive(Debug, Clone)]
 pub struct USFinancialISItem {
     pub revenue: String,
@@ -2525,7 +2525,7 @@ impl From<lb_us::USFinancialISItem> for USFinancialISItem {
 }
 
 /// One balance-sheet entry in USFinancialOverview.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFinancialBSItem")]
 #[derive(Debug, Clone)]
 pub struct USFinancialBSItem {
     pub debt_assets_ratio: String,
@@ -2546,7 +2546,7 @@ impl From<lb_us::USFinancialBSItem> for USFinancialBSItem {
 }
 
 /// One cash-flow entry in USFinancialOverview.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFinancialCFItem")]
 #[derive(Debug, Clone)]
 pub struct USFinancialCFItem {
     pub operating: String,
@@ -2567,7 +2567,7 @@ impl From<lb_us::USFinancialCFItem> for USFinancialCFItem {
 }
 
 /// US financial overview — income statement, balance sheet, and cash flow.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USFinancialOverview")]
 #[derive(Debug, Clone)]
 pub struct USFinancialOverview {
     pub ccy_symbol: String,
@@ -2590,7 +2590,7 @@ impl From<lb_us::USFinancialOverview> for USFinancialOverview {
 }
 
 /// One period entry in USKeyFinancialMetrics.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USKeyMetricItem")]
 #[derive(Debug, Clone)]
 pub struct USKeyMetricItem {
     pub ff_period: String,
@@ -2615,7 +2615,7 @@ impl From<lb_us::USKeyMetricItem> for USKeyMetricItem {
 }
 
 /// US key financial metrics — ratios and indicators per reporting period.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USKeyFinancialMetrics")]
 #[derive(Debug, Clone)]
 pub struct USKeyFinancialMetrics {
     pub currency: String,
@@ -2636,7 +2636,7 @@ impl From<lb_us::USKeyFinancialMetrics> for USKeyFinancialMetrics {
 }
 
 /// AI chat context embedded in USAnalystConsensus.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USAIChatData")]
 #[derive(Debug, Clone)]
 pub struct USAIChatData {
     pub agent_id: String,
@@ -2661,7 +2661,7 @@ impl From<lb_us::USAIChatData> for USAIChatData {
 }
 
 /// Actual vs estimated value for one consensus metric.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USConsensusEstimate")]
 #[derive(Debug, Clone)]
 pub struct USConsensusEstimate {
     pub actual: String,
@@ -2678,7 +2678,7 @@ impl From<lb_us::USConsensusEstimate> for USConsensusEstimate {
 }
 
 /// One fiscal-year entry in USAnalystConsensus.list.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USConsensusItem")]
 #[derive(Debug, Clone)]
 pub struct USConsensusItem {
     pub ebit: USConsensusEstimate,
@@ -2701,7 +2701,7 @@ impl From<lb_us::USConsensusItem> for USConsensusItem {
 }
 
 /// US analyst consensus estimates and AI analysis.
-#[napi_derive::napi(object)]
+#[napi_derive::napi(object, js_name = "USAnalystConsensus")]
 #[derive(Debug, Clone)]
 pub struct USAnalystConsensus {
     pub ai_summary: String,
