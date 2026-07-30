@@ -1840,7 +1840,8 @@ mod tests {
                 "quantity": "100",
                 "symbol": "700.HK",
                 "trade_done_at": "1648611351",
-                "trade_id": "693664675163312128-1648611351433741210"
+                "trade_id": "693664675163312128-1648611351433741210",
+                "side": "Buy"
               }
             ]
           }
@@ -1861,6 +1862,7 @@ mod tests {
         assert_eq!(execution.symbol, "700.HK");
         assert_eq!(execution.trade_done_at, datetime!(2022-03-30 11:35:51 +8));
         assert_eq!(execution.trade_id, "693664675163312128-1648611351433741210");
+        assert_eq!(execution.side, OrderSide::Buy);
     }
 
     #[test]
