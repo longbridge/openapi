@@ -1136,6 +1136,8 @@ export declare class OptionVolumeDaily {
 export declare class OptionVolumeDailyStat {
   toString(): string
   toJSON(): any
+  /** Underlying security symbol */
+  get symbol(): string
   /** Trading date */
   get date(): NaiveDate
   /** Call volume */
@@ -1146,6 +1148,10 @@ export declare class OptionVolumeDailyStat {
   get callOpenInterest(): number
   /** Put open interest */
   get putOpenInterest(): number
+  /** Total options volume (calls + puts) */
+  get totalVolume(): number
+  /** Total open interest (calls + puts) */
+  get totalOpenInterest(): number
   /** Put/call volume ratio */
   get pcVol(): number
   /** Put/call OI ratio */
@@ -5417,14 +5423,6 @@ export interface OptionVolumeStats {
   callVolume: number
   /** Total put volume */
   putVolume: number
-  /** Total call open interest */
-  callOpenInterest: number
-  /** Total put open interest */
-  putOpenInterest: number
-  /** Put/call volume ratio */
-  pcVol: number
-  /** Put/call open interest ratio */
-  pcOi: number
 }
 
 export declare const enum OrderSide {

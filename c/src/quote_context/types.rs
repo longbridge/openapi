@@ -3313,24 +3313,12 @@ pub struct COptionVolumeStats {
     pub call_volume: i64,
     /// Total put volume
     pub put_volume: i64,
-    /// Total call open interest
-    pub call_open_interest: i64,
-    /// Total put open interest
-    pub put_open_interest: i64,
-    /// Put/call volume ratio
-    pub pc_vol: f64,
-    /// Put/call open interest ratio
-    pub pc_oi: f64,
 }
 
 pub(crate) struct COptionVolumeStatsOwned {
     symbol: CString,
     call_volume: i64,
     put_volume: i64,
-    call_open_interest: i64,
-    put_open_interest: i64,
-    pc_vol: f64,
-    pc_oi: f64,
 }
 
 impl From<OptionVolumeStats> for COptionVolumeStatsOwned {
@@ -3339,10 +3327,6 @@ impl From<OptionVolumeStats> for COptionVolumeStatsOwned {
             symbol: v.symbol.into(),
             call_volume: v.call_volume,
             put_volume: v.put_volume,
-            call_open_interest: v.call_open_interest,
-            put_open_interest: v.put_open_interest,
-            pc_vol: v.pc_vol,
-            pc_oi: v.pc_oi,
         }
     }
 }
@@ -3354,10 +3338,6 @@ impl ToFFI for COptionVolumeStatsOwned {
             symbol: self.symbol.to_ffi_type(),
             call_volume: self.call_volume,
             put_volume: self.put_volume,
-            call_open_interest: self.call_open_interest,
-            put_open_interest: self.put_open_interest,
-            pc_vol: self.pc_vol,
-            pc_oi: self.pc_oi,
         }
     }
 }
@@ -3366,8 +3346,9 @@ impl ToFFI for COptionVolumeStatsOwned {
 
 /// One day's option volume statistics
 #[repr(C)]
-#[derive(Copy, Clone)]
 pub struct COptionVolumeDailyStat {
+    /// Underlying security symbol
+    pub symbol: *const c_char,
     /// Trading date
     pub date: CDate,
     /// Call volume
@@ -3378,30 +3359,61 @@ pub struct COptionVolumeDailyStat {
     pub call_open_interest: i64,
     /// Put open interest
     pub put_open_interest: i64,
+    /// Total options volume (calls + puts)
+    pub total_volume: i64,
+    /// Total open interest (calls + puts)
+    pub total_open_interest: i64,
     /// Put/call volume ratio
     pub pc_vol: f64,
     /// Put/call open interest ratio
     pub pc_oi: f64,
 }
 
-impl From<OptionVolumeDailyStat> for COptionVolumeDailyStat {
+pub(crate) struct COptionVolumeDailyStatOwned {
+    symbol: CString,
+    date: CDate,
+    call_volume: i64,
+    put_volume: i64,
+    call_open_interest: i64,
+    put_open_interest: i64,
+    total_volume: i64,
+    total_open_interest: i64,
+    pc_vol: f64,
+    pc_oi: f64,
+}
+
+impl From<OptionVolumeDailyStat> for COptionVolumeDailyStatOwned {
     fn from(v: OptionVolumeDailyStat) -> Self {
         Self {
+            symbol: v.symbol.into(),
             date: v.date.into(),
             call_volume: v.call_volume,
             put_volume: v.put_volume,
             call_open_interest: v.call_open_interest,
             put_open_interest: v.put_open_interest,
+            total_volume: v.total_volume,
+            total_open_interest: v.total_open_interest,
             pc_vol: v.pc_vol,
             pc_oi: v.pc_oi,
         }
     }
 }
 
-impl ToFFI for COptionVolumeDailyStat {
+impl ToFFI for COptionVolumeDailyStatOwned {
     type FFIType = COptionVolumeDailyStat;
     fn to_ffi_type(&self) -> Self::FFIType {
-        *self
+        COptionVolumeDailyStat {
+            symbol: self.symbol.to_ffi_type(),
+            date: self.date,
+            call_volume: self.call_volume,
+            put_volume: self.put_volume,
+            call_open_interest: self.call_open_interest,
+            put_open_interest: self.put_open_interest,
+            total_volume: self.total_volume,
+            total_open_interest: self.total_open_interest,
+            pc_vol: self.pc_vol,
+            pc_oi: self.pc_oi,
+        }
     }
 }
 
@@ -3418,19 +3430,23 @@ pub struct COptionVolumeDaily {
 
 pub(crate) struct COptionVolumeDailyOwned {
     symbol: CString,
-    stats: CVec<COptionVolumeDailyStat>,
+    stats: Vec<COptionVolumeDailyStatOwned>,
+    stats_ffi: Vec<COptionVolumeDailyStat>,
 }
 
 impl From<OptionVolumeDaily> for COptionVolumeDailyOwned {
     fn from(v: OptionVolumeDaily) -> Self {
+        let stats: Vec<COptionVolumeDailyStatOwned> = v
+            .stats
+            .into_iter()
+            .map(COptionVolumeDailyStatOwned::from)
+            .collect();
+        let stats_ffi: Vec<COptionVolumeDailyStat> =
+            stats.iter().map(|s| s.to_ffi_type()).collect();
         Self {
             symbol: v.symbol.into(),
-            stats: v
-                .stats
-                .into_iter()
-                .map(COptionVolumeDailyStat::from)
-                .collect::<Vec<_>>()
-                .into(),
+            stats,
+            stats_ffi,
         }
     }
 }
@@ -3440,8 +3456,12 @@ impl ToFFI for COptionVolumeDailyOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         COptionVolumeDaily {
             symbol: self.symbol.to_ffi_type(),
-            stats: self.stats.to_ffi_type(),
-            num_stats: self.stats.len(),
+            stats: if self.stats_ffi.is_empty() {
+                std::ptr::null()
+            } else {
+                self.stats_ffi.as_ptr()
+            },
+            num_stats: self.stats_ffi.len(),
         }
     }
 }

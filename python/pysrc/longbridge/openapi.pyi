@@ -12725,19 +12725,13 @@ class OptionVolumeStats:
     """Total call volume"""
     put_volume: int
     """Total put volume"""
-    call_open_interest: int
-    """Total call open interest"""
-    put_open_interest: int
-    """Total put open interest"""
-    pc_vol: float
-    """Put/call volume ratio"""
-    pc_oi: float
-    """Put/call open interest ratio"""
 
 
 class OptionVolumeDailyStat:
     """One day's option volume statistics."""
 
+    symbol: str
+    """Underlying security symbol"""
     date: date
     """Trading date"""
     call_volume: int
@@ -12748,6 +12742,10 @@ class OptionVolumeDailyStat:
     """Call open interest"""
     put_open_interest: int
     """Put open interest"""
+    total_volume: int
+    """Total options volume (calls + puts)"""
+    total_open_interest: int
+    """Total open interest (calls + puts)"""
     pc_vol: float
     """Put/call volume ratio"""
     pc_oi: float

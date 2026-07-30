@@ -2079,16 +2079,6 @@ pub struct OptionVolumeStats {
     pub call_volume: i64,
     /// Total put volume
     pub put_volume: i64,
-    /// Total call open interest
-    pub call_open_interest: i64,
-    /// Total put open interest
-    pub put_open_interest: i64,
-    /// Put/call volume ratio
-    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
-    pub pc_vol: f64,
-    /// Put/call open interest ratio
-    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
-    pub pc_oi: f64,
 }
 
 // ── option_volume_daily ───────────────────────────────────────────
@@ -2099,15 +2089,15 @@ pub struct OptionVolumeDaily {
     /// Underlying security symbol
     pub symbol: String,
     /// Daily option volume records
-    #[serde(rename = "list")]
     pub stats: Vec<OptionVolumeDailyStat>,
 }
 
 /// One day's option volume statistics
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OptionVolumeDailyStat {
+    /// Underlying security symbol
+    pub symbol: String,
     /// Trading date
-    #[serde(deserialize_with = "crate::serde_utils::date::deserialize")]
     pub date: Date,
     /// Call volume
     pub call_volume: i64,
@@ -2117,11 +2107,13 @@ pub struct OptionVolumeDailyStat {
     pub call_open_interest: i64,
     /// Put open interest
     pub put_open_interest: i64,
+    /// Total options volume (calls + puts)
+    pub total_volume: i64,
+    /// Total open interest (calls + puts)
+    pub total_open_interest: i64,
     /// Put/call volume ratio
-    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
     pub pc_vol: f64,
     /// Put/call open interest ratio
-    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
     pub pc_oi: f64,
 }
 

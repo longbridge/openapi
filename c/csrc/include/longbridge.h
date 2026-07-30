@@ -9751,28 +9751,16 @@ typedef struct lb_option_volume_stats_t {
    * Total put volume
    */
   int64_t put_volume;
-  /**
-   * Total call open interest
-   */
-  int64_t call_open_interest;
-  /**
-   * Total put open interest
-   */
-  int64_t put_open_interest;
-  /**
-   * Put/call volume ratio
-   */
-  double pc_vol;
-  /**
-   * Put/call open interest ratio
-   */
-  double pc_oi;
 } lb_option_volume_stats_t;
 
 /**
  * One day's option volume statistics
  */
 typedef struct lb_option_volume_daily_stat_t {
+  /**
+   * Underlying security symbol
+   */
+  const char *symbol;
   /**
    * Trading date
    */
@@ -9793,6 +9781,14 @@ typedef struct lb_option_volume_daily_stat_t {
    * Put open interest
    */
   int64_t put_open_interest;
+  /**
+   * Total options volume (calls + puts)
+   */
+  int64_t total_volume;
+  /**
+   * Total open interest (calls + puts)
+   */
+  int64_t total_open_interest;
   /**
    * Put/call volume ratio
    */

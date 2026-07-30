@@ -1599,14 +1599,6 @@ pub struct OptionVolumeStats {
     pub call_volume: i64,
     /// Total put volume
     pub put_volume: i64,
-    /// Total call open interest
-    pub call_open_interest: i64,
-    /// Total put open interest
-    pub put_open_interest: i64,
-    /// Put/call volume ratio
-    pub pc_vol: f64,
-    /// Put/call open interest ratio
-    pub pc_oi: f64,
 }
 
 impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
@@ -1615,10 +1607,6 @@ impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
             symbol: v.symbol,
             call_volume: v.call_volume,
             put_volume: v.put_volume,
-            call_open_interest: v.call_open_interest,
-            put_open_interest: v.put_open_interest,
-            pc_vol: v.pc_vol,
-            pc_oi: v.pc_oi,
         }
     }
 }
@@ -1640,6 +1628,8 @@ pub struct OptionVolumeDaily {
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::quote::OptionVolumeDailyStat")]
 pub struct OptionVolumeDailyStat {
+    /// Underlying security symbol
+    symbol: String,
     /// Trading date
     date: NaiveDate,
     /// Call volume
@@ -1650,6 +1640,10 @@ pub struct OptionVolumeDailyStat {
     call_open_interest: i64,
     /// Put open interest
     put_open_interest: i64,
+    /// Total options volume (calls + puts)
+    total_volume: i64,
+    /// Total open interest (calls + puts)
+    total_open_interest: i64,
     /// Put/call volume ratio
     pc_vol: f64,
     /// Put/call OI ratio

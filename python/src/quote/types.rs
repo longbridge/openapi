@@ -1557,14 +1557,6 @@ pub(crate) struct OptionVolumeStats {
     pub call_volume: i64,
     /// Total put volume
     pub put_volume: i64,
-    /// Total call open interest
-    pub call_open_interest: i64,
-    /// Total put open interest
-    pub put_open_interest: i64,
-    /// Put/call volume ratio
-    pub pc_vol: f64,
-    /// Put/call open interest ratio
-    pub pc_oi: f64,
 }
 
 impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
@@ -1573,10 +1565,6 @@ impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
             symbol: v.symbol,
             call_volume: v.call_volume,
             put_volume: v.put_volume,
-            call_open_interest: v.call_open_interest,
-            put_open_interest: v.put_open_interest,
-            pc_vol: v.pc_vol,
-            pc_oi: v.pc_oi,
         }
     }
 }
@@ -1604,6 +1592,8 @@ impl From<longbridge::quote::OptionVolumeDaily> for OptionVolumeDaily {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OptionVolumeDailyStat {
+    /// Underlying security symbol
+    pub symbol: String,
     /// Trading date
     pub date: PyDateWrapper,
     /// Call volume
@@ -1614,6 +1604,10 @@ pub(crate) struct OptionVolumeDailyStat {
     pub call_open_interest: i64,
     /// Put open interest
     pub put_open_interest: i64,
+    /// Total options volume (calls + puts)
+    pub total_volume: i64,
+    /// Total open interest (calls + puts)
+    pub total_open_interest: i64,
     /// Put/call volume ratio
     pub pc_vol: f64,
     /// Put/call OI ratio
@@ -1623,11 +1617,14 @@ pub(crate) struct OptionVolumeDailyStat {
 impl From<longbridge::quote::OptionVolumeDailyStat> for OptionVolumeDailyStat {
     fn from(v: longbridge::quote::OptionVolumeDailyStat) -> Self {
         Self {
+            symbol: v.symbol,
             date: v.date.into(),
             call_volume: v.call_volume,
             put_volume: v.put_volume,
             call_open_interest: v.call_open_interest,
             put_open_interest: v.put_open_interest,
+            total_volume: v.total_volume,
+            total_open_interest: v.total_open_interest,
             pc_vol: v.pc_vol,
             pc_oi: v.pc_oi,
         }

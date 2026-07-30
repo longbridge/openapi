@@ -17,13 +17,13 @@ use crate::{
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily, OptionVolumeStats,
-        ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
-        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
-        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        ShortPositionsItem, ShortPositionsResponse, ShortTradesItem, ShortTradesResponse,
-        StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote,
-        WarrantType, WatchlistGroup,
+        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily,
+        OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period, PushEvent,
+        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsItem,
+        ShortPositionsResponse, ShortTradesItem, ShortTradesResponse, StrikePriceInfo,
+        Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
@@ -2071,18 +2071,29 @@ impl QuoteContext {
         struct Query {
             underlying_counter_id: String,
         }
+        #[derive(serde::Deserialize)]
+        struct RawOptionVolumeStats {
+            c: String,
+            p: String,
+        }
+        let symbol = symbol.into();
         let resp = self
             .0
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats")
             .query_params(Query {
-                underlying_counter_id: symbol_to_counter_id(&symbol.into()),
+                underlying_counter_id: symbol_to_counter_id(&symbol),
             })
-            .response::<Json<OptionVolumeStats>>()
+            .response::<Json<RawOptionVolumeStats>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?;
-        Ok(resp.0)
+        let raw = resp.0;
+        Ok(OptionVolumeStats {
+            symbol,
+            call_volume: raw.c.parse().unwrap_or(0),
+            put_volume: raw.p.parse().unwrap_or(0),
+        })
     }
 
     /// Get daily historical option volume for a security.
@@ -2094,7 +2105,7 @@ impl QuoteContext {
         timestamp: i64,
         count: u32,
     ) -> Result<OptionVolumeDaily> {
-        use crate::utils::counter::symbol_to_counter_id;
+        use crate::utils::counter::{counter_id_to_symbol, symbol_to_counter_id};
         #[derive(serde::Serialize)]
         struct Query {
             counter_id: String,
@@ -2102,21 +2113,63 @@ impl QuoteContext {
             line_num: u32,
             direction: i32,
         }
+        #[derive(serde::Deserialize)]
+        struct RawDailyStat {
+            underlying_counter_id: String,
+            timestamp: String,
+            total_call_volume: String,
+            total_put_volume: String,
+            total_call_open_interest: String,
+            total_put_open_interest: String,
+            total_volume: String,
+            total_open_interest: String,
+            #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
+            put_call_volume_ratio: f64,
+            #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
+            put_call_open_interest_ratio: f64,
+        }
+        #[derive(serde::Deserialize)]
+        struct RawOptionVolumeDaily {
+            stats: Vec<RawDailyStat>,
+        }
+        let symbol = symbol.into();
         let resp = self
             .0
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats/daily")
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                counter_id: symbol_to_counter_id(&symbol),
                 timestamp,
                 line_num: count,
                 direction: 1,
             })
-            .response::<Json<OptionVolumeDaily>>()
+            .response::<Json<RawOptionVolumeDaily>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?;
-        Ok(resp.0)
+        let raw = resp.0;
+        let stats = raw
+            .stats
+            .into_iter()
+            .map(|item| {
+                let ts: i64 = item.timestamp.parse().unwrap_or(0);
+                OptionVolumeDailyStat {
+                    symbol: counter_id_to_symbol(&item.underlying_counter_id),
+                    date: time::OffsetDateTime::from_unix_timestamp(ts)
+                        .unwrap_or(time::OffsetDateTime::UNIX_EPOCH)
+                        .date(),
+                    call_volume: item.total_call_volume.parse().unwrap_or(0),
+                    put_volume: item.total_put_volume.parse().unwrap_or(0),
+                    call_open_interest: item.total_call_open_interest.parse().unwrap_or(0),
+                    put_open_interest: item.total_put_open_interest.parse().unwrap_or(0),
+                    total_volume: item.total_volume.parse().unwrap_or(0),
+                    total_open_interest: item.total_open_interest.parse().unwrap_or(0),
+                    pc_vol: item.put_call_volume_ratio,
+                    pc_oi: item.put_call_open_interest_ratio,
+                }
+            })
+            .collect();
+        Ok(OptionVolumeDaily { symbol, stats })
     }
     // ── short_trades ──────────────────────────────────────────────
 

@@ -2322,15 +2322,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/quote/OptionVolumeStats",
     longbridge::quote::OptionVolumeStats,
-    [
-        symbol,
-        call_volume,
-        put_volume,
-        call_open_interest,
-        put_open_interest,
-        pc_vol,
-        pc_oi
-    ]
+    [symbol, call_volume, put_volume]
 );
 
 impl_java_class!(
@@ -2347,11 +2339,14 @@ impl_java_class!(
     "com/longbridge/quote/OptionVolumeDailyStat",
     longbridge::quote::OptionVolumeDailyStat,
     [
+        symbol,
         date,
         call_volume,
         put_volume,
         call_open_interest,
         put_open_interest,
+        total_volume,
+        total_open_interest,
         pc_vol,
         pc_oi
     ]
