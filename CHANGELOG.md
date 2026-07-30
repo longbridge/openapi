@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.2] - 2026-07-30
+
 ### Added
 
 - **All languages:** corrected `OptionVolumeStats` and `OptionVolumeDailyStat` to match the actual API response — fields now are `symbol`, `call_volume`, `put_volume`, `call_open_interest`, `put_open_interest`, `pc_vol` (f32/float), `pc_oi` (f32/float); `OptionVolumeDaily` gains a top-level `symbol` field; `OptionVolumeDailyStat` date field renamed from `timestamp` to `date` (YYYY-MM-DD string)
