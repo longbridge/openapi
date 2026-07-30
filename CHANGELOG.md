@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **All languages:** corrected `OptionVolumeStats` and `OptionVolumeDailyStat` to match the actual API response — fields now are `symbol`, `call_volume`, `put_volume`, `call_open_interest`, `put_open_interest`, `pc_vol` (f32/float), `pc_oi` (f32/float); `OptionVolumeDaily` gains a top-level `symbol` field; `OptionVolumeDailyStat` date field renamed from `timestamp` to `date` (YYYY-MM-DD string)
+- **Python SDK:** added missing `option_volume` and `option_volume_daily` stub definitions to `openapi.pyi` — `QuoteContext` and `AsyncQuoteContext` now expose correct signatures and docstrings for these methods
 - **All languages:** attached order (take-profit / stop-loss) support for `submit_order` and `replace_order`
   - New types: `AttachedOrderType` (`ProfitTaker` / `StopLoss` / `Bracket`), `AttachedOrderDetail`, `SubmitAttachedParams`, `ReplaceAttachedParams`
   - `SubmitOrderOptions` / `ReplaceOrderOptions`: new `attached_params` field

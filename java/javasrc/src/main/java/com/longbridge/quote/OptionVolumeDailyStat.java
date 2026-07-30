@@ -1,14 +1,13 @@
 package com.longbridge.quote;
 
+import java.time.LocalDate;
+
 public class OptionVolumeDailyStat {
-    public String symbol;
-    public String timestamp;
-    public String totalVolume;
-    public String totalPutVolume;
-    public String totalCallVolume;
-    public String putCallVolumeRatio;
-    public String totalOpenInterest;
-    public String totalPutOpenInterest;
-    public String totalCallOpenInterest;
-    public String putCallOpenInterestRatio;
+    public LocalDate date;
+    public long callVolume;
+    public long putVolume;
+    public long callOpenInterest;
+    public long putOpenInterest;
+    public double pcVol;
+    public double pcOi;
 }

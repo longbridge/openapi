@@ -1551,15 +1551,33 @@ impl From<longbridge::quote::ShortTradesResponse> for ShortTradesResponse {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OptionVolumeStats {
-    /// Call volume string
-    pub c: String,
-    /// Put volume string
-    pub p: String,
+    /// Underlying security symbol
+    pub symbol: String,
+    /// Total call volume
+    pub call_volume: i64,
+    /// Total put volume
+    pub put_volume: i64,
+    /// Total call open interest
+    pub call_open_interest: i64,
+    /// Total put open interest
+    pub put_open_interest: i64,
+    /// Put/call volume ratio
+    pub pc_vol: f64,
+    /// Put/call open interest ratio
+    pub pc_oi: f64,
 }
 
 impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
     fn from(v: longbridge::quote::OptionVolumeStats) -> Self {
-        Self { c: v.c, p: v.p }
+        Self {
+            symbol: v.symbol,
+            call_volume: v.call_volume,
+            put_volume: v.put_volume,
+            call_open_interest: v.call_open_interest,
+            put_open_interest: v.put_open_interest,
+            pc_vol: v.pc_vol,
+            pc_oi: v.pc_oi,
+        }
     }
 }
 
@@ -1567,6 +1585,8 @@ impl From<longbridge::quote::OptionVolumeStats> for OptionVolumeStats {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OptionVolumeDaily {
+    /// Underlying security symbol
+    pub symbol: String,
     /// Daily stats
     pub stats: Vec<OptionVolumeDailyStat>,
 }
@@ -1574,6 +1594,7 @@ pub(crate) struct OptionVolumeDaily {
 impl From<longbridge::quote::OptionVolumeDaily> for OptionVolumeDaily {
     fn from(v: longbridge::quote::OptionVolumeDaily) -> Self {
         Self {
+            symbol: v.symbol,
             stats: v.stats.into_iter().map(Into::into).collect(),
         }
     }
@@ -1583,41 +1604,32 @@ impl From<longbridge::quote::OptionVolumeDaily> for OptionVolumeDaily {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct OptionVolumeDailyStat {
-    /// Underlying symbol
-    pub symbol: String,
-    /// Date timestamp string
-    pub timestamp: String,
-    /// Total volume
-    pub total_volume: String,
-    /// Put volume
-    pub total_put_volume: String,
+    /// Trading date
+    pub date: PyDateWrapper,
     /// Call volume
-    pub total_call_volume: String,
-    /// Put/call volume ratio
-    pub put_call_volume_ratio: String,
-    /// Total open interest
-    pub total_open_interest: String,
-    /// Put open interest
-    pub total_put_open_interest: String,
+    pub call_volume: i64,
+    /// Put volume
+    pub put_volume: i64,
     /// Call open interest
-    pub total_call_open_interest: String,
+    pub call_open_interest: i64,
+    /// Put open interest
+    pub put_open_interest: i64,
+    /// Put/call volume ratio
+    pub pc_vol: f64,
     /// Put/call OI ratio
-    pub put_call_open_interest_ratio: String,
+    pub pc_oi: f64,
 }
 
 impl From<longbridge::quote::OptionVolumeDailyStat> for OptionVolumeDailyStat {
     fn from(v: longbridge::quote::OptionVolumeDailyStat) -> Self {
         Self {
-            symbol: v.symbol,
-            timestamp: v.timestamp,
-            total_volume: v.total_volume,
-            total_put_volume: v.total_put_volume,
-            total_call_volume: v.total_call_volume,
-            put_call_volume_ratio: v.put_call_volume_ratio,
-            total_open_interest: v.total_open_interest,
-            total_put_open_interest: v.total_put_open_interest,
-            total_call_open_interest: v.total_call_open_interest,
-            put_call_open_interest_ratio: v.put_call_open_interest_ratio,
+            date: v.date.into(),
+            call_volume: v.call_volume,
+            put_volume: v.put_volume,
+            call_open_interest: v.call_open_interest,
+            put_open_interest: v.put_open_interest,
+            pc_vol: v.pc_vol,
+            pc_oi: v.pc_oi,
         }
     }
 }

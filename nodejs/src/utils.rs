@@ -41,6 +41,14 @@ impl ToJSON for bool {
     }
 }
 
+impl ToJSON for f64 {
+    fn to_json(&self) -> Value {
+        serde_json::Number::from_f64(*self)
+            .map(Value::Number)
+            .unwrap_or(Value::Null)
+    }
+}
+
 impl<Tz> ToJSON for DateTime<Tz>
 where
     Tz: TimeZone,

@@ -2073,10 +2073,22 @@ pub struct ShortPositionsResponse {
 /// Response for [`crate::QuoteContext::option_volume`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OptionVolumeStats {
-    /// Total call volume (string)
-    pub c: String,
-    /// Total put volume (string)
-    pub p: String,
+    /// Underlying security symbol
+    pub symbol: String,
+    /// Total call volume
+    pub call_volume: i64,
+    /// Total put volume
+    pub put_volume: i64,
+    /// Total call open interest
+    pub call_open_interest: i64,
+    /// Total put open interest
+    pub put_open_interest: i64,
+    /// Put/call volume ratio
+    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
+    pub pc_vol: f64,
+    /// Put/call open interest ratio
+    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
+    pub pc_oi: f64,
 }
 
 // ── option_volume_daily ───────────────────────────────────────────
@@ -2084,37 +2096,33 @@ pub struct OptionVolumeStats {
 /// Response for [`crate::QuoteContext::option_volume_daily`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OptionVolumeDaily {
-    /// Daily option volume statistics
+    /// Underlying security symbol
+    pub symbol: String,
+    /// Daily option volume records
+    #[serde(rename = "list")]
     pub stats: Vec<OptionVolumeDailyStat>,
 }
 
 /// One day's option volume statistics
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OptionVolumeDailyStat {
-    /// Underlying security symbol
-    #[serde(
-        rename = "underlying_counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
-    pub symbol: String,
-    /// Settlement date (unix timestamp string)
-    pub timestamp: String,
-    /// Total option volume (calls + puts) — string in API response
-    pub total_volume: String,
-    /// Total put volume — string in API response
-    pub total_put_volume: String,
-    /// Total call volume — string in API response
-    pub total_call_volume: String,
+    /// Trading date
+    #[serde(deserialize_with = "crate::serde_utils::date::deserialize")]
+    pub date: Date,
+    /// Call volume
+    pub call_volume: i64,
+    /// Put volume
+    pub put_volume: i64,
+    /// Call open interest
+    pub call_open_interest: i64,
+    /// Put open interest
+    pub put_open_interest: i64,
     /// Put/call volume ratio
-    pub put_call_volume_ratio: String,
-    /// Total open interest — string in API response
-    pub total_open_interest: String,
-    /// Total put open interest
-    pub total_put_open_interest: String,
-    /// Total call open interest
-    pub total_call_open_interest: String,
+    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
+    pub pc_vol: f64,
     /// Put/call open interest ratio
-    pub put_call_open_interest_ratio: String,
+    #[serde(deserialize_with = "crate::serde_utils::f64_str::deserialize")]
+    pub pc_oi: f64,
 }
 
 // ── short_trades ──────────────────────────────────────────────────
