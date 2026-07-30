@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.3] - 2026-07-30
+
 ### Fixed
 
 - **All languages:** fix `option_volume` and `option_volume_daily` response deserialization — actual API fields (`c`/`p` for real-time; `underlying_counter_id`, `total_*` for daily) now correctly mapped; `underlying_counter_id` converted to user-facing symbol; `OptionVolumeStats` simplified to `symbol`, `call_volume`, `put_volume`; `OptionVolumeDailyStat` gains `symbol`, `total_volume`, `total_open_interest` and removes fields not returned by the API
