@@ -81,7 +81,7 @@ public class AgentContext implements AutoCloseable {
      *             WorkspacesResponse workspaces = ctx.workspaces().get();
      *             AgentsResponse agents = ctx.agents(workspaces.getWorkspaces()[0].getId(), null).get();
      *             ConversationResponse resp = ctx.conversation(agents.getAgents()[0].getUid(),
-     *                     "How has Tesla stock performed recently?", null).get();
+     *                     "How has Tesla stock performed recently?", null, null).get();
      *             System.out.println(resp);
      *         }
      *     }
@@ -89,17 +89,25 @@ public class AgentContext implements AutoCloseable {
      * }
      * </pre>
      *
-     * @param agentId Agent UID
-     * @param query   User query
-     * @param chatUid Conversation identifier to continue an existing chat, or
-     *                {@code null} to start a new one
+     * @param agentId         Agent UID
+     * @param query           User query
+     * @param chatUid         Conversation identifier to continue an existing
+     *                        chat, or {@code null} to start a new one
+     * @param parentMessageId {@code messageId} from a previous response. Pass
+     *                        it when asking a follow-up in an existing
+     *                        conversation to attach the new message after the
+     *                        specified one, keeping the message stream in
+     *                        order. Only valid together with {@code chatUid},
+     *                        the parent message must belong to that
+     *                        conversation, and it must be {@code null} for a
+     *                        new conversation
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ConversationResponse> conversation(String agentId, String query, String chatUid)
-            throws OpenApiException {
+    public CompletableFuture<ConversationResponse> conversation(String agentId, String query, String chatUid,
+            String parentMessageId) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.agentContextConversation(this.raw, agentId, query, chatUid, callback);
+            SdkNative.agentContextConversation(this.raw, agentId, query, chatUid, parentMessageId, callback);
         });
     }
 
@@ -148,7 +156,7 @@ public class AgentContext implements AutoCloseable {
      * <pre>
      * {@code
      * Flow.Publisher<ConversationStreamEvent> publisher =
-     *     ctx.conversationStream(agentId, "How has Tesla stock performed recently?", null);
+     *     ctx.conversationStream(agentId, "How has Tesla stock performed recently?", null, null);
      * publisher.subscribe(new Flow.Subscriber<ConversationStreamEvent>() {
      *     public void onSubscribe(Flow.Subscription subscription) {
      *         subscription.request(Long.MAX_VALUE); // unbounded demand
@@ -166,14 +174,19 @@ public class AgentContext implements AutoCloseable {
      * }
      * </pre>
      *
-     * @param agentId Agent UID
-     * @param query   User query
-     * @param chatUid Conversation identifier to continue an existing chat, or
-     *                {@code null} to start a new one
+     * @param agentId         Agent UID
+     * @param query           User query
+     * @param chatUid         Conversation identifier to continue an existing
+     *                        chat, or {@code null} to start a new one
+     * @param parentMessageId {@code messageId} from a previous response, to
+     *                        attach a follow-up after that message. Only valid
+     *                        together with {@code chatUid} and must be
+     *                        {@code null} for a new conversation
      * @return A cold {@link Flow.Publisher} of conversation stream events
      */
-    public Flow.Publisher<ConversationStreamEvent> conversationStream(String agentId, String query, String chatUid) {
-        return new ConversationStreamPublisher(this.raw, agentId, query, chatUid);
+    public Flow.Publisher<ConversationStreamEvent> conversationStream(String agentId, String query, String chatUid,
+            String parentMessageId) {
+        return ConversationStreamPublisher.forNewConversation(this.raw, agentId, query, chatUid, parentMessageId);
     }
 
     /**
@@ -193,7 +206,7 @@ public class AgentContext implements AutoCloseable {
     public Flow.Publisher<ConversationStreamEvent> continueConversationStream(String agentId, String chatUid,
             String messageId, Map<String, Map<String, String>> answersByToolCall) {
         String answersJson = toAnswersJson(answersByToolCall);
-        return new ConversationStreamPublisher(this.raw, agentId, chatUid, messageId, answersJson);
+        return ConversationStreamPublisher.forContinueConversation(this.raw, agentId, chatUid, messageId, answersJson);
     }
 
     private static String toAnswersJson(Map<String, Map<String, String>> answersByToolCall) {

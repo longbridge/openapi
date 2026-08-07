@@ -73,6 +73,12 @@ export declare class AgentContext {
    * Start a conversation with the specified Agent, blocking until the run
    * succeeds, is interrupted, or fails.
    *
+   * `parentMessageId` is the `messageId` from a previous response. Pass it
+   * when asking a follow-up in an existing conversation to attach the new
+   * message after the specified one, keeping the message stream in order. It
+   * is only valid together with `chatUid`, the parent message must belong to
+   * that conversation, and it must not be set for a new conversation.
+   *
    * #### Example
    *
    * ```javascript
@@ -83,7 +89,7 @@ export declare class AgentContext {
    * console.log(resp);
    * ```
    */
-  conversation(agentId: string, query: string, chatUid?: string | undefined | null): Promise<ConversationResponse>
+  conversation(agentId: string, query: string, chatUid?: string | undefined | null, parentMessageId?: string | undefined | null): Promise<ConversationResponse>
   /**
    * Resume an interrupted conversation, blocking until the run succeeds, is
    * interrupted again, or fails.
@@ -108,12 +114,15 @@ export declare class AgentContext {
    *   agentId,
    *   "How has Tesla stock performed recently?",
    *   undefined,
+   *   undefined,
    *   (err, event) => console.log(event),
    * );
    * console.log(resp);
    * ```
+   *
+   * `parentMessageId` behaves as in `conversation`.
    */
-  conversationStreamed(agentId: string, query: string, chatUid: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+  conversationStreamed(agentId: string, query: string, chatUid: string | undefined | null, parentMessageId: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
   /**
    * Resume an interrupted conversation, invoking `callback` for every
    * progress event observed over SSE, and resolving to the final

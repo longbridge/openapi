@@ -65,16 +65,20 @@ impl AgentContext {
 
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
-    #[pyo3(signature = (agent_id, query, chat_uid = None))]
+    #[pyo3(signature = (agent_id, query, chat_uid = None, parent_message_id = None))]
     fn conversation(
         &self,
         py: Python<'_>,
         agent_id: String,
         query: String,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
     ) -> PyResult<ConversationResponse> {
         Ok(py
-            .detach(|| self.0.conversation(agent_id, query, chat_uid))
+            .detach(|| {
+                self.0
+                    .conversation(agent_id, query, chat_uid, parent_message_id)
+            })
             .map_err(ErrorNewType)?
             .into())
     }
@@ -108,16 +112,20 @@ impl AgentContext {
     /// housekeeping events (e.g. `kind == "chat_title_updated"`) before
     /// actually closing the connection, so keep iterating to the end rather
     /// than stopping as soon as you see it.
-    #[pyo3(signature = (agent_id, query, chat_uid = None))]
+    #[pyo3(signature = (agent_id, query, chat_uid = None, parent_message_id = None))]
     fn conversation_streamed(
         &self,
         py: Python<'_>,
         agent_id: String,
         query: String,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
     ) -> PyResult<ConversationStreamIter> {
         let iter = py
-            .detach(|| self.0.conversation_streamed(agent_id, query, chat_uid))
+            .detach(|| {
+                self.0
+                    .conversation_streamed(agent_id, query, chat_uid, parent_message_id)
+            })
             .map_err(ErrorNewType)?;
         Ok(ConversationStreamIter(Mutex::new(iter)))
     }

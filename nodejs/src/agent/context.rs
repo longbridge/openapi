@@ -82,6 +82,12 @@ impl AgentContext {
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     ///
+    /// `parentMessageId` is the `messageId` from a previous response. Pass it
+    /// when asking a follow-up in an existing conversation to attach the new
+    /// message after the specified one, keeping the message stream in order. It
+    /// is only valid together with `chatUid`, the parent message must belong to
+    /// that conversation, and it must not be set for a new conversation.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -97,10 +103,11 @@ impl AgentContext {
         agent_id: String,
         query: String,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
     ) -> Result<ConversationResponse> {
         Ok(self
             .ctx
-            .conversation(agent_id, query, chat_uid)
+            .conversation(agent_id, query, chat_uid, parent_message_id)
             .await
             .map_err(ErrorNewType)?
             .into())
@@ -142,10 +149,13 @@ impl AgentContext {
     ///   agentId,
     ///   "How has Tesla stock performed recently?",
     ///   undefined,
+    ///   undefined,
     ///   (err, event) => console.log(event),
     /// );
     /// console.log(resp);
     /// ```
+    ///
+    /// `parentMessageId` behaves as in `conversation`.
     // Design note: unlike `QuoteContext::set_on_quote` (a plain, non-async
     // `fn` that takes a `Function<...>` and builds the threadsafe function
     // itself), `callback` here is declared as `JsCallback<ConversationStreamEvent>`
@@ -159,18 +169,19 @@ impl AgentContext {
     // requires the future backing every `#[napi] async fn` to be `Send`.
     // `set_on_quote` itself avoids this only because it is not async.
     #[napi(
-        ts_args_type = "agentId: string, query: string, chatUid: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void"
+        ts_args_type = "agentId: string, query: string, chatUid: string | undefined | null, parentMessageId: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void"
     )]
     pub async fn conversation_streamed(
         &self,
         agent_id: String,
         query: String,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
         callback: JsCallback<ConversationStreamEvent>,
     ) -> Result<ConversationResponse> {
         let stream = self
             .ctx
-            .conversation_streamed(agent_id, query, chat_uid)
+            .conversation_streamed(agent_id, query, chat_uid, parent_message_id)
             .await
             .map_err(ErrorNewType)?;
         Ok(

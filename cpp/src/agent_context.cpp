@@ -164,6 +164,7 @@ AgentContext::conversation(
   const std::string& agent_id,
   const std::string& query,
   const std::optional<std::string>& chat_uid,
+  const std::optional<std::string>& parent_message_id,
   AsyncCallback<AgentContext, ConversationResponse> callback) const
 {
   lb_agent_context_conversation(
@@ -171,6 +172,7 @@ AgentContext::conversation(
     agent_id.c_str(),
     query.c_str(),
     chat_uid ? chat_uid->c_str() : nullptr,
+    parent_message_id ? parent_message_id->c_str() : nullptr,
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<AgentContext, ConversationResponse>(
@@ -233,6 +235,7 @@ AgentContext::conversation_streamed(
   const std::string& agent_id,
   const std::string& query,
   const std::optional<std::string>& chat_uid,
+  const std::optional<std::string>& parent_message_id,
   PushCallback<AgentContext, ConversationStreamEvent> on_event,
   AsyncCallback<AgentContext, ConversationResponse> callback) const
 {
@@ -241,6 +244,7 @@ AgentContext::conversation_streamed(
     agent_id.c_str(),
     query.c_str(),
     chat_uid ? chat_uid->c_str() : nullptr,
+    parent_message_id ? parent_message_id->c_str() : nullptr,
     [](auto ctx, auto event, auto userdata) {
       auto cb =
         callback::get_push_callback<AgentContext, ConversationStreamEvent>(

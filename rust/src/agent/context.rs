@@ -199,18 +199,27 @@ impl AgentContext {
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     ///
+    /// `parent_message_id` is the `message_id` from a previous response. Pass
+    /// it when asking a follow-up in an existing conversation to attach the new
+    /// message after the specified one, keeping the message stream in order. It
+    /// is only valid together with `chat_uid`, the parent message must belong
+    /// to that conversation, and it must not be set for a new conversation.
+    ///
     /// Path: `POST /v1/ai/agents/{id}/conversations`
     pub async fn conversation(
         &self,
         agent_id: impl Into<String>,
         query: impl Into<String>,
         chat_uid: impl Into<Option<String>>,
+        parent_message_id: impl Into<Option<String>>,
     ) -> Result<ConversationResponse> {
         #[derive(Debug, Serialize)]
         struct Body {
             query: String,
             #[serde(skip_serializing_if = "Option::is_none")]
             chat_uid: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            parent_message_id: Option<String>,
         }
 
         let agent_id = agent_id.into();
@@ -225,6 +234,7 @@ impl AgentContext {
             .body(Json(Body {
                 query: query.into(),
                 chat_uid: chat_uid.into(),
+                parent_message_id: parent_message_id.into(),
             }))
             .timeout(AGENT_REQUEST_TIMEOUT)
             .response::<Json<ConversationResponse>>()
@@ -288,6 +298,8 @@ impl AgentContext {
     /// the connection, so keep draining the stream until it ends rather than
     /// stopping as soon as you see one.
     ///
+    /// `parent_message_id` behaves as in [`Self::conversation`].
+    ///
     /// Path: `POST /v1/ai/agents/{id}/conversations` (`Accept:
     /// text/event-stream`)
     pub async fn conversation_streamed(
@@ -295,12 +307,15 @@ impl AgentContext {
         agent_id: impl Into<String>,
         query: impl Into<String>,
         chat_uid: impl Into<Option<String>>,
+        parent_message_id: impl Into<Option<String>>,
     ) -> Result<impl Stream<Item = Result<ConversationStreamEvent>> + Send + 'static> {
         #[derive(Debug, Serialize)]
         struct Body {
             query: String,
             #[serde(skip_serializing_if = "Option::is_none")]
             chat_uid: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            parent_message_id: Option<String>,
         }
 
         let agent_id = agent_id.into();
@@ -314,6 +329,7 @@ impl AgentContext {
             .body(Json(Body {
                 query: query.into(),
                 chat_uid: chat_uid.into(),
+                parent_message_id: parent_message_id.into(),
             }))
             .timeout(AGENT_REQUEST_TIMEOUT)
             .send_events()

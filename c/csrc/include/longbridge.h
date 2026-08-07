@@ -10412,13 +10412,23 @@ void lb_agent_context_agents(const struct lb_agent_context_t *ctx,
  * Start a conversation with the specified Agent, blocking until the run
  * succeeds, is interrupted, or fails. Returns `CConversationResponse`.
  *
- * @param[in] chat_uid Existing conversation identifier to continue within
- *                      (can be null to start a brand-new conversation)
+ * @param[in] chat_uid          Existing conversation identifier to continue
+ *                              within (can be null to start a brand-new
+ *                              conversation)
+ * @param[in] parent_message_id `message_id` from a previous response. Pass it
+ *                              when asking a follow-up in an existing
+ *                              conversation to attach the new message after
+ *                              the specified one, keeping the message stream
+ *                              in order. Only valid together with `chat_uid`,
+ *                              the parent message must belong to that
+ *                              conversation, and it must be null for a new
+ *                              conversation (can be null)
  */
 void lb_agent_context_conversation(const struct lb_agent_context_t *ctx,
                                    const char *agent_id,
                                    const char *query,
                                    const char *chat_uid,
+                                   const char *parent_message_id,
                                    lb_async_callback_t callback,
                                    void *userdata);
 
@@ -10453,6 +10463,10 @@ void lb_agent_context_continue_conversation(const struct lb_agent_context_t *ctx
  * @param[in] chat_uid            Existing conversation identifier to
  *                                continue within (can be null to start a
  *                                brand-new conversation)
+ * @param[in] parent_message_id   `message_id` from a previous response, to
+ *                                attach a follow-up after that message. Only
+ *                                valid together with `chat_uid` and must be
+ *                                null for a new conversation (can be null)
  * @param[in] event_callback      Called once per stream event, on an
  *                                internal worker thread
  * @param[in] event_userdata      Opaque pointer forwarded to
@@ -10465,6 +10479,7 @@ void lb_agent_context_conversation_streamed(const struct lb_agent_context_t *ctx
                                             const char *agent_id,
                                             const char *query,
                                             const char *chat_uid,
+                                            const char *parent_message_id,
                                             lb_conversation_event_callback_t event_callback,
                                             void *event_userdata,
                                             lb_free_userdata_func_t event_free_userdata,

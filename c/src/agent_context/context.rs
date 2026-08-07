@@ -126,14 +126,24 @@ pub unsafe extern "C" fn lb_agent_context_agents(
 /// Start a conversation with the specified Agent, blocking until the run
 /// succeeds, is interrupted, or fails. Returns `CConversationResponse`.
 ///
-/// @param[in] chat_uid Existing conversation identifier to continue within
-///                      (can be null to start a brand-new conversation)
+/// @param[in] chat_uid          Existing conversation identifier to continue
+///                              within (can be null to start a brand-new
+///                              conversation)
+/// @param[in] parent_message_id `message_id` from a previous response. Pass it
+///                              when asking a follow-up in an existing
+///                              conversation to attach the new message after
+///                              the specified one, keeping the message stream
+///                              in order. Only valid together with `chat_uid`,
+///                              the parent message must belong to that
+///                              conversation, and it must be null for a new
+///                              conversation (can be null)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_agent_context_conversation(
     ctx: *const CAgentContext,
     agent_id: *const c_char,
     query: *const c_char,
     chat_uid: *const c_char,
+    parent_message_id: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -141,9 +151,13 @@ pub unsafe extern "C" fn lb_agent_context_conversation(
     let agent_id = cstr_to_rust(agent_id);
     let query = cstr_to_rust(query);
     let chat_uid = (!chat_uid.is_null()).then(|| cstr_to_rust(chat_uid));
+    let parent_message_id = (!parent_message_id.is_null()).then(|| cstr_to_rust(parent_message_id));
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CConversationResponseOwned> =
-            CCow::new(ctx_inner.conversation(agent_id, query, chat_uid).await?);
+        let resp: CCow<CConversationResponseOwned> = CCow::new(
+            ctx_inner
+                .conversation(agent_id, query, chat_uid, parent_message_id)
+                .await?,
+        );
         Ok(resp)
     });
 }
@@ -193,6 +207,10 @@ pub unsafe extern "C" fn lb_agent_context_continue_conversation(
 /// @param[in] chat_uid            Existing conversation identifier to
 ///                                continue within (can be null to start a
 ///                                brand-new conversation)
+/// @param[in] parent_message_id   `message_id` from a previous response, to
+///                                attach a follow-up after that message. Only
+///                                valid together with `chat_uid` and must be
+///                                null for a new conversation (can be null)
 /// @param[in] event_callback      Called once per stream event, on an
 ///                                internal worker thread
 /// @param[in] event_userdata      Opaque pointer forwarded to
@@ -206,6 +224,7 @@ pub unsafe extern "C" fn lb_agent_context_conversation_streamed(
     agent_id: *const c_char,
     query: *const c_char,
     chat_uid: *const c_char,
+    parent_message_id: *const c_char,
     event_callback: COnConversationEventCallback,
     event_userdata: *mut c_void,
     event_free_userdata: CFreeUserDataFunc,
@@ -216,6 +235,7 @@ pub unsafe extern "C" fn lb_agent_context_conversation_streamed(
     let agent_id = cstr_to_rust(agent_id);
     let query = cstr_to_rust(query);
     let chat_uid = (!chat_uid.is_null()).then(|| cstr_to_rust(chat_uid));
+    let parent_message_id = (!parent_message_id.is_null()).then(|| cstr_to_rust(parent_message_id));
     // Raw pointers aren't `Send`, so thread them through the future as plain
     // addresses (mirroring how `execute_async` itself carries `ctx`/
     // `userdata` across the `spawn` boundary) and only reconstitute them
@@ -225,7 +245,7 @@ pub unsafe extern "C" fn lb_agent_context_conversation_streamed(
     execute_async(callback, ctx, userdata, async move {
         let stream = Box::pin(
             ctx_inner
-                .conversation_streamed(agent_id, query, chat_uid)
+                .conversation_streamed(agent_id, query, chat_uid, parent_message_id)
                 .await?,
         );
         let result = drive_conversation_stream(stream, move |event| {

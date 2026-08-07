@@ -203,6 +203,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
     agent_id: JString,
     query: JString,
     chat_uid: JObject,
+    parent_message_id: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -210,9 +211,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let query: String = FromJValue::from_jvalue(env, query.into())?;
         let chat_uid: Option<String> = FromJValue::from_jvalue(env, chat_uid.into())?;
+        let parent_message_id: Option<String> =
+            FromJValue::from_jvalue(env, parent_message_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(crate::types::ConversationResponse::from(
-                context.ctx.conversation(agent_id, query, chat_uid).await?,
+                context
+                    .ctx
+                    .conversation(agent_id, query, chat_uid, parent_message_id)
+                    .await?,
             ))
         })?;
         Ok(())
@@ -257,6 +263,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
     agent_id: JString,
     query: JString,
     chat_uid: JObject,
+    parent_message_id: JObject,
     subscriber: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -265,6 +272,8 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let query: String = FromJValue::from_jvalue(env, query.into())?;
         let chat_uid: Option<String> = FromJValue::from_jvalue(env, chat_uid.into())?;
+        let parent_message_id: Option<String> =
+            FromJValue::from_jvalue(env, parent_message_id.into())?;
         let jvm = env.get_java_vm()?;
         let subscriber = env.new_global_ref(subscriber)?;
 
@@ -274,7 +283,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
         // once it resolves.
         longbridge::runtime_handle().spawn(async move {
             let sink = Arc::new(SubscriberSink { jvm, subscriber });
-            match ctx.conversation_streamed(agent_id, query, chat_uid).await {
+            match ctx
+                .conversation_streamed(agent_id, query, chat_uid, parent_message_id)
+                .await
+            {
                 Ok(stream) => {
                     let (sink_next, sink_err, sink_complete) =
                         (sink.clone(), sink.clone(), sink.clone());

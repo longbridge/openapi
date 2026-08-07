@@ -14097,7 +14097,11 @@ class AgentContext:
         ...
 
     def conversation(
-        self, agent_id: str, query: str, chat_uid: str | None = None
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
     ) -> ConversationResponse:
         """
         Start a conversation with the specified Agent, blocking until the run
@@ -14108,6 +14112,12 @@ class AgentContext:
             query: The question to ask
             chat_uid: Continue an existing conversation instead of starting a
                 new one
+            parent_message_id: ``message_id`` from a previous response. Pass it
+                when asking a follow-up in an existing conversation to attach
+                the new message after the specified one, keeping the message
+                stream in order. Only valid together with ``chat_uid``, the
+                parent message must belong to that conversation, and it must not
+                be set for a new conversation
         """
         ...
 
@@ -14134,7 +14144,11 @@ class AgentContext:
         ...
 
     def conversation_streamed(
-        self, agent_id: str, query: str, chat_uid: str | None = None
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
     ) -> Iterator[ConversationStreamEvent]:
         """
         Start a conversation with the specified Agent, returning an iterator
@@ -14150,6 +14164,8 @@ class AgentContext:
             query: The question to ask
             chat_uid: Continue an existing conversation instead of starting a
                 new one
+            parent_message_id: ``message_id`` from a previous response; see
+                ``conversation`` for the exact semantics
         """
         ...
 
@@ -14247,7 +14263,11 @@ class AsyncAgentContext:
         ...
 
     def conversation(
-        self, agent_id: str, query: str, chat_uid: str | None = None
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
     ) -> Awaitable[ConversationResponse]:
         """
         Start a conversation with the specified Agent, blocking until the run
@@ -14258,6 +14278,12 @@ class AsyncAgentContext:
             query: The question to ask
             chat_uid: Continue an existing conversation instead of starting a
                 new one
+            parent_message_id: ``message_id`` from a previous response. Pass it
+                when asking a follow-up in an existing conversation to attach
+                the new message after the specified one, keeping the message
+                stream in order. Only valid together with ``chat_uid``, the
+                parent message must belong to that conversation, and it must not
+                be set for a new conversation
         """
         ...
 
@@ -14284,7 +14310,11 @@ class AsyncAgentContext:
         ...
 
     def conversation_streamed(
-        self, agent_id: str, query: str, chat_uid: str | None = None
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
     ) -> Awaitable[AsyncConversationStreamIter]:
         """
         Start a conversation with the specified Agent. Returns an awaitable
@@ -14296,6 +14326,8 @@ class AsyncAgentContext:
             query: The question to ask
             chat_uid: Continue an existing conversation instead of starting a
                 new one
+            parent_message_id: ``message_id`` from a previous response; see
+                ``conversation`` for the exact semantics
         """
         ...
 

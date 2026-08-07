@@ -485,12 +485,12 @@ public class SdkNative {
         public static native void agentContextAgents(long context, String workspaceId, Object opts,
                         AsyncCallback callback);
         public static native void agentContextConversation(long context, String agentId, String query,
-                        String chatUid, AsyncCallback callback);
+                        String chatUid, String parentMessageId, AsyncCallback callback);
         public static native void agentContextContinueConversation(long context, String agentId, String chatUid,
                         String messageId, String answersByToolCallJson, AsyncCallback callback);
 
         public static native void agentContextConversationStreamSubscribe(long context, String agentId, String query,
-                        String chatUid, Flow.Subscriber<?> subscriber);
+                        String chatUid, String parentMessageId, Flow.Subscriber<?> subscriber);
         public static native void agentContextContinueConversationStreamSubscribe(long context, String agentId,
                         String chatUid, String messageId, String answersByToolCallJson,
                         Flow.Subscriber<?> subscriber);

@@ -52,9 +52,12 @@ impl AgentContextSync {
         agent_id: impl Into<String> + Send + 'static,
         query: impl Into<String> + Send + 'static,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
     ) -> Result<ConversationResponse> {
-        self.rt
-            .call(move |ctx| async move { ctx.conversation(agent_id, query, chat_uid).await })
+        self.rt.call(move |ctx| async move {
+            ctx.conversation(agent_id, query, chat_uid, parent_message_id)
+                .await
+        })
     }
 
     /// Resume an interrupted conversation, blocking until the run succeeds, is
@@ -79,14 +82,18 @@ impl AgentContextSync {
         agent_id: impl Into<String> + Send + 'static,
         query: impl Into<String> + Send + 'static,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
     ) -> Result<agent::ConversationStreamIter> {
         let stream = self.rt.call(move |ctx| async move {
             // Box the RPIT stream so it can flow through `rt.call`'s generic
             // `R: Send + 'static`.
-            Ok(
-                Box::pin(ctx.conversation_streamed(agent_id, query, chat_uid).await?)
-                    as Pin<Box<dyn Stream<Item = Result<ConversationStreamEvent>> + Send>>,
+            Ok(Box::pin(
+                ctx.conversation_streamed(agent_id, query, chat_uid, parent_message_id)
+                    .await?,
             )
+                as Pin<
+                    Box<dyn Stream<Item = Result<ConversationStreamEvent>> + Send>,
+                >)
         })?;
         Ok(agent::conversation_stream_iter(stream))
     }

@@ -85,18 +85,19 @@ impl AsyncAgentContext {
 
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails. Returns awaitable.
-    #[pyo3(signature = (agent_id, query, chat_uid = None))]
+    #[pyo3(signature = (agent_id, query, chat_uid = None, parent_message_id = None))]
     fn conversation(
         &self,
         py: Python<'_>,
         agent_id: String,
         query: String,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let resp: ConversationResponse = ctx
-                .conversation(agent_id, query, chat_uid)
+                .conversation(agent_id, query, chat_uid, parent_message_id)
                 .await
                 .map_err(ErrorNewType)?
                 .into();
@@ -133,18 +134,19 @@ impl AsyncAgentContext {
     /// Start a conversation with the specified Agent. Returns an awaitable
     /// that resolves to an `AsyncConversationStreamIter`; use `async for` on
     /// it to consume run-progress events.
-    #[pyo3(signature = (agent_id, query, chat_uid = None))]
+    #[pyo3(signature = (agent_id, query, chat_uid = None, parent_message_id = None))]
     fn conversation_streamed(
         &self,
         py: Python<'_>,
         agent_id: String,
         query: String,
         chat_uid: Option<String>,
+        parent_message_id: Option<String>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let stream = ctx
-                .conversation_streamed(agent_id, query, chat_uid)
+                .conversation_streamed(agent_id, query, chat_uid, parent_message_id)
                 .await
                 .map_err(ErrorNewType)?;
             let boxed: BoxedEventStream = Box::pin(stream);

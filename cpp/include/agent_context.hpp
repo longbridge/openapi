@@ -48,11 +48,17 @@ public:
   /// Start a conversation with the specified Agent, blocking until the run
   /// succeeds, is interrupted, or fails.
   ///
-  /// @param chat_uid Existing conversation identifier to continue within
-  ///                 (`std::nullopt` to start a brand-new conversation)
+  /// @param chat_uid          Existing conversation identifier to continue
+  ///                          within (`std::nullopt` to start a brand-new
+  ///                          conversation)
+  /// @param parent_message_id `message_id` from a previous response, to attach
+  ///                          a follow-up after that message. Only valid
+  ///                          together with `chat_uid` and must be
+  ///                          `std::nullopt` for a new conversation
   void conversation(const std::string& agent_id,
                     const std::string& query,
                     const std::optional<std::string>& chat_uid,
+                    const std::optional<std::string>& parent_message_id,
                     AsyncCallback<AgentContext, ConversationResponse> callback) const;
 
   /// Resume an interrupted conversation, blocking until the run succeeds,
@@ -76,12 +82,18 @@ public:
   /// `callback` is invoked with the final ConversationResponse — same as
   /// `conversation`, just arrived at via the streamed path.
   ///
-  /// @param chat_uid Existing conversation identifier to continue within
-  ///                 (`std::nullopt` to start a brand-new conversation)
+  /// @param chat_uid          Existing conversation identifier to continue
+  ///                          within (`std::nullopt` to start a brand-new
+  ///                          conversation)
+  /// @param parent_message_id `message_id` from a previous response, to attach
+  ///                          a follow-up after that message. Only valid
+  ///                          together with `chat_uid` and must be
+  ///                          `std::nullopt` for a new conversation
   void conversation_streamed(
     const std::string& agent_id,
     const std::string& query,
     const std::optional<std::string>& chat_uid,
+    const std::optional<std::string>& parent_message_id,
     PushCallback<AgentContext, ConversationStreamEvent> on_event,
     AsyncCallback<AgentContext, ConversationResponse> callback) const;
 
