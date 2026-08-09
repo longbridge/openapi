@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use jni::{
     JNIEnv,
     objects::{JClass, JObject},
@@ -21,9 +23,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newFundamentalContex
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        let config = crate::handles::get::<Config>(config)?;
+        let config = Arc::new((*(config as *const Config)).clone());
         let ctx = FundamentalContext::new(config);
-        Ok(crate::handles::insert(ContextObj { ctx }))
+        Ok(Box::into_raw(Box::new(ContextObj { ctx })) as i64)
     })
 }
 
@@ -33,7 +35,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeFundamentalConte
     _class: JClass,
     ctx: i64,
 ) {
-    crate::handles::remove(ctx);
+    let _ = Box::from_raw(ctx as *mut ContextObj);
 }
 
 // ── financial_report ─────────────────────────────────────────────
@@ -47,7 +49,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextFi
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = get_field(env, &opts, "symbol")?;
         let kind: Option<FinancialReportKind> = get_field(env, &opts, "kind")?;
         let kind = kind.unwrap_or(FinancialReportKind::All);
@@ -73,7 +75,7 @@ macro_rules! symbol_method {
             callback: JObject,
         ) {
             jni_result(&mut env, (), |env| {
-                let context = crate::handles::get::<ContextObj>(context)?;
+                let context = &*(context as *const ContextObj);
                 let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
                 async_util::execute(env, callback, async move {
                     let resp = context.ctx.$method(symbol).await?;
@@ -162,7 +164,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             let resp = context.ctx.buyback(symbol).await?;
@@ -181,7 +183,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             let resp = context.ctx.ratings(symbol).await?;
@@ -200,7 +202,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextSh
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             let resp = context.ctx.shareholder_top(symbol).await?;
@@ -220,7 +222,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextSh
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             let resp = context.ctx.shareholder_detail(symbol, object_id).await?;
@@ -241,7 +243,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextVa
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let currency: String = FromJValue::from_jvalue(env, currency.into())?;
         let comparison_syms: Option<Vec<String>> = if comparison_symbols.is_null() {
@@ -273,7 +275,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let country: Option<String> = FromJValue::from_jvalue(env, country.into())?;
         let country = country.and_then(|s| {
             use longbridge::fundamental::MacroeconomicCountry::*;
@@ -313,7 +315,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let indicator_code: String = FromJValue::from_jvalue(env, indicator_code.into())?;
         let start_date: Option<String> = FromJValue::from_jvalue(env, start_time.into())?;
         let end_date: Option<String> = FromJValue::from_jvalue(env, end_time.into())?;
@@ -344,7 +346,7 @@ macro_rules! us_counter_id_method {
             callback: JObject,
         ) {
             jni_result(&mut env, (), |env| {
-                let context = crate::handles::get::<ContextObj>(context)?;
+                let context = &*(context as *const ContextObj);
                 let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
                 async_util::execute(env, callback, async move {
                     let resp = context.ctx.$method(counter_id).await?;
@@ -368,7 +370,7 @@ macro_rules! us_counter_id_report_method {
             callback: JObject,
         ) {
             jni_result(&mut env, (), |env| {
-                let context = crate::handles::get::<ContextObj>(context)?;
+                let context = &*(context as *const ContextObj);
                 let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
                 let report: String = FromJValue::from_jvalue(env, report.into())?;
                 async_util::execute(env, callback, async move {
@@ -421,7 +423,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let kind: String = FromJValue::from_jvalue(env, kind.into())?;
         let report: String = FromJValue::from_jvalue(env, report.into())?;
@@ -446,7 +448,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let size: Option<i32> = FromJValue::from_jvalue(env, size.into())?;
         async_util::execute(env, callback, async move {

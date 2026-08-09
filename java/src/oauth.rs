@@ -3,7 +3,7 @@ use jni::{
     objects::{JClass, JObject, JString},
     sys::{jint, jlong},
 };
-use longbridge::oauth::OAuthBuilder;
+use longbridge::oauth::{OAuth, OAuthBuilder};
 
 use crate::{async_util, error::jni_result, types::JavaLong};
 
@@ -14,7 +14,8 @@ use crate::{async_util, error::jni_result, types::JavaLong};
 ///
 /// `callback_port == 0` means "use the default (60355)".
 /// `openUrlCallback` must be a `java.util.function.Consumer<String>`.
-/// On success the async `callback` receives an opaque OAuth handle.
+/// On success the async `callback` receives a heap-allocated `*mut OAuth`
+/// cast to `jlong`; the caller is responsible for calling `freeOAuth`.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthBuild(
     mut env: JNIEnv,
@@ -50,18 +51,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthBuild(
                 })
                 .await
                 .map_err(|e| crate::error::JniError::Other(e.to_string()))?;
-            Ok(JavaLong::from(crate::handles::insert(oauth)))
+            Ok(JavaLong::from(Box::into_raw(Box::new(oauth)) as jlong))
         })?;
         Ok(())
     })
 }
 
-/// Release an OAuth handle.
+/// Free an OAuth pointer.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeOAuth(
     _env: JNIEnv,
     _class: JClass,
     oauth: jlong,
 ) {
-    crate::handles::remove(oauth);
+    drop(Box::from_raw(oauth as *mut OAuth));
 }

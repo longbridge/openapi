@@ -76,7 +76,7 @@ fn new_subscription_object<'a>(
     env.new_object(cls, "(J)V", &[JValue::from(handle)])
 }
 
-/// Finish a successful `subscribe()`: store `subscription` behind an opaque
+/// Finish a successful `subscribe()`: box up `subscription` behind an opaque
 /// handle, wrap it in a Java `ConversationStreamSubscription`, and deliver it
 /// via `onSubscribe`. If attaching to the JVM or constructing the Java object
 /// fails, the boxed subscription is freed immediately so it isn't leaked (the
@@ -86,10 +86,12 @@ fn finish_subscribe_success(
     sink: Arc<SubscriberSink>,
     subscription: agent::ConversationStreamSubscription,
 ) {
-    let handle = crate::handles::insert(subscription);
+    let handle = Box::into_raw(Box::new(subscription)) as i64;
 
     let Ok(mut env) = sink.jvm.attach_current_thread() else {
-        crate::handles::remove(handle);
+        unsafe {
+            let _ = Box::from_raw(handle as *mut agent::ConversationStreamSubscription);
+        }
         return;
     };
 
@@ -102,7 +104,9 @@ fn finish_subscribe_success(
                 &[JValue::from(&obj)],
             );
         }
-        Err(_) => crate::handles::remove(handle),
+        Err(_) => unsafe {
+            let _ = Box::from_raw(handle as *mut agent::ConversationStreamSubscription);
+        },
     }
 }
 
@@ -137,10 +141,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newAgentContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        let config = crate::handles::get::<Config>(config)?;
-        Ok(crate::handles::insert(ContextObj {
+        let config = Arc::new((*(config as *const Config)).clone());
+        Ok(Box::into_raw(Box::new(ContextObj {
             ctx: AgentContext::new(config),
-        }))
+        })) as i64)
     })
 }
 
@@ -150,7 +154,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeAgentContext(
     _class: JClass,
     ctx: i64,
 ) {
-    crate::handles::remove(ctx);
+    let _ = Box::from_raw(ctx as *mut ContextObj);
 }
 
 #[unsafe(no_mangle)]
@@ -161,7 +165,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextWorkspac
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         async_util::execute(
             env,
             callback,
@@ -181,7 +185,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextAgents(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let workspace_id: String = FromJValue::from_jvalue(env, workspace_id.into())?;
         let opts = read_get_agents_options(env, &opts)?;
         async_util::execute(env, callback, async move {
@@ -203,7 +207,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let query: String = FromJValue::from_jvalue(env, query.into())?;
         let chat_uid: Option<String> = FromJValue::from_jvalue(env, chat_uid.into())?;
@@ -233,7 +237,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextContinue
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let chat_uid: String = FromJValue::from_jvalue(env, chat_uid.into())?;
         let message_id: String = FromJValue::from_jvalue(env, message_id.into())?;
@@ -263,7 +267,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
     subscriber: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let ctx = context.ctx.clone();
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let query: String = FromJValue::from_jvalue(env, query.into())?;
@@ -313,7 +317,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextContinue
     subscriber: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let ctx = context.ctx.clone();
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let chat_uid: String = FromJValue::from_jvalue(env, chat_uid.into())?;
@@ -349,29 +353,23 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextContinue
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_conversationStreamSubscriptionRequest(
-    mut env: JNIEnv,
+    _env: JNIEnv,
     _class: JClass,
     handle: i64,
     n: i64,
 ) {
-    jni_result(&mut env, (), |_env| {
-        let subscription = crate::handles::get::<agent::ConversationStreamSubscription>(handle)?;
-        subscription.request(n.max(0) as u64);
-        Ok(())
-    });
+    let subscription = &*(handle as *const agent::ConversationStreamSubscription);
+    subscription.request(n.max(0) as u64);
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_conversationStreamSubscriptionCancel(
-    mut env: JNIEnv,
+    _env: JNIEnv,
     _class: JClass,
     handle: i64,
 ) {
-    jni_result(&mut env, (), |_env| {
-        let subscription = crate::handles::get::<agent::ConversationStreamSubscription>(handle)?;
-        subscription.cancel();
-        Ok(())
-    });
+    let subscription = &*(handle as *const agent::ConversationStreamSubscription);
+    subscription.cancel();
 }
 
 #[unsafe(no_mangle)]
@@ -380,5 +378,5 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeConversationStre
     _class: JClass,
     handle: i64,
 ) {
-    crate::handles::remove(handle);
+    let _ = Box::from_raw(handle as *mut agent::ConversationStreamSubscription);
 }

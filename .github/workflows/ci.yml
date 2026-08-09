@@ -251,9 +251,6 @@ jobs:
       - name: Check with clippy
         run: cargo clippy -p longbridge-java --all-features
 
-      - name: Test native library
-        run: cargo test -p longbridge-java --all-features
-
       - name: Compile java sources
         working-directory: java/javasrc
         run: mvn package

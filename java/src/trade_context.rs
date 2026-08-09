@@ -63,7 +63,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newTradeContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |env| {
-        let config = crate::handles::get::<Config>(config)?;
+        let config = Arc::new((*(config as *const Config)).clone());
         let jvm = env.get_java_vm()?;
 
         let (ctx, mut receiver) = TradeContext::new(config);
@@ -79,7 +79,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newTradeContext(
             }
         });
 
-        Ok(crate::handles::insert(ContextObj { ctx, callbacks }))
+        Ok(Box::into_raw(Box::new(ContextObj { ctx, callbacks })) as i64)
     })
 }
 
@@ -89,7 +89,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeTradeContext(
     _class: JClass,
     ctx: i64,
 ) {
-    crate::handles::remove(ctx);
+    let _ = Box::from_raw(ctx as *mut ContextObj);
 }
 
 #[unsafe(no_mangle)]
@@ -99,8 +99,8 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnOrd
     ctx: i64,
     handler: JObject,
 ) {
+    let context = &*(ctx as *const ContextObj);
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(ctx)?;
         if !handler.is_null() {
             context.callbacks.lock().order_changed = Some(env.new_global_ref(handler)?);
         } else {
@@ -119,7 +119,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubscrib
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let topics: ObjectArray<TopicType> =
             FromJValue::from_jvalue(env, JObject::from_raw(topics).into())?;
         async_util::execute(env, callback, async move {
@@ -138,7 +138,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUnsubscr
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let topics: ObjectArray<TopicType> =
             FromJValue::from_jvalue(env, JObject::from_raw(topics).into())?;
         async_util::execute(env, callback, async move {
@@ -157,7 +157,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryE
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let opts = if !opts.is_null() {
             let mut new_opts = GetHistoryExecutionsOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -192,7 +192,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let opts = if !opts.is_null() {
             let mut new_opts = GetTodayExecutionsOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -224,7 +224,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
 // callback: JObject,
 // ) {
 // jni_result(&mut env, (), |env| {
-// let context = crate::handles::get::<ContextObj>(context)?;
+// let context = &*(context as *const ContextObj);
 // let opts = if !opts.is_null() {
 // let mut new_opts = GetAllExecutionsOptions::new();
 // let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -267,7 +267,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryO
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let opts = if !opts.is_null() {
             let mut new_opts = GetHistoryOrdersOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -312,7 +312,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayOrd
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let opts = if !opts.is_null() {
             let mut new_opts = GetTodayOrdersOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -468,7 +468,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextReplaceO
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let order_id: String = get_field(env, &opts, "orderId")?;
         let quantity: Decimal = get_field(env, &opts, "quantity")?;
         let mut new_opts = ReplaceOrderOptions::new(order_id, quantity);
@@ -541,7 +541,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = get_field(env, &opts, "symbol")?;
         let quantity: OrderType = get_field(env, &opts, "orderType")?;
         let side: OrderSide = get_field(env, &opts, "side")?;
@@ -630,7 +630,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOr
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(context.ctx.cancel_order(order_id).await?)
@@ -648,7 +648,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOr
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(context
@@ -669,7 +669,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAccountB
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let currency: Option<String> = FromJValue::from_jvalue(env, currency.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
@@ -689,7 +689,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCashFlow
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let start_at: OffsetDateTime = get_field(env, &opts, "startAt")?;
         let end_at: OffsetDateTime = get_field(env, &opts, "endAt")?;
         let mut new_opts = GetCashFlowOptions::new(start_at, end_at);
@@ -727,7 +727,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextFundPosi
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundPositionsOptions::new();
             let symbols: ObjectArray<String> = get_field(env, opts, "symbols")?;
@@ -752,7 +752,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextStockPos
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let opts = if !opts.is_null() {
             let mut new_opts = GetStockPositionsOptions::new();
             let symbols: ObjectArray<String> = get_field(env, opts, "symbols")?;
@@ -779,7 +779,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextMarginRa
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             Ok(context.ctx.margin_ratio(symbol).await?)
@@ -797,7 +797,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDet
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(context.ctx.order_detail(order_id).await?)
@@ -815,7 +815,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimate
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = get_field(env, &opts, "symbol")?;
         let order_type: OrderType = get_field(env, &opts, "orderType")?;
         let side: OrderSide = get_field(env, &opts, "side")?;
@@ -860,7 +860,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsQueryO
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol_str: String = FromJValue::from_jvalue(env, symbol.into())?;
         let us_opts = longbridge::trade::GetUSHistoryOrders {
             symbol: if symbol_str.is_empty() {
@@ -896,7 +896,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsOrderD
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             let resp = context.ctx.us_order_detail(order_id).await?;
@@ -914,7 +914,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsAssetO
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
             let resp = context.ctx.us_asset_overview().await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
@@ -933,7 +933,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsRealiz
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let currency: String = FromJValue::from_jvalue(env, currency.into())?;
         let category: Option<String> = FromJValue::from_jvalue(env, category.into()).ok();
         async_util::execute(env, callback, async move {
@@ -959,7 +959,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDet
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(context

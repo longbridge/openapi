@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use jni::{
     JNIEnv,
     objects::{JClass, JObject, JString},
@@ -16,15 +18,13 @@ struct ContextObj {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newScreenerContext(
-    mut env: JNIEnv,
+    _env: JNIEnv,
     _class: JClass,
     config: i64,
 ) -> i64 {
-    jni_result(&mut env, 0, |_env| {
-        let config = crate::handles::get::<Config>(config)?;
-        let ctx = ScreenerContext::new(config);
-        Ok(crate::handles::insert(ContextObj { ctx }))
-    })
+    let config = &*(config as *const Config);
+    let ctx = ScreenerContext::new(Arc::new(config.clone()));
+    Box::into_raw(Box::new(ContextObj { ctx })) as i64
 }
 
 #[unsafe(no_mangle)]
@@ -33,7 +33,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeScreenerContext(
     _class: JClass,
     context: i64,
 ) {
-    crate::handles::remove(context);
+    let _ = Box::from_raw(context as *mut ContextObj);
 }
 
 #[unsafe(no_mangle)]
@@ -45,7 +45,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextRecom
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let market: String = FromJValue::from_jvalue(env, market.into())?;
         async_util::execute(env, callback, async move {
             let resp = context.ctx.screener_recommend_strategies(market).await?;
@@ -64,7 +64,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextUserS
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let market: String = FromJValue::from_jvalue(env, market.into())?;
         async_util::execute(env, callback, async move {
             let resp = context.ctx.screener_user_strategies(market).await?;
@@ -83,7 +83,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextStrat
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
             let resp = context.ctx.screener_strategy(id).await?;
             Ok(resp)
@@ -101,7 +101,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextSearc
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let market: String = get_field(env, &opts, "market")?;
         let strategy_id: Option<i64> = get_field(env, &opts, "strategyId")?;
         let page_opt: Option<JavaInteger> = get_field(env, &opts, "page")?;
@@ -127,7 +127,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextIndic
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
             let resp = context.ctx.screener_indicators().await?;
             Ok(resp)

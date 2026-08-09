@@ -24,7 +24,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_newConfigFromApikey(
         let app_secret = String::from_jvalue(env, app_secret.into())?;
         let access_token = String::from_jvalue(env, access_token.into())?;
         let config = Config::from_apikey(app_key, app_secret, access_token);
-        Ok(crate::handles::insert(config))
+        Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
 
@@ -35,7 +35,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_newConfigFromApikeyEnv(
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
         let config = Config::from_apikey_env()?;
-        Ok(crate::handles::insert(config))
+        Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
 
@@ -46,9 +46,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newConfigFromOauth(
     oauth: jlong,
 ) -> jlong {
     jni_result(&mut env, 0, |_env| {
-        let oauth = crate::handles::get::<longbridge::oauth::OAuth>(oauth)?;
-        let config = Config::from_oauth((*oauth).clone());
-        Ok(crate::handles::insert(config))
+        let oauth = &*(oauth as *const longbridge::oauth::OAuth);
+        let config = Config::from_oauth(oauth.clone());
+        Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
 
@@ -64,7 +64,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetHttpUrl(
 ) -> jlong {
     jni_result(&mut env, config, |env| {
         let url = String::from_jvalue(env, http_url.into())?;
-        crate::handles::update(config, |config: &mut Config| config.set_http_url(url))?;
+        (*(config as *mut Config)).set_http_url(url);
         Ok(config)
     })
 }
@@ -78,7 +78,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetQuoteWsUrl(
 ) -> jlong {
     jni_result(&mut env, config, |env| {
         let url = String::from_jvalue(env, quote_ws_url.into())?;
-        crate::handles::update(config, |config: &mut Config| config.set_quote_ws_url(url))?;
+        (*(config as *mut Config)).set_quote_ws_url(url);
         Ok(config)
     })
 }
@@ -92,7 +92,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetTradeWsUrl(
 ) -> jlong {
     jni_result(&mut env, config, |env| {
         let url = String::from_jvalue(env, trade_ws_url.into())?;
-        crate::handles::update(config, |config: &mut Config| config.set_trade_ws_url(url))?;
+        (*(config as *mut Config)).set_trade_ws_url(url);
         Ok(config)
     })
 }
@@ -106,7 +106,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetLanguage(
 ) -> jlong {
     jni_result(&mut env, config, |env| {
         let lang = Language::from_jvalue(env, language.into())?;
-        crate::handles::update(config, |config: &mut Config| config.set_language(lang))?;
+        (*(config as *mut Config)).set_language(lang);
         Ok(config)
     })
 }
@@ -118,7 +118,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnableOvern
     config: jlong,
 ) -> jlong {
     jni_result(&mut env, config, |_env| {
-        crate::handles::update(config, Config::set_enable_overnight)?;
+        (*(config as *mut Config)).set_enable_overnight();
         Ok(config)
     })
 }
@@ -132,9 +132,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetPushCandles
 ) -> jlong {
     jni_result(&mut env, config, |env| {
         let mode = PushCandlestickMode::from_jvalue(env, mode.into())?;
-        crate::handles::update(config, |config: &mut Config| {
-            config.set_push_candlestick_mode(mode)
-        })?;
+        (*(config as *mut Config)).set_push_candlestick_mode(mode);
         Ok(config)
     })
 }
@@ -148,7 +146,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnablePrint
 ) -> jlong {
     jni_result(&mut env, config, |_env| {
         if enable == 0 {
-            crate::handles::update(config, Config::set_dont_print_quote_packages)?;
+            (*(config as *mut Config)).set_dont_print_quote_packages();
         }
         Ok(config)
     })
@@ -163,7 +161,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetLogPath(
 ) -> jlong {
     jni_result(&mut env, config, |env| {
         let path = String::from_jvalue(env, log_path.into())?;
-        crate::handles::update(config, |config: &mut Config| config.set_log_path(path))?;
+        (*(config as *mut Config)).set_log_path(path);
         Ok(config)
     })
 }
@@ -175,7 +173,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetEnablePaper
     config: jlong,
 ) -> jlong {
     jni_result(&mut env, config, |_env| {
-        crate::handles::update(config, Config::set_enable_papertrading)?;
+        (*(config as *mut Config)).set_enable_papertrading();
         Ok(config)
     })
 }
@@ -192,7 +190,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configRefreshAccessT
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let config = crate::handles::get::<Config>(config)?;
+        let config = &*(config as *const Config);
         let expired_at: Option<OffsetDateTime> = FromJValue::from_jvalue(env, expired_at.into())?;
         async_util::execute(env, callback, async move {
             let token = config.refresh_access_token(expired_at).await?;
@@ -210,5 +208,5 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeConfig(
     _class: JClass,
     config: jlong,
 ) {
-    crate::handles::remove(config);
+    let _ = Box::from_raw(config as *mut Config);
 }

@@ -19,8 +19,6 @@ pub(crate) enum JniError {
     OpenApi(#[from] Box<longbridge::Error>),
     #[error("{0}")]
     Other(String),
-    #[error("invalid or closed native handle: {0}")]
-    InvalidHandle(i64),
 }
 
 impl From<longbridge::Error> for JniError {
@@ -88,10 +86,6 @@ impl JniError {
             JniError::Jni(err) => Self::into_runtime_error_object(env, err),
             JniError::OpenApi(err) => Self::into_openapi_error_object(env, *err),
             JniError::Other(err) => Self::into_runtime_error_object(env, err),
-            JniError::InvalidHandle(handle) => Self::into_runtime_error_object(
-                env,
-                format!("invalid or closed native handle: {handle}"),
-            ),
         }
         .expect("to error object")
     }
@@ -101,9 +95,6 @@ impl JniError {
             JniError::Jni(err) => Self::throw_runtime_error(env, err),
             JniError::OpenApi(err) => Self::throw_openapi_error(env, *err),
             JniError::Other(err) => Self::throw_runtime_error(env, err),
-            JniError::InvalidHandle(handle) => {
-                Self::throw_runtime_error(env, format!("invalid or closed native handle: {handle}"))
-            }
         };
         if let Err(err) = res {
             env.fatal_error(err.to_string());

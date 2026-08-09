@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use jni::{
     JNIEnv,
     objects::{JClass, JObject},
@@ -59,10 +61,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newAlertContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        let config = crate::handles::get::<Config>(config)?;
-        Ok(crate::handles::insert(ContextObj {
+        let config = Arc::new((*(config as *const Config)).clone());
+        Ok(Box::into_raw(Box::new(ContextObj {
             ctx: AlertContext::new(config),
-        }))
+        })) as i64)
     })
 }
 #[unsafe(no_mangle)]
@@ -71,7 +73,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeAlertContext(
     _class: JClass,
     ctx: i64,
 ) {
-    crate::handles::remove(ctx);
+    let _ = Box::from_raw(ctx as *mut ContextObj);
 }
 
 #[unsafe(no_mangle)]
@@ -82,7 +84,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextList(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move { Ok(context.ctx.list().await?) })?;
         Ok(())
     })
@@ -97,7 +99,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextAdd(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let symbol: String = get_field(env, &opts, "symbol")?;
         let condition: Option<AlertCondition> = get_field(env, &opts, "condition")?;
         let condition = condition.unwrap_or(AlertCondition::PriceRise);
@@ -124,7 +126,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextUpdate(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let alert_item = read_alert_item(env, &item)?;
         async_util::execute(env, callback, async move {
             context.ctx.update(&alert_item).await?;
@@ -143,7 +145,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_alertContextDelete(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = crate::handles::get::<ContextObj>(context)?;
+        let context = &*(context as *const ContextObj);
         let ids_raw: ObjectArray<String> = get_field(env, &opts, "ids")?;
         let ids: Vec<String> = ids_raw.0;
         async_util::execute(env, callback, async move {

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use jni::{
     JNIEnv,
     objects::{JClass, JObject},
@@ -21,9 +23,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newSharelistContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        Ok(crate::handles::insert(ContextObj {
-            ctx: SharelistContext::new(crate::handles::get::<Config>(config)?),
-        }))
+        Ok(Box::into_raw(Box::new(ContextObj {
+            ctx: SharelistContext::new(Arc::new((*(config as *const Config)).clone())),
+        })) as i64)
     })
 }
 #[unsafe(no_mangle)]
@@ -32,7 +34,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeSharelistContext
     _class: JClass,
     ctx: i64,
 ) {
-    crate::handles::remove(ctx);
+    let _ = Box::from_raw(ctx as *mut ContextObj);
 }
 
 #[unsafe(no_mangle)]
@@ -44,7 +46,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextList
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
             Ok(ctx.ctx.list(count as u32).await?)
         })?;
@@ -60,7 +62,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextDeta
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move { Ok(ctx.ctx.detail(id).await?) })?;
         Ok(())
     })
@@ -74,7 +76,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextPopu
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
             Ok(ctx.ctx.popular(count as u32).await?)
         })?;
@@ -90,7 +92,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextCrea
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         let name: String = get_field(env, &opts, "name")?;
         let description: Option<String> = get_field(env, &opts, "description")?;
         async_util::execute(env, callback, async move {
@@ -109,7 +111,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextAddS
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         let syms: ObjectArray<String> = FromJValue::from_jvalue(env, symbols.into())?;
         async_util::execute(env, callback, async move {
             ctx.ctx.add_securities(id, syms.0).await?;
@@ -128,7 +130,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextRemo
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         let syms: ObjectArray<String> = FromJValue::from_jvalue(env, symbols.into())?;
         async_util::execute(env, callback, async move {
             ctx.ctx.remove_securities(id, syms.0).await?;
@@ -147,7 +149,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextSort
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         let syms: ObjectArray<String> = FromJValue::from_jvalue(env, symbols.into())?;
         async_util::execute(env, callback, async move {
             ctx.ctx.sort_securities(id, syms.0).await?;
@@ -166,7 +168,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextDele
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let ctx = crate::handles::get::<ContextObj>(context)?;
+        let ctx = &*(context as *const ContextObj);
         async_util::execute(env, callback, async move {
             ctx.ctx.delete(id).await?;
             Ok(())

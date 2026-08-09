@@ -32,7 +32,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newHttpClientFromApi
         if !http_url.is_null() {
             config = config.http_url(String::from_jvalue(env, http_url.into())?);
         }
-        Ok(crate::handles::insert(HttpClient::new(config)))
+        Ok(Box::into_raw(Box::new(HttpClient::new(config))) as jlong)
     })
 }
 
@@ -46,7 +46,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_newHttpClientFromApikeyEnv(
             longbridge::httpclient::HttpClientConfig::from_apikey_env()
                 .map_err(longbridge::Error::HttpClient)?,
         );
-        Ok(crate::handles::insert(config))
+        Ok(Box::into_raw(Box::new(config)) as jlong)
     })
 }
 
@@ -58,12 +58,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newHttpClientFromOau
     http_url: JString,
 ) -> jlong {
     jni_result(&mut env, 0, |env| {
-        let oauth = crate::handles::get::<longbridge::oauth::OAuth>(oauth)?;
-        let mut config = HttpClientConfig::from_oauth((*oauth).clone());
+        let oauth = &*(oauth as *const longbridge::oauth::OAuth);
+        let mut config = HttpClientConfig::from_oauth(oauth.clone());
         if !http_url.is_null() {
             config = config.http_url(String::from_jvalue(env, http_url.into())?);
         }
-        Ok(crate::handles::insert(HttpClient::new(config)))
+        Ok(Box::into_raw(Box::new(HttpClient::new(config))) as jlong)
     })
 }
 
@@ -73,7 +73,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeHttpClient(
     _class: JClass,
     http_client: i64,
 ) {
-    crate::handles::remove(http_client);
+    let _ = Box::from_raw(http_client as *mut HttpClient);
 }
 
 #[unsafe(no_mangle)]
@@ -93,7 +93,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_httpClientRequest(
     }
 
     jni_result(&mut env, (), |env| {
-        let http_client = crate::handles::get::<HttpClient>(http_client)?;
+        let http_client = &*(http_client as *const HttpClient);
         let request = String::from_jvalue(env, request.into())?;
         let request: Request =
             serde_json::from_str(&request).map_err(|err| JniError::Other(err.to_string()))?;
