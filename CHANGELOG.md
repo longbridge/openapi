@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All languages:** add optional `parent_message_id` parameter to the AI Agent `conversation` and `conversation_streamed` methods — pass the `message_id` from a previous response to attach a follow-up message after the specified one, keeping the message stream in order. Only valid together with `chat_uid`; must not be set for a new conversation
 
+### Changed
+
+- **Java SDK:** enable the native library test suite in CI on Linux, Windows, and macOS
+
 ## [4.4.3] - 2026-07-30
 
 ### Fixed
