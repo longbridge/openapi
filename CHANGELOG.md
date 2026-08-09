@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All languages:** add optional `parent_message_id` parameter to the AI Agent `conversation` and `conversation_streamed` methods — pass the `message_id` from a previous response to attach a follow-up message after the specified one, keeping the message stream in order. Only valid together with `chat_uid`; must not be set for a new conversation
 
+### Fixed
+
+- **Java SDK:** invalid arguments passed across the JNI boundary no longer crash the JVM (process abort / core dump). Previously a Rust `panic!`/`unwrap`/`expect` in the value conversions unwound across the `extern "system"` boundary and aborted the whole process. These cases now throw a catchable `java.lang.IllegalArgumentException` instead:
+  - a `null` or unrecognized constant passed for any enum argument (e.g. `Language`, `OrderSide`, `OrderType`, `Period`, `Market`, `AdjustType`, …)
+  - a `null` `BigDecimal` / `LocalDate` / `LocalTime` / `OffsetDateTime` / `String` argument, or an out-of-range date/time, an out-of-range/non-representable decimal, or a non-UTF-8 string
+  - `jni_result` now preserves an already-pending Java exception instead of throwing a second one
+- **Java SDK:** background callback threads (async request completions and quote/trade push events) no longer abort the JVM on failure. Previously a failed `unwrap` while attaching the tokio worker thread to the JVM, or while converting a result/push payload to a Java object, would panic and crash the whole process; these paths now fail gracefully (the affected callback/event is skipped or delivered as an error). `JniError::throw` no longer calls `FatalError` (which aborts the JVM) as a fallback, and `into_error_object` no longer panics if the error object cannot be built
+
 ## [4.4.3] - 2026-07-30
 
 ### Fixed

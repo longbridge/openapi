@@ -25,9 +25,22 @@ impl JSignature for Decimal {
 impl FromJValue for Decimal {
     fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
         let obj = value.l()?;
+        if obj.is_null() {
+            crate::error::throw_illegal_argument(env, "BigDecimal argument must not be null");
+            return Err(jni::errors::Error::JavaException);
+        }
         let value = env.call_method(obj, "toString", "()Ljava/lang/String;", &[])?;
         let value = String::from_jvalue(env, value)?;
-        Ok(value.parse().expect("valid decimal"))
+        match value.parse() {
+            Ok(decimal) => Ok(decimal),
+            Err(_) => {
+                crate::error::throw_illegal_argument(
+                    env,
+                    format!("value \"{value}\" is not a valid / representable decimal"),
+                );
+                Err(jni::errors::Error::JavaException)
+            }
+        }
     }
 }
 

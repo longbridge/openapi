@@ -37,7 +37,7 @@ struct ContextObj {
 }
 
 fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Result<()> {
-    let mut env = jvm.attach_current_thread().unwrap();
+    let mut env = jvm.attach_current_thread()?;
 
     match event {
         PushEvent::OrderChanged(order_changed) => {

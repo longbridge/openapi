@@ -317,8 +317,19 @@ pub fn impl_java_enum(input: TokenStream) -> TokenStream {
                 use #type_path::*;
                 let cls = <Self as crate::types::ClassLoader>::class_ref();
                 let value = value.l()?;
+                if value.is_null() {
+                    crate::error::throw_illegal_argument(
+                        env,
+                        concat!("argument of enum type ", #classname, " must not be null"),
+                    );
+                    return Err(jni::errors::Error::JavaException);
+                }
                 #(#from_jsvalue)*
-                panic!("invalid enum value")
+                crate::error::throw_illegal_argument(
+                    env,
+                    concat!("unrecognized enum value for ", #classname),
+                );
+                Err(jni::errors::Error::JavaException)
             }
         }
 
