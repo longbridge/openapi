@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use jni::{
     JNIEnv,
     objects::{JClass, JObject},
@@ -19,10 +17,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newCalendarContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        let config = Arc::new((*(config as *const Config)).clone());
-        Ok(Box::into_raw(Box::new(ContextObj {
+        let config = crate::handles::get::<Config>(config)?;
+        Ok(crate::handles::insert(ContextObj {
             ctx: CalendarContext::new(config),
-        })) as i64)
+        }))
     })
 }
 
@@ -32,7 +30,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeCalendarContext(
     _class: JClass,
     ctx: i64,
 ) {
-    let _ = Box::from_raw(ctx as *mut ContextObj);
+    crate::handles::remove(ctx);
 }
 
 #[unsafe(no_mangle)]
@@ -44,7 +42,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_calendarContextFinan
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let category: Option<CalendarCategory> = get_field(env, &opts, "category")?;
         let category = category.unwrap_or(CalendarCategory::Report);
         let start: String = get_field(env, &opts, "start")?;

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use jni::{
     JNIEnv,
     objects::{JClass, JObject},
@@ -26,9 +24,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newAssetContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        let config = Arc::new((*(config as *const Config)).clone());
+        let config = crate::handles::get::<Config>(config)?;
         let ctx = AssetContext::new(config);
-        Ok(Box::into_raw(Box::new(ContextObj { ctx })) as i64)
+        Ok(crate::handles::insert(ContextObj { ctx }))
     })
 }
 
@@ -38,7 +36,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeAssetContext(
     _class: JClass,
     ctx: i64,
 ) {
-    let _ = Box::from_raw(ctx as *mut ContextObj);
+    crate::handles::remove(ctx);
 }
 
 #[unsafe(no_mangle)]
@@ -50,7 +48,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextStatemen
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let statement_type: Option<JavaInteger> = get_field(env, &opts, "statementType")?;
         let start_date: Option<JavaInteger> = get_field(env, &opts, "startDate")?;
         let limit: Option<JavaInteger> = get_field(env, &opts, "limit")?;
@@ -84,7 +82,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_assetContextDownload
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let file_key: String = FromJValue::from_jvalue(env, file_key.into())?;
         let options = GetStatementOptions::new(file_key);
 
