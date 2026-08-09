@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Java SDK:** prevent native crashes when contexts or other SDK handles are closed more than once or while asynchronous operations are still in flight
+- **Java SDK:** prevent native crashes when contexts or other SDK handles are closed more than once or while asynchronous operations are still in flight, with native lifecycle regression tests running in CI
 
 ## [4.4.3] - 2026-07-30
 
