@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use jni::{
     JNIEnv,
     objects::{JClass, JObject},
@@ -23,9 +21,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newPortfolioContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        let config = Arc::new((*(config as *const Config)).clone());
+        let config = crate::handles::get::<Config>(config)?;
         let ctx = PortfolioContext::new(config);
-        Ok(Box::into_raw(Box::new(ContextObj { ctx })) as i64)
+        Ok(crate::handles::insert(ContextObj { ctx }))
     })
 }
 
@@ -35,7 +33,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freePortfolioContext
     _class: JClass,
     ctx: i64,
 ) {
-    let _ = Box::from_raw(ctx as *mut ContextObj);
+    crate::handles::remove(ctx);
 }
 
 #[unsafe(no_mangle)]
@@ -46,7 +44,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextExch
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         async_util::execute(env, callback, async move {
             Ok(context.ctx.exchange_rate().await?)
         })?;
@@ -63,7 +61,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let start: Option<String> = if opts.is_null() {
             None
         } else {
@@ -90,7 +88,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let symbol: String = get_field(env, &opts, "symbol")?;
         let start: Option<String> = get_field(env, &opts, "start")?;
         let end: Option<String> = get_field(env, &opts, "end")?;
@@ -113,7 +111,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let market: Option<String> = if opts.is_null() {
             None
         } else {
@@ -157,7 +155,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let symbol: String = get_field(env, &opts, "symbol")?;
         let page_v: Option<JavaInteger> = get_field(env, &opts, "page")?;
         let page: u32 = page_v.map(|v| i32::from(v) as u32).unwrap_or(1);

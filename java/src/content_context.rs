@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use jni::{
     JNIEnv,
     objects::{JClass, JObject},
@@ -26,9 +24,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newContentContext(
     config: i64,
 ) -> i64 {
     jni_result(&mut env, 0i64, |_env| {
-        let config = Arc::new((*(config as *const Config)).clone());
+        let config = crate::handles::get::<Config>(config)?;
         let ctx = ContentContext::new(config);
-        Ok(Box::into_raw(Box::new(ContextObj { ctx })) as i64)
+        Ok(crate::handles::insert(ContextObj { ctx }))
     })
 }
 
@@ -38,7 +36,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeContentContext(
     _class: JClass,
     ctx: i64,
 ) {
-    let _ = Box::from_raw(ctx as *mut ContextObj);
+    crate::handles::remove(ctx);
 }
 
 #[unsafe(no_mangle)]
@@ -50,7 +48,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextMyTopi
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
         let size: Option<JavaInteger> = get_field(env, &opts, "size")?;
         let topic_type: Option<String> = get_field(env, &opts, "topicType")?;
@@ -79,7 +77,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextCreate
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let title: String = get_field(env, &opts, "title")?;
         let body: String = get_field(env, &opts, "body")?;
         let topic_type: Option<String> = get_field(env, &opts, "topicType")?;
@@ -110,7 +108,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextTopics
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(context.ctx.topics(symbol).await?))
@@ -128,7 +126,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextNews(
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
+        let context = crate::handles::get::<ContextObj>(context)?;
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(context.ctx.news(symbol).await?))
