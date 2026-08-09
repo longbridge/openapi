@@ -8,6 +8,15 @@ import com.longbridge.*;
 public class SharelistContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a SharelistContext object.
      *
@@ -16,7 +25,14 @@ public class SharelistContext implements AutoCloseable {
      */
     public static SharelistContext create(Config config) { SharelistContext ctx = new SharelistContext(); ctx.raw = SdkNative.newSharelistContext(config.getRaw()); return ctx; }
 
-    @Override public void close() throws Exception { SdkNative.freeSharelistContext(raw); }
+    @Override
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeSharelistContext(h);
+        }
+    }
 
     /**
      * List the user's own and subscribed sharelists.
@@ -25,7 +41,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the sharelist collection
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SharelistList> list(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextList(raw, count, cb)); }
+    public CompletableFuture<SharelistList> list(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextList(raw(), count, cb)); }
 
     /**
      * Get sharelist detail including its constituent securities.
@@ -34,7 +50,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the sharelist detail
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SharelistDetail> detail(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDetail(raw, id, cb)); }
+    public CompletableFuture<SharelistDetail> detail(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDetail(raw(), id, cb)); }
 
     /**
      * Get popular sharelists.
@@ -43,7 +59,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the popular sharelist collection
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SharelistList> popular(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextPopular(raw, count, cb)); }
+    public CompletableFuture<SharelistList> popular(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextPopular(raw(), count, cb)); }
 
     /**
      * Create a new sharelist.
@@ -52,7 +68,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the newly created sharelist detail
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> create(CreateSharelistOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextCreate(raw, opts, cb)); }
+    public CompletableFuture<Void> create(CreateSharelistOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextCreate(raw(), opts, cb)); }
 
     /**
      * Add securities to a sharelist.
@@ -62,7 +78,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the securities have been added
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> addSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextAddSecurities(raw, id, symbols, cb)); }
+    public CompletableFuture<Void> addSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextAddSecurities(raw(), id, symbols, cb)); }
 
     /**
      * Delete a sharelist.
@@ -71,7 +87,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the sharelist has been deleted
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> delete(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDelete(raw, id, cb)); }
+    public CompletableFuture<Void> delete(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDelete(raw(), id, cb)); }
 
     /**
      * Remove securities from a sharelist.
@@ -81,7 +97,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the securities have been removed
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> removeSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextRemoveSecurities(raw, id, symbols, cb)); }
+    public CompletableFuture<Void> removeSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextRemoveSecurities(raw(), id, symbols, cb)); }
 
     /**
      * Reorder securities in a sharelist.
@@ -91,5 +107,5 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the securities have been reordered
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> sortSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextSortSecurities(raw, id, symbols, cb)); }
+    public CompletableFuture<Void> sortSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextSortSecurities(raw(), id, symbols, cb)); }
 }

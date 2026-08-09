@@ -20,6 +20,15 @@ import com.longbridge.SdkNative;
 public class AgentContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create an AgentContext object
      *
@@ -33,8 +42,12 @@ public class AgentContext implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeAgentContext(raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeAgentContext(h);
+        }
     }
 
     /**
@@ -45,7 +58,7 @@ public class AgentContext implements AutoCloseable {
      */
     public CompletableFuture<WorkspacesResponse> workspaces() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.agentContextWorkspaces(this.raw, callback);
+            SdkNative.agentContextWorkspaces(raw(), callback);
         });
     }
 
@@ -60,7 +73,7 @@ public class AgentContext implements AutoCloseable {
     public CompletableFuture<AgentsResponse> agents(String workspaceId, GetAgentsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.agentContextAgents(this.raw, workspaceId, opts, callback);
+            SdkNative.agentContextAgents(raw(), workspaceId, opts, callback);
         });
     }
 
@@ -107,7 +120,7 @@ public class AgentContext implements AutoCloseable {
     public CompletableFuture<ConversationResponse> conversation(String agentId, String query, String chatUid,
             String parentMessageId) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.agentContextConversation(this.raw, agentId, query, chatUid, parentMessageId, callback);
+            SdkNative.agentContextConversation(raw(), agentId, query, chatUid, parentMessageId, callback);
         });
     }
 
@@ -129,7 +142,7 @@ public class AgentContext implements AutoCloseable {
             String messageId, Map<String, Map<String, String>> answersByToolCall) throws OpenApiException {
         String answersJson = toAnswersJson(answersByToolCall);
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.agentContextContinueConversation(this.raw, agentId, chatUid, messageId, answersJson, callback);
+            SdkNative.agentContextContinueConversation(raw(), agentId, chatUid, messageId, answersJson, callback);
         });
     }
 
@@ -186,7 +199,7 @@ public class AgentContext implements AutoCloseable {
      */
     public Flow.Publisher<ConversationStreamEvent> conversationStream(String agentId, String query, String chatUid,
             String parentMessageId) {
-        return ConversationStreamPublisher.forNewConversation(this.raw, agentId, query, chatUid, parentMessageId);
+        return ConversationStreamPublisher.forNewConversation(raw(), agentId, query, chatUid, parentMessageId);
     }
 
     /**
@@ -206,7 +219,7 @@ public class AgentContext implements AutoCloseable {
     public Flow.Publisher<ConversationStreamEvent> continueConversationStream(String agentId, String chatUid,
             String messageId, Map<String, Map<String, String>> answersByToolCall) {
         String answersJson = toAnswersJson(answersByToolCall);
-        return ConversationStreamPublisher.forContinueConversation(this.raw, agentId, chatUid, messageId, answersJson);
+        return ConversationStreamPublisher.forContinueConversation(raw(), agentId, chatUid, messageId, answersJson);
     }
 
     private static String toAnswersJson(Map<String, Map<String, String>> answersByToolCall) {

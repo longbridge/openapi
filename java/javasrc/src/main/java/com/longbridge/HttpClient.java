@@ -15,6 +15,15 @@ import com.google.gson.Gson;
 public class HttpClient implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * @hidden
      */
@@ -54,8 +63,12 @@ public class HttpClient implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeHttpClient(this.raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeHttpClient(h);
+        }
     }
 
     /**
@@ -167,7 +180,7 @@ public class HttpClient implements AutoCloseable {
 
         String requestJson = gson.toJson(request);
         CompletableFuture<String> fut = AsyncCallback.executeTask((callback) -> {
-            SdkNative.httpClientRequest(this.raw, requestJson, callback);
+            SdkNative.httpClientRequest(raw(), requestJson, callback);
         });
         return fut.thenApply(respBody -> {
             if (respClass != null) {

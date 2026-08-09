@@ -50,12 +50,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextFi
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let kind: Option<FinancialReportKind> = get_field(env, &opts, "kind")?;
         let kind = kind.unwrap_or(FinancialReportKind::All);
         let period: Option<FinancialReportPeriod> = get_field(env, &opts, "period")?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.financial_report(symbol, kind, period).await?;
+            let resp = __owned_ctx.financial_report(symbol, kind, period).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -76,9 +77,10 @@ macro_rules! symbol_method {
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
                 let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = context.ctx.$method(symbol).await?;
+                    let resp = __owned_ctx.$method(symbol).await?;
                     Ok(resp)
                 })?;
                 Ok(())
@@ -165,9 +167,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.buyback(symbol).await?;
+            let resp = __owned_ctx.buyback(symbol).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -184,9 +187,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.ratings(symbol).await?;
+            let resp = __owned_ctx.ratings(symbol).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -203,9 +207,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextSh
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.shareholder_top(symbol).await?;
+            let resp = __owned_ctx.shareholder_top(symbol).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -223,9 +228,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextSh
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.shareholder_detail(symbol, object_id).await?;
+            let resp = __owned_ctx.shareholder_detail(symbol, object_id).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -244,6 +250,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextVa
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let currency: String = FromJValue::from_jvalue(env, currency.into())?;
         let comparison_syms: Option<Vec<String>> = if comparison_symbols.is_null() {
@@ -253,8 +260,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextVa
             Some(arr.0)
         };
         async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
+            let resp = __owned_ctx
                 .valuation_comparison(symbol, currency, comparison_syms)
                 .await?;
             Ok(resp)
@@ -276,6 +282,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let country: Option<String> = FromJValue::from_jvalue(env, country.into())?;
         let country = country.and_then(|s| {
             use longbridge::fundamental::MacroeconomicCountry::*;
@@ -293,8 +300,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
         let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .macroeconomic_indicators(country, keyword, offset, limit)
                 .await?)
         })?;
@@ -316,14 +322,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let indicator_code: String = FromJValue::from_jvalue(env, indicator_code.into())?;
         let start_date: Option<String> = FromJValue::from_jvalue(env, start_time.into())?;
         let end_date: Option<String> = FromJValue::from_jvalue(env, end_time.into())?;
         let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .macroeconomic(indicator_code, start_date, end_date, offset, limit)
                 .await?)
         })?;
@@ -347,9 +353,10 @@ macro_rules! us_counter_id_method {
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
                 let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = context.ctx.$method(counter_id).await?;
+                    let resp = __owned_ctx.$method(counter_id).await?;
                     Ok(serde_json::to_string(&resp).unwrap_or_default())
                 })?;
                 Ok(())
@@ -371,10 +378,11 @@ macro_rules! us_counter_id_report_method {
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
                 let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
                 let report: String = FromJValue::from_jvalue(env, report.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = context.ctx.$method(counter_id, report).await?;
+                    let resp = __owned_ctx.$method(counter_id, report).await?;
                     Ok(serde_json::to_string(&resp).unwrap_or_default())
                 })?;
                 Ok(())
@@ -424,12 +432,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let kind: String = FromJValue::from_jvalue(env, kind.into())?;
         let report: String = FromJValue::from_jvalue(env, report.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
+            let resp = __owned_ctx
                 .us_financial_statement(counter_id, kind, report)
                 .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
@@ -449,11 +457,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let size: Option<i32> = FromJValue::from_jvalue(env, size.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
+            let resp = __owned_ctx
                 .us_etf_files(counter_id, size.map(|s| s as u32))
                 .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())

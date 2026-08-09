@@ -47,8 +47,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextList
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         async_util::execute(env, callback, async move {
-            Ok(ctx.ctx.list(count as u32).await?)
+            Ok(__owned_ctx.list(count as u32).await?)
         })?;
         Ok(())
     })
@@ -63,7 +64,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextDeta
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
-        async_util::execute(env, callback, async move { Ok(ctx.ctx.detail(id).await?) })?;
+        let __owned_ctx = ctx.ctx.clone();
+        async_util::execute(
+            env,
+            callback,
+            async move { Ok(__owned_ctx.detail(id).await?) },
+        )?;
         Ok(())
     })
 }
@@ -77,8 +83,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextPopu
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         async_util::execute(env, callback, async move {
-            Ok(ctx.ctx.popular(count as u32).await?)
+            Ok(__owned_ctx.popular(count as u32).await?)
         })?;
         Ok(())
     })
@@ -93,10 +100,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextCrea
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let name: String = get_field(env, &opts, "name")?;
         let description: Option<String> = get_field(env, &opts, "description")?;
         async_util::execute(env, callback, async move {
-            Ok(ctx.ctx.create(name, description).await?)
+            Ok(__owned_ctx.create(name, description).await?)
         })?;
         Ok(())
     })
@@ -112,9 +120,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextAddS
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let syms: ObjectArray<String> = FromJValue::from_jvalue(env, symbols.into())?;
         async_util::execute(env, callback, async move {
-            ctx.ctx.add_securities(id, syms.0).await?;
+            __owned_ctx.add_securities(id, syms.0).await?;
             Ok(())
         })?;
         Ok(())
@@ -131,9 +140,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextRemo
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let syms: ObjectArray<String> = FromJValue::from_jvalue(env, symbols.into())?;
         async_util::execute(env, callback, async move {
-            ctx.ctx.remove_securities(id, syms.0).await?;
+            __owned_ctx.remove_securities(id, syms.0).await?;
             Ok(())
         })?;
         Ok(())
@@ -150,9 +160,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextSort
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         let syms: ObjectArray<String> = FromJValue::from_jvalue(env, symbols.into())?;
         async_util::execute(env, callback, async move {
-            ctx.ctx.sort_securities(id, syms.0).await?;
+            __owned_ctx.sort_securities(id, syms.0).await?;
             Ok(())
         })?;
         Ok(())
@@ -169,8 +180,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_sharelistContextDele
 ) {
     jni_result(&mut env, (), |env| {
         let ctx = &*(context as *const ContextObj);
+        let __owned_ctx = ctx.ctx.clone();
         async_util::execute(env, callback, async move {
-            ctx.ctx.delete(id).await?;
+            __owned_ctx.delete(id).await?;
             Ok(())
         })?;
         Ok(())

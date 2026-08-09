@@ -166,10 +166,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextWorkspac
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         async_util::execute(
             env,
             callback,
-            async move { Ok(context.ctx.workspaces().await?) },
+            async move { Ok(__owned_ctx.workspaces().await?) },
         )?;
         Ok(())
     })
@@ -186,10 +187,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextAgents(
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let workspace_id: String = FromJValue::from_jvalue(env, workspace_id.into())?;
         let opts = read_get_agents_options(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.agents(workspace_id, opts).await?)
+            Ok(__owned_ctx.agents(workspace_id, opts).await?)
         })?;
         Ok(())
     })
@@ -208,6 +210,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let query: String = FromJValue::from_jvalue(env, query.into())?;
         let chat_uid: Option<String> = FromJValue::from_jvalue(env, chat_uid.into())?;
@@ -215,8 +218,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversa
             FromJValue::from_jvalue(env, parent_message_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(crate::types::ConversationResponse::from(
-                context
-                    .ctx
+                __owned_ctx
                     .conversation(agent_id, query, chat_uid, parent_message_id)
                     .await?,
             ))
@@ -238,6 +240,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextContinue
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let agent_id: String = FromJValue::from_jvalue(env, agent_id.into())?;
         let chat_uid: String = FromJValue::from_jvalue(env, chat_uid.into())?;
         let message_id: String = FromJValue::from_jvalue(env, message_id.into())?;
@@ -245,8 +248,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextContinue
         let answers: AnswersByToolCall = serde_json::from_str(&answers_json).unwrap_or_default();
         async_util::execute(env, callback, async move {
             Ok(crate::types::ConversationResponse::from(
-                context
-                    .ctx
+                __owned_ctx
                     .continue_conversation(agent_id, chat_uid, message_id, answers)
                     .await?,
             ))

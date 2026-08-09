@@ -11,6 +11,15 @@ import com.longbridge.*;
 public class FundamentalContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a FundamentalContext.
      *
@@ -24,8 +33,12 @@ public class FundamentalContext implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeFundamentalContext(raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeFundamentalContext(h);
+        }
     }
 
     /**
@@ -40,7 +53,7 @@ public class FundamentalContext implements AutoCloseable {
         FinancialReportOptions o = opts != null ? opts : new FinancialReportOptions();
         o.symbol = symbol;
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextFinancialReport(raw, o, callback);
+            SdkNative.fundamentalContextFinancialReport(raw(), o, callback);
         });
     }
 
@@ -53,7 +66,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<InstitutionRating> getInstitutionRating(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextInstitutionRating(raw, symbol, callback);
+            SdkNative.fundamentalContextInstitutionRating(raw(), symbol, callback);
         });
     }
 
@@ -66,7 +79,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<InstitutionRatingDetail> getInstitutionRatingDetail(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextInstitutionRatingDetail(raw, symbol, callback);
+            SdkNative.fundamentalContextInstitutionRatingDetail(raw(), symbol, callback);
         });
     }
 
@@ -78,7 +91,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<DividendList> getDividend(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextDividend(raw, symbol, callback);
+            SdkNative.fundamentalContextDividend(raw(), symbol, callback);
         });
     }
 
@@ -90,7 +103,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<DividendList> getDividendDetail(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextDividendDetail(raw, symbol, callback);
+            SdkNative.fundamentalContextDividendDetail(raw(), symbol, callback);
         });
     }
 
@@ -102,7 +115,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<ForecastEps> getForecastEps(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextForecastEps(raw, symbol, callback);
+            SdkNative.fundamentalContextForecastEps(raw(), symbol, callback);
         });
     }
 
@@ -114,7 +127,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<FinancialConsensus> getConsensus(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextConsensus(raw, symbol, callback);
+            SdkNative.fundamentalContextConsensus(raw(), symbol, callback);
         });
     }
 
@@ -126,7 +139,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<ValuationData> getValuation(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextValuation(raw, symbol, callback);
+            SdkNative.fundamentalContextValuation(raw(), symbol, callback);
         });
     }
 
@@ -138,7 +151,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<ValuationHistoryResponse> getValuationHistory(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextValuationHistory(raw, symbol, callback);
+            SdkNative.fundamentalContextValuationHistory(raw(), symbol, callback);
         });
     }
 
@@ -151,7 +164,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<IndustryValuationList> getIndustryValuation(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextIndustryValuation(raw, symbol, callback);
+            SdkNative.fundamentalContextIndustryValuation(raw(), symbol, callback);
         });
     }
 
@@ -164,7 +177,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<IndustryValuationDist> getIndustryValuationDist(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextIndustryValuationDist(raw, symbol, callback);
+            SdkNative.fundamentalContextIndustryValuationDist(raw(), symbol, callback);
         });
     }
 
@@ -176,7 +189,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<CompanyOverview> getCompany(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextCompany(raw, symbol, callback);
+            SdkNative.fundamentalContextCompany(raw(), symbol, callback);
         });
     }
 
@@ -188,7 +201,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<ExecutiveList> getExecutive(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextExecutive(raw, symbol, callback);
+            SdkNative.fundamentalContextExecutive(raw(), symbol, callback);
         });
     }
 
@@ -200,7 +213,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<ShareholderList> getShareholder(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextShareholder(raw, symbol, callback);
+            SdkNative.fundamentalContextShareholder(raw(), symbol, callback);
         });
     }
 
@@ -212,7 +225,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<FundHolders> getFundHolder(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextFundHolder(raw, symbol, callback);
+            SdkNative.fundamentalContextFundHolder(raw(), symbol, callback);
         });
     }
 
@@ -224,7 +237,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<CorpActions> getCorpAction(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextCorpAction(raw, symbol, callback);
+            SdkNative.fundamentalContextCorpAction(raw(), symbol, callback);
         });
     }
 
@@ -236,7 +249,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<InvestRelations> getInvestRelation(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextInvestRelation(raw, symbol, callback);
+            SdkNative.fundamentalContextInvestRelation(raw(), symbol, callback);
         });
     }
 
@@ -248,21 +261,21 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<OperatingList> getOperating(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextOperating(raw, symbol, callback);
+            SdkNative.fundamentalContextOperating(raw(), symbol, callback);
         });
     }
 
     /** Get buyback data. */
     public CompletableFuture<BuybackData> getBuyback(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetBuyback(raw, symbol, callback);
+            SdkNative.fundamentalContextGetBuyback(raw(), symbol, callback);
         });
     }
 
     /** Get stock ratings. */
     public CompletableFuture<StockRatings> getRatings(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetRatings(raw, symbol, callback);
+            SdkNative.fundamentalContextGetRatings(raw(), symbol, callback);
         });
     }
 
@@ -270,7 +283,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<BusinessSegments> getBusinessSegments(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetBusinessSegments(raw, symbol, callback);
+            SdkNative.fundamentalContextGetBusinessSegments(raw(), symbol, callback);
         });
     }
 
@@ -278,7 +291,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<BusinessSegmentsHistory> getBusinessSegmentsHistory(
             BusinessSegmentsHistoryOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetBusinessSegmentsHistory(raw, opts, callback);
+            SdkNative.fundamentalContextGetBusinessSegmentsHistory(raw(), opts, callback);
         });
     }
 
@@ -286,7 +299,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<InstitutionRatingViews> getInstitutionRatingViews(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetInstitutionRatingViews(raw, symbol, callback);
+            SdkNative.fundamentalContextGetInstitutionRatingViews(raw(), symbol, callback);
         });
     }
 
@@ -294,7 +307,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<IndustryRankResponse> getIndustryRank(IndustryRankOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetIndustryRank(raw, opts, callback);
+            SdkNative.fundamentalContextGetIndustryRank(raw(), opts, callback);
         });
     }
 
@@ -302,7 +315,7 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<IndustryPeersResponse> getIndustryPeers(IndustryPeersOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetIndustryPeers(raw, opts, callback);
+            SdkNative.fundamentalContextGetIndustryPeers(raw(), opts, callback);
         });
     }
 
@@ -310,28 +323,28 @@ public class FundamentalContext implements AutoCloseable {
     public CompletableFuture<FinancialReportSnapshot> getFinancialReportSnapshot(
             FinancialReportSnapshotOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetFinancialReportSnapshot(raw, opts, callback);
+            SdkNative.fundamentalContextGetFinancialReportSnapshot(raw(), opts, callback);
         });
     }
 
     /** Get top 20 major shareholders with multi-period holdings. */
     public CompletableFuture<ShareholderTopResponse> getShareholderTop(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextShareholderTop(raw, symbol, callback);
+            SdkNative.fundamentalContextShareholderTop(raw(), symbol, callback);
         });
     }
 
     /** Get holding history and trade detail for a specific shareholder. */
     public CompletableFuture<ShareholderDetailResponse> getShareholderDetail(ShareholderDetailOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextShareholderDetail(raw, opts, callback);
+            SdkNative.fundamentalContextShareholderDetail(raw(), opts, callback);
         });
     }
 
     /** Get valuation comparison between a symbol and optional peer symbols. */
     public CompletableFuture<ValuationComparisonResponse> getValuationComparison(ValuationComparisonOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextValuationComparison(raw, opts, callback);
+            SdkNative.fundamentalContextValuationComparison(raw(), opts, callback);
         });
     }
 
@@ -341,7 +354,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<MacroeconomicIndicatorListResponse> getMacroeconomicIndicators(String country, String keyword, Integer offset, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextMacroeconomicIndicators(raw, country, keyword, offset, limit, callback);
+            SdkNative.fundamentalContextMacroeconomicIndicators(raw(), country, keyword, offset, limit, callback);
         });
     }
 
@@ -351,7 +364,7 @@ public class FundamentalContext implements AutoCloseable {
      */
     public CompletableFuture<MacroeconomicResponse> getMacroeconomic(String indicatorCode, String startDate, String endDate, Integer offset, Integer limit) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextMacroeconomic(raw, indicatorCode, startDate, endDate, offset, limit, callback);
+            SdkNative.fundamentalContextMacroeconomic(raw(), indicatorCode, startDate, endDate, offset, limit, callback);
         });
     }
 

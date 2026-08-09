@@ -23,7 +23,7 @@ public class OAuth implements AutoCloseable {
     /**
      * @hidden
      */
-    final long raw;
+    long raw;
 
     /**
      * @hidden
@@ -39,11 +39,19 @@ public class OAuth implements AutoCloseable {
      * @return raw native pointer
      */
     long getRaw() {
-        return this.raw;
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException("OAuth has already been closed");
+        }
+        return r;
     }
 
     @Override
-    public void close() {
-        SdkNative.freeOAuth(this.raw);
+    public synchronized void close() {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeOAuth(h);
+        }
     }
 }

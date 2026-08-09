@@ -45,14 +45,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_calendarContextFinan
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let category: Option<CalendarCategory> = get_field(env, &opts, "category")?;
         let category = category.unwrap_or(CalendarCategory::Report);
         let start: String = get_field(env, &opts, "start")?;
         let end: String = get_field(env, &opts, "end")?;
         let market: Option<String> = get_field(env, &opts, "market")?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .finance_calendar(category, start, end, market)
                 .await?)
         })?;

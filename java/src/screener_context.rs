@@ -46,9 +46,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextRecom
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let market: String = FromJValue::from_jvalue(env, market.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.screener_recommend_strategies(market).await?;
+            let resp = __owned_ctx.screener_recommend_strategies(market).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -65,9 +66,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextUserS
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let market: String = FromJValue::from_jvalue(env, market.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.screener_user_strategies(market).await?;
+            let resp = __owned_ctx.screener_user_strategies(market).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -84,8 +86,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextStrat
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.screener_strategy(id).await?;
+            let resp = __owned_ctx.screener_strategy(id).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -102,6 +105,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextSearc
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let market: String = get_field(env, &opts, "market")?;
         let strategy_id: Option<i64> = get_field(env, &opts, "strategyId")?;
         let page_opt: Option<JavaInteger> = get_field(env, &opts, "page")?;
@@ -109,8 +113,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextSearc
         let size_opt: Option<JavaInteger> = get_field(env, &opts, "size")?;
         let size = size_opt.map(i32::from).unwrap_or(20) as u32;
         async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
+            let resp = __owned_ctx
                 .screener_search(market, strategy_id, vec![], vec![], page, size)
                 .await?;
             Ok(resp)
@@ -128,8 +131,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextIndic
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.screener_indicators().await?;
+            let resp = __owned_ctx.screener_indicators().await?;
             Ok(resp)
         })?;
         Ok(())

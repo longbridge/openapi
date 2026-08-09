@@ -120,10 +120,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubscrib
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let topics: ObjectArray<TopicType> =
             FromJValue::from_jvalue(env, JObject::from_raw(topics).into())?;
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.subscribe(topics.0).await?)
+            Ok(__owned_ctx.subscribe(topics.0).await?)
         })?;
         Ok(())
     })
@@ -139,10 +140,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUnsubscr
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let topics: ObjectArray<TopicType> =
             FromJValue::from_jvalue(env, JObject::from_raw(topics).into())?;
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.unsubscribe(topics.0).await?)
+            Ok(__owned_ctx.unsubscribe(topics.0).await?)
         })?;
         Ok(())
     })
@@ -158,6 +160,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryE
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetHistoryExecutionsOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -177,7 +180,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryE
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.history_executions(opts).await?))
+            Ok(ObjectArray(__owned_ctx.history_executions(opts).await?))
         })?;
         Ok(())
     })
@@ -193,6 +196,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetTodayExecutionsOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -208,7 +212,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.today_executions(opts).await?))
+            Ok(ObjectArray(__owned_ctx.today_executions(opts).await?))
         })?;
         Ok(())
     })
@@ -252,7 +256,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
 // None
 // };
 // async_util::execute(env, callback, async move {
-// Ok(context.ctx.all_executions(opts).await?)
+// Ok(__owned_ctx.all_executions(opts).await?)
 // })?;
 // Ok(())
 // })
@@ -268,6 +272,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryO
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetHistoryOrdersOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -297,7 +302,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryO
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.history_orders(opts).await?))
+            Ok(ObjectArray(__owned_ctx.history_orders(opts).await?))
         })?;
         Ok(())
     })
@@ -313,6 +318,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayOrd
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetTodayOrdersOptions::new();
             let symbol: Option<String> = get_field(env, &opts, "symbol")?;
@@ -342,7 +348,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayOrd
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.today_orders(opts).await?))
+            Ok(ObjectArray(__owned_ctx.today_orders(opts).await?))
         })?;
         Ok(())
     })
@@ -469,6 +475,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextReplaceO
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let order_id: String = get_field(env, &opts, "orderId")?;
         let quantity: Decimal = get_field(env, &opts, "quantity")?;
         let mut new_opts = ReplaceOrderOptions::new(order_id, quantity);
@@ -526,7 +533,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextReplaceO
         }
 
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.replace_order(new_opts).await?)
+            Ok(__owned_ctx.replace_order(new_opts).await?)
         })?;
         Ok(())
     })
@@ -542,6 +549,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let quantity: OrderType = get_field(env, &opts, "orderType")?;
         let side: OrderSide = get_field(env, &opts, "side")?;
@@ -615,7 +623,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
         }
 
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.submit_order(new_opts).await?)
+            Ok(__owned_ctx.submit_order(new_opts).await?)
         })?;
         Ok(())
     })
@@ -631,9 +639,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOr
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.cancel_order(order_id).await?)
+            Ok(__owned_ctx.cancel_order(order_id).await?)
         })?;
         Ok(())
     })
@@ -649,10 +658,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelOr
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .cancel_order(CancelOrderOptions::new(order_id).is_attached())
                 .await?)
         })?;
@@ -670,10 +679,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAccountB
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let currency: Option<String> = FromJValue::from_jvalue(env, currency.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
-                context.ctx.account_balance(currency.as_deref()).await?,
+                __owned_ctx.account_balance(currency.as_deref()).await?,
             ))
         })?;
         Ok(())
@@ -690,6 +700,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCashFlow
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let start_at: OffsetDateTime = get_field(env, &opts, "startAt")?;
         let end_at: OffsetDateTime = get_field(env, &opts, "endAt")?;
         let mut new_opts = GetCashFlowOptions::new(start_at, end_at);
@@ -712,7 +723,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCashFlow
         }
 
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.cash_flow(new_opts).await?))
+            Ok(ObjectArray(__owned_ctx.cash_flow(new_opts).await?))
         })?;
         Ok(())
     })
@@ -728,6 +739,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextFundPosi
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundPositionsOptions::new();
             let symbols: ObjectArray<String> = get_field(env, opts, "symbols")?;
@@ -737,7 +749,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextFundPosi
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.fund_positions(opts).await?)
+            Ok(__owned_ctx.fund_positions(opts).await?)
         })?;
         Ok(())
     })
@@ -753,6 +765,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextStockPos
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetStockPositionsOptions::new();
             let symbols: ObjectArray<String> = get_field(env, opts, "symbols")?;
@@ -763,7 +776,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextStockPos
         };
         async_util::execute(env, callback, async move {
             Ok(crate::types::StockPositionsResponse::from(
-                context.ctx.stock_positions(opts).await?,
+                __owned_ctx.stock_positions(opts).await?,
             ))
         })?;
         Ok(())
@@ -780,9 +793,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextMarginRa
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.margin_ratio(symbol).await?)
+            Ok(__owned_ctx.margin_ratio(symbol).await?)
         })?;
         Ok(())
     })
@@ -798,9 +812,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDet
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.order_detail(order_id).await?)
+            Ok(__owned_ctx.order_detail(order_id).await?)
         })?;
         Ok(())
     })
@@ -816,6 +831,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimate
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let order_type: OrderType = get_field(env, &opts, "orderType")?;
         let side: OrderSide = get_field(env, &opts, "side")?;
@@ -837,7 +853,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimate
             new_opts = new_opts.fractional_shares();
         }
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.estimate_max_purchase_quantity(new_opts).await?)
+            Ok(__owned_ctx.estimate_max_purchase_quantity(new_opts).await?)
         })?;
         Ok(())
     })
@@ -861,6 +877,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsQueryO
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol_str: String = FromJValue::from_jvalue(env, symbol.into())?;
         let us_opts = longbridge::trade::GetUSHistoryOrders {
             symbol: if symbol_str.is_empty() {
@@ -880,7 +897,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsQueryO
             limit: limit as i32,
         };
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.us_query_orders(us_opts).await?;
+            let resp = __owned_ctx.us_query_orders(us_opts).await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
@@ -897,9 +914,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsOrderD
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.us_order_detail(order_id).await?;
+            let resp = __owned_ctx.us_order_detail(order_id).await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
@@ -915,8 +933,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsAssetO
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.us_asset_overview().await?;
+            let resp = __owned_ctx.us_asset_overview().await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
@@ -934,11 +953,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsRealiz
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let currency: String = FromJValue::from_jvalue(env, currency.into())?;
         let category: Option<String> = FromJValue::from_jvalue(env, category.into()).ok();
         async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
+            let resp = __owned_ctx
                 .us_realized_pl(longbridge::trade::GetUSRealizedPLOptions {
                     currency,
                     category: category.unwrap_or_default(),
@@ -960,10 +979,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDet
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .order_detail(GetOrderDetailOptions::new(order_id).is_attached())
                 .await?)
         })?;

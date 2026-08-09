@@ -47,8 +47,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextMarketS
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.market_status().await?;
+            let resp = __owned_ctx.market_status().await?;
             Ok(resp)
         })?;
         Ok(())
@@ -65,11 +66,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextBrokerH
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let period: Option<BrokerHoldingPeriod> = get_field(env, &opts, "period")?;
         let period = period.unwrap_or(BrokerHoldingPeriod::Rct1);
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.broker_holding(symbol, period).await?;
+            let resp = __owned_ctx.broker_holding(symbol, period).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -86,10 +88,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextBrokerH
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let broker_id: String = get_field(env, &opts, "brokerId")?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.broker_holding_daily(symbol, broker_id).await?;
+            let resp = __owned_ctx.broker_holding_daily(symbol, broker_id).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -106,13 +109,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextAhPremi
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let period: Option<AhPremiumPeriod> = get_field(env, &opts, "period")?;
         let period = period.unwrap_or(AhPremiumPeriod::Day);
         let count_val: Option<JavaInteger> = get_field(env, &opts, "count")?;
         let count = count_val.map(i32::from).unwrap_or(100) as u32;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.ah_premium(symbol, period, count).await?;
+            let resp = __owned_ctx.ah_premium(symbol, period, count).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -131,9 +135,10 @@ macro_rules! symbol_method {
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
                 let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = context.ctx.$method(symbol).await?;
+                    let resp = __owned_ctx.$method(symbol).await?;
                     Ok(resp)
                 })?;
                 Ok(())
@@ -154,9 +159,10 @@ macro_rules! market_method {
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
                 let market: String = FromJValue::from_jvalue(env, market.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = context.ctx.$method(market).await?;
+                    let resp = __owned_ctx.$method(market).await?;
                     Ok(resp)
                 })?;
                 Ok(())
@@ -193,6 +199,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextTopMove
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let markets_raw: ObjectArray<String> = get_field(env, &opts, "markets")?;
         let markets: Vec<String> = markets_raw.0;
         let sort_opt: Option<JavaInteger> = get_field(env, &opts, "sort")?;
@@ -201,7 +208,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextTopMove
         let limit_opt: Option<JavaInteger> = get_field(env, &opts, "limit")?;
         let limit = limit_opt.map(i32::from).unwrap_or(20) as u32;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.top_movers(markets, sort, date, limit).await?;
+            let resp = __owned_ctx.top_movers(markets, sort, date, limit).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -217,8 +224,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextRankCat
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.rank_categories().await?;
+            let resp = __owned_ctx.rank_categories().await?;
             Ok(resp)
         })?;
         Ok(())
@@ -236,9 +244,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextRankLis
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let key: String = FromJValue::from_jvalue(env, key.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.rank_list(key, need_article).await?;
+            let resp = __owned_ctx.rank_list(key, need_article).await?;
             Ok(resp)
         })?;
         Ok(())

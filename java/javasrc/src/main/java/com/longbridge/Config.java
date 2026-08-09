@@ -9,6 +9,15 @@ import java.util.concurrent.CompletableFuture;
 public class Config implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * @hidden
      */
@@ -104,7 +113,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config httpUrl(String httpUrl) {
-        this.raw = SdkNative.configSetHttpUrl(this.raw, httpUrl);
+        this.raw = SdkNative.configSetHttpUrl(raw(), httpUrl);
         return this;
     }
 
@@ -117,7 +126,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config quoteWebsocketUrl(String quoteWsUrl) {
-        this.raw = SdkNative.configSetQuoteWsUrl(this.raw, quoteWsUrl);
+        this.raw = SdkNative.configSetQuoteWsUrl(raw(), quoteWsUrl);
         return this;
     }
 
@@ -130,7 +139,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config tradeWebsocketUrl(String tradeWsUrl) {
-        this.raw = SdkNative.configSetTradeWsUrl(this.raw, tradeWsUrl);
+        this.raw = SdkNative.configSetTradeWsUrl(raw(), tradeWsUrl);
         return this;
     }
 
@@ -141,7 +150,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config language(Language language) {
-        this.raw = SdkNative.configSetLanguage(this.raw, language);
+        this.raw = SdkNative.configSetLanguage(raw(), language);
         return this;
     }
 
@@ -151,7 +160,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config enableOvernight() {
-        this.raw = SdkNative.configSetEnableOvernight(this.raw);
+        this.raw = SdkNative.configSetEnableOvernight(raw());
         return this;
     }
 
@@ -162,7 +171,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config pushCandlestickMode(PushCandlestickMode mode) {
-        this.raw = SdkNative.configSetPushCandlestickMode(this.raw, mode);
+        this.raw = SdkNative.configSetPushCandlestickMode(raw(), mode);
         return this;
     }
 
@@ -172,7 +181,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config disablePrintQuotePackages() {
-        this.raw = SdkNative.configSetEnablePrintQuotePackages(this.raw, false);
+        this.raw = SdkNative.configSetEnablePrintQuotePackages(raw(), false);
         return this;
     }
 
@@ -183,7 +192,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config logPath(String path) {
-        this.raw = SdkNative.configSetLogPath(this.raw, path);
+        this.raw = SdkNative.configSetLogPath(raw(), path);
         return this;
     }
 
@@ -202,7 +211,7 @@ public class Config implements AutoCloseable {
      * @return this object
      */
     public Config enablePapertrading() {
-        this.raw = SdkNative.configSetEnablePapertrading(this.raw);
+        this.raw = SdkNative.configSetEnablePapertrading(raw());
         return this;
     }
 
@@ -221,7 +230,7 @@ public class Config implements AutoCloseable {
      */
     public CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) {
         CompletableFuture<String> future = new CompletableFuture<>();
-        SdkNative.configRefreshAccessToken(this.raw, expiredAt, new AsyncCallback() {
+        SdkNative.configRefreshAccessToken(raw(), expiredAt, new AsyncCallback() {
             @Override
             public void callback(Object err, Object result) {
                 if (err != null) {
@@ -239,11 +248,15 @@ public class Config implements AutoCloseable {
      * @return Context pointer
      */
     public long getRaw() {
-        return this.raw;
+        return raw();
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeConfig(this.raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeConfig(h);
+        }
     }
 }

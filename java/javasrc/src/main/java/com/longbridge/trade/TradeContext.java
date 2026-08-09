@@ -10,6 +10,15 @@ import com.longbridge.*;
 public class TradeContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a TradeContext object
      *
@@ -23,8 +32,12 @@ public class TradeContext implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeTradeContext(raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeTradeContext(h);
+        }
     }
 
     /**
@@ -34,7 +47,7 @@ public class TradeContext implements AutoCloseable {
      * @param handler A order changed handler
      */
     public void setOnOrderChange(OrderChangedHandler handler) {
-        SdkNative.tradeContextSetOnOrderChanged(this.raw, handler);
+        SdkNative.tradeContextSetOnOrderChanged(raw(), handler);
     }
 
     /**
@@ -76,7 +89,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<Void> subscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextSubscribe(this.raw, topics, callback);
+            SdkNative.tradeContextSubscribe(raw(), topics, callback);
         });
     }
 
@@ -89,7 +102,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<Void> unsubscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextUnsubscribe(this.raw, topics, callback);
+            SdkNative.tradeContextUnsubscribe(raw(), topics, callback);
         });
     }
 
@@ -127,7 +140,7 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<Execution[]> getHistoryExecutions(GetHistoryExecutionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextHistoryExecutions(this.raw, opts, callback);
+            SdkNative.tradeContextHistoryExecutions(raw(), opts, callback);
         });
     }
 
@@ -162,7 +175,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<Execution[]> getTodayExecutions(GetTodayExecutionsOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextTodayExecutions(this.raw, opts, callback);
+            SdkNative.tradeContextTodayExecutions(raw(), opts, callback);
         });
     }
 
@@ -176,7 +189,7 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<AllExecutionsResponse> getAllExecutions(GetAllExecutionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextAllExecutions(this.raw, opts, callback);
+            SdkNative.tradeContextAllExecutions(raw(), opts, callback);
         });
     }
 
@@ -216,7 +229,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<Order[]> getHistoryOrders(GetHistoryOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextHistoryOrders(this.raw, opts, callback);
+            SdkNative.tradeContextHistoryOrders(raw(), opts, callback);
         });
     }
 
@@ -253,7 +266,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<Order[]> getTodayOrders(GetTodayOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextTodayOrders(this.raw, opts, callback);
+            SdkNative.tradeContextTodayOrders(raw(), opts, callback);
         });
     }
 
@@ -286,7 +299,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<Void> replaceOrder(ReplaceOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextReplaceOrder(this.raw, opts, callback);
+            SdkNative.tradeContextReplaceOrder(raw(), opts, callback);
         });
     }
 
@@ -324,7 +337,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<SubmitOrderResponse> submitOrder(SubmitOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextSubmitOrder(this.raw, opts, callback);
+            SdkNative.tradeContextSubmitOrder(raw(), opts, callback);
         });
     }
 
@@ -370,9 +383,9 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<Void> cancelOrder(String orderId, boolean isAttached) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             if (isAttached) {
-                SdkNative.tradeContextCancelOrderAttached(this.raw, orderId, callback);
+                SdkNative.tradeContextCancelOrderAttached(raw(), orderId, callback);
             } else {
-                SdkNative.tradeContextCancelOrder(this.raw, orderId, callback);
+                SdkNative.tradeContextCancelOrder(raw(), orderId, callback);
             }
         });
     }
@@ -406,7 +419,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<AccountBalance[]> getAccountBalance(String currency) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextAccountBalance(this.raw, currency, callback);
+            SdkNative.tradeContextAccountBalance(raw(), currency, callback);
         });
     }
 
@@ -438,7 +451,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<AccountBalance[]> getAccountBalance() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextAccountBalance(this.raw, null, callback);
+            SdkNative.tradeContextAccountBalance(raw(), null, callback);
         });
     }
 
@@ -475,7 +488,7 @@ public class TradeContext implements AutoCloseable {
      */
     public CompletableFuture<CashFlow[]> getCashFlow(GetCashFlowOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextCashFlow(this.raw, opts, callback);
+            SdkNative.tradeContextCashFlow(raw(), opts, callback);
         });
     }
 
@@ -507,7 +520,7 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<FundPositionsResponse> getFundPositions(GetFundPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextFundPositions(this.raw, opts, callback);
+            SdkNative.tradeContextFundPositions(raw(), opts, callback);
         });
     }
 
@@ -539,7 +552,7 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<StockPositionsResponse> getStockPositions(GetStockPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextStockPositions(this.raw, opts, callback);
+            SdkNative.tradeContextStockPositions(raw(), opts, callback);
         });
     }
 
@@ -571,7 +584,7 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<MarginRatio> getMarginRatio(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextMarginRatio(this.raw, symbol, callback);
+            SdkNative.tradeContextMarginRatio(raw(), symbol, callback);
         });
     }
 
@@ -603,7 +616,7 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<OrderDetail> getOrderDetail(String orderId)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextOrderDetail(this.raw, orderId, callback);
+            SdkNative.tradeContextOrderDetail(raw(), orderId, callback);
         });
     }
 
@@ -617,7 +630,7 @@ public class TradeContext implements AutoCloseable {
     public CompletableFuture<OrderDetail> getOrderDetailAttached(String orderId)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextOrderDetailAttached(this.raw, orderId, callback);
+            SdkNative.tradeContextOrderDetailAttached(raw(), orderId, callback);
         });
     }
 
@@ -633,7 +646,7 @@ public class TradeContext implements AutoCloseable {
             EstimateMaxPurchaseQuantityOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextEstimateMaxPurchaseQuantity(this.raw, opts, callback);
+            SdkNative.tradeContextEstimateMaxPurchaseQuantity(raw(), opts, callback);
         });
     }
 }

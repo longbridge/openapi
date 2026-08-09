@@ -10,6 +10,15 @@ import com.longbridge.*;
 public class AssetContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a AssetContext object
      *
@@ -23,8 +32,12 @@ public class AssetContext implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        SdkNative.freeAssetContext(raw);
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeAssetContext(h);
+        }
     }
 
     /**
@@ -37,7 +50,7 @@ public class AssetContext implements AutoCloseable {
     public CompletableFuture<Object> getStatements(GetStatementListOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.assetContextStatements(raw, opts, callback);
+            SdkNative.assetContextStatements(raw(), opts, callback);
         });
     }
 
@@ -51,7 +64,7 @@ public class AssetContext implements AutoCloseable {
     public CompletableFuture<Object> getStatementDownloadUrl(String fileKey)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.assetContextDownloadUrl(raw, fileKey, callback);
+            SdkNative.assetContextDownloadUrl(raw(), fileKey, callback);
         });
     }
 }

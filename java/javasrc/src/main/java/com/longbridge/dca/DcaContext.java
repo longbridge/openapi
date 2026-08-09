@@ -8,6 +8,15 @@ import com.longbridge.*;
 public class DcaContext implements AutoCloseable {
     private long raw;
 
+    private long raw() {
+        long r = this.raw;
+        if (r == 0) {
+            throw new IllegalStateException(
+                    getClass().getSimpleName() + " has already been closed");
+        }
+        return r;
+    }
+
     /**
      * Create a DcaContext object.
      *
@@ -16,7 +25,14 @@ public class DcaContext implements AutoCloseable {
      */
     public static DcaContext create(Config config) { DcaContext ctx = new DcaContext(); ctx.raw = SdkNative.newDcaContext(config.getRaw()); return ctx; }
 
-    @Override public void close() throws Exception { SdkNative.freeDcaContext(raw); }
+    @Override
+    public synchronized void close() throws Exception {
+        long h = this.raw;
+        if (h != 0) {
+            this.raw = 0;
+            SdkNative.freeDcaContext(h);
+        }
+    }
 
     /**
      * Create a new DCA plan.
@@ -25,7 +41,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to the updated plan list
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<DcaCreateResult> createDca(DcaCreateOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextCreate(raw, opts, cb)); }
+    public CompletableFuture<DcaCreateResult> createDca(DcaCreateOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextCreate(raw(), opts, cb)); }
 
     /**
      * Update an existing DCA plan.
@@ -34,7 +50,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to the result containing the plan ID
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<DcaCreateResult> updateDca(DcaUpdateOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextUpdate(raw, opts, cb)); }
+    public CompletableFuture<DcaCreateResult> updateDca(DcaUpdateOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextUpdate(raw(), opts, cb)); }
 
     /**
      * List DCA plans, optionally filtered by status and/or symbol.
@@ -43,7 +59,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to the list of DCA plans
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<DcaList> list(DcaListOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextList(raw, opts, cb)); }
+    public CompletableFuture<DcaList> list(DcaListOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextList(raw(), opts, cb)); }
 
     /**
      * Get DCA statistics, optionally scoped to a single security.
@@ -52,7 +68,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to DCA statistics
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<DcaStats> stats(String symbol) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextStats(raw, symbol, cb)); }
+    public CompletableFuture<DcaStats> stats(String symbol) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextStats(raw(), symbol, cb)); }
 
     /**
      * Check DCA support for a batch of securities.
@@ -61,7 +77,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to the support status list
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<DcaSupportList> checkSupport(String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextCheckSupport(raw, symbols, cb)); }
+    public CompletableFuture<DcaSupportList> checkSupport(String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextCheckSupport(raw(), symbols, cb)); }
 
     /**
      * Get execution history for a DCA plan.
@@ -70,7 +86,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to the execution history
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<DcaHistoryResponse> history(DcaHistoryOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextHistory(raw, opts, cb)); }
+    public CompletableFuture<DcaHistoryResponse> history(DcaHistoryOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextHistory(raw(), opts, cb)); }
 
     /**
      * Pause a DCA plan.
@@ -79,7 +95,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to the updated plan list
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> pause(String planId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextPause(raw, planId, cb)); }
+    public CompletableFuture<Void> pause(String planId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextPause(raw(), planId, cb)); }
 
     /**
      * Resume a suspended DCA plan.
@@ -88,7 +104,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future that completes when the plan is resumed
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> resume(String planId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextResume(raw, planId, cb)); }
+    public CompletableFuture<Void> resume(String planId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextResume(raw(), planId, cb)); }
 
     /**
      * Stop (permanently finish) a DCA plan.
@@ -97,7 +113,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future that completes when the plan is stopped
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> stop(String planId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextStop(raw, planId, cb)); }
+    public CompletableFuture<Void> stop(String planId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextStop(raw(), planId, cb)); }
 
     /**
      * Calculate the next projected trade date for a DCA plan with the given schedule parameters.
@@ -106,7 +122,7 @@ public class DcaContext implements AutoCloseable {
      * @return A Future resolving to the calculated date result
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<DcaCalcDateResult> calcDate(DcaCalcDateOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextCalcDate(raw, opts, cb)); }
+    public CompletableFuture<DcaCalcDateResult> calcDate(DcaCalcDateOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextCalcDate(raw(), opts, cb)); }
 
     /**
      * Update the advance reminder hours for DCA execution notifications.
@@ -116,5 +132,5 @@ public class DcaContext implements AutoCloseable {
      * @return A Future that completes when the reminder setting is updated
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> setReminder(String hours) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextSetReminder(raw, hours, cb)); }
+    public CompletableFuture<Void> setReminder(String hours) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.dcaContextSetReminder(raw(), hours, cb)); }
 }

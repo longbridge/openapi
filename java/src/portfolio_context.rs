@@ -47,8 +47,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextExch
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.exchange_rate().await?)
+            Ok(__owned_ctx.exchange_rate().await?)
         })?;
         Ok(())
     })
@@ -64,6 +65,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let start: Option<String> = if opts.is_null() {
             None
         } else {
@@ -75,7 +77,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
             get_field(env, &opts, "end")?
         };
         async_util::execute(env, callback, async move {
-            Ok(context.ctx.profit_analysis(start, end).await?)
+            Ok(__owned_ctx.profit_analysis(start, end).await?)
         })?;
         Ok(())
     })
@@ -91,12 +93,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let start: Option<String> = get_field(env, &opts, "start")?;
         let end: Option<String> = get_field(env, &opts, "end")?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .profit_analysis_detail(symbol, start, end)
                 .await?)
         })?;
@@ -114,6 +116,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let market: Option<String> = if opts.is_null() {
             None
         } else {
@@ -139,8 +142,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
         let size_v: Option<JavaInteger> = get_field(env, &opts, "size")?;
         let size: u32 = size_v.map(|v| i32::from(v) as u32).unwrap_or(20);
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .profit_analysis_by_market(market, start, end, currency, page, size)
                 .await?)
         })?;
@@ -158,6 +160,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let page_v: Option<JavaInteger> = get_field(env, &opts, "page")?;
         let page: u32 = page_v.map(|v| i32::from(v) as u32).unwrap_or(1);
@@ -167,8 +170,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_portfolioContextProf
         let start: Option<String> = get_field(env, &opts, "start")?;
         let end: Option<String> = get_field(env, &opts, "end")?;
         async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
+            let resp = __owned_ctx
                 .profit_analysis_flows(symbol, page, size, include_outside_rth, start, end)
                 .await?;
             Ok(resp)
