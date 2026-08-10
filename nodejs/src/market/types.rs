@@ -656,18 +656,62 @@ impl From<lb::TopMoversResponse> for TopMoversResponse {
 
 // ── RankCategoriesResponse ────────────────────────────────────────
 
-/// Rank categories response. `data` is a JSON string.
+/// One leaf rank sub-category.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct RankSubCategory {
+    /// Sub-category key (e.g. `"hot_all-us"`). Pass to `rank_list`.
+    pub key: String,
+    /// Display name (e.g. `"美股总热度"`)
+    pub name: String,
+    /// Market code (e.g. `"US"`, `"HK"`)
+    pub market: String,
+}
+
+impl From<lb::RankSubCategory> for RankSubCategory {
+    fn from(v: lb::RankSubCategory) -> Self {
+        Self {
+            key: v.key,
+            name: v.name,
+            market: v.market,
+        }
+    }
+}
+
+/// A top-level rank category grouping sub-categories.
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct RankCategory {
+    /// Top-level key (e.g. `"hot"`)
+    pub key: String,
+    /// Display name (e.g. `"热度排行"`)
+    pub name: String,
+    /// Sub-categories
+    pub sub_categories: Vec<RankSubCategory>,
+}
+
+impl From<lb::RankCategory> for RankCategory {
+    fn from(v: lb::RankCategory) -> Self {
+        Self {
+            key: v.key,
+            name: v.name,
+            sub_categories: v.sub_categories.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Rank categories response.
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct RankCategoriesResponse {
-    /// Raw rank categories data (JSON string)
-    pub data: String,
+    /// All top-level rank categories
+    pub categories: Vec<RankCategory>,
 }
 
 impl From<lb::RankCategoriesResponse> for RankCategoriesResponse {
     fn from(v: lb::RankCategoriesResponse) -> Self {
         Self {
-            data: v.data.to_string(),
+            categories: v.categories.into_iter().map(Into::into).collect(),
         }
     }
 }

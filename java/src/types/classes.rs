@@ -3142,9 +3142,29 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/market/RankSubCategory",
+    longbridge::market::RankSubCategory,
+    [key, name, market]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankCategory",
+    longbridge::market::RankCategory,
+    [
+        key,
+        name,
+        #[java(objarray)]
+        sub_categories
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/market/RankCategoriesResponse",
     longbridge::market::RankCategoriesResponse,
-    [data]
+    [
+        #[java(objarray)]
+        categories
+    ]
 );
 
 impl_java_class!(

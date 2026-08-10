@@ -425,6 +425,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::market::TopMoversStock,
         longbridge::market::TopMoversEvent,
         longbridge::market::TopMoversResponse,
+        longbridge::market::RankSubCategory,
+        longbridge::market::RankCategory,
         longbridge::market::RankCategoriesResponse,
         longbridge::market::RankListItem,
         longbridge::market::RankListResponse,

@@ -774,14 +774,34 @@ pub struct TopMoversResponse {
 
 // ── rank_categories ───────────────────────────────────────────────
 
+/// A leaf rank sub-category whose `key` can be passed to
+/// [`MarketContext::rank_list`](crate::MarketContext::rank_list).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankSubCategory {
+    /// Sub-category key, e.g. `"hot_all-us"`. Pass directly to `rank_list`.
+    pub key: String,
+    /// Display name, e.g. `"美股总热度"`
+    pub name: String,
+    /// Market code, e.g. `"US"`, `"HK"`, `"CN"`, `"SG"`
+    pub market: String,
+}
+
+/// A top-level rank category grouping one or more sub-categories.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankCategory {
+    /// Top-level key, e.g. `"hot"`
+    pub key: String,
+    /// Display name, e.g. `"热度排行"`
+    pub name: String,
+    /// Sub-categories
+    pub sub_categories: Vec<RankSubCategory>,
+}
+
 /// Response for [`crate::MarketContext::rank_categories`]
-///
-/// The raw data contains all available rank category keys and labels.
-/// The exact structure varies so the payload is preserved as raw JSON.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankCategoriesResponse {
-    /// Raw rank category data
-    pub data: serde_json::Value,
+    /// All top-level rank categories
+    pub categories: Vec<RankCategory>,
 }
 
 // ── rank_list ─────────────────────────────────────────────────────

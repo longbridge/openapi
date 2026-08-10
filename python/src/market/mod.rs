@@ -30,6 +30,8 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<TopMoversStock>()?;
     parent.add_class::<TopMoversEvent>()?;
     parent.add_class::<TopMoversResponse>()?;
+    parent.add_class::<RankSubCategory>()?;
+    parent.add_class::<RankCategory>()?;
     parent.add_class::<RankCategoriesResponse>()?;
     parent.add_class::<RankListItem>()?;
     parent.add_class::<RankListResponse>()?;

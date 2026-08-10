@@ -12453,7 +12453,7 @@ class MarketContext:
         Get all available rank category keys and labels.
 
         Returns:
-            :class:`RankCategoriesResponse` with raw JSON data
+            :class:`RankCategoriesResponse` with typed categories
         """
         ...
 
@@ -12522,11 +12522,33 @@ class TopMoversResponse:
     """Pagination cursor for next page (raw JSON object)"""
 
 
-class RankCategoriesResponse:
-    """Rank categories response. ``data`` is a Python dict/list from JSON."""
+class RankSubCategory:
+    """One leaf rank sub-category."""
 
-    data: object
-    """Raw rank categories data (JSON object / list)"""
+    key: str
+    """Sub-category key (e.g. ``"hot_all-us"``). Pass to :meth:`MarketContext.rank_list`."""
+    name: str
+    """Display name (e.g. ``"美股总热度"``)"""
+    market: str
+    """Market code (e.g. ``"US"``, ``"HK"``)"""
+
+
+class RankCategory:
+    """A top-level rank category grouping sub-categories."""
+
+    key: str
+    """Top-level key (e.g. ``"hot"``)"""
+    name: str
+    """Display name (e.g. ``"热度排行"``)"""
+    sub_categories: List[RankSubCategory]
+    """Sub-categories"""
+
+
+class RankCategoriesResponse:
+    """Rank categories response."""
+
+    categories: List[RankCategory]
+    """All top-level rank categories"""
 
 
 class RankListItem:
