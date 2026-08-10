@@ -4,8 +4,6 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
 
-use crate::utils::counter::deserialize_counter_id_as_symbol;
-
 // ── exchange_rate ─────────────────────────────────────────────────
 
 /// Response for [`crate::PortfolioContext::exchange_rate`]
@@ -175,10 +173,6 @@ pub struct ProfitAnalysisItem {
     /// Currency
     pub currency: String,
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Holding period display string
     #[serde(default)]

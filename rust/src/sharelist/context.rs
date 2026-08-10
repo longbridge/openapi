@@ -4,7 +4,7 @@ use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, sharelist::types::*, utils::counter::symbol_to_counter_id};
+use crate::{Config, Result, sharelist::types::*};
 
 struct InnerSharelistContext {
     http_cli: HttpClient,
@@ -180,17 +180,10 @@ impl SharelistContext {
     ///
     /// Path: `POST /v1/sharelists/{id}/items`
     pub async fn add_securities(&self, id: i64, symbols: Vec<String>) -> Result<serde_json::Value> {
-        let counter_ids = symbols
-            .iter()
-            .map(|s| symbol_to_counter_id(s))
-            .collect::<Vec<_>>()
-            .join(",");
+        let syms = symbols.join(",");
         let path = format!("/v1/sharelists/{id}/items");
-        self.post(
-            path.leak(),
-            serde_json::json!({ "counter_ids": counter_ids }),
-        )
-        .await
+        self.post(path.leak(), serde_json::json!({ "symbols": syms }))
+            .await
     }
 
     /// Remove securities from a sharelist.
@@ -201,14 +194,10 @@ impl SharelistContext {
         id: i64,
         symbols: Vec<String>,
     ) -> Result<serde_json::Value> {
-        let counter_ids = symbols
-            .iter()
-            .map(|s| symbol_to_counter_id(s))
-            .collect::<Vec<_>>()
-            .join(",");
+        let syms = symbols.join(",");
         self.http_delete(
             format!("/v1/sharelists/{id}/items"),
-            serde_json::json!({ "counter_ids": counter_ids }),
+            serde_json::json!({ "symbols": syms }),
         )
         .await
     }
@@ -221,16 +210,9 @@ impl SharelistContext {
         id: i64,
         symbols: Vec<String>,
     ) -> Result<serde_json::Value> {
-        let counter_ids = symbols
-            .iter()
-            .map(|s| symbol_to_counter_id(s))
-            .collect::<Vec<_>>()
-            .join(",");
+        let syms = symbols.join(",");
         let path = format!("/v1/sharelists/{id}/items/sort");
-        self.post(
-            path.leak(),
-            serde_json::json!({ "counter_ids": counter_ids }),
-        )
-        .await
+        self.post(path.leak(), serde_json::json!({ "symbols": syms }))
+            .await
     }
 }

@@ -4,7 +4,7 @@ use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, portfolio::types::*, utils::counter::symbol_to_counter_id};
+use crate::{Config, Result, portfolio::types::*};
 
 struct InnerPortfolioContext {
     http_cli: HttpClient,
@@ -178,7 +178,7 @@ impl PortfolioContext {
     ) -> Result<ProfitAnalysisDetail> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             #[serde(skip_serializing_if = "Option::is_none")]
             start: Option<i64>,
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -187,7 +187,7 @@ impl PortfolioContext {
         self.get(
             "/v1/portfolio/profit-analysis/detail",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 start: date_to_unix_opt(start.as_deref()),
                 end: date_to_unix_end_opt(end.as_deref()),
             },
@@ -212,7 +212,7 @@ impl PortfolioContext {
     ) -> Result<ProfitAnalysisFlows> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             page: u32,
             size: u32,
             derivative: bool,
@@ -224,7 +224,7 @@ impl PortfolioContext {
         self.get(
             "/v1/portfolio/profit-analysis/flows",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 page,
                 size,
                 derivative,

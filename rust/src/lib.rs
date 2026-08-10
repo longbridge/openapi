@@ -14,9 +14,6 @@ pub mod runtime;
 pub use runtime::runtime_handle;
 mod serde_utils;
 mod types;
-mod utils;
-
-pub use utils::counter;
 
 #[cfg(feature = "blocking")]
 #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
