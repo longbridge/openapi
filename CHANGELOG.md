@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Rust SDK:** removed internal `symbol_to_counter_id` / `index_symbol_to_counter_id` conversions from request parameters across `FundamentalContext` (financial\_report, institution\_rating, dividend, forecast\_eps, consensus, valuation, company, shareholder, fund\_holder, corp\_action, invest\_relation, operating, buyback, ratings, business\_segments, etf\_asset\_allocation, and US-series endpoints), `MarketContext` (broker\_holding, broker\_holding\_detail, broker\_holding\_daily, ah\_premium, ah\_premium\_intraday, trade\_stats, constituent), `DCAContext` (list, create, stats, calc\_date), and `AlertContext` (add). These endpoints now send the user-supplied symbol (e.g. `AAPL.US`, `HSI.HK`) directly instead of converting to internal counter-id format (e.g. `ST/US/AAPL`, `IX/HK/HSI`)
+- **Rust SDK:** removed remaining `symbol_to_counter_id` conversions from `QuoteContext` (`short_positions`, `option_volume`, `option_volume_daily`, `short_trades`, `us_crypto_overview`), `TradeContext` (`us_query_orders`), `FundamentalContext` (`executive`, `industry_peers`, `valuation_comparison`), `DCAContext` (`check_support`), `SharelistContext` (`add_securities`, `remove_securities`, `sort_securities`), and `PortfolioContext` (`profit_analysis_detail`, `profit_analysis_flows`). All outbound query/body parameters now use the user-supplied symbol string directly
+- **Rust SDK:** removed all `counter_id → symbol` response-deserialization conversions. All affected structs (`ExecutiveGroup`, `ShareholderStock`, `FundHolder`, `OperatingFinancial`, `EtfAllocationItem`, `CryptoStaticInfo`, `USOrder`, `USOrderDetail`, `USCryptoEntry`, `USStockEntry`) now read the `symbol` field directly from the server response instead of converting from `counter_id`. The `deserialize_counter_id_as_symbol` helper has been removed from `utils/counter.rs`
+
 ### Added
 
 - **All languages:** add `AgentContext.public_agents` (`GET /v1/ai/agents`) — list all publicly available Agents on the platform (the Explore catalog). Unlike `agents`, it is not scoped to a Workspace and returns every published, publicly-shared Agent. Takes the same optional `page` / `limit` / `name` parameters and returns the existing `AgentsResponse`

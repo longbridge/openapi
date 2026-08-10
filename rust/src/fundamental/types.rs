@@ -8,8 +8,6 @@ use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
 use time::OffsetDateTime;
 
-use crate::utils::counter::deserialize_counter_id_as_symbol;
-
 // ── financial_report ─────────────────────────────────────────────
 
 /// Response for [`crate::FundamentalContext::financial_report`]
@@ -38,10 +36,6 @@ pub struct DividendList {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DividendItem {
     /// Security symbol, e.g. `"700.HK"`
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Internal record ID (may be absent in dividend_detail response)
     #[serde(default)]
@@ -448,10 +442,6 @@ pub struct IndustryValuationList {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndustryValuationItem {
     /// Security symbol, e.g. `"700.HK"`
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Company name
     pub name: String,
@@ -625,10 +615,6 @@ pub struct ExecutiveList {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExecutiveGroup {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Link to the company wiki page
     pub forward_url: String,
@@ -699,10 +685,6 @@ pub struct Shareholder {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShareholderStock {
     /// Security symbol of the cross-held stock
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Ticker code, e.g. `"BLK"`
     pub code: String,
@@ -726,11 +708,7 @@ pub struct FundHolders {
 pub struct FundHolder {
     /// Fund/ETF ticker code, e.g. `"513050"`
     pub code: String,
-    /// Fund/ETF symbol, e.g. `"ETF/SH/513050"` → converted to `"513050.SH"`
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
+    /// Fund/ETF symbol, e.g. `"513050.SH"`
     pub symbol: String,
     /// Reporting currency, e.g. `"CNY"`
     pub currency: String,
@@ -822,10 +800,6 @@ pub struct InvestSecurity {
     /// Company name in Simplified Chinese
     pub company_name_zhcn: String,
     /// Security symbol of the invested company
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Reporting currency
     pub currency: String,
@@ -877,10 +851,6 @@ pub struct OperatingFinancial {
     /// Ticker code (may be empty)
     pub code: String,
     /// Symbol in `CODE.MARKET` format (may be empty)
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Reporting currency
     pub currency: String,
@@ -1529,11 +1499,7 @@ pub struct AssetAllocationItem {
     /// Position ratio (e.g. `0.0861114`)
     pub position_ratio: String,
     /// Security symbol (holdings only, e.g. `NVDA.US`)
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol",
-        default
-    )]
+    #[serde(default)]
     pub symbol: String,
     /// Localized names (locale → name, e.g. `zh-CN` → `英伟达`)
     #[serde(rename = "name_locales_map", default)]

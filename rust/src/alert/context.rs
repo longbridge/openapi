@@ -4,7 +4,7 @@ use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, alert::types::*, utils::counter::symbol_to_counter_id};
+use crate::{Config, Result, alert::types::*};
 
 struct InnerAlertContext {
     http_cli: HttpClient,
@@ -116,7 +116,7 @@ impl AlertContext {
         trigger_value: impl Into<String>,
         frequency: AlertFrequency,
     ) -> Result<serde_json::Value> {
-        let cid = symbol_to_counter_id(&symbol.into());
+        let sym = symbol.into();
         let (key, val) = match condition {
             AlertCondition::PriceRise | AlertCondition::PriceFall => {
                 ("price", trigger_value.into())
@@ -130,7 +130,7 @@ impl AlertContext {
         self.post(
             "/v1/notify/reminders",
             serde_json::json!({
-                "counter_id": cid,
+                "symbol": sym,
                 "indicator_id": indicator_id.to_string(),
                 "value_map": { key: val },
                 "frequency": freq,

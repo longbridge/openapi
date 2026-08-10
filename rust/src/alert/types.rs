@@ -3,8 +3,6 @@
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-use crate::utils::counter::deserialize_counter_id_as_symbol;
-
 /// Response for [`crate::AlertContext::list`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlertList {
@@ -16,10 +14,6 @@ pub struct AlertList {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlertSymbolGroup {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Ticker code (without market)
     pub code: String,

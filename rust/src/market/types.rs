@@ -6,7 +6,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum_macros::{FromRepr, IntoStaticStr};
 use time::OffsetDateTime;
 
-use crate::{types::Market, utils::counter::deserialize_counter_id_as_symbol};
+use crate::types::Market;
 
 // ── market_status ─────────────────────────────────────────────────
 
@@ -649,10 +649,6 @@ pub struct AnomalyResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnomalyItem {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Security name
     pub name: String,
@@ -685,10 +681,6 @@ pub struct IndexConstituents {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConstituentStock {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Security name
     pub name: String,

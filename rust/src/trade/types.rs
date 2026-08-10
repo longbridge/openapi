@@ -931,7 +931,7 @@ pub(crate) struct USQueryOrdersBody {
     pub action: i32,
     pub start_at: f64,
     pub end_at: f64,
-    pub counter_ids: Vec<String>,
+    pub symbols: Vec<String>,
     pub security_types: Vec<String>,
     pub query_type: i32,
     pub page: i32,
@@ -1046,13 +1046,8 @@ pub struct USAttachedOrder {
     pub activate_rth: i32,
     #[serde(default)]
     pub submit_price: String,
-    /// User-facing trading symbol (e.g. `"NKE.US"`), converted from
-    /// `counter_id`.
-    #[serde(
-        default,
-        rename = "counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
+    /// User-facing trading symbol (e.g. `"NKE.US"`)
+    #[serde(default)]
     pub symbol: String,
     #[serde(default)]
     pub withdrawn: bool,
@@ -1072,21 +1067,11 @@ pub struct USOrderDetail {
     pub account_channel: String,
     #[serde(default)]
     pub action: i32,
-    /// User-facing trading symbol (e.g. `"NKE.US"`), converted from
-    /// `counter_id`.
-    #[serde(
-        default,
-        rename = "counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
+    /// User-facing trading symbol (e.g. `"NKE.US"`)
+    #[serde(default)]
     pub symbol: String,
-    /// User-facing underlying symbol (options only), converted from
-    /// `underlying_counter_id`.
-    #[serde(
-        default,
-        rename = "underlying_counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
+    /// User-facing underlying symbol (options only)
+    #[serde(default)]
     pub underlying_symbol: String,
     #[serde(default)]
     pub security_type: String,
@@ -1270,13 +1255,8 @@ pub struct USCryptoEntry {
     pub asset_type: String,
     #[serde(default)]
     pub average_cost: String,
-    /// User-facing trading-pair symbol (e.g. `"BTCUSD.BKKT"`), converted from
-    /// the API's `counter_id` field (e.g. `"VA/BKKT/BTCUSD"`).
-    #[serde(
-        default,
-        rename = "counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
+    /// User-facing trading-pair symbol (e.g. `"BTCUSD.BKKT"`)
+    #[serde(default)]
     pub symbol: String,
     #[serde(default)]
     pub currency: String,
@@ -1291,13 +1271,8 @@ pub struct USStockEntry {
     /// the qualified form.
     #[serde(default)]
     pub symbol: String,
-    /// Qualified user-facing symbol (e.g. `"AAPL.US"`), converted from
-    /// `counter_id`.
-    #[serde(
-        default,
-        rename = "counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
+    /// Qualified user-facing symbol (e.g. `"AAPL.US"`)
+    #[serde(default)]
     pub full_symbol: String,
     #[serde(default)]
     pub asset_type: String,

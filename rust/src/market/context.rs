@@ -4,11 +4,7 @@ use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{
-    Config, Result,
-    market::types::*,
-    utils::counter::{counter_id_to_symbol, index_symbol_to_counter_id, symbol_to_counter_id},
-};
+use crate::{Config, Result, market::types::*};
 
 /// Convert a Unix-seconds value (integer or string) to RFC 3339.
 fn unix_secs_to_rfc3339(ts: i64) -> String {
@@ -151,14 +147,14 @@ impl MarketContext {
         };
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             #[serde(rename = "type")]
             period: &'static str,
         }
         self.get_dc(
             "/v1/quote/broker-holding",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 period: period_str,
             },
             DcRegion::Ap,
@@ -175,12 +171,12 @@ impl MarketContext {
     ) -> Result<BrokerHoldingDetail> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         self.get_dc(
             "/v1/quote/broker-holding/detail",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             },
             DcRegion::Ap,
         )
@@ -197,13 +193,13 @@ impl MarketContext {
     ) -> Result<BrokerHoldingDailyHistory> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             parti_number: String,
         }
         self.get_dc(
             "/v1/quote/broker-holding/daily",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 parti_number: broker_id.into(),
             },
             DcRegion::Ap,
@@ -224,14 +220,14 @@ impl MarketContext {
     ) -> Result<AhPremiumKlines> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             line_type: &'static str,
             line_num: u32,
         }
         self.get(
             "/v1/quote/ahpremium/klines",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 line_type: period.to_line_type(),
                 line_num: count,
             },
@@ -248,13 +244,13 @@ impl MarketContext {
     ) -> Result<AhPremiumIntraday> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             days: &'static str,
         }
         self.get(
             "/v1/quote/ahpremium/timeshares",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 days: "1",
             },
         )
@@ -269,12 +265,12 @@ impl MarketContext {
     pub async fn trade_stats(&self, symbol: impl Into<String>) -> Result<TradeStatsResponse> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         self.get(
             "/v1/quote/trades-statistics",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             },
         )
         .await
@@ -311,12 +307,12 @@ impl MarketContext {
     pub async fn constituent(&self, symbol: impl Into<String>) -> Result<IndexConstituents> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         self.get(
             "/v1/quote/index-constituents",
             Query {
-                counter_id: index_symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             },
         )
         .await
@@ -373,7 +369,7 @@ impl MarketContext {
                 };
                 let stock_val = &ev["stock"];
                 let stock = TopMoversStock {
-                    symbol: counter_id_to_symbol(stock_val["counter_id"].as_str().unwrap_or("")),
+                    symbol: stock_val["symbol"].as_str().unwrap_or("").to_string(),
                     code: stock_val["code"].as_str().unwrap_or("").to_string(),
                     name: stock_val["name"].as_str().unwrap_or("").to_string(),
                     full_name: stock_val["full_name"].as_str().unwrap_or("").to_string(),
@@ -478,7 +474,7 @@ impl MarketContext {
             .unwrap_or_default()
             .into_iter()
             .map(|item| RankListItem {
-                symbol: counter_id_to_symbol(item["counter_id"].as_str().unwrap_or("")),
+                symbol: item["symbol"].as_str().unwrap_or("").to_string(),
                 code: item["code"].as_str().unwrap_or("").to_string(),
                 name: item["name"].as_str().unwrap_or("").to_string(),
                 last_done: item["last_done"].as_str().unwrap_or("").to_string(),
