@@ -1054,8 +1054,8 @@ impl From<lb::ExecutiveList> for ExecutiveList {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct ExecutiveGroup {
-    /// Security symbol
-    pub symbol: String,
+    /// Security symbol (``None`` when the server omits it)
+    pub symbol: Option<String>,
     /// Link to company wiki page
     pub forward_url: String,
     /// Total number of executives
@@ -1643,28 +1643,27 @@ pub(crate) struct StockRatings {
     pub style_txt_name: String,
     pub scale_txt_name: String,
     pub report_period_txt: String,
-    /// Composite score (string representation of the JSON value)
-    pub multi_score: String,
+    /// Composite score (``None`` when not rated)
+    pub multi_score: Option<f64>,
     pub multi_letter: String,
     pub multi_score_change: i32,
     pub industry_name: String,
-    pub industry_rank: i64,
+    pub industry_rank: Option<i64>,
     /// Full ratings JSON string
     pub ratings_json: String,
 }
 
 impl From<lb::StockRatings> for StockRatings {
     fn from(v: lb::StockRatings) -> Self {
-        let industry_rank = v.industry_rank.as_i64().unwrap_or(0);
         Self {
             style_txt_name: v.style_txt_name,
             scale_txt_name: v.scale_txt_name,
             report_period_txt: v.report_period_txt,
-            multi_score: v.multi_score.to_string(),
+            multi_score: v.multi_score,
             multi_letter: v.multi_letter,
             multi_score_change: v.multi_score_change,
             industry_name: v.industry_name,
-            industry_rank,
+            industry_rank: v.industry_rank,
             ratings_json: serde_json::to_string(&v.ratings).unwrap_or_default(),
         }
     }

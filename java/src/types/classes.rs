@@ -2701,13 +2701,25 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/fundamental/RatingIndicator",
     longbridge::fundamental::RatingIndicator,
-    [name, score, letter]
+    [
+        name,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
     "com/longbridge/fundamental/RatingLeafIndicator",
     longbridge::fundamental::RatingLeafIndicator,
-    [name, value, value_type, score, letter]
+    [
+        name,
+        value,
+        value_type,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
@@ -2737,13 +2749,18 @@ impl_java_class!(
         style_txt_name,
         scale_txt_name,
         report_period_txt,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         multi_score,
         multi_letter,
         multi_score_change,
         industry_name,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_rank,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_total,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_mean_score,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_median_score,
         #[java(objarray)]
         ratings
@@ -2819,7 +2836,7 @@ impl_java_class!(
     longbridge::fundamental::IndustryRankItem,
     [
         name,
-        counter_id,
+        symbol,
         chg,
         leading_name,
         leading_ticker,
@@ -2891,7 +2908,7 @@ impl crate::types::IntoJValue for longbridge::fundamental::IndustryPeerNode {
     ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
         let longbridge::fundamental::IndustryPeerNode {
             name,
-            counter_id,
+            symbol,
             stock_num,
             chg,
             ytd_chg,
@@ -2901,7 +2918,7 @@ impl crate::types::IntoJValue for longbridge::fundamental::IndustryPeerNode {
         let cls = <Self as crate::types::ClassLoader>::class_ref();
         let obj = env.new_object(cls.borrow(), "()V", &[])?;
         crate::types::set_field(env, &obj, "name", name)?;
-        crate::types::set_field(env, &obj, "counterId", counter_id)?;
+        crate::types::set_field(env, &obj, "symbol", symbol)?;
         crate::types::set_field(env, &obj, "stockNum", stock_num)?;
         crate::types::set_field(env, &obj, "chg", chg)?;
         crate::types::set_field(env, &obj, "ytdChg", ytd_chg)?;
@@ -2974,6 +2991,7 @@ impl_java_class!(
     longbridge::portfolio::FlowItem,
     [
         executed_date,
+        #[java(nullable)]
         executed_timestamp,
         code,
         direction,

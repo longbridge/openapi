@@ -10,6 +10,7 @@ use crate::types::ClassLoader;
 
 pub(crate) static INTEGER_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static LONG_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DOUBLE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static STRING_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DECIMAL_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_INSTANT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
@@ -61,6 +62,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         env,
         (INTEGER_CLASS, "java/lang/Integer"),
         (LONG_CLASS, "java/lang/Long"),
+        (DOUBLE_CLASS, "java/lang/Double"),
         (STRING_CLASS, "java/lang/String"),
         (DECIMAL_CLASS, "java/math/BigDecimal"),
         (TIME_INSTANT_CLASS, "java/time/Instant"),

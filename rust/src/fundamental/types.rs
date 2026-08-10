@@ -614,8 +614,9 @@ pub struct ExecutiveList {
 /// Executives for one security
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExecutiveGroup {
-    /// Security symbol
-    pub symbol: String,
+    /// Security symbol (`None` when the server omits it or returns empty)
+    #[serde(default, with = "crate::serde_utils::symbol_opt")]
+    pub symbol: Option<String>,
     /// Link to the company wiki page
     pub forward_url: String,
     /// Total number of executives
@@ -954,9 +955,9 @@ pub struct StockRatings {
     /// Report period display text
     #[serde(default)]
     pub report_period_txt: String,
-    /// Composite score (may be int, float, or null)
+    /// Composite score
     #[serde(default)]
-    pub multi_score: serde_json::Value,
+    pub multi_score: Option<f64>,
     /// Composite score letter grade
     #[serde(default)]
     pub multi_letter: String,
@@ -966,18 +967,18 @@ pub struct StockRatings {
     /// Industry name
     #[serde(default)]
     pub industry_name: String,
-    /// Industry rank (may be int or null)
+    /// Industry rank
     #[serde(default)]
-    pub industry_rank: serde_json::Value,
+    pub industry_rank: Option<i64>,
     /// Total securities in the industry
     #[serde(default)]
-    pub industry_total: serde_json::Value,
+    pub industry_total: Option<i64>,
     /// Industry mean score
     #[serde(default)]
-    pub industry_mean_score: serde_json::Value,
+    pub industry_mean_score: Option<f64>,
     /// Industry median score
     #[serde(default)]
-    pub industry_median_score: serde_json::Value,
+    pub industry_median_score: Option<f64>,
     /// Detailed rating categories
     #[serde(default)]
     pub ratings: Vec<RatingCategory>,
@@ -1009,9 +1010,9 @@ pub struct RatingSubIndicatorGroup {
 pub struct RatingIndicator {
     /// Indicator display name
     pub name: String,
-    /// Score (may be int, float, or null)
+    /// Score
     #[serde(default)]
-    pub score: serde_json::Value,
+    pub score: Option<f64>,
     /// Letter grade
     #[serde(default)]
     pub letter: String,
@@ -1028,9 +1029,9 @@ pub struct RatingLeafIndicator {
     /// Value type hint, e.g. `"percent"`
     #[serde(default)]
     pub value_type: String,
-    /// Score (may be int, float, or null)
+    /// Score
     #[serde(default)]
-    pub score: serde_json::Value,
+    pub score: Option<f64>,
     /// Letter grade
     #[serde(default)]
     pub letter: String,
@@ -1200,8 +1201,8 @@ pub struct IndustryRankGroup {
 pub struct IndustryRankItem {
     /// Industry / sector name
     pub name: String,
-    /// Counter ID of the industry
-    pub counter_id: String,
+    /// Industry symbol
+    pub symbol: String,
     /// Change percentage
     pub chg: String,
     /// Name of the leading stock
@@ -1221,8 +1222,9 @@ pub struct IndustryRankItem {
 /// Response for [`crate::FundamentalContext::industry_peers`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndustryPeersResponse {
-    /// Top-level industry node info
-    pub top: IndustryPeersTop,
+    /// Top-level industry node info (may be absent if no data)
+    #[serde(default)]
+    pub top: Option<IndustryPeersTop>,
     /// Root peer chain node (may be absent if no data)
     pub chain: Option<IndustryPeerNode>,
 }
@@ -1241,8 +1243,8 @@ pub struct IndustryPeersTop {
 pub struct IndustryPeerNode {
     /// Node name
     pub name: String,
-    /// Counter ID
-    pub counter_id: String,
+    /// Node symbol
+    pub symbol: String,
     /// Number of stocks in this node (API returns as integer)
     pub stock_num: i32,
     /// Change percentage

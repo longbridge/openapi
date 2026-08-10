@@ -115,7 +115,7 @@ impl AlertContext {
         condition: AlertCondition,
         trigger_value: impl Into<String>,
         frequency: AlertFrequency,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<()> {
         let sym = symbol.into();
         let (key, val) = match condition {
             AlertCondition::PriceRise | AlertCondition::PriceFall => {
@@ -127,7 +127,7 @@ impl AlertContext {
         };
         let indicator_id = condition as i32;
         let freq = frequency as i32;
-        self.post(
+        self.post::<serde_json::Value, _>(
             "/v1/notify/reminders",
             serde_json::json!({
                 "symbol": sym,
@@ -139,7 +139,8 @@ impl AlertContext {
                 "state": [1]
             }),
         )
-        .await
+        .await?;
+        Ok(())
     }
 
     /// Update a price alert.
@@ -150,8 +151,8 @@ impl AlertContext {
     /// — no extra round-trip needed.
     ///
     /// Path: `POST /v1/notify/reminders`
-    pub async fn update(&self, item: &AlertItem) -> Result<serde_json::Value> {
-        self.post(
+    pub async fn update(&self, item: &AlertItem) -> Result<()> {
+        self.post::<serde_json::Value, _>(
             "/v1/notify/reminders",
             serde_json::json!({
                 "id": item.id,
@@ -163,17 +164,19 @@ impl AlertContext {
                 "enabled": item.enabled,
             }),
         )
-        .await
+        .await?;
+        Ok(())
     }
 
     /// Delete price alerts.
     ///
     /// Path: `DELETE /v1/notify/reminders`
-    pub async fn delete(&self, alert_ids: Vec<String>) -> Result<serde_json::Value> {
-        self.http_delete(
+    pub async fn delete(&self, alert_ids: Vec<String>) -> Result<()> {
+        self.http_delete::<serde_json::Value, _>(
             "/v1/notify/reminders",
             serde_json::json!({ "ids": alert_ids }),
         )
-        .await
+        .await?;
+        Ok(())
     }
 }

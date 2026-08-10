@@ -9517,9 +9517,9 @@ typedef struct lb_industry_rank_item_t {
    */
   const char *name;
   /**
-   * Counter ID of the industry.
+   * Industry symbol.
    */
-  const char *counter_id;
+  const char *symbol;
   /**
    * Change percentage.
    */
@@ -9597,9 +9597,9 @@ typedef struct lb_industry_peer_node_t {
    */
   const char *name;
   /**
-   * Counter ID.
+   * Node symbol.
    */
-  const char *counter_id;
+  const char *symbol;
   /**
    * Number of stocks in this node.
    */
@@ -9623,9 +9623,9 @@ typedef struct lb_industry_peer_node_t {
  */
 typedef struct lb_industry_peers_response_t {
   /**
-   * Top-level industry node info.
+   * Top-level industry node info (NULL if absent).
    */
-  struct lb_industry_peers_top_t top;
+  const struct lb_industry_peers_top_t *top;
   /**
    * Root peer chain node (NULL if absent).
    */
@@ -11438,7 +11438,7 @@ typedef struct lb_top_movers_response_t {
    */
   uintptr_t num_events;
   /**
-   * Pagination cursor as a JSON string
+   * Pagination cursor (empty string means no more pages)
    */
   const char *next_params;
 } lb_top_movers_response_t;
@@ -11448,7 +11448,8 @@ typedef struct lb_top_movers_response_t {
  */
 typedef struct lb_rank_sub_category_t {
   /**
-   * Sub-category key (e.g. `"hot_all-us"`). Pass to `lb_market_context_rank_list`.
+   * Sub-category key (e.g. `"hot_all-us"`). Pass to
+   * `lb_market_context_rank_list`.
    */
   const char *key;
   /**

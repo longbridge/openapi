@@ -3429,7 +3429,7 @@ inline fundamental::InstitutionRatingViews convert(const lb_institution_rating_v
 
 // ── industry_rank conversions ─────────────────────────────────────
 inline fundamental::IndustryRankItem convert(const lb_industry_rank_item_t* item) {
-  return { item->name, item->counter_id, item->chg, item->leading_name, item->leading_ticker,
+  return { item->name, item->symbol, item->chg, item->leading_name, item->leading_ticker,
            item->leading_chg, item->value_name, item->value_data };
 }
 inline fundamental::IndustryRankGroup convert(const lb_industry_rank_group_t* g) {
@@ -3445,11 +3445,12 @@ inline fundamental::IndustryRankResponse convert(const lb_industry_rank_response
 
 // ── industry_peers conversions ────────────────────────────────────
 inline fundamental::IndustryPeerNode convert(const lb_industry_peer_node_t* node) {
-  return { node->name, node->counter_id, node->stock_num, node->chg, node->ytd_chg,
+  return { node->name, node->symbol, node->stock_num, node->chg, node->ytd_chg,
            node->next_json ? node->next_json : "" };
 }
 inline fundamental::IndustryPeersResponse convert(const lb_industry_peers_response_t* r) {
-  fundamental::IndustryPeersTop top{ r->top.name, r->top.market };
+  std::optional<fundamental::IndustryPeersTop> top;
+  if (r->top) top = fundamental::IndustryPeersTop{ r->top->name, r->top->market };
   std::optional<fundamental::IndustryPeerNode> chain;
   if (r->chain) chain = convert(r->chain);
   return { std::move(top), std::move(chain) };

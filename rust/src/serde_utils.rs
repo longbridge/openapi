@@ -555,3 +555,34 @@ where
 {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
 }
+
+/// Deserializes a field that may be a JSON number, string, or null into
+/// `Option<String>`.  Null and missing fields produce `None`; numbers are
+/// converted to their decimal string representation.
+pub(crate) mod value_as_opt_string {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<String>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let v = serde_json::Value::deserialize(d)?;
+        Ok(match v {
+            serde_json::Value::Null => None,
+            serde_json::Value::String(s) if s.is_empty() => None,
+            serde_json::Value::String(s) => Some(s),
+            serde_json::Value::Number(n) => Some(n.to_string()),
+            other => Some(other.to_string()),
+        })
+    }
+
+    pub(crate) fn serialize<S>(v: &Option<String>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match v {
+            Some(val) => s.serialize_str(val),
+            None => s.serialize_none(),
+        }
+    }
+}

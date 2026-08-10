@@ -768,8 +768,9 @@ pub struct TopMoversEvent {
 pub struct TopMoversResponse {
     /// Top-mover events
     pub events: Vec<TopMoversEvent>,
-    /// Pagination cursor for next page
-    pub next_params: serde_json::Value,
+    /// Pagination cursor for next page (pass as-is to the next call; empty
+    /// string means no more pages)
+    pub next_params: String,
 }
 
 // ── rank_categories ───────────────────────────────────────────────
