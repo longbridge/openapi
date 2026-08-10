@@ -4,8 +4,8 @@ package com.longbridge.fundamental;
 public class RatingIndicator {
     /** Indicator display name */
     public String name;
-    /** Score (JSON string; may be int, float, or null) */
-    public String score;
+    /** Score; may be null */
+    public Double score;
     /** Letter grade */
     public String letter;
 }

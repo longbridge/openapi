@@ -171,48 +171,47 @@ impl SharelistContext {
     /// Delete a sharelist.
     ///
     /// Path: `DELETE /v1/sharelists/{id}`
-    pub async fn delete(&self, id: i64) -> Result<serde_json::Value> {
-        self.http_delete(format!("/v1/sharelists/{id}"), serde_json::json!({}))
-            .await
+    pub async fn delete(&self, id: i64) -> Result<()> {
+        self.http_delete::<serde_json::Value, _>(
+            format!("/v1/sharelists/{id}"),
+            serde_json::json!({}),
+        )
+        .await?;
+        Ok(())
     }
 
     /// Add securities to a sharelist.
     ///
     /// Path: `POST /v1/sharelists/{id}/items`
-    pub async fn add_securities(&self, id: i64, symbols: Vec<String>) -> Result<serde_json::Value> {
+    pub async fn add_securities(&self, id: i64, symbols: Vec<String>) -> Result<()> {
         let syms = symbols.join(",");
         let path = format!("/v1/sharelists/{id}/items");
-        self.post(path.leak(), serde_json::json!({ "symbols": syms }))
-            .await
+        self.post::<serde_json::Value, _>(path.leak(), serde_json::json!({ "symbols": syms }))
+            .await?;
+        Ok(())
     }
 
     /// Remove securities from a sharelist.
     ///
     /// Path: `DELETE /v1/sharelists/{id}/items`
-    pub async fn remove_securities(
-        &self,
-        id: i64,
-        symbols: Vec<String>,
-    ) -> Result<serde_json::Value> {
+    pub async fn remove_securities(&self, id: i64, symbols: Vec<String>) -> Result<()> {
         let syms = symbols.join(",");
-        self.http_delete(
+        self.http_delete::<serde_json::Value, _>(
             format!("/v1/sharelists/{id}/items"),
             serde_json::json!({ "symbols": syms }),
         )
-        .await
+        .await?;
+        Ok(())
     }
 
     /// Reorder securities in a sharelist.
     ///
     /// Path: `POST /v1/sharelists/{id}/items/sort`
-    pub async fn sort_securities(
-        &self,
-        id: i64,
-        symbols: Vec<String>,
-    ) -> Result<serde_json::Value> {
+    pub async fn sort_securities(&self, id: i64, symbols: Vec<String>) -> Result<()> {
         let syms = symbols.join(",");
         let path = format!("/v1/sharelists/{id}/items/sort");
-        self.post(path.leak(), serde_json::json!({ "symbols": syms }))
-            .await
+        self.post::<serde_json::Value, _>(path.leak(), serde_json::json!({ "symbols": syms }))
+            .await?;
+        Ok(())
     }
 }

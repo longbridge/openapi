@@ -2564,7 +2564,7 @@ struct TopMoversEvent
 struct TopMoversResponse
 {
   std::vector<TopMoversEvent> events;
-  /// Pagination cursor as a JSON string
+  /// Pagination cursor (empty string means no more pages)
   std::string next_params;
 };
 
@@ -3278,7 +3278,7 @@ struct InstitutionRatingViews
 struct IndustryRankItem
 {
   std::string name;
-  std::string counter_id;
+  std::string symbol;
   std::string chg;
   std::string leading_name;
   std::string leading_ticker;
@@ -3312,7 +3312,7 @@ struct IndustryPeersTop
 struct IndustryPeerNode
 {
   std::string name;
-  std::string counter_id;
+  std::string symbol;
   int32_t stock_num;
   std::string chg;
   std::string ytd_chg;
@@ -3322,7 +3322,7 @@ struct IndustryPeerNode
 /// Industry peers response.
 struct IndustryPeersResponse
 {
-  IndustryPeersTop top;
+  std::optional<IndustryPeersTop> top;
   std::optional<IndustryPeerNode> chain;
 };
 

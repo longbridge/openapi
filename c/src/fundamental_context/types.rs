@@ -2347,7 +2347,7 @@ pub(crate) struct CExecutiveGroupOwned {
 impl From<longbridge::fundamental::ExecutiveGroup> for CExecutiveGroupOwned {
     fn from(v: longbridge::fundamental::ExecutiveGroup) -> Self {
         Self {
-            symbol: v.symbol.into(),
+            symbol: v.symbol.unwrap_or_default().into(),
             forward_url: v.forward_url.into(),
             total: v.total,
             professionals: v.professionals.into(),
@@ -2628,7 +2628,7 @@ impl From<longbridge::fundamental::RatingLeafIndicator> for CRatingLeafIndicator
             name: v.name.into(),
             value: v.value.into(),
             value_type: v.value_type.into(),
-            score: v.score.to_string().into(),
+            score: v.score.map(|f| f.to_string()).unwrap_or_default().into(),
             letter: v.letter.into(),
         }
     }
@@ -2668,7 +2668,7 @@ impl From<longbridge::fundamental::RatingIndicator> for CRatingIndicatorOwned {
     fn from(v: longbridge::fundamental::RatingIndicator) -> Self {
         Self {
             name: v.name.into(),
-            score: v.score.to_string().into(),
+            score: v.score.map(|f| f.to_string()).unwrap_or_default().into(),
             letter: v.letter.into(),
         }
     }
@@ -2809,14 +2809,34 @@ impl From<longbridge::fundamental::StockRatings> for CStockRatingsOwned {
             style_txt_name: v.style_txt_name.into(),
             scale_txt_name: v.scale_txt_name.into(),
             report_period_txt: v.report_period_txt.into(),
-            multi_score: v.multi_score.to_string().into(),
+            multi_score: v
+                .multi_score
+                .map(|f| f.to_string())
+                .unwrap_or_default()
+                .into(),
             multi_letter: v.multi_letter.into(),
             multi_score_change: v.multi_score_change,
             industry_name: v.industry_name.into(),
-            industry_rank: v.industry_rank.to_string().into(),
-            industry_total: v.industry_total.to_string().into(),
-            industry_mean_score: v.industry_mean_score.to_string().into(),
-            industry_median_score: v.industry_median_score.to_string().into(),
+            industry_rank: v
+                .industry_rank
+                .map(|n| n.to_string())
+                .unwrap_or_default()
+                .into(),
+            industry_total: v
+                .industry_total
+                .map(|n| n.to_string())
+                .unwrap_or_default()
+                .into(),
+            industry_mean_score: v
+                .industry_mean_score
+                .map(|f| f.to_string())
+                .unwrap_or_default()
+                .into(),
+            industry_median_score: v
+                .industry_median_score
+                .map(|f| f.to_string())
+                .unwrap_or_default()
+                .into(),
             ratings: v.ratings.into(),
         }
     }
@@ -3386,8 +3406,8 @@ impl ToFFI for CInstitutionRatingViewsOwned {
 pub struct CIndustryRankItem {
     /// Industry / sector name.
     pub name: *const c_char,
-    /// Counter ID of the industry.
-    pub counter_id: *const c_char,
+    /// Industry symbol.
+    pub symbol: *const c_char,
     /// Change percentage.
     pub chg: *const c_char,
     /// Name of the leading stock.
@@ -3404,7 +3424,7 @@ pub struct CIndustryRankItem {
 
 pub(crate) struct CIndustryRankItemOwned {
     name: CString,
-    counter_id: CString,
+    symbol: CString,
     chg: CString,
     leading_name: CString,
     leading_ticker: CString,
@@ -3417,7 +3437,7 @@ impl From<longbridge::fundamental::IndustryRankItem> for CIndustryRankItemOwned 
     fn from(v: longbridge::fundamental::IndustryRankItem) -> Self {
         Self {
             name: v.name.into(),
-            counter_id: v.counter_id.into(),
+            symbol: v.symbol.into(),
             chg: v.chg.into(),
             leading_name: v.leading_name.into(),
             leading_ticker: v.leading_ticker.into(),
@@ -3433,7 +3453,7 @@ impl ToFFI for CIndustryRankItemOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CIndustryRankItem {
             name: self.name.to_ffi_type(),
-            counter_id: self.counter_id.to_ffi_type(),
+            symbol: self.symbol.to_ffi_type(),
             chg: self.chg.to_ffi_type(),
             leading_name: self.leading_name.to_ffi_type(),
             leading_ticker: self.leading_ticker.to_ffi_type(),
@@ -3546,8 +3566,8 @@ impl ToFFI for CIndustryPeersTopOwned {
 pub struct CIndustryPeerNode {
     /// Node name.
     pub name: *const c_char,
-    /// Counter ID.
-    pub counter_id: *const c_char,
+    /// Node symbol.
+    pub symbol: *const c_char,
     /// Number of stocks in this node.
     pub stock_num: i32,
     /// Change percentage.
@@ -3560,7 +3580,7 @@ pub struct CIndustryPeerNode {
 
 pub(crate) struct CIndustryPeerNodeOwned {
     name: CString,
-    counter_id: CString,
+    symbol: CString,
     stock_num: i32,
     chg: CString,
     ytd_chg: CString,
@@ -3576,7 +3596,7 @@ impl From<longbridge::fundamental::IndustryPeerNode> for CIndustryPeerNodeOwned 
         };
         Self {
             name: v.name.into(),
-            counter_id: v.counter_id.into(),
+            symbol: v.symbol.into(),
             stock_num: v.stock_num,
             chg: v.chg.into(),
             ytd_chg: v.ytd_chg.into(),
@@ -3590,7 +3610,7 @@ impl ToFFI for CIndustryPeerNodeOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CIndustryPeerNode {
             name: self.name.to_ffi_type(),
-            counter_id: self.counter_id.to_ffi_type(),
+            symbol: self.symbol.to_ffi_type(),
             stock_num: self.stock_num,
             chg: self.chg.to_ffi_type(),
             ytd_chg: self.ytd_chg.to_ffi_type(),
@@ -3602,14 +3622,14 @@ impl ToFFI for CIndustryPeerNodeOwned {
 /// Industry peer chain response.
 #[repr(C)]
 pub struct CIndustryPeersResponse {
-    /// Top-level industry node info.
-    pub top: CIndustryPeersTop,
+    /// Top-level industry node info (NULL if absent).
+    pub top: *const CIndustryPeersTop,
     /// Root peer chain node (NULL if absent).
     pub chain: *const CIndustryPeerNode,
 }
 
 pub(crate) struct CIndustryPeersResponseOwned {
-    top: CIndustryPeersTopOwned,
+    top: COption<CIndustryPeersTopOwned>,
     chain: COption<CIndustryPeerNodeOwned>,
 }
 

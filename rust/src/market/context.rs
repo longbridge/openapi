@@ -395,7 +395,7 @@ impl MarketContext {
                 }
             })
             .collect();
-        let next_params = raw["next_params"].clone();
+        let next_params = serde_json::to_string(&raw["next_params"]).unwrap_or_default();
         Ok(TopMoversResponse {
             events,
             next_params,

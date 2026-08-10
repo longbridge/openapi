@@ -1088,7 +1088,7 @@ pub struct CTopMoversResponse {
     pub events: *const CTopMoversEvent,
     /// Number of items in `events`
     pub num_events: usize,
-    /// Pagination cursor as a JSON string
+    /// Pagination cursor (empty string means no more pages)
     pub next_params: *const c_char,
 }
 
@@ -1101,7 +1101,7 @@ impl From<TopMoversResponse> for CTopMoversResponseOwned {
     fn from(v: TopMoversResponse) -> Self {
         Self {
             events: v.events.into(),
-            next_params: v.next_params.to_string().into(),
+            next_params: v.next_params.into(),
         }
     }
 }

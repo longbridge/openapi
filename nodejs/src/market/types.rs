@@ -641,7 +641,7 @@ impl From<lb::TopMoversEvent> for TopMoversEvent {
 pub struct TopMoversResponse {
     /// Top-mover events
     pub events: Vec<TopMoversEvent>,
-    /// Pagination cursor for next page (JSON string)
+    /// Pagination cursor for next page (empty string means no more pages)
     pub next_params: String,
 }
 
@@ -649,7 +649,7 @@ impl From<lb::TopMoversResponse> for TopMoversResponse {
     fn from(v: lb::TopMoversResponse) -> Self {
         Self {
             events: v.events.into_iter().map(Into::into).collect(),
-            next_params: v.next_params.to_string(),
+            next_params: v.next_params,
         }
     }
 }
