@@ -649,4 +649,161 @@ public class TradeContext implements AutoCloseable {
             SdkNative.tradeContextEstimateMaxPurchaseQuantity(raw(), opts, callback);
         });
     }
+
+    /**
+     * Set grid trading order changed event callback. After receiving a grid order
+     * changed event, it will call back to this handler.
+     *
+     * @param handler A grid order changed handler
+     */
+    public void setOnGridOrderChange(GridOrderChangedHandler handler) {
+        SdkNative.tradeContextSetOnGridOrderChanged(raw(), handler);
+    }
+
+    /**
+     * Submit a grid trading order
+     *
+     * @param opts Options for this request, not null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<SubmitGridOrderResponse> submitGridOrder(SubmitGridOrderOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextSubmitGridOrder(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Replace (modify) a grid trading order
+     *
+     * @param opts Options for this request, not null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> replaceGridOrder(ReplaceGridOrderOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextReplaceGridOrder(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Get grid trading orders (paged list)
+     *
+     * @param opts Options for this request; may be null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<GridOrdersResponse> getGridOrders(GetGridOrdersOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextGridOrders(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Query grid trading orders by IDs
+     *
+     * @param orderIds Grid master order IDs
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<GridOrder[]> getGridOrdersByIds(String[] orderIds) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextGridOrdersByIds(raw(), orderIds, callback);
+        });
+    }
+
+    /**
+     * Get grid trading order detail (and paged history)
+     *
+     * @param opts Options for this request, not null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<GridOrderDetail> getGridOrderDetail(GetGridOrderDetailOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextGridOrderDetail(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Get grid trading trigger history
+     *
+     * @param opts Options for this request, not null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<GridTriggerHistoryResponse> getGridTriggerHistory(GetGridTriggerHistoryOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextGridTriggerHistory(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Cancel a grid trading order
+     *
+     * @param orderId Grid master order ID
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> cancelGridOrder(String orderId) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextCancelGridOrder(raw(), orderId, callback);
+        });
+    }
+
+    /**
+     * Suspend a grid trading order
+     *
+     * @param orderId Grid master order ID
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> suspendGridOrder(String orderId) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextSuspendGridOrder(raw(), orderId, callback);
+        });
+    }
+
+    /**
+     * Restart a grid trading order
+     *
+     * @param orderId Grid master order ID
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> restartGridOrder(String orderId) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextRestartGridOrder(raw(), orderId, callback);
+        });
+    }
+
+    /**
+     * Submit the strategy risk-disclosure questionnaire record (grid trading
+     * compliance authorization).
+     *
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Void> submitStrategyQuestionnaire() throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextSubmitStrategyQuestionnaire(raw(), callback);
+        });
+    }
+
+    /**
+     * Get order info used by the grid order window (lot size, authorization flag,
+     * settlement currency, etc.).
+     *
+     * @param symbol Security symbol (e.g. 700.HK)
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<GridOrderInfo> getGridOrderInfo(String symbol) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextGridOrderInfo(raw(), symbol, callback);
+        });
+    }
 }

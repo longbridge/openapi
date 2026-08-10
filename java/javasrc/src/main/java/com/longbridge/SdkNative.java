@@ -262,6 +262,37 @@ public class SdkNative {
                         EstimateMaxPurchaseQuantityOptions opts,
                         AsyncCallback callback);
 
+        // ── Grid trading ──────────────────────────────────────────────
+        public static native void tradeContextSetOnGridOrderChanged(long context, GridOrderChangedHandler handler);
+
+        public static native void tradeContextSubmitGridOrder(long context, SubmitGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void tradeContextReplaceGridOrder(long context, ReplaceGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void tradeContextGridOrders(long context, GetGridOrdersOptions opts,
+                        AsyncCallback callback);
+
+        public static native void tradeContextGridOrdersByIds(long context, String[] orderIds,
+                        AsyncCallback callback);
+
+        public static native void tradeContextGridOrderDetail(long context, GetGridOrderDetailOptions opts,
+                        AsyncCallback callback);
+
+        public static native void tradeContextGridTriggerHistory(long context, GetGridTriggerHistoryOptions opts,
+                        AsyncCallback callback);
+
+        public static native void tradeContextCancelGridOrder(long context, String orderId, AsyncCallback callback);
+
+        public static native void tradeContextSuspendGridOrder(long context, String orderId, AsyncCallback callback);
+
+        public static native void tradeContextRestartGridOrder(long context, String orderId, AsyncCallback callback);
+
+        public static native void tradeContextSubmitStrategyQuestionnaire(long context, AsyncCallback callback);
+
+        public static native void tradeContextGridOrderInfo(long context, String symbol, AsyncCallback callback);
+
         // ── DCAContext ────────────────────────────────────────────────
         public static native long newDcaContext(long config);
         public static native void freeDcaContext(long context);

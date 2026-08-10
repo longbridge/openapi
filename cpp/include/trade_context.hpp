@@ -128,6 +128,63 @@ public:
     const EstimateMaxPurchaseQuantityOptions& opts,
     AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse> callback)
     const;
+
+  /// Set grid order changed callback, after receiving the grid order changed
+  /// event, it will call back to this function.
+  void set_on_grid_order_changed(
+    PushCallback<TradeContext, PushGridOrderChanged> callback) const;
+
+  /// Submit a grid trading order
+  void submit_grid_order(
+    const SubmitGridOrderOptions& opts,
+    AsyncCallback<TradeContext, SubmitGridOrderResponse> callback) const;
+
+  /// Replace (modify) a grid trading order
+  void replace_grid_order(const ReplaceGridOrderOptions& opts,
+                          AsyncCallback<TradeContext, void> callback) const;
+
+  /// Get grid trading orders (paged list)
+  void grid_orders(
+    const std::optional<GetGridOrdersOptions>& opts,
+    AsyncCallback<TradeContext, GridOrdersResponse> callback) const;
+
+  /// Query grid trading orders by IDs
+  void grid_orders_by_ids(
+    const GetGridOrdersByIdsOptions& opts,
+    AsyncCallback<TradeContext, std::vector<GridOrder>> callback) const;
+
+  /// Get grid trading order detail (and paged history)
+  void grid_order_detail(
+    const GetGridOrderDetailOptions& opts,
+    AsyncCallback<TradeContext, GridOrderDetail> callback) const;
+
+  /// Get grid trading trigger history
+  void grid_trigger_history(
+    const GetGridTriggerHistoryOptions& opts,
+    AsyncCallback<TradeContext, GridTriggerHistoryResponse> callback) const;
+
+  /// Cancel a grid trading order
+  void cancel_grid_order(const std::string& order_id,
+                         AsyncCallback<TradeContext, void> callback) const;
+
+  /// Suspend a grid trading order
+  void suspend_grid_order(const std::string& order_id,
+                          AsyncCallback<TradeContext, void> callback) const;
+
+  /// Restart a grid trading order
+  void restart_grid_order(const std::string& order_id,
+                          AsyncCallback<TradeContext, void> callback) const;
+
+  /// Submit the strategy risk-disclosure questionnaire record (grid trading
+  /// compliance authorization).
+  void submit_strategy_questionnaire(
+    AsyncCallback<TradeContext, void> callback) const;
+
+  /// Get order info used by the grid order window (lot size, authorization
+  /// flag, settlement currency, etc.).
+  void grid_order_info(
+    const std::string& symbol,
+    AsyncCallback<TradeContext, GridOrderInfo> callback) const;
 };
 
 } // namespace trade

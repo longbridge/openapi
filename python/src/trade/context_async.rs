@@ -4,10 +4,12 @@ use std::sync::Arc;
 
 use longbridge::trade::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
-    GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
-    GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions,
-    SubmitOrderOptions, TradeContext,
+    GetCashFlowOptions, GetFundPositionsOptions, GetGridOrderDetailOptions,
+    GetGridOrdersByIdsOptions, GetGridOrdersOptions, GetGridTriggerHistoryOptions,
+    GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+    GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+    QueryUSOrdersOptions, ReplaceGridOrderOptions, ReplaceOrderOptions, SubmitGridOrderOptions,
+    SubmitOrderOptions, SubmitStrategyQuestionnaireOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -22,10 +24,12 @@ use crate::{
         push::handle_push_event,
         types::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
-            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
-            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
-            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
-            SubmitOrderResponse, TimeInForceType, TopicType,
+            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GridOrder,
+            GridOrderDetail, GridOrderInfo, GridOrdersResponse, GridTradeRule,
+            GridTriggerHistoryResponse, MarginRatio, Order, OrderDetail, OrderSide, OrderStatus,
+            OrderType, OutsideRTH, ReplaceAttachedParams, StockPositionsResponse,
+            SubmitAttachedParams, SubmitGridOrderResponse, SubmitOrderResponse, TimeInForceType,
+            TopicType, TriggerOrder,
         },
     },
     types::Market,
@@ -76,6 +80,16 @@ impl AsyncTradeContext {
             self.callbacks.lock().order_changed = None;
         } else {
             self.callbacks.lock().order_changed = Some(callback);
+        }
+    }
+
+    /// Set grid order changed callback. May be sync or async (coroutines are
+    /// scheduled).
+    fn set_on_grid_order_changed(&self, py: Python<'_>, callback: Py<PyAny>) {
+        if callback.is_none(py) {
+            self.callbacks.lock().grid_order_changed = None;
+        } else {
+            self.callbacks.lock().grid_order_changed = Some(callback);
         }
     }
 
@@ -684,6 +698,235 @@ impl AsyncTradeContext {
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: EstimateMaxPurchaseQuantityResponse = ctx
                 .estimate_max_purchase_quantity(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    // ── Grid-trading methods ──────────────────────────────────────────────
+
+    /// Submit a grid trading order. Returns awaitable.
+    fn submit_grid_order(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        settlement_currency: String,
+        grid_trading_rule: GridTradeRule,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let opts = SubmitGridOrderOptions::new(symbol, settlement_currency, grid_trading_rule.0);
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: SubmitGridOrderResponse = ctx
+                .submit_grid_order(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Replace (modify) a grid trading order. Returns awaitable.
+    fn replace_grid_order(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        grid_trading_rule: GridTradeRule,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let opts = ReplaceGridOrderOptions::new(order_id, grid_trading_rule.0);
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.replace_grid_order(opts).await.map_err(ErrorNewType)?;
+            Ok(())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get grid trading orders (paged list). Returns awaitable.
+    #[pyo3(signature = (page = None, limit = None, market = None, status = None, symbol = None, sort_by = None, sort_order = None))]
+    #[allow(clippy::too_many_arguments)]
+    fn grid_orders(
+        &self,
+        py: Python<'_>,
+        page: Option<i32>,
+        limit: Option<i32>,
+        market: Option<Market>,
+        status: Option<String>,
+        symbol: Option<String>,
+        sort_by: Option<String>,
+        sort_order: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetGridOrdersOptions::new();
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+        if let Some(limit) = limit {
+            opts = opts.limit(limit);
+        }
+        if let Some(market) = market {
+            opts = opts.market(market.into());
+        }
+        if let Some(status) = status {
+            opts = opts.status(status);
+        }
+        if let Some(symbol) = symbol {
+            opts = opts.symbol(symbol);
+        }
+        if let Some(sort_by) = sort_by {
+            opts = opts.sort_by(sort_by);
+        }
+        if let Some(sort_order) = sort_order {
+            opts = opts.sort_order(sort_order);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp = ctx.grid_orders(opts).await.map_err(ErrorNewType)?;
+            let grid_order = resp
+                .grid_order
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<PyResult<Vec<GridOrder>>>()?;
+            Ok(GridOrdersResponse {
+                grid_order,
+                has_more: resp.has_more,
+            })
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Query grid trading orders by IDs. Returns awaitable.
+    fn grid_orders_by_ids(&self, py: Python<'_>, order_ids: Vec<String>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let opts = GetGridOrdersByIdsOptions::new(order_ids);
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let v = ctx.grid_orders_by_ids(opts).await.map_err(ErrorNewType)?;
+            v.into_iter()
+                .map(|x| -> PyResult<GridOrder> { x.try_into() })
+                .collect::<PyResult<Vec<GridOrder>>>()
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get grid trading order detail (and paged history). Returns awaitable.
+    #[pyo3(signature = (order_id, history_id = None, limit = None))]
+    fn grid_order_detail(
+        &self,
+        py: Python<'_>,
+        order_id: String,
+        history_id: Option<String>,
+        limit: Option<i32>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetGridOrderDetailOptions::new(order_id);
+        if let Some(history_id) = history_id {
+            opts = opts.history_id(history_id);
+        }
+        if let Some(limit) = limit {
+            opts = opts.limit(limit);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: GridOrderDetail = ctx
+                .grid_order_detail(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get grid trading trigger history. Returns awaitable.
+    #[pyo3(signature = (grid_order_id, page = None, limit = None))]
+    fn grid_trigger_history(
+        &self,
+        py: Python<'_>,
+        grid_order_id: String,
+        page: Option<i32>,
+        limit: Option<i32>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetGridTriggerHistoryOptions::new(grid_order_id);
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+        if let Some(limit) = limit {
+            opts = opts.limit(limit);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp = ctx.grid_trigger_history(opts).await.map_err(ErrorNewType)?;
+            let trigger_orders = resp
+                .trigger_orders
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<PyResult<Vec<TriggerOrder>>>()?;
+            Ok(GridTriggerHistoryResponse {
+                trigger_orders,
+                has_more: resp.has_more,
+            })
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Cancel a grid trading order. Returns awaitable.
+    fn cancel_grid_order(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.cancel_grid_order(order_id)
+                .await
+                .map_err(ErrorNewType)?;
+            Ok(())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Suspend a grid trading order. Returns awaitable.
+    fn suspend_grid_order(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.suspend_grid_order(order_id)
+                .await
+                .map_err(ErrorNewType)?;
+            Ok(())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Restart a grid trading order. Returns awaitable.
+    fn restart_grid_order(&self, py: Python<'_>, order_id: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.restart_grid_order(order_id)
+                .await
+                .map_err(ErrorNewType)?;
+            Ok(())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Submit the strategy risk-disclosure questionnaire record (grid trading
+    /// compliance authorization). Returns awaitable.
+    fn submit_strategy_questionnaire(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let opts = SubmitStrategyQuestionnaireOptions::new();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.submit_strategy_questionnaire(opts)
+                .await
+                .map_err(ErrorNewType)?;
+            Ok(())
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get order info used by the grid order window (lot size, authorization
+    /// flag, settlement currency, etc.). Returns awaitable.
+    fn grid_order_info(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: GridOrderInfo = ctx
+                .grid_order_info(symbol)
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;

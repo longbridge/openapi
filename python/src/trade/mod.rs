@@ -61,6 +61,20 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::USOrderDetail>()?;
     parent.add_class::<types::USOrderDetailResponse>()?;
 
+    parent.add_class::<types::GridTradeRule>()?;
+    parent.add_class::<types::SubmitGridOrderResponse>()?;
+    parent.add_class::<types::GridOrder>()?;
+    parent.add_class::<types::GridOrderSubOrder>()?;
+    parent.add_class::<types::GridOrderHistory>()?;
+    parent.add_class::<types::GridOrderDetail>()?;
+    parent.add_class::<types::TriggerOrder>()?;
+    parent.add_class::<types::GridBidSize>()?;
+    parent.add_class::<types::GridChannelInfo>()?;
+    parent.add_class::<types::GridOrderInfo>()?;
+    parent.add_class::<types::GridOrdersResponse>()?;
+    parent.add_class::<types::GridTriggerHistoryResponse>()?;
+    parent.add_class::<types::PushGridOrderChanged>()?;
+
     parent.add_class::<context::TradeContext>()?;
     parent.add_class::<context_async::AsyncTradeContext>()?;
     Ok(())

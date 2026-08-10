@@ -110,6 +110,19 @@ using longbridge::trade::SubmitOrderResponse;
 using longbridge::trade::TimeInForceType;
 using longbridge::trade::TopicType;
 using longbridge::trade::TriggerStatus;
+using longbridge::trade::GridBidSize;
+using longbridge::trade::GridChannelInfo;
+using longbridge::trade::GridOrder;
+using longbridge::trade::GridOrderDetail;
+using longbridge::trade::GridOrderHistory;
+using longbridge::trade::GridOrderInfo;
+using longbridge::trade::GridOrdersResponse;
+using longbridge::trade::GridOrderSubOrder;
+using longbridge::trade::GridTradeRule;
+using longbridge::trade::GridTriggerHistoryResponse;
+using longbridge::trade::PushGridOrderChanged;
+using longbridge::trade::SubmitGridOrderResponse;
+using longbridge::trade::TriggerOrder;
 using longbridge::quote::FilingItem;
 using longbridge::content::OwnedTopic;
 using longbridge::content::NewsItem;
@@ -1950,6 +1963,348 @@ convert(const lb_order_detail_t* order)
     order->has_charge_detail ? std::optional{ convert(&order->charge_detail) } : std::nullopt,
     attached_orders,
   };
+}
+
+inline SubmitGridOrderResponse
+convert(const lb_submit_grid_order_response_t* info)
+{
+  return SubmitGridOrderResponse{ info->order_id };
+}
+
+inline GridOrder
+convert(const lb_grid_order_t* o)
+{
+  return GridOrder{
+    o->order_id,
+    o->symbol,
+    o->stock_name,
+    o->market,
+    o->status,
+    o->grid_status,
+    o->submitted_base_price,
+    o->current_base_price,
+    o->pre_trigger_base_price,
+    o->post_trigger_base_price,
+    o->upper_limit_price,
+    o->lower_limit_price,
+    o->trigger_price_type,
+    o->trigger_spread_up,
+    o->trigger_spread_down,
+    o->trigger_percent_up,
+    o->trigger_percent_down,
+    o->pullback_percent,
+    o->pullback_spread,
+    o->rebound_percent,
+    o->rebound_spread,
+    o->trigger_sell_order_type,
+    o->trigger_buy_order_type,
+    o->trigger_sell_depth,
+    o->trigger_buy_depth,
+    o->trigger_quantity,
+    o->trigger_sell_quantity,
+    o->trigger_buy_quantity,
+    o->upper_limit_quantity,
+    o->lower_limit_quantity,
+    o->upper_limit_event,
+    o->lower_limit_event,
+    o->multiple_trigger,
+    o->trigger_times,
+    o->total_buy_quantity,
+    o->total_sell_quantity,
+    o->total_profit_balance,
+    o->settlement_currency,
+    o->time_in_force,
+    o->gtd,
+    o->created_at ? std::optional{ *o->created_at } : std::nullopt,
+    o->rth,
+    o->support_shortsell,
+    o->grid_order_type_up,
+    o->grid_order_type_down,
+  };
+}
+
+inline GridOrderSubOrder
+convert(const lb_grid_order_sub_order_t* s)
+{
+  return GridOrderSubOrder{
+    s->id,
+    s->price,
+    s->order_type,
+    s->quantity,
+    s->executed_qty,
+    s->action,
+    s->status,
+    s->submitted_at ? std::optional{ *s->submitted_at } : std::nullopt,
+    s->rth,
+  };
+}
+
+inline GridOrderHistory
+convert(const lb_grid_order_history_t* h)
+{
+  return GridOrderHistory{
+    h->history_id,
+    h->created_at ? std::optional{ *h->created_at } : std::nullopt,
+    h->status,
+    h->suspend_reason,
+    h->reason,
+  };
+}
+
+inline GridOrderDetail
+convert(const lb_grid_order_detail_t* d)
+{
+  std::vector<GridOrderSubOrder> grid_sub_orders;
+  std::transform(d->grid_sub_orders,
+                 d->grid_sub_orders + d->num_grid_sub_orders,
+                 std::back_inserter(grid_sub_orders),
+                 [](auto& item) { return convert(&item); });
+
+  std::vector<GridOrderHistory> grid_order_history;
+  std::transform(d->grid_order_history,
+                 d->grid_order_history + d->num_grid_order_history,
+                 std::back_inserter(grid_order_history),
+                 [](auto& item) { return convert(&item); });
+
+  return GridOrderDetail{
+    d->order_id,
+    d->symbol,
+    d->stock_name,
+    d->status,
+    d->grid_status,
+    d->suspend_reason,
+    d->sleeping_reason,
+    d->submitted_base_price,
+    d->current_base_price,
+    d->upper_limit_price,
+    d->lower_limit_price,
+    d->trigger_price_type,
+    d->trigger_spread_up,
+    d->trigger_spread_down,
+    d->trigger_percent_up,
+    d->trigger_percent_down,
+    d->pullback_percent,
+    d->pullback_spread,
+    d->rebound_percent,
+    d->rebound_spread,
+    d->multiple_trigger,
+    d->time_in_force,
+    d->trigger_quantity,
+    d->trigger_sell_quantity,
+    d->trigger_buy_quantity,
+    d->upper_limit_quantity,
+    d->lower_limit_quantity,
+    d->upper_limit_event,
+    d->lower_limit_event,
+    d->trigger_sell_depth,
+    d->trigger_buy_depth,
+    d->created_at ? std::optional{ *d->created_at } : std::nullopt,
+    d->updated_at ? std::optional{ *d->updated_at } : std::nullopt,
+    d->settlement_currency,
+    d->expire_time ? std::optional{ *d->expire_time } : std::nullopt,
+    d->gtd,
+    grid_sub_orders,
+    d->sub_has_more,
+    grid_order_history,
+    d->history_has_more,
+    d->support_shortsell,
+    d->rth,
+    d->grid_order_type_up,
+    d->grid_order_type_down,
+  };
+}
+
+inline TriggerOrder
+convert(const lb_trigger_order_t* t)
+{
+  return TriggerOrder{
+    t->id,
+    t->status,
+    t->name,
+    t->symbol,
+    t->price,
+    t->quantity,
+    t->executed_price,
+    t->executed_qty,
+    t->submitted_at ? std::optional{ *t->submitted_at } : std::nullopt,
+    t->action,
+    t->order_type,
+    t->trigger_price,
+    t->msg,
+    t->currency,
+    t->last_done,
+    t->updated_at ? std::optional{ *t->updated_at } : std::nullopt,
+    t->time_in_force,
+    t->gtd,
+    t->trigger_at ? std::optional{ *t->trigger_at } : std::nullopt,
+    t->trigger_status,
+  };
+}
+
+inline GridBidSize
+convert(const lb_grid_bid_size_t* b)
+{
+  return GridBidSize{
+    b->str_proceed,
+    b->end_proceed,
+    b->bid_size,
+  };
+}
+
+inline GridChannelInfo
+convert(const lb_grid_channel_info_t* c)
+{
+  std::vector<std::string> settlement_currency;
+  std::transform(c->settlement_currency,
+                 c->settlement_currency + c->num_settlement_currency,
+                 std::back_inserter(settlement_currency),
+                 [](auto item) { return std::string(item); });
+
+  return GridChannelInfo{
+    c->strategy_granted,
+    c->support_rth,
+    c->currency,
+    settlement_currency,
+  };
+}
+
+inline GridOrderInfo
+convert(const lb_grid_order_info_t* info)
+{
+  std::vector<GridBidSize> bid_sizes;
+  std::transform(info->bid_sizes,
+                 info->bid_sizes + info->num_bid_sizes,
+                 std::back_inserter(bid_sizes),
+                 [](auto& item) { return convert(&item); });
+
+  return GridOrderInfo{
+    info->name,
+    info->last_done,
+    info->lot_size,
+    info->buy_lot_size,
+    info->sell_lot_size,
+    bid_sizes,
+    convert(&info->channel_infos),
+  };
+}
+
+inline GridOrdersResponse
+convert(const lb_grid_orders_response_t* resp)
+{
+  std::vector<GridOrder> grid_order;
+  std::transform(resp->grid_order,
+                 resp->grid_order + resp->num_grid_order,
+                 std::back_inserter(grid_order),
+                 [](auto& item) { return convert(&item); });
+
+  return GridOrdersResponse{
+    grid_order,
+    resp->has_more,
+  };
+}
+
+inline GridTriggerHistoryResponse
+convert(const lb_grid_trigger_history_response_t* resp)
+{
+  std::vector<TriggerOrder> trigger_orders;
+  std::transform(resp->trigger_orders,
+                 resp->trigger_orders + resp->num_trigger_orders,
+                 std::back_inserter(trigger_orders),
+                 [](auto& item) { return convert(&item); });
+
+  return GridTriggerHistoryResponse{
+    trigger_orders,
+    resp->has_more,
+  };
+}
+
+inline PushGridOrderChanged
+convert(const lb_push_grid_order_changed_t* p)
+{
+  return PushGridOrderChanged{
+    p->order_id,
+    p->status,
+    p->symbol,
+    p->suspend_reason,
+    p->submitted_base_price,
+    p->current_base_price,
+    p->upper_limit_price,
+    p->lower_limit_price,
+    p->trigger_price_type,
+    p->trigger_quantity,
+    p->settlement_currency,
+    p->time_in_force,
+    p->rth,
+    p->grid_order_type_up,
+    p->grid_order_type_down,
+  };
+}
+
+inline lb_grid_trade_rule_t
+convert_grid_trade_rule(const GridTradeRule& src)
+{
+  lb_grid_trade_rule_t r = {
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+  };
+  r.submitted_base_price =
+    src.submitted_base_price
+      ? (const lb_decimal_t*)src.submitted_base_price.value()
+      : nullptr;
+  r.upper_limit_price = src.upper_limit_price
+                          ? (const lb_decimal_t*)src.upper_limit_price.value()
+                          : nullptr;
+  r.lower_limit_price = src.lower_limit_price
+                          ? (const lb_decimal_t*)src.lower_limit_price.value()
+                          : nullptr;
+  r.trigger_price_type =
+    src.trigger_price_type ? &*src.trigger_price_type : nullptr;
+  r.trigger_spread_up = src.trigger_spread_up
+                          ? (const lb_decimal_t*)src.trigger_spread_up.value()
+                          : nullptr;
+  r.trigger_spread_down =
+    src.trigger_spread_down
+      ? (const lb_decimal_t*)src.trigger_spread_down.value()
+      : nullptr;
+  r.trigger_percent_up =
+    src.trigger_percent_up
+      ? (const lb_decimal_t*)src.trigger_percent_up.value()
+      : nullptr;
+  r.trigger_percent_down =
+    src.trigger_percent_down
+      ? (const lb_decimal_t*)src.trigger_percent_down.value()
+      : nullptr;
+  r.multiple_trigger = src.multiple_trigger ? &*src.multiple_trigger : nullptr;
+  r.time_in_force = src.time_in_force ? &*src.time_in_force : nullptr;
+  r.upper_limit_quantity =
+    src.upper_limit_quantity
+      ? (const lb_decimal_t*)src.upper_limit_quantity.value()
+      : nullptr;
+  r.lower_limit_quantity =
+    src.lower_limit_quantity
+      ? (const lb_decimal_t*)src.lower_limit_quantity.value()
+      : nullptr;
+  r.expire_time = src.expire_time ? &*src.expire_time : nullptr;
+  r.upper_limit_event =
+    src.upper_limit_event ? &*src.upper_limit_event : nullptr;
+  r.lower_limit_event =
+    src.lower_limit_event ? &*src.lower_limit_event : nullptr;
+  r.trigger_sell_depth =
+    src.trigger_sell_depth ? &*src.trigger_sell_depth : nullptr;
+  r.trigger_buy_depth =
+    src.trigger_buy_depth ? &*src.trigger_buy_depth : nullptr;
+  r.trigger_quantity = src.trigger_quantity
+                         ? (const lb_decimal_t*)src.trigger_quantity.value()
+                         : nullptr;
+  r.support_shortsell =
+    src.support_shortsell ? &*src.support_shortsell : nullptr;
+  r.rth = src.rth ? &*src.rth : nullptr;
+  r.grid_order_type_up =
+    src.grid_order_type_up ? src.grid_order_type_up->c_str() : nullptr;
+  r.grid_order_type_down =
+    src.grid_order_type_down ? src.grid_order_type_down->c_str() : nullptr;
+  return r;
 }
 
 inline lb_securities_update_mode_t

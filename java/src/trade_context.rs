@@ -11,10 +11,13 @@ use longbridge::{
     trade::{
         AttachedOrderType, BalanceType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, QueryUSOrdersOptions, ReplaceAttachedParams,
-        ReplaceOrderOptions, SubmitAttachedParams, SubmitOrderOptions, TimeInForceType, TopicType,
+        GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
+        GetGridTriggerHistoryOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GridTradeRule, OrderSide, OrderStatus, OrderType, OutsideRTH,
+        PushEvent, QueryUSOrdersOptions, ReplaceAttachedParams, ReplaceGridOrderOptions,
+        ReplaceOrderOptions, SubmitAttachedParams, SubmitGridOrderOptions, SubmitOrderOptions,
+        SubmitStrategyQuestionnaireOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;
@@ -29,6 +32,7 @@ use crate::{
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<GlobalRef>,
+    grid_order_changed: Option<GlobalRef>,
 }
 
 struct ContextObj {
@@ -47,6 +51,17 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                     handler,
                     "onOrderChanged",
                     "(Lcom/longbridge/trade/PushOrderChanged;)V",
+                    &[event.borrow()],
+                )?;
+            }
+        }
+        PushEvent::GridOrderChanged(grid_order_changed) => {
+            if let Some(handler) = &callbacks.grid_order_changed {
+                let event = grid_order_changed.into_jvalue(&mut env)?;
+                env.call_method(
+                    handler,
+                    "onGridOrderChanged",
+                    "(Lcom/longbridge/trade/PushGridOrderChanged;)V",
                     &[event.borrow()],
                 )?;
             }
@@ -105,6 +120,24 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnOrd
             context.callbacks.lock().order_changed = Some(env.new_global_ref(handler)?);
         } else {
             context.callbacks.lock().order_changed = None;
+        }
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnGridOrderChanged(
+    mut env: JNIEnv,
+    _class: JClass,
+    ctx: i64,
+    handler: JObject,
+) {
+    let context = &*(ctx as *const ContextObj);
+    jni_result(&mut env, (), |env| {
+        if !handler.is_null() {
+            context.callbacks.lock().grid_order_changed = Some(env.new_global_ref(handler)?);
+        } else {
+            context.callbacks.lock().grid_order_changed = None;
         }
         Ok(())
     })
@@ -985,6 +1018,339 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextOrderDet
             Ok(__owned_ctx
                 .order_detail(GetOrderDetailOptions::new(order_id).is_attached())
                 .await?)
+        })?;
+        Ok(())
+    })
+}
+
+// ── Grid trading JNI stubs ────────────────────────────────────────────────────
+
+/// Read a `GridTradeRule` from a Java `com.longbridge.trade.GridTradeRule`
+/// object. Every field is optional (nullable box type on the Java side).
+fn read_grid_trade_rule(
+    env: &mut JNIEnv<'_>,
+    obj: &JObject<'_>,
+) -> jni::errors::Result<GridTradeRule> {
+    fn read_opt_bool(
+        env: &mut JNIEnv<'_>,
+        obj: &JObject<'_>,
+        name: &str,
+    ) -> jni::errors::Result<Option<bool>> {
+        let field = env.get_field(obj, name, "Ljava/lang/Boolean;")?.l()?;
+        if field.is_null() {
+            Ok(None)
+        } else {
+            Ok(Some(
+                env.call_method(&field, "booleanValue", "()Z", &[])?.z()?,
+            ))
+        }
+    }
+
+    let mut rule = GridTradeRule::default();
+    rule.submitted_base_price = get_field(env, obj, "submittedBasePrice")?;
+    rule.upper_limit_price = get_field(env, obj, "upperLimitPrice")?;
+    rule.lower_limit_price = get_field(env, obj, "lowerLimitPrice")?;
+    rule.trigger_price_type =
+        get_field::<_, _, Option<JavaInteger>>(env, obj, "triggerPriceType")?.map(i32::from);
+    rule.trigger_spread_up = get_field(env, obj, "triggerSpreadUp")?;
+    rule.trigger_spread_down = get_field(env, obj, "triggerSpreadDown")?;
+    rule.trigger_percent_up = get_field(env, obj, "triggerPercentUp")?;
+    rule.trigger_percent_down = get_field(env, obj, "triggerPercentDown")?;
+    rule.multiple_trigger = read_opt_bool(env, obj, "multipleTrigger")?;
+    rule.time_in_force =
+        get_field::<_, _, Option<JavaInteger>>(env, obj, "timeInForce")?.map(i32::from);
+    rule.upper_limit_quantity = get_field(env, obj, "upperLimitQuantity")?;
+    rule.lower_limit_quantity = get_field(env, obj, "lowerLimitQuantity")?;
+    rule.expire_time = get_field::<_, _, Option<JavaLong>>(env, obj, "expireTime")?.map(i64::from);
+    rule.upper_limit_event =
+        get_field::<_, _, Option<JavaInteger>>(env, obj, "upperLimitEvent")?.map(i32::from);
+    rule.lower_limit_event =
+        get_field::<_, _, Option<JavaInteger>>(env, obj, "lowerLimitEvent")?.map(i32::from);
+    rule.trigger_sell_depth =
+        get_field::<_, _, Option<JavaInteger>>(env, obj, "triggerSellDepth")?.map(i32::from);
+    rule.trigger_buy_depth =
+        get_field::<_, _, Option<JavaInteger>>(env, obj, "triggerBuyDepth")?.map(i32::from);
+    rule.trigger_quantity = get_field(env, obj, "triggerQuantity")?;
+    rule.support_shortsell = read_opt_bool(env, obj, "supportShortsell")?;
+    rule.rth = get_field::<_, _, Option<JavaInteger>>(env, obj, "rth")?.map(i32::from);
+    rule.grid_order_type_up = get_field(env, obj, "gridOrderTypeUp")?;
+    rule.grid_order_type_down = get_field(env, obj, "gridOrderTypeDown")?;
+    Ok(rule)
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitGridOrder(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let settlement_currency: String = get_field(env, &opts, "settlementCurrency")?;
+        let rule_obj = env
+            .get_field(
+                &opts,
+                "gridTradingRule",
+                "Lcom/longbridge/trade/GridTradeRule;",
+            )?
+            .l()?;
+        let rule = read_grid_trade_rule(env, &rule_obj)?;
+        let new_opts = SubmitGridOrderOptions::new(symbol, settlement_currency, rule);
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.submit_grid_order(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextReplaceGridOrder(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = get_field(env, &opts, "orderId")?;
+        let rule_obj = env
+            .get_field(
+                &opts,
+                "gridTradingRule",
+                "Lcom/longbridge/trade/GridTradeRule;",
+            )?
+            .l()?;
+        let rule = read_grid_trade_rule(env, &rule_obj)?;
+        let new_opts = ReplaceGridOrderOptions::new(order_id, rule);
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.replace_grid_order(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextGridOrders(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let opts = if !opts.is_null() {
+            let mut new_opts = GetGridOrdersOptions::new();
+            if let Some(page) = get_field::<_, _, Option<JavaInteger>>(env, &opts, "page")? {
+                new_opts = new_opts.page(page.into());
+            }
+            if let Some(limit) = get_field::<_, _, Option<JavaInteger>>(env, &opts, "limit")? {
+                new_opts = new_opts.limit(limit.into());
+            }
+            if let Some(market) = get_field::<_, _, Option<Market>>(env, &opts, "market")? {
+                new_opts = new_opts.market(market);
+            }
+            if let Some(status) = get_field::<_, _, Option<String>>(env, &opts, "status")? {
+                new_opts = new_opts.status(status);
+            }
+            if let Some(symbol) = get_field::<_, _, Option<String>>(env, &opts, "symbol")? {
+                new_opts = new_opts.symbol(symbol);
+            }
+            if let Some(sort_by) = get_field::<_, _, Option<String>>(env, &opts, "sortBy")? {
+                new_opts = new_opts.sort_by(sort_by);
+            }
+            if let Some(sort_order) = get_field::<_, _, Option<String>>(env, &opts, "sortOrder")? {
+                new_opts = new_opts.sort_order(sort_order);
+            }
+            Some(new_opts)
+        } else {
+            None
+        };
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.grid_orders(opts).await?;
+            Ok(crate::types::GridOrdersResponse::new(
+                resp.grid_order,
+                resp.has_more,
+            ))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextGridOrdersByIds(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_ids: jobjectArray,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_ids: ObjectArray<String> =
+            FromJValue::from_jvalue(env, JObject::from_raw(order_ids).into())?;
+        let new_opts = GetGridOrdersByIdsOptions::new(order_ids.0);
+        async_util::execute(env, callback, async move {
+            Ok(ObjectArray(__owned_ctx.grid_orders_by_ids(new_opts).await?))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextGridOrderDetail(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = get_field(env, &opts, "orderId")?;
+        let mut new_opts = GetGridOrderDetailOptions::new(order_id);
+        if let Some(history_id) = get_field::<_, _, Option<String>>(env, &opts, "historyId")? {
+            new_opts = new_opts.history_id(history_id);
+        }
+        if let Some(limit) = get_field::<_, _, Option<JavaInteger>>(env, &opts, "limit")? {
+            new_opts = new_opts.limit(limit.into());
+        }
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.grid_order_detail(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextGridTriggerHistory(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let grid_order_id: String = get_field(env, &opts, "gridOrderId")?;
+        let mut new_opts = GetGridTriggerHistoryOptions::new(grid_order_id);
+        if let Some(page) = get_field::<_, _, Option<JavaInteger>>(env, &opts, "page")? {
+            new_opts = new_opts.page(page.into());
+        }
+        if let Some(limit) = get_field::<_, _, Option<JavaInteger>>(env, &opts, "limit")? {
+            new_opts = new_opts.limit(limit.into());
+        }
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.grid_trigger_history(new_opts).await?;
+            Ok(crate::types::GridTriggerHistoryResponse::new(
+                resp.trigger_orders,
+                resp.has_more,
+            ))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextCancelGridOrder(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.cancel_grid_order(order_id).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSuspendGridOrder(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.suspend_grid_order(order_id).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextRestartGridOrder(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.restart_grid_order(order_id).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitStrategyQuestionnaire(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx
+                .submit_strategy_questionnaire(SubmitStrategyQuestionnaireOptions::new())
+                .await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextGridOrderInfo(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.grid_order_info(symbol).await?)
         })?;
         Ok(())
     })

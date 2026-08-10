@@ -10,6 +10,7 @@ namespace trade {
 using longbridge::convert::convert;
 using longbridge::convert::convert_submit_attached;
 using longbridge::convert::convert_replace_attached;
+using longbridge::convert::convert_grid_trade_rule;
 
 TradeContext::TradeContext()
   : ctx_(nullptr)
@@ -892,6 +893,346 @@ TradeContext::estimate_max_purchase_quantity(
     },
     new AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse>(
       callback));
+}
+
+void
+TradeContext::set_on_grid_order_changed(
+  PushCallback<TradeContext, PushGridOrderChanged> callback) const
+{
+  lb_trade_context_set_on_grid_order_changed(
+    ctx_,
+    [](auto ctx, auto event, auto userdata) {
+      auto callback_ptr =
+        callback::get_push_callback<TradeContext, PushGridOrderChanged>(
+          userdata);
+      PushGridOrderChanged event2 = convert(event);
+      (*callback_ptr)(PushEvent<TradeContext, PushGridOrderChanged>(
+        TradeContext(ctx), &event2));
+    },
+    new PushCallback<TradeContext, PushGridOrderChanged>(callback),
+    [](auto p) {
+      delete (PushCallback<TradeContext, PushGridOrderChanged>*)p;
+    });
+}
+
+void
+TradeContext::submit_grid_order(
+  const SubmitGridOrderOptions& opts,
+  AsyncCallback<TradeContext, SubmitGridOrderResponse> callback) const
+{
+  lb_submit_grid_order_options_t opts2 = {
+    opts.symbol.c_str(),
+    opts.settlement_currency.c_str(),
+    convert_grid_trade_rule(opts.grid_trading_rule),
+  };
+
+  lb_trade_context_submit_grid_order(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, SubmitGridOrderResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        SubmitGridOrderResponse resp =
+          convert((const lb_submit_grid_order_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitGridOrderResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitGridOrderResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, SubmitGridOrderResponse>(callback));
+}
+
+void
+TradeContext::replace_grid_order(
+  const ReplaceGridOrderOptions& opts,
+  AsyncCallback<TradeContext, void> callback) const
+{
+  lb_replace_grid_order_options_t opts2 = {
+    opts.order_id.c_str(),
+    convert_grid_trade_rule(opts.grid_trading_rule),
+  };
+
+  lb_trade_context_replace_grid_order(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<TradeContext, void>(
+        TradeContext((const lb_trade_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<TradeContext, void>(callback));
+}
+
+void
+TradeContext::grid_orders(
+  const std::optional<GetGridOrdersOptions>& opts,
+  AsyncCallback<TradeContext, GridOrdersResponse> callback) const
+{
+  lb_get_grid_orders_options_t opts2 = {
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+  };
+  lb_market_t market;
+
+  if (opts) {
+    opts2.page = opts->page ? &opts->page.value() : nullptr;
+    opts2.limit = opts->limit ? &opts->limit.value() : nullptr;
+    if (opts->market) {
+      market = convert(*opts->market);
+      opts2.market = &market;
+    }
+    opts2.status = opts->status ? opts->status->c_str() : nullptr;
+    opts2.symbol = opts->symbol ? opts->symbol->c_str() : nullptr;
+    opts2.sort_by = opts->sort_by ? opts->sort_by->c_str() : nullptr;
+    opts2.sort_order = opts->sort_order ? opts->sort_order->c_str() : nullptr;
+  }
+
+  lb_trade_context_grid_orders(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, GridOrdersResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        GridOrdersResponse resp =
+          convert((const lb_grid_orders_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, GridOrdersResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, GridOrdersResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, GridOrdersResponse>(callback));
+}
+
+void
+TradeContext::grid_orders_by_ids(
+  const GetGridOrdersByIdsOptions& opts,
+  AsyncCallback<TradeContext, std::vector<GridOrder>> callback) const
+{
+  std::vector<const char*> order_ids;
+  std::transform(opts.order_ids.cbegin(),
+                 opts.order_ids.cend(),
+                 std::back_inserter(order_ids),
+                 [](auto& id) { return id.c_str(); });
+  lb_get_grid_orders_by_ids_options_t opts2 = {
+    order_ids.data(),
+    order_ids.size(),
+  };
+
+  lb_trade_context_grid_orders_by_ids(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, std::vector<GridOrder>>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto rows = (const lb_grid_order_t*)res->data;
+        std::vector<GridOrder> rows2;
+        std::transform(rows,
+                       rows + res->length,
+                       std::back_inserter(rows2),
+                       [](auto& row) { return convert(&row); });
+
+        (*callback_ptr)(AsyncResult<TradeContext, std::vector<GridOrder>>(
+          ctx, std::move(status), &rows2));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, std::vector<GridOrder>>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, std::vector<GridOrder>>(callback));
+}
+
+void
+TradeContext::grid_order_detail(
+  const GetGridOrderDetailOptions& opts,
+  AsyncCallback<TradeContext, GridOrderDetail> callback) const
+{
+  lb_get_grid_order_detail_options_t opts2 = {
+    opts.order_id.c_str(),
+    opts.history_id ? opts.history_id->c_str() : nullptr,
+    opts.limit ? &opts.limit.value() : nullptr,
+  };
+
+  lb_trade_context_grid_order_detail(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, GridOrderDetail>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        GridOrderDetail resp =
+          convert((const lb_grid_order_detail_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, GridOrderDetail>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, GridOrderDetail>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, GridOrderDetail>(callback));
+}
+
+void
+TradeContext::grid_trigger_history(
+  const GetGridTriggerHistoryOptions& opts,
+  AsyncCallback<TradeContext, GridTriggerHistoryResponse> callback) const
+{
+  lb_get_grid_trigger_history_options_t opts2 = {
+    opts.grid_order_id.c_str(),
+    opts.page ? &opts.page.value() : nullptr,
+    opts.limit ? &opts.limit.value() : nullptr,
+  };
+
+  lb_trade_context_grid_trigger_history(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext,
+                                     GridTriggerHistoryResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        GridTriggerHistoryResponse resp =
+          convert((const lb_grid_trigger_history_response_t*)res->data);
+        (*callback_ptr)(
+          AsyncResult<TradeContext, GridTriggerHistoryResponse>(
+            ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<TradeContext, GridTriggerHistoryResponse>(
+            ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, GridTriggerHistoryResponse>(callback));
+}
+
+void
+TradeContext::cancel_grid_order(
+  const std::string& order_id,
+  AsyncCallback<TradeContext, void> callback) const
+{
+  lb_trade_context_cancel_grid_order(
+    ctx_,
+    order_id.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<TradeContext, void>(
+        TradeContext((const lb_trade_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<TradeContext, void>(callback));
+}
+
+void
+TradeContext::suspend_grid_order(
+  const std::string& order_id,
+  AsyncCallback<TradeContext, void> callback) const
+{
+  lb_trade_context_suspend_grid_order(
+    ctx_,
+    order_id.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<TradeContext, void>(
+        TradeContext((const lb_trade_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<TradeContext, void>(callback));
+}
+
+void
+TradeContext::restart_grid_order(
+  const std::string& order_id,
+  AsyncCallback<TradeContext, void> callback) const
+{
+  lb_trade_context_restart_grid_order(
+    ctx_,
+    order_id.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<TradeContext, void>(
+        TradeContext((const lb_trade_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<TradeContext, void>(callback));
+}
+
+void
+TradeContext::submit_strategy_questionnaire(
+  AsyncCallback<TradeContext, void> callback) const
+{
+  lb_trade_context_submit_strategy_questionnaire(
+    ctx_,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, void>(res->userdata);
+      (*callback_ptr)(AsyncResult<TradeContext, void>(
+        TradeContext((const lb_trade_context_t*)res->ctx),
+        Status(res->error),
+        nullptr));
+    },
+    new AsyncCallback<TradeContext, void>(callback));
+}
+
+void
+TradeContext::grid_order_info(
+  const std::string& symbol,
+  AsyncCallback<TradeContext, GridOrderInfo> callback) const
+{
+  lb_trade_context_grid_order_info(
+    ctx_,
+    symbol.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, GridOrderInfo>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        GridOrderInfo resp =
+          convert((const lb_grid_order_info_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, GridOrderInfo>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, GridOrderInfo>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, GridOrderInfo>(callback));
 }
 
 } // namespace trade

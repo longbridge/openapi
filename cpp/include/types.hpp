@@ -2268,6 +2268,497 @@ struct EstimateMaxPurchaseQuantityResponse
   Decimal margin_max_qty;
 };
 
+/// Grid trading rule — parameters for submit / replace.
+struct GridTradeRule
+{
+  /// Base price the grid is anchored to
+  std::optional<Decimal> submitted_base_price;
+  /// Upper price bound
+  std::optional<Decimal> upper_limit_price;
+  /// Lower price bound
+  std::optional<Decimal> lower_limit_price;
+  /// Trigger price type (only `1` / `2` allowed)
+  std::optional<int32_t> trigger_price_type;
+  /// Upward trigger spread (absolute)
+  std::optional<Decimal> trigger_spread_up;
+  /// Downward trigger spread (absolute)
+  std::optional<Decimal> trigger_spread_down;
+  /// Upward trigger percent
+  std::optional<Decimal> trigger_percent_up;
+  /// Downward trigger percent
+  std::optional<Decimal> trigger_percent_down;
+  /// Whether a single grid level may trigger multiple times
+  std::optional<bool> multiple_trigger;
+  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+  std::optional<int32_t> time_in_force;
+  /// Quantity handled when the upper bound is reached
+  std::optional<Decimal> upper_limit_quantity;
+  /// Quantity handled when the lower bound is reached
+  std::optional<Decimal> lower_limit_quantity;
+  /// Expiry time (unix seconds), used with GTD
+  std::optional<int64_t> expire_time;
+  /// Action when the upper bound is reached (only `1` / `2` allowed)
+  std::optional<int32_t> upper_limit_event;
+  /// Action when the lower bound is reached (only `1` / `2` allowed)
+  std::optional<int32_t> lower_limit_event;
+  /// Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`)
+  std::optional<int32_t> trigger_sell_depth;
+  /// Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`)
+  std::optional<int32_t> trigger_buy_depth;
+  /// Quantity per trigger
+  std::optional<Decimal> trigger_quantity;
+  /// Whether short selling is allowed
+  std::optional<bool> support_shortsell;
+  /// Regular trading hours flag (`0` / `1` / `2`)
+  std::optional<int32_t> rth;
+  /// Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`)
+  std::optional<std::string> grid_order_type_up;
+  /// Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`)
+  std::optional<std::string> grid_order_type_down;
+};
+
+/// Options for submit grid trading order request
+struct SubmitGridOrderOptions
+{
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Grid trading rule
+  GridTradeRule grid_trading_rule;
+};
+
+/// Options for replace grid trading order request
+struct ReplaceGridOrderOptions
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Grid trading rule
+  GridTradeRule grid_trading_rule;
+};
+
+/// Options for get grid trading orders (list) request
+struct GetGridOrdersOptions
+{
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+  /// Market
+  std::optional<Market> market;
+  /// Comma-joined status filter (e.g. `Performing,Suspended`)
+  std::optional<std::string> status;
+  /// Security symbol filter (e.g. `700.HK`)
+  std::optional<std::string> symbol;
+  /// Sort field
+  std::optional<std::string> sort_by;
+  /// Sort order
+  std::optional<std::string> sort_order;
+};
+
+/// Options for query grid trading orders by IDs request
+struct GetGridOrdersByIdsOptions
+{
+  /// Grid master order IDs
+  std::vector<std::string> order_ids;
+};
+
+/// Options for get grid trading order detail request
+struct GetGridOrderDetailOptions
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// History cursor for paging through the trigger history
+  std::optional<std::string> history_id;
+  /// Page size
+  std::optional<int32_t> limit;
+};
+
+/// Options for get grid trading trigger history request
+struct GetGridTriggerHistoryOptions
+{
+  /// Grid master order ID
+  std::string grid_order_id;
+  /// Page number
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+};
+
+/// Response for submit grid trading order request
+struct SubmitGridOrderResponse
+{
+  /// Grid master order id
+  std::string order_id;
+};
+
+/// A grid trading order (element of the list / by-ids responses).
+struct GridOrder
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Stock name
+  std::string stock_name;
+  /// Market
+  std::string market;
+  /// Order status
+  std::string status;
+  /// Grid running status
+  std::string grid_status;
+  /// Submitted base price
+  std::string submitted_base_price;
+  /// Current base price
+  std::string current_base_price;
+  /// Base price before the last trigger
+  std::string pre_trigger_base_price;
+  /// Base price after the last trigger
+  std::string post_trigger_base_price;
+  /// Upper price bound
+  std::string upper_limit_price;
+  /// Lower price bound
+  std::string lower_limit_price;
+  /// Trigger price type (`1` = spread, `2` = percent)
+  int32_t trigger_price_type;
+  /// Upward trigger spread
+  std::string trigger_spread_up;
+  /// Downward trigger spread
+  std::string trigger_spread_down;
+  /// Upward trigger percent
+  std::string trigger_percent_up;
+  /// Downward trigger percent
+  std::string trigger_percent_down;
+  /// Pullback percent
+  std::string pullback_percent;
+  /// Pullback spread
+  std::string pullback_spread;
+  /// Rebound percent
+  std::string rebound_percent;
+  /// Rebound spread
+  std::string rebound_spread;
+  /// Sell-side execution order type (e.g. `MO`)
+  std::string trigger_sell_order_type;
+  /// Buy-side execution order type (e.g. `MO`)
+  std::string trigger_buy_order_type;
+  /// Sell-side order-book depth
+  int32_t trigger_sell_depth;
+  /// Buy-side order-book depth
+  int32_t trigger_buy_depth;
+  /// Quantity per trigger
+  std::string trigger_quantity;
+  /// Quantity per sell trigger
+  std::string trigger_sell_quantity;
+  /// Quantity per buy trigger
+  std::string trigger_buy_quantity;
+  /// Quantity handled at the upper bound
+  std::string upper_limit_quantity;
+  /// Quantity handled at the lower bound
+  std::string lower_limit_quantity;
+  /// Action at the upper bound
+  int32_t upper_limit_event;
+  /// Action at the lower bound
+  int32_t lower_limit_event;
+  /// Whether a single grid level may trigger multiple times
+  bool multiple_trigger;
+  /// Number of times the grid has triggered
+  int32_t trigger_times;
+  /// Accumulated bought quantity
+  std::string total_buy_quantity;
+  /// Accumulated sold quantity
+  std::string total_sell_quantity;
+  /// Accumulated profit balance
+  std::string total_profit_balance;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+  int32_t time_in_force;
+  /// Expiry date (`YYYY-MM-DD`, GTD)
+  std::string gtd;
+  /// Created time (unix timestamp)
+  std::optional<int64_t> created_at;
+  /// Regular trading hours flag
+  int32_t rth;
+  /// Whether short selling is allowed
+  bool support_shortsell;
+  /// Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_up;
+  /// Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_down;
+};
+
+/// A triggered sub-order carried in the grid order detail.
+struct GridOrderSubOrder
+{
+  /// Sub-order ID
+  std::string id;
+  /// Order price
+  std::string price;
+  /// Order type
+  std::string order_type;
+  /// Order quantity
+  std::string quantity;
+  /// Executed quantity
+  std::string executed_qty;
+  /// Buy / sell direction
+  int32_t action;
+  /// Order status
+  std::string status;
+  /// Submitted time (unix timestamp)
+  std::optional<int64_t> submitted_at;
+  /// Regular trading hours flag
+  int32_t rth;
+};
+
+/// A grid order lifecycle-history entry carried in the grid order detail.
+struct GridOrderHistory
+{
+  /// History entry ID (paging cursor)
+  std::string history_id;
+  /// Created time (unix timestamp)
+  std::optional<int64_t> created_at;
+  /// Status at this point
+  std::string status;
+  /// Suspend reason, if any
+  std::string suspend_reason;
+  /// Additional reason detail, if any
+  std::string reason;
+};
+
+/// Detail of a grid trading order.
+struct GridOrderDetail
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Stock name
+  std::string stock_name;
+  /// Order status
+  std::string status;
+  /// Grid running status
+  std::string grid_status;
+  /// Suspend reason, if any
+  std::string suspend_reason;
+  /// Sleeping reason, if any
+  std::string sleeping_reason;
+  /// Submitted base price
+  std::string submitted_base_price;
+  /// Current base price
+  std::string current_base_price;
+  /// Upper price bound
+  std::string upper_limit_price;
+  /// Lower price bound
+  std::string lower_limit_price;
+  /// Trigger price type (`1` = spread, `2` = percent)
+  int32_t trigger_price_type;
+  /// Upward trigger spread
+  std::string trigger_spread_up;
+  /// Downward trigger spread
+  std::string trigger_spread_down;
+  /// Upward trigger percent
+  std::string trigger_percent_up;
+  /// Downward trigger percent
+  std::string trigger_percent_down;
+  /// Pullback percent
+  std::string pullback_percent;
+  /// Pullback spread
+  std::string pullback_spread;
+  /// Rebound percent
+  std::string rebound_percent;
+  /// Rebound spread
+  std::string rebound_spread;
+  /// Whether a single grid level may trigger multiple times
+  bool multiple_trigger;
+  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+  int32_t time_in_force;
+  /// Quantity per trigger
+  std::string trigger_quantity;
+  /// Quantity per sell trigger
+  std::string trigger_sell_quantity;
+  /// Quantity per buy trigger
+  std::string trigger_buy_quantity;
+  /// Quantity handled at the upper bound
+  std::string upper_limit_quantity;
+  /// Quantity handled at the lower bound
+  std::string lower_limit_quantity;
+  /// Action at the upper bound
+  int32_t upper_limit_event;
+  /// Action at the lower bound
+  int32_t lower_limit_event;
+  /// Sell-side order-book depth
+  int32_t trigger_sell_depth;
+  /// Buy-side order-book depth
+  int32_t trigger_buy_depth;
+  /// Created time (unix timestamp)
+  std::optional<int64_t> created_at;
+  /// Last updated time (unix timestamp)
+  std::optional<int64_t> updated_at;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Expiry time (unix timestamp)
+  std::optional<int64_t> expire_time;
+  /// Expiry date (`YYYY-MM-DD`, GTD)
+  std::string gtd;
+  /// Triggered sub-orders
+  std::vector<GridOrderSubOrder> grid_sub_orders;
+  /// Whether there are more sub-orders to page
+  bool sub_has_more;
+  /// Lifecycle history entries
+  std::vector<GridOrderHistory> grid_order_history;
+  /// Whether there are more history entries to page
+  bool history_has_more;
+  /// Whether short selling is allowed
+  bool support_shortsell;
+  /// Regular trading hours flag
+  int32_t rth;
+  /// Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_up;
+  /// Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+  std::string grid_order_type_down;
+};
+
+/// A grid trigger-history entry (one triggered order).
+struct TriggerOrder
+{
+  /// Triggered order ID
+  std::string id;
+  /// Order status
+  std::string status;
+  /// Stock name
+  std::string name;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Order price
+  std::string price;
+  /// Order quantity
+  std::string quantity;
+  /// Executed average price
+  std::string executed_price;
+  /// Executed total quantity
+  std::string executed_qty;
+  /// Submitted time (unix timestamp)
+  std::optional<int64_t> submitted_at;
+  /// Buy / sell direction
+  int32_t action;
+  /// Order type
+  std::string order_type;
+  /// Trigger price
+  std::string trigger_price;
+  /// Rejection reason, if any
+  std::string msg;
+  /// Settlement currency
+  std::string currency;
+  /// Latest quote price
+  std::string last_done;
+  /// Last updated time (unix timestamp)
+  std::optional<int64_t> updated_at;
+  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+  int32_t time_in_force;
+  /// Expiry date (`YYYY-MM-DD`, GTD)
+  std::string gtd;
+  /// Trigger time (unix timestamp)
+  std::optional<int64_t> trigger_at;
+  /// Conditional trigger status
+  int32_t trigger_status;
+};
+
+/// A price-step (bid-size) rule entry from the order-info response.
+struct GridBidSize
+{
+  /// Range start price (inclusive)
+  std::string str_proceed;
+  /// Range end price
+  std::string end_proceed;
+  /// Price step within the range
+  std::string bid_size;
+};
+
+/// Channel / authorization info nested in the order-info response.
+struct GridChannelInfo
+{
+  /// Whether the strategy compliance authorization has been granted
+  bool strategy_granted;
+  /// Whether the RTH toggle is supported
+  bool support_rth;
+  /// Trading currency
+  std::string currency;
+  /// Supported settlement currencies
+  std::vector<std::string> settlement_currency;
+};
+
+/// Order info fields used by the grid order window.
+struct GridOrderInfo
+{
+  /// Security name
+  std::string name;
+  /// Latest quote price
+  std::string last_done;
+  /// Board lot size
+  std::string lot_size;
+  /// Buy-side board lot size
+  std::string buy_lot_size;
+  /// Sell-side board lot size
+  std::string sell_lot_size;
+  /// Price-step (bid-size) rule table
+  std::vector<GridBidSize> bid_sizes;
+  /// Channel / authorization info (strategy grant, RTH, currencies)
+  GridChannelInfo channel_infos;
+};
+
+/// Response for get grid trading orders (list) request
+struct GridOrdersResponse
+{
+  /// Grid orders
+  std::vector<GridOrder> grid_order;
+  /// Whether there are more pages
+  bool has_more;
+};
+
+/// Response for get grid trading trigger history request
+struct GridTriggerHistoryResponse
+{
+  /// Trigger history entries
+  std::vector<TriggerOrder> trigger_orders;
+  /// Whether there are more pages
+  bool has_more;
+};
+
+/// Grid trading master-order changed message.
+struct PushGridOrderChanged
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Order status
+  std::string status;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Suspend reason, if any
+  std::string suspend_reason;
+  /// Submitted base price
+  std::string submitted_base_price;
+  /// Current base price
+  std::string current_base_price;
+  /// Upper price bound
+  std::string upper_limit_price;
+  /// Lower price bound
+  std::string lower_limit_price;
+  /// Trigger price type
+  int32_t trigger_price_type;
+  /// Quantity per trigger
+  std::string trigger_quantity;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+  int32_t time_in_force;
+  /// Regular trading hours flag
+  int32_t rth;
+  /// Sell-side order type when depth is 0
+  std::string grid_order_type_up;
+  /// Buy-side order type when depth is 0
+  std::string grid_order_type_down;
+};
+
 } // namespace trade
 
 namespace content {
