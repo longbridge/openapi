@@ -2677,6 +2677,19 @@ inline market::RankListResponse convert(const lb_rank_list_response_t* r) {
   for (size_t i = 0; i < r->num_lists; ++i) lists.push_back(convert(&r->lists[i]));
   return { r->bmp, std::move(lists) };
 }
+inline market::RankSubCategory convert(const lb_rank_sub_category_t* s) {
+  return { s->key ? s->key : "", s->name ? s->name : "", s->market ? s->market : "" };
+}
+inline market::RankCategory convert(const lb_rank_category_t* c) {
+  std::vector<market::RankSubCategory> subs;
+  for (size_t i = 0; i < c->num_sub_categories; ++i) subs.push_back(convert(&c->sub_categories[i]));
+  return { c->key ? c->key : "", c->name ? c->name : "", std::move(subs) };
+}
+inline market::RankCategoriesResponse convert(const lb_rank_categories_response_t* r) {
+  std::vector<market::RankCategory> cats;
+  for (size_t i = 0; i < r->num_categories; ++i) cats.push_back(convert(&r->categories[i]));
+  return { std::move(cats) };
+}
 
 // ── FundamentalContext conversions ────────────────────────────────
 

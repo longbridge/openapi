@@ -10230,13 +10230,57 @@ typedef struct lb_top_movers_response_t {
 } lb_top_movers_response_t;
 
 /**
- * Rank categories response. `data` is a NUL-terminated JSON string.
+ * One leaf rank sub-category.
+ */
+typedef struct lb_rank_sub_category_t {
+  /**
+   * Sub-category key (e.g. `"hot_all-us"`). Pass to `lb_market_context_rank_list`.
+   */
+  const char *key;
+  /**
+   * Display name
+   */
+  const char *name;
+  /**
+   * Market code (e.g. `"US"`, `"HK"`)
+   */
+  const char *market;
+} lb_rank_sub_category_t;
+
+/**
+ * A top-level rank category.
+ */
+typedef struct lb_rank_category_t {
+  /**
+   * Top-level key (e.g. `"hot"`)
+   */
+  const char *key;
+  /**
+   * Display name
+   */
+  const char *name;
+  /**
+   * Sub-categories pointer
+   */
+  const struct lb_rank_sub_category_t *sub_categories;
+  /**
+   * Number of sub-categories
+   */
+  uintptr_t num_sub_categories;
+} lb_rank_category_t;
+
+/**
+ * Rank categories response.
  */
 typedef struct lb_rank_categories_response_t {
   /**
-   * Raw rank categories data as a JSON string
+   * Top-level categories pointer
    */
-  const char *data;
+  const struct lb_rank_category_t *categories;
+  /**
+   * Number of categories
+   */
+  uintptr_t num_categories;
 } lb_rank_categories_response_t;
 
 /**

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
-use serde::{Serialize, de::DeserializeOwned};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{Config, Result, market::types::*};
@@ -410,28 +410,50 @@ impl MarketContext {
     pub async fn rank_categories(&self) -> Result<RankCategoriesResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        let mut raw: serde_json::Value = self
+        #[derive(Deserialize)]
+        struct RawSubTag {
+            key: String,
+            name: String,
+            #[serde(default)]
+            market: String,
+        }
+        #[derive(Deserialize)]
+        struct RawTag {
+            key: String,
+            name: String,
+            #[serde(default)]
+            second_tags: Vec<RawSubTag>,
+        }
+        #[derive(Deserialize)]
+        struct RawData {
+            #[serde(default)]
+            first_tags: Vec<RawTag>,
+        }
+        let raw: RawData = self
             .get("/v1/quote/market/rank/categories", Empty {})
             .await?;
-        // Strip the "ib_" prefix from all key fields so callers get clean keys
-        // that can be passed back to rank_list without the prefix.
-        if let Some(tags) = raw["first_tags"].as_array_mut() {
-            for tag in tags.iter_mut() {
-                if let Some(k) = tag["key"].as_str() {
-                    let stripped = k.strip_prefix("ib_").unwrap_or(k).to_string();
-                    tag["key"] = serde_json::Value::String(stripped);
+        let categories = raw
+            .first_tags
+            .into_iter()
+            .map(|tag| {
+                let key = tag.key.strip_prefix("ib_").unwrap_or(&tag.key).to_string();
+                let sub_categories = tag
+                    .second_tags
+                    .into_iter()
+                    .map(|sub| RankSubCategory {
+                        key: sub.key.strip_prefix("ib_").unwrap_or(&sub.key).to_string(),
+                        name: sub.name,
+                        market: sub.market,
+                    })
+                    .collect();
+                RankCategory {
+                    key,
+                    name: tag.name,
+                    sub_categories,
                 }
-                if let Some(subs) = tag["second_tags"].as_array_mut() {
-                    for sub in subs.iter_mut() {
-                        if let Some(sk) = sub["key"].as_str() {
-                            let stripped = sk.strip_prefix("ib_").unwrap_or(sk).to_string();
-                            sub["key"] = serde_json::Value::String(stripped);
-                        }
-                    }
-                }
-            }
-        }
-        Ok(RankCategoriesResponse { data: raw })
+            })
+            .collect();
+        Ok(RankCategoriesResponse { categories })
     }
 
     // ── rank_list ─────────────────────────────────────────────────

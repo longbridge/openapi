@@ -2596,6 +2596,33 @@ struct RankListResponse
   std::vector<RankListItem> lists;
 };
 
+/// One leaf rank sub-category.
+struct RankSubCategory
+{
+  /// Sub-category key (e.g. "hot_all-us"). Pass to rank_list.
+  std::string key;
+  /// Display name
+  std::string name;
+  /// Market code (e.g. "US", "HK")
+  std::string market;
+};
+
+/// A top-level rank category grouping sub-categories.
+struct RankCategory
+{
+  /// Top-level key (e.g. "hot")
+  std::string key;
+  /// Display name (e.g. "热度排行")
+  std::string name;
+  std::vector<RankSubCategory> sub_categories;
+};
+
+/// Response for rank_categories.
+struct RankCategoriesResponse
+{
+  std::vector<RankCategory> categories;
+};
+
 /// A single anomaly (unusual market movement) alert item.
 struct AnomalyItem
 {

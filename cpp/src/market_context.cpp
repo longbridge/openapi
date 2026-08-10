@@ -79,19 +79,19 @@ void MarketContext::constituent(const std::string& symbol, AsyncCallback<MarketC
 
 #undef TYPED_CB
 
-// ── New JSON-string API (rank_categories) ────────────────────────
-#define M_JSON(cfn, CType, ...) cfn(__VA_ARGS__, [](auto res) { \
-  auto cb = callback::get_async_callback<MarketContext,std::string>(res->userdata); \
-  MarketContext mctx((const lb_market_context_t*)res->ctx); Status status(res->error); \
-  if(status){const CType* d=(const CType*)res->data; std::string j(d->data ? d->data : ""); (*cb)(AsyncResult<MarketContext,std::string>(mctx,std::move(status),&j));} \
-  else{(*cb)(AsyncResult<MarketContext,std::string>(mctx,std::move(status),nullptr));} \
-}, new AsyncCallback<MarketContext,std::string>(callback))
-
-void MarketContext::rank_categories(AsyncCallback<MarketContext, std::string> callback) const {
-  M_JSON(lb_market_context_rank_categories, lb_rank_categories_response_t, ctx_);
+void MarketContext::rank_categories(AsyncCallback<MarketContext, RankCategoriesResponse> callback) const {
+  lb_market_context_rank_categories(ctx_,
+    [](auto res) {
+      auto cb = callback::get_async_callback<MarketContext, RankCategoriesResponse>(res->userdata);
+      MarketContext mctx((const lb_market_context_t*)res->ctx); Status status(res->error);
+      if (status) {
+        auto r = convert::convert((const lb_rank_categories_response_t*)res->data);
+        (*cb)(AsyncResult<MarketContext, RankCategoriesResponse>(mctx, std::move(status), &r));
+      } else {
+        (*cb)(AsyncResult<MarketContext, RankCategoriesResponse>(mctx, std::move(status), nullptr));
+      }
+    }, new AsyncCallback<MarketContext, RankCategoriesResponse>(callback));
 }
-
-#undef M_JSON
 
 void MarketContext::top_movers(const std::vector<std::string>& markets, uint32_t sort, const std::string* date, uint32_t limit, AsyncCallback<MarketContext, TopMoversResponse> callback) const {
   std::vector<const char*> mptrs;
