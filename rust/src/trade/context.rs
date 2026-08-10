@@ -13,11 +13,14 @@ use crate::{
         AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
         EstimateMaxPurchaseQuantityOptions, Execution, FundPositionsResponse,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
+        GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
+        GetGridTriggerHistoryOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, GridOrder,
+        GridOrderDetail, GridOrderInfo, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
+        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceGridOrderOptions, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitGridOrderOptions, SubmitOrderOptions,
+        SubmitStrategyQuestionnaireOptions, TopicType, TriggerOrder, USAssetOverview,
         USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
@@ -31,6 +34,35 @@ struct EmptyResponse {}
 pub struct SubmitOrderResponse {
     /// Order id
     pub order_id: String,
+}
+
+/// Response for submit grid trading order request
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubmitGridOrderResponse {
+    /// Grid master order id
+    pub order_id: String,
+}
+
+/// Response for get grid trading orders (list) request
+#[derive(Debug, Deserialize)]
+pub struct GridOrdersResponse {
+    /// Grid orders
+    #[serde(default)]
+    pub grid_order: Vec<GridOrder>,
+    /// Whether there are more pages
+    #[serde(default)]
+    pub has_more: bool,
+}
+
+/// Response for get grid trading trigger history request
+#[derive(Debug, Deserialize)]
+pub struct GridTriggerHistoryResponse {
+    /// Trigger history entries
+    #[serde(default)]
+    pub trigger_orders: Vec<TriggerOrder>,
+    /// Whether there are more pages
+    #[serde(default)]
+    pub has_more: bool,
 }
 
 /// Response for estimate maximum purchase quantity
@@ -995,6 +1027,185 @@ impl TradeContext {
             .dc_restrict(DcRegion::Us)
             .query_params(Query { currency, category })
             .response::<Json<USRealizedPL>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Submit a grid trading order
+    pub async fn submit_grid_order(
+        &self,
+        options: SubmitGridOrderOptions,
+    ) -> Result<SubmitGridOrderResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/gridtrading/submit")
+            .body(Json(options))
+            .response::<Json<SubmitGridOrderResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Replace (modify) a grid trading order
+    pub async fn replace_grid_order(&self, options: ReplaceGridOrderOptions) -> Result<()> {
+        self.0
+            .http_cli
+            .request(Method::POST, "/v1/gridtrading/replace")
+            .body(Json(options))
+            .response::<Json<EmptyResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(())
+    }
+
+    /// Get grid trading orders (paged list)
+    pub async fn grid_orders(
+        &self,
+        options: impl Into<Option<GetGridOrdersOptions>>,
+    ) -> Result<GridOrdersResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/gridtrading/list")
+            .query_params(options.into().unwrap_or_default())
+            .response::<Json<GridOrdersResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Query grid trading orders by IDs
+    pub async fn grid_orders_by_ids(
+        &self,
+        options: GetGridOrdersByIdsOptions,
+    ) -> Result<Vec<GridOrder>> {
+        #[derive(Deserialize)]
+        struct Response {
+            #[serde(default)]
+            grid_order: Vec<GridOrder>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/gridtrading/list")
+            .body(Json(options))
+            .response::<Json<Response>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0
+            .grid_order)
+    }
+
+    /// Get grid trading order detail (and paged history)
+    pub async fn grid_order_detail(
+        &self,
+        options: GetGridOrderDetailOptions,
+    ) -> Result<GridOrderDetail> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/gridtrading/detail")
+            .query_params(options)
+            .response::<Json<GridOrderDetail>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get grid trading trigger history
+    pub async fn grid_trigger_history(
+        &self,
+        options: GetGridTriggerHistoryOptions,
+    ) -> Result<GridTriggerHistoryResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/gridtrading/trigger_history_list")
+            .query_params(options)
+            .response::<Json<GridTriggerHistoryResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Cancel a grid trading order
+    pub async fn cancel_grid_order(&self, order_id: impl Into<String>) -> Result<()> {
+        self.grid_action("/v1/gridtrading/cancel", order_id).await
+    }
+
+    /// Suspend a grid trading order
+    pub async fn suspend_grid_order(&self, order_id: impl Into<String>) -> Result<()> {
+        self.grid_action("/v1/gridtrading/suspend", order_id).await
+    }
+
+    /// Restart a grid trading order
+    pub async fn restart_grid_order(&self, order_id: impl Into<String>) -> Result<()> {
+        self.grid_action("/v1/gridtrading/restart", order_id).await
+    }
+
+    /// Shared body for the cancel / suspend / restart grid actions.
+    async fn grid_action(&self, path: &'static str, order_id: impl Into<String>) -> Result<()> {
+        #[derive(Debug, Serialize)]
+        struct Body {
+            order_id: String,
+        }
+
+        self.0
+            .http_cli
+            .request(Method::POST, path)
+            .body(Json(Body {
+                order_id: order_id.into(),
+            }))
+            .response::<Json<EmptyResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(())
+    }
+
+    /// Submit the strategy risk-disclosure questionnaire record (grid trading
+    /// compliance authorization).
+    pub async fn submit_strategy_questionnaire(
+        &self,
+        options: SubmitStrategyQuestionnaireOptions,
+    ) -> Result<()> {
+        self.0
+            .http_cli
+            .request(Method::POST, "/v1/record/questionnaire")
+            .body(Json(options))
+            .response::<Json<EmptyResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
+        Ok(())
+    }
+
+    /// Get order info used by the grid order window (lot size, authorization
+    /// flag, settlement currency, etc.).
+    pub async fn grid_order_info(&self, symbol: impl Into<String>) -> Result<GridOrderInfo> {
+        #[derive(Debug, Serialize)]
+        struct Query {
+            symbol: String,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/orders/info")
+            .query_params(Query {
+                symbol: symbol.into(),
+            })
+            .response::<Json<GridOrderInfo>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
