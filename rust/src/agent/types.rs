@@ -222,6 +222,10 @@ pub struct ConversationResponse {
     /// Sources referenced by the answer
     #[serde(default)]
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions ("you might also ask"); present when the
+    /// run produced them
+    #[serde(default)]
+    pub further_questions: Option<Vec<String>>,
     /// Run duration in seconds
     #[serde(default)]
     pub elapsed_time: f64,
@@ -252,6 +256,7 @@ impl ConversationResponse {
             status: payload.status,
             answer: payload.outputs.answer.unwrap_or_default(),
             references: payload.outputs.references,
+            further_questions: payload.outputs.further_questions,
             elapsed_time: payload.elapsed_time,
             interrupt: None,
             error,
@@ -277,6 +282,7 @@ impl ConversationResponse {
             status: ConversationStatus::Interrupted,
             answer: String::new(),
             references: None,
+            further_questions: None,
             elapsed_time: 0.0,
             interrupt: Some(interrupt),
             error: None,
@@ -340,6 +346,10 @@ pub struct WorkflowOutputs {
     /// Sources referenced by the answer
     #[serde(default)]
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions ("you might also ask"); present when the
+    /// run produced them
+    #[serde(default)]
+    pub further_questions: Option<Vec<String>>,
 }
 
 /// Payload of a `workflow_finished` SSE event. `status` is never
@@ -1065,13 +1075,23 @@ mod tests {
 
     #[test]
     fn deserialize_workflow_finished_payload() {
-        let json = r#"{"status":"succeeded","elapsed_time":3.21,"outputs":{"answer":"Tesla (TSLA.US) recently..."}}"#;
+        let json = r#"{"status":"succeeded","elapsed_time":3.21,"outputs":{"answer":"Tesla (TSLA.US) recently...","further_questions":["What is Tesla's P/E?","How did Q3 deliveries look?"]}}"#;
         let payload: WorkflowFinishedPayload = serde_json::from_str(json).unwrap();
         assert_eq!(payload.status, ConversationStatus::Succeeded);
         assert!((payload.elapsed_time - 3.21).abs() < f64::EPSILON);
         assert_eq!(
             payload.outputs.answer.as_deref(),
             Some("Tesla (TSLA.US) recently...")
+        );
+        assert_eq!(
+            payload.outputs.further_questions.as_deref(),
+            Some(
+                [
+                    "What is Tesla's P/E?".to_string(),
+                    "How did Q3 deliveries look?".to_string(),
+                ]
+                .as_slice()
+            )
         );
 
         let resp = ConversationResponse::from_stream_parts(
@@ -1081,6 +1101,8 @@ mod tests {
         assert_eq!(resp.chat_uid, "ct_9f2c1a5b");
         assert_eq!(resp.message_id, "42");
         assert_eq!(resp.answer, "Tesla (TSLA.US) recently...");
+        // Follow-up questions thread through the folded response.
+        assert_eq!(resp.further_questions.as_ref().unwrap().len(), 2);
         assert!(resp.interrupt.is_none());
         assert!(resp.error.is_none());
     }

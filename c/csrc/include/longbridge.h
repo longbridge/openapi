@@ -2611,6 +2611,14 @@ typedef struct lb_conversation_response_t {
    */
   uintptr_t num_references;
   /**
+   * Suggested follow-up questions ("you might also ask"); empty when absent
+   */
+  const char *const *further_questions;
+  /**
+   * Number of follow-up questions
+   */
+  uintptr_t num_further_questions;
+  /**
    * Run duration in seconds
    */
   double elapsed_time;

@@ -496,6 +496,10 @@ pub struct CConversationResponse {
     pub references: *const CReference,
     /// Number of references
     pub num_references: usize,
+    /// Suggested follow-up questions ("you might also ask"); empty when absent
+    pub further_questions: *const *const c_char,
+    /// Number of follow-up questions
+    pub num_further_questions: usize,
     /// Run duration in seconds
     pub elapsed_time: f64,
     /// Present only when `status` is `ConversationStatusInterrupted` (can be
@@ -511,6 +515,7 @@ pub(crate) struct CConversationResponseOwned {
     status: CConversationStatus,
     answer: CString,
     references: CVec<CReferenceOwned>,
+    further_questions: CVec<CString>,
     elapsed_time: f64,
     interrupt: Option<CCow<CInterruptOwned>>,
     error: Option<CCow<CAgentErrorOwned>>,
@@ -524,6 +529,7 @@ impl From<ConversationResponse> for CConversationResponseOwned {
             status,
             answer,
             references,
+            further_questions,
             elapsed_time,
             interrupt,
             error,
@@ -537,6 +543,7 @@ impl From<ConversationResponse> for CConversationResponseOwned {
             // distinction between "absent" and "empty" here, both surface as
             // `num_references == 0`.
             references: references.unwrap_or_default().into(),
+            further_questions: further_questions.unwrap_or_default().into(),
             elapsed_time,
             interrupt: interrupt.map(CCow::new),
             error: error.map(CCow::new),
@@ -554,6 +561,7 @@ impl ToFFI for CConversationResponseOwned {
             status,
             answer,
             references,
+            further_questions,
             elapsed_time,
             interrupt,
             error,
@@ -565,6 +573,8 @@ impl ToFFI for CConversationResponseOwned {
             answer: answer.to_ffi_type(),
             references: references.to_ffi_type(),
             num_references: references.len(),
+            further_questions: further_questions.to_ffi_type(),
+            num_further_questions: further_questions.len(),
             elapsed_time: *elapsed_time,
             interrupt: interrupt
                 .as_ref()

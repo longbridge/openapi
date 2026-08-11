@@ -13481,6 +13481,8 @@ class ConversationResponse:
     """Final answer text; valid when status is ConversationStatus.Succeeded"""
     references: list[Reference] | None
     """Sources referenced by the answer"""
+    further_questions: list[str] | None
+    """Suggested follow-up questions ("you might also ask")"""
     elapsed_time: float
     """Run duration in seconds"""
     interrupt: Interrupt | None
