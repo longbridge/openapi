@@ -16,6 +16,6 @@ public class AlertItem {
     public String text;
     /** Trigger state flags. */
     public int[] state;
-    /** Trigger value map, e.g. {@code {"price":"500"}} or {@code {"chg":"5"}}. */
-    public String valueMap;
+    /** Trigger value, e.g. {@code {"price":"500"}} or {@code {"chg":"5"}}. */
+    public AlertValueMap valueMap;
 }

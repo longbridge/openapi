@@ -491,6 +491,34 @@ pub(crate) mod f64_str {
     }
 }
 
+/// Deserializes a stringly-typed `f64` into `Option<f64>`.  An empty or
+/// non-parseable string (e.g. `"--"`) yields `None`.  Serializes back to a
+/// string form for symmetry with the API's request format.
+pub(crate) mod f64_opt_str {
+    use super::*;
+
+    pub(crate) fn serialize<S>(value: &Option<f64>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.collect_str(value),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if value.is_empty() {
+            return Ok(None);
+        }
+        Ok(value.parse::<f64>().ok())
+    }
+}
+
 /// Deserializer that maps a JSON `null` to the type's `Default` value.
 pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
 where

@@ -3410,8 +3410,8 @@ export interface AlertItem {
   text: string
   /** Trigger state flags */
   state: Array<number>
-  /** Trigger value: `{"price":"500"}` or `{"chg":"5"}` */
-  valueMap: any
+  /** Trigger value, e.g. `{"price":"500"}` or `{"chg":"5"}` */
+  valueMap: AlertValueMap
 }
 
 /** Alert list response */
@@ -3440,6 +3440,14 @@ export interface AlertSymbolGroup {
   product: string
   /** Alert items */
   indicators: Array<AlertItem>
+}
+
+/** Trigger value of a price alert (exactly one field is populated). */
+export interface AlertValueMap {
+  /** Absolute price threshold as a decimal string, e.g. `"500"`. */
+  price?: string
+  /** Percentage-change threshold, e.g. `5`. */
+  chg?: number
 }
 
 /** One market anomaly event (e.g. large block trade, margin buying surge) */
@@ -4526,8 +4534,8 @@ export interface ExchangeRates {
 
 /** Executives for one security */
 export interface ExecutiveGroup {
-  /** Security symbol */
-  symbol: string
+  /** Security symbol (`null` when the server omits it) */
+  symbol?: string
   /** Company wiki URL */
   forwardUrl: string
   /** Total executives */
@@ -4672,8 +4680,11 @@ export declare const enum FlowDirection {
 /** One profit-analysis flow record */
 export interface FlowItem {
   executedDate: string
-  /** Execution timestamp as a JSON value string */
-  executedTimestamp: string
+  /**
+   * Execution timestamp as a Unix-seconds string (absent when not yet
+   * executed)
+   */
+  executedTimestamp?: string
   code: string
   direction: FlowDirection
   executedQuantity?: string
@@ -5916,10 +5927,20 @@ export interface QuestionOption {
   description: string
 }
 
-/** Rank categories response. `data` is a JSON string. */
+/** Rank categories response. */
 export interface RankCategoriesResponse {
-  /** Raw rank categories data (JSON string) */
-  data: string
+  /** All top-level rank categories */
+  categories: Array<RankCategory>
+}
+
+/** A top-level rank category grouping sub-categories. */
+export interface RankCategory {
+  /** Top-level key (e.g. `"hot"`) */
+  key: string
+  /** Display name (e.g. `"热度排行"`) */
+  name: string
+  /** Sub-categories */
+  subCategories: Array<RankSubCategory>
 }
 
 /** One ranked security item. */
@@ -5964,6 +5985,16 @@ export interface RankListResponse {
   bmp: boolean
   /** Ranked security items */
   lists: Array<RankListItem>
+}
+
+/** One leaf rank sub-category. */
+export interface RankSubCategory {
+  /** Sub-category key (e.g. `"hot_all-us"`). Pass to `rank_list`. */
+  key: string
+  /** Display name (e.g. `"美股总热度"`) */
+  name: string
+  /** Market code (e.g. `"US"`, `"HK"`) */
+  market: string
 }
 
 /** Analyst rating distribution counts */
@@ -6448,12 +6479,12 @@ export interface StockRatings {
   styleTxtName: string
   scaleTxtName: string
   reportPeriodTxt: string
-  /** Composite score as a JSON string */
-  multiScore: string
+  /** Composite score (`null` when not rated) */
+  multiScore?: number
   multiLetter: string
   multiScoreChange: number
   industryName: string
-  industryRank: number
+  industryRank?: number
   /** Full ratings array as a JSON string */
   ratingsJson: string
 }
@@ -6674,7 +6705,7 @@ export interface TopMoversEvent {
 export interface TopMoversResponse {
   /** Top-mover events */
   events: Array<TopMoversEvent>
-  /** Pagination cursor for next page (JSON string) */
+  /** Pagination cursor for next page (empty string means no more pages) */
   nextParams: string
 }
 
@@ -6960,7 +6991,7 @@ export interface USCryptoOverview {
   issuePrice: string
   shares: string
   officialWebAddress: string
-  /** User-facing symbol (e.g. "BTCUSD.BKKT"), converted from counter_id */
+  /** User-facing symbol (e.g. "BTCUSD.BKKT") */
   symbol: string
   baseAsset: string
   logo: string

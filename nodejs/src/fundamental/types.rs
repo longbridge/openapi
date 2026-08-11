@@ -1274,7 +1274,7 @@ impl From<lb::CorpActionLive> for CorpActionLive {
     fn from(v: lb::CorpActionLive) -> Self {
         Self {
             id: v.id,
-            status: v.status.to_string(),
+            status: v.status,
             started_at: v.started_at,
             name: v.name,
             icon: v.icon,
