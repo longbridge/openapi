@@ -45,6 +45,15 @@ impl AgentContextSync {
             .call(move |ctx| async move { ctx.agents(workspace_id, opts).await })
     }
 
+    /// List all publicly available Agents on the platform.
+    pub fn public_agents(
+        &self,
+        opts: impl Into<Option<GetAgentsOptions>> + Send + 'static,
+    ) -> Result<AgentsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.public_agents(opts).await })
+    }
+
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     pub fn conversation(

@@ -70,6 +70,11 @@ export declare class AgentContext {
    */
   agents(workspaceId: string, page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
   /**
+   * List all publicly available Agents on the platform (the Explore
+   * catalog). Not scoped to a Workspace.
+   */
+  publicAgents(page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
    * Start a conversation with the specified Agent, blocking until the run
    * succeeds, is interrupted, or fails.
    *

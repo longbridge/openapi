@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **All languages:** add `AgentContext.public_agents` (`GET /v1/ai/agents`) — list all publicly available Agents on the platform (the Explore catalog). Unlike `agents`, it is not scoped to a Workspace and returns every published, publicly-shared Agent. Takes the same optional `page` / `limit` / `name` parameters and returns the existing `AgentsResponse`
 - **All languages:** add optional `parent_message_id` parameter to the AI Agent `conversation` and `conversation_streamed` methods — pass the `message_id` from a previous response to attach a follow-up message after the specified one, keeping the message stream in order. Only valid together with `chat_uid`; must not be set for a new conversation
 
 ### Changed

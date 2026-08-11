@@ -484,6 +484,8 @@ public class SdkNative {
         public static native void agentContextWorkspaces(long context, AsyncCallback callback);
         public static native void agentContextAgents(long context, String workspaceId, Object opts,
                         AsyncCallback callback);
+        public static native void agentContextPublicAgents(long context, Object opts,
+                        AsyncCallback callback);
         public static native void agentContextConversation(long context, String agentId, String query,
                         String chatUid, String parentMessageId, AsyncCallback callback);
         public static native void agentContextContinueConversation(long context, String agentId, String chatUid,

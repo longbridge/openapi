@@ -63,6 +63,32 @@ impl AgentContext {
             .into())
     }
 
+    /// List all publicly available Agents on the platform.
+    #[pyo3(signature = (page = None, limit = None, name = None))]
+    fn public_agents(
+        &self,
+        py: Python<'_>,
+        page: Option<i32>,
+        limit: Option<i32>,
+        name: Option<String>,
+    ) -> PyResult<AgentsResponse> {
+        let mut opts = GetAgentsOptions::new();
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+        if let Some(limit) = limit {
+            opts = opts.limit(limit);
+        }
+        if let Some(name) = name {
+            opts = opts.name(name);
+        }
+
+        Ok(py
+            .detach(|| self.0.public_agents(Some(opts)))
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     #[pyo3(signature = (agent_id, query, chat_uid = None, parent_message_id = None))]

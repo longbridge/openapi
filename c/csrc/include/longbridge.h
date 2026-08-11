@@ -10445,6 +10445,17 @@ void lb_agent_context_agents(const struct lb_agent_context_t *ctx,
                              void *userdata);
 
 /**
+ * List all publicly available Agents on the platform (the Explore catalog).
+ * Not scoped to a Workspace. Returns `CAgentsResponse`.
+ *
+ * @param[in] opts Options for the request (can be null)
+ */
+void lb_agent_context_public_agents(const struct lb_agent_context_t *ctx,
+                                    const struct lb_get_agents_options_t *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
  * Start a conversation with the specified Agent, blocking until the run
  * succeeds, is interrupted, or fails. Returns `CConversationResponse`.
  *

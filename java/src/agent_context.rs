@@ -198,6 +198,25 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextAgents(
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextPublicAgents(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let opts = read_get_agents_options(env, &opts)?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.public_agents(opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextConversation(
     mut env: JNIEnv,
     _class: JClass,
