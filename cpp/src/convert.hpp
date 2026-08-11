@@ -3071,8 +3071,12 @@ inline portfolio::ProfitAnalysisDetail convert(const lb_profit_analysis_detail_t
 
 inline alert::AlertItem convert(const lb_alert_item_t* item) {
   std::vector<int32_t> state(item->state, item->state + item->num_state);
+  alert::AlertValueMap value_map{
+    item->value_map.price ? item->value_map.price : "",
+    item->value_map.chg ? std::optional<double>(*item->value_map.chg) : std::nullopt
+  };
   return { item->id, item->indicator_id, item->enabled, item->frequency, item->scope,
-           item->text, std::move(state), item->value_map };
+           item->text, std::move(state), std::move(value_map) };
 }
 inline alert::AlertSymbolGroup convert(const lb_alert_symbol_group_t* g) {
   std::vector<alert::AlertItem> inds;

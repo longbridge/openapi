@@ -3476,6 +3476,16 @@ struct AssetAllocationResponse
 namespace alert {
 
 /// One price alert rule attached to a security.
+/// Trigger threshold for a price alert. Exactly one field is populated,
+/// depending on the alert condition.
+struct AlertValueMap
+{
+  /// Absolute price threshold as a decimal string (empty if not set)
+  std::string price;
+  /// Percentage-change threshold (nullopt if not set)
+  std::optional<double> chg;
+};
+
 struct AlertItem
 {
   /// Alert ID
@@ -3492,8 +3502,8 @@ struct AlertItem
   std::string text;
   /// Trigger state flags
   std::vector<int32_t> state;
-  /// Trigger threshold, serialised as JSON: {"price":"500"} or {"chg":"5"}
-  std::string value_map;
+  /// Trigger threshold
+  AlertValueMap value_map;
 };
 
 /// All price alerts for one security.
