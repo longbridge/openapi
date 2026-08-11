@@ -2,7 +2,7 @@ package com.longbridge.fundamental;
 
 /** One security in the valuation comparison. */
 public class ValuationComparisonItem {
-    /** Symbol, e.g. "AAPL.US" (converted from counter_id) */
+    /** Symbol, e.g. "AAPL.US" */
     public String symbol;
     public String name;
     public String currency;

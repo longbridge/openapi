@@ -725,7 +725,7 @@ pub struct ConstituentStock {
 /// Stock information within a top-movers event.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TopMoversStock {
-    /// Symbol (converted from counter_id, e.g. `"NVDA.US"`)
+    /// Symbol, e.g. `"NVDA.US"`
     pub symbol: String,
     /// Ticker code (e.g. `"NVDA"`)
     pub code: String,
@@ -810,7 +810,7 @@ pub struct RankCategoriesResponse {
 /// One ranked security item.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankListItem {
-    /// Symbol (converted from counter_id, e.g. `"MU.US"`)
+    /// Symbol, e.g. `"MU.US"`
     pub symbol: String,
     /// Ticker code (e.g. `"MU"`)
     pub code: String,

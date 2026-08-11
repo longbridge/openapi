@@ -569,14 +569,14 @@ pub unsafe extern "C" fn lb_fundamental_context_industry_rank(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
     ctx: *const CFundamentalContext,
-    counter_id: *const c_char,
+    symbol: *const c_char,
     market: *const c_char,
     industry_id: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let counter_id = cstr_to_rust(counter_id);
+    let symbol = cstr_to_rust(symbol);
     let market = cstr_to_rust(market);
     let industry_id: Option<String> = if industry_id.is_null() {
         None
@@ -586,7 +586,7 @@ pub unsafe extern "C" fn lb_fundamental_context_industry_peers(
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CIndustryPeersResponseOwned> = CCow::new(CIndustryPeersResponseOwned::from(
             ctx_inner
-                .industry_peers(counter_id, market, industry_id)
+                .industry_peers(symbol, market, industry_id)
                 .await?,
         ));
         Ok(resp)

@@ -1365,7 +1365,7 @@ pub struct ValuationHistoryPoint {
 /// One security's valuation comparison item.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ValuationComparisonItem {
-    /// Symbol (converted from counter_id)
+    /// Symbol
     pub symbol: String,
     /// Security name
     pub name: String,

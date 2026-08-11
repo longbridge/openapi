@@ -12933,7 +12933,7 @@ class USCryptoEntry:
     average_cost: str
     """Average cost price"""
     symbol: str
-    """Internal counter_id, e.g. ``"VA/BKKT/BTCUSD"``"""
+    """Symbol"""
     currency: str
     """Settlement currency"""
     industry_counter_id: str

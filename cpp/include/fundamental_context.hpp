@@ -148,7 +148,7 @@ public:
                      AsyncCallback<FundamentalContext, IndustryRankResponse> callback) const;
 
   /// Get industry peer chain (pass nullptr for industry_id to omit)
-  void industry_peers(const std::string& counter_id,
+  void industry_peers(const std::string& symbol,
                       const std::string& market,
                       const char* industry_id,
                       AsyncCallback<FundamentalContext, IndustryPeersResponse> callback) const;
