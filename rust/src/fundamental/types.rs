@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use std::collections::HashMap;
 
 use num_enum::{FromPrimitive, IntoPrimitive};
@@ -1695,16 +1693,22 @@ pub struct MacroeconomicResponse {
 /// [`crate::FundamentalContext::us_company_overview`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USRankTag {
+    /// Tag key
     #[serde(default)]
     pub key: String,
+    /// Display position / ordering
     #[serde(default)]
     pub location: i32,
+    /// Tag title
     #[serde(default)]
     pub title: String,
+    /// Tag text
     #[serde(default)]
     pub text: String,
+    /// Rank type code
     #[serde(default)]
     pub rank_type: i32,
+    /// Highlighted portion of the text
     #[serde(default)]
     pub highlight_text: String,
 }
@@ -1712,10 +1716,13 @@ pub struct USRankTag {
 /// One entry in [`USCompanyOverview`]'s sharelist field.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USSharelistItem {
+    /// Price change ratio
     #[serde(default)]
     pub chg: String,
+    /// Sharelist ID
     #[serde(default)]
     pub id: String,
+    /// Sharelist name
     #[serde(default)]
     pub name: String,
 }
@@ -1723,16 +1730,22 @@ pub struct USSharelistItem {
 /// Response for [`crate::FundamentalContext::us_company_overview`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USCompanyOverview {
+    /// Company introduction / description
     #[serde(default)]
     pub intro: String,
+    /// Market capitalisation
     #[serde(default)]
     pub market_cap: String,
+    /// Currency symbol (e.g. `"$"`)
     #[serde(default)]
     pub ccy_symbol: String,
+    /// Top industry-rank tags
     #[serde(default)]
     pub top_rank_tags: Vec<USRankTag>,
+    /// Detail page URL
     #[serde(default)]
     pub detail_url: String,
+    /// Related sharelists
     #[serde(default)]
     pub share_list: Vec<USSharelistItem>,
 }
@@ -1740,14 +1753,19 @@ pub struct USCompanyOverview {
 /// One valuation metric entry within [`USValuationOverview`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USValuationMetric {
+    /// Position on the percentile circle / gauge
     #[serde(default)]
     pub circle: String,
+    /// Segment / part label
     #[serde(default)]
     pub part: String,
+    /// Metric value
     #[serde(default)]
     pub metric: String,
+    /// Metric description
     #[serde(default)]
     pub desc: String,
+    /// Industry median for this metric
     #[serde(default)]
     pub industry_median: String,
 }
@@ -1767,10 +1785,13 @@ pub struct USValuationOverview {
     /// Data date string
     #[serde(default)]
     pub date: String,
+    /// Currency symbol (e.g. `"$"`)
     #[serde(default)]
     pub ccy_symbol: String,
+    /// Embedded AI-chat context
     #[serde(default)]
     pub aichat_data: USAIChatData,
+    /// AI-generated summary text
     #[serde(default)]
     pub ai_summary: String,
 }
@@ -1778,20 +1799,28 @@ pub struct USValuationOverview {
 /// One financial field within a [`USFinancialStatementPeriod`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatementField {
+    /// Display order within the statement
     #[serde(default)]
     pub display_order: i32,
+    /// Field code
     #[serde(default)]
     pub field: String,
+    /// Field ID
     #[serde(default)]
     pub id: String,
+    /// Nesting level (for indentation)
     #[serde(default)]
     pub level: i64,
+    /// Field display name
     #[serde(default)]
     pub name: String,
+    /// Field value
     #[serde(default)]
     pub value: String,
+    /// Value type hint
     #[serde(default)]
     pub value_type: String,
+    /// Year-over-year change
     #[serde(default)]
     pub yoy: String,
 }
@@ -1799,16 +1828,22 @@ pub struct USFinancialStatementField {
 /// One reporting period in [`USFinancialStatement`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatementPeriod {
+    /// Fiscal period (e.g. `"Q1"`, `"FY"`)
     #[serde(default)]
     pub ff_period: String,
+    /// Fiscal year
     #[serde(default)]
     pub ff_year: i32,
+    /// Statement fields for this period
     #[serde(default)]
     pub fields: Vec<USFinancialStatementField>,
+    /// Fiscal-period end date
     #[serde(default)]
     pub fp_end: String,
+    /// Report label text
     #[serde(default)]
     pub report_txt: String,
+    /// Report publication date
     #[serde(default)]
     pub rpt_date: String,
 }
@@ -1816,12 +1851,16 @@ pub struct USFinancialStatementPeriod {
 /// Response for [`crate::FundamentalContext::us_financial_statement`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatement {
+    /// Reporting currency
     #[serde(default)]
     pub currency: String,
+    /// Report type
     #[serde(default)]
     pub report: String,
+    /// Per-period statement data
     #[serde(default)]
     pub list: Vec<USFinancialStatementPeriod>,
+    /// Field codes that have no data
     #[serde(default)]
     pub empty_fields: Vec<String>,
 }
@@ -1829,14 +1868,19 @@ pub struct USFinancialStatement {
 /// Per-fiscal-year dividend records for a US ETF.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFiscalYearDividend {
+    /// Dividend amount for the fiscal year
     #[serde(default)]
     pub dividend: String,
+    /// Dividend yield for the fiscal year
     #[serde(default)]
     pub dividend_yield: String,
+    /// Fiscal year
     #[serde(default)]
     pub fiscal_year: String,
+    /// Currency
     #[serde(default)]
     pub currency: String,
+    /// Fiscal-year date range
     #[serde(default)]
     pub fiscal_year_range: String,
 }
@@ -1884,12 +1928,16 @@ pub struct USDividendItem {
 /// Trailing-12-month dividend summary within [`USCompanyDividends`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USRecentDividend {
+    /// Total dividend over the trailing 12 months
     #[serde(default)]
     pub dividend_ttm: String,
+    /// Dividend yield over the trailing 12 months
     #[serde(default)]
     pub dividend_yield_ttm: String,
+    /// Number of payouts
     #[serde(default)]
     pub payouts: String,
+    /// Currency
     #[serde(default)]
     pub currency: String,
 }
@@ -1897,32 +1945,46 @@ pub struct USRecentDividend {
 /// One fiscal-year row in the dividend history or payout-ratio table.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USDividendHistoryItem {
+    /// Fiscal year
     #[serde(default)]
     pub fiscal_year: String,
+    /// Fiscal-year date range
     #[serde(default)]
     pub fiscal_year_range: String,
+    /// Total shareholder yield (dividend + buyback)
     #[serde(default)]
     pub total_shareholder_yield: String,
+    /// Dividend amount
     #[serde(default)]
     pub dividend: String,
+    /// Dividend yield
     #[serde(default)]
     pub dividend_yield: String,
+    /// Dividend growth rate
     #[serde(default)]
     pub dividend_growth_rate: String,
+    /// Dividend payout ratio
     #[serde(default)]
     pub dividend_payout_ratio: String,
+    /// Dividend-to-cash-flow ratio
     #[serde(default)]
     pub dividend_to_cashflow_ratio: String,
+    /// Net buyback amount
     #[serde(default)]
     pub net_buyback: String,
+    /// Net buyback yield
     #[serde(default)]
     pub net_buyback_yield: String,
+    /// Net buyback growth rate
     #[serde(default)]
     pub net_buyback_growth_rate: String,
+    /// Net buyback payout ratio
     #[serde(default)]
     pub net_buyback_payout_ratio: String,
+    /// Net-buyback-to-cash-flow ratio
     #[serde(default)]
     pub net_buyback_to_cashflow_ratio: String,
+    /// Currency
     #[serde(default)]
     pub currency: String,
 }
@@ -1930,20 +1992,28 @@ pub struct USDividendHistoryItem {
 /// One actual dividend payment event in [`USCompanyDividends`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USDividendPayoutRecord {
+    /// Per-share dividend amount
     #[serde(default)]
     pub dividend: String,
+    /// Dividend type (e.g. cash dividend)
     #[serde(default)]
     pub dividend_type: String,
+    /// Currency
     #[serde(default)]
     pub currency: String,
+    /// Ex-dividend date
     #[serde(default)]
     pub ex_date: String,
+    /// Payment date
     #[serde(default)]
     pub payment_date: String,
+    /// Record date
     #[serde(default)]
     pub record_date: String,
+    /// Display title
     #[serde(default)]
     pub title: String,
+    /// Start time as a Unix-seconds string
     #[serde(default)]
     pub start_time_unix: String,
 }
@@ -1951,12 +2021,16 @@ pub struct USDividendPayoutRecord {
 /// Response for [`crate::FundamentalContext::us_company_dividends`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USCompanyDividends {
+    /// Trailing-12-month dividend summary
     #[serde(default)]
     pub recent_dividends: USRecentDividend,
+    /// Per-fiscal-year dividend history
     #[serde(default)]
     pub dividend_history: Vec<USDividendHistoryItem>,
+    /// Per-fiscal-year payout ratios
     #[serde(default)]
     pub payout_ratios: Vec<USDividendHistoryItem>,
+    /// Individual dividend payout events
     #[serde(default)]
     pub dividend_payout_history: Vec<USDividendPayoutRecord>,
 }
@@ -1964,14 +2038,19 @@ pub struct USCompanyDividends {
 /// A single file in an ETF document list.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USETFFile {
+    /// File name
     #[serde(default)]
     pub file_name: String,
+    /// File path / URL
     #[serde(default)]
     pub file_path: String,
+    /// Last update date
     #[serde(default)]
     pub update_date: String,
+    /// Document type code
     #[serde(default)]
     pub code: String,
+    /// File format (e.g. `"pdf"`)
     #[serde(default)]
     pub format: String,
 }
@@ -2067,10 +2146,13 @@ pub(crate) struct V2MacroIndicatorDataResponse {
 /// One reporting-period window shared by IS/BS/CF entries.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USReportPeriod {
+    /// Period start date
     #[serde(default)]
     pub start_date: String,
+    /// Period end date
     #[serde(default)]
     pub end_date: String,
+    /// Report label text
     #[serde(default)]
     pub report_txt: String,
 }
@@ -2078,12 +2160,16 @@ pub struct USReportPeriod {
 /// One income-statement entry in [`USFinancialOverview`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialISItem {
+    /// Revenue
     #[serde(default)]
     pub revenue: String,
+    /// Net income
     #[serde(default)]
     pub net_income: String,
+    /// Net margin
     #[serde(default)]
     pub net_margin: String,
+    /// Reporting period
     #[serde(default)]
     pub report: USReportPeriod,
 }
@@ -2091,12 +2177,16 @@ pub struct USFinancialISItem {
 /// One balance-sheet entry in [`USFinancialOverview`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialBSItem {
+    /// Debt-to-assets ratio
     #[serde(default)]
     pub debt_assets_ratio: String,
+    /// Total assets
     #[serde(default)]
     pub total_assets: String,
+    /// Total liabilities
     #[serde(default)]
     pub total_liabilities: String,
+    /// Reporting period
     #[serde(default)]
     pub report: USReportPeriod,
 }
@@ -2104,12 +2194,16 @@ pub struct USFinancialBSItem {
 /// One cash-flow entry in [`USFinancialOverview`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialCFItem {
+    /// Operating cash flow
     #[serde(default)]
     pub operating: String,
+    /// Investing cash flow
     #[serde(default)]
     pub investing: String,
+    /// Financing cash flow
     #[serde(default)]
     pub financing: String,
+    /// Reporting period
     #[serde(default)]
     pub report: USReportPeriod,
 }
@@ -2117,14 +2211,19 @@ pub struct USFinancialCFItem {
 /// Response for [`crate::FundamentalContext::us_financial_overview`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialOverview {
+    /// Currency symbol (e.g. `"$"`)
     #[serde(default)]
     pub ccy_symbol: String,
+    /// Report type
     #[serde(default)]
     pub report_type: String,
+    /// Income-statement entries
     #[serde(default)]
     pub is_list: Vec<USFinancialISItem>,
+    /// Balance-sheet entries
     #[serde(default)]
     pub bs_list: Vec<USFinancialBSItem>,
+    /// Cash-flow entries
     #[serde(default)]
     pub cf_list: Vec<USFinancialCFItem>,
 }
@@ -2134,14 +2233,19 @@ pub struct USFinancialOverview {
 /// One period entry in [`USKeyFinancialMetrics`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USKeyMetricItem {
+    /// Fiscal period (e.g. `"Q1"`, `"FY"`)
     #[serde(default)]
     pub ff_period: String,
+    /// Fiscal year
     #[serde(default)]
     pub ff_year: i32,
+    /// Fiscal-period end date
     #[serde(default)]
     pub fp_end: String,
+    /// Report label text
     #[serde(default)]
     pub report_txt: String,
+    /// Report publication date
     #[serde(default)]
     pub rpt_date: String,
     /// Metric values — shape varies per field configuration.
@@ -2152,12 +2256,16 @@ pub struct USKeyMetricItem {
 /// Response for [`crate::FundamentalContext::us_key_financial_metrics`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USKeyFinancialMetrics {
+    /// Reporting currency
     #[serde(default)]
     pub currency: String,
+    /// Report type
     #[serde(default)]
     pub report: String,
+    /// Field codes that have no data
     #[serde(default)]
     pub empty_fields: Vec<String>,
+    /// Per-period metric data
     #[serde(default)]
     pub list: Vec<USKeyMetricItem>,
 }
@@ -2167,16 +2275,22 @@ pub struct USKeyFinancialMetrics {
 /// AI chat context embedded in [`USAnalystConsensus`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAIChatData {
+    /// AI agent ID
     #[serde(default)]
     pub agent_id: String,
+    /// Handoff agent ID
     #[serde(default)]
     pub handoff_agent_id: String,
+    /// Security symbol
     #[serde(default)]
     pub symbol: String,
+    /// Prompt / context text
     #[serde(default)]
     pub text: String,
+    /// Chat type
     #[serde(default, rename = "type")]
     pub chat_type: String,
+    /// Workflow type
     #[serde(default)]
     pub workflow_type: String,
 }
@@ -2184,8 +2298,10 @@ pub struct USAIChatData {
 /// Actual vs estimated value for one consensus metric.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USConsensusEstimate {
+    /// Actual reported value
     #[serde(default)]
     pub actual: String,
+    /// Consensus estimate value
     #[serde(default)]
     pub estimate: String,
 }
@@ -2193,14 +2309,19 @@ pub struct USConsensusEstimate {
 /// One fiscal-year entry in [`USAnalystConsensus`]'s list.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USConsensusItem {
+    /// EBIT actual vs estimate
     #[serde(default)]
     pub ebit: USConsensusEstimate,
+    /// EPS actual vs estimate
     #[serde(default)]
     pub eps: USConsensusEstimate,
+    /// Fiscal year
     #[serde(default)]
     pub fiscal_year: i64,
+    /// Report label text
     #[serde(default)]
     pub report_txt: String,
+    /// Revenue actual vs estimate
     #[serde(default)]
     pub revenue: USConsensusEstimate,
 }
@@ -2208,19 +2329,25 @@ pub struct USConsensusItem {
 /// Response for [`crate::FundamentalContext::us_analyst_consensus`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAnalystConsensus {
+    /// AI-generated summary text
     #[serde(default)]
     pub ai_summary: String,
+    /// Embedded AI-chat context
     #[serde(default)]
     pub aichat_data: USAIChatData,
+    /// Reporting currency
     #[serde(default)]
     pub currency: String,
+    /// Report type
     #[serde(default)]
     pub report: String,
+    /// Per-fiscal-year consensus estimates
     #[serde(default)]
     pub list: Vec<USConsensusItem>,
     /// Option consensus type identifiers (e.g. "call", "put").
     #[serde(default)]
     pub opt_reports: Vec<String>,
+    /// Raw H5 page data (structure varies)
     #[serde(default)]
     pub h5_data: serde_json::Value,
 }

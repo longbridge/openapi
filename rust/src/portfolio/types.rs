@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
