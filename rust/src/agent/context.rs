@@ -196,6 +196,31 @@ impl AgentContext {
             .0)
     }
 
+    /// List all publicly available Agents on the platform — the same catalog
+    /// shown on the Explore page.
+    ///
+    /// Unlike [`agents`](Self::agents), this endpoint is not scoped to a
+    /// Workspace: it returns every Agent that is published and publicly shared.
+    /// The returned [`Agent::uid`] is used as the path parameter of
+    /// [`conversation`](Self::conversation).
+    ///
+    /// Path: `GET /v1/ai/agents`
+    pub async fn public_agents(
+        &self,
+        opts: impl Into<Option<GetAgentsOptions>>,
+    ) -> Result<AgentsResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/ai/agents")
+            .query_params(opts.into().unwrap_or_default())
+            .response::<Json<AgentsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     ///

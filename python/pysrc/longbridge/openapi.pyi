@@ -14096,6 +14096,23 @@ class AgentContext:
         """
         ...
 
+    def public_agents(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> AgentsResponse:
+        """
+        List all publicly available Agents on the platform (the Explore
+        catalog). Not scoped to a Workspace.
+
+        Args:
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
     def conversation(
         self,
         agent_id: str,
@@ -14256,6 +14273,23 @@ class AsyncAgentContext:
 
         Args:
             workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def public_agents(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> Awaitable[AgentsResponse]:
+        """
+        List all publicly available Agents on the platform (the Explore
+        catalog). Not scoped to a Workspace. Returns awaitable.
+
+        Args:
             page: Page number, starts at 1
             limit: Page size
             name: Fuzzy search by Agent name

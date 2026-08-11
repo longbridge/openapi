@@ -78,6 +78,21 @@ public class AgentContext implements AutoCloseable {
     }
 
     /**
+     * List all publicly available Agents on the platform (the Explore catalog).
+     * Not scoped to a Workspace.
+     *
+     * @param opts Options for this request, may be {@code null}
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<AgentsResponse> publicAgents(GetAgentsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.agentContextPublicAgents(raw(), opts, callback);
+        });
+    }
+
+    /**
      * Start a conversation with the specified Agent, blocking until the run
      * succeeds, is interrupted, or fails.
      *

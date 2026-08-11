@@ -123,6 +123,36 @@ pub unsafe extern "C" fn lb_agent_context_agents(
     });
 }
 
+/// List all publicly available Agents on the platform (the Explore catalog).
+/// Not scoped to a Workspace. Returns `CAgentsResponse`.
+///
+/// @param[in] opts Options for the request (can be null)
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_agent_context_public_agents(
+    ctx: *const CAgentContext,
+    opts: *const CGetAgentsOptions,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let mut opts2 = GetAgentsOptions::new();
+    if !opts.is_null() {
+        if !(*opts).page.is_null() {
+            opts2 = opts2.page(*(*opts).page);
+        }
+        if !(*opts).limit.is_null() {
+            opts2 = opts2.limit(*(*opts).limit);
+        }
+        if !(*opts).name.is_null() {
+            opts2 = opts2.name(cstr_to_rust((*opts).name));
+        }
+    }
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CAgentsResponseOwned> = CCow::new(ctx_inner.public_agents(opts2).await?);
+        Ok(resp)
+    });
+}
+
 /// Start a conversation with the specified Agent, blocking until the run
 /// succeeds, is interrupted, or fails. Returns `CConversationResponse`.
 ///
