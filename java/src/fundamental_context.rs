@@ -341,22 +341,22 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextMa
 // ─────────────────────────────────────────────────────── All US APIs return
 // JSON strings; Java callers parse with Gson/Jackson.
 
-macro_rules! us_counter_id_method {
+macro_rules! us_symbol_method {
     ($jni_name:ident, $method:ident) => {
         #[unsafe(no_mangle)]
         pub unsafe extern "system" fn $jni_name(
             mut env: JNIEnv,
             _class: JClass,
             context: i64,
-            counter_id: JObject,
+            symbol: JObject,
             callback: JObject,
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
                 let __owned_ctx = context.ctx.clone();
-                let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+                let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = __owned_ctx.$method(counter_id).await?;
+                    let resp = __owned_ctx.$method(symbol).await?;
                     Ok(serde_json::to_string(&resp).unwrap_or_default())
                 })?;
                 Ok(())
@@ -365,24 +365,24 @@ macro_rules! us_counter_id_method {
     };
 }
 
-macro_rules! us_counter_id_report_method {
+macro_rules! us_symbol_report_method {
     ($jni_name:ident, $method:ident) => {
         #[unsafe(no_mangle)]
         pub unsafe extern "system" fn $jni_name(
             mut env: JNIEnv,
             _class: JClass,
             context: i64,
-            counter_id: JObject,
+            symbol: JObject,
             report: JObject,
             callback: JObject,
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
                 let __owned_ctx = context.ctx.clone();
-                let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+                let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
                 let report: String = FromJValue::from_jvalue(env, report.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = __owned_ctx.$method(counter_id, report).await?;
+                    let resp = __owned_ctx.$method(symbol, report).await?;
                     Ok(serde_json::to_string(&resp).unwrap_or_default())
                 })?;
                 Ok(())
@@ -391,31 +391,31 @@ macro_rules! us_counter_id_report_method {
     };
 }
 
-us_counter_id_method!(
+us_symbol_method!(
     Java_com_longbridge_SdkNative_fundamentalContextUsCompanyOverview,
     us_company_overview
 );
-us_counter_id_method!(
+us_symbol_method!(
     Java_com_longbridge_SdkNative_fundamentalContextUsValuationOverview,
     us_valuation_overview
 );
-us_counter_id_report_method!(
+us_symbol_report_method!(
     Java_com_longbridge_SdkNative_fundamentalContextUsFinancialOverview,
     us_financial_overview
 );
-us_counter_id_report_method!(
+us_symbol_report_method!(
     Java_com_longbridge_SdkNative_fundamentalContextUsKeyFinancialMetrics,
     us_key_financial_metrics
 );
-us_counter_id_report_method!(
+us_symbol_report_method!(
     Java_com_longbridge_SdkNative_fundamentalContextUsAnalystConsensus,
     us_analyst_consensus
 );
-us_counter_id_method!(
+us_symbol_method!(
     Java_com_longbridge_SdkNative_fundamentalContextUsEtfDividendInfo,
     us_etf_dividend_info
 );
-us_counter_id_method!(
+us_symbol_method!(
     Java_com_longbridge_SdkNative_fundamentalContextUsCompanyDividends,
     us_company_dividends
 );
@@ -425,7 +425,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    counter_id: JObject,
+    symbol: JObject,
     kind: JObject,
     report: JObject,
     callback: JObject,
@@ -433,12 +433,12 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let kind: String = FromJValue::from_jvalue(env, kind.into())?;
         let report: String = FromJValue::from_jvalue(env, report.into())?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
-                .us_financial_statement(counter_id, kind, report)
+                .us_financial_statement(symbol, kind, report)
                 .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
@@ -451,18 +451,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    counter_id: JObject,
+    symbol: JObject,
     size: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let size: Option<i32> = FromJValue::from_jvalue(env, size.into())?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
-                .us_etf_files(counter_id, size.map(|s| s as u32))
+                .us_etf_files(symbol, size.map(|s| s as u32))
                 .await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;

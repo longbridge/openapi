@@ -226,13 +226,12 @@ impl FundamentalContextSync {
     /// Get industry peer chain
     pub fn industry_peers(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
         market: impl Into<String> + Send + 'static,
         industry_id: Option<String>,
     ) -> Result<IndustryPeersResponse> {
-        self.rt.call(
-            move |ctx| async move { ctx.industry_peers(counter_id, market, industry_id).await },
-        )
+        self.rt
+            .call(move |ctx| async move { ctx.industry_peers(symbol, market, industry_id).await })
     }
 
     /// Get financial report snapshot (earnings snapshot)
@@ -355,88 +354,87 @@ impl FundamentalContextSync {
     /// Get US company overview (blocking)
     pub fn us_company_overview(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
     ) -> Result<USCompanyOverview> {
         self.rt
-            .call(move |ctx| async move { ctx.us_company_overview(counter_id).await })
+            .call(move |ctx| async move { ctx.us_company_overview(symbol).await })
     }
 
     /// Get US valuation overview snapshot (blocking)
     pub fn us_valuation_overview(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
     ) -> Result<USValuationOverview> {
         self.rt
-            .call(move |ctx| async move { ctx.us_valuation_overview(counter_id).await })
+            .call(move |ctx| async move { ctx.us_valuation_overview(symbol).await })
     }
 
     /// Get US financial overview (blocking)
     pub fn us_financial_overview(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
     ) -> Result<USFinancialOverview> {
         self.rt
-            .call(move |ctx| async move { ctx.us_financial_overview(counter_id, report).await })
+            .call(move |ctx| async move { ctx.us_financial_overview(symbol, report).await })
     }
 
     /// Get US financial statement v3 (blocking)
     pub fn us_financial_statement(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
         kind: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
     ) -> Result<USFinancialStatement> {
-        self.rt.call(move |ctx| async move {
-            ctx.us_financial_statement(counter_id, kind, report).await
-        })
+        self.rt
+            .call(move |ctx| async move { ctx.us_financial_statement(symbol, kind, report).await })
     }
 
     /// Get US key financial metrics (blocking)
     pub fn us_key_financial_metrics(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
     ) -> Result<USKeyFinancialMetrics> {
         self.rt
-            .call(move |ctx| async move { ctx.us_key_financial_metrics(counter_id, report).await })
+            .call(move |ctx| async move { ctx.us_key_financial_metrics(symbol, report).await })
     }
 
     /// Get US analyst consensus estimates (blocking)
     pub fn us_analyst_consensus(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
         report: impl Into<String> + Send + 'static,
     ) -> Result<USAnalystConsensus> {
         self.rt
-            .call(move |ctx| async move { ctx.us_analyst_consensus(counter_id, report).await })
+            .call(move |ctx| async move { ctx.us_analyst_consensus(symbol, report).await })
     }
 
     /// Get US ETF dividend history (blocking)
     pub fn us_etf_dividend_info(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
     ) -> Result<USETFDividendInfo> {
         self.rt
-            .call(move |ctx| async move { ctx.us_etf_dividend_info(counter_id).await })
+            .call(move |ctx| async move { ctx.us_etf_dividend_info(symbol).await })
     }
 
     /// Get US company historical dividends (blocking)
     pub fn us_company_dividends(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
     ) -> Result<USCompanyDividends> {
         self.rt
-            .call(move |ctx| async move { ctx.us_company_dividends(counter_id).await })
+            .call(move |ctx| async move { ctx.us_company_dividends(symbol).await })
     }
 
     /// Get US ETF document list (blocking)
     pub fn us_etf_files(
         &self,
-        counter_id: impl Into<String> + Send + 'static,
+        symbol: impl Into<String> + Send + 'static,
         size: Option<u32>,
     ) -> Result<USETFFilesResponse> {
         self.rt
-            .call(move |ctx| async move { ctx.us_etf_files(counter_id, size).await })
+            .call(move |ctx| async move { ctx.us_etf_files(symbol, size).await })
     }
 }

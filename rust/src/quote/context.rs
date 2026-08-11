@@ -2021,7 +2021,7 @@ impl QuoteContext {
             last_timestamp: String,
             count: u32,
         }
-        // Response: {"counter_id":"ST/US/AAPL","data":[{...}]}
+        // Response: {"symbol":"AAPL.US","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli
@@ -2203,7 +2203,7 @@ impl QuoteContext {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
-        // Response: {"counter_id":"ST/HK/700","data":[{...}]}
+        // Response: {"symbol":"00700.HK","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli

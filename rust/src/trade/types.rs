@@ -1004,12 +1004,11 @@ impl_default_for_enum_string!(
 /// `query_type`: 0 = all (includes Rejected), 1 = pending, 2 = history (filled
 /// only). Default 0 matches what the app shows as "past orders".
 ///
-/// `symbol` accepts a user-facing symbol e.g. `"AAPL.US"` or `"DOGEUSD.BKKT"`.
-/// The SDK converts it to the internal `counter_id` format automatically.
+/// `symbol` accepts a user-facing symbol e.g. `"AAPL.US"` or `"DOGEUSD.BKKT"`
+/// and is sent to the server as-is.
 #[derive(Debug, Clone, Default)]
 pub struct GetUSHistoryOrders {
-    /// Optional symbol filter, e.g. `"AAPL.US"`. Converted to counter_id
-    /// internally.
+    /// Optional symbol filter, e.g. `"AAPL.US"`.
     pub symbol: Option<String>,
     /// Direction filter. [`crate::OrderSide::Unknown`] = all (default).
     pub side: OrderSide,

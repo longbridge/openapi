@@ -12582,7 +12582,7 @@ void lb_fundamental_context_industry_rank(const struct lb_fundamental_context_t 
  * Pass NULL for `industry_id` to omit it.
  */
 void lb_fundamental_context_industry_peers(const struct lb_fundamental_context_t *ctx,
-                                           const char *counter_id,
+                                           const char *symbol,
                                            const char *market,
                                            const char *industry_id,
                                            lb_async_callback_t callback,
