@@ -52,22 +52,16 @@ public class AlertContext implements AutoCloseable {
     public synchronized CompletableFuture<Void> add(AddAlertOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.alertContextAdd(raw(), opts, cb)); }
 
     /**
-     * Enable a price alert.
+     * Update a price alert (e.g. enable/disable or change its trigger).
      *
-     * @param alertId ID of the alert to enable
-     * @return A Future that completes when the alert is enabled
+     * <p>Typically obtained from {@link #list()}; set {@code item.enabled} to
+     * {@code true} to re-enable or {@code false} to disable, then pass it here.
+     *
+     * @param item The alert item to update
+     * @return A Future that completes when the alert is updated
      * @throws OpenApiException If an error occurs
      */
-    public synchronized CompletableFuture<Void> enable(String alertId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.alertContextEnable(raw(), alertId, cb)); }
-
-    /**
-     * Disable a price alert.
-     *
-     * @param alertId ID of the alert to disable
-     * @return A Future that completes when the alert is disabled
-     * @throws OpenApiException If an error occurs
-     */
-    public synchronized CompletableFuture<Void> disable(String alertId) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.alertContextDisable(raw(), alertId, cb)); }
+    public CompletableFuture<Void> update(AlertItem item) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.alertContextUpdate(raw(), item, cb)); }
 
     /**
      * Delete price alerts.
