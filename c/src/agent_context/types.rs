@@ -253,26 +253,53 @@ pub struct CGetAgentsOptions {
 pub struct CReference {
     /// Reference index
     pub index: i32,
+    /// Original reference index as provided by the source
+    pub original_index: i32,
+    /// Reference type (wire field `type`)
+    pub ref_type: *const c_char,
+    /// Reference identifier
+    pub id: *const c_char,
     /// Reference title
     pub title: *const c_char,
     /// Reference URL
     pub url: *const c_char,
+    /// Full nested reference payload, as a JSON string; empty when absent
+    pub content_json: *const c_char,
 }
 
 #[derive(Debug)]
 pub(crate) struct CReferenceOwned {
     index: i32,
+    original_index: i32,
+    ref_type: CString,
+    id: CString,
     title: CString,
     url: CString,
+    content_json: CString,
 }
 
 impl From<Reference> for CReferenceOwned {
     fn from(v: Reference) -> Self {
-        let Reference { index, title, url } = v;
+        let Reference {
+            index,
+            original_index,
+            ref_type,
+            id,
+            title,
+            url,
+            content,
+        } = v;
         Self {
             index,
+            original_index,
+            ref_type: ref_type.into(),
+            id: id.into(),
             title: title.into(),
             url: url.into(),
+            content_json: content
+                .map(|v| serde_json::to_string(&v).unwrap_or_default())
+                .unwrap_or_default()
+                .into(),
         }
     }
 }
@@ -281,11 +308,23 @@ impl ToFFI for CReferenceOwned {
     type FFIType = CReference;
 
     fn to_ffi_type(&self) -> Self::FFIType {
-        let CReferenceOwned { index, title, url } = self;
+        let CReferenceOwned {
+            index,
+            original_index,
+            ref_type,
+            id,
+            title,
+            url,
+            content_json,
+        } = self;
         CReference {
             index: *index,
+            original_index: *original_index,
+            ref_type: ref_type.to_ffi_type(),
+            id: id.to_ffi_type(),
             title: title.to_ffi_type(),
             url: url.to_ffi_type(),
+            content_json: content_json.to_ffi_type(),
         }
     }
 }
@@ -593,25 +632,40 @@ impl ToFFI for CConversationResponseOwned {
 pub struct CChatStartedPayload {
     /// Conversation identifier
     pub chat_uid: *const c_char,
+    /// Numeric conversation identifier
+    pub chat_id: i64,
     /// Message ID of this round
     pub message_id: *const c_char,
+    /// Error code; empty when absent
+    pub error: *const c_char,
+    /// Error message; empty when absent
+    pub error_message: *const c_char,
 }
 
 #[derive(Debug)]
 pub(crate) struct CChatStartedPayloadOwned {
     chat_uid: CString,
+    chat_id: i64,
     message_id: CString,
+    error: CString,
+    error_message: CString,
 }
 
 impl From<ChatStartedPayload> for CChatStartedPayloadOwned {
     fn from(v: ChatStartedPayload) -> Self {
         let ChatStartedPayload {
             chat_uid,
+            chat_id,
             message_id,
+            error,
+            error_message,
         } = v;
         Self {
             chat_uid: chat_uid.into(),
+            chat_id,
             message_id: message_id.into(),
+            error: error.into(),
+            error_message: error_message.into(),
         }
     }
 }
@@ -622,7 +676,10 @@ impl ToFFI for CChatStartedPayloadOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CChatStartedPayload {
             chat_uid: self.chat_uid.to_ffi_type(),
+            chat_id: self.chat_id,
             message_id: self.message_id.to_ffi_type(),
+            error: self.error.to_ffi_type(),
+            error_message: self.error_message.to_ffi_type(),
         }
     }
 }

@@ -13420,10 +13420,19 @@ class Reference:
 
     index: int
     """Reference index"""
+    original_index: int
+    """Original index in the source list, before any reranking"""
+    ref_type: str
+    """Reference kind, e.g. ``"NewsArticle"``"""
+    id: str
+    """Reference id"""
     title: str
     """Reference title"""
     url: str
     """Reference URL"""
+    content: Any | None
+    """Full reference payload as sent by the server. Kept as raw JSON
+    because the field set varies by reference ``ref_type``"""
 
 class QuestionOption:
     """One option of a Question."""
@@ -13497,6 +13506,12 @@ class ChatStartedPayload:
     """Conversation identifier"""
     message_id: str
     """Message ID of this round"""
+    chat_id: int
+    """ID of the owning conversation"""
+    error: str
+    """Error detail; empty at start"""
+    error_message: str
+    """User-facing error message; empty at start"""
 
 class MessagePayload:
     """

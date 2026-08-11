@@ -1916,9 +1916,21 @@ typedef struct lb_chat_started_payload_t {
    */
   const char *chat_uid;
   /**
+   * Numeric conversation identifier
+   */
+  int64_t chat_id;
+  /**
    * Message ID of this round
    */
   const char *message_id;
+  /**
+   * Error code; empty when absent
+   */
+  const char *error;
+  /**
+   * Error message; empty when absent
+   */
+  const char *error_message;
 } lb_chat_started_payload_t;
 
 /**
@@ -2097,6 +2109,18 @@ typedef struct lb_reference_t {
    */
   int32_t index;
   /**
+   * Original reference index as provided by the source
+   */
+  int32_t original_index;
+  /**
+   * Reference type (wire field `type`)
+   */
+  const char *ref_type;
+  /**
+   * Reference identifier
+   */
+  const char *id;
+  /**
    * Reference title
    */
   const char *title;
@@ -2104,6 +2128,10 @@ typedef struct lb_reference_t {
    * Reference URL
    */
   const char *url;
+  /**
+   * Full nested reference payload, as a JSON string; empty when absent
+   */
+  const char *content_json;
 } lb_reference_t;
 
 /**

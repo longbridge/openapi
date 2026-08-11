@@ -3849,6 +3849,12 @@ export interface ChatStartedPayload {
   chatUid: string
   /** Message ID of this round */
   messageId: string
+  /** ID of the owning conversation */
+  chatId: number
+  /** Error detail; empty at start */
+  error: string
+  /** User-facing error message; empty at start */
+  errorMessage: string
 }
 
 /**
@@ -5998,10 +6004,18 @@ export interface RecentBuybacks {
 export interface Reference {
   /** Reference index */
   index: number
+  /** Original index in the source list, before any reranking */
+  originalIndex: number
+  /** Reference kind, e.g. `"NewsArticle"` */
+  refType: string
+  /** Reference id */
+  id: string
   /** Reference title */
   title: string
   /** Reference URL */
   url: string
+  /** Full reference payload as sent by the server; kept as raw JSON because the field set varies by reference `refType` */
+  content?: any
 }
 
 /** Parameters for replacing an attached order */

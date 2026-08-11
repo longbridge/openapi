@@ -118,16 +118,29 @@ pub(crate) enum ConversationStatus {
 #[derive(Debug, Clone)]
 pub(crate) struct Reference {
     pub index: i32,
+    /// Original index in the source list, before any reranking
+    pub original_index: i32,
+    /// Reference kind, e.g. `"NewsArticle"`
+    pub ref_type: String,
+    /// Reference id
+    pub id: String,
     pub title: String,
     pub url: String,
+    /// Full reference payload as sent by the server. Kept as raw JSON
+    /// because the field set varies by reference `ref_type`.
+    pub content: Option<JsonValue>,
 }
 
 impl From<longbridge::agent::Reference> for Reference {
     fn from(v: longbridge::agent::Reference) -> Self {
         Self {
             index: v.index,
+            original_index: v.original_index,
+            ref_type: v.ref_type,
+            id: v.id,
             title: v.title,
             url: v.url,
+            content: v.content.map(JsonValue),
         }
     }
 }
@@ -249,6 +262,12 @@ impl From<longbridge::agent::ConversationResponse> for ConversationResponse {
 pub(crate) struct ChatStartedPayload {
     pub chat_uid: String,
     pub message_id: String,
+    /// ID of the owning conversation
+    pub chat_id: i64,
+    /// Error detail; empty at start
+    pub error: String,
+    /// User-facing error message; empty at start
+    pub error_message: String,
 }
 
 impl From<longbridge::agent::ChatStartedPayload> for ChatStartedPayload {
@@ -256,6 +275,9 @@ impl From<longbridge::agent::ChatStartedPayload> for ChatStartedPayload {
         Self {
             chat_uid: v.chat_uid,
             message_id: v.message_id,
+            chat_id: v.chat_id,
+            error: v.error,
+            error_message: v.error_message,
         }
     }
 }

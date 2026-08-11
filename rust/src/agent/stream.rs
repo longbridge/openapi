@@ -181,6 +181,9 @@ mod tests {
             Ok(ConversationStreamEvent::ChatStarted(ChatStartedPayload {
                 chat_uid: "ct_1".to_string(),
                 message_id: "1".to_string(),
+                chat_id: 0,
+                error: String::new(),
+                error_message: String::new(),
             })),
             Ok(ConversationStreamEvent::HumanInteractionRequired(
                 interrupt_resp,
