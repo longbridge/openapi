@@ -7,19 +7,14 @@ mod push_types;
 mod requests;
 mod types;
 
-pub use context::{
-    EstimateMaxPurchaseQuantityResponse, GridOrdersResponse, GridTriggerHistoryResponse,
-    SubmitGridOrderResponse, SubmitOrderResponse, TradeContext,
-};
+pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, TradeContext};
 pub use push_types::{PushEvent, PushGridOrderChanged, PushOrderChanged, TopicType};
 pub use requests::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
-    GetCashFlowOptions, GetFundPositionsOptions, GetGridOrderDetailOptions,
-    GetGridOrdersByIdsOptions, GetGridOrdersOptions, GetGridTriggerHistoryOptions,
-    GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
-    GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-    ReplaceAttachedParams, ReplaceGridOrderOptions, ReplaceOrderOptions, SubmitAttachedParams,
-    SubmitGridOrderOptions, SubmitOrderOptions, SubmitStrategyQuestionnaireOptions,
+    GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
+    GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions,
+    SubmitAttachedParams, SubmitOrderOptions,
 };
 pub use types::{
     AccountBalance,
@@ -41,14 +36,6 @@ pub use types::{
     // US-market types
     GetUSHistoryOrders,
     GetUSRealizedPLOptions,
-    GridBidSize,
-    GridChannelInfo,
-    GridOrder,
-    GridOrderDetail,
-    GridOrderHistory,
-    GridOrderInfo,
-    GridOrderSubOrder,
-    GridTradeRule,
     MarginRatio,
     Order,
     OrderChargeDetail,
@@ -67,7 +54,6 @@ pub use types::{
     StockPositionChannel,
     StockPositionsResponse,
     TimeInForceType,
-    TriggerOrder,
     TriggerPriceType,
     TriggerStatus,
     USAssetOverview,

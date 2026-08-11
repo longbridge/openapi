@@ -370,6 +370,36 @@ typedef enum lb_financial_report_kind_t {
 } lb_financial_report_kind_t;
 
 /**
+ * Market type
+ */
+typedef enum lb_market_t {
+  /**
+   * Unknown
+   */
+  MarketUnknown,
+  /**
+   * US market
+   */
+  MarketUS,
+  /**
+   * HK market
+   */
+  MarketHK,
+  /**
+   * CN market
+   */
+  MarketCN,
+  /**
+   * SG market
+   */
+  MarketSG,
+  /**
+   * Crypto market
+   */
+  MarketCrypto,
+} lb_market_t;
+
+/**
  * Broker holding lookback period
  */
 typedef enum lb_broker_holding_period_t {
@@ -824,36 +854,6 @@ typedef enum lb_warrant_status_t {
    */
   WarrantStatusNormal,
 } lb_warrant_status_t;
-
-/**
- * Market type
- */
-typedef enum lb_market_t {
-  /**
-   * Unknown
-   */
-  MarketUnknown,
-  /**
-   * US market
-   */
-  MarketUS,
-  /**
-   * HK market
-   */
-  MarketHK,
-  /**
-   * CN market
-   */
-  MarketCN,
-  /**
-   * SG market
-   */
-  MarketSG,
-  /**
-   * Crypto market
-   */
-  MarketCrypto,
-} lb_market_t;
 
 /**
  * Calc index
@@ -1800,6 +1800,8 @@ typedef struct lb_decimal_t lb_decimal_t;
 typedef struct lb_error_t lb_error_t;
 
 typedef struct lb_fundamental_context_t lb_fundamental_context_t;
+
+typedef struct lb_grid_context_t lb_grid_context_t;
 
 /**
  * A HTTP client for Longbridge OpenAPI
@@ -2947,6 +2949,222 @@ typedef struct lb_alert_item_t {
 } lb_alert_item_t;
 
 /**
+ * Grid trading rule — parameters for submit / replace.
+ */
+typedef struct lb_grid_trade_rule_t {
+  /**
+   * Base price the grid is anchored to (can be null)
+   */
+  const struct lb_decimal_t *submitted_base_price;
+  /**
+   * Upper price bound (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_price;
+  /**
+   * Lower price bound (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_price;
+  /**
+   * Trigger price type (only `1` / `2` allowed) (can be null)
+   */
+  const int32_t *trigger_price_type;
+  /**
+   * Upward trigger spread (absolute) (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_up;
+  /**
+   * Downward trigger spread (absolute) (can be null)
+   */
+  const struct lb_decimal_t *trigger_spread_down;
+  /**
+   * Upward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_up;
+  /**
+   * Downward trigger percent (can be null)
+   */
+  const struct lb_decimal_t *trigger_percent_down;
+  /**
+   * Whether a single grid level may trigger multiple times (can be null)
+   */
+  const bool *multiple_trigger;
+  /**
+   * Time in force (`0` = Day, `1` = GTC, `6` = GTD) (can be null)
+   */
+  const int32_t *time_in_force;
+  /**
+   * Quantity handled when the upper bound is reached (can be null)
+   */
+  const struct lb_decimal_t *upper_limit_quantity;
+  /**
+   * Quantity handled when the lower bound is reached (can be null)
+   */
+  const struct lb_decimal_t *lower_limit_quantity;
+  /**
+   * Expiry time (unix seconds), used with GTD (can be null)
+   */
+  const int64_t *expire_time;
+  /**
+   * Action when the upper bound is reached (only `1` / `2` allowed) (can be
+   * null)
+   */
+  const int32_t *upper_limit_event;
+  /**
+   * Action when the lower bound is reached (only `1` / `2` allowed) (can be
+   * null)
+   */
+  const int32_t *lower_limit_event;
+  /**
+   * Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`) (can
+   * be null)
+   */
+  const int32_t *trigger_sell_depth;
+  /**
+   * Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`) (can
+   * be null)
+   */
+  const int32_t *trigger_buy_depth;
+  /**
+   * Quantity per trigger (can be null)
+   */
+  const struct lb_decimal_t *trigger_quantity;
+  /**
+   * Whether short selling is allowed (can be null)
+   */
+  const bool *support_shortsell;
+  /**
+   * Regular trading hours flag (`0` / `1` / `2`) (can be null)
+   */
+  const int32_t *rth;
+  /**
+   * Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) (can be
+   * null)
+   */
+  const char *grid_order_type_up;
+  /**
+   * Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) (can be
+   * null)
+   */
+  const char *grid_order_type_down;
+} lb_grid_trade_rule_t;
+
+/**
+ * Options for submit grid trading order request
+ */
+typedef struct lb_submit_grid_order_options_t {
+  /**
+   * Security symbol (e.g. `700.HK`)
+   */
+  const char *symbol;
+  /**
+   * Settlement currency
+   */
+  const char *settlement_currency;
+  /**
+   * Grid trading rule
+   */
+  struct lb_grid_trade_rule_t grid_trading_rule;
+} lb_submit_grid_order_options_t;
+
+/**
+ * Options for replace grid trading order request
+ */
+typedef struct lb_replace_grid_order_options_t {
+  /**
+   * Grid master order ID
+   */
+  const char *order_id;
+  /**
+   * Grid trading rule
+   */
+  struct lb_grid_trade_rule_t grid_trading_rule;
+} lb_replace_grid_order_options_t;
+
+/**
+ * Options for get grid trading orders (list) request
+ */
+typedef struct lb_get_grid_orders_options_t {
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+  /**
+   * Market (can be null)
+   */
+  const enum lb_market_t *market;
+  /**
+   * Comma-joined status filter (e.g. `Performing,Suspended`) (can be null)
+   */
+  const char *status;
+  /**
+   * Security symbol filter (e.g. `700.HK`) (can be null)
+   */
+  const char *symbol;
+  /**
+   * Sort field (can be null)
+   */
+  const char *sort_by;
+  /**
+   * Sort order (can be null)
+   */
+  const char *sort_order;
+} lb_get_grid_orders_options_t;
+
+/**
+ * Options for query grid trading orders by IDs request
+ */
+typedef struct lb_get_grid_orders_by_ids_options_t {
+  /**
+   * Grid master order IDs
+   */
+  const char *const *order_ids;
+  /**
+   * Number of order IDs
+   */
+  uintptr_t num_order_ids;
+} lb_get_grid_orders_by_ids_options_t;
+
+/**
+ * Options for get grid trading order detail request
+ */
+typedef struct lb_get_grid_order_detail_options_t {
+  /**
+   * Grid master order ID
+   */
+  const char *order_id;
+  /**
+   * History cursor for paging through the trigger history (can be null)
+   */
+  const char *history_id;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+} lb_get_grid_order_detail_options_t;
+
+/**
+ * Options for get grid trading trigger history request
+ */
+typedef struct lb_get_grid_trigger_history_options_t {
+  /**
+   * Grid master order ID
+   */
+  const char *grid_order_id;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+} lb_get_grid_trigger_history_options_t;
+
+/**
  * HTTP Header
  */
 typedef struct lb_http_header_t {
@@ -3939,222 +4157,6 @@ typedef struct lb_estimate_max_purchase_quantity_options_t {
    */
   bool fractional_shares;
 } lb_estimate_max_purchase_quantity_options_t;
-
-/**
- * Grid trading rule — parameters for submit / replace.
- */
-typedef struct lb_grid_trade_rule_t {
-  /**
-   * Base price the grid is anchored to (can be null)
-   */
-  const struct lb_decimal_t *submitted_base_price;
-  /**
-   * Upper price bound (can be null)
-   */
-  const struct lb_decimal_t *upper_limit_price;
-  /**
-   * Lower price bound (can be null)
-   */
-  const struct lb_decimal_t *lower_limit_price;
-  /**
-   * Trigger price type (only `1` / `2` allowed) (can be null)
-   */
-  const int32_t *trigger_price_type;
-  /**
-   * Upward trigger spread (absolute) (can be null)
-   */
-  const struct lb_decimal_t *trigger_spread_up;
-  /**
-   * Downward trigger spread (absolute) (can be null)
-   */
-  const struct lb_decimal_t *trigger_spread_down;
-  /**
-   * Upward trigger percent (can be null)
-   */
-  const struct lb_decimal_t *trigger_percent_up;
-  /**
-   * Downward trigger percent (can be null)
-   */
-  const struct lb_decimal_t *trigger_percent_down;
-  /**
-   * Whether a single grid level may trigger multiple times (can be null)
-   */
-  const bool *multiple_trigger;
-  /**
-   * Time in force (`0` = Day, `1` = GTC, `6` = GTD) (can be null)
-   */
-  const int32_t *time_in_force;
-  /**
-   * Quantity handled when the upper bound is reached (can be null)
-   */
-  const struct lb_decimal_t *upper_limit_quantity;
-  /**
-   * Quantity handled when the lower bound is reached (can be null)
-   */
-  const struct lb_decimal_t *lower_limit_quantity;
-  /**
-   * Expiry time (unix seconds), used with GTD (can be null)
-   */
-  const int64_t *expire_time;
-  /**
-   * Action when the upper bound is reached (only `1` / `2` allowed) (can be
-   * null)
-   */
-  const int32_t *upper_limit_event;
-  /**
-   * Action when the lower bound is reached (only `1` / `2` allowed) (can be
-   * null)
-   */
-  const int32_t *lower_limit_event;
-  /**
-   * Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`) (can
-   * be null)
-   */
-  const int32_t *trigger_sell_depth;
-  /**
-   * Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`) (can
-   * be null)
-   */
-  const int32_t *trigger_buy_depth;
-  /**
-   * Quantity per trigger (can be null)
-   */
-  const struct lb_decimal_t *trigger_quantity;
-  /**
-   * Whether short selling is allowed (can be null)
-   */
-  const bool *support_shortsell;
-  /**
-   * Regular trading hours flag (`0` / `1` / `2`) (can be null)
-   */
-  const int32_t *rth;
-  /**
-   * Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) (can be
-   * null)
-   */
-  const char *grid_order_type_up;
-  /**
-   * Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) (can be
-   * null)
-   */
-  const char *grid_order_type_down;
-} lb_grid_trade_rule_t;
-
-/**
- * Options for submit grid trading order request
- */
-typedef struct lb_submit_grid_order_options_t {
-  /**
-   * Security symbol (e.g. `700.HK`)
-   */
-  const char *symbol;
-  /**
-   * Settlement currency
-   */
-  const char *settlement_currency;
-  /**
-   * Grid trading rule
-   */
-  struct lb_grid_trade_rule_t grid_trading_rule;
-} lb_submit_grid_order_options_t;
-
-/**
- * Options for replace grid trading order request
- */
-typedef struct lb_replace_grid_order_options_t {
-  /**
-   * Grid master order ID
-   */
-  const char *order_id;
-  /**
-   * Grid trading rule
-   */
-  struct lb_grid_trade_rule_t grid_trading_rule;
-} lb_replace_grid_order_options_t;
-
-/**
- * Options for get grid trading orders (list) request
- */
-typedef struct lb_get_grid_orders_options_t {
-  /**
-   * Page number (can be null)
-   */
-  const int32_t *page;
-  /**
-   * Page size (can be null)
-   */
-  const int32_t *limit;
-  /**
-   * Market (can be null)
-   */
-  const enum lb_market_t *market;
-  /**
-   * Comma-joined status filter (e.g. `Performing,Suspended`) (can be null)
-   */
-  const char *status;
-  /**
-   * Security symbol filter (e.g. `700.HK`) (can be null)
-   */
-  const char *symbol;
-  /**
-   * Sort field (can be null)
-   */
-  const char *sort_by;
-  /**
-   * Sort order (can be null)
-   */
-  const char *sort_order;
-} lb_get_grid_orders_options_t;
-
-/**
- * Options for query grid trading orders by IDs request
- */
-typedef struct lb_get_grid_orders_by_ids_options_t {
-  /**
-   * Grid master order IDs
-   */
-  const char *const *order_ids;
-  /**
-   * Number of order IDs
-   */
-  uintptr_t num_order_ids;
-} lb_get_grid_orders_by_ids_options_t;
-
-/**
- * Options for get grid trading order detail request
- */
-typedef struct lb_get_grid_order_detail_options_t {
-  /**
-   * Grid master order ID
-   */
-  const char *order_id;
-  /**
-   * History cursor for paging through the trigger history (can be null)
-   */
-  const char *history_id;
-  /**
-   * Page size (can be null)
-   */
-  const int32_t *limit;
-} lb_get_grid_order_detail_options_t;
-
-/**
- * Options for get grid trading trigger history request
- */
-typedef struct lb_get_grid_trigger_history_options_t {
-  /**
-   * Grid master order ID
-   */
-  const char *grid_order_id;
-  /**
-   * Page number (can be null)
-   */
-  const int32_t *page;
-  /**
-   * Page size (can be null)
-   */
-  const int32_t *limit;
-} lb_get_grid_trigger_history_options_t;
 
 /**
  * Active subscription for a security
@@ -12216,6 +12218,113 @@ void lb_fundamental_context_etf_asset_allocation(const struct lb_fundamental_con
                                                  lb_async_callback_t callback,
                                                  void *userdata);
 
+const struct lb_grid_context_t *lb_grid_context_new(const struct lb_config_t *config);
+
+void lb_grid_context_retain(const struct lb_grid_context_t *ctx);
+
+void lb_grid_context_release(const struct lb_grid_context_t *ctx);
+
+/**
+ * Submit a grid trading order
+ *
+ * @param[in] opts Options for submit grid order request
+ */
+void lb_grid_context_submit(const struct lb_grid_context_t *ctx,
+                            const struct lb_submit_grid_order_options_t *opts,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Replace (modify) a grid trading order
+ *
+ * @param[in] opts Options for replace grid order request
+ */
+void lb_grid_context_replace(const struct lb_grid_context_t *ctx,
+                             const struct lb_replace_grid_order_options_t *opts,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Get grid trading orders (paged list)
+ *
+ * @param[in] opts Options for get grid orders request (can be null)
+ */
+void lb_grid_context_list(const struct lb_grid_context_t *ctx,
+                          const struct lb_get_grid_orders_options_t *opts,
+                          lb_async_callback_t callback,
+                          void *userdata);
+
+/**
+ * Query grid trading orders by IDs
+ *
+ * @param[in] opts Options for get grid orders by ids request
+ */
+void lb_grid_context_list_by_ids(const struct lb_grid_context_t *ctx,
+                                 const struct lb_get_grid_orders_by_ids_options_t *opts,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get grid trading order detail (and paged history)
+ *
+ * @param[in] opts Options for get grid order detail request
+ */
+void lb_grid_context_detail(const struct lb_grid_context_t *ctx,
+                            const struct lb_get_grid_order_detail_options_t *opts,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Get grid trading trigger history
+ *
+ * @param[in] opts Options for get grid trigger history request
+ */
+void lb_grid_context_trigger_history(const struct lb_grid_context_t *ctx,
+                                     const struct lb_get_grid_trigger_history_options_t *opts,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Cancel a grid trading order
+ */
+void lb_grid_context_cancel(const struct lb_grid_context_t *ctx,
+                            const char *order_id,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Suspend a grid trading order
+ */
+void lb_grid_context_suspend(const struct lb_grid_context_t *ctx,
+                             const char *order_id,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Restart a grid trading order
+ */
+void lb_grid_context_restart(const struct lb_grid_context_t *ctx,
+                             const char *order_id,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Submit the strategy risk-disclosure questionnaire record (grid trading
+ * compliance authorization).
+ */
+void lb_grid_context_submit_strategy_questionnaire(const struct lb_grid_context_t *ctx,
+                                                   lb_async_callback_t callback,
+                                                   void *userdata);
+
+/**
+ * Get order info used by the grid order window (lot size, authorization
+ * flag, settlement currency, etc.).
+ */
+void lb_grid_context_order_info(const struct lb_grid_context_t *ctx,
+                                const char *symbol,
+                                lb_async_callback_t callback,
+                                void *userdata);
+
 /**
  * Create a HTTP client using API Key authentication
  *
@@ -13321,107 +13430,6 @@ void lb_trade_context_estimate_max_purchase_quantity(const struct lb_trade_conte
                                                      const struct lb_estimate_max_purchase_quantity_options_t *opts,
                                                      lb_async_callback_t callback,
                                                      void *userdata);
-
-/**
- * Submit a grid trading order
- *
- * @param[in] opts Options for submit grid order request
- */
-void lb_trade_context_submit_grid_order(const struct lb_trade_context_t *ctx,
-                                        const struct lb_submit_grid_order_options_t *opts,
-                                        lb_async_callback_t callback,
-                                        void *userdata);
-
-/**
- * Replace (modify) a grid trading order
- *
- * @param[in] opts Options for replace grid order request
- */
-void lb_trade_context_replace_grid_order(const struct lb_trade_context_t *ctx,
-                                         const struct lb_replace_grid_order_options_t *opts,
-                                         lb_async_callback_t callback,
-                                         void *userdata);
-
-/**
- * Get grid trading orders (paged list)
- *
- * @param[in] opts Options for get grid orders request (can be null)
- */
-void lb_trade_context_grid_orders(const struct lb_trade_context_t *ctx,
-                                  const struct lb_get_grid_orders_options_t *opts,
-                                  lb_async_callback_t callback,
-                                  void *userdata);
-
-/**
- * Query grid trading orders by IDs
- *
- * @param[in] opts Options for get grid orders by ids request
- */
-void lb_trade_context_grid_orders_by_ids(const struct lb_trade_context_t *ctx,
-                                         const struct lb_get_grid_orders_by_ids_options_t *opts,
-                                         lb_async_callback_t callback,
-                                         void *userdata);
-
-/**
- * Get grid trading order detail (and paged history)
- *
- * @param[in] opts Options for get grid order detail request
- */
-void lb_trade_context_grid_order_detail(const struct lb_trade_context_t *ctx,
-                                        const struct lb_get_grid_order_detail_options_t *opts,
-                                        lb_async_callback_t callback,
-                                        void *userdata);
-
-/**
- * Get grid trading trigger history
- *
- * @param[in] opts Options for get grid trigger history request
- */
-void lb_trade_context_grid_trigger_history(const struct lb_trade_context_t *ctx,
-                                           const struct lb_get_grid_trigger_history_options_t *opts,
-                                           lb_async_callback_t callback,
-                                           void *userdata);
-
-/**
- * Cancel a grid trading order
- */
-void lb_trade_context_cancel_grid_order(const struct lb_trade_context_t *ctx,
-                                        const char *order_id,
-                                        lb_async_callback_t callback,
-                                        void *userdata);
-
-/**
- * Suspend a grid trading order
- */
-void lb_trade_context_suspend_grid_order(const struct lb_trade_context_t *ctx,
-                                         const char *order_id,
-                                         lb_async_callback_t callback,
-                                         void *userdata);
-
-/**
- * Restart a grid trading order
- */
-void lb_trade_context_restart_grid_order(const struct lb_trade_context_t *ctx,
-                                         const char *order_id,
-                                         lb_async_callback_t callback,
-                                         void *userdata);
-
-/**
- * Submit the strategy risk-disclosure questionnaire record (grid trading
- * compliance authorization).
- */
-void lb_trade_context_submit_strategy_questionnaire(const struct lb_trade_context_t *ctx,
-                                                    lb_async_callback_t callback,
-                                                    void *userdata);
-
-/**
- * Get order info used by the grid order window (lot size, authorization
- * flag, settlement currency, etc.).
- */
-void lb_trade_context_grid_order_info(const struct lb_trade_context_t *ctx,
-                                      const char *symbol,
-                                      lb_async_callback_t callback,
-                                      void *userdata);
 
 /**
  * Create a decimal value with a 64 bit `m` representation and corresponding

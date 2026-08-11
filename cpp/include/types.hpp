@@ -2268,6 +2268,46 @@ struct EstimateMaxPurchaseQuantityResponse
   Decimal margin_max_qty;
 };
 
+
+/// Grid trading master-order changed message.
+struct PushGridOrderChanged
+{
+  /// Grid master order ID
+  std::string order_id;
+  /// Order status
+  std::string status;
+  /// Security symbol (e.g. `700.HK`)
+  std::string symbol;
+  /// Suspend reason, if any
+  std::string suspend_reason;
+  /// Submitted base price
+  std::string submitted_base_price;
+  /// Current base price
+  std::string current_base_price;
+  /// Upper price bound
+  std::string upper_limit_price;
+  /// Lower price bound
+  std::string lower_limit_price;
+  /// Trigger price type
+  int32_t trigger_price_type;
+  /// Quantity per trigger
+  std::string trigger_quantity;
+  /// Settlement currency
+  std::string settlement_currency;
+  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+  int32_t time_in_force;
+  /// Regular trading hours flag
+  int32_t rth;
+  /// Sell-side order type when depth is 0
+  std::string grid_order_type_up;
+  /// Buy-side order type when depth is 0
+  std::string grid_order_type_down;
+};
+
+} // namespace trade
+
+namespace grid {
+
 /// Grid trading rule — parameters for submit / replace.
 struct GridTradeRule
 {
@@ -2723,43 +2763,7 @@ struct GridTriggerHistoryResponse
   /// Whether there are more pages
   bool has_more;
 };
-
-/// Grid trading master-order changed message.
-struct PushGridOrderChanged
-{
-  /// Grid master order ID
-  std::string order_id;
-  /// Order status
-  std::string status;
-  /// Security symbol (e.g. `700.HK`)
-  std::string symbol;
-  /// Suspend reason, if any
-  std::string suspend_reason;
-  /// Submitted base price
-  std::string submitted_base_price;
-  /// Current base price
-  std::string current_base_price;
-  /// Upper price bound
-  std::string upper_limit_price;
-  /// Lower price bound
-  std::string lower_limit_price;
-  /// Trigger price type
-  int32_t trigger_price_type;
-  /// Quantity per trigger
-  std::string trigger_quantity;
-  /// Settlement currency
-  std::string settlement_currency;
-  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-  int32_t time_in_force;
-  /// Regular trading hours flag
-  int32_t rth;
-  /// Sell-side order type when depth is 0
-  std::string grid_order_type_up;
-  /// Buy-side order type when depth is 0
-  std::string grid_order_type_down;
-};
-
-} // namespace trade
+} // namespace grid
 
 namespace content {
 

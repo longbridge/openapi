@@ -2,11 +2,12 @@ use std::sync::Arc;
 
 use longbridge::{
     Config,
-    oauth::OAuthBuilder,
-    trade::{
-        GetGridOrderDetailOptions, GetGridOrdersOptions, GetGridTriggerHistoryOptions,
-        GridTradeRule, SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions, TradeContext,
+    grid::{
+        GetGridOrderDetailOptions, GetGridOrdersOptions, GetGridTriggerHistoryOptions, GridContext,
+        GridTradeRule, SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
     },
+    oauth::OAuthBuilder,
+    trade::TradeContext,
 };
 use rust_decimal::Decimal;
 use tracing_subscriber::EnvFilter;
@@ -21,14 +22,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build(|url| println!("Open this URL to authorize: {url}"))
         .await?;
     let config = Arc::new(Config::from_oauth(oauth));
-    let (ctx, mut receiver) = TradeContext::new(config);
+    // Grid REST calls go through the standalone GridContext.
+    let ctx = GridContext::new(config.clone());
+    // Grid master-order pushes still arrive on the TradeContext private topic.
+    let (_trade, mut receiver) = TradeContext::new(config);
 
     // Accept the strategy risk disclosure (compliance authorization) once.
     ctx.submit_strategy_questionnaire(SubmitStrategyQuestionnaireOptions::new())
         .await?;
 
     // Order-info fields used by the grid window (lot size, authorization flag).
-    let info = ctx.grid_order_info("700.HK").await?;
+    let info = ctx.order_info("700.HK").await?;
     println!("grid order info: {info:?}");
 
     // Submit a grid order.
@@ -56,32 +60,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ..Default::default()
     };
     let submitted = ctx
-        .submit_grid_order(SubmitGridOrderOptions::new("700.HK", "HKD", rule))
+        .submit(SubmitGridOrderOptions::new("700.HK", "HKD", rule))
         .await?;
     let order_id = submitted.order_id;
     println!("submitted grid order: {order_id}");
 
     // List grid orders.
     let list = ctx
-        .grid_orders(GetGridOrdersOptions::new().symbol("700.HK").limit(20))
+        .list(GetGridOrdersOptions::new().symbol("700.HK").limit(20))
         .await?;
     println!("grid orders: {} (has_more={})", list.grid_order.len(), list.has_more);
 
     // Detail.
     let detail = ctx
-        .grid_order_detail(GetGridOrderDetailOptions::new(&order_id))
+        .detail(GetGridOrderDetailOptions::new(&order_id))
         .await?;
     println!("grid order detail: {detail:?}");
 
     // Query by IDs.
     let by_ids = ctx
-        .grid_orders_by_ids(longbridge::trade::GetGridOrdersByIdsOptions::new([&order_id]))
+        .list_by_ids(longbridge::grid::GetGridOrdersByIdsOptions::new([&order_id]))
         .await?;
     println!("grid orders by ids: {}", by_ids.len());
 
     // Trigger history.
     let history = ctx
-        .grid_trigger_history(GetGridTriggerHistoryOptions::new(&order_id))
+        .trigger_history(GetGridTriggerHistoryOptions::new(&order_id))
         .await?;
     println!(
         "trigger history: {} (has_more={})",
@@ -90,9 +94,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     // Suspend -> restart -> cancel.
-    ctx.suspend_grid_order(&order_id).await?;
-    ctx.restart_grid_order(&order_id).await?;
-    ctx.cancel_grid_order(&order_id).await?;
+    ctx.suspend(&order_id).await?;
+    ctx.restart(&order_id).await?;
+    ctx.cancel(&order_id).await?;
     println!("suspend / restart / cancel done");
 
     // Drain a few push events (grid master-order changes arrive here).

@@ -989,14 +989,14 @@ impl_java_class!(
 // ── Grid trading types ────────────────────────────────────────────
 
 impl_java_class!(
-    "com/longbridge/trade/SubmitGridOrderResponse",
-    longbridge::trade::SubmitGridOrderResponse,
+    "com/longbridge/grid/SubmitGridOrderResponse",
+    longbridge::grid::SubmitGridOrderResponse,
     [order_id]
 );
 
 impl_java_class!(
-    "com/longbridge/trade/GridOrder",
-    longbridge::trade::GridOrder,
+    "com/longbridge/grid/GridOrder",
+    longbridge::grid::GridOrder,
     [
         order_id,
         symbol,
@@ -1047,8 +1047,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/trade/GridOrderSubOrder",
-    longbridge::trade::GridOrderSubOrder,
+    "com/longbridge/grid/GridOrderSubOrder",
+    longbridge::grid::GridOrderSubOrder,
     [
         id,
         price,
@@ -1063,14 +1063,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/trade/GridOrderHistory",
-    longbridge::trade::GridOrderHistory,
+    "com/longbridge/grid/GridOrderHistory",
+    longbridge::grid::GridOrderHistory,
     [history_id, created_at, status, suspend_reason, reason]
 );
 
 impl_java_class!(
-    "com/longbridge/trade/GridOrderDetail",
-    longbridge::trade::GridOrderDetail,
+    "com/longbridge/grid/GridOrderDetail",
+    longbridge::grid::GridOrderDetail,
     [
         order_id,
         symbol,
@@ -1122,8 +1122,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/trade/TriggerOrder",
-    longbridge::trade::TriggerOrder,
+    "com/longbridge/grid/TriggerOrder",
+    longbridge::grid::TriggerOrder,
     [
         id,
         status,
@@ -1149,14 +1149,14 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/trade/GridBidSize",
-    longbridge::trade::GridBidSize,
+    "com/longbridge/grid/GridBidSize",
+    longbridge::grid::GridBidSize,
     [str_proceed, end_proceed, bid_size]
 );
 
 impl_java_class!(
-    "com/longbridge/trade/GridChannelInfo",
-    longbridge::trade::GridChannelInfo,
+    "com/longbridge/grid/GridChannelInfo",
+    longbridge::grid::GridChannelInfo,
     [
         strategy_granted,
         support_rth,
@@ -1167,8 +1167,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/trade/GridOrderInfo",
-    longbridge::trade::GridOrderInfo,
+    "com/longbridge/grid/GridOrderInfo",
+    longbridge::grid::GridOrderInfo,
     [
         name,
         last_done,
@@ -1203,15 +1203,15 @@ impl_java_class!(
     ]
 );
 
-// `GridOrdersResponse` / `GridTriggerHistoryResponse` are not re-exported by
-// the `longbridge::trade` module, so mirror them with binding-side structs.
+// Mirror the grid list / trigger-history responses with binding-side structs so
+// the `has_more` paging flag can be flattened alongside the item array.
 pub(crate) struct GridOrdersResponse {
-    grid_order: Vec<longbridge::trade::GridOrder>,
+    grid_order: Vec<longbridge::grid::GridOrder>,
     has_more: bool,
 }
 
 impl GridOrdersResponse {
-    pub(crate) fn new(grid_order: Vec<longbridge::trade::GridOrder>, has_more: bool) -> Self {
+    pub(crate) fn new(grid_order: Vec<longbridge::grid::GridOrder>, has_more: bool) -> Self {
         Self {
             grid_order,
             has_more,
@@ -1220,7 +1220,7 @@ impl GridOrdersResponse {
 }
 
 impl_java_class!(
-    "com/longbridge/trade/GridOrdersResponse",
+    "com/longbridge/grid/GridOrdersResponse",
     GridOrdersResponse,
     [
         #[java(objarray)]
@@ -1230,15 +1230,12 @@ impl_java_class!(
 );
 
 pub(crate) struct GridTriggerHistoryResponse {
-    trigger_orders: Vec<longbridge::trade::TriggerOrder>,
+    trigger_orders: Vec<longbridge::grid::TriggerOrder>,
     has_more: bool,
 }
 
 impl GridTriggerHistoryResponse {
-    pub(crate) fn new(
-        trigger_orders: Vec<longbridge::trade::TriggerOrder>,
-        has_more: bool,
-    ) -> Self {
+    pub(crate) fn new(trigger_orders: Vec<longbridge::grid::TriggerOrder>, has_more: bool) -> Self {
         Self {
             trigger_orders,
             has_more,
@@ -1247,7 +1244,7 @@ impl GridTriggerHistoryResponse {
 }
 
 impl_java_class!(
-    "com/longbridge/trade/GridTriggerHistoryResponse",
+    "com/longbridge/grid/GridTriggerHistoryResponse",
     GridTriggerHistoryResponse,
     [
         #[java(objarray)]

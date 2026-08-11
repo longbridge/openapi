@@ -7,16 +7,12 @@ use crate::{
         AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
         EstimateMaxPurchaseQuantityOptions, EstimateMaxPurchaseQuantityResponse, Execution,
         FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetGridOrderDetailOptions, GetGridOrdersByIdsOptions,
-        GetGridOrdersOptions, GetGridTriggerHistoryOptions, GetHistoryExecutionsOptions,
-        GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, GetUSHistoryOrders,
-        GetUSRealizedPLOptions, GridOrder, GridOrderDetail, GridOrderInfo, GridOrdersResponse,
-        GridTriggerHistoryResponse, MarginRatio, Order, OrderDetail, PushEvent,
-        QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceGridOrderOptions, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitGridOrderOptions, SubmitGridOrderResponse,
-        SubmitOrderOptions, SubmitOrderResponse, SubmitStrategyQuestionnaireOptions, TopicType,
-        TradeContext, USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
+        OrderDetail, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+        USAssetOverview, USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -504,86 +500,5 @@ impl TradeContextSync {
     pub fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
         self.rt
             .call(move |ctx| async move { ctx.us_realized_pl(opts).await })
-    }
-
-    /// Submit a grid trading order (blocking)
-    pub fn submit_grid_order(
-        &self,
-        options: SubmitGridOrderOptions,
-    ) -> Result<SubmitGridOrderResponse> {
-        self.rt
-            .call(move |ctx| async move { ctx.submit_grid_order(options).await })
-    }
-
-    /// Replace (modify) a grid trading order (blocking)
-    pub fn replace_grid_order(&self, options: ReplaceGridOrderOptions) -> Result<()> {
-        self.rt
-            .call(move |ctx| async move { ctx.replace_grid_order(options).await })
-    }
-
-    /// Get grid trading orders (paged list) (blocking)
-    pub fn grid_orders(
-        &self,
-        options: impl Into<Option<GetGridOrdersOptions>> + Send + 'static,
-    ) -> Result<GridOrdersResponse> {
-        self.rt
-            .call(move |ctx| async move { ctx.grid_orders(options).await })
-    }
-
-    /// Query grid trading orders by IDs (blocking)
-    pub fn grid_orders_by_ids(&self, options: GetGridOrdersByIdsOptions) -> Result<Vec<GridOrder>> {
-        self.rt
-            .call(move |ctx| async move { ctx.grid_orders_by_ids(options).await })
-    }
-
-    /// Get grid trading order detail (blocking)
-    pub fn grid_order_detail(&self, options: GetGridOrderDetailOptions) -> Result<GridOrderDetail> {
-        self.rt
-            .call(move |ctx| async move { ctx.grid_order_detail(options).await })
-    }
-
-    /// Get grid trading trigger history (blocking)
-    pub fn grid_trigger_history(
-        &self,
-        options: GetGridTriggerHistoryOptions,
-    ) -> Result<GridTriggerHistoryResponse> {
-        self.rt
-            .call(move |ctx| async move { ctx.grid_trigger_history(options).await })
-    }
-
-    /// Cancel a grid trading order (blocking)
-    pub fn cancel_grid_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
-        self.rt
-            .call(move |ctx| async move { ctx.cancel_grid_order(order_id).await })
-    }
-
-    /// Suspend a grid trading order (blocking)
-    pub fn suspend_grid_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
-        self.rt
-            .call(move |ctx| async move { ctx.suspend_grid_order(order_id).await })
-    }
-
-    /// Restart a grid trading order (blocking)
-    pub fn restart_grid_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
-        self.rt
-            .call(move |ctx| async move { ctx.restart_grid_order(order_id).await })
-    }
-
-    /// Submit the strategy risk-disclosure questionnaire record (blocking)
-    pub fn submit_strategy_questionnaire(
-        &self,
-        options: SubmitStrategyQuestionnaireOptions,
-    ) -> Result<()> {
-        self.rt
-            .call(move |ctx| async move { ctx.submit_strategy_questionnaire(options).await })
-    }
-
-    /// Get order info used by the grid order window (blocking)
-    pub fn grid_order_info(
-        &self,
-        symbol: impl Into<String> + Send + 'static,
-    ) -> Result<GridOrderInfo> {
-        self.rt
-            .call(move |ctx| async move { ctx.grid_order_info(symbol).await })
     }
 }
