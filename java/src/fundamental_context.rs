@@ -9,7 +9,7 @@ use longbridge::{Config, FundamentalContext, fundamental::types::*};
 use crate::{
     async_util,
     error::jni_result,
-    types::{FromJValue, ObjectArray, get_field},
+    types::{FromJValue, JavaInteger, ObjectArray, get_field},
 };
 
 struct ContextObj {
@@ -116,6 +116,65 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
     })
 }
 
+// ── business_segments_history ─────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetBusinessSegmentsHistory(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let report: Option<String> = get_field(env, &opts, "report")?;
+        // The core API takes `Option<&'static str>`; leak the short report code.
+        let report: Option<&'static str> = report.map(|s| &*s.leak());
+        let cate: Option<String> = get_field(env, &opts, "cate")?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .business_segments_history(symbol, report, cate)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+// ── financial_report_snapshot ─────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetFinancialReportSnapshot(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let report: Option<String> = get_field(env, &opts, "report")?;
+        // The core API takes `Option<&'static str>`; leak the short codes.
+        let report: Option<&'static str> = report.map(|s| &*s.leak());
+        let fiscal_year: Option<JavaInteger> = get_field(env, &opts, "fiscalYear")?;
+        let fiscal_year: Option<i32> = fiscal_year.map(i32::from);
+        let fiscal_period: Option<String> = get_field(env, &opts, "fiscalPeriod")?;
+        let fiscal_period: Option<&'static str> = fiscal_period.map(|s| &*s.leak());
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .financial_report_snapshot(symbol, report, fiscal_year, fiscal_period)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
 // ── simple symbol-only methods ────────────────────────────────────
 
 macro_rules! symbol_method {
@@ -145,6 +204,14 @@ macro_rules! symbol_method {
 symbol_method!(
     Java_com_longbridge_SdkNative_fundamentalContextInstitutionRating,
     institution_rating
+);
+symbol_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextGetBusinessSegments,
+    business_segments
+);
+symbol_method!(
+    Java_com_longbridge_SdkNative_fundamentalContextGetInstitutionRatingViews,
+    institution_rating_views
 );
 symbol_method!(
     Java_com_longbridge_SdkNative_fundamentalContextInstitutionRatingDetail,

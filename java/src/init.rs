@@ -408,6 +408,17 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::IndustryPeersTop,
         longbridge::fundamental::IndustryPeerNode,
         longbridge::fundamental::IndustryPeersResponse,
+        // FundamentalContext: business segments / rating views / snapshot
+        longbridge::fundamental::BusinessSegmentItem,
+        longbridge::fundamental::BusinessSegments,
+        longbridge::fundamental::BusinessSegmentHistoryItem,
+        longbridge::fundamental::BusinessSegmentsHistoricalItem,
+        longbridge::fundamental::BusinessSegmentsHistory,
+        longbridge::fundamental::InstitutionRatingViewItem,
+        longbridge::fundamental::InstitutionRatingViews,
+        longbridge::fundamental::SnapshotForecastMetric,
+        longbridge::fundamental::SnapshotReportedMetric,
+        longbridge::fundamental::FinancialReportSnapshot,
         // MarketContext: top movers / rank
         longbridge::market::TopMoversStock,
         longbridge::market::TopMoversEvent,
