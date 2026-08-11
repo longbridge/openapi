@@ -4063,6 +4063,8 @@ export interface ConversationResponse {
   answer: string
   /** Sources referenced by the answer */
   references?: Array<Reference>
+  /** Suggested follow-up questions */
+  furtherQuestions?: Array<string>
   /** Run duration in seconds */
   elapsedTime: number
   /** Present only when `status` is `interrupted` */

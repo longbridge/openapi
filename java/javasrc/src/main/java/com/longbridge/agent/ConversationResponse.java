@@ -13,6 +13,7 @@ public class ConversationResponse {
     private ConversationStatus status;
     private String answer;
     private Reference[] references;
+    private String[] furtherQuestions;
     private double elapsedTime;
     private Interrupt interrupt;
     private ConversationError error;
@@ -65,6 +66,15 @@ public class ConversationResponse {
     }
 
     /**
+     * Returns the suggested follow-up questions ("you might also ask").
+     *
+     * @return suggested follow-up questions
+     */
+    public String[] getFurtherQuestions() {
+        return furtherQuestions;
+    }
+
+    /**
      * Returns the run duration in seconds.
      *
      * @return run duration in seconds
@@ -95,7 +105,8 @@ public class ConversationResponse {
     @Override
     public String toString() {
         return "ConversationResponse [chatUid=" + chatUid + ", messageId=" + messageId + ", status=" + status
-                + ", answer=" + answer + ", references=" + Arrays.toString(references) + ", elapsedTime="
-                + elapsedTime + ", interrupt=" + interrupt + ", error=" + error + "]";
+                + ", answer=" + answer + ", references=" + Arrays.toString(references) + ", furtherQuestions="
+                + Arrays.toString(furtherQuestions) + ", elapsedTime=" + elapsedTime + ", interrupt=" + interrupt
+                + ", error=" + error + "]";
     }
 }

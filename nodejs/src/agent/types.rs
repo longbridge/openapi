@@ -240,6 +240,8 @@ pub struct ConversationResponse {
     pub answer: String,
     /// Sources referenced by the answer
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions
+    pub further_questions: Option<Vec<String>>,
     /// Run duration in seconds
     pub elapsed_time: f64,
     /// Present only when `status` is `interrupted`
@@ -257,6 +259,7 @@ impl From<lb::ConversationResponse> for ConversationResponse {
             references: v
                 .references
                 .map(|refs| refs.into_iter().map(Into::into).collect()),
+            further_questions: v.further_questions,
             elapsed_time: v.elapsed_time,
             interrupt: v.interrupt.map(Into::into),
             error: v.error.map(Into::into),
