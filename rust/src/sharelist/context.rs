@@ -80,16 +80,16 @@ impl SharelistContext {
             .0)
     }
 
-    async fn http_delete<R, B>(&self, path: String, body: B) -> Result<R>
+    async fn http_delete<R, Q>(&self, path: String, query: Q) -> Result<R>
     where
         R: DeserializeOwned + Send + Sync + 'static,
-        B: std::fmt::Debug + Serialize + Send + Sync + 'static,
+        Q: Serialize + Send + Sync,
     {
         Ok(self
             .0
             .http_cli
             .request(Method::DELETE, path.leak())
-            .body(Json(body))
+            .query_params(query)
             .response::<Json<R>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
@@ -172,11 +172,14 @@ impl SharelistContext {
     ///
     /// Path: `DELETE /v1/sharelists/{id}`
     pub async fn delete(&self, id: i64) -> Result<()> {
-        self.http_delete::<serde_json::Value, _>(
-            format!("/v1/sharelists/{id}"),
-            serde_json::json!({}),
-        )
-        .await?;
+        let path = format!("/v1/sharelists/{id}");
+        self.0
+            .http_cli
+            .request(Method::DELETE, path.leak())
+            .response::<Json<serde_json::Value>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?;
         Ok(())
     }
 
@@ -195,10 +198,15 @@ impl SharelistContext {
     ///
     /// Path: `DELETE /v1/sharelists/{id}/items`
     pub async fn remove_securities(&self, id: i64, symbols: Vec<String>) -> Result<()> {
-        let syms = symbols.join(",");
+        #[derive(Serialize)]
+        struct Query {
+            symbols: String,
+        }
         self.http_delete::<serde_json::Value, _>(
             format!("/v1/sharelists/{id}/items"),
-            serde_json::json!({ "symbols": syms }),
+            Query {
+                symbols: symbols.join(","),
+            },
         )
         .await?;
         Ok(())

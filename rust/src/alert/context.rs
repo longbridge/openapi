@@ -80,16 +80,16 @@ impl AlertContext {
             .0)
     }
 
-    async fn http_delete<R, B>(&self, path: &'static str, body: B) -> Result<R>
+    async fn http_delete<R, Q>(&self, path: &'static str, query: Q) -> Result<R>
     where
         R: DeserializeOwned + Send + Sync + 'static,
-        B: std::fmt::Debug + Serialize + Send + Sync + 'static,
+        Q: Serialize + Send + Sync,
     {
         Ok(self
             .0
             .http_cli
             .request(Method::DELETE, path)
-            .body(Json(body))
+            .query_params(query)
             .response::<Json<R>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
@@ -172,11 +172,12 @@ impl AlertContext {
     ///
     /// Path: `DELETE /v1/notify/reminders`
     pub async fn delete(&self, alert_ids: Vec<String>) -> Result<()> {
-        self.http_delete::<serde_json::Value, _>(
-            "/v1/notify/reminders",
-            serde_json::json!({ "ids": alert_ids }),
-        )
-        .await?;
+        #[derive(Serialize)]
+        struct Query {
+            ids: Vec<String>,
+        }
+        self.http_delete::<serde_json::Value, _>("/v1/notify/reminders", Query { ids: alert_ids })
+            .await?;
         Ok(())
     }
 }
