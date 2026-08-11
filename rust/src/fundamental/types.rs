@@ -765,8 +765,12 @@ pub struct CorpActionItem {
 pub struct CorpActionLive {
     /// Live stream ID
     pub id: String,
-    /// Status code: 1=preview, 2=live, 3=ended, 4=replay, 5=processing
-    pub status: serde_json::Value, // API may return int or string
+    /// Status code: 1=preview, 2=live, 3=ended, 4=replay, 5=processing.
+    ///
+    /// The API may return this as either an integer or a string; it is
+    /// normalized to a string.
+    #[serde(deserialize_with = "crate::serde_utils::deserialize_string_or_int_as_string")]
+    pub status: String,
     /// Start time
     pub started_at: String,
     /// Stream title

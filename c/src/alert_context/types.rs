@@ -1,8 +1,57 @@
 use std::os::raw::c_char;
 
-use longbridge::alert::{AlertItem, AlertList, AlertSymbolGroup};
+use longbridge::alert::{AlertItem, AlertList, AlertSymbolGroup, AlertValueMap};
 
-use crate::types::{CString, CVec, ToFFI, slice_from_raw_parts};
+use crate::types::{COption, CString, CVec, ToFFI, slice_from_raw_parts};
+
+/// Trigger value of a price alert (exactly one field is populated).
+#[repr(C)]
+pub struct CAlertValueMap {
+    /// Absolute price threshold as a decimal string (empty string if not set).
+    pub price: *const c_char,
+    /// Percentage-change threshold (NULL if not set).
+    pub chg: *const f64,
+}
+
+pub(crate) struct CAlertValueMapOwned {
+    price: CString,
+    chg: COption<f64>,
+}
+
+impl From<AlertValueMap> for CAlertValueMapOwned {
+    fn from(v: AlertValueMap) -> Self {
+        Self {
+            price: v.price.map(|d| d.to_string()).unwrap_or_default().into(),
+            chg: v.chg.into(),
+        }
+    }
+}
+
+impl ToFFI for CAlertValueMapOwned {
+    type FFIType = CAlertValueMap;
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CAlertValueMap {
+            price: self.price.to_ffi_type(),
+            chg: self.chg.to_ffi_type(),
+        }
+    }
+}
+
+impl CAlertValueMap {
+    /// Reconstruct a [`longbridge::alert::AlertValueMap`] from this C struct.
+    ///
+    /// # Safety
+    /// `price` must be a valid null-terminated C string (or NULL) and `chg`
+    /// must be NULL or point to a valid `f64`.
+    unsafe fn to_value_map(&self) -> AlertValueMap {
+        use crate::types::cstr_to_rust;
+        let price = cstr_to_rust(self.price);
+        AlertValueMap {
+            price: (!price.is_empty()).then(|| price.parse().ok()).flatten(),
+            chg: (!self.chg.is_null()).then(|| *self.chg),
+        }
+    }
+}
 
 /// A single alert indicator configuration for a symbol.
 #[repr(C)]
@@ -23,8 +72,8 @@ pub struct CAlertItem {
     pub state: *const i32,
     /// Number of elements in the `state` array.
     pub num_state: usize,
-    /// JSON-serialized map of additional indicator parameter values.
-    pub value_map: *const c_char,
+    /// Trigger value of the alert.
+    pub value_map: CAlertValueMap,
 }
 
 pub(crate) struct CAlertItemOwned {
@@ -35,7 +84,7 @@ pub(crate) struct CAlertItemOwned {
     scope: i32,
     text: CString,
     state: CVec<i32>,
-    value_map: CString,
+    value_map: CAlertValueMapOwned,
 }
 
 impl From<AlertItem> for CAlertItemOwned {
@@ -48,9 +97,7 @@ impl From<AlertItem> for CAlertItemOwned {
             scope: v.scope,
             text: v.text.into(),
             state: v.state.into(),
-            value_map: serde_json::to_string(&v.value_map)
-                .unwrap_or_default()
-                .into(),
+            value_map: v.value_map.into(),
         }
     }
 }
@@ -64,8 +111,6 @@ impl CAlertItem {
     pub unsafe fn to_alert_item(&self) -> longbridge::alert::AlertItem {
         use crate::types::cstr_to_rust;
         let state = slice_from_raw_parts(self.state, self.num_state).to_vec();
-        let value_map_str = cstr_to_rust(self.value_map);
-        let value_map = serde_json::from_str(&value_map_str).unwrap_or(serde_json::Value::Null);
         longbridge::alert::AlertItem {
             id: cstr_to_rust(self.id),
             indicator_id: cstr_to_rust(self.indicator_id),
@@ -74,7 +119,7 @@ impl CAlertItem {
             scope: self.scope,
             text: cstr_to_rust(self.text),
             state,
-            value_map,
+            value_map: self.value_map.to_value_map(),
         }
     }
 }

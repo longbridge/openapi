@@ -2017,6 +2017,16 @@ impl_java_class!(
 // ── AlertContext types ────────────────────────────────────────────
 
 impl_java_class!(
+    "com/longbridge/alert/AlertValueMap",
+    longbridge::alert::AlertValueMap,
+    [
+        price,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        chg
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/alert/AlertItem",
     longbridge::alert::AlertItem,
     [

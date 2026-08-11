@@ -256,6 +256,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         // AlertContext
+        longbridge::alert::AlertValueMap,
         longbridge::alert::AlertItem,
         longbridge::alert::AlertSymbolGroup,
         longbridge::alert::AlertList,

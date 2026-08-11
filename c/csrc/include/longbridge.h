@@ -3063,6 +3063,20 @@ typedef void (*lb_conversation_event_callback_t)(const struct lb_agent_context_t
 typedef void (*lb_free_userdata_func_t)(void*);
 
 /**
+ * Trigger value of a price alert (exactly one field is populated).
+ */
+typedef struct CAlertValueMap {
+  /**
+   * Absolute price threshold as a decimal string (empty string if not set).
+   */
+  const char *price;
+  /**
+   * Percentage-change threshold (NULL if not set).
+   */
+  const double *chg;
+} CAlertValueMap;
+
+/**
  * A single alert indicator configuration for a symbol.
  */
 typedef struct lb_alert_item_t {
@@ -3099,9 +3113,9 @@ typedef struct lb_alert_item_t {
    */
   uintptr_t num_state;
   /**
-   * JSON-serialized map of additional indicator parameter values.
+   * Trigger value of the alert.
    */
-  const char *value_map;
+  struct CAlertValueMap value_map;
 } lb_alert_item_t;
 
 /**
