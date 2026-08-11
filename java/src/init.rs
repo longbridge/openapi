@@ -423,6 +423,13 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::ValuationHistoryPoint,
         longbridge::fundamental::ValuationComparisonItem,
         longbridge::fundamental::ValuationComparisonResponse,
+        // FundamentalContext: industry rank / peers
+        longbridge::fundamental::IndustryRankItem,
+        longbridge::fundamental::IndustryRankGroup,
+        longbridge::fundamental::IndustryRankResponse,
+        longbridge::fundamental::IndustryPeersTop,
+        longbridge::fundamental::IndustryPeerNode,
+        longbridge::fundamental::IndustryPeersResponse,
         // MarketContext: top movers / rank
         longbridge::market::TopMoversStock,
         longbridge::market::TopMoversEvent,

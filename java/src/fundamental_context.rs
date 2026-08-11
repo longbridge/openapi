@@ -63,6 +63,59 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextFi
     })
 }
 
+// ── industry_rank ─────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetIndustryRank(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let market: String = get_field(env, &opts, "market")?;
+        let indicator: String = get_field(env, &opts, "indicator")?;
+        let sort_type: String = get_field(env, &opts, "sortType")?;
+        let limit: i32 = get_field(env, &opts, "limit")?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .industry_rank(market, indicator, sort_type, limit as u32)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+// ── industry_peers ────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetIndustryPeers(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let market: String = get_field(env, &opts, "market")?;
+        let industry_id: Option<String> = get_field(env, &opts, "industryId")?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .industry_peers(symbol, market, industry_id)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
 // ── simple symbol-only methods ────────────────────────────────────
 
 macro_rules! symbol_method {
