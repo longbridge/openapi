@@ -23,8 +23,8 @@ pub(crate) enum TriggerPriceType {
 ///
 /// The core enum carries an `Unknown(i32)` catch-all variant, which cannot be
 /// mirrored one-to-one by the macro-based enum derive; the conversions are
-/// hand-written below (any unknown wire value maps to [`GridTimeInForce::Unknown`],
-/// which serializes back as `0`).
+/// hand-written below (any unknown wire value maps to
+/// [`GridTimeInForce::Unknown`], which serializes back as `0`).
 #[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(

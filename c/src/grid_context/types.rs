@@ -6,7 +6,7 @@ use longbridge::grid::{
 };
 use time::OffsetDateTime;
 
-use crate::types::{COption, CDecimal, CMarket, CString, CVec, ToFFI};
+use crate::types::{CDecimal, CMarket, COption, CString, CVec, ToFFI};
 
 // ââ Grid trading types
 // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ

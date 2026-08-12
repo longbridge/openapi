@@ -19,8 +19,8 @@ pub enum TriggerPriceType {
 /// Time in force for a grid order.
 ///
 /// The underlying SDK models unknown wire values with a catch-all data variant;
-/// the binding collapses those to `Unknown`, so the conversions are hand-written
-/// instead of derived.
+/// the binding collapses those to `Unknown`, so the conversions are
+/// hand-written instead of derived.
 #[napi_derive::napi]
 #[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
 pub enum GridTimeInForce {
