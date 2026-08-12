@@ -162,7 +162,8 @@ pub struct Reference {
     pub url: String,
     /// Full reference payload as sent by the server (`source`, `description`,
     /// `published_at`, `source_url`, `source_logo`, `kind`, …). Kept as raw
-    /// JSON because the field set varies by reference [`ref_type`](Self::ref_type).
+    /// JSON because the field set varies by reference
+    /// [`ref_type`](Self::ref_type).
     #[serde(default)]
     pub content: Option<serde_json::Value>,
 }
