@@ -94,7 +94,7 @@ public class HttpClient implements AutoCloseable {
      * @return HttpClient object
      */
     public static HttpClient fromOAuth(OAuth oauth) {
-        return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), null));
+        synchronized (oauth) { return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), null)); }
     }
 
     /**
@@ -109,7 +109,7 @@ public class HttpClient implements AutoCloseable {
      * @return HttpClient object
      */
     public static HttpClient fromOAuth(OAuth oauth, String httpUrl) {
-        return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), httpUrl));
+        synchronized (oauth) { return new HttpClient(SdkNative.newHttpClientFromOauth(oauth.getRaw(), httpUrl)); }
     }
 
     /**
@@ -122,7 +122,7 @@ public class HttpClient implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws RuntimeException If an error occurs
      */
-    public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path)
+    public synchronized <T> CompletableFuture<T> request(Class<T> respClass, String method, String path)
             throws RuntimeException {
         return doRequest(respClass, method, path, null, null);
     }
@@ -138,7 +138,7 @@ public class HttpClient implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws RuntimeException If an error occurs
      */
-    public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody)
+    public synchronized <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody)
             throws RuntimeException {
         return doRequest(respClass, method, path, requestBody, null);
     }
@@ -155,7 +155,7 @@ public class HttpClient implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws RuntimeException If the request fails
      */
-    public <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody,
+    public synchronized <T> CompletableFuture<T> request(Class<T> respClass, String method, String path, Object requestBody,
             HashMap<String, String> headers)
             throws RuntimeException {
         return doRequest(respClass, method, path, requestBody, headers);

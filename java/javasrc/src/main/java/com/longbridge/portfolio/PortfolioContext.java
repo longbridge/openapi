@@ -17,7 +17,7 @@ public class PortfolioContext implements AutoCloseable {
     }
     public static PortfolioContext create(Config config) {
         PortfolioContext ctx = new PortfolioContext();
-        ctx.raw = SdkNative.newPortfolioContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newPortfolioContext(config.getRaw()); }
         return ctx;
     }
     @Override
@@ -35,7 +35,7 @@ public class PortfolioContext implements AutoCloseable {
      * @return A Future resolving to the current exchange rates
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ExchangeRates> getExchangeRate() throws OpenApiException {
+    public synchronized CompletableFuture<ExchangeRates> getExchangeRate() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> SdkNative.portfolioContextExchangeRate(raw(), callback));
     }
 
@@ -46,7 +46,7 @@ public class PortfolioContext implements AutoCloseable {
      * @return A Future resolving to the profit/loss analysis
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ProfitAnalysis> getProfitAnalysis(ProfitAnalysisOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<ProfitAnalysis> getProfitAnalysis(ProfitAnalysisOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> SdkNative.portfolioContextProfitAnalysis(raw(), opts, callback));
     }
 
@@ -57,7 +57,7 @@ public class PortfolioContext implements AutoCloseable {
      * @return A Future resolving to the security-level profit/loss detail
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ProfitAnalysisDetail> getProfitAnalysisDetail(ProfitAnalysisDetailOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<ProfitAnalysisDetail> getProfitAnalysisDetail(ProfitAnalysisDetailOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> SdkNative.portfolioContextProfitAnalysisDetail(raw(), opts, callback));
     }
 
@@ -68,7 +68,7 @@ public class PortfolioContext implements AutoCloseable {
      * @return A Future resolving to the paginated market-level analysis
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ProfitAnalysisByMarket> getProfitAnalysisByMarket(ProfitAnalysisByMarketOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<ProfitAnalysisByMarket> getProfitAnalysisByMarket(ProfitAnalysisByMarketOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> SdkNative.portfolioContextProfitAnalysisByMarket(raw(), opts, callback));
     }
 
@@ -79,7 +79,7 @@ public class PortfolioContext implements AutoCloseable {
      * @return A Future resolving to the flow records and pagination flag
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ProfitAnalysisFlowsResponse> getProfitAnalysisFlows(ProfitAnalysisFlowsOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<ProfitAnalysisFlowsResponse> getProfitAnalysisFlows(ProfitAnalysisFlowsOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> SdkNative.portfolioContextProfitAnalysisFlows(raw(), opts, callback));
     }
 }

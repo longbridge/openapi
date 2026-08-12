@@ -48,6 +48,9 @@ struct InnerTradeContext {
     command_tx: mpsc::UnboundedSender<Command>,
     http_cli: HttpClient,
     log_subscriber: Arc<dyn Subscriber + Send + Sync>,
+    /// Kept alive only so the background `Core::run` task can observe the
+    /// context being dropped (via this channel closing) and stop reconnecting.
+    _shutdown_tx: mpsc::UnboundedSender<()>,
 }
 
 impl Drop for InnerTradeContext {
@@ -74,10 +77,12 @@ impl TradeContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
+        let (shutdown_tx, shutdown_rx) = mpsc::unbounded_channel();
         let core = Core::new(config, command_rx, push_tx);
-        crate::runtime::RUNTIME
-            .handle()
-            .spawn(core.run().with_subscriber(log_subscriber.clone()));
+        crate::runtime::RUNTIME.handle().spawn(
+            core.run(shutdown_rx)
+                .with_subscriber(log_subscriber.clone()),
+        );
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
             tracing::info!("trade context created");
@@ -88,6 +93,7 @@ impl TradeContext {
                 http_cli,
                 command_tx,
                 log_subscriber,
+                _shutdown_tx: shutdown_tx,
             })),
             push_rx,
         )

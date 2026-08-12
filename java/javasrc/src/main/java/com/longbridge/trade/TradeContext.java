@@ -27,7 +27,7 @@ public class TradeContext implements AutoCloseable {
      */
     public static TradeContext create(Config config) {
         TradeContext ctx = new TradeContext();
-        ctx.raw = SdkNative.newTradeContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newTradeContext(config.getRaw()); }
         return ctx;
     }
 
@@ -46,7 +46,7 @@ public class TradeContext implements AutoCloseable {
      * 
      * @param handler A order changed handler
      */
-    public void setOnOrderChange(OrderChangedHandler handler) {
+    public synchronized void setOnOrderChange(OrderChangedHandler handler) {
         SdkNative.tradeContextSetOnOrderChanged(raw(), handler);
     }
 
@@ -87,7 +87,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> subscribe(TopicType[] topics) throws OpenApiException {
+    public synchronized CompletableFuture<Void> subscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextSubscribe(raw(), topics, callback);
         });
@@ -100,7 +100,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> unsubscribe(TopicType[] topics) throws OpenApiException {
+    public synchronized CompletableFuture<Void> unsubscribe(TopicType[] topics) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextUnsubscribe(raw(), topics, callback);
         });
@@ -137,7 +137,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Execution[]> getHistoryExecutions(GetHistoryExecutionsOptions opts)
+    public synchronized CompletableFuture<Execution[]> getHistoryExecutions(GetHistoryExecutionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextHistoryExecutions(raw(), opts, callback);
@@ -173,7 +173,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Execution[]> getTodayExecutions(GetTodayExecutionsOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Execution[]> getTodayExecutions(GetTodayExecutionsOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextTodayExecutions(raw(), opts, callback);
         });
@@ -186,7 +186,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<AllExecutionsResponse> getAllExecutions(GetAllExecutionsOptions opts)
+    public synchronized CompletableFuture<AllExecutionsResponse> getAllExecutions(GetAllExecutionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextAllExecutions(raw(), opts, callback);
@@ -227,7 +227,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Order[]> getHistoryOrders(GetHistoryOrdersOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Order[]> getHistoryOrders(GetHistoryOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextHistoryOrders(raw(), opts, callback);
         });
@@ -264,7 +264,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Order[]> getTodayOrders(GetTodayOrdersOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Order[]> getTodayOrders(GetTodayOrdersOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextTodayOrders(raw(), opts, callback);
         });
@@ -297,7 +297,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> replaceOrder(ReplaceOrderOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<Void> replaceOrder(ReplaceOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextReplaceOrder(raw(), opts, callback);
         });
@@ -335,7 +335,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SubmitOrderResponse> submitOrder(SubmitOrderOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<SubmitOrderResponse> submitOrder(SubmitOrderOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextSubmitOrder(raw(), opts, callback);
         });
@@ -365,7 +365,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
+    public synchronized CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
         return cancelOrder(orderId, false);
     }
 
@@ -380,7 +380,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> cancelOrder(String orderId, boolean isAttached) throws OpenApiException {
+    public synchronized CompletableFuture<Void> cancelOrder(String orderId, boolean isAttached) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             if (isAttached) {
                 SdkNative.tradeContextCancelOrderAttached(raw(), orderId, callback);
@@ -417,7 +417,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<AccountBalance[]> getAccountBalance(String currency) throws OpenApiException {
+    public synchronized CompletableFuture<AccountBalance[]> getAccountBalance(String currency) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextAccountBalance(raw(), currency, callback);
         });
@@ -449,7 +449,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<AccountBalance[]> getAccountBalance() throws OpenApiException {
+    public synchronized CompletableFuture<AccountBalance[]> getAccountBalance() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextAccountBalance(raw(), null, callback);
         });
@@ -486,7 +486,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<CashFlow[]> getCashFlow(GetCashFlowOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<CashFlow[]> getCashFlow(GetCashFlowOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextCashFlow(raw(), opts, callback);
         });
@@ -517,7 +517,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<FundPositionsResponse> getFundPositions(GetFundPositionsOptions opts)
+    public synchronized CompletableFuture<FundPositionsResponse> getFundPositions(GetFundPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextFundPositions(raw(), opts, callback);
@@ -549,7 +549,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<StockPositionsResponse> getStockPositions(GetStockPositionsOptions opts)
+    public synchronized CompletableFuture<StockPositionsResponse> getStockPositions(GetStockPositionsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextStockPositions(raw(), opts, callback);
@@ -581,7 +581,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<MarginRatio> getMarginRatio(String symbol)
+    public synchronized CompletableFuture<MarginRatio> getMarginRatio(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextMarginRatio(raw(), symbol, callback);
@@ -613,7 +613,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OrderDetail> getOrderDetail(String orderId)
+    public synchronized CompletableFuture<OrderDetail> getOrderDetail(String orderId)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextOrderDetail(raw(), orderId, callback);
@@ -627,7 +627,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OrderDetail> getOrderDetailAttached(String orderId)
+    public synchronized CompletableFuture<OrderDetail> getOrderDetailAttached(String orderId)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextOrderDetailAttached(raw(), orderId, callback);
@@ -642,7 +642,7 @@ public class TradeContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<EstimateMaxPurchaseQuantityResponse> getEstimateMaxPurchaseQuantity(
+    public synchronized CompletableFuture<EstimateMaxPurchaseQuantityResponse> getEstimateMaxPurchaseQuantity(
             EstimateMaxPurchaseQuantityOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
