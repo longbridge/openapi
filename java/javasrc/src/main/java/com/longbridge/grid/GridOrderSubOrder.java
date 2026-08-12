@@ -1,5 +1,7 @@
 package com.longbridge.grid;
 
+import java.math.BigDecimal;
+
 import java.time.OffsetDateTime;
 
 /**
@@ -7,10 +9,10 @@ import java.time.OffsetDateTime;
  */
 public class GridOrderSubOrder {
     private String id;
-    private String price;
+    private BigDecimal price;
     private String orderType;
-    private String quantity;
-    private String executedQty;
+    private BigDecimal quantity;
+    private BigDecimal executedQty;
     private int action;
     private String status;
     private OffsetDateTime submittedAt;
@@ -30,7 +32,7 @@ public class GridOrderSubOrder {
      *
      * @return price
      */
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -48,7 +50,7 @@ public class GridOrderSubOrder {
      *
      * @return quantity
      */
-    public String getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
@@ -57,7 +59,7 @@ public class GridOrderSubOrder {
      *
      * @return executedQty
      */
-    public String getExecutedQty() {
+    public BigDecimal getExecutedQty() {
         return executedQty;
     }
 

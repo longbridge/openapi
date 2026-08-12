@@ -1,19 +1,21 @@
 package com.longbridge.grid;
 
+import java.math.BigDecimal;
+
 /**
  * A price-step (bid-size) rule entry from the order-info response
  */
 public class GridBidSize {
-    private String strProceed;
-    private String endProceed;
-    private String bidSize;
+    private BigDecimal strProceed;
+    private BigDecimal endProceed;
+    private BigDecimal bidSize;
 
     /**
      * Returns strProceed.
      *
      * @return strProceed
      */
-    public String getStrProceed() {
+    public BigDecimal getStrProceed() {
         return strProceed;
     }
 
@@ -22,7 +24,7 @@ public class GridBidSize {
      *
      * @return endProceed
      */
-    public String getEndProceed() {
+    public BigDecimal getEndProceed() {
         return endProceed;
     }
 
@@ -31,7 +33,7 @@ public class GridBidSize {
      *
      * @return bidSize
      */
-    public String getBidSize() {
+    public BigDecimal getBidSize() {
         return bidSize;
     }
 

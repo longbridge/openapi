@@ -4,8 +4,9 @@ use longbridge::{
     GridContext,
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
-        GetGridTriggerHistoryOptions, GridTradeRule, ReplaceGridOrderOptions,
-        SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
+        GetGridTriggerHistoryOptions, GridLimitEvent, GridTimeInForce, GridTradeRule,
+        ReplaceGridOrderOptions, SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
+        TriggerPriceType,
     },
 };
 
@@ -55,7 +56,7 @@ unsafe fn build_grid_trade_rule(rule: &CGridTradeRule) -> GridTradeRule {
         r.lower_limit_price = Some((*rule.lower_limit_price).value);
     }
     if !rule.trigger_price_type.is_null() {
-        r.trigger_price_type = Some(*rule.trigger_price_type);
+        r.trigger_price_type = Some(TriggerPriceType::from(*rule.trigger_price_type));
     }
     if !rule.trigger_spread_up.is_null() {
         r.trigger_spread_up = Some((*rule.trigger_spread_up).value);
@@ -73,7 +74,7 @@ unsafe fn build_grid_trade_rule(rule: &CGridTradeRule) -> GridTradeRule {
         r.multiple_trigger = Some(*rule.multiple_trigger);
     }
     if !rule.time_in_force.is_null() {
-        r.time_in_force = Some(*rule.time_in_force);
+        r.time_in_force = Some(GridTimeInForce::from(*rule.time_in_force));
     }
     if !rule.upper_limit_quantity.is_null() {
         r.upper_limit_quantity = Some((*rule.upper_limit_quantity).value);
@@ -85,10 +86,10 @@ unsafe fn build_grid_trade_rule(rule: &CGridTradeRule) -> GridTradeRule {
         r.expire_time = Some(*rule.expire_time);
     }
     if !rule.upper_limit_event.is_null() {
-        r.upper_limit_event = Some(*rule.upper_limit_event);
+        r.upper_limit_event = Some(GridLimitEvent::from(*rule.upper_limit_event));
     }
     if !rule.lower_limit_event.is_null() {
-        r.lower_limit_event = Some(*rule.lower_limit_event);
+        r.lower_limit_event = Some(GridLimitEvent::from(*rule.lower_limit_event));
     }
     if !rule.trigger_sell_depth.is_null() {
         r.trigger_sell_depth = Some(*rule.trigger_sell_depth);

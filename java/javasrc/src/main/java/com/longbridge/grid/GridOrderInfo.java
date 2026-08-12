@@ -1,5 +1,7 @@
 package com.longbridge.grid;
 
+import java.math.BigDecimal;
+
 import java.util.Arrays;
 
 /**
@@ -7,10 +9,10 @@ import java.util.Arrays;
  */
 public class GridOrderInfo {
     private String name;
-    private String lastDone;
-    private String lotSize;
-    private String buyLotSize;
-    private String sellLotSize;
+    private BigDecimal lastDone;
+    private BigDecimal lotSize;
+    private BigDecimal buyLotSize;
+    private BigDecimal sellLotSize;
     private GridBidSize[] bidSizes;
     private GridChannelInfo channelInfos;
 
@@ -28,7 +30,7 @@ public class GridOrderInfo {
      *
      * @return lastDone
      */
-    public String getLastDone() {
+    public BigDecimal getLastDone() {
         return lastDone;
     }
 
@@ -37,7 +39,7 @@ public class GridOrderInfo {
      *
      * @return lotSize
      */
-    public String getLotSize() {
+    public BigDecimal getLotSize() {
         return lotSize;
     }
 
@@ -46,7 +48,7 @@ public class GridOrderInfo {
      *
      * @return buyLotSize
      */
-    public String getBuyLotSize() {
+    public BigDecimal getBuyLotSize() {
         return buyLotSize;
     }
 
@@ -55,7 +57,7 @@ public class GridOrderInfo {
      *
      * @return sellLotSize
      */
-    public String getSellLotSize() {
+    public BigDecimal getSellLotSize() {
         return sellLotSize;
     }
 

@@ -5,6 +5,9 @@ use pyo3::prelude::*;
 
 pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     use types::*;
+    parent.add_class::<TriggerPriceType>()?;
+    parent.add_class::<GridTimeInForce>()?;
+    parent.add_class::<GridLimitEvent>()?;
     parent.add_class::<GridTradeRule>()?;
     parent.add_class::<SubmitGridOrderResponse>()?;
     parent.add_class::<GridOrder>()?;

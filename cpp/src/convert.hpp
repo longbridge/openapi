@@ -112,6 +112,9 @@ using longbridge::trade::TopicType;
 using longbridge::trade::TriggerStatus;
 using longbridge::grid::GridBidSize;
 using longbridge::grid::GridChannelInfo;
+using longbridge::grid::GridLimitEvent;
+using longbridge::grid::GridTimeInForce;
+using longbridge::grid::TriggerPriceType;
 using longbridge::grid::GridOrder;
 using longbridge::grid::GridOrderDetail;
 using longbridge::grid::GridOrderHistory;
@@ -1965,6 +1968,17 @@ convert(const lb_order_detail_t* order)
   };
 }
 
+/// Convert a nullable grid response numeric field (a null pointer means "no
+/// value") to an optional decimal.
+inline std::optional<Decimal>
+convert_grid_opt_decimal(const lb_decimal_t* d)
+{
+  if (d == nullptr) {
+    return std::nullopt;
+  }
+  return std::optional<Decimal>(Decimal(d));
+}
+
 inline SubmitGridOrderResponse
 convert(const lb_submit_grid_order_response_t* info)
 {
@@ -1981,39 +1995,39 @@ convert(const lb_grid_order_t* o)
     o->market,
     o->status,
     o->grid_status,
-    o->submitted_base_price,
-    o->current_base_price,
-    o->pre_trigger_base_price,
-    o->post_trigger_base_price,
-    o->upper_limit_price,
-    o->lower_limit_price,
-    o->trigger_price_type,
-    o->trigger_spread_up,
-    o->trigger_spread_down,
-    o->trigger_percent_up,
-    o->trigger_percent_down,
-    o->pullback_percent,
-    o->pullback_spread,
-    o->rebound_percent,
-    o->rebound_spread,
+    convert_grid_opt_decimal(o->submitted_base_price),
+    convert_grid_opt_decimal(o->current_base_price),
+    convert_grid_opt_decimal(o->pre_trigger_base_price),
+    convert_grid_opt_decimal(o->post_trigger_base_price),
+    convert_grid_opt_decimal(o->upper_limit_price),
+    convert_grid_opt_decimal(o->lower_limit_price),
+    static_cast<TriggerPriceType>(o->trigger_price_type),
+    convert_grid_opt_decimal(o->trigger_spread_up),
+    convert_grid_opt_decimal(o->trigger_spread_down),
+    convert_grid_opt_decimal(o->trigger_percent_up),
+    convert_grid_opt_decimal(o->trigger_percent_down),
+    convert_grid_opt_decimal(o->pullback_percent),
+    convert_grid_opt_decimal(o->pullback_spread),
+    convert_grid_opt_decimal(o->rebound_percent),
+    convert_grid_opt_decimal(o->rebound_spread),
     o->trigger_sell_order_type,
     o->trigger_buy_order_type,
     o->trigger_sell_depth,
     o->trigger_buy_depth,
-    o->trigger_quantity,
-    o->trigger_sell_quantity,
-    o->trigger_buy_quantity,
-    o->upper_limit_quantity,
-    o->lower_limit_quantity,
-    o->upper_limit_event,
-    o->lower_limit_event,
+    convert_grid_opt_decimal(o->trigger_quantity),
+    convert_grid_opt_decimal(o->trigger_sell_quantity),
+    convert_grid_opt_decimal(o->trigger_buy_quantity),
+    convert_grid_opt_decimal(o->upper_limit_quantity),
+    convert_grid_opt_decimal(o->lower_limit_quantity),
+    static_cast<GridLimitEvent>(o->upper_limit_event),
+    static_cast<GridLimitEvent>(o->lower_limit_event),
     o->multiple_trigger,
     o->trigger_times,
-    o->total_buy_quantity,
-    o->total_sell_quantity,
-    o->total_profit_balance,
+    convert_grid_opt_decimal(o->total_buy_quantity),
+    convert_grid_opt_decimal(o->total_sell_quantity),
+    convert_grid_opt_decimal(o->total_profit_balance),
     o->settlement_currency,
-    o->time_in_force,
+    static_cast<GridTimeInForce>(o->time_in_force),
     o->gtd,
     o->created_at ? std::optional{ *o->created_at } : std::nullopt,
     o->rth,
@@ -2028,10 +2042,10 @@ convert(const lb_grid_order_sub_order_t* s)
 {
   return GridOrderSubOrder{
     s->id,
-    s->price,
+    convert_grid_opt_decimal(s->price),
     s->order_type,
-    s->quantity,
-    s->executed_qty,
+    convert_grid_opt_decimal(s->quantity),
+    convert_grid_opt_decimal(s->executed_qty),
     s->action,
     s->status,
     s->submitted_at ? std::optional{ *s->submitted_at } : std::nullopt,
@@ -2074,28 +2088,28 @@ convert(const lb_grid_order_detail_t* d)
     d->grid_status,
     d->suspend_reason,
     d->sleeping_reason,
-    d->submitted_base_price,
-    d->current_base_price,
-    d->upper_limit_price,
-    d->lower_limit_price,
-    d->trigger_price_type,
-    d->trigger_spread_up,
-    d->trigger_spread_down,
-    d->trigger_percent_up,
-    d->trigger_percent_down,
-    d->pullback_percent,
-    d->pullback_spread,
-    d->rebound_percent,
-    d->rebound_spread,
+    convert_grid_opt_decimal(d->submitted_base_price),
+    convert_grid_opt_decimal(d->current_base_price),
+    convert_grid_opt_decimal(d->upper_limit_price),
+    convert_grid_opt_decimal(d->lower_limit_price),
+    static_cast<TriggerPriceType>(d->trigger_price_type),
+    convert_grid_opt_decimal(d->trigger_spread_up),
+    convert_grid_opt_decimal(d->trigger_spread_down),
+    convert_grid_opt_decimal(d->trigger_percent_up),
+    convert_grid_opt_decimal(d->trigger_percent_down),
+    convert_grid_opt_decimal(d->pullback_percent),
+    convert_grid_opt_decimal(d->pullback_spread),
+    convert_grid_opt_decimal(d->rebound_percent),
+    convert_grid_opt_decimal(d->rebound_spread),
     d->multiple_trigger,
-    d->time_in_force,
-    d->trigger_quantity,
-    d->trigger_sell_quantity,
-    d->trigger_buy_quantity,
-    d->upper_limit_quantity,
-    d->lower_limit_quantity,
-    d->upper_limit_event,
-    d->lower_limit_event,
+    static_cast<GridTimeInForce>(d->time_in_force),
+    convert_grid_opt_decimal(d->trigger_quantity),
+    convert_grid_opt_decimal(d->trigger_sell_quantity),
+    convert_grid_opt_decimal(d->trigger_buy_quantity),
+    convert_grid_opt_decimal(d->upper_limit_quantity),
+    convert_grid_opt_decimal(d->lower_limit_quantity),
+    static_cast<GridLimitEvent>(d->upper_limit_event),
+    static_cast<GridLimitEvent>(d->lower_limit_event),
     d->trigger_sell_depth,
     d->trigger_buy_depth,
     d->created_at ? std::optional{ *d->created_at } : std::nullopt,
@@ -2122,19 +2136,19 @@ convert(const lb_trigger_order_t* t)
     t->status,
     t->name,
     t->symbol,
-    t->price,
-    t->quantity,
-    t->executed_price,
-    t->executed_qty,
+    convert_grid_opt_decimal(t->price),
+    convert_grid_opt_decimal(t->quantity),
+    convert_grid_opt_decimal(t->executed_price),
+    convert_grid_opt_decimal(t->executed_qty),
     t->submitted_at ? std::optional{ *t->submitted_at } : std::nullopt,
     t->action,
     t->order_type,
-    t->trigger_price,
+    convert_grid_opt_decimal(t->trigger_price),
     t->msg,
     t->currency,
-    t->last_done,
+    convert_grid_opt_decimal(t->last_done),
     t->updated_at ? std::optional{ *t->updated_at } : std::nullopt,
-    t->time_in_force,
+    static_cast<GridTimeInForce>(t->time_in_force),
     t->gtd,
     t->trigger_at ? std::optional{ *t->trigger_at } : std::nullopt,
     t->trigger_status,
@@ -2145,9 +2159,9 @@ inline GridBidSize
 convert(const lb_grid_bid_size_t* b)
 {
   return GridBidSize{
-    b->str_proceed,
-    b->end_proceed,
-    b->bid_size,
+    convert_grid_opt_decimal(b->str_proceed),
+    convert_grid_opt_decimal(b->end_proceed),
+    convert_grid_opt_decimal(b->bid_size),
   };
 }
 
@@ -2179,10 +2193,10 @@ convert(const lb_grid_order_info_t* info)
 
   return GridOrderInfo{
     info->name,
-    info->last_done,
-    info->lot_size,
-    info->buy_lot_size,
-    info->sell_lot_size,
+    convert_grid_opt_decimal(info->last_done),
+    convert_grid_opt_decimal(info->lot_size),
+    convert_grid_opt_decimal(info->buy_lot_size),
+    convert_grid_opt_decimal(info->sell_lot_size),
     bid_sizes,
     convert(&info->channel_infos),
   };
@@ -2259,7 +2273,9 @@ convert_grid_trade_rule(const GridTradeRule& src)
                           ? (const lb_decimal_t*)src.lower_limit_price.value()
                           : nullptr;
   r.trigger_price_type =
-    src.trigger_price_type ? &*src.trigger_price_type : nullptr;
+    src.trigger_price_type
+      ? reinterpret_cast<const int32_t*>(&*src.trigger_price_type)
+      : nullptr;
   r.trigger_spread_up = src.trigger_spread_up
                           ? (const lb_decimal_t*)src.trigger_spread_up.value()
                           : nullptr;
@@ -2276,7 +2292,10 @@ convert_grid_trade_rule(const GridTradeRule& src)
       ? (const lb_decimal_t*)src.trigger_percent_down.value()
       : nullptr;
   r.multiple_trigger = src.multiple_trigger ? &*src.multiple_trigger : nullptr;
-  r.time_in_force = src.time_in_force ? &*src.time_in_force : nullptr;
+  r.time_in_force =
+    src.time_in_force
+      ? reinterpret_cast<const int32_t*>(&*src.time_in_force)
+      : nullptr;
   r.upper_limit_quantity =
     src.upper_limit_quantity
       ? (const lb_decimal_t*)src.upper_limit_quantity.value()
@@ -2287,9 +2306,13 @@ convert_grid_trade_rule(const GridTradeRule& src)
       : nullptr;
   r.expire_time = src.expire_time ? &*src.expire_time : nullptr;
   r.upper_limit_event =
-    src.upper_limit_event ? &*src.upper_limit_event : nullptr;
+    src.upper_limit_event
+      ? reinterpret_cast<const int32_t*>(&*src.upper_limit_event)
+      : nullptr;
   r.lower_limit_event =
-    src.lower_limit_event ? &*src.lower_limit_event : nullptr;
+    src.lower_limit_event
+      ? reinterpret_cast<const int32_t*>(&*src.lower_limit_event)
+      : nullptr;
   r.trigger_sell_depth =
     src.trigger_sell_depth ? &*src.trigger_sell_depth : nullptr;
   r.trigger_buy_depth =

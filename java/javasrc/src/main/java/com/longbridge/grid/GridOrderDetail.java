@@ -1,5 +1,7 @@
 package com.longbridge.grid;
 
+import java.math.BigDecimal;
+
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 
@@ -14,28 +16,28 @@ public class GridOrderDetail {
     private String gridStatus;
     private String suspendReason;
     private String sleepingReason;
-    private String submittedBasePrice;
-    private String currentBasePrice;
-    private String upperLimitPrice;
-    private String lowerLimitPrice;
-    private int triggerPriceType;
-    private String triggerSpreadUp;
-    private String triggerSpreadDown;
-    private String triggerPercentUp;
-    private String triggerPercentDown;
-    private String pullbackPercent;
-    private String pullbackSpread;
-    private String reboundPercent;
-    private String reboundSpread;
+    private BigDecimal submittedBasePrice;
+    private BigDecimal currentBasePrice;
+    private BigDecimal upperLimitPrice;
+    private BigDecimal lowerLimitPrice;
+    private TriggerPriceType triggerPriceType;
+    private BigDecimal triggerSpreadUp;
+    private BigDecimal triggerSpreadDown;
+    private BigDecimal triggerPercentUp;
+    private BigDecimal triggerPercentDown;
+    private BigDecimal pullbackPercent;
+    private BigDecimal pullbackSpread;
+    private BigDecimal reboundPercent;
+    private BigDecimal reboundSpread;
     private boolean multipleTrigger;
-    private int timeInForce;
-    private String triggerQuantity;
-    private String triggerSellQuantity;
-    private String triggerBuyQuantity;
-    private String upperLimitQuantity;
-    private String lowerLimitQuantity;
-    private int upperLimitEvent;
-    private int lowerLimitEvent;
+    private GridTimeInForce timeInForce;
+    private BigDecimal triggerQuantity;
+    private BigDecimal triggerSellQuantity;
+    private BigDecimal triggerBuyQuantity;
+    private BigDecimal upperLimitQuantity;
+    private BigDecimal lowerLimitQuantity;
+    private GridLimitEvent upperLimitEvent;
+    private GridLimitEvent lowerLimitEvent;
     private int triggerSellDepth;
     private int triggerBuyDepth;
     private OffsetDateTime createdAt;
@@ -120,7 +122,7 @@ public class GridOrderDetail {
      *
      * @return submittedBasePrice
      */
-    public String getSubmittedBasePrice() {
+    public BigDecimal getSubmittedBasePrice() {
         return submittedBasePrice;
     }
 
@@ -129,7 +131,7 @@ public class GridOrderDetail {
      *
      * @return currentBasePrice
      */
-    public String getCurrentBasePrice() {
+    public BigDecimal getCurrentBasePrice() {
         return currentBasePrice;
     }
 
@@ -138,7 +140,7 @@ public class GridOrderDetail {
      *
      * @return upperLimitPrice
      */
-    public String getUpperLimitPrice() {
+    public BigDecimal getUpperLimitPrice() {
         return upperLimitPrice;
     }
 
@@ -147,7 +149,7 @@ public class GridOrderDetail {
      *
      * @return lowerLimitPrice
      */
-    public String getLowerLimitPrice() {
+    public BigDecimal getLowerLimitPrice() {
         return lowerLimitPrice;
     }
 
@@ -156,7 +158,7 @@ public class GridOrderDetail {
      *
      * @return triggerPriceType
      */
-    public int getTriggerPriceType() {
+    public TriggerPriceType getTriggerPriceType() {
         return triggerPriceType;
     }
 
@@ -165,7 +167,7 @@ public class GridOrderDetail {
      *
      * @return triggerSpreadUp
      */
-    public String getTriggerSpreadUp() {
+    public BigDecimal getTriggerSpreadUp() {
         return triggerSpreadUp;
     }
 
@@ -174,7 +176,7 @@ public class GridOrderDetail {
      *
      * @return triggerSpreadDown
      */
-    public String getTriggerSpreadDown() {
+    public BigDecimal getTriggerSpreadDown() {
         return triggerSpreadDown;
     }
 
@@ -183,7 +185,7 @@ public class GridOrderDetail {
      *
      * @return triggerPercentUp
      */
-    public String getTriggerPercentUp() {
+    public BigDecimal getTriggerPercentUp() {
         return triggerPercentUp;
     }
 
@@ -192,7 +194,7 @@ public class GridOrderDetail {
      *
      * @return triggerPercentDown
      */
-    public String getTriggerPercentDown() {
+    public BigDecimal getTriggerPercentDown() {
         return triggerPercentDown;
     }
 
@@ -201,7 +203,7 @@ public class GridOrderDetail {
      *
      * @return pullbackPercent
      */
-    public String getPullbackPercent() {
+    public BigDecimal getPullbackPercent() {
         return pullbackPercent;
     }
 
@@ -210,7 +212,7 @@ public class GridOrderDetail {
      *
      * @return pullbackSpread
      */
-    public String getPullbackSpread() {
+    public BigDecimal getPullbackSpread() {
         return pullbackSpread;
     }
 
@@ -219,7 +221,7 @@ public class GridOrderDetail {
      *
      * @return reboundPercent
      */
-    public String getReboundPercent() {
+    public BigDecimal getReboundPercent() {
         return reboundPercent;
     }
 
@@ -228,7 +230,7 @@ public class GridOrderDetail {
      *
      * @return reboundSpread
      */
-    public String getReboundSpread() {
+    public BigDecimal getReboundSpread() {
         return reboundSpread;
     }
 
@@ -246,7 +248,7 @@ public class GridOrderDetail {
      *
      * @return timeInForce
      */
-    public int getTimeInForce() {
+    public GridTimeInForce getTimeInForce() {
         return timeInForce;
     }
 
@@ -255,7 +257,7 @@ public class GridOrderDetail {
      *
      * @return triggerQuantity
      */
-    public String getTriggerQuantity() {
+    public BigDecimal getTriggerQuantity() {
         return triggerQuantity;
     }
 
@@ -264,7 +266,7 @@ public class GridOrderDetail {
      *
      * @return triggerSellQuantity
      */
-    public String getTriggerSellQuantity() {
+    public BigDecimal getTriggerSellQuantity() {
         return triggerSellQuantity;
     }
 
@@ -273,7 +275,7 @@ public class GridOrderDetail {
      *
      * @return triggerBuyQuantity
      */
-    public String getTriggerBuyQuantity() {
+    public BigDecimal getTriggerBuyQuantity() {
         return triggerBuyQuantity;
     }
 
@@ -282,7 +284,7 @@ public class GridOrderDetail {
      *
      * @return upperLimitQuantity
      */
-    public String getUpperLimitQuantity() {
+    public BigDecimal getUpperLimitQuantity() {
         return upperLimitQuantity;
     }
 
@@ -291,7 +293,7 @@ public class GridOrderDetail {
      *
      * @return lowerLimitQuantity
      */
-    public String getLowerLimitQuantity() {
+    public BigDecimal getLowerLimitQuantity() {
         return lowerLimitQuantity;
     }
 
@@ -300,7 +302,7 @@ public class GridOrderDetail {
      *
      * @return upperLimitEvent
      */
-    public int getUpperLimitEvent() {
+    public GridLimitEvent getUpperLimitEvent() {
         return upperLimitEvent;
     }
 
@@ -309,7 +311,7 @@ public class GridOrderDetail {
      *
      * @return lowerLimitEvent
      */
-    public int getLowerLimitEvent() {
+    public GridLimitEvent getLowerLimitEvent() {
         return lowerLimitEvent;
     }
 

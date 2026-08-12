@@ -1,5 +1,85 @@
 use chrono::{DateTime, Utc};
-use longbridge_nodejs_macros::JsObject;
+use longbridge_nodejs_macros::{JsEnum, JsObject};
+
+use crate::decimal::Decimal;
+
+/// How grid trigger thresholds are interpreted.
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::grid::TriggerPriceType")]
+pub enum TriggerPriceType {
+    /// Unknown / unset
+    Unknown,
+    /// Trigger by absolute price spread
+    Spread,
+    /// Trigger by percent
+    Percent,
+}
+
+/// Time in force for a grid order.
+///
+/// The underlying SDK models unknown wire values with a catch-all data variant;
+/// the binding collapses those to `Unknown`, so the conversions are hand-written
+/// instead of derived.
+#[napi_derive::napi]
+#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
+pub enum GridTimeInForce {
+    /// Day order
+    Day,
+    /// Good-til-canceled
+    GoodTilCanceled,
+    /// Good-til-date
+    GoodTilDate,
+    /// Unknown value
+    Unknown,
+}
+
+impl ::std::convert::From<longbridge::grid::GridTimeInForce> for GridTimeInForce {
+    fn from(value: longbridge::grid::GridTimeInForce) -> Self {
+        match value {
+            longbridge::grid::GridTimeInForce::Day => GridTimeInForce::Day,
+            longbridge::grid::GridTimeInForce::GoodTilCanceled => GridTimeInForce::GoodTilCanceled,
+            longbridge::grid::GridTimeInForce::GoodTilDate => GridTimeInForce::GoodTilDate,
+            longbridge::grid::GridTimeInForce::Unknown(_) => GridTimeInForce::Unknown,
+        }
+    }
+}
+
+impl ::std::convert::From<GridTimeInForce> for longbridge::grid::GridTimeInForce {
+    fn from(value: GridTimeInForce) -> Self {
+        match value {
+            GridTimeInForce::Day => longbridge::grid::GridTimeInForce::Day,
+            GridTimeInForce::GoodTilCanceled => longbridge::grid::GridTimeInForce::GoodTilCanceled,
+            GridTimeInForce::GoodTilDate => longbridge::grid::GridTimeInForce::GoodTilDate,
+            GridTimeInForce::Unknown => longbridge::grid::GridTimeInForce::Unknown(0),
+        }
+    }
+}
+
+impl crate::utils::ToJSON for GridTimeInForce {
+    fn to_json(&self) -> serde_json::Value {
+        let name = match self {
+            GridTimeInForce::Day => "Day",
+            GridTimeInForce::GoodTilCanceled => "GoodTilCanceled",
+            GridTimeInForce::GoodTilDate => "GoodTilDate",
+            GridTimeInForce::Unknown => "Unknown",
+        };
+        serde_json::Value::String(name.to_string())
+    }
+}
+
+/// Action taken when a grid boundary is reached.
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::grid::GridLimitEvent")]
+pub enum GridLimitEvent {
+    /// Unknown / unset
+    Unknown,
+    /// Ignore — keep the grid running
+    Ignore,
+    /// Close the position at the last price
+    CloseAtLast,
+}
 
 /// Response for submit grid trading order request
 #[napi_derive::napi]
@@ -28,35 +108,49 @@ pub struct GridOrder {
     /// Grid running status
     grid_status: String,
     /// Submitted base price
-    submitted_base_price: String,
+    #[js(opt)]
+    submitted_base_price: Option<Decimal>,
     /// Current base price
-    current_base_price: String,
+    #[js(opt)]
+    current_base_price: Option<Decimal>,
     /// Base price before the last trigger
-    pre_trigger_base_price: String,
+    #[js(opt)]
+    pre_trigger_base_price: Option<Decimal>,
     /// Base price after the last trigger
-    post_trigger_base_price: String,
+    #[js(opt)]
+    post_trigger_base_price: Option<Decimal>,
     /// Upper price bound
-    upper_limit_price: String,
+    #[js(opt)]
+    upper_limit_price: Option<Decimal>,
     /// Lower price bound
-    lower_limit_price: String,
-    /// Trigger price type (`1` = spread, `2` = percent)
-    trigger_price_type: i32,
+    #[js(opt)]
+    lower_limit_price: Option<Decimal>,
+    /// Trigger price type
+    trigger_price_type: TriggerPriceType,
     /// Upward trigger spread
-    trigger_spread_up: String,
+    #[js(opt)]
+    trigger_spread_up: Option<Decimal>,
     /// Downward trigger spread
-    trigger_spread_down: String,
+    #[js(opt)]
+    trigger_spread_down: Option<Decimal>,
     /// Upward trigger percent
-    trigger_percent_up: String,
+    #[js(opt)]
+    trigger_percent_up: Option<Decimal>,
     /// Downward trigger percent
-    trigger_percent_down: String,
+    #[js(opt)]
+    trigger_percent_down: Option<Decimal>,
     /// Pullback percent
-    pullback_percent: String,
+    #[js(opt)]
+    pullback_percent: Option<Decimal>,
     /// Pullback spread
-    pullback_spread: String,
+    #[js(opt)]
+    pullback_spread: Option<Decimal>,
     /// Rebound percent
-    rebound_percent: String,
+    #[js(opt)]
+    rebound_percent: Option<Decimal>,
     /// Rebound spread
-    rebound_spread: String,
+    #[js(opt)]
+    rebound_spread: Option<Decimal>,
     /// Sell-side execution order type (e.g. `MO`)
     trigger_sell_order_type: String,
     /// Buy-side execution order type (e.g. `MO`)
@@ -66,33 +160,41 @@ pub struct GridOrder {
     /// Buy-side order-book depth
     trigger_buy_depth: i32,
     /// Quantity per trigger
-    trigger_quantity: String,
+    #[js(opt)]
+    trigger_quantity: Option<Decimal>,
     /// Quantity per sell trigger
-    trigger_sell_quantity: String,
+    #[js(opt)]
+    trigger_sell_quantity: Option<Decimal>,
     /// Quantity per buy trigger
-    trigger_buy_quantity: String,
+    #[js(opt)]
+    trigger_buy_quantity: Option<Decimal>,
     /// Quantity handled at the upper bound
-    upper_limit_quantity: String,
+    #[js(opt)]
+    upper_limit_quantity: Option<Decimal>,
     /// Quantity handled at the lower bound
-    lower_limit_quantity: String,
+    #[js(opt)]
+    lower_limit_quantity: Option<Decimal>,
     /// Action at the upper bound
-    upper_limit_event: i32,
+    upper_limit_event: GridLimitEvent,
     /// Action at the lower bound
-    lower_limit_event: i32,
+    lower_limit_event: GridLimitEvent,
     /// Whether a single grid level may trigger multiple times
     multiple_trigger: bool,
     /// Number of times the grid has triggered
     trigger_times: i32,
     /// Accumulated bought quantity
-    total_buy_quantity: String,
+    #[js(opt)]
+    total_buy_quantity: Option<Decimal>,
     /// Accumulated sold quantity
-    total_sell_quantity: String,
+    #[js(opt)]
+    total_sell_quantity: Option<Decimal>,
     /// Accumulated profit balance
-    total_profit_balance: String,
+    #[js(opt)]
+    total_profit_balance: Option<Decimal>,
     /// Settlement currency
     settlement_currency: String,
-    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-    time_in_force: i32,
+    /// Time in force
+    time_in_force: GridTimeInForce,
     /// Expiry date (`YYYY-MM-DD`, GTD)
     gtd: String,
     /// Created time
@@ -116,13 +218,16 @@ pub struct GridOrderSubOrder {
     /// Sub-order ID
     id: String,
     /// Order price
-    price: String,
+    #[js(opt)]
+    price: Option<Decimal>,
     /// Order type
     order_type: String,
     /// Order quantity
-    quantity: String,
+    #[js(opt)]
+    quantity: Option<Decimal>,
     /// Executed quantity
-    executed_qty: String,
+    #[js(opt)]
+    executed_qty: Option<Decimal>,
     /// Buy / sell direction
     action: i32,
     /// Order status
@@ -172,49 +277,66 @@ pub struct GridOrderDetail {
     /// Sleeping reason, if any
     sleeping_reason: String,
     /// Submitted base price
-    submitted_base_price: String,
+    #[js(opt)]
+    submitted_base_price: Option<Decimal>,
     /// Current base price
-    current_base_price: String,
+    #[js(opt)]
+    current_base_price: Option<Decimal>,
     /// Upper price bound
-    upper_limit_price: String,
+    #[js(opt)]
+    upper_limit_price: Option<Decimal>,
     /// Lower price bound
-    lower_limit_price: String,
-    /// Trigger price type (`1` = spread, `2` = percent)
-    trigger_price_type: i32,
+    #[js(opt)]
+    lower_limit_price: Option<Decimal>,
+    /// Trigger price type
+    trigger_price_type: TriggerPriceType,
     /// Upward trigger spread
-    trigger_spread_up: String,
+    #[js(opt)]
+    trigger_spread_up: Option<Decimal>,
     /// Downward trigger spread
-    trigger_spread_down: String,
+    #[js(opt)]
+    trigger_spread_down: Option<Decimal>,
     /// Upward trigger percent
-    trigger_percent_up: String,
+    #[js(opt)]
+    trigger_percent_up: Option<Decimal>,
     /// Downward trigger percent
-    trigger_percent_down: String,
+    #[js(opt)]
+    trigger_percent_down: Option<Decimal>,
     /// Pullback percent
-    pullback_percent: String,
+    #[js(opt)]
+    pullback_percent: Option<Decimal>,
     /// Pullback spread
-    pullback_spread: String,
+    #[js(opt)]
+    pullback_spread: Option<Decimal>,
     /// Rebound percent
-    rebound_percent: String,
+    #[js(opt)]
+    rebound_percent: Option<Decimal>,
     /// Rebound spread
-    rebound_spread: String,
+    #[js(opt)]
+    rebound_spread: Option<Decimal>,
     /// Whether a single grid level may trigger multiple times
     multiple_trigger: bool,
-    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-    time_in_force: i32,
+    /// Time in force
+    time_in_force: GridTimeInForce,
     /// Quantity per trigger
-    trigger_quantity: String,
+    #[js(opt)]
+    trigger_quantity: Option<Decimal>,
     /// Quantity per sell trigger
-    trigger_sell_quantity: String,
+    #[js(opt)]
+    trigger_sell_quantity: Option<Decimal>,
     /// Quantity per buy trigger
-    trigger_buy_quantity: String,
+    #[js(opt)]
+    trigger_buy_quantity: Option<Decimal>,
     /// Quantity handled at the upper bound
-    upper_limit_quantity: String,
+    #[js(opt)]
+    upper_limit_quantity: Option<Decimal>,
     /// Quantity handled at the lower bound
-    lower_limit_quantity: String,
+    #[js(opt)]
+    lower_limit_quantity: Option<Decimal>,
     /// Action at the upper bound
-    upper_limit_event: i32,
+    upper_limit_event: GridLimitEvent,
     /// Action at the lower bound
-    lower_limit_event: i32,
+    lower_limit_event: GridLimitEvent,
     /// Sell-side order-book depth
     trigger_sell_depth: i32,
     /// Buy-side order-book depth
@@ -266,13 +388,17 @@ pub struct TriggerOrder {
     /// Security symbol (e.g. `700.HK`)
     symbol: String,
     /// Order price
-    price: String,
+    #[js(opt)]
+    price: Option<Decimal>,
     /// Order quantity
-    quantity: String,
+    #[js(opt)]
+    quantity: Option<Decimal>,
     /// Executed average price
-    executed_price: String,
+    #[js(opt)]
+    executed_price: Option<Decimal>,
     /// Executed total quantity
-    executed_qty: String,
+    #[js(opt)]
+    executed_qty: Option<Decimal>,
     /// Submitted time
     #[js(opt, datetime)]
     submitted_at: Option<DateTime<Utc>>,
@@ -281,18 +407,20 @@ pub struct TriggerOrder {
     /// Order type
     order_type: String,
     /// Trigger price
-    trigger_price: String,
+    #[js(opt)]
+    trigger_price: Option<Decimal>,
     /// Rejection reason, if any
     msg: String,
     /// Settlement currency
     currency: String,
     /// Latest quote price
-    last_done: String,
+    #[js(opt)]
+    last_done: Option<Decimal>,
     /// Last updated time
     #[js(opt, datetime)]
     updated_at: Option<DateTime<Utc>>,
-    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-    time_in_force: i32,
+    /// Time in force
+    time_in_force: GridTimeInForce,
     /// Expiry date (`YYYY-MM-DD`, GTD)
     gtd: String,
     /// Trigger time
@@ -308,11 +436,14 @@ pub struct TriggerOrder {
 #[js(remote = "longbridge::grid::GridBidSize")]
 pub struct GridBidSize {
     /// Range start price (inclusive)
-    str_proceed: String,
+    #[js(opt)]
+    str_proceed: Option<Decimal>,
     /// Range end price
-    end_proceed: String,
+    #[js(opt)]
+    end_proceed: Option<Decimal>,
     /// Price step within the range
-    bid_size: String,
+    #[js(opt)]
+    bid_size: Option<Decimal>,
 }
 
 /// Channel / authorization info nested in the order-info response.
@@ -339,13 +470,17 @@ pub struct GridOrderInfo {
     /// Security name
     name: String,
     /// Latest quote price
-    last_done: String,
+    #[js(opt)]
+    last_done: Option<Decimal>,
     /// Board lot size
-    lot_size: String,
+    #[js(opt)]
+    lot_size: Option<Decimal>,
     /// Buy-side board lot size
-    buy_lot_size: String,
+    #[js(opt)]
+    buy_lot_size: Option<Decimal>,
     /// Sell-side board lot size
-    sell_lot_size: String,
+    #[js(opt)]
+    sell_lot_size: Option<Decimal>,
     /// Price-step (bid-size) rule table
     #[js(array)]
     bid_sizes: Vec<GridBidSize>,

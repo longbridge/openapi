@@ -1,10 +1,131 @@
 //! Grid trading types
 
+use num_enum::{FromPrimitive, IntoPrimitive};
 use rust_decimal::Decimal;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use time::OffsetDateTime;
 
 use crate::serde_utils;
+
+/// Serde helper for response numeric fields: they arrive as strings and an
+/// empty string means "no value". Deserializes to `Option<Decimal>` (empty →
+/// `None`) and serializes back to a string (`None` → `""`) to preserve the
+/// exact wire format.
+mod opt_decimal_string {
+    use rust_decimal::Decimal;
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub(crate) fn serialize<S: Serializer>(value: &Option<Decimal>, serializer: S) -> Result<S::Ok, S::Error> {
+        match value {
+            Some(v) => serializer.serialize_str(&v.to_string()),
+            None => serializer.serialize_str(""),
+        }
+    }
+
+    pub(crate) fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<Decimal>, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        if s.is_empty() {
+            Ok(None)
+        } else {
+            s.parse::<Decimal>().map(Some).map_err(serde::de::Error::custom)
+        }
+    }
+}
+
+/// How grid trigger thresholds are interpreted (wire: `i32`).
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, FromPrimitive, IntoPrimitive)]
+#[repr(i32)]
+pub enum TriggerPriceType {
+    /// Unknown / unset
+    #[num_enum(default)]
+    Unknown = 0,
+    /// Trigger by absolute price spread
+    Spread = 1,
+    /// Trigger by percent
+    Percent = 2,
+}
+
+impl Default for TriggerPriceType {
+    fn default() -> Self {
+        Self::Unknown
+    }
+}
+
+impl Serialize for TriggerPriceType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        i32::from(*self).serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for TriggerPriceType {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Ok(Self::from(i32::deserialize(deserializer)?))
+    }
+}
+
+/// Time in force for a grid order (wire: `i32`).
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, FromPrimitive, IntoPrimitive)]
+#[repr(i32)]
+pub enum GridTimeInForce {
+    /// Day order
+    Day = 0,
+    /// Good-til-canceled
+    GoodTilCanceled = 1,
+    /// Good-til-date
+    GoodTilDate = 6,
+    /// Unknown value, preserved verbatim
+    #[num_enum(catch_all)]
+    Unknown(i32),
+}
+
+impl Default for GridTimeInForce {
+    fn default() -> Self {
+        Self::Day
+    }
+}
+
+impl Serialize for GridTimeInForce {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        i32::from(*self).serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for GridTimeInForce {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Ok(Self::from(i32::deserialize(deserializer)?))
+    }
+}
+
+/// Action taken when a grid boundary is reached (wire: `i32`).
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, FromPrimitive, IntoPrimitive)]
+#[repr(i32)]
+pub enum GridLimitEvent {
+    /// Unknown / unset
+    #[num_enum(default)]
+    Unknown = 0,
+    /// Ignore — keep the grid running
+    Ignore = 1,
+    /// Close the position at the last price
+    CloseAtLast = 2,
+}
+
+impl Default for GridLimitEvent {
+    fn default() -> Self {
+        Self::Unknown
+    }
+}
+
+impl Serialize for GridLimitEvent {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        i32::from(*self).serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for GridLimitEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Ok(Self::from(i32::deserialize(deserializer)?))
+    }
+}
 
 /// Grid trading rule — parameters for submit / replace.
 ///
@@ -24,7 +145,7 @@ pub struct GridTradeRule {
     pub lower_limit_price: Option<Decimal>,
     /// Trigger price type (only `1` / `2` allowed)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub trigger_price_type: Option<i32>,
+    pub trigger_price_type: Option<TriggerPriceType>,
     /// Upward trigger spread (absolute)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_spread_up: Option<Decimal>,
@@ -42,7 +163,7 @@ pub struct GridTradeRule {
     pub multiple_trigger: Option<bool>,
     /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub time_in_force: Option<i32>,
+    pub time_in_force: Option<GridTimeInForce>,
     /// Quantity handled when the upper bound is reached
     #[serde(skip_serializing_if = "Option::is_none")]
     pub upper_limit_quantity: Option<Decimal>,
@@ -54,10 +175,10 @@ pub struct GridTradeRule {
     pub expire_time: Option<i64>,
     /// Action when the upper bound is reached (only `1` / `2` allowed)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub upper_limit_event: Option<i32>,
+    pub upper_limit_event: Option<GridLimitEvent>,
     /// Action when the lower bound is reached (only `1` / `2` allowed)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub lower_limit_event: Option<i32>,
+    pub lower_limit_event: Option<GridLimitEvent>,
     /// Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_sell_depth: Option<i32>,
@@ -81,6 +202,120 @@ pub struct GridTradeRule {
     pub grid_order_type_down: Option<String>,
 }
 
+/// How a grid's up/down trigger thresholds are expressed. Percent and spread
+/// are mutually exclusive; modeling them as an enum makes the choice explicit
+/// (instead of four independent optional fields).
+#[derive(Debug, Clone, Copy)]
+pub enum GridTrigger {
+    /// Trigger by percent (`up`, `down`)
+    Percent {
+        /// Upward trigger percent
+        up: Decimal,
+        /// Downward trigger percent
+        down: Decimal,
+    },
+    /// Trigger by absolute price spread (`up`, `down`)
+    Spread {
+        /// Upward trigger spread
+        up: Decimal,
+        /// Downward trigger spread
+        down: Decimal,
+    },
+}
+
+impl GridTradeRule {
+    /// Create a rule with the fields a valid grid order requires. The gateway
+    /// still validates business rules, but this makes the minimum field set
+    /// visible in the type signature instead of leaving all fields optional.
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        base_price: Decimal,
+        upper_price: Decimal,
+        lower_price: Decimal,
+        trigger: GridTrigger,
+        quantity: Decimal,
+        upper_quantity: Decimal,
+        lower_quantity: Decimal,
+        time_in_force: GridTimeInForce,
+    ) -> Self {
+        let mut rule = GridTradeRule {
+            submitted_base_price: Some(base_price),
+            upper_limit_price: Some(upper_price),
+            lower_limit_price: Some(lower_price),
+            trigger_quantity: Some(quantity),
+            upper_limit_quantity: Some(upper_quantity),
+            lower_limit_quantity: Some(lower_quantity),
+            time_in_force: Some(time_in_force),
+            ..Default::default()
+        };
+        match trigger {
+            GridTrigger::Percent { up, down } => {
+                rule.trigger_price_type = Some(TriggerPriceType::Percent);
+                rule.trigger_percent_up = Some(up);
+                rule.trigger_percent_down = Some(down);
+            }
+            GridTrigger::Spread { up, down } => {
+                rule.trigger_price_type = Some(TriggerPriceType::Spread);
+                rule.trigger_spread_up = Some(up);
+                rule.trigger_spread_down = Some(down);
+            }
+        }
+        rule
+    }
+
+    /// Set the actions taken at the upper / lower bounds.
+    #[must_use]
+    pub fn limit_events(mut self, upper: GridLimitEvent, lower: GridLimitEvent) -> Self {
+        self.upper_limit_event = Some(upper);
+        self.lower_limit_event = Some(lower);
+        self
+    }
+
+    /// Set the sell / buy order-book depths (`0` = use the order type).
+    #[must_use]
+    pub fn depths(mut self, sell: i32, buy: i32) -> Self {
+        self.trigger_sell_depth = Some(sell);
+        self.trigger_buy_depth = Some(buy);
+        self
+    }
+
+    /// Set the sell / buy order types (`GMO` / `GLO` / `GTG`).
+    #[must_use]
+    pub fn order_types(mut self, up: impl Into<String>, down: impl Into<String>) -> Self {
+        self.grid_order_type_up = Some(up.into());
+        self.grid_order_type_down = Some(down.into());
+        self
+    }
+
+    /// Allow a single grid level to trigger multiple times.
+    #[must_use]
+    pub fn multiple_trigger(mut self, value: bool) -> Self {
+        self.multiple_trigger = Some(value);
+        self
+    }
+
+    /// Allow short selling.
+    #[must_use]
+    pub fn support_shortsell(mut self, value: bool) -> Self {
+        self.support_shortsell = Some(value);
+        self
+    }
+
+    /// Set the regular-trading-hours flag (`0` / `1` / `2`).
+    #[must_use]
+    pub fn rth(mut self, value: i32) -> Self {
+        self.rth = Some(value);
+        self
+    }
+
+    /// Set the expiry time (unix seconds), used with a GTD time-in-force.
+    #[must_use]
+    pub fn expire_time(mut self, unix_seconds: i64) -> Self {
+        self.expire_time = Some(unix_seconds);
+        self
+    }
+}
+
 /// A grid trading order (element of the list / by-ids responses).
 ///
 /// Fields reflect the gateway JSON; the security is exposed via `symbol`
@@ -102,35 +337,49 @@ pub struct GridOrder {
     /// Grid running status
     pub grid_status: String,
     /// Submitted base price
-    pub submitted_base_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub submitted_base_price: Option<Decimal>,
     /// Current base price
-    pub current_base_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub current_base_price: Option<Decimal>,
     /// Base price before the last trigger
-    pub pre_trigger_base_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub pre_trigger_base_price: Option<Decimal>,
     /// Base price after the last trigger
-    pub post_trigger_base_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub post_trigger_base_price: Option<Decimal>,
     /// Upper price bound
-    pub upper_limit_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub upper_limit_price: Option<Decimal>,
     /// Lower price bound
-    pub lower_limit_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub lower_limit_price: Option<Decimal>,
     /// Trigger price type (`1` = spread, `2` = percent)
-    pub trigger_price_type: i32,
+    pub trigger_price_type: TriggerPriceType,
     /// Upward trigger spread
-    pub trigger_spread_up: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_spread_up: Option<Decimal>,
     /// Downward trigger spread
-    pub trigger_spread_down: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_spread_down: Option<Decimal>,
     /// Upward trigger percent
-    pub trigger_percent_up: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_percent_up: Option<Decimal>,
     /// Downward trigger percent
-    pub trigger_percent_down: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_percent_down: Option<Decimal>,
     /// Pullback percent
-    pub pullback_percent: String,
+    #[serde(with = "opt_decimal_string")]
+    pub pullback_percent: Option<Decimal>,
     /// Pullback spread
-    pub pullback_spread: String,
+    #[serde(with = "opt_decimal_string")]
+    pub pullback_spread: Option<Decimal>,
     /// Rebound percent
-    pub rebound_percent: String,
+    #[serde(with = "opt_decimal_string")]
+    pub rebound_percent: Option<Decimal>,
     /// Rebound spread
-    pub rebound_spread: String,
+    #[serde(with = "opt_decimal_string")]
+    pub rebound_spread: Option<Decimal>,
     /// Sell-side execution order type (e.g. `MO`)
     pub trigger_sell_order_type: String,
     /// Buy-side execution order type (e.g. `MO`)
@@ -140,33 +389,41 @@ pub struct GridOrder {
     /// Buy-side order-book depth
     pub trigger_buy_depth: i32,
     /// Quantity per trigger
-    pub trigger_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_quantity: Option<Decimal>,
     /// Quantity per sell trigger
-    pub trigger_sell_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_sell_quantity: Option<Decimal>,
     /// Quantity per buy trigger
-    pub trigger_buy_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_buy_quantity: Option<Decimal>,
     /// Quantity handled at the upper bound
-    pub upper_limit_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub upper_limit_quantity: Option<Decimal>,
     /// Quantity handled at the lower bound
-    pub lower_limit_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub lower_limit_quantity: Option<Decimal>,
     /// Action at the upper bound
-    pub upper_limit_event: i32,
+    pub upper_limit_event: GridLimitEvent,
     /// Action at the lower bound
-    pub lower_limit_event: i32,
+    pub lower_limit_event: GridLimitEvent,
     /// Whether a single grid level may trigger multiple times
     pub multiple_trigger: bool,
     /// Number of times the grid has triggered
     pub trigger_times: i32,
     /// Accumulated bought quantity
-    pub total_buy_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub total_buy_quantity: Option<Decimal>,
     /// Accumulated sold quantity
-    pub total_sell_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub total_sell_quantity: Option<Decimal>,
     /// Accumulated profit balance
-    pub total_profit_balance: String,
+    #[serde(with = "opt_decimal_string")]
+    pub total_profit_balance: Option<Decimal>,
     /// Settlement currency
     pub settlement_currency: String,
     /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-    pub time_in_force: i32,
+    pub time_in_force: GridTimeInForce,
     /// Expiry date (`YYYY-MM-DD`, GTD)
     pub gtd: String,
     /// Created time (RFC3339)
@@ -192,13 +449,16 @@ pub struct GridOrderSubOrder {
     /// Sub-order ID
     pub id: String,
     /// Order price
-    pub price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub price: Option<Decimal>,
     /// Order type
     pub order_type: String,
     /// Order quantity
-    pub quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub quantity: Option<Decimal>,
     /// Executed quantity
-    pub executed_qty: String,
+    #[serde(with = "opt_decimal_string")]
+    pub executed_qty: Option<Decimal>,
     /// Buy / sell direction
     pub action: i32,
     /// Order status
@@ -252,49 +512,66 @@ pub struct GridOrderDetail {
     /// Sleeping reason, if any
     pub sleeping_reason: String,
     /// Submitted base price
-    pub submitted_base_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub submitted_base_price: Option<Decimal>,
     /// Current base price
-    pub current_base_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub current_base_price: Option<Decimal>,
     /// Upper price bound
-    pub upper_limit_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub upper_limit_price: Option<Decimal>,
     /// Lower price bound
-    pub lower_limit_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub lower_limit_price: Option<Decimal>,
     /// Trigger price type (`1` = spread, `2` = percent)
-    pub trigger_price_type: i32,
+    pub trigger_price_type: TriggerPriceType,
     /// Upward trigger spread
-    pub trigger_spread_up: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_spread_up: Option<Decimal>,
     /// Downward trigger spread
-    pub trigger_spread_down: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_spread_down: Option<Decimal>,
     /// Upward trigger percent
-    pub trigger_percent_up: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_percent_up: Option<Decimal>,
     /// Downward trigger percent
-    pub trigger_percent_down: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_percent_down: Option<Decimal>,
     /// Pullback percent
-    pub pullback_percent: String,
+    #[serde(with = "opt_decimal_string")]
+    pub pullback_percent: Option<Decimal>,
     /// Pullback spread
-    pub pullback_spread: String,
+    #[serde(with = "opt_decimal_string")]
+    pub pullback_spread: Option<Decimal>,
     /// Rebound percent
-    pub rebound_percent: String,
+    #[serde(with = "opt_decimal_string")]
+    pub rebound_percent: Option<Decimal>,
     /// Rebound spread
-    pub rebound_spread: String,
+    #[serde(with = "opt_decimal_string")]
+    pub rebound_spread: Option<Decimal>,
     /// Whether a single grid level may trigger multiple times
     pub multiple_trigger: bool,
     /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-    pub time_in_force: i32,
+    pub time_in_force: GridTimeInForce,
     /// Quantity per trigger
-    pub trigger_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_quantity: Option<Decimal>,
     /// Quantity per sell trigger
-    pub trigger_sell_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_sell_quantity: Option<Decimal>,
     /// Quantity per buy trigger
-    pub trigger_buy_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_buy_quantity: Option<Decimal>,
     /// Quantity handled at the upper bound
-    pub upper_limit_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub upper_limit_quantity: Option<Decimal>,
     /// Quantity handled at the lower bound
-    pub lower_limit_quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub lower_limit_quantity: Option<Decimal>,
     /// Action at the upper bound
-    pub upper_limit_event: i32,
+    pub upper_limit_event: GridLimitEvent,
     /// Action at the lower bound
-    pub lower_limit_event: i32,
+    pub lower_limit_event: GridLimitEvent,
     /// Sell-side order-book depth
     pub trigger_sell_depth: i32,
     /// Buy-side order-book depth
@@ -352,13 +629,17 @@ pub struct TriggerOrder {
     /// Security symbol (e.g. `700.HK`)
     pub symbol: String,
     /// Order price
-    pub price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub price: Option<Decimal>,
     /// Order quantity
-    pub quantity: String,
+    #[serde(with = "opt_decimal_string")]
+    pub quantity: Option<Decimal>,
     /// Executed average price
-    pub executed_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub executed_price: Option<Decimal>,
     /// Executed total quantity
-    pub executed_qty: String,
+    #[serde(with = "opt_decimal_string")]
+    pub executed_qty: Option<Decimal>,
     /// Submitted time (RFC3339)
     #[serde(
         deserialize_with = "serde_utils::timestamp_opt::deserialize",
@@ -370,13 +651,15 @@ pub struct TriggerOrder {
     /// Order type
     pub order_type: String,
     /// Trigger price
-    pub trigger_price: String,
+    #[serde(with = "opt_decimal_string")]
+    pub trigger_price: Option<Decimal>,
     /// Rejection reason, if any
     pub msg: String,
     /// Settlement currency
     pub currency: String,
     /// Latest quote price
-    pub last_done: String,
+    #[serde(with = "opt_decimal_string")]
+    pub last_done: Option<Decimal>,
     /// Last updated time (RFC3339)
     #[serde(
         deserialize_with = "serde_utils::timestamp_opt::deserialize",
@@ -384,7 +667,7 @@ pub struct TriggerOrder {
     )]
     pub updated_at: Option<OffsetDateTime>,
     /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-    pub time_in_force: i32,
+    pub time_in_force: GridTimeInForce,
     /// Expiry date (`YYYY-MM-DD`, GTD)
     pub gtd: String,
     /// Trigger time (RFC3339)
@@ -402,11 +685,14 @@ pub struct TriggerOrder {
 #[serde(default)]
 pub struct GridBidSize {
     /// Range start price (inclusive)
-    pub str_proceed: String,
+    #[serde(with = "opt_decimal_string")]
+    pub str_proceed: Option<Decimal>,
     /// Range end price
-    pub end_proceed: String,
+    #[serde(with = "opt_decimal_string")]
+    pub end_proceed: Option<Decimal>,
     /// Price step within the range
-    pub bid_size: String,
+    #[serde(with = "opt_decimal_string")]
+    pub bid_size: Option<Decimal>,
 }
 
 /// Channel / authorization info nested in the order-info response, holding the
@@ -434,13 +720,17 @@ pub struct GridOrderInfo {
     /// Security name
     pub name: String,
     /// Latest quote price
-    pub last_done: String,
+    #[serde(with = "opt_decimal_string")]
+    pub last_done: Option<Decimal>,
     /// Board lot size
-    pub lot_size: String,
+    #[serde(with = "opt_decimal_string")]
+    pub lot_size: Option<Decimal>,
     /// Buy-side board lot size
-    pub buy_lot_size: String,
+    #[serde(with = "opt_decimal_string")]
+    pub buy_lot_size: Option<Decimal>,
     /// Sell-side board lot size
-    pub sell_lot_size: String,
+    #[serde(with = "opt_decimal_string")]
+    pub sell_lot_size: Option<Decimal>,
     /// Price-step (bid-size) rule table
     pub bid_sizes: Vec<GridBidSize>,
     /// Channel / authorization info (strategy grant, RTH, currencies)

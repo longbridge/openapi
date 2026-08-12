@@ -6,7 +6,7 @@ use longbridge::grid::{
 };
 use time::OffsetDateTime;
 
-use crate::types::{CDecimal, CMarket, CString, CVec, ToFFI};
+use crate::types::{COption, CDecimal, CMarket, CString, CVec, ToFFI};
 
 // ââ Grid trading types
 // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -188,36 +188,36 @@ pub struct CGridOrder {
     pub status: *const c_char,
     /// Grid running status
     pub grid_status: *const c_char,
-    /// Submitted base price
-    pub submitted_base_price: *const c_char,
-    /// Current base price
-    pub current_base_price: *const c_char,
-    /// Base price before the last trigger
-    pub pre_trigger_base_price: *const c_char,
-    /// Base price after the last trigger
-    pub post_trigger_base_price: *const c_char,
-    /// Upper price bound
-    pub upper_limit_price: *const c_char,
-    /// Lower price bound
-    pub lower_limit_price: *const c_char,
+    /// Submitted base price (can be null)
+    pub submitted_base_price: *const CDecimal,
+    /// Current base price (can be null)
+    pub current_base_price: *const CDecimal,
+    /// Base price before the last trigger (can be null)
+    pub pre_trigger_base_price: *const CDecimal,
+    /// Base price after the last trigger (can be null)
+    pub post_trigger_base_price: *const CDecimal,
+    /// Upper price bound (can be null)
+    pub upper_limit_price: *const CDecimal,
+    /// Lower price bound (can be null)
+    pub lower_limit_price: *const CDecimal,
     /// Trigger price type (`1` = spread, `2` = percent)
     pub trigger_price_type: i32,
-    /// Upward trigger spread
-    pub trigger_spread_up: *const c_char,
-    /// Downward trigger spread
-    pub trigger_spread_down: *const c_char,
-    /// Upward trigger percent
-    pub trigger_percent_up: *const c_char,
-    /// Downward trigger percent
-    pub trigger_percent_down: *const c_char,
-    /// Pullback percent
-    pub pullback_percent: *const c_char,
-    /// Pullback spread
-    pub pullback_spread: *const c_char,
-    /// Rebound percent
-    pub rebound_percent: *const c_char,
-    /// Rebound spread
-    pub rebound_spread: *const c_char,
+    /// Upward trigger spread (can be null)
+    pub trigger_spread_up: *const CDecimal,
+    /// Downward trigger spread (can be null)
+    pub trigger_spread_down: *const CDecimal,
+    /// Upward trigger percent (can be null)
+    pub trigger_percent_up: *const CDecimal,
+    /// Downward trigger percent (can be null)
+    pub trigger_percent_down: *const CDecimal,
+    /// Pullback percent (can be null)
+    pub pullback_percent: *const CDecimal,
+    /// Pullback spread (can be null)
+    pub pullback_spread: *const CDecimal,
+    /// Rebound percent (can be null)
+    pub rebound_percent: *const CDecimal,
+    /// Rebound spread (can be null)
+    pub rebound_spread: *const CDecimal,
     /// Sell-side execution order type (e.g. `MO`)
     pub trigger_sell_order_type: *const c_char,
     /// Buy-side execution order type (e.g. `MO`)
@@ -226,16 +226,16 @@ pub struct CGridOrder {
     pub trigger_sell_depth: i32,
     /// Buy-side order-book depth
     pub trigger_buy_depth: i32,
-    /// Quantity per trigger
-    pub trigger_quantity: *const c_char,
-    /// Quantity per sell trigger
-    pub trigger_sell_quantity: *const c_char,
-    /// Quantity per buy trigger
-    pub trigger_buy_quantity: *const c_char,
-    /// Quantity handled at the upper bound
-    pub upper_limit_quantity: *const c_char,
-    /// Quantity handled at the lower bound
-    pub lower_limit_quantity: *const c_char,
+    /// Quantity per trigger (can be null)
+    pub trigger_quantity: *const CDecimal,
+    /// Quantity per sell trigger (can be null)
+    pub trigger_sell_quantity: *const CDecimal,
+    /// Quantity per buy trigger (can be null)
+    pub trigger_buy_quantity: *const CDecimal,
+    /// Quantity handled at the upper bound (can be null)
+    pub upper_limit_quantity: *const CDecimal,
+    /// Quantity handled at the lower bound (can be null)
+    pub lower_limit_quantity: *const CDecimal,
     /// Action at the upper bound
     pub upper_limit_event: i32,
     /// Action at the lower bound
@@ -244,12 +244,12 @@ pub struct CGridOrder {
     pub multiple_trigger: bool,
     /// Number of times the grid has triggered
     pub trigger_times: i32,
-    /// Accumulated bought quantity
-    pub total_buy_quantity: *const c_char,
-    /// Accumulated sold quantity
-    pub total_sell_quantity: *const c_char,
-    /// Accumulated profit balance
-    pub total_profit_balance: *const c_char,
+    /// Accumulated bought quantity (can be null)
+    pub total_buy_quantity: *const CDecimal,
+    /// Accumulated sold quantity (can be null)
+    pub total_sell_quantity: *const CDecimal,
+    /// Accumulated profit balance (can be null)
+    pub total_profit_balance: *const CDecimal,
     /// Settlement currency
     pub settlement_currency: *const c_char,
     /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
@@ -276,37 +276,37 @@ pub(crate) struct CGridOrderOwned {
     market: CString,
     status: CString,
     grid_status: CString,
-    submitted_base_price: CString,
-    current_base_price: CString,
-    pre_trigger_base_price: CString,
-    post_trigger_base_price: CString,
-    upper_limit_price: CString,
-    lower_limit_price: CString,
+    submitted_base_price: COption<CDecimal>,
+    current_base_price: COption<CDecimal>,
+    pre_trigger_base_price: COption<CDecimal>,
+    post_trigger_base_price: COption<CDecimal>,
+    upper_limit_price: COption<CDecimal>,
+    lower_limit_price: COption<CDecimal>,
     trigger_price_type: i32,
-    trigger_spread_up: CString,
-    trigger_spread_down: CString,
-    trigger_percent_up: CString,
-    trigger_percent_down: CString,
-    pullback_percent: CString,
-    pullback_spread: CString,
-    rebound_percent: CString,
-    rebound_spread: CString,
+    trigger_spread_up: COption<CDecimal>,
+    trigger_spread_down: COption<CDecimal>,
+    trigger_percent_up: COption<CDecimal>,
+    trigger_percent_down: COption<CDecimal>,
+    pullback_percent: COption<CDecimal>,
+    pullback_spread: COption<CDecimal>,
+    rebound_percent: COption<CDecimal>,
+    rebound_spread: COption<CDecimal>,
     trigger_sell_order_type: CString,
     trigger_buy_order_type: CString,
     trigger_sell_depth: i32,
     trigger_buy_depth: i32,
-    trigger_quantity: CString,
-    trigger_sell_quantity: CString,
-    trigger_buy_quantity: CString,
-    upper_limit_quantity: CString,
-    lower_limit_quantity: CString,
+    trigger_quantity: COption<CDecimal>,
+    trigger_sell_quantity: COption<CDecimal>,
+    trigger_buy_quantity: COption<CDecimal>,
+    upper_limit_quantity: COption<CDecimal>,
+    lower_limit_quantity: COption<CDecimal>,
     upper_limit_event: i32,
     lower_limit_event: i32,
     multiple_trigger: bool,
     trigger_times: i32,
-    total_buy_quantity: CString,
-    total_sell_quantity: CString,
-    total_profit_balance: CString,
+    total_buy_quantity: COption<CDecimal>,
+    total_sell_quantity: COption<CDecimal>,
+    total_profit_balance: COption<CDecimal>,
     settlement_currency: CString,
     time_in_force: i32,
     gtd: CString,
@@ -332,7 +332,7 @@ impl From<GridOrder> for CGridOrderOwned {
             post_trigger_base_price: order.post_trigger_base_price.into(),
             upper_limit_price: order.upper_limit_price.into(),
             lower_limit_price: order.lower_limit_price.into(),
-            trigger_price_type: order.trigger_price_type,
+            trigger_price_type: order.trigger_price_type.into(),
             trigger_spread_up: order.trigger_spread_up.into(),
             trigger_spread_down: order.trigger_spread_down.into(),
             trigger_percent_up: order.trigger_percent_up.into(),
@@ -350,15 +350,15 @@ impl From<GridOrder> for CGridOrderOwned {
             trigger_buy_quantity: order.trigger_buy_quantity.into(),
             upper_limit_quantity: order.upper_limit_quantity.into(),
             lower_limit_quantity: order.lower_limit_quantity.into(),
-            upper_limit_event: order.upper_limit_event,
-            lower_limit_event: order.lower_limit_event,
+            upper_limit_event: order.upper_limit_event.into(),
+            lower_limit_event: order.lower_limit_event.into(),
             multiple_trigger: order.multiple_trigger,
             trigger_times: order.trigger_times,
             total_buy_quantity: order.total_buy_quantity.into(),
             total_sell_quantity: order.total_sell_quantity.into(),
             total_profit_balance: order.total_profit_balance.into(),
             settlement_currency: order.settlement_currency.into(),
-            time_in_force: order.time_in_force,
+            time_in_force: order.time_in_force.into(),
             gtd: order.gtd.into(),
             created_at: order.created_at.map(OffsetDateTime::unix_timestamp),
             rth: order.rth,
@@ -380,37 +380,37 @@ impl ToFFI for CGridOrderOwned {
             market: self.market.to_ffi_type(),
             status: self.status.to_ffi_type(),
             grid_status: self.grid_status.to_ffi_type(),
-            submitted_base_price: self.submitted_base_price.to_ffi_type(),
-            current_base_price: self.current_base_price.to_ffi_type(),
-            pre_trigger_base_price: self.pre_trigger_base_price.to_ffi_type(),
-            post_trigger_base_price: self.post_trigger_base_price.to_ffi_type(),
-            upper_limit_price: self.upper_limit_price.to_ffi_type(),
-            lower_limit_price: self.lower_limit_price.to_ffi_type(),
+            submitted_base_price: self.submitted_base_price.to_ffi_type().to_ffi_type(),
+            current_base_price: self.current_base_price.to_ffi_type().to_ffi_type(),
+            pre_trigger_base_price: self.pre_trigger_base_price.to_ffi_type().to_ffi_type(),
+            post_trigger_base_price: self.post_trigger_base_price.to_ffi_type().to_ffi_type(),
+            upper_limit_price: self.upper_limit_price.to_ffi_type().to_ffi_type(),
+            lower_limit_price: self.lower_limit_price.to_ffi_type().to_ffi_type(),
             trigger_price_type: self.trigger_price_type,
-            trigger_spread_up: self.trigger_spread_up.to_ffi_type(),
-            trigger_spread_down: self.trigger_spread_down.to_ffi_type(),
-            trigger_percent_up: self.trigger_percent_up.to_ffi_type(),
-            trigger_percent_down: self.trigger_percent_down.to_ffi_type(),
-            pullback_percent: self.pullback_percent.to_ffi_type(),
-            pullback_spread: self.pullback_spread.to_ffi_type(),
-            rebound_percent: self.rebound_percent.to_ffi_type(),
-            rebound_spread: self.rebound_spread.to_ffi_type(),
+            trigger_spread_up: self.trigger_spread_up.to_ffi_type().to_ffi_type(),
+            trigger_spread_down: self.trigger_spread_down.to_ffi_type().to_ffi_type(),
+            trigger_percent_up: self.trigger_percent_up.to_ffi_type().to_ffi_type(),
+            trigger_percent_down: self.trigger_percent_down.to_ffi_type().to_ffi_type(),
+            pullback_percent: self.pullback_percent.to_ffi_type().to_ffi_type(),
+            pullback_spread: self.pullback_spread.to_ffi_type().to_ffi_type(),
+            rebound_percent: self.rebound_percent.to_ffi_type().to_ffi_type(),
+            rebound_spread: self.rebound_spread.to_ffi_type().to_ffi_type(),
             trigger_sell_order_type: self.trigger_sell_order_type.to_ffi_type(),
             trigger_buy_order_type: self.trigger_buy_order_type.to_ffi_type(),
             trigger_sell_depth: self.trigger_sell_depth,
             trigger_buy_depth: self.trigger_buy_depth,
-            trigger_quantity: self.trigger_quantity.to_ffi_type(),
-            trigger_sell_quantity: self.trigger_sell_quantity.to_ffi_type(),
-            trigger_buy_quantity: self.trigger_buy_quantity.to_ffi_type(),
-            upper_limit_quantity: self.upper_limit_quantity.to_ffi_type(),
-            lower_limit_quantity: self.lower_limit_quantity.to_ffi_type(),
+            trigger_quantity: self.trigger_quantity.to_ffi_type().to_ffi_type(),
+            trigger_sell_quantity: self.trigger_sell_quantity.to_ffi_type().to_ffi_type(),
+            trigger_buy_quantity: self.trigger_buy_quantity.to_ffi_type().to_ffi_type(),
+            upper_limit_quantity: self.upper_limit_quantity.to_ffi_type().to_ffi_type(),
+            lower_limit_quantity: self.lower_limit_quantity.to_ffi_type().to_ffi_type(),
             upper_limit_event: self.upper_limit_event,
             lower_limit_event: self.lower_limit_event,
             multiple_trigger: self.multiple_trigger,
             trigger_times: self.trigger_times,
-            total_buy_quantity: self.total_buy_quantity.to_ffi_type(),
-            total_sell_quantity: self.total_sell_quantity.to_ffi_type(),
-            total_profit_balance: self.total_profit_balance.to_ffi_type(),
+            total_buy_quantity: self.total_buy_quantity.to_ffi_type().to_ffi_type(),
+            total_sell_quantity: self.total_sell_quantity.to_ffi_type().to_ffi_type(),
+            total_profit_balance: self.total_profit_balance.to_ffi_type().to_ffi_type(),
             settlement_currency: self.settlement_currency.to_ffi_type(),
             time_in_force: self.time_in_force,
             gtd: self.gtd.to_ffi_type(),
@@ -432,14 +432,14 @@ impl ToFFI for CGridOrderOwned {
 pub struct CGridOrderSubOrder {
     /// Sub-order ID
     pub id: *const c_char,
-    /// Order price
-    pub price: *const c_char,
+    /// Order price (can be null)
+    pub price: *const CDecimal,
     /// Order type
     pub order_type: *const c_char,
-    /// Order quantity
-    pub quantity: *const c_char,
-    /// Executed quantity
-    pub executed_qty: *const c_char,
+    /// Order quantity (can be null)
+    pub quantity: *const CDecimal,
+    /// Executed quantity (can be null)
+    pub executed_qty: *const CDecimal,
     /// Buy / sell direction
     pub action: i32,
     /// Order status
@@ -453,10 +453,10 @@ pub struct CGridOrderSubOrder {
 #[derive(Debug)]
 pub(crate) struct CGridOrderSubOrderOwned {
     id: CString,
-    price: CString,
+    price: COption<CDecimal>,
     order_type: CString,
-    quantity: CString,
-    executed_qty: CString,
+    quantity: COption<CDecimal>,
+    executed_qty: COption<CDecimal>,
     action: i32,
     status: CString,
     submitted_at: Option<i64>,
@@ -485,10 +485,10 @@ impl ToFFI for CGridOrderSubOrderOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CGridOrderSubOrder {
             id: self.id.to_ffi_type(),
-            price: self.price.to_ffi_type(),
+            price: self.price.to_ffi_type().to_ffi_type(),
             order_type: self.order_type.to_ffi_type(),
-            quantity: self.quantity.to_ffi_type(),
-            executed_qty: self.executed_qty.to_ffi_type(),
+            quantity: self.quantity.to_ffi_type().to_ffi_type(),
+            executed_qty: self.executed_qty.to_ffi_type().to_ffi_type(),
             action: self.action,
             status: self.status.to_ffi_type(),
             submitted_at: self
@@ -572,46 +572,46 @@ pub struct CGridOrderDetail {
     pub suspend_reason: *const c_char,
     /// Sleeping reason, if any
     pub sleeping_reason: *const c_char,
-    /// Submitted base price
-    pub submitted_base_price: *const c_char,
-    /// Current base price
-    pub current_base_price: *const c_char,
-    /// Upper price bound
-    pub upper_limit_price: *const c_char,
-    /// Lower price bound
-    pub lower_limit_price: *const c_char,
+    /// Submitted base price (can be null)
+    pub submitted_base_price: *const CDecimal,
+    /// Current base price (can be null)
+    pub current_base_price: *const CDecimal,
+    /// Upper price bound (can be null)
+    pub upper_limit_price: *const CDecimal,
+    /// Lower price bound (can be null)
+    pub lower_limit_price: *const CDecimal,
     /// Trigger price type (`1` = spread, `2` = percent)
     pub trigger_price_type: i32,
-    /// Upward trigger spread
-    pub trigger_spread_up: *const c_char,
-    /// Downward trigger spread
-    pub trigger_spread_down: *const c_char,
-    /// Upward trigger percent
-    pub trigger_percent_up: *const c_char,
-    /// Downward trigger percent
-    pub trigger_percent_down: *const c_char,
-    /// Pullback percent
-    pub pullback_percent: *const c_char,
-    /// Pullback spread
-    pub pullback_spread: *const c_char,
-    /// Rebound percent
-    pub rebound_percent: *const c_char,
-    /// Rebound spread
-    pub rebound_spread: *const c_char,
+    /// Upward trigger spread (can be null)
+    pub trigger_spread_up: *const CDecimal,
+    /// Downward trigger spread (can be null)
+    pub trigger_spread_down: *const CDecimal,
+    /// Upward trigger percent (can be null)
+    pub trigger_percent_up: *const CDecimal,
+    /// Downward trigger percent (can be null)
+    pub trigger_percent_down: *const CDecimal,
+    /// Pullback percent (can be null)
+    pub pullback_percent: *const CDecimal,
+    /// Pullback spread (can be null)
+    pub pullback_spread: *const CDecimal,
+    /// Rebound percent (can be null)
+    pub rebound_percent: *const CDecimal,
+    /// Rebound spread (can be null)
+    pub rebound_spread: *const CDecimal,
     /// Whether a single grid level may trigger multiple times
     pub multiple_trigger: bool,
     /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
     pub time_in_force: i32,
-    /// Quantity per trigger
-    pub trigger_quantity: *const c_char,
-    /// Quantity per sell trigger
-    pub trigger_sell_quantity: *const c_char,
-    /// Quantity per buy trigger
-    pub trigger_buy_quantity: *const c_char,
-    /// Quantity handled at the upper bound
-    pub upper_limit_quantity: *const c_char,
-    /// Quantity handled at the lower bound
-    pub lower_limit_quantity: *const c_char,
+    /// Quantity per trigger (can be null)
+    pub trigger_quantity: *const CDecimal,
+    /// Quantity per sell trigger (can be null)
+    pub trigger_sell_quantity: *const CDecimal,
+    /// Quantity per buy trigger (can be null)
+    pub trigger_buy_quantity: *const CDecimal,
+    /// Quantity handled at the upper bound (can be null)
+    pub upper_limit_quantity: *const CDecimal,
+    /// Quantity handled at the lower bound (can be null)
+    pub lower_limit_quantity: *const CDecimal,
     /// Action at the upper bound
     pub upper_limit_event: i32,
     /// Action at the lower bound
@@ -661,26 +661,26 @@ pub(crate) struct CGridOrderDetailOwned {
     grid_status: CString,
     suspend_reason: CString,
     sleeping_reason: CString,
-    submitted_base_price: CString,
-    current_base_price: CString,
-    upper_limit_price: CString,
-    lower_limit_price: CString,
+    submitted_base_price: COption<CDecimal>,
+    current_base_price: COption<CDecimal>,
+    upper_limit_price: COption<CDecimal>,
+    lower_limit_price: COption<CDecimal>,
     trigger_price_type: i32,
-    trigger_spread_up: CString,
-    trigger_spread_down: CString,
-    trigger_percent_up: CString,
-    trigger_percent_down: CString,
-    pullback_percent: CString,
-    pullback_spread: CString,
-    rebound_percent: CString,
-    rebound_spread: CString,
+    trigger_spread_up: COption<CDecimal>,
+    trigger_spread_down: COption<CDecimal>,
+    trigger_percent_up: COption<CDecimal>,
+    trigger_percent_down: COption<CDecimal>,
+    pullback_percent: COption<CDecimal>,
+    pullback_spread: COption<CDecimal>,
+    rebound_percent: COption<CDecimal>,
+    rebound_spread: COption<CDecimal>,
     multiple_trigger: bool,
     time_in_force: i32,
-    trigger_quantity: CString,
-    trigger_sell_quantity: CString,
-    trigger_buy_quantity: CString,
-    upper_limit_quantity: CString,
-    lower_limit_quantity: CString,
+    trigger_quantity: COption<CDecimal>,
+    trigger_sell_quantity: COption<CDecimal>,
+    trigger_buy_quantity: COption<CDecimal>,
+    upper_limit_quantity: COption<CDecimal>,
+    lower_limit_quantity: COption<CDecimal>,
     upper_limit_event: i32,
     lower_limit_event: i32,
     trigger_sell_depth: i32,
@@ -714,7 +714,7 @@ impl From<GridOrderDetail> for CGridOrderDetailOwned {
             current_base_price: d.current_base_price.into(),
             upper_limit_price: d.upper_limit_price.into(),
             lower_limit_price: d.lower_limit_price.into(),
-            trigger_price_type: d.trigger_price_type,
+            trigger_price_type: d.trigger_price_type.into(),
             trigger_spread_up: d.trigger_spread_up.into(),
             trigger_spread_down: d.trigger_spread_down.into(),
             trigger_percent_up: d.trigger_percent_up.into(),
@@ -724,14 +724,14 @@ impl From<GridOrderDetail> for CGridOrderDetailOwned {
             rebound_percent: d.rebound_percent.into(),
             rebound_spread: d.rebound_spread.into(),
             multiple_trigger: d.multiple_trigger,
-            time_in_force: d.time_in_force,
+            time_in_force: d.time_in_force.into(),
             trigger_quantity: d.trigger_quantity.into(),
             trigger_sell_quantity: d.trigger_sell_quantity.into(),
             trigger_buy_quantity: d.trigger_buy_quantity.into(),
             upper_limit_quantity: d.upper_limit_quantity.into(),
             lower_limit_quantity: d.lower_limit_quantity.into(),
-            upper_limit_event: d.upper_limit_event,
-            lower_limit_event: d.lower_limit_event,
+            upper_limit_event: d.upper_limit_event.into(),
+            lower_limit_event: d.lower_limit_event.into(),
             trigger_sell_depth: d.trigger_sell_depth,
             trigger_buy_depth: d.trigger_buy_depth,
             created_at: d.created_at.map(OffsetDateTime::unix_timestamp),
@@ -763,26 +763,26 @@ impl ToFFI for CGridOrderDetailOwned {
             grid_status: self.grid_status.to_ffi_type(),
             suspend_reason: self.suspend_reason.to_ffi_type(),
             sleeping_reason: self.sleeping_reason.to_ffi_type(),
-            submitted_base_price: self.submitted_base_price.to_ffi_type(),
-            current_base_price: self.current_base_price.to_ffi_type(),
-            upper_limit_price: self.upper_limit_price.to_ffi_type(),
-            lower_limit_price: self.lower_limit_price.to_ffi_type(),
+            submitted_base_price: self.submitted_base_price.to_ffi_type().to_ffi_type(),
+            current_base_price: self.current_base_price.to_ffi_type().to_ffi_type(),
+            upper_limit_price: self.upper_limit_price.to_ffi_type().to_ffi_type(),
+            lower_limit_price: self.lower_limit_price.to_ffi_type().to_ffi_type(),
             trigger_price_type: self.trigger_price_type,
-            trigger_spread_up: self.trigger_spread_up.to_ffi_type(),
-            trigger_spread_down: self.trigger_spread_down.to_ffi_type(),
-            trigger_percent_up: self.trigger_percent_up.to_ffi_type(),
-            trigger_percent_down: self.trigger_percent_down.to_ffi_type(),
-            pullback_percent: self.pullback_percent.to_ffi_type(),
-            pullback_spread: self.pullback_spread.to_ffi_type(),
-            rebound_percent: self.rebound_percent.to_ffi_type(),
-            rebound_spread: self.rebound_spread.to_ffi_type(),
+            trigger_spread_up: self.trigger_spread_up.to_ffi_type().to_ffi_type(),
+            trigger_spread_down: self.trigger_spread_down.to_ffi_type().to_ffi_type(),
+            trigger_percent_up: self.trigger_percent_up.to_ffi_type().to_ffi_type(),
+            trigger_percent_down: self.trigger_percent_down.to_ffi_type().to_ffi_type(),
+            pullback_percent: self.pullback_percent.to_ffi_type().to_ffi_type(),
+            pullback_spread: self.pullback_spread.to_ffi_type().to_ffi_type(),
+            rebound_percent: self.rebound_percent.to_ffi_type().to_ffi_type(),
+            rebound_spread: self.rebound_spread.to_ffi_type().to_ffi_type(),
             multiple_trigger: self.multiple_trigger,
             time_in_force: self.time_in_force,
-            trigger_quantity: self.trigger_quantity.to_ffi_type(),
-            trigger_sell_quantity: self.trigger_sell_quantity.to_ffi_type(),
-            trigger_buy_quantity: self.trigger_buy_quantity.to_ffi_type(),
-            upper_limit_quantity: self.upper_limit_quantity.to_ffi_type(),
-            lower_limit_quantity: self.lower_limit_quantity.to_ffi_type(),
+            trigger_quantity: self.trigger_quantity.to_ffi_type().to_ffi_type(),
+            trigger_sell_quantity: self.trigger_sell_quantity.to_ffi_type().to_ffi_type(),
+            trigger_buy_quantity: self.trigger_buy_quantity.to_ffi_type().to_ffi_type(),
+            upper_limit_quantity: self.upper_limit_quantity.to_ffi_type().to_ffi_type(),
+            lower_limit_quantity: self.lower_limit_quantity.to_ffi_type().to_ffi_type(),
             upper_limit_event: self.upper_limit_event,
             lower_limit_event: self.lower_limit_event,
             trigger_sell_depth: self.trigger_sell_depth,
@@ -829,28 +829,28 @@ pub struct CTriggerOrder {
     pub name: *const c_char,
     /// Security symbol (e.g. `700.HK`)
     pub symbol: *const c_char,
-    /// Order price
-    pub price: *const c_char,
-    /// Order quantity
-    pub quantity: *const c_char,
-    /// Executed average price
-    pub executed_price: *const c_char,
-    /// Executed total quantity
-    pub executed_qty: *const c_char,
+    /// Order price (can be null)
+    pub price: *const CDecimal,
+    /// Order quantity (can be null)
+    pub quantity: *const CDecimal,
+    /// Executed average price (can be null)
+    pub executed_price: *const CDecimal,
+    /// Executed total quantity (can be null)
+    pub executed_qty: *const CDecimal,
     /// Submitted time (unix timestamp, maybe null)
     pub submitted_at: *const i64,
     /// Buy / sell direction
     pub action: i32,
     /// Order type
     pub order_type: *const c_char,
-    /// Trigger price
-    pub trigger_price: *const c_char,
+    /// Trigger price (can be null)
+    pub trigger_price: *const CDecimal,
     /// Rejection reason, if any
     pub msg: *const c_char,
     /// Settlement currency
     pub currency: *const c_char,
-    /// Latest quote price
-    pub last_done: *const c_char,
+    /// Latest quote price (can be null)
+    pub last_done: *const CDecimal,
     /// Last updated time (unix timestamp, maybe null)
     pub updated_at: *const i64,
     /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
@@ -869,17 +869,17 @@ pub(crate) struct CTriggerOrderOwned {
     status: CString,
     name: CString,
     symbol: CString,
-    price: CString,
-    quantity: CString,
-    executed_price: CString,
-    executed_qty: CString,
+    price: COption<CDecimal>,
+    quantity: COption<CDecimal>,
+    executed_price: COption<CDecimal>,
+    executed_qty: COption<CDecimal>,
     submitted_at: Option<i64>,
     action: i32,
     order_type: CString,
-    trigger_price: CString,
+    trigger_price: COption<CDecimal>,
     msg: CString,
     currency: CString,
-    last_done: CString,
+    last_done: COption<CDecimal>,
     updated_at: Option<i64>,
     time_in_force: i32,
     gtd: CString,
@@ -906,7 +906,7 @@ impl From<TriggerOrder> for CTriggerOrderOwned {
             currency: t.currency.into(),
             last_done: t.last_done.into(),
             updated_at: t.updated_at.map(OffsetDateTime::unix_timestamp),
-            time_in_force: t.time_in_force,
+            time_in_force: t.time_in_force.into(),
             gtd: t.gtd.into(),
             trigger_at: t.trigger_at.map(OffsetDateTime::unix_timestamp),
             trigger_status: t.trigger_status,
@@ -923,10 +923,10 @@ impl ToFFI for CTriggerOrderOwned {
             status: self.status.to_ffi_type(),
             name: self.name.to_ffi_type(),
             symbol: self.symbol.to_ffi_type(),
-            price: self.price.to_ffi_type(),
-            quantity: self.quantity.to_ffi_type(),
-            executed_price: self.executed_price.to_ffi_type(),
-            executed_qty: self.executed_qty.to_ffi_type(),
+            price: self.price.to_ffi_type().to_ffi_type(),
+            quantity: self.quantity.to_ffi_type().to_ffi_type(),
+            executed_price: self.executed_price.to_ffi_type().to_ffi_type(),
+            executed_qty: self.executed_qty.to_ffi_type().to_ffi_type(),
             submitted_at: self
                 .submitted_at
                 .as_ref()
@@ -934,10 +934,10 @@ impl ToFFI for CTriggerOrderOwned {
                 .unwrap_or(std::ptr::null()),
             action: self.action,
             order_type: self.order_type.to_ffi_type(),
-            trigger_price: self.trigger_price.to_ffi_type(),
+            trigger_price: self.trigger_price.to_ffi_type().to_ffi_type(),
             msg: self.msg.to_ffi_type(),
             currency: self.currency.to_ffi_type(),
-            last_done: self.last_done.to_ffi_type(),
+            last_done: self.last_done.to_ffi_type().to_ffi_type(),
             updated_at: self
                 .updated_at
                 .as_ref()
@@ -958,19 +958,19 @@ impl ToFFI for CTriggerOrderOwned {
 /// A price-step (bid-size) rule entry from the order-info response.
 #[repr(C)]
 pub struct CGridBidSize {
-    /// Range start price (inclusive)
-    pub str_proceed: *const c_char,
-    /// Range end price
-    pub end_proceed: *const c_char,
-    /// Price step within the range
-    pub bid_size: *const c_char,
+    /// Range start price (inclusive) (can be null)
+    pub str_proceed: *const CDecimal,
+    /// Range end price (can be null)
+    pub end_proceed: *const CDecimal,
+    /// Price step within the range (can be null)
+    pub bid_size: *const CDecimal,
 }
 
 #[derive(Debug)]
 pub(crate) struct CGridBidSizeOwned {
-    str_proceed: CString,
-    end_proceed: CString,
-    bid_size: CString,
+    str_proceed: COption<CDecimal>,
+    end_proceed: COption<CDecimal>,
+    bid_size: COption<CDecimal>,
 }
 
 impl From<GridBidSize> for CGridBidSizeOwned {
@@ -988,9 +988,9 @@ impl ToFFI for CGridBidSizeOwned {
 
     fn to_ffi_type(&self) -> Self::FFIType {
         CGridBidSize {
-            str_proceed: self.str_proceed.to_ffi_type(),
-            end_proceed: self.end_proceed.to_ffi_type(),
-            bid_size: self.bid_size.to_ffi_type(),
+            str_proceed: self.str_proceed.to_ffi_type().to_ffi_type(),
+            end_proceed: self.end_proceed.to_ffi_type().to_ffi_type(),
+            bid_size: self.bid_size.to_ffi_type().to_ffi_type(),
         }
     }
 }
@@ -1048,14 +1048,14 @@ impl ToFFI for CGridChannelInfoOwned {
 pub struct CGridOrderInfo {
     /// Security name
     pub name: *const c_char,
-    /// Latest quote price
-    pub last_done: *const c_char,
-    /// Board lot size
-    pub lot_size: *const c_char,
-    /// Buy-side board lot size
-    pub buy_lot_size: *const c_char,
-    /// Sell-side board lot size
-    pub sell_lot_size: *const c_char,
+    /// Latest quote price (can be null)
+    pub last_done: *const CDecimal,
+    /// Board lot size (can be null)
+    pub lot_size: *const CDecimal,
+    /// Buy-side board lot size (can be null)
+    pub buy_lot_size: *const CDecimal,
+    /// Sell-side board lot size (can be null)
+    pub sell_lot_size: *const CDecimal,
     /// Price-step (bid-size) rule table
     pub bid_sizes: *const CGridBidSize,
     /// Number of bid-size entries
@@ -1067,10 +1067,10 @@ pub struct CGridOrderInfo {
 #[derive(Debug)]
 pub(crate) struct CGridOrderInfoOwned {
     name: CString,
-    last_done: CString,
-    lot_size: CString,
-    buy_lot_size: CString,
-    sell_lot_size: CString,
+    last_done: COption<CDecimal>,
+    lot_size: COption<CDecimal>,
+    buy_lot_size: COption<CDecimal>,
+    sell_lot_size: COption<CDecimal>,
     bid_sizes: CVec<CGridBidSizeOwned>,
     channel_infos: CGridChannelInfoOwned,
 }
@@ -1095,10 +1095,10 @@ impl ToFFI for CGridOrderInfoOwned {
     fn to_ffi_type(&self) -> Self::FFIType {
         CGridOrderInfo {
             name: self.name.to_ffi_type(),
-            last_done: self.last_done.to_ffi_type(),
-            lot_size: self.lot_size.to_ffi_type(),
-            buy_lot_size: self.buy_lot_size.to_ffi_type(),
-            sell_lot_size: self.sell_lot_size.to_ffi_type(),
+            last_done: self.last_done.to_ffi_type().to_ffi_type(),
+            lot_size: self.lot_size.to_ffi_type().to_ffi_type(),
+            buy_lot_size: self.buy_lot_size.to_ffi_type().to_ffi_type(),
+            sell_lot_size: self.sell_lot_size.to_ffi_type().to_ffi_type(),
             bid_sizes: self.bid_sizes.to_ffi_type(),
             num_bid_sizes: self.bid_sizes.len(),
             channel_infos: self.channel_infos.to_ffi_type(),

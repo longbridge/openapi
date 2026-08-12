@@ -2308,7 +2308,77 @@ struct PushGridOrderChanged
 
 namespace grid {
 
+/// How grid trigger thresholds are interpreted (wire: `int32_t`).
+enum class TriggerPriceType : int32_t
+{
+  /// Unknown / unset
+  Unknown = 0,
+  /// Trigger by absolute price spread
+  Spread = 1,
+  /// Trigger by percent
+  Percent = 2,
+};
+
+/// Time in force for a grid order (wire: `int32_t`). Values other than the
+/// named ones are preserved verbatim in the underlying `int32_t`.
+enum class GridTimeInForce : int32_t
+{
+  /// Day order
+  Day = 0,
+  /// Good-til-canceled
+  GoodTilCanceled = 1,
+  /// Good-til-date
+  GoodTilDate = 6,
+};
+
+/// Action taken when a grid boundary is reached (wire: `int32_t`).
+enum class GridLimitEvent : int32_t
+{
+  /// Unknown / unset
+  Unknown = 0,
+  /// Ignore — keep the grid running
+  Ignore = 1,
+  /// Close the position at the last price
+  CloseAtLast = 2,
+};
+
+/// How a grid's up/down trigger thresholds are expressed. Percent and spread
+/// are mutually exclusive; modeling them together makes the choice explicit
+/// (instead of four independent optional fields).
+struct GridTrigger
+{
+  /// Threshold interpretation kind.
+  enum class Kind
+  {
+    /// Trigger by percent
+    Percent,
+    /// Trigger by absolute price spread
+    Spread,
+  };
+  /// Which interpretation the `up` / `down` values use.
+  Kind kind;
+  /// Upward trigger threshold
+  Decimal up;
+  /// Downward trigger threshold
+  Decimal down;
+
+  /// Trigger by percent (`up`, `down`).
+  static GridTrigger percent(Decimal up, Decimal down)
+  {
+    return GridTrigger{ Kind::Percent, up, down };
+  }
+  /// Trigger by absolute price spread (`up`, `down`).
+  static GridTrigger spread(Decimal up, Decimal down)
+  {
+    return GridTrigger{ Kind::Spread, up, down };
+  }
+};
+
 /// Grid trading rule — parameters for submit / replace.
+///
+/// All fields are public and optional; use `GridTradeRule::create` to build a
+/// rule with the minimum required field set visible in the signature, then the
+/// fluent `with_*` setters for optional parameters.
 struct GridTradeRule
 {
   /// Base price the grid is anchored to
@@ -2317,8 +2387,8 @@ struct GridTradeRule
   std::optional<Decimal> upper_limit_price;
   /// Lower price bound
   std::optional<Decimal> lower_limit_price;
-  /// Trigger price type (only `1` / `2` allowed)
-  std::optional<int32_t> trigger_price_type;
+  /// Trigger price type (only `Spread` / `Percent` allowed)
+  std::optional<TriggerPriceType> trigger_price_type;
   /// Upward trigger spread (absolute)
   std::optional<Decimal> trigger_spread_up;
   /// Downward trigger spread (absolute)
@@ -2329,18 +2399,20 @@ struct GridTradeRule
   std::optional<Decimal> trigger_percent_down;
   /// Whether a single grid level may trigger multiple times
   std::optional<bool> multiple_trigger;
-  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-  std::optional<int32_t> time_in_force;
+  /// Time in force (`Day` / `GoodTilCanceled` / `GoodTilDate`)
+  std::optional<GridTimeInForce> time_in_force;
   /// Quantity handled when the upper bound is reached
   std::optional<Decimal> upper_limit_quantity;
   /// Quantity handled when the lower bound is reached
   std::optional<Decimal> lower_limit_quantity;
   /// Expiry time (unix seconds), used with GTD
   std::optional<int64_t> expire_time;
-  /// Action when the upper bound is reached (only `1` / `2` allowed)
-  std::optional<int32_t> upper_limit_event;
-  /// Action when the lower bound is reached (only `1` / `2` allowed)
-  std::optional<int32_t> lower_limit_event;
+  /// Action when the upper bound is reached (only `Ignore` / `CloseAtLast`
+  /// allowed)
+  std::optional<GridLimitEvent> upper_limit_event;
+  /// Action when the lower bound is reached (only `Ignore` / `CloseAtLast`
+  /// allowed)
+  std::optional<GridLimitEvent> lower_limit_event;
   /// Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`)
   std::optional<int32_t> trigger_sell_depth;
   /// Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`)
@@ -2355,6 +2427,90 @@ struct GridTradeRule
   std::optional<std::string> grid_order_type_up;
   /// Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`)
   std::optional<std::string> grid_order_type_down;
+
+  /// Create a rule with the fields a valid grid order requires. The gateway
+  /// still validates business rules, but this makes the minimum field set
+  /// visible in the signature instead of leaving all fields optional.
+  static GridTradeRule create(Decimal base_price,
+                              Decimal upper_price,
+                              Decimal lower_price,
+                              GridTrigger trigger,
+                              Decimal quantity,
+                              Decimal upper_quantity,
+                              Decimal lower_quantity,
+                              GridTimeInForce time_in_force)
+  {
+    GridTradeRule rule;
+    rule.submitted_base_price = base_price;
+    rule.upper_limit_price = upper_price;
+    rule.lower_limit_price = lower_price;
+    rule.trigger_quantity = quantity;
+    rule.upper_limit_quantity = upper_quantity;
+    rule.lower_limit_quantity = lower_quantity;
+    rule.time_in_force = time_in_force;
+    if (trigger.kind == GridTrigger::Kind::Percent) {
+      rule.trigger_price_type = TriggerPriceType::Percent;
+      rule.trigger_percent_up = trigger.up;
+      rule.trigger_percent_down = trigger.down;
+    } else {
+      rule.trigger_price_type = TriggerPriceType::Spread;
+      rule.trigger_spread_up = trigger.up;
+      rule.trigger_spread_down = trigger.down;
+    }
+    return rule;
+  }
+
+  /// Set the actions taken at the upper / lower bounds.
+  GridTradeRule& with_limit_events(GridLimitEvent upper, GridLimitEvent lower)
+  {
+    upper_limit_event = upper;
+    lower_limit_event = lower;
+    return *this;
+  }
+
+  /// Set the sell / buy order-book depths (`0` = use the order type).
+  GridTradeRule& with_depths(int32_t sell, int32_t buy)
+  {
+    trigger_sell_depth = sell;
+    trigger_buy_depth = buy;
+    return *this;
+  }
+
+  /// Set the sell / buy order types (`GMO` / `GLO` / `GTG`).
+  GridTradeRule& with_order_types(std::string up, std::string down)
+  {
+    grid_order_type_up = std::move(up);
+    grid_order_type_down = std::move(down);
+    return *this;
+  }
+
+  /// Allow a single grid level to trigger multiple times.
+  GridTradeRule& with_multiple_trigger(bool value)
+  {
+    multiple_trigger = value;
+    return *this;
+  }
+
+  /// Allow short selling.
+  GridTradeRule& with_support_shortsell(bool value)
+  {
+    support_shortsell = value;
+    return *this;
+  }
+
+  /// Set the regular-trading-hours flag (`0` / `1` / `2`).
+  GridTradeRule& with_rth(int32_t value)
+  {
+    rth = value;
+    return *this;
+  }
+
+  /// Set the expiry time (unix seconds), used with a GTD time-in-force.
+  GridTradeRule& with_expire_time(int64_t unix_seconds)
+  {
+    expire_time = unix_seconds;
+    return *this;
+  }
 };
 
 /// Options for submit grid trading order request
@@ -2448,35 +2604,35 @@ struct GridOrder
   /// Grid running status
   std::string grid_status;
   /// Submitted base price
-  std::string submitted_base_price;
+  std::optional<Decimal> submitted_base_price;
   /// Current base price
-  std::string current_base_price;
+  std::optional<Decimal> current_base_price;
   /// Base price before the last trigger
-  std::string pre_trigger_base_price;
+  std::optional<Decimal> pre_trigger_base_price;
   /// Base price after the last trigger
-  std::string post_trigger_base_price;
+  std::optional<Decimal> post_trigger_base_price;
   /// Upper price bound
-  std::string upper_limit_price;
+  std::optional<Decimal> upper_limit_price;
   /// Lower price bound
-  std::string lower_limit_price;
-  /// Trigger price type (`1` = spread, `2` = percent)
-  int32_t trigger_price_type;
+  std::optional<Decimal> lower_limit_price;
+  /// Trigger price type
+  TriggerPriceType trigger_price_type;
   /// Upward trigger spread
-  std::string trigger_spread_up;
+  std::optional<Decimal> trigger_spread_up;
   /// Downward trigger spread
-  std::string trigger_spread_down;
+  std::optional<Decimal> trigger_spread_down;
   /// Upward trigger percent
-  std::string trigger_percent_up;
+  std::optional<Decimal> trigger_percent_up;
   /// Downward trigger percent
-  std::string trigger_percent_down;
+  std::optional<Decimal> trigger_percent_down;
   /// Pullback percent
-  std::string pullback_percent;
+  std::optional<Decimal> pullback_percent;
   /// Pullback spread
-  std::string pullback_spread;
+  std::optional<Decimal> pullback_spread;
   /// Rebound percent
-  std::string rebound_percent;
+  std::optional<Decimal> rebound_percent;
   /// Rebound spread
-  std::string rebound_spread;
+  std::optional<Decimal> rebound_spread;
   /// Sell-side execution order type (e.g. `MO`)
   std::string trigger_sell_order_type;
   /// Buy-side execution order type (e.g. `MO`)
@@ -2486,33 +2642,33 @@ struct GridOrder
   /// Buy-side order-book depth
   int32_t trigger_buy_depth;
   /// Quantity per trigger
-  std::string trigger_quantity;
+  std::optional<Decimal> trigger_quantity;
   /// Quantity per sell trigger
-  std::string trigger_sell_quantity;
+  std::optional<Decimal> trigger_sell_quantity;
   /// Quantity per buy trigger
-  std::string trigger_buy_quantity;
+  std::optional<Decimal> trigger_buy_quantity;
   /// Quantity handled at the upper bound
-  std::string upper_limit_quantity;
+  std::optional<Decimal> upper_limit_quantity;
   /// Quantity handled at the lower bound
-  std::string lower_limit_quantity;
+  std::optional<Decimal> lower_limit_quantity;
   /// Action at the upper bound
-  int32_t upper_limit_event;
+  GridLimitEvent upper_limit_event;
   /// Action at the lower bound
-  int32_t lower_limit_event;
+  GridLimitEvent lower_limit_event;
   /// Whether a single grid level may trigger multiple times
   bool multiple_trigger;
   /// Number of times the grid has triggered
   int32_t trigger_times;
   /// Accumulated bought quantity
-  std::string total_buy_quantity;
+  std::optional<Decimal> total_buy_quantity;
   /// Accumulated sold quantity
-  std::string total_sell_quantity;
+  std::optional<Decimal> total_sell_quantity;
   /// Accumulated profit balance
-  std::string total_profit_balance;
+  std::optional<Decimal> total_profit_balance;
   /// Settlement currency
   std::string settlement_currency;
-  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-  int32_t time_in_force;
+  /// Time in force
+  GridTimeInForce time_in_force;
   /// Expiry date (`YYYY-MM-DD`, GTD)
   std::string gtd;
   /// Created time (unix timestamp)
@@ -2533,13 +2689,13 @@ struct GridOrderSubOrder
   /// Sub-order ID
   std::string id;
   /// Order price
-  std::string price;
+  std::optional<Decimal> price;
   /// Order type
   std::string order_type;
   /// Order quantity
-  std::string quantity;
+  std::optional<Decimal> quantity;
   /// Executed quantity
-  std::string executed_qty;
+  std::optional<Decimal> executed_qty;
   /// Buy / sell direction
   int32_t action;
   /// Order status
@@ -2583,49 +2739,49 @@ struct GridOrderDetail
   /// Sleeping reason, if any
   std::string sleeping_reason;
   /// Submitted base price
-  std::string submitted_base_price;
+  std::optional<Decimal> submitted_base_price;
   /// Current base price
-  std::string current_base_price;
+  std::optional<Decimal> current_base_price;
   /// Upper price bound
-  std::string upper_limit_price;
+  std::optional<Decimal> upper_limit_price;
   /// Lower price bound
-  std::string lower_limit_price;
-  /// Trigger price type (`1` = spread, `2` = percent)
-  int32_t trigger_price_type;
+  std::optional<Decimal> lower_limit_price;
+  /// Trigger price type
+  TriggerPriceType trigger_price_type;
   /// Upward trigger spread
-  std::string trigger_spread_up;
+  std::optional<Decimal> trigger_spread_up;
   /// Downward trigger spread
-  std::string trigger_spread_down;
+  std::optional<Decimal> trigger_spread_down;
   /// Upward trigger percent
-  std::string trigger_percent_up;
+  std::optional<Decimal> trigger_percent_up;
   /// Downward trigger percent
-  std::string trigger_percent_down;
+  std::optional<Decimal> trigger_percent_down;
   /// Pullback percent
-  std::string pullback_percent;
+  std::optional<Decimal> pullback_percent;
   /// Pullback spread
-  std::string pullback_spread;
+  std::optional<Decimal> pullback_spread;
   /// Rebound percent
-  std::string rebound_percent;
+  std::optional<Decimal> rebound_percent;
   /// Rebound spread
-  std::string rebound_spread;
+  std::optional<Decimal> rebound_spread;
   /// Whether a single grid level may trigger multiple times
   bool multiple_trigger;
-  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-  int32_t time_in_force;
+  /// Time in force
+  GridTimeInForce time_in_force;
   /// Quantity per trigger
-  std::string trigger_quantity;
+  std::optional<Decimal> trigger_quantity;
   /// Quantity per sell trigger
-  std::string trigger_sell_quantity;
+  std::optional<Decimal> trigger_sell_quantity;
   /// Quantity per buy trigger
-  std::string trigger_buy_quantity;
+  std::optional<Decimal> trigger_buy_quantity;
   /// Quantity handled at the upper bound
-  std::string upper_limit_quantity;
+  std::optional<Decimal> upper_limit_quantity;
   /// Quantity handled at the lower bound
-  std::string lower_limit_quantity;
+  std::optional<Decimal> lower_limit_quantity;
   /// Action at the upper bound
-  int32_t upper_limit_event;
+  GridLimitEvent upper_limit_event;
   /// Action at the lower bound
-  int32_t lower_limit_event;
+  GridLimitEvent lower_limit_event;
   /// Sell-side order-book depth
   int32_t trigger_sell_depth;
   /// Buy-side order-book depth
@@ -2670,13 +2826,13 @@ struct TriggerOrder
   /// Security symbol (e.g. `700.HK`)
   std::string symbol;
   /// Order price
-  std::string price;
+  std::optional<Decimal> price;
   /// Order quantity
-  std::string quantity;
+  std::optional<Decimal> quantity;
   /// Executed average price
-  std::string executed_price;
+  std::optional<Decimal> executed_price;
   /// Executed total quantity
-  std::string executed_qty;
+  std::optional<Decimal> executed_qty;
   /// Submitted time (unix timestamp)
   std::optional<int64_t> submitted_at;
   /// Buy / sell direction
@@ -2684,17 +2840,17 @@ struct TriggerOrder
   /// Order type
   std::string order_type;
   /// Trigger price
-  std::string trigger_price;
+  std::optional<Decimal> trigger_price;
   /// Rejection reason, if any
   std::string msg;
   /// Settlement currency
   std::string currency;
   /// Latest quote price
-  std::string last_done;
+  std::optional<Decimal> last_done;
   /// Last updated time (unix timestamp)
   std::optional<int64_t> updated_at;
-  /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-  int32_t time_in_force;
+  /// Time in force
+  GridTimeInForce time_in_force;
   /// Expiry date (`YYYY-MM-DD`, GTD)
   std::string gtd;
   /// Trigger time (unix timestamp)
@@ -2707,11 +2863,11 @@ struct TriggerOrder
 struct GridBidSize
 {
   /// Range start price (inclusive)
-  std::string str_proceed;
+  std::optional<Decimal> str_proceed;
   /// Range end price
-  std::string end_proceed;
+  std::optional<Decimal> end_proceed;
   /// Price step within the range
-  std::string bid_size;
+  std::optional<Decimal> bid_size;
 };
 
 /// Channel / authorization info nested in the order-info response.
@@ -2733,13 +2889,13 @@ struct GridOrderInfo
   /// Security name
   std::string name;
   /// Latest quote price
-  std::string last_done;
+  std::optional<Decimal> last_done;
   /// Board lot size
-  std::string lot_size;
+  std::optional<Decimal> lot_size;
   /// Buy-side board lot size
-  std::string buy_lot_size;
+  std::optional<Decimal> buy_lot_size;
   /// Sell-side board lot size
-  std::string sell_lot_size;
+  std::optional<Decimal> sell_lot_size;
   /// Price-step (bid-size) rule table
   std::vector<GridBidSize> bid_sizes;
   /// Channel / authorization info (strategy grant, RTH, currencies)

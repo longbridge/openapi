@@ -131,7 +131,10 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::alert::types::AlertCondition,
         longbridge::alert::types::AlertFrequency,
         longbridge::calendar::types::CalendarCategory,
-        longbridge::agent::ConversationStatus
+        longbridge::agent::ConversationStatus,
+        longbridge::grid::TriggerPriceType,
+        longbridge::grid::GridLimitEvent,
+        longbridge::grid::GridTimeInForce
     );
 
     // classes

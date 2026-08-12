@@ -1,5 +1,7 @@
 package com.longbridge.grid;
 
+import java.math.BigDecimal;
+
 import java.time.OffsetDateTime;
 
 /**
@@ -10,19 +12,19 @@ public class TriggerOrder {
     private String status;
     private String name;
     private String symbol;
-    private String price;
-    private String quantity;
-    private String executedPrice;
-    private String executedQty;
+    private BigDecimal price;
+    private BigDecimal quantity;
+    private BigDecimal executedPrice;
+    private BigDecimal executedQty;
     private OffsetDateTime submittedAt;
     private int action;
     private String orderType;
-    private String triggerPrice;
+    private BigDecimal triggerPrice;
     private String msg;
     private String currency;
-    private String lastDone;
+    private BigDecimal lastDone;
     private OffsetDateTime updatedAt;
-    private int timeInForce;
+    private GridTimeInForce timeInForce;
     private String gtd;
     private OffsetDateTime triggerAt;
     private int triggerStatus;
@@ -68,7 +70,7 @@ public class TriggerOrder {
      *
      * @return price
      */
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -77,7 +79,7 @@ public class TriggerOrder {
      *
      * @return quantity
      */
-    public String getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
@@ -86,7 +88,7 @@ public class TriggerOrder {
      *
      * @return executedPrice
      */
-    public String getExecutedPrice() {
+    public BigDecimal getExecutedPrice() {
         return executedPrice;
     }
 
@@ -95,7 +97,7 @@ public class TriggerOrder {
      *
      * @return executedQty
      */
-    public String getExecutedQty() {
+    public BigDecimal getExecutedQty() {
         return executedQty;
     }
 
@@ -131,7 +133,7 @@ public class TriggerOrder {
      *
      * @return triggerPrice
      */
-    public String getTriggerPrice() {
+    public BigDecimal getTriggerPrice() {
         return triggerPrice;
     }
 
@@ -158,7 +160,7 @@ public class TriggerOrder {
      *
      * @return lastDone
      */
-    public String getLastDone() {
+    public BigDecimal getLastDone() {
         return lastDone;
     }
 
@@ -176,7 +178,7 @@ public class TriggerOrder {
      *
      * @return timeInForce
      */
-    public int getTimeInForce() {
+    public GridTimeInForce getTimeInForce() {
         return timeInForce;
     }
 

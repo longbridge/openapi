@@ -72,21 +72,21 @@ fn read_grid_trade_rule(
     rule.upper_limit_price = get_field(env, obj, "upperLimitPrice")?;
     rule.lower_limit_price = get_field(env, obj, "lowerLimitPrice")?;
     rule.trigger_price_type =
-        get_field::<_, _, Option<JavaInteger>>(env, obj, "triggerPriceType")?.map(i32::from);
+        get_field::<_, _, Option<longbridge::grid::TriggerPriceType>>(env, obj, "triggerPriceType")?;
     rule.trigger_spread_up = get_field(env, obj, "triggerSpreadUp")?;
     rule.trigger_spread_down = get_field(env, obj, "triggerSpreadDown")?;
     rule.trigger_percent_up = get_field(env, obj, "triggerPercentUp")?;
     rule.trigger_percent_down = get_field(env, obj, "triggerPercentDown")?;
     rule.multiple_trigger = read_opt_bool(env, obj, "multipleTrigger")?;
     rule.time_in_force =
-        get_field::<_, _, Option<JavaInteger>>(env, obj, "timeInForce")?.map(i32::from);
+        get_field::<_, _, Option<longbridge::grid::GridTimeInForce>>(env, obj, "timeInForce")?;
     rule.upper_limit_quantity = get_field(env, obj, "upperLimitQuantity")?;
     rule.lower_limit_quantity = get_field(env, obj, "lowerLimitQuantity")?;
     rule.expire_time = get_field::<_, _, Option<JavaLong>>(env, obj, "expireTime")?.map(i64::from);
     rule.upper_limit_event =
-        get_field::<_, _, Option<JavaInteger>>(env, obj, "upperLimitEvent")?.map(i32::from);
+        get_field::<_, _, Option<longbridge::grid::GridLimitEvent>>(env, obj, "upperLimitEvent")?;
     rule.lower_limit_event =
-        get_field::<_, _, Option<JavaInteger>>(env, obj, "lowerLimitEvent")?.map(i32::from);
+        get_field::<_, _, Option<longbridge::grid::GridLimitEvent>>(env, obj, "lowerLimitEvent")?;
     rule.trigger_sell_depth =
         get_field::<_, _, Option<JavaInteger>>(env, obj, "triggerSellDepth")?.map(i32::from);
     rule.trigger_buy_depth =

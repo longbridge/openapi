@@ -9,7 +9,7 @@ use longbridge_java_macros::impl_java_enum;
 
 use crate::{
     init::DERIVATIVE_TYPE_CLASS,
-    types::{IntoJValue, JSignature},
+    types::{ClassLoader, FromJValue, IntoJValue, JSignature},
 };
 
 impl_java_enum!(
@@ -535,3 +535,94 @@ impl_java_enum!(
     longbridge::agent::ConversationStatus,
     [Succeeded, Interrupted, Failed, Stopped]
 );
+
+impl_java_enum!(
+    "com/longbridge/grid/TriggerPriceType",
+    longbridge::grid::TriggerPriceType,
+    [Unknown, Spread, Percent]
+);
+
+impl_java_enum!(
+    "com/longbridge/grid/GridLimitEvent",
+    longbridge::grid::GridLimitEvent,
+    [Unknown, Ignore, CloseAtLast]
+);
+
+// `GridTimeInForce` carries a catch-all `Unknown(i32)` data variant that the
+// unit-variant `impl_java_enum!` macro cannot express, so bridge it by hand.
+// The Java side is a plain enum, so an unknown wire value maps to `Unknown` and
+// back to `Unknown(0)`.
+#[allow(non_upper_case_globals)]
+static com_longbridge_grid_GridTimeInForce: std::sync::OnceLock<jni::objects::GlobalRef> =
+    std::sync::OnceLock::new();
+
+impl ClassLoader for longbridge::grid::GridTimeInForce {
+    fn init(env: &mut JNIEnv) {
+        let cls = jni::descriptors::Desc::<jni::objects::JClass>::lookup(
+            "com/longbridge/grid/GridTimeInForce",
+            env,
+        )
+        .expect("com/longbridge/grid/GridTimeInForce");
+        let _ = com_longbridge_grid_GridTimeInForce.set(env.new_global_ref(&*cls).unwrap());
+    }
+
+    fn class_ref() -> jni::objects::GlobalRef {
+        com_longbridge_grid_GridTimeInForce.get().cloned().unwrap()
+    }
+}
+
+impl JSignature for longbridge::grid::GridTimeInForce {
+    #[inline]
+    fn signature() -> Cow<'static, str> {
+        "Lcom/longbridge/grid/GridTimeInForce;".into()
+    }
+}
+
+impl FromJValue for longbridge::grid::GridTimeInForce {
+    fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
+        use longbridge::grid::GridTimeInForce;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let value = value.l()?;
+        if value.is_null() {
+            crate::error::throw_illegal_argument(
+                env,
+                "argument of enum type com/longbridge/grid/GridTimeInForce must not be null",
+            );
+            return Err(jni::errors::Error::JavaException);
+        }
+        for (name, variant) in [
+            ("Day", GridTimeInForce::Day),
+            ("GoodTilCanceled", GridTimeInForce::GoodTilCanceled),
+            ("GoodTilDate", GridTimeInForce::GoodTilDate),
+            ("Unknown", GridTimeInForce::Unknown(0)),
+        ] {
+            let r = env
+                .get_static_field(&cls, name, "Lcom/longbridge/grid/GridTimeInForce;")?
+                .l()?;
+            if env.is_same_object(&value, r)? {
+                return Ok(variant);
+            }
+        }
+        crate::error::throw_illegal_argument(
+            env,
+            "unrecognized enum value for com/longbridge/grid/GridTimeInForce",
+        );
+        Err(jni::errors::Error::JavaException)
+    }
+}
+
+impl IntoJValue for longbridge::grid::GridTimeInForce {
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        use longbridge::grid::GridTimeInForce;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let name = match self {
+            GridTimeInForce::Day => "Day",
+            GridTimeInForce::GoodTilCanceled => "GoodTilCanceled",
+            GridTimeInForce::GoodTilDate => "GoodTilDate",
+            GridTimeInForce::Unknown(_) => "Unknown",
+        };
+        env.get_static_field(&cls, name, "Lcom/longbridge/grid/GridTimeInForce;")
+    }
+}

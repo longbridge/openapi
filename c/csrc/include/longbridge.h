@@ -5768,65 +5768,65 @@ typedef struct lb_grid_order_t {
    */
   const char *grid_status;
   /**
-   * Submitted base price
+   * Submitted base price (can be null)
    */
-  const char *submitted_base_price;
+  const struct lb_decimal_t *submitted_base_price;
   /**
-   * Current base price
+   * Current base price (can be null)
    */
-  const char *current_base_price;
+  const struct lb_decimal_t *current_base_price;
   /**
-   * Base price before the last trigger
+   * Base price before the last trigger (can be null)
    */
-  const char *pre_trigger_base_price;
+  const struct lb_decimal_t *pre_trigger_base_price;
   /**
-   * Base price after the last trigger
+   * Base price after the last trigger (can be null)
    */
-  const char *post_trigger_base_price;
+  const struct lb_decimal_t *post_trigger_base_price;
   /**
-   * Upper price bound
+   * Upper price bound (can be null)
    */
-  const char *upper_limit_price;
+  const struct lb_decimal_t *upper_limit_price;
   /**
-   * Lower price bound
+   * Lower price bound (can be null)
    */
-  const char *lower_limit_price;
+  const struct lb_decimal_t *lower_limit_price;
   /**
    * Trigger price type (`1` = spread, `2` = percent)
    */
   int32_t trigger_price_type;
   /**
-   * Upward trigger spread
+   * Upward trigger spread (can be null)
    */
-  const char *trigger_spread_up;
+  const struct lb_decimal_t *trigger_spread_up;
   /**
-   * Downward trigger spread
+   * Downward trigger spread (can be null)
    */
-  const char *trigger_spread_down;
+  const struct lb_decimal_t *trigger_spread_down;
   /**
-   * Upward trigger percent
+   * Upward trigger percent (can be null)
    */
-  const char *trigger_percent_up;
+  const struct lb_decimal_t *trigger_percent_up;
   /**
-   * Downward trigger percent
+   * Downward trigger percent (can be null)
    */
-  const char *trigger_percent_down;
+  const struct lb_decimal_t *trigger_percent_down;
   /**
-   * Pullback percent
+   * Pullback percent (can be null)
    */
-  const char *pullback_percent;
+  const struct lb_decimal_t *pullback_percent;
   /**
-   * Pullback spread
+   * Pullback spread (can be null)
    */
-  const char *pullback_spread;
+  const struct lb_decimal_t *pullback_spread;
   /**
-   * Rebound percent
+   * Rebound percent (can be null)
    */
-  const char *rebound_percent;
+  const struct lb_decimal_t *rebound_percent;
   /**
-   * Rebound spread
+   * Rebound spread (can be null)
    */
-  const char *rebound_spread;
+  const struct lb_decimal_t *rebound_spread;
   /**
    * Sell-side execution order type (e.g. `MO`)
    */
@@ -5844,25 +5844,25 @@ typedef struct lb_grid_order_t {
    */
   int32_t trigger_buy_depth;
   /**
-   * Quantity per trigger
+   * Quantity per trigger (can be null)
    */
-  const char *trigger_quantity;
+  const struct lb_decimal_t *trigger_quantity;
   /**
-   * Quantity per sell trigger
+   * Quantity per sell trigger (can be null)
    */
-  const char *trigger_sell_quantity;
+  const struct lb_decimal_t *trigger_sell_quantity;
   /**
-   * Quantity per buy trigger
+   * Quantity per buy trigger (can be null)
    */
-  const char *trigger_buy_quantity;
+  const struct lb_decimal_t *trigger_buy_quantity;
   /**
-   * Quantity handled at the upper bound
+   * Quantity handled at the upper bound (can be null)
    */
-  const char *upper_limit_quantity;
+  const struct lb_decimal_t *upper_limit_quantity;
   /**
-   * Quantity handled at the lower bound
+   * Quantity handled at the lower bound (can be null)
    */
-  const char *lower_limit_quantity;
+  const struct lb_decimal_t *lower_limit_quantity;
   /**
    * Action at the upper bound
    */
@@ -5880,17 +5880,17 @@ typedef struct lb_grid_order_t {
    */
   int32_t trigger_times;
   /**
-   * Accumulated bought quantity
+   * Accumulated bought quantity (can be null)
    */
-  const char *total_buy_quantity;
+  const struct lb_decimal_t *total_buy_quantity;
   /**
-   * Accumulated sold quantity
+   * Accumulated sold quantity (can be null)
    */
-  const char *total_sell_quantity;
+  const struct lb_decimal_t *total_sell_quantity;
   /**
-   * Accumulated profit balance
+   * Accumulated profit balance (can be null)
    */
-  const char *total_profit_balance;
+  const struct lb_decimal_t *total_profit_balance;
   /**
    * Settlement currency
    */
@@ -5934,21 +5934,21 @@ typedef struct lb_grid_order_sub_order_t {
    */
   const char *id;
   /**
-   * Order price
+   * Order price (can be null)
    */
-  const char *price;
+  const struct lb_decimal_t *price;
   /**
    * Order type
    */
   const char *order_type;
   /**
-   * Order quantity
+   * Order quantity (can be null)
    */
-  const char *quantity;
+  const struct lb_decimal_t *quantity;
   /**
-   * Executed quantity
+   * Executed quantity (can be null)
    */
-  const char *executed_qty;
+  const struct lb_decimal_t *executed_qty;
   /**
    * Buy / sell direction
    */
@@ -6026,57 +6026,57 @@ typedef struct lb_grid_order_detail_t {
    */
   const char *sleeping_reason;
   /**
-   * Submitted base price
+   * Submitted base price (can be null)
    */
-  const char *submitted_base_price;
+  const struct lb_decimal_t *submitted_base_price;
   /**
-   * Current base price
+   * Current base price (can be null)
    */
-  const char *current_base_price;
+  const struct lb_decimal_t *current_base_price;
   /**
-   * Upper price bound
+   * Upper price bound (can be null)
    */
-  const char *upper_limit_price;
+  const struct lb_decimal_t *upper_limit_price;
   /**
-   * Lower price bound
+   * Lower price bound (can be null)
    */
-  const char *lower_limit_price;
+  const struct lb_decimal_t *lower_limit_price;
   /**
    * Trigger price type (`1` = spread, `2` = percent)
    */
   int32_t trigger_price_type;
   /**
-   * Upward trigger spread
+   * Upward trigger spread (can be null)
    */
-  const char *trigger_spread_up;
+  const struct lb_decimal_t *trigger_spread_up;
   /**
-   * Downward trigger spread
+   * Downward trigger spread (can be null)
    */
-  const char *trigger_spread_down;
+  const struct lb_decimal_t *trigger_spread_down;
   /**
-   * Upward trigger percent
+   * Upward trigger percent (can be null)
    */
-  const char *trigger_percent_up;
+  const struct lb_decimal_t *trigger_percent_up;
   /**
-   * Downward trigger percent
+   * Downward trigger percent (can be null)
    */
-  const char *trigger_percent_down;
+  const struct lb_decimal_t *trigger_percent_down;
   /**
-   * Pullback percent
+   * Pullback percent (can be null)
    */
-  const char *pullback_percent;
+  const struct lb_decimal_t *pullback_percent;
   /**
-   * Pullback spread
+   * Pullback spread (can be null)
    */
-  const char *pullback_spread;
+  const struct lb_decimal_t *pullback_spread;
   /**
-   * Rebound percent
+   * Rebound percent (can be null)
    */
-  const char *rebound_percent;
+  const struct lb_decimal_t *rebound_percent;
   /**
-   * Rebound spread
+   * Rebound spread (can be null)
    */
-  const char *rebound_spread;
+  const struct lb_decimal_t *rebound_spread;
   /**
    * Whether a single grid level may trigger multiple times
    */
@@ -6086,25 +6086,25 @@ typedef struct lb_grid_order_detail_t {
    */
   int32_t time_in_force;
   /**
-   * Quantity per trigger
+   * Quantity per trigger (can be null)
    */
-  const char *trigger_quantity;
+  const struct lb_decimal_t *trigger_quantity;
   /**
-   * Quantity per sell trigger
+   * Quantity per sell trigger (can be null)
    */
-  const char *trigger_sell_quantity;
+  const struct lb_decimal_t *trigger_sell_quantity;
   /**
-   * Quantity per buy trigger
+   * Quantity per buy trigger (can be null)
    */
-  const char *trigger_buy_quantity;
+  const struct lb_decimal_t *trigger_buy_quantity;
   /**
-   * Quantity handled at the upper bound
+   * Quantity handled at the upper bound (can be null)
    */
-  const char *upper_limit_quantity;
+  const struct lb_decimal_t *upper_limit_quantity;
   /**
-   * Quantity handled at the lower bound
+   * Quantity handled at the lower bound (can be null)
    */
-  const char *lower_limit_quantity;
+  const struct lb_decimal_t *lower_limit_quantity;
   /**
    * Action at the upper bound
    */
@@ -6204,21 +6204,21 @@ typedef struct lb_trigger_order_t {
    */
   const char *symbol;
   /**
-   * Order price
+   * Order price (can be null)
    */
-  const char *price;
+  const struct lb_decimal_t *price;
   /**
-   * Order quantity
+   * Order quantity (can be null)
    */
-  const char *quantity;
+  const struct lb_decimal_t *quantity;
   /**
-   * Executed average price
+   * Executed average price (can be null)
    */
-  const char *executed_price;
+  const struct lb_decimal_t *executed_price;
   /**
-   * Executed total quantity
+   * Executed total quantity (can be null)
    */
-  const char *executed_qty;
+  const struct lb_decimal_t *executed_qty;
   /**
    * Submitted time (unix timestamp, maybe null)
    */
@@ -6232,9 +6232,9 @@ typedef struct lb_trigger_order_t {
    */
   const char *order_type;
   /**
-   * Trigger price
+   * Trigger price (can be null)
    */
-  const char *trigger_price;
+  const struct lb_decimal_t *trigger_price;
   /**
    * Rejection reason, if any
    */
@@ -6244,9 +6244,9 @@ typedef struct lb_trigger_order_t {
    */
   const char *currency;
   /**
-   * Latest quote price
+   * Latest quote price (can be null)
    */
-  const char *last_done;
+  const struct lb_decimal_t *last_done;
   /**
    * Last updated time (unix timestamp, maybe null)
    */
@@ -6274,17 +6274,17 @@ typedef struct lb_trigger_order_t {
  */
 typedef struct lb_grid_bid_size_t {
   /**
-   * Range start price (inclusive)
+   * Range start price (inclusive) (can be null)
    */
-  const char *str_proceed;
+  const struct lb_decimal_t *str_proceed;
   /**
-   * Range end price
+   * Range end price (can be null)
    */
-  const char *end_proceed;
+  const struct lb_decimal_t *end_proceed;
   /**
-   * Price step within the range
+   * Price step within the range (can be null)
    */
-  const char *bid_size;
+  const struct lb_decimal_t *bid_size;
 } lb_grid_bid_size_t;
 
 /**
@@ -6322,21 +6322,21 @@ typedef struct lb_grid_order_info_t {
    */
   const char *name;
   /**
-   * Latest quote price
+   * Latest quote price (can be null)
    */
-  const char *last_done;
+  const struct lb_decimal_t *last_done;
   /**
-   * Board lot size
+   * Board lot size (can be null)
    */
-  const char *lot_size;
+  const struct lb_decimal_t *lot_size;
   /**
-   * Buy-side board lot size
+   * Buy-side board lot size (can be null)
    */
-  const char *buy_lot_size;
+  const struct lb_decimal_t *buy_lot_size;
   /**
-   * Sell-side board lot size
+   * Sell-side board lot size (can be null)
    */
-  const char *sell_lot_size;
+  const struct lb_decimal_t *sell_lot_size;
   /**
    * Price-step (bid-size) rule table
    */
