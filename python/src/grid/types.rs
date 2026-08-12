@@ -27,7 +27,11 @@ pub(crate) enum TriggerPriceType {
 /// which serializes back as `0`).
 #[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::grid::GridTimeInForce", from = false, into = false)]
+#[py(
+    remote = "longbridge::grid::GridTimeInForce",
+    from = false,
+    into = false
+)]
 pub(crate) enum GridTimeInForce {
     /// Day order
     Day,

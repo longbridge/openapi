@@ -71,8 +71,11 @@ fn read_grid_trade_rule(
     rule.submitted_base_price = get_field(env, obj, "submittedBasePrice")?;
     rule.upper_limit_price = get_field(env, obj, "upperLimitPrice")?;
     rule.lower_limit_price = get_field(env, obj, "lowerLimitPrice")?;
-    rule.trigger_price_type =
-        get_field::<_, _, Option<longbridge::grid::TriggerPriceType>>(env, obj, "triggerPriceType")?;
+    rule.trigger_price_type = get_field::<_, _, Option<longbridge::grid::TriggerPriceType>>(
+        env,
+        obj,
+        "triggerPriceType",
+    )?;
     rule.trigger_spread_up = get_field(env, obj, "triggerSpreadUp")?;
     rule.trigger_spread_down = get_field(env, obj, "triggerSpreadDown")?;
     rule.trigger_percent_up = get_field(env, obj, "triggerPercentUp")?;

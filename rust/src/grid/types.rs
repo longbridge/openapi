@@ -15,19 +15,26 @@ mod opt_decimal_string {
     use rust_decimal::Decimal;
     use serde::{Deserialize, Deserializer, Serializer};
 
-    pub(crate) fn serialize<S: Serializer>(value: &Option<Decimal>, serializer: S) -> Result<S::Ok, S::Error> {
+    pub(crate) fn serialize<S: Serializer>(
+        value: &Option<Decimal>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
         match value {
             Some(v) => serializer.serialize_str(&v.to_string()),
             None => serializer.serialize_str(""),
         }
     }
 
-    pub(crate) fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<Decimal>, D::Error> {
+    pub(crate) fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Option<Decimal>, D::Error> {
         let s = String::deserialize(deserializer)?;
         if s.is_empty() {
             Ok(None)
         } else {
-            s.parse::<Decimal>().map(Some).map_err(serde::de::Error::custom)
+            s.parse::<Decimal>()
+                .map(Some)
+                .map_err(serde::de::Error::custom)
         }
     }
 }
