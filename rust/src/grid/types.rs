@@ -742,7 +742,11 @@ pub struct GridSymbolInfo {
     pub sell_lot_size: Option<Decimal>,
     /// Price-step (bid-size) rule table
     pub bid_sizes: Vec<GridBidSize>,
-    /// Channel / authorization info (strategy grant, RTH, currencies)
-    #[serde(rename = "channel_infos")]
+    /// Channel / authorization info (strategy grant, RTH, currencies).
+    ///
+    /// Uses `alias` (not `rename`) so deserialization still accepts the
+    /// server's `channel_infos` key, while serialization emits the clean
+    /// `channel_info` name for downstream consumers (e.g. CLI `--format json`).
+    #[serde(alias = "channel_infos")]
     pub channel_info: GridChannelInfo,
 }
