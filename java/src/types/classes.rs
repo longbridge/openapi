@@ -2953,7 +2953,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/Reference",
     longbridge::agent::Reference,
-    [index, title, url]
+    [index, original_index, ref_type, id, title, url, content]
 );
 
 impl_java_class!(
@@ -3000,7 +3000,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/ChatStartedEvent",
     longbridge::agent::ChatStartedPayload,
-    [chat_uid, message_id]
+    [chat_uid, message_id, chat_id, error, error_message]
 );
 
 // JNI-side view of `longbridge::agent::WorkflowStartedInputs`, the `inputs`
