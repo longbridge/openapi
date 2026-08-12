@@ -462,11 +462,11 @@ pub struct GridChannelInfo {
     settlement_currency: Vec<String>,
 }
 
-/// Order info fields used by the grid order window.
+/// Security (symbol) info used to build a grid order.
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
-#[js(remote = "longbridge::grid::GridOrderInfo")]
-pub struct GridOrderInfo {
+#[js(remote = "longbridge::grid::GridSymbolInfo")]
+pub struct GridSymbolInfo {
     /// Security name
     name: String,
     /// Latest quote price
@@ -485,7 +485,7 @@ pub struct GridOrderInfo {
     #[js(array)]
     bid_sizes: Vec<GridBidSize>,
     /// Channel / authorization info (strategy grant, RTH, currencies)
-    channel_infos: GridChannelInfo,
+    channel_info: GridChannelInfo,
 }
 
 /// Response for get grid trading orders (list) request.

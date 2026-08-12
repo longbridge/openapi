@@ -354,31 +354,31 @@ GridContext::submit_strategy_questionnaire(
 }
 
 void
-GridContext::order_info(
+GridContext::symbol_info(
   const std::string& symbol,
-  AsyncCallback<GridContext, GridOrderInfo> callback) const
+  AsyncCallback<GridContext, GridSymbolInfo> callback) const
 {
-  lb_grid_context_order_info(
+  lb_grid_context_symbol_info(
     ctx_,
     symbol.c_str(),
     [](auto res) {
       auto callback_ptr =
-        callback::get_async_callback<GridContext, GridOrderInfo>(
+        callback::get_async_callback<GridContext, GridSymbolInfo>(
           res->userdata);
       GridContext ctx((const lb_grid_context_t*)res->ctx);
       Status status(res->error);
 
       if (status) {
-        GridOrderInfo resp =
-          convert((const lb_grid_order_info_t*)res->data);
-        (*callback_ptr)(AsyncResult<GridContext, GridOrderInfo>(
+        GridSymbolInfo resp =
+          convert((const lb_grid_symbol_info_t*)res->data);
+        (*callback_ptr)(AsyncResult<GridContext, GridSymbolInfo>(
           ctx, std::move(status), &resp));
       } else {
-        (*callback_ptr)(AsyncResult<GridContext, GridOrderInfo>(
+        (*callback_ptr)(AsyncResult<GridContext, GridSymbolInfo>(
           ctx, std::move(status), nullptr));
       }
     },
-    new AsyncCallback<GridContext, GridOrderInfo>(callback));
+    new AsyncCallback<GridContext, GridSymbolInfo>(callback));
 }
 
 } // namespace grid

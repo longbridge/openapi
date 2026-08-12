@@ -11,7 +11,7 @@ use crate::{
             GetGridTriggerHistoryOptions, ReplaceGridOrderOptions, SubmitGridOrderOptions,
         },
         types::{
-            GridOrder, GridOrderDetail, GridOrderInfo, GridOrdersResponse,
+            GridOrder, GridOrderDetail, GridOrdersResponse, GridSymbolInfo,
             GridTriggerHistoryResponse, SubmitGridOrderResponse, TriggerOrder,
         },
     },
@@ -158,12 +158,12 @@ impl GridContext {
         Ok(())
     }
 
-    /// Get order info used by the grid order window (lot size, authorization
-    /// flag, settlement currency, etc.).
+    /// Get the security (symbol) info used to build a grid order (lot size,
+    /// authorization flag, settlement currency, etc.).
     #[napi]
-    pub async fn order_info(&self, symbol: String) -> Result<GridOrderInfo> {
+    pub async fn symbol_info(&self, symbol: String) -> Result<GridSymbolInfo> {
         self.ctx
-            .order_info(symbol)
+            .symbol_info(symbol)
             .await
             .map_err(ErrorNewType)?
             .try_into()

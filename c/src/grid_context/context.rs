@@ -15,9 +15,10 @@ use crate::{
     config::CConfig,
     grid_context::types::{
         CGetGridOrderDetailOptions, CGetGridOrdersByIdsOptions, CGetGridOrdersOptions,
-        CGetGridTriggerHistoryOptions, CGridOrderDetailOwned, CGridOrderInfoOwned, CGridOrderOwned,
-        CGridOrdersResponseOwned, CGridTradeRule, CGridTriggerHistoryResponseOwned,
-        CReplaceGridOrderOptions, CSubmitGridOrderOptions, CSubmitGridOrderResponseOwned,
+        CGetGridTriggerHistoryOptions, CGridOrderDetailOwned, CGridOrderOwned,
+        CGridOrdersResponseOwned, CGridSymbolInfoOwned, CGridTradeRule,
+        CGridTriggerHistoryResponseOwned, CReplaceGridOrderOptions, CSubmitGridOrderOptions,
+        CSubmitGridOrderResponseOwned,
     },
     types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
 };
@@ -338,10 +339,10 @@ pub unsafe extern "C" fn lb_grid_context_submit_strategy_questionnaire(
     });
 }
 
-/// Get order info used by the grid order window (lot size, authorization
-/// flag, settlement currency, etc.).
+/// Get the security (symbol) info used to build a grid order (lot size,
+/// authorization flag, settlement currency, etc.).
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_grid_context_order_info(
+pub unsafe extern "C" fn lb_grid_context_symbol_info(
     ctx: *const CGridContext,
     symbol: *const c_char,
     callback: CAsyncCallback,
@@ -350,7 +351,7 @@ pub unsafe extern "C" fn lb_grid_context_order_info(
     let ctx_inner = (*ctx).ctx.clone();
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CGridOrderInfoOwned> = CCow::new(ctx_inner.order_info(symbol).await?);
+        let resp: CCow<CGridSymbolInfoOwned> = CCow::new(ctx_inner.symbol_info(symbol).await?);
         Ok(resp)
     });
 }

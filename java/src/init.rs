@@ -210,7 +210,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::grid::TriggerOrder,
         longbridge::grid::GridBidSize,
         longbridge::grid::GridChannelInfo,
-        longbridge::grid::GridOrderInfo,
+        longbridge::grid::GridSymbolInfo,
         // Grid push stays on the trade side
         longbridge::trade::PushGridOrderChanged,
         crate::types::GridOrdersResponse,

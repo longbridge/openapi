@@ -297,7 +297,7 @@ public class SdkNative {
 
         public static native void gridContextSubmitStrategyQuestionnaire(long context, AsyncCallback callback);
 
-        public static native void gridContextOrderInfo(long context, String symbol, AsyncCallback callback);
+        public static native void gridContextSymbolInfo(long context, String symbol, AsyncCallback callback);
 
         // ── DCAContext ────────────────────────────────────────────────
         public static native long newDcaContext(long config);

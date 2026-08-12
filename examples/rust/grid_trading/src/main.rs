@@ -31,9 +31,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ctx.submit_strategy_questionnaire(SubmitStrategyQuestionnaireOptions::new())
         .await?;
 
-    // Order-info fields used by the grid window (lot size, authorization flag).
-    let info = ctx.order_info("700.HK").await?;
-    println!("grid order info: {info:?}");
+    // Security (symbol) info used to build a grid order (lot size, auth flag).
+    let info = ctx.symbol_info("700.HK").await?;
+    println!("grid symbol info: {info:?}");
 
     // Submit a grid order.
     let rule = GridTradeRule {

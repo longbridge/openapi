@@ -74,11 +74,11 @@ public:
   void submit_strategy_questionnaire(
     AsyncCallback<GridContext, void> callback) const;
 
-  /// Get order info used by the grid order window (lot size, authorization
-  /// flag, settlement currency, etc.).
-  void order_info(
+  /// Get the security (symbol) info used to build a grid order (lot size,
+  /// authorization flag, settlement currency, etc.).
+  void symbol_info(
     const std::string& symbol,
-    AsyncCallback<GridContext, GridOrderInfo> callback) const;
+    AsyncCallback<GridContext, GridSymbolInfo> callback) const;
 };
 
 } // namespace grid

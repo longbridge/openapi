@@ -5,16 +5,16 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 /**
- * Order info fields used by the grid order window
+ * Security (symbol) info used to build a grid order
  */
-public class GridOrderInfo {
+public class GridSymbolInfo {
     private String name;
     private BigDecimal lastDone;
     private BigDecimal lotSize;
     private BigDecimal buyLotSize;
     private BigDecimal sellLotSize;
     private GridBidSize[] bidSizes;
-    private GridChannelInfo channelInfos;
+    private GridChannelInfo channelInfo;
 
     /**
      * Returns name.
@@ -71,22 +71,22 @@ public class GridOrderInfo {
     }
 
     /**
-     * Returns channelInfos.
+     * Returns channelInfo.
      *
-     * @return channelInfos
+     * @return channelInfo
      */
-    public GridChannelInfo getChannelInfos() {
-        return channelInfos;
+    public GridChannelInfo getChannelInfo() {
+        return channelInfo;
     }
 
     @Override
     public String toString() {
-        return "GridOrderInfo [name=" + name +
+        return "GridSymbolInfo [name=" + name +
                 ", lastDone=" + lastDone +
                 ", lotSize=" + lotSize +
                 ", buyLotSize=" + buyLotSize +
                 ", sellLotSize=" + sellLotSize +
                 ", bidSizes=" + Arrays.toString(bidSizes) +
-                ", channelInfos=" + channelInfos + "]";
+                ", channelInfo=" + channelInfo + "]";
     }
 }

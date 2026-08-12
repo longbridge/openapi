@@ -1167,8 +1167,8 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/grid/GridOrderInfo",
-    longbridge::grid::GridOrderInfo,
+    "com/longbridge/grid/GridSymbolInfo",
+    longbridge::grid::GridSymbolInfo,
     [
         name,
         last_done,
@@ -1177,7 +1177,7 @@ impl_java_class!(
         sell_lot_size,
         #[java(objarray)]
         bid_sizes,
-        channel_infos
+        channel_info
     ]
 );
 

@@ -2883,8 +2883,8 @@ struct GridChannelInfo
   std::vector<std::string> settlement_currency;
 };
 
-/// Order info fields used by the grid order window.
-struct GridOrderInfo
+/// Security (symbol) info used to build a grid order.
+struct GridSymbolInfo
 {
   /// Security name
   std::string name;
@@ -2899,7 +2899,7 @@ struct GridOrderInfo
   /// Price-step (bid-size) rule table
   std::vector<GridBidSize> bid_sizes;
   /// Channel / authorization info (strategy grant, RTH, currencies)
-  GridChannelInfo channel_infos;
+  GridChannelInfo channel_info;
 };
 
 /// Response for get grid trading orders (list) request

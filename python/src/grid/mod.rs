@@ -17,7 +17,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<TriggerOrder>()?;
     parent.add_class::<GridBidSize>()?;
     parent.add_class::<GridChannelInfo>()?;
-    parent.add_class::<GridOrderInfo>()?;
+    parent.add_class::<GridSymbolInfo>()?;
     parent.add_class::<GridOrdersResponse>()?;
     parent.add_class::<GridTriggerHistoryResponse>()?;
     parent.add_class::<context::GridContext>()?;

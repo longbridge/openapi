@@ -173,16 +173,16 @@ public class GridContext implements AutoCloseable {
     }
 
     /**
-     * Get order info used by the grid order window (lot size, authorization flag,
-     * settlement currency, etc.).
+     * Get the security (symbol) info used to build a grid order (lot size,
+     * authorization flag, settlement currency, etc.).
      *
      * @param symbol Security symbol (e.g. 700.HK)
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<GridOrderInfo> orderInfo(String symbol) throws OpenApiException {
+    public CompletableFuture<GridSymbolInfo> symbolInfo(String symbol) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.gridContextOrderInfo(raw(), symbol, callback);
+            SdkNative.gridContextSymbolInfo(raw(), symbol, callback);
         });
     }
 }

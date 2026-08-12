@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All languages:** add optional `parent_message_id` parameter to the AI Agent `conversation` and `conversation_streamed` methods — pass the `message_id` from a previous response to attach a follow-up message after the specified one, keeping the message stream in order. Only valid together with `chat_uid`; must not be set for a new conversation
 
+- **All languages:** add grid-trading support via a standalone `GridContext` — submit / replace / cancel / suspend / restart grid orders, list orders (paged and by IDs), fetch order detail and trigger history, submit the strategy risk-disclosure questionnaire, and query the security (symbol) info (`symbol_info` → `GridSymbolInfo`: name, last price, lot sizes, price-step rules, channel/authorization) needed to build a grid order. Available in the Rust, Python, Node.js, Java, and C/C++ bindings
+
 ### Fixed
 
 - **Java SDK:** invalid arguments passed across the JNI boundary no longer crash the JVM (process abort / core dump). Previously a Rust `panic!`/`unwrap`/`expect` in the value conversions unwound across the `extern "system"` boundary and aborted the whole process. These cases now throw a catchable `java.lang.IllegalArgumentException` instead:

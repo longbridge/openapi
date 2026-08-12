@@ -8,7 +8,7 @@ use crate::{
     Config, Result,
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
-        GetGridTriggerHistoryOptions, GridOrder, GridOrderDetail, GridOrderInfo,
+        GetGridTriggerHistoryOptions, GridOrder, GridOrderDetail, GridSymbolInfo,
         ReplaceGridOrderOptions, SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
         TriggerOrder,
     },
@@ -234,9 +234,9 @@ impl GridContext {
         Ok(())
     }
 
-    /// Get order info used by the grid order window (lot size, authorization
-    /// flag, settlement currency, etc.).
-    pub async fn order_info(&self, symbol: impl Into<String>) -> Result<GridOrderInfo> {
+    /// Get the security (symbol) info used to build a grid order (lot size,
+    /// authorization flag, settlement currency, etc.).
+    pub async fn symbol_info(&self, symbol: impl Into<String>) -> Result<GridSymbolInfo> {
         #[derive(Debug, Serialize)]
         struct Query {
             symbol: String,
@@ -249,7 +249,7 @@ impl GridContext {
             .query_params(Query {
                 symbol: symbol.into(),
             })
-            .response::<Json<GridOrderInfo>>()
+            .response::<Json<GridSymbolInfo>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

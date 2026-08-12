@@ -1,8 +1,8 @@
 use std::os::raw::c_char;
 
 use longbridge::grid::{
-    GridBidSize, GridChannelInfo, GridOrder, GridOrderDetail, GridOrderHistory, GridOrderInfo,
-    GridOrderSubOrder, SubmitGridOrderResponse, TriggerOrder,
+    GridBidSize, GridChannelInfo, GridOrder, GridOrderDetail, GridOrderHistory, GridOrderSubOrder,
+    GridSymbolInfo, SubmitGridOrderResponse, TriggerOrder,
 };
 use time::OffsetDateTime;
 
@@ -1043,9 +1043,9 @@ impl ToFFI for CGridChannelInfoOwned {
     }
 }
 
-/// Order info fields used by the grid order window.
+/// Security (symbol) info used to build a grid order.
 #[repr(C)]
-pub struct CGridOrderInfo {
+pub struct CGridSymbolInfo {
     /// Security name
     pub name: *const c_char,
     /// Latest quote price (can be null)
@@ -1061,39 +1061,39 @@ pub struct CGridOrderInfo {
     /// Number of bid-size entries
     pub num_bid_sizes: usize,
     /// Channel / authorization info (strategy grant, RTH, currencies)
-    pub channel_infos: CGridChannelInfo,
+    pub channel_info: CGridChannelInfo,
 }
 
 #[derive(Debug)]
-pub(crate) struct CGridOrderInfoOwned {
+pub(crate) struct CGridSymbolInfoOwned {
     name: CString,
     last_done: COption<CDecimal>,
     lot_size: COption<CDecimal>,
     buy_lot_size: COption<CDecimal>,
     sell_lot_size: COption<CDecimal>,
     bid_sizes: CVec<CGridBidSizeOwned>,
-    channel_infos: CGridChannelInfoOwned,
+    channel_info: CGridChannelInfoOwned,
 }
 
-impl From<GridOrderInfo> for CGridOrderInfoOwned {
-    fn from(info: GridOrderInfo) -> Self {
-        CGridOrderInfoOwned {
+impl From<GridSymbolInfo> for CGridSymbolInfoOwned {
+    fn from(info: GridSymbolInfo) -> Self {
+        CGridSymbolInfoOwned {
             name: info.name.into(),
             last_done: info.last_done.into(),
             lot_size: info.lot_size.into(),
             buy_lot_size: info.buy_lot_size.into(),
             sell_lot_size: info.sell_lot_size.into(),
             bid_sizes: info.bid_sizes.into(),
-            channel_infos: info.channel_infos.into(),
+            channel_info: info.channel_info.into(),
         }
     }
 }
 
-impl ToFFI for CGridOrderInfoOwned {
-    type FFIType = CGridOrderInfo;
+impl ToFFI for CGridSymbolInfoOwned {
+    type FFIType = CGridSymbolInfo;
 
     fn to_ffi_type(&self) -> Self::FFIType {
-        CGridOrderInfo {
+        CGridSymbolInfo {
             name: self.name.to_ffi_type(),
             last_done: self.last_done.to_ffi_type().to_ffi_type(),
             lot_size: self.lot_size.to_ffi_type().to_ffi_type(),
@@ -1101,7 +1101,7 @@ impl ToFFI for CGridOrderInfoOwned {
             sell_lot_size: self.sell_lot_size.to_ffi_type().to_ffi_type(),
             bid_sizes: self.bid_sizes.to_ffi_type(),
             num_bid_sizes: self.bid_sizes.len(),
-            channel_infos: self.channel_infos.to_ffi_type(),
+            channel_info: self.channel_info.to_ffi_type(),
         }
     }
 }

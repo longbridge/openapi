@@ -14,7 +14,7 @@ use crate::{
     config::Config,
     error::ErrorNewType,
     grid::types::{
-        GridOrder, GridOrderDetail, GridOrderInfo, GridOrdersResponse, GridTradeRule,
+        GridOrder, GridOrderDetail, GridOrdersResponse, GridSymbolInfo, GridTradeRule,
         GridTriggerHistoryResponse, SubmitGridOrderResponse, TriggerOrder,
     },
     types::Market,
@@ -184,11 +184,11 @@ impl GridContext {
         Ok(())
     }
 
-    /// Get order info used by the grid order window (lot size, authorization
-    /// flag, settlement currency, etc.).
-    fn order_info(&self, symbol: String) -> PyResult<GridOrderInfo> {
+    /// Get the security (symbol) info used to build a grid order (lot size,
+    /// authorization flag, settlement currency, etc.).
+    fn symbol_info(&self, symbol: String) -> PyResult<GridSymbolInfo> {
         self.ctx
-            .order_info(symbol)
+            .symbol_info(symbol)
             .map_err(ErrorNewType)?
             .try_into()
     }

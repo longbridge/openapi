@@ -6314,9 +6314,9 @@ typedef struct lb_grid_channel_info_t {
 } lb_grid_channel_info_t;
 
 /**
- * Order info fields used by the grid order window.
+ * Security (symbol) info used to build a grid order.
  */
-typedef struct lb_grid_order_info_t {
+typedef struct lb_grid_symbol_info_t {
   /**
    * Security name
    */
@@ -6348,8 +6348,8 @@ typedef struct lb_grid_order_info_t {
   /**
    * Channel / authorization info (strategy grant, RTH, currencies)
    */
-  struct lb_grid_channel_info_t channel_infos;
-} lb_grid_order_info_t;
+  struct lb_grid_channel_info_t channel_info;
+} lb_grid_symbol_info_t;
 
 /**
  * Response for get grid trading orders (list) request
@@ -12317,13 +12317,13 @@ void lb_grid_context_submit_strategy_questionnaire(const struct lb_grid_context_
                                                    void *userdata);
 
 /**
- * Get order info used by the grid order window (lot size, authorization
- * flag, settlement currency, etc.).
+ * Get the security (symbol) info used to build a grid order (lot size,
+ * authorization flag, settlement currency, etc.).
  */
-void lb_grid_context_order_info(const struct lb_grid_context_t *ctx,
-                                const char *symbol,
-                                lb_async_callback_t callback,
-                                void *userdata);
+void lb_grid_context_symbol_info(const struct lb_grid_context_t *ctx,
+                                 const char *symbol,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
 
 /**
  * Create a HTTP client using API Key authentication

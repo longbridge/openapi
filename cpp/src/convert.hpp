@@ -118,7 +118,7 @@ using longbridge::grid::TriggerPriceType;
 using longbridge::grid::GridOrder;
 using longbridge::grid::GridOrderDetail;
 using longbridge::grid::GridOrderHistory;
-using longbridge::grid::GridOrderInfo;
+using longbridge::grid::GridSymbolInfo;
 using longbridge::grid::GridOrdersResponse;
 using longbridge::grid::GridOrderSubOrder;
 using longbridge::grid::GridTradeRule;
@@ -2182,8 +2182,8 @@ convert(const lb_grid_channel_info_t* c)
   };
 }
 
-inline GridOrderInfo
-convert(const lb_grid_order_info_t* info)
+inline GridSymbolInfo
+convert(const lb_grid_symbol_info_t* info)
 {
   std::vector<GridBidSize> bid_sizes;
   std::transform(info->bid_sizes,
@@ -2191,14 +2191,14 @@ convert(const lb_grid_order_info_t* info)
                  std::back_inserter(bid_sizes),
                  [](auto& item) { return convert(&item); });
 
-  return GridOrderInfo{
+  return GridSymbolInfo{
     info->name,
     convert_grid_opt_decimal(info->last_done),
     convert_grid_opt_decimal(info->lot_size),
     convert_grid_opt_decimal(info->buy_lot_size),
     convert_grid_opt_decimal(info->sell_lot_size),
     bid_sizes,
-    convert(&info->channel_infos),
+    convert(&info->channel_info),
   };
 }
 

@@ -566,11 +566,11 @@ pub(crate) struct GridChannelInfo {
     settlement_currency: Vec<String>,
 }
 
-/// Order info (`/v1/orders/info`) fields used by the grid order window.
+/// Security (symbol) info (`/v1/orders/info`) used to build a grid order.
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longbridge::grid::GridOrderInfo")]
-pub(crate) struct GridOrderInfo {
+#[py(remote = "longbridge::grid::GridSymbolInfo")]
+pub(crate) struct GridSymbolInfo {
     /// Security name
     name: String,
     /// Latest quote price
@@ -589,7 +589,7 @@ pub(crate) struct GridOrderInfo {
     #[py(array)]
     bid_sizes: Vec<GridBidSize>,
     /// Channel / authorization info (strategy grant, RTH, currencies)
-    channel_infos: GridChannelInfo,
+    channel_info: GridChannelInfo,
 }
 
 /// Response for get grid trading orders (list) request

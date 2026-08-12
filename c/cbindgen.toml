@@ -126,7 +126,7 @@ cpp_compat = true
 "CTriggerOrder" = "lb_trigger_order_t"
 "CGridBidSize" = "lb_grid_bid_size_t"
 "CGridChannelInfo" = "lb_grid_channel_info_t"
-"CGridOrderInfo" = "lb_grid_order_info_t"
+"CGridSymbolInfo" = "lb_grid_symbol_info_t"
 "CGridOrdersResponse" = "lb_grid_orders_response_t"
 "CGridTriggerHistoryResponse" = "lb_grid_trigger_history_response_t"
 "CPushGridOrderChanged" = "lb_push_grid_order_changed_t"
@@ -430,7 +430,7 @@ include = [
     # GridContext: grid trading (reachable only via void* async data pointer)
     "CSubmitGridOrderResponse",
     "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",
-    "CTriggerOrder", "CGridBidSize", "CGridChannelInfo", "CGridOrderInfo",
+    "CTriggerOrder", "CGridBidSize", "CGridChannelInfo", "CGridSymbolInfo",
     "CGridOrdersResponse", "CGridTriggerHistoryResponse",
     # TradeContext: grid trading push (stays on trade side)
     "CPushGridOrderChanged",

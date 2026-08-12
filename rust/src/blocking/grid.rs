@@ -7,8 +7,8 @@ use crate::{
     blocking::runtime::BlockingRuntime,
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
-        GetGridTriggerHistoryOptions, GridContext, GridOrder, GridOrderDetail, GridOrderInfo,
-        GridOrdersResponse, GridTriggerHistoryResponse, ReplaceGridOrderOptions,
+        GetGridTriggerHistoryOptions, GridContext, GridOrder, GridOrderDetail, GridOrdersResponse,
+        GridSymbolInfo, GridTriggerHistoryResponse, ReplaceGridOrderOptions,
         SubmitGridOrderOptions, SubmitGridOrderResponse, SubmitStrategyQuestionnaireOptions,
     },
 };
@@ -102,9 +102,12 @@ impl GridContextSync {
             .call(move |ctx| async move { ctx.submit_strategy_questionnaire(options).await })
     }
 
-    /// Get order info used by the grid order window (blocking)
-    pub fn order_info(&self, symbol: impl Into<String> + Send + 'static) -> Result<GridOrderInfo> {
+    /// Get the security (symbol) info used to build a grid order (blocking)
+    pub fn symbol_info(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<GridSymbolInfo> {
         self.rt
-            .call(move |ctx| async move { ctx.order_info(symbol).await })
+            .call(move |ctx| async move { ctx.symbol_info(symbol).await })
     }
 }

@@ -687,7 +687,7 @@ pub struct TriggerOrder {
     pub trigger_status: i32,
 }
 
-/// A price-step (bid-size) rule entry from the order-info response.
+/// A price-step (bid-size) rule entry from the symbol-info response.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct GridBidSize {
@@ -702,7 +702,7 @@ pub struct GridBidSize {
     pub bid_size: Option<Decimal>,
 }
 
-/// Channel / authorization info nested in the order-info response, holding the
+/// Channel / authorization info nested in the symbol-info response, holding the
 /// fields the grid order window needs.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
@@ -717,13 +717,15 @@ pub struct GridChannelInfo {
     pub settlement_currency: Vec<String>,
 }
 
-/// Order info (`/v1/orders/info`) fields used by the grid order window.
+/// Security (symbol) info (`/v1/orders/info`) used to build a grid order.
 ///
-/// The endpoint takes a `counter_id` query parameter (a symbol such as
-/// `700.HK` is accepted).
+/// Returns the target security's name, latest price, lot sizes, price-step
+/// rules and channel / authorization info needed by the grid order window. The
+/// endpoint takes a `counter_id` query parameter (a symbol such as `700.HK` is
+/// accepted).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
-pub struct GridOrderInfo {
+pub struct GridSymbolInfo {
     /// Security name
     pub name: String,
     /// Latest quote price
@@ -741,5 +743,6 @@ pub struct GridOrderInfo {
     /// Price-step (bid-size) rule table
     pub bid_sizes: Vec<GridBidSize>,
     /// Channel / authorization info (strategy grant, RTH, currencies)
-    pub channel_infos: GridChannelInfo,
+    #[serde(rename = "channel_infos")]
+    pub channel_info: GridChannelInfo,
 }

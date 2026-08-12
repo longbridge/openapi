@@ -362,7 +362,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_gridContextSubmitStr
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_gridContextOrderInfo(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_gridContextSymbolInfo(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -374,7 +374,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_gridContextOrderInfo
         let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.order_info(symbol).await?)
+            Ok(__owned_ctx.symbol_info(symbol).await?)
         })?;
         Ok(())
     })
