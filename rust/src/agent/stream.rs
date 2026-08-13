@@ -173,6 +173,7 @@ mod tests {
                 node_id: "n_ask_human".to_string(),
                 tool_call_id: "call_1".to_string(),
                 questions: vec![],
+                interactions: vec![],
                 message_id: 1,
                 chat_id: 1,
             },

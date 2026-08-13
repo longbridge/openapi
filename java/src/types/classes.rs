@@ -3226,7 +3226,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/QuestionOption",
     longbridge::agent::QuestionOption,
-    [description]
+    [label, description]
 );
 
 impl_java_class!(
@@ -3241,6 +3241,20 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/agent/HumanInteraction",
+    longbridge::agent::HumanInteraction,
+    [
+        tool_call_id,
+        interrupt_id,
+        interaction_type,
+        tool_name,
+        #[java(objarray)]
+        questions,
+        tool_args
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/agent/Interrupt",
     longbridge::agent::Interrupt,
     [
@@ -3248,6 +3262,8 @@ impl_java_class!(
         tool_call_id,
         #[java(objarray)]
         questions,
+        #[java(objarray)]
+        interactions,
         message_id,
         chat_id
     ]

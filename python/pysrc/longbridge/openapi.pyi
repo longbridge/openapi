@@ -14345,6 +14345,8 @@ class Reference:
 class QuestionOption:
     """One option of a Question."""
 
+    label: str
+    """Short UI label for the option"""
     description: str
     """Option text"""
 
@@ -14358,6 +14360,22 @@ class Question:
     multi_select: bool
     """Whether multiple options may be selected"""
 
+class HumanInteraction:
+    """A single interaction requested while an Agent workflow is paused."""
+
+    tool_call_id: str
+    """Tool call that requested the interaction"""
+    interrupt_id: str
+    """Stable key expected by the answers map when continuing"""
+    interaction_type: str
+    """Interaction type such as `ask_human` or `trade_password`"""
+    tool_name: str
+    """Human-readable tool name"""
+    questions: list[Question]
+    """Questions and answer options presented to the user"""
+    tool_args: Any
+    """Original tool arguments, retained for host-specific UI rendering"""
+
 class Interrupt:
     """Present when a conversation run is interrupted, waiting for
     AgentContext.continue_conversation."""
@@ -14368,6 +14386,8 @@ class Interrupt:
     """Tool call ID of this inquiry; used as the answer key when continuing"""
     questions: list[Question]
     """Questions you need to answer"""
+    interactions: list[HumanInteraction]
+    """Full interaction descriptors used to render and answer the pause"""
     message_id: int
     """ID of the paused message"""
     chat_id: int

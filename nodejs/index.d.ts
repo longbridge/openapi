@@ -5440,6 +5440,22 @@ export interface HoldingDetail {
   holdingTypeName: string
 }
 
+/** A single interaction requested while an Agent workflow is paused */
+export interface HumanInteraction {
+  /** Tool call that requested the interaction */
+  toolCallId: string
+  /** Stable key expected by `answersByToolCall` */
+  interruptId: string
+  /** Interaction type such as `ask_human` or `trade_password` */
+  interactionType: string
+  /** Human-readable tool name */
+  toolName: string
+  /** Questions and answer options presented to the user */
+  questions: Array<Question>
+  /** Original tool arguments, retained for host-specific UI rendering */
+  toolArgs: any
+}
+
 /** Index constituents response */
 export interface IndexConstituents {
   /** Number of constituent stocks that fell today */
@@ -5646,6 +5662,8 @@ export interface Interrupt {
   toolCallId: string
   /** Questions you need to answer */
   questions: Array<Question>
+  /** Full interaction descriptors used to render and answer the pause */
+  interactions: Array<HumanInteraction>
   /** ID of the paused message */
   messageId: number
   /** ID of the owning conversation */
@@ -6460,6 +6478,8 @@ export interface Question {
 
 /** One option of a `Question` */
 export interface QuestionOption {
+  /** Short UI label for the option */
+  label: string
   /** Option text */
   description: string
 }

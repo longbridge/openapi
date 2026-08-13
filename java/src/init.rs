@@ -442,6 +442,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::agent::Reference,
         longbridge::agent::QuestionOption,
         longbridge::agent::Question,
+        longbridge::agent::HumanInteraction,
         longbridge::agent::Interrupt,
         longbridge::agent::AgentError,
         longbridge::agent::ChatStartedPayload,

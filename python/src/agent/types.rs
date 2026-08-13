@@ -149,12 +149,14 @@ impl From<longbridge::agent::Reference> for Reference {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct QuestionOption {
+    pub label: String,
     pub description: String,
 }
 
 impl From<longbridge::agent::QuestionOption> for QuestionOption {
     fn from(v: longbridge::agent::QuestionOption) -> Self {
         Self {
+            label: v.label,
             description: v.description,
         }
     }
@@ -179,6 +181,31 @@ impl From<longbridge::agent::Question> for Question {
     }
 }
 
+/// A single interaction requested while an Agent workflow is paused
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct HumanInteraction {
+    pub tool_call_id: String,
+    pub interrupt_id: String,
+    pub interaction_type: String,
+    pub tool_name: String,
+    pub questions: Vec<Question>,
+    pub tool_args: JsonValue,
+}
+
+impl From<longbridge::agent::HumanInteraction> for HumanInteraction {
+    fn from(v: longbridge::agent::HumanInteraction) -> Self {
+        Self {
+            tool_call_id: v.tool_call_id,
+            interrupt_id: v.interrupt_id,
+            interaction_type: v.interaction_type,
+            tool_name: v.tool_name,
+            questions: v.questions.into_iter().map(Into::into).collect(),
+            tool_args: JsonValue(v.tool_args),
+        }
+    }
+}
+
 /// Present when a conversation run is interrupted, waiting for
 /// `AgentContext.continue_conversation`
 #[pyclass(get_all, skip_from_py_object)]
@@ -187,6 +214,7 @@ pub(crate) struct Interrupt {
     pub node_id: String,
     pub tool_call_id: String,
     pub questions: Vec<Question>,
+    pub interactions: Vec<HumanInteraction>,
     pub message_id: i64,
     pub chat_id: i64,
 }
@@ -197,6 +225,7 @@ impl From<longbridge::agent::Interrupt> for Interrupt {
             node_id: v.node_id,
             tool_call_id: v.tool_call_id,
             questions: v.questions.into_iter().map(Into::into).collect(),
+            interactions: v.interactions.into_iter().map(Into::into).collect(),
             message_id: v.message_id,
             chat_id: v.chat_id,
         }

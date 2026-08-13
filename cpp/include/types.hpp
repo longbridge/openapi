@@ -4468,6 +4468,8 @@ struct Reference
 /// One option of a Question.
 struct QuestionOption
 {
+  /// Short UI label for the option
+  std::string label;
   /// Option text
   std::string description;
 };
@@ -4483,6 +4485,23 @@ struct Question
   bool multi_select;
 };
 
+/// A single interaction requested while an Agent workflow is paused.
+struct HumanInteraction
+{
+  /// Tool call that requested the interaction
+  std::string tool_call_id;
+  /// Stable key expected by the answers map when continuing
+  std::string interrupt_id;
+  /// Interaction type such as `ask_human` or `trade_password`
+  std::string interaction_type;
+  /// Human-readable tool name
+  std::string tool_name;
+  /// Questions and answer options presented to the user
+  std::vector<Question> questions;
+  /// Original tool arguments as a JSON string; empty when absent
+  std::string tool_args_json;
+};
+
 /// Present when a conversation run is interrupted, waiting for
 /// AgentContext::continue_conversation.
 struct Interrupt
@@ -4493,6 +4512,8 @@ struct Interrupt
   std::string tool_call_id;
   /// Questions you need to answer
   std::vector<Question> questions;
+  /// Full interaction descriptors used to render and answer the pause
+  std::vector<HumanInteraction> interactions;
   /// ID of the paused message
   int64_t message_id;
   /// ID of the owning conversation

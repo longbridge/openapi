@@ -4,10 +4,10 @@ use longbridge::agent::{
     Agent, AgentError, AgentToolFinishedPayload, AgentToolProgressPayload, AgentToolStartedPayload,
     AgentsResponse, ChatFinishedPayload, ChatStartedPayload, ChatTitleUpdatedPayload,
     ContextCompressFinishedPayload, ContextCompressStartedPayload, ConversationResponse,
-    ConversationStreamEvent, Interrupt, MessagePayload, NodeToolUseFinishedPayload,
-    NodeToolUseOutputs, NodeToolUseStartedPayload, PlanChangedPayload, QueryMaskedPayload,
-    Question, QuestionOption, Reference, SubagentFinishedPayload, SubagentOutputs,
-    SubagentProgressPayload, SubagentStartedPayload, ThinkingFinishedPayload,
+    ConversationStreamEvent, HumanInteraction, Interrupt, MessagePayload,
+    NodeToolUseFinishedPayload, NodeToolUseOutputs, NodeToolUseStartedPayload, PlanChangedPayload,
+    QueryMaskedPayload, Question, QuestionOption, Reference, SubagentFinishedPayload,
+    SubagentOutputs, SubagentProgressPayload, SubagentStartedPayload, ThinkingFinishedPayload,
     ThinkingStartedPayload, WorkflowStartedInputs, WorkflowStartedPayload, Workspace,
     WorkspacesResponse,
 };
@@ -332,18 +332,22 @@ impl ToFFI for CReferenceOwned {
 /// One option of a [`CQuestion`]
 #[repr(C)]
 pub struct CQuestionOption {
+    /// Short UI label for the option
+    pub label: *const c_char,
     /// Option text
     pub description: *const c_char,
 }
 
 #[derive(Debug)]
 pub(crate) struct CQuestionOptionOwned {
+    label: CString,
     description: CString,
 }
 
 impl From<QuestionOption> for CQuestionOptionOwned {
     fn from(v: QuestionOption) -> Self {
         Self {
+            label: v.label.into(),
             description: v.description.into(),
         }
     }
@@ -354,6 +358,7 @@ impl ToFFI for CQuestionOptionOwned {
 
     fn to_ffi_type(&self) -> Self::FFIType {
         CQuestionOption {
+            label: self.label.to_ffi_type(),
             description: self.description.to_ffi_type(),
         }
     }
@@ -412,6 +417,72 @@ impl ToFFI for CQuestionOwned {
     }
 }
 
+/// A single interaction requested while an Agent workflow is paused
+#[repr(C)]
+pub struct CHumanInteraction {
+    /// Tool call that requested the interaction
+    pub tool_call_id: *const c_char,
+    /// Stable key expected by the answers map when continuing
+    pub interrupt_id: *const c_char,
+    /// Interaction type such as `ask_human` or `trade_password`
+    pub interaction_type: *const c_char,
+    /// Human-readable tool name
+    pub tool_name: *const c_char,
+    /// Questions and answer options presented to the user
+    pub questions: *const CQuestion,
+    /// Number of questions
+    pub num_questions: usize,
+    /// Original tool arguments as a JSON string; empty when absent
+    pub tool_args_json: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CHumanInteractionOwned {
+    tool_call_id: CString,
+    interrupt_id: CString,
+    interaction_type: CString,
+    tool_name: CString,
+    questions: CVec<CQuestionOwned>,
+    tool_args_json: CString,
+}
+
+impl From<HumanInteraction> for CHumanInteractionOwned {
+    fn from(v: HumanInteraction) -> Self {
+        let HumanInteraction {
+            tool_call_id,
+            interrupt_id,
+            interaction_type,
+            tool_name,
+            questions,
+            tool_args,
+        } = v;
+        Self {
+            tool_call_id: tool_call_id.into(),
+            interrupt_id: interrupt_id.into(),
+            interaction_type: interaction_type.into(),
+            tool_name: tool_name.into(),
+            questions: questions.into(),
+            tool_args_json: serde_json::to_string(&tool_args).unwrap_or_default().into(),
+        }
+    }
+}
+
+impl ToFFI for CHumanInteractionOwned {
+    type FFIType = CHumanInteraction;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CHumanInteraction {
+            tool_call_id: self.tool_call_id.to_ffi_type(),
+            interrupt_id: self.interrupt_id.to_ffi_type(),
+            interaction_type: self.interaction_type.to_ffi_type(),
+            tool_name: self.tool_name.to_ffi_type(),
+            questions: self.questions.to_ffi_type(),
+            num_questions: self.questions.len(),
+            tool_args_json: self.tool_args_json.to_ffi_type(),
+        }
+    }
+}
+
 /// Present when a conversation run is interrupted, waiting for
 /// `lb_agent_context_continue_conversation`
 #[repr(C)]
@@ -424,6 +495,10 @@ pub struct CInterrupt {
     pub questions: *const CQuestion,
     /// Number of questions
     pub num_questions: usize,
+    /// Full interaction descriptors used to render and answer the pause
+    pub interactions: *const CHumanInteraction,
+    /// Number of interactions
+    pub num_interactions: usize,
     /// ID of the paused message
     pub message_id: i64,
     /// ID of the owning conversation
@@ -435,6 +510,7 @@ pub(crate) struct CInterruptOwned {
     node_id: CString,
     tool_call_id: CString,
     questions: CVec<CQuestionOwned>,
+    interactions: CVec<CHumanInteractionOwned>,
     message_id: i64,
     chat_id: i64,
 }
@@ -445,6 +521,7 @@ impl From<Interrupt> for CInterruptOwned {
             node_id,
             tool_call_id,
             questions,
+            interactions,
             message_id,
             chat_id,
         } = v;
@@ -452,6 +529,7 @@ impl From<Interrupt> for CInterruptOwned {
             node_id: node_id.into(),
             tool_call_id: tool_call_id.into(),
             questions: questions.into(),
+            interactions: interactions.into(),
             message_id,
             chat_id,
         }
@@ -466,6 +544,7 @@ impl ToFFI for CInterruptOwned {
             node_id,
             tool_call_id,
             questions,
+            interactions,
             message_id,
             chat_id,
         } = self;
@@ -474,6 +553,8 @@ impl ToFFI for CInterruptOwned {
             tool_call_id: tool_call_id.to_ffi_type(),
             questions: questions.to_ffi_type(),
             num_questions: questions.len(),
+            interactions: interactions.to_ffi_type(),
+            num_interactions: interactions.len(),
             message_id: *message_id,
             chat_id: *chat_id,
         }

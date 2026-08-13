@@ -2536,6 +2536,10 @@ typedef struct lb_agent_tool_finished_payload_t {
  */
 typedef struct lb_question_option_t {
   /**
+   * Short UI label for the option
+   */
+  const char *label;
+  /**
    * Option text
    */
   const char *description;
@@ -2564,6 +2568,40 @@ typedef struct lb_question_t {
 } lb_question_t;
 
 /**
+ * A single interaction requested while an Agent workflow is paused
+ */
+typedef struct lb_human_interaction_t {
+  /**
+   * Tool call that requested the interaction
+   */
+  const char *tool_call_id;
+  /**
+   * Stable key expected by the answers map when continuing
+   */
+  const char *interrupt_id;
+  /**
+   * Interaction type such as `ask_human` or `trade_password`
+   */
+  const char *interaction_type;
+  /**
+   * Human-readable tool name
+   */
+  const char *tool_name;
+  /**
+   * Questions and answer options presented to the user
+   */
+  const struct lb_question_t *questions;
+  /**
+   * Number of questions
+   */
+  uintptr_t num_questions;
+  /**
+   * Original tool arguments as a JSON string; empty when absent
+   */
+  const char *tool_args_json;
+} lb_human_interaction_t;
+
+/**
  * Present when a conversation run is interrupted, waiting for
  * `lb_agent_context_continue_conversation`
  */
@@ -2584,6 +2622,14 @@ typedef struct lb_interrupt_t {
    * Number of questions
    */
   uintptr_t num_questions;
+  /**
+   * Full interaction descriptors used to render and answer the pause
+   */
+  const struct lb_human_interaction_t *interactions;
+  /**
+   * Number of interactions
+   */
+  uintptr_t num_interactions;
   /**
    * ID of the paused message
    */
