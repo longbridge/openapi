@@ -445,6 +445,10 @@ impl From<Interrupt> for CInterruptOwned {
             node_id,
             tool_call_id,
             questions,
+            // Not surfaced by the C binding (parity with Node.js/Python, which
+            // also omit it); ignored explicitly to keep the destructure
+            // exhaustive.
+            interactions: _,
             message_id,
             chat_id,
         } = v;

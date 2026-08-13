@@ -2959,7 +2959,10 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/QuestionOption",
     longbridge::agent::QuestionOption,
-    [description]
+    // `label` is intentionally not surfaced (parity with Node.js/Python);
+    // `non_exhaustive` lets the destructure ignore it.
+    [description],
+    non_exhaustive
 );
 
 impl_java_class!(
@@ -2976,6 +2979,8 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/Interrupt",
     longbridge::agent::Interrupt,
+    // `interactions` is intentionally not surfaced (parity with
+    // Node.js/Python); `non_exhaustive` lets the destructure ignore it.
     [
         node_id,
         tool_call_id,
@@ -2983,7 +2988,8 @@ impl_java_class!(
         questions,
         message_id,
         chat_id
-    ]
+    ],
+    non_exhaustive
 );
 
 // The Java class is named `ConversationError` (not `AgentError`) since it
