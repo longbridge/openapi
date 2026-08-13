@@ -8,11 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **All languages:** add grid-trading support via a standalone `GridContext` — submit / replace / cancel / suspend / restart grid orders, list orders (paged and by IDs), fetch order detail and trigger history, submit the strategy risk-disclosure questionnaire, and query the security (symbol) info (`symbol_info` → `GridSymbolInfo`: name, last price, lot sizes, price-step rules, channel/authorization) needed to build a grid order. Available in the Rust, Python, Node.js, Java, and C/C++ bindings
 - **All languages:** add `AgentContext.public_agents` (`GET /v1/ai/agents`) — list all publicly available Agents on the platform (the Explore catalog). Unlike `agents`, it is not scoped to a Workspace and returns every published, publicly-shared Agent. Takes the same optional `page` / `limit` / `name` parameters and returns the existing `AgentsResponse`
 - **All languages:** add optional `parent_message_id` parameter to the AI Agent `conversation` and `conversation_streamed` methods — pass the `message_id` from a previous response to attach a follow-up message after the specified one, keeping the message stream in order. Only valid together with `chat_uid`; must not be set for a new conversation
 - **All languages:** the AI Agent `Interrupt` now exposes `interactions` — a list of `HumanInteraction` (tool call id, interrupt id, interaction type, tool name, questions, and the raw tool arguments) — and `QuestionOption` now exposes `label`. The server may send `null` for the `questions` / `interactions` lists, which is now accepted and deserialized as an empty list instead of erroring. Available in the Rust, Python, Node.js, Java, and C/C++ bindings
-
-- **All languages:** add grid-trading support via a standalone `GridContext` — submit / replace / cancel / suspend / restart grid orders, list orders (paged and by IDs), fetch order detail and trigger history, submit the strategy risk-disclosure questionnaire, and query the security (symbol) info (`symbol_info` → `GridSymbolInfo`: name, last price, lot sizes, price-step rules, channel/authorization) needed to build a grid order. Available in the Rust, Python, Node.js, Java, and C/C++ bindings
 
 ### Changed
 
