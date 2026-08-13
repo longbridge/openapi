@@ -3194,17 +3194,26 @@ inline agent::Reference convert(const lb_reference_t* r) {
   return { r->index, r->title, r->url };
 }
 inline agent::QuestionOption convert(const lb_question_option_t* o) {
-  return { o->description };
+  return { o->label, o->description };
 }
 inline agent::Question convert(const lb_question_t* q) {
   std::vector<agent::QuestionOption> options;
   for (size_t i = 0; i < q->num_options; ++i) options.push_back(convert(&q->options[i]));
   return { q->question, std::move(options), q->multi_select };
 }
+inline agent::HumanInteraction convert(const lb_human_interaction_t* h) {
+  std::vector<agent::Question> questions;
+  for (size_t j = 0; j < h->num_questions; ++j) questions.push_back(convert(&h->questions[j]));
+  return { h->tool_call_id, h->interrupt_id, h->interaction_type, h->tool_name,
+           std::move(questions), h->tool_args_json };
+}
 inline agent::Interrupt convert(const lb_interrupt_t* i) {
   std::vector<agent::Question> questions;
   for (size_t j = 0; j < i->num_questions; ++j) questions.push_back(convert(&i->questions[j]));
-  return { i->node_id, i->tool_call_id, std::move(questions), i->message_id, i->chat_id };
+  std::vector<agent::HumanInteraction> interactions;
+  for (size_t j = 0; j < i->num_interactions; ++j) interactions.push_back(convert(&i->interactions[j]));
+  return { i->node_id, i->tool_call_id, std::move(questions), std::move(interactions),
+           i->message_id, i->chat_id };
 }
 inline agent::AgentError convert(const lb_agent_error_t* e) {
   return { e->code, e->message };

@@ -174,7 +174,7 @@ pub struct Question {
     /// Question text
     pub question: String,
     /// Options; empty means free-form answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub options: Vec<QuestionOption>,
     /// Whether multiple options may be selected
     #[serde(default)]
@@ -184,6 +184,9 @@ pub struct Question {
 /// One option of a [`Question`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuestionOption {
+    /// Short UI label for the option.
+    #[serde(default)]
+    pub label: String,
     /// Option text
     #[serde(default)]
     pub description: String,
@@ -198,14 +201,40 @@ pub struct Interrupt {
     /// Tool call ID of this inquiry; used as the answer key when continuing
     pub tool_call_id: String,
     /// Questions you need to answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub questions: Vec<Question>,
+    /// Full interaction descriptors used to render and answer the pause.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub interactions: Vec<HumanInteraction>,
     /// ID of the paused message
     #[serde(default)]
     pub message_id: i64,
     /// ID of the owning conversation
     #[serde(default)]
     pub chat_id: i64,
+}
+
+/// A single interaction requested while an Agent workflow is paused.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HumanInteraction {
+    /// Tool call that requested the interaction.
+    #[serde(default)]
+    pub tool_call_id: String,
+    /// Stable key expected by `answers_by_tool_call`.
+    #[serde(default)]
+    pub interrupt_id: String,
+    /// Interaction type such as `ask_human` or `trade_password`.
+    #[serde(default, rename = "type")]
+    pub interaction_type: String,
+    /// Human-readable tool name.
+    #[serde(default)]
+    pub tool_name: String,
+    /// Questions and answer options presented to the user.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub questions: Vec<Question>,
+    /// Original tool arguments, retained for host-specific UI rendering.
+    #[serde(default)]
+    pub tool_args: serde_json::Value,
 }
 
 /// Present when a conversation run failed
@@ -308,7 +337,7 @@ impl ConversationResponse {
 }
 
 /// Payload of a `chat_started` SSE event
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatStartedPayload {
     /// Conversation identifier
     pub chat_uid: String,
@@ -330,7 +359,7 @@ pub struct ChatStartedPayload {
 
 /// Payload of a `message` SSE event — an incremental text chunk. This is the
 /// highest-frequency event; concatenate `text` fragments in arrival order.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MessagePayload {
     /// Incremental text fragment
     #[serde(default)]
@@ -364,7 +393,7 @@ pub struct MessagePayload {
 }
 
 /// `outputs` of a `workflow_finished` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WorkflowOutputs {
     /// Final answer text; present when the run succeeded
     #[serde(default)]
@@ -381,7 +410,7 @@ pub struct WorkflowOutputs {
 /// Payload of a `workflow_finished` SSE event. `status` is never
 /// `interrupted` here — an interrupted run doesn't emit `workflow_finished`
 /// at all; see [`ConversationStreamEvent::HumanInteractionRequired`].
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkflowFinishedPayload {
     /// Final run status: `succeeded` / `failed` / `stopped`
     pub status: ConversationStatus,
@@ -409,7 +438,7 @@ pub struct WorkflowFinishedPayload {
 }
 
 /// `inputs` of a `workflow_started` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WorkflowStartedInputs {
     /// ID of the owning conversation
     #[serde(default)]
@@ -431,7 +460,7 @@ pub struct WorkflowStartedInputs {
 
 /// Payload of a `workflow_started` SSE event, observed right after
 /// `chat_started`
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WorkflowStartedPayload {
     /// Whether this run's answer was served from a cache
     #[serde(default)]
@@ -449,7 +478,7 @@ pub struct WorkflowStartedPayload {
 
 /// Payload of a `chat_finished` SSE event, observed once all `message` events
 /// for this round have been sent, shortly before `workflow_finished`
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ChatFinishedPayload {
     /// ID of the owning conversation
     #[serde(default)]
@@ -475,7 +504,7 @@ pub struct ChatFinishedPayload {
 /// Payload of a `chat_title_updated` SSE event — the server auto-generates a
 /// short title for the conversation as a UI convenience. Can arrive before
 /// *or* after `workflow_finished`; not tied to the run's outcome.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ChatTitleUpdatedPayload {
     /// ID of the owning conversation
     #[serde(default)]
@@ -498,7 +527,7 @@ pub struct ChatTitleUpdatedPayload {
 /// reasoning phase (analyzing the question, planning tool calls). Between
 /// this and [`ConversationStreamEvent::ThinkingFinished`], `Message` events
 /// with `message_type == "think"` and tool-call events may arrive.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ThinkingStartedPayload {
     /// Start time, Unix timestamp in seconds
     #[serde(default)]
@@ -507,7 +536,7 @@ pub struct ThinkingStartedPayload {
 
 /// Payload of a `thinking_finished` SSE event — the reasoning phase is over;
 /// answer text (`Message` with `message_type == "answer"`) follows.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ThinkingFinishedPayload {
     /// Finish time, Unix timestamp in seconds
     #[serde(default)]
@@ -520,7 +549,7 @@ pub struct ThinkingFinishedPayload {
 /// Payload of a `node_tool_use_started` SSE event — an ordinary tool call has
 /// started. Match it to its `NodeToolUseFinished` counterpart by
 /// `tool_use_id`.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct NodeToolUseStartedPayload {
     /// Unique ID of this call; matches the finished event
     #[serde(default)]
@@ -553,7 +582,7 @@ pub struct NodeToolUseStartedPayload {
 
 /// `outputs` of a [`NodeToolUseFinishedPayload`] — only carries fields meant
 /// for display
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct NodeToolUseOutputs {
     /// Sources referenced by the tool result
     #[serde(default)]
@@ -577,7 +606,7 @@ pub struct NodeToolUseOutputs {
 
 /// Payload of a `node_tool_use_finished` SSE event — the tool call has
 /// ended.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct NodeToolUseFinishedPayload {
     /// Matches the `tool_use_id` of the started event
     #[serde(default)]
@@ -626,7 +655,7 @@ pub struct NodeToolUseFinishedPayload {
 /// Payload of a `subagent_started` SSE event. When the Agent spawns a
 /// subagent to work on a sub-task, the subagent's lifecycle is reported with
 /// this dedicated event family instead of `node_tool_use_*`.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentStartedPayload {
     /// ID of the node that spawned the subagent
     #[serde(default)]
@@ -654,7 +683,7 @@ pub struct SubagentStartedPayload {
 /// Payload of a `subagent_progress` SSE event, emitted every time the
 /// subagent calls one of its own tools. Use it to render a live timeline
 /// inside the subagent card.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentProgressPayload {
     /// ID of the node that spawned the subagent
     #[serde(default)]
@@ -683,7 +712,7 @@ pub struct SubagentProgressPayload {
 }
 
 /// `outputs` of a [`SubagentFinishedPayload`]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentOutputs {
     /// The goal that was assigned to the subagent
     #[serde(default)]
@@ -697,7 +726,7 @@ pub struct SubagentOutputs {
 }
 
 /// Payload of a `subagent_finished` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentFinishedPayload {
     /// ID of the node that spawned the subagent
     #[serde(default)]
@@ -726,7 +755,7 @@ pub struct SubagentFinishedPayload {
 /// Payload of an `agent_tool_started` SSE event. When the Agent delegates to
 /// another Agent as a tool, that inner run is reported with the
 /// `agent_tool_*` family — the shape mirrors the subagent events.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AgentToolStartedPayload {
     /// ID of the calling node
     #[serde(default)]
@@ -762,7 +791,7 @@ pub struct AgentToolStartedPayload {
 
 /// Payload of an `agent_tool_progress` SSE event, emitted for each inner
 /// tool call the delegated Agent makes.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AgentToolProgressPayload {
     /// ID of the calling node
     #[serde(default)]
@@ -794,7 +823,7 @@ pub struct AgentToolProgressPayload {
 }
 
 /// Payload of an `agent_tool_finished` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AgentToolFinishedPayload {
     /// ID of the calling node
     #[serde(default)]
@@ -840,7 +869,7 @@ pub struct AgentToolFinishedPayload {
 /// Payload of a `query_masked` SSE event — sensitive content in the user
 /// query was masked before processing. Display `masked_query` instead of the
 /// original query.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct QueryMaskedPayload {
     /// The original user query
     #[serde(default)]
@@ -852,7 +881,7 @@ pub struct QueryMaskedPayload {
 
 /// Payload of a `plan_changed` SSE event — the Agent created or updated its
 /// task plan.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PlanChangedPayload {
     /// ID of the planning node
     #[serde(default)]
@@ -872,7 +901,7 @@ pub struct PlanChangedPayload {
 /// Payload of a `context_compress_started` SSE event, marking the start of a
 /// context-compression pass triggered by a long conversation. Unlike other
 /// events, the timestamp here is an RFC 3339 string.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ContextCompressStartedPayload {
     /// Start time, RFC 3339
     #[serde(default)]
@@ -884,7 +913,7 @@ pub struct ContextCompressStartedPayload {
 
 /// Payload of a `context_compress_finished` SSE event. Unlike other events,
 /// the timestamp here is an RFC 3339 string.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ContextCompressFinishedPayload {
     /// Finish time, RFC 3339
     #[serde(default)]
@@ -1259,5 +1288,54 @@ mod tests {
         assert_eq!(resp.total, 12);
         assert_eq!(resp.agents[0].uid, "ag_7d3f9b2c");
         assert!(resp.agents[0].is_published);
+    }
+
+    #[test]
+    fn deserialize_interrupt_treats_null_questions_as_empty() {
+        let interrupt: Interrupt = serde_json::from_str(
+            r#"{"node_id":"approval","tool_call_id":"call-1","questions":null}"#,
+        )
+        .unwrap();
+        assert!(interrupt.questions.is_empty());
+    }
+
+    #[test]
+    fn deserialize_question_treats_null_options_as_empty() {
+        let question: Question =
+            serde_json::from_str(r#"{"question":"Continue?","options":null}"#).unwrap();
+        assert!(question.options.is_empty());
+    }
+
+    #[test]
+    fn deserialize_human_interaction_preserves_labels_and_answer_keys() {
+        let interrupt: Interrupt = serde_json::from_str(
+            r#"{
+            "node_id":"ask",
+            "tool_call_id":"call-1",
+            "questions":[],
+            "interactions":[{
+                "tool_call_id":"call-1",
+                "interrupt_id":"call-1",
+                "type":"ask_human",
+                "tool_name":"AskHuman",
+                "questions":[{
+                    "question":"从哪个方向开始？",
+                    "options":[{"label":"看行情","description":"比较当前价格"}],
+                    "multi_select":false
+                }],
+                "tool_args":{}
+            }]
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(interrupt.interactions[0].interrupt_id, "call-1");
+        assert_eq!(
+            interrupt.interactions[0].questions[0].options[0].label,
+            "看行情"
+        );
+        assert_eq!(
+            interrupt.interactions[0].questions[0].options[0].description,
+            "比较当前价格"
+        );
     }
 }

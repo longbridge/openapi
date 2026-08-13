@@ -158,12 +158,15 @@ impl From<lb::Reference> for Reference {
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct QuestionOption {
+    /// Short UI label for the option
+    pub label: String,
     /// Option text
     pub description: String,
 }
 impl From<lb::QuestionOption> for QuestionOption {
     fn from(v: lb::QuestionOption) -> Self {
         Self {
+            label: v.label,
             description: v.description,
         }
     }
@@ -190,6 +193,36 @@ impl From<lb::Question> for Question {
     }
 }
 
+/// A single interaction requested while an Agent workflow is paused
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct HumanInteraction {
+    /// Tool call that requested the interaction
+    pub tool_call_id: String,
+    /// Stable key expected by `answersByToolCall`
+    pub interrupt_id: String,
+    /// Interaction type such as `ask_human` or `trade_password`
+    pub interaction_type: String,
+    /// Human-readable tool name
+    pub tool_name: String,
+    /// Questions and answer options presented to the user
+    pub questions: Vec<Question>,
+    /// Original tool arguments, retained for host-specific UI rendering
+    pub tool_args: serde_json::Value,
+}
+impl From<lb::HumanInteraction> for HumanInteraction {
+    fn from(v: lb::HumanInteraction) -> Self {
+        Self {
+            tool_call_id: v.tool_call_id,
+            interrupt_id: v.interrupt_id,
+            interaction_type: v.interaction_type,
+            tool_name: v.tool_name,
+            questions: v.questions.into_iter().map(Into::into).collect(),
+            tool_args: v.tool_args,
+        }
+    }
+}
+
 /// Present when a conversation run is interrupted, waiting for
 /// `AgentContext.continueConversation`
 #[napi_derive::napi(object)]
@@ -201,6 +234,8 @@ pub struct Interrupt {
     pub tool_call_id: String,
     /// Questions you need to answer
     pub questions: Vec<Question>,
+    /// Full interaction descriptors used to render and answer the pause
+    pub interactions: Vec<HumanInteraction>,
     /// ID of the paused message
     pub message_id: i64,
     /// ID of the owning conversation
@@ -212,6 +247,7 @@ impl From<lb::Interrupt> for Interrupt {
             node_id: v.node_id,
             tool_call_id: v.tool_call_id,
             questions: v.questions.into_iter().map(Into::into).collect(),
+            interactions: v.interactions.into_iter().map(Into::into).collect(),
             message_id: v.message_id,
             chat_id: v.chat_id,
         }

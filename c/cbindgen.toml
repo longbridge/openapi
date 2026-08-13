@@ -345,6 +345,7 @@ cpp_compat = true
 "CReference" = "lb_reference_t"
 "CQuestionOption" = "lb_question_option_t"
 "CQuestion" = "lb_question_t"
+"CHumanInteraction" = "lb_human_interaction_t"
 "CInterrupt" = "lb_interrupt_t"
 "CAgentError" = "lb_agent_error_t"
 "CConversationResponse" = "lb_conversation_response_t"
