@@ -596,7 +596,7 @@ pub(crate) struct TriggerOrder {
     trigger_status: i32,
 }
 
-/// A price-step (bid-size) rule entry from the order-info response.
+/// A price-step (bid-size) rule entry from the symbol-info response.
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::grid::GridBidSize")]
@@ -612,7 +612,7 @@ pub(crate) struct GridBidSize {
     bid_size: Option<PyDecimal>,
 }
 
-/// Channel / authorization info nested in the order-info response.
+/// Channel / authorization info nested in the symbol-info response.
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::grid::GridChannelInfo")]
