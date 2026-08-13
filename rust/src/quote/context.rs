@@ -61,6 +61,9 @@ struct InnerQuoteContext {
     language: Language,
     http_cli: HttpClient,
     command_tx: mpsc::UnboundedSender<Command>,
+    /// Kept alive only so the background `Core::run` task can observe the
+    /// context being dropped (via this channel closing) and stop reconnecting.
+    _shutdown_tx: mpsc::UnboundedSender<()>,
     cache_participants: Cache<Vec<ParticipantInfo>>,
     cache_issuers: Cache<Vec<IssuerInfo>>,
     cache_option_chain_expiry_date_list: CacheWithKey<String, Vec<Date>>,
@@ -101,11 +104,13 @@ impl QuoteContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
+        let (shutdown_tx, shutdown_rx) = mpsc::unbounded_channel();
         let user_profile = Arc::new(RwLock::new(None::<UserProfile>));
         let core = Core::new(config, command_rx, push_tx, user_profile.clone());
-        crate::runtime::RUNTIME
-            .handle()
-            .spawn(core.run().with_subscriber(log_subscriber.clone()));
+        crate::runtime::RUNTIME.handle().spawn(
+            core.run(shutdown_rx)
+                .with_subscriber(log_subscriber.clone()),
+        );
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
             tracing::info!("quote context created");
@@ -116,6 +121,7 @@ impl QuoteContext {
                 language,
                 http_cli,
                 command_tx,
+                _shutdown_tx: shutdown_tx,
                 cache_participants: Cache::new(PARTICIPANT_INFO_CACHE_TIMEOUT),
                 cache_issuers: Cache::new(ISSUER_INFO_CACHE_TIMEOUT),
                 cache_option_chain_expiry_date_list: CacheWithKey::new(

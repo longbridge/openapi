@@ -14328,10 +14328,19 @@ class Reference:
 
     index: int
     """Reference index"""
+    original_index: int
+    """Original index in the source list, before any reranking"""
+    ref_type: str
+    """Reference kind, e.g. ``"NewsArticle"``"""
+    id: str
+    """Reference id"""
     title: str
     """Reference title"""
     url: str
     """Reference URL"""
+    content: Any | None
+    """Full reference payload as sent by the server. Kept as raw JSON
+    because the field set varies by reference ``ref_type``"""
 
 class QuestionOption:
     """One option of a Question."""
@@ -14389,6 +14398,8 @@ class ConversationResponse:
     """Final answer text; valid when status is ConversationStatus.Succeeded"""
     references: list[Reference] | None
     """Sources referenced by the answer"""
+    further_questions: list[str] | None
+    """Suggested follow-up questions ("you might also ask")"""
     elapsed_time: float
     """Run duration in seconds"""
     interrupt: Interrupt | None
@@ -14403,6 +14414,12 @@ class ChatStartedPayload:
     """Conversation identifier"""
     message_id: str
     """Message ID of this round"""
+    chat_id: int
+    """ID of the owning conversation"""
+    error: str
+    """Error detail; empty at start"""
+    error_message: str
+    """User-facing error message; empty at start"""
 
 class MessagePayload:
     """
@@ -15004,6 +15021,23 @@ class AgentContext:
         """
         ...
 
+    def public_agents(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> AgentsResponse:
+        """
+        List all publicly available Agents on the platform (the Explore
+        catalog). Not scoped to a Workspace.
+
+        Args:
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
     def conversation(
         self,
         agent_id: str,
@@ -15164,6 +15198,23 @@ class AsyncAgentContext:
 
         Args:
             workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def public_agents(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> Awaitable[AgentsResponse]:
+        """
+        List all publicly available Agents on the platform (the Explore
+        catalog). Not scoped to a Workspace. Returns awaitable.
+
+        Args:
             page: Page number, starts at 1
             limit: Page size
             name: Fuzzy search by Agent name

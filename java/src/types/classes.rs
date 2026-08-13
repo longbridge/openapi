@@ -3220,7 +3220,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/Reference",
     longbridge::agent::Reference,
-    [index, title, url]
+    [index, original_index, ref_type, id, title, url, content]
 );
 
 impl_java_class!(
@@ -3267,7 +3267,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/ChatStartedEvent",
     longbridge::agent::ChatStartedPayload,
-    [chat_uid, message_id]
+    [chat_uid, message_id, chat_id, error, error_message]
 );
 
 // JNI-side view of `longbridge::agent::WorkflowStartedInputs`, the `inputs`
@@ -3582,16 +3582,18 @@ impl_java_class!(
 );
 
 /// JNI-side view of [`longbridge::agent::ConversationResponse`], with
-/// `references` normalized from `Option<Vec<Reference>>` down to a plain
-/// `Vec` (empty when absent) so it can use the same `#[java(objarray)]`
-/// convention as every other list field — mirrors how `StockPosition` above
-/// collapses `Option<Decimal>`/`Option<i64>` fields with `unwrap_or_default`.
+/// `references`/`further_questions` normalized from `Option<Vec<_>>` down to
+/// a plain `Vec` (empty when absent) so they can use the same
+/// `#[java(objarray)]` convention as every other list field — mirrors how
+/// `StockPosition` above collapses `Option<Decimal>`/`Option<i64>` fields
+/// with `unwrap_or_default`.
 pub(crate) struct ConversationResponse {
     pub(crate) chat_uid: String,
     pub(crate) message_id: String,
     pub(crate) status: longbridge::agent::ConversationStatus,
     pub(crate) answer: String,
     pub(crate) references: Vec<longbridge::agent::Reference>,
+    pub(crate) further_questions: Vec<String>,
     pub(crate) elapsed_time: f64,
     pub(crate) interrupt: Option<longbridge::agent::Interrupt>,
     pub(crate) error: Option<longbridge::agent::AgentError>,
@@ -3605,6 +3607,7 @@ impl From<longbridge::agent::ConversationResponse> for ConversationResponse {
             status: value.status,
             answer: value.answer,
             references: value.references.unwrap_or_default(),
+            further_questions: value.further_questions.unwrap_or_default(),
             elapsed_time: value.elapsed_time,
             interrupt: value.interrupt,
             error: value.error,
@@ -3622,6 +3625,8 @@ impl_java_class!(
         answer,
         #[java(objarray)]
         references,
+        #[java(objarray)]
+        further_questions,
         elapsed_time,
         interrupt,
         error

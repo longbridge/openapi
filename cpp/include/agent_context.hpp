@@ -45,6 +45,11 @@ public:
              const std::optional<GetAgentsOptions>& opts,
              AsyncCallback<AgentContext, AgentsResponse> callback) const;
 
+  /// List all publicly available Agents on the platform (the Explore catalog).
+  /// Not scoped to a Workspace.
+  void public_agents(const std::optional<GetAgentsOptions>& opts,
+                     AsyncCallback<AgentContext, AgentsResponse> callback) const;
+
   /// Start a conversation with the specified Agent, blocking until the run
   /// succeeds, is interrupted, or fails.
   ///

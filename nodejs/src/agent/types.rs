@@ -126,17 +126,30 @@ impl From<lb::ConversationStatus> for ConversationStatus {
 pub struct Reference {
     /// Reference index
     pub index: i32,
+    /// Original index in the source list, before any reranking
+    pub original_index: i32,
+    /// Reference kind, e.g. `"NewsArticle"`
+    pub ref_type: String,
+    /// Reference id
+    pub id: String,
     /// Reference title
     pub title: String,
     /// Reference URL
     pub url: String,
+    /// Full reference payload as sent by the server; kept as raw JSON
+    /// because the field set varies by reference `ref_type`
+    pub content: Option<serde_json::Value>,
 }
 impl From<lb::Reference> for Reference {
     fn from(v: lb::Reference) -> Self {
         Self {
             index: v.index,
+            original_index: v.original_index,
+            ref_type: v.ref_type,
+            id: v.id,
             title: v.title,
             url: v.url,
+            content: v.content,
         }
     }
 }
@@ -240,6 +253,8 @@ pub struct ConversationResponse {
     pub answer: String,
     /// Sources referenced by the answer
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions
+    pub further_questions: Option<Vec<String>>,
     /// Run duration in seconds
     pub elapsed_time: f64,
     /// Present only when `status` is `interrupted`
@@ -257,6 +272,7 @@ impl From<lb::ConversationResponse> for ConversationResponse {
             references: v
                 .references
                 .map(|refs| refs.into_iter().map(Into::into).collect()),
+            further_questions: v.further_questions,
             elapsed_time: v.elapsed_time,
             interrupt: v.interrupt.map(Into::into),
             error: v.error.map(Into::into),
@@ -272,12 +288,21 @@ pub struct ChatStartedPayload {
     pub chat_uid: String,
     /// Message ID of this round
     pub message_id: String,
+    /// ID of the owning conversation
+    pub chat_id: i64,
+    /// Error detail; empty at start
+    pub error: String,
+    /// User-facing error message; empty at start
+    pub error_message: String,
 }
 impl From<lb::ChatStartedPayload> for ChatStartedPayload {
     fn from(v: lb::ChatStartedPayload) -> Self {
         Self {
             chat_uid: v.chat_uid,
             message_id: v.message_id,
+            chat_id: v.chat_id,
+            error: v.error,
+            error_message: v.error_message,
         }
     }
 }

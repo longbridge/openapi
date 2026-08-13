@@ -160,6 +160,40 @@ AgentContext::agents(
 }
 
 void
+AgentContext::public_agents(
+  const std::optional<GetAgentsOptions>& opts,
+  AsyncCallback<AgentContext, AgentsResponse> callback) const
+{
+  lb_get_agents_options_t opts2 = { nullptr, nullptr, nullptr };
+  if (opts) {
+    opts2.page = opts->page ? &opts->page.value() : nullptr;
+    opts2.limit = opts->limit ? &opts->limit.value() : nullptr;
+    opts2.name = opts->name ? opts->name->c_str() : nullptr;
+  }
+
+  lb_agent_context_public_agents(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<AgentContext, AgentsResponse>(
+          res->userdata);
+      AgentContext ctx((const lb_agent_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        AgentsResponse resp = convert((const lb_agents_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<AgentContext, AgentsResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<AgentContext, AgentsResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<AgentContext, AgentsResponse>(callback));
+}
+
+void
 AgentContext::conversation(
   const std::string& agent_id,
   const std::string& query,

@@ -70,6 +70,11 @@ export declare class AgentContext {
    */
   agents(workspaceId: string, page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
   /**
+   * List all publicly available Agents on the platform (the Explore
+   * catalog). Not scoped to a Workspace.
+   */
+  publicAgents(page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
    * Start a conversation with the specified Agent, blocking until the run
    * succeeds, is interrupted, or fails.
    *
@@ -4286,6 +4291,12 @@ export interface ChatStartedPayload {
   chatUid: string
   /** Message ID of this round */
   messageId: string
+  /** ID of the owning conversation */
+  chatId: number
+  /** Error detail; empty at start */
+  error: string
+  /** User-facing error message; empty at start */
+  errorMessage: string
 }
 
 /**
@@ -4500,6 +4511,8 @@ export interface ConversationResponse {
   answer: string
   /** Sources referenced by the answer */
   references?: Array<Reference>
+  /** Suggested follow-up questions */
+  furtherQuestions?: Array<string>
   /** Run duration in seconds */
   elapsedTime: number
   /** Present only when `status` is `interrupted` */
@@ -6564,10 +6577,21 @@ export interface RecentBuybacks {
 export interface Reference {
   /** Reference index */
   index: number
+  /** Original index in the source list, before any reranking */
+  originalIndex: number
+  /** Reference kind, e.g. `"NewsArticle"` */
+  refType: string
+  /** Reference id */
+  id: string
   /** Reference title */
   title: string
   /** Reference URL */
   url: string
+  /**
+   * Full reference payload as sent by the server; kept as raw JSON
+   * because the field set varies by reference `ref_type`
+   */
+  content?: any
 }
 
 /** Parameters for replacing an attached order */

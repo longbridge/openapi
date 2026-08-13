@@ -37,7 +37,7 @@ public class AgentContext implements AutoCloseable {
      */
     public static AgentContext create(Config config) {
         AgentContext ctx = new AgentContext();
-        ctx.raw = SdkNative.newAgentContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newAgentContext(config.getRaw()); }
         return ctx;
     }
 
@@ -56,7 +56,7 @@ public class AgentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<WorkspacesResponse> workspaces() throws OpenApiException {
+    public synchronized CompletableFuture<WorkspacesResponse> workspaces() throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.agentContextWorkspaces(raw(), callback);
         });
@@ -70,10 +70,25 @@ public class AgentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<AgentsResponse> agents(String workspaceId, GetAgentsOptions opts)
+    public synchronized CompletableFuture<AgentsResponse> agents(String workspaceId, GetAgentsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.agentContextAgents(raw(), workspaceId, opts, callback);
+        });
+    }
+
+    /**
+     * List all publicly available Agents on the platform (the Explore catalog).
+     * Not scoped to a Workspace.
+     *
+     * @param opts Options for this request, may be {@code null}
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<AgentsResponse> publicAgents(GetAgentsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.agentContextPublicAgents(raw(), opts, callback);
         });
     }
 
@@ -117,7 +132,7 @@ public class AgentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ConversationResponse> conversation(String agentId, String query, String chatUid,
+    public synchronized CompletableFuture<ConversationResponse> conversation(String agentId, String query, String chatUid,
             String parentMessageId) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.agentContextConversation(raw(), agentId, query, chatUid, parentMessageId, callback);
@@ -138,7 +153,7 @@ public class AgentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<ConversationResponse> continueConversation(String agentId, String chatUid,
+    public synchronized CompletableFuture<ConversationResponse> continueConversation(String agentId, String chatUid,
             String messageId, Map<String, Map<String, String>> answersByToolCall) throws OpenApiException {
         String answersJson = toAnswersJson(answersByToolCall);
         return AsyncCallback.executeTask((callback) -> {
@@ -197,7 +212,7 @@ public class AgentContext implements AutoCloseable {
      *                        {@code null} for a new conversation
      * @return A cold {@link Flow.Publisher} of conversation stream events
      */
-    public Flow.Publisher<ConversationStreamEvent> conversationStream(String agentId, String query, String chatUid,
+    public synchronized Flow.Publisher<ConversationStreamEvent> conversationStream(String agentId, String query, String chatUid,
             String parentMessageId) {
         return ConversationStreamPublisher.forNewConversation(raw(), agentId, query, chatUid, parentMessageId);
     }
@@ -216,7 +231,7 @@ public class AgentContext implements AutoCloseable {
      *                         {@code null} if there is nothing to answer
      * @return A cold {@link Flow.Publisher} of conversation stream events
      */
-    public Flow.Publisher<ConversationStreamEvent> continueConversationStream(String agentId, String chatUid,
+    public synchronized Flow.Publisher<ConversationStreamEvent> continueConversationStream(String agentId, String chatUid,
             String messageId, Map<String, Map<String, String>> answersByToolCall) {
         String answersJson = toAnswersJson(answersByToolCall);
         return ConversationStreamPublisher.forContinueConversation(raw(), agentId, chatUid, messageId, answersJson);

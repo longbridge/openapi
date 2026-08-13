@@ -143,12 +143,29 @@ pub struct Reference {
     /// Reference index
     #[serde(default)]
     pub index: i32,
-    /// Reference title
+    /// Original index in the source list, before any reranking
+    #[serde(default)]
+    pub original_index: i32,
+    /// Reference kind, e.g. `"NewsArticle"`
+    #[serde(default, rename = "type")]
+    pub ref_type: String,
+    /// Reference id
+    #[serde(default)]
+    pub id: String,
+    /// Reference title. Often empty at the top level — the human-readable
+    /// title usually lives in [`content`](Self::content).
     #[serde(default)]
     pub title: String,
-    /// Reference URL
+    /// Reference URL. Often empty at the top level — see
+    /// [`content`](Self::content).
     #[serde(default)]
     pub url: String,
+    /// Full reference payload as sent by the server (`source`, `description`,
+    /// `published_at`, `source_url`, `source_logo`, `kind`, …). Kept as raw
+    /// JSON because the field set varies by reference
+    /// [`ref_type`](Self::ref_type).
+    #[serde(default)]
+    pub content: Option<serde_json::Value>,
 }
 
 /// One question the Agent needs you to answer
@@ -222,6 +239,10 @@ pub struct ConversationResponse {
     /// Sources referenced by the answer
     #[serde(default)]
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions ("you might also ask"); present when the
+    /// run produced them
+    #[serde(default)]
+    pub further_questions: Option<Vec<String>>,
     /// Run duration in seconds
     #[serde(default)]
     pub elapsed_time: f64,
@@ -252,6 +273,7 @@ impl ConversationResponse {
             status: payload.status,
             answer: payload.outputs.answer.unwrap_or_default(),
             references: payload.outputs.references,
+            further_questions: payload.outputs.further_questions,
             elapsed_time: payload.elapsed_time,
             interrupt: None,
             error,
@@ -277,6 +299,7 @@ impl ConversationResponse {
             status: ConversationStatus::Interrupted,
             answer: String::new(),
             references: None,
+            further_questions: None,
             elapsed_time: 0.0,
             interrupt: Some(interrupt),
             error: None,
@@ -294,6 +317,15 @@ pub struct ChatStartedPayload {
     /// which is a quoted string) — accept either.
     #[serde(deserialize_with = "crate::serde_utils::deserialize_string_or_int_as_string")]
     pub message_id: String,
+    /// ID of the owning conversation
+    #[serde(default)]
+    pub chat_id: i64,
+    /// Error detail; empty at start
+    #[serde(default)]
+    pub error: String,
+    /// User-facing error message; empty at start
+    #[serde(default)]
+    pub error_message: String,
 }
 
 /// Payload of a `message` SSE event — an incremental text chunk. This is the
@@ -340,6 +372,10 @@ pub struct WorkflowOutputs {
     /// Sources referenced by the answer
     #[serde(default)]
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions ("you might also ask"); present when the
+    /// run produced them
+    #[serde(default)]
+    pub further_questions: Option<Vec<String>>,
 }
 
 /// Payload of a `workflow_finished` SSE event. `status` is never
@@ -1065,13 +1101,23 @@ mod tests {
 
     #[test]
     fn deserialize_workflow_finished_payload() {
-        let json = r#"{"status":"succeeded","elapsed_time":3.21,"outputs":{"answer":"Tesla (TSLA.US) recently..."}}"#;
+        let json = r#"{"status":"succeeded","elapsed_time":3.21,"outputs":{"answer":"Tesla (TSLA.US) recently...","further_questions":["What is Tesla's P/E?","How did Q3 deliveries look?"]}}"#;
         let payload: WorkflowFinishedPayload = serde_json::from_str(json).unwrap();
         assert_eq!(payload.status, ConversationStatus::Succeeded);
         assert!((payload.elapsed_time - 3.21).abs() < f64::EPSILON);
         assert_eq!(
             payload.outputs.answer.as_deref(),
             Some("Tesla (TSLA.US) recently...")
+        );
+        assert_eq!(
+            payload.outputs.further_questions.as_deref(),
+            Some(
+                [
+                    "What is Tesla's P/E?".to_string(),
+                    "How did Q3 deliveries look?".to_string(),
+                ]
+                .as_slice()
+            )
         );
 
         let resp = ConversationResponse::from_stream_parts(
@@ -1081,6 +1127,8 @@ mod tests {
         assert_eq!(resp.chat_uid, "ct_9f2c1a5b");
         assert_eq!(resp.message_id, "42");
         assert_eq!(resp.answer, "Tesla (TSLA.US) recently...");
+        // Follow-up questions thread through the folded response.
+        assert_eq!(resp.further_questions.as_ref().unwrap().len(), 2);
         assert!(resp.interrupt.is_none());
         assert!(resp.error.is_none());
     }
@@ -1137,6 +1185,33 @@ mod tests {
         assert!(payload.is_thinking);
         assert_eq!(payload.outputs.query.as_deref(), Some("TSLA stock news"));
         assert_eq!(payload.outputs.references.as_ref().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn deserialize_reference_with_nested_content() {
+        // The real wire reference nests the human-readable fields under
+        // `content` and carries `type`/`id`/`original_index` at the top
+        // level; only `index` overlaps the old flat shape.
+        let json = r#"{"type":"NewsArticle","id":"295354885","index":1,"original_index":10,"content":{"source":"智通财经","description":"Jefferies cut Tesla's target.","published_at":"2026-08-10T03:45:02Z","source_url":"https://example.com/a","title":""}}"#;
+        let r: Reference = serde_json::from_str(json).unwrap();
+        assert_eq!(r.index, 1);
+        assert_eq!(r.original_index, 10);
+        assert_eq!(r.ref_type, "NewsArticle");
+        assert_eq!(r.id, "295354885");
+        let content = r.content.expect("content");
+        assert_eq!(content["source"], "智通财经");
+        assert_eq!(content["published_at"], "2026-08-10T03:45:02Z");
+    }
+
+    #[test]
+    fn deserialize_reference_flat_shape_still_works() {
+        // The docs' example uses a flat {index,title,url}; new fields default.
+        let r: Reference = serde_json::from_str(r#"{"index":1,"title":"t","url":"u"}"#).unwrap();
+        assert_eq!(r.index, 1);
+        assert_eq!(r.title, "t");
+        assert_eq!(r.url, "u");
+        assert!(r.content.is_none());
+        assert_eq!(r.ref_type, "");
     }
 
     #[test]
