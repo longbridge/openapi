@@ -955,7 +955,7 @@ impl ToFFI for CTriggerOrderOwned {
     }
 }
 
-/// A price-step (bid-size) rule entry from the order-info response.
+/// A price-step (bid-size) rule entry from the symbol-info response.
 #[repr(C)]
 pub struct CGridBidSize {
     /// Range start price (inclusive) (can be null)
@@ -995,7 +995,7 @@ impl ToFFI for CGridBidSizeOwned {
     }
 }
 
-/// Channel / authorization info nested in the order-info response.
+/// Channel / authorization info nested in the symbol-info response.
 #[repr(C)]
 pub struct CGridChannelInfo {
     /// Whether the strategy compliance authorization has been granted

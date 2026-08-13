@@ -6270,7 +6270,7 @@ typedef struct lb_trigger_order_t {
 } lb_trigger_order_t;
 
 /**
- * A price-step (bid-size) rule entry from the order-info response.
+ * A price-step (bid-size) rule entry from the symbol-info response.
  */
 typedef struct lb_grid_bid_size_t {
   /**
@@ -6288,7 +6288,7 @@ typedef struct lb_grid_bid_size_t {
 } lb_grid_bid_size_t;
 
 /**
- * Channel / authorization info nested in the order-info response.
+ * Channel / authorization info nested in the symbol-info response.
  */
 typedef struct lb_grid_channel_info_t {
   /**

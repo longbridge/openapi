@@ -842,7 +842,7 @@ export declare class FundPositionsResponse {
   get channels(): Array<FundPositionChannel>
 }
 
-/** A price-step (bid-size) rule entry from the order-info response. */
+/** A price-step (bid-size) rule entry from the symbol-info response. */
 export declare class GridBidSize {
   toString(): string
   toJSON(): any
@@ -854,7 +854,7 @@ export declare class GridBidSize {
   get bidSize(): Decimal | null
 }
 
-/** Channel / authorization info nested in the order-info response. */
+/** Channel / authorization info nested in the symbol-info response. */
 export declare class GridChannelInfo {
   toString(): string
   toJSON(): any

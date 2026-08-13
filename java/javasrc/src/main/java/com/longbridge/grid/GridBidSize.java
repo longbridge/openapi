@@ -3,7 +3,7 @@ package com.longbridge.grid;
 import java.math.BigDecimal;
 
 /**
- * A price-step (bid-size) rule entry from the order-info response
+ * A price-step (bid-size) rule entry from the symbol-info response
  */
 public class GridBidSize {
     private BigDecimal strProceed;

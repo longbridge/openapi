@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use longbridge_nodejs_macros::{JsEnum, JsObject};
+use longbridge_nodejs_macros::JsObject;
 
 use crate::decimal::Decimal;
 
@@ -498,7 +498,7 @@ pub struct TriggerOrder {
     trigger_status: i32,
 }
 
-/// A price-step (bid-size) rule entry from the order-info response.
+/// A price-step (bid-size) rule entry from the symbol-info response.
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::grid::GridBidSize")]
@@ -514,7 +514,7 @@ pub struct GridBidSize {
     bid_size: Option<Decimal>,
 }
 
-/// Channel / authorization info nested in the order-info response.
+/// Channel / authorization info nested in the symbol-info response.
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::grid::GridChannelInfo")]

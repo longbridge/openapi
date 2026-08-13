@@ -2859,7 +2859,7 @@ struct TriggerOrder
   int32_t trigger_status;
 };
 
-/// A price-step (bid-size) rule entry from the order-info response.
+/// A price-step (bid-size) rule entry from the symbol-info response.
 struct GridBidSize
 {
   /// Range start price (inclusive)
@@ -2870,7 +2870,7 @@ struct GridBidSize
   std::optional<Decimal> bid_size;
 };
 
-/// Channel / authorization info nested in the order-info response.
+/// Channel / authorization info nested in the symbol-info response.
 struct GridChannelInfo
 {
   /// Whether the strategy compliance authorization has been granted

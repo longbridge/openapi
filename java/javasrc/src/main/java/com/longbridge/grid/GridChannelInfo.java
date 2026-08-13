@@ -3,7 +3,7 @@ package com.longbridge.grid;
 import java.util.Arrays;
 
 /**
- * Channel / authorization info nested in the order-info response
+ * Channel / authorization info nested in the symbol-info response
  */
 public class GridChannelInfo {
     private boolean strategyGranted;
