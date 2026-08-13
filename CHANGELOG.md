@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All languages:** add `AgentContext.public_agents` (`GET /v1/ai/agents`) — list all publicly available Agents on the platform (the Explore catalog). Unlike `agents`, it is not scoped to a Workspace and returns every published, publicly-shared Agent. Takes the same optional `page` / `limit` / `name` parameters and returns the existing `AgentsResponse`
 - **All languages:** add optional `parent_message_id` parameter to the AI Agent `conversation` and `conversation_streamed` methods — pass the `message_id` from a previous response to attach a follow-up message after the specified one, keeping the message stream in order. Only valid together with `chat_uid`; must not be set for a new conversation
+- **All languages:** the AI Agent `ConversationResponse` now surfaces `further_questions` — the "you might also ask" follow-up suggestions carried in the `workflow_finished` event's `outputs`, previously dropped by the SDK
+- **All languages:** the AI Agent `Reference` now captures the full source payload the server sends — `original_index`, `ref_type` (wire `type`), `id`, and the nested `content` (raw JSON; JSON string in C/C++/Java). Previously only a flat `{index, title, url}` was modeled, so `title`/`url` came back empty for real references and `source`/`description`/`published_at`/… were lost entirely. Fixes references wherever they appear (`ConversationResponse.references`, `message` / `node_tool_use_finished` / `workflow_finished` outputs)
+- **All languages:** the AI Agent `ChatStartedPayload` now carries `chat_id`, `error`, and `error_message` (present on the wire, mirroring `ChatFinishedPayload`)
+
+> Note: the three AI Agent changes above landed for Rust/Python/Node.js/Java/C in
+> #564 and #566; this entry also completes the matching **C++** bindings, which
+> those PRs missed.
+
 - **All languages:** the AI Agent `Interrupt` now exposes `interactions` — a list of `HumanInteraction` (tool call id, interrupt id, interaction type, tool name, questions, and the raw tool arguments) — and `QuestionOption` now exposes `label`. The server may send `null` for the `questions` / `interactions` lists, which is now accepted and deserialized as an empty list instead of erroring. Available in the Rust, Python, Node.js, Java, and C/C++ bindings
 
 ### Changed

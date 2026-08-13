@@ -3808,10 +3808,18 @@ struct Reference
 {
   /// Reference index
   int32_t index;
+  /// Original reference index as provided by the source
+  int32_t original_index;
+  /// Reference type (wire field `type`)
+  std::string ref_type;
+  /// Reference identifier
+  std::string id;
   /// Reference title
   std::string title;
   /// Reference URL
   std::string url;
+  /// Full nested reference payload, as a JSON string; empty when absent
+  std::string content_json;
 };
 
 /// One option of a Question.
@@ -3906,6 +3914,8 @@ struct ConversationResponse
   std::string answer;
   /// Sources referenced by the answer
   std::vector<Reference> references;
+  /// Suggested follow-up questions ("you might also ask"); empty when absent
+  std::vector<std::string> further_questions;
   /// Run duration in seconds
   double elapsed_time;
   /// Present only when status is ConversationStatus::Interrupted
@@ -3919,8 +3929,14 @@ struct ChatStartedPayload
 {
   /// Conversation identifier
   std::string chat_uid;
+  /// Numeric conversation identifier
+  int64_t chat_id;
   /// Message ID of this round
   std::string message_id;
+  /// Error code; empty when absent
+  std::string error;
+  /// Error message; empty when absent
+  std::string error_message;
 };
 
 /// Payload of a Message conversation stream event — an incremental text

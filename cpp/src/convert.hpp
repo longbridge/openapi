@@ -3191,7 +3191,7 @@ inline agent::ConversationStatus convert(lb_conversation_status_t status) {
   }
 }
 inline agent::Reference convert(const lb_reference_t* r) {
-  return { r->index, r->title, r->url };
+  return { r->index, r->original_index, r->ref_type, r->id, r->title, r->url, r->content_json };
 }
 inline agent::QuestionOption convert(const lb_question_option_t* o) {
   return { o->label, o->description };
@@ -3221,19 +3221,22 @@ inline agent::AgentError convert(const lb_agent_error_t* e) {
 inline agent::ConversationResponse convert(const lb_conversation_response_t* r) {
   std::vector<agent::Reference> references;
   for (size_t i = 0; i < r->num_references; ++i) references.push_back(convert(&r->references[i]));
+  std::vector<std::string> further_questions(r->further_questions,
+                                             r->further_questions + r->num_further_questions);
   return {
     r->chat_uid,
     r->message_id,
     convert(r->status),
     r->answer,
     std::move(references),
+    std::move(further_questions),
     r->elapsed_time,
     r->interrupt ? std::optional<agent::Interrupt>(convert(r->interrupt)) : std::nullopt,
     r->error ? std::optional<agent::AgentError>(convert(r->error)) : std::nullopt,
   };
 }
 inline agent::ChatStartedPayload convert(const lb_chat_started_payload_t* p) {
-  return { p->chat_uid, p->message_id };
+  return { p->chat_uid, p->chat_id, p->message_id, p->error, p->error_message };
 }
 inline agent::MessagePayload convert(const lb_message_payload_t* p) {
   return { p->text, p->message_type, p->key, p->started_at, p->stage, p->stage_title,
