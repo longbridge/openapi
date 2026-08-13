@@ -4,9 +4,12 @@ use longbridge_nodejs_macros::{JsEnum, JsObject};
 use crate::decimal::Decimal;
 
 /// How grid trigger thresholds are interpreted.
+///
+/// The underlying SDK models unknown wire values with a catch-all data variant;
+/// the binding collapses those to `Unknown`, so the conversions are
+/// hand-written instead of derived.
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longbridge::grid::TriggerPriceType")]
+#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
 pub enum TriggerPriceType {
     /// Unknown / unset
     Unknown,
@@ -14,6 +17,37 @@ pub enum TriggerPriceType {
     Spread,
     /// Trigger by percent
     Percent,
+}
+
+impl ::std::convert::From<longbridge::grid::TriggerPriceType> for TriggerPriceType {
+    fn from(value: longbridge::grid::TriggerPriceType) -> Self {
+        match value {
+            longbridge::grid::TriggerPriceType::Spread => TriggerPriceType::Spread,
+            longbridge::grid::TriggerPriceType::Percent => TriggerPriceType::Percent,
+            longbridge::grid::TriggerPriceType::Unknown(_) => TriggerPriceType::Unknown,
+        }
+    }
+}
+
+impl ::std::convert::From<TriggerPriceType> for longbridge::grid::TriggerPriceType {
+    fn from(value: TriggerPriceType) -> Self {
+        match value {
+            TriggerPriceType::Spread => longbridge::grid::TriggerPriceType::Spread,
+            TriggerPriceType::Percent => longbridge::grid::TriggerPriceType::Percent,
+            TriggerPriceType::Unknown => longbridge::grid::TriggerPriceType::Unknown(0),
+        }
+    }
+}
+
+impl crate::utils::ToJSON for TriggerPriceType {
+    fn to_json(&self) -> serde_json::Value {
+        let name = match self {
+            TriggerPriceType::Unknown => "Unknown",
+            TriggerPriceType::Spread => "Spread",
+            TriggerPriceType::Percent => "Percent",
+        };
+        serde_json::Value::String(name.to_string())
+    }
 }
 
 /// Time in force for a grid order.
@@ -69,9 +103,12 @@ impl crate::utils::ToJSON for GridTimeInForce {
 }
 
 /// Action taken when a grid boundary is reached.
+///
+/// The underlying SDK models unknown wire values with a catch-all data variant;
+/// the binding collapses those to `Unknown`, so the conversions are
+/// hand-written instead of derived.
 #[napi_derive::napi]
-#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
-#[js(remote = "longbridge::grid::GridLimitEvent")]
+#[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
 pub enum GridLimitEvent {
     /// Unknown / unset
     Unknown,
@@ -79,6 +116,37 @@ pub enum GridLimitEvent {
     Ignore,
     /// Close the position at the last price
     CloseAtLast,
+}
+
+impl ::std::convert::From<longbridge::grid::GridLimitEvent> for GridLimitEvent {
+    fn from(value: longbridge::grid::GridLimitEvent) -> Self {
+        match value {
+            longbridge::grid::GridLimitEvent::Ignore => GridLimitEvent::Ignore,
+            longbridge::grid::GridLimitEvent::CloseAtLast => GridLimitEvent::CloseAtLast,
+            longbridge::grid::GridLimitEvent::Unknown(_) => GridLimitEvent::Unknown,
+        }
+    }
+}
+
+impl ::std::convert::From<GridLimitEvent> for longbridge::grid::GridLimitEvent {
+    fn from(value: GridLimitEvent) -> Self {
+        match value {
+            GridLimitEvent::Ignore => longbridge::grid::GridLimitEvent::Ignore,
+            GridLimitEvent::CloseAtLast => longbridge::grid::GridLimitEvent::CloseAtLast,
+            GridLimitEvent::Unknown => longbridge::grid::GridLimitEvent::Unknown(0),
+        }
+    }
+}
+
+impl crate::utils::ToJSON for GridLimitEvent {
+    fn to_json(&self) -> serde_json::Value {
+        let name = match self {
+            GridLimitEvent::Unknown => "Unknown",
+            GridLimitEvent::Ignore => "Ignore",
+            GridLimitEvent::CloseAtLast => "CloseAtLast",
+        };
+        serde_json::Value::String(name.to_string())
+    }
 }
 
 /// Response for submit grid trading order request

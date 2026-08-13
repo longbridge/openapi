@@ -5324,7 +5324,13 @@ export declare const enum Granularity {
   Monthly = 3
 }
 
-/** Action taken when a grid boundary is reached. */
+/**
+ * Action taken when a grid boundary is reached.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
 export declare const enum GridLimitEvent {
   /** Unknown / unset */
   Unknown = 0,
@@ -7333,7 +7339,13 @@ export declare const enum TradeStatus {
   Suspend = 10
 }
 
-/** How grid trigger thresholds are interpreted. */
+/**
+ * How grid trigger thresholds are interpreted.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
 export declare const enum TriggerPriceType {
   /** Unknown / unset */
   Unknown = 0,

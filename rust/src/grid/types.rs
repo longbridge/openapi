@@ -43,18 +43,18 @@ mod opt_decimal_string {
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, FromPrimitive, IntoPrimitive)]
 #[repr(i32)]
 pub enum TriggerPriceType {
-    /// Unknown / unset
-    #[num_enum(default)]
-    Unknown = 0,
     /// Trigger by absolute price spread
     Spread = 1,
     /// Trigger by percent
     Percent = 2,
+    /// Unknown value, preserved verbatim
+    #[num_enum(catch_all)]
+    Unknown(i32),
 }
 
 impl Default for TriggerPriceType {
     fn default() -> Self {
-        Self::Unknown
+        Self::Unknown(0)
     }
 }
 
@@ -107,18 +107,18 @@ impl<'de> Deserialize<'de> for GridTimeInForce {
 #[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, FromPrimitive, IntoPrimitive)]
 #[repr(i32)]
 pub enum GridLimitEvent {
-    /// Unknown / unset
-    #[num_enum(default)]
-    Unknown = 0,
     /// Ignore — keep the grid running
     Ignore = 1,
     /// Close the position at the last price
     CloseAtLast = 2,
+    /// Unknown value, preserved verbatim
+    #[num_enum(catch_all)]
+    Unknown(i32),
 }
 
 impl Default for GridLimitEvent {
     fn default() -> Self {
-        Self::Unknown
+        Self::Unknown(0)
     }
 }
 
@@ -721,8 +721,7 @@ pub struct GridChannelInfo {
 ///
 /// Returns the target security's name, latest price, lot sizes, price-step
 /// rules and channel / authorization info needed by the grid order window. The
-/// endpoint takes a `counter_id` query parameter (a symbol such as `700.HK` is
-/// accepted).
+/// endpoint takes a `symbol` query parameter (e.g. `700.HK`).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct GridSymbolInfo {

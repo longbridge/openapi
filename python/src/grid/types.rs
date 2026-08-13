@@ -7,9 +7,18 @@ use crate::{decimal::PyDecimal, time::PyOffsetDateTimeWrapper};
 // ─────────────────────────────────────────────────────────
 
 /// How grid trigger thresholds are interpreted.
+///
+/// The core enum carries an `Unknown(i32)` catch-all variant, which cannot be
+/// mirrored one-to-one by the macro-based enum derive; the conversions are
+/// hand-written below (any unknown wire value maps to
+/// [`TriggerPriceType::Unknown`], which serializes back as `0`).
 #[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::grid::TriggerPriceType")]
+#[py(
+    remote = "longbridge::grid::TriggerPriceType",
+    from = false,
+    into = false
+)]
 pub(crate) enum TriggerPriceType {
     /// Unknown / unset
     Unknown,
@@ -17,6 +26,28 @@ pub(crate) enum TriggerPriceType {
     Spread,
     /// Trigger by percent
     Percent,
+}
+
+impl From<longbridge::grid::TriggerPriceType> for TriggerPriceType {
+    fn from(value: longbridge::grid::TriggerPriceType) -> Self {
+        use longbridge::grid::TriggerPriceType as Remote;
+        match value {
+            Remote::Spread => TriggerPriceType::Spread,
+            Remote::Percent => TriggerPriceType::Percent,
+            Remote::Unknown(_) => TriggerPriceType::Unknown,
+        }
+    }
+}
+
+impl From<TriggerPriceType> for longbridge::grid::TriggerPriceType {
+    fn from(value: TriggerPriceType) -> Self {
+        use longbridge::grid::TriggerPriceType as Remote;
+        match value {
+            TriggerPriceType::Spread => Remote::Spread,
+            TriggerPriceType::Percent => Remote::Percent,
+            TriggerPriceType::Unknown => Remote::Unknown(0),
+        }
+    }
 }
 
 /// Time in force for a grid order.
@@ -68,9 +99,18 @@ impl From<GridTimeInForce> for longbridge::grid::GridTimeInForce {
 }
 
 /// Action taken when a grid boundary is reached.
+///
+/// The core enum carries an `Unknown(i32)` catch-all variant, which cannot be
+/// mirrored one-to-one by the macro-based enum derive; the conversions are
+/// hand-written below (any unknown wire value maps to
+/// [`GridLimitEvent::Unknown`], which serializes back as `0`).
 #[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
-#[py(remote = "longbridge::grid::GridLimitEvent")]
+#[py(
+    remote = "longbridge::grid::GridLimitEvent",
+    from = false,
+    into = false
+)]
 pub(crate) enum GridLimitEvent {
     /// Unknown / unset
     Unknown,
@@ -78,6 +118,28 @@ pub(crate) enum GridLimitEvent {
     Ignore,
     /// Close the position at the last price
     CloseAtLast,
+}
+
+impl From<longbridge::grid::GridLimitEvent> for GridLimitEvent {
+    fn from(value: longbridge::grid::GridLimitEvent) -> Self {
+        use longbridge::grid::GridLimitEvent as Remote;
+        match value {
+            Remote::Ignore => GridLimitEvent::Ignore,
+            Remote::CloseAtLast => GridLimitEvent::CloseAtLast,
+            Remote::Unknown(_) => GridLimitEvent::Unknown,
+        }
+    }
+}
+
+impl From<GridLimitEvent> for longbridge::grid::GridLimitEvent {
+    fn from(value: GridLimitEvent) -> Self {
+        use longbridge::grid::GridLimitEvent as Remote;
+        match value {
+            GridLimitEvent::Ignore => Remote::Ignore,
+            GridLimitEvent::CloseAtLast => Remote::CloseAtLast,
+            GridLimitEvent::Unknown => Remote::Unknown(0),
+        }
+    }
 }
 
 /// Grid trading rule — parameters for submit / replace.
