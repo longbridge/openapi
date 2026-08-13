@@ -184,6 +184,9 @@ pub struct Question {
 /// One option of a [`Question`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuestionOption {
+    /// Short UI label for the option.
+    #[serde(default)]
+    pub label: String,
     /// Option text
     #[serde(default)]
     pub description: String,
@@ -200,12 +203,38 @@ pub struct Interrupt {
     /// Questions you need to answer
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub questions: Vec<Question>,
+    /// Full interaction descriptors used to render and answer the pause.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub interactions: Vec<HumanInteraction>,
     /// ID of the paused message
     #[serde(default)]
     pub message_id: i64,
     /// ID of the owning conversation
     #[serde(default)]
     pub chat_id: i64,
+}
+
+/// A single interaction requested while an Agent workflow is paused.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HumanInteraction {
+    /// Tool call that requested the interaction.
+    #[serde(default)]
+    pub tool_call_id: String,
+    /// Stable key expected by `answers_by_tool_call`.
+    #[serde(default)]
+    pub interrupt_id: String,
+    /// Interaction type such as `ask_human` or `trade_password`.
+    #[serde(default, rename = "type")]
+    pub interaction_type: String,
+    /// Human-readable tool name.
+    #[serde(default)]
+    pub tool_name: String,
+    /// Questions and answer options presented to the user.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub questions: Vec<Question>,
+    /// Original tool arguments, retained for host-specific UI rendering.
+    #[serde(default)]
+    pub tool_args: serde_json::Value,
 }
 
 /// Present when a conversation run failed
@@ -1275,5 +1304,38 @@ mod tests {
         let question: Question =
             serde_json::from_str(r#"{"question":"Continue?","options":null}"#).unwrap();
         assert!(question.options.is_empty());
+    }
+
+    #[test]
+    fn deserialize_human_interaction_preserves_labels_and_answer_keys() {
+        let interrupt: Interrupt = serde_json::from_str(
+            r#"{
+            "node_id":"ask",
+            "tool_call_id":"call-1",
+            "questions":[],
+            "interactions":[{
+                "tool_call_id":"call-1",
+                "interrupt_id":"call-1",
+                "type":"ask_human",
+                "tool_name":"AskHuman",
+                "questions":[{
+                    "question":"从哪个方向开始？",
+                    "options":[{"label":"看行情","description":"比较当前价格"}],
+                    "multi_select":false
+                }],
+                "tool_args":{}
+            }]
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(interrupt.interactions[0].interrupt_id, "call-1");
+        assert_eq!(
+            interrupt.interactions[0].questions[0].options[0].label,
+            "看行情"
+        );
+        assert_eq!(
+            interrupt.interactions[0].questions[0].options[0].description,
+            "比较当前价格"
+        );
     }
 }
