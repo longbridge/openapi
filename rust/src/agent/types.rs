@@ -174,7 +174,7 @@ pub struct Question {
     /// Question text
     pub question: String,
     /// Options; empty means free-form answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub options: Vec<QuestionOption>,
     /// Whether multiple options may be selected
     #[serde(default)]
@@ -198,7 +198,7 @@ pub struct Interrupt {
     /// Tool call ID of this inquiry; used as the answer key when continuing
     pub tool_call_id: String,
     /// Questions you need to answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub questions: Vec<Question>,
     /// ID of the paused message
     #[serde(default)]
@@ -1259,5 +1259,21 @@ mod tests {
         assert_eq!(resp.total, 12);
         assert_eq!(resp.agents[0].uid, "ag_7d3f9b2c");
         assert!(resp.agents[0].is_published);
+    }
+
+    #[test]
+    fn deserialize_interrupt_treats_null_questions_as_empty() {
+        let interrupt: Interrupt = serde_json::from_str(
+            r#"{"node_id":"approval","tool_call_id":"call-1","questions":null}"#,
+        )
+        .unwrap();
+        assert!(interrupt.questions.is_empty());
+    }
+
+    #[test]
+    fn deserialize_question_treats_null_options_as_empty() {
+        let question: Question =
+            serde_json::from_str(r#"{"question":"Continue?","options":null}"#).unwrap();
+        assert!(question.options.is_empty());
     }
 }
