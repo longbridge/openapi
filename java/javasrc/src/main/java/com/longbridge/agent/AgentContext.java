@@ -85,7 +85,7 @@ public class AgentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<AgentsResponse> publicAgents(GetAgentsOptions opts)
+    public synchronized CompletableFuture<AgentsResponse> publicAgents(GetAgentsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.agentContextPublicAgents(raw(), opts, callback);
