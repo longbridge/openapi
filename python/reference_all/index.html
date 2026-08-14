@@ -5746,14 +5746,24 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Reference.index">index</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Reference.original_index">original_index</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Reference.ref_type">ref_type</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Reference.id">id</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Reference.title">title</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Reference.url">url</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Reference.content">content</a>
     </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.QuestionOption">QuestionOption</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.QuestionOption.label">label</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.QuestionOption.description">description</a>
     </li>
         </ul>
@@ -5768,6 +5778,22 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.HumanInteraction">HumanInteraction</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HumanInteraction.tool_call_id">tool_call_id</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HumanInteraction.interrupt_id">interrupt_id</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HumanInteraction.interaction_type">interaction_type</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HumanInteraction.tool_name">tool_name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HumanInteraction.questions">questions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.HumanInteraction.tool_args">tool_args</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.Interrupt">Interrupt</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Interrupt.node_id">node_id</a>
@@ -5775,6 +5801,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Interrupt.tool_call_id">tool_call_id</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Interrupt.questions">questions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Interrupt.interactions">interactions</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Interrupt.message_id">message_id</a>
     </li>
@@ -5802,6 +5830,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ConversationResponse.references">references</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ConversationResponse.further_questions">further_questions</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ConversationResponse.elapsed_time">elapsed_time</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ConversationResponse.interrupt">interrupt</a>
@@ -5815,6 +5845,12 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ChatStartedPayload.chat_uid">chat_uid</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ChatStartedPayload.message_id">message_id</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ChatStartedPayload.chat_id">chat_id</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ChatStartedPayload.error">error</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.ChatStartedPayload.error_message">error_message</a>
     </li>
         </ul>
     </li>
@@ -6220,6 +6256,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AgentContext.agents">agents</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AgentContext.public_agents">public_agents</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AgentContext.conversation">conversation</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AgentContext.continue_conversation">continue_conversation</a>
@@ -6245,6 +6283,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncAgentContext.workspaces">workspaces</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncAgentContext.agents">agents</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncAgentContext.public_agents">public_agents</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncAgentContext.conversation">conversation</a>
     </li>
@@ -91815,6 +91855,75 @@ AgentContext.conversation</p>
 
 
 
+<h3 id="longbridge.openapi.Reference.original_index" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">original_index</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">original_index: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Original index in the source list, before any reranking</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Reference.ref_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">ref_type</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">ref_type: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Reference kind, e.g. <code>"NewsArticle"</code></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Reference.id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">id: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Reference id</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="longbridge.openapi.Reference.title" class="doc doc-heading">
             <span class="doc doc-object-name doc-attribute-name">title</span>
 
@@ -91852,6 +91961,30 @@ AgentContext.conversation</p>
     <div class="doc doc-contents ">
 
         <p>Reference URL</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Reference.content" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">content</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">content: Any | None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Full reference payload as sent by the server. Kept as raw JSON
+because the field set varies by reference <code>ref_type</code></p>
 
     </div>
 
@@ -91902,6 +92035,29 @@ AgentContext.conversation</p>
 
 
 
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.QuestionOption.label" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">label</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">label: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Short UI label for the option</p>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-attribute">
 
@@ -92057,6 +92213,190 @@ AgentContext.conversation</p>
 
 
 
+<h2 id="longbridge.openapi.HumanInteraction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">HumanInteraction</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>A single interaction requested while an Agent workflow is paused.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HumanInteraction.tool_call_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">tool_call_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">tool_call_id: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Tool call that requested the interaction</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HumanInteraction.interrupt_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">interrupt_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">interrupt_id: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Stable key expected by the answers map when continuing</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HumanInteraction.interaction_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">interaction_type</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">interaction_type: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Interaction type such as <code>ask_human</code> or <code>trade_password</code></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HumanInteraction.tool_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">tool_name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">tool_name: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Human-readable tool name</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HumanInteraction.questions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">questions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">questions: list[Question]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Questions and answer options presented to the user</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.HumanInteraction.tool_args" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">tool_args</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">tool_args: Any</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Original tool arguments, retained for host-specific UI rendering</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="longbridge.openapi.Interrupt" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">Interrupt</span>
 
@@ -92152,6 +92492,29 @@ AgentContext.continue_conversation.</p>
     <div class="doc doc-contents ">
 
         <p>Questions you need to answer</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.Interrupt.interactions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">interactions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">interactions: list[HumanInteraction]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Full interaction descriptors used to render and answer the pause</p>
 
     </div>
 
@@ -92462,6 +92825,29 @@ troubleshooting</p>
 
 
 
+<h3 id="longbridge.openapi.ConversationResponse.further_questions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">further_questions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">further_questions: list[str] | None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Suggested follow-up questions ("you might also ask")</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="longbridge.openapi.ConversationResponse.elapsed_time" class="doc doc-heading">
             <span class="doc doc-object-name doc-attribute-name">elapsed_time</span>
 
@@ -92614,6 +93000,75 @@ troubleshooting</p>
     <div class="doc doc-contents ">
 
         <p>Message ID of this round</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.ChatStartedPayload.chat_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">chat_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">chat_id: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>ID of the owning conversation</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.ChatStartedPayload.error" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">error</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">error: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Error detail; empty at start</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.ChatStartedPayload.error_message" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">error_message</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">error_message: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>User-facing error message; empty at start</p>
 
     </div>
 
@@ -97442,12 +97897,78 @@ for event in ctx.conversation_streamed(
 <div class="doc doc-object doc-function">
 
 
+<h3 id="longbridge.openapi.AgentContext.public_agents" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">public_agents</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">public_agents(page: int | None = None, limit: int | None = None, name: str | None = None) -&gt; AgentsResponse</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>List all publicly available Agents on the platform (the Explore
+catalog). Not scoped to a Workspace.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>page</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page number, starts at 1</p>
+              </div>
+            </li>
+            <li>
+              <b><code>limit</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page size</p>
+              </div>
+            </li>
+            <li>
+              <b><code>name</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Fuzzy search by Agent name</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="longbridge.openapi.AgentContext.conversation" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">conversation</span>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">conversation(agent_id: str, query: str, chat_uid: str | None = None) -&gt; ConversationResponse</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">conversation(agent_id: str, query: str, chat_uid: str | None = None, parent_message_id: str | None = None) -&gt; ConversationResponse</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -97490,6 +98011,21 @@ succeeds, is interrupted, or fails.</p>
               <div class="doc-md-description">
                 <p>Continue an existing conversation instead of starting a
 new one</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_message_id</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>message_id</code> from a previous response. Pass it
+when asking a follow-up in an existing conversation to attach
+the new message after the specified one, keeping the message
+stream in order. Only valid together with <code>chat_uid</code>, the
+parent message must belong to that conversation, and it must not
+be set for a new conversation</p>
               </div>
             </li>
         </ul>
@@ -97581,7 +98117,7 @@ text to answer</p>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">conversation_streamed(agent_id: str, query: str, chat_uid: str | None = None) -&gt; Iterator[ConversationStreamEvent]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">conversation_streamed(agent_id: str, query: str, chat_uid: str | None = None, parent_message_id: str | None = None) -&gt; Iterator[ConversationStreamEvent]</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -97629,6 +98165,17 @@ than stopping as soon as you see it.</p>
               <div class="doc-md-description">
                 <p>Continue an existing conversation instead of starting a
 new one</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_message_id</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>message_id</code> from a previous response; see
+<code>conversation</code> for the exact semantics</p>
               </div>
             </li>
         </ul>
@@ -97989,12 +98536,78 @@ awaitable.</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="longbridge.openapi.AsyncAgentContext.public_agents" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">public_agents</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">public_agents(page: int | None = None, limit: int | None = None, name: str | None = None) -&gt; Awaitable[AgentsResponse]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>List all publicly available Agents on the platform (the Explore
+catalog). Not scoped to a Workspace. Returns awaitable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>page</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page number, starts at 1</p>
+              </div>
+            </li>
+            <li>
+              <b><code>limit</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page size</p>
+              </div>
+            </li>
+            <li>
+              <b><code>name</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Fuzzy search by Agent name</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="longbridge.openapi.AsyncAgentContext.conversation" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">conversation</span>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">conversation(agent_id: str, query: str, chat_uid: str | None = None) -&gt; Awaitable[ConversationResponse]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">conversation(agent_id: str, query: str, chat_uid: str | None = None, parent_message_id: str | None = None) -&gt; Awaitable[ConversationResponse]</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -98037,6 +98650,21 @@ succeeds, is interrupted, or fails. Returns awaitable.</p>
               <div class="doc-md-description">
                 <p>Continue an existing conversation instead of starting a
 new one</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_message_id</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>message_id</code> from a previous response. Pass it
+when asking a follow-up in an existing conversation to attach
+the new message after the specified one, keeping the message
+stream in order. Only valid together with <code>chat_uid</code>, the
+parent message must belong to that conversation, and it must not
+be set for a new conversation</p>
               </div>
             </li>
         </ul>
@@ -98128,7 +98756,7 @@ text to answer</p>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">conversation_streamed(agent_id: str, query: str, chat_uid: str | None = None) -&gt; Awaitable[AsyncConversationStreamIter]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">conversation_streamed(agent_id: str, query: str, chat_uid: str | None = None, parent_message_id: str | None = None) -&gt; Awaitable[AsyncConversationStreamIter]</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -98172,6 +98800,17 @@ it to consume run-progress events.</p>
               <div class="doc-md-description">
                 <p>Continue an existing conversation instead of starting a
 new one</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_message_id</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>message_id</code> from a previous response; see
+<code>conversation</code> for the exact semantics</p>
               </div>
             </li>
         </ul>

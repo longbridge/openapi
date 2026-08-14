@@ -91,6 +91,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a56dc3d8c825dc7cc16c019932ef6ce74"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structlongbridge_1_1agent_1_1_reference.html">Reference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html#a56dc3d8c825dc7cc16c019932ef6ce74">references</a></td></tr>
 <tr class="memdesc:a56dc3d8c825dc7cc16c019932ef6ce74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sources referenced by the answer.  <a href="structlongbridge_1_1agent_1_1_conversation_response.html#a56dc3d8c825dc7cc16c019932ef6ce74">More...</a><br /></td></tr>
 <tr class="separator:a56dc3d8c825dc7cc16c019932ef6ce74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2c888c0d4a068cdaf4400a0a07decf6"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html#ae2c888c0d4a068cdaf4400a0a07decf6">further_questions</a></td></tr>
+<tr class="memdesc:ae2c888c0d4a068cdaf4400a0a07decf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Suggested follow-up questions ("you might also ask"); empty when absent.  <a href="structlongbridge_1_1agent_1_1_conversation_response.html#ae2c888c0d4a068cdaf4400a0a07decf6">More...</a><br /></td></tr>
+<tr class="separator:ae2c888c0d4a068cdaf4400a0a07decf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6fb0183df9cce0160ebe1a1ce752241"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html#ab6fb0183df9cce0160ebe1a1ce752241">elapsed_time</a></td></tr>
 <tr class="memdesc:ab6fb0183df9cce0160ebe1a1ce752241"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run duration in seconds.  <a href="structlongbridge_1_1agent_1_1_conversation_response.html#ab6fb0183df9cce0160ebe1a1ce752241">More...</a><br /></td></tr>
 <tr class="separator:ab6fb0183df9cce0160ebe1a1ce752241"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,7 +105,7 @@ Public Attributes</h2></td></tr>
 <tr class="separator:af96e1b16391aeceb160d4c96fb70fd59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Response for <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a7b3733fd09205bfeb4902ec6b2284840">AgentContext::conversation</a>, <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a0119ec50b75603f6ae09c6e5bf202e3b">AgentContext::continue_conversation</a>, and the final result of the streamed counterparts. </p>
+<div class="textblock"><p>Response for <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a1fba8054c8433e4ded78aaf3fabb1d49">AgentContext::conversation</a>, <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a0119ec50b75603f6ae09c6e5bf202e3b">AgentContext::continue_conversation</a>, and the final result of the streamed counterparts. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="afba5bfc2fc21861a7f5efbb4f1a52625"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afba5bfc2fc21861a7f5efbb4f1a52625">&#9670;&nbsp;</a></span>answer</h2>
@@ -164,6 +167,22 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Present only when the run failed. </p>
+
+</div>
+</div>
+<a id="ae2c888c0d4a068cdaf4400a0a07decf6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2c888c0d4a068cdaf4400a0a07decf6">&#9670;&nbsp;</a></span>further_questions</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; longbridge::agent::ConversationResponse::further_questions</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Suggested follow-up questions ("you might also ask"); empty when absent. </p>
 
 </div>
 </div>

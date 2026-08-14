@@ -99,12 +99,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9698ac0b38f4a65cd25371ce6fd6378c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a9698ac0b38f4a65cd25371ce6fd6378c">agents</a> (const std::string &amp;workspace_id, const std::optional&lt; <a class="el" href="structlongbridge_1_1agent_1_1_get_agents_options.html">GetAgentsOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_agents_response.html">AgentsResponse</a> &gt; callback) const</td></tr>
 <tr class="memdesc:a9698ac0b38f4a65cd25371ce6fd6378c"><td class="mdescLeft">&#160;</td><td class="mdescRight">List the Agents in the specified <a class="el" href="structlongbridge_1_1agent_1_1_workspace.html" title="A Workspace the current account belongs to.">Workspace</a>.  <a href="classlongbridge_1_1agent_1_1_agent_context.html#a9698ac0b38f4a65cd25371ce6fd6378c">More...</a><br /></td></tr>
 <tr class="separator:a9698ac0b38f4a65cd25371ce6fd6378c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b3733fd09205bfeb4902ec6b2284840"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a7b3733fd09205bfeb4902ec6b2284840">conversation</a> (const std::string &amp;agent_id, const std::string &amp;query, const std::optional&lt; std::string &gt; &amp;chat_uid, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html">ConversationResponse</a> &gt; callback) const</td></tr>
-<tr class="separator:a7b3733fd09205bfeb4902ec6b2284840"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0059fabda8f58ae4eb7288fa6dd051b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#ad0059fabda8f58ae4eb7288fa6dd051b">public_agents</a> (const std::optional&lt; <a class="el" href="structlongbridge_1_1agent_1_1_get_agents_options.html">GetAgentsOptions</a> &gt; &amp;opts, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_agents_response.html">AgentsResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:ad0059fabda8f58ae4eb7288fa6dd051b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fba8054c8433e4ded78aaf3fabb1d49"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a1fba8054c8433e4ded78aaf3fabb1d49">conversation</a> (const std::string &amp;agent_id, const std::string &amp;query, const std::optional&lt; std::string &gt; &amp;chat_uid, const std::optional&lt; std::string &gt; &amp;parent_message_id, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html">ConversationResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:a1fba8054c8433e4ded78aaf3fabb1d49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0119ec50b75603f6ae09c6e5bf202e3b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#a0119ec50b75603f6ae09c6e5bf202e3b">continue_conversation</a> (const std::string &amp;agent_id, const std::string &amp;chat_uid, const std::string &amp;message_id, const <a class="el" href="namespacelongbridge_1_1agent.html#a5dcea82dece49f2be126aa01f9bd137d">AnswersByToolCall</a> &amp;answers, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html">ConversationResponse</a> &gt; callback) const</td></tr>
 <tr class="separator:a0119ec50b75603f6ae09c6e5bf202e3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1bb0ff63badb886a30012675894fa7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#aa1bb0ff63badb886a30012675894fa7e">conversation_streamed</a> (const std::string &amp;agent_id, const std::string &amp;query, const std::optional&lt; std::string &gt; &amp;chat_uid, <a class="el" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">PushCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html">ConversationStreamEvent</a> &gt; on_event, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html">ConversationResponse</a> &gt; callback) const</td></tr>
-<tr class="separator:aa1bb0ff63badb886a30012675894fa7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad07749d0fcc5650860510df77e3d112b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#ad07749d0fcc5650860510df77e3d112b">conversation_streamed</a> (const std::string &amp;agent_id, const std::string &amp;query, const std::optional&lt; std::string &gt; &amp;chat_uid, const std::optional&lt; std::string &gt; &amp;parent_message_id, <a class="el" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">PushCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html">ConversationStreamEvent</a> &gt; on_event, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html">ConversationResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:ad07749d0fcc5650860510df77e3d112b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa113fb1146759467079829a9e36d81e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#aa113fb1146759467079829a9e36d81e0">continue_conversation_streamed</a> (const std::string &amp;agent_id, const std::string &amp;chat_uid, const std::string &amp;message_id, const <a class="el" href="namespacelongbridge_1_1agent.html#a5dcea82dece49f2be126aa01f9bd137d">AnswersByToolCall</a> &amp;answers, <a class="el" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">PushCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html">ConversationStreamEvent</a> &gt; on_event, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html">ConversationResponse</a> &gt; callback) const</td></tr>
 <tr class="separator:aa113fb1146759467079829a9e36d81e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -354,8 +356,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a7b3733fd09205bfeb4902ec6b2284840"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b3733fd09205bfeb4902ec6b2284840">&#9670;&nbsp;</a></span>conversation()</h2>
+<a id="a1fba8054c8433e4ded78aaf3fabb1d49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fba8054c8433e4ded78aaf3fabb1d49">&#9670;&nbsp;</a></span>conversation()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -381,6 +383,12 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::optional&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>parent_message_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_response.html">ConversationResponse</a> &gt;&#160;</td>
           <td class="paramname"><em>callback</em>&#160;</td>
         </tr>
@@ -395,14 +403,15 @@ Static Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">chat_uid</td><td>Existing conversation identifier to continue within (<code>std::nullopt</code> to start a brand-new conversation) </td></tr>
+    <tr><td class="paramname">parent_message_id</td><td><code>message_id</code> from a previous response, to attach a follow-up after that message. Only valid together with <code>chat_uid</code> and must be <code>std::nullopt</code> for a new conversation </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="aa1bb0ff63badb886a30012675894fa7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1bb0ff63badb886a30012675894fa7e">&#9670;&nbsp;</a></span>conversation_streamed()</h2>
+<a id="ad07749d0fcc5650860510df77e3d112b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad07749d0fcc5650860510df77e3d112b">&#9670;&nbsp;</a></span>conversation_streamed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -428,6 +437,12 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::optional&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>parent_message_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="namespacelongbridge.html#a4691be27906dbe9f1a49613c73c7de9d">PushCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_conversation_stream_event.html">ConversationStreamEvent</a> &gt;&#160;</td>
           <td class="paramname"><em>on_event</em>, </td>
         </tr>
@@ -448,6 +463,7 @@ Static Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">chat_uid</td><td>Existing conversation identifier to continue within (<code>std::nullopt</code> to start a brand-new conversation) </td></tr>
+    <tr><td class="paramname">parent_message_id</td><td><code>message_id</code> from a previous response, to attach a follow-up after that message. Only valid together with <code>chat_uid</code> and must be <code>std::nullopt</code> for a new conversation </td></tr>
   </table>
   </dd>
 </dl>
@@ -497,6 +513,35 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad0059fabda8f58ae4eb7288fa6dd051b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0059fabda8f58ae4eb7288fa6dd051b">&#9670;&nbsp;</a></span>public_agents()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void longbridge::agent::AgentContext::public_agents </td>
+          <td>(</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="structlongbridge_1_1agent_1_1_get_agents_options.html">GetAgentsOptions</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html">AgentContext</a>, <a class="el" href="structlongbridge_1_1agent_1_1_agents_response.html">AgentsResponse</a> &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>List all publicly available Agents on the platform (the Explore catalog). Not scoped to a <a class="el" href="structlongbridge_1_1agent_1_1_workspace.html" title="A Workspace the current account belongs to.">Workspace</a>. </p>
 
 </div>
 </div>

@@ -130,6 +130,8 @@ Data Structures</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__question__t.html">lb_question_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__human__interaction__t.html">lb_human_interaction_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__interrupt__t.html">lb_interrupt_t</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__agent__error__t.html">lb_agent_error_t</a></td></tr>
@@ -840,6 +842,8 @@ Typedefs</h2></td></tr>
 <tr class="separator:af173fee4f05a9fd13741b151a087cf2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae424e6483fd79e930cf931ed7a05e5f3"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__question__t.html">lb_question_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ae424e6483fd79e930cf931ed7a05e5f3">lb_question_t</a></td></tr>
 <tr class="separator:ae424e6483fd79e930cf931ed7a05e5f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad18ddca978f9a149d5fafa97d89cabf8"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__human__interaction__t.html">lb_human_interaction_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ad18ddca978f9a149d5fafa97d89cabf8">lb_human_interaction_t</a></td></tr>
+<tr class="separator:ad18ddca978f9a149d5fafa97d89cabf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40d06c90441f34b0da244258c02fa02a"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__interrupt__t.html">lb_interrupt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a40d06c90441f34b0da244258c02fa02a">lb_interrupt_t</a></td></tr>
 <tr class="separator:a40d06c90441f34b0da244258c02fa02a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8faf193c8e3de5cff91b94d587663878"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structlb__agent__error__t.html">lb_agent_error_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a8faf193c8e3de5cff91b94d587663878">lb_agent_error_t</a></td></tr>
@@ -1909,12 +1913,14 @@ Functions</h2></td></tr>
 <tr class="separator:a1492d39a6edcb236e01d2fa885d2b1e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace48e3d314f61bd64597f6823dc06a64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ace48e3d314f61bd64597f6823dc06a64">lb_agent_context_agents</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const char *workspace_id, const struct <a class="el" href="structlb__get__agents__options__t.html">lb_get_agents_options_t</a> *opts, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:ace48e3d314f61bd64597f6823dc06a64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a491862dc02bcd1d4652f1fe78581f723"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a491862dc02bcd1d4652f1fe78581f723">lb_agent_context_conversation</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const char *agent_id, const char *query, const char *chat_uid, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
-<tr class="separator:a491862dc02bcd1d4652f1fe78581f723"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abef0f6100c3021a52a0282709db975a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#abef0f6100c3021a52a0282709db975a7">lb_agent_context_public_agents</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const struct <a class="el" href="structlb__get__agents__options__t.html">lb_get_agents_options_t</a> *opts, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:abef0f6100c3021a52a0282709db975a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d39687fdb5f0d029838c5084b557a29"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a4d39687fdb5f0d029838c5084b557a29">lb_agent_context_conversation</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const char *agent_id, const char *query, const char *chat_uid, const char *parent_message_id, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a4d39687fdb5f0d029838c5084b557a29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a011cfecc2757cda34e56d89a445c6dab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a011cfecc2757cda34e56d89a445c6dab">lb_agent_context_continue_conversation</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const char *agent_id, const char *chat_uid, const char *message_id, const struct <a class="el" href="structlb__answers__by__tool__call__entry__t.html">lb_answers_by_tool_call_entry_t</a> *answers, uintptr_t num_answers, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:a011cfecc2757cda34e56d89a445c6dab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae1ea552491caab1ed381d83150ae4bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#aae1ea552491caab1ed381d83150ae4bb">lb_agent_context_conversation_streamed</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const char *agent_id, const char *query, const char *chat_uid, <a class="el" href="longbridge_8h.html#a92a09f694278948bb43df038d6faf9bb">lb_conversation_event_callback_t</a> event_callback, void *event_userdata, <a class="el" href="longbridge_8h.html#a3a459665767d593ef5ac16cf279af507">lb_free_userdata_func_t</a> event_free_userdata, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
-<tr class="separator:aae1ea552491caab1ed381d83150ae4bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a8abbac49ed662894e8719aba8cb096"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a5a8abbac49ed662894e8719aba8cb096">lb_agent_context_conversation_streamed</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const char *agent_id, const char *query, const char *chat_uid, const char *parent_message_id, <a class="el" href="longbridge_8h.html#a92a09f694278948bb43df038d6faf9bb">lb_conversation_event_callback_t</a> event_callback, void *event_userdata, <a class="el" href="longbridge_8h.html#a3a459665767d593ef5ac16cf279af507">lb_free_userdata_func_t</a> event_free_userdata, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a5a8abbac49ed662894e8719aba8cb096"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f4f4d5f2e8fdf0c1742af091c48ae1b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a0f4f4d5f2e8fdf0c1742af091c48ae1b">lb_agent_context_continue_conversation_streamed</a> (const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *ctx, const char *agent_id, const char *chat_uid, const char *message_id, const struct <a class="el" href="structlb__answers__by__tool__call__entry__t.html">lb_answers_by_tool_call_entry_t</a> *answers, uintptr_t num_answers, <a class="el" href="longbridge_8h.html#a92a09f694278948bb43df038d6faf9bb">lb_conversation_event_callback_t</a> event_callback, void *event_userdata, <a class="el" href="longbridge_8h.html#a3a459665767d593ef5ac16cf279af507">lb_free_userdata_func_t</a> event_free_userdata, <a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:a0f4f4d5f2e8fdf0c1742af091c48ae1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30b4ce92bdd1cb9424431e2af17c833e"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="longbridge_8h.html#a9931816abc604b27571b8229c08dee02">lb_alert_context_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a30b4ce92bdd1cb9424431e2af17c833e">lb_alert_context_new</a> (const struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config)</td></tr>
@@ -4887,6 +4893,21 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad18ddca978f9a149d5fafa97d89cabf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad18ddca978f9a149d5fafa97d89cabf8">&#9670;&nbsp;</a></span>lb_human_interaction_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structlb__human__interaction__t.html">lb_human_interaction_t</a> <a class="el" href="structlb__human__interaction__t.html">lb_human_interaction_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>A single interaction requested while an Agent workflow is paused </p>
 
 </div>
 </div>
@@ -9650,8 +9671,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a491862dc02bcd1d4652f1fe78581f723"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a491862dc02bcd1d4652f1fe78581f723">&#9670;&nbsp;</a></span>lb_agent_context_conversation()</h2>
+<a id="a4d39687fdb5f0d029838c5084b557a29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d39687fdb5f0d029838c5084b557a29">&#9670;&nbsp;</a></span>lb_agent_context_conversation()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -9683,6 +9704,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>parent_message_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
           <td class="paramname"><em>callback</em>, </td>
         </tr>
@@ -9703,14 +9730,15 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">chat_uid</td><td>Existing conversation identifier to continue within (can be null to start a brand-new conversation) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">parent_message_id</td><td><code>message_id</code> from a previous response. Pass it when asking a follow-up in an existing conversation to attach the new message after the specified one, keeping the message stream in order. Only valid together with <code>chat_uid</code>, the parent message must belong to that conversation, and it must be null for a new conversation (can be null) </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="aae1ea552491caab1ed381d83150ae4bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae1ea552491caab1ed381d83150ae4bb">&#9670;&nbsp;</a></span>lb_agent_context_conversation_streamed()</h2>
+<a id="a5a8abbac49ed662894e8719aba8cb096"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a8abbac49ed662894e8719aba8cb096">&#9670;&nbsp;</a></span>lb_agent_context_conversation_streamed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -9738,6 +9766,12 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>chat_uid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>parent_message_id</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -9780,6 +9814,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">chat_uid</td><td>Existing conversation identifier to continue within (can be null to start a brand-new conversation) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">parent_message_id</td><td><code>message_id</code> from a previous response, to attach a follow-up after that message. Only valid together with <code>chat_uid</code> and must be null for a new conversation (can be null) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">event_callback</td><td>Called once per stream event, on an internal worker thread </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">event_userdata</td><td>Opaque pointer forwarded to <code>event_callback</code> </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">event_free_userdata</td><td>Called exactly once, after the stream ends (successfully or not), to free <code>event_userdata</code> (can be null) </td></tr>
@@ -9804,6 +9839,53 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="abef0f6100c3021a52a0282709db975a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abef0f6100c3021a52a0282709db975a7">&#9670;&nbsp;</a></span>lb_agent_context_public_agents()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_agent_context_public_agents </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longbridge_8h.html#af99071d39d1ee9caab5d674d57adb78c">lb_agent_context_t</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const struct <a class="el" href="structlb__get__agents__options__t.html">lb_get_agents_options_t</a> *&#160;</td>
+          <td class="paramname"><em>opts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="longbridge_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>userdata</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>List all publicly available Agents on the platform (the Explore catalog). Not scoped to a Workspace. Returns <code>CAgentsResponse</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">opts</td><td>Options for the request (can be null) </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

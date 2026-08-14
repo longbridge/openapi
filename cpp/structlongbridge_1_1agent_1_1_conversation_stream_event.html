@@ -130,7 +130,7 @@ Public Attributes</h2></td></tr>
 <tr class="separator:aa3a5891aa6a29c9dd2d6d4fdd059c58e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>One event observed while streaming <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#aa1bb0ff63badb886a30012675894fa7e">AgentContext::conversation_streamed</a> or <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#aa113fb1146759467079829a9e36d81e0">AgentContext::continue_conversation_streamed</a>.</p>
+<div class="textblock"><p>One event observed while streaming <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#ad07749d0fcc5650860510df77e3d112b">AgentContext::conversation_streamed</a> or <a class="el" href="classlongbridge_1_1agent_1_1_agent_context.html#aa113fb1146759467079829a9e36d81e0">AgentContext::continue_conversation_streamed</a>.</p>
 <p>This mirrors the C layer's tagged-union <code>lb_conversation_stream_event_t</code>: <code>kind</code> tells you which one of the payload fields below is populated (all others are <code>std::nullopt</code>; when <code>kind</code> is <code>Ping</code>, none of them are). A plain discriminated struct is used here (rather than <code>std::variant</code> or a JSON library) since neither has any precedent elsewhere in this C++ binding, and this shape converts directly from the C tagged union. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="ad22b3c824650cf52eb0c0898156f2390"></a>

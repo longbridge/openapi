@@ -74,12 +74,33 @@ $(function() {
 Data Fields</h2></td></tr>
 <tr class="memitem:a32c5348fa12152c96fe97c0101f7764a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__chat__started__payload__t.html#a32c5348fa12152c96fe97c0101f7764a">chat_uid</a></td></tr>
 <tr class="separator:a32c5348fa12152c96fe97c0101f7764a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a044e2751c9be81fdd46b6fd5114cf2b9"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__chat__started__payload__t.html#a044e2751c9be81fdd46b6fd5114cf2b9">chat_id</a></td></tr>
+<tr class="separator:a044e2751c9be81fdd46b6fd5114cf2b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c538511cd733bccc8cd661cd762e50c"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__chat__started__payload__t.html#a6c538511cd733bccc8cd661cd762e50c">message_id</a></td></tr>
 <tr class="separator:a6c538511cd733bccc8cd661cd762e50c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49f154ded02555c4d15e7861acf2e434"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__chat__started__payload__t.html#a49f154ded02555c4d15e7861acf2e434">error</a></td></tr>
+<tr class="separator:a49f154ded02555c4d15e7861acf2e434"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed3e11140a4ff2456ee8cb2bb7271c3c"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__chat__started__payload__t.html#aed3e11140a4ff2456ee8cb2bb7271c3c">error_message</a></td></tr>
+<tr class="separator:aed3e11140a4ff2456ee8cb2bb7271c3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Payload of a <code>ChatStarted</code> conversation stream event </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a044e2751c9be81fdd46b6fd5114cf2b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a044e2751c9be81fdd46b6fd5114cf2b9">&#9670;&nbsp;</a></span>chat_id</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t chat_id</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Numeric conversation identifier </p>
+
+</div>
+</div>
 <a id="a32c5348fa12152c96fe97c0101f7764a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a32c5348fa12152c96fe97c0101f7764a">&#9670;&nbsp;</a></span>chat_uid</h2>
 
@@ -92,6 +113,36 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Conversation identifier </p>
+
+</div>
+</div>
+<a id="a49f154ded02555c4d15e7861acf2e434"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49f154ded02555c4d15e7861acf2e434">&#9670;&nbsp;</a></span>error</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* error</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Error code; empty when absent </p>
+
+</div>
+</div>
+<a id="aed3e11140a4ff2456ee8cb2bb7271c3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed3e11140a4ff2456ee8cb2bb7271c3c">&#9670;&nbsp;</a></span>error_message</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* error_message</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Error message; empty when absent </p>
 
 </div>
 </div>

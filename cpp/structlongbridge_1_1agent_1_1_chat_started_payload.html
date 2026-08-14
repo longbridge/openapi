@@ -83,13 +83,38 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a01cb73469e526ab915608d7ba3d99657"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a01cb73469e526ab915608d7ba3d99657">chat_uid</a></td></tr>
 <tr class="memdesc:a01cb73469e526ab915608d7ba3d99657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversation identifier.  <a href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a01cb73469e526ab915608d7ba3d99657">More...</a><br /></td></tr>
 <tr class="separator:a01cb73469e526ab915608d7ba3d99657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bef9f22b668219762976a0721ed942b"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a7bef9f22b668219762976a0721ed942b">chat_id</a></td></tr>
+<tr class="memdesc:a7bef9f22b668219762976a0721ed942b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Numeric conversation identifier.  <a href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a7bef9f22b668219762976a0721ed942b">More...</a><br /></td></tr>
+<tr class="separator:a7bef9f22b668219762976a0721ed942b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a599f8c39b9c726b98b7b692d95a7a40c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a599f8c39b9c726b98b7b692d95a7a40c">message_id</a></td></tr>
 <tr class="memdesc:a599f8c39b9c726b98b7b692d95a7a40c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message ID of this round.  <a href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a599f8c39b9c726b98b7b692d95a7a40c">More...</a><br /></td></tr>
 <tr class="separator:a599f8c39b9c726b98b7b692d95a7a40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1f537cbb0dfed2f530e19237038525f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_chat_started_payload.html#ae1f537cbb0dfed2f530e19237038525f">error</a></td></tr>
+<tr class="memdesc:ae1f537cbb0dfed2f530e19237038525f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code; empty when absent.  <a href="structlongbridge_1_1agent_1_1_chat_started_payload.html#ae1f537cbb0dfed2f530e19237038525f">More...</a><br /></td></tr>
+<tr class="separator:ae1f537cbb0dfed2f530e19237038525f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ed1ba0ac9f85994510cdeeb8f354f55"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a1ed1ba0ac9f85994510cdeeb8f354f55">error_message</a></td></tr>
+<tr class="memdesc:a1ed1ba0ac9f85994510cdeeb8f354f55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error message; empty when absent.  <a href="structlongbridge_1_1agent_1_1_chat_started_payload.html#a1ed1ba0ac9f85994510cdeeb8f354f55">More...</a><br /></td></tr>
+<tr class="separator:a1ed1ba0ac9f85994510cdeeb8f354f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Payload of a ChatStarted conversation stream event. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a7bef9f22b668219762976a0721ed942b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bef9f22b668219762976a0721ed942b">&#9670;&nbsp;</a></span>chat_id</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t longbridge::agent::ChatStartedPayload::chat_id</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Numeric conversation identifier. </p>
+
+</div>
+</div>
 <a id="a01cb73469e526ab915608d7ba3d99657"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a01cb73469e526ab915608d7ba3d99657">&#9670;&nbsp;</a></span>chat_uid</h2>
 
@@ -103,6 +128,38 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Conversation identifier. </p>
+
+</div>
+</div>
+<a id="ae1f537cbb0dfed2f530e19237038525f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1f537cbb0dfed2f530e19237038525f">&#9670;&nbsp;</a></span>error</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string longbridge::agent::ChatStartedPayload::error</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Error code; empty when absent. </p>
+
+</div>
+</div>
+<a id="a1ed1ba0ac9f85994510cdeeb8f354f55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ed1ba0ac9f85994510cdeeb8f354f55">&#9670;&nbsp;</a></span>error_message</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string longbridge::agent::ChatStartedPayload::error_message</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Error message; empty when absent. </p>
 
 </div>
 </div>
