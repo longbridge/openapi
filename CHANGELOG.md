@@ -15,10 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All languages:** the AI Agent `ChatStartedPayload` now carries `chat_id`, `error`, and `error_message` (present on the wire, mirroring `ChatFinishedPayload`)
 - **All languages:** the AI Agent `Interrupt` now exposes `interactions` — a list of `HumanInteraction` (tool call id, interrupt id, interaction type, tool name, questions, and the raw tool arguments) — and `QuestionOption` now exposes `label`. The server may send `null` for the `questions` / `interactions` lists, which is now accepted and deserialized as an empty list instead of erroring. Available in the Rust, Python, Node.js, Java, and C/C++ bindings
 
-> Note: the AI Agent additions above landed for Rust/Python/Node.js/Java/C in #564
-> and #566; this release also completes the matching **C++** bindings, which those
-> PRs missed.
-
 ### Changed
 
 - **All SDKs:** every `HttpClient` now shares a single process-wide `reqwest::Client` (connection pool, DNS cache and TLS state) instead of creating its own. Each SDK context previously built two independent connection pools, so a process that churns thousands of short-lived contexts spun up thousands of pools; they now all share one. `reqwest::Client` is internally reference-counted, all requests target the same OpenAPI host, and auth is applied per-request, so sharing is both correct and far cheaper
