@@ -418,7 +418,7 @@ pub struct WorkflowFinishedPayload {
     #[serde(default)]
     pub elapsed_time: f64,
     /// Run outputs
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: WorkflowOutputs,
     /// Localized error description; only present when `status` is `failed`
     #[serde(default)]
@@ -648,7 +648,7 @@ pub struct NodeToolUseFinishedPayload {
     #[serde(default)]
     pub is_thinking: bool,
     /// Filtered call results, for display
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: NodeToolUseOutputs,
 }
 
@@ -748,7 +748,7 @@ pub struct SubagentFinishedPayload {
     pub error: String,
     /// Subagent result: `goal`, `result`, and the timeline of tool calls it
     /// made
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: SubagentOutputs,
 }
 
@@ -1031,6 +1031,21 @@ pub enum ConversationStreamEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn workflow_finished_tolerates_null_outputs() {
+        // A resumed/continued conversation can send `"outputs": null`; that must
+        // deserialize to the default rather than erroring, otherwise the whole
+        // event stream fails mid-turn.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded","outputs":null}"#).unwrap();
+        assert!(payload.outputs.answer.is_none());
+
+        // A missing key must keep working too.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded"}"#).unwrap();
+        assert!(payload.outputs.answer.is_none());
+    }
 
     // The `data` payload of the "Run succeeded" example from
     // https://open.longbridge.com/en/docs/ai/chat/conversation
