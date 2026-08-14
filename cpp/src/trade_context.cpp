@@ -894,25 +894,5 @@ TradeContext::estimate_max_purchase_quantity(
       callback));
 }
 
-void
-TradeContext::set_on_grid_order_changed(
-  PushCallback<TradeContext, PushGridOrderChanged> callback) const
-{
-  lb_trade_context_set_on_grid_order_changed(
-    ctx_,
-    [](auto ctx, auto event, auto userdata) {
-      auto callback_ptr =
-        callback::get_push_callback<TradeContext, PushGridOrderChanged>(
-          userdata);
-      PushGridOrderChanged event2 = convert(event);
-      (*callback_ptr)(PushEvent<TradeContext, PushGridOrderChanged>(
-        TradeContext(ctx), &event2));
-    },
-    new PushCallback<TradeContext, PushGridOrderChanged>(callback),
-    [](auto p) {
-      delete (PushCallback<TradeContext, PushGridOrderChanged>*)p;
-    });
-}
-
 } // namespace trade
 } // namespace longbridge

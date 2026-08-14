@@ -131,10 +131,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::alert::types::AlertCondition,
         longbridge::alert::types::AlertFrequency,
         longbridge::calendar::types::CalendarCategory,
-        longbridge::agent::ConversationStatus,
-        longbridge::grid::TriggerPriceType,
-        longbridge::grid::GridLimitEvent,
-        longbridge::grid::GridTimeInForce
+        longbridge::agent::ConversationStatus
     );
 
     // classes
@@ -201,20 +198,6 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::OrderChargeDetail,
         longbridge::trade::OrderDetail,
         longbridge::trade::EstimateMaxPurchaseQuantityResponse,
-        // Grid trading (GridContext types live in `longbridge::grid`)
-        longbridge::grid::SubmitGridOrderResponse,
-        longbridge::grid::GridOrder,
-        longbridge::grid::GridOrderSubOrder,
-        longbridge::grid::GridOrderHistory,
-        longbridge::grid::GridOrderDetail,
-        longbridge::grid::TriggerOrder,
-        longbridge::grid::GridBidSize,
-        longbridge::grid::GridChannelInfo,
-        longbridge::grid::GridSymbolInfo,
-        // Grid push stays on the trade side
-        longbridge::trade::PushGridOrderChanged,
-        crate::types::GridOrdersResponse,
-        crate::types::GridTriggerHistoryResponse,
         longbridge::content::TopicItem,
         longbridge::content::NewsItem,
         longbridge::content::TopicAuthor,
