@@ -11,7 +11,6 @@ mod content_context;
 mod dca_context;
 mod error;
 mod fundamental_context;
-mod grid_context;
 mod http_client;
 mod market_context;
 mod oauth;

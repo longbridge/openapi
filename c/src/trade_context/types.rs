@@ -7,9 +7,9 @@ use longbridge::{
         CashFlow, CashFlowDirection, CashInfo, EstimateMaxPurchaseQuantityResponse, Execution,
         FrozenTransactionFee, FundPosition, FundPositionChannel, FundPositionsResponse,
         MarginRatio, Order, OrderChargeDetail, OrderChargeFee, OrderChargeItem, OrderDetail,
-        OrderHistoryDetail, OrderSide, OrderStatus, OrderTag, OrderType, PushGridOrderChanged,
-        PushOrderChanged, StockPosition, StockPositionChannel, StockPositionsResponse,
-        SubmitOrderResponse, TimeInForceType,
+        OrderHistoryDetail, OrderSide, OrderStatus, OrderTag, OrderType, PushOrderChanged,
+        StockPosition, StockPositionChannel, StockPositionsResponse, SubmitOrderResponse,
+        TimeInForceType,
     },
 };
 use time::OffsetDateTime;
@@ -2513,109 +2513,6 @@ impl ToFFI for CEstimateMaxPurchaseQuantityResponseOwned {
         CEstimateMaxPurchaseQuantityResponse {
             cash_max_qty: self.cash_max_qty.to_ffi_type(),
             margin_max_qty: self.margin_max_qty.to_ffi_type(),
-        }
-    }
-}
-
-// ââ Grid trading push (stays on the trade context)
-// ââââââââââââââââââââââââââââââââââ
-
-/// Grid trading master-order changed message.
-#[repr(C)]
-pub struct CPushGridOrderChanged {
-    /// Grid master order ID
-    pub order_id: *const c_char,
-    /// Order status
-    pub status: *const c_char,
-    /// Security symbol (e.g. `700.HK`)
-    pub symbol: *const c_char,
-    /// Suspend reason, if any
-    pub suspend_reason: *const c_char,
-    /// Submitted base price
-    pub submitted_base_price: *const c_char,
-    /// Current base price
-    pub current_base_price: *const c_char,
-    /// Upper price bound
-    pub upper_limit_price: *const c_char,
-    /// Lower price bound
-    pub lower_limit_price: *const c_char,
-    /// Trigger price type
-    pub trigger_price_type: i32,
-    /// Quantity per trigger
-    pub trigger_quantity: *const c_char,
-    /// Settlement currency
-    pub settlement_currency: *const c_char,
-    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
-    pub time_in_force: i32,
-    /// Regular trading hours flag
-    pub rth: i32,
-    /// Sell-side order type when depth is 0
-    pub grid_order_type_up: *const c_char,
-    /// Buy-side order type when depth is 0
-    pub grid_order_type_down: *const c_char,
-}
-
-#[derive(Debug)]
-pub(crate) struct CPushGridOrderChangedOwned {
-    order_id: CString,
-    status: CString,
-    symbol: CString,
-    suspend_reason: CString,
-    submitted_base_price: CString,
-    current_base_price: CString,
-    upper_limit_price: CString,
-    lower_limit_price: CString,
-    trigger_price_type: i32,
-    trigger_quantity: CString,
-    settlement_currency: CString,
-    time_in_force: i32,
-    rth: i32,
-    grid_order_type_up: CString,
-    grid_order_type_down: CString,
-}
-
-impl From<PushGridOrderChanged> for CPushGridOrderChangedOwned {
-    fn from(p: PushGridOrderChanged) -> Self {
-        CPushGridOrderChangedOwned {
-            order_id: p.order_id.into(),
-            status: p.status.into(),
-            symbol: p.symbol.into(),
-            suspend_reason: p.suspend_reason.into(),
-            submitted_base_price: p.submitted_base_price.into(),
-            current_base_price: p.current_base_price.into(),
-            upper_limit_price: p.upper_limit_price.into(),
-            lower_limit_price: p.lower_limit_price.into(),
-            trigger_price_type: p.trigger_price_type,
-            trigger_quantity: p.trigger_quantity.into(),
-            settlement_currency: p.settlement_currency.into(),
-            time_in_force: p.time_in_force,
-            rth: p.rth,
-            grid_order_type_up: p.grid_order_type_up.into(),
-            grid_order_type_down: p.grid_order_type_down.into(),
-        }
-    }
-}
-
-impl ToFFI for CPushGridOrderChangedOwned {
-    type FFIType = CPushGridOrderChanged;
-
-    fn to_ffi_type(&self) -> Self::FFIType {
-        CPushGridOrderChanged {
-            order_id: self.order_id.to_ffi_type(),
-            status: self.status.to_ffi_type(),
-            symbol: self.symbol.to_ffi_type(),
-            suspend_reason: self.suspend_reason.to_ffi_type(),
-            submitted_base_price: self.submitted_base_price.to_ffi_type(),
-            current_base_price: self.current_base_price.to_ffi_type(),
-            upper_limit_price: self.upper_limit_price.to_ffi_type(),
-            lower_limit_price: self.lower_limit_price.to_ffi_type(),
-            trigger_price_type: self.trigger_price_type,
-            trigger_quantity: self.trigger_quantity.to_ffi_type(),
-            settlement_currency: self.settlement_currency.to_ffi_type(),
-            time_in_force: self.time_in_force,
-            rth: self.rth,
-            grid_order_type_up: self.grid_order_type_up.to_ffi_type(),
-            grid_order_type_down: self.grid_order_type_down.to_ffi_type(),
         }
     }
 }

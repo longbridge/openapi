@@ -15,8 +15,8 @@ use crate::{
         },
         types::{
             AccountBalance, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, PushGridOrderChanged,
-            PushOrderChanged, StockPositionsResponse, SubmitOrderResponse, TopicType,
+            FundPositionsResponse, MarginRatio, Order, OrderDetail, PushOrderChanged,
+            StockPositionsResponse, SubmitOrderResponse, TopicType,
         },
     },
     utils::JsCallback,
@@ -25,7 +25,6 @@ use crate::{
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<JsCallback<PushOrderChanged>>,
-    grid_order_changed: Option<JsCallback<PushGridOrderChanged>>,
 }
 
 /// Trade context
@@ -65,24 +64,6 @@ impl TradeContext {
                                 );
                             }
                         },
-                        PushEvent::GridOrderChanged(grid_order_changed) => {
-                            match grid_order_changed.try_into() {
-                                Ok(grid_order_changed) => {
-                                    if let Some(callback) = &callbacks.grid_order_changed {
-                                        callback.call(
-                                            Ok(grid_order_changed),
-                                            ThreadsafeFunctionCallMode::Blocking,
-                                        );
-                                    }
-                                }
-                                Err(e) => {
-                                    tracing::warn!(
-                                        error = %e,
-                                        "grid order changed push event conversion failed"
-                                    );
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -96,22 +77,6 @@ impl TradeContext {
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void")]
     pub fn set_on_order_changed(&self, callback: Function<PushOrderChanged, ()>) -> Result<()> {
         self.callbacks.lock().order_changed = Some(
-            callback
-                .build_threadsafe_function()
-                .callee_handled::<true>()
-                .build()?,
-        );
-        Ok(())
-    }
-
-    /// Set grid order changed callback, after receiving the grid order changed
-    /// event, it will call back to this function.
-    #[napi(ts_args_type = "callback: (err: null | Error, event: PushGridOrderChanged) => void")]
-    pub fn set_on_grid_order_changed(
-        &self,
-        callback: Function<PushGridOrderChanged, ()>,
-    ) -> Result<()> {
-        self.callbacks.lock().grid_order_changed = Some(
             callback
                 .build_threadsafe_function()
                 .callee_handled::<true>()
