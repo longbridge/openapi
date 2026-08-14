@@ -1,9 +1,5 @@
-#![allow(missing_docs)]
-
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-
-use crate::utils::counter::deserialize_counter_id_as_symbol;
 
 /// Response for [`crate::CalendarContext::finance_calendar`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,10 +29,6 @@ pub struct CalendarDateGroup {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CalendarEventInfo {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Market, e.g. `"HK"`
     pub market: String,

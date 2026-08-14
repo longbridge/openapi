@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use serde::{Deserialize, Serialize};
 
 // ── screener_recommend_strategies ─────────────────────────────────

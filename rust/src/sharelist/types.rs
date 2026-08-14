@@ -1,10 +1,6 @@
-#![allow(missing_docs)]
-
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
-
-use crate::utils::counter::deserialize_counter_id_as_symbol;
 
 /// Response for [`crate::SharelistContext::list`] and
 /// [`crate::SharelistContext::popular`]
@@ -75,10 +71,6 @@ pub struct SharelistInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SharelistStock {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Security name
     #[serde(default)]

@@ -2987,6 +2987,20 @@ typedef void (*lb_conversation_event_callback_t)(const struct lb_agent_context_t
 typedef void (*lb_free_userdata_func_t)(void*);
 
 /**
+ * Trigger value of a price alert (exactly one field is populated).
+ */
+typedef struct CAlertValueMap {
+  /**
+   * Absolute price threshold as a decimal string (empty string if not set).
+   */
+  const char *price;
+  /**
+   * Percentage-change threshold (NULL if not set).
+   */
+  const double *chg;
+} CAlertValueMap;
+
+/**
  * A single alert indicator configuration for a symbol.
  */
 typedef struct lb_alert_item_t {
@@ -3023,9 +3037,9 @@ typedef struct lb_alert_item_t {
    */
   uintptr_t num_state;
   /**
-   * JSON-serialized map of additional indicator parameter values.
+   * Trigger value of the alert.
    */
-  const char *value_map;
+  struct CAlertValueMap value_map;
 } lb_alert_item_t;
 
 /**
@@ -8303,9 +8317,9 @@ typedef struct lb_industry_rank_item_t {
    */
   const char *name;
   /**
-   * Counter ID of the industry.
+   * Industry symbol.
    */
-  const char *counter_id;
+  const char *symbol;
   /**
    * Change percentage.
    */
@@ -8383,9 +8397,9 @@ typedef struct lb_industry_peer_node_t {
    */
   const char *name;
   /**
-   * Counter ID.
+   * Node symbol.
    */
-  const char *counter_id;
+  const char *symbol;
   /**
    * Number of stocks in this node.
    */
@@ -8409,9 +8423,9 @@ typedef struct lb_industry_peer_node_t {
  */
 typedef struct lb_industry_peers_response_t {
   /**
-   * Top-level industry node info.
+   * Top-level industry node info (NULL if absent).
    */
-  struct lb_industry_peers_top_t top;
+  const struct lb_industry_peers_top_t *top;
   /**
    * Root peer chain node (NULL if absent).
    */
@@ -10224,19 +10238,64 @@ typedef struct lb_top_movers_response_t {
    */
   uintptr_t num_events;
   /**
-   * Pagination cursor as a JSON string
+   * Pagination cursor (empty string means no more pages)
    */
   const char *next_params;
 } lb_top_movers_response_t;
 
 /**
- * Rank categories response. `data` is a NUL-terminated JSON string.
+ * One leaf rank sub-category.
+ */
+typedef struct lb_rank_sub_category_t {
+  /**
+   * Sub-category key (e.g. `"hot_all-us"`). Pass to
+   * `lb_market_context_rank_list`.
+   */
+  const char *key;
+  /**
+   * Display name
+   */
+  const char *name;
+  /**
+   * Market code (e.g. `"US"`, `"HK"`)
+   */
+  const char *market;
+} lb_rank_sub_category_t;
+
+/**
+ * A top-level rank category.
+ */
+typedef struct lb_rank_category_t {
+  /**
+   * Top-level key (e.g. `"hot"`)
+   */
+  const char *key;
+  /**
+   * Display name
+   */
+  const char *name;
+  /**
+   * Sub-categories pointer
+   */
+  const struct lb_rank_sub_category_t *sub_categories;
+  /**
+   * Number of sub-categories
+   */
+  uintptr_t num_sub_categories;
+} lb_rank_category_t;
+
+/**
+ * Rank categories response.
  */
 typedef struct lb_rank_categories_response_t {
   /**
-   * Raw rank categories data as a JSON string
+   * Top-level categories pointer
    */
-  const char *data;
+  const struct lb_rank_category_t *categories;
+  /**
+   * Number of categories
+   */
+  uintptr_t num_categories;
 } lb_rank_categories_response_t;
 
 /**
@@ -11323,7 +11382,7 @@ void lb_fundamental_context_industry_rank(const struct lb_fundamental_context_t 
  * Pass NULL for `industry_id` to omit it.
  */
 void lb_fundamental_context_industry_peers(const struct lb_fundamental_context_t *ctx,
-                                           const char *counter_id,
+                                           const char *symbol,
                                            const char *market,
                                            const char *industry_id,
                                            lb_async_callback_t callback,

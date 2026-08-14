@@ -4,7 +4,7 @@ use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, dca::types::*, utils::counter::symbol_to_counter_id};
+use crate::{Config, Result, dca::types::*};
 
 struct InnerDCAContext {
     http_cli: HttpClient,
@@ -95,7 +95,7 @@ impl DCAContext {
             #[serde(skip_serializing_if = "Option::is_none")]
             status: Option<DCAStatus>,
             #[serde(skip_serializing_if = "Option::is_none")]
-            counter_id: Option<String>,
+            symbol: Option<String>,
         }
         self.get(
             "/v1/dailycoins/query",
@@ -103,7 +103,7 @@ impl DCAContext {
                 page: 1,
                 limit: 100,
                 status,
-                counter_id: symbol.map(|s| symbol_to_counter_id(&s)),
+                symbol,
             },
         )
         .await
@@ -121,9 +121,8 @@ impl DCAContext {
         day_of_month: Option<u32>,
         allow_margin: bool,
     ) -> Result<DcaCreateResult> {
-        let cid = symbol_to_counter_id(&symbol.into());
         let mut body = serde_json::json!({
-            "counter_id": cid,
+            "symbol": symbol.into(),
             "per_invest_amount": amount.into(),
             "invest_frequency": frequency,
             "allow_margin_finance": if allow_margin { 1 } else { 0 }
@@ -233,25 +232,18 @@ impl DCAContext {
         #[derive(Serialize)]
         struct Query {
             #[serde(skip_serializing_if = "Option::is_none")]
-            counter_id: Option<String>,
+            symbol: Option<String>,
         }
-        self.get(
-            "/v1/dailycoins/statistic",
-            Query {
-                counter_id: symbol.map(|s| symbol_to_counter_id(&s)),
-            },
-        )
-        .await
+        self.get("/v1/dailycoins/statistic", Query { symbol }).await
     }
 
     /// Check DCA support for a list of securities.
     ///
     /// Path: `POST /v1/dailycoins/batch-check-support`
     pub async fn check_support(&self, symbols: Vec<String>) -> Result<DcaSupportList> {
-        let counter_ids: Vec<String> = symbols.iter().map(|s| symbol_to_counter_id(s)).collect();
         self.post(
             "/v1/dailycoins/batch-check-support",
-            serde_json::json!({ "counter_ids": counter_ids }),
+            serde_json::json!({ "symbols": symbols }),
         )
         .await
     }
@@ -268,7 +260,7 @@ impl DCAContext {
         day_of_month: Option<u32>,
     ) -> Result<DcaCalcDateResult> {
         let mut body = serde_json::json!({
-            "counter_id": symbol_to_counter_id(&symbol.into()),
+            "symbol": symbol.into(),
             "invest_frequency": frequency,
         });
         if let Some(dow) = day_of_week {

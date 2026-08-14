@@ -9816,8 +9816,8 @@ class Professional:
 class ExecutiveGroup:
     """Executives for one security."""
 
-    symbol: str
-    """Security symbol"""
+    symbol: Optional[str]
+    """Security symbol (``None`` when the server omits it)"""
     forward_url: str
     """Link to company wiki page"""
     total: int
@@ -10103,16 +10103,16 @@ class StockRatings:
     """Scale display name"""
     report_period_txt: str
     """Report period display text"""
-    multi_score: str
-    """Composite score (string representation)"""
+    multi_score: Optional[float]
+    """Composite score (``None`` when not rated)"""
     multi_letter: str
     """Composite score letter grade"""
     multi_score_change: int
     """Score change vs previous period"""
     industry_name: str
     """Industry name"""
-    industry_rank: int
-    """Industry rank"""
+    industry_rank: Optional[int]
+    """Industry rank (``None`` when unavailable)"""
     ratings_json: str
     """Full ratings array as a JSON string"""
 
@@ -11226,7 +11226,7 @@ class MarketContext:
         Get all available rank category keys and labels.
 
         Returns:
-            :class:`RankCategoriesResponse` with raw JSON data
+            :class:`RankCategoriesResponse` with typed categories
         """
         ...
 
@@ -11291,15 +11291,37 @@ class TopMoversResponse:
 
     events: List[TopMoversEvent]
     """Top-mover events"""
-    next_params: object
-    """Pagination cursor for next page (raw JSON object)"""
+    next_params: str
+    """Pagination cursor for next page (empty string means no more pages)"""
+
+
+class RankSubCategory:
+    """One leaf rank sub-category."""
+
+    key: str
+    """Sub-category key (e.g. ``"hot_all-us"``). Pass to :meth:`MarketContext.rank_list`."""
+    name: str
+    """Display name (e.g. ``"美股总热度"``)"""
+    market: str
+    """Market code (e.g. ``"US"``, ``"HK"``)"""
+
+
+class RankCategory:
+    """A top-level rank category grouping sub-categories."""
+
+    key: str
+    """Top-level key (e.g. ``"hot"``)"""
+    name: str
+    """Display name (e.g. ``"热度排行"``)"""
+    sub_categories: List[RankSubCategory]
+    """Sub-categories"""
 
 
 class RankCategoriesResponse:
-    """Rank categories response. ``data`` is a Python dict/list from JSON."""
+    """Rank categories response."""
 
-    data: object
-    """Raw rank categories data (JSON object / list)"""
+    categories: List[RankCategory]
+    """All top-level rank categories"""
 
 
 class RankListItem:
@@ -12024,8 +12046,8 @@ class FlowItem:
 
     executed_date: str
     """Execution date string, e.g. ``"2024-01-15"``"""
-    executed_timestamp: str
-    """Execution timestamp (string representation)"""
+    executed_timestamp: Optional[str]
+    """Execution timestamp as a Unix-seconds string (``None`` when not yet executed)"""
     code: str
     """Security code / ticker"""
     direction: FlowDirection
@@ -12051,6 +12073,15 @@ class ProfitAnalysisFlows:
 
 # ── AlertContext ──────────────────────────────────────────────────
 
+class AlertValueMap:
+    """Trigger value of a price alert (exactly one field is populated)."""
+
+    price: Optional[Decimal]
+    """Absolute price threshold, e.g. ``500``"""
+    chg: Optional[float]
+    """Percentage-change threshold, e.g. ``5``"""
+
+
 class AlertItem:
     """One price alert."""
 
@@ -12068,6 +12099,8 @@ class AlertItem:
     """Display text, e.g. ``"价格涨到 600"``"""
     state: list[int]
     """Trigger state flags"""
+    value_map: AlertValueMap
+    """Trigger value, e.g. ``{"price":"500"}`` or ``{"chg":"5"}``"""
 
 
 class AlertSymbolGroup:
@@ -12911,7 +12944,7 @@ class USCryptoEntry:
     average_cost: str
     """Average cost price"""
     symbol: str
-    """Internal counter_id, e.g. ``"VA/BKKT/BTCUSD"``"""
+    """Symbol"""
     currency: str
     """Settlement currency"""
     industry_counter_id: str

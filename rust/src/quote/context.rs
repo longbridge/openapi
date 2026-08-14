@@ -2003,8 +2003,6 @@ impl QuoteContext {
     ) -> Result<ShortPositionsResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
-
         let sym = symbol.into();
         let is_hk = sym.to_uppercase().ends_with(".HK");
         let path = if is_hk {
@@ -2019,17 +2017,17 @@ impl QuoteContext {
 
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             last_timestamp: String,
             count: u32,
         }
-        // Response: {"counter_id":"ST/US/AAPL","data":[{...}]}
+        // Response: {"symbol":"AAPL.US","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&sym),
+                symbol: sym.clone(),
                 last_timestamp: ts.to_string(),
                 count,
             })
@@ -2072,10 +2070,9 @@ impl QuoteContext {
     ///
     /// Path: `GET /v1/quote/option-volume-stats`
     pub async fn option_volume(&self, symbol: impl Into<String>) -> Result<OptionVolumeStats> {
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(serde::Serialize)]
         struct Query {
-            underlying_counter_id: String,
+            symbol: String,
         }
         #[derive(serde::Deserialize)]
         struct RawOptionVolumeStats {
@@ -2088,7 +2085,7 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats")
             .query_params(Query {
-                underlying_counter_id: symbol_to_counter_id(&symbol),
+                symbol: symbol.clone(),
             })
             .response::<Json<RawOptionVolumeStats>>()
             .send()
@@ -2111,17 +2108,16 @@ impl QuoteContext {
         timestamp: i64,
         count: u32,
     ) -> Result<OptionVolumeDaily> {
-        use crate::utils::counter::{counter_id_to_symbol, symbol_to_counter_id};
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             timestamp: i64,
             line_num: u32,
             direction: i32,
         }
         #[derive(serde::Deserialize)]
         struct RawDailyStat {
-            underlying_counter_id: String,
+            symbol: String,
             timestamp: String,
             total_call_volume: String,
             total_put_volume: String,
@@ -2144,7 +2140,7 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats/daily")
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol),
+                symbol: symbol.clone(),
                 timestamp,
                 line_num: count,
                 direction: 1,
@@ -2160,7 +2156,7 @@ impl QuoteContext {
             .map(|item| {
                 let ts: i64 = item.timestamp.parse().unwrap_or(0);
                 OptionVolumeDailyStat {
-                    symbol: counter_id_to_symbol(&item.underlying_counter_id),
+                    symbol: item.symbol,
                     date: time::OffsetDateTime::from_unix_timestamp(ts)
                         .unwrap_or(time::OffsetDateTime::UNIX_EPOCH)
                         .date(),
@@ -2191,10 +2187,9 @@ impl QuoteContext {
     ) -> Result<ShortTradesResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             last_timestamp: String,
             page_size: String,
         }
@@ -2208,13 +2203,13 @@ impl QuoteContext {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
-        // Response: {"counter_id":"ST/HK/700","data":[{...}]}
+        // Response: {"symbol":"00700.HK","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&sym),
+                symbol: sym.clone(),
                 last_timestamp: ts.to_string(),
                 page_size: count.to_string(),
             })
@@ -2270,81 +2265,6 @@ impl QuoteContext {
         Ok(())
     }
 
-    // ── symbol_to_counter_ids ─────────────────────────────────────
-
-    /// Batch convert symbols to counter IDs via the remote API.
-    ///
-    /// Returns a map of `symbol → counter_id` (e.g. `DRAM.US` →
-    /// `ETF/US/DRAM`). Symbols the backend does not recognize are omitted
-    /// from the result.
-    ///
-    /// Path: `POST /v1/quote/symbol-to-counter-ids`
-    pub async fn symbol_to_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<HashMap<String, String>> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            ticker_regions: Vec<String>,
-        }
-        #[derive(Debug, Deserialize)]
-        struct Response {
-            #[serde(default)]
-            list: HashMap<String, String>,
-        }
-
-        let resp = self
-            .0
-            .http_cli
-            .request(Method::POST, "/v1/quote/symbol-to-counter-ids")
-            .body(Json(Request {
-                ticker_regions: symbols,
-            }))
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(resp.0.list)
-    }
-
-    /// Resolve counter IDs for symbols, local-first with remote fallback.
-    ///
-    /// Symbols found in the embedded ETF / index / warrant directory (or in
-    /// the local cache of previous remote resolutions) are resolved without
-    /// network access. The remaining symbols are resolved in one batch via
-    /// [`symbol_to_counter_ids`](Self::symbol_to_counter_ids) and the results
-    /// are persisted to the local cache for subsequent lookups. Symbols the
-    /// backend does not recognize fall back to the default `ST/` conversion.
-    pub async fn resolve_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<HashMap<String, String>> {
-        use crate::utils::counter;
-
-        let mut result = HashMap::with_capacity(symbols.len());
-        let mut unknown = Vec::new();
-        for symbol in symbols {
-            match counter::lookup_counter_id(&symbol) {
-                Some(counter_id) => {
-                    result.insert(symbol, counter_id);
-                }
-                None => unknown.push(symbol),
-            }
-        }
-        if !unknown.is_empty() {
-            let resolved = self.symbol_to_counter_ids(unknown.clone()).await?;
-            counter::cache_counter_ids(resolved.values().map(String::as_str));
-            for symbol in unknown {
-                let counter_id = resolved
-                    .get(&symbol)
-                    .cloned()
-                    .unwrap_or_else(|| counter::symbol_to_counter_id(&symbol));
-                result.insert(symbol, counter_id);
-            }
-        }
-        Ok(result)
-    }
-
     // ── US-market APIs ────────────────────────────────────────────────────────
 
     /// Get cryptocurrency market overview.
@@ -2360,10 +2280,9 @@ impl QuoteContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<crate::quote::USCryptoOverview> {
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         Ok(self
             .0
@@ -2371,7 +2290,7 @@ impl QuoteContext {
             .request(Method::GET, "/v1/us/gemini/crypto-overview")
             .dc_restrict(DcRegion::Us)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             })
             .response::<Json<crate::quote::USCryptoOverview>>()
             .send()

@@ -1,9 +1,7 @@
-#![allow(missing_docs)]
-
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-use crate::{types::Market, utils::counter::deserialize_counter_id_as_symbol};
+use crate::types::Market;
 
 /// Response for [`crate::DCAContext::list`] and write operations
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -21,10 +19,6 @@ pub struct DcaPlan {
     #[serde(default)]
     pub status: DCAStatus,
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Member ID
     #[serde(default)]
@@ -126,10 +120,6 @@ pub struct DcaSupportList {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DcaSupportInfo {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Whether DCA is supported for this security
     pub support_regular_saving: bool,
@@ -170,10 +160,6 @@ pub struct DcaHistoryRecord {
     /// Rejection reason (if any)
     pub rejected_reason: String,
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
 }
 

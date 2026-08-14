@@ -1,7 +1,7 @@
 package com.longbridge.market;
 
-/** Response for {@link MarketContext#getRankCategories}. Contains raw JSON data. */
+/** Response for {@link MarketContext#getRankCategories}. */
 public class RankCategoriesResponse {
-    /** Raw JSON data string */
-    public String data;
+    /** All top-level rank categories */
+    public RankCategory[] categories;
 }

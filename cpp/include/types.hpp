@@ -2564,7 +2564,7 @@ struct TopMoversEvent
 struct TopMoversResponse
 {
   std::vector<TopMoversEvent> events;
-  /// Pagination cursor as a JSON string
+  /// Pagination cursor (empty string means no more pages)
   std::string next_params;
 };
 
@@ -2594,6 +2594,33 @@ struct RankListResponse
 {
   bool bmp;
   std::vector<RankListItem> lists;
+};
+
+/// One leaf rank sub-category.
+struct RankSubCategory
+{
+  /// Sub-category key (e.g. "hot_all-us"). Pass to rank_list.
+  std::string key;
+  /// Display name
+  std::string name;
+  /// Market code (e.g. "US", "HK")
+  std::string market;
+};
+
+/// A top-level rank category grouping sub-categories.
+struct RankCategory
+{
+  /// Top-level key (e.g. "hot")
+  std::string key;
+  /// Display name (e.g. "热度排行")
+  std::string name;
+  std::vector<RankSubCategory> sub_categories;
+};
+
+/// Response for rank_categories.
+struct RankCategoriesResponse
+{
+  std::vector<RankCategory> categories;
 };
 
 /// A single anomaly (unusual market movement) alert item.
@@ -3251,7 +3278,7 @@ struct InstitutionRatingViews
 struct IndustryRankItem
 {
   std::string name;
-  std::string counter_id;
+  std::string symbol;
   std::string chg;
   std::string leading_name;
   std::string leading_ticker;
@@ -3285,7 +3312,7 @@ struct IndustryPeersTop
 struct IndustryPeerNode
 {
   std::string name;
-  std::string counter_id;
+  std::string symbol;
   int32_t stock_num;
   std::string chg;
   std::string ytd_chg;
@@ -3295,7 +3322,7 @@ struct IndustryPeerNode
 /// Industry peers response.
 struct IndustryPeersResponse
 {
-  IndustryPeersTop top;
+  std::optional<IndustryPeersTop> top;
   std::optional<IndustryPeerNode> chain;
 };
 
@@ -3449,6 +3476,16 @@ struct AssetAllocationResponse
 namespace alert {
 
 /// One price alert rule attached to a security.
+/// Trigger threshold for a price alert. Exactly one field is populated,
+/// depending on the alert condition.
+struct AlertValueMap
+{
+  /// Absolute price threshold as a decimal string (empty if not set)
+  std::string price;
+  /// Percentage-change threshold (nullopt if not set)
+  std::optional<double> chg;
+};
+
 struct AlertItem
 {
   /// Alert ID
@@ -3465,8 +3502,8 @@ struct AlertItem
   std::string text;
   /// Trigger state flags
   std::vector<int32_t> state;
-  /// Trigger threshold, serialised as JSON: {"price":"500"} or {"chg":"5"}
-  std::string value_map;
+  /// Trigger threshold
+  AlertValueMap value_map;
 };
 
 /// All price alerts for one security.

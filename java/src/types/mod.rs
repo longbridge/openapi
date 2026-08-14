@@ -26,7 +26,7 @@ pub(crate) use self::{
     },
     object_array::ObjectArray,
     primary_array::PrimaryArray,
-    primary_types::{JavaInteger, JavaLong},
+    primary_types::{JavaDouble, JavaInteger, JavaLong},
 };
 
 pub(crate) trait ClassLoader {

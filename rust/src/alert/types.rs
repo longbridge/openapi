@@ -1,9 +1,5 @@
-#![allow(missing_docs)]
-
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-
-use crate::utils::counter::deserialize_counter_id_as_symbol;
 
 /// Response for [`crate::AlertContext::list`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -16,10 +12,6 @@ pub struct AlertList {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlertSymbolGroup {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Ticker code (without market)
     pub code: String,
@@ -61,8 +53,32 @@ pub struct AlertItem {
     /// Trigger state flags
     #[serde(default)]
     pub state: Vec<i32>,
-    /// Trigger value: `{"price":"500"}` or `{"chg":"5"}`
-    pub value_map: serde_json::Value,
+    /// Trigger value, e.g. `{"price":"500"}` or `{"chg":"5"}`
+    pub value_map: AlertValueMap,
+}
+
+/// Trigger value of a price alert.
+///
+/// Exactly one field is populated, depending on the alert condition: `price`
+/// for absolute-price alerts ([`AlertCondition::PriceRise`] /
+/// [`AlertCondition::PriceFall`]), `chg` for percentage-change alerts
+/// ([`AlertCondition::PercentRise`] / [`AlertCondition::PercentFall`]).
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct AlertValueMap {
+    /// Absolute price threshold, e.g. `500`.
+    #[serde(
+        default,
+        with = "crate::serde_utils::decimal_opt_str_is_none",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub price: Option<Decimal>,
+    /// Percentage-change threshold, e.g. `5`.
+    #[serde(
+        default,
+        with = "crate::serde_utils::f64_opt_str",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub chg: Option<f64>,
 }
 
 /// Alert condition

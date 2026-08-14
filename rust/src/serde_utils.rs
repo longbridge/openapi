@@ -491,6 +491,34 @@ pub(crate) mod f64_str {
     }
 }
 
+/// Deserializes a stringly-typed `f64` into `Option<f64>`.  An empty or
+/// non-parseable string (e.g. `"--"`) yields `None`.  Serializes back to a
+/// string form for symmetry with the API's request format.
+pub(crate) mod f64_opt_str {
+    use super::*;
+
+    pub(crate) fn serialize<S>(value: &Option<f64>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.collect_str(value),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if value.is_empty() {
+            return Ok(None);
+        }
+        Ok(value.parse::<f64>().ok())
+    }
+}
+
 /// Deserializer that maps a JSON `null` to the type's `Default` value.
 pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
 where
@@ -498,4 +526,35 @@ where
     T: Deserialize<'de> + Default,
 {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
+}
+
+/// Deserializes a field that may be a JSON number, string, or null into
+/// `Option<String>`.  Null and missing fields produce `None`; numbers are
+/// converted to their decimal string representation.
+pub(crate) mod value_as_opt_string {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<String>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let v = serde_json::Value::deserialize(d)?;
+        Ok(match v {
+            serde_json::Value::Null => None,
+            serde_json::Value::String(s) if s.is_empty() => None,
+            serde_json::Value::String(s) => Some(s),
+            serde_json::Value::Number(n) => Some(n.to_string()),
+            other => Some(other.to_string()),
+        })
+    }
+
+    pub(crate) fn serialize<S>(v: &Option<String>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match v {
+            Some(val) => s.serialize_str(val),
+            None => s.serialize_none(),
+        }
+    }
 }

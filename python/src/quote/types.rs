@@ -1646,7 +1646,7 @@ pub(crate) struct USCryptoOverview {
     pub issue_price: String,
     pub shares: String,
     pub official_web_address: String,
-    /// User-facing symbol (e.g. "BTCUSD.BKKT"), converted from counter_id
+    /// User-facing symbol (e.g. "BTCUSD.BKKT")
     pub symbol: String,
     pub base_asset: String,
     pub logo: String,

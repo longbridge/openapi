@@ -4,7 +4,7 @@ use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, alert::types::*, utils::counter::symbol_to_counter_id};
+use crate::{Config, Result, alert::types::*};
 
 struct InnerAlertContext {
     http_cli: HttpClient,
@@ -80,16 +80,16 @@ impl AlertContext {
             .0)
     }
 
-    async fn http_delete<R, B>(&self, path: &'static str, body: B) -> Result<R>
+    async fn http_delete<R, Q>(&self, path: &'static str, query: Q) -> Result<R>
     where
         R: DeserializeOwned + Send + Sync + 'static,
-        B: std::fmt::Debug + Serialize + Send + Sync + 'static,
+        Q: Serialize + Send + Sync,
     {
         Ok(self
             .0
             .http_cli
             .request(Method::DELETE, path)
-            .body(Json(body))
+            .query_params(query)
             .response::<Json<R>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
@@ -115,8 +115,8 @@ impl AlertContext {
         condition: AlertCondition,
         trigger_value: impl Into<String>,
         frequency: AlertFrequency,
-    ) -> Result<serde_json::Value> {
-        let cid = symbol_to_counter_id(&symbol.into());
+    ) -> Result<()> {
+        let sym = symbol.into();
         let (key, val) = match condition {
             AlertCondition::PriceRise | AlertCondition::PriceFall => {
                 ("price", trigger_value.into())
@@ -127,10 +127,10 @@ impl AlertContext {
         };
         let indicator_id = condition as i32;
         let freq = frequency as i32;
-        self.post(
+        self.post::<serde_json::Value, _>(
             "/v1/notify/reminders",
             serde_json::json!({
-                "counter_id": cid,
+                "symbol": sym,
                 "indicator_id": indicator_id.to_string(),
                 "value_map": { key: val },
                 "frequency": freq,
@@ -139,7 +139,8 @@ impl AlertContext {
                 "state": [1]
             }),
         )
-        .await
+        .await?;
+        Ok(())
     }
 
     /// Update a price alert.
@@ -150,8 +151,8 @@ impl AlertContext {
     /// — no extra round-trip needed.
     ///
     /// Path: `POST /v1/notify/reminders`
-    pub async fn update(&self, item: &AlertItem) -> Result<serde_json::Value> {
-        self.post(
+    pub async fn update(&self, item: &AlertItem) -> Result<()> {
+        self.post::<serde_json::Value, _>(
             "/v1/notify/reminders",
             serde_json::json!({
                 "id": item.id,
@@ -163,17 +164,20 @@ impl AlertContext {
                 "enabled": item.enabled,
             }),
         )
-        .await
+        .await?;
+        Ok(())
     }
 
     /// Delete price alerts.
     ///
     /// Path: `DELETE /v1/notify/reminders`
-    pub async fn delete(&self, alert_ids: Vec<String>) -> Result<serde_json::Value> {
-        self.http_delete(
-            "/v1/notify/reminders",
-            serde_json::json!({ "ids": alert_ids }),
-        )
-        .await
+    pub async fn delete(&self, alert_ids: Vec<String>) -> Result<()> {
+        #[derive(Serialize)]
+        struct Query {
+            ids: Vec<String>,
+        }
+        self.http_delete::<serde_json::Value, _>("/v1/notify/reminders", Query { ids: alert_ids })
+            .await?;
+        Ok(())
     }
 }

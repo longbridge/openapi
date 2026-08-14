@@ -10,6 +10,7 @@ use crate::types::ClassLoader;
 
 pub(crate) static INTEGER_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static LONG_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DOUBLE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static STRING_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DECIMAL_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_INSTANT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
@@ -61,6 +62,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         env,
         (INTEGER_CLASS, "java/lang/Integer"),
         (LONG_CLASS, "java/lang/Long"),
+        (DOUBLE_CLASS, "java/lang/Double"),
         (STRING_CLASS, "java/lang/String"),
         (DECIMAL_CLASS, "java/math/BigDecimal"),
         (TIME_INSTANT_CLASS, "java/time/Instant"),
@@ -232,6 +234,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         // AlertContext
+        longbridge::alert::AlertValueMap,
         longbridge::alert::AlertItem,
         longbridge::alert::AlertSymbolGroup,
         longbridge::alert::AlertList,
@@ -399,10 +402,30 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::ValuationHistoryPoint,
         longbridge::fundamental::ValuationComparisonItem,
         longbridge::fundamental::ValuationComparisonResponse,
+        // FundamentalContext: industry rank / peers
+        longbridge::fundamental::IndustryRankItem,
+        longbridge::fundamental::IndustryRankGroup,
+        longbridge::fundamental::IndustryRankResponse,
+        longbridge::fundamental::IndustryPeersTop,
+        longbridge::fundamental::IndustryPeerNode,
+        longbridge::fundamental::IndustryPeersResponse,
+        // FundamentalContext: business segments / rating views / snapshot
+        longbridge::fundamental::BusinessSegmentItem,
+        longbridge::fundamental::BusinessSegments,
+        longbridge::fundamental::BusinessSegmentHistoryItem,
+        longbridge::fundamental::BusinessSegmentsHistoricalItem,
+        longbridge::fundamental::BusinessSegmentsHistory,
+        longbridge::fundamental::InstitutionRatingViewItem,
+        longbridge::fundamental::InstitutionRatingViews,
+        longbridge::fundamental::SnapshotForecastMetric,
+        longbridge::fundamental::SnapshotReportedMetric,
+        longbridge::fundamental::FinancialReportSnapshot,
         // MarketContext: top movers / rank
         longbridge::market::TopMoversStock,
         longbridge::market::TopMoversEvent,
         longbridge::market::TopMoversResponse,
+        longbridge::market::RankSubCategory,
+        longbridge::market::RankCategory,
         longbridge::market::RankCategoriesResponse,
         longbridge::market::RankListItem,
         longbridge::market::RankListResponse,

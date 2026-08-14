@@ -1,10 +1,6 @@
-#![allow(missing_docs)]
-
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
-
-use crate::utils::counter::deserialize_counter_id_as_symbol;
 
 // ── exchange_rate ─────────────────────────────────────────────────
 
@@ -175,10 +171,6 @@ pub struct ProfitAnalysisItem {
     /// Currency
     pub currency: String,
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Holding period display string
     #[serde(default)]
@@ -327,9 +319,10 @@ pub struct FlowItem {
     /// Execution date string, e.g. `"2024-01-15"`
     #[serde(default)]
     pub executed_date: String,
-    /// Execution timestamp (may be int or string)
-    #[serde(default)]
-    pub executed_timestamp: serde_json::Value,
+    /// Execution timestamp as a Unix-seconds string (absent when not yet
+    /// executed)
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    pub executed_timestamp: Option<String>,
     /// Security code / ticker
     #[serde(default)]
     pub code: String,
