@@ -847,6 +847,348 @@ export declare class FundPositionsResponse {
   get channels(): Array<FundPositionChannel>
 }
 
+/** A price-step (bid-size) rule entry from the symbol-info response. */
+export declare class GridBidSize {
+  toString(): string
+  toJSON(): any
+  /** Range start price (inclusive) */
+  get strProceed(): Decimal | null
+  /** Range end price */
+  get endProceed(): Decimal | null
+  /** Price step within the range */
+  get bidSize(): Decimal | null
+}
+
+/** Channel / authorization info nested in the symbol-info response. */
+export declare class GridChannelInfo {
+  toString(): string
+  toJSON(): any
+  /** Whether the strategy compliance authorization has been granted */
+  get strategyGranted(): boolean
+  /** Whether the RTH toggle is supported */
+  get supportRth(): boolean
+  /** Trading currency */
+  get currency(): string
+  /** Supported settlement currencies */
+  get settlementCurrency(): Array<string>
+}
+
+/** Grid trading context. */
+export declare class GridContext {
+  /** Create a new `GridContext`. */
+  static new(config: Config): GridContext
+  /** Submit a grid trading order */
+  submit(opts: SubmitGridOrderOptions): Promise<SubmitGridOrderResponse>
+  /** Replace (modify) a grid trading order */
+  replace(opts: ReplaceGridOrderOptions): Promise<undefined>
+  /** Get grid trading orders (paged list) */
+  list(opts?: GetGridOrdersOptions | undefined | null): Promise<GridOrdersResponse>
+  /** Query grid trading orders by IDs */
+  listByIds(opts: GetGridOrdersByIdsOptions): Promise<Array<GridOrder>>
+  /** Get grid trading order detail (and paged history) */
+  detail(opts: GetGridOrderDetailOptions): Promise<GridOrderDetail>
+  /** Get grid trading trigger history */
+  triggerHistory(opts: GetGridTriggerHistoryOptions): Promise<GridTriggerHistoryResponse>
+  /** Cancel a grid trading order */
+  cancel(orderId: string): Promise<void>
+  /** Suspend a grid trading order */
+  suspend(orderId: string): Promise<void>
+  /** Restart a grid trading order */
+  restart(orderId: string): Promise<void>
+  /**
+   * Submit the strategy risk-disclosure questionnaire record (grid trading
+   * compliance authorization).
+   */
+  submitStrategyQuestionnaire(): Promise<void>
+  /**
+   * Get the security (symbol) info used to build a grid order (lot size,
+   * authorization flag, settlement currency, etc.).
+   */
+  symbolInfo(symbol: string): Promise<GridSymbolInfo>
+}
+
+/** A grid trading order (element of the list / by-ids responses). */
+export declare class GridOrder {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Stock name */
+  get stockName(): string
+  /** Market */
+  get market(): string
+  /** Order status */
+  get status(): string
+  /** Grid running status */
+  get gridStatus(): string
+  /** Submitted base price */
+  get submittedBasePrice(): Decimal | null
+  /** Current base price */
+  get currentBasePrice(): Decimal | null
+  /** Base price before the last trigger */
+  get preTriggerBasePrice(): Decimal | null
+  /** Base price after the last trigger */
+  get postTriggerBasePrice(): Decimal | null
+  /** Upper price bound */
+  get upperLimitPrice(): Decimal | null
+  /** Lower price bound */
+  get lowerLimitPrice(): Decimal | null
+  /** Trigger price type */
+  get triggerPriceType(): TriggerPriceType
+  /** Upward trigger spread */
+  get triggerSpreadUp(): Decimal | null
+  /** Downward trigger spread */
+  get triggerSpreadDown(): Decimal | null
+  /** Upward trigger percent */
+  get triggerPercentUp(): Decimal | null
+  /** Downward trigger percent */
+  get triggerPercentDown(): Decimal | null
+  /** Pullback percent */
+  get pullbackPercent(): Decimal | null
+  /** Pullback spread */
+  get pullbackSpread(): Decimal | null
+  /** Rebound percent */
+  get reboundPercent(): Decimal | null
+  /** Rebound spread */
+  get reboundSpread(): Decimal | null
+  /** Sell-side execution order type (e.g. `MO`) */
+  get triggerSellOrderType(): string
+  /** Buy-side execution order type (e.g. `MO`) */
+  get triggerBuyOrderType(): string
+  /** Sell-side order-book depth */
+  get triggerSellDepth(): number
+  /** Buy-side order-book depth */
+  get triggerBuyDepth(): number
+  /** Quantity per trigger */
+  get triggerQuantity(): Decimal | null
+  /** Quantity per sell trigger */
+  get triggerSellQuantity(): Decimal | null
+  /** Quantity per buy trigger */
+  get triggerBuyQuantity(): Decimal | null
+  /** Quantity handled at the upper bound */
+  get upperLimitQuantity(): Decimal | null
+  /** Quantity handled at the lower bound */
+  get lowerLimitQuantity(): Decimal | null
+  /** Action at the upper bound */
+  get upperLimitEvent(): GridLimitEvent
+  /** Action at the lower bound */
+  get lowerLimitEvent(): GridLimitEvent
+  /** Whether a single grid level may trigger multiple times */
+  get multipleTrigger(): boolean
+  /** Number of times the grid has triggered */
+  get triggerTimes(): number
+  /** Accumulated bought quantity */
+  get totalBuyQuantity(): Decimal | null
+  /** Accumulated sold quantity */
+  get totalSellQuantity(): Decimal | null
+  /** Accumulated profit balance */
+  get totalProfitBalance(): Decimal | null
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Whether short selling is allowed */
+  get supportShortsell(): boolean
+  /** Sell-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeUp(): string
+  /** Buy-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeDown(): string
+}
+
+/** Detail of a grid trading order. */
+export declare class GridOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Stock name */
+  get stockName(): string
+  /** Order status */
+  get status(): string
+  /** Grid running status */
+  get gridStatus(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Sleeping reason, if any */
+  get sleepingReason(): string
+  /** Submitted base price */
+  get submittedBasePrice(): Decimal | null
+  /** Current base price */
+  get currentBasePrice(): Decimal | null
+  /** Upper price bound */
+  get upperLimitPrice(): Decimal | null
+  /** Lower price bound */
+  get lowerLimitPrice(): Decimal | null
+  /** Trigger price type */
+  get triggerPriceType(): TriggerPriceType
+  /** Upward trigger spread */
+  get triggerSpreadUp(): Decimal | null
+  /** Downward trigger spread */
+  get triggerSpreadDown(): Decimal | null
+  /** Upward trigger percent */
+  get triggerPercentUp(): Decimal | null
+  /** Downward trigger percent */
+  get triggerPercentDown(): Decimal | null
+  /** Pullback percent */
+  get pullbackPercent(): Decimal | null
+  /** Pullback spread */
+  get pullbackSpread(): Decimal | null
+  /** Rebound percent */
+  get reboundPercent(): Decimal | null
+  /** Rebound spread */
+  get reboundSpread(): Decimal | null
+  /** Whether a single grid level may trigger multiple times */
+  get multipleTrigger(): boolean
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Quantity per trigger */
+  get triggerQuantity(): Decimal | null
+  /** Quantity per sell trigger */
+  get triggerSellQuantity(): Decimal | null
+  /** Quantity per buy trigger */
+  get triggerBuyQuantity(): Decimal | null
+  /** Quantity handled at the upper bound */
+  get upperLimitQuantity(): Decimal | null
+  /** Quantity handled at the lower bound */
+  get lowerLimitQuantity(): Decimal | null
+  /** Action at the upper bound */
+  get upperLimitEvent(): GridLimitEvent
+  /** Action at the lower bound */
+  get lowerLimitEvent(): GridLimitEvent
+  /** Sell-side order-book depth */
+  get triggerSellDepth(): number
+  /** Buy-side order-book depth */
+  get triggerBuyDepth(): number
+  /** Created time */
+  get createdAt(): Date | null
+  /** Last updated time */
+  get updatedAt(): Date | null
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Expiry time */
+  get expireTime(): Date | null
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Triggered sub-orders */
+  get gridSubOrders(): Array<GridOrderSubOrder>
+  /** Whether there are more sub-orders to page */
+  get subHasMore(): boolean
+  /** Lifecycle history entries */
+  get gridOrderHistory(): Array<GridOrderHistory>
+  /** Whether there are more history entries to page */
+  get historyHasMore(): boolean
+  /** Whether short selling is allowed */
+  get supportShortsell(): boolean
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Sell-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeUp(): string
+  /** Buy-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeDown(): string
+}
+
+/** A grid order lifecycle-history entry carried in the grid order detail. */
+export declare class GridOrderHistory {
+  toString(): string
+  toJSON(): any
+  /** History entry ID (paging cursor) */
+  get historyId(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Status at this point */
+  get status(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Additional reason detail, if any */
+  get reason(): string
+}
+
+/**
+ * Response for get grid trading orders (list) request.
+ *
+ * Hand-written because the underlying `longbridge::grid::GridOrdersResponse`
+ * is not re-exported from the SDK; the wrapper is built directly in the
+ * context method.
+ */
+export declare class GridOrdersResponse {
+  toString(): string
+  toJSON(): any
+  /** Grid orders */
+  get gridOrder(): Array<GridOrder>
+  /** Whether there are more pages */
+  get hasMore(): boolean
+}
+
+/** A triggered sub-order carried in the grid order detail. */
+export declare class GridOrderSubOrder {
+  toString(): string
+  toJSON(): any
+  /** Sub-order ID */
+  get id(): string
+  /** Order price */
+  get price(): Decimal | null
+  /** Order type */
+  get orderType(): string
+  /** Order quantity */
+  get quantity(): Decimal | null
+  /** Executed quantity */
+  get executedQty(): Decimal | null
+  /** Buy / sell direction */
+  get action(): number
+  /** Order status */
+  get status(): string
+  /** Submitted time */
+  get submittedAt(): Date | null
+  /** Regular trading hours flag */
+  get rth(): number
+}
+
+/** Security (symbol) info used to build a grid order. */
+export declare class GridSymbolInfo {
+  toString(): string
+  toJSON(): any
+  /** Security name */
+  get name(): string
+  /** Latest quote price */
+  get lastDone(): Decimal | null
+  /** Board lot size */
+  get lotSize(): Decimal | null
+  /** Buy-side board lot size */
+  get buyLotSize(): Decimal | null
+  /** Sell-side board lot size */
+  get sellLotSize(): Decimal | null
+  /** Price-step (bid-size) rule table */
+  get bidSizes(): Array<GridBidSize>
+  /** Channel / authorization info (strategy grant, RTH, currencies) */
+  get channelInfo(): GridChannelInfo
+}
+
+/**
+ * Response for get grid trading trigger history request.
+ *
+ * Hand-written because the underlying
+ * `longbridge::grid::GridTriggerHistoryResponse` is not re-exported from the
+ * SDK; the wrapper is built directly in the context method.
+ */
+export declare class GridTriggerHistoryResponse {
+  toString(): string
+  toJSON(): any
+  /** Trigger history entries */
+  get triggerOrders(): Array<TriggerOrder>
+  /** Whether there are more pages */
+  get hasMore(): boolean
+}
+
 /** History market temperature response */
 export declare class HistoryMarketTemperatureResponse {
   toString(): string
@@ -1540,6 +1882,42 @@ export declare class PushDepthEvent {
   get symbol(): string
   get data(): PushDepth
   toString(): string
+}
+
+/** Grid trading master-order changed message. */
+export declare class PushGridOrderChanged {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Order status */
+  get status(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Submitted base price */
+  get submittedBasePrice(): string
+  /** Current base price */
+  get currentBasePrice(): string
+  /** Upper price bound */
+  get upperLimitPrice(): string
+  /** Lower price bound */
+  get lowerLimitPrice(): string
+  /** Trigger price type */
+  get triggerPriceType(): number
+  /** Quantity per trigger */
+  get triggerQuantity(): string
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Time in force (`0` = Day, `1` = GTC, `6` = GTD) */
+  get timeInForce(): number
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Sell-side order type when depth is 0 */
+  get gridOrderTypeUp(): string
+  /** Buy-side order type when depth is 0 */
+  get gridOrderTypeDown(): string
 }
 
 /** Order changed message */
@@ -2621,6 +2999,14 @@ export declare class StrikePriceInfo {
   get standard(): boolean
 }
 
+/** Response for submit grid trading order request */
+export declare class SubmitGridOrderResponse {
+  toString(): string
+  toJSON(): any
+  /** Grid master order id */
+  get orderId(): string
+}
+
 /** Response for submit order request */
 export declare class SubmitOrderResponse {
   toString(): string
@@ -2719,6 +3105,11 @@ export declare class TradeContext {
    * will call back to this function.
    */
   setOnOrderChanged(callback: (err: null | Error, event: PushOrderChanged) => void): void
+  /**
+   * Set grid order changed callback, after receiving the grid order changed
+   * event, it will call back to this function.
+   */
+  setOnGridOrderChanged(callback: (err: null | Error, event: PushGridOrderChanged) => void): void
   /**
    * Subscribe
    *
@@ -3051,6 +3442,52 @@ export declare class TradingSessionInfo {
   get endTime(): Time
   /** Trading session */
   get tradeSession(): TradeSession
+}
+
+/** A grid trigger-history entry (one triggered order). */
+export declare class TriggerOrder {
+  toString(): string
+  toJSON(): any
+  /** Triggered order ID */
+  get id(): string
+  /** Order status */
+  get status(): string
+  /** Stock name */
+  get name(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Order price */
+  get price(): Decimal | null
+  /** Order quantity */
+  get quantity(): Decimal | null
+  /** Executed average price */
+  get executedPrice(): Decimal | null
+  /** Executed total quantity */
+  get executedQty(): Decimal | null
+  /** Submitted time */
+  get submittedAt(): Date | null
+  /** Buy / sell direction */
+  get action(): number
+  /** Order type */
+  get orderType(): string
+  /** Trigger price */
+  get triggerPrice(): Decimal | null
+  /** Rejection reason, if any */
+  get msg(): string
+  /** Settlement currency */
+  get currency(): string
+  /** Latest quote price */
+  get lastDone(): Decimal | null
+  /** Last updated time */
+  get updatedAt(): Date | null
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Trigger time */
+  get triggerAt(): Date | null
+  /** Conditional trigger status */
+  get triggerStatus(): number
 }
 
 /** Warrant info */
@@ -4762,6 +5199,50 @@ export interface GetCashFlowOptions {
   size?: number
 }
 
+/** Options for get grid trading order detail request */
+export interface GetGridOrderDetailOptions {
+  /** Grid master order id */
+  orderId: string
+  /** History cursor for paging through the trigger history */
+  historyId?: string
+  /** Page size */
+  limit?: number
+}
+
+/** Options for query grid trading orders by IDs request */
+export interface GetGridOrdersByIdsOptions {
+  /** Grid master order IDs */
+  orderIds: Array<string>
+}
+
+/** Options for get grid trading orders (list) request */
+export interface GetGridOrdersOptions {
+  /** Page number */
+  page?: number
+  /** Page size */
+  limit?: number
+  /** Market */
+  market?: Market
+  /** Comma-joined status filter (e.g. `Performing,Suspended`) */
+  status?: string
+  /** Security symbol filter (e.g. `700.HK`) */
+  symbol?: string
+  /** Sort field */
+  sortBy?: string
+  /** Sort order */
+  sortOrder?: string
+}
+
+/** Options for get grid trading trigger history request */
+export interface GetGridTriggerHistoryOptions {
+  /** Grid master order id */
+  gridOrderId: string
+  /** Page number */
+  page?: number
+  /** Page size */
+  limit?: number
+}
+
 /** Options for get history executions request */
 export interface GetHistoryExecutionsOptions {
   /** Security symbol */
@@ -4854,6 +5335,93 @@ export declare const enum Granularity {
   Weekly = 2,
   /** Monthly */
   Monthly = 3
+}
+
+/**
+ * Action taken when a grid boundary is reached.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum GridLimitEvent {
+  /** Unknown / unset */
+  Unknown = 0,
+  /** Ignore — keep the grid running */
+  Ignore = 1,
+  /** Close the position at the last price */
+  CloseAtLast = 2
+}
+
+/**
+ * Time in force for a grid order.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum GridTimeInForce {
+  /** Day order */
+  Day = 0,
+  /** Good-til-canceled */
+  GoodTilCanceled = 1,
+  /** Good-til-date */
+  GoodTilDate = 2,
+  /** Unknown value */
+  Unknown = 3
+}
+
+/**
+ * Grid trading rule — parameters for submit / replace.
+ *
+ * Prices and quantities are decimals; trigger price type, time in force and
+ * limit events are named enums.
+ */
+export interface GridTradeRule {
+  /** Base price the grid is anchored to */
+  submittedBasePrice?: Decimal
+  /** Upper price bound */
+  upperLimitPrice?: Decimal
+  /** Lower price bound */
+  lowerLimitPrice?: Decimal
+  /** Trigger price type (`Spread` / `Percent`) */
+  triggerPriceType?: TriggerPriceType
+  /** Upward trigger spread (absolute) */
+  triggerSpreadUp?: Decimal
+  /** Downward trigger spread (absolute) */
+  triggerSpreadDown?: Decimal
+  /** Upward trigger percent */
+  triggerPercentUp?: Decimal
+  /** Downward trigger percent */
+  triggerPercentDown?: Decimal
+  /** Whether a single grid level may trigger multiple times */
+  multipleTrigger?: boolean
+  /** Time in force (`Day` / `GoodTilCanceled` / `GoodTilDate`) */
+  timeInForce?: GridTimeInForce
+  /** Quantity handled when the upper bound is reached */
+  upperLimitQuantity?: Decimal
+  /** Quantity handled when the lower bound is reached */
+  lowerLimitQuantity?: Decimal
+  /** Expiry time (unix seconds), used with GTD */
+  expireTime?: number
+  /** Action when the upper bound is reached (`Ignore` / `CloseAtLast`) */
+  upperLimitEvent?: GridLimitEvent
+  /** Action when the lower bound is reached (`Ignore` / `CloseAtLast`) */
+  lowerLimitEvent?: GridLimitEvent
+  /** Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`) */
+  triggerSellDepth?: number
+  /** Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`) */
+  triggerBuyDepth?: number
+  /** Quantity per trigger */
+  triggerQuantity?: Decimal
+  /** Whether short selling is allowed */
+  supportShortsell?: boolean
+  /** Regular trading hours flag (`0` / `1` / `2`) */
+  rth?: number
+  /** Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) */
+  gridOrderTypeUp?: string
+  /** Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) */
+  gridOrderTypeDown?: string
 }
 
 /** Holding detail of an ETF asset allocation element (holdings only) */
@@ -6080,6 +6648,14 @@ export interface ReplaceAttachedParams {
   marketPrice?: Decimal
 }
 
+/** Options for replace grid trading order request */
+export interface ReplaceGridOrderOptions {
+  /** Grid master order id */
+  orderId: string
+  /** Grid trading rule */
+  gridTradingRule: GridTradeRule
+}
+
 /** Options for replace order request */
 export interface ReplaceOrderOptions {
   /** Order id */
@@ -6557,6 +7133,16 @@ export interface SubmitAttachedParams {
   activateRth?: OutsideRTH
 }
 
+/** Options for submit grid trading order request */
+export interface SubmitGridOrderOptions {
+  /** Security code */
+  symbol: string
+  /** Settlement currency */
+  settlementCurrency: string
+  /** Grid trading rule */
+  gridTradingRule: GridTradeRule
+}
+
 /** Options for submit order request */
 export interface SubmitOrderOptions {
   /** Security code */
@@ -6795,6 +7381,22 @@ export declare const enum TradeStatus {
   WarrantPrepareList = 9,
   /** Warrant To BeListed */
   Suspend = 10
+}
+
+/**
+ * How grid trigger thresholds are interpreted.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum TriggerPriceType {
+  /** Unknown / unset */
+  Unknown = 0,
+  /** Trigger by absolute price spread */
+  Spread = 1,
+  /** Trigger by percent */
+  Percent = 2
 }
 
 /** Trigger status */

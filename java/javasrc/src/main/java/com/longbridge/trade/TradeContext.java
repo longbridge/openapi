@@ -649,4 +649,14 @@ public class TradeContext implements AutoCloseable {
             SdkNative.tradeContextEstimateMaxPurchaseQuantity(raw(), opts, callback);
         });
     }
+
+    /**
+     * Set grid trading order changed event callback. After receiving a grid order
+     * changed event, it will call back to this handler.
+     *
+     * @param handler A grid order changed handler
+     */
+    public void setOnGridOrderChange(GridOrderChangedHandler handler) {
+        SdkNative.tradeContextSetOnGridOrderChanged(raw(), handler);
+    }
 }
