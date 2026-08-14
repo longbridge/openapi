@@ -5,13 +5,15 @@ use std::{collections::HashMap, pin::Pin, sync::Arc};
 use futures_util::{Stream, StreamExt};
 use longbridge::agent::{
     AgentContext, ConversationStreamEvent as RustConversationStreamEvent, GetAgentsOptions,
+    GetChatsOptions,
 };
 use pyo3::{exceptions::PyStopAsyncIteration, prelude::*, types::PyType};
 use tokio::sync::Mutex;
 
 use crate::{
     agent::types::{
-        AgentsResponse, ConversationResponse, ConversationStreamEvent, WorkspacesResponse,
+        AgentsResponse, ChatDetail, ChatsResponse, ConversationResponse, ConversationStreamEvent,
+        WorkspacesResponse,
     },
     config::Config,
     error::ErrorNewType,
@@ -109,6 +111,43 @@ impl AsyncAgentContext {
                 .await
                 .map_err(ErrorNewType)?
                 .into();
+            Ok(resp)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// List the current account's chats (conversations) across Agents.
+    #[pyo3(signature = (page = None, limit = None, exclude_agent_uids = None))]
+    fn chats(
+        &self,
+        py: Python<'_>,
+        page: Option<i32>,
+        limit: Option<i32>,
+        exclude_agent_uids: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetChatsOptions::new();
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+        if let Some(limit) = limit {
+            opts = opts.limit(limit);
+        }
+        if let Some(exclude_agent_uids) = exclude_agent_uids {
+            opts = opts.exclude_agent_uids(exclude_agent_uids);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp: ChatsResponse = ctx.chats(Some(opts)).await.map_err(ErrorNewType)?.into();
+            Ok(resp)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the detail of a single chat, including its messages.
+    fn chat(&self, py: Python<'_>, chat_uid: String) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let resp: ChatDetail = ctx.chat(chat_uid).await.map_err(ErrorNewType)?.into();
             Ok(resp)
         })
         .map(|b| b.unbind())

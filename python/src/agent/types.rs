@@ -98,6 +98,158 @@ impl From<longbridge::agent::AgentsResponse> for AgentsResponse {
     }
 }
 
+/// A chat (conversation) with an Agent
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct Chat {
+    pub id: i64,
+    pub uid: String,
+    pub name: String,
+    pub agent_id: i64,
+    pub agent_name: String,
+    pub agent_uid: String,
+    pub from_source: String,
+    pub has_unread: bool,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub chat_relation: JsonValue,
+}
+impl From<longbridge::agent::Chat> for Chat {
+    fn from(v: longbridge::agent::Chat) -> Self {
+        Self {
+            id: v.id,
+            uid: v.uid,
+            name: v.name,
+            agent_id: v.agent_id,
+            agent_name: v.agent_name,
+            agent_uid: v.agent_uid,
+            from_source: v.from_source,
+            has_unread: v.has_unread,
+            created_at: v.created_at,
+            updated_at: v.updated_at,
+            chat_relation: JsonValue(v.chat_relation),
+        }
+    }
+}
+
+/// Response for `AgentContext.chats`
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ChatsResponse {
+    pub chats: Vec<Chat>,
+}
+impl From<longbridge::agent::ChatsResponse> for ChatsResponse {
+    fn from(v: longbridge::agent::ChatsResponse) -> Self {
+        Self {
+            chats: v.chats.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One content chunk of a chat message
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ChatMessageChunk {
+    pub chunk_type: String,
+    pub content: String,
+    pub index: i32,
+    pub started_at: i64,
+    pub stopped_at: i64,
+}
+impl From<longbridge::agent::ChatMessageChunk> for ChatMessageChunk {
+    fn from(v: longbridge::agent::ChatMessageChunk) -> Self {
+        Self {
+            chunk_type: v.chunk_type,
+            content: v.content,
+            index: v.index,
+            started_at: v.started_at,
+            stopped_at: v.stopped_at,
+        }
+    }
+}
+
+/// A message within a chat
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ChatMessage {
+    pub id: i64,
+    pub chat_id: i64,
+    pub chat_uid: String,
+    pub agent_id: i64,
+    pub agent_name: String,
+    pub agent_uid: String,
+    pub sender: String,
+    pub status: i32,
+    pub likes: i32,
+    pub parent_message_id: i64,
+    pub thinking_seconds: i32,
+    pub error_code: i32,
+    pub workflow_run_id: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub chunks: Vec<ChatMessageChunk>,
+    pub extends_data: JsonValue,
+}
+impl From<longbridge::agent::ChatMessage> for ChatMessage {
+    fn from(v: longbridge::agent::ChatMessage) -> Self {
+        Self {
+            id: v.id,
+            chat_id: v.chat_id,
+            chat_uid: v.chat_uid,
+            agent_id: v.agent_id,
+            agent_name: v.agent_name,
+            agent_uid: v.agent_uid,
+            sender: v.sender,
+            status: v.status,
+            likes: v.likes,
+            parent_message_id: v.parent_message_id,
+            thinking_seconds: v.thinking_seconds,
+            error_code: v.error_code,
+            workflow_run_id: v.workflow_run_id,
+            created_at: v.created_at,
+            updated_at: v.updated_at,
+            chunks: v.chunks.into_iter().map(Into::into).collect(),
+            extends_data: JsonValue(v.extends_data),
+        }
+    }
+}
+
+/// Chat summary carried in the chat detail response
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ChatInfo {
+    pub id: i64,
+    pub name: String,
+    pub uid: String,
+}
+impl From<longbridge::agent::ChatInfo> for ChatInfo {
+    fn from(v: longbridge::agent::ChatInfo) -> Self {
+        Self {
+            id: v.id,
+            name: v.name,
+            uid: v.uid,
+        }
+    }
+}
+
+/// Response for `AgentContext.chat`
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ChatDetail {
+    pub chat: ChatInfo,
+    pub chat_relation: JsonValue,
+    pub messages: Vec<ChatMessage>,
+}
+impl From<longbridge::agent::ChatDetail> for ChatDetail {
+    fn from(v: longbridge::agent::ChatDetail) -> Self {
+        Self {
+            chat: v.chat.into(),
+            chat_relation: JsonValue(v.chat_relation),
+            messages: v.messages.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 /// Final run status of a conversation
 #[pyclass(eq, eq_int, skip_from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]

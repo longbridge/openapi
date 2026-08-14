@@ -106,6 +106,33 @@ impl AgentContext {
             .into())
     }
 
+    /// List the current account's chats (conversations) across Agents.
+    #[napi]
+    pub async fn chats(
+        &self,
+        page: Option<i32>,
+        limit: Option<i32>,
+        exclude_agent_uids: Option<String>,
+    ) -> Result<ChatsResponse> {
+        let mut opts = longbridge::agent::GetChatsOptions::new();
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+        if let Some(limit) = limit {
+            opts = opts.limit(limit);
+        }
+        if let Some(exclude_agent_uids) = exclude_agent_uids {
+            opts = opts.exclude_agent_uids(exclude_agent_uids);
+        }
+        Ok(self.ctx.chats(opts).await.map_err(ErrorNewType)?.into())
+    }
+
+    /// Get the detail of a single chat, including its messages.
+    #[napi]
+    pub async fn chat(&self, chat_uid: String) -> Result<ChatDetail> {
+        Ok(self.ctx.chat(chat_uid).await.map_err(ErrorNewType)?.into())
+    }
+
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     ///

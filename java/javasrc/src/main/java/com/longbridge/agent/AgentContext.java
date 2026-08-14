@@ -93,6 +93,34 @@ public class AgentContext implements AutoCloseable {
     }
 
     /**
+     * List the current account's chats (conversations) across Agents.
+     *
+     * @param opts Options for this request, may be {@code null}
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<ChatsResponse> chats(GetChatsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.agentContextChats(raw(), opts, callback);
+        });
+    }
+
+    /**
+     * Get the detail of a single chat, including its messages.
+     *
+     * @param chatUid Chat UID
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<ChatDetail> chat(String chatUid)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.agentContextChat(raw(), chatUid, callback);
+        });
+    }
+
+    /**
      * Start a conversation with the specified Agent, blocking until the run
      * succeeds, is interrupted, or fails.
      *

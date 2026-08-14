@@ -50,6 +50,14 @@ public:
   void public_agents(const std::optional<GetAgentsOptions>& opts,
                      AsyncCallback<AgentContext, AgentsResponse> callback) const;
 
+  /// List the current account's chats (conversations) across Agents.
+  void chats(const std::optional<GetChatsOptions>& opts,
+             AsyncCallback<AgentContext, ChatsResponse> callback) const;
+
+  /// Get the detail of a single chat, including its messages.
+  void chat(const std::string& chat_uid,
+            AsyncCallback<AgentContext, ChatDetail> callback) const;
+
   /// Start a conversation with the specified Agent, blocking until the run
   /// succeeds, is interrupted, or fails.
   ///

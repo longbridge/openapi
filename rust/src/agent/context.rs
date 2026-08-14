@@ -221,6 +221,37 @@ impl AgentContext {
             .0)
     }
 
+    /// List the current account's chats (conversations) across Agents.
+    ///
+    /// Path: `GET /v1/ai/chats`
+    pub async fn chats(&self, opts: impl Into<Option<GetChatsOptions>>) -> Result<ChatsResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/ai/chats")
+            .query_params(opts.into().unwrap_or_default())
+            .response::<Json<ChatsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the detail of a single chat, including its messages.
+    ///
+    /// Path: `GET /v1/ai/chats/{chat_uid}`
+    pub async fn chat(&self, chat_uid: impl Into<String>) -> Result<ChatDetail> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, format!("/v1/ai/chats/{}", chat_uid.into()))
+            .response::<Json<ChatDetail>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     ///

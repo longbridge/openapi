@@ -96,6 +96,198 @@ impl From<lb::AgentsResponse> for AgentsResponse {
     }
 }
 
+/// A chat (conversation) with an Agent
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct Chat {
+    /// Chat ID
+    pub id: i64,
+    /// Chat UID, used as the path parameter of `AgentContext.chat`
+    pub uid: String,
+    /// Chat name (title)
+    pub name: String,
+    /// ID of the Agent this chat belongs to
+    pub agent_id: i64,
+    /// Name of the Agent this chat belongs to
+    pub agent_name: String,
+    /// UID of the Agent this chat belongs to
+    pub agent_uid: String,
+    /// Source the chat was created from, e.g. `api`
+    pub from_source: String,
+    /// Whether the chat has unread messages
+    pub has_unread: bool,
+    /// Creation time, Unix timestamp in seconds
+    pub created_at: i64,
+    /// Last updated time, Unix timestamp in seconds
+    pub updated_at: i64,
+    /// Agent / permission relation metadata, as raw JSON
+    pub chat_relation: serde_json::Value,
+}
+impl From<lb::Chat> for Chat {
+    fn from(v: lb::Chat) -> Self {
+        Self {
+            id: v.id,
+            uid: v.uid,
+            name: v.name,
+            agent_id: v.agent_id,
+            agent_name: v.agent_name,
+            agent_uid: v.agent_uid,
+            from_source: v.from_source,
+            has_unread: v.has_unread,
+            created_at: v.created_at,
+            updated_at: v.updated_at,
+            chat_relation: v.chat_relation,
+        }
+    }
+}
+
+/// Response for `AgentContext.chats`
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct ChatsResponse {
+    /// Chat list
+    pub chats: Vec<Chat>,
+}
+impl From<lb::ChatsResponse> for ChatsResponse {
+    fn from(v: lb::ChatsResponse) -> Self {
+        Self {
+            chats: v.chats.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One content chunk of a chat message
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct ChatMessageChunk {
+    /// Chunk type, e.g. `text`
+    pub chunk_type: String,
+    /// Chunk content
+    pub content: String,
+    /// Index of the chunk within the message
+    pub index: i32,
+    /// Start time, Unix timestamp in seconds
+    pub started_at: i64,
+    /// Stop time, Unix timestamp in seconds
+    pub stopped_at: i64,
+}
+impl From<lb::ChatMessageChunk> for ChatMessageChunk {
+    fn from(v: lb::ChatMessageChunk) -> Self {
+        Self {
+            chunk_type: v.chunk_type,
+            content: v.content,
+            index: v.index,
+            started_at: v.started_at,
+            stopped_at: v.stopped_at,
+        }
+    }
+}
+
+/// A message within a chat
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct ChatMessage {
+    /// Message ID
+    pub id: i64,
+    /// ID of the owning chat
+    pub chat_id: i64,
+    /// UID of the owning chat
+    pub chat_uid: String,
+    /// ID of the Agent
+    pub agent_id: i64,
+    /// Name of the Agent
+    pub agent_name: String,
+    /// UID of the Agent
+    pub agent_uid: String,
+    /// Sender, e.g. `user` or `assistant`
+    pub sender: String,
+    /// Message status
+    pub status: i32,
+    /// Number of likes
+    pub likes: i32,
+    /// ID of the parent message; 0 if none
+    pub parent_message_id: i64,
+    /// Thinking time in seconds
+    pub thinking_seconds: i32,
+    /// Error code; 0 if none
+    pub error_code: i32,
+    /// Workflow run ID
+    pub workflow_run_id: String,
+    /// Creation time, Unix timestamp in seconds
+    pub created_at: i64,
+    /// Last updated time, Unix timestamp in seconds
+    pub updated_at: i64,
+    /// Content chunks of the message
+    pub chunks: Vec<ChatMessageChunk>,
+    /// Extension payload, as raw JSON
+    pub extends_data: serde_json::Value,
+}
+impl From<lb::ChatMessage> for ChatMessage {
+    fn from(v: lb::ChatMessage) -> Self {
+        Self {
+            id: v.id,
+            chat_id: v.chat_id,
+            chat_uid: v.chat_uid,
+            agent_id: v.agent_id,
+            agent_name: v.agent_name,
+            agent_uid: v.agent_uid,
+            sender: v.sender,
+            status: v.status,
+            likes: v.likes,
+            parent_message_id: v.parent_message_id,
+            thinking_seconds: v.thinking_seconds,
+            error_code: v.error_code,
+            workflow_run_id: v.workflow_run_id,
+            created_at: v.created_at,
+            updated_at: v.updated_at,
+            chunks: v.chunks.into_iter().map(Into::into).collect(),
+            extends_data: v.extends_data,
+        }
+    }
+}
+
+/// Chat summary carried in the chat detail response
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct ChatInfo {
+    /// Chat ID
+    pub id: i64,
+    /// Chat name (title)
+    pub name: String,
+    /// Chat UID
+    pub uid: String,
+}
+impl From<lb::ChatInfo> for ChatInfo {
+    fn from(v: lb::ChatInfo) -> Self {
+        Self {
+            id: v.id,
+            name: v.name,
+            uid: v.uid,
+        }
+    }
+}
+
+/// Response for `AgentContext.chat`
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct ChatDetail {
+    /// Chat summary
+    pub chat: ChatInfo,
+    /// Agent / permission relation metadata, as raw JSON
+    pub chat_relation: serde_json::Value,
+    /// Messages in the chat
+    pub messages: Vec<ChatMessage>,
+}
+impl From<lb::ChatDetail> for ChatDetail {
+    fn from(v: lb::ChatDetail) -> Self {
+        Self {
+            chat: v.chat.into(),
+            chat_relation: v.chat_relation,
+            messages: v.messages.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 /// Final run status of a conversation
 #[napi_derive::napi]
 #[derive(Debug, Clone, Copy)]

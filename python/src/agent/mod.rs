@@ -9,6 +9,12 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::WorkspacesResponse>()?;
     parent.add_class::<types::Agent>()?;
     parent.add_class::<types::AgentsResponse>()?;
+    parent.add_class::<types::Chat>()?;
+    parent.add_class::<types::ChatsResponse>()?;
+    parent.add_class::<types::ChatMessageChunk>()?;
+    parent.add_class::<types::ChatMessage>()?;
+    parent.add_class::<types::ChatInfo>()?;
+    parent.add_class::<types::ChatDetail>()?;
     parent.add_class::<types::ConversationStatus>()?;
     parent.add_class::<types::Reference>()?;
     parent.add_class::<types::QuestionOption>()?;

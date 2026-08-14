@@ -74,6 +74,10 @@ export declare class AgentContext {
    * catalog). Not scoped to a Workspace.
    */
   publicAgents(page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /** List the current account's chats (conversations) across Agents. */
+  chats(page?: number | undefined | null, limit?: number | undefined | null, excludeAgentUids?: string | undefined | null): Promise<ChatsResponse>
+  /** Get the detail of a single chat, including its messages. */
+  chat(chatUid: string): Promise<ChatDetail>
   /**
    * Start a conversation with the specified Agent, blocking until the run
    * succeeds, is interrupted, or fails.
@@ -3831,6 +3835,42 @@ export declare const enum ChargeCategoryCode {
   Third = 2
 }
 
+/** A chat (conversation) with an Agent */
+export interface Chat {
+  /** Chat ID */
+  id: number
+  /** Chat UID, used as the path parameter of `AgentContext.chat` */
+  uid: string
+  /** Chat name (title) */
+  name: string
+  /** ID of the Agent this chat belongs to */
+  agentId: number
+  /** Name of the Agent this chat belongs to */
+  agentName: string
+  /** UID of the Agent this chat belongs to */
+  agentUid: string
+  /** Source the chat was created from, e.g. `api` */
+  fromSource: string
+  /** Whether the chat has unread messages */
+  hasUnread: boolean
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+  /** Agent / permission relation metadata, as raw JSON */
+  chatRelation: any
+}
+
+/** Response for `AgentContext.chat` */
+export interface ChatDetail {
+  /** Chat summary */
+  chat: ChatInfo
+  /** Agent / permission relation metadata, as raw JSON */
+  chatRelation: any
+  /** Messages in the chat */
+  messages: Array<ChatMessage>
+}
+
 /**
  * Payload of a `chat_finished` stream event, observed once all `message`
  * events for this round have been sent, shortly before `workflow_finished`
@@ -3846,6 +3886,74 @@ export interface ChatFinishedPayload {
   error: string
   /** Empty string in every run observed so far */
   errorMessage: string
+}
+
+/** Chat summary carried in the chat detail response */
+export interface ChatInfo {
+  /** Chat ID */
+  id: number
+  /** Chat name (title) */
+  name: string
+  /** Chat UID */
+  uid: string
+}
+
+/** A message within a chat */
+export interface ChatMessage {
+  /** Message ID */
+  id: number
+  /** ID of the owning chat */
+  chatId: number
+  /** UID of the owning chat */
+  chatUid: string
+  /** ID of the Agent */
+  agentId: number
+  /** Name of the Agent */
+  agentName: string
+  /** UID of the Agent */
+  agentUid: string
+  /** Sender, e.g. `user` or `assistant` */
+  sender: string
+  /** Message status */
+  status: number
+  /** Number of likes */
+  likes: number
+  /** ID of the parent message; 0 if none */
+  parentMessageId: number
+  /** Thinking time in seconds */
+  thinkingSeconds: number
+  /** Error code; 0 if none */
+  errorCode: number
+  /** Workflow run ID */
+  workflowRunId: string
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+  /** Content chunks of the message */
+  chunks: Array<ChatMessageChunk>
+  /** Extension payload, as raw JSON */
+  extendsData: any
+}
+
+/** One content chunk of a chat message */
+export interface ChatMessageChunk {
+  /** Chunk type, e.g. `text` */
+  chunkType: string
+  /** Chunk content */
+  content: string
+  /** Index of the chunk within the message */
+  index: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Stop time, Unix timestamp in seconds */
+  stoppedAt: number
+}
+
+/** Response for `AgentContext.chats` */
+export interface ChatsResponse {
+  /** Chat list */
+  chats: Array<Chat>
 }
 
 /** Payload of a `chat_started` stream event */

@@ -2951,6 +2951,81 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/agent/Chat",
+    longbridge::agent::Chat,
+    [
+        id,
+        uid,
+        name,
+        agent_id,
+        agent_name,
+        agent_uid,
+        from_source,
+        has_unread,
+        created_at,
+        updated_at,
+        chat_relation
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatsResponse",
+    longbridge::agent::ChatsResponse,
+    [
+        #[java(objarray)]
+        chats
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatMessageChunk",
+    longbridge::agent::ChatMessageChunk,
+    [chunk_type, content, index, started_at, stopped_at]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatMessage",
+    longbridge::agent::ChatMessage,
+    [
+        id,
+        chat_id,
+        chat_uid,
+        agent_id,
+        agent_name,
+        agent_uid,
+        sender,
+        status,
+        likes,
+        parent_message_id,
+        thinking_seconds,
+        error_code,
+        workflow_run_id,
+        created_at,
+        updated_at,
+        #[java(objarray)]
+        chunks,
+        extends_data
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatInfo",
+    longbridge::agent::ChatInfo,
+    [id, name, uid]
+);
+
+impl_java_class!(
+    "com/longbridge/agent/ChatDetail",
+    longbridge::agent::ChatDetail,
+    [
+        chat,
+        chat_relation,
+        #[java(objarray)]
+        messages
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/agent/Reference",
     longbridge::agent::Reference,
     [index, original_index, ref_type, id, title, url, content]

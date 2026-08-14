@@ -6,7 +6,7 @@ use jni::{
 };
 use longbridge::{
     AgentContext, Config,
-    agent::{self, AnswersByToolCall, ConversationStreamEvent, GetAgentsOptions},
+    agent::{self, AnswersByToolCall, ConversationStreamEvent, GetAgentsOptions, GetChatsOptions},
 };
 
 use crate::{
@@ -211,6 +211,70 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextPublicAg
         let opts = read_get_agents_options(env, &opts)?;
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.public_agents(opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+fn read_get_chats_options(
+    env: &mut JNIEnv,
+    opts: &JObject,
+) -> jni::errors::Result<Option<GetChatsOptions>> {
+    if opts.is_null() {
+        return Ok(None);
+    }
+
+    let mut new_opts = GetChatsOptions::new();
+    let page: Option<JavaInteger> = get_field(env, opts, "page")?;
+    if let Some(page) = page {
+        new_opts = new_opts.page(page.into());
+    }
+    let limit: Option<JavaInteger> = get_field(env, opts, "limit")?;
+    if let Some(limit) = limit {
+        new_opts = new_opts.limit(limit.into());
+    }
+    let exclude_agent_uids: Option<String> = get_field(env, opts, "excludeAgentUids")?;
+    if let Some(exclude_agent_uids) = exclude_agent_uids {
+        new_opts = new_opts.exclude_agent_uids(exclude_agent_uids);
+    }
+    Ok(Some(new_opts))
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextChats(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let opts = read_get_chats_options(env, &opts)?;
+        async_util::execute(
+            env,
+            callback,
+            async move { Ok(__owned_ctx.chats(opts).await?) },
+        )?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_agentContextChat(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    chat_uid: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let chat_uid: String = FromJValue::from_jvalue(env, chat_uid.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.chat(chat_uid).await?)
         })?;
         Ok(())
     })

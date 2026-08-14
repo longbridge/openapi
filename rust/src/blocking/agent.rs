@@ -54,6 +54,21 @@ impl AgentContextSync {
             .call(move |ctx| async move { ctx.public_agents(opts).await })
     }
 
+    /// List the current account's chats (conversations) across Agents.
+    pub fn chats(
+        &self,
+        opts: impl Into<Option<GetChatsOptions>> + Send + 'static,
+    ) -> Result<ChatsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.chats(opts).await })
+    }
+
+    /// Get the detail of a single chat, including its messages.
+    pub fn chat(&self, chat_uid: impl Into<String> + Send + 'static) -> Result<ChatDetail> {
+        self.rt
+            .call(move |ctx| async move { ctx.chat(chat_uid).await })
+    }
+
     /// Start a conversation with the specified Agent, blocking until the run
     /// succeeds, is interrupted, or fails.
     pub fn conversation(

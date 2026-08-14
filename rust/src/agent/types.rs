@@ -122,6 +122,207 @@ impl GetAgentsOptions {
     }
 }
 
+/// A chat (conversation) with an Agent, as returned by
+/// [`crate::AgentContext::chats`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Chat {
+    /// Chat ID
+    #[serde(default)]
+    pub id: i64,
+    /// Chat UID, used as the path parameter of [`crate::AgentContext::chat`]
+    pub uid: String,
+    /// Chat name (title)
+    #[serde(default)]
+    pub name: String,
+    /// ID of the Agent this chat belongs to
+    #[serde(default)]
+    pub agent_id: i64,
+    /// Name of the Agent this chat belongs to
+    #[serde(default)]
+    pub agent_name: String,
+    /// UID of the Agent this chat belongs to
+    #[serde(default)]
+    pub agent_uid: String,
+    /// Source the chat was created from, e.g. `api`
+    #[serde(default)]
+    pub from_source: String,
+    /// Whether the chat has unread messages
+    #[serde(default)]
+    pub has_unread: bool,
+    /// Creation time, Unix timestamp in seconds
+    #[serde(default)]
+    pub created_at: i64,
+    /// Last updated time, Unix timestamp in seconds
+    #[serde(default)]
+    pub updated_at: i64,
+    /// Agent / permission relation metadata, kept as raw JSON because the field
+    /// set is UI-configuration detail that varies by Agent
+    #[serde(default)]
+    pub chat_relation: serde_json::Value,
+}
+
+/// Response for [`crate::AgentContext::chats`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatsResponse {
+    /// Chat list
+    #[serde(default)]
+    pub chats: Vec<Chat>,
+}
+
+/// Options for [`crate::AgentContext::chats`]
+#[derive(Debug, Serialize, Default, Clone)]
+pub struct GetChatsOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    page: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    limit: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    exclude_agent_uids: Option<String>,
+}
+
+impl GetChatsOptions {
+    /// Create a new `GetChatsOptions`
+    #[inline]
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    /// Set the page number, starts at 1
+    #[inline]
+    #[must_use]
+    pub fn page(self, page: i32) -> Self {
+        Self {
+            page: Some(page),
+            ..self
+        }
+    }
+
+    /// Set the page size
+    #[inline]
+    #[must_use]
+    pub fn limit(self, limit: i32) -> Self {
+        Self {
+            limit: Some(limit),
+            ..self
+        }
+    }
+
+    /// Exclude chats belonging to the given Agent UIDs (comma-joined, e.g.
+    /// `dsl_builder`)
+    #[inline]
+    #[must_use]
+    pub fn exclude_agent_uids(self, exclude_agent_uids: impl Into<String>) -> Self {
+        Self {
+            exclude_agent_uids: Some(exclude_agent_uids.into()),
+            ..self
+        }
+    }
+}
+
+/// One content chunk of a [`ChatMessage`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatMessageChunk {
+    /// Chunk type, e.g. `text`
+    #[serde(default)]
+    pub chunk_type: String,
+    /// Chunk content
+    #[serde(default)]
+    pub content: String,
+    /// Index of the chunk within the message
+    #[serde(default)]
+    pub index: i32,
+    /// Start time, Unix timestamp in seconds
+    #[serde(default)]
+    pub started_at: i64,
+    /// Stop time, Unix timestamp in seconds
+    #[serde(default)]
+    pub stopped_at: i64,
+}
+
+/// A message within a chat, as returned by [`crate::AgentContext::chat`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatMessage {
+    /// Message ID
+    #[serde(default)]
+    pub id: i64,
+    /// ID of the owning chat
+    #[serde(default)]
+    pub chat_id: i64,
+    /// UID of the owning chat
+    #[serde(default)]
+    pub chat_uid: String,
+    /// ID of the Agent
+    #[serde(default)]
+    pub agent_id: i64,
+    /// Name of the Agent
+    #[serde(default)]
+    pub agent_name: String,
+    /// UID of the Agent
+    #[serde(default)]
+    pub agent_uid: String,
+    /// Sender, e.g. `user` or `assistant`
+    #[serde(default)]
+    pub sender: String,
+    /// Message status
+    #[serde(default)]
+    pub status: i32,
+    /// Number of likes
+    #[serde(default)]
+    pub likes: i32,
+    /// ID of the parent message; 0 if none
+    #[serde(default)]
+    pub parent_message_id: i64,
+    /// Thinking time in seconds
+    #[serde(default)]
+    pub thinking_seconds: i32,
+    /// Error code; 0 if none
+    #[serde(default)]
+    pub error_code: i32,
+    /// Workflow run ID
+    #[serde(default)]
+    pub workflow_run_id: String,
+    /// Creation time, Unix timestamp in seconds
+    #[serde(default)]
+    pub created_at: i64,
+    /// Last updated time, Unix timestamp in seconds
+    #[serde(default)]
+    pub updated_at: i64,
+    /// Content chunks of the message
+    #[serde(default)]
+    pub chunks: Vec<ChatMessageChunk>,
+    /// Extension payload, kept as raw JSON. Named `extends_data` because
+    /// `extends` is a reserved word in some target languages (e.g. Java); the
+    /// wire key remains `extends`.
+    #[serde(default, rename = "extends")]
+    pub extends_data: serde_json::Value,
+}
+
+/// Chat summary carried in the [`ChatDetail`] response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatInfo {
+    /// Chat ID
+    #[serde(default)]
+    pub id: i64,
+    /// Chat name (title)
+    #[serde(default)]
+    pub name: String,
+    /// Chat UID
+    pub uid: String,
+}
+
+/// Response for [`crate::AgentContext::chat`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatDetail {
+    /// Chat summary
+    pub chat: ChatInfo,
+    /// Agent / permission relation metadata, kept as raw JSON
+    #[serde(default)]
+    pub chat_relation: serde_json::Value,
+    /// Messages in the chat
+    #[serde(default)]
+    pub messages: Vec<ChatMessage>,
+}
+
 /// Final run status of a conversation
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]

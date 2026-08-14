@@ -1,14 +1,14 @@
 use std::{collections::HashMap, ffi::c_void, os::raw::c_char, sync::Arc};
 
 use longbridge::agent::{
-    AgentContext, AnswersByToolCall, GetAgentsOptions, drive_conversation_stream,
+    AgentContext, AnswersByToolCall, GetAgentsOptions, GetChatsOptions, drive_conversation_stream,
 };
 
 use crate::{
     agent_context::types::{
-        CAgentsResponseOwned, CAnswersByToolCallEntry, CConversationResponseOwned,
-        CConversationStreamEvent, CConversationStreamEventOwned, CGetAgentsOptions,
-        CWorkspacesResponseOwned,
+        CAgentsResponseOwned, CAnswersByToolCallEntry, CChatDetailOwned, CChatsResponseOwned,
+        CConversationResponseOwned, CConversationStreamEvent, CConversationStreamEventOwned,
+        CGetAgentsOptions, CGetChatsOptions, CWorkspacesResponseOwned,
     },
     async_call::{CAsyncCallback, execute_async},
     callback::CFreeUserDataFunc,
@@ -149,6 +149,55 @@ pub unsafe extern "C" fn lb_agent_context_public_agents(
     }
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CAgentsResponseOwned> = CCow::new(ctx_inner.public_agents(opts2).await?);
+        Ok(resp)
+    });
+}
+
+/// List the current account's chats (conversations) across Agents. Returns
+/// `CChatsResponse`.
+///
+/// @param[in] opts Options for the request (can be null)
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_agent_context_chats(
+    ctx: *const CAgentContext,
+    opts: *const CGetChatsOptions,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let mut opts2 = GetChatsOptions::new();
+    if !opts.is_null() {
+        if !(*opts).page.is_null() {
+            opts2 = opts2.page(*(*opts).page);
+        }
+        if !(*opts).limit.is_null() {
+            opts2 = opts2.limit(*(*opts).limit);
+        }
+        if !(*opts).exclude_agent_uids.is_null() {
+            opts2 = opts2.exclude_agent_uids(cstr_to_rust((*opts).exclude_agent_uids));
+        }
+    }
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CChatsResponseOwned> = CCow::new(ctx_inner.chats(opts2).await?);
+        Ok(resp)
+    });
+}
+
+/// Get the detail of a single chat, including its messages. Returns
+/// `CChatDetail`.
+///
+/// @param[in] chat_uid Chat UID
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_agent_context_chat(
+    ctx: *const CAgentContext,
+    chat_uid: *const c_char,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let chat_uid = cstr_to_rust(chat_uid);
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CChatDetailOwned> = CCow::new(ctx_inner.chat(chat_uid).await?);
         Ok(resp)
     });
 }

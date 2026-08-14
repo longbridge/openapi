@@ -194,6 +194,67 @@ AgentContext::public_agents(
 }
 
 void
+AgentContext::chats(
+  const std::optional<GetChatsOptions>& opts,
+  AsyncCallback<AgentContext, ChatsResponse> callback) const
+{
+  lb_get_chats_options_t opts2 = { nullptr, nullptr, nullptr };
+  if (opts) {
+    opts2.page = opts->page ? &opts->page.value() : nullptr;
+    opts2.limit = opts->limit ? &opts->limit.value() : nullptr;
+    opts2.exclude_agent_uids =
+      opts->exclude_agent_uids ? opts->exclude_agent_uids->c_str() : nullptr;
+  }
+
+  lb_agent_context_chats(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<AgentContext, ChatsResponse>(
+          res->userdata);
+      AgentContext ctx((const lb_agent_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        ChatsResponse resp = convert((const lb_chats_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<AgentContext, ChatsResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<AgentContext, ChatsResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<AgentContext, ChatsResponse>(callback));
+}
+
+void
+AgentContext::chat(
+  const std::string& chat_uid,
+  AsyncCallback<AgentContext, ChatDetail> callback) const
+{
+  lb_agent_context_chat(
+    ctx_,
+    chat_uid.c_str(),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<AgentContext, ChatDetail>(res->userdata);
+      AgentContext ctx((const lb_agent_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        ChatDetail resp = convert((const lb_chat_detail_t*)res->data);
+        (*callback_ptr)(AsyncResult<AgentContext, ChatDetail>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<AgentContext, ChatDetail>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<AgentContext, ChatDetail>(callback));
+}
+
+void
 AgentContext::conversation(
   const std::string& agent_id,
   const std::string& query,

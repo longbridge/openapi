@@ -3176,6 +3176,35 @@ inline agent::AgentsResponse convert(const lb_agents_response_t* r) {
   for (size_t i = 0; i < r->num_agents; ++i) agents.push_back(convert(&r->agents[i]));
   return { std::move(agents), r->total };
 }
+inline agent::Chat convert(const lb_chat_t* c) {
+  return { c->id, c->uid, c->name, c->agent_id, c->agent_name, c->agent_uid,
+           c->from_source, c->has_unread, c->created_at, c->updated_at,
+           c->chat_relation_json };
+}
+inline agent::ChatsResponse convert(const lb_chats_response_t* r) {
+  std::vector<agent::Chat> chats;
+  for (size_t i = 0; i < r->num_chats; ++i) chats.push_back(convert(&r->chats[i]));
+  return { std::move(chats) };
+}
+inline agent::ChatMessageChunk convert(const lb_chat_message_chunk_t* c) {
+  return { c->chunk_type, c->content, c->index, c->started_at, c->stopped_at };
+}
+inline agent::ChatMessage convert(const lb_chat_message_t* m) {
+  std::vector<agent::ChatMessageChunk> chunks;
+  for (size_t i = 0; i < m->num_chunks; ++i) chunks.push_back(convert(&m->chunks[i]));
+  return { m->id, m->chat_id, m->chat_uid, m->agent_id, m->agent_name, m->agent_uid,
+           m->sender, m->status, m->likes, m->parent_message_id, m->thinking_seconds,
+           m->error_code, m->workflow_run_id, m->created_at, m->updated_at,
+           std::move(chunks), m->extends_json };
+}
+inline agent::ChatInfo convert(const lb_chat_info_t* c) {
+  return { c->id, c->name, c->uid };
+}
+inline agent::ChatDetail convert(const lb_chat_detail_t* d) {
+  std::vector<agent::ChatMessage> messages;
+  for (size_t i = 0; i < d->num_messages; ++i) messages.push_back(convert(&d->messages[i]));
+  return { convert(&d->chat), d->chat_relation_json, std::move(messages) };
+}
 inline agent::ConversationStatus convert(lb_conversation_status_t status) {
   switch (status) {
     case ConversationStatusSucceeded:

@@ -13392,6 +13392,110 @@ class AgentsResponse:
     total: int
     """Total number of matching Agents"""
 
+class Chat:
+    """A chat (conversation) with an Agent."""
+
+    id: int
+    """Chat ID"""
+    uid: str
+    """Chat UID, used as the path parameter of AgentContext.chat"""
+    name: str
+    """Chat name (title)"""
+    agent_id: int
+    """ID of the Agent this chat belongs to"""
+    agent_name: str
+    """Name of the Agent this chat belongs to"""
+    agent_uid: str
+    """UID of the Agent this chat belongs to"""
+    from_source: str
+    """Source the chat was created from, e.g. `api`"""
+    has_unread: bool
+    """Whether the chat has unread messages"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+    chat_relation: Any
+    """Agent / permission relation metadata, as raw JSON"""
+
+class ChatsResponse:
+    """Response for AgentContext.chats / AsyncAgentContext.chats."""
+
+    chats: list[Chat]
+    """Chat list"""
+
+class ChatMessageChunk:
+    """One content chunk of a ChatMessage."""
+
+    chunk_type: str
+    """Chunk type, e.g. `text`"""
+    content: str
+    """Chunk content"""
+    index: int
+    """Index of the chunk within the message"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    stopped_at: int
+    """Stop time, Unix timestamp in seconds"""
+
+class ChatMessage:
+    """A message within a chat."""
+
+    id: int
+    """Message ID"""
+    chat_id: int
+    """ID of the owning chat"""
+    chat_uid: str
+    """UID of the owning chat"""
+    agent_id: int
+    """ID of the Agent"""
+    agent_name: str
+    """Name of the Agent"""
+    agent_uid: str
+    """UID of the Agent"""
+    sender: str
+    """Sender, e.g. `user` or `assistant`"""
+    status: int
+    """Message status"""
+    likes: int
+    """Number of likes"""
+    parent_message_id: int
+    """ID of the parent message; 0 if none"""
+    thinking_seconds: int
+    """Thinking time in seconds"""
+    error_code: int
+    """Error code; 0 if none"""
+    workflow_run_id: str
+    """Workflow run ID"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+    chunks: list[ChatMessageChunk]
+    """Content chunks of the message"""
+    extends_data: Any
+    """Extension payload (wire field `extends`), as raw JSON"""
+
+class ChatInfo:
+    """Chat summary carried in the ChatDetail response."""
+
+    id: int
+    """Chat ID"""
+    name: str
+    """Chat name (title)"""
+    uid: str
+    """Chat UID"""
+
+class ChatDetail:
+    """Response for AgentContext.chat / AsyncAgentContext.chat."""
+
+    chat: ChatInfo
+    """Chat summary"""
+    chat_relation: Any
+    """Agent / permission relation metadata, as raw JSON"""
+    messages: list[ChatMessage]
+    """Messages in the chat"""
+
 class ConversationStatus:
     """Final run status of a conversation."""
 
@@ -14150,6 +14254,32 @@ class AgentContext:
         """
         ...
 
+    def chats(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        exclude_agent_uids: str | None = None,
+    ) -> ChatsResponse:
+        """
+        List the current account's chats (conversations) across Agents.
+
+        Args:
+            page: Page number, starts at 1
+            limit: Page size
+            exclude_agent_uids: Exclude chats belonging to the given Agent UIDs
+                (comma-joined, e.g. ``dsl_builder``)
+        """
+        ...
+
+    def chat(self, chat_uid: str) -> ChatDetail:
+        """
+        Get the detail of a single chat, including its messages.
+
+        Args:
+            chat_uid: Chat UID
+        """
+        ...
+
     def conversation(
         self,
         agent_id: str,
@@ -14330,6 +14460,32 @@ class AsyncAgentContext:
             page: Page number, starts at 1
             limit: Page size
             name: Fuzzy search by Agent name
+        """
+        ...
+
+    def chats(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        exclude_agent_uids: str | None = None,
+    ) -> Awaitable[ChatsResponse]:
+        """
+        List the current account's chats (conversations) across Agents. Returns awaitable.
+
+        Args:
+            page: Page number, starts at 1
+            limit: Page size
+            exclude_agent_uids: Exclude chats belonging to the given Agent UIDs
+                (comma-joined, e.g. ``dsl_builder``)
+        """
+        ...
+
+    def chat(self, chat_uid: str) -> Awaitable[ChatDetail]:
+        """
+        Get the detail of a single chat, including its messages. Returns awaitable.
+
+        Args:
+            chat_uid: Chat UID
         """
         ...
 

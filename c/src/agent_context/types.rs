@@ -2,14 +2,14 @@ use std::os::raw::c_char;
 
 use longbridge::agent::{
     Agent, AgentError, AgentToolFinishedPayload, AgentToolProgressPayload, AgentToolStartedPayload,
-    AgentsResponse, ChatFinishedPayload, ChatStartedPayload, ChatTitleUpdatedPayload,
-    ContextCompressFinishedPayload, ContextCompressStartedPayload, ConversationResponse,
-    ConversationStreamEvent, HumanInteraction, Interrupt, MessagePayload,
-    NodeToolUseFinishedPayload, NodeToolUseOutputs, NodeToolUseStartedPayload, PlanChangedPayload,
-    QueryMaskedPayload, Question, QuestionOption, Reference, SubagentFinishedPayload,
-    SubagentOutputs, SubagentProgressPayload, SubagentStartedPayload, ThinkingFinishedPayload,
-    ThinkingStartedPayload, WorkflowStartedInputs, WorkflowStartedPayload, Workspace,
-    WorkspacesResponse,
+    AgentsResponse, Chat, ChatDetail, ChatFinishedPayload, ChatInfo, ChatMessage, ChatMessageChunk,
+    ChatStartedPayload, ChatTitleUpdatedPayload, ChatsResponse, ContextCompressFinishedPayload,
+    ContextCompressStartedPayload, ConversationResponse, ConversationStreamEvent, HumanInteraction,
+    Interrupt, MessagePayload, NodeToolUseFinishedPayload, NodeToolUseOutputs,
+    NodeToolUseStartedPayload, PlanChangedPayload, QueryMaskedPayload, Question, QuestionOption,
+    Reference, SubagentFinishedPayload, SubagentOutputs, SubagentProgressPayload,
+    SubagentStartedPayload, ThinkingFinishedPayload, ThinkingStartedPayload, WorkflowStartedInputs,
+    WorkflowStartedPayload, Workspace, WorkspacesResponse,
 };
 
 use crate::{
@@ -237,6 +237,369 @@ impl ToFFI for CAgentsResponseOwned {
     }
 }
 
+/// A chat (conversation) with an Agent
+#[repr(C)]
+pub struct CChat {
+    /// Chat ID
+    pub id: i64,
+    /// Chat UID, used as the path parameter of `lb_agent_context_chat`
+    pub uid: *const c_char,
+    /// Chat name (title)
+    pub name: *const c_char,
+    /// ID of the Agent this chat belongs to
+    pub agent_id: i64,
+    /// Name of the Agent this chat belongs to
+    pub agent_name: *const c_char,
+    /// UID of the Agent this chat belongs to
+    pub agent_uid: *const c_char,
+    /// Source the chat was created from, e.g. `api`
+    pub from_source: *const c_char,
+    /// Whether the chat has unread messages
+    pub has_unread: bool,
+    /// Creation time, Unix timestamp in seconds
+    pub created_at: i64,
+    /// Last updated time, Unix timestamp in seconds
+    pub updated_at: i64,
+    /// Agent / permission relation metadata, as a JSON string
+    pub chat_relation_json: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CChatOwned {
+    id: i64,
+    uid: CString,
+    name: CString,
+    agent_id: i64,
+    agent_name: CString,
+    agent_uid: CString,
+    from_source: CString,
+    has_unread: bool,
+    created_at: i64,
+    updated_at: i64,
+    chat_relation_json: CString,
+}
+
+impl From<Chat> for CChatOwned {
+    fn from(v: Chat) -> Self {
+        Self {
+            id: v.id,
+            uid: v.uid.into(),
+            name: v.name.into(),
+            agent_id: v.agent_id,
+            agent_name: v.agent_name.into(),
+            agent_uid: v.agent_uid.into(),
+            from_source: v.from_source.into(),
+            has_unread: v.has_unread,
+            created_at: v.created_at,
+            updated_at: v.updated_at,
+            chat_relation_json: serde_json::to_string(&v.chat_relation)
+                .unwrap_or_default()
+                .into(),
+        }
+    }
+}
+
+impl ToFFI for CChatOwned {
+    type FFIType = CChat;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CChat {
+            id: self.id,
+            uid: self.uid.to_ffi_type(),
+            name: self.name.to_ffi_type(),
+            agent_id: self.agent_id,
+            agent_name: self.agent_name.to_ffi_type(),
+            agent_uid: self.agent_uid.to_ffi_type(),
+            from_source: self.from_source.to_ffi_type(),
+            has_unread: self.has_unread,
+            created_at: self.created_at,
+            updated_at: self.updated_at,
+            chat_relation_json: self.chat_relation_json.to_ffi_type(),
+        }
+    }
+}
+
+/// Response for `lb_agent_context_chats`
+#[repr(C)]
+pub struct CChatsResponse {
+    /// Chat list
+    pub chats: *const CChat,
+    /// Number of chats in the array
+    pub num_chats: usize,
+}
+
+pub(crate) struct CChatsResponseOwned {
+    chats: CVec<CChatOwned>,
+}
+
+impl From<ChatsResponse> for CChatsResponseOwned {
+    fn from(v: ChatsResponse) -> Self {
+        Self {
+            chats: v.chats.into(),
+        }
+    }
+}
+
+impl ToFFI for CChatsResponseOwned {
+    type FFIType = CChatsResponse;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CChatsResponse {
+            chats: self.chats.to_ffi_type(),
+            num_chats: self.chats.len(),
+        }
+    }
+}
+
+/// One content chunk of a `CChatMessage`
+#[repr(C)]
+pub struct CChatMessageChunk {
+    /// Chunk type, e.g. `text`
+    pub chunk_type: *const c_char,
+    /// Chunk content
+    pub content: *const c_char,
+    /// Index of the chunk within the message
+    pub index: i32,
+    /// Start time, Unix timestamp in seconds
+    pub started_at: i64,
+    /// Stop time, Unix timestamp in seconds
+    pub stopped_at: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CChatMessageChunkOwned {
+    chunk_type: CString,
+    content: CString,
+    index: i32,
+    started_at: i64,
+    stopped_at: i64,
+}
+
+impl From<ChatMessageChunk> for CChatMessageChunkOwned {
+    fn from(v: ChatMessageChunk) -> Self {
+        Self {
+            chunk_type: v.chunk_type.into(),
+            content: v.content.into(),
+            index: v.index,
+            started_at: v.started_at,
+            stopped_at: v.stopped_at,
+        }
+    }
+}
+
+impl ToFFI for CChatMessageChunkOwned {
+    type FFIType = CChatMessageChunk;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CChatMessageChunk {
+            chunk_type: self.chunk_type.to_ffi_type(),
+            content: self.content.to_ffi_type(),
+            index: self.index,
+            started_at: self.started_at,
+            stopped_at: self.stopped_at,
+        }
+    }
+}
+
+/// A message within a chat
+#[repr(C)]
+pub struct CChatMessage {
+    /// Message ID
+    pub id: i64,
+    /// ID of the owning chat
+    pub chat_id: i64,
+    /// UID of the owning chat
+    pub chat_uid: *const c_char,
+    /// ID of the Agent
+    pub agent_id: i64,
+    /// Name of the Agent
+    pub agent_name: *const c_char,
+    /// UID of the Agent
+    pub agent_uid: *const c_char,
+    /// Sender, e.g. `user` or `assistant`
+    pub sender: *const c_char,
+    /// Message status
+    pub status: i32,
+    /// Number of likes
+    pub likes: i32,
+    /// ID of the parent message; 0 if none
+    pub parent_message_id: i64,
+    /// Thinking time in seconds
+    pub thinking_seconds: i32,
+    /// Error code; 0 if none
+    pub error_code: i32,
+    /// Workflow run ID
+    pub workflow_run_id: *const c_char,
+    /// Creation time, Unix timestamp in seconds
+    pub created_at: i64,
+    /// Last updated time, Unix timestamp in seconds
+    pub updated_at: i64,
+    /// Content chunks of the message
+    pub chunks: *const CChatMessageChunk,
+    /// Number of chunks in the array
+    pub num_chunks: usize,
+    /// Extension payload (wire field `extends`), as a JSON string
+    pub extends_json: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CChatMessageOwned {
+    id: i64,
+    chat_id: i64,
+    chat_uid: CString,
+    agent_id: i64,
+    agent_name: CString,
+    agent_uid: CString,
+    sender: CString,
+    status: i32,
+    likes: i32,
+    parent_message_id: i64,
+    thinking_seconds: i32,
+    error_code: i32,
+    workflow_run_id: CString,
+    created_at: i64,
+    updated_at: i64,
+    chunks: CVec<CChatMessageChunkOwned>,
+    extends_json: CString,
+}
+
+impl From<ChatMessage> for CChatMessageOwned {
+    fn from(v: ChatMessage) -> Self {
+        Self {
+            id: v.id,
+            chat_id: v.chat_id,
+            chat_uid: v.chat_uid.into(),
+            agent_id: v.agent_id,
+            agent_name: v.agent_name.into(),
+            agent_uid: v.agent_uid.into(),
+            sender: v.sender.into(),
+            status: v.status,
+            likes: v.likes,
+            parent_message_id: v.parent_message_id,
+            thinking_seconds: v.thinking_seconds,
+            error_code: v.error_code,
+            workflow_run_id: v.workflow_run_id.into(),
+            created_at: v.created_at,
+            updated_at: v.updated_at,
+            chunks: v.chunks.into(),
+            extends_json: serde_json::to_string(&v.extends_data)
+                .unwrap_or_default()
+                .into(),
+        }
+    }
+}
+
+impl ToFFI for CChatMessageOwned {
+    type FFIType = CChatMessage;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CChatMessage {
+            id: self.id,
+            chat_id: self.chat_id,
+            chat_uid: self.chat_uid.to_ffi_type(),
+            agent_id: self.agent_id,
+            agent_name: self.agent_name.to_ffi_type(),
+            agent_uid: self.agent_uid.to_ffi_type(),
+            sender: self.sender.to_ffi_type(),
+            status: self.status,
+            likes: self.likes,
+            parent_message_id: self.parent_message_id,
+            thinking_seconds: self.thinking_seconds,
+            error_code: self.error_code,
+            workflow_run_id: self.workflow_run_id.to_ffi_type(),
+            created_at: self.created_at,
+            updated_at: self.updated_at,
+            chunks: self.chunks.to_ffi_type(),
+            num_chunks: self.chunks.len(),
+            extends_json: self.extends_json.to_ffi_type(),
+        }
+    }
+}
+
+/// Chat summary carried in the `CChatDetail` response
+#[repr(C)]
+pub struct CChatInfo {
+    /// Chat ID
+    pub id: i64,
+    /// Chat name (title)
+    pub name: *const c_char,
+    /// Chat UID
+    pub uid: *const c_char,
+}
+
+#[derive(Debug)]
+pub(crate) struct CChatInfoOwned {
+    id: i64,
+    name: CString,
+    uid: CString,
+}
+
+impl From<ChatInfo> for CChatInfoOwned {
+    fn from(v: ChatInfo) -> Self {
+        Self {
+            id: v.id,
+            name: v.name.into(),
+            uid: v.uid.into(),
+        }
+    }
+}
+
+impl ToFFI for CChatInfoOwned {
+    type FFIType = CChatInfo;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CChatInfo {
+            id: self.id,
+            name: self.name.to_ffi_type(),
+            uid: self.uid.to_ffi_type(),
+        }
+    }
+}
+
+/// Response for `lb_agent_context_chat`
+#[repr(C)]
+pub struct CChatDetail {
+    /// Chat summary
+    pub chat: CChatInfo,
+    /// Agent / permission relation metadata, as a JSON string
+    pub chat_relation_json: *const c_char,
+    /// Messages in the chat
+    pub messages: *const CChatMessage,
+    /// Number of messages in the array
+    pub num_messages: usize,
+}
+
+pub(crate) struct CChatDetailOwned {
+    chat: CChatInfoOwned,
+    chat_relation_json: CString,
+    messages: CVec<CChatMessageOwned>,
+}
+
+impl From<ChatDetail> for CChatDetailOwned {
+    fn from(v: ChatDetail) -> Self {
+        Self {
+            chat: v.chat.into(),
+            chat_relation_json: serde_json::to_string(&v.chat_relation)
+                .unwrap_or_default()
+                .into(),
+            messages: v.messages.into(),
+        }
+    }
+}
+
+impl ToFFI for CChatDetailOwned {
+    type FFIType = CChatDetail;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CChatDetail {
+            chat: self.chat.to_ffi_type(),
+            chat_relation_json: self.chat_relation_json.to_ffi_type(),
+            messages: self.messages.to_ffi_type(),
+            num_messages: self.messages.len(),
+        }
+    }
+}
+
 /// Options for `lb_agent_context_agents` (all fields can be null)
 #[repr(C)]
 pub struct CGetAgentsOptions {
@@ -246,6 +609,18 @@ pub struct CGetAgentsOptions {
     pub limit: *const i32,
     /// Fuzzy search by Agent name (can be null)
     pub name: *const c_char,
+}
+
+/// Options for `lb_agent_context_chats` (all fields can be null)
+#[repr(C)]
+pub struct CGetChatsOptions {
+    /// Page number, starts at 1 (can be null)
+    pub page: *const i32,
+    /// Page size (can be null)
+    pub limit: *const i32,
+    /// Exclude chats belonging to the given Agent UIDs (comma-joined, e.g.
+    /// `dsl_builder`) (can be null)
+    pub exclude_agent_uids: *const c_char,
 }
 
 /// A source referenced by the answer

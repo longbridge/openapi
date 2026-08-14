@@ -3803,6 +3803,128 @@ struct GetAgentsOptions
   std::optional<std::string> name;
 };
 
+/// A chat (conversation) with an Agent.
+struct Chat
+{
+  /// Chat ID
+  int64_t id;
+  /// Chat UID, used as the path parameter of AgentContext::chat
+  std::string uid;
+  /// Chat name (title)
+  std::string name;
+  /// ID of the Agent this chat belongs to
+  int64_t agent_id;
+  /// Name of the Agent this chat belongs to
+  std::string agent_name;
+  /// UID of the Agent this chat belongs to
+  std::string agent_uid;
+  /// Source the chat was created from, e.g. "api"
+  std::string from_source;
+  /// Whether the chat has unread messages
+  bool has_unread;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+  /// Agent / permission relation metadata, as a JSON string
+  std::string chat_relation;
+};
+
+/// Response for AgentContext::chats.
+struct ChatsResponse
+{
+  /// Chat list
+  std::vector<Chat> chats;
+};
+
+/// Options for AgentContext::chats (all fields optional).
+struct GetChatsOptions
+{
+  /// Page number, starts at 1
+  std::optional<int32_t> page;
+  /// Page size
+  std::optional<int32_t> limit;
+  /// Exclude chats belonging to the given Agent UIDs (comma-joined, e.g.
+  /// "dsl_builder")
+  std::optional<std::string> exclude_agent_uids;
+};
+
+/// One content chunk of a ChatMessage.
+struct ChatMessageChunk
+{
+  /// Chunk type, e.g. "text"
+  std::string chunk_type;
+  /// Chunk content
+  std::string content;
+  /// Index of the chunk within the message
+  int32_t index;
+  /// Start time, Unix timestamp in seconds
+  int64_t started_at;
+  /// Stop time, Unix timestamp in seconds
+  int64_t stopped_at;
+};
+
+/// A message within a chat.
+struct ChatMessage
+{
+  /// Message ID
+  int64_t id;
+  /// ID of the owning chat
+  int64_t chat_id;
+  /// UID of the owning chat
+  std::string chat_uid;
+  /// ID of the Agent
+  int64_t agent_id;
+  /// Name of the Agent
+  std::string agent_name;
+  /// UID of the Agent
+  std::string agent_uid;
+  /// Sender, e.g. "user" or "assistant"
+  std::string sender;
+  /// Message status
+  int32_t status;
+  /// Number of likes
+  int32_t likes;
+  /// ID of the parent message; 0 if none
+  int64_t parent_message_id;
+  /// Thinking time in seconds
+  int32_t thinking_seconds;
+  /// Error code; 0 if none
+  int32_t error_code;
+  /// Workflow run ID
+  std::string workflow_run_id;
+  /// Creation time, Unix timestamp in seconds
+  int64_t created_at;
+  /// Last updated time, Unix timestamp in seconds
+  int64_t updated_at;
+  /// Content chunks of the message
+  std::vector<ChatMessageChunk> chunks;
+  /// Extension payload (wire field "extends"), as a JSON string
+  std::string extends_data;
+};
+
+/// Chat summary carried in the ChatDetail response.
+struct ChatInfo
+{
+  /// Chat ID
+  int64_t id;
+  /// Chat name (title)
+  std::string name;
+  /// Chat UID
+  std::string uid;
+};
+
+/// Response for AgentContext::chat.
+struct ChatDetail
+{
+  /// Chat summary
+  ChatInfo chat;
+  /// Agent / permission relation metadata, as a JSON string
+  std::string chat_relation;
+  /// Messages in the chat
+  std::vector<ChatMessage> messages;
+};
+
 /// A source referenced by the answer.
 struct Reference
 {

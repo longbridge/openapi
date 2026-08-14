@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use longbridge::{
-    agent::{self, GetAgentsOptions},
+    agent::{self, GetAgentsOptions, GetChatsOptions},
     blocking::AgentContextSync,
 };
 use parking_lot::Mutex;
@@ -9,7 +9,8 @@ use pyo3::prelude::*;
 
 use crate::{
     agent::types::{
-        AgentsResponse, ConversationResponse, ConversationStreamEvent, WorkspacesResponse,
+        AgentsResponse, ChatDetail, ChatsResponse, ConversationResponse, ConversationStreamEvent,
+        WorkspacesResponse,
     },
     config::Config,
     error::ErrorNewType,
@@ -85,6 +86,40 @@ impl AgentContext {
 
         Ok(py
             .detach(|| self.0.public_agents(Some(opts)))
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// List the current account's chats (conversations) across Agents.
+    #[pyo3(signature = (page = None, limit = None, exclude_agent_uids = None))]
+    fn chats(
+        &self,
+        py: Python<'_>,
+        page: Option<i32>,
+        limit: Option<i32>,
+        exclude_agent_uids: Option<String>,
+    ) -> PyResult<ChatsResponse> {
+        let mut opts = GetChatsOptions::new();
+        if let Some(page) = page {
+            opts = opts.page(page);
+        }
+        if let Some(limit) = limit {
+            opts = opts.limit(limit);
+        }
+        if let Some(exclude_agent_uids) = exclude_agent_uids {
+            opts = opts.exclude_agent_uids(exclude_agent_uids);
+        }
+
+        Ok(py
+            .detach(|| self.0.chats(Some(opts)))
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the detail of a single chat, including its messages.
+    fn chat(&self, py: Python<'_>, chat_uid: String) -> PyResult<ChatDetail> {
+        Ok(py
+            .detach(|| self.0.chat(chat_uid))
             .map_err(ErrorNewType)?
             .into())
     }

@@ -1866,6 +1866,25 @@ typedef struct lb_get_agents_options_t {
 } lb_get_agents_options_t;
 
 /**
+ * Options for `lb_agent_context_chats` (all fields can be null)
+ */
+typedef struct lb_get_chats_options_t {
+  /**
+   * Page number, starts at 1 (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *limit;
+  /**
+   * Exclude chats belonging to the given Agent UIDs (comma-joined, e.g.
+   * `dsl_builder`) (can be null)
+   */
+  const char *exclude_agent_uids;
+} lb_get_chats_options_t;
+
+/**
  * One answer to a [`CInterrupt`] question, used as an entry of
  * [`CAnswersByToolCallEntry::answers`]
  */
@@ -10459,6 +10478,214 @@ typedef struct lb_agents_response_t {
   int32_t total;
 } lb_agents_response_t;
 
+/**
+ * A chat (conversation) with an Agent
+ */
+typedef struct lb_chat_t {
+  /**
+   * Chat ID
+   */
+  int64_t id;
+  /**
+   * Chat UID, used as the path parameter of `lb_agent_context_chat`
+   */
+  const char *uid;
+  /**
+   * Chat name (title)
+   */
+  const char *name;
+  /**
+   * ID of the Agent this chat belongs to
+   */
+  int64_t agent_id;
+  /**
+   * Name of the Agent this chat belongs to
+   */
+  const char *agent_name;
+  /**
+   * UID of the Agent this chat belongs to
+   */
+  const char *agent_uid;
+  /**
+   * Source the chat was created from, e.g. `api`
+   */
+  const char *from_source;
+  /**
+   * Whether the chat has unread messages
+   */
+  bool has_unread;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+  /**
+   * Agent / permission relation metadata, as a JSON string
+   */
+  const char *chat_relation_json;
+} lb_chat_t;
+
+/**
+ * Response for `lb_agent_context_chats`
+ */
+typedef struct lb_chats_response_t {
+  /**
+   * Chat list
+   */
+  const struct lb_chat_t *chats;
+  /**
+   * Number of chats in the array
+   */
+  uintptr_t num_chats;
+} lb_chats_response_t;
+
+/**
+ * One content chunk of a `CChatMessage`
+ */
+typedef struct lb_chat_message_chunk_t {
+  /**
+   * Chunk type, e.g. `text`
+   */
+  const char *chunk_type;
+  /**
+   * Chunk content
+   */
+  const char *content;
+  /**
+   * Index of the chunk within the message
+   */
+  int32_t index;
+  /**
+   * Start time, Unix timestamp in seconds
+   */
+  int64_t started_at;
+  /**
+   * Stop time, Unix timestamp in seconds
+   */
+  int64_t stopped_at;
+} lb_chat_message_chunk_t;
+
+/**
+ * A message within a chat
+ */
+typedef struct lb_chat_message_t {
+  /**
+   * Message ID
+   */
+  int64_t id;
+  /**
+   * ID of the owning chat
+   */
+  int64_t chat_id;
+  /**
+   * UID of the owning chat
+   */
+  const char *chat_uid;
+  /**
+   * ID of the Agent
+   */
+  int64_t agent_id;
+  /**
+   * Name of the Agent
+   */
+  const char *agent_name;
+  /**
+   * UID of the Agent
+   */
+  const char *agent_uid;
+  /**
+   * Sender, e.g. `user` or `assistant`
+   */
+  const char *sender;
+  /**
+   * Message status
+   */
+  int32_t status;
+  /**
+   * Number of likes
+   */
+  int32_t likes;
+  /**
+   * ID of the parent message; 0 if none
+   */
+  int64_t parent_message_id;
+  /**
+   * Thinking time in seconds
+   */
+  int32_t thinking_seconds;
+  /**
+   * Error code; 0 if none
+   */
+  int32_t error_code;
+  /**
+   * Workflow run ID
+   */
+  const char *workflow_run_id;
+  /**
+   * Creation time, Unix timestamp in seconds
+   */
+  int64_t created_at;
+  /**
+   * Last updated time, Unix timestamp in seconds
+   */
+  int64_t updated_at;
+  /**
+   * Content chunks of the message
+   */
+  const struct lb_chat_message_chunk_t *chunks;
+  /**
+   * Number of chunks in the array
+   */
+  uintptr_t num_chunks;
+  /**
+   * Extension payload (wire field `extends`), as a JSON string
+   */
+  const char *extends_json;
+} lb_chat_message_t;
+
+/**
+ * Chat summary carried in the `CChatDetail` response
+ */
+typedef struct lb_chat_info_t {
+  /**
+   * Chat ID
+   */
+  int64_t id;
+  /**
+   * Chat name (title)
+   */
+  const char *name;
+  /**
+   * Chat UID
+   */
+  const char *uid;
+} lb_chat_info_t;
+
+/**
+ * Response for `lb_agent_context_chat`
+ */
+typedef struct lb_chat_detail_t {
+  /**
+   * Chat summary
+   */
+  struct lb_chat_info_t chat;
+  /**
+   * Agent / permission relation metadata, as a JSON string
+   */
+  const char *chat_relation_json;
+  /**
+   * Messages in the chat
+   */
+  const struct lb_chat_message_t *messages;
+  /**
+   * Number of messages in the array
+   */
+  uintptr_t num_messages;
+} lb_chat_detail_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -10500,6 +10727,28 @@ void lb_agent_context_public_agents(const struct lb_agent_context_t *ctx,
                                     const struct lb_get_agents_options_t *opts,
                                     lb_async_callback_t callback,
                                     void *userdata);
+
+/**
+ * List the current account's chats (conversations) across Agents. Returns
+ * `CChatsResponse`.
+ *
+ * @param[in] opts Options for the request (can be null)
+ */
+void lb_agent_context_chats(const struct lb_agent_context_t *ctx,
+                            const struct lb_get_chats_options_t *opts,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Get the detail of a single chat, including its messages. Returns
+ * `CChatDetail`.
+ *
+ * @param[in] chat_uid Chat UID
+ */
+void lb_agent_context_chat(const struct lb_agent_context_t *ctx,
+                           const char *chat_uid,
+                           lb_async_callback_t callback,
+                           void *userdata);
 
 /**
  * Start a conversation with the specified Agent, blocking until the run

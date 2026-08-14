@@ -342,6 +342,13 @@ cpp_compat = true
 "CAgent" = "lb_agent_t"
 "CAgentsResponse" = "lb_agents_response_t"
 "CGetAgentsOptions" = "lb_get_agents_options_t"
+"CChat" = "lb_chat_t"
+"CChatsResponse" = "lb_chats_response_t"
+"CGetChatsOptions" = "lb_get_chats_options_t"
+"CChatMessageChunk" = "lb_chat_message_chunk_t"
+"CChatMessage" = "lb_chat_message_t"
+"CChatInfo" = "lb_chat_info_t"
+"CChatDetail" = "lb_chat_detail_t"
 "CReference" = "lb_reference_t"
 "CQuestionOption" = "lb_question_option_t"
 "CQuestion" = "lb_question_t"
@@ -510,4 +517,6 @@ include = [
     # callback data pointer, not from any genuinely-typed function signature,
     # so cbindgen can't discover them transitively — force their emission.
     "CWorkspace", "CWorkspacesResponse", "CAgent", "CAgentsResponse",
+    "CChat", "CChatsResponse", "CChatMessageChunk", "CChatMessage", "CChatInfo",
+    "CChatDetail",
 ]
