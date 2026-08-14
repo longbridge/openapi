@@ -128,6 +128,11 @@ public:
     const EstimateMaxPurchaseQuantityOptions& opts,
     AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse> callback)
     const;
+
+  /// Set grid order changed callback, after receiving the grid order changed
+  /// event, it will call back to this function.
+  void set_on_grid_order_changed(
+    PushCallback<TradeContext, PushGridOrderChanged> callback) const;
 };
 
 } // namespace trade

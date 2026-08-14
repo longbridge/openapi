@@ -986,6 +986,273 @@ impl_java_class!(
     [cash_max_qty, margin_max_qty]
 );
 
+// ── Grid trading types ────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/grid/SubmitGridOrderResponse",
+    longbridge::grid::SubmitGridOrderResponse,
+    [order_id]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrder",
+    longbridge::grid::GridOrder,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        market,
+        status,
+        grid_status,
+        submitted_base_price,
+        current_base_price,
+        pre_trigger_base_price,
+        post_trigger_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        trigger_sell_order_type,
+        trigger_buy_order_type,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        multiple_trigger,
+        trigger_times,
+        total_buy_quantity,
+        total_sell_quantity,
+        total_profit_balance,
+        settlement_currency,
+        time_in_force,
+        gtd,
+        created_at,
+        rth,
+        support_shortsell,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderSubOrder",
+    longbridge::grid::GridOrderSubOrder,
+    [
+        id,
+        price,
+        order_type,
+        quantity,
+        executed_qty,
+        action,
+        status,
+        submitted_at,
+        rth
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderHistory",
+    longbridge::grid::GridOrderHistory,
+    [history_id, created_at, status, suspend_reason, reason]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderDetail",
+    longbridge::grid::GridOrderDetail,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        status,
+        grid_status,
+        suspend_reason,
+        sleeping_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        multiple_trigger,
+        time_in_force,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        created_at,
+        updated_at,
+        settlement_currency,
+        expire_time,
+        gtd,
+        #[java(objarray)]
+        grid_sub_orders,
+        sub_has_more,
+        #[java(objarray)]
+        grid_order_history,
+        history_has_more,
+        support_shortsell,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/TriggerOrder",
+    longbridge::grid::TriggerOrder,
+    [
+        id,
+        status,
+        name,
+        symbol,
+        price,
+        quantity,
+        executed_price,
+        executed_qty,
+        submitted_at,
+        action,
+        order_type,
+        trigger_price,
+        msg,
+        currency,
+        last_done,
+        updated_at,
+        time_in_force,
+        gtd,
+        trigger_at,
+        trigger_status
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridBidSize",
+    longbridge::grid::GridBidSize,
+    [str_proceed, end_proceed, bid_size]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridChannelInfo",
+    longbridge::grid::GridChannelInfo,
+    [
+        strategy_granted,
+        support_rth,
+        currency,
+        #[java(objarray)]
+        settlement_currency
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridSymbolInfo",
+    longbridge::grid::GridSymbolInfo,
+    [
+        name,
+        last_done,
+        lot_size,
+        buy_lot_size,
+        sell_lot_size,
+        #[java(objarray)]
+        bid_sizes,
+        channel_info
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/PushGridOrderChanged",
+    longbridge::trade::PushGridOrderChanged,
+    [
+        order_id,
+        status,
+        symbol,
+        suspend_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_quantity,
+        settlement_currency,
+        time_in_force,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+// Mirror the grid list / trigger-history responses with binding-side structs so
+// the `has_more` paging flag can be flattened alongside the item array.
+pub(crate) struct GridOrdersResponse {
+    grid_order: Vec<longbridge::grid::GridOrder>,
+    has_more: bool,
+}
+
+impl GridOrdersResponse {
+    pub(crate) fn new(grid_order: Vec<longbridge::grid::GridOrder>, has_more: bool) -> Self {
+        Self {
+            grid_order,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrdersResponse",
+    GridOrdersResponse,
+    [
+        #[java(objarray)]
+        grid_order,
+        has_more
+    ]
+);
+
+pub(crate) struct GridTriggerHistoryResponse {
+    trigger_orders: Vec<longbridge::grid::TriggerOrder>,
+    has_more: bool,
+}
+
+impl GridTriggerHistoryResponse {
+    pub(crate) fn new(trigger_orders: Vec<longbridge::grid::TriggerOrder>, has_more: bool) -> Self {
+        Self {
+            trigger_orders,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/grid/GridTriggerHistoryResponse",
+    GridTriggerHistoryResponse,
+    [
+        #[java(objarray)]
+        trigger_orders,
+        has_more
+    ]
+);
+
 impl_java_class!(
     "com/longbridge/quote/QuotePackageDetail",
     longbridge::quote::QuotePackageDetail,
