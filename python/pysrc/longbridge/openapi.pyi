@@ -9798,7 +9798,7 @@ class CompanyOverview:
     year_end: str
     """Fiscal year end"""
     employees: str
-    """Number of employees"""
+    """Number of employees (returned as a string by the API, e.g. "10000")"""
     phone: str
     """Phone number"""
     fax: str

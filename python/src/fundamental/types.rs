@@ -959,7 +959,7 @@ pub(crate) struct CompanyOverview {
     pub category: String,
     /// Fiscal year end
     pub year_end: String,
-    /// Number of employees
+    /// Number of employees (returned as a string by the API, e.g. `"10000"`)
     pub employees: String,
     /// Phone number
     pub phone: String,
