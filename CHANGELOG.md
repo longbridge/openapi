@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All languages:** the AI Agent streamed conversation no longer errors mid-run when the server sends an explicit `"outputs": null`. `WorkflowFinishedPayload.outputs`, `NodeToolUseFinishedPayload.outputs`, and `SubagentFinishedPayload.outputs` were annotated `#[serde(default)]`, which only covers a *missing* key, not an explicit `null` — so a `workflow_finished` / `node_tool_use_finished` / `subagent_finished` event carrying `null` outputs failed to deserialize and aborted the whole event stream (`invalid type: null, expected struct WorkflowOutputs`). These fields now map `null` to the type's default
 - **All languages:** likewise, list-typed fields on the streamed AI Agent event payloads no longer error on an explicit `null` (`invalid type: null, expected a sequence`). `tip_chips` (on the node / subagent / agent-tool `*_started` payloads), `WorkflowFinishedPayload.process_data`, and `SubagentStartedPayload.tools` were `#[serde(default)]`, which does not accept an explicit `null`; they now deserialize `null` to an empty list
+- **All languages:** clarified that `CompanyOverview.employees` is typed as a **string** (not an integer) across all SDK languages — the Longbridge API returns this field as a JSON string (e.g. `"10000"`). Doc comments have been updated to make this explicit and prevent downstream tools from incorrectly treating the value as an integer
 
 ## [4.5.0] - 2026-08-14
 
