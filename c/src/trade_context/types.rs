@@ -4,12 +4,13 @@ use longbridge::{
     Market,
     trade::{
         AccountBalance, AllExecutionsResponse, AttachedOrderDetail, AttachedOrderType, BalanceType,
-        CashFlow, CashFlowDirection, CashInfo, EstimateMaxPurchaseQuantityResponse, Execution,
-        FrozenTransactionFee, FundPosition, FundPositionChannel, FundPositionsResponse,
-        MarginRatio, Order, OrderChargeDetail, OrderChargeFee, OrderChargeItem, OrderDetail,
-        OrderHistoryDetail, OrderSide, OrderStatus, OrderTag, OrderType, PushOrderChanged,
-        StockPosition, StockPositionChannel, StockPositionsResponse, SubmitOrderResponse,
-        TimeInForceType,
+        CashFlow, CashFlowDirection, CashInfo, ContractDirection,
+        EstimateMaxPurchaseQuantityResponse, Execution, FrozenTransactionFee, FundPosition,
+        FundPositionChannel, FundPositionsResponse, MarginRatio, MultiLegInfo, MultiLegOrderLeg,
+        MultiLegPosition, MultiLegStrategy, Order, OrderChargeDetail, OrderChargeFee,
+        OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag,
+        OrderType, PushOrderChanged, StockPosition, StockPositionChannel, StockPositionsResponse,
+        SubmitOrderResponse, TimeInForceType,
     },
 };
 use time::OffsetDateTime;
@@ -17,8 +18,8 @@ use time::OffsetDateTime;
 use crate::{
     trade_context::enum_types::{
         CBalanceType, CCashFlowDirection, CChargeCategoryCode, CCommissionFreeStatus,
-        CDeductionStatus, COrderSide, COrderStatus, COrderTag, COrderType, COutsideRTH,
-        CTimeInForceType, CTriggerStatus,
+        CContractDirection, CDeductionStatus, CMultiLegPosition, CMultiLegStrategy, COrderSide,
+        COrderStatus, COrderTag, COrderType, COutsideRTH, CTimeInForceType, CTriggerStatus,
     },
     types::{CDate, CDecimal, CMarket, CString, CVec, ToFFI},
 };
@@ -257,6 +258,180 @@ impl ToFFI for CAttachedOrderDetailOwned {
     }
 }
 
+/// A leg of a multi-leg combination order
+#[repr(C)]
+pub struct CMultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    pub symbol: *const c_char,
+    /// Order side
+    pub side: COrderSide,
+    /// Position direction
+    pub position: CMultiLegPosition,
+    /// Leg ratio quantity
+    pub ratio_quantity: *const CDecimal,
+    /// Strike price (maybe null)
+    pub strike_price: *const CDecimal,
+    /// Option expiry date (maybe null)
+    pub expire_date: *const CDate,
+    /// Contract type
+    pub contract_direction: CContractDirection,
+    /// Contract size (maybe null)
+    pub contract_size: *const CDecimal,
+}
+
+#[derive(Debug)]
+pub(crate) struct CMultiLegOrderLegOwned {
+    symbol: CString,
+    side: OrderSide,
+    position: MultiLegPosition,
+    ratio_quantity: CDecimal,
+    strike_price: Option<CDecimal>,
+    expire_date: Option<CDate>,
+    contract_direction: ContractDirection,
+    contract_size: Option<CDecimal>,
+}
+
+impl From<MultiLegOrderLeg> for CMultiLegOrderLegOwned {
+    fn from(leg: MultiLegOrderLeg) -> Self {
+        let MultiLegOrderLeg {
+            symbol,
+            side,
+            position,
+            ratio_quantity,
+            strike_price,
+            expire_date,
+            contract_direction,
+            contract_size,
+        } = leg;
+        Self {
+            symbol: symbol.into(),
+            side,
+            position,
+            ratio_quantity: ratio_quantity.into(),
+            strike_price: strike_price.map(Into::into),
+            expire_date: expire_date.map(Into::into),
+            contract_direction,
+            contract_size: contract_size.map(Into::into),
+        }
+    }
+}
+
+impl ToFFI for CMultiLegOrderLegOwned {
+    type FFIType = CMultiLegOrderLeg;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CMultiLegOrderLegOwned {
+            symbol,
+            side,
+            position,
+            ratio_quantity,
+            strike_price,
+            expire_date,
+            contract_direction,
+            contract_size,
+        } = self;
+        CMultiLegOrderLeg {
+            symbol: symbol.to_ffi_type(),
+            side: (*side).into(),
+            position: (*position).into(),
+            ratio_quantity: ratio_quantity.to_ffi_type(),
+            strike_price: strike_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            expire_date: expire_date
+                .as_ref()
+                .map(|value| value as *const CDate)
+                .unwrap_or(std::ptr::null()),
+            contract_direction: (*contract_direction).into(),
+            contract_size: contract_size
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+        }
+    }
+}
+
+/// Multi-leg strategy information
+#[repr(C)]
+pub struct CMultiLegInfo {
+    /// Multi-leg strategy
+    pub strategy: CMultiLegStrategy,
+    /// Strategy name
+    pub strategy_name: *const c_char,
+    /// Multi-leg combination ID
+    pub multileg_id: *const c_char,
+    /// Multi-leg combination code
+    pub code: *const c_char,
+    /// Legs of the combination order
+    pub legs: *const CMultiLegOrderLeg,
+    /// Number of legs
+    pub num_legs: usize,
+}
+
+impl Default for CMultiLegInfo {
+    fn default() -> Self {
+        Self {
+            strategy: CMultiLegStrategy::MultiLegStrategyUnknown,
+            strategy_name: std::ptr::null(),
+            multileg_id: std::ptr::null(),
+            code: std::ptr::null(),
+            legs: std::ptr::null(),
+            num_legs: 0,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct CMultiLegInfoOwned {
+    strategy: MultiLegStrategy,
+    strategy_name: CString,
+    multileg_id: CString,
+    code: CString,
+    legs: CVec<CMultiLegOrderLegOwned>,
+}
+
+impl From<MultiLegInfo> for CMultiLegInfoOwned {
+    fn from(info: MultiLegInfo) -> Self {
+        let MultiLegInfo {
+            strategy,
+            strategy_name,
+            multileg_id,
+            code,
+            legs,
+        } = info;
+        Self {
+            strategy,
+            strategy_name: strategy_name.into(),
+            multileg_id: multileg_id.into(),
+            code: code.into(),
+            legs: legs.into(),
+        }
+    }
+}
+
+impl ToFFI for CMultiLegInfoOwned {
+    type FFIType = CMultiLegInfo;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CMultiLegInfoOwned {
+            strategy,
+            strategy_name,
+            multileg_id,
+            code,
+            legs,
+        } = self;
+        CMultiLegInfo {
+            strategy: (*strategy).into(),
+            strategy_name: strategy_name.to_ffi_type(),
+            multileg_id: multileg_id.to_ffi_type(),
+            code: code.to_ffi_type(),
+            legs: legs.to_ffi_type(),
+            num_legs: legs.len(),
+        }
+    }
+}
+
 /// Options for submit attached order params
 #[derive(Debug)]
 #[repr(C)]
@@ -370,6 +545,11 @@ pub struct CPushOrderChanged {
     pub last_price: *const CDecimal,
     /// Remark message
     pub remark: *const c_char,
+    /// Whether multi_leg is valid (true only for multi-leg option combination
+    /// orders)
+    pub has_multi_leg: bool,
+    /// Multi-leg strategy information (only valid when has_multi_leg is true)
+    pub multi_leg: CMultiLegInfo,
 }
 
 pub struct CPushOrderChangedOwned {
@@ -399,6 +579,7 @@ pub struct CPushOrderChangedOwned {
     last_price: Option<CDecimal>,
     /// Remark message
     pub remark: CString,
+    multi_leg: Option<CMultiLegInfoOwned>,
 }
 
 impl From<PushOrderChanged> for CPushOrderChangedOwned {
@@ -429,6 +610,7 @@ impl From<PushOrderChanged> for CPushOrderChangedOwned {
             last_share,
             last_price,
             remark,
+            multi_leg,
         } = order_changed;
         CPushOrderChangedOwned {
             side,
@@ -456,6 +638,7 @@ impl From<PushOrderChanged> for CPushOrderChangedOwned {
             last_share: last_share.map(Into::into),
             last_price: last_price.map(Into::into),
             remark: remark.into(),
+            multi_leg: multi_leg.map(Into::into),
         }
     }
 }
@@ -490,6 +673,7 @@ impl ToFFI for CPushOrderChangedOwned {
             last_share,
             last_price,
             remark,
+            multi_leg,
         } = self;
         CPushOrderChanged {
             side: (*side).into(),
@@ -544,6 +728,11 @@ impl ToFFI for CPushOrderChangedOwned {
                 .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
+            has_multi_leg: multi_leg.is_some(),
+            multi_leg: multi_leg
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
         }
     }
 }
@@ -765,6 +954,11 @@ pub struct COrder {
     pub attached_orders: *const CAttachedOrderDetail,
     /// Number of attached orders
     pub num_attached_orders: usize,
+    /// Whether multi_leg is valid (true only for multi-leg option combination
+    /// orders)
+    pub has_multi_leg: bool,
+    /// Multi-leg strategy information (only valid when has_multi_leg is true)
+    pub multi_leg: CMultiLegInfo,
 }
 
 #[derive(Debug)]
@@ -799,6 +993,7 @@ pub(crate) struct COrderOwned {
     monitor_price: Option<CDecimal>,
     remark: CString,
     attached_orders: CVec<CAttachedOrderDetailOwned>,
+    multi_leg: Option<CMultiLegInfoOwned>,
 }
 
 impl From<Order> for COrderOwned {
@@ -834,6 +1029,7 @@ impl From<Order> for COrderOwned {
             monitor_price,
             remark,
             attached_orders,
+            multi_leg,
         } = order;
         COrderOwned {
             order_id: order_id.into(),
@@ -866,6 +1062,7 @@ impl From<Order> for COrderOwned {
             monitor_price: monitor_price.map(Into::into),
             remark: remark.into(),
             attached_orders: attached_orders.into(),
+            multi_leg: multi_leg.map(Into::into),
         }
     }
 }
@@ -905,6 +1102,7 @@ impl ToFFI for COrderOwned {
             monitor_price,
             remark,
             attached_orders,
+            multi_leg,
         } = self;
         COrder {
             order_id: order_id.to_ffi_type(),
@@ -983,6 +1181,11 @@ impl ToFFI for COrderOwned {
             remark: remark.to_ffi_type(),
             attached_orders: attached_orders.to_ffi_type(),
             num_attached_orders: attached_orders.len(),
+            has_multi_leg: multi_leg.is_some(),
+            multi_leg: multi_leg
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
         }
     }
 }
@@ -1130,6 +1333,41 @@ impl ToFFI for CSubmitOrderResponseOwned {
             order_id: self.order_id.to_ffi_type(),
         }
     }
+}
+
+/// A leg of a multi-leg combination order to submit
+#[repr(C)]
+pub struct CSubmitMultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
+    pub symbol: *const c_char,
+    /// Leg ratio quantity
+    pub ratio_quantity: *const CDecimal,
+}
+
+/// Options for submit multi-leg order request
+#[repr(C)]
+pub struct CSubmitMultiLegOrderOptions {
+    /// Order side
+    pub side: COrderSide,
+    /// Order type
+    pub order_type: COrderType,
+    /// Submitted quantity (number of combinations)
+    pub submitted_quantity: *const CDecimal,
+    /// Multi-leg strategy
+    pub strategy: CMultiLegStrategy,
+    /// Legs of the combination order
+    pub legs: *const CSubmitMultiLegOrderLeg,
+    /// Number of legs
+    pub num_legs: usize,
+    /// Submitted price (required for limit order types such as `LO`) (can be
+    /// null)
+    pub submitted_price: *const CDecimal,
+    /// Remark (Maximum 255 characters) (can be null)
+    pub remark: *const c_char,
+    /// Idempotent request ID for preventing duplicate orders (can be null).
+    /// If not specified, idempotency control is skipped.
+    /// The server caches this ID for 10 minutes.
+    pub client_request_id: *const c_char,
 }
 
 /// Account balance
@@ -2165,6 +2403,11 @@ pub struct COrderDetail {
     pub attached_orders: *const CAttachedOrderDetail,
     /// Number of attached orders
     pub num_attached_orders: usize,
+    /// Whether multi_leg is valid (true only for multi-leg option combination
+    /// orders)
+    pub has_multi_leg: bool,
+    /// Multi-leg strategy information (only valid when has_multi_leg is true)
+    pub multi_leg: CMultiLegInfo,
 }
 
 #[derive(Debug)]
@@ -2210,6 +2453,7 @@ pub(crate) struct COrderDetailOwned {
     history: CVec<COrderHistoryDetailOwned>,
     charge_detail: Option<COrderChargeDetailOwned>,
     attached_orders: CVec<CAttachedOrderDetailOwned>,
+    multi_leg: Option<CMultiLegInfoOwned>,
 }
 
 impl From<OrderDetail> for COrderDetailOwned {
@@ -2256,6 +2500,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             history,
             charge_detail,
             attached_orders,
+            multi_leg,
         } = order;
         COrderDetailOwned {
             order_id: order_id.into(),
@@ -2299,6 +2544,7 @@ impl From<OrderDetail> for COrderDetailOwned {
             history: history.into(),
             charge_detail: charge_detail.map(Into::into),
             attached_orders: attached_orders.into(),
+            multi_leg: multi_leg.map(Into::into),
         }
     }
 }
@@ -2349,6 +2595,7 @@ impl ToFFI for COrderDetailOwned {
             history,
             charge_detail,
             attached_orders,
+            multi_leg,
         } = self;
         COrderDetail {
             order_id: order_id.to_ffi_type(),
@@ -2461,6 +2708,11 @@ impl ToFFI for COrderDetailOwned {
                 .unwrap_or_default(),
             attached_orders: attached_orders.to_ffi_type(),
             num_attached_orders: attached_orders.len(),
+            has_multi_leg: multi_leg.is_some(),
+            multi_leg: multi_leg
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
+                .unwrap_or_default(),
         }
     }
 }

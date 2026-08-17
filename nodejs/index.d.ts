@@ -1014,6 +1014,44 @@ export declare class MarketTradingSession {
   get tradeSessions(): Array<TradingSessionInfo>
 }
 
+/** Multi-leg strategy information */
+export declare class MultiLegInfo {
+  toString(): string
+  toJSON(): any
+  /** Multi-leg strategy */
+  get strategy(): MultiLegStrategy
+  /** Strategy name */
+  get strategyName(): string
+  /** Multi-leg combination ID */
+  get multilegId(): string
+  /** Multi-leg combination code */
+  get code(): string
+  /** Legs of the combination order */
+  get legs(): Array<MultiLegOrderLeg>
+}
+
+/** A leg of a multi-leg combination order */
+export declare class MultiLegOrderLeg {
+  toString(): string
+  toJSON(): any
+  /** Option symbol, in `ticker.region` format */
+  get symbol(): string
+  /** Order side */
+  get side(): OrderSide
+  /** Position direction */
+  get position(): MultiLegPosition
+  /** Leg ratio quantity */
+  get ratioQuantity(): Decimal
+  /** Strike price */
+  get strikePrice(): Decimal | null
+  /** Option expiry date */
+  get expireDate(): NaiveDate | null
+  /** Contract type */
+  get contractDirection(): ContractDirection
+  /** Contract size */
+  get contractSize(): Decimal | null
+}
+
 /** Naive date type */
 export declare class NaiveDate {
   constructor(year: number, month: number, day: number)
@@ -1238,6 +1276,11 @@ export declare class Order {
   get remark(): string
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Order charge detail */
@@ -1364,6 +1407,11 @@ export declare class OrderDetail {
   get chargeDetail(): OrderChargeDetail | null
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Order history detail */
@@ -1598,6 +1646,11 @@ export declare class PushOrderChanged {
   get lastPrice(): Decimal | null
   /** Remark message */
   get remark(): string
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Push real-time quote */
@@ -2793,6 +2846,8 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
+  /** Get all executions */
+  allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
    *
@@ -2898,6 +2953,40 @@ export declare class TradeContext {
    * ```
    */
   submitOrder(opts: SubmitOrderOptions): Promise<SubmitOrderResponse>
+  /**
+   * Submit a multi-leg option combination order (such as vertical spreads,
+   * straddles, strangles, collars, etc.). All legs are submitted together
+   * as a single strategy order.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const {
+   *   OAuth, Config,
+   *   TradeContext,
+   *   OrderType,
+   *   OrderSide,
+   *   Decimal,
+   *   MultiLegStrategy,
+   * } = require('longbridge');
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.submitMultileg({
+   *   side: OrderSide.Buy,
+   *   orderType: OrderType.LO,
+   *   submittedQuantity: new Decimal("1"),
+   *   strategy: MultiLegStrategy.VerticalCallSpread,
+   *   submittedPrice: new Decimal("1.5"),
+   *   legs: [
+   *     { symbol: "QQQ260731C764000.US", ratioQuantity: new Decimal("1") },
+   *     { symbol: "QQQ260731C767000.US", ratioQuantity: new Decimal("1") },
+   *   ],
+   * });
+   * console.log(resp.toString());
+   * ```
+   */
+  submitMultileg(opts: SubmitMultiLegOrderOptions): Promise<SubmitOrderResponse>
   /**
    * Cancel order
    *
@@ -4055,6 +4144,16 @@ export interface ContextCompressStartedPayload {
   startedAt: string
   /** Compression input summary */
   inputs?: any
+}
+
+/** Option contract type */
+export declare const enum ContractDirection {
+  /** Unknown */
+  Unknown = 0,
+  /** Call */
+  Call = 1,
+  /** Put */
+  Put = 2
 }
 
 /**
@@ -5286,6 +5385,36 @@ export interface MultiLanguageText {
   english: string
   simplifiedChinese: string
   traditionalChinese: string
+}
+
+/** Multi-leg position direction */
+export declare const enum MultiLegPosition {
+  /** Unknown */
+  Unknown = 0,
+  /** Long */
+  Long = 1,
+  /** Short */
+  Short = 2
+}
+
+/** Multi-leg strategy */
+export declare const enum MultiLegStrategy {
+  /** Unknown */
+  Unknown = 0,
+  /** Covered call (covered stock) */
+  CoveredCall = 1,
+  /** Covered put (covered stock) */
+  CoveredPut = 2,
+  /** Vertical call spread */
+  VerticalCallSpread = 3,
+  /** Vertical put spread */
+  VerticalPutSpread = 4,
+  /** Collar */
+  Collar = 5,
+  /** Straddle */
+  Straddle = 6,
+  /** Strangle */
+  Strangle = 7
 }
 
 /** Options for listing topics created by the current authenticated user */
@@ -6557,6 +6686,38 @@ export interface SubmitAttachedParams {
   stopLossSubmitPrice?: Decimal
   /** Activate RTH */
   activateRth?: OutsideRTH
+}
+
+/** A leg of a multi-leg combination order to submit */
+export interface SubmitMultiLegOrderLeg {
+  /** Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`) */
+  symbol: string
+  /** Leg ratio quantity */
+  ratioQuantity: Decimal
+}
+
+/** Options for submit multi-leg order request */
+export interface SubmitMultiLegOrderOptions {
+  /** Order side */
+  side: OrderSide
+  /** Order type */
+  orderType: OrderType
+  /** Submitted quantity (number of combinations) */
+  submittedQuantity: Decimal
+  /** Multi-leg strategy */
+  strategy: MultiLegStrategy
+  /** Legs of the combination order */
+  legs: Array<SubmitMultiLegOrderLeg>
+  /** Submitted price (required for limit order types such as `LO`) */
+  submittedPrice?: Decimal
+  /** Remark (Maximum 255 characters) */
+  remark?: string
+  /**
+   * Client request ID for idempotency control.
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  clientRequestId?: string
 }
 
 /** Options for submit order request */

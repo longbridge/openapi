@@ -88,7 +88,12 @@ using longbridge::trade::FundPositionsResponse;
 using longbridge::trade::GetHistoryExecutionsOptions;
 using longbridge::trade::GetHistoryOrdersOptions;
 using longbridge::trade::GetTodayExecutionsOptions;
+using longbridge::trade::ContractDirection;
 using longbridge::trade::MarginRatio;
+using longbridge::trade::MultiLegInfo;
+using longbridge::trade::MultiLegOrderLeg;
+using longbridge::trade::MultiLegPosition;
+using longbridge::trade::MultiLegStrategy;
 using longbridge::trade::Order;
 using longbridge::trade::OrderChargeDetail;
 using longbridge::trade::OrderChargeFee;
@@ -106,6 +111,8 @@ using longbridge::trade::StockPosition;
 using longbridge::trade::StockPositionChannel;
 using longbridge::trade::StockPositionsResponse;
 using longbridge::trade::SubmitAttachedParams;
+using longbridge::trade::SubmitMultiLegOrderLeg;
+using longbridge::trade::SubmitMultiLegOrderOptions;
 using longbridge::trade::SubmitOrderResponse;
 using longbridge::trade::TimeInForceType;
 using longbridge::trade::TopicType;
@@ -1452,6 +1459,117 @@ convert_replace_attached(const ReplaceAttachedParams& src)
   return s;
 }
 
+inline MultiLegStrategy
+convert(CMultiLegStrategy strategy)
+{
+  switch (strategy) {
+    case MultiLegStrategyUnknown:
+      return MultiLegStrategy::Unknown;
+    case MultiLegStrategyCoveredCall:
+      return MultiLegStrategy::CoveredCall;
+    case MultiLegStrategyCoveredPut:
+      return MultiLegStrategy::CoveredPut;
+    case MultiLegStrategyVerticalCallSpread:
+      return MultiLegStrategy::VerticalCallSpread;
+    case MultiLegStrategyVerticalPutSpread:
+      return MultiLegStrategy::VerticalPutSpread;
+    case MultiLegStrategyCollar:
+      return MultiLegStrategy::Collar;
+    case MultiLegStrategyStraddle:
+      return MultiLegStrategy::Straddle;
+    case MultiLegStrategyStrangle:
+      return MultiLegStrategy::Strangle;
+    default:
+      return MultiLegStrategy::Unknown;
+  }
+}
+
+inline CMultiLegStrategy
+convert(MultiLegStrategy strategy)
+{
+  switch (strategy) {
+    case MultiLegStrategy::Unknown:
+      return MultiLegStrategyUnknown;
+    case MultiLegStrategy::CoveredCall:
+      return MultiLegStrategyCoveredCall;
+    case MultiLegStrategy::CoveredPut:
+      return MultiLegStrategyCoveredPut;
+    case MultiLegStrategy::VerticalCallSpread:
+      return MultiLegStrategyVerticalCallSpread;
+    case MultiLegStrategy::VerticalPutSpread:
+      return MultiLegStrategyVerticalPutSpread;
+    case MultiLegStrategy::Collar:
+      return MultiLegStrategyCollar;
+    case MultiLegStrategy::Straddle:
+      return MultiLegStrategyStraddle;
+    case MultiLegStrategy::Strangle:
+      return MultiLegStrategyStrangle;
+    default:
+      return MultiLegStrategyUnknown;
+  }
+}
+
+inline MultiLegPosition
+convert(CMultiLegPosition position)
+{
+  switch (position) {
+    case MultiLegPositionUnknown:
+      return MultiLegPosition::Unknown;
+    case MultiLegPositionLong:
+      return MultiLegPosition::Long;
+    case MultiLegPositionShort:
+      return MultiLegPosition::Short;
+    default:
+      return MultiLegPosition::Unknown;
+  }
+}
+
+inline ContractDirection
+convert(CContractDirection direction)
+{
+  switch (direction) {
+    case ContractDirectionUnknown:
+      return ContractDirection::Unknown;
+    case ContractDirectionCall:
+      return ContractDirection::Call;
+    case ContractDirectionPut:
+      return ContractDirection::Put;
+    default:
+      return ContractDirection::Unknown;
+  }
+}
+
+inline MultiLegOrderLeg
+convert(const CMultiLegOrderLeg* leg)
+{
+  return MultiLegOrderLeg{
+    leg->symbol,
+    convert(leg->side),
+    convert(leg->position),
+    Decimal(leg->ratio_quantity),
+    leg->strike_price ? std::optional{ Decimal(leg->strike_price) }
+                      : std::nullopt,
+    leg->expire_date ? std::optional{ convert(leg->expire_date) } : std::nullopt,
+    convert(leg->contract_direction),
+    leg->contract_size ? std::optional{ Decimal(leg->contract_size) }
+                       : std::nullopt,
+  };
+}
+
+inline MultiLegInfo
+convert(const CMultiLegInfo* info)
+{
+  std::vector<MultiLegOrderLeg> legs;
+  std::transform(info->legs,
+                 info->legs + info->num_legs,
+                 std::back_inserter(legs),
+                 [](auto& item) { return convert(&item); });
+  return MultiLegInfo{
+    convert(info->strategy), info->strategy_name, info->multileg_id,
+    info->code,              legs,
+  };
+}
+
 inline Order
 convert(const lb_order_t* order)
 {
@@ -1503,6 +1621,8 @@ convert(const lb_order_t* order)
                          : std::nullopt,
     order->remark,
     attached_orders,
+    order->has_multi_leg ? std::optional{ convert(&order->multi_leg) }
+                         : std::nullopt,
   };
 }
 
@@ -1740,6 +1860,8 @@ convert(const lb_push_order_changed_t* info)
     info->last_price ? std::optional{ Decimal(info->last_price) }
                      : std::nullopt,
     info->remark,
+    info->has_multi_leg ? std::optional{ convert(&info->multi_leg) }
+                        : std::nullopt,
   };
 }
 
@@ -1953,6 +2075,8 @@ convert(const lb_order_detail_t* order)
     history,
     order->has_charge_detail ? std::optional{ convert(&order->charge_detail) } : std::nullopt,
     attached_orders,
+    order->has_multi_leg ? std::optional{ convert(&order->multi_leg) }
+                         : std::nullopt,
   };
 }
 

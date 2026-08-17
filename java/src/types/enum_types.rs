@@ -460,6 +460,33 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/trade/MultiLegStrategy",
+    longbridge::trade::MultiLegStrategy,
+    [
+        Unknown,
+        CoveredCall,
+        CoveredPut,
+        VerticalCallSpread,
+        VerticalPutSpread,
+        Collar,
+        Straddle,
+        Strangle
+    ]
+);
+
+impl_java_enum!(
+    "com/longbridge/trade/MultiLegPosition",
+    longbridge::trade::MultiLegPosition,
+    [Unknown, Long, Short]
+);
+
+impl_java_enum!(
+    "com/longbridge/trade/ContractDirection",
+    longbridge::trade::ContractDirection,
+    [Unknown, Call, Put]
+);
+
+impl_java_enum!(
     "com/longbridge/alert/AlertCondition",
     longbridge::alert::types::AlertCondition,
     [PriceRise, PriceFall, PercentRise, PercentFall]

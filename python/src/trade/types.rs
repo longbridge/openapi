@@ -396,6 +396,99 @@ impl ReplaceAttachedParams {
     }
 }
 
+/// Multi-leg strategy
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::MultiLegStrategy")]
+pub(crate) enum MultiLegStrategy {
+    /// Unknown
+    Unknown,
+    /// Covered call (covered stock)
+    CoveredCall,
+    /// Covered put (covered stock)
+    CoveredPut,
+    /// Vertical call spread
+    VerticalCallSpread,
+    /// Vertical put spread
+    VerticalPutSpread,
+    /// Collar
+    Collar,
+    /// Straddle
+    Straddle,
+    /// Strangle
+    Strangle,
+}
+
+/// Multi-leg position direction
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::MultiLegPosition")]
+pub(crate) enum MultiLegPosition {
+    /// Unknown
+    Unknown,
+    /// Long
+    Long,
+    /// Short
+    Short,
+}
+
+/// Option contract type
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::trade::ContractDirection")]
+pub(crate) enum ContractDirection {
+    /// Unknown
+    Unknown,
+    /// Call
+    Call,
+    /// Put
+    Put,
+}
+
+/// A leg of a multi-leg combination order
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::MultiLegOrderLeg")]
+pub(crate) struct MultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    symbol: String,
+    /// Order side
+    side: OrderSide,
+    /// Position direction
+    position: MultiLegPosition,
+    /// Leg ratio quantity
+    ratio_quantity: PyDecimal,
+    /// Strike price
+    #[py(opt)]
+    strike_price: Option<PyDecimal>,
+    /// Option expiry date
+    #[py(opt)]
+    expire_date: Option<PyDateWrapper>,
+    /// Contract type
+    contract_direction: ContractDirection,
+    /// Contract size
+    #[py(opt)]
+    contract_size: Option<PyDecimal>,
+}
+
+/// Multi-leg strategy information
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::MultiLegInfo")]
+pub(crate) struct MultiLegInfo {
+    /// Multi-leg strategy
+    strategy: MultiLegStrategy,
+    /// Strategy name
+    strategy_name: String,
+    /// Multi-leg combination ID
+    multileg_id: String,
+    /// Multi-leg combination code
+    code: String,
+    /// Legs of the combination order
+    #[py(array)]
+    legs: Vec<MultiLegOrderLeg>,
+}
+
 /// Order
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
@@ -477,6 +570,10 @@ pub(crate) struct Order {
     /// Attached orders
     #[py(array)]
     attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[py(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Commission-free Status
@@ -700,6 +797,10 @@ pub(crate) struct OrderDetail {
     /// Attached orders
     #[py(array)]
     attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[py(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Order changed message
@@ -766,6 +867,10 @@ pub(crate) struct PushOrderChanged {
     last_price: Option<PyDecimal>,
     /// Remark message
     remark: String,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[py(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Response for submit order request

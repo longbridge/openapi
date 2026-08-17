@@ -9,6 +9,7 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Tuple,
     Type,
 )
 
@@ -5893,6 +5894,12 @@ class PushOrderChanged:
     Remark message
     """
 
+    multi_leg: Optional[MultiLegInfo]
+    """
+    Multi-leg strategy information (only present for multi-leg option
+    combination orders)
+    """
+
 class TimeInForceType:
     """
     Time in force type
@@ -6127,6 +6134,166 @@ class ReplaceAttachedParams:
         market_price: Optional[Decimal] = None,
     ) -> None: ...
 
+class MultiLegStrategy:
+    """
+    Multi-leg strategy
+    """
+
+    class Unknown(MultiLegStrategy):
+        """
+        Unknown
+        """
+
+    class CoveredCall(MultiLegStrategy):
+        """
+        Covered call (covered stock)
+        """
+
+    class CoveredPut(MultiLegStrategy):
+        """
+        Covered put (covered stock)
+        """
+
+    class VerticalCallSpread(MultiLegStrategy):
+        """
+        Vertical call spread
+        """
+
+    class VerticalPutSpread(MultiLegStrategy):
+        """
+        Vertical put spread
+        """
+
+    class Collar(MultiLegStrategy):
+        """
+        Collar
+        """
+
+    class Straddle(MultiLegStrategy):
+        """
+        Straddle
+        """
+
+    class Strangle(MultiLegStrategy):
+        """
+        Strangle
+        """
+
+class MultiLegPosition:
+    """
+    Multi-leg position direction
+    """
+
+    class Unknown(MultiLegPosition):
+        """
+        Unknown
+        """
+
+    class Long(MultiLegPosition):
+        """
+        Long
+        """
+
+    class Short(MultiLegPosition):
+        """
+        Short
+        """
+
+class ContractDirection:
+    """
+    Option contract type
+    """
+
+    class Unknown(ContractDirection):
+        """
+        Unknown
+        """
+
+    class Call(ContractDirection):
+        """
+        Call
+        """
+
+    class Put(ContractDirection):
+        """
+        Put
+        """
+
+class MultiLegOrderLeg:
+    """
+    A leg of a multi-leg combination order
+    """
+
+    symbol: str
+    """
+    Option symbol, in `ticker.region` format
+    """
+
+    side: Type[OrderSide]
+    """
+    Order side
+    """
+
+    position: Type[MultiLegPosition]
+    """
+    Position direction
+    """
+
+    ratio_quantity: Decimal
+    """
+    Leg ratio quantity
+    """
+
+    strike_price: Optional[Decimal]
+    """
+    Strike price
+    """
+
+    expire_date: Optional[date]
+    """
+    Option expiry date
+    """
+
+    contract_direction: Type[ContractDirection]
+    """
+    Contract type
+    """
+
+    contract_size: Optional[Decimal]
+    """
+    Contract size
+    """
+
+class MultiLegInfo:
+    """
+    Multi-leg strategy information
+    """
+
+    strategy: Type[MultiLegStrategy]
+    """
+    Multi-leg strategy
+    """
+
+    strategy_name: str
+    """
+    Strategy name
+    """
+
+    multileg_id: str
+    """
+    Multi-leg combination ID
+    """
+
+    code: str
+    """
+    Multi-leg combination code
+    """
+
+    legs: List[MultiLegOrderLeg]
+    """
+    Legs of the combination order
+    """
+
 class Order:
     """
     Order
@@ -6280,6 +6447,12 @@ class Order:
     attached_orders: List[AttachedOrderDetail]
     """
     Attached orders
+    """
+
+    multi_leg: Optional[MultiLegInfo]
+    """
+    Multi-leg strategy information (only present for multi-leg option
+    combination orders)
     """
 
 class CommissionFreeStatus:
@@ -6665,6 +6838,12 @@ class OrderDetail:
     attached_orders: List[AttachedOrderDetail]
     """
     Attached orders
+    """
+
+    multi_leg: Optional[MultiLegInfo]
+    """
+    Multi-leg strategy information (only present for multi-leg option
+    combination orders)
     """
 
 class SubmitOrderResponse:
@@ -7388,6 +7567,61 @@ class TradeContext:
                     submitted_quantity = Decimal(200),
                     time_in_force = TimeInForceType.Day,
                     remark = "Hello from Python SDK",
+                )
+                print(resp)
+        """
+
+    def submit_multileg(
+        self,
+        side: Type[OrderSide],
+        order_type: Type[OrderType],
+        submitted_quantity: Decimal,
+        strategy: Type[MultiLegStrategy],
+        legs: List[Tuple[str, Decimal]],
+        submitted_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
+    ) -> SubmitOrderResponse:
+        """
+        Submit a multi-leg option combination order (such as vertical spreads,
+        straddles, strangles, collars, etc.). All legs are submitted together
+        as a single strategy order.
+
+        Args:
+            side: Order Side
+            order_type: Order type
+            submitted_quantity: Submitted quantity (number of combinations)
+            strategy: Multi-leg strategy
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples
+            submitted_price: Submitted price (required for limit order types such as `LO`)
+            remark: Remark (Maximum 255 characters)
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+
+        Returns:
+            Response
+
+        Examples:
+            ::
+
+                from decimal import Decimal
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config, OrderSide, OrderType, MultiLegStrategy
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = TradeContext(config)
+
+                resp = ctx.submit_multileg(
+                    side = OrderSide.Buy,
+                    order_type = OrderType.LO,
+                    submitted_quantity = Decimal(1),
+                    strategy = MultiLegStrategy.VerticalCallSpread,
+                    submitted_price = Decimal("1.5"),
+                    legs = [
+                        ("QQQ260731C764000.US", Decimal(1)),
+                        ("QQQ260731C767000.US", Decimal(1)),
+                    ],
                 )
                 print(resp)
         """
@@ -8127,6 +8361,69 @@ class AsyncTradeContext:
                         time_in_force=TimeInForceType.Day,
                         submitted_price=Decimal(50),
                         remark="Hello from Python SDK",
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def submit_multileg(
+        self,
+        side: Type[OrderSide],
+        order_type: Type[OrderType],
+        submitted_quantity: Decimal,
+        strategy: Type[MultiLegStrategy],
+        legs: List[Tuple[str, Decimal]],
+        submitted_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
+    ) -> Awaitable[SubmitOrderResponse]:
+        """
+        Submit a multi-leg option combination order (such as vertical spreads,
+        straddles, strangles, collars, etc.). Returns an awaitable that
+        resolves to SubmitOrderResponse. Same parameters as sync
+        TradeContext.submit_multileg.
+
+        Args:
+            side: Order side.
+            order_type: Order type.
+            submitted_quantity: Submitted quantity (number of combinations).
+            strategy: Multi-leg strategy.
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples.
+            submitted_price: Submitted price (required for limit order types such as `LO`).
+            remark: Remark (max 255 characters).
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longbridge.openapi import OAuthBuilder, (
+                    AsyncTradeContext,
+                    Config,
+                    OrderSide,
+                    OrderType,
+                    MultiLegStrategy,
+                )
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncTradeContext.create(config)
+                    resp = await ctx.submit_multileg(
+                        side=OrderSide.Buy,
+                        order_type=OrderType.LO,
+                        submitted_quantity=Decimal(1),
+                        strategy=MultiLegStrategy.VerticalCallSpread,
+                        submitted_price=Decimal("1.5"),
+                        legs=[
+                            ("QQQ260731C764000.US", Decimal(1)),
+                            ("QQQ260731C767000.US", Decimal(1)),
+                        ],
                     )
                     print(resp)
 

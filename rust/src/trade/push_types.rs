@@ -9,7 +9,7 @@ use time::OffsetDateTime;
 
 use crate::{
     Error, Result, serde_utils,
-    trade::{OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus, cmd_code},
+    trade::{MultiLegInfo, OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus, cmd_code},
 };
 
 /// Topic type
@@ -93,6 +93,10 @@ pub struct PushOrderChanged {
     pub last_price: Option<Decimal>,
     /// Remark message
     pub remark: String,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[serde(default)]
+    pub multi_leg: Option<MultiLegInfo>,
 }
 
 /// Push event

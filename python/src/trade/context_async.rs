@@ -6,8 +6,8 @@ use longbridge::trade::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
-    TradeContext,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderLeg,
+    SubmitMultiLegOrderOptions, SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -23,7 +23,7 @@ use crate::{
         types::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
             EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
-            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
             ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
             SubmitOrderResponse, TimeInForceType, TopicType,
         },
@@ -415,6 +415,57 @@ impl AsyncTradeContext {
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: SubmitOrderResponse = ctx
                 .submit_order(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Submit a multi-leg option combination order. Returns awaitable.
+    ///
+    /// `legs` is a list of `(symbol, ratio_quantity)` tuples.
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None))]
+    #[allow(clippy::too_many_arguments)]
+    fn submit_multileg(
+        &self,
+        py: Python<'_>,
+        side: OrderSide,
+        order_type: OrderType,
+        submitted_quantity: PyDecimal,
+        strategy: MultiLegStrategy,
+        legs: Vec<(String, PyDecimal)>,
+        submitted_price: Option<PyDecimal>,
+        remark: Option<String>,
+        client_request_id: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let legs = legs
+            .into_iter()
+            .map(|(symbol, ratio_quantity)| {
+                SubmitMultiLegOrderLeg::new(symbol, ratio_quantity.into())
+            })
+            .collect::<Vec<_>>();
+        let mut opts = SubmitMultiLegOrderOptions::new(
+            side.into(),
+            order_type.into(),
+            submitted_quantity.into(),
+            strategy.into(),
+            legs,
+        );
+        if let Some(p) = submitted_price {
+            opts = opts.submitted_price(p.into());
+        }
+        if let Some(r) = remark {
+            opts = opts.remark(r);
+        }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: SubmitOrderResponse = ctx
+                .submit_multileg(opts)
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;

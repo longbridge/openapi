@@ -315,6 +315,101 @@ pub struct AttachedOrderDetail {
     pub submit_price: Option<Decimal>,
 }
 
+/// Multi-leg strategy
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum MultiLegStrategy {
+    /// Unknown
+    Unknown,
+    /// Covered call (covered stock)
+    #[strum(to_string = "CoveredCall", serialize = "0")]
+    CoveredCall,
+    /// Covered put (covered stock)
+    #[strum(to_string = "CoveredPut", serialize = "1")]
+    CoveredPut,
+    /// Vertical call spread
+    #[strum(to_string = "VerticalCallSpread", serialize = "2")]
+    VerticalCallSpread,
+    /// Vertical put spread
+    #[strum(to_string = "VerticalPutSpread", serialize = "3")]
+    VerticalPutSpread,
+    /// Collar
+    #[strum(to_string = "Collar", serialize = "4")]
+    Collar,
+    /// Straddle
+    #[strum(to_string = "Straddle", serialize = "5")]
+    Straddle,
+    /// Strangle
+    #[strum(to_string = "Strangle", serialize = "6")]
+    Strangle,
+}
+
+/// Multi-leg position direction
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum MultiLegPosition {
+    /// Unknown
+    Unknown,
+    /// Long
+    #[strum(serialize = "LONG")]
+    Long,
+    /// Short
+    #[strum(serialize = "SHORT")]
+    Short,
+}
+
+/// Option contract type
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum ContractDirection {
+    /// Unknown
+    Unknown,
+    /// Call
+    #[strum(serialize = "C")]
+    Call,
+    /// Put
+    #[strum(serialize = "P")]
+    Put,
+}
+
+/// A leg of a multi-leg combination order
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    pub symbol: String,
+    /// Order side
+    pub side: OrderSide,
+    /// Position direction
+    pub position: MultiLegPosition,
+    /// Leg ratio quantity
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub ratio_quantity: Decimal,
+    /// Strike price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub strike_price: Option<Decimal>,
+    /// Option expiry date
+    #[serde(default, with = "serde_utils::date_ymd_opt")]
+    pub expire_date: Option<Date>,
+    /// Contract type
+    pub contract_direction: ContractDirection,
+    /// Contract size
+    #[serde(default, with = "serde_utils::decimal_opt_empty_is_none")]
+    pub contract_size: Option<Decimal>,
+}
+
+/// Multi-leg strategy information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiLegInfo {
+    /// Multi-leg strategy
+    pub strategy: MultiLegStrategy,
+    /// Strategy name
+    pub strategy_name: String,
+    /// Multi-leg combination ID
+    pub multileg_id: String,
+    /// Multi-leg combination code
+    pub code: String,
+    /// Legs of the combination order
+    #[serde(default)]
+    pub legs: Vec<MultiLegOrderLeg>,
+}
+
 /// Order
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Order {
@@ -404,6 +499,10 @@ pub struct Order {
     /// Attached orders
     #[serde(default)]
     pub attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[serde(default)]
+    pub multi_leg: Option<MultiLegInfo>,
 }
 
 /// Commission-free Status
@@ -629,6 +728,10 @@ pub struct OrderDetail {
     /// Attached orders
     #[serde(default)]
     pub attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[serde(default)]
+    pub multi_leg: Option<MultiLegInfo>,
 }
 
 /// Cash info
@@ -879,6 +982,8 @@ impl_serde_for_enum_string!(
 );
 impl_serde_for_enum_string!(AttachedOrderType);
 impl_default_for_enum_string!(AttachedOrderType);
+impl_serde_for_enum_string!(MultiLegStrategy, MultiLegPosition, ContractDirection);
+impl_default_for_enum_string!(MultiLegStrategy, MultiLegPosition, ContractDirection);
 impl_default_for_enum_string!(
     OrderType,
     OrderStatus,

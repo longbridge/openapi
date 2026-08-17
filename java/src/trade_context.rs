@@ -3,7 +3,7 @@ use std::sync::Arc;
 use jni::{
     JNIEnv, JavaVM,
     errors::Result,
-    objects::{GlobalRef, JClass, JObject, JString},
+    objects::{GlobalRef, JClass, JObject, JObjectArray, JString},
     sys::jobjectArray,
 };
 use longbridge::{
@@ -12,9 +12,10 @@ use longbridge::{
         AttachedOrderType, BalanceType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, ReplaceAttachedParams, ReplaceOrderOptions,
-        SubmitAttachedParams, SubmitOrderOptions, TimeInForceType, TopicType,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        MultiLegStrategy, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
+        ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitMultiLegOrderLeg,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;
@@ -623,6 +624,63 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
 
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.submit_order(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitMultileg(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let side: OrderSide = get_field(env, &opts, "side")?;
+        let order_type: OrderType = get_field(env, &opts, "orderType")?;
+        let submitted_quantity: Decimal = get_field(env, &opts, "submittedQuantity")?;
+        let strategy: MultiLegStrategy = get_field(env, &opts, "strategy")?;
+
+        let legs_obj = env
+            .get_field(
+                &opts,
+                "legs",
+                "[Lcom/longbridge/trade/SubmitMultiLegOrderLeg;",
+            )?
+            .l()?;
+        let mut legs = Vec::new();
+        if !legs_obj.is_null() {
+            let legs_array: JObjectArray = legs_obj.into();
+            let len = env.get_array_length(&legs_array)?;
+            for i in 0..len {
+                let leg_obj = env.get_object_array_element(&legs_array, i)?;
+                let symbol: String = get_field(env, &leg_obj, "symbol")?;
+                let ratio_quantity: Decimal = get_field(env, &leg_obj, "ratioQuantity")?;
+                legs.push(SubmitMultiLegOrderLeg::new(symbol, ratio_quantity));
+            }
+        }
+
+        let mut new_opts =
+            SubmitMultiLegOrderOptions::new(side, order_type, submitted_quantity, strategy, legs);
+        let submitted_price: Option<Decimal> = get_field(env, &opts, "submittedPrice")?;
+        if let Some(submitted_price) = submitted_price {
+            new_opts = new_opts.submitted_price(submitted_price);
+        }
+        let remark: Option<String> = get_field(env, &opts, "remark")?;
+        if let Some(remark) = remark {
+            new_opts = new_opts.remark(remark);
+        }
+        let client_request_id: Option<String> = get_field(env, &opts, "clientRequestId")?;
+        if let Some(id) = client_request_id {
+            new_opts = new_opts.client_request_id(id);
+        }
+
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.submit_multileg(new_opts).await?)
         })?;
         Ok(())
     })

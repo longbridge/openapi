@@ -614,6 +614,34 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/trade/MultiLegOrderLeg",
+    longbridge::trade::MultiLegOrderLeg,
+    [
+        symbol,
+        side,
+        position,
+        ratio_quantity,
+        strike_price,
+        expire_date,
+        contract_direction,
+        contract_size
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/MultiLegInfo",
+    longbridge::trade::MultiLegInfo,
+    [
+        strategy,
+        strategy_name,
+        multileg_id,
+        code,
+        #[java(objarray)]
+        legs
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/trade/PushOrderChanged",
     longbridge::trade::PushOrderChanged,
     [
@@ -641,7 +669,8 @@ impl_java_class!(
         account_no,
         last_share,
         last_price,
-        remark
+        remark,
+        multi_leg
     ]
 );
 
@@ -705,7 +734,8 @@ impl_java_class!(
         monitor_price,
         remark,
         #[java(objarray)]
-        attached_orders
+        attached_orders,
+        multi_leg
     ]
 );
 
@@ -984,7 +1014,8 @@ impl_java_class!(
         history,
         charge_detail,
         #[java(objarray)]
-        attached_orders
+        attached_orders,
+        multi_leg
     ]
 );
 
