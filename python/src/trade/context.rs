@@ -33,6 +33,7 @@ use crate::{
 #[derive(Debug, Default)]
 pub(crate) struct Callbacks {
     pub(crate) order_changed: Option<Py<PyAny>>,
+    pub(crate) grid_order_changed: Option<Py<PyAny>>,
 }
 
 #[pyclass]
@@ -45,8 +46,9 @@ pub(crate) struct TradeContext {
 impl TradeContext {
     #[new]
     fn new(config: &Config) -> Self {
+        let config = Arc::new(config.0.clone());
         let callbacks = Arc::new(Mutex::new(Callbacks::default()));
-        let ctx = TradeContextSync::new(Arc::new(config.0.clone()), {
+        let ctx = TradeContextSync::new(config, {
             let callbacks = callbacks.clone();
             move |event| {
                 handle_push_event(&callbacks.lock(), event, None);
@@ -62,6 +64,16 @@ impl TradeContext {
             self.callbacks.lock().order_changed = None;
         } else {
             self.callbacks.lock().order_changed = Some(callback);
+        }
+    }
+
+    /// Set grid order changed callback, after receiving the grid order changed
+    /// event, it will call back to this function.
+    fn set_on_grid_order_changed(&self, py: Python<'_>, callback: Py<PyAny>) {
+        if callback.is_none(py) {
+            self.callbacks.lock().grid_order_changed = None;
+        } else {
+            self.callbacks.lock().grid_order_changed = Some(callback);
         }
     }
 

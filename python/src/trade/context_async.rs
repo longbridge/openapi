@@ -79,6 +79,16 @@ impl AsyncTradeContext {
         }
     }
 
+    /// Set grid order changed callback. May be sync or async (coroutines are
+    /// scheduled).
+    fn set_on_grid_order_changed(&self, py: Python<'_>, callback: Py<PyAny>) {
+        if callback.is_none(py) {
+            self.callbacks.lock().grid_order_changed = None;
+        } else {
+            self.callbacks.lock().grid_order_changed = Some(callback);
+        }
+    }
+
     /// Subscribe. Returns awaitable.
     fn subscribe(&self, py: Python<'_>, topics: Vec<TopicType>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();

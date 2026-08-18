@@ -30,6 +30,7 @@ pub mod calendar;
 pub mod content;
 pub mod dca;
 pub mod fundamental;
+pub mod grid;
 pub mod market;
 pub mod portfolio;
 pub mod quote;
@@ -51,6 +52,7 @@ pub use fundamental::types::{
     USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
     USETFFilesResponse, USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
 };
+pub use grid::GridContext;
 pub use longbridge_httpcli as httpclient;
 pub use longbridge_httpcli::{DC_REGION_HEADER, DcRegion};
 pub use longbridge_wscli as wsclient;

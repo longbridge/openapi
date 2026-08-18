@@ -29,6 +29,7 @@ use crate::{
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<GlobalRef>,
+    grid_order_changed: Option<GlobalRef>,
 }
 
 struct ContextObj {
@@ -47,6 +48,17 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                     handler,
                     "onOrderChanged",
                     "(Lcom/longbridge/trade/PushOrderChanged;)V",
+                    &[event.borrow()],
+                )?;
+            }
+        }
+        PushEvent::GridOrderChanged(grid_order_changed) => {
+            if let Some(handler) = &callbacks.grid_order_changed {
+                let event = grid_order_changed.into_jvalue(&mut env)?;
+                env.call_method(
+                    handler,
+                    "onGridOrderChanged",
+                    "(Lcom/longbridge/trade/PushGridOrderChanged;)V",
                     &[event.borrow()],
                 )?;
             }
@@ -105,6 +117,24 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnOrd
             context.callbacks.lock().order_changed = Some(env.new_global_ref(handler)?);
         } else {
             context.callbacks.lock().order_changed = None;
+        }
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnGridOrderChanged(
+    mut env: JNIEnv,
+    _class: JClass,
+    ctx: i64,
+    handler: JObject,
+) {
+    let context = &*(ctx as *const ContextObj);
+    jni_result(&mut env, (), |env| {
+        if !handler.is_null() {
+            context.callbacks.lock().grid_order_changed = Some(env.new_global_ref(handler)?);
+        } else {
+            context.callbacks.lock().grid_order_changed = None;
         }
         Ok(())
     })

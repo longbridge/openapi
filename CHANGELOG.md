@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **All languages:** add grid-trading support via a standalone `GridContext` — submit / replace / cancel / suspend / restart grid orders, list orders (paged and by IDs), fetch order detail and trigger history, submit the strategy risk-disclosure questionnaire, and query the security (symbol) info (`symbol_info` → `GridSymbolInfo`: name, last price, lot sizes, price-step rules, channel/authorization) needed to build a grid order. Available in the Rust, Python, Node.js, Java, and C/C++ bindings
 - **All languages:** `Execution` gains a `side` field (`OrderSide`) — the buy/sell direction of the fill, now returned by the `today_executions`, `history_executions`, and `all_executions` responses
 
 ### Fixed

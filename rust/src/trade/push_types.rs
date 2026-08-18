@@ -95,6 +95,46 @@ pub struct PushOrderChanged {
     pub remark: String,
 }
 
+/// Grid trading master-order changed message.
+///
+/// Delivered on the same `private` topic as regular order changes. Field set is
+/// a skeleton to be confirmed against the test environment during integration;
+/// unknown fields are ignored (`#[serde(default)]`).
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct PushGridOrderChanged {
+    /// Grid master order ID
+    pub order_id: String,
+    /// Order status
+    pub status: String,
+    /// Security symbol (e.g. `700.HK`)
+    pub symbol: String,
+    /// Suspend reason, if any
+    pub suspend_reason: String,
+    /// Submitted base price
+    pub submitted_base_price: String,
+    /// Current base price
+    pub current_base_price: String,
+    /// Upper price bound
+    pub upper_limit_price: String,
+    /// Lower price bound
+    pub lower_limit_price: String,
+    /// Trigger price type
+    pub trigger_price_type: i32,
+    /// Quantity per trigger
+    pub trigger_quantity: String,
+    /// Settlement currency
+    pub settlement_currency: String,
+    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+    pub time_in_force: i32,
+    /// Regular trading hours flag
+    pub rth: i32,
+    /// Sell-side order type when depth is 0
+    pub grid_order_type_up: String,
+    /// Buy-side order type when depth is 0
+    pub grid_order_type_down: String,
+}
+
 /// Push event
 #[derive(Debug, Deserialize)]
 #[serde(tag = "event", content = "data")]
@@ -102,6 +142,9 @@ pub enum PushEvent {
     /// Order changed
     #[serde(rename = "order_changed_lb")]
     OrderChanged(PushOrderChanged),
+    /// Grid trading master order changed
+    #[serde(rename = "gridtrading_order")]
+    GridOrderChanged(PushGridOrderChanged),
 }
 
 impl PushEvent {
