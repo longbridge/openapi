@@ -166,13 +166,15 @@ pub struct InstitutionRatingDetail {
     /// Currency symbol, e.g. `"HK$"`
     pub ccy_symbol: String,
     /// Historical rating distribution time-series
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub evaluate: InstitutionRatingDetailEvaluate,
     /// Historical target price time-series
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub target: InstitutionRatingDetailTarget,
 }
 
 /// Historical rating distribution time-series
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct InstitutionRatingDetailEvaluate {
     /// Weekly snapshots ordered from oldest to newest
     pub list: Vec<InstitutionRatingDetailEvaluateItem>,
@@ -200,7 +202,7 @@ pub struct InstitutionRatingDetailEvaluateItem {
 }
 
 /// Historical target price time-series
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct InstitutionRatingDetailTarget {
     /// Prediction accuracy ratio, e.g. `"0.9934"` (may be `null`)
     pub data_percent: Option<Decimal>,
@@ -2026,7 +2028,7 @@ pub struct USDividendPayoutRecord {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USCompanyDividends {
     /// Trailing-12-month dividend summary
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub recent_dividends: USRecentDividend,
     /// Per-fiscal-year dividend history
     #[serde(default)]
@@ -2354,4 +2356,31 @@ pub struct USAnalystConsensus {
     /// Raw H5 page data (structure varies)
     #[serde(default)]
     pub h5_data: serde_json::Value,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn us_company_dividends_tolerates_null_recent_dividends() {
+        // The server sends an explicit `"recent_dividends": null` when the
+        // company has no trailing dividends; `#[serde(default)]` alone only
+        // covers a missing key.
+        let parsed: USCompanyDividends = serde_json::from_str(
+            r#"{"dividend_history":[],"dividend_payout_history":[],"payout_ratios":[],"recent_dividends":null}"#,
+        )
+        .unwrap();
+        assert!(parsed.recent_dividends.dividend_ttm.is_empty());
+    }
+
+    #[test]
+    fn institution_rating_detail_tolerates_null_series() {
+        // Symbols without coverage return `"target": null` (and potentially
+        // `"evaluate": null`); both must map to empty series, not error.
+        let parsed: InstitutionRatingDetail =
+            serde_json::from_str(r#"{"ccy_symbol":"HK$","evaluate":null,"target":null}"#).unwrap();
+        assert!(parsed.target.list.is_empty());
+        assert!(parsed.evaluate.list.is_empty());
+    }
 }
