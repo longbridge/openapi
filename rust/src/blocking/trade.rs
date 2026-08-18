@@ -11,8 +11,8 @@ use crate::{
         GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
         GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
         OrderDetail, PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, SubmitOrderResponse, TopicType,
+        TradeContext, USAssetOverview, USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -269,6 +269,17 @@ impl TradeContextSync {
     pub fn submit_order(&self, options: SubmitOrderOptions) -> Result<SubmitOrderResponse> {
         self.rt
             .call(move |ctx| async move { ctx.submit_order(options).await })
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    pub fn submit_multileg(
+        &self,
+        options: SubmitMultiLegOrderOptions,
+    ) -> Result<SubmitOrderResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.submit_multileg(options).await })
     }
 
     /// Cancel order

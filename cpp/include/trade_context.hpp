@@ -77,6 +77,13 @@ public:
     const SubmitOrderOptions& opts,
     AsyncCallback<TradeContext, SubmitOrderResponse> callback) const;
 
+  /// Submit a multi-leg option combination order (such as vertical spreads,
+  /// straddles, strangles, collars, etc.). All legs are submitted together as
+  /// a single strategy order.
+  void submit_multileg(
+    const SubmitMultiLegOrderOptions& opts,
+    AsyncCallback<TradeContext, SubmitOrderResponse> callback) const;
+
   /// Cancel order
   void cancel_order(const std::string& order_id,
                     AsyncCallback<TradeContext, void> callback,

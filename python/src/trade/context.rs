@@ -6,7 +6,8 @@ use longbridge::{
         CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
         GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
         GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions,
+        SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -22,7 +23,7 @@ use crate::{
         types::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
             EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
-            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
             ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
             SubmitOrderResponse, TimeInForceType, TopicType,
         },
@@ -372,6 +373,52 @@ impl TradeContext {
 
         self.ctx
             .submit_order(opts)
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// `legs` is a list of `(symbol, ratio_quantity)` tuples.
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None))]
+    #[allow(clippy::too_many_arguments)]
+    fn submit_multileg(
+        &self,
+        side: OrderSide,
+        order_type: OrderType,
+        submitted_quantity: PyDecimal,
+        strategy: MultiLegStrategy,
+        legs: Vec<(String, PyDecimal)>,
+        submitted_price: Option<PyDecimal>,
+        remark: Option<String>,
+        client_request_id: Option<String>,
+    ) -> PyResult<SubmitOrderResponse> {
+        let legs = legs
+            .into_iter()
+            .map(|(symbol, ratio_quantity)| {
+                SubmitMultiLegOrderLeg::new(symbol, ratio_quantity.into())
+            })
+            .collect::<Vec<_>>();
+        let mut opts = SubmitMultiLegOrderOptions::new(
+            side.into(),
+            order_type.into(),
+            submitted_quantity.into(),
+            strategy.into(),
+            legs,
+        );
+        if let Some(submitted_price) = submitted_price {
+            opts = opts.submitted_price(submitted_price.into());
+        }
+        if let Some(remark) = remark {
+            opts = opts.remark(remark);
+        }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
+        }
+        self.ctx
+            .submit_multileg(opts)
             .map_err(ErrorNewType)?
             .try_into()
     }

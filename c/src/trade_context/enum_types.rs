@@ -322,3 +322,69 @@ pub enum CChargeCategoryCode {
     #[c(remote = "Third")]
     ChargeCategoryCodeThird,
 }
+
+/// Multi-leg strategy
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::trade::MultiLegStrategy")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CMultiLegStrategy {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    MultiLegStrategyUnknown,
+    /// Covered call (covered stock)
+    #[c(remote = "CoveredCall")]
+    MultiLegStrategyCoveredCall,
+    /// Covered put (covered stock)
+    #[c(remote = "CoveredPut")]
+    MultiLegStrategyCoveredPut,
+    /// Vertical call spread
+    #[c(remote = "VerticalCallSpread")]
+    MultiLegStrategyVerticalCallSpread,
+    /// Vertical put spread
+    #[c(remote = "VerticalPutSpread")]
+    MultiLegStrategyVerticalPutSpread,
+    /// Collar
+    #[c(remote = "Collar")]
+    MultiLegStrategyCollar,
+    /// Straddle
+    #[c(remote = "Straddle")]
+    MultiLegStrategyStraddle,
+    /// Strangle
+    #[c(remote = "Strangle")]
+    MultiLegStrategyStrangle,
+}
+
+/// Multi-leg position direction
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::trade::MultiLegPosition")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CMultiLegPosition {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    MultiLegPositionUnknown,
+    /// Long
+    #[c(remote = "Long")]
+    MultiLegPositionLong,
+    /// Short
+    #[c(remote = "Short")]
+    MultiLegPositionShort,
+}
+
+/// Option contract type
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::trade::ContractDirection")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CContractDirection {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    ContractDirectionUnknown,
+    /// Call
+    #[c(remote = "Call")]
+    ContractDirectionCall,
+    /// Put
+    #[c(remote = "Put")]
+    ContractDirectionPut,
+}

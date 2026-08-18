@@ -56,6 +56,41 @@ pub(crate) mod date_opt {
     }
 }
 
+pub(crate) mod date_ymd_opt {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<Date>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if !value.is_empty() {
+            let date = Date::parse(
+                &value,
+                time::macros::format_description!("[year][month][day]"),
+            )
+            .map_err(D::Error::custom)?;
+            Ok(Some(date))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub(crate) fn serialize<S>(date: &Option<Date>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match date {
+            Some(date) => serializer.serialize_str(
+                &date
+                    .format(time::macros::format_description!("[year][month][day]"))
+                    .unwrap(),
+            ),
+            None => serializer.serialize_none(),
+        }
+    }
+}
+
 pub(crate) mod timestamp {
     use super::*;
 

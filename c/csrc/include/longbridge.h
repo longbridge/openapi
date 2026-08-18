@@ -1252,6 +1252,80 @@ typedef enum lb_trigger_status_t {
 } lb_trigger_status_t;
 
 /**
+ * Multi-leg strategy
+ */
+typedef enum CMultiLegStrategy {
+  /**
+   * Unknown
+   */
+  MultiLegStrategyUnknown,
+  /**
+   * Covered call (covered stock)
+   */
+  MultiLegStrategyCoveredCall,
+  /**
+   * Covered put (covered stock)
+   */
+  MultiLegStrategyCoveredPut,
+  /**
+   * Vertical call spread
+   */
+  MultiLegStrategyVerticalCallSpread,
+  /**
+   * Vertical put spread
+   */
+  MultiLegStrategyVerticalPutSpread,
+  /**
+   * Collar
+   */
+  MultiLegStrategyCollar,
+  /**
+   * Straddle
+   */
+  MultiLegStrategyStraddle,
+  /**
+   * Strangle
+   */
+  MultiLegStrategyStrangle,
+} CMultiLegStrategy;
+
+/**
+ * Multi-leg position direction
+ */
+typedef enum CMultiLegPosition {
+  /**
+   * Unknown
+   */
+  MultiLegPositionUnknown,
+  /**
+   * Long
+   */
+  MultiLegPositionLong,
+  /**
+   * Short
+   */
+  MultiLegPositionShort,
+} CMultiLegPosition;
+
+/**
+ * Option contract type
+ */
+typedef enum CContractDirection {
+  /**
+   * Unknown
+   */
+  ContractDirectionUnknown,
+  /**
+   * Call
+   */
+  ContractDirectionCall,
+  /**
+   * Put
+   */
+  ContractDirectionPut,
+} CContractDirection;
+
+/**
  * Topic type
  */
 typedef enum lb_topic_type_t {
@@ -3407,6 +3481,70 @@ typedef struct lb_update_watchlist_group_t {
 } lb_update_watchlist_group_t;
 
 /**
+ * A leg of a multi-leg combination order
+ */
+typedef struct CMultiLegOrderLeg {
+  /**
+   * Option symbol, in `ticker.region` format
+   */
+  const char *symbol;
+  /**
+   * Order side
+   */
+  enum lb_order_side_t side;
+  /**
+   * Position direction
+   */
+  enum CMultiLegPosition position;
+  /**
+   * Leg ratio quantity
+   */
+  const struct lb_decimal_t *ratio_quantity;
+  /**
+   * Strike price (maybe null)
+   */
+  const struct lb_decimal_t *strike_price;
+  /**
+   * Option expiry date (maybe null)
+   */
+  const struct lb_date_t *expire_date;
+  /**
+   * Contract type
+   */
+  enum CContractDirection contract_direction;
+} CMultiLegOrderLeg;
+
+/**
+ * Multi-leg strategy information
+ */
+typedef struct CMultiLegInfo {
+  /**
+   * Multi-leg strategy
+   */
+  enum CMultiLegStrategy strategy;
+  /**
+   * Strategy name
+   */
+  const char *strategy_name;
+  /**
+   * Multi-leg combination ID
+   */
+  const char *multileg_id;
+  /**
+   * Multi-leg combination code
+   */
+  const char *code;
+  /**
+   * Legs of the combination order
+   */
+  const struct CMultiLegOrderLeg *legs;
+  /**
+   * Number of legs
+   */
+  uintptr_t num_legs;
+} CMultiLegInfo;
+
+/**
  * Order changed message
  */
 typedef struct lb_push_order_changed_t {
@@ -3510,6 +3648,15 @@ typedef struct lb_push_order_changed_t {
    * Remark message
    */
   const char *remark;
+  /**
+   * Whether multi_leg is valid (true only for multi-leg option combination
+   * orders)
+   */
+  bool has_multi_leg;
+  /**
+   * Multi-leg strategy information (only valid when has_multi_leg is true)
+   */
+  struct CMultiLegInfo multi_leg;
 } lb_push_order_changed_t;
 
 typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*,
@@ -3884,6 +4031,65 @@ typedef struct lb_submit_order_options_t {
    */
   const struct CSubmitAttachedParams *attached_params;
 } lb_submit_order_options_t;
+
+/**
+ * A leg of a multi-leg combination order to submit
+ */
+typedef struct CSubmitMultiLegOrderLeg {
+  /**
+   * Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
+   */
+  const char *symbol;
+  /**
+   * Leg ratio quantity
+   */
+  const struct lb_decimal_t *ratio_quantity;
+} CSubmitMultiLegOrderLeg;
+
+/**
+ * Options for submit multi-leg order request
+ */
+typedef struct CSubmitMultiLegOrderOptions {
+  /**
+   * Order side
+   */
+  enum lb_order_side_t side;
+  /**
+   * Order type
+   */
+  enum lb_order_type_t order_type;
+  /**
+   * Submitted quantity (number of combinations)
+   */
+  const struct lb_decimal_t *submitted_quantity;
+  /**
+   * Multi-leg strategy
+   */
+  enum CMultiLegStrategy strategy;
+  /**
+   * Legs of the combination order
+   */
+  const struct CSubmitMultiLegOrderLeg *legs;
+  /**
+   * Number of legs
+   */
+  uintptr_t num_legs;
+  /**
+   * Submitted price (required for limit order types such as `LO`) (can be
+   * null)
+   */
+  const struct lb_decimal_t *submitted_price;
+  /**
+   * Remark (Maximum 255 characters) (can be null)
+   */
+  const char *remark;
+  /**
+   * Idempotent request ID for preventing duplicate orders (can be null).
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  const char *client_request_id;
+} CSubmitMultiLegOrderOptions;
 
 /**
  * Options for get cash flow request
@@ -4924,6 +5130,15 @@ typedef struct lb_order_t {
    * Number of attached orders
    */
   uintptr_t num_attached_orders;
+  /**
+   * Whether multi_leg is valid (true only for multi-leg option combination
+   * orders)
+   */
+  bool has_multi_leg;
+  /**
+   * Multi-leg strategy information (only valid when has_multi_leg is true)
+   */
+  struct CMultiLegInfo multi_leg;
 } lb_order_t;
 
 /**
@@ -5551,6 +5766,15 @@ typedef struct lb_order_detail_t {
    * Number of attached orders
    */
   uintptr_t num_attached_orders;
+  /**
+   * Whether multi_leg is valid (true only for multi-leg option combination
+   * orders)
+   */
+  bool has_multi_leg;
+  /**
+   * Multi-leg strategy information (only valid when has_multi_leg is true)
+   */
+  struct CMultiLegInfo multi_leg;
 } lb_order_detail_t;
 
 /**
@@ -12415,6 +12639,18 @@ void lb_trade_context_submit_order(const struct lb_trade_context_t *ctx,
                                    const struct lb_submit_order_options_t *opts,
                                    lb_async_callback_t callback,
                                    void *userdata);
+
+/**
+ * Submit a multi-leg option combination order (such as vertical spreads,
+ * straddles, strangles, collars, etc.). All legs are submitted together as a
+ * single strategy order.
+ *
+ * @param[in] opts Options for submit multi-leg order request
+ */
+void lb_trade_context_submit_multileg(const struct lb_trade_context_t *ctx,
+                                      const struct CSubmitMultiLegOrderOptions *opts,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
 
 /**
  * Cancel order

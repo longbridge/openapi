@@ -1629,6 +1629,83 @@ struct ReplaceAttachedParams
   std::optional<Decimal> market_price;
 };
 
+/// Multi-leg strategy
+enum class MultiLegStrategy
+{
+  /// Unknown
+  Unknown,
+  /// Covered call (covered stock)
+  CoveredCall,
+  /// Covered put (covered stock)
+  CoveredPut,
+  /// Vertical call spread
+  VerticalCallSpread,
+  /// Vertical put spread
+  VerticalPutSpread,
+  /// Collar
+  Collar,
+  /// Straddle
+  Straddle,
+  /// Strangle
+  Strangle,
+};
+
+/// Multi-leg position direction
+enum class MultiLegPosition
+{
+  /// Unknown
+  Unknown,
+  /// Long
+  Long,
+  /// Short
+  Short,
+};
+
+/// Option contract type
+enum class ContractDirection
+{
+  /// Unknown
+  Unknown,
+  /// Call
+  Call,
+  /// Put
+  Put,
+};
+
+/// A leg of a multi-leg combination order
+struct MultiLegOrderLeg
+{
+  /// Option symbol, in `ticker.region` format
+  std::string symbol;
+  /// Order side
+  OrderSide side;
+  /// Position direction
+  MultiLegPosition position;
+  /// Leg ratio quantity
+  Decimal ratio_quantity;
+  /// Strike price
+  std::optional<Decimal> strike_price;
+  /// Option expiry date
+  std::optional<Date> expire_date;
+  /// Contract type
+  ContractDirection contract_direction;
+};
+
+/// Multi-leg strategy information
+struct MultiLegInfo
+{
+  /// Multi-leg strategy
+  MultiLegStrategy strategy;
+  /// Strategy name
+  std::string strategy_name;
+  /// Multi-leg combination ID
+  std::string multileg_id;
+  /// Multi-leg combination code
+  std::string code;
+  /// Legs of the combination order
+  std::vector<MultiLegOrderLeg> legs;
+};
+
 /// Order
 struct Order
 {
@@ -1692,6 +1769,9 @@ struct Order
   std::string remark;
   /// Attached orders
   std::vector<AttachedOrderDetail> attached_orders;
+  /// Multi-leg strategy information (only present for multi-leg option
+  /// combination orders)
+  std::optional<MultiLegInfo> multi_leg;
 };
 
 /// Order changed message
@@ -1747,6 +1827,9 @@ struct PushOrderChanged
   std::optional<Decimal> last_price;
   /// Remark message
   std::string remark;
+  /// Multi-leg strategy information (only present for multi-leg option
+  /// combination orders)
+  std::optional<MultiLegInfo> multi_leg;
 };
 
 /// Options for get history orders request
@@ -1861,6 +1944,38 @@ struct SubmitOrderResponse
 {
   /// Order id
   std::string order_id;
+};
+
+/// A leg of a multi-leg combination order to submit
+struct SubmitMultiLegOrderLeg
+{
+  /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
+  std::string symbol;
+  /// Leg ratio quantity
+  Decimal ratio_quantity;
+};
+
+/// Options for submit multi-leg order request
+struct SubmitMultiLegOrderOptions
+{
+  /// Order side
+  OrderSide side;
+  /// Order type
+  OrderType order_type;
+  /// Submitted quantity (number of combinations)
+  Decimal submitted_quantity;
+  /// Multi-leg strategy
+  MultiLegStrategy strategy;
+  /// Legs of the combination order
+  std::vector<SubmitMultiLegOrderLeg> legs;
+  /// Submitted price (required for limit order types such as `LO`)
+  std::optional<Decimal> submitted_price;
+  /// Remark (Maximum 255 characters)
+  std::optional<std::string> remark;
+  /// Idempotent request ID for preventing duplicate orders.
+  /// If not specified, idempotency control is skipped.
+  /// The server caches this ID for 10 minutes.
+  std::optional<std::string> client_request_id;
 };
 
 /// Cash info
@@ -2239,6 +2354,9 @@ struct OrderDetail
   std::optional<OrderChargeDetail> charge_detail;
   /// Attached orders
   std::vector<AttachedOrderDetail> attached_orders;
+  /// Multi-leg strategy information (only present for multi-leg option
+  /// combination orders)
+  std::optional<MultiLegInfo> multi_leg;
 };
 
 /// Options for estimate maximum purchase quantity

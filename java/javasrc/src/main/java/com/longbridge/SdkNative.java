@@ -237,6 +237,9 @@ public class SdkNative {
         public static native void tradeContextSubmitOrder(long context, SubmitOrderOptions opts,
                         AsyncCallback callback);
 
+        public static native void tradeContextSubmitMultileg(long context, SubmitMultiLegOrderOptions opts,
+                        AsyncCallback callback);
+
         public static native void tradeContextCancelOrder(long context, String orderId, AsyncCallback callback);
 
         public static native void tradeContextCancelOrderAttached(long context, String orderId,
