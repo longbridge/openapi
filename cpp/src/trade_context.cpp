@@ -221,8 +221,6 @@ TradeContext::today_executions(
     new AsyncCallback<TradeContext, std::vector<Execution>>(callback));
 }
 
-// TODO: temporarily disabled — restore when API is available
-/*
 /// Get all executions
 void
 TradeContext::all_executions(
@@ -261,7 +259,6 @@ TradeContext::all_executions(
     },
     new AsyncCallback<TradeContext, AllExecutionsResponse>(callback));
 }
-*/
 
 /// Get history orders
 void

@@ -418,7 +418,7 @@ pub struct WorkflowFinishedPayload {
     #[serde(default)]
     pub elapsed_time: f64,
     /// Run outputs
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: WorkflowOutputs,
     /// Localized error description; only present when `status` is `failed`
     #[serde(default)]
@@ -433,7 +433,7 @@ pub struct WorkflowFinishedPayload {
     #[serde(default)]
     pub error_args: Option<serde_json::Value>,
     /// Process stages the run went through; for display only
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub process_data: Vec<serde_json::Value>,
 }
 
@@ -569,7 +569,7 @@ pub struct NodeToolUseStartedPayload {
     #[serde(default)]
     pub tips: String,
     /// Short tags accompanying `tips`; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// Round number. Calls in the same round (same `iteration`) run in
     /// parallel
@@ -639,7 +639,7 @@ pub struct NodeToolUseFinishedPayload {
     #[serde(default)]
     pub tips: String,
     /// Short tags; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// Round number
     #[serde(default)]
@@ -648,7 +648,7 @@ pub struct NodeToolUseFinishedPayload {
     #[serde(default)]
     pub is_thinking: bool,
     /// Filtered call results, for display
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: NodeToolUseOutputs,
 }
 
@@ -676,7 +676,7 @@ pub struct SubagentStartedPayload {
     #[serde(default)]
     pub subagent_id: String,
     /// Tools granted to the subagent; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tools: Vec<serde_json::Value>,
 }
 
@@ -748,7 +748,7 @@ pub struct SubagentFinishedPayload {
     pub error: String,
     /// Subagent result: `goal`, `result`, and the timeline of tool calls it
     /// made
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: SubagentOutputs,
 }
 
@@ -782,7 +782,7 @@ pub struct AgentToolStartedPayload {
     #[serde(default)]
     pub tips: String,
     /// Short tags; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// `true` if called during the thinking phase
     #[serde(default)]
@@ -859,7 +859,7 @@ pub struct AgentToolFinishedPayload {
     #[serde(default)]
     pub tips: String,
     /// Short tags; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// `true` if during the thinking phase
     #[serde(default)]
@@ -1031,6 +1031,38 @@ pub enum ConversationStreamEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn workflow_finished_tolerates_null_outputs() {
+        // A resumed/continued conversation can send `"outputs": null`; that must
+        // deserialize to the default rather than erroring, otherwise the whole
+        // event stream fails mid-turn.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded","outputs":null}"#).unwrap();
+        assert!(payload.outputs.answer.is_none());
+
+        // A missing key must keep working too.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded"}"#).unwrap();
+        assert!(payload.outputs.answer.is_none());
+    }
+
+    #[test]
+    fn streamed_vec_fields_tolerate_null_sequences() {
+        // The server can send an explicit `null` for list-typed fields; that
+        // must deserialize to an empty list, not error with
+        // "invalid type: null, expected a sequence" and abort the stream.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded","process_data":null}"#).unwrap();
+        assert!(payload.process_data.is_empty());
+
+        let payload: NodeToolUseStartedPayload =
+            serde_json::from_str(r#"{"tip_chips":null}"#).unwrap();
+        assert!(payload.tip_chips.is_empty());
+
+        let payload: SubagentStartedPayload = serde_json::from_str(r#"{"tools":null}"#).unwrap();
+        assert!(payload.tools.is_empty());
+    }
 
     // The `data` payload of the "Run succeeded" example from
     // https://open.longbridge.com/en/docs/ai/chat/conversation

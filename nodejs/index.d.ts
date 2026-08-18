@@ -700,6 +700,8 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
+  /** Order side */
+  get side(): OrderSide
 }
 
 /** Filing item */
@@ -3182,6 +3184,8 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
+  /** Get all executions */
+  allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
    *
@@ -4365,7 +4369,7 @@ export interface CompanyOverview {
   category: string
   /** Fiscal year end */
   yearEnd: string
-  /** Number of employees */
+  /** Number of employees (returned as a string by the API, e.g. `"10000"`) */
   employees: string
   /** Phone number */
   phone: string

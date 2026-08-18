@@ -53,13 +53,10 @@ public:
     const std::optional<GetTodayExecutionsOptions>& opts,
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
 
-  // TODO: temporarily disabled — restore when API is available
-  /*
   /// Get all executions
   void all_executions(
     const std::optional<GetAllExecutionsOptions>& opts,
     AsyncCallback<TradeContext, AllExecutionsResponse> callback) const;
-  */
 
   /// Get history orders
   void history_orders(

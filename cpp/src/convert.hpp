@@ -979,12 +979,16 @@ convert(TopicType ty)
   }
 }
 
+inline OrderSide
+convert(lb_order_side_t side);
+
 inline Execution
 convert(const lb_execution_t* info)
 {
   return Execution{
     info->order_id,      info->trade_id, info->symbol,
     info->trade_done_at, info->quantity, Decimal(info->price),
+    convert(info->side),
   };
 }
 

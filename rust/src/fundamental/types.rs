@@ -576,7 +576,7 @@ pub struct CompanyOverview {
     pub category: String,
     /// Fiscal year end, e.g. `"12 月 31 日"`
     pub year_end: String,
-    /// Number of employees
+    /// Number of employees (returned as a string by the API, e.g. `"10000"`)
     pub employees: String,
     /// Phone number (API field name is `"Phone"`)
     #[serde(rename = "Phone")]

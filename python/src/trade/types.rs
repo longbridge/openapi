@@ -34,6 +34,8 @@ pub(crate) struct Execution {
     quantity: PyDecimal,
     /// Executed price
     price: PyDecimal,
+    /// Order side
+    side: OrderSide,
 }
 
 /// Response for get all executions request
