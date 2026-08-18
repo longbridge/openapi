@@ -1551,8 +1551,6 @@ convert(const CMultiLegOrderLeg* leg)
                       : std::nullopt,
     leg->expire_date ? std::optional{ convert(leg->expire_date) } : std::nullopt,
     convert(leg->contract_direction),
-    leg->contract_size ? std::optional{ Decimal(leg->contract_size) }
-                       : std::nullopt,
   };
 }
 

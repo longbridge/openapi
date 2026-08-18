@@ -1689,8 +1689,6 @@ struct MultiLegOrderLeg
   std::optional<Date> expire_date;
   /// Contract type
   ContractDirection contract_direction;
-  /// Contract size
-  std::optional<Decimal> contract_size;
 };
 
 /// Multi-leg strategy information

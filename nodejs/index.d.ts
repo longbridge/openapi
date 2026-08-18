@@ -1048,8 +1048,6 @@ export declare class MultiLegOrderLeg {
   get expireDate(): NaiveDate | null
   /** Contract type */
   get contractDirection(): ContractDirection
-  /** Contract size */
-  get contractSize(): Decimal | null
 }
 
 /** Naive date type */

@@ -275,8 +275,6 @@ pub struct CMultiLegOrderLeg {
     pub expire_date: *const CDate,
     /// Contract type
     pub contract_direction: CContractDirection,
-    /// Contract size (maybe null)
-    pub contract_size: *const CDecimal,
 }
 
 #[derive(Debug)]
@@ -288,7 +286,6 @@ pub(crate) struct CMultiLegOrderLegOwned {
     strike_price: Option<CDecimal>,
     expire_date: Option<CDate>,
     contract_direction: ContractDirection,
-    contract_size: Option<CDecimal>,
 }
 
 impl From<MultiLegOrderLeg> for CMultiLegOrderLegOwned {
@@ -301,7 +298,6 @@ impl From<MultiLegOrderLeg> for CMultiLegOrderLegOwned {
             strike_price,
             expire_date,
             contract_direction,
-            contract_size,
         } = leg;
         Self {
             symbol: symbol.into(),
@@ -311,7 +307,6 @@ impl From<MultiLegOrderLeg> for CMultiLegOrderLegOwned {
             strike_price: strike_price.map(Into::into),
             expire_date: expire_date.map(Into::into),
             contract_direction,
-            contract_size: contract_size.map(Into::into),
         }
     }
 }
@@ -328,7 +323,6 @@ impl ToFFI for CMultiLegOrderLegOwned {
             strike_price,
             expire_date,
             contract_direction,
-            contract_size,
         } = self;
         CMultiLegOrderLeg {
             symbol: symbol.to_ffi_type(),
@@ -344,10 +338,6 @@ impl ToFFI for CMultiLegOrderLegOwned {
                 .map(|value| value as *const CDate)
                 .unwrap_or(std::ptr::null()),
             contract_direction: (*contract_direction).into(),
-            contract_size: contract_size
-                .as_ref()
-                .map(ToFFI::to_ffi_type)
-                .unwrap_or(std::ptr::null()),
         }
     }
 }

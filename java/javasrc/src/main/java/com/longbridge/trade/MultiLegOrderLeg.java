@@ -14,7 +14,6 @@ public class MultiLegOrderLeg {
     private BigDecimal strikePrice;
     private LocalDate expireDate;
     private ContractDirection contractDirection;
-    private BigDecimal contractSize;
 
     /**
      * Returns the option symbol, in `ticker.region` format.
@@ -79,19 +78,10 @@ public class MultiLegOrderLeg {
         return contractDirection;
     }
 
-    /**
-     * Returns the contract size.
-     *
-     * @return contract size
-     */
-    public BigDecimal getContractSize() {
-        return contractSize;
-    }
-
     @Override
     public String toString() {
         return "MultiLegOrderLeg [symbol=" + symbol + ", side=" + side + ", position=" + position
                 + ", ratioQuantity=" + ratioQuantity + ", strikePrice=" + strikePrice + ", expireDate=" + expireDate
-                + ", contractDirection=" + contractDirection + ", contractSize=" + contractSize + "]";
+                + ", contractDirection=" + contractDirection + "]";
     }
 }

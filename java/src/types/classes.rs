@@ -623,8 +623,7 @@ impl_java_class!(
         ratio_quantity,
         strike_price,
         expire_date,
-        contract_direction,
-        contract_size
+        contract_direction
     ]
 );
 

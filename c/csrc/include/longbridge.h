@@ -3512,10 +3512,6 @@ typedef struct CMultiLegOrderLeg {
    * Contract type
    */
   enum CContractDirection contract_direction;
-  /**
-   * Contract size (maybe null)
-   */
-  const struct lb_decimal_t *contract_size;
 } CMultiLegOrderLeg;
 
 /**

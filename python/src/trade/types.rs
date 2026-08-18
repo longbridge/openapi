@@ -466,9 +466,6 @@ pub(crate) struct MultiLegOrderLeg {
     expire_date: Option<PyDateWrapper>,
     /// Contract type
     contract_direction: ContractDirection,
-    /// Contract size
-    #[py(opt)]
-    contract_size: Option<PyDecimal>,
 }
 
 /// Multi-leg strategy information

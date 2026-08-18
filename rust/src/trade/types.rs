@@ -389,9 +389,6 @@ pub struct MultiLegOrderLeg {
     pub expire_date: Option<Date>,
     /// Contract type
     pub contract_direction: ContractDirection,
-    /// Contract size
-    #[serde(default, with = "serde_utils::decimal_opt_empty_is_none")]
-    pub contract_size: Option<Decimal>,
 }
 
 /// Multi-leg strategy information

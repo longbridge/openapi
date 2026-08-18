@@ -6259,11 +6259,6 @@ class MultiLegOrderLeg:
     Contract type
     """
 
-    contract_size: Optional[Decimal]
-    """
-    Contract size
-    """
-
 class MultiLegInfo:
     """
     Multi-leg strategy information

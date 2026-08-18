@@ -340,9 +340,6 @@ pub struct MultiLegOrderLeg {
     expire_date: Option<NaiveDate>,
     /// Contract type
     contract_direction: ContractDirection,
-    /// Contract size
-    #[js(opt)]
-    contract_size: Option<Decimal>,
 }
 
 /// Multi-leg strategy information
