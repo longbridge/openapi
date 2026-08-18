@@ -140,7 +140,7 @@ pub struct AllExecutionsResponse {
     /// Has more records
     pub has_more: bool,
     /// Execution list
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trades: Vec<Execution>,
 }
 
@@ -494,7 +494,7 @@ pub struct Order {
     /// Remark
     pub remark: String,
     /// Attached orders
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_orders: Vec<AttachedOrderDetail>,
     /// Multi-leg strategy information (only present for multi-leg option
     /// combination orders)
@@ -723,7 +723,7 @@ pub struct OrderDetail {
     /// Order charges
     pub charge_detail: Option<OrderChargeDetail>,
     /// Attached orders
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_orders: Vec<AttachedOrderDetail>,
     /// Multi-leg strategy information (only present for multi-leg option
     /// combination orders)
@@ -772,7 +772,7 @@ pub struct AccountBalance {
     /// Currency
     pub currency: String,
     /// Cash details
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cash_infos: Vec<CashInfo>,
     /// Net assets
     #[serde(with = "serde_utils::decimal_empty_is_0")]
@@ -880,7 +880,11 @@ pub struct FundPositionChannel {
     pub account_channel: String,
 
     /// Fund positions
-    #[serde(default, rename = "fund_info")]
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "fund_info"
+    )]
     pub positions: Vec<FundPosition>,
 }
 
@@ -925,7 +929,11 @@ pub struct StockPositionChannel {
     pub account_channel: String,
 
     /// Stock positions
-    #[serde(default, rename = "stock_info")]
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "stock_info"
+    )]
     pub positions: Vec<StockPosition>,
 }
 
@@ -1047,10 +1055,10 @@ pub(crate) struct USQueryOrdersBody {
 pub struct QueryUSOrdersResponse {
     /// Order list (raw JSON for forward compatibility).
     /// Order ID field is `id` (not `order_id`).
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub orders: Vec<serde_json::Value>,
     /// Total number of orders matching the query.
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_count: i32,
 }
 
@@ -1058,49 +1066,49 @@ pub struct QueryUSOrdersResponse {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USOrderHistory {
     /// Execution type code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub exec_type: i32,
     /// Order status at this transition
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: String,
     /// Price at this transition
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub price: String,
     /// Quantity at this transition
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub qty: String,
     /// Transition time (Unix-second string)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub time: String,
     /// Message / note
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub msg: String,
     /// Whether the action was manual
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_manually: bool,
     /// Counterparty ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub opp_party_id: String,
     /// Trade match ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trd_match_id: String,
     /// Operator identifier
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub operator: String,
     /// Entrust channel of the operation
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub op_entrust_way: String,
     /// Cancel/reject response-to code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cxl_rej_response_to: i32,
     /// Withdrawal reason
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub withdrawal_reason: String,
     /// Counterparty name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub opp_name: String,
     /// Execution ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub exec_id: String,
 }
 
@@ -1108,13 +1116,13 @@ pub struct USOrderHistory {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USButtonControl {
     /// Whether the withdraw/cancel action is available
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub withdraw: i32,
     /// Whether the replace/modify action is available
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub replace: i32,
     /// Actions blocked with an exception reason
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub exceptionable: Vec<String>,
 }
 
@@ -1122,13 +1130,13 @@ pub struct USButtonControl {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USChargeItem {
     /// Fee category code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub code: i32,
     /// Fee category name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Individual fee amounts in this category
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fees: Vec<String>,
 }
 
@@ -1136,13 +1144,13 @@ pub struct USChargeItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USChargeDetail {
     /// Fee currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Total fee amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_amount: String,
     /// Per-category fee breakdown
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub items: Vec<USChargeItem>,
 }
 
@@ -1150,46 +1158,46 @@ pub struct USChargeDetail {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAttachedOrder {
     /// Attached-order type (display code)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_type_display: i32,
     /// Executed quantity
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub executed_qty: String,
     /// Order quantity
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub quantity: String,
     /// Order status
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: String,
     /// Trigger price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trigger_price: String,
     /// Order ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub order_id: String,
     /// Good-till date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub gtd: String,
     /// Time-in-force code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub time_in_force: i32,
     /// Order tag code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tag: i32,
     /// Order type to activate on trigger
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub activate_order_type: String,
     /// Whether to activate outside regular trading hours
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub activate_rth: i32,
     /// Submitted price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub submit_price: String,
     /// User-facing trading symbol (e.g. `"NKE.US"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Whether the order has been withdrawn
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub withdrawn: bool,
 }
 
@@ -1200,237 +1208,237 @@ pub struct USAttachedOrder {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USOrderDetail {
     /// Order ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub id: String,
     /// Internal account ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub aaid: String,
     /// Account channel
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub account_channel: String,
     /// Order action code (buy/sell)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub action: i32,
     /// User-facing trading symbol (e.g. `"NKE.US"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// User-facing underlying symbol (options only)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub underlying_symbol: String,
     /// Security type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub security_type: String,
     /// Security name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Order currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Trade currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trade_currency: String,
     /// Order type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub order_type: String,
     /// Order status
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: String,
     /// Order price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub price: String,
     /// Order quantity
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub quantity: String,
     /// Executed quantity
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub executed_qty: String,
     /// Executed price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub executed_price: String,
     /// Executed amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub executed_amount: String,
     /// Operate direction
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub operate_direction: String,
     /// Time-in-force code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub time_in_force: i32,
     /// Good-till date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub gtd: String,
     /// Order tag code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tag: i32,
     /// Message / note
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub msg: String,
     /// Whether the order is restricted to regular trading hours
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub force_only_rth: i32,
     /// Submission time (Unix-second string)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub submitted_at: String,
     /// Completion time (Unix-second string)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub done_at: String,
     /// Trigger price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trigger_price: String,
     /// Trigger time (Unix-second string)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trigger_at: String,
     /// Trigger status code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trigger_status: i32,
     /// Trigger exchange
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trigger_exchange: String,
     /// Last-done price at trigger
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trigger_last_done: String,
     /// Number of times triggered
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trigger_count: i32,
     /// Trailing amount (trailing-stop orders)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tailing_amount: String,
     /// Trailing percent (trailing-stop orders)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tailing_percent: String,
     /// Limit offset (trailing-limit orders)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub limit_offset: String,
     /// Order-book depth level for limit orders
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub limit_depth_level: i32,
     /// Market price at reference
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market_price: String,
     /// Submitted amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub submitted_amount: String,
     /// Estimated fee
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub estimated_fee: String,
     /// Commission-free status code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub free_status: i32,
     /// Commission-free amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub free_amount: String,
     /// Commission-free currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub free_currency: String,
     /// Deduction status code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub deductions_status: i32,
     /// Deduction amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub deductions_amount: String,
     /// Deduction currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub deductions_currency: String,
     /// Platform deduction status code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub platform_deductions_status: i32,
     /// Platform deduction amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub platform_deductions_amount: String,
     /// Platform deduction currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub platform_deductions_currency: String,
     /// Display account
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub display_account: String,
     /// Settlement account
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub settlement_account: String,
     /// Settlement channel
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub settlement_channel: String,
     /// Customer name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub customer_name: String,
     /// Account holder real name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub real_name: String,
     /// Account holder English name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub en_name: String,
     /// Joint-account holder real name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub joint_real_name: String,
     /// Joint-account holder English name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub joint_en_name: String,
     /// Organization ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub org_id: String,
     /// Broker-to-client assigned number (HK)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub bcan: String,
     /// Entrust channel code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub op_entrust_way: i32,
     /// Entrust channel name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub op_entrust_way_name: String,
     /// Remark
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub remark: String,
     /// Notice text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub notice: String,
     /// Short-sell type code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub short_sell_type: i32,
     /// Strategy (ploy) type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ploy_type: String,
     /// Strategy (ploy) ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ploy_id: String,
     /// Strategy (ploy) status
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ploy_status: String,
     /// Trend direction code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trend: i32,
     /// Withdrawal reason
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub withdrawal_reason: String,
     /// Order type to activate on trigger
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub activate_order_type: String,
     /// Whether to activate outside regular trading hours
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub activate_rth: i32,
     /// Submitted price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub submit_price: String,
     /// Contract direction (options)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub contract_direction: String,
     /// Strike price (options)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub strike_price: String,
     /// Contract size (options)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub contract_size: String,
     /// Monitor price (conditional orders)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub monitor_price: String,
     /// Available action buttons
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub button_control: USButtonControl,
     /// Fee breakdown (absent when not applicable)
     pub charge_detail: Option<USChargeDetail>,
     /// Attached bracket/conditional sub-orders
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_orders: Vec<USAttachedOrder>,
     /// Order state-transition history
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub order_histories: Vec<USOrderHistory>,
 }
 
@@ -1443,7 +1451,7 @@ pub struct USOrderDetailResponse {
     /// Active bracket/conditional sub-order, or None.
     pub current_attached_order: Option<USOrderDetail>,
     /// Server response timestamp (milliseconds string).
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub current_millisecond: String,
 }
 
@@ -1451,22 +1459,22 @@ pub struct USOrderDetailResponse {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USCashEntry {
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Cash frozen for pending buys
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub frozen_buy_cash: String,
     /// Outstanding (unsettled) amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outstanding: String,
     /// Settled cash
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub settled_cash: String,
     /// Total amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_amount: String,
     /// Total cash
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_cash: String,
 }
 
@@ -1474,19 +1482,19 @@ pub struct USCashEntry {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USCryptoEntry {
     /// Asset type (e.g. `"CRYPTO"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub asset_type: String,
     /// Average cost price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub average_cost: String,
     /// User-facing trading-pair symbol (e.g. `"BTCUSD.BKKT"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Settlement currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Industry name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_name: String,
 }
 
@@ -1495,73 +1503,73 @@ pub struct USCryptoEntry {
 pub struct USStockEntry {
     /// Ticker code returned by the API (e.g. `"AAPL"`). See `full_symbol` for
     /// the qualified form.
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Qualified user-facing symbol (e.g. `"AAPL.US"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub full_symbol: String,
     /// Asset type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub asset_type: String,
     /// Holding quantity
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub quantity: String,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Average cost price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub average_cost: String,
     /// Market code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market: String,
     /// Trade status
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trade_status: String,
     /// Previous close price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub prev_close: String,
     /// Latest price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub last_done: String,
     /// Market price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market_price: String,
     /// Pre-market close price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pretrade_close: String,
     /// Today's stock investment value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stock_invest_of_today: String,
     /// Today's profit/loss
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub today_pl: String,
     /// Today's stock investment value (pre-market)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pretrade_stock_invest_of_today: String,
     /// Today's profit/loss (pre-market)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pretrade_today_pl: String,
     /// Overnight-session latest price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub night_last_done: String,
     /// Overnight-session previous close
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub night_prev_close: String,
     /// Position side (long/short)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub position_side: String,
     /// Position open time (Unix-second string)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub open_position_time: String,
     /// Security name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Industry classification ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_counter_id: String,
     /// Industry name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_name: String,
 }
 
@@ -1570,34 +1578,34 @@ pub struct USStockEntry {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAssetOverview {
     /// Account type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub account_type: String,
     /// Account snapshot timestamp (Unix-second string → OffsetDateTime).
     #[serde(default, with = "crate::serde_utils::timestamp_opt")]
     pub asset_timestamp: Option<time::OffsetDateTime>,
     /// Cash buying power (top-level convenience field).
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cash_buy_power: String,
     /// Overnight buying power
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub overnight_buy_power: String,
     /// Account currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Cash balances per currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cash_list: Vec<USCashEntry>,
     /// Stock/equity positions
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stock_list: Vec<USStockEntry>,
     /// Option positions (raw JSON)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub option_list: Vec<serde_json::Value>,
     /// Cryptocurrency holdings
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub crypto_list: Vec<USCryptoEntry>,
     /// Multi-leg option strategies (raw JSON)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub multi_leg: serde_json::Value,
 }
 
@@ -1605,13 +1613,13 @@ pub struct USAssetOverview {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USRealizedPLMetric {
     /// Realized P&L amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub amount: String,
     /// Period code (server-defined; 2 = current month observed in testing).
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub period: i32,
     /// Realized P&L rate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub rate: String,
 }
 
@@ -1620,13 +1628,13 @@ pub struct USRealizedPLMetric {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USRealizedPLEntry {
     /// Asset category (0 = all, 1 = stock, 2 = option, 3 = crypto)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub category: i32,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Per-period realized P&L metrics
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub metrics: Vec<USRealizedPLMetric>,
 }
 
@@ -1646,7 +1654,7 @@ pub struct GetUSRealizedPLOptions {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USRealizedPL {
     /// Per-asset-category realized P&L entries
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub realized_pl_list: Vec<USRealizedPLEntry>,
 }
 

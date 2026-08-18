@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **All SDKs:** `FundamentalContext.institution_rating_detail` no longer errors when the server returns `"target": null` / `"evaluate": null` (symbols without analyst coverage) — both now deserialize to empty series. `FundamentalContext.us_company_dividends` likewise tolerates `"recent_dividends": null` (companies with no trailing dividends). `#[serde(default)]` alone only covers a missing key, not an explicit `null`
+- **All SDKs:** every optional response field now tolerates an explicit JSON `null`. `#[serde(default)]` alone only covers a *missing* key, so a server that sent `null` for any of ~700 optional fields aborted the whole response with `deserialize response body error: invalid type: null`. All `#[serde(default)]` response fields across every module (quote, trade, fundamental, market, dca, alert, sharelist, portfolio, calendar, content, screener, agent) now map `null` to the field's default value. First observed live as `institution_rating_detail` `"target"/"evaluate": null` (symbols without analyst coverage) and `us_company_dividends` `"recent_dividends": null` (no trailing dividends). No field types changed, so the language bindings are unaffected
 
 ### Breaking changes
 

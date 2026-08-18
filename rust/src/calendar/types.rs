@@ -10,7 +10,7 @@ pub struct CalendarEventsResponse {
     pub list: Vec<CalendarDateGroup>,
     /// Pagination cursor; pass as `start` to fetch the next page, empty when
     /// there are no more pages
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub next_date: String,
 }
 
@@ -37,12 +37,12 @@ pub struct CalendarEventInfo {
     /// Security name
     pub counter_name: String,
     /// Date type label, e.g. `"盘前"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub date_type: String,
     /// Event date string, e.g. `"2025.05.02"`
     pub date: String,
     /// Chart UID (may be empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chart_uid: String,
     /// Structured data key-value pairs
     pub data_kv: Vec<CalendarDataKv>,
@@ -52,7 +52,7 @@ pub struct CalendarEventInfo {
     /// Event datetime (unix timestamp string)
     pub datetime: String,
     /// Icon URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub icon: String,
     /// Importance star rating (0–3)
     pub star: i32,
@@ -61,15 +61,15 @@ pub struct CalendarEventInfo {
     /// Internal event ID
     pub id: String,
     /// Financial market session time string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub financial_market_time: String,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Extended data (structure varies by event type)
     pub ext: Option<serde_json::Value>,
     /// Activity type code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub activity_type: String,
 }
 

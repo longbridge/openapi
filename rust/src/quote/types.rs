@@ -1405,7 +1405,7 @@ pub struct WatchlistSecurity {
     )]
     pub watched_at: OffsetDateTime,
     /// Whether the security is pinned to the top of the group
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_pinned: bool,
 }
 
@@ -1956,7 +1956,7 @@ pub struct MarketTemperature {
     /// Temperature value
     pub temperature: i32,
     /// Temperature description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// Market valuation
     pub valuation: i32,
@@ -2006,7 +2006,7 @@ pub struct FilingItem {
     /// Title
     pub title: String,
     /// Description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// File name
     pub file_name: String,
@@ -2042,22 +2042,22 @@ pub struct ShortPositionsItem {
     /// Closing price (both markets)
     pub close: String,
     /// [US] Number of short shares outstanding
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub current_shares_short: String,
     /// [US] Average daily share volume
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub avg_daily_share_volume: String,
     /// [US] Days to cover ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub days_to_cover: String,
     /// [HK] Short sale amount (HKD)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub amount: String,
     /// [HK] Short position balance
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub balance: String,
     /// [HK] Cost / closing price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cost: String,
 }
 
@@ -2129,19 +2129,19 @@ pub struct ShortTradesItem {
     /// Closing price
     pub close: String,
     /// [US] NYSE short amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub nus_amount: String,
     /// [US] NY short amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ny_amount: String,
     /// [US] Total short amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_amount: String,
     /// [HK] Short sale amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub amount: String,
     /// [HK] Short position balance
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub balance: String,
 }
 
@@ -2173,52 +2173,52 @@ pub enum PinnedMode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USCryptoOverview {
     /// Full name (e.g. `"Bitcoin"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Ticker symbol (e.g. `"BTC"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ticker: String,
     /// Pricing currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// All-time high price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_high: String,
     /// All-time high date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_high_date: String,
     /// All-time low price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_low: String,
     /// All-time low date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_low_date: String,
     /// Listing date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ipo_date: String,
     /// Issue price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub issue_price: String,
     /// Circulating supply
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub shares: String,
     /// User-facing symbol (e.g. `"BTCUSD.BKKT"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Base asset code (e.g. `"BTC"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub base_asset: String,
     /// Official website URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub official_web_address: String,
     /// Logo image URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub logo: String,
     /// In-app wiki URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub wiki_url: String,
     /// Multi-language profile / description (JSON string)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub profile: String,
 }
 

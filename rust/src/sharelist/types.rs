@@ -9,10 +9,10 @@ pub struct SharelistList {
     /// User's own and followed sharelists
     pub sharelists: Vec<SharelistInfo>,
     /// Subscribed sharelists (may be absent in popular response)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subscribed_sharelists: Vec<SharelistInfo>,
     /// Pagination cursor for subscribed list
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tail_mark: String,
 }
 
@@ -34,13 +34,13 @@ pub struct SharelistInfo {
     /// Name
     pub name: String,
     /// Description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// Cover image URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cover: String,
     /// Number of subscribers (may be null)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subscribers_count: i64,
     /// Creation time
     #[serde(deserialize_with = "crate::serde_utils::deserialize_timestamp")]
@@ -63,7 +63,7 @@ pub struct SharelistInfo {
     /// Sharelist type: 0=regular, 3=official, 4=industry
     pub sharelist_type: i32,
     /// Industry code (for industry sharelists)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_code: String,
 }
 
@@ -73,19 +73,19 @@ pub struct SharelistStock {
     /// Security symbol
     pub symbol: String,
     /// Security name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Market, e.g. `"HK"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market: String,
     /// Ticker code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub code: String,
     /// Brief description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub intro: String,
     /// Unread change log category
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub unread_change_log_category: String,
     /// Day change percentage
     #[serde(default, with = "crate::serde_utils::decimal_opt_str_is_none")]
@@ -94,10 +94,10 @@ pub struct SharelistStock {
     #[serde(default, with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub last_done: Option<Decimal>,
     /// Trade status code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub trade_status: Option<i32>,
     /// Whether delayed quote
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub latency: Option<bool>,
 }
 
