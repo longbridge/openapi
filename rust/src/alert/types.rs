@@ -29,7 +29,7 @@ pub struct AlertSymbolGroup {
     #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub p_chg: Option<Decimal>,
     /// Product type (may be empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub product: String,
     /// Alert items
     pub indicators: Vec<AlertItem>,
@@ -51,7 +51,7 @@ pub struct AlertItem {
     /// Display text, e.g. "价格涨到 600"
     pub text: String,
     /// Trigger state flags
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub state: Vec<i32>,
     /// Trigger value, e.g. `{"price":"500"}` or `{"chg":"5"}`
     pub value_map: AlertValueMap,

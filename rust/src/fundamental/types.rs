@@ -36,7 +36,7 @@ pub struct DividendItem {
     /// Security symbol, e.g. `"700.HK"`
     pub symbol: String,
     /// Internal record ID (may be absent in dividend_detail response)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub id: String,
     /// Human-readable description, e.g. `"每股派息 5.3 HKD"`
     pub desc: String,
@@ -192,10 +192,10 @@ pub struct InstitutionRatingDetailEvaluateItem {
     /// Number of "Sell" ratings
     pub sell: i32,
     /// Number of "Strong Buy" / "Outperform" ratings
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub strong_buy: i32,
     /// Number of "No Opinion" ratings
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub no_opinion: i32,
     /// Number of "Underperform" ratings
     pub under: i32,
@@ -288,7 +288,7 @@ pub struct FinancialConsensus {
     /// Reporting currency, e.g. `"HKD"`
     pub currency: String,
     /// Available period types, e.g. `["qf", "saf", "af"]`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub opt_periods: Vec<String>,
     /// Currently returned period type
     pub current_period: String,
@@ -596,7 +596,7 @@ pub struct CompanyOverview {
     /// Business profile / description
     pub profile: String,
     /// ADS ratio (may be empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ads_ratio: String,
     /// Industry sector code
     pub sector: i32,
@@ -654,7 +654,7 @@ pub struct ShareholderList {
     /// List of major shareholders
     pub shareholder_list: Vec<Shareholder>,
     /// Link to the full shareholder page
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub forward_url: String,
     /// Total number of shareholders returned
     pub total: i32,
@@ -678,7 +678,7 @@ pub struct Shareholder {
     /// Date of the most recent filing, e.g. `"2026-05-04"`
     pub report_date: String,
     /// Other securities held by this shareholder (cross-holdings)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stocks: Vec<ShareholderStock>,
 }
 
@@ -787,7 +787,7 @@ pub struct CorpActionLive {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InvestRelations {
     /// Link to the full investor-relations page
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub forward_url: String,
     /// Securities in which the queried company holds a stake
     pub invest_securities: Vec<InvestSecurity>,
@@ -841,10 +841,10 @@ pub struct OperatingItem {
     /// Whether this is the most recent report
     pub latest: bool,
     /// Keyword tags (structure undocumented; usually empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub keywords: Vec<serde_json::Value>,
     /// URL to the full community report page
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub web_url: String,
     /// Key financial metrics extracted from the report
     pub financial: OperatingFinancial,
@@ -891,13 +891,13 @@ pub struct OperatingIndicator {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BuybackData {
     /// Most recent buyback summary (TTM)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub recent_buybacks: Option<RecentBuybacks>,
     /// Historical annual buyback data
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub buyback_history: Vec<BuybackHistoryItem>,
     /// Buyback payout and cash-flow ratios
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub buyback_ratios: Vec<BuybackRatios>,
 }
 
@@ -951,40 +951,40 @@ pub struct BuybackRatios {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StockRatings {
     /// Style display name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub style_txt_name: String,
     /// Scale display name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub scale_txt_name: String,
     /// Report period display text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report_period_txt: String,
     /// Composite score
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub multi_score: Option<f64>,
     /// Composite score letter grade
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub multi_letter: String,
     /// Score change vs previous period
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub multi_score_change: i32,
     /// Industry name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_name: String,
     /// Industry rank
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_rank: Option<i64>,
     /// Total securities in the industry
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_total: Option<i64>,
     /// Industry mean score
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_mean_score: Option<f64>,
     /// Industry median score
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_median_score: Option<f64>,
     /// Detailed rating categories
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ratings: Vec<RatingCategory>,
 }
 
@@ -995,7 +995,7 @@ pub struct RatingCategory {
     #[serde(rename = "type")]
     pub kind: i32,
     /// Sub-indicator groups within this category
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub sub_indicators: Vec<RatingSubIndicatorGroup>,
 }
 
@@ -1005,7 +1005,7 @@ pub struct RatingSubIndicatorGroup {
     /// Parent indicator for this group
     pub indicator: RatingIndicator,
     /// Leaf sub-indicators
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub sub_indicators: Vec<RatingLeafIndicator>,
 }
 
@@ -1015,10 +1015,10 @@ pub struct RatingIndicator {
     /// Indicator display name
     pub name: String,
     /// Score
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub score: Option<f64>,
     /// Letter grade
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub letter: String,
 }
 
@@ -1028,16 +1028,16 @@ pub struct RatingLeafIndicator {
     /// Indicator display name
     pub name: String,
     /// Formatted value string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub value: String,
     /// Value type hint, e.g. `"percent"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub value_type: String,
     /// Score
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub score: Option<f64>,
     /// Letter grade
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub letter: String,
 }
 
@@ -1104,7 +1104,7 @@ pub struct BusinessSegments {
     /// Reporting currency
     pub currency: String,
     /// Business segment breakdown
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub business: Vec<BusinessSegmentItem>,
 }
 
@@ -1121,7 +1121,7 @@ pub struct BusinessSegmentItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BusinessSegmentsHistory {
     /// Historical snapshots
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub historical: Vec<BusinessSegmentsHistoricalItem>,
 }
 
@@ -1135,10 +1135,10 @@ pub struct BusinessSegmentsHistoricalItem {
     /// Reporting currency
     pub currency: String,
     /// Business segment breakdown
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub business: Vec<BusinessSegmentHistoryItem>,
     /// Regional breakdown
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub regionals: Vec<BusinessSegmentHistoryItem>,
 }
 
@@ -1159,7 +1159,7 @@ pub struct BusinessSegmentHistoryItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InstitutionRatingViews {
     /// Historical rating distribution snapshots
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub elist: Vec<InstitutionRatingViewItem>,
 }
 
@@ -1188,7 +1188,7 @@ pub struct InstitutionRatingViewItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndustryRankResponse {
     /// Grouped rank items
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub items: Vec<IndustryRankGroup>,
 }
 
@@ -1196,7 +1196,7 @@ pub struct IndustryRankResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndustryRankGroup {
     /// Items in this group
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub lists: Vec<IndustryRankItem>,
 }
 
@@ -1227,7 +1227,7 @@ pub struct IndustryRankItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndustryPeersResponse {
     /// Top-level industry node info (may be absent if no data)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub top: Option<IndustryPeersTop>,
     /// Root peer chain node (may be absent if no data)
     pub chain: Option<IndustryPeerNode>,
@@ -1256,7 +1256,7 @@ pub struct IndustryPeerNode {
     /// Year-to-date change
     pub ytd_chg: String,
     /// Child nodes (recursive)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub next: Vec<IndustryPeerNode>,
 }
 
@@ -1475,22 +1475,22 @@ impl<'de> Deserialize<'de> for ElementType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HoldingDetail {
     /// Industry ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_id: String,
     /// Industry name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_name: String,
     /// Index counter ID (e.g. `BK/US/CP99000`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub index: String,
     /// Index name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub index_name: String,
     /// Holding type (e.g. `E` for stock)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub holding_type: String,
     /// Holding type name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub holding_type_name: String,
 }
 
@@ -1500,18 +1500,18 @@ pub struct AssetAllocationItem {
     /// Element name
     pub name: String,
     /// Security code (holdings only, e.g. `NVDA`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub code: String,
     /// Position ratio (e.g. `0.0861114`)
     pub position_ratio: String,
     /// Security symbol (holdings only, e.g. `NVDA.US`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Localized names (locale → name, e.g. `zh-CN` → `英伟达`)
     #[serde(rename = "name_locales_map", default)]
     pub name_locales: HashMap<String, String>,
     /// Holding detail (holdings only)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub holding_detail: Option<HoldingDetail>,
 }
 
@@ -1523,7 +1523,7 @@ pub struct AssetAllocationGroup {
     /// Element type of this group
     pub asset_type: ElementType,
     /// Elements
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub lists: Vec<AssetAllocationItem>,
 }
 
@@ -1531,7 +1531,7 @@ pub struct AssetAllocationGroup {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AssetAllocationResponse {
     /// Asset allocation groups
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub info: Vec<AssetAllocationGroup>,
 }
 
@@ -1587,13 +1587,13 @@ impl MacroeconomicImportance {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MultiLanguageText {
     /// English
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub english: String,
     /// Simplified Chinese
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub simplified_chinese: String,
     /// Traditional Chinese
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub traditional_chinese: String,
 }
 
@@ -1603,28 +1603,28 @@ pub struct MacroeconomicIndicator {
     /// External vendor code (used as input to `macroeconomic`)
     pub indicator_code: String,
     /// Publishing organisation
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub source_org: String,
     /// Country
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub country: String,
     /// Indicator name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Adjustment factor
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub adjustment_factor: String,
     /// Release periodicity (e.g. `monthly` / `quarterly`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub periodicity: String,
     /// Indicator category
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub category: String,
     /// Description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub describe: String,
     /// Importance — higher is more important
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub importance: i32,
     /// Start date of data coverage
     #[serde(
@@ -1639,10 +1639,14 @@ pub struct MacroeconomicIndicator {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MacroeconomicIndicatorListResponse {
     /// Indicator list
-    #[serde(default, rename = "list")]
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "list"
+    )]
     pub data: Vec<MacroeconomicIndicator>,
     /// Total number of indicators matching the query
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub count: i32,
 }
 
@@ -1650,31 +1654,31 @@ pub struct MacroeconomicIndicatorListResponse {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Macroeconomic {
     /// Statistical period (e.g. `2024-Q1`, `2024-03`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub period: String,
     /// Release datetime
     #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
     pub release_at: Option<OffsetDateTime>,
     /// Actual value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub actual_value: String,
     /// Previous value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub previous_value: String,
     /// Forecast value (market consensus)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub forecast_value: String,
     /// Revised value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub revised_value: String,
     /// Next release datetime
     #[serde(default, with = "crate::serde_utils::rfc3339_opt")]
     pub next_release_at: Option<OffsetDateTime>,
     /// Unit
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub unit: String,
     /// Unit prefix / data scale (e.g. millions / billions)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub unit_prefix: String,
 }
 
@@ -1685,10 +1689,10 @@ pub struct MacroeconomicResponse {
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub info: MacroeconomicIndicator,
     /// Historical data points
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub data: Vec<Macroeconomic>,
     /// Total number of historical data points
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub count: i32,
 }
 
@@ -1700,22 +1704,22 @@ pub struct MacroeconomicResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USRankTag {
     /// Tag key
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub key: String,
     /// Display position / ordering
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub location: i32,
     /// Tag title
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
     /// Tag text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub text: String,
     /// Rank type code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub rank_type: i32,
     /// Highlighted portion of the text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub highlight_text: String,
 }
 
@@ -1723,13 +1727,13 @@ pub struct USRankTag {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USSharelistItem {
     /// Price change ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chg: String,
     /// Sharelist ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub id: String,
     /// Sharelist name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
 }
 
@@ -1737,22 +1741,22 @@ pub struct USSharelistItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USCompanyOverview {
     /// Company introduction / description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub intro: String,
     /// Market capitalisation
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market_cap: String,
     /// Currency symbol (e.g. `"$"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ccy_symbol: String,
     /// Top industry-rank tags
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub top_rank_tags: Vec<USRankTag>,
     /// Detail page URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub detail_url: String,
     /// Related sharelists
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub share_list: Vec<USSharelistItem>,
 }
 
@@ -1760,19 +1764,19 @@ pub struct USCompanyOverview {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USValuationMetric {
     /// Position on the percentile circle / gauge
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub circle: String,
     /// Segment / part label
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub part: String,
     /// Metric value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub metric: String,
     /// Metric description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub desc: String,
     /// Industry median for this metric
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_median: String,
 }
 
@@ -1780,25 +1784,25 @@ pub struct USValuationMetric {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USValuationOverview {
     /// Map of metric key (e.g. "pe") to its valuation data
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub metrics: std::collections::HashMap<String, USValuationMetric>,
     /// Active indicator key (e.g. "pe")
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator: String,
     /// Historical percentile range in years
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub range: i32,
     /// Data date string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub date: String,
     /// Currency symbol (e.g. `"$"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ccy_symbol: String,
     /// Embedded AI-chat context
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub aichat_data: USAIChatData,
     /// AI-generated summary text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ai_summary: String,
 }
 
@@ -1806,28 +1810,28 @@ pub struct USValuationOverview {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatementField {
     /// Display order within the statement
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub display_order: i32,
     /// Field code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub field: String,
     /// Field ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub id: String,
     /// Nesting level (for indentation)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub level: i64,
     /// Field display name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Field value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub value: String,
     /// Value type hint
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub value_type: String,
     /// Year-over-year change
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub yoy: String,
 }
 
@@ -1835,22 +1839,22 @@ pub struct USFinancialStatementField {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatementPeriod {
     /// Fiscal period (e.g. `"Q1"`, `"FY"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ff_period: String,
     /// Fiscal year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ff_year: i32,
     /// Statement fields for this period
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fields: Vec<USFinancialStatementField>,
     /// Fiscal-period end date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fp_end: String,
     /// Report label text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report_txt: String,
     /// Report publication date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub rpt_date: String,
 }
 
@@ -1858,16 +1862,16 @@ pub struct USFinancialStatementPeriod {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialStatement {
     /// Reporting currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Report type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report: String,
     /// Per-period statement data
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub list: Vec<USFinancialStatementPeriod>,
     /// Field codes that have no data
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub empty_fields: Vec<String>,
 }
 
@@ -1875,19 +1879,19 @@ pub struct USFinancialStatement {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFiscalYearDividend {
     /// Dividend amount for the fiscal year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend: String,
     /// Dividend yield for the fiscal year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_yield: String,
     /// Fiscal year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fiscal_year: String,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Fiscal-year date range
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fiscal_year_range: String,
 }
 
@@ -1895,19 +1899,19 @@ pub struct USFiscalYearDividend {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USETFDividendInfo {
     /// Total dividend over trailing 12 months
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_ttm: String,
     /// Dividend yield over trailing 12 months
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_yield_ttm: String,
     /// Dividend frequency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_frequency: String,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Per-fiscal-year dividend records
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fiscal_year_info: Vec<USFiscalYearDividend>,
 }
 
@@ -1915,19 +1919,19 @@ pub struct USETFDividendInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USDividendItem {
     /// Per-share dividend amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend: String,
     /// Dividend type (e.g. cash dividend)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_type: String,
     /// Ex-dividend date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ex_date: String,
     /// Payment date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub payment_date: String,
     /// Record date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub record_date: String,
 }
 
@@ -1935,16 +1939,16 @@ pub struct USDividendItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USRecentDividend {
     /// Total dividend over the trailing 12 months
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_ttm: String,
     /// Dividend yield over the trailing 12 months
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_yield_ttm: String,
     /// Number of payouts
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub payouts: String,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
 }
 
@@ -1952,46 +1956,46 @@ pub struct USRecentDividend {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USDividendHistoryItem {
     /// Fiscal year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fiscal_year: String,
     /// Fiscal-year date range
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fiscal_year_range: String,
     /// Total shareholder yield (dividend + buyback)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_shareholder_yield: String,
     /// Dividend amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend: String,
     /// Dividend yield
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_yield: String,
     /// Dividend growth rate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_growth_rate: String,
     /// Dividend payout ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_payout_ratio: String,
     /// Dividend-to-cash-flow ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_to_cashflow_ratio: String,
     /// Net buyback amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub net_buyback: String,
     /// Net buyback yield
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub net_buyback_yield: String,
     /// Net buyback growth rate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub net_buyback_growth_rate: String,
     /// Net buyback payout ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub net_buyback_payout_ratio: String,
     /// Net-buyback-to-cash-flow ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub net_buyback_to_cashflow_ratio: String,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
 }
 
@@ -1999,28 +2003,28 @@ pub struct USDividendHistoryItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USDividendPayoutRecord {
     /// Per-share dividend amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend: String,
     /// Dividend type (e.g. cash dividend)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_type: String,
     /// Currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Ex-dividend date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ex_date: String,
     /// Payment date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub payment_date: String,
     /// Record date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub record_date: String,
     /// Display title
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
     /// Start time as a Unix-seconds string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub start_time_unix: String,
 }
 
@@ -2031,13 +2035,13 @@ pub struct USCompanyDividends {
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub recent_dividends: USRecentDividend,
     /// Per-fiscal-year dividend history
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_history: Vec<USDividendHistoryItem>,
     /// Per-fiscal-year payout ratios
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub payout_ratios: Vec<USDividendHistoryItem>,
     /// Individual dividend payout events
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub dividend_payout_history: Vec<USDividendPayoutRecord>,
 }
 
@@ -2045,19 +2049,19 @@ pub struct USCompanyDividends {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USETFFile {
     /// File name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub file_name: String,
     /// File path / URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub file_path: String,
     /// Last update date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub update_date: String,
     /// Document type code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub code: String,
     /// File format (e.g. `"pdf"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub format: String,
 }
 
@@ -2065,7 +2069,7 @@ pub struct USETFFile {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USETFFilesResponse {
     /// List of ETF documents
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub files: Vec<USETFFile>,
 }
 
@@ -2074,64 +2078,64 @@ pub struct USETFFilesResponse {
 /// v2 wire: one indicator from GET /v2/quote/macrodata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct V2MacroIndicator {
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator_id: i32,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator_name: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub importance: i32,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// Update frequency: day/week/month/quarter/half_year/year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub frequence: String,
 }
 
 /// v2 wire: response from GET /v2/quote/macrodata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct V2MacroIndicatorListResponse {
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator_list: Vec<V2MacroIndicator>,
     /// Total count for pagination
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total: i32,
 }
 
 /// v2 wire: one data point from GET /v2/quote/macrodata/:id
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct V2IndicatorDataDetail {
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub actual_data: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub previous_data: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub estimated_data: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub published_time: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub observation_date: String,
 }
 
 /// v2 wire: one indicator with data from GET /v2/quote/macrodata/:id
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub(crate) struct V2MacroIndicatorDetail {
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator_id: i32,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator_name: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub unit: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub frequence: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub importance: i32,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator_data: Vec<V2IndicatorDataDetail>,
 }
 
@@ -2140,10 +2144,10 @@ pub(crate) struct V2MacroIndicatorDetail {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub(crate) struct V2MacroIndicatorDataResponse {
     /// Single indicator with paginated data points
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub indicator: V2MacroIndicatorDetail,
     /// Total data points matching the query (for pagination)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total: i32,
 }
 
@@ -2153,13 +2157,13 @@ pub(crate) struct V2MacroIndicatorDataResponse {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USReportPeriod {
     /// Period start date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub start_date: String,
     /// Period end date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub end_date: String,
     /// Report label text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report_txt: String,
 }
 
@@ -2167,16 +2171,16 @@ pub struct USReportPeriod {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialISItem {
     /// Revenue
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub revenue: String,
     /// Net income
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub net_income: String,
     /// Net margin
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub net_margin: String,
     /// Reporting period
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report: USReportPeriod,
 }
 
@@ -2184,16 +2188,16 @@ pub struct USFinancialISItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialBSItem {
     /// Debt-to-assets ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub debt_assets_ratio: String,
     /// Total assets
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_assets: String,
     /// Total liabilities
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_liabilities: String,
     /// Reporting period
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report: USReportPeriod,
 }
 
@@ -2201,16 +2205,16 @@ pub struct USFinancialBSItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialCFItem {
     /// Operating cash flow
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub operating: String,
     /// Investing cash flow
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub investing: String,
     /// Financing cash flow
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub financing: String,
     /// Reporting period
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report: USReportPeriod,
 }
 
@@ -2218,19 +2222,19 @@ pub struct USFinancialCFItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USFinancialOverview {
     /// Currency symbol (e.g. `"$"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ccy_symbol: String,
     /// Report type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report_type: String,
     /// Income-statement entries
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_list: Vec<USFinancialISItem>,
     /// Balance-sheet entries
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub bs_list: Vec<USFinancialBSItem>,
     /// Cash-flow entries
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cf_list: Vec<USFinancialCFItem>,
 }
 
@@ -2240,22 +2244,22 @@ pub struct USFinancialOverview {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USKeyMetricItem {
     /// Fiscal period (e.g. `"Q1"`, `"FY"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ff_period: String,
     /// Fiscal year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ff_year: i32,
     /// Fiscal-period end date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fp_end: String,
     /// Report label text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report_txt: String,
     /// Report publication date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub rpt_date: String,
     /// Metric values — shape varies per field configuration.
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fields: Vec<serde_json::Value>,
 }
 
@@ -2263,16 +2267,16 @@ pub struct USKeyMetricItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USKeyFinancialMetrics {
     /// Reporting currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Report type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report: String,
     /// Field codes that have no data
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub empty_fields: Vec<String>,
     /// Per-period metric data
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub list: Vec<USKeyMetricItem>,
 }
 
@@ -2282,22 +2286,26 @@ pub struct USKeyFinancialMetrics {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAIChatData {
     /// AI agent ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub agent_id: String,
     /// Handoff agent ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub handoff_agent_id: String,
     /// Security symbol
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Prompt / context text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub text: String,
     /// Chat type
-    #[serde(default, rename = "type")]
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "type"
+    )]
     pub chat_type: String,
     /// Workflow type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub workflow_type: String,
 }
 
@@ -2305,10 +2313,10 @@ pub struct USAIChatData {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USConsensusEstimate {
     /// Actual reported value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub actual: String,
     /// Consensus estimate value
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub estimate: String,
 }
 
@@ -2316,19 +2324,19 @@ pub struct USConsensusEstimate {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USConsensusItem {
     /// EBIT actual vs estimate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ebit: USConsensusEstimate,
     /// EPS actual vs estimate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub eps: USConsensusEstimate,
     /// Fiscal year
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub fiscal_year: i64,
     /// Report label text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report_txt: String,
     /// Revenue actual vs estimate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub revenue: USConsensusEstimate,
 }
 
@@ -2336,25 +2344,25 @@ pub struct USConsensusItem {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USAnalystConsensus {
     /// AI-generated summary text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ai_summary: String,
     /// Embedded AI-chat context
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub aichat_data: USAIChatData,
     /// Reporting currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Report type
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub report: String,
     /// Per-fiscal-year consensus estimates
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub list: Vec<USConsensusItem>,
     /// Option consensus type identifiers (e.g. "call", "put").
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub opt_reports: Vec<String>,
     /// Raw H5 page data (structure varies)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub h5_data: serde_json::Value,
 }
 

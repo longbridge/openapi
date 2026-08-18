@@ -173,7 +173,7 @@ pub struct ProfitAnalysisItem {
     /// Security symbol
     pub symbol: String,
     /// Holding period display string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub holding_period: String,
     /// Ticker code
     pub security_code: String,
@@ -279,10 +279,10 @@ pub struct ProfitAnalysisByMarket {
     #[serde(with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub profit: Option<Decimal>,
     /// Whether more pages are available
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub has_more: bool,
     /// Per-security P&L items for the requested market/page
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stock_items: Vec<ProfitAnalysisByMarketItem>,
 }
 
@@ -306,10 +306,10 @@ pub struct ProfitAnalysisByMarketItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProfitAnalysisFlows {
     /// Paginated list of flow items
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub flows_list: Vec<FlowItem>,
     /// Whether there are more pages
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub has_more: bool,
 }
 
@@ -317,14 +317,14 @@ pub struct ProfitAnalysisFlows {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FlowItem {
     /// Execution date string, e.g. `"2024-01-15"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub executed_date: String,
     /// Execution timestamp as a Unix-seconds string (absent when not yet
     /// executed)
     #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
     pub executed_timestamp: Option<String>,
     /// Security code / ticker
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub code: String,
     /// Direction of the flow
     pub direction: FlowDirection,
@@ -338,7 +338,7 @@ pub struct FlowItem {
     #[serde(default, with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub executed_cost: Option<Decimal>,
     /// Human-readable description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub describe: String,
 }
 

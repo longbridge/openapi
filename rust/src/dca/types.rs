@@ -16,39 +16,39 @@ pub struct DcaPlan {
     /// Plan ID
     pub plan_id: String,
     /// Status
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: DCAStatus,
     /// Security symbol
     pub symbol: String,
     /// Member ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub member_id: String,
     /// Account ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub aaid: String,
     /// Account channel
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub account_channel: String,
     /// Display account
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub display_account: String,
     /// Market
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub market: Market,
     /// Investment amount per period
     #[serde(default, with = "crate::serde_utils::decimal_empty_is_0")]
     pub per_invest_amount: Decimal,
     /// Investment frequency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub invest_frequency: DCAFrequency,
     /// Day of week for weekly plans (e.g. `"Mon"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub invest_day_of_week: String,
     /// Day of month for monthly plans
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub invest_day_of_month: String,
     /// Whether margin finance is allowed
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub allow_margin_finance: bool,
     /// Reminder notification hours before execution (API may return integer or
     /// string)
@@ -58,22 +58,22 @@ pub struct DcaPlan {
     )]
     pub alter_hours: String,
     /// Creation time
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub created_at: String,
     /// Last updated time
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: String,
     /// Next investment date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub next_trd_date: String,
     /// Security name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stock_name: String,
     /// Cumulative invested amount
     #[serde(default, with = "crate::serde_utils::decimal_opt_str_is_none")]
     pub cum_amount: Option<Decimal>,
     /// Number of completed investment periods
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub issue_number: i64,
     /// Average cost
     #[serde(default, with = "crate::serde_utils::decimal_opt_str_is_none")]
@@ -87,19 +87,19 @@ pub struct DcaPlan {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct DcaStats {
     /// Number of active plans
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub active_count: String,
     /// Number of finished plans
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub finished_count: String,
     /// Number of suspended plans
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub suspended_count: String,
     /// Nearest upcoming plans
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub nearest_plans: Vec<DcaPlan>,
     /// Days until next investment
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub rest_days: String,
     /// Total invested amount
     #[serde(default, with = "crate::serde_utils::decimal_opt_str_is_none")]
@@ -131,7 +131,7 @@ pub struct DcaHistoryResponse {
     /// Execution history records
     pub records: Vec<DcaHistoryRecord>,
     /// Whether more records exist
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub has_more: bool,
 }
 

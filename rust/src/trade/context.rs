@@ -10,14 +10,13 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result, serde_utils,
     trade::{
-        AccountBalance, CancelOrderOptions, CashFlow,
-        EstimateMaxPurchaseQuantityOptions, Execution, FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
+        AccountBalance, CancelOrderOptions, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        Execution, FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };

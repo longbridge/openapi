@@ -440,7 +440,7 @@ pub struct BrokerHoldingTop {
     /// Top brokers by net selling
     pub sell: Vec<BrokerHoldingEntry>,
     /// Last updated (may be empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: String,
 }
 
@@ -466,7 +466,7 @@ pub struct BrokerHoldingDetail {
     /// Full list of broker holdings
     pub list: Vec<BrokerHoldingDetailItem>,
     /// Last updated (may be empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: String,
 }
 
@@ -730,7 +730,7 @@ pub struct TopMoversStock {
     /// Security name
     pub name: String,
     /// Full name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub full_name: String,
     /// Price change (decimal ratio)
     pub change: String,
@@ -739,10 +739,10 @@ pub struct TopMoversStock {
     /// Market code
     pub market: String,
     /// Labels / tags
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub labels: Vec<String>,
     /// Logo URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub logo: String,
 }
 
@@ -827,25 +827,25 @@ pub struct RankListItem {
     /// Industry name
     pub industry: String,
     /// Pre/post market price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pre_post_price: String,
     /// Pre/post market change
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pre_post_chg: String,
     /// Amplitude
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub amplitude: String,
     /// 5-day change
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub five_day_chg: String,
     /// Turnover rate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub turnover_rate: String,
     /// Volume ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub volume_rate: String,
     /// P/B ratio (TTM)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pb_ttm: String,
 }
 
