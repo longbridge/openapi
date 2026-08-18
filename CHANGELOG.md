@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **All SDKs:** `FundamentalContext.institution_rating_detail` no longer errors when the server returns `"target": null` / `"evaluate": null` (symbols without analyst coverage) — both now deserialize to empty series. `FundamentalContext.us_company_dividends` likewise tolerates `"recent_dividends": null` (companies with no trailing dividends). `#[serde(default)]` alone only covers a missing key, not an explicit `null`
+
 ### Breaking changes
 
 - **All SDKs:** the write methods on `AlertContext` (`add`, `update`, `delete`) and `SharelistContext` (`delete`, `add_securities`, `remove_securities`, `sort_securities`) no longer return the raw server JSON. They now return `()` / `void` / `Promise<void>` — the server response body carried no useful information
