@@ -512,22 +512,23 @@ impl FundamentalContext {
 
     // ── ratings ───────────────────────────────────────────────────
 
-    /// Get stock ratings for a security.
-    ///
-    /// Path: `GET /v1/quote/ratings`
-    pub async fn ratings(&self, symbol: impl Into<String>) -> Result<StockRatings> {
-        #[derive(Serialize)]
-        struct Query {
-            symbol: String,
-        }
-        self.get(
-            "/v1/quote/ratings",
-            Query {
-                symbol: symbol.into(),
-            },
-        )
-        .await
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings for a security.
+    // ///
+    // /// Path: `GET /v1/quote/ratings`
+    // pub async fn ratings(&self, symbol: impl Into<String>) ->
+    // Result<StockRatings> {     #[derive(Serialize)]
+    //     struct Query {
+    //         symbol: String,
+    //     }
+    //     self.get(
+    //         "/v1/quote/ratings",
+    //         Query {
+    //             symbol: symbol.into(),
+    //         },
+    //     )
+    //     .await
+    // }
 
     // ── business_segments ────────────────────────────────────────
 

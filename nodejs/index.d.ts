@@ -774,8 +774,6 @@ export declare class FundamentalContext {
   operating(symbol: string): Promise<OperatingList>
   /** Get buyback data for a security */
   buyback(symbol: string): Promise<BuybackData>
-  /** Get stock ratings for a security */
-  ratings(symbol: string): Promise<StockRatings>
   /** Get ranked list of top shareholders */
   shareholderTop(symbol: string): Promise<ShareholderTopResponse>
   /** Get holding history and detail for one shareholder */

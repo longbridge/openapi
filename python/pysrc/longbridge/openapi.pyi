@@ -11510,17 +11510,18 @@ class FundamentalContext:
         """
         ...
 
-    def ratings(self, symbol: str) -> "StockRatings":
-        """
-        Get stock ratings for a security.
-
-        Args:
-            symbol: Security symbol, e.g. ``"AAPL.US"``
-
-        Returns:
-            :class:`StockRatings`
-        """
-        ...
+    # TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    # def ratings(self, symbol: str) -> "StockRatings":
+    #     """
+    #     Get stock ratings for a security.
+    #
+    #     Args:
+    #         symbol: Security symbol, e.g. ``"AAPL.US"``
+    #
+    #     Returns:
+    #         :class:`StockRatings`
+    #     """
+    #     ...
 
     def shareholder_top(self, symbol: str) -> "ShareholderTopResponse":
         """

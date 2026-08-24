@@ -159,10 +159,11 @@ impl FundamentalContext {
         Ok(self.ctx.buyback(symbol).map_err(ErrorNewType)?.into())
     }
 
-    /// Get stock ratings for a security.
-    fn ratings(&self, symbol: String) -> PyResult<StockRatings> {
-        Ok(self.ctx.ratings(symbol).map_err(ErrorNewType)?.into())
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings for a security.
+    // fn ratings(&self, symbol: String) -> PyResult<StockRatings> {
+    //     Ok(self.ctx.ratings(symbol).map_err(ErrorNewType)?.into())
+    // }
 
     /// Get ranked list of top shareholders.
     fn shareholder_top(&self, symbol: String) -> PyResult<ShareholderTopResponse> {

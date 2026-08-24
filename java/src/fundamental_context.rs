@@ -297,25 +297,26 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
     })
 }
 
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGetRatings(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    symbol: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        async_util::execute(env, callback, async move {
-            let resp = __owned_ctx.ratings(symbol).await?;
-            Ok(resp)
-        })?;
-        Ok(())
-    })
-}
+// TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+// #[unsafe(no_mangle)]
+// pub unsafe extern "system" fn
+// Java_com_longbridge_SdkNative_fundamentalContextGetRatings(     mut env:
+// JNIEnv,     _class: JClass,
+//     context: i64,
+//     symbol: JObject,
+//     callback: JObject,
+// ) {
+//     jni_result(&mut env, (), |env| {
+//         let context = &*(context as *const ContextObj);
+//         let __owned_ctx = context.ctx.clone();
+//         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+//         async_util::execute(env, callback, async move {
+//             let resp = __owned_ctx.ratings(symbol).await?;
+//             Ok(resp)
+//         })?;
+//         Ok(())
+//     })
+// }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextShareholderTop(

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking changes
 
 - **All SDKs:** the write methods on `AlertContext` (`add`, `update`, `delete`) and `SharelistContext` (`delete`, `add_securities`, `remove_securities`, `sort_securities`) no longer return the raw server JSON. They now return `()` / `void` / `Promise<void>` — the server response body carried no useful information
+- **All SDKs:** `FundamentalContext.ratings` (`GET /v1/quote/ratings`) is temporarily unavailable — the endpoint has been designated 暂不开放 (not yet open) on the server side, so the method has been commented out across every language binding (Rust incl. blocking, Python sync/async + `openapi.pyi` stub, Node.js, Java incl. JNI, C, C++) pending release. The `StockRatings` types remain in place for when it reopens
 
 ### Changed
 

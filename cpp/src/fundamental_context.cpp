@@ -95,9 +95,10 @@ void FundamentalContext::executive(const std::string& s, AsyncCallback<Fundament
 void FundamentalContext::buyback(const std::string& s, AsyncCallback<FundamentalContext, BuybackData> callback) const {
   F_TYPED(BuybackData, lb_buyback_data_t, lb_fundamental_context_buyback, ctx_, s.c_str());
 }
-void FundamentalContext::ratings(const std::string& s, AsyncCallback<FundamentalContext, StockRatings> callback) const {
-  F_TYPED(StockRatings, lb_stock_ratings_t, lb_fundamental_context_ratings, ctx_, s.c_str());
-}
+// TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+// void FundamentalContext::ratings(const std::string& s, AsyncCallback<FundamentalContext, StockRatings> callback) const {
+//   F_TYPED(StockRatings, lb_stock_ratings_t, lb_fundamental_context_ratings, ctx_, s.c_str());
+// }
 void FundamentalContext::business_segments(const std::string& s, AsyncCallback<FundamentalContext, BusinessSegments> callback) const {
   F_TYPED(BusinessSegments, lb_business_segments_t, lb_fundamental_context_business_segments, ctx_, s.c_str());
 }

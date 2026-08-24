@@ -477,8 +477,9 @@ public class SdkNative {
         public static native void fundamentalContextGetBuyback(long context, String symbol,
                         AsyncCallback callback);
 
-        public static native void fundamentalContextGetRatings(long context, String symbol,
-                        AsyncCallback callback);
+        // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+        // public static native void fundamentalContextGetRatings(long context, String symbol,
+        //                 AsyncCallback callback);
 
         public static native void fundamentalContextGetBusinessSegments(long context, String symbol,
                         AsyncCallback callback);

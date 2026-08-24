@@ -174,11 +174,12 @@ impl FundamentalContextSync {
             .call(move |ctx| async move { ctx.buyback(symbol).await })
     }
 
-    /// Get stock ratings
-    pub fn ratings(&self, symbol: impl Into<String> + Send + 'static) -> Result<StockRatings> {
-        self.rt
-            .call(move |ctx| async move { ctx.ratings(symbol).await })
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings
+    // pub fn ratings(&self, symbol: impl Into<String> + Send + 'static) ->
+    // Result<StockRatings> {     self.rt
+    //         .call(move |ctx| async move { ctx.ratings(symbol).await })
+    // }
 
     /// Get latest business segment breakdown
     pub fn business_segments(

@@ -412,22 +412,24 @@ pub unsafe extern "C" fn lb_fundamental_context_buyback(
     });
 }
 
-/// Get stock ratings. Returns `CStockRatings`.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_fundamental_context_ratings(
-    ctx: *const CFundamentalContext,
-    symbol: *const c_char,
-    callback: CAsyncCallback,
-    userdata: *mut c_void,
-) {
-    let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
-    execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CStockRatingsOwned> =
-            CCow::new(CStockRatingsOwned::from(ctx_inner.ratings(symbol).await?));
-        Ok(resp)
-    });
-}
+// TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+// /// Get stock ratings. Returns `CStockRatings`.
+// #[unsafe(no_mangle)]
+// pub unsafe extern "C" fn lb_fundamental_context_ratings(
+//     ctx: *const CFundamentalContext,
+//     symbol: *const c_char,
+//     callback: CAsyncCallback,
+//     userdata: *mut c_void,
+// ) {
+//     let ctx_inner = (*ctx).ctx.clone();
+//     let symbol = cstr_to_rust(symbol);
+//     execute_async(callback, ctx, userdata, async move {
+//         let resp: CCow<CStockRatingsOwned> =
+//
+// CCow::new(CStockRatingsOwned::from(ctx_inner.ratings(symbol).await?));
+//         Ok(resp)
+//     });
+// }
 
 /// Get ranked list of top shareholders. Returns `CShareholderTopResponse`.
 #[unsafe(no_mangle)]

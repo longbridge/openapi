@@ -228,11 +228,12 @@ impl FundamentalContext {
         Ok(self.ctx.buyback(symbol).await.map_err(ErrorNewType)?.into())
     }
 
-    /// Get stock ratings for a security
-    #[napi]
-    pub async fn ratings(&self, symbol: String) -> Result<StockRatings> {
-        Ok(self.ctx.ratings(symbol).await.map_err(ErrorNewType)?.into())
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings for a security
+    // #[napi]
+    // pub async fn ratings(&self, symbol: String) -> Result<StockRatings> {
+    //     Ok(self.ctx.ratings(symbol).await.map_err(ErrorNewType)?.into())
+    // }
 
     /// Get ranked list of top shareholders
     #[napi]

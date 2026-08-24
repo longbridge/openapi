@@ -12523,14 +12523,6 @@ void lb_fundamental_context_buyback(const struct lb_fundamental_context_t *ctx,
                                     void *userdata);
 
 /**
- * Get stock ratings. Returns `CStockRatings`.
- */
-void lb_fundamental_context_ratings(const struct lb_fundamental_context_t *ctx,
-                                    const char *symbol,
-                                    lb_async_callback_t callback,
-                                    void *userdata);
-
-/**
  * Get ranked list of top shareholders. Returns `CShareholderTopResponse`.
  */
 void lb_fundamental_context_shareholder_top(const struct lb_fundamental_context_t *ctx,

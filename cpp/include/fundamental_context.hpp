@@ -122,9 +122,10 @@ public:
   void buyback(const std::string& symbol,
                AsyncCallback<FundamentalContext, BuybackData> callback) const;
 
-  /// Get stock ratings
-  void ratings(const std::string& symbol,
-               AsyncCallback<FundamentalContext, StockRatings> callback) const;
+  // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+  // /// Get stock ratings
+  // void ratings(const std::string& symbol,
+  //              AsyncCallback<FundamentalContext, StockRatings> callback) const;
 
   /// Get latest business segment breakdown
   void business_segments(const std::string& symbol,
