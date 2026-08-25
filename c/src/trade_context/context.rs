@@ -27,9 +27,9 @@ use crate::{
             CGetCashFlowOptions, CGetFundPositionsOptions, CGetHistoryExecutionsOptions,
             CGetHistoryOrdersOptions, CGetStockPositionsOptions, CGetTodayExecutionsOptions,
             CGetTodayOrdersOptions, CMarginRatioOwned, COrderDetailOwned, COrderOwned,
-            CPushOrderChanged, CPushOrderChangedOwned, CReplaceOrderOptions,
-            CStockPositionsResponseOwned, CSubmitMultiLegOrderOptions, CSubmitOrderOptions,
-            CSubmitOrderResponseOwned,
+            CPushGridOrderChanged, CPushGridOrderChangedOwned, CPushOrderChanged,
+            CPushOrderChangedOwned, CReplaceOrderOptions, CStockPositionsResponseOwned,
+            CSubmitMultiLegOrderOptions, CSubmitOrderOptions, CSubmitOrderResponseOwned,
         },
     },
     types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
@@ -38,9 +38,13 @@ use crate::{
 pub type COnOrderChangedCallback =
     extern "C" fn(*const CTradeContext, *const CPushOrderChanged, *mut c_void);
 
+pub type COnGridOrderChangedCallback =
+    extern "C" fn(*const CTradeContext, *const CPushGridOrderChanged, *mut c_void);
+
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<Callback<COnOrderChangedCallback>>,
+    grid_order_changed: Option<Callback<COnGridOrderChangedCallback>>,
 }
 
 pub struct CTradeContextState {
@@ -109,6 +113,28 @@ pub unsafe extern "C" fn lb_trade_context_new(config: *const CConfig) -> *const 
                         );
                     }
                 }
+                PushEvent::GridOrderChanged(grid_order_changed) => {
+                    if let Some(callback) = &state.callbacks.grid_order_changed {
+                        let log_subscriber = ctx.ctx.log_subscriber();
+                        let _guard = tracing::dispatcher::set_default(&log_subscriber.into());
+
+                        let s = Instant::now();
+                        tracing::info!("begin call on_grid_order_changed callback");
+
+                        let grid_order_changed_owned: CPushGridOrderChangedOwned =
+                            grid_order_changed.into();
+                        (callback.f)(
+                            Arc::as_ptr(&ctx),
+                            &grid_order_changed_owned.to_ffi_type(),
+                            callback.userdata,
+                        );
+
+                        tracing::info!(
+                            duration = ?s.elapsed(),
+                            "after call on_grid_order_changed callback"
+                        );
+                    }
+                }
             }
         }
     });
@@ -164,6 +190,22 @@ pub unsafe extern "C" fn lb_trade_context_set_on_order_changed(
     free_userdata: CFreeUserDataFunc,
 ) {
     (*ctx).state.lock().callbacks.order_changed = Some(Callback {
+        f: callback,
+        userdata,
+        free_userdata,
+    });
+}
+
+/// Set grid order changed callback, after receiving the grid order changed
+/// event, it will call back to this function.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_set_on_grid_order_changed(
+    ctx: *const CTradeContext,
+    callback: COnGridOrderChangedCallback,
+    userdata: *mut c_void,
+    free_userdata: CFreeUserDataFunc,
+) {
+    (*ctx).state.lock().callbacks.grid_order_changed = Some(Callback {
         f: callback,
         userdata,
         free_userdata,

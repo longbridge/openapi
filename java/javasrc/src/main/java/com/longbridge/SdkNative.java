@@ -8,6 +8,7 @@ import org.scijava.nativelib.NativeLoader;
 
 import com.longbridge.asset.*;
 import com.longbridge.content.*;
+import com.longbridge.grid.*;
 import com.longbridge.quote.*;
 import com.longbridge.trade.*;
 
@@ -264,6 +265,42 @@ public class SdkNative {
         public static native void tradeContextEstimateMaxPurchaseQuantity(long context,
                         EstimateMaxPurchaseQuantityOptions opts,
                         AsyncCallback callback);
+
+        // ── Grid trading push (stays on the trade side) ───────────────
+        public static native void tradeContextSetOnGridOrderChanged(long context, GridOrderChangedHandler handler);
+
+        // ── GridContext ───────────────────────────────────────────────
+        public static native long newGridContext(long config);
+
+        public static native void freeGridContext(long context);
+
+        public static native void gridContextSubmit(long context, SubmitGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextReplace(long context, ReplaceGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextList(long context, GetGridOrdersOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextListByIds(long context, String[] orderIds,
+                        AsyncCallback callback);
+
+        public static native void gridContextDetail(long context, GetGridOrderDetailOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextTriggerHistory(long context, GetGridTriggerHistoryOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextCancel(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextSuspend(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextRestart(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextSubmitStrategyQuestionnaire(long context, AsyncCallback callback);
+
+        public static native void gridContextSymbolInfo(long context, String symbol, AsyncCallback callback);
 
         // ── DCAContext ────────────────────────────────────────────────
         public static native long newDcaContext(long config);

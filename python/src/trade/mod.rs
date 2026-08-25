@@ -66,6 +66,8 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::USOrderDetail>()?;
     parent.add_class::<types::USOrderDetailResponse>()?;
 
+    parent.add_class::<types::PushGridOrderChanged>()?;
+
     parent.add_class::<context::TradeContext>()?;
     parent.add_class::<context_async::AsyncTradeContext>()?;
     Ok(())

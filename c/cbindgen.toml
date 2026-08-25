@@ -111,6 +111,25 @@ cpp_compat = true
 "COrderChargeItem" = "lb_order_charge_item_t"
 "COrderChargeDetail" = "lb_order_charge_detail_t"
 "COrderDetail" = "lb_order_detail_t"
+"CGridTradeRule" = "lb_grid_trade_rule_t"
+"CSubmitGridOrderOptions" = "lb_submit_grid_order_options_t"
+"CReplaceGridOrderOptions" = "lb_replace_grid_order_options_t"
+"CGetGridOrdersOptions" = "lb_get_grid_orders_options_t"
+"CGetGridOrdersByIdsOptions" = "lb_get_grid_orders_by_ids_options_t"
+"CGetGridOrderDetailOptions" = "lb_get_grid_order_detail_options_t"
+"CGetGridTriggerHistoryOptions" = "lb_get_grid_trigger_history_options_t"
+"CSubmitGridOrderResponse" = "lb_submit_grid_order_response_t"
+"CGridOrder" = "lb_grid_order_t"
+"CGridOrderSubOrder" = "lb_grid_order_sub_order_t"
+"CGridOrderHistory" = "lb_grid_order_history_t"
+"CGridOrderDetail" = "lb_grid_order_detail_t"
+"CTriggerOrder" = "lb_trigger_order_t"
+"CGridBidSize" = "lb_grid_bid_size_t"
+"CGridChannelInfo" = "lb_grid_channel_info_t"
+"CGridSymbolInfo" = "lb_grid_symbol_info_t"
+"CGridOrdersResponse" = "lb_grid_orders_response_t"
+"CGridTriggerHistoryResponse" = "lb_grid_trigger_history_response_t"
+"CPushGridOrderChanged" = "lb_push_grid_order_changed_t"
 "CEstimateMaxPurchaseQuantityOptions" = "lb_estimate_max_purchase_quantity_options_t"
 "CEstimateMaxPurchaseQuantityResponse" = "lb_estimate_max_purchase_quantity_response_t"
 "CCreateWatchlistGroup" = "lb_create_watchlist_group_t"
@@ -143,6 +162,7 @@ cpp_compat = true
 "CFundamentalContext" = "lb_fundamental_context_t"
 "CAlertContext" = "lb_alert_context_t"
 "CDCAContext" = "lb_dca_context_t"
+"CGridContext" = "lb_grid_context_t"
 "CSharelistContext" = "lb_sharelist_context_t"
 "CCalendarContext" = "lb_calendar_context_t"
 "CPortfolioContext" = "lb_portfolio_context_t"
@@ -408,6 +428,13 @@ include = [
     "CWatchlistSecurity",
     "CMarginRatio",
     "COrderDetail",
+    # GridContext: grid trading (reachable only via void* async data pointer)
+    "CSubmitGridOrderResponse",
+    "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",
+    "CTriggerOrder", "CGridBidSize", "CGridChannelInfo", "CGridSymbolInfo",
+    "CGridOrdersResponse", "CGridTriggerHistoryResponse",
+    # TradeContext: grid trading push (stays on trade side)
+    "CPushGridOrderChanged",
     "CEstimateMaxPurchaseQuantityResponse",
     "CSecurityCalcIndex",
     "CWarrantInfo",

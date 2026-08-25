@@ -8,7 +8,7 @@ mod requests;
 mod types;
 
 pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, TradeContext};
-pub use push_types::{PushEvent, PushOrderChanged, TopicType};
+pub use push_types::{PushEvent, PushGridOrderChanged, PushOrderChanged, TopicType};
 pub use requests::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
