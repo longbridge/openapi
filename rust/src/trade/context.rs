@@ -17,7 +17,8 @@ use crate::{
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
         PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -493,6 +494,67 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::POST, "/v1/trade/order")
+            .body(Json(options))
+            .response::<Json<_>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0;
+        _ = self.0.command_tx.send(Command::SubmittedOrder {
+            order_id: resp.order_id.clone(),
+        });
+        Ok(resp)
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{
+    ///     Config, decimal,
+    ///     oauth::OAuthBuilder,
+    ///     trade::{
+    ///         MultiLegStrategy, OrderSide, OrderType, SubmitMultiLegOrderLeg,
+    ///         SubmitMultiLegOrderOptions, TradeContext,
+    ///     },
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let (ctx, _) = TradeContext::new(config);
+    ///
+    /// let opts = SubmitMultiLegOrderOptions::new(
+    ///     OrderSide::Buy,
+    ///     OrderType::LO,
+    ///     decimal!(1i32),
+    ///     MultiLegStrategy::VerticalCallSpread,
+    ///     [
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C764000.US", decimal!(1i32)),
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C767000.US", decimal!(1i32)),
+    ///     ],
+    /// )
+    /// .submitted_price(decimal!(1.5));
+    /// let resp = ctx.submit_multileg(opts).await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn submit_multileg(
+        &self,
+        options: SubmitMultiLegOrderOptions,
+    ) -> Result<SubmitOrderResponse> {
+        let resp: SubmitOrderResponse = self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/trade/order/multileg")
             .body(Json(options))
             .response::<Json<_>>()
             .send()

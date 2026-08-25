@@ -550,6 +550,65 @@ TradeContext::submit_order(
 }
 
 void
+TradeContext::submit_multileg(
+  const SubmitMultiLegOrderOptions& opts,
+  AsyncCallback<TradeContext, SubmitOrderResponse> callback) const
+{
+  std::vector<CSubmitMultiLegOrderLeg> legs;
+  legs.reserve(opts.legs.size());
+  for (const auto& leg : opts.legs) {
+    legs.push_back(CSubmitMultiLegOrderLeg{
+      leg.symbol.c_str(),
+      (const lb_decimal_t*)leg.ratio_quantity,
+    });
+  }
+
+  CSubmitMultiLegOrderOptions opts2 = {
+    convert(opts.side),
+    convert(opts.order_type),
+    (const lb_decimal_t*)opts.submitted_quantity,
+    convert(opts.strategy),
+    legs.data(),
+    legs.size(),
+    nullptr,
+    nullptr,
+    nullptr,
+  };
+
+  if (opts.submitted_price) {
+    opts2.submitted_price = (const lb_decimal_t*)opts.submitted_price.value();
+  }
+  if (opts.remark) {
+    opts2.remark = opts.remark->c_str();
+  }
+  if (opts.client_request_id) {
+    opts2.client_request_id = opts.client_request_id->c_str();
+  }
+
+  lb_trade_context_submit_multileg(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, SubmitOrderResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        SubmitOrderResponse resp =
+          convert((const lb_submit_order_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitOrderResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitOrderResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, SubmitOrderResponse>(callback));
+}
+
+void
 TradeContext::cancel_order(const std::string& order_id,
                            AsyncCallback<TradeContext, void> callback,
                            bool is_attached) const

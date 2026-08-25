@@ -10,6 +10,7 @@ mod get_stock_positions;
 mod get_today_executions;
 mod get_today_orders;
 mod replace_order;
+mod submit_multileg;
 mod submit_order;
 
 pub use cancel_order::CancelOrderOptions;
@@ -24,4 +25,5 @@ pub use get_stock_positions::GetStockPositionsOptions;
 pub use get_today_executions::GetTodayExecutionsOptions;
 pub use get_today_orders::GetTodayOrdersOptions;
 pub use replace_order::{ReplaceAttachedParams, ReplaceOrderOptions};
+pub use submit_multileg::{SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions};
 pub use submit_order::{SubmitAttachedParams, SubmitOrderOptions};

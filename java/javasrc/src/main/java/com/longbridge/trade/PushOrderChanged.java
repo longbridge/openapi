@@ -32,6 +32,7 @@ public class PushOrderChanged {
     private BigDecimal lastShare;
     private BigDecimal lastPrice;
     private String remark;
+    private MultiLegInfo multiLeg;
 
     /**
      * Returns the order side.
@@ -258,6 +259,16 @@ public class PushOrderChanged {
         return remark;
     }
 
+    /**
+     * Returns the multi-leg strategy information (only present for multi-leg
+     * option combination orders).
+     *
+     * @return multi-leg strategy information, or {@code null}
+     */
+    public MultiLegInfo getMultiLeg() {
+        return multiLeg;
+    }
+
     @Override
     public String toString() {
         return "PushOrderChanged [side=" + side + ", stockName=" + stockName + ", submittedQuantity="
@@ -268,7 +279,7 @@ public class PushOrderChanged {
                 + ", tag=" + tag + ", triggerStatus=" + triggerStatus + ", triggerAt=" + triggerAt + ", trailingAmount="
                 + trailingAmount + ", trailingPercent=" + trailingPercent + ", limitOffset=" + limitOffset
                 + ", accountNo=" + accountNo + ", lastShare=" + lastShare + ", lastPrice=" + lastPrice + ", remark="
-                + remark + "]";
+                + remark + ", multiLeg=" + multiLeg + "]";
     }
 
 }

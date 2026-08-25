@@ -11,7 +11,8 @@ use crate::{
         requests::{
             EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
             GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions,
-            GetTodayOrdersOptions, ReplaceOrderOptions, SubmitOrderOptions,
+            GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderOptions,
+            SubmitOrderOptions,
         },
         types::{
             AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityResponse,
@@ -384,6 +385,51 @@ impl TradeContext {
         let opts = longbridge::trade::SubmitOrderOptions::from(opts);
         env.spawn_future(async move {
             let res = ctx.submit_order(opts).await.map_err(ErrorNewType)?;
+            SubmitOrderResponse::try_from(res)
+        })
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const {
+    ///   OAuth, Config,
+    ///   TradeContext,
+    ///   OrderType,
+    ///   OrderSide,
+    ///   Decimal,
+    ///   MultiLegStrategy,
+    /// } = require('longbridge');
+    ///
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.submitMultileg({
+    ///   side: OrderSide.Buy,
+    ///   orderType: OrderType.LO,
+    ///   submittedQuantity: new Decimal("1"),
+    ///   strategy: MultiLegStrategy.VerticalCallSpread,
+    ///   submittedPrice: new Decimal("1.5"),
+    ///   legs: [
+    ///     { symbol: "QQQ260731C764000.US", ratioQuantity: new Decimal("1") },
+    ///     { symbol: "QQQ260731C767000.US", ratioQuantity: new Decimal("1") },
+    ///   ],
+    /// });
+    /// console.log(resp.toString());
+    /// ```
+    #[napi]
+    pub fn submit_multileg<'env>(
+        &self,
+        env: &'env Env,
+        opts: SubmitMultiLegOrderOptions<'env>,
+    ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::SubmitMultiLegOrderOptions::from(opts);
+        env.spawn_future(async move {
+            let res = ctx.submit_multileg(opts).await.map_err(ErrorNewType)?;
             SubmitOrderResponse::try_from(res)
         })
     }

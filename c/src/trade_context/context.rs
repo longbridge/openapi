@@ -7,7 +7,8 @@ use longbridge::{
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent,
-        ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitOrderOptions,
+        ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitMultiLegOrderLeg,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -28,7 +29,7 @@ use crate::{
             CGetTodayOrdersOptions, CMarginRatioOwned, COrderDetailOwned, COrderOwned,
             CPushGridOrderChanged, CPushGridOrderChangedOwned, CPushOrderChanged,
             CPushOrderChangedOwned, CReplaceOrderOptions, CStockPositionsResponseOwned,
-            CSubmitOrderOptions, CSubmitOrderResponseOwned,
+            CSubmitMultiLegOrderOptions, CSubmitOrderOptions, CSubmitOrderResponseOwned,
         },
     },
     types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
@@ -616,6 +617,47 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     }
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CSubmitOrderResponseOwned> = CCow::new(ctx_inner.submit_order(opts2).await?);
+        Ok(resp)
+    });
+}
+
+/// Submit a multi-leg option combination order (such as vertical spreads,
+/// straddles, strangles, collars, etc.). All legs are submitted together as a
+/// single strategy order.
+///
+/// @param[in] opts Options for submit multi-leg order request
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_submit_multileg(
+    ctx: *const CTradeContext,
+    opts: *const CSubmitMultiLegOrderOptions,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let side = (*opts).side.into();
+    let order_type = (*opts).order_type.into();
+    let submitted_quantity = (*(*opts).submitted_quantity).value;
+    let strategy = (*opts).strategy.into();
+    let legs = std::slice::from_raw_parts((*opts).legs, (*opts).num_legs)
+        .iter()
+        .map(|leg| {
+            SubmitMultiLegOrderLeg::new(cstr_to_rust(leg.symbol), (*leg.ratio_quantity).value)
+        })
+        .collect::<Vec<_>>();
+    let mut opts2 =
+        SubmitMultiLegOrderOptions::new(side, order_type, submitted_quantity, strategy, legs);
+    if !(*opts).submitted_price.is_null() {
+        opts2 = opts2.submitted_price((*(*opts).submitted_price).value);
+    }
+    if !(*opts).remark.is_null() {
+        opts2 = opts2.remark(cstr_to_rust((*opts).remark));
+    }
+    if !(*opts).client_request_id.is_null() {
+        opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
+    }
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CSubmitOrderResponseOwned> =
+            CCow::new(ctx_inner.submit_multileg(opts2).await?);
         Ok(resp)
     });
 }
