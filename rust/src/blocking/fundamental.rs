@@ -3,7 +3,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc;
 
 use crate::{
-    Config, Result,
+    Config, Market, Result,
     blocking::runtime::BlockingRuntime,
     fundamental::{FundamentalContext, types::*},
 };
@@ -214,9 +214,9 @@ impl FundamentalContextSync {
     /// Get industry rank for a market
     pub fn industry_rank(
         &self,
-        market: impl Into<String> + Send + 'static,
-        indicator: impl Into<String> + Send + 'static,
-        sort_type: impl Into<String> + Send + 'static,
+        market: Market,
+        indicator: IndustryRankIndicator,
+        sort_type: IndustryRankSortType,
         limit: u32,
     ) -> Result<IndustryRankResponse> {
         self.rt.call(move |ctx| async move {

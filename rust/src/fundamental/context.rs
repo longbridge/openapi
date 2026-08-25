@@ -4,7 +4,7 @@ use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, fundamental::types::*};
+use crate::{Config, Market, Result, fundamental::types::*};
 
 /// Convert a Unix-seconds string to RFC 3339.
 fn unix_secs_str_to_rfc3339(s: &str) -> String {
@@ -656,27 +656,34 @@ impl FundamentalContext {
 
     /// Get industry rank for a market.
     ///
+    /// `limit` is the number of results to return; the server defaults to 20
+    /// when it is `0`.
+    ///
     /// Path: `GET /v1/quote/industry/rank`
     pub async fn industry_rank(
         &self,
-        market: impl Into<String>,
-        indicator: impl Into<String>,
-        sort_type: impl Into<String>,
+        market: Market,
+        indicator: IndustryRankIndicator,
+        sort_type: IndustryRankSortType,
         limit: u32,
     ) -> Result<IndustryRankResponse> {
         #[derive(Serialize)]
         struct Query {
-            market: String,
-            indicator: String,
-            sort_type: String,
+            market: Market,
+            indicator: &'static str,
+            sort_type: &'static str,
+            #[serde(skip_serializing_if = "is_zero")]
             limit: u32,
+        }
+        fn is_zero(v: &u32) -> bool {
+            *v == 0
         }
         self.get(
             "/v1/quote/industry/rank",
             Query {
-                market: market.into(),
-                indicator: indicator.into(),
-                sort_type: sort_type.into(),
+                market,
+                indicator: indicator.as_str(),
+                sort_type: sort_type.as_str(),
                 limit,
             },
         )

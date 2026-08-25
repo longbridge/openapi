@@ -47,9 +47,9 @@ pub use error::{Error, Result, SimpleError, SimpleErrorKind};
 pub use fundamental::FundamentalContext;
 // ── US-market type re-exports ─────────────────────────────────────────────────
 pub use fundamental::types::{
-    FinancialStatementKind, USCompanyDividends, USCompanyOverview, USDividendItem,
-    USETFDividendInfo, USETFFile, USETFFilesResponse, USFinancialStatement, USRankTag,
-    USValuationMetric, USValuationOverview,
+    FinancialStatementKind, IndustryRankIndicator, IndustryRankSortType, USCompanyDividends,
+    USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile, USETFFilesResponse,
+    USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
 };
 pub use grid::GridContext;
 pub use longbridge_httpcli as httpclient;

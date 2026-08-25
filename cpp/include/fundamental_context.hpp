@@ -29,6 +29,26 @@ enum class FinancialReportPeriod
   Q3            = 4,
   QuarterlyFull = 5,
 };
+/// Ranking indicator for FundamentalContext::industry_rank.
+enum class IndustryRankIndicator
+{
+  LeadingGainer   = 0,
+  TodayTrend      = 1,
+  Popularity      = 2,
+  MarketCap       = 3,
+  Revenue         = 4,
+  RevenueGrowth   = 5,
+  NetProfit       = 6,
+  NetProfitGrowth = 7,
+};
+/// Sort mode for FundamentalContext::industry_rank.
+enum class IndustryRankSortType
+{
+  /// Rank by the single selected indicator
+  Single = 0,
+  /// Rank by a composite of several indicators
+  Multi  = 1,
+};
 
 /// Fundamental data context.
 class FundamentalContext
@@ -141,10 +161,10 @@ public:
   void institution_rating_views(const std::string& symbol,
                                  AsyncCallback<FundamentalContext, InstitutionRatingViews> callback) const;
 
-  /// Get industry rank list for a market
-  void industry_rank(const std::string& market,
-                     const std::string& indicator,
-                     const std::string& sort_type,
+  /// Get industry rank list for a market (`limit` 0 → server default of 20)
+  void industry_rank(Market market,
+                     IndustryRankIndicator indicator,
+                     IndustryRankSortType sort_type,
                      uint32_t limit,
                      AsyncCallback<FundamentalContext, IndustryRankResponse> callback) const;
 

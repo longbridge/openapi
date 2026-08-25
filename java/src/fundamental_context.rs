@@ -4,7 +4,7 @@ use jni::{
     JNIEnv,
     objects::{JClass, JObject},
 };
-use longbridge::{Config, FundamentalContext, fundamental::types::*};
+use longbridge::{Config, FundamentalContext, Market, fundamental::types::*};
 
 use crate::{
     async_util,
@@ -76,9 +76,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let market: String = get_field(env, &opts, "market")?;
-        let indicator: String = get_field(env, &opts, "indicator")?;
-        let sort_type: String = get_field(env, &opts, "sortType")?;
+        let market: Market = get_field(env, &opts, "market")?;
+        let indicator: IndustryRankIndicator = get_field(env, &opts, "indicator")?;
+        let sort_type: IndustryRankSortType = get_field(env, &opts, "sortType")?;
         let limit: i32 = get_field(env, &opts, "limit")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx

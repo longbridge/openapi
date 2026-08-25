@@ -1,13 +1,15 @@
 package com.longbridge.fundamental;
 
+import com.longbridge.Market;
+
 /** Options for {@link FundamentalContext#getIndustryRank}. */
 public class IndustryRankOptions {
-    /** Market code, e.g. "US" */
-    public String market;
-    /** Indicator (numeric string "0"–"7") */
-    public String indicator;
-    /** Sort type: "0" (ascending) or "1" (descending) */
-    public String sortType;
-    /** Maximum number of results */
+    /** Market */
+    public Market market;
+    /** Ranking indicator */
+    public IndustryRankIndicator indicator;
+    /** Sort mode */
+    public IndustryRankSortType sortType;
+    /** Number of results to return; the server defaults to 20 when 0 */
     public int limit;
 }

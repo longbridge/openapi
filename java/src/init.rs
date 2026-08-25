@@ -129,6 +129,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::types::InstitutionRecommend,
         longbridge::fundamental::types::FinancialReportKind,
         longbridge::fundamental::types::FinancialStatementKind,
+        longbridge::fundamental::types::IndustryRankIndicator,
+        longbridge::fundamental::types::IndustryRankSortType,
         longbridge::fundamental::types::FinancialReportPeriod,
         longbridge::market::types::BrokerHoldingPeriod,
         longbridge::market::types::AhPremiumPeriod,

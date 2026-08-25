@@ -400,6 +400,58 @@ typedef enum lb_market_t {
 } lb_market_t;
 
 /**
+ * Ranking indicator for industry rank
+ */
+typedef enum lb_industry_rank_indicator_t {
+  /**
+   * Leading gainer
+   */
+  IndustryRankIndicatorLeadingGainer,
+  /**
+   * Today's trend
+   */
+  IndustryRankIndicatorTodayTrend,
+  /**
+   * Popularity
+   */
+  IndustryRankIndicatorPopularity,
+  /**
+   * Market capitalisation
+   */
+  IndustryRankIndicatorMarketCap,
+  /**
+   * Revenue
+   */
+  IndustryRankIndicatorRevenue,
+  /**
+   * Revenue growth
+   */
+  IndustryRankIndicatorRevenueGrowth,
+  /**
+   * Net profit
+   */
+  IndustryRankIndicatorNetProfit,
+  /**
+   * Net profit growth
+   */
+  IndustryRankIndicatorNetProfitGrowth,
+} lb_industry_rank_indicator_t;
+
+/**
+ * Sort mode for industry rank
+ */
+typedef enum lb_industry_rank_sort_type_t {
+  /**
+   * Rank by the single selected indicator
+   */
+  IndustryRankSortTypeSingle,
+  /**
+   * Rank by a composite of several indicators
+   */
+  IndustryRankSortTypeMulti,
+} lb_industry_rank_sort_type_t;
+
+/**
  * Broker holding lookback period
  */
 typedef enum lb_broker_holding_period_t {
@@ -12575,9 +12627,9 @@ void lb_fundamental_context_institution_rating_views(const struct lb_fundamental
  * Returns `CIndustryRankResponse`.
  */
 void lb_fundamental_context_industry_rank(const struct lb_fundamental_context_t *ctx,
-                                          const char *market,
-                                          const char *indicator,
-                                          const char *sort_type,
+                                          enum lb_market_t market,
+                                          enum lb_industry_rank_indicator_t indicator,
+                                          enum lb_industry_rank_sort_type_t sort_type,
                                           uint32_t limit,
                                           lb_async_callback_t callback,
                                           void *userdata);

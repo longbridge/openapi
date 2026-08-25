@@ -524,6 +524,25 @@ impl_java_enum!(
     [IncomeStatement, BalanceSheet, CashFlow]
 );
 impl_java_enum!(
+    "com/longbridge/fundamental/IndustryRankIndicator",
+    longbridge::fundamental::types::IndustryRankIndicator,
+    [
+        LeadingGainer,
+        TodayTrend,
+        Popularity,
+        MarketCap,
+        Revenue,
+        RevenueGrowth,
+        NetProfit,
+        NetProfitGrowth
+    ]
+);
+impl_java_enum!(
+    "com/longbridge/fundamental/IndustryRankSortType",
+    longbridge::fundamental::types::IndustryRankSortType,
+    [Single, Multi]
+);
+impl_java_enum!(
     "com/longbridge/fundamental/FinancialReportPeriod",
     longbridge::fundamental::types::FinancialReportPeriod,
     [Annual, SemiAnnual, Q1, Q2, Q3, QuarterlyFull, ThreeQ]
