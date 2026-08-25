@@ -378,12 +378,14 @@ impl FundamentalContext {
     pub async fn executive(&self, symbol: impl Into<String>) -> Result<ExecutiveList> {
         #[derive(Serialize)]
         struct Query {
-            symbol: String,
+            // The endpoint takes a comma-separated list, so the parameter is
+            // plural: `symbol=` is silently ignored and returns an empty group.
+            symbols: String,
         }
         self.get(
             "/v1/quote/company-professionals",
             Query {
-                symbol: symbol.into(),
+                symbols: symbol.into(),
             },
         )
         .await
