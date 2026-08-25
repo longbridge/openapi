@@ -9303,7 +9303,8 @@ class AsyncTradeContext:
 
                 import asyncio
                 from decimal import Decimal
-                from longbridge.openapi import OAuthBuilder, (
+                from longbridge.openapi import (
+                    OAuthBuilder,
                     AsyncTradeContext,
                     Config,
                     OrderSide,
