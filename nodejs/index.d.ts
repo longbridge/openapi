@@ -795,8 +795,11 @@ export declare class FundamentalContext {
   usValuationOverview(symbol: string): Promise<USValuationOverview>
   /** Get US financial overview. US token required. */
   usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
-  /** Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required. */
-  usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
+  /**
+   * Get US financial statement v3. `kind` selects one statement (there is
+   * no "all" mode). US token required.
+   */
+  usFinancialStatement(symbol: string, kind: FinancialStatementKind, report: string): Promise<USFinancialStatement>
   /** Get US key financial metrics. US token required. */
   usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
   /** Get US analyst consensus estimates. US token required. */
@@ -5202,6 +5205,21 @@ export interface FinancialReports {
   list: any
 }
 
+/**
+ * Financial statement kind
+ *
+ * Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+ * needs one specific statement per request.
+ */
+export declare const enum FinancialStatementKind {
+  /** Income statement */
+  IncomeStatement = 0,
+  /** Balance sheet */
+  BalanceSheet = 1,
+  /** Cash flow statement */
+  CashFlow = 2
+}
+
 export declare const enum FlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -7295,7 +7313,12 @@ export interface SubmitAttachedParams {
 export interface SubmitMultiLegOrderLeg {
   /** Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`) */
   symbol: string
-  /** Leg ratio quantity */
+  /**
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by `strategy` together with the order `side`, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
+   */
   ratioQuantity: Decimal
 }
 

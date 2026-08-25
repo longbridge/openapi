@@ -525,6 +525,7 @@ module.exports.FilterWarrantExpiryDate = nativeBinding.FilterWarrantExpiryDate
 module.exports.FilterWarrantInOutBoundsType = nativeBinding.FilterWarrantInOutBoundsType
 module.exports.FinancialReportKind = nativeBinding.FinancialReportKind
 module.exports.FinancialReportPeriod = nativeBinding.FinancialReportPeriod
+module.exports.FinancialStatementKind = nativeBinding.FinancialStatementKind
 module.exports.FlowDirection = nativeBinding.FlowDirection
 module.exports.Granularity = nativeBinding.Granularity
 module.exports.GridLimitEvent = nativeBinding.GridLimitEvent
