@@ -1478,6 +1478,31 @@ impl From<FinancialReportKind> for lb::FinancialReportKind {
     }
 }
 
+/// Financial statement kind
+///
+/// Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+/// needs one specific statement per request.
+#[napi_derive::napi]
+#[derive(Debug, Clone, Copy)]
+pub enum FinancialStatementKind {
+    /// Income statement
+    IncomeStatement,
+    /// Balance sheet
+    BalanceSheet,
+    /// Cash flow statement
+    CashFlow,
+}
+
+impl From<FinancialStatementKind> for lb::FinancialStatementKind {
+    fn from(v: FinancialStatementKind) -> Self {
+        match v {
+            FinancialStatementKind::IncomeStatement => lb::FinancialStatementKind::IncomeStatement,
+            FinancialStatementKind::BalanceSheet => lb::FinancialStatementKind::BalanceSheet,
+            FinancialStatementKind::CashFlow => lb::FinancialStatementKind::CashFlow,
+        }
+    }
+}
+
 /// Financial report period type
 #[napi_derive::napi]
 #[derive(Debug, Clone, Copy)]

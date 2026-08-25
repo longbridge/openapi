@@ -384,7 +384,7 @@ impl FundamentalContextSync {
     pub fn us_financial_statement(
         &self,
         symbol: impl Into<String> + Send + 'static,
-        kind: impl Into<String> + Send + 'static,
+        kind: FinancialStatementKind,
         report: impl Into<String> + Send + 'static,
     ) -> Result<USFinancialStatement> {
         self.rt

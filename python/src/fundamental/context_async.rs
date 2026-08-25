@@ -414,13 +414,13 @@ impl AsyncFundamentalContext {
         &self,
         py: Python<'_>,
         symbol: String,
-        kind: String,
+        kind: FinancialStatementKind,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USFinancialStatement::from(
-                ctx.us_financial_statement(symbol, kind, report)
+                ctx.us_financial_statement(symbol, kind.into(), report)
                     .await
                     .map_err(ErrorNewType)?,
             ))

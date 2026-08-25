@@ -11358,6 +11358,22 @@ class FinancialReportKind:
     """All statements (default)"""
 
 
+class FinancialStatementKind:
+    """Financial statement kind.
+
+    Unlike :class:`FinancialReportKind` there is no ``All``: the statements
+    endpoint needs one specific statement per request and returns an empty
+    list for ``ALL``.
+    """
+
+    class IncomeStatement(FinancialStatementKind): ...
+    """Income statement (IS)"""
+    class BalanceSheet(FinancialStatementKind): ...
+    """Balance sheet (BS)"""
+    class CashFlow(FinancialStatementKind): ...
+    """Cash flow statement (CF)"""
+
+
 class FinancialReportPeriod:
     """Financial report period type."""
 
@@ -11654,12 +11670,12 @@ class FundamentalContext:
         """
         ...
 
-    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
+    def us_financial_statement(self, symbol: str, kind: FinancialStatementKind, report: str) -> "USFinancialStatement":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            kind: Which statement to fetch — there is no "all statements" mode
             report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
@@ -11767,12 +11783,12 @@ class AsyncFundamentalContext:
         """
         ...
 
-    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "Awaitable[USFinancialStatement]":
+    def us_financial_statement(self, symbol: str, kind: FinancialStatementKind, report: str) -> "Awaitable[USFinancialStatement]":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            kind: Which statement to fetch — there is no "all statements" mode
             report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:

@@ -1092,6 +1092,38 @@ pub enum FinancialReportKind {
     All,
 }
 
+/// Financial statement kind
+///
+/// Used by [`crate::FundamentalContext::us_financial_statement`], which needs
+/// exactly one statement per request.  Unlike [`FinancialReportKind`] there is
+/// deliberately no `All` variant and no `Default`: the endpoint answers with an
+/// empty list for `ALL` (and for a missing `kind`), so a default would silently
+/// return nothing.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum FinancialStatementKind {
+    /// Income statement
+    #[serde(rename = "IS")]
+    IncomeStatement,
+    /// Balance sheet
+    #[serde(rename = "BS")]
+    BalanceSheet,
+    /// Cash flow statement
+    #[serde(rename = "CF")]
+    CashFlow,
+}
+
+impl FinancialStatementKind {
+    /// The value sent as the `kind` query parameter.
+    #[inline]
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            FinancialStatementKind::IncomeStatement => "IS",
+            FinancialStatementKind::BalanceSheet => "BS",
+            FinancialStatementKind::CashFlow => "CF",
+        }
+    }
+}
+
 // ── business_segments ─────────────────────────────────────────────
 
 /// Response for [`crate::FundamentalContext::business_segments`]

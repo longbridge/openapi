@@ -1124,8 +1124,9 @@ impl FundamentalContext {
 
     /// Get US financial statement detail (IS / BS / CF).
     ///
-    /// `kind`: `"IS"` (income statement), `"BS"` (balance sheet), `"CF"` (cash
-    /// flow). `report`: `"annual"` or `"quarterly"`.
+    /// `kind` selects one statement — the endpoint has no "all statements"
+    /// mode and answers with an empty list when `kind` is `ALL` or missing.
+    /// `report`: `"annual"` or `"quarterly"`.
     ///
     /// Path: `GET /v1/us/quote/financials/statements`
     ///
@@ -1133,20 +1134,20 @@ impl FundamentalContext {
     pub async fn us_financial_statement(
         &self,
         symbol: impl Into<String>,
-        kind: impl Into<String>,
+        kind: FinancialStatementKind,
         report: impl Into<String>,
     ) -> Result<USFinancialStatement> {
         #[derive(Serialize)]
         struct Query {
             symbol: String,
-            kind: String,
+            kind: &'static str,
             report: String,
         }
         self.get_dc(
             "/v1/us/quote/financials/statements",
             Query {
                 symbol: symbol.into(),
-                kind: kind.into(),
+                kind: kind.as_str(),
                 report: report.into(),
             },
             DcRegion::Us,

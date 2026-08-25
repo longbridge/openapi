@@ -277,17 +277,17 @@ impl FundamentalContext {
             .into())
     }
 
-    /// Get US financial statement v3. `kind`: "IS"/"BS"/"CF". US token
-    /// required.
+    /// Get US financial statement v3. `kind` selects one statement (there is
+    /// no "all" mode). US token required.
     fn us_financial_statement(
         &self,
         symbol: String,
-        kind: String,
+        kind: FinancialStatementKind,
         report: String,
     ) -> PyResult<USFinancialStatement> {
         Ok(self
             .ctx
-            .us_financial_statement(symbol, kind, report)
+            .us_financial_statement(symbol, kind.into(), report)
             .map_err(ErrorNewType)?
             .into())
     }

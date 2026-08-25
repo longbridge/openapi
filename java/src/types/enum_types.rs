@@ -519,6 +519,11 @@ impl_java_enum!(
     [IncomeStatement, BalanceSheet, CashFlow, All]
 );
 impl_java_enum!(
+    "com/longbridge/fundamental/FinancialStatementKind",
+    longbridge::fundamental::types::FinancialStatementKind,
+    [IncomeStatement, BalanceSheet, CashFlow]
+);
+impl_java_enum!(
     "com/longbridge/fundamental/FinancialReportPeriod",
     longbridge::fundamental::types::FinancialReportPeriod,
     [Annual, SemiAnnual, Q1, Q2, Q3, QuarterlyFull, ThreeQ]

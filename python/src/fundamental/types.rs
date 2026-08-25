@@ -1535,6 +1535,31 @@ impl From<FinancialReportKind> for lb::FinancialReportKind {
     }
 }
 
+/// Financial statement kind
+///
+/// Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+/// needs one specific statement per request.
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
+pub(crate) enum FinancialStatementKind {
+    /// Income statement
+    IncomeStatement = 0,
+    /// Balance sheet
+    BalanceSheet = 1,
+    /// Cash flow statement
+    CashFlow = 2,
+}
+
+impl From<FinancialStatementKind> for lb::FinancialStatementKind {
+    fn from(v: FinancialStatementKind) -> Self {
+        match v {
+            FinancialStatementKind::IncomeStatement => lb::FinancialStatementKind::IncomeStatement,
+            FinancialStatementKind::BalanceSheet => lb::FinancialStatementKind::BalanceSheet,
+            FinancialStatementKind::CashFlow => lb::FinancialStatementKind::CashFlow,
+        }
+    }
+}
+
 // ── BuybackData ───────────────────────────────────────────────────
 
 /// TTM buyback summary

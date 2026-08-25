@@ -555,7 +555,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextUs
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        let kind: String = FromJValue::from_jvalue(env, kind.into())?;
+        let kind: FinancialStatementKind = FromJValue::from_jvalue(env, kind.into())?;
         let report: String = FromJValue::from_jvalue(env, report.into())?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
