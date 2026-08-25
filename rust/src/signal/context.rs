@@ -91,19 +91,12 @@ impl SignalContext {
     /// Facts are what strategies react to: a signal names the fact that
     /// triggered it in [`Signal::key_fact_id`].
     ///
-    /// Each fact is returned verbatim as a JSON object; the payload is
-    /// fact-type specific (news, fundamental, technical) and carries different
-    /// fields per type.
-    ///
     /// Path: `GET /v1/facts/security_facts`
-    pub async fn security_facts(
-        &self,
-        opts: SecurityFactsOptions,
-    ) -> Result<Vec<serde_json::Value>> {
+    pub async fn security_facts(&self, opts: SecurityFactsOptions) -> Result<Vec<SecurityFact>> {
         #[derive(Debug, Deserialize)]
         struct Response {
             #[serde(default)]
-            facts: Vec<serde_json::Value>,
+            facts: Vec<SecurityFact>,
         }
 
         Ok(self

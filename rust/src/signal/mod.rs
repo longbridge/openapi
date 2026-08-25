@@ -5,4 +5,8 @@ mod context;
 pub mod types;
 
 pub use context::SignalContext;
-pub use types::{Outlook, SecurityFactsOptions, Signal, SignalsOptions, SignalsResponse};
+pub use types::{
+    AnomalyDetection, AnomalyThresholds, FactDataSource, FactDirection, FactFactor, FactNlInfo,
+    FactSymbol, FactType, NlTag, Outlook, SecurityFact, SecurityFactsOptions, Signal, SignalStatus,
+    SignalsOptions, SignalsResponse,
+};
