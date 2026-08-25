@@ -111,6 +111,27 @@ pub(crate) mod timestamp {
     }
 }
 
+pub(crate) mod timestamp_ms {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<OffsetDateTime, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        let value = value.parse::<i64>().map_err(D::Error::custom)?;
+        OffsetDateTime::from_unix_timestamp_nanos(i128::from(value) * 1_000_000)
+            .map_err(D::Error::custom)
+    }
+
+    pub(crate) fn serialize<S>(datetime: &OffsetDateTime, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_str(&(datetime.unix_timestamp_nanos() / 1_000_000))
+    }
+}
+
 pub(crate) mod timestamp_opt {
     use super::*;
 
