@@ -10,8 +10,7 @@ use longbridge::{
         MultiLegPosition, MultiLegStrategy, Order, OrderChargeDetail, OrderChargeFee,
         OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag,
         OrderType, PushGridOrderChanged, PushOrderChanged, StockPosition, StockPositionChannel,
-        StockPositionsResponse,
-        SubmitOrderResponse, TimeInForceType,
+        StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
     },
 };
 use time::OffsetDateTime;
