@@ -36,6 +36,7 @@ pub mod portfolio;
 pub mod quote;
 pub mod screener;
 pub mod sharelist;
+pub mod signal;
 pub mod trade;
 
 pub use agent::AgentContext;
@@ -62,6 +63,7 @@ pub use quote::{QuoteContext, USCryptoOverview};
 pub use rust_decimal::Decimal;
 pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
+pub use signal::SignalContext;
 pub use trade::{
     GetUSHistoryOrders, GetUSRealizedPLOptions, QueryUSOrdersOptions, QueryUSOrdersResponse,
     TradeContext, USAssetOverview, USCashEntry, USCryptoEntry, USOrderDetailResponse,

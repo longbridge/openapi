@@ -15,6 +15,7 @@ mod quote;
 mod runtime;
 mod screener;
 mod sharelist;
+mod signal;
 mod trade;
 
 pub use agent::AgentContextSync;
@@ -31,4 +32,5 @@ pub use portfolio::PortfolioContextSync;
 pub use quote::QuoteContextSync;
 pub use screener::ScreenerContextSync;
 pub use sharelist::SharelistContextSync;
+pub use signal::SignalContextSync;
 pub use trade::TradeContextSync;
