@@ -7587,7 +7587,9 @@ class TradeContext:
             order_type: Order type
             submitted_quantity: Submitted quantity (number of combinations)
             strategy: Multi-leg strategy
-            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples. Each ``ratio_quantity`` must be positive — a leg's direction comes from
+                ``strategy`` plus ``side``, not from the sign of the ratio; a negative or
+                zero ratio is rejected by the server with ``602001``
             submitted_price: Submitted price (required for limit order types such as `LO`)
             remark: Remark (Maximum 255 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
@@ -9293,7 +9295,9 @@ class AsyncTradeContext:
             order_type: Order type.
             submitted_quantity: Submitted quantity (number of combinations).
             strategy: Multi-leg strategy.
-            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples.
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples. Each ``ratio_quantity`` must be positive — a leg's direction comes from
+                ``strategy`` plus ``side``, not from the sign of the ratio; a negative or
+                zero ratio is rejected by the server with ``602001``
             submitted_price: Submitted price (required for limit order types such as `LO`).
             remark: Remark (max 255 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.

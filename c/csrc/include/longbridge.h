@@ -4395,7 +4395,10 @@ typedef struct CSubmitMultiLegOrderLeg {
    */
   const char *symbol;
   /**
-   * Leg ratio quantity
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by the strategy together with the order side, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
    */
   const struct lb_decimal_t *ratio_quantity;
 } CSubmitMultiLegOrderLeg;
