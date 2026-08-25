@@ -41,7 +41,7 @@ impl SignalContextSync {
     }
 
     /// List the fact (catalyst) events for one security
-    pub fn security_facts(&self, opts: SecurityFactsOptions) -> Result<Vec<serde_json::Value>> {
+    pub fn security_facts(&self, opts: SecurityFactsOptions) -> Result<Vec<SecurityFact>> {
         self.rt
             .call(move |ctx| async move { ctx.security_facts(opts).await })
     }
