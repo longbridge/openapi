@@ -82,8 +82,24 @@ pub(crate) unsafe fn cstr_to_rust(value: *const c_char) -> String {
         .expect("invalid cstr")
 }
 
+/// Like [`std::slice::from_raw_parts`], but tolerates a null `data` pointer
+/// when `len` is `0`.
+///
+/// `from_raw_parts` requires a non-null, aligned pointer even for a zero-length
+/// slice, but `std::vector::data()` in C++ is allowed to return `nullptr` for
+/// an empty vector — which is exactly what the C++ binding passes for an
+/// omitted list argument. Calling `from_raw_parts(null, 0)` is undefined
+/// behaviour and aborts the process under the debug UB checks.
+pub(crate) unsafe fn slice_from_raw_parts<'a, T>(data: *const T, len: usize) -> &'a [T] {
+    if len == 0 || data.is_null() {
+        &[]
+    } else {
+        std::slice::from_raw_parts(data, len)
+    }
+}
+
 pub(crate) unsafe fn cstr_array_to_rust(values: *const *const c_char, n: usize) -> Vec<String> {
-    std::slice::from_raw_parts(values, n)
+    slice_from_raw_parts(values, n)
         .iter()
         .copied()
         .map(|value| cstr_to_rust(value))
