@@ -2,7 +2,7 @@ use std::os::raw::c_char;
 
 use longbridge::alert::{AlertItem, AlertList, AlertSymbolGroup};
 
-use crate::types::{CString, CVec, ToFFI};
+use crate::types::{CString, CVec, ToFFI, slice_from_raw_parts};
 
 /// A single alert indicator configuration for a symbol.
 #[repr(C)]
@@ -63,7 +63,7 @@ impl CAlertItem {
     /// `state` pointer must point to at least `num_state` valid `i32` values.
     pub unsafe fn to_alert_item(&self) -> longbridge::alert::AlertItem {
         use crate::types::cstr_to_rust;
-        let state = std::slice::from_raw_parts(self.state, self.num_state).to_vec();
+        let state = slice_from_raw_parts(self.state, self.num_state).to_vec();
         let value_map_str = cstr_to_rust(self.value_map);
         let value_map = serde_json::from_str(&value_map_str).unwrap_or(serde_json::Value::Null);
         longbridge::alert::AlertItem {

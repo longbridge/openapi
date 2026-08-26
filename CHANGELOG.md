@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **C/C++ SDKs:** every list argument that crosses the FFI boundary now tolerates a null pointer with a zero length. `std::vector::data()` is allowed to return `nullptr` for an empty vector, which is exactly what the C++ binding passes for an omitted list argument, but the C layer fed it straight to `std::slice::from_raw_parts` — undefined behaviour that **aborts the process** under the debug UB checks. Hit live by `QuoteContext::warrant_list` with no filters (`c/src/quote_context/context.rs`); all 17 call sites across `quote_context`, `trade_context`, `agent_context`, `alert_context`, and `types` now go through a null-tolerant `slice_from_raw_parts` helper
+
 ### Added
 
 - **Rust:** `Signal.status` is now a `SignalStatus` enum (pending / active / deleted / ai-failed / filtered-by-manual / ai-submit-failed), `SignalsResponse.total` is `i32` to match the wire contract, and the `risk_level` / `display_control` fields were dropped — neither is part of the API contract nor served in production
