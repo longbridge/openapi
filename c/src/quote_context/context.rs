@@ -33,7 +33,10 @@ use crate::{
             LB_WATCHLIST_GROUP_NAME, LB_WATCHLIST_GROUP_SECURITIES,
         },
     },
-    types::{CCow, CDate, CDateTime, CMarket, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
+    types::{
+        CCow, CDate, CDateTime, CMarket, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust,
+        slice_from_raw_parts,
+    },
 };
 
 pub type COnQuoteCallback = extern "C" fn(*const CQuoteContext, *const CPushQuote, *mut c_void);
@@ -781,23 +784,23 @@ pub unsafe extern "C" fn lb_quote_context_warrant_list(
     let symbol = cstr_to_rust(symbol);
     let sort_by = sort_by.into();
     let sort_order = sort_order.into();
-    let warrant_type = std::slice::from_raw_parts(warrant_type, num_warrant_type)
+    let warrant_type = slice_from_raw_parts(warrant_type, num_warrant_type)
         .iter()
         .copied()
         .map(Into::into)
         .collect::<Vec<_>>();
-    let issuer = std::slice::from_raw_parts(issuer, num_issuer).to_vec();
-    let expiry_date = std::slice::from_raw_parts(expiry_date, num_expiry_date)
+    let issuer = slice_from_raw_parts(issuer, num_issuer).to_vec();
+    let expiry_date = slice_from_raw_parts(expiry_date, num_expiry_date)
         .iter()
         .copied()
         .map(Into::into)
         .collect::<Vec<_>>();
-    let price_type = std::slice::from_raw_parts(price_type, num_price_type)
+    let price_type = slice_from_raw_parts(price_type, num_price_type)
         .iter()
         .copied()
         .map(Into::into)
         .collect::<Vec<_>>();
-    let status = std::slice::from_raw_parts(status, num_status)
+    let status = slice_from_raw_parts(status, num_status)
         .iter()
         .copied()
         .map(Into::into)
@@ -904,7 +907,7 @@ pub unsafe extern "C" fn lb_quote_context_calc_indexes(
 ) {
     let ctx_inner = (*ctx).ctx.clone();
     let symbols = cstr_array_to_rust(symbols, num_symbols);
-    let indexes = std::slice::from_raw_parts(indexes, num_indexes)
+    let indexes = slice_from_raw_parts(indexes, num_indexes)
         .iter()
         .map(|index| (*index).into())
         .collect::<Vec<_>>();
@@ -939,7 +942,7 @@ pub unsafe extern "C" fn lb_quote_context_create_watchlist_group(
 ) {
     let ctx_inner = (*ctx).ctx.clone();
     let name = cstr_to_rust(req.name);
-    let securities = std::slice::from_raw_parts(req.securities, req.num_securities);
+    let securities = slice_from_raw_parts(req.securities, req.num_securities);
     let securities = (req.num_securities > 0).then(|| {
         securities
             .iter()
@@ -1003,7 +1006,7 @@ pub unsafe extern "C" fn lb_quote_context_update_watchlist_group(
     let ctx_inner = (*ctx).ctx.clone();
     let id = req.id;
     let name = ((req.flags & LB_WATCHLIST_GROUP_NAME) != 0).then(|| cstr_to_rust(req.name));
-    let securities = std::slice::from_raw_parts(req.securities, req.num_securities);
+    let securities = slice_from_raw_parts(req.securities, req.num_securities);
     let securities = ((req.flags & LB_WATCHLIST_GROUP_SECURITIES) != 0).then(|| {
         securities
             .iter()
