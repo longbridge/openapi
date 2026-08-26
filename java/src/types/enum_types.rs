@@ -277,7 +277,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longbridge/quote/WarrantStatus",
     longbridge::quote::WarrantStatus,
-    [Suspend, PrepareList, Normal]
+    [Unknown, Suspend, PrepareList, Normal]
 );
 
 impl_java_enum!(

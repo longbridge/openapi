@@ -1082,6 +1082,11 @@ pub enum FilterWarrantInOutBoundsType {
 )]
 #[repr(i32)]
 pub enum WarrantStatus {
+    /// Unknown
+    ///
+    /// The server reports an unrecognized status (e.g. `0` on placeholder
+    /// rows).
+    Unknown = 0,
     /// Suspend
     Suspend = 2,
     /// Prepare List
@@ -1110,7 +1115,9 @@ pub struct WarrantInfo {
     /// Turnover
     pub turnover: Decimal,
     /// Expiry date
-    pub expiry_date: Date,
+    ///
+    /// `None` if the server does not report an expiry date for this warrant.
+    pub expiry_date: Option<Date>,
     /// Strike price
     pub strike_price: Option<Decimal>,
     /// Upper strike price
@@ -1163,8 +1170,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 change_value: info.change_val.parse().unwrap_or_default(),
                 volume: info.volume,
                 turnover: info.turnover.parse().unwrap_or_default(),
-                expiry_date: parse_date(&info.expiry_date)
-                    .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                expiry_date: parse_date(&info.expiry_date).ok(),
                 strike_price: info.strike_price.parse().ok(),
                 upper_strike_price: info.upper_strike_price.parse().ok(),
                 lower_strike_price: info.lower_strike_price.parse().ok(),
@@ -1180,8 +1186,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 leverage_ratio: info.leverage_ratio.parse().unwrap_or_default(),
                 conversion_ratio: info.conversion_ratio.parse().ok(),
                 balance_point: info.balance_point.parse().ok(),
-                status: WarrantStatus::try_from(info.status)
-                    .map_err(|err| Error::parse_field_error("state", err))?,
+                status: WarrantStatus::try_from(info.status).unwrap_or(WarrantStatus::Unknown),
             }),
             WarrantType::Bull | WarrantType::Bear => Ok(Self {
                 symbol: info.symbol,
@@ -1192,8 +1197,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 change_value: info.change_val.parse().unwrap_or_default(),
                 volume: info.volume,
                 turnover: info.turnover.parse().unwrap_or_default(),
-                expiry_date: parse_date(&info.expiry_date)
-                    .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                expiry_date: parse_date(&info.expiry_date).ok(),
                 strike_price: Some(info.strike_price.parse().unwrap_or_default()),
                 upper_strike_price: None,
                 lower_strike_price: None,
@@ -1209,8 +1213,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 leverage_ratio: info.leverage_ratio.parse().unwrap_or_default(),
                 conversion_ratio: Some(info.conversion_ratio.parse().unwrap_or_default()),
                 balance_point: Some(info.balance_point.parse().unwrap_or_default()),
-                status: WarrantStatus::try_from(info.status)
-                    .map_err(|err| Error::parse_field_error("state", err))?,
+                status: WarrantStatus::try_from(info.status).unwrap_or(WarrantStatus::Unknown),
             }),
             WarrantType::Inline => Ok(Self {
                 symbol: info.symbol,
@@ -1221,8 +1224,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 change_value: info.change_val.parse().unwrap_or_default(),
                 volume: info.volume,
                 turnover: info.turnover.parse().unwrap_or_default(),
-                expiry_date: parse_date(&info.expiry_date)
-                    .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                expiry_date: parse_date(&info.expiry_date).ok(),
                 strike_price: None,
                 upper_strike_price: Some(info.upper_strike_price.parse().unwrap_or_default()),
                 lower_strike_price: Some(info.lower_strike_price.parse().unwrap_or_default()),
@@ -1238,8 +1240,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 leverage_ratio: info.leverage_ratio.parse().unwrap_or_default(),
                 conversion_ratio: None,
                 balance_point: None,
-                status: WarrantStatus::try_from(info.status)
-                    .map_err(|err| Error::parse_field_error("state", err))?,
+                status: WarrantStatus::try_from(info.status).unwrap_or(WarrantStatus::Unknown),
             }),
         }
     }

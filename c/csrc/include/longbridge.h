@@ -894,6 +894,10 @@ typedef enum lb_filter_warrant_in_out_bounds_type_t {
  */
 typedef enum lb_warrant_status_t {
   /**
+   * Unknown
+   */
+  WarrantStatusUnknown,
+  /**
    * Suspend
    */
   WarrantStatusSuspend,
@@ -7029,7 +7033,7 @@ typedef struct lb_warrant_info_t {
   /**
    * Expiry date
    */
-  struct lb_date_t expiry_date;
+  const struct lb_date_t *expiry_date;
   /**
    * Strike price
    */

@@ -3601,7 +3601,7 @@ export declare class WarrantInfo {
   /** Turnover */
   get turnover(): Decimal
   /** Expiry date */
-  get expiryDate(): NaiveDate
+  get expiryDate(): NaiveDate | null
   /** Strike price */
   get strikePrice(): Decimal | null
   /** Upper strike price */
@@ -8338,12 +8338,14 @@ export declare const enum WarrantSortBy {
 
 /** Warrant status */
 export declare const enum WarrantStatus {
+  /** Unknown */
+  Unknown = 0,
   /** Suspend */
-  Suspend = 0,
+  Suspend = 1,
   /** Prepare List */
-  PrepareList = 1,
+  PrepareList = 2,
   /** Normal */
-  Normal = 2
+  Normal = 3
 }
 
 /** Warrant type */

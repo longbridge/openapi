@@ -1855,6 +1855,11 @@ class WarrantStatus:
     Warrant status
     """
 
+    class Unknown(WarrantStatus):
+        """
+        Unknown
+        """
+
     class Suspend(WarrantStatus):
         """
         Suspend
@@ -2085,9 +2090,10 @@ class WarrantInfo:
     Turnover
     """
 
-    expiry_date: date
+    expiry_date: Optional[date]
     """
-    Expiry date
+    Expiry date, or `None` if the server does not report an expiry date for
+    this warrant
     """
 
     strike_price: Optional[Decimal]

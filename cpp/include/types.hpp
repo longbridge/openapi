@@ -1116,6 +1116,8 @@ enum class FilterWarrantInOutBoundsType
 /// Warrant status
 enum class WarrantStatus
 {
+  /// Unknown
+  Unknown,
   /// Suspend
   Suspend,
   /// Prepare List
@@ -1144,7 +1146,10 @@ struct WarrantInfo
   /// Turnover
   Decimal turnover;
   /// Expiry date
-  Date expiry_date;
+  ///
+  /// `std::nullopt` if the server does not report an expiry date for this
+  /// warrant.
+  std::optional<Date> expiry_date;
   /// Strike price
   std::optional<Decimal> strike_price;
   /// Upper strike price
