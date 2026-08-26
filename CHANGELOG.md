@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **C++ SDK:** `asset::AssetContext` (`statements` / `statement_download_url`) is now actually built and usable. `longbridge.hpp` has always included `asset_context.hpp`, but `cpp/src/asset_context.cpp` was never listed in `cpp/CMakeLists.txt`, so the class was declared to users and then failed to link. It had also never compiled: it included neither `longbridge.h` nor the C declarations, and `statement_download_url` read `res->data` as a `lb_statement_download_url_response_t*` — a type that does not exist anywhere in the C layer, which delivers the URL as a bare `const char*` (the same convention as `QuoteContext::quote_level`). Fixed the include and the callback, and added the file to the build
+- **C SDK:** export `lb_statement_item_t` from `longbridge.h`. `CStatementItem` is only reachable through the `void*` async-result pointer, so cbindgen did not emit it and no C or C++ caller could read what `lb_asset_context_statements` returns. Also added the missing `CAssetContext` → `lb_asset_context_t` entry to the cbindgen rename map: every other context type was mapped, so the header exposed the raw Rust name (`const struct CAssetContext *lb_asset_context_new(...)`) while the C++ side forward-declared `lb_asset_context_t`
+
 ### Added
 
 - **Rust:** `Signal.status` is now a `SignalStatus` enum (pending / active / deleted / ai-failed / filtered-by-manual / ai-submit-failed), `SignalsResponse.total` is `i32` to match the wire contract, and the `risk_level` / `display_control` fields were dropped — neither is part of the API contract nor served in production

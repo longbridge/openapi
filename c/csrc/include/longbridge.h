@@ -1853,7 +1853,7 @@ typedef struct lb_alert_context_t lb_alert_context_t;
 /**
  * Asset context
  */
-typedef struct CAssetContext CAssetContext;
+typedef struct lb_asset_context_t lb_asset_context_t;
 
 typedef struct lb_calendar_context_t lb_calendar_context_t;
 
@@ -6064,6 +6064,20 @@ typedef struct lb_order_detail_t {
    */
   struct CMultiLegInfo multi_leg;
 } lb_order_detail_t;
+
+/**
+ * Statement item
+ */
+typedef struct lb_statement_item_t {
+  /**
+   * Statement date (integer, e.g. 20250301)
+   */
+  int32_t dt;
+  /**
+   * File key
+   */
+  const char *file_key;
+} lb_statement_item_t;
 
 /**
  * Response for submit grid trading order request
@@ -11862,17 +11876,17 @@ void lb_alert_context_delete(const struct lb_alert_context_t *ctx,
  * @param config  Config object
  * @return A new asset context
  */
-const struct CAssetContext *lb_asset_context_new(const struct lb_config_t *config);
+const struct lb_asset_context_t *lb_asset_context_new(const struct lb_config_t *config);
 
 /**
  * Retain the asset context (increment reference count)
  */
-void lb_asset_context_retain(const struct CAssetContext *ctx);
+void lb_asset_context_retain(const struct lb_asset_context_t *ctx);
 
 /**
  * Release the asset context (decrement reference count)
  */
-void lb_asset_context_release(const struct CAssetContext *ctx);
+void lb_asset_context_release(const struct lb_asset_context_t *ctx);
 
 /**
  * Get statement data list
@@ -11884,7 +11898,7 @@ void lb_asset_context_release(const struct CAssetContext *ctx);
  * @param callback        Async callback
  * @param userdata        User data passed to the callback
  */
-void lb_asset_context_statements(const struct CAssetContext *ctx,
+void lb_asset_context_statements(const struct lb_asset_context_t *ctx,
                                  int32_t statement_type,
                                  int32_t start_date,
                                  int32_t limit,
@@ -11899,7 +11913,7 @@ void lb_asset_context_statements(const struct CAssetContext *ctx,
  * @param callback  Async callback
  * @param userdata  User data passed to the callback
  */
-void lb_asset_context_download_url(const struct CAssetContext *ctx,
+void lb_asset_context_download_url(const struct lb_asset_context_t *ctx,
                                    const char *file_key,
                                    lb_async_callback_t callback,
                                    void *userdata);
