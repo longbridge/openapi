@@ -6,6 +6,7 @@ set(SOURCES
     src/decimal.cpp
     src/agent_context.cpp
     src/alert_context.cpp
+    src/asset_context.cpp
     src/dca_context.cpp
     src/sharelist_context.cpp
     src/calendar_context.cpp

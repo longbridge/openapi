@@ -1,4 +1,5 @@
 #include "asset_context.hpp"
+#include "longbridge.h"
 #include <algorithm>
 #include <iterator>
 
@@ -122,9 +123,8 @@ AssetContext::statement_download_url(
       Status status(res->error);
 
       if (status) {
-        auto resp = (const lb_statement_download_url_response_t*)res->data;
         StatementDownloadUrlResponse result;
-        result.url = resp->url;
+        result.url = (const char*)res->data;
 
         (*callback_ptr)(
           AsyncResult<AssetContext, StatementDownloadUrlResponse>(
