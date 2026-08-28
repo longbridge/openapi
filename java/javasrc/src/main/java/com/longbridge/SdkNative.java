@@ -335,8 +335,7 @@ public class SdkNative {
         public static native void freeAlertContext(long context);
         public static native void alertContextList(long context, AsyncCallback callback);
         public static native void alertContextAdd(long context, Object opts, AsyncCallback callback);
-        public static native void alertContextEnable(long context, String alertId, AsyncCallback callback);
-        public static native void alertContextDisable(long context, String alertId, AsyncCallback callback);
+        public static native void alertContextUpdate(long context, Object item, AsyncCallback callback);
         public static native void alertContextDelete(long context, Object opts, AsyncCallback callback);
 
                 // ── CalendarContext ───────────────────────────────────────────
@@ -478,8 +477,9 @@ public class SdkNative {
         public static native void fundamentalContextGetBuyback(long context, String symbol,
                         AsyncCallback callback);
 
-        public static native void fundamentalContextGetRatings(long context, String symbol,
-                        AsyncCallback callback);
+        // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+        // public static native void fundamentalContextGetRatings(long context, String symbol,
+        //                 AsyncCallback callback);
 
         public static native void fundamentalContextGetBusinessSegments(long context, String symbol,
                         AsyncCallback callback);

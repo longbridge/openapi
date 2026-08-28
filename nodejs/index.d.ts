@@ -774,8 +774,6 @@ export declare class FundamentalContext {
   operating(symbol: string): Promise<OperatingList>
   /** Get buyback data for a security */
   buyback(symbol: string): Promise<BuybackData>
-  /** Get stock ratings for a security */
-  ratings(symbol: string): Promise<StockRatings>
   /** Get ranked list of top shareholders */
   shareholderTop(symbol: string): Promise<ShareholderTopResponse>
   /** Get holding history and detail for one shareholder */
@@ -797,8 +795,11 @@ export declare class FundamentalContext {
   usValuationOverview(symbol: string): Promise<USValuationOverview>
   /** Get US financial overview. US token required. */
   usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
-  /** Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required. */
-  usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
+  /**
+   * Get US financial statement v3. `kind` selects one statement (there is
+   * no "all" mode). US token required.
+   */
+  usFinancialStatement(symbol: string, kind: FinancialStatementKind, report: string): Promise<USFinancialStatement>
   /** Get US key financial metrics. US token required. */
   usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
   /** Get US analyst consensus estimates. US token required. */
@@ -3600,7 +3601,7 @@ export declare class WarrantInfo {
   /** Turnover */
   get turnover(): Decimal
   /** Expiry date */
-  get expiryDate(): NaiveDate
+  get expiryDate(): NaiveDate | null
   /** Strike price */
   get strikePrice(): Decimal | null
   /** Upper strike price */
@@ -3936,8 +3937,8 @@ export interface AlertItem {
   text: string
   /** Trigger state flags */
   state: Array<number>
-  /** Trigger value: `{"price":"500"}` or `{"chg":"5"}` */
-  valueMap: any
+  /** Trigger value, e.g. `{"price":"500"}` or `{"chg":"5"}` */
+  valueMap: AlertValueMap
 }
 
 /** Alert list response */
@@ -3966,6 +3967,14 @@ export interface AlertSymbolGroup {
   product: string
   /** Alert items */
   indicators: Array<AlertItem>
+}
+
+/** Trigger value of a price alert (exactly one field is populated). */
+export interface AlertValueMap {
+  /** Absolute price threshold as a decimal string, e.g. `"500"`. */
+  price?: string
+  /** Percentage-change threshold, e.g. `5`. */
+  chg?: number
 }
 
 /** One market anomaly event (e.g. large block trade, margin buying surge) */
@@ -5062,8 +5071,8 @@ export interface ExchangeRates {
 
 /** Executives for one security */
 export interface ExecutiveGroup {
-  /** Security symbol */
-  symbol: string
+  /** Security symbol (`null` when the server omits it) */
+  symbol?: string
   /** Company wiki URL */
   forwardUrl: string
   /** Total executives */
@@ -5196,6 +5205,21 @@ export interface FinancialReports {
   list: any
 }
 
+/**
+ * Financial statement kind
+ *
+ * Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+ * needs one specific statement per request.
+ */
+export declare const enum FinancialStatementKind {
+  /** Income statement */
+  IncomeStatement = 0,
+  /** Balance sheet */
+  BalanceSheet = 1,
+  /** Cash flow statement */
+  CashFlow = 2
+}
+
 export declare const enum FlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -5208,8 +5232,11 @@ export declare const enum FlowDirection {
 /** One profit-analysis flow record */
 export interface FlowItem {
   executedDate: string
-  /** Execution timestamp as a JSON value string */
-  executedTimestamp: string
+  /**
+   * Execution timestamp as a Unix-seconds string (absent when not yet
+   * executed)
+   */
+  executedTimestamp?: string
   code: string
   direction: FlowDirection
   executedQuantity?: string
@@ -6613,10 +6640,20 @@ export interface QuestionOption {
   description: string
 }
 
-/** Rank categories response. `data` is a JSON string. */
+/** Rank categories response. */
 export interface RankCategoriesResponse {
-  /** Raw rank categories data (JSON string) */
-  data: string
+  /** All top-level rank categories */
+  categories: Array<RankCategory>
+}
+
+/** A top-level rank category grouping sub-categories. */
+export interface RankCategory {
+  /** Top-level key (e.g. `"hot"`) */
+  key: string
+  /** Display name (e.g. `"热度排行"`) */
+  name: string
+  /** Sub-categories */
+  subCategories: Array<RankSubCategory>
 }
 
 /** One ranked security item. */
@@ -6661,6 +6698,16 @@ export interface RankListResponse {
   bmp: boolean
   /** Ranked security items */
   lists: Array<RankListItem>
+}
+
+/** One leaf rank sub-category. */
+export interface RankSubCategory {
+  /** Sub-category key (e.g. `"hot_all-us"`). Pass to `rank_list`. */
+  key: string
+  /** Display name (e.g. `"美股总热度"`) */
+  name: string
+  /** Market code (e.g. `"US"`, `"HK"`) */
+  market: string
 }
 
 /** Analyst rating distribution counts */
@@ -7153,12 +7200,12 @@ export interface StockRatings {
   styleTxtName: string
   scaleTxtName: string
   reportPeriodTxt: string
-  /** Composite score as a JSON string */
-  multiScore: string
+  /** Composite score (`null` when not rated) */
+  multiScore?: number
   multiLetter: string
   multiScoreChange: number
   industryName: string
-  industryRank: number
+  industryRank?: number
   /** Full ratings array as a JSON string */
   ratingsJson: string
 }
@@ -7266,7 +7313,12 @@ export interface SubmitAttachedParams {
 export interface SubmitMultiLegOrderLeg {
   /** Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`) */
   symbol: string
-  /** Leg ratio quantity */
+  /**
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by `strategy` together with the order `side`, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
+   */
   ratioQuantity: Decimal
 }
 
@@ -7421,7 +7473,7 @@ export interface TopMoversEvent {
 export interface TopMoversResponse {
   /** Top-mover events */
   events: Array<TopMoversEvent>
-  /** Pagination cursor for next page (JSON string) */
+  /** Pagination cursor for next page (empty string means no more pages) */
   nextParams: string
 }
 
@@ -7723,7 +7775,7 @@ export interface USCryptoOverview {
   issuePrice: string
   shares: string
   officialWebAddress: string
-  /** User-facing symbol (e.g. "BTCUSD.BKKT"), converted from counter_id */
+  /** User-facing symbol (e.g. "BTCUSD.BKKT") */
   symbol: string
   baseAsset: string
   logo: string
@@ -8286,12 +8338,14 @@ export declare const enum WarrantSortBy {
 
 /** Warrant status */
 export declare const enum WarrantStatus {
+  /** Unknown */
+  Unknown = 0,
   /** Suspend */
-  Suspend = 0,
+  Suspend = 1,
   /** Prepare List */
-  PrepareList = 1,
+  PrepareList = 2,
   /** Normal */
-  Normal = 2
+  Normal = 3
 }
 
 /** Warrant type */

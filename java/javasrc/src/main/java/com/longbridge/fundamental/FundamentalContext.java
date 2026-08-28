@@ -272,12 +272,13 @@ public class FundamentalContext implements AutoCloseable {
         });
     }
 
-    /** Get stock ratings. */
-    public synchronized CompletableFuture<StockRatings> getRatings(String symbol) throws OpenApiException {
-        return AsyncCallback.executeTask((callback) -> {
-            SdkNative.fundamentalContextGetRatings(raw(), symbol, callback);
-        });
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /** Get stock ratings. */
+    // public synchronized CompletableFuture<StockRatings> getRatings(String symbol) throws OpenApiException {
+    //     return AsyncCallback.executeTask((callback) -> {
+    //         SdkNative.fundamentalContextGetRatings(raw(), symbol, callback);
+    //     });
+    // }
 
     /** Get business segment breakdowns (latest snapshot). */
     public synchronized CompletableFuture<BusinessSegments> getBusinessSegments(String symbol)

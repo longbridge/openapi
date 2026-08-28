@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 public class FlowItem {
     /** Execution date string, e.g. "2024-01-15" */
     public String executedDate;
-    /** Execution timestamp (JSON string; may be int or string) */
+    /** Execution timestamp as a Unix-seconds string; may be null when not yet executed */
     public String executedTimestamp;
     /** Security code / ticker */
     public String code;

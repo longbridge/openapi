@@ -254,6 +254,8 @@ cpp_compat = true
 "CCalendarCategory" = "lb_calendar_category_t"
 # FundamentalContext enums
 "CFinancialReportKind" = "lb_financial_report_kind_t"
+"CIndustryRankIndicator" = "lb_industry_rank_indicator_t"
+"CIndustryRankSortType" = "lb_industry_rank_sort_type_t"
 "CFinancialReportPeriod" = "lb_financial_report_period_t"
 "CInstitutionRecommend" = "lb_institution_recommend_t"
 # MarketContext enums
@@ -344,6 +346,8 @@ cpp_compat = true
 "CTopMoversStock" = "lb_top_movers_stock_t"
 "CTopMoversEvent" = "lb_top_movers_event_t"
 "CTopMoversResponse" = "lb_top_movers_response_t"
+"CRankSubCategory" = "lb_rank_sub_category_t"
+"CRankCategory" = "lb_rank_category_t"
 "CRankCategoriesResponse" = "lb_rank_categories_response_t"
 "CRankListItem" = "lb_rank_list_item_t"
 "CRankListResponse" = "lb_rank_list_response_t"
@@ -504,6 +508,7 @@ include = [
     "CCalendarCategory",
     # FundamentalContext enums
     "CFinancialReportKind", "CFinancialReportPeriod", "CInstitutionRecommend",
+    "CIndustryRankIndicator", "CIndustryRankSortType",
     # MarketContext enums
     "CBrokerHoldingPeriod", "CAhPremiumPeriod",
     # PortfolioContext enums
@@ -531,7 +536,7 @@ include = [
     "CValuationHistoryPoint", "CValuationComparisonItem", "CValuationComparisonResponse",
     # MarketContext new types
     "CTopMoversStock", "CTopMoversEvent", "CTopMoversResponse",
-    "CRankCategoriesResponse",
+    "CRankSubCategory", "CRankCategory", "CRankCategoriesResponse",
     "CRankListItem", "CRankListResponse",
     # ScreenerContext
     "CScreenerContext",

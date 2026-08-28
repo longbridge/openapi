@@ -277,7 +277,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longbridge/quote/WarrantStatus",
     longbridge::quote::WarrantStatus,
-    [Suspend, PrepareList, Normal]
+    [Unknown, Suspend, PrepareList, Normal]
 );
 
 impl_java_enum!(
@@ -517,6 +517,30 @@ impl_java_enum!(
     "com/longbridge/fundamental/FinancialReportKind",
     longbridge::fundamental::types::FinancialReportKind,
     [IncomeStatement, BalanceSheet, CashFlow, All]
+);
+impl_java_enum!(
+    "com/longbridge/fundamental/FinancialStatementKind",
+    longbridge::fundamental::types::FinancialStatementKind,
+    [IncomeStatement, BalanceSheet, CashFlow]
+);
+impl_java_enum!(
+    "com/longbridge/fundamental/IndustryRankIndicator",
+    longbridge::fundamental::types::IndustryRankIndicator,
+    [
+        LeadingGainer,
+        TodayTrend,
+        Popularity,
+        MarketCap,
+        Revenue,
+        RevenueGrowth,
+        NetProfit,
+        NetProfitGrowth
+    ]
+);
+impl_java_enum!(
+    "com/longbridge/fundamental/IndustryRankSortType",
+    longbridge::fundamental::types::IndustryRankSortType,
+    [Single, Multi]
 );
 impl_java_enum!(
     "com/longbridge/fundamental/FinancialReportPeriod",

@@ -1330,7 +1330,10 @@ impl ToFFI for CSubmitOrderResponseOwned {
 pub struct CSubmitMultiLegOrderLeg {
     /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
     pub symbol: *const c_char,
-    /// Leg ratio quantity
+    /// Leg ratio quantity — must be a positive number.  The direction of each
+    /// leg is implied by the strategy together with the order side, not by the
+    /// sign of this value; a negative or zero ratio is rejected by the server
+    /// with `602001`.
     pub ratio_quantity: *const CDecimal,
 }
 

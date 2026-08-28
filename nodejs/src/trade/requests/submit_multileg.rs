@@ -10,7 +10,10 @@ use crate::{
 pub struct SubmitMultiLegOrderLeg<'env> {
     /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
     pub symbol: String,
-    /// Leg ratio quantity
+    /// Leg ratio quantity — must be a positive number.  The direction of each
+    /// leg is implied by `strategy` together with the order `side`, not by the
+    /// sign of this value; a negative or zero ratio is rejected by the server
+    /// with `602001`.
     pub ratio_quantity: ClassInstance<'env, Decimal>,
 }
 

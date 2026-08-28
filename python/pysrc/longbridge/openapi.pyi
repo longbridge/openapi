@@ -1855,6 +1855,11 @@ class WarrantStatus:
     Warrant status
     """
 
+    class Unknown(WarrantStatus):
+        """
+        Unknown
+        """
+
     class Suspend(WarrantStatus):
         """
         Suspend
@@ -2085,9 +2090,10 @@ class WarrantInfo:
     Turnover
     """
 
-    expiry_date: date
+    expiry_date: Optional[date]
     """
-    Expiry date
+    Expiry date, or `None` if the server does not report an expiry date for
+    this warrant
     """
 
     strike_price: Optional[Decimal]
@@ -7587,7 +7593,9 @@ class TradeContext:
             order_type: Order type
             submitted_quantity: Submitted quantity (number of combinations)
             strategy: Multi-leg strategy
-            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples. Each ``ratio_quantity`` must be positive — a leg's direction comes from
+                ``strategy`` plus ``side``, not from the sign of the ratio; a negative or
+                zero ratio is rejected by the server with ``602001``
             submitted_price: Submitted price (required for limit order types such as `LO`)
             remark: Remark (Maximum 255 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
@@ -9293,7 +9301,9 @@ class AsyncTradeContext:
             order_type: Order type.
             submitted_quantity: Submitted quantity (number of combinations).
             strategy: Multi-leg strategy.
-            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples.
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples. Each ``ratio_quantity`` must be positive — a leg's direction comes from
+                ``strategy`` plus ``side``, not from the sign of the ratio; a negative or
+                zero ratio is rejected by the server with ``602001``
             submitted_price: Submitted price (required for limit order types such as `LO`).
             remark: Remark (max 255 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
@@ -9303,7 +9313,8 @@ class AsyncTradeContext:
 
                 import asyncio
                 from decimal import Decimal
-                from longbridge.openapi import OAuthBuilder, (
+                from longbridge.openapi import (
+                    OAuthBuilder,
                     AsyncTradeContext,
                     Config,
                     OrderSide,
@@ -11043,8 +11054,8 @@ class Professional:
 class ExecutiveGroup:
     """Executives for one security."""
 
-    symbol: str
-    """Security symbol"""
+    symbol: Optional[str]
+    """Security symbol (``None`` when the server omits it)"""
     forward_url: str
     """Link to company wiki page"""
     total: int
@@ -11330,16 +11341,16 @@ class StockRatings:
     """Scale display name"""
     report_period_txt: str
     """Report period display text"""
-    multi_score: str
-    """Composite score (string representation)"""
+    multi_score: Optional[float]
+    """Composite score (``None`` when not rated)"""
     multi_letter: str
     """Composite score letter grade"""
     multi_score_change: int
     """Score change vs previous period"""
     industry_name: str
     """Industry name"""
-    industry_rank: int
-    """Industry rank"""
+    industry_rank: Optional[int]
+    """Industry rank (``None`` when unavailable)"""
     ratings_json: str
     """Full ratings array as a JSON string"""
 
@@ -11355,6 +11366,22 @@ class FinancialReportKind:
     """Cash flow statement (CF)"""
     class All(FinancialReportKind): ...
     """All statements (default)"""
+
+
+class FinancialStatementKind:
+    """Financial statement kind.
+
+    Unlike :class:`FinancialReportKind` there is no ``All``: the statements
+    endpoint needs one specific statement per request and returns an empty
+    list for ``ALL``.
+    """
+
+    class IncomeStatement(FinancialStatementKind): ...
+    """Income statement (IS)"""
+    class BalanceSheet(FinancialStatementKind): ...
+    """Balance sheet (BS)"""
+    class CashFlow(FinancialStatementKind): ...
+    """Cash flow statement (CF)"""
 
 
 class FinancialReportPeriod:
@@ -11510,17 +11537,18 @@ class FundamentalContext:
         """
         ...
 
-    def ratings(self, symbol: str) -> "StockRatings":
-        """
-        Get stock ratings for a security.
-
-        Args:
-            symbol: Security symbol, e.g. ``"AAPL.US"``
-
-        Returns:
-            :class:`StockRatings`
-        """
-        ...
+    # TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    # def ratings(self, symbol: str) -> "StockRatings":
+    #     """
+    #     Get stock ratings for a security.
+    #
+    #     Args:
+    #         symbol: Security symbol, e.g. ``"AAPL.US"``
+    #
+    #     Returns:
+    #         :class:`StockRatings`
+    #     """
+    #     ...
 
     def shareholder_top(self, symbol: str) -> "ShareholderTopResponse":
         """
@@ -11652,12 +11680,12 @@ class FundamentalContext:
         """
         ...
 
-    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
+    def us_financial_statement(self, symbol: str, kind: FinancialStatementKind, report: str) -> "USFinancialStatement":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            kind: Which statement to fetch — there is no "all statements" mode
             report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
@@ -11765,12 +11793,12 @@ class AsyncFundamentalContext:
         """
         ...
 
-    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "Awaitable[USFinancialStatement]":
+    def us_financial_statement(self, symbol: str, kind: FinancialStatementKind, report: str) -> "Awaitable[USFinancialStatement]":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            kind: Which statement to fetch — there is no "all statements" mode
             report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
@@ -12453,7 +12481,7 @@ class MarketContext:
         Get all available rank category keys and labels.
 
         Returns:
-            :class:`RankCategoriesResponse` with raw JSON data
+            :class:`RankCategoriesResponse` with typed categories
         """
         ...
 
@@ -12518,15 +12546,37 @@ class TopMoversResponse:
 
     events: List[TopMoversEvent]
     """Top-mover events"""
-    next_params: object
-    """Pagination cursor for next page (raw JSON object)"""
+    next_params: str
+    """Pagination cursor for next page (empty string means no more pages)"""
+
+
+class RankSubCategory:
+    """One leaf rank sub-category."""
+
+    key: str
+    """Sub-category key (e.g. ``"hot_all-us"``). Pass to :meth:`MarketContext.rank_list`."""
+    name: str
+    """Display name (e.g. ``"美股总热度"``)"""
+    market: str
+    """Market code (e.g. ``"US"``, ``"HK"``)"""
+
+
+class RankCategory:
+    """A top-level rank category grouping sub-categories."""
+
+    key: str
+    """Top-level key (e.g. ``"hot"``)"""
+    name: str
+    """Display name (e.g. ``"热度排行"``)"""
+    sub_categories: List[RankSubCategory]
+    """Sub-categories"""
 
 
 class RankCategoriesResponse:
-    """Rank categories response. ``data`` is a Python dict/list from JSON."""
+    """Rank categories response."""
 
-    data: object
-    """Raw rank categories data (JSON object / list)"""
+    categories: List[RankCategory]
+    """All top-level rank categories"""
 
 
 class RankListItem:
@@ -13251,8 +13301,8 @@ class FlowItem:
 
     executed_date: str
     """Execution date string, e.g. ``"2024-01-15"``"""
-    executed_timestamp: str
-    """Execution timestamp (string representation)"""
+    executed_timestamp: Optional[str]
+    """Execution timestamp as a Unix-seconds string (``None`` when not yet executed)"""
     code: str
     """Security code / ticker"""
     direction: FlowDirection
@@ -13278,6 +13328,15 @@ class ProfitAnalysisFlows:
 
 # ── AlertContext ──────────────────────────────────────────────────
 
+class AlertValueMap:
+    """Trigger value of a price alert (exactly one field is populated)."""
+
+    price: Optional[Decimal]
+    """Absolute price threshold, e.g. ``500``"""
+    chg: Optional[float]
+    """Percentage-change threshold, e.g. ``5``"""
+
+
 class AlertItem:
     """One price alert."""
 
@@ -13295,6 +13354,8 @@ class AlertItem:
     """Display text, e.g. ``"价格涨到 600"``"""
     state: list[int]
     """Trigger state flags"""
+    value_map: AlertValueMap
+    """Trigger value, e.g. ``{"price":"500"}`` or ``{"chg":"5"}``"""
 
 
 class AlertSymbolGroup:
@@ -14138,7 +14199,7 @@ class USCryptoEntry:
     average_cost: str
     """Average cost price"""
     symbol: str
-    """Internal counter_id, e.g. ``"VA/BKKT/BTCUSD"``"""
+    """Symbol"""
     currency: str
     """Settlement currency"""
     industry_counter_id: str

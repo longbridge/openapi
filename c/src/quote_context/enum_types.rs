@@ -578,6 +578,9 @@ pub enum CFilterWarrantInOutBoundsType {
 #[allow(clippy::enum_variant_names)]
 #[repr(C)]
 pub enum CWarrantStatus {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    WarrantStatusUnknown,
     /// Suspend
     #[c(remote = "Suspend")]
     WarrantStatusSuspend,

@@ -2745,6 +2745,8 @@ inline lb_warrant_status_t
 convert(WarrantStatus ty)
 {
   switch (ty) {
+    case WarrantStatus::Unknown:
+      return WarrantStatusUnknown;
     case WarrantStatus::Suspend:
       return WarrantStatusSuspend;
     case WarrantStatus::PrepareList:
@@ -2760,6 +2762,8 @@ inline WarrantStatus
 convert(lb_warrant_status_t ty)
 {
   switch (ty) {
+    case WarrantStatusUnknown:
+      return WarrantStatus::Unknown;
     case WarrantStatusSuspend:
       return WarrantStatus::Suspend;
     case WarrantStatusPrepareList:
@@ -2783,7 +2787,8 @@ convert(lb_warrant_info_t info)
     Decimal(info.change_value),
     info.volume,
     Decimal(info.turnover),
-    convert(&info.expiry_date),
+    info.expiry_date ? std::optional{ convert(info.expiry_date) }
+                     : std::nullopt,
     info.strike_price ? std::optional{ Decimal(info.strike_price) }
                       : std::nullopt,
     info.upper_strike_price ? std::optional{ Decimal(info.upper_strike_price) }
@@ -3181,6 +3186,19 @@ inline market::RankListResponse convert(const lb_rank_list_response_t* r) {
   for (size_t i = 0; i < r->num_lists; ++i) lists.push_back(convert(&r->lists[i]));
   return { r->bmp, std::move(lists) };
 }
+inline market::RankSubCategory convert(const lb_rank_sub_category_t* s) {
+  return { s->key ? s->key : "", s->name ? s->name : "", s->market ? s->market : "" };
+}
+inline market::RankCategory convert(const lb_rank_category_t* c) {
+  std::vector<market::RankSubCategory> subs;
+  for (size_t i = 0; i < c->num_sub_categories; ++i) subs.push_back(convert(&c->sub_categories[i]));
+  return { c->key ? c->key : "", c->name ? c->name : "", std::move(subs) };
+}
+inline market::RankCategoriesResponse convert(const lb_rank_categories_response_t* r) {
+  std::vector<market::RankCategory> cats;
+  for (size_t i = 0; i < r->num_categories; ++i) cats.push_back(convert(&r->categories[i]));
+  return { std::move(cats) };
+}
 
 // ── FundamentalContext conversions ────────────────────────────────
 
@@ -3416,7 +3434,7 @@ inline fundamental::InstitutionRatingViews convert(const lb_institution_rating_v
 
 // ── industry_rank conversions ─────────────────────────────────────
 inline fundamental::IndustryRankItem convert(const lb_industry_rank_item_t* item) {
-  return { item->name, item->counter_id, item->chg, item->leading_name, item->leading_ticker,
+  return { item->name, item->symbol, item->chg, item->leading_name, item->leading_ticker,
            item->leading_chg, item->value_name, item->value_data };
 }
 inline fundamental::IndustryRankGroup convert(const lb_industry_rank_group_t* g) {
@@ -3432,11 +3450,12 @@ inline fundamental::IndustryRankResponse convert(const lb_industry_rank_response
 
 // ── industry_peers conversions ────────────────────────────────────
 inline fundamental::IndustryPeerNode convert(const lb_industry_peer_node_t* node) {
-  return { node->name, node->counter_id, node->stock_num, node->chg, node->ytd_chg,
+  return { node->name, node->symbol, node->stock_num, node->chg, node->ytd_chg,
            node->next_json ? node->next_json : "" };
 }
 inline fundamental::IndustryPeersResponse convert(const lb_industry_peers_response_t* r) {
-  fundamental::IndustryPeersTop top{ r->top.name, r->top.market };
+  std::optional<fundamental::IndustryPeersTop> top;
+  if (r->top) top = fundamental::IndustryPeersTop{ r->top->name, r->top->market };
   std::optional<fundamental::IndustryPeerNode> chain;
   if (r->chain) chain = convert(r->chain);
   return { std::move(top), std::move(chain) };
@@ -3561,8 +3580,12 @@ inline portfolio::ProfitAnalysisDetail convert(const lb_profit_analysis_detail_t
 
 inline alert::AlertItem convert(const lb_alert_item_t* item) {
   std::vector<int32_t> state(item->state, item->state + item->num_state);
+  alert::AlertValueMap value_map{
+    item->value_map.price ? item->value_map.price : "",
+    item->value_map.chg ? std::optional<double>(*item->value_map.chg) : std::nullopt
+  };
   return { item->id, item->indicator_id, item->enabled, item->frequency, item->scope,
-           item->text, std::move(state), item->value_map };
+           item->text, std::move(state), std::move(value_map) };
 }
 inline alert::AlertSymbolGroup convert(const lb_alert_symbol_group_t* g) {
   std::vector<alert::AlertItem> inds;

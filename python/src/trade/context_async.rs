@@ -435,7 +435,11 @@ impl AsyncTradeContext {
 
     /// Submit a multi-leg option combination order. Returns awaitable.
     ///
-    /// `legs` is a list of `(symbol, ratio_quantity)` tuples.
+    /// `legs` is a list of `(symbol, ratio_quantity)` tuples.  Each
+    /// `ratio_quantity` must be a positive number: the direction of a leg is
+    /// implied by `strategy` together with `side`, not by the sign of the
+    /// ratio, and a negative or zero ratio is rejected by the server with
+    /// `602001`.
     #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_multileg(

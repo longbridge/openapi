@@ -797,7 +797,8 @@ pub(crate) struct WarrantInfo {
     /// Turnover
     turnover: PyDecimal,
     /// Expiry date
-    expiry_date: PyDateWrapper,
+    #[py(opt)]
+    expiry_date: Option<PyDateWrapper>,
     /// Strike price
     #[py(opt)]
     strike_price: Option<PyDecimal>,
@@ -848,6 +849,8 @@ pub(crate) struct WarrantInfo {
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longbridge::quote::WarrantStatus")]
 pub enum WarrantStatus {
+    /// Unknown
+    Unknown,
     /// Suspend
     Suspend,
     /// Prepare List
@@ -1646,7 +1649,7 @@ pub(crate) struct USCryptoOverview {
     pub issue_price: String,
     pub shares: String,
     pub official_web_address: String,
-    /// User-facing symbol (e.g. "BTCUSD.BKKT"), converted from counter_id
+    /// User-facing symbol (e.g. "BTCUSD.BKKT")
     pub symbol: String,
     pub base_asset: String,
     pub logo: String,

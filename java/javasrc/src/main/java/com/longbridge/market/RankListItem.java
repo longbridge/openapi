@@ -2,7 +2,7 @@ package com.longbridge.market;
 
 /** One item in the popularity rank list. */
 public class RankListItem {
-    /** Symbol, e.g. "MU.US" (converted from counter_id) */
+    /** Symbol, e.g. "MU.US" */
     public String symbol;
     /** Ticker code */
     public String code;

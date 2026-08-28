@@ -228,11 +228,12 @@ impl FundamentalContext {
         Ok(self.ctx.buyback(symbol).await.map_err(ErrorNewType)?.into())
     }
 
-    /// Get stock ratings for a security
-    #[napi]
-    pub async fn ratings(&self, symbol: String) -> Result<StockRatings> {
-        Ok(self.ctx.ratings(symbol).await.map_err(ErrorNewType)?.into())
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings for a security
+    // #[napi]
+    // pub async fn ratings(&self, symbol: String) -> Result<StockRatings> {
+    //     Ok(self.ctx.ratings(symbol).await.map_err(ErrorNewType)?.into())
+    // }
 
     /// Get ranked list of top shareholders
     #[napi]
@@ -362,17 +363,18 @@ impl FundamentalContext {
             .into())
     }
 
-    /// Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required.
+    /// Get US financial statement v3. `kind` selects one statement (there is
+    /// no "all" mode). US token required.
     #[napi]
     pub async fn us_financial_statement(
         &self,
         symbol: String,
-        kind: String,
+        kind: FinancialStatementKind,
         report: String,
     ) -> Result<USFinancialStatement> {
         Ok(self
             .ctx
-            .us_financial_statement(symbol, kind, report)
+            .us_financial_statement(symbol, kind.into(), report)
             .await
             .map_err(ErrorNewType)?
             .into())

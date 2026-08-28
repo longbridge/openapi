@@ -15,7 +15,11 @@ public class SubmitMultiLegOrderLeg {
      *
      * @param symbol        option symbol, in `ticker.region` format (e.g.
      *                      {@code QQQ260731C764000.US})
-     * @param ratioQuantity leg ratio quantity
+     * @param ratioQuantity leg ratio quantity; must be a positive number. The
+     *                      direction of each leg is implied by the strategy
+     *                      together with the order side, not by the sign of
+     *                      this value; a negative or zero ratio is rejected by
+     *                      the server with {@code 602001}
      */
     public SubmitMultiLegOrderLeg(String symbol, BigDecimal ratioQuantity) {
         this.symbol = symbol;

@@ -35,9 +35,23 @@ fn read_alert_item(
             std::slice::from_raw_parts(elements.as_ptr(), elements.len()).to_vec()
         }
     };
-    // valueMap: JSON string
-    let value_map_str: String = get_field(env, item, "valueMap")?;
-    let value_map = serde_json::from_str(&value_map_str).unwrap_or(serde_json::Value::Null);
+    // valueMap: AlertValueMap object with a `price` (BigDecimal) and `chg`
+    // (Double) field
+    let value_map = {
+        let vm_obj = env
+            .get_field(item, "valueMap", "Lcom/longbridge/alert/AlertValueMap;")?
+            .l()?;
+        if vm_obj.is_null() {
+            longbridge::alert::AlertValueMap::default()
+        } else {
+            let price: Option<longbridge::Decimal> = get_field(env, &vm_obj, "price")?;
+            let chg: Option<crate::types::JavaDouble> = get_field(env, &vm_obj, "chg")?;
+            longbridge::alert::AlertValueMap {
+                price,
+                chg: chg.map(Into::into),
+            }
+        }
+    };
     Ok(longbridge::alert::AlertItem {
         id,
         indicator_id,

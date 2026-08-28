@@ -159,10 +159,11 @@ impl FundamentalContext {
         Ok(self.ctx.buyback(symbol).map_err(ErrorNewType)?.into())
     }
 
-    /// Get stock ratings for a security.
-    fn ratings(&self, symbol: String) -> PyResult<StockRatings> {
-        Ok(self.ctx.ratings(symbol).map_err(ErrorNewType)?.into())
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings for a security.
+    // fn ratings(&self, symbol: String) -> PyResult<StockRatings> {
+    //     Ok(self.ctx.ratings(symbol).map_err(ErrorNewType)?.into())
+    // }
 
     /// Get ranked list of top shareholders.
     fn shareholder_top(&self, symbol: String) -> PyResult<ShareholderTopResponse> {
@@ -276,17 +277,17 @@ impl FundamentalContext {
             .into())
     }
 
-    /// Get US financial statement v3. `kind`: "IS"/"BS"/"CF". US token
-    /// required.
+    /// Get US financial statement v3. `kind` selects one statement (there is
+    /// no "all" mode). US token required.
     fn us_financial_statement(
         &self,
         symbol: String,
-        kind: String,
+        kind: FinancialStatementKind,
         report: String,
     ) -> PyResult<USFinancialStatement> {
         Ok(self
             .ctx
-            .us_financial_statement(symbol, kind, report)
+            .us_financial_statement(symbol, kind.into(), report)
             .map_err(ErrorNewType)?
             .into())
     }
