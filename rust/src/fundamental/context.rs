@@ -6,6 +6,31 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{Config, Market, Result, fundamental::types::*};
 
+/// Convert a user-facing symbol (e.g. `700.HK`, `AAPL.US`, `HSI.HK`) to the
+/// backend counter-id form (e.g. `ST/HK/700`, `ST/US/AAPL`, `IX/HK/HSI`).
+///
+/// TODO: temporary shim used only by
+/// [`FundamentalContext::valuation_comparison`] while the gateway does not yet
+/// accept the `comparison_symbols` parameter. Remove it once the gateway
+/// converts the symbols itself, and pass the user symbols straight through.
+/// This is a naive best-effort conversion: it maps dotted-index symbols
+/// (leading `.`, e.g. `.DJI.US`) to the `IX/` prefix and everything else to
+/// `ST/`, so ETF / warrant peers may resolve to the wrong prefix — acceptable
+/// because valuation peers are virtually always equities.
+fn symbol_to_counter_id(symbol: &str) -> String {
+    match symbol.rsplit_once('.') {
+        Some((code, market)) => {
+            let market = market.to_uppercase();
+            if code.starts_with('.') {
+                format!("IX/{market}/{}", &code[1..])
+            } else {
+                format!("ST/{market}/{code}")
+            }
+        }
+        None => symbol.to_string(),
+    }
+}
+
 /// Convert a Unix-seconds string to RFC 3339.
 fn unix_secs_str_to_rfc3339(s: &str) -> String {
     s.parse::<i64>()
@@ -767,22 +792,31 @@ impl FundamentalContext {
         currency: impl Into<String>,
         comparison_symbols: Option<Vec<String>>,
     ) -> Result<ValuationComparisonResponse> {
+        // TODO: The gateway does not yet accept the `comparison_symbols`
+        // parameter (user symbols). Until it does, keep sending the legacy
+        // `comparison_counter_ids` parameter and convert the user symbols to
+        // counter-ids here. Once the gateway supports `comparison_symbols`,
+        // drop this local conversion and pass the user symbols straight
+        // through as `comparison_symbols` (serde_json array string) — the
+        // public API already takes user symbols so no signature change.
         #[derive(Serialize)]
         struct Query {
             symbol: String,
             currency: String,
             #[serde(skip_serializing_if = "Option::is_none")]
-            comparison_symbols: Option<String>,
+            comparison_counter_ids: Option<String>,
         }
-        let comparison_symbols =
-            comparison_symbols.map(|syms| serde_json::to_string(&syms).unwrap_or_default());
+        let comparison_counter_ids = comparison_symbols.map(|syms| {
+            let ids: Vec<String> = syms.iter().map(|s| symbol_to_counter_id(s)).collect();
+            serde_json::to_string(&ids).unwrap_or_default()
+        });
         let raw: serde_json::Value = self
             .get(
                 "/v1/quote/compare/valuation",
                 Query {
                     symbol: symbol.into(),
                     currency: currency.into(),
-                    comparison_symbols,
+                    comparison_counter_ids,
                 },
             )
             .await?;
