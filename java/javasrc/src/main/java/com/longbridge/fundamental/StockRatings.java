@@ -1,6 +1,12 @@
 package com.longbridge.fundamental;
 
-/** Response for {@link FundamentalContext#getRatings}. */
+/**
+ * Response for the stock ratings endpoint ({@code getRatings}).
+ *
+ * <p>Note: {@code FundamentalContext.getRatings} is temporarily disabled
+ * (endpoint not yet open — {@code /v1/quote/ratings}), so this type is not
+ * currently returned by any method. It is kept for when the endpoint reopens.
+ */
 public class StockRatings {
     /** Style display name */
     public String styleTxtName;
