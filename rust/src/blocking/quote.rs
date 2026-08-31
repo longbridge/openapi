@@ -1214,7 +1214,8 @@ impl QuoteContextSync {
             .call(move |ctx| async move { ctx.short_trades(symbol, count).await })
     }
 
-    // ── US-market blocking wrappers ───────────────────────────────────────────
+    // ── US-market blocking wrappers
+    // ───────────────────────────────────────────
 
     /// Get cryptocurrency market overview (blocking)
     pub fn us_crypto_overview(

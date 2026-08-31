@@ -243,7 +243,8 @@ impl FundamentalContext {
             .into())
     }
 
-    // ── US-market methods ─────────────────────────────────────────────────────
+    // ── US-market methods
+    // ─────────────────────────────────────────────────────
 
     /// Get US company overview. US token required.
     fn us_company_overview(&self, symbol: String) -> PyResult<USCompanyOverview> {

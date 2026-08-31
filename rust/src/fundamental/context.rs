@@ -1085,7 +1085,8 @@ impl FundamentalContext {
         Ok(MacroeconomicResponse { info, data, count })
     }
 
-    // ── US-market APIs (US token required) ────────────────────────────────────
+    // ── US-market APIs (US token required)
+    // ────────────────────────────────────
 
     /// Get US company overview.
     ///

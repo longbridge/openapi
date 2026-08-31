@@ -248,8 +248,8 @@ impl AsyncFundamentalContext {
 
     // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
     // /// Get stock ratings. Returns awaitable.
-    // fn ratings(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
-    //     let ctx = self.ctx.clone();
+    // fn ratings(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>>
+    // {     let ctx = self.ctx.clone();
     //     pyo3_async_runtimes::tokio::future_into_py(py, async move {
     //         Ok(StockRatings::from(
     //             ctx.ratings(symbol).await.map_err(ErrorNewType)?,
@@ -363,7 +363,8 @@ impl AsyncFundamentalContext {
         .map(|b| b.unbind())
     }
 
-    // ── US-market async methods ───────────────────────────────────────────────
+    // ── US-market async methods
+    // ───────────────────────────────────────────────
 
     /// Get US company overview. US token required. Returns awaitable.
     fn us_company_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {

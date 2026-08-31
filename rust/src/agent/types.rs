@@ -1044,9 +1044,9 @@ mod tests {
 
     #[test]
     fn workflow_finished_tolerates_null_outputs() {
-        // A resumed/continued conversation can send `"outputs": null`; that must
-        // deserialize to the default rather than erroring, otherwise the whole
-        // event stream fails mid-turn.
+        // A resumed/continued conversation can send `"outputs": null`; that
+        // must deserialize to the default rather than erroring,
+        // otherwise the whole event stream fails mid-turn.
         let payload: WorkflowFinishedPayload =
             serde_json::from_str(r#"{"status":"succeeded","outputs":null}"#).unwrap();
         assert!(payload.outputs.answer.is_none());

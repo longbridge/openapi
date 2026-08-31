@@ -563,8 +563,9 @@ impl Config {
                 request.headers_mut().append(name, val);
             }
         }
-        // Route the upgrade to the data center matching the credential's region,
-        // unless the caller already set the header via a custom header.
+        // Route the upgrade to the data center matching the credential's
+        // region, unless the caller already set the header via a custom
+        // header.
         if !self
             .custom_headers
             .keys()
