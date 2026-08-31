@@ -34,7 +34,12 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          args: -i python --release --out dist -m python/Cargo.toml
+          # GNU/Linux wheels must be built in a manylinux container. Building on
+          # the ubuntu-24.04 host without this tags manylinux_2_39 (glibc 2.39),
+          # which pip cannot install on Ubuntu 22.04 (glibc 2.35). manylinux_2_28
+          # covers Ubuntu 20.04/22.04/24.04. Ignored on Windows and macOS.
+          manylinux: ${{ startsWith(matrix.runs-on, 'ubuntu') && '2_28' || 'off' }}
+          args: -i python${{ matrix.python-version }} --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longbridge --no-index --find-links dist --force-reinstall
