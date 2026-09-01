@@ -4,7 +4,7 @@ use longbridge::{
     Config,
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersOptions, GetGridTriggerHistoryOptions, GridContext,
-        GridTradeRule, SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
+        GridTradeRule, SubmitGridOrderOptions,
     },
     oauth::OAuthBuilder,
     trade::TradeContext,
@@ -26,10 +26,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ctx = GridContext::new(config.clone());
     // Grid master-order pushes still arrive on the TradeContext private topic.
     let (_trade, mut receiver) = TradeContext::new(config);
-
-    // Accept the strategy risk disclosure (compliance authorization) once.
-    ctx.submit_strategy_questionnaire(SubmitStrategyQuestionnaireOptions::new())
-        .await?;
 
     // Security (symbol) info used to build a grid order (lot size, auth flag).
     let info = ctx.symbol_info("700.HK").await?;

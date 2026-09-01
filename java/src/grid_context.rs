@@ -10,7 +10,7 @@ use longbridge::{
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
         GetGridTriggerHistoryOptions, GridContext, GridTradeRule, ReplaceGridOrderOptions,
-        SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
+        SubmitGridOrderOptions,
     },
 };
 
@@ -337,25 +337,6 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_gridContextRestart(
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.restart(order_id).await?)
-        })?;
-        Ok(())
-    })
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_gridContextSubmitStrategyQuestionnaire(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let __owned_ctx = context.ctx.clone();
-        async_util::execute(env, callback, async move {
-            Ok(__owned_ctx
-                .submit_strategy_questionnaire(SubmitStrategyQuestionnaireOptions::new())
-                .await?)
         })?;
         Ok(())
     })

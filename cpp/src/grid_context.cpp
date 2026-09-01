@@ -337,23 +337,6 @@ GridContext::restart(
 }
 
 void
-GridContext::submit_strategy_questionnaire(
-  AsyncCallback<GridContext, void> callback) const
-{
-  lb_grid_context_submit_strategy_questionnaire(
-    ctx_,
-    [](auto res) {
-      auto callback_ptr =
-        callback::get_async_callback<GridContext, void>(res->userdata);
-      (*callback_ptr)(AsyncResult<GridContext, void>(
-        GridContext((const lb_grid_context_t*)res->ctx),
-        Status(res->error),
-        nullptr));
-    },
-    new AsyncCallback<GridContext, void>(callback));
-}
-
-void
 GridContext::symbol_info(
   const std::string& symbol,
   AsyncCallback<GridContext, GridSymbolInfo> callback) const

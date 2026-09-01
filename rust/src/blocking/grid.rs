@@ -9,7 +9,7 @@ use crate::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
         GetGridTriggerHistoryOptions, GridContext, GridOrder, GridOrderDetail, GridOrdersResponse,
         GridSymbolInfo, GridTriggerHistoryResponse, ReplaceGridOrderOptions,
-        SubmitGridOrderOptions, SubmitGridOrderResponse, SubmitStrategyQuestionnaireOptions,
+        SubmitGridOrderOptions, SubmitGridOrderResponse,
     },
 };
 
@@ -91,15 +91,6 @@ impl GridContextSync {
     pub fn restart(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.restart(order_id).await })
-    }
-
-    /// Submit the strategy risk-disclosure questionnaire record (blocking)
-    pub fn submit_strategy_questionnaire(
-        &self,
-        options: SubmitStrategyQuestionnaireOptions,
-    ) -> Result<()> {
-        self.rt
-            .call(move |ctx| async move { ctx.submit_strategy_questionnaire(options).await })
     }
 
     /// Get the security (symbol) info used to build a grid order (blocking)

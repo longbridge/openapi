@@ -145,19 +145,6 @@ impl GridContext {
         Ok(())
     }
 
-    /// Submit the strategy risk-disclosure questionnaire record (grid trading
-    /// compliance authorization).
-    #[napi]
-    pub async fn submit_strategy_questionnaire(&self) -> Result<()> {
-        self.ctx
-            .submit_strategy_questionnaire(
-                longbridge::grid::SubmitStrategyQuestionnaireOptions::new(),
-            )
-            .await
-            .map_err(ErrorNewType)?;
-        Ok(())
-    }
-
     /// Get the security (symbol) info used to build a grid order (lot size,
     /// authorization flag, settlement currency, etc.).
     #[napi]
