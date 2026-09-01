@@ -5,8 +5,7 @@ use longbridge::{
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
         GetGridTriggerHistoryOptions, GridLimitEvent, GridTimeInForce, GridTradeRule,
-        ReplaceGridOrderOptions, SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
-        TriggerPriceType,
+        ReplaceGridOrderOptions, SubmitGridOrderOptions, TriggerPriceType,
     },
 };
 
@@ -318,23 +317,6 @@ pub unsafe extern "C" fn lb_grid_context_restart(
     let order_id = cstr_to_rust(order_id);
     execute_async(callback, ctx, userdata, async move {
         ctx_inner.restart(order_id).await?;
-        Ok(())
-    });
-}
-
-/// Submit the strategy risk-disclosure questionnaire record (grid trading
-/// compliance authorization).
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_grid_context_submit_strategy_questionnaire(
-    ctx: *const CGridContext,
-    callback: CAsyncCallback,
-    userdata: *mut c_void,
-) {
-    let ctx_inner = (*ctx).ctx.clone();
-    execute_async(callback, ctx, userdata, async move {
-        ctx_inner
-            .submit_strategy_questionnaire(SubmitStrategyQuestionnaireOptions::new())
-            .await?;
         Ok(())
     });
 }

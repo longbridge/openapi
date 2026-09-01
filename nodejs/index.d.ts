@@ -899,11 +899,6 @@ export declare class GridContext {
   /** Restart a grid trading order */
   restart(orderId: string): Promise<void>
   /**
-   * Submit the strategy risk-disclosure questionnaire record (grid trading
-   * compliance authorization).
-   */
-  submitStrategyQuestionnaire(): Promise<void>
-  /**
    * Get the security (symbol) info used to build a grid order (lot size,
    * authorization flag, settlement currency, etc.).
    */
@@ -7309,6 +7304,16 @@ export interface SubmitAttachedParams {
   activateRth?: OutsideRTH
 }
 
+/** Options for submit grid trading order request */
+export interface SubmitGridOrderOptions {
+  /** Security code */
+  symbol: string
+  /** Settlement currency */
+  settlementCurrency: string
+  /** Grid trading rule */
+  gridTradingRule: GridTradeRule
+}
+
 /** A leg of a multi-leg combination order to submit */
 export interface SubmitMultiLegOrderLeg {
   /** Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`) */
@@ -7344,16 +7349,6 @@ export interface SubmitMultiLegOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   clientRequestId?: string
-}
-
-/** Options for submit grid trading order request */
-export interface SubmitGridOrderOptions {
-  /** Security code */
-  symbol: string
-  /** Settlement currency */
-  settlementCurrency: string
-  /** Grid trading rule */
-  gridTradingRule: GridTradeRule
 }
 
 /** Options for submit order request */

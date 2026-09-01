@@ -160,19 +160,6 @@ public class GridContext implements AutoCloseable {
     }
 
     /**
-     * Submit the strategy risk-disclosure questionnaire record (grid trading
-     * compliance authorization).
-     *
-     * @return A Future representing the result of the operation
-     * @throws OpenApiException If an error occurs
-     */
-    public CompletableFuture<Void> submitStrategyQuestionnaire() throws OpenApiException {
-        return AsyncCallback.executeTask((callback) -> {
-            SdkNative.gridContextSubmitStrategyQuestionnaire(raw(), callback);
-        });
-    }
-
-    /**
      * Get the security (symbol) info used to build a grid order (lot size,
      * authorization flag, settlement currency, etc.).
      *

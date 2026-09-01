@@ -5,7 +5,6 @@ use longbridge::{
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
         GetGridTriggerHistoryOptions, ReplaceGridOrderOptions, SubmitGridOrderOptions,
-        SubmitStrategyQuestionnaireOptions,
     },
 };
 use pyo3::{PyResult, pyclass, pymethods};
@@ -171,16 +170,6 @@ impl GridContext {
     /// Restart a grid trading order
     fn restart(&self, order_id: String) -> PyResult<()> {
         self.ctx.restart(order_id).map_err(ErrorNewType)?;
-        Ok(())
-    }
-
-    /// Submit the strategy risk-disclosure questionnaire record (grid trading
-    /// compliance authorization).
-    fn submit_strategy_questionnaire(&self) -> PyResult<()> {
-        let opts = SubmitStrategyQuestionnaireOptions::new();
-        self.ctx
-            .submit_strategy_questionnaire(opts)
-            .map_err(ErrorNewType)?;
         Ok(())
     }
 

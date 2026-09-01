@@ -9,8 +9,7 @@ use crate::{
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersByIdsOptions, GetGridOrdersOptions,
         GetGridTriggerHistoryOptions, GridOrder, GridOrderDetail, GridSymbolInfo,
-        ReplaceGridOrderOptions, SubmitGridOrderOptions, SubmitStrategyQuestionnaireOptions,
-        TriggerOrder,
+        ReplaceGridOrderOptions, SubmitGridOrderOptions, TriggerOrder,
     },
 };
 
@@ -210,23 +209,6 @@ impl GridContext {
             .body(Json(Body {
                 order_id: order_id.into(),
             }))
-            .response::<Json<EmptyResponse>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(())
-    }
-
-    /// Submit the strategy risk-disclosure questionnaire record (grid trading
-    /// compliance authorization).
-    pub async fn submit_strategy_questionnaire(
-        &self,
-        options: SubmitStrategyQuestionnaireOptions,
-    ) -> Result<()> {
-        self.0
-            .http_cli
-            .request(Method::POST, "/v1/record/questionnaire")
-            .body(Json(options))
             .response::<Json<EmptyResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())

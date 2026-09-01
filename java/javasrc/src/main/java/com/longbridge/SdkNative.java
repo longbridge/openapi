@@ -298,8 +298,6 @@ public class SdkNative {
 
         public static native void gridContextRestart(long context, String orderId, AsyncCallback callback);
 
-        public static native void gridContextSubmitStrategyQuestionnaire(long context, AsyncCallback callback);
-
         public static native void gridContextSymbolInfo(long context, String symbol, AsyncCallback callback);
 
         // ── DCAContext ────────────────────────────────────────────────

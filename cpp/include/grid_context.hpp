@@ -69,11 +69,6 @@ public:
   void restart(const std::string& order_id,
                AsyncCallback<GridContext, void> callback) const;
 
-  /// Submit the strategy risk-disclosure questionnaire record (grid trading
-  /// compliance authorization).
-  void submit_strategy_questionnaire(
-    AsyncCallback<GridContext, void> callback) const;
-
   /// Get the security (symbol) info used to build a grid order (lot size,
   /// authorization flag, settlement currency, etc.).
   void symbol_info(

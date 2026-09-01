@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking changes
+
+- **All SDKs:** removed `GridContext.submit_strategy_questionnaire` (`POST /v1/record/questionnaire`) and its `SubmitStrategyQuestionnaireOptions` type. The endpoint has been retired; the strategy risk-disclosure record is no longer submitted through the OpenAPI SDK. Removed across Rust (incl. blocking), C, C++, Java, Node.js, and Python bindings
+
 ### Fixed
 
 - **C/C++ SDKs:** every list argument that crosses the FFI boundary now tolerates a null pointer with a zero length. `std::vector::data()` is allowed to return `nullptr` for an empty vector, which is exactly what the C++ binding passes for an omitted list argument, but the C layer fed it straight to `std::slice::from_raw_parts` — undefined behaviour that **aborts the process** under the debug UB checks. Hit live by `QuoteContext::warrant_list` with no filters (`c/src/quote_context/context.rs:784`); all 17 call sites across `quote_context`, `trade_context`, `agent_context`, `alert_context`, and `types` now go through a null-tolerant `slice_from_raw_parts` helper

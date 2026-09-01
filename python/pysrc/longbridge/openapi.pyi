@@ -8816,12 +8816,6 @@ class GridContext:
             order_id: Grid master order ID
         """
 
-    def submit_strategy_questionnaire(self) -> None:
-        """
-        Submit the strategy risk-disclosure questionnaire record (grid trading
-        compliance authorization).
-        """
-
     def symbol_info(self, symbol: str) -> GridSymbolInfo:
         """
         Get the security (symbol) info used to build a grid order (lot size,

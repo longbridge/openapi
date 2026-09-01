@@ -12780,14 +12780,6 @@ void lb_grid_context_restart(const struct lb_grid_context_t *ctx,
                              void *userdata);
 
 /**
- * Submit the strategy risk-disclosure questionnaire record (grid trading
- * compliance authorization).
- */
-void lb_grid_context_submit_strategy_questionnaire(const struct lb_grid_context_t *ctx,
-                                                   lb_async_callback_t callback,
-                                                   void *userdata);
-
-/**
  * Get the security (symbol) info used to build a grid order (lot size,
  * authorization flag, settlement currency, etc.).
  */
