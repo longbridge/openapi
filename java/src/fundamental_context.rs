@@ -131,7 +131,8 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextGe
         let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let report: Option<String> = get_field(env, &opts, "report")?;
-        // The core API takes `Option<&'static str>`; leak the short report code.
+        // The core API takes `Option<&'static str>`; leak the short report
+        // code.
         let report: Option<&'static str> = report.map(|s| &*s.leak());
         let cate: Option<String> = get_field(env, &opts, "cate")?;
         async_util::execute(env, callback, async move {

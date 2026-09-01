@@ -483,7 +483,8 @@ impl TradeContextSync {
             .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
     }
 
-    // ── US-market blocking wrappers ───────────────────────────────────────────
+    // ── US-market blocking wrappers
+    // ───────────────────────────────────────────
 
     /// Query the paginated US order list (blocking)
     pub fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {

@@ -2264,7 +2264,8 @@ impl QuoteContext {
         Ok(())
     }
 
-    // ── US-market APIs ────────────────────────────────────────────────────────
+    // ── US-market APIs
+    // ────────────────────────────────────────────────────────
 
     /// Get cryptocurrency market overview.
     ///
