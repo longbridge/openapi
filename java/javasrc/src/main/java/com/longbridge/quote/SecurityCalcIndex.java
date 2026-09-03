@@ -374,7 +374,8 @@ public class SecurityCalcIndex {
     }
 
     /**
-     * Returns the delta.
+     * Returns the delta. Measures the expected change in option price for a $1
+     * move in the underlying asset price.
      *
      * @return the delta
      */
@@ -383,7 +384,8 @@ public class SecurityCalcIndex {
     }
 
     /**
-     * Returns the gamma.
+     * Returns the gamma. Measures the expected change in Delta for a $1 move in
+     * the underlying asset price.
      *
      * @return the gamma
      */
@@ -392,7 +394,9 @@ public class SecurityCalcIndex {
     }
 
     /**
-     * Returns the theta.
+     * Returns the theta. Measures the expected change in option price as one day
+     * passes; the raw value has been divided by 365 to convert to a daily value,
+     * representing the impact of one day's time decay on the option price.
      *
      * @return the theta
      */
@@ -401,7 +405,9 @@ public class SecurityCalcIndex {
     }
 
     /**
-     * Returns the vega.
+     * Returns the vega. Measures the expected change in option price when implied
+     * volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to get
+     * the expected price change per 1% move in IV.
      *
      * @return the vega
      */
@@ -410,7 +416,9 @@ public class SecurityCalcIndex {
     }
 
     /**
-     * Returns the rho.
+     * Returns the rho. Measures the expected change in option price when the
+     * risk-free interest rate moves by 1 (i.e. 100%); divide the raw value by 100
+     * to get the expected price change per 1% move in the interest rate.
      *
      * @return the rho
      */
