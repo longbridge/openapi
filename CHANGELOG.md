@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **All SDKs:** refreshed the option Greek field descriptions on `SecurityCalcIndex` (`calc_indexes`) — `delta` / `gamma` / `theta` / `vega` / `rho` — to match the Calc Index interface documentation. Notably, `theta` is now documented as a per-day value: the server divides the raw annualized value by 365, so the returned `theta` is already daily (previously the doc said the raw value was annualized by 252 and had to be divided by 252). Doc comments only — no field or behaviour changes
+
 ### Breaking changes
 
 - **All SDKs:** removed `GridContext.submit_strategy_questionnaire` (`POST /v1/record/questionnaire`) and its `SubmitStrategyQuestionnaireOptions` type. The endpoint has been retired; the strategy risk-disclosure record is no longer submitted through the OpenAPI SDK. Removed across Rust (incl. blocking), C, C++, Java, Node.js, and Python bindings

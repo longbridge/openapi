@@ -2853,34 +2853,32 @@ export declare class SecurityCalcIndex {
   get balancePoint(): Decimal | null
   /** Open interest */
   get openInterest(): number | null
-  /** Delta */
+  /**
+   * Delta. Measures the expected change in option price for a $1 move in the
+   * underlying asset price.
+   */
   get delta(): Decimal | null
-  /** Gamma */
+  /**
+   * Gamma. Measures the expected change in Delta for a $1 move in the
+   * underlying asset price.
+   */
   get gamma(): Decimal | null
   /**
-   * Theta
-   *
-   * The raw value returned by the API is annualized (scaled by 252 trading
-   * days per year). To obtain the standard per-calendar-day theta, divide
-   * by 252: `theta / 252`.
+   * Theta. Measures the expected change in option price as one day passes;
+   * the raw value has been divided by 365 to convert to a daily value,
+   * representing the impact of one day's time decay on the option price.
    */
   get theta(): Decimal | null
   /**
-   * Vega
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in implied volatility (i.e. the value has been multiplied by
-   * 100). To obtain the standard vega (per unit change in IV), divide by
-   * 100: `vega / 100`.
+   * Vega. Measures the expected change in option price when implied
+   * volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+   * get the expected price change per 1% move in IV.
    */
   get vega(): Decimal | null
   /**
-   * Rho
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in the risk-free rate (i.e. the value has been multiplied by
-   * 100). To obtain the standard rho (per unit change in rate), divide by
-   * 100: `rho / 100`.
+   * Rho. Measures the expected change in option price when the risk-free
+   * interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+   * the expected price change per 1% move in the interest rate.
    */
   get rho(): Decimal | null
 }
