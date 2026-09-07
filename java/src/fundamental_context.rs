@@ -344,14 +344,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextSh
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    object_id: i64,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let object_id: i64 = get_field(env, &opts, "objectId")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx.shareholder_detail(symbol, object_id).await?;
             Ok(resp)
@@ -365,22 +365,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundamentalContextVa
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    currency: JObject,
-    comparison_symbols: JObject,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        let currency: String = FromJValue::from_jvalue(env, currency.into())?;
-        let comparison_syms: Option<Vec<String>> = if comparison_symbols.is_null() {
-            None
-        } else {
-            let arr: ObjectArray<String> = FromJValue::from_jvalue(env, comparison_symbols.into())?;
-            Some(arr.0)
-        };
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let currency: String = get_field(env, &opts, "currency")?;
+        let comparison_syms: Option<Vec<String>> =
+            get_field::<_, _, Option<ObjectArray<String>>>(env, &opts, "comparisonSymbols")?
+                .map(|arr| arr.0);
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
                 .valuation_comparison(symbol, currency, comparison_syms)

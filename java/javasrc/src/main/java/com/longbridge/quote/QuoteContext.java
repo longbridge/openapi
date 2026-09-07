@@ -1396,12 +1396,13 @@ public class QuoteContext implements AutoCloseable {
      * Get short positions for a symbol
      *
      * @param symbol Security symbol
+     * @param count  Number of records to return
      * @return A Future representing the short positions response
      * @throws OpenApiException If an error occurs
      */
-    public synchronized CompletableFuture<ShortPositionsResponse> getShortPositions(String symbol) throws OpenApiException {
+    public synchronized CompletableFuture<ShortPositionsResponse> getShortPositions(String symbol, int count) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextShortPositions(raw(), symbol, callback);
+            SdkNative.quoteContextShortPositions(raw(), symbol, count, callback);
         });
     }
 

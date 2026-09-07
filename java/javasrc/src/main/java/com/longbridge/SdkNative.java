@@ -353,7 +353,7 @@ public class SdkNative {
 
         // ── QuoteContext extensions (Step 3) ─────────────────────────
 
-        public static native void quoteContextShortPositions(long context, String symbol, AsyncCallback callback);
+        public static native void quoteContextShortPositions(long context, String symbol, int count, AsyncCallback callback);
         public static native void quoteContextOptionVolume(long context, String symbol, AsyncCallback callback);
         public static native void quoteContextOptionVolumeDaily(long context, Object opts, AsyncCallback callback);
 

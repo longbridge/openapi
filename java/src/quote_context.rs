@@ -1250,14 +1250,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextShortTra
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    count: i32,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let count: i32 = get_field(env, &opts, "count")?;
         let count = count.max(1) as u32;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx.short_trades(symbol, count).await?;

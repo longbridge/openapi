@@ -238,14 +238,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_marketContextRankLis
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    key: JObject,
-    need_article: bool,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let key: String = FromJValue::from_jvalue(env, key.into())?;
+        let key: String = get_field(env, &opts, "key")?;
+        let need_article: bool = get_field(env, &opts, "needArticle")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx.rank_list(key, need_article).await?;
             Ok(resp)
