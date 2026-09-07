@@ -2875,6 +2875,41 @@ class TradeSessions:
         All
         """
 
+class FilingItem:
+    """
+    Filing item
+    """
+
+    id: str
+    """
+    Filing ID
+    """
+
+    title: str
+    """
+    Title
+    """
+
+    description: str
+    """
+    Description
+    """
+
+    file_name: str
+    """
+    File name
+    """
+
+    file_urls: List[str]
+    """
+    File URLs
+    """
+
+    published_at: datetime
+    """
+    Published time
+    """
+
 class MarketTemperature:
     """
     Market temperature
@@ -4083,6 +4118,17 @@ class QuoteContext:
 
         Returns:
             :class:`USCryptoOverview`
+        """
+        ...
+
+    def filings(self, symbol: str) -> List["FilingItem"]:
+        """Get corporate filings for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            List of :class:`FilingItem`
         """
         ...
 
@@ -5438,32 +5484,6 @@ class AsyncQuoteContext:
         """
         ...
 
-    def option_volume(self, symbol: str) -> "Awaitable[OptionVolumeStats]":
-        """Get real-time option call/put volume. Returns awaitable.
-
-        Args:
-            symbol: Underlying symbol, e.g. ``"AAPL.US"``
-
-        Returns:
-            Awaitable resolving to :class:`OptionVolumeStats`
-        """
-        ...
-
-    def option_volume_daily(
-        self, symbol: str, timestamp: int = 0, count: int = 30
-    ) -> "Awaitable[OptionVolumeDaily]":
-        """Get daily historical option volume. Returns awaitable.
-
-        Args:
-            symbol: Underlying symbol, e.g. ``"AAPL.US"``
-            timestamp: Start timestamp (0 = most recent)
-            count: Number of days to return (default 30)
-
-        Returns:
-            Awaitable resolving to :class:`OptionVolumeDaily`
-        """
-        ...
-
     def us_crypto_overview(self, symbol: str) -> "Awaitable[USCryptoOverview]":
         """Get US cryptocurrency market overview. US token required. Returns awaitable.
 
@@ -5472,6 +5492,17 @@ class AsyncQuoteContext:
 
         Returns:
             Awaitable resolving to :class:`USCryptoOverview`
+        """
+        ...
+
+    async def filings(self, symbol: str) -> List["FilingItem"]:
+        """Get corporate filings for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            List of :class:`FilingItem`
         """
         ...
 
@@ -5769,6 +5800,56 @@ class AllExecutionsResponse:
     """
     Execution list
     """
+
+class PushGridOrderChanged:
+    """
+    Grid order changed push event
+    """
+
+    order_id: str
+    """Grid master order ID"""
+
+    status: str
+    """Order status"""
+
+    symbol: str
+    """Security symbol (e.g. ``700.HK``)"""
+
+    suspend_reason: str
+    """Suspend reason, if any"""
+
+    submitted_base_price: str
+    """Submitted base price"""
+
+    current_base_price: str
+    """Current base price"""
+
+    upper_limit_price: str
+    """Upper price bound"""
+
+    lower_limit_price: str
+    """Lower price bound"""
+
+    trigger_price_type: int
+    """Trigger price type"""
+
+    trigger_quantity: str
+    """Quantity per trigger"""
+
+    settlement_currency: str
+    """Settlement currency"""
+
+    time_in_force: int
+    """Time in force (``0`` = Day, ``1`` = GTC, ``6`` = GTD)"""
+
+    rth: int
+    """Regular trading hours flag"""
+
+    grid_order_type_up: str
+    """Sell-side order type when depth is 0"""
+
+    grid_order_type_down: str
+    """Buy-side order type when depth is 0"""
 
 class PushOrderChanged:
     """
@@ -7926,6 +8007,10 @@ class TradeContext:
         """
         ...
 
+    def set_on_grid_order_changed(self, callback: Callable[["PushGridOrderChanged"], None]) -> None:
+        """Set the grid-order-changed push callback."""
+        ...
+
 class TriggerPriceType:
     """
     How grid trigger thresholds are interpreted
@@ -9648,6 +9733,10 @@ class AsyncTradeContext:
         """
         ...
 
+    async def set_on_grid_order_changed(self, callback: Callable[["PushGridOrderChanged"], None]) -> None:
+        """Set the grid-order-changed push callback."""
+        ...
+
 class StatementType:
     """
     Statement type
@@ -10494,6 +10583,222 @@ class AsyncContentContext:
         ...
 
 # ── FundamentalContext ────────────────────────────────────────────
+
+    async def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[List[str]] = None,
+        hashtags: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Create a new community topic
+
+        Args:
+            title: Topic title (required for "article"; optional for "post")
+            body: Topic body (plain text for "post", Markdown for "article")
+            topic_type: "post" (default) or "article"
+            tickers: Associated stock symbols, e.g. ["700.HK"], max 10
+            hashtags: Hashtag names, max 5
+
+        Returns:
+            The new topic ID
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic_id = ctx.create_topic(
+                    title="My Article",
+                    body="Hello world",
+                    topic_type="article",
+                    tickers=["700.HK"],
+                )
+                print(topic_id)
+        """
+        ...
+
+    async def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """
+        Post a reply to a community topic
+
+        Args:
+            topic_id: Topic ID
+            body: Reply body (plain text only)
+            reply_to_id: ID of the parent reply to nest under; empty or "0" for top-level
+
+        Returns:
+            The created reply
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                reply = ctx.create_topic_reply("123456", "Great post!")
+                print(reply.id)
+        """
+        ...
+
+    async def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[TopicReply]:
+        """
+        List replies on a topic
+
+        Args:
+            topic_id: Topic ID
+            page: Page number (default 1)
+            size: Page size (default 20, range 1-50)
+
+        Returns:
+            List of topic replies
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                replies = ctx.list_topic_replies("123456")
+                for r in replies:
+                    print(r.id, r.body)
+        """
+        ...
+
+    async def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> List[OwnedTopic]:
+        """
+        Get topics created by the current authenticated user
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 50, range 1-500)
+            topic_type: Filter by type: "article" or "post"; empty returns all
+
+        Returns:
+            List of owned topics
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.my_topics(size=20)
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
+
+    async def news(self, symbol: str) -> List[NewsItem]:
+        """
+        Get news list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of news items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                news = ctx.news("700.HK")
+                for n in news:
+                    print(n.id, n.title)
+        """
+        ...
+
+    async def topic_detail(self, id: str) -> OwnedTopic:
+        """
+        Get full details of a topic by its ID
+
+        Args:
+            id: Topic ID
+
+        Returns:
+            Full topic detail
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic = ctx.topic_detail("123456")
+                print(topic.title, topic.body)
+        """
+        ...
+
+    async def topics(self, symbol: str) -> List[TopicItem]:
+        """
+        Get discussion topics list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of topic items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.topics("700.HK")
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
 
 class FinancialReports:
     """
@@ -11604,18 +11909,22 @@ class FundamentalContext:
 
     def macroeconomic_indicators(
         self,
+        country: "MacroeconomicCountry | None" = None,
+        keyword: str | None = None,
         offset: int | None = None,
         limit: int | None = None,
-    ) -> list["MacroeconomicIndicator"]:
+    ) -> "MacroeconomicIndicatorListResponse":
         """
         List macroeconomic indicators.
 
         Args:
+            country: Filter by country / region (optional)
+            keyword: Filter by keyword (optional)
             offset: Pagination offset (default 0)
             limit: Page size (default 100, max 1000)
 
         Returns:
-            List of :class:`MacroeconomicIndicator`
+            :class:`MacroeconomicIndicatorListResponse`
         """
         ...
 
@@ -11624,6 +11933,7 @@ class FundamentalContext:
         indicator_code: str,
         start_date: str | None = None,
         end_date: str | None = None,
+        offset: int | None = None,
         limit: int | None = None,
     ) -> "MacroeconomicResponse":
         """
@@ -11633,6 +11943,7 @@ class FundamentalContext:
             indicator_code: External vendor code from ``macroeconomic_indicators``
             start_date: Start date in ``"YYYY-MM-DD"`` format (optional)
             end_date: End date in ``"YYYY-MM-DD"`` format (optional)
+            offset: Pagination offset (optional)
             limit: Max records to return (default 100, max 100)
 
         Returns:
@@ -11861,6 +12172,218 @@ class AsyncFundamentalContext:
 
 # ── FundamentalContext new response types ─────────────────────────
 
+    @classmethod
+    def create(cls, config: Config) -> AsyncFundamentalContext: ...
+
+    async def buyback(self, symbol: str) -> "BuybackData":
+        """
+        Get buyback data for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`BuybackData`
+        """
+        ...
+
+    async def company(self, symbol: str) -> "CompanyOverview":
+        """Get company overview."""
+        ...
+
+    async def consensus(self, symbol: str) -> "FinancialConsensus":
+        """Get financial consensus estimates."""
+        ...
+
+    async def corp_action(self, symbol: str) -> "CorpActions":
+        """Get corporate actions (dividends, splits, buybacks, etc.)."""
+        ...
+
+    async def dividend(self, symbol: str) -> "DividendList":
+        """Get dividend history."""
+        ...
+
+    async def dividend_detail(self, symbol: str) -> "DividendList":
+        """Get detailed dividend information."""
+        ...
+
+    async def etf_asset_allocation(self, symbol: str) -> "AssetAllocationResponse":
+        """
+        Get ETF asset allocation (holdings / regional / asset class / industry).
+
+        Args:
+            symbol: ETF security code (e.g. ``"QQQ.US"``)
+
+        Returns:
+            :class:`AssetAllocationResponse` with allocation groups
+        """
+        ...
+
+    async def executive(self, symbol: str) -> "ExecutiveList":
+        """Get executive and board member information."""
+        ...
+
+    async def financial_report(
+        self,
+        symbol: str,
+        kind: "FinancialReportKind" = ...,
+        period: "FinancialReportPeriod | None" = None,
+    ) -> "FinancialReports":
+        """
+        Get financial reports.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            kind: Report kind (default ``All``)
+            period: Report period (``None`` means not specified)
+
+        Returns:
+            Financial reports response
+        """
+        ...
+
+    async def forecast_eps(self, symbol: str) -> "ForecastEps":
+        """Get EPS forecasts."""
+        ...
+
+    async def fund_holder(self, symbol: str) -> "FundHolders":
+        """Get funds and ETFs that hold the security."""
+        ...
+
+    async def industry_valuation(self, symbol: str) -> "IndustryValuationList":
+        """Get industry peer valuation comparison."""
+        ...
+
+    async def industry_valuation_dist(self, symbol: str) -> "IndustryValuationDist":
+        """Get industry valuation distribution."""
+        ...
+
+    async def institution_rating(self, symbol: str) -> "InstitutionRating":
+        """
+        Get analyst ratings (latest snapshot + consensus summary).
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            Combined analyst rating response
+        """
+        ...
+
+    async def institution_rating_detail(self, symbol: str) -> "InstitutionRatingDetail":
+        """Get historical analyst rating details."""
+        ...
+
+    async def invest_relation(self, symbol: str) -> "InvestRelations":
+        """Get investor relations / investment holdings."""
+        ...
+
+    async def macroeconomic(
+        self,
+        indicator_code: str,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> "MacroeconomicResponse":
+        """
+        Get historical data for a macroeconomic indicator.
+
+        Args:
+            indicator_code: External vendor code from ``macroeconomic_indicators``
+            start_date: Start date in ``"YYYY-MM-DD"`` format (optional)
+            end_date: End date in ``"YYYY-MM-DD"`` format (optional)
+            offset: Pagination offset (optional)
+            limit: Max records to return (default 100, max 100)
+
+        Returns:
+            :class:`MacroeconomicResponse`
+        """
+        ...
+
+    async def macroeconomic_indicators(
+        self,
+        country: "MacroeconomicCountry | None" = None,
+        keyword: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> "MacroeconomicIndicatorListResponse":
+        """
+        List macroeconomic indicators.
+
+        Args:
+            country: Filter by country / region (optional)
+            keyword: Filter by keyword (optional)
+            offset: Pagination offset (default 0)
+            limit: Page size (default 100, max 1000)
+
+        Returns:
+            :class:`MacroeconomicIndicatorListResponse`
+        """
+        ...
+
+    async def operating(self, symbol: str) -> "OperatingList":
+        """Get operating metrics and financial report summaries."""
+        ...
+
+    async def shareholder(self, symbol: str) -> "ShareholderList":
+        """Get major shareholders."""
+        ...
+
+    async def shareholder_detail(
+        self, symbol: str, object_id: int
+    ) -> "ShareholderDetailResponse":
+        """
+        Get holding history and detail for one shareholder.
+
+        Args:
+            symbol: Security symbol
+            object_id: Shareholder object ID
+
+        Returns:
+            :class:`ShareholderDetailResponse` with raw JSON data
+        """
+        ...
+
+    async def shareholder_top(self, symbol: str) -> "ShareholderTopResponse":
+        """
+        Get ranked list of top shareholders.
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            :class:`ShareholderTopResponse` with raw JSON data
+        """
+        ...
+
+    async def valuation(self, symbol: str) -> "ValuationData":
+        """Get valuation metrics (PE / PB / PS / dividend yield)."""
+        ...
+
+    async def valuation_comparison(
+        self,
+        symbol: str,
+        currency: str,
+        comparison_symbols: Optional[List[str]] = None,
+    ) -> "ValuationComparisonResponse":
+        """
+        Get valuation comparison between a security and optional peers.
+
+        Args:
+            symbol: Security symbol
+            currency: Currency code (e.g. ``"USD"``)
+            comparison_symbols: Optional list of peer symbols
+
+        Returns:
+            :class:`ValuationComparisonResponse` with raw JSON data
+        """
+        ...
+
+    async def valuation_history(self, symbol: str) -> "ValuationHistoryResponse":
+        """Get historical valuation data."""
+        ...
+
 class ShareholderTopResponse:
     """Top-shareholder list response. ``data`` is a Python dict/list from JSON."""
 
@@ -12008,6 +12531,44 @@ class MultiLanguageText:
     simplified_chinese: str
     traditional_chinese: str
 
+
+class MacroeconomicCountry:
+    """
+    Macroeconomic country / region
+    """
+
+    class HongKong(MacroeconomicCountry):
+        """Hong Kong"""
+
+    class China(MacroeconomicCountry):
+        """China"""
+
+    class UnitedStates(MacroeconomicCountry):
+        """United States"""
+
+    class EuroZone(MacroeconomicCountry):
+        """Euro Zone"""
+
+    class Japan(MacroeconomicCountry):
+        """Japan"""
+
+    class Singapore(MacroeconomicCountry):
+        """Singapore"""
+
+class MacroeconomicIndicatorListResponse:
+    """
+    Response for :meth:`FundamentalContext.macroeconomic_indicators`
+    """
+
+    data: List["MacroeconomicIndicator"]
+    """
+    Macroeconomic indicators
+    """
+
+    count: int
+    """
+    Total number of indicators
+    """
 
 class MacroeconomicIndicator:
     """Metadata for one macroeconomic indicator."""
@@ -12497,6 +13058,136 @@ class MarketContext:
 
 # ── MarketContext new response types ──────────────────────────────
 
+
+class AsyncMarketContext:
+    """
+    Async market context. Create via ``AsyncMarketContext.create(config)``.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncMarketContext: ...
+
+    async def market_status(self) -> "MarketStatusResponse":
+        """Get current trading status for all markets."""
+        ...
+
+    async def broker_holding(
+        self,
+        symbol: str,
+        period: "BrokerHoldingPeriod" = ...,
+    ) -> "BrokerHoldingTop":
+        """
+        Get top broker holdings (buy/sell leaders) for a security.
+
+        Args:
+            symbol: Security symbol
+            period: Lookback period (default ``Rct1``)
+        """
+        ...
+
+    async def broker_holding_detail(self, symbol: str) -> "BrokerHoldingDetail":
+        """Get full broker holding details for a security."""
+        ...
+
+    async def broker_holding_daily(
+        self, symbol: str, broker_id: str
+    ) -> "BrokerHoldingDailyHistory":
+        """
+        Get daily holding history for a specific broker.
+
+        Args:
+            symbol: Security symbol
+            broker_id: Broker participant number, e.g. ``"B01451"``
+        """
+        ...
+
+    async def ah_premium(
+        self,
+        symbol: str,
+        period: "AhPremiumPeriod" = ...,
+        count: int = 100,
+    ) -> "AhPremiumKlines":
+        """
+        Get A/H premium K-line data for a dual-listed security.
+
+        Args:
+            symbol: H-share symbol, e.g. ``"2318.HK"``
+            period: K-line period (default ``Day``)
+            count: Number of K-lines to return
+        """
+        ...
+
+    async def ah_premium_intraday(self, symbol: str) -> "AhPremiumIntraday":
+        """Get A/H premium intraday data for a dual-listed security."""
+        ...
+
+    async def trade_stats(self, symbol: str) -> "TradeStatsResponse":
+        """Get buy/sell/neutral trade statistics for a security."""
+        ...
+
+    async def anomaly(self, market: str) -> "AnomalyResponse":
+        """
+        Get market anomaly alerts (unusual price/volume events).
+
+        Args:
+            market: Market code: ``"HK"``, ``"US"``, ``"CN"``, ``"SG"``
+        """
+        ...
+
+    async def constituent(self, symbol: str) -> "IndexConstituents":
+        """
+        Get constituent stocks for an index.
+
+        Args:
+            symbol: Index symbol, e.g. ``"HSI.HK"``
+        """
+        ...
+
+    async def top_movers(
+        self,
+        markets: List[str],
+        sort: int = 0,
+        date: Optional[str] = None,
+        limit: int = 20,
+    ) -> "TopMoversResponse":
+        """
+        Get top movers (stocks with unusual price movements) across one or more markets.
+
+        Args:
+            markets: List of market codes, e.g. ``["HK", "US"]``
+            sort: Sort order (0=ascending, 1=descending)
+            date: Optional date filter (``"YYYY-MM-DD"``)
+            limit: Max records to return
+
+        Returns:
+            :class:`TopMoversResponse` with raw JSON data
+        """
+        ...
+
+    async def rank_categories(self) -> "RankCategoriesResponse":
+        """
+        Get all available rank category keys and labels.
+
+        Returns:
+            :class:`RankCategoriesResponse` with typed categories
+        """
+        ...
+
+    async def rank_list(
+        self, key: str, need_article: bool = False
+    ) -> "RankListResponse":
+        """
+        Get a ranked list of securities for the given category key.
+
+        Args:
+            key: Category key from :meth:`rank_categories`
+            need_article: Whether to include article content
+
+        Returns:
+            :class:`RankListResponse` with raw JSON data
+        """
+        ...
+
 class TopMoversStock:
     """Stock information within a top-movers event."""
 
@@ -12916,6 +13607,33 @@ class CalendarContext:
 
 # ── PortfolioContext ──────────────────────────────────────────────
 
+
+class AsyncCalendarContext:
+    """
+    Async calendar context. Create via ``AsyncCalendarContext.create(config)``.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncCalendarContext: ...
+
+    async def finance_calendar(
+        self,
+        category: "CalendarCategory",
+        start: str,
+        end: str,
+        market: str | None = None,
+    ) -> "CalendarEventsResponse":
+        """
+        Get financial calendar events.
+
+        Args:
+            category: Event category
+            start: Start date in ``YYYY-MM-DD`` format
+            end: End date in ``YYYY-MM-DD`` format
+            market: Optional market filter, e.g. ``"HK"``
+        """
+        ...
+
 class ExchangeRate:
     """One currency exchange rate."""
 
@@ -13266,6 +13984,71 @@ class PortfolioContext:
         ...
 
 
+class AsyncPortfolioContext:
+    """
+    Async portfolio context. Create via ``AsyncPortfolioContext.create(config)``.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncPortfolioContext: ...
+
+    async def exchange_rate(self) -> "ExchangeRates":
+        """Get exchange rates for supported currencies."""
+        ...
+
+    async def profit_analysis(
+        self,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysis":
+        """
+        Get portfolio P&L analysis (summary + per-security breakdown).
+
+        Args:
+            start: Optional start date in ``YYYY-MM-DD`` format
+            end: Optional end date in ``YYYY-MM-DD`` format
+        """
+        ...
+
+    async def profit_analysis_detail(
+        self,
+        symbol: str,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysisDetail":
+        """
+        Get P&L detail for a specific security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            start: Optional start date
+            end: Optional end date
+        """
+        ...
+
+    async def profit_analysis_flows(
+        self,
+        symbol: str,
+        page: int,
+        size: int,
+        derivative: bool,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysisFlows":
+        """
+        Get paginated P&L flow records for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            page: Page number (1-based)
+            size: Page size
+            derivative: Whether to include derivative flows
+            start: Optional start date in ``YYYY-MM-DD`` format
+            end: Optional end date in ``YYYY-MM-DD`` format
+        """
+        ...
+
+
 class ProfitAnalysisByMarketItem:
     """One security entry in a by-market P&L response."""
 
@@ -13450,12 +14233,8 @@ class AlertContext:
         """
         ...
 
-    def enable(self, alert_id: str) -> None:
-        """Enable a price alert."""
-        ...
-
-    def disable(self, alert_id: str) -> None:
-        """Disable a price alert."""
+    def update(self, item: "AlertItem") -> None:
+        """Update an existing price alert."""
         ...
 
     def delete(self, alert_ids: list[str]) -> None:
@@ -13513,6 +14292,16 @@ class DcaPlan:
     cum_profit: str
     """Cumulative profit/loss"""
 
+
+class DcaCreateResult:
+    """
+    Result of creating or updating a DCA plan
+    """
+
+    plan_id: str
+    """
+    The created or updated plan ID
+    """
 
 class DcaList:
     """DCA plan list response."""
@@ -13669,7 +14458,7 @@ class DCAContext:
         day_of_week: str | None = None,
         day_of_month: int | None = None,
         allow_margin: bool = False,
-    ) -> "DcaList":
+    ) -> "DcaCreateResult":
         """
         Create a new DCA plan.
 
@@ -13683,15 +14472,37 @@ class DCAContext:
         """
         ...
 
-    def pause(self, plan_id: str) -> "DcaList":
+    def update(
+        self,
+        plan_id: str,
+        amount: str | None = None,
+        frequency: "DCAFrequency | None" = None,
+        day_of_week: str | None = None,
+        day_of_month: int | None = None,
+        allow_margin: bool | None = None,
+    ) -> "DcaCreateResult":
+        """
+        Update an existing DCA plan. Only the provided fields are changed.
+
+        Args:
+            plan_id: Plan ID
+            amount: Investment amount per period
+            frequency: Investment frequency
+            day_of_week: Day of week for weekly plans, e.g. ``"Mon"``
+            day_of_month: Day of month for monthly plans (1–28)
+            allow_margin: Whether to allow margin finance
+        """
+        ...
+
+    def pause(self, plan_id: str) -> None:
         """Pause (suspend) a DCA plan."""
         ...
 
-    def resume(self, plan_id: str) -> "DcaList":
+    def resume(self, plan_id: str) -> None:
         """Resume a suspended DCA plan."""
         ...
 
-    def stop(self, plan_id: str) -> "DcaList":
+    def stop(self, plan_id: str) -> None:
         """Permanently stop a DCA plan."""
         ...
 
@@ -13888,7 +14699,7 @@ class SharelistContext:
         """
         ...
 
-    def create(self, name: str, description: str | None = None) -> "SharelistDetail":
+    def create(self, name: str, description: str | None = None) -> None:
         """
         Create a new community sharelist.
 
