@@ -731,6 +731,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionCh
     context: i64,
     symbol: JString,
     expiry_date: JObject,
+    standard_only: jboolean,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -741,7 +742,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextOptionCh
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
                 __owned_ctx
-                    .option_chain_info_by_date(symbol, expiry_date)
+                    .option_chain_info_by_date(symbol, expiry_date, standard_only > 0)
                     .await?,
             ))
         })?;

@@ -656,7 +656,12 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
-     * Get option chain info by date
+     * Get the option contract list of an underlying security for a given expiry
+     * date
+     * 
+     * <p>
+     * Every contract is an independent entry: calls and puts are not paired, so
+     * a strike price that is listed on one side only yields a single entry.
      * 
      * <pre>
      * {@code
@@ -669,8 +674,8 @@ public class QuoteContext implements AutoCloseable {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
      *             .build(url -> System.out.println("Visit: " + url)).get();
      *         try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config)) {
-     *             StrikePriceInfo[] resp = ctx.getOptionChainInfoByDate("AAPL.US", LocalDate.of(2023, 1, 20)).get();
-     *             for (StrikePriceInfo obj : resp) {
+     *             OptionChainContract[] resp = ctx.getOptionChainInfoByDate("AAPL.US", LocalDate.of(2023, 1, 20), false).get();
+     *             for (OptionChainContract obj : resp) {
      *                 System.out.println(obj);
      *             }
      *         }
@@ -679,15 +684,21 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param symbol     Security symbol
-     * @param expiryDate Option expiry date
+     * @param symbol       Security symbol
+     * @param expiryDate   Option expiry date
+     * @param standardOnly Whether to filter out the legacy contracts produced by
+     *                     corporate actions. {@code true} returns standard
+     *                     contracts only; {@code false} returns everything,
+     *                     including the contracts carrying
+     *                     {@link OptionStandardAttr#Old}
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public synchronized CompletableFuture<StrikePriceInfo[]> getOptionChainInfoByDate(String symbol, LocalDate expiryDate)
+    public synchronized CompletableFuture<OptionChainContract[]> getOptionChainInfoByDate(String symbol,
+            LocalDate expiryDate, boolean standardOnly)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextOptionChainInfoByDate(raw(), symbol, expiryDate, callback);
+            SdkNative.quoteContextOptionChainInfoByDate(raw(), symbol, expiryDate, standardOnly, callback);
         });
     }
 

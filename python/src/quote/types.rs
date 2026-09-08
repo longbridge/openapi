@@ -156,6 +156,35 @@ pub(crate) enum OptionDirection {
     Call,
 }
 
+/// Special expiration cycle of an option contract
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::quote::OptionExpiryCycleType")]
+pub(crate) enum OptionExpiryCycleType {
+    /// Unknown
+    Unknown,
+    /// Standard monthly option
+    Monthly,
+    /// Weekly option, expires weekly
+    Weekly,
+    /// Quarterly option, expires quarterly
+    Quarterly,
+}
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action (e.g. a stock split or a merger)
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longbridge::quote::OptionStandardAttr")]
+pub(crate) enum OptionStandardAttr {
+    /// Unknown
+    Unknown,
+    /// A normal, active contract
+    Normal,
+    /// A legacy contract produced by a corporate action
+    Old,
+}
+
 /// Warrant type
 #[pyclass(eq, eq_int, from_py_object)]
 #[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
@@ -656,19 +685,30 @@ pub(crate) struct Candlestick {
     trade_session: TradeSession,
 }
 
-/// Strike price info
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject)]
-#[py(remote = "longbridge::quote::StrikePriceInfo")]
-pub(crate) struct StrikePriceInfo {
+#[py(remote = "longbridge::quote::OptionChainContract")]
+pub(crate) struct OptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    symbol: String,
+    /// Expiry date, in US Eastern time
+    expiry_date: PyDateWrapper,
     /// Strike price
-    price: PyDecimal,
-    /// Security code of call option
-    call_symbol: String,
-    /// Security code of put option
-    put_symbol: String,
-    /// Is standard
-    standard: bool,
+    strike_price: PyDecimal,
+    /// Contract direction
+    direction: OptionDirection,
+    /// Special expiration cycle of the contract
+    option_type: OptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    standard_attr: OptionStandardAttr,
+    /// Number of days remaining until the option expires, `0` on the expiry
+    /// day and negative once expired
+    days_to_expiry: i32,
 }
 
 /// Issuer info

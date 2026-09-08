@@ -860,7 +860,8 @@ void
 QuoteContext::option_chain_info_by_date(
   const std::string& symbol,
   Date expiry_date,
-  AsyncCallback<QuoteContext, std::vector<StrikePriceInfo>> callback) const
+  bool standard_only,
+  AsyncCallback<QuoteContext, std::vector<OptionChainContract>> callback) const
 {
   auto expiry_date2 = convert(&expiry_date);
 
@@ -868,30 +869,33 @@ QuoteContext::option_chain_info_by_date(
     ctx_,
     symbol.c_str(),
     &expiry_date2,
+    standard_only,
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext,
-                                     std::vector<StrikePriceInfo>>(
+                                     std::vector<OptionChainContract>>(
           res->userdata);
       QuoteContext ctx((const lb_quote_context_t*)res->ctx);
       Status status(res->error);
 
       if (status) {
-        auto rows = (const lb_strike_price_info_t*)res->data;
-        std::vector<StrikePriceInfo> rows2;
+        auto rows = (const lb_option_chain_contract_t*)res->data;
+        std::vector<OptionChainContract> rows2;
         std::transform(rows,
                        rows + res->length,
                        std::back_inserter(rows2),
                        [](auto row) { return convert(&row); });
 
-        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<StrikePriceInfo>>(
-          ctx, std::move(status), &rows2));
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, std::vector<OptionChainContract>>(
+            ctx, std::move(status), &rows2));
       } else {
-        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<StrikePriceInfo>>(
-          ctx, std::move(status), nullptr));
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, std::vector<OptionChainContract>>(
+            ctx, std::move(status), nullptr));
       }
     },
-    new AsyncCallback<QuoteContext, std::vector<StrikePriceInfo>>(callback));
+    new AsyncCallback<QuoteContext, std::vector<OptionChainContract>>(callback));
 }
 
 void
