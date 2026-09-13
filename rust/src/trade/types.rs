@@ -341,6 +341,12 @@ pub enum MultiLegStrategy {
     /// Strangle
     #[strum(to_string = "Strangle", serialize = "6")]
     Strangle,
+    /// Calendar call spread
+    #[strum(to_string = "CalendarCallSpread", serialize = "7")]
+    CalendarCallSpread,
+    /// Calendar put spread
+    #[strum(to_string = "CalendarPutSpread", serialize = "8")]
+    CalendarPutSpread,
 }
 
 /// Multi-leg position direction

@@ -470,7 +470,9 @@ impl_java_enum!(
         VerticalPutSpread,
         Collar,
         Straddle,
-        Strangle
+        Strangle,
+        CalendarCallSpread,
+        CalendarPutSpread
     ]
 );
 

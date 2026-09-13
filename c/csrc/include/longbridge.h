@@ -1343,6 +1343,14 @@ typedef enum CMultiLegStrategy {
    * Strangle
    */
   MultiLegStrategyStrangle,
+  /**
+   * Calendar call spread
+   */
+  MultiLegStrategyCalendarCallSpread,
+  /**
+   * Calendar put spread
+   */
+  MultiLegStrategyCalendarPutSpread,
 } CMultiLegStrategy;
 
 /**
