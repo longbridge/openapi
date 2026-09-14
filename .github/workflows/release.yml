@@ -747,6 +747,10 @@ jobs:
           python-version: 3.8
       - name: Publish to PyPi
         uses: pypa/gh-action-pypi-publish@release/v1
+        # Skip files already on PyPI so a re-run of the release (e.g. to retry a
+        # different SDK's publish) does not fail on an already-published version.
+        with:
+          skip-existing: true
 
   publish-nodejs-sdk:
     runs-on: ubuntu-24.04
@@ -764,7 +768,12 @@ jobs:
           node-version: 20
           check-latest: true
       - name: Install napi-rs/cli
-        run: npm install -g @napi-rs/cli
+        # Pinned: @napi-rs/cli 3.9.x changed `napi prepublish` behaviour and
+        # breaks npm publish with a spurious `E404 PUT .../longbridge-<target>`
+        # during prepublish. 3.8.6 is the last version that published cleanly
+        # (used by the v4.5.0 release). Do not float this to latest without
+        # re-verifying a full nodejs publish.
+        run: npm install -g @napi-rs/cli@3.8.6
       - name: Download all artifacts
         uses: actions/download-artifact@v5
         with:
@@ -852,11 +861,28 @@ jobs:
       - name: Get version
         run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
 
+      # Maven Central releases are immutable — re-deploying an existing version
+      # fails. Skip the deploy when this version is already published so a
+      # release re-run (e.g. to retry another SDK) is idempotent.
+      - name: Check if version already on Maven Central
+        run: |
+          url="https://repo1.maven.org/maven2/io/github/longbridge/openapi-sdk/${PACKAGE_VERSION}/"
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+          if [ "$code" = "200" ]; then
+            echo "openapi-sdk ${PACKAGE_VERSION} already on Maven Central; skipping deploy."
+            echo "MAVEN_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "openapi-sdk ${PACKAGE_VERSION} not found on Maven Central (HTTP $code); will deploy."
+            echo "MAVEN_EXISTS=false" >> $GITHUB_ENV
+          fi
+
       - name: Update version
+        if: env.MAVEN_EXISTS != 'true'
         working-directory: java/javasrc
         run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
 
       - name: Import GPG private key
+        if: env.MAVEN_EXISTS != 'true'
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -866,5 +892,6 @@ jobs:
           rm private.key
 
       - name: Deploy Maven package
+        if: env.MAVEN_EXISTS != 'true'
         working-directory: java/javasrc
         run: mvn deploy --activate-profiles release
