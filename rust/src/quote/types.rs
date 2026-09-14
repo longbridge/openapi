@@ -499,6 +499,36 @@ pub enum OptionDirection {
     Call,
 }
 
+/// Special expiration cycle of an option contract
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Serialize, Deserialize)]
+pub enum OptionExpiryCycleType {
+    /// Unknown
+    Unknown,
+    /// Standard monthly option
+    #[strum(serialize = "")]
+    Monthly,
+    /// Weekly option, expires weekly
+    #[strum(serialize = "W")]
+    Weekly,
+    /// Quarterly option, expires quarterly
+    #[strum(serialize = "Q")]
+    Quarterly,
+}
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action (e.g. a stock split or a merger)
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Serialize, Deserialize)]
+pub enum OptionStandardAttr {
+    /// Unknown
+    Unknown,
+    /// A normal, active contract
+    #[strum(serialize = "")]
+    Normal,
+    /// A legacy contract produced by a corporate action
+    #[strum(serialize = "old")]
+    Old,
+}
+
 /// Quote of option
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OptionQuote {
@@ -940,30 +970,31 @@ impl longbridge_candlesticks::CandlestickType for Candlestick {
     }
 }
 
-/// Strike price info
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StrikePriceInfo {
+pub struct OptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    pub symbol: String,
+    /// Expiry date, in US Eastern time
+    pub expiry_date: Date,
     /// Strike price
-    pub price: Decimal,
-    /// Security code of call option
-    pub call_symbol: String,
-    /// Security code of put option
-    pub put_symbol: String,
-    /// Is standard
-    pub standard: bool,
-}
-
-impl TryFrom<quote::StrikePriceInfo> for StrikePriceInfo {
-    type Error = Error;
-
-    fn try_from(value: quote::StrikePriceInfo) -> Result<Self> {
-        Ok(Self {
-            price: value.price.parse().unwrap_or_default(),
-            call_symbol: value.call_symbol,
-            put_symbol: value.put_symbol,
-            standard: value.standard,
-        })
-    }
+    pub strike_price: Decimal,
+    /// Contract direction
+    pub direction: OptionDirection,
+    /// Special expiration cycle of the contract
+    pub option_type: OptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    pub standard_attr: OptionStandardAttr,
+    /// Number of days remaining until the option expires, updated daily at
+    /// midnight ET
+    ///
+    /// `0` for options expiring today, and negative for already-expired
+    /// options.
+    pub days_to_expiry: i32,
 }
 
 /// Issuer info
@@ -2026,6 +2057,8 @@ impl_serde_for_enum_string!(Granularity);
 impl_default_for_enum_string!(
     OptionType,
     OptionDirection,
+    OptionExpiryCycleType,
+    OptionStandardAttr,
     WarrantType,
     SecurityBoard,
     Granularity

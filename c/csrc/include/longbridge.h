@@ -1634,6 +1634,47 @@ typedef enum lb_option_direction_t {
 } lb_option_direction_t;
 
 /**
+ * Special expiration cycle of an option contract
+ */
+typedef enum lb_option_expiry_cycle_type_t {
+  /**
+   * Unknown
+   */
+  OptionExpiryCycleTypeUnknown,
+  /**
+   * Standard monthly option
+   */
+  OptionExpiryCycleTypeMonthly,
+  /**
+   * Weekly option, expires weekly
+   */
+  OptionExpiryCycleTypeWeekly,
+  /**
+   * Quarterly option, expires quarterly
+   */
+  OptionExpiryCycleTypeQuarterly,
+} lb_option_expiry_cycle_type_t;
+
+/**
+ * Whether an option contract is a legacy contract left over from a corporate
+ * action
+ */
+typedef enum lb_option_standard_attr_t {
+  /**
+   * Unknown
+   */
+  OptionStandardAttrUnknown,
+  /**
+   * A normal, active contract
+   */
+  OptionStandardAttrNormal,
+  /**
+   * A legacy contract produced by a corporate action
+   */
+  OptionStandardAttrOld,
+} lb_option_standard_attr_t;
+
+/**
  * Cash flow direction
  */
 typedef enum lb_cash_flow_direction_t {
@@ -5028,26 +5069,40 @@ typedef struct lb_intraday_line_t {
 } lb_intraday_line_t;
 
 /**
- * Strike price info
+ * A single option contract of an option chain
  */
-typedef struct lb_strike_price_info_t {
+typedef struct lb_option_chain_contract_t {
+  /**
+   * Option contract code, in `ticker.region` format
+   */
+  const char *symbol;
+  /**
+   * Expiry date, in US Eastern time
+   */
+  struct lb_date_t expiry_date;
   /**
    * Strike price
    */
-  const struct lb_decimal_t *price;
+  const struct lb_decimal_t *strike_price;
   /**
-   * Security code of call option
+   * Contract direction
    */
-  const char *call_symbol;
+  enum lb_option_direction_t direction;
   /**
-   * Security code of put option
+   * Special expiration cycle of the contract
    */
-  const char *put_symbol;
+  enum lb_option_expiry_cycle_type_t option_type;
   /**
-   * Is standard
+   * Whether the contract is a legacy contract left over from a corporate
+   * action
    */
-  bool standard;
-} lb_strike_price_info_t;
+  enum lb_option_standard_attr_t standard_attr;
+  /**
+   * Number of days remaining until the option expires, `0` on the expiry
+   * day and negative once expired
+   */
+  int32_t days_to_expiry;
+} lb_option_chain_contract_t;
 
 /**
  * Issuer info
@@ -13319,11 +13374,20 @@ void lb_quote_context_option_chain_expiry_date_list(const struct lb_quote_contex
                                                     void *userdata);
 
 /**
- * Get option chain info by date
+ * Get the option contract list of an underlying security for a given expiry
+ * date
+ *
+ * Every contract is an independent entry: calls and puts are not paired, so a
+ * strike price that is listed on one side only yields a single entry.
+ *
+ * `standard_only` filters out the legacy contracts produced by corporate
+ * actions. `true` returns standard contracts only; `false` returns everything,
+ * including the contracts carrying `OptionStandardAttrOld`.
  */
 void lb_quote_context_option_chain_info_by_date(const struct lb_quote_context_t *ctx,
                                                 const char *symbol,
                                                 const struct lb_date_t *expiry_date,
+                                                bool standard_only,
                                                 lb_async_callback_t callback,
                                                 void *userdata);
 

@@ -473,6 +473,31 @@ enum class OptionDirection
   Call,
 };
 
+/// Special expiration cycle of an option contract
+enum class OptionExpiryCycleType
+{
+  /// Unknown
+  Unknown,
+  /// Standard monthly option
+  Monthly,
+  /// Weekly option, expires weekly
+  Weekly,
+  /// Quarterly option, expires quarterly
+  Quarterly,
+};
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action
+enum class OptionStandardAttr
+{
+  /// Unknown
+  Unknown,
+  /// A normal, active contract
+  Normal,
+  /// A legacy contract produced by a corporate action
+  Old,
+};
+
 /// Quote of option
 struct OptionQuote
 { /// Security code
@@ -694,17 +719,28 @@ enum class AdjustType
   ForwardAdjust
 };
 
-/// Strike price info
-struct StrikePriceInfo
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
+struct OptionChainContract
 {
+  /// Option contract code, in `ticker.region` format
+  std::string symbol;
+  /// Expiry date, in US Eastern time
+  Date expiry_date;
   /// Strike price
-  Decimal price;
-  /// Security code of call option
-  std::string call_symbol;
-  /// Security code of put option
-  std::string put_symbol;
-  /// Is standard
-  bool standard;
+  Decimal strike_price;
+  /// Contract direction
+  OptionDirection direction;
+  /// Special expiration cycle of the contract
+  OptionExpiryCycleType option_type;
+  /// Whether the contract is a legacy contract left over from a corporate
+  /// action
+  OptionStandardAttr standard_attr;
+  /// Number of days remaining until the option expires, `0` on the expiry day
+  /// and negative once expired
+  int32_t days_to_expiry;
 };
 
 /// Issuer info
