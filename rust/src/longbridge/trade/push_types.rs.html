@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/trade/push_types.rs`."><title>push_types.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/trade/</div>push_types.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::str::FromStr;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/trade/push_types.rs`."><title>push_types.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.1 (48a229cea 2026-09-01)" data-channel="1.98.1" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/trade/</div>push_types.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::str::FromStr;
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>longbridge_proto::trade::Notification;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>prost::Message;
@@ -9,7 +9,7 @@
 <a href=#9 id=9 data-nosnippet>9</a>
 <a href=#10 id=10 data-nosnippet>10</a><span class="kw">use crate</span>::{
 <a href=#11 id=11 data-nosnippet>11</a>    Error, <span class="prelude-ty">Result</span>, serde_utils,
-<a href=#12 id=12 data-nosnippet>12</a>    trade::{OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus, cmd_code},
+<a href=#12 id=12 data-nosnippet>12</a>    trade::{MultiLegInfo, OrderSide, OrderStatus, OrderTag, OrderType, TriggerStatus, cmd_code},
 <a href=#13 id=13 data-nosnippet>13</a>};
 <a href=#14 id=14 data-nosnippet>14</a>
 <a href=#15 id=15 data-nosnippet>15</a><span class="doccomment">/// Topic type
@@ -93,31 +93,78 @@
 <a href=#93 id=93 data-nosnippet>93</a>    </span><span class="kw">pub </span>last_price: <span class="prelude-ty">Option</span>&lt;Decimal&gt;,
 <a href=#94 id=94 data-nosnippet>94</a>    <span class="doccomment">/// Remark message
 <a href=#95 id=95 data-nosnippet>95</a>    </span><span class="kw">pub </span>remark: String,
-<a href=#96 id=96 data-nosnippet>96</a>}
-<a href=#97 id=97 data-nosnippet>97</a>
-<a href=#98 id=98 data-nosnippet>98</a><span class="doccomment">/// Push event
-<a href=#99 id=99 data-nosnippet>99</a></span><span class="attr">#[derive(Debug, Deserialize)]
-<a href=#100 id=100 data-nosnippet>100</a>#[serde(tag = <span class="string">"event"</span>, content = <span class="string">"data"</span>)]
-<a href=#101 id=101 data-nosnippet>101</a></span><span class="kw">pub enum </span>PushEvent {
-<a href=#102 id=102 data-nosnippet>102</a>    <span class="doccomment">/// Order changed
-<a href=#103 id=103 data-nosnippet>103</a>    </span><span class="attr">#[serde(rename = <span class="string">"order_changed_lb"</span>)]
-<a href=#104 id=104 data-nosnippet>104</a>    </span>OrderChanged(PushOrderChanged),
-<a href=#105 id=105 data-nosnippet>105</a>}
-<a href=#106 id=106 data-nosnippet>106</a>
-<a href=#107 id=107 data-nosnippet>107</a><span class="kw">impl </span>PushEvent {
-<a href=#108 id=108 data-nosnippet>108</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(command_code: u8, data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;PushEvent&gt;&gt; {
-<a href=#109 id=109 data-nosnippet>109</a>        <span class="kw">if </span>command_code == cmd_code::PUSH_NOTIFICATION {
-<a href=#110 id=110 data-nosnippet>110</a>            <span class="kw">let </span>notification = Notification::decode(data)<span class="question-mark">?</span>;
-<a href=#111 id=111 data-nosnippet>111</a>            <span class="kw">if let </span><span class="prelude-val">Ok</span>(TopicType::Private) = TopicType::from_str(<span class="kw-2">&amp;</span>notification.topic) {
-<a href=#112 id=112 data-nosnippet>112</a>                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(serde_json::from_slice::&lt;PushEvent&gt;(
-<a href=#113 id=113 data-nosnippet>113</a>                    <span class="kw-2">&amp;</span>notification.data,
-<a href=#114 id=114 data-nosnippet>114</a>                )<span class="question-mark">?</span>))
-<a href=#115 id=115 data-nosnippet>115</a>            } <span class="kw">else </span>{
-<a href=#116 id=116 data-nosnippet>116</a>                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-<a href=#117 id=117 data-nosnippet>117</a>            }
-<a href=#118 id=118 data-nosnippet>118</a>        } <span class="kw">else </span>{
-<a href=#119 id=119 data-nosnippet>119</a>            <span class="prelude-val">Err</span>(Error::UnknownCommand(command_code))
-<a href=#120 id=120 data-nosnippet>120</a>        }
-<a href=#121 id=121 data-nosnippet>121</a>    }
-<a href=#122 id=122 data-nosnippet>122</a>}
+<a href=#96 id=96 data-nosnippet>96</a>    <span class="doccomment">/// Multi-leg strategy information (only present for multi-leg option
+<a href=#97 id=97 data-nosnippet>97</a>    /// combination orders)
+<a href=#98 id=98 data-nosnippet>98</a>    </span><span class="attr">#[serde(default)]
+<a href=#99 id=99 data-nosnippet>99</a>    </span><span class="kw">pub </span>multi_leg: <span class="prelude-ty">Option</span>&lt;MultiLegInfo&gt;,
+<a href=#100 id=100 data-nosnippet>100</a>}
+<a href=#101 id=101 data-nosnippet>101</a>
+<a href=#102 id=102 data-nosnippet>102</a><span class="doccomment">/// Grid trading master-order changed message.
+<a href=#103 id=103 data-nosnippet>103</a>///
+<a href=#104 id=104 data-nosnippet>104</a>/// Delivered on the same `private` topic as regular order changes. Field set is
+<a href=#105 id=105 data-nosnippet>105</a>/// a skeleton to be confirmed against the test environment during integration;
+<a href=#106 id=106 data-nosnippet>106</a>/// unknown fields are ignored (`#[serde(default)]`).
+<a href=#107 id=107 data-nosnippet>107</a></span><span class="attr">#[derive(Debug, Default, Deserialize)]
+<a href=#108 id=108 data-nosnippet>108</a>#[serde(default)]
+<a href=#109 id=109 data-nosnippet>109</a></span><span class="kw">pub struct </span>PushGridOrderChanged {
+<a href=#110 id=110 data-nosnippet>110</a>    <span class="doccomment">/// Grid master order ID
+<a href=#111 id=111 data-nosnippet>111</a>    </span><span class="kw">pub </span>order_id: String,
+<a href=#112 id=112 data-nosnippet>112</a>    <span class="doccomment">/// Order status
+<a href=#113 id=113 data-nosnippet>113</a>    </span><span class="kw">pub </span>status: String,
+<a href=#114 id=114 data-nosnippet>114</a>    <span class="doccomment">/// Security symbol (e.g. `700.HK`)
+<a href=#115 id=115 data-nosnippet>115</a>    </span><span class="kw">pub </span>symbol: String,
+<a href=#116 id=116 data-nosnippet>116</a>    <span class="doccomment">/// Suspend reason, if any
+<a href=#117 id=117 data-nosnippet>117</a>    </span><span class="kw">pub </span>suspend_reason: String,
+<a href=#118 id=118 data-nosnippet>118</a>    <span class="doccomment">/// Submitted base price
+<a href=#119 id=119 data-nosnippet>119</a>    </span><span class="kw">pub </span>submitted_base_price: String,
+<a href=#120 id=120 data-nosnippet>120</a>    <span class="doccomment">/// Current base price
+<a href=#121 id=121 data-nosnippet>121</a>    </span><span class="kw">pub </span>current_base_price: String,
+<a href=#122 id=122 data-nosnippet>122</a>    <span class="doccomment">/// Upper price bound
+<a href=#123 id=123 data-nosnippet>123</a>    </span><span class="kw">pub </span>upper_limit_price: String,
+<a href=#124 id=124 data-nosnippet>124</a>    <span class="doccomment">/// Lower price bound
+<a href=#125 id=125 data-nosnippet>125</a>    </span><span class="kw">pub </span>lower_limit_price: String,
+<a href=#126 id=126 data-nosnippet>126</a>    <span class="doccomment">/// Trigger price type
+<a href=#127 id=127 data-nosnippet>127</a>    </span><span class="kw">pub </span>trigger_price_type: i32,
+<a href=#128 id=128 data-nosnippet>128</a>    <span class="doccomment">/// Quantity per trigger
+<a href=#129 id=129 data-nosnippet>129</a>    </span><span class="kw">pub </span>trigger_quantity: String,
+<a href=#130 id=130 data-nosnippet>130</a>    <span class="doccomment">/// Settlement currency
+<a href=#131 id=131 data-nosnippet>131</a>    </span><span class="kw">pub </span>settlement_currency: String,
+<a href=#132 id=132 data-nosnippet>132</a>    <span class="doccomment">/// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+<a href=#133 id=133 data-nosnippet>133</a>    </span><span class="kw">pub </span>time_in_force: i32,
+<a href=#134 id=134 data-nosnippet>134</a>    <span class="doccomment">/// Regular trading hours flag
+<a href=#135 id=135 data-nosnippet>135</a>    </span><span class="kw">pub </span>rth: i32,
+<a href=#136 id=136 data-nosnippet>136</a>    <span class="doccomment">/// Sell-side order type when depth is 0
+<a href=#137 id=137 data-nosnippet>137</a>    </span><span class="kw">pub </span>grid_order_type_up: String,
+<a href=#138 id=138 data-nosnippet>138</a>    <span class="doccomment">/// Buy-side order type when depth is 0
+<a href=#139 id=139 data-nosnippet>139</a>    </span><span class="kw">pub </span>grid_order_type_down: String,
+<a href=#140 id=140 data-nosnippet>140</a>}
+<a href=#141 id=141 data-nosnippet>141</a>
+<a href=#142 id=142 data-nosnippet>142</a><span class="doccomment">/// Push event
+<a href=#143 id=143 data-nosnippet>143</a></span><span class="attr">#[derive(Debug, Deserialize)]
+<a href=#144 id=144 data-nosnippet>144</a>#[serde(tag = <span class="string">"event"</span>, content = <span class="string">"data"</span>)]
+<a href=#145 id=145 data-nosnippet>145</a></span><span class="kw">pub enum </span>PushEvent {
+<a href=#146 id=146 data-nosnippet>146</a>    <span class="doccomment">/// Order changed
+<a href=#147 id=147 data-nosnippet>147</a>    </span><span class="attr">#[serde(rename = <span class="string">"order_changed_lb"</span>)]
+<a href=#148 id=148 data-nosnippet>148</a>    </span>OrderChanged(PushOrderChanged),
+<a href=#149 id=149 data-nosnippet>149</a>    <span class="doccomment">/// Grid trading master order changed
+<a href=#150 id=150 data-nosnippet>150</a>    </span><span class="attr">#[serde(rename = <span class="string">"gridtrading_order"</span>)]
+<a href=#151 id=151 data-nosnippet>151</a>    </span>GridOrderChanged(PushGridOrderChanged),
+<a href=#152 id=152 data-nosnippet>152</a>}
+<a href=#153 id=153 data-nosnippet>153</a>
+<a href=#154 id=154 data-nosnippet>154</a><span class="kw">impl </span>PushEvent {
+<a href=#155 id=155 data-nosnippet>155</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(command_code: u8, data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;PushEvent&gt;&gt; {
+<a href=#156 id=156 data-nosnippet>156</a>        <span class="kw">if </span>command_code == cmd_code::PUSH_NOTIFICATION {
+<a href=#157 id=157 data-nosnippet>157</a>            <span class="kw">let </span>notification = Notification::decode(data)<span class="question-mark">?</span>;
+<a href=#158 id=158 data-nosnippet>158</a>            <span class="kw">if let </span><span class="prelude-val">Ok</span>(TopicType::Private) = TopicType::from_str(<span class="kw-2">&amp;</span>notification.topic) {
+<a href=#159 id=159 data-nosnippet>159</a>                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(serde_json::from_slice::&lt;PushEvent&gt;(
+<a href=#160 id=160 data-nosnippet>160</a>                    <span class="kw-2">&amp;</span>notification.data,
+<a href=#161 id=161 data-nosnippet>161</a>                )<span class="question-mark">?</span>))
+<a href=#162 id=162 data-nosnippet>162</a>            } <span class="kw">else </span>{
+<a href=#163 id=163 data-nosnippet>163</a>                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+<a href=#164 id=164 data-nosnippet>164</a>            }
+<a href=#165 id=165 data-nosnippet>165</a>        } <span class="kw">else </span>{
+<a href=#166 id=166 data-nosnippet>166</a>            <span class="prelude-val">Err</span>(Error::UnknownCommand(command_code))
+<a href=#167 id=167 data-nosnippet>167</a>        }
+<a href=#168 id=168 data-nosnippet>168</a>    }
+<a href=#169 id=169 data-nosnippet>169</a>}
 </code></pre></div></section></main></body></html>

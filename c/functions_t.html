@@ -121,9 +121,14 @@ $(function() {
 : <a class="el" href="struct_c_attached_order_detail.html#a94faaa75956f17e0eb295c153eabf92a">CAttachedOrderDetail</a>
 , <a class="el" href="struct_c_replace_attached_params.html#a3c0aa3bc63b9a534d5175a323567b532">CReplaceAttachedParams</a>
 , <a class="el" href="struct_c_submit_attached_params.html#a3c0aa3bc63b9a534d5175a323567b532">CSubmitAttachedParams</a>
+, <a class="el" href="structlb__grid__order__detail__t.html#ac19a20019aed0d9ebdc6f8b9eba6b61c">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#ac19a20019aed0d9ebdc6f8b9eba6b61c">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#a90cf00fa49bc734f9f72f84c70bc4a3f">lb_grid_trade_rule_t</a>
 , <a class="el" href="structlb__order__detail__t.html#a94faaa75956f17e0eb295c153eabf92a">lb_order_detail_t</a>
 , <a class="el" href="structlb__order__t.html#a94faaa75956f17e0eb295c153eabf92a">lb_order_t</a>
+, <a class="el" href="structlb__push__grid__order__changed__t.html#ac19a20019aed0d9ebdc6f8b9eba6b61c">lb_push_grid_order_changed_t</a>
 , <a class="el" href="structlb__submit__order__options__t.html#a94faaa75956f17e0eb295c153eabf92a">lb_submit_order_options_t</a>
+, <a class="el" href="structlb__trigger__order__t.html#ac19a20019aed0d9ebdc6f8b9eba6b61c">lb_trigger_order_t</a>
 </li>
 <li>timestamp
 : <a class="el" href="structlb__ah__premium__kline__t.html#a8a591d341723df9496cda98e225b25b4">lb_ah_premium_kline_t</a>
@@ -216,7 +221,7 @@ $(function() {
 : <a class="el" href="structlb__subagent__started__payload__t.html#a8164260e9c833baab62a6da809e2e5ae">lb_subagent_started_payload_t</a>
 </li>
 <li>top
-: <a class="el" href="structlb__industry__peers__response__t.html#a47e487d75794dd1f81a68a9927b4d058">lb_industry_peers_response_t</a>
+: <a class="el" href="structlb__industry__peers__response__t.html#a3259dec26dce3861db6d975c80bf0843">lb_industry_peers_response_t</a>
 </li>
 <li>topic_type
 : <a class="el" href="structlb__owned__topic__t.html#ad0dafd38f35b3a75d8e3a9cff7641d2b">lb_owned_topic_t</a>
@@ -236,6 +241,9 @@ $(function() {
 , <a class="el" href="structlb__short__trades__item__t.html#a169bf27ee39f736f7e8546f25afd4225">lb_short_trades_item_t</a>
 , <a class="el" href="structlb__trade__statistics__t.html#a169bf27ee39f736f7e8546f25afd4225">lb_trade_statistics_t</a>
 </li>
+<li>total_buy_quantity
+: <a class="el" href="structlb__grid__order__t.html#ad1e02b9735286b373d47a4c0d5b8ef23">lb_grid_order_t</a>
+</li>
 <li>total_cash
 : <a class="el" href="structlb__account__balance__t.html#a065becb414a5529ec7cc9c19649b2e3a">lb_account_balance_t</a>
 </li>
@@ -247,6 +255,12 @@ $(function() {
 </li>
 <li>total_profit
 : <a class="el" href="structlb__dca__stats__t.html#a84c994bfc45c00fdfa347deaedbc0e5c">lb_dca_stats_t</a>
+</li>
+<li>total_profit_balance
+: <a class="el" href="structlb__grid__order__t.html#a497722ee06444a767fd3ab27170705df">lb_grid_order_t</a>
+</li>
+<li>total_sell_quantity
+: <a class="el" href="structlb__grid__order__t.html#a4bb3a545274d3dfd6a926c397aa08195">lb_grid_order_t</a>
 </li>
 <li>total_shares
 : <a class="el" href="structlb__constituent__stock__t.html#a941a11bbf286093253b0ea6fe7a520db">lb_constituent_stock_t</a>
@@ -325,12 +339,38 @@ $(function() {
 : <a class="el" href="structlb__order__detail__t.html#a60a1e0be0e1985296572c2a67829ae63">lb_order_detail_t</a>
 , <a class="el" href="structlb__order__t.html#a60a1e0be0e1985296572c2a67829ae63">lb_order_t</a>
 , <a class="el" href="structlb__push__order__changed__t.html#a60a1e0be0e1985296572c2a67829ae63">lb_push_order_changed_t</a>
+, <a class="el" href="structlb__trigger__order__t.html#a60a1e0be0e1985296572c2a67829ae63">lb_trigger_order_t</a>
+</li>
+<li>trigger_buy_depth
+: <a class="el" href="structlb__grid__order__detail__t.html#acc19306f33d43a05a251fb1f261e5c21">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#acc19306f33d43a05a251fb1f261e5c21">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#ab98b11dc502bbcd4f6ff4dbf2b4b95b8">lb_grid_trade_rule_t</a>
+</li>
+<li>trigger_buy_order_type
+: <a class="el" href="structlb__grid__order__t.html#aa2953500eb3866e201b1d0f2e14ec60b">lb_grid_order_t</a>
+</li>
+<li>trigger_buy_quantity
+: <a class="el" href="structlb__grid__order__detail__t.html#ab8bc6295f7eebd73cbeaaea31c59c6c5">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#ab8bc6295f7eebd73cbeaaea31c59c6c5">lb_grid_order_t</a>
 </li>
 <li>trigger_count
 : <a class="el" href="structlb__order__detail__t.html#aa93203e86a45fd16565e814ea54773b6">lb_order_detail_t</a>
 , <a class="el" href="structlb__order__t.html#aa93203e86a45fd16565e814ea54773b6">lb_order_t</a>
 , <a class="el" href="structlb__replace__order__options__t.html#aa93203e86a45fd16565e814ea54773b6">lb_replace_order_options_t</a>
 , <a class="el" href="structlb__submit__order__options__t.html#aa93203e86a45fd16565e814ea54773b6">lb_submit_order_options_t</a>
+</li>
+<li>trigger_orders
+: <a class="el" href="structlb__grid__trigger__history__response__t.html#aa46bc7442820283edad6a8790dc1f2dc">lb_grid_trigger_history_response_t</a>
+</li>
+<li>trigger_percent_down
+: <a class="el" href="structlb__grid__order__detail__t.html#aeace464531397f838de89e0e69b2d9fd">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#aeace464531397f838de89e0e69b2d9fd">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#aeace464531397f838de89e0e69b2d9fd">lb_grid_trade_rule_t</a>
+</li>
+<li>trigger_percent_up
+: <a class="el" href="structlb__grid__order__detail__t.html#a4e958cac41165688f518d03fcc55bc65">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#a4e958cac41165688f518d03fcc55bc65">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#a4e958cac41165688f518d03fcc55bc65">lb_grid_trade_rule_t</a>
 </li>
 <li>trigger_price
 : <a class="el" href="struct_c_attached_order_detail.html#a8e3fd53f1015b952d18990210bc1fbc7">CAttachedOrderDetail</a>
@@ -339,12 +379,51 @@ $(function() {
 , <a class="el" href="structlb__push__order__changed__t.html#a8e3fd53f1015b952d18990210bc1fbc7">lb_push_order_changed_t</a>
 , <a class="el" href="structlb__replace__order__options__t.html#a8e3fd53f1015b952d18990210bc1fbc7">lb_replace_order_options_t</a>
 , <a class="el" href="structlb__submit__order__options__t.html#a8e3fd53f1015b952d18990210bc1fbc7">lb_submit_order_options_t</a>
+, <a class="el" href="structlb__trigger__order__t.html#a8e3fd53f1015b952d18990210bc1fbc7">lb_trigger_order_t</a>
+</li>
+<li>trigger_price_type
+: <a class="el" href="structlb__grid__order__detail__t.html#aa2a64b24e2c824d3a657bca44a6f3116">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#aa2a64b24e2c824d3a657bca44a6f3116">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#a0a656138bd15399baf2043a482cc14ee">lb_grid_trade_rule_t</a>
+, <a class="el" href="structlb__push__grid__order__changed__t.html#aa2a64b24e2c824d3a657bca44a6f3116">lb_push_grid_order_changed_t</a>
+</li>
+<li>trigger_quantity
+: <a class="el" href="structlb__grid__order__detail__t.html#a4d85c9849541092a18e0c8dfd431f75b">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#a4d85c9849541092a18e0c8dfd431f75b">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#a4d85c9849541092a18e0c8dfd431f75b">lb_grid_trade_rule_t</a>
+, <a class="el" href="structlb__push__grid__order__changed__t.html#a87adf5bbf71db0cd357f2f70e4b176ac">lb_push_grid_order_changed_t</a>
+</li>
+<li>trigger_sell_depth
+: <a class="el" href="structlb__grid__order__detail__t.html#a590c124151c5ebaa27cf748f293bd4a0">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#a590c124151c5ebaa27cf748f293bd4a0">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#a88adc9284db177a5e47a3666981786b2">lb_grid_trade_rule_t</a>
+</li>
+<li>trigger_sell_order_type
+: <a class="el" href="structlb__grid__order__t.html#a882581b01aafa3fda71b79dd597969b6">lb_grid_order_t</a>
+</li>
+<li>trigger_sell_quantity
+: <a class="el" href="structlb__grid__order__detail__t.html#a3905714ca8bc61378fa11c3a60ac222a">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#a3905714ca8bc61378fa11c3a60ac222a">lb_grid_order_t</a>
+</li>
+<li>trigger_spread_down
+: <a class="el" href="structlb__grid__order__detail__t.html#abc7de2bf5c1c151dc8c97e485f5058f2">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#abc7de2bf5c1c151dc8c97e485f5058f2">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#abc7de2bf5c1c151dc8c97e485f5058f2">lb_grid_trade_rule_t</a>
+</li>
+<li>trigger_spread_up
+: <a class="el" href="structlb__grid__order__detail__t.html#afb51b2bb848f081e140d98721f493842">lb_grid_order_detail_t</a>
+, <a class="el" href="structlb__grid__order__t.html#afb51b2bb848f081e140d98721f493842">lb_grid_order_t</a>
+, <a class="el" href="structlb__grid__trade__rule__t.html#afb51b2bb848f081e140d98721f493842">lb_grid_trade_rule_t</a>
 </li>
 <li>trigger_status
 : <a class="el" href="struct_c_attached_order_detail.html#a37133fffcaf50a3a16ddc84199a0e40f">CAttachedOrderDetail</a>
 , <a class="el" href="structlb__order__detail__t.html#a37133fffcaf50a3a16ddc84199a0e40f">lb_order_detail_t</a>
 , <a class="el" href="structlb__order__t.html#a37133fffcaf50a3a16ddc84199a0e40f">lb_order_t</a>
 , <a class="el" href="structlb__push__order__changed__t.html#a37133fffcaf50a3a16ddc84199a0e40f">lb_push_order_changed_t</a>
+, <a class="el" href="structlb__trigger__order__t.html#aeccd524d4534cbf609fe7174bb5b31c4">lb_trigger_order_t</a>
+</li>
+<li>trigger_times
+: <a class="el" href="structlb__grid__order__t.html#a85966667a36c0a999699e80c52b12eea">lb_grid_order_t</a>
 </li>
 <li>turnover
 : <a class="el" href="structlb__candlestick__t.html#a0d916fd1dd7d70ee7dfb04ac8bd6d9e4">lb_candlestick_t</a>

@@ -6,6 +6,7 @@ com.longbridge.calendar
 com.longbridge.content
 com.longbridge.dca
 com.longbridge.fundamental
+com.longbridge.grid
 com.longbridge.market
 com.longbridge.portfolio
 com.longbridge.quote

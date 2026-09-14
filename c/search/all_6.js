@@ -1,11 +1,19 @@
 var searchData=
 [
-  ['gamma_437',['gamma',['../structlb__security__calc__index__t.html#a1c2926f413a50fbffef7aadd4cd33d53',1,'lb_security_calc_index_t']]],
-  ['goal_438',['goal',['../structlb__subagent__started__payload__t.html#a9b53175b1f96252a00e6bf9702a85d56',1,'lb_subagent_started_payload_t::goal()'],['../structlb__subagent__outputs__t.html#a9b53175b1f96252a00e6bf9702a85d56',1,'lb_subagent_outputs_t::goal()']]],
-  ['granularity_439',['granularity',['../structlb__history__market__temperature__response__t.html#a971132c38a33c335725eaf183683123b',1,'lb_history_market_temperature_response_t']]],
-  ['granularitydaily_440',['GranularityDaily',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120a586d968ee933d5af0e0999ebb6ff0231',1,'longbridge.h']]],
-  ['granularitymonthly_441',['GranularityMonthly',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120ab4edd426d7039ff7e82151efd2e724f3',1,'longbridge.h']]],
-  ['granularityunknown_442',['GranularityUnknown',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120ae3d262a0ce38dbaa81a452333122eca5',1,'longbridge.h']]],
-  ['granularityweekly_443',['GranularityWeekly',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120a8d2c31d415722e66f25fbbd19803b520',1,'longbridge.h']]],
-  ['gtd_444',['gtd',['../struct_c_attached_order_detail.html#ad1c03662cf6743f2e970a0bebf38c286',1,'CAttachedOrderDetail']]]
+  ['gamma_458',['gamma',['../structlb__security__calc__index__t.html#a1c2926f413a50fbffef7aadd4cd33d53',1,'lb_security_calc_index_t']]],
+  ['goal_459',['goal',['../structlb__subagent__started__payload__t.html#a9b53175b1f96252a00e6bf9702a85d56',1,'lb_subagent_started_payload_t::goal()'],['../structlb__subagent__outputs__t.html#a9b53175b1f96252a00e6bf9702a85d56',1,'lb_subagent_outputs_t::goal()']]],
+  ['granularity_460',['granularity',['../structlb__history__market__temperature__response__t.html#a971132c38a33c335725eaf183683123b',1,'lb_history_market_temperature_response_t']]],
+  ['granularitydaily_461',['GranularityDaily',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120a586d968ee933d5af0e0999ebb6ff0231',1,'longbridge.h']]],
+  ['granularitymonthly_462',['GranularityMonthly',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120ab4edd426d7039ff7e82151efd2e724f3',1,'longbridge.h']]],
+  ['granularityunknown_463',['GranularityUnknown',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120ae3d262a0ce38dbaa81a452333122eca5',1,'longbridge.h']]],
+  ['granularityweekly_464',['GranularityWeekly',['../longbridge_8h.html#ac642c0c57b044e0b95b30cc4dc909120a8d2c31d415722e66f25fbbd19803b520',1,'longbridge.h']]],
+  ['grid_5forder_465',['grid_order',['../structlb__grid__orders__response__t.html#a6223a50a8b3a4ce9daa82dec2ed72723',1,'lb_grid_orders_response_t']]],
+  ['grid_5forder_5fhistory_466',['grid_order_history',['../structlb__grid__order__detail__t.html#a19f37de6c579048cf5fd11b2daf9fba5',1,'lb_grid_order_detail_t']]],
+  ['grid_5forder_5fid_467',['grid_order_id',['../structlb__get__grid__trigger__history__options__t.html#a8d0ee9509edc116f0236324ec9ca419c',1,'lb_get_grid_trigger_history_options_t']]],
+  ['grid_5forder_5ftype_5fdown_468',['grid_order_type_down',['../structlb__grid__order__t.html#a2d70acff7c50ee0aef6a590c4fc571eb',1,'lb_grid_order_t::grid_order_type_down()'],['../structlb__grid__trade__rule__t.html#a2d70acff7c50ee0aef6a590c4fc571eb',1,'lb_grid_trade_rule_t::grid_order_type_down()'],['../structlb__grid__order__detail__t.html#a2d70acff7c50ee0aef6a590c4fc571eb',1,'lb_grid_order_detail_t::grid_order_type_down()'],['../structlb__push__grid__order__changed__t.html#a2d70acff7c50ee0aef6a590c4fc571eb',1,'lb_push_grid_order_changed_t::grid_order_type_down()']]],
+  ['grid_5forder_5ftype_5fup_469',['grid_order_type_up',['../structlb__grid__order__t.html#a99ecd4b5bbd5e2d708f52e6156759e51',1,'lb_grid_order_t::grid_order_type_up()'],['../structlb__grid__order__detail__t.html#a99ecd4b5bbd5e2d708f52e6156759e51',1,'lb_grid_order_detail_t::grid_order_type_up()'],['../structlb__push__grid__order__changed__t.html#a99ecd4b5bbd5e2d708f52e6156759e51',1,'lb_push_grid_order_changed_t::grid_order_type_up()'],['../structlb__grid__trade__rule__t.html#a99ecd4b5bbd5e2d708f52e6156759e51',1,'lb_grid_trade_rule_t::grid_order_type_up()']]],
+  ['grid_5fstatus_470',['grid_status',['../structlb__grid__order__t.html#a49d82767527acb89db658dd106d8f4c8',1,'lb_grid_order_t::grid_status()'],['../structlb__grid__order__detail__t.html#a49d82767527acb89db658dd106d8f4c8',1,'lb_grid_order_detail_t::grid_status()']]],
+  ['grid_5fsub_5forders_471',['grid_sub_orders',['../structlb__grid__order__detail__t.html#a1d87d06376c2f131b00f65867931a96d',1,'lb_grid_order_detail_t']]],
+  ['grid_5ftrading_5frule_472',['grid_trading_rule',['../structlb__submit__grid__order__options__t.html#afe45b4a0182b0f96d4eca0efba2946c3',1,'lb_submit_grid_order_options_t::grid_trading_rule()'],['../structlb__replace__grid__order__options__t.html#afe45b4a0182b0f96d4eca0efba2946c3',1,'lb_replace_grid_order_options_t::grid_trading_rule()']]],
+  ['gtd_473',['gtd',['../struct_c_attached_order_detail.html#ad1c03662cf6743f2e970a0bebf38c286',1,'CAttachedOrderDetail::gtd()'],['../structlb__grid__order__t.html#aeee2aee0267ca25fa96f2d099f9439d7',1,'lb_grid_order_t::gtd()'],['../structlb__grid__order__detail__t.html#aeee2aee0267ca25fa96f2d099f9439d7',1,'lb_grid_order_detail_t::gtd()'],['../structlb__trigger__order__t.html#aeee2aee0267ca25fa96f2d099f9439d7',1,'lb_trigger_order_t::gtd()']]]
 ];

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["FactDirection","FactType","Outlook","SignalStatus"],"struct":["AnomalyDetection","AnomalyThresholds","FactDataSource","FactFactor","FactNlInfo","FactSymbol","NlTag","SecurityFact","SecurityFactsOptions","Signal","SignalsOptions","SignalsResponse"]};

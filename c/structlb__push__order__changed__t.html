@@ -122,6 +122,10 @@ Data Fields</h2></td></tr>
 <tr class="separator:aea4fd1c6d7a7e2ce3f25d3a0a210b267"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__push__order__changed__t.html#a9a51a4c0d5faa2f4386a52affa7e12d7">remark</a></td></tr>
 <tr class="separator:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ec7d795cac47a012c0fb75a5496bd75"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__push__order__changed__t.html#a5ec7d795cac47a012c0fb75a5496bd75">has_multi_leg</a></td></tr>
+<tr class="separator:a5ec7d795cac47a012c0fb75a5496bd75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d6491ced786fc37d2ec8911ab18e2d9"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_c_multi_leg_info.html">CMultiLegInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__push__order__changed__t.html#a1d6491ced786fc37d2ec8911ab18e2d9">multi_leg</a></td></tr>
+<tr class="separator:a1d6491ced786fc37d2ec8911ab18e2d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Order changed message </p>
@@ -186,6 +190,21 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
+<a id="a5ec7d795cac47a012c0fb75a5496bd75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ec7d795cac47a012c0fb75a5496bd75">&#9670;&nbsp;</a></span>has_multi_leg</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_multi_leg</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether multi_leg is valid (true only for multi-leg option combination orders) </p>
+
+</div>
+</div>
 <a id="aea4fd1c6d7a7e2ce3f25d3a0a210b267"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aea4fd1c6d7a7e2ce3f25d3a0a210b267">&#9670;&nbsp;</a></span>last_price</h2>
 
@@ -243,6 +262,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Rejected message or remark </p>
+
+</div>
+</div>
+<a id="a1d6491ced786fc37d2ec8911ab18e2d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d6491ced786fc37d2ec8911ab18e2d9">&#9670;&nbsp;</a></span>multi_leg</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="struct_c_multi_leg_info.html">CMultiLegInfo</a> multi_leg</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Multi-leg strategy information (only valid when has_multi_leg is true) </p>
 
 </div>
 </div>

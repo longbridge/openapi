@@ -70,6 +70,8 @@ $(function() {
 <li>page
 : <a class="el" href="structlongbridge_1_1agent_1_1_get_agents_options.html#a7d7878fe852e63a6332b4e410fbb897b">longbridge::agent::GetAgentsOptions</a>
 , <a class="el" href="structlongbridge_1_1content_1_1_my_topics_options.html#a07485080c5f26391974f9e5631186461">longbridge::content::MyTopicsOptions</a>
+, <a class="el" href="structlongbridge_1_1grid_1_1_get_grid_orders_options.html#a83997ebdc617962d1cdec2b3926b76f6">longbridge::grid::GetGridOrdersOptions</a>
+, <a class="el" href="structlongbridge_1_1grid_1_1_get_grid_trigger_history_options.html#a40292ae62bd49d84cd48f8e79a8dfdd8">longbridge::grid::GetGridTriggerHistoryOptions</a>
 , <a class="el" href="structlongbridge_1_1trade_1_1_get_all_executions_options.html#a225962125946f1c00ded6377a8bbe994">longbridge::trade::GetAllExecutionsOptions</a>
 , <a class="el" href="structlongbridge_1_1trade_1_1_get_cash_flow_options.html#a116dbb26409aaccf71dc6e7d2cd4dfa3">longbridge::trade::GetCashFlowOptions</a>
 </li>
@@ -128,6 +130,7 @@ $(function() {
 <li>percent
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_business_segment_history_item.html#a2bfbf331e0d032a857b0a80a41cae91c">longbridge::fundamental::BusinessSegmentHistoryItem</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_business_segment_item.html#acc110764d697ab15c23a3ba44d931915">longbridge::fundamental::BusinessSegmentItem</a>
+, <a class="el" href="structlongbridge_1_1grid_1_1_grid_trigger.html#acafbc3d2d012a61925a73a59ce8c6614">longbridge::grid::GridTrigger</a>
 </li>
 <li>percent_of_shares
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_invest_security.html#ab138022748c05904f79bb39041ae6124">longbridge::fundamental::InvestSecurity</a>
@@ -168,11 +171,12 @@ $(function() {
 : <a class="el" href="classlongbridge_1_1sharelist_1_1_sharelist_context.html#a1d937642f93abbcd447fe619a8aff3cf">longbridge::sharelist::SharelistContext</a>
 </li>
 <li>PortfolioContext()
-: <a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html#a010b8ab9cafcf043fa7ffa754d0d3755">longbridge::portfolio::PortfolioContext</a>
+: <a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html#af27f749b7b60ad1a6d75590d0cb037c2">longbridge::portfolio::PortfolioContext</a>
 </li>
 <li>position
 : <a class="el" href="structlongbridge_1_1quote_1_1_brokers.html#af25679e94a05a6a7980d27fbb0320d05">longbridge::quote::Brokers</a>
 , <a class="el" href="structlongbridge_1_1quote_1_1_depth.html#a4e2c0993471a461a0ceedab90753ee32">longbridge::quote::Depth</a>
+, <a class="el" href="structlongbridge_1_1trade_1_1_multi_leg_order_leg.html#ab9e811af7ec1042cc815a05f8af1a7f7">longbridge::trade::MultiLegOrderLeg</a>
 </li>
 <li>position_ratio
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_item.html#a6e31dd39f4c7b1941aec66ccd5dd6fc3">longbridge::fundamental::AssetAllocationItem</a>
@@ -188,6 +192,9 @@ $(function() {
 <li>post_market_quote
 : <a class="el" href="structlongbridge_1_1quote_1_1_security_quote.html#a6957832963c67aaffe893b5c3615155c">longbridge::quote::SecurityQuote</a>
 </li>
+<li>post_trigger_base_price
+: <a class="el" href="structlongbridge_1_1grid_1_1_grid_order.html#a3a4d8d90f08fed4ec3c317e9884188f4">longbridge::grid::GridOrder</a>
+</li>
 <li>pow()
 : <a class="el" href="classlongbridge_1_1_decimal.html#a5f635906a2e8747d58aaaf55aceb8981">longbridge::Decimal</a>
 </li>
@@ -199,6 +206,9 @@ $(function() {
 </li>
 <li>pre_post_price
 : <a class="el" href="structlongbridge_1_1market_1_1_rank_list_item.html#a6d42b5255968154e136a2e5aabc30c83">longbridge::market::RankListItem</a>
+</li>
+<li>pre_trigger_base_price
+: <a class="el" href="structlongbridge_1_1grid_1_1_grid_order.html#aa3756b1e219fd40d90ad2bce1662eb5d">longbridge::grid::GridOrder</a>
 </li>
 <li>preclose
 : <a class="el" href="structlongbridge_1_1market_1_1_trade_statistics.html#a6e0f7ba289e3f565cb9c7add416db925">longbridge::market::TradeStatistics</a>
@@ -220,7 +230,10 @@ $(function() {
 </li>
 <li>price
 : <a class="el" href="structlongbridge_1_1alert_1_1_alert_symbol_group.html#a93d2af2b9b646369e50190be7a714e45">longbridge::alert::AlertSymbolGroup</a>
+, <a class="el" href="structlongbridge_1_1alert_1_1_alert_value_map.html#a5d0e29f47def9b3e8aa1b47d70c15ee7">longbridge::alert::AlertValueMap</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_institution_rating_detail_target_item.html#a5fc75a1f1b056bd5566f8b5b73b0329d">longbridge::fundamental::InstitutionRatingDetailTargetItem</a>
+, <a class="el" href="structlongbridge_1_1grid_1_1_grid_order_sub_order.html#a6866b5a9c49f467e54f2e3bab47aadfc">longbridge::grid::GridOrderSubOrder</a>
+, <a class="el" href="structlongbridge_1_1grid_1_1_trigger_order.html#acd25a137e69cd65911337d5689ba8c52">longbridge::grid::TriggerOrder</a>
 , <a class="el" href="structlongbridge_1_1market_1_1_trade_price_level.html#a360a3cb9efc1dbaa0c49864af265f387">longbridge::market::TradePriceLevel</a>
 , <a class="el" href="structlongbridge_1_1quote_1_1_depth.html#a30f144ec493e6ce4338fbe8fa1e06abc">longbridge::quote::Depth</a>
 , <a class="el" href="structlongbridge_1_1quote_1_1_intraday_line.html#ac35330cfdf962354222bddb5cf81a06e">longbridge::quote::IntradayLine</a>
@@ -312,6 +325,14 @@ $(function() {
 , <a class="el" href="structlongbridge_1_1content_1_1_news_item.html#af767f11a3909e9b92790006efc871706">longbridge::content::NewsItem</a>
 , <a class="el" href="structlongbridge_1_1content_1_1_topic_item.html#a8513fa78cbb6dc0779f430c129ea506f">longbridge::content::TopicItem</a>
 , <a class="el" href="structlongbridge_1_1quote_1_1_filing_item.html#ae03b648efeaef48e5d30152dd4c0e04c">longbridge::quote::FilingItem</a>
+</li>
+<li>pullback_percent
+: <a class="el" href="structlongbridge_1_1grid_1_1_grid_order.html#a49b8bfc6c81cefe67ea3eadb39f0ebe6">longbridge::grid::GridOrder</a>
+, <a class="el" href="structlongbridge_1_1grid_1_1_grid_order_detail.html#aec5b28488318509015611f2dcb0ee3d1">longbridge::grid::GridOrderDetail</a>
+</li>
+<li>pullback_spread
+: <a class="el" href="structlongbridge_1_1grid_1_1_grid_order.html#ad1acda63c55c74cef00f1f3ca35f29e4">longbridge::grid::GridOrder</a>
+, <a class="el" href="structlongbridge_1_1grid_1_1_grid_order_detail.html#a167eb5a708ced3a598f80e109a46aa7b">longbridge::grid::GridOrderDetail</a>
 </li>
 <li>PushEvent()
 : <a class="el" href="structlongbridge_1_1_push_event.html#a6956106e2c9fb7893a71c4cb8f2d5fc0">longbridge::PushEvent&lt; Ctx, T &gt;</a>

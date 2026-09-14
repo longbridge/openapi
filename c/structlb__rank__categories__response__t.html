@@ -72,24 +72,41 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:a8f64897c7ccc5c13f276d1d07c4e7095"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__rank__categories__response__t.html#a8f64897c7ccc5c13f276d1d07c4e7095">data</a></td></tr>
-<tr class="separator:a8f64897c7ccc5c13f276d1d07c4e7095"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0b928f03184f279f44c4cac9ea2ab22"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structlb__rank__category__t.html">lb_rank_category_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__rank__categories__response__t.html#aa0b928f03184f279f44c4cac9ea2ab22">categories</a></td></tr>
+<tr class="separator:aa0b928f03184f279f44c4cac9ea2ab22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa075e59d1c355809e97e3d9968a3246"><td class="memItemLeft" align="right" valign="top">uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__rank__categories__response__t.html#aaa075e59d1c355809e97e3d9968a3246">num_categories</a></td></tr>
+<tr class="separator:aaa075e59d1c355809e97e3d9968a3246"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Rank categories response. <code>data</code> is a NUL-terminated JSON string. </p>
+<div class="textblock"><p>Rank categories response. </p>
 </div><h2 class="groupheader">Field Documentation</h2>
-<a id="a8f64897c7ccc5c13f276d1d07c4e7095"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f64897c7ccc5c13f276d1d07c4e7095">&#9670;&nbsp;</a></span>data</h2>
+<a id="aa0b928f03184f279f44c4cac9ea2ab22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0b928f03184f279f44c4cac9ea2ab22">&#9670;&nbsp;</a></span>categories</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* data</td>
+          <td class="memname">const struct <a class="el" href="structlb__rank__category__t.html">lb_rank_category_t</a>* categories</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Raw rank categories data as a JSON string </p>
+<p>Top-level categories pointer </p>
+
+</div>
+</div>
+<a id="aaa075e59d1c355809e97e3d9968a3246"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa075e59d1c355809e97e3d9968a3246">&#9670;&nbsp;</a></span>num_categories</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uintptr_t num_categories</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Number of categories </p>
 
 </div>
 </div>

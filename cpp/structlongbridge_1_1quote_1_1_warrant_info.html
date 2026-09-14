@@ -104,9 +104,8 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a7981ae6be038dfe42efebfbccce14600"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_warrant_info.html#a7981ae6be038dfe42efebfbccce14600">turnover</a></td></tr>
 <tr class="memdesc:a7981ae6be038dfe42efebfbccce14600"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turnover.  <a href="structlongbridge_1_1quote_1_1_warrant_info.html#a7981ae6be038dfe42efebfbccce14600">More...</a><br /></td></tr>
 <tr class="separator:a7981ae6be038dfe42efebfbccce14600"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79ff7ea2697f71b0a03391badfeb3b91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structlongbridge_1_1_date.html">Date</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_warrant_info.html#a79ff7ea2697f71b0a03391badfeb3b91">expiry_date</a></td></tr>
-<tr class="memdesc:a79ff7ea2697f71b0a03391badfeb3b91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expiry date.  <a href="structlongbridge_1_1quote_1_1_warrant_info.html#a79ff7ea2697f71b0a03391badfeb3b91">More...</a><br /></td></tr>
-<tr class="separator:a79ff7ea2697f71b0a03391badfeb3b91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab304ac29923d6c02b5d02d4dd3bd4c40"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structlongbridge_1_1_date.html">Date</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_warrant_info.html#ab304ac29923d6c02b5d02d4dd3bd4c40">expiry_date</a></td></tr>
+<tr class="separator:ab304ac29923d6c02b5d02d4dd3bd4c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc9a008f9e2194478def5ef26f407dcc"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_warrant_info.html#afc9a008f9e2194478def5ef26f407dcc">strike_price</a></td></tr>
 <tr class="memdesc:afc9a008f9e2194478def5ef26f407dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strike price.  <a href="structlongbridge_1_1quote_1_1_warrant_info.html#afc9a008f9e2194478def5ef26f407dcc">More...</a><br /></td></tr>
 <tr class="separator:afc9a008f9e2194478def5ef26f407dcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -271,19 +270,19 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a79ff7ea2697f71b0a03391badfeb3b91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79ff7ea2697f71b0a03391badfeb3b91">&#9670;&nbsp;</a></span>expiry_date</h2>
+<a id="ab304ac29923d6c02b5d02d4dd3bd4c40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab304ac29923d6c02b5d02d4dd3bd4c40">&#9670;&nbsp;</a></span>expiry_date</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structlongbridge_1_1_date.html">Date</a> longbridge::quote::WarrantInfo::expiry_date</td>
+          <td class="memname">std::optional&lt;<a class="el" href="structlongbridge_1_1_date.html">Date</a>&gt; longbridge::quote::WarrantInfo::expiry_date</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Expiry date. </p>
+<p>Expiry date</p>
+<p><code>std::nullopt</code> if the server does not report an expiry date for this warrant. </p>
 
 </div>
 </div>

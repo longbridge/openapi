@@ -80,6 +80,7 @@ $(function() {
 , <a class="el" href="structlb__financial__report__snapshot__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_financial_report_snapshot_t</a>
 , <a class="el" href="structlb__fund__holder__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_fund_holder_t</a>
 , <a class="el" href="structlb__get__agents__options__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_get_agents_options_t</a>
+, <a class="el" href="structlb__grid__symbol__info__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_grid_symbol_info_t</a>
 , <a class="el" href="structlb__http__header__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_http_header_t</a>
 , <a class="el" href="structlb__industry__peer__node__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_industry_peer_node_t</a>
 , <a class="el" href="structlb__industry__peers__top__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_industry_peers_top_t</a>
@@ -93,13 +94,16 @@ $(function() {
 , <a class="el" href="structlb__profit__analysis__detail__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_profit_analysis_detail_t</a>
 , <a class="el" href="structlb__profit__analysis__item__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_profit_analysis_item_t</a>
 , <a class="el" href="structlb__quote__package__detail__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_quote_package_detail_t</a>
+, <a class="el" href="structlb__rank__category__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_rank_category_t</a>
 , <a class="el" href="structlb__rank__list__item__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_rank_list_item_t</a>
+, <a class="el" href="structlb__rank__sub__category__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_rank_sub_category_t</a>
 , <a class="el" href="structlb__rating__indicator__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_rating_indicator_t</a>
 , <a class="el" href="structlb__rating__leaf__indicator__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_rating_leaf_indicator_t</a>
 , <a class="el" href="structlb__sharelist__info__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_sharelist_info_t</a>
 , <a class="el" href="structlb__sharelist__stock__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_sharelist_stock_t</a>
 , <a class="el" href="structlb__top__movers__stock__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_top_movers_stock_t</a>
 , <a class="el" href="structlb__topic__author__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_topic_author_t</a>
+, <a class="el" href="structlb__trigger__order__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_trigger_order_t</a>
 , <a class="el" href="structlb__update__watchlist__group__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_update_watchlist_group_t</a>
 , <a class="el" href="structlb__valuation__comparison__item__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_valuation_comparison_item_t</a>
 , <a class="el" href="structlb__warrant__info__t.html#a8f8f80d37794cde9472343e4487ba3eb">lb_warrant_info_t</a>
@@ -222,6 +226,9 @@ $(function() {
 : <a class="el" href="structlb__push__brokers__t.html#a5c90e563065db8dc047bacc09bdfa820">lb_push_brokers_t</a>
 , <a class="el" href="structlb__security__brokers__t.html#a5c90e563065db8dc047bacc09bdfa820">lb_security_brokers_t</a>
 </li>
+<li>num_bid_sizes
+: <a class="el" href="structlb__grid__symbol__info__t.html#a3d64af5d7d5d8792c89456a9ebe1df2e">lb_grid_symbol_info_t</a>
+</li>
 <li>num_bids
 : <a class="el" href="structlb__push__depth__t.html#a05ff937e173889f08a8d78a0b38d29a6">lb_push_depth_t</a>
 , <a class="el" href="structlb__security__depth__t.html#a05ff937e173889f08a8d78a0b38d29a6">lb_security_depth_t</a>
@@ -248,6 +255,9 @@ $(function() {
 </li>
 <li>num_cash_infos
 : <a class="el" href="structlb__account__balance__t.html#ab1a410289db45306b84a57ae8fe1c3c2">lb_account_balance_t</a>
+</li>
+<li>num_categories
+: <a class="el" href="structlb__rank__categories__response__t.html#aaa075e59d1c355809e97e3d9968a3246">lb_rank_categories_response_t</a>
 </li>
 <li>num_change_values
 : <a class="el" href="structlb__anomaly__item__t.html#a54922fa6846e68eb96c13747ed265048">lb_anomaly_item_t</a>
@@ -305,6 +315,15 @@ $(function() {
 <li>num_further_questions
 : <a class="el" href="structlb__conversation__response__t.html#a57ca2f72b50f4eeb30fbd3e3385129bd">lb_conversation_response_t</a>
 </li>
+<li>num_grid_order
+: <a class="el" href="structlb__grid__orders__response__t.html#a58086fd8efa83caecb18cada4cd3f5ce">lb_grid_orders_response_t</a>
+</li>
+<li>num_grid_order_history
+: <a class="el" href="structlb__grid__order__detail__t.html#a24e6b9811d2bfcd766242704ca962229">lb_grid_order_detail_t</a>
+</li>
+<li>num_grid_sub_orders
+: <a class="el" href="structlb__grid__order__detail__t.html#a07439c3190fa1af489093adfe1b221f0">lb_grid_order_detail_t</a>
+</li>
 <li>num_half_trading_days
 : <a class="el" href="structlb__market__trading__days__t.html#ad023f6bf15caebc811a17fb06719ac31">lb_market_trading_days_t</a>
 </li>
@@ -353,6 +372,10 @@ $(function() {
 <li>num_labels
 : <a class="el" href="structlb__top__movers__stock__t.html#af47d4aad4cb225fc35c4f37351a7d057">lb_top_movers_stock_t</a>
 </li>
+<li>num_legs
+: <a class="el" href="struct_c_multi_leg_info.html#add5fd78b2ac2463b00db78d90c8a1635">CMultiLegInfo</a>
+, <a class="el" href="struct_c_submit_multi_leg_order_options.html#add5fd78b2ac2463b00db78d90c8a1635">CSubmitMultiLegOrderOptions</a>
+</li>
 <li>num_list
 : <a class="el" href="structlb__broker__holding__daily__history__t.html#ae803df714d920ec126afdc13bb0f28ea">lb_broker_holding_daily_history_t</a>
 , <a class="el" href="structlb__broker__holding__detail__t.html#ae803df714d920ec126afdc13bb0f28ea">lb_broker_holding_detail_t</a>
@@ -385,6 +408,9 @@ $(function() {
 </li>
 <li>num_options
 : <a class="el" href="structlb__question__t.html#afa57b03afea01ffdb1c26e6905c28c6a">lb_question_t</a>
+</li>
+<li>num_order_ids
+: <a class="el" href="structlb__get__grid__orders__by__ids__options__t.html#a0361d8866b747d5b1d902681198a63d6">lb_get_grid_orders_by_ids_options_t</a>
 </li>
 <li>num_plans
 : <a class="el" href="structlb__dca__list__t.html#a78ef50192ddf83fe349a0b1fa3c4cbe6">lb_dca_list_t</a>
@@ -428,6 +454,9 @@ $(function() {
 <li>num_sell
 : <a class="el" href="structlb__broker__holding__top__t.html#acbc74b41d73cc467893a5e92bdb29f4c">lb_broker_holding_top_t</a>
 </li>
+<li>num_settlement_currency
+: <a class="el" href="structlb__grid__channel__info__t.html#a8fdfe80be6d9ea876e0eba6834000c62">lb_grid_channel_info_t</a>
+</li>
 <li>num_shareholder_list
 : <a class="el" href="structlb__shareholder__list__t.html#a614332f9e32aab1a154d8c7ea3ab0c47">lb_shareholder_list_t</a>
 </li>
@@ -451,6 +480,9 @@ $(function() {
 : <a class="el" href="structlb__index__constituents__t.html#aa7e4b23958d9a3dabfb319198b2deb8f">lb_index_constituents_t</a>
 , <a class="el" href="structlb__shareholder__t.html#aa7e4b23958d9a3dabfb319198b2deb8f">lb_shareholder_t</a>
 , <a class="el" href="structlb__sharelist__info__t.html#aa7e4b23958d9a3dabfb319198b2deb8f">lb_sharelist_info_t</a>
+</li>
+<li>num_sub_categories
+: <a class="el" href="structlb__rank__category__t.html#a5455eb0932aa3912380eea57bd12deff">lb_rank_category_t</a>
 </li>
 <li>num_sub_indicators
 : <a class="el" href="structlb__rating__category__t.html#ac186b004be5ac80d1945ab2ca2090ba4">lb_rating_category_t</a>
@@ -494,6 +526,9 @@ $(function() {
 </li>
 <li>num_trading_days
 : <a class="el" href="structlb__market__trading__days__t.html#a6dbd40aa6a90ec00454a8aa4823a5d38">lb_market_trading_days_t</a>
+</li>
+<li>num_trigger_orders
+: <a class="el" href="structlb__grid__trigger__history__response__t.html#a499738c2a4dbcd42c3078e0f38434fbf">lb_grid_trigger_history_response_t</a>
 </li>
 <li>num_workspaces
 : <a class="el" href="structlb__workspaces__response__t.html#a488aff693632737d66b409155be880b9">lb_workspaces_response_t</a>
