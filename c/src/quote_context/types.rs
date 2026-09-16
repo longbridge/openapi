@@ -2258,15 +2258,23 @@ pub struct CSecurityCalcIndex {
     pub balance_point: *const CDecimal,
     /// Open interest
     pub open_interest: *const i64,
-    /// Delta
+    /// Delta. Measures the expected change in option price for a $1 move in the
+    /// underlying asset price.
     pub delta: *const CDecimal,
-    /// Gamma
+    /// Gamma. Measures the expected change in Delta for a $1 move in the
+    /// underlying asset price.
     pub gamma: *const CDecimal,
-    /// Theta
+    /// Theta. Measures the expected change in option price as one day passes;
+    /// the raw value has been divided by 365 to convert to a daily value,
+    /// representing the impact of one day's time decay on the option price.
     pub theta: *const CDecimal,
-    /// Vega
+    /// Vega. Measures the expected change in option price when implied
+    /// volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+    /// get the expected price change per 1% move in IV.
     pub vega: *const CDecimal,
-    /// Rho
+    /// Rho. Measures the expected change in option price when the risk-free
+    /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+    /// the expected price change per 1% move in the interest rate.
     pub rho: *const CDecimal,
 }
 

@@ -6973,23 +6973,31 @@ typedef struct lb_security_calc_index_t {
    */
   const int64_t *open_interest;
   /**
-   * Delta
+   * Delta. Measures the expected change in option price for a $1 move in the
+   * underlying asset price.
    */
   const struct lb_decimal_t *delta;
   /**
-   * Gamma
+   * Gamma. Measures the expected change in Delta for a $1 move in the
+   * underlying asset price.
    */
   const struct lb_decimal_t *gamma;
   /**
-   * Theta
+   * Theta. Measures the expected change in option price as one day passes;
+   * the raw value has been divided by 365 to convert to a daily value,
+   * representing the impact of one day's time decay on the option price.
    */
   const struct lb_decimal_t *theta;
   /**
-   * Vega
+   * Vega. Measures the expected change in option price when implied
+   * volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+   * get the expected price change per 1% move in IV.
    */
   const struct lb_decimal_t *vega;
   /**
-   * Rho
+   * Rho. Measures the expected change in option price when the risk-free
+   * interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+   * the expected price change per 1% move in the interest rate.
    */
   const struct lb_decimal_t *rho;
 } lb_security_calc_index_t;
