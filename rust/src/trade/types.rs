@@ -109,6 +109,9 @@ pub enum OrderStatus {
     /// Partial Withdrawal
     #[strum(serialize = "PartialWithdrawal")]
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    #[strum(serialize = "DelayedNotReported")]
+    DelayedNotReported,
 }
 
 /// Execution

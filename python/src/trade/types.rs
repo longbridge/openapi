@@ -90,6 +90,8 @@ pub(crate) enum OrderStatus {
     Expired,
     /// Partial Withdrawal
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    DelayedNotReported,
 }
 
 #[pyclass(eq, eq_int, from_py_object)]

@@ -1261,6 +1261,10 @@ typedef enum lb_order_status_t {
    * Partial Withdrawal
    */
   OrderStatusPartialWithdrawal,
+  /**
+   * Monitoring (Time-Conditional Order)
+   */
+  OrderStatusDelayedNotReported,
 } lb_order_status_t;
 
 /**

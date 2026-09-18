@@ -5704,6 +5704,11 @@ class OrderStatus:
         PartialWithdrawal
         """
 
+    class DelayedNotReported(OrderStatus):
+        """
+        Monitoring (Time-Conditional Order)
+        """
+
 class OrderTag:
     """
     Order tag
