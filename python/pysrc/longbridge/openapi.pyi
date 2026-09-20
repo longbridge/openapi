@@ -1149,6 +1149,52 @@ class OptionDirection:
         Call
         """
 
+class OptionExpiryCycleType:
+    """
+    Special expiration cycle of an option contract
+    """
+
+    class Unknown(OptionExpiryCycleType):
+        """
+        Unknown
+        """
+
+    class Monthly(OptionExpiryCycleType):
+        """
+        Standard monthly option
+        """
+
+    class Weekly(OptionExpiryCycleType):
+        """
+        Weekly option, expires weekly
+        """
+
+    class Quarterly(OptionExpiryCycleType):
+        """
+        Quarterly option, expires quarterly
+        """
+
+class OptionStandardAttr:
+    """
+    Whether an option contract is a legacy contract left over from a corporate
+    action (e.g. a stock split or a merger)
+    """
+
+    class Unknown(OptionStandardAttr):
+        """
+        Unknown
+        """
+
+    class Normal(OptionStandardAttr):
+        """
+        A normal, active contract
+        """
+
+    class Old(OptionStandardAttr):
+        """
+        A legacy contract produced by a corporate action
+        """
+
 class OptionQuote:
     """
     Quote of option
@@ -1800,29 +1846,48 @@ class Period:
         Yearly
         """
 
-class StrikePriceInfo:
+class OptionChainContract:
     """
-    Strike price info
+    A single option contract of an option chain
+
+    Every contract is an independent entry: calls and puts are not paired, so a
+    strike price that is listed on one side only yields a single entry.
     """
 
-    price: Decimal
+    symbol: str
+    """
+    Option contract code, in `ticker.region` format
+    """
+
+    expiry_date: date
+    """
+    Expiry date, in US Eastern time
+    """
+
+    strike_price: Decimal
     """
     Strike price
     """
 
-    call_symbol: str
+    direction: OptionDirection
     """
-    Security code of call option
-    """
-
-    put_symbol: str
-    """
-    Security code of put option
+    Contract direction
     """
 
-    standard: bool
+    option_type: OptionExpiryCycleType
     """
-    Is standard
+    Special expiration cycle of the contract
+    """
+
+    standard_attr: OptionStandardAttr
+    """
+    Whether the contract is a legacy contract left over from a corporate action
+    """
+
+    days_to_expiry: int
+    """
+    Number of days remaining until the option expires, `0` on the expiry day
+    and negative once expired
     """
 
 class IssuerInfo:
@@ -3483,17 +3548,26 @@ class QuoteContext:
         """
 
     def option_chain_info_by_date(
-        self, symbol: str, expiry_date: date
-    ) -> List[StrikePriceInfo]:
+        self, symbol: str, expiry_date: date, standard_only: bool = False
+    ) -> List[OptionChainContract]:
         """
-        Get option chain info by date
+        Get the option contract list of an underlying security for a given
+        expiry date
+
+        Every contract is an independent entry: calls and puts are not paired,
+        so a strike price that is listed on one side only yields a single
+        entry.
 
         Args:
             symbol: Security code
             expiry_date: Expiry date
+            standard_only: Whether to filter out the legacy contracts produced
+                by corporate actions. `True` returns standard contracts only;
+                `False` returns everything, including the contracts carrying a
+                `standard_attr` of `Old`
 
         Returns:
-            Option chain info
+            Option contract list
 
         Examples:
             ::
@@ -4824,14 +4898,24 @@ class AsyncQuoteContext:
         ...
 
     def option_chain_info_by_date(
-        self, symbol: str, expiry_date: date
-    ) -> Awaitable[List[StrikePriceInfo]]:
+        self, symbol: str, expiry_date: date, standard_only: bool = False
+    ) -> Awaitable[List[OptionChainContract]]:
         """
-        Get option chain info by date. Returns an awaitable that resolves to strike price info list.
+        Get the option contract list of an underlying security for a given
+        expiry date. Returns an awaitable that resolves to the option contract
+        list.
+
+        Every contract is an independent entry: calls and puts are not paired,
+        so a strike price that is listed on one side only yields a single
+        entry.
 
         Args:
             symbol: Security code.
             expiry_date: Expiry date.
+            standard_only: Whether to filter out the legacy contracts produced
+                by corporate actions. `True` returns standard contracts only;
+                `False` returns everything, including the contracts carrying a
+                `standard_attr` of `Old`.
 
         Examples:
             ::

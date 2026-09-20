@@ -24,6 +24,8 @@ cpp_compat = true
 "CTradeStatus" = "lb_trade_status_t"
 "CTradeDirection" = "lb_trade_direction_t"
 "COptionDirection" = "lb_option_direction_t"
+"COptionExpiryCycleType" = "lb_option_expiry_cycle_type_t"
+"COptionStandardAttr" = "lb_option_standard_attr_t"
 "COptionType" = "lb_option_type_t"
 "CWarrantType" = "lb_warrant_type_t"
 "CAdjustType" = "lb_adjust_type_t"
@@ -52,7 +54,7 @@ cpp_compat = true
 "CSecurityBrokers" = "lb_security_brokers_t"
 "CParticipantInfo" = "lb_participant_info_t"
 "CIntradayLine" = "lb_intraday_line_t"
-"CStrikePriceInfo" = "lb_strike_price_info_t"
+"COptionChainContract" = "lb_option_chain_contract_t"
 "CIssuerInfo" = "lb_issuer_info_t"
 "CTradingSessionInfo" = "lb_trading_session_info_t"
 "CMarketTradingSession" = "lb_market_trading_session_t"
@@ -413,7 +415,7 @@ include = [
     "CSecurityBrokers",
     "CParticipantInfo",
     "CIntradayLine",
-    "CStrikePriceInfo",
+    "COptionChainContract",
     "CIssuerInfo",
     "CTradingSessionInfo",
     "CMarketTradingSession",

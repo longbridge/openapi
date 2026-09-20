@@ -1466,6 +1466,37 @@ export declare class OAuth {
   static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
 }
 
+/**
+ * A single option contract of an option chain
+ *
+ * Every contract is an independent entry: calls and puts are not paired, so a
+ * strike price that is listed on one side only yields a single entry.
+ */
+export declare class OptionChainContract {
+  toString(): string
+  toJSON(): any
+  /** Option contract code, in `ticker.region` format */
+  get symbol(): string
+  /** Expiry date, in US Eastern time */
+  get expiryDate(): NaiveDate
+  /** Strike price */
+  get strikePrice(): Decimal
+  /** Contract direction */
+  get direction(): OptionDirection
+  /** Special expiration cycle of the contract */
+  get optionType(): OptionExpiryCycleType
+  /**
+   * Whether the contract is a legacy contract left over from a corporate
+   * action
+   */
+  get standardAttr(): OptionStandardAttr
+  /**
+   * Number of days remaining until the option expires, `0` on the expiry
+   * day and negative once expired
+   */
+  get daysToExpiry(): number
+}
+
 /** Quote of option */
 export declare class OptionQuote {
   toString(): string
@@ -2345,7 +2376,16 @@ export declare class QuoteContext {
    */
   optionChainExpiryDateList(symbol: string): Promise<Array<NaiveDate>>
   /**
-   * Get option chain info by date
+   * Get the option contract list of an underlying security for a given
+   * expiry date
+   *
+   * Every contract is an independent entry: calls and puts are not paired,
+   * so a strike price that is listed on one side only yields a single entry.
+   *
+   * `standardOnly` filters out the legacy contracts produced by corporate
+   * actions. `true` returns standard contracts only; omitted or `false`
+   * returns everything, including the contracts carrying a `standardAttr`
+   * of `Old`.
    *
    * #### Example
    *
@@ -2360,7 +2400,7 @@ export declare class QuoteContext {
    * }
    * ```
    */
-  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate): Promise<Array<StrikePriceInfo>>
+  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate, standardOnly?: boolean | undefined | null): Promise<Array<OptionChainContract>>
   /**
    * Get warrant issuers
    *
@@ -3030,20 +3070,6 @@ export declare class StockPositionsResponse {
   toJSON(): any
   /** Channels */
   get channels(): Array<StockPositionChannel>
-}
-
-/** Strike price info */
-export declare class StrikePriceInfo {
-  toString(): string
-  toJSON(): any
-  /** Strike price */
-  get price(): Decimal
-  /** Security code of call option */
-  get callSymbol(): string
-  /** Security code of put option */
-  get putSymbol(): string
-  /** Is standard */
-  get standard(): boolean
 }
 
 /** Response for submit grid trading order request */
@@ -6160,6 +6186,31 @@ export declare const enum OptionDirection {
   Put = 1,
   /** Call */
   Call = 2
+}
+
+/** Special expiration cycle of an option contract */
+export declare const enum OptionExpiryCycleType {
+  /** Unknown */
+  Unknown = 0,
+  /** Standard monthly option */
+  Monthly = 1,
+  /** Weekly option, expires weekly */
+  Weekly = 2,
+  /** Quarterly option, expires quarterly */
+  Quarterly = 3
+}
+
+/**
+ * Whether an option contract is a legacy contract left over from a corporate
+ * action (e.g. a stock split or a merger)
+ */
+export declare const enum OptionStandardAttr {
+  /** Unknown */
+  Unknown = 0,
+  /** A normal, active contract */
+  Normal = 1,
+  /** A legacy contract produced by a corporate action */
+  Old = 2
 }
 
 /** Option type */

@@ -129,6 +129,18 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longbridge/quote/OptionExpiryCycleType",
+    longbridge::quote::OptionExpiryCycleType,
+    [Unknown, Monthly, Weekly, Quarterly]
+);
+
+impl_java_enum!(
+    "com/longbridge/quote/OptionStandardAttr",
+    longbridge::quote::OptionStandardAttr,
+    [Unknown, Normal, Old]
+);
+
+impl_java_enum!(
     "com/longbridge/quote/WarrantType",
     longbridge::quote::WarrantType,
     [Unknown, Call, Put, Bull, Bear, Inline]

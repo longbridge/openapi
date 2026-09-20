@@ -112,6 +112,44 @@ pub enum COptionDirection {
     OptionDirectionCall,
 }
 
+/// Special expiration cycle of an option contract
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::quote::OptionExpiryCycleType")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum COptionExpiryCycleType {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    OptionExpiryCycleTypeUnknown,
+    /// Standard monthly option
+    #[c(remote = "Monthly")]
+    OptionExpiryCycleTypeMonthly,
+    /// Weekly option, expires weekly
+    #[c(remote = "Weekly")]
+    OptionExpiryCycleTypeWeekly,
+    /// Quarterly option, expires quarterly
+    #[c(remote = "Quarterly")]
+    OptionExpiryCycleTypeQuarterly,
+}
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::quote::OptionStandardAttr")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum COptionStandardAttr {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    OptionStandardAttrUnknown,
+    /// A normal, active contract
+    #[c(remote = "Normal")]
+    OptionStandardAttrNormal,
+    /// A legacy contract produced by a corporate action
+    #[c(remote = "Old")]
+    OptionStandardAttrOld,
+}
+
 /// Warrant type
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::quote::WarrantType")]
