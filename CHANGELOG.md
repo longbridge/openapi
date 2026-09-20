@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **All SDKs:** `OrderStatus` gains a `DelayedNotReported` variant (wire value `DelayedNotReported`) — "monitoring", the state a time-conditional order sits in before it is reported to the exchange. Previously this status deserialized to `OrderStatus::Unknown`, so time-conditional orders being monitored were indistinguishable from a genuinely unrecognized status in `today_orders` / `history_orders` / `order_detail` and the order-changed push. The variant is appended **after** `PartialWithdrawal` rather than inserted next to the other `*NotReported` values on purpose: the C/C++/Node.js enums use implicit discriminants, and inserting mid-list would renumber every following value (an ABI break for the C/C++ bindings, and a silent mismatch for TypeScript code that inlined the old `const enum` values)
+
 ## [5.0.0] - 2026-09-14
 
 ### Changed

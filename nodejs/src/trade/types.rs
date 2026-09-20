@@ -74,6 +74,8 @@ pub enum OrderStatus {
     Expired,
     /// Partial Withdrawal
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    DelayedNotReported,
 }
 
 #[napi_derive::napi]

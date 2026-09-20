@@ -40,4 +40,6 @@ public enum OrderStatus {
     Expired,
     /** Partial withdrawal */
     PartialWithdrawal,
+    /** Monitoring (time-conditional order) */
+    DelayedNotReported,
 }

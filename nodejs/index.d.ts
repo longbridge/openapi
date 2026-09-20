@@ -6282,7 +6282,9 @@ export declare const enum OrderStatus {
   /** Expired */
   Expired = 16,
   /** Partial Withdrawal */
-  PartialWithdrawal = 17
+  PartialWithdrawal = 17,
+  /** Monitoring (Time-Conditional Order) */
+  DelayedNotReported = 18
 }
 
 /** Order tag */

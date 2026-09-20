@@ -1088,6 +1088,8 @@ convert(lb_order_status_t status)
       return OrderStatus::Expired;
     case OrderStatusPartialWithdrawal:
       return OrderStatus::PartialWithdrawal;
+    case OrderStatusDelayedNotReported:
+      return OrderStatus::DelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1133,6 +1135,8 @@ convert(OrderStatus status)
       return OrderStatusExpired;
     case OrderStatus::PartialWithdrawal:
       return OrderStatusPartialWithdrawal;
+    case OrderStatus::DelayedNotReported:
+      return OrderStatusDelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }

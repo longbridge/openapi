@@ -1516,6 +1516,8 @@ enum class OrderStatus
   Expired,
   /// Partial Withdrawal
   PartialWithdrawal,
+  /// Monitoring (Time-Conditional Order)
+  DelayedNotReported,
 };
 
 /// Order type
