@@ -1,18 +1,18 @@
 var searchData=
 [
-  ['tendaychangerate_3699',['TenDayChangeRate',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a093b586f5f75ad868b2c9cfe61b61ff2',1,'longbridge::quote']]],
-  ['theta_3700',['Theta',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011ad21c855a168b8f09d1ebb1bc596be927',1,'longbridge::quote']]],
-  ['thinkingfinished_3701',['ThinkingFinished',['../namespacelongbridge_1_1agent.html#af8b8c0e13c2fc57234fa94dc3adff7c6ad76660d027e30a5348483a419ea9c169',1,'longbridge::agent']]],
-  ['thinkingstarted_3702',['ThinkingStarted',['../namespacelongbridge_1_1agent.html#af8b8c0e13c2fc57234fa94dc3adff7c6a7563ed2a0791a7dde26d0ff96c3016c1',1,'longbridge::agent']]],
-  ['third_3703',['Third',['../namespacelongbridge_1_1trade.html#ad18383294f9b6800a1f1ad43ba89e23fa168909c0b6f1dfbd48f679d47059c1d6',1,'longbridge::trade']]],
-  ['tobeopened_3704',['ToBeOpened',['../namespacelongbridge_1_1quote.html#a568e35ea1390b41113035045900c232aac55b12a0d9abac44f550710b581de30f',1,'longbridge::quote']]],
-  ['tocallprice_3705',['ToCallPrice',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a9c7d965950f5139ec76d37b834730243',1,'longbridge::quote::ToCallPrice()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a9c7d965950f5139ec76d37b834730243',1,'longbridge::quote::ToCallPrice()']]],
-  ['todaytrend_3706',['TodayTrend',['../namespacelongbridge_1_1fundamental.html#ad41a7b175d14839458db23cfaa3b7811a24a2d1f375395ad547927da6d0b51814',1,'longbridge::fundamental']]],
-  ['totalmarketvalue_3707',['TotalMarketValue',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011aa0621778fd755a0f5d8306b6d2e9d465',1,'longbridge::quote']]],
-  ['tslpamt_3708',['TSLPAMT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa0e001ef336c6a434ea097d1f7ea18623',1,'longbridge::trade']]],
-  ['tslppct_3709',['TSLPPCT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aadf385743f8b7cf42fb42d7096a3dd669',1,'longbridge::trade']]],
-  ['tsmamt_3710',['TSMAMT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aaa601b3c15ca69570477e6c310ff44345',1,'longbridge::trade']]],
-  ['tsmpct_3711',['TSMPCT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aaf0515c26b3431cb9235c0cde082aa2e7',1,'longbridge::trade']]],
-  ['turnover_3712',['Turnover',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011af0da7d56118485f19220a9d4997b51b8',1,'longbridge::quote::Turnover()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7af0da7d56118485f19220a9d4997b51b8',1,'longbridge::quote::Turnover()']]],
-  ['turnoverrate_3713',['TurnoverRate',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011ac2e459221965c51fbe8ede5acd43e2a3',1,'longbridge::quote']]]
+  ['tendaychangerate_3707',['TenDayChangeRate',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a093b586f5f75ad868b2c9cfe61b61ff2',1,'longbridge::quote']]],
+  ['theta_3708',['Theta',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011ad21c855a168b8f09d1ebb1bc596be927',1,'longbridge::quote']]],
+  ['thinkingfinished_3709',['ThinkingFinished',['../namespacelongbridge_1_1agent.html#af8b8c0e13c2fc57234fa94dc3adff7c6ad76660d027e30a5348483a419ea9c169',1,'longbridge::agent']]],
+  ['thinkingstarted_3710',['ThinkingStarted',['../namespacelongbridge_1_1agent.html#af8b8c0e13c2fc57234fa94dc3adff7c6a7563ed2a0791a7dde26d0ff96c3016c1',1,'longbridge::agent']]],
+  ['third_3711',['Third',['../namespacelongbridge_1_1trade.html#ad18383294f9b6800a1f1ad43ba89e23fa168909c0b6f1dfbd48f679d47059c1d6',1,'longbridge::trade']]],
+  ['tobeopened_3712',['ToBeOpened',['../namespacelongbridge_1_1quote.html#a568e35ea1390b41113035045900c232aac55b12a0d9abac44f550710b581de30f',1,'longbridge::quote']]],
+  ['tocallprice_3713',['ToCallPrice',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a9c7d965950f5139ec76d37b834730243',1,'longbridge::quote::ToCallPrice()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7a9c7d965950f5139ec76d37b834730243',1,'longbridge::quote::ToCallPrice()']]],
+  ['todaytrend_3714',['TodayTrend',['../namespacelongbridge_1_1fundamental.html#ad41a7b175d14839458db23cfaa3b7811a24a2d1f375395ad547927da6d0b51814',1,'longbridge::fundamental']]],
+  ['totalmarketvalue_3715',['TotalMarketValue',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011aa0621778fd755a0f5d8306b6d2e9d465',1,'longbridge::quote']]],
+  ['tslpamt_3716',['TSLPAMT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa0e001ef336c6a434ea097d1f7ea18623',1,'longbridge::trade']]],
+  ['tslppct_3717',['TSLPPCT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aadf385743f8b7cf42fb42d7096a3dd669',1,'longbridge::trade']]],
+  ['tsmamt_3718',['TSMAMT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aaa601b3c15ca69570477e6c310ff44345',1,'longbridge::trade']]],
+  ['tsmpct_3719',['TSMPCT',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aaf0515c26b3431cb9235c0cde082aa2e7',1,'longbridge::trade']]],
+  ['turnover_3720',['Turnover',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011af0da7d56118485f19220a9d4997b51b8',1,'longbridge::quote::Turnover()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7af0da7d56118485f19220a9d4997b51b8',1,'longbridge::quote::Turnover()']]],
+  ['turnoverrate_3721',['TurnoverRate',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011ac2e459221965c51fbe8ede5acd43e2a3',1,'longbridge::quote']]]
 ];

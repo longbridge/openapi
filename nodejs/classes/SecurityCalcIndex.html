@@ -414,7 +414,8 @@
 <li>
 <div class="tsd-signature" id="deltadelta"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">delta</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Delta</p>
+<div class="tsd-comment tsd-typography"><p>Delta. Measures the expected change in option price for a $1 move in the
+underlying asset price.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></h4></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -423,7 +424,8 @@
 <li>
 <div class="tsd-signature" id="gammagamma"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">gamma</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Gamma</p>
+<div class="tsd-comment tsd-typography"><p>Gamma. Measures the expected change in Delta for a $1 move in the
+underlying asset price.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></h4></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -432,10 +434,9 @@
 <li>
 <div class="tsd-signature" id="thetatheta"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">theta</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Theta</p>
-<p>The raw value returned by the API is annualized (scaled by 252 trading
-days per year). To obtain the standard per-calendar-day theta, divide
-by 252: <code>theta / 252</code>.</p>
+<div class="tsd-comment tsd-typography"><p>Theta. Measures the expected change in option price as one day passes;
+the raw value has been divided by 365 to convert to a daily value,
+representing the impact of one day's time decay on the option price.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></h4></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -444,11 +445,9 @@ by 252: <code>theta / 252</code>.</p>
 <li>
 <div class="tsd-signature" id="vegavega"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">vega</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Vega</p>
-<p>The raw value returned by the API is expressed per 1 percentage-point
-change in implied volatility (i.e. the value has been multiplied by
-100). To obtain the standard vega (per unit change in IV), divide by
-100: <code>vega / 100</code>.</p>
+<div class="tsd-comment tsd-typography"><p>Vega. Measures the expected change in option price when implied
+volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+get the expected price change per 1% move in IV.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></h4></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -457,11 +456,9 @@ change in implied volatility (i.e. the value has been multiplied by
 <li>
 <div class="tsd-signature" id="rhorho"><span class="tsd-signature-keyword">get</span> <span class="tsd-kind-get-signature">rho</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></div>
 <div class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Rho</p>
-<p>The raw value returned by the API is expressed per 1 percentage-point
-change in the risk-free rate (i.e. the value has been multiplied by
-100). To obtain the standard rho (per unit change in rate), divide by
-100: <code>rho / 100</code>.</p>
+<div class="tsd-comment tsd-typography"><p>Rho. Measures the expected change in option price when the risk-free
+interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+the expected price change per 1% move in the interest rate.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <a href="Decimal.html" class="tsd-signature-type tsd-kind-class">Decimal</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">null</span></h4></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>

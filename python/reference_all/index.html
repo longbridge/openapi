@@ -430,6 +430,28 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OptionExpiryCycleType">OptionExpiryCycleType</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionExpiryCycleType.Unknown">Unknown</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionExpiryCycleType.Monthly">Monthly</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionExpiryCycleType.Weekly">Weekly</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionExpiryCycleType.Quarterly">Quarterly</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OptionStandardAttr">OptionStandardAttr</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionStandardAttr.Unknown">Unknown</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionStandardAttr.Normal">Normal</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionStandardAttr.Old">Old</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OptionQuote">OptionQuote</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionQuote.symbol">symbol</a>
@@ -708,15 +730,21 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.StrikePriceInfo">StrikePriceInfo</a>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OptionChainContract">OptionChainContract</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.StrikePriceInfo.price">price</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionChainContract.symbol">symbol</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.StrikePriceInfo.call_symbol">call_symbol</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionChainContract.expiry_date">expiry_date</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.StrikePriceInfo.put_symbol">put_symbol</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionChainContract.strike_price">strike_price</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.StrikePriceInfo.standard">standard</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionChainContract.direction">direction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionChainContract.option_type">option_type</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionChainContract.standard_attr">standard_attr</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OptionChainContract.days_to_expiry">days_to_expiry</a>
     </li>
         </ul>
     </li>
@@ -1799,6 +1827,10 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MultiLegStrategy.Straddle">Straddle</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MultiLegStrategy.Strangle">Strangle</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MultiLegStrategy.CalendarCallSpread">CalendarCallSpread</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.MultiLegStrategy.CalendarPutSpread">CalendarPutSpread</a>
     </li>
         </ul>
     </li>
@@ -13933,6 +13965,435 @@ days from now).</p>
 
 
 
+<h2 id="longbridge.openapi.OptionExpiryCycleType" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OptionExpiryCycleType</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Special expiration cycle of an option contract</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OptionExpiryCycleType.Unknown" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Unknown</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OptionExpiryCycleType (longbridge.openapi.OptionExpiryCycleType)" href="#longbridge.openapi.OptionExpiryCycleType">OptionExpiryCycleType</a></code></p>
+
+
+
+        <p>Unknown</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OptionExpiryCycleType.Monthly" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Monthly</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OptionExpiryCycleType (longbridge.openapi.OptionExpiryCycleType)" href="#longbridge.openapi.OptionExpiryCycleType">OptionExpiryCycleType</a></code></p>
+
+
+
+        <p>Standard monthly option</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OptionExpiryCycleType.Weekly" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Weekly</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OptionExpiryCycleType (longbridge.openapi.OptionExpiryCycleType)" href="#longbridge.openapi.OptionExpiryCycleType">OptionExpiryCycleType</a></code></p>
+
+
+
+        <p>Weekly option, expires weekly</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OptionExpiryCycleType.Quarterly" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Quarterly</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OptionExpiryCycleType (longbridge.openapi.OptionExpiryCycleType)" href="#longbridge.openapi.OptionExpiryCycleType">OptionExpiryCycleType</a></code></p>
+
+
+
+        <p>Quarterly option, expires quarterly</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.OptionStandardAttr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OptionStandardAttr</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Whether an option contract is a legacy contract left over from a corporate
+action (e.g. a stock split or a merger)</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OptionStandardAttr.Unknown" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Unknown</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OptionStandardAttr (longbridge.openapi.OptionStandardAttr)" href="#longbridge.openapi.OptionStandardAttr">OptionStandardAttr</a></code></p>
+
+
+
+        <p>Unknown</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OptionStandardAttr.Normal" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Normal</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OptionStandardAttr (longbridge.openapi.OptionStandardAttr)" href="#longbridge.openapi.OptionStandardAttr">OptionStandardAttr</a></code></p>
+
+
+
+        <p>A normal, active contract</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OptionStandardAttr.Old" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Old</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OptionStandardAttr (longbridge.openapi.OptionStandardAttr)" href="#longbridge.openapi.OptionStandardAttr">OptionStandardAttr</a></code></p>
+
+
+
+        <p>A legacy contract produced by a corporate action</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="longbridge.openapi.OptionQuote" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">OptionQuote</span>
 
@@ -18011,8 +18472,8 @@ days from now).</p>
 
 
 
-<h2 id="longbridge.openapi.StrikePriceInfo" class="doc doc-heading">
-            <span class="doc doc-object-name doc-class-name">StrikePriceInfo</span>
+<h2 id="longbridge.openapi.OptionChainContract" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OptionChainContract</span>
 
 
 </h2>
@@ -18022,7 +18483,9 @@ days from now).</p>
 
 
 
-        <p>Strike price info</p>
+        <p>A single option contract of an option chain</p>
+<p>Every contract is an independent entry: calls and puts are not paired, so a
+strike price that is listed on one side only yields a single entry.</p>
 
 
 
@@ -18045,8 +18508,8 @@ days from now).</p>
 
 
 
-<h3 id="longbridge.openapi.StrikePriceInfo.price" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">price</span>
+<h3 id="longbridge.openapi.OptionChainContract.symbol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">symbol</span>
 
 
   <span class="doc doc-labels">
@@ -18054,7 +18517,53 @@ days from now).</p>
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">price: Decimal</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Option contract code, in <code>ticker.region</code> format</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OptionChainContract.expiry_date" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">expiry_date</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">expiry_date: date</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Expiry date, in US Eastern time</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OptionChainContract.strike_price" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">strike_price</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">strike_price: Decimal</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -18068,8 +18577,8 @@ days from now).</p>
 
 
 
-<h3 id="longbridge.openapi.StrikePriceInfo.call_symbol" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">call_symbol</span>
+<h3 id="longbridge.openapi.OptionChainContract.direction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">direction</span>
 
 
   <span class="doc doc-labels">
@@ -18077,11 +18586,11 @@ days from now).</p>
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">call_symbol: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">direction: OptionDirection</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Security code of call option</p>
+        <p>Contract direction</p>
 
     </div>
 
@@ -18091,8 +18600,8 @@ days from now).</p>
 
 
 
-<h3 id="longbridge.openapi.StrikePriceInfo.put_symbol" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">put_symbol</span>
+<h3 id="longbridge.openapi.OptionChainContract.option_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">option_type</span>
 
 
   <span class="doc doc-labels">
@@ -18100,11 +18609,11 @@ days from now).</p>
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">put_symbol: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">option_type: OptionExpiryCycleType</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Security code of put option</p>
+        <p>Special expiration cycle of the contract</p>
 
     </div>
 
@@ -18114,8 +18623,8 @@ days from now).</p>
 
 
 
-<h3 id="longbridge.openapi.StrikePriceInfo.standard" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">standard</span>
+<h3 id="longbridge.openapi.OptionChainContract.standard_attr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">standard_attr</span>
 
 
   <span class="doc doc-labels">
@@ -18123,11 +18632,35 @@ days from now).</p>
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">standard: bool</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">standard_attr: OptionStandardAttr</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Is standard</p>
+        <p>Whether the contract is a legacy contract left over from a corporate action</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OptionChainContract.days_to_expiry" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">days_to_expiry</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">days_to_expiry: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Number of days remaining until the option expires, <code>0</code> on the expiry day
+and negative once expired</p>
 
     </div>
 
@@ -25201,7 +25734,8 @@ this warrant</p>
 
     <div class="doc doc-contents ">
 
-        <p>Delta</p>
+        <p>Delta. Measures the expected change in option price for a $1 move in the
+underlying asset price.</p>
 
     </div>
 
@@ -25224,7 +25758,8 @@ this warrant</p>
 
     <div class="doc doc-contents ">
 
-        <p>Gamma</p>
+        <p>Gamma. Measures the expected change in Delta for a $1 move in the
+underlying asset price.</p>
 
     </div>
 
@@ -25247,7 +25782,9 @@ this warrant</p>
 
     <div class="doc doc-contents ">
 
-        <p>Theta</p>
+        <p>Theta. Measures the expected change in option price as one day passes; the
+raw value has been divided by 365 to convert to a daily value, representing
+the impact of one day's time decay on the option price.</p>
 
     </div>
 
@@ -25270,7 +25807,9 @@ this warrant</p>
 
     <div class="doc doc-contents ">
 
-        <p>Vega</p>
+        <p>Vega. Measures the expected change in option price when implied volatility
+(IV) moves by 1 (i.e. 100%); divide the raw value by 100 to get the expected
+price change per 1% move in IV.</p>
 
     </div>
 
@@ -25293,7 +25832,9 @@ this warrant</p>
 
     <div class="doc doc-contents ">
 
-        <p>Rho</p>
+        <p>Rho. Measures the expected change in option price when the risk-free
+interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get the
+expected price change per 1% move in the interest rate.</p>
 
     </div>
 
@@ -27913,11 +28454,15 @@ print(resp)</code></pre>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">option_chain_info_by_date(symbol: str, expiry_date: date) -&gt; List[StrikePriceInfo]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">option_chain_info_by_date(symbol: str, expiry_date: date, standard_only: bool = False) -&gt; List[OptionChainContract]</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Get option chain info by date</p>
+        <p>Get the option contract list of an underlying security for a given
+expiry date</p>
+<p>Every contract is an independent entry: calls and puts are not paired,
+so a strike price that is listed on one side only yields a single
+entry.</p>
 
 
 <table class="field-list">
@@ -27946,6 +28491,19 @@ print(resp)</code></pre>
                 <p>Expiry date</p>
               </div>
             </li>
+            <li>
+              <b><code>standard_only</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to filter out the legacy contracts produced
+by corporate actions. <code>True</code> returns standard contracts only;
+<code>False</code> returns everything, including the contracts carrying a
+<code>standard_attr</code> of <code>Old</code></p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -27963,10 +28521,10 @@ print(resp)</code></pre>
       <td class="field-body">
         <ul class="first simple">
             <li>
-                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-internal" title="StrikePriceInfo (longbridge.openapi.StrikePriceInfo)" href="#longbridge.openapi.StrikePriceInfo">StrikePriceInfo</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-internal" title="OptionChainContract (longbridge.openapi.OptionChainContract)" href="#longbridge.openapi.OptionChainContract">OptionChainContract</a>]</code>
               –
               <div class="doc-md-description">
-                <p>Option chain info</p>
+                <p>Option contract list</p>
               </div>
             </li>
         </ul>
@@ -31698,11 +32256,16 @@ asyncio.run(main())</code></pre>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">option_chain_info_by_date(symbol: str, expiry_date: date) -&gt; Awaitable[List[StrikePriceInfo]]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">option_chain_info_by_date(symbol: str, expiry_date: date, standard_only: bool = False) -&gt; Awaitable[List[OptionChainContract]]</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Get option chain info by date. Returns an awaitable that resolves to strike price info list.</p>
+        <p>Get the option contract list of an underlying security for a given
+expiry date. Returns an awaitable that resolves to the option contract
+list.</p>
+<p>Every contract is an independent entry: calls and puts are not paired,
+so a strike price that is listed on one side only yields a single
+entry.</p>
 
 
 <table class="field-list">
@@ -31729,6 +32292,19 @@ asyncio.run(main())</code></pre>
               –
               <div class="doc-md-description">
                 <p>Expiry date.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>standard_only</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to filter out the legacy contracts produced
+by corporate actions. <code>True</code> returns standard contracts only;
+<code>False</code> returns everything, including the contracts carrying a
+<code>standard_attr</code> of <code>Old</code>.</p>
               </div>
             </li>
         </ul>
@@ -38860,6 +39436,102 @@ combination orders)</p>
 
 
         <p>Strangle</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.MultiLegStrategy.CalendarCallSpread" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">CalendarCallSpread</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="MultiLegStrategy (longbridge.openapi.MultiLegStrategy)" href="#longbridge.openapi.MultiLegStrategy">MultiLegStrategy</a></code></p>
+
+
+
+        <p>Calendar call spread</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.MultiLegStrategy.CalendarPutSpread" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">CalendarPutSpread</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="MultiLegStrategy (longbridge.openapi.MultiLegStrategy)" href="#longbridge.openapi.MultiLegStrategy">MultiLegStrategy</a></code></p>
+
+
+
+        <p>Calendar put spread</p>
 
 
 

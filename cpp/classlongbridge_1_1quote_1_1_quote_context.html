@@ -168,9 +168,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a39c967d93c9435deea550956bc668bdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a39c967d93c9435deea550956bc668bdb">option_chain_expiry_date_list</a> (const std::string &amp;symbol, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1_date.html">Date</a> &gt;&gt; callback) const</td></tr>
 <tr class="memdesc:a39c967d93c9435deea550956bc668bdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get option chain expiry date list.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#a39c967d93c9435deea550956bc668bdb">More...</a><br /></td></tr>
 <tr class="separator:a39c967d93c9435deea550956bc668bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d8df470c1324ce2407265cdc99df2a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a9d8df470c1324ce2407265cdc99df2a5">option_chain_info_by_date</a> (const std::string &amp;symbol, <a class="el" href="structlongbridge_1_1_date.html">Date</a> expiry_date, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_strike_price_info.html">StrikePriceInfo</a> &gt;&gt; callback) const</td></tr>
-<tr class="memdesc:a9d8df470c1324ce2407265cdc99df2a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get option chain expiry date list.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#a9d8df470c1324ce2407265cdc99df2a5">More...</a><br /></td></tr>
-<tr class="separator:a9d8df470c1324ce2407265cdc99df2a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7161927ab6bfefb3522f1bc4896c0e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#ad7161927ab6bfefb3522f1bc4896c0e5">option_chain_info_by_date</a> (const std::string &amp;symbol, <a class="el" href="structlongbridge_1_1_date.html">Date</a> expiry_date, bool standard_only, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_option_chain_contract.html">OptionChainContract</a> &gt;&gt; callback) const</td></tr>
+<tr class="separator:ad7161927ab6bfefb3522f1bc4896c0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90965318b95a15869f50760339b8a71c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html#a90965318b95a15869f50760339b8a71c">warrant_issuers</a> (<a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_issuer_info.html">IssuerInfo</a> &gt;&gt; callback) const</td></tr>
 <tr class="memdesc:a90965318b95a15869f50760339b8a71c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get warrant issuers.  <a href="classlongbridge_1_1quote_1_1_quote_context.html#a90965318b95a15869f50760339b8a71c">More...</a><br /></td></tr>
 <tr class="separator:a90965318b95a15869f50760339b8a71c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -975,8 +974,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a9d8df470c1324ce2407265cdc99df2a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d8df470c1324ce2407265cdc99df2a5">&#9670;&nbsp;</a></span>option_chain_info_by_date()</h2>
+<a id="ad7161927ab6bfefb3522f1bc4896c0e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7161927ab6bfefb3522f1bc4896c0e5">&#9670;&nbsp;</a></span>option_chain_info_by_date()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -996,7 +995,13 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_strike_price_info.html">StrikePriceInfo</a> &gt;&gt;&#160;</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>standard_only</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1quote_1_1_quote_context.html">QuoteContext</a>, std::vector&lt; <a class="el" href="structlongbridge_1_1quote_1_1_option_chain_contract.html">OptionChainContract</a> &gt;&gt;&#160;</td>
           <td class="paramname"><em>callback</em>&#160;</td>
         </tr>
         <tr>
@@ -1006,8 +1011,9 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Get option chain expiry date list. </p>
+<p>Get the option contract list of an underlying security for a given expiry date</p>
+<p>Every contract is an independent entry: calls and puts are not paired, so a strike price that is listed on one side only yields a single entry.</p>
+<p><code>standard_only</code> filters out the legacy contracts produced by corporate actions. <code>true</code> returns standard contracts only; <code>false</code> returns everything, including the contracts carrying <code><a class="el" href="namespacelongbridge_1_1quote.html#a8a81f60c339e461e83b55a0670b7131dac7268757fbabf48019f4984933539d8a" title="A legacy contract produced by a corporate action.">OptionStandardAttr::Old</a></code>. </p>
 
 </div>
 </div>

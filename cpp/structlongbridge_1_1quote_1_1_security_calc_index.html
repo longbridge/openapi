@@ -189,19 +189,14 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a25e6d6ad263f650d96576842beb50d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open interest.  <a href="structlongbridge_1_1quote_1_1_security_calc_index.html#a25e6d6ad263f650d96576842beb50d13">More...</a><br /></td></tr>
 <tr class="separator:a25e6d6ad263f650d96576842beb50d13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70ca038b6aa2eef3f6b2a7d3fc406e7d"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#a70ca038b6aa2eef3f6b2a7d3fc406e7d">delta</a></td></tr>
-<tr class="memdesc:a70ca038b6aa2eef3f6b2a7d3fc406e7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delta.  <a href="structlongbridge_1_1quote_1_1_security_calc_index.html#a70ca038b6aa2eef3f6b2a7d3fc406e7d">More...</a><br /></td></tr>
 <tr class="separator:a70ca038b6aa2eef3f6b2a7d3fc406e7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc7481d5a3dc4723601e5a05679a61d6"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#adc7481d5a3dc4723601e5a05679a61d6">gamma</a></td></tr>
-<tr class="memdesc:adc7481d5a3dc4723601e5a05679a61d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gamma.  <a href="structlongbridge_1_1quote_1_1_security_calc_index.html#adc7481d5a3dc4723601e5a05679a61d6">More...</a><br /></td></tr>
 <tr class="separator:adc7481d5a3dc4723601e5a05679a61d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1486afdd9899f5ae14e773e155c5075f"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#a1486afdd9899f5ae14e773e155c5075f">theta</a></td></tr>
-<tr class="memdesc:a1486afdd9899f5ae14e773e155c5075f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Theta.  <a href="structlongbridge_1_1quote_1_1_security_calc_index.html#a1486afdd9899f5ae14e773e155c5075f">More...</a><br /></td></tr>
 <tr class="separator:a1486afdd9899f5ae14e773e155c5075f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a814f084024120d3809814c289f582b15"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#a814f084024120d3809814c289f582b15">vega</a></td></tr>
-<tr class="memdesc:a814f084024120d3809814c289f582b15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vega.  <a href="structlongbridge_1_1quote_1_1_security_calc_index.html#a814f084024120d3809814c289f582b15">More...</a><br /></td></tr>
 <tr class="separator:a814f084024120d3809814c289f582b15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4748924f9f2257288abd1ddcaa064c7"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#ad4748924f9f2257288abd1ddcaa064c7">rho</a></td></tr>
-<tr class="memdesc:ad4748924f9f2257288abd1ddcaa064c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rho.  <a href="structlongbridge_1_1quote_1_1_security_calc_index.html#ad4748924f9f2257288abd1ddcaa064c7">More...</a><br /></td></tr>
 <tr class="separator:ad4748924f9f2257288abd1ddcaa064c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -330,8 +325,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Delta. </p>
+<p>Delta. Measures the expected change in option price for a $1 move in the underlying asset price. </p>
 
 </div>
 </div>
@@ -426,8 +420,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Gamma. </p>
+<p>Gamma. Measures the expected change in Delta for a $1 move in the underlying asset price. </p>
 
 </div>
 </div>
@@ -634,8 +627,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Rho. </p>
+<p>Rho. Measures the expected change in option price when the risk-free interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get the expected price change per 1% move in the interest rate. </p>
 
 </div>
 </div>
@@ -698,8 +690,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Theta. </p>
+<p>Theta. Measures the expected change in option price as one day passes; the raw value has been divided by 365 to convert to a daily value, representing the impact of one day's time decay on the option price. </p>
 
 </div>
 </div>
@@ -794,8 +785,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Vega. </p>
+<p>Vega. Measures the expected change in option price when implied volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to get the expected price change per 1% move in IV. </p>
 
 </div>
 </div>

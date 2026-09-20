@@ -152,8 +152,7 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_intraday_line.html">longbridge::quote::IntradayLine</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intraday line.  <a href="structlongbridge_1_1quote_1_1_intraday_line.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_strike_price_info.html">longbridge::quote::StrikePriceInfo</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strike price info.  <a href="structlongbridge_1_1quote_1_1_strike_price_info.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_option_chain_contract.html">longbridge::quote::OptionChainContract</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1quote_1_1_issuer_info.html">longbridge::quote::IssuerInfo</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issuer info.  <a href="structlongbridge_1_1quote_1_1_issuer_info.html#details">More...</a><br /></td></tr>
@@ -1021,6 +1020,18 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a28faabaed78f34816fcf30a3a5835fdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Option direction.  <a href="namespacelongbridge_1_1quote.html#a28faabaed78f34816fcf30a3a5835fdb">More...</a><br /></td></tr>
 <tr class="separator:a28faabaed78f34816fcf30a3a5835fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad406dfd85fda2d4038cc731a3d3f9768"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1quote.html#ad406dfd85fda2d4038cc731a3d3f9768">longbridge::quote::OptionExpiryCycleType</a> { <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::quote::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a9030e39f00132d583da4122532e509e9">longbridge::quote::Monthly</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a6c25e6a6da95b3d583c6ec4c3f82ed4d">longbridge::quote::Weekly</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ad406dfd85fda2d4038cc731a3d3f9768abe92c62702dcec6751c101b5adb0ce3b">longbridge::quote::Quarterly</a>
+ }</td></tr>
+<tr class="memdesc:ad406dfd85fda2d4038cc731a3d3f9768"><td class="mdescLeft">&#160;</td><td class="mdescRight">Special expiration cycle of an option contract.  <a href="namespacelongbridge_1_1quote.html#ad406dfd85fda2d4038cc731a3d3f9768">More...</a><br /></td></tr>
+<tr class="separator:ad406dfd85fda2d4038cc731a3d3f9768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a81f60c339e461e83b55a0670b7131d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1quote.html#a8a81f60c339e461e83b55a0670b7131d">longbridge::quote::OptionStandardAttr</a> { <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::quote::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#a8a81f60c339e461e83b55a0670b7131da960b44c579bc2f6818d2daaf9e4c16f0">longbridge::quote::Normal</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#a8a81f60c339e461e83b55a0670b7131dac7268757fbabf48019f4984933539d8a">longbridge::quote::Old</a>
+ }</td></tr>
+<tr class="separator:a8a81f60c339e461e83b55a0670b7131d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa355880c75bee41851d27b6e2c55fed2"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge_1_1quote.html#aa355880c75bee41851d27b6e2c55fed2">longbridge::quote::TradeDirection</a> { <a class="el" href="namespacelongbridge_1_1quote.html#aa355880c75bee41851d27b6e2c55fed2ae9bb5320b3890b6747c91b5a71ae5a01">longbridge::quote::Neutral</a>
 , <a class="el" href="namespacelongbridge_1_1quote.html#aa355880c75bee41851d27b6e2c55fed2a08a38277b0309070706f6652eeae9a53">longbridge::quote::Down</a>
 , <a class="el" href="namespacelongbridge_1_1quote.html#aa355880c75bee41851d27b6e2c55fed2a258f49887ef8d14ac268c92b02503aaa">longbridge::quote::Up</a>
@@ -1178,10 +1189,15 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::quote::Unknown</a>
 , <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::quote::Unknown</a>
 , <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::quote::Unknown</a>
-, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0ae9cd73d29d6cef636516d9d408891d73">longbridge::quote::Daily</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::quote::Unknown</a>
 , <br />
-&#160;&#160;<a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0ab937a8ddaa283657bab59250c0155895">longbridge::quote::Weekly</a>
-, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a8e16fb91b3b8903cedee835834b559ec">longbridge::quote::Monthly</a>
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a88183b946cc5f0e8c96b2e66e1c74a7e">longbridge::quote::Unknown</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0ae9cd73d29d6cef636516d9d408891d73">longbridge::quote::Daily</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0ab937a8ddaa283657bab59250c0155895">longbridge::quote::Weekly</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a6c25e6a6da95b3d583c6ec4c3f82ed4d">longbridge::quote::Weekly</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a8e16fb91b3b8903cedee835834b559ec">longbridge::quote::Monthly</a>
+, <a class="el" href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0a9030e39f00132d583da4122532e509e9">longbridge::quote::Monthly</a>
 <br />
  }</td></tr>
 <tr class="memdesc:ab8fbd1efd72aa09edf90c5318b5945b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data granularity.  <a href="namespacelongbridge_1_1quote.html#ab8fbd1efd72aa09edf90c5318b5945b0">More...</a><br /></td></tr>
@@ -1294,6 +1310,9 @@ Enumerations</h2></td></tr>
 , <a class="el" href="namespacelongbridge_1_1trade.html#af8b1e302e72e4276b661bbc85fa7a591aecd5a80c0fb8f7709d9871403dcf3192">longbridge::trade::Collar</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#af8b1e302e72e4276b661bbc85fa7a591a32d702f0f305c48fe0fa6b722aa5a2ff">longbridge::trade::Straddle</a>
 , <a class="el" href="namespacelongbridge_1_1trade.html#af8b1e302e72e4276b661bbc85fa7a591a367d255592a92fcf885c579effde28d2">longbridge::trade::Strangle</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongbridge_1_1trade.html#af8b1e302e72e4276b661bbc85fa7a591a84c420fe22182d8686d9b377528c49f5">longbridge::trade::CalendarCallSpread</a>
+, <a class="el" href="namespacelongbridge_1_1trade.html#af8b1e302e72e4276b661bbc85fa7a591a9945e1d97580afc20f441e3715fc09ae">longbridge::trade::CalendarPutSpread</a>
 <br />
  }</td></tr>
 <tr class="memdesc:af8b1e302e72e4276b661bbc85fa7a591"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multi-leg strategy.  <a href="namespacelongbridge_1_1trade.html#af8b1e302e72e4276b661bbc85fa7a591">More...</a><br /></td></tr>
