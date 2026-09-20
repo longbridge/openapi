@@ -270,9 +270,17 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/quote/StrikePriceInfo",
-    longbridge::quote::StrikePriceInfo,
-    [price, call_symbol, put_symbol, standard]
+    "com/longbridge/quote/OptionChainContract",
+    longbridge::quote::OptionChainContract,
+    [
+        symbol,
+        expiry_date,
+        strike_price,
+        direction,
+        option_type,
+        standard_attr,
+        days_to_expiry
+    ]
 );
 
 impl_java_class!(

@@ -153,7 +153,7 @@ public class SdkNative {
                         AsyncCallback callback);
 
         public static native void quoteContextOptionChainInfoByDate(long context, String symbol, LocalDate expiryDate,
-                        AsyncCallback callback);
+                        boolean standardOnly, AsyncCallback callback);
 
         public static native void quoteContextWarrantIssuers(long context, AsyncCallback callback);
 

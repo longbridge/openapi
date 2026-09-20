@@ -16,13 +16,13 @@ use crate::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
             FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-            MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily,
-            OptionVolumeStats, ParticipantInfo, Period, PinnedMode, QuotePackageDetail,
-            RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
-            SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse,
-            ShortTradesResponse, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
-            Trade, TradeSessions, USCryptoOverview, WarrantInfo, WarrantQuote, WarrantSortBy,
-            WarrantStatus, WarrantType, WatchlistGroup,
+            MarketTradingDays, MarketTradingSession, OptionChainContract, OptionQuote,
+            OptionVolumeDaily, OptionVolumeStats, ParticipantInfo, Period, PinnedMode,
+            QuotePackageDetail, RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex,
+            SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
+            ShortPositionsResponse, ShortTradesResponse, SortOrderType, SubType, SubTypes,
+            Subscription, Trade, TradeSessions, USCryptoOverview, WarrantInfo, WarrantQuote,
+            WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
         },
     },
     time::{NaiveDate, NaiveDatetime},
@@ -692,7 +692,16 @@ impl QuoteContext {
             .collect())
     }
 
-    /// Get option chain info by date
+    /// Get the option contract list of an underlying security for a given
+    /// expiry date
+    ///
+    /// Every contract is an independent entry: calls and puts are not paired,
+    /// so a strike price that is listed on one side only yields a single entry.
+    ///
+    /// `standardOnly` filters out the legacy contracts produced by corporate
+    /// actions. `true` returns standard contracts only; omitted or `false`
+    /// returns everything, including the contracts carrying a `standardAttr`
+    /// of `Old`.
     ///
     /// #### Example
     ///
@@ -711,9 +720,10 @@ impl QuoteContext {
         &self,
         symbol: String,
         expiry_date: &NaiveDate,
-    ) -> Result<Vec<StrikePriceInfo>> {
+        standard_only: Option<bool>,
+    ) -> Result<Vec<OptionChainContract>> {
         self.ctx
-            .option_chain_info_by_date(symbol, expiry_date.0)
+            .option_chain_info_by_date(symbol, expiry_date.0, standard_only.unwrap_or(false))
             .await
             .map_err(ErrorNewType)?
             .into_iter()

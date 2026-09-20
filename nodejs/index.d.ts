@@ -1466,6 +1466,37 @@ export declare class OAuth {
   static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
 }
 
+/**
+ * A single option contract of an option chain
+ *
+ * Every contract is an independent entry: calls and puts are not paired, so a
+ * strike price that is listed on one side only yields a single entry.
+ */
+export declare class OptionChainContract {
+  toString(): string
+  toJSON(): any
+  /** Option contract code, in `ticker.region` format */
+  get symbol(): string
+  /** Expiry date, in US Eastern time */
+  get expiryDate(): NaiveDate
+  /** Strike price */
+  get strikePrice(): Decimal
+  /** Contract direction */
+  get direction(): OptionDirection
+  /** Special expiration cycle of the contract */
+  get optionType(): OptionExpiryCycleType
+  /**
+   * Whether the contract is a legacy contract left over from a corporate
+   * action
+   */
+  get standardAttr(): OptionStandardAttr
+  /**
+   * Number of days remaining until the option expires, `0` on the expiry
+   * day and negative once expired
+   */
+  get daysToExpiry(): number
+}
+
 /** Quote of option */
 export declare class OptionQuote {
   toString(): string
@@ -2345,7 +2376,16 @@ export declare class QuoteContext {
    */
   optionChainExpiryDateList(symbol: string): Promise<Array<NaiveDate>>
   /**
-   * Get option chain info by date
+   * Get the option contract list of an underlying security for a given
+   * expiry date
+   *
+   * Every contract is an independent entry: calls and puts are not paired,
+   * so a strike price that is listed on one side only yields a single entry.
+   *
+   * `standardOnly` filters out the legacy contracts produced by corporate
+   * actions. `true` returns standard contracts only; omitted or `false`
+   * returns everything, including the contracts carrying a `standardAttr`
+   * of `Old`.
    *
    * #### Example
    *
@@ -2360,7 +2400,7 @@ export declare class QuoteContext {
    * }
    * ```
    */
-  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate): Promise<Array<StrikePriceInfo>>
+  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate, standardOnly?: boolean | undefined | null): Promise<Array<OptionChainContract>>
   /**
    * Get warrant issuers
    *
@@ -2853,34 +2893,32 @@ export declare class SecurityCalcIndex {
   get balancePoint(): Decimal | null
   /** Open interest */
   get openInterest(): number | null
-  /** Delta */
+  /**
+   * Delta. Measures the expected change in option price for a $1 move in the
+   * underlying asset price.
+   */
   get delta(): Decimal | null
-  /** Gamma */
+  /**
+   * Gamma. Measures the expected change in Delta for a $1 move in the
+   * underlying asset price.
+   */
   get gamma(): Decimal | null
   /**
-   * Theta
-   *
-   * The raw value returned by the API is annualized (scaled by 252 trading
-   * days per year). To obtain the standard per-calendar-day theta, divide
-   * by 252: `theta / 252`.
+   * Theta. Measures the expected change in option price as one day passes;
+   * the raw value has been divided by 365 to convert to a daily value,
+   * representing the impact of one day's time decay on the option price.
    */
   get theta(): Decimal | null
   /**
-   * Vega
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in implied volatility (i.e. the value has been multiplied by
-   * 100). To obtain the standard vega (per unit change in IV), divide by
-   * 100: `vega / 100`.
+   * Vega. Measures the expected change in option price when implied
+   * volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+   * get the expected price change per 1% move in IV.
    */
   get vega(): Decimal | null
   /**
-   * Rho
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in the risk-free rate (i.e. the value has been multiplied by
-   * 100). To obtain the standard rho (per unit change in rate), divide by
-   * 100: `rho / 100`.
+   * Rho. Measures the expected change in option price when the risk-free
+   * interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+   * the expected price change per 1% move in the interest rate.
    */
   get rho(): Decimal | null
 }
@@ -3032,20 +3070,6 @@ export declare class StockPositionsResponse {
   toJSON(): any
   /** Channels */
   get channels(): Array<StockPositionChannel>
-}
-
-/** Strike price info */
-export declare class StrikePriceInfo {
-  toString(): string
-  toJSON(): any
-  /** Strike price */
-  get price(): Decimal
-  /** Security code of call option */
-  get callSymbol(): string
-  /** Security code of put option */
-  get putSymbol(): string
-  /** Is standard */
-  get standard(): boolean
 }
 
 /** Response for submit grid trading order request */
@@ -6166,6 +6190,31 @@ export declare const enum OptionDirection {
   Put = 1,
   /** Call */
   Call = 2
+}
+
+/** Special expiration cycle of an option contract */
+export declare const enum OptionExpiryCycleType {
+  /** Unknown */
+  Unknown = 0,
+  /** Standard monthly option */
+  Monthly = 1,
+  /** Weekly option, expires weekly */
+  Weekly = 2,
+  /** Quarterly option, expires quarterly */
+  Quarterly = 3
+}
+
+/**
+ * Whether an option contract is a legacy contract left over from a corporate
+ * action (e.g. a stock split or a merger)
+ */
+export declare const enum OptionStandardAttr {
+  /** Unknown */
+  Unknown = 0,
+  /** A normal, active contract */
+  Normal = 1,
+  /** A legacy contract produced by a corporate action */
+  Old = 2
 }
 
 /** Option type */

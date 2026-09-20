@@ -214,22 +214,50 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryExecutionsOptions>>,
     ) -> Result<Vec<Execution>> {
+        use std::collections::HashSet;
+
         #[derive(Deserialize)]
         struct Response {
+            #[serde(default)]
+            has_more: bool,
             trades: Vec<Execution>,
         }
 
-        Ok(self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/trade/execution/history")
-            .query_params(options.into().unwrap_or_default())
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?
-            .0
-            .trades)
+        // The endpoint caps each response at 1000 records; walk the `page`
+        // param (1-based) until `has_more` is false. Dedupe by
+        // `trade_id` and stop if a page adds nothing new, guarding
+        // against the gateway ignoring `page`. Bounded to 1000 pages as
+        // a runaway guard.
+        let mut options = options.into().unwrap_or_default();
+        let mut all: Vec<Execution> = Vec::new();
+        let mut seen: HashSet<String> = HashSet::new();
+        for page in 1..=1000u32 {
+            options = options.with_page(page);
+            let resp = self
+                .0
+                .http_cli
+                .request(Method::GET, "/v1/trade/execution/history")
+                .query_params(&options)
+                .response::<Json<Response>>()
+                .send()
+                .with_subscriber(self.0.log_subscriber.clone())
+                .await?
+                .0;
+            if resp.trades.is_empty() {
+                break;
+            }
+            let mut added = 0usize;
+            for t in resp.trades {
+                if seen.insert(t.trade_id.clone()) {
+                    all.push(t);
+                    added += 1;
+                }
+            }
+            if !resp.has_more || added == 0 {
+                break;
+            }
+        }
+        Ok(all)
     }
 
     /// Get today executions

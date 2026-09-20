@@ -3,20 +3,21 @@ use std::os::raw::c_char;
 use longbridge::quote::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
     FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-    MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,
-    OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period,
-    PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
+    MarketTradingDays, MarketTradingSession, OptionChainContract, OptionDirection, OptionQuote,
+    OptionType, OptionVolumeDaily, OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo,
+    Period, PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote, PushTrades,
     QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers, SecurityCalcIndex,
     SecurityDepth, SecurityQuote, SecurityStaticInfo, ShortPositionsItem, ShortPositionsResponse,
-    ShortTradesItem, ShortTradesResponse, StrikePriceInfo, Subscription, Trade, TradeDirection,
-    TradeSession, TradeStatus, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantType,
-    WatchlistGroup, WatchlistSecurity,
+    ShortTradesItem, ShortTradesResponse, Subscription, Trade, TradeDirection, TradeSession,
+    TradeStatus, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
+    WatchlistSecurity,
 };
 
 use crate::{
     quote_context::enum_types::{
-        CGranularity, COptionDirection, COptionType, CPeriod, CSecuritiesUpdateMode,
-        CSecurityBoard, CTradeDirection, CTradeSession, CTradeStatus, CWarrantStatus, CWarrantType,
+        CGranularity, COptionDirection, COptionExpiryCycleType, COptionStandardAttr, COptionType,
+        CPeriod, CSecuritiesUpdateMode, CSecurityBoard, CTradeDirection, CTradeSession,
+        CTradeStatus, CWarrantStatus, CWarrantType,
     },
     types::{CDate, CDecimal, CMarket, COption, CString, CTime, CVec, ToFFI},
 };
@@ -1559,59 +1560,82 @@ impl ToFFI for CIntradayLineOwned {
     }
 }
 
-/// Strike price info
+/// A single option contract of an option chain
 #[repr(C)]
-pub struct CStrikePriceInfo {
+pub struct COptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    pub symbol: *const c_char,
+    /// Expiry date, in US Eastern time
+    pub expiry_date: CDate,
     /// Strike price
-    pub price: *const CDecimal,
-    /// Security code of call option
-    pub call_symbol: *const c_char,
-    /// Security code of put option
-    pub put_symbol: *const c_char,
-    /// Is standard
-    pub standard: bool,
+    pub strike_price: *const CDecimal,
+    /// Contract direction
+    pub direction: COptionDirection,
+    /// Special expiration cycle of the contract
+    pub option_type: COptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    pub standard_attr: COptionStandardAttr,
+    /// Number of days remaining until the option expires, `0` on the expiry
+    /// day and negative once expired
+    pub days_to_expiry: i32,
 }
 
 #[derive(Debug)]
-pub(crate) struct CStrikePriceInfoOwned {
-    price: CDecimal,
-    call_symbol: CString,
-    put_symbol: CString,
-    standard: bool,
+pub(crate) struct COptionChainContractOwned {
+    symbol: CString,
+    expiry_date: CDate,
+    strike_price: CDecimal,
+    direction: COptionDirection,
+    option_type: COptionExpiryCycleType,
+    standard_attr: COptionStandardAttr,
+    days_to_expiry: i32,
 }
 
-impl From<StrikePriceInfo> for CStrikePriceInfoOwned {
-    fn from(info: StrikePriceInfo) -> Self {
-        let StrikePriceInfo {
-            price,
-            call_symbol,
-            put_symbol,
-            standard,
+impl From<OptionChainContract> for COptionChainContractOwned {
+    fn from(info: OptionChainContract) -> Self {
+        let OptionChainContract {
+            symbol,
+            expiry_date,
+            strike_price,
+            direction,
+            option_type,
+            standard_attr,
+            days_to_expiry,
         } = info;
-        CStrikePriceInfoOwned {
-            price: price.into(),
-            call_symbol: call_symbol.into(),
-            put_symbol: put_symbol.into(),
-            standard,
+        COptionChainContractOwned {
+            symbol: symbol.into(),
+            expiry_date: expiry_date.into(),
+            strike_price: strike_price.into(),
+            direction: direction.into(),
+            option_type: option_type.into(),
+            standard_attr: standard_attr.into(),
+            days_to_expiry,
         }
     }
 }
 
-impl ToFFI for CStrikePriceInfoOwned {
-    type FFIType = CStrikePriceInfo;
+impl ToFFI for COptionChainContractOwned {
+    type FFIType = COptionChainContract;
 
     fn to_ffi_type(&self) -> Self::FFIType {
-        let CStrikePriceInfoOwned {
-            price,
-            call_symbol,
-            put_symbol,
-            standard,
+        let COptionChainContractOwned {
+            symbol,
+            expiry_date,
+            strike_price,
+            direction,
+            option_type,
+            standard_attr,
+            days_to_expiry,
         } = self;
-        CStrikePriceInfo {
-            price,
-            call_symbol: call_symbol.to_ffi_type(),
-            put_symbol: put_symbol.to_ffi_type(),
-            standard: *standard,
+        COptionChainContract {
+            symbol: symbol.to_ffi_type(),
+            expiry_date: *expiry_date,
+            strike_price,
+            direction: *direction,
+            option_type: *option_type,
+            standard_attr: *standard_attr,
+            days_to_expiry: *days_to_expiry,
         }
     }
 }
@@ -2258,15 +2282,23 @@ pub struct CSecurityCalcIndex {
     pub balance_point: *const CDecimal,
     /// Open interest
     pub open_interest: *const i64,
-    /// Delta
+    /// Delta. Measures the expected change in option price for a $1 move in the
+    /// underlying asset price.
     pub delta: *const CDecimal,
-    /// Gamma
+    /// Gamma. Measures the expected change in Delta for a $1 move in the
+    /// underlying asset price.
     pub gamma: *const CDecimal,
-    /// Theta
+    /// Theta. Measures the expected change in option price as one day passes;
+    /// the raw value has been divided by 365 to convert to a daily value,
+    /// representing the impact of one day's time decay on the option price.
     pub theta: *const CDecimal,
-    /// Vega
+    /// Vega. Measures the expected change in option price when implied
+    /// volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+    /// get the expected price change per 1% move in IV.
     pub vega: *const CDecimal,
-    /// Rho
+    /// Rho. Measures the expected change in option price when the risk-free
+    /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+    /// the expected price change per 1% move in the interest rate.
     pub rho: *const CDecimal,
 }
 

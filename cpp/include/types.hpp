@@ -473,6 +473,31 @@ enum class OptionDirection
   Call,
 };
 
+/// Special expiration cycle of an option contract
+enum class OptionExpiryCycleType
+{
+  /// Unknown
+  Unknown,
+  /// Standard monthly option
+  Monthly,
+  /// Weekly option, expires weekly
+  Weekly,
+  /// Quarterly option, expires quarterly
+  Quarterly,
+};
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action
+enum class OptionStandardAttr
+{
+  /// Unknown
+  Unknown,
+  /// A normal, active contract
+  Normal,
+  /// A legacy contract produced by a corporate action
+  Old,
+};
+
 /// Quote of option
 struct OptionQuote
 { /// Security code
@@ -694,17 +719,28 @@ enum class AdjustType
   ForwardAdjust
 };
 
-/// Strike price info
-struct StrikePriceInfo
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
+struct OptionChainContract
 {
+  /// Option contract code, in `ticker.region` format
+  std::string symbol;
+  /// Expiry date, in US Eastern time
+  Date expiry_date;
   /// Strike price
-  Decimal price;
-  /// Security code of call option
-  std::string call_symbol;
-  /// Security code of put option
-  std::string put_symbol;
-  /// Is standard
-  bool standard;
+  Decimal strike_price;
+  /// Contract direction
+  OptionDirection direction;
+  /// Special expiration cycle of the contract
+  OptionExpiryCycleType option_type;
+  /// Whether the contract is a legacy contract left over from a corporate
+  /// action
+  OptionStandardAttr standard_attr;
+  /// Number of days remaining until the option expires, `0` on the expiry day
+  /// and negative once expired
+  int32_t days_to_expiry;
 };
 
 /// Issuer info
@@ -1021,15 +1057,23 @@ struct SecurityCalcIndex
   std::optional<Decimal> balance_point;
   /// Open interest
   std::optional<int64_t> open_interest;
-  /// Delta
+  /// Delta. Measures the expected change in option price for a $1 move in the
+  /// underlying asset price.
   std::optional<Decimal> delta;
-  /// Gamma
+  /// Gamma. Measures the expected change in Delta for a $1 move in the
+  /// underlying asset price.
   std::optional<Decimal> gamma;
-  /// Theta
+  /// Theta. Measures the expected change in option price as one day passes; the
+  /// raw value has been divided by 365 to convert to a daily value,
+  /// representing the impact of one day's time decay on the option price.
   std::optional<Decimal> theta;
-  /// Vega
+  /// Vega. Measures the expected change in option price when implied volatility
+  /// (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to get the
+  /// expected price change per 1% move in IV.
   std::optional<Decimal> vega;
-  /// Rho
+  /// Rho. Measures the expected change in option price when the risk-free
+  /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+  /// the expected price change per 1% move in the interest rate.
   std::optional<Decimal> rho;
 };
 
