@@ -1532,6 +1532,10 @@ convert(CMultiLegStrategy strategy)
       return MultiLegStrategy::Straddle;
     case MultiLegStrategyStrangle:
       return MultiLegStrategy::Strangle;
+    case MultiLegStrategyCalendarCallSpread:
+      return MultiLegStrategy::CalendarCallSpread;
+    case MultiLegStrategyCalendarPutSpread:
+      return MultiLegStrategy::CalendarPutSpread;
     default:
       return MultiLegStrategy::Unknown;
   }
@@ -1557,6 +1561,10 @@ convert(MultiLegStrategy strategy)
       return MultiLegStrategyStraddle;
     case MultiLegStrategy::Strangle:
       return MultiLegStrategyStrangle;
+    case MultiLegStrategy::CalendarCallSpread:
+      return MultiLegStrategyCalendarCallSpread;
+    case MultiLegStrategy::CalendarPutSpread:
+      return MultiLegStrategyCalendarPutSpread;
     default:
       return MultiLegStrategyUnknown;
   }
