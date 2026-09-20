@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    str::FromStr,
     sync::{Arc, RwLock},
     time::Duration,
 };
@@ -7,6 +7,7 @@ use std::{
 use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use time::{Date, PrimitiveDateTime};
 use tokio::sync::{mpsc, oneshot};
@@ -17,13 +18,14 @@ use crate::{
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily,
+        MarketTradingDays, MarketTradingSession, OptionChainContract, OptionDirection,
+        OptionExpiryCycleType, OptionQuote, OptionStandardAttr, OptionVolumeDaily,
         OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period, PushEvent,
         QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
         RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
         SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsItem,
-        ShortPositionsResponse, ShortTradesItem, ShortTradesResponse, StrikePriceInfo,
-        Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
+        ShortPositionsResponse, ShortTradesItem, ShortTradesResponse, Subscription, Trade,
+        TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
@@ -54,17 +56,18 @@ fn unix_secs_to_rfc3339(s: &str) -> String {
 }
 const ISSUER_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const OPTION_CHAIN_EXPIRY_DATE_LIST_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
-const OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const TRADING_SESSION_CACHE_TIMEOUT: Duration = Duration::from_secs(60 * 60 * 2);
 
 struct InnerQuoteContext {
     language: Language,
     http_cli: HttpClient,
     command_tx: mpsc::UnboundedSender<Command>,
+    /// Kept alive only so the background `Core::run` task can observe the
+    /// context being dropped (via this channel closing) and stop reconnecting.
+    _shutdown_tx: mpsc::UnboundedSender<()>,
     cache_participants: Cache<Vec<ParticipantInfo>>,
     cache_issuers: Cache<Vec<IssuerInfo>>,
     cache_option_chain_expiry_date_list: CacheWithKey<String, Vec<Date>>,
-    cache_option_chain_strike_info: CacheWithKey<(String, Date), Vec<StrikePriceInfo>>,
     cache_trading_session: Cache<Vec<MarketTradingSession>>,
     user_profile: Arc<RwLock<Option<UserProfile>>>,
     log_subscriber: Arc<dyn Subscriber + Send + Sync>,
@@ -101,11 +104,13 @@ impl QuoteContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
+        let (shutdown_tx, shutdown_rx) = mpsc::unbounded_channel();
         let user_profile = Arc::new(RwLock::new(None::<UserProfile>));
         let core = Core::new(config, command_rx, push_tx, user_profile.clone());
-        crate::runtime::RUNTIME
-            .handle()
-            .spawn(core.run().with_subscriber(log_subscriber.clone()));
+        crate::runtime::RUNTIME.handle().spawn(
+            core.run(shutdown_rx)
+                .with_subscriber(log_subscriber.clone()),
+        );
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
             tracing::info!("quote context created");
@@ -116,13 +121,11 @@ impl QuoteContext {
                 language,
                 http_cli,
                 command_tx,
+                _shutdown_tx: shutdown_tx,
                 cache_participants: Cache::new(PARTICIPANT_INFO_CACHE_TIMEOUT),
                 cache_issuers: Cache::new(ISSUER_INFO_CACHE_TIMEOUT),
                 cache_option_chain_expiry_date_list: CacheWithKey::new(
                     OPTION_CHAIN_EXPIRY_DATE_LIST_CACHE_TIMEOUT,
-                ),
-                cache_option_chain_strike_info: CacheWithKey::new(
-                    OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT,
                 ),
                 cache_trading_session: Cache::new(TRADING_SESSION_CACHE_TIMEOUT),
                 user_profile,
@@ -1044,9 +1047,18 @@ impl QuoteContext {
             .await
     }
 
-    /// Get option chain info by date
+    /// Get the option contract list of an underlying security for a given
+    /// expiry date
     ///
-    /// Reference: <https://open.longbridge.com/en/docs/quote/pull/optionchain-date-strike>
+    /// Every contract is an independent entry: calls and puts are not paired,
+    /// so a strike price that is listed on one side only yields a single entry.
+    ///
+    /// `standard_only` filters out the legacy contracts produced by corporate
+    /// actions. `true` returns standard contracts only; `false` returns
+    /// everything, including the contracts carrying
+    /// [`OptionStandardAttr::Old`].
+    ///
+    /// Path: `GET /v1/gemini/option/option_chain_list`
     ///
     /// # Examples
     ///
@@ -1064,7 +1076,7 @@ impl QuoteContext {
     /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
-    ///     .option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20))
+    ///     .option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20), false)
     ///     .await?;
     /// println!("{:?}", resp);
     /// # Ok::<_, Box<dyn std::error::Error>>(())
@@ -1074,28 +1086,72 @@ impl QuoteContext {
         &self,
         symbol: impl Into<String>,
         expiry_date: Date,
-    ) -> Result<Vec<StrikePriceInfo>> {
+        standard_only: bool,
+    ) -> Result<Vec<OptionChainContract>> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            symbol: String,
+            expiry_date: String,
+            // `false` and an omitted parameter mean the same thing to the
+            // endpoint, so send nothing rather than `standard_only=false`.
+            #[serde(skip_serializing_if = "std::ops::Not::not")]
+            standard_only: bool,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct RawOptionChainContract {
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            symbol: String,
+            expiry_date: String,
+            #[serde(with = "crate::serde_utils::decimal_empty_is_0")]
+            strike_price: Decimal,
+            direction: String,
+            // Both of these are documented as an empty string for the common
+            // case, so tolerate an explicit `null` as well.
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            option_type: String,
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            standard_attr: String,
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            days_to_expiry: i32,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            list: Vec<RawOptionChainContract>,
+        }
+
         self.0
-            .cache_option_chain_strike_info
-            .get_or_update(
-                (symbol.into(), expiry_date),
-                |(symbol, expiry_date)| async move {
-                    let resp: quote::OptionChainDateStrikeInfoResponse = self
-                        .request(
-                            cmd_code::GET_OPTION_CHAIN_INFO_BY_DATE,
-                            quote::OptionChainDateStrikeInfoRequest {
-                                symbol,
-                                expiry_date: format_date(expiry_date),
-                            },
-                        )
-                        .await?;
-                    resp.strike_price_info
-                        .into_iter()
-                        .map(TryInto::try_into)
-                        .collect::<Result<Vec<_>>>()
-                },
-            )
-            .await
+            .http_cli
+            .request(Method::GET, "/v1/gemini/option/option_chain_list")
+            .query_params(Request {
+                symbol: symbol.into(),
+                expiry_date: format_date(expiry_date),
+                standard_only,
+            })
+            .response::<Json<Response>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0
+            .list
+            .into_iter()
+            .map(|row| {
+                Ok(OptionChainContract {
+                    symbol: row.symbol,
+                    expiry_date: parse_date(&row.expiry_date)
+                        .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                    strike_price: row.strike_price,
+                    direction: OptionDirection::from_str(&row.direction).unwrap_or_default(),
+                    option_type: OptionExpiryCycleType::from_str(&row.option_type)
+                        .unwrap_or_default(),
+                    standard_attr: OptionStandardAttr::from_str(&row.standard_attr)
+                        .unwrap_or_default(),
+                    days_to_expiry: row.days_to_expiry,
+                })
+            })
+            .collect()
     }
 
     /// Get warrant issuers
@@ -1997,8 +2053,6 @@ impl QuoteContext {
     ) -> Result<ShortPositionsResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
-
         let sym = symbol.into();
         let is_hk = sym.to_uppercase().ends_with(".HK");
         let path = if is_hk {
@@ -2013,17 +2067,17 @@ impl QuoteContext {
 
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             last_timestamp: String,
             count: u32,
         }
-        // Response: {"counter_id":"ST/US/AAPL","data":[{...}]}
+        // Response: {"symbol":"AAPL.US","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&sym),
+                symbol: sym.clone(),
                 last_timestamp: ts.to_string(),
                 count,
             })
@@ -2066,10 +2120,9 @@ impl QuoteContext {
     ///
     /// Path: `GET /v1/quote/option-volume-stats`
     pub async fn option_volume(&self, symbol: impl Into<String>) -> Result<OptionVolumeStats> {
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(serde::Serialize)]
         struct Query {
-            underlying_counter_id: String,
+            symbol: String,
         }
         #[derive(serde::Deserialize)]
         struct RawOptionVolumeStats {
@@ -2082,7 +2135,7 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats")
             .query_params(Query {
-                underlying_counter_id: symbol_to_counter_id(&symbol),
+                symbol: symbol.clone(),
             })
             .response::<Json<RawOptionVolumeStats>>()
             .send()
@@ -2105,17 +2158,16 @@ impl QuoteContext {
         timestamp: i64,
         count: u32,
     ) -> Result<OptionVolumeDaily> {
-        use crate::utils::counter::{counter_id_to_symbol, symbol_to_counter_id};
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             timestamp: i64,
             line_num: u32,
             direction: i32,
         }
         #[derive(serde::Deserialize)]
         struct RawDailyStat {
-            underlying_counter_id: String,
+            symbol: String,
             timestamp: String,
             total_call_volume: String,
             total_put_volume: String,
@@ -2138,7 +2190,7 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats/daily")
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol),
+                symbol: symbol.clone(),
                 timestamp,
                 line_num: count,
                 direction: 1,
@@ -2154,7 +2206,7 @@ impl QuoteContext {
             .map(|item| {
                 let ts: i64 = item.timestamp.parse().unwrap_or(0);
                 OptionVolumeDailyStat {
-                    symbol: counter_id_to_symbol(&item.underlying_counter_id),
+                    symbol: item.symbol,
                     date: time::OffsetDateTime::from_unix_timestamp(ts)
                         .unwrap_or(time::OffsetDateTime::UNIX_EPOCH)
                         .date(),
@@ -2185,10 +2237,9 @@ impl QuoteContext {
     ) -> Result<ShortTradesResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             last_timestamp: String,
             page_size: String,
         }
@@ -2202,13 +2253,13 @@ impl QuoteContext {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
-        // Response: {"counter_id":"ST/HK/700","data":[{...}]}
+        // Response: {"symbol":"00700.HK","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&sym),
+                symbol: sym.clone(),
                 last_timestamp: ts.to_string(),
                 page_size: count.to_string(),
             })
@@ -2264,82 +2315,8 @@ impl QuoteContext {
         Ok(())
     }
 
-    // ── symbol_to_counter_ids ─────────────────────────────────────
-
-    /// Batch convert symbols to counter IDs via the remote API.
-    ///
-    /// Returns a map of `symbol → counter_id` (e.g. `DRAM.US` →
-    /// `ETF/US/DRAM`). Symbols the backend does not recognize are omitted
-    /// from the result.
-    ///
-    /// Path: `POST /v1/quote/symbol-to-counter-ids`
-    pub async fn symbol_to_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<HashMap<String, String>> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            ticker_regions: Vec<String>,
-        }
-        #[derive(Debug, Deserialize)]
-        struct Response {
-            #[serde(default)]
-            list: HashMap<String, String>,
-        }
-
-        let resp = self
-            .0
-            .http_cli
-            .request(Method::POST, "/v1/quote/symbol-to-counter-ids")
-            .body(Json(Request {
-                ticker_regions: symbols,
-            }))
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(resp.0.list)
-    }
-
-    /// Resolve counter IDs for symbols, local-first with remote fallback.
-    ///
-    /// Symbols found in the embedded ETF / index / warrant directory (or in
-    /// the local cache of previous remote resolutions) are resolved without
-    /// network access. The remaining symbols are resolved in one batch via
-    /// [`symbol_to_counter_ids`](Self::symbol_to_counter_ids) and the results
-    /// are persisted to the local cache for subsequent lookups. Symbols the
-    /// backend does not recognize fall back to the default `ST/` conversion.
-    pub async fn resolve_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<HashMap<String, String>> {
-        use crate::utils::counter;
-
-        let mut result = HashMap::with_capacity(symbols.len());
-        let mut unknown = Vec::new();
-        for symbol in symbols {
-            match counter::lookup_counter_id(&symbol) {
-                Some(counter_id) => {
-                    result.insert(symbol, counter_id);
-                }
-                None => unknown.push(symbol),
-            }
-        }
-        if !unknown.is_empty() {
-            let resolved = self.symbol_to_counter_ids(unknown.clone()).await?;
-            counter::cache_counter_ids(resolved.values().map(String::as_str));
-            for symbol in unknown {
-                let counter_id = resolved
-                    .get(&symbol)
-                    .cloned()
-                    .unwrap_or_else(|| counter::symbol_to_counter_id(&symbol));
-                result.insert(symbol, counter_id);
-            }
-        }
-        Ok(result)
-    }
-
-    // ── US-market APIs ────────────────────────────────────────────────────────
+    // ── US-market APIs
+    // ────────────────────────────────────────────────────────
 
     /// Get cryptocurrency market overview.
     ///
@@ -2354,10 +2331,9 @@ impl QuoteContext {
         &self,
         symbol: impl Into<String>,
     ) -> Result<crate::quote::USCryptoOverview> {
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         Ok(self
             .0
@@ -2365,7 +2341,7 @@ impl QuoteContext {
             .request(Method::GET, "/v1/us/gemini/crypto-overview")
             .dc_restrict(DcRegion::Us)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             })
             .response::<Json<crate::quote::USCryptoOverview>>()
             .send()

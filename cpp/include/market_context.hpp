@@ -90,8 +90,8 @@ public:
                   uint32_t limit,
                   AsyncCallback<MarketContext, TopMoversResponse> callback) const;
 
-  /// Get all available rank category keys and labels (raw JSON string)
-  void rank_categories(AsyncCallback<MarketContext, std::string> callback) const;
+  /// Get all available rank category keys and labels
+  void rank_categories(AsyncCallback<MarketContext, RankCategoriesResponse> callback) const;
 
   /// Get a ranked list of securities for the given category key
   void rank_list(const std::string& key,

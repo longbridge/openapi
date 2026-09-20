@@ -58,6 +58,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<OperatingFinancial>()?;
     parent.add_class::<OperatingIndicator>()?;
     parent.add_class::<FinancialReportKind>()?;
+    parent.add_class::<FinancialStatementKind>()?;
     parent.add_class::<FinancialReportPeriod>()?;
     parent.add_class::<RecentBuybacks>()?;
     parent.add_class::<BuybackHistoryItem>()?;

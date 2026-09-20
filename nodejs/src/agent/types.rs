@@ -126,17 +126,30 @@ impl From<lb::ConversationStatus> for ConversationStatus {
 pub struct Reference {
     /// Reference index
     pub index: i32,
+    /// Original index in the source list, before any reranking
+    pub original_index: i32,
+    /// Reference kind, e.g. `"NewsArticle"`
+    pub ref_type: String,
+    /// Reference id
+    pub id: String,
     /// Reference title
     pub title: String,
     /// Reference URL
     pub url: String,
+    /// Full reference payload as sent by the server; kept as raw JSON
+    /// because the field set varies by reference `ref_type`
+    pub content: Option<serde_json::Value>,
 }
 impl From<lb::Reference> for Reference {
     fn from(v: lb::Reference) -> Self {
         Self {
             index: v.index,
+            original_index: v.original_index,
+            ref_type: v.ref_type,
+            id: v.id,
             title: v.title,
             url: v.url,
+            content: v.content,
         }
     }
 }
@@ -145,12 +158,15 @@ impl From<lb::Reference> for Reference {
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct QuestionOption {
+    /// Short UI label for the option
+    pub label: String,
     /// Option text
     pub description: String,
 }
 impl From<lb::QuestionOption> for QuestionOption {
     fn from(v: lb::QuestionOption) -> Self {
         Self {
+            label: v.label,
             description: v.description,
         }
     }
@@ -177,6 +193,36 @@ impl From<lb::Question> for Question {
     }
 }
 
+/// A single interaction requested while an Agent workflow is paused
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct HumanInteraction {
+    /// Tool call that requested the interaction
+    pub tool_call_id: String,
+    /// Stable key expected by `answersByToolCall`
+    pub interrupt_id: String,
+    /// Interaction type such as `ask_human` or `trade_password`
+    pub interaction_type: String,
+    /// Human-readable tool name
+    pub tool_name: String,
+    /// Questions and answer options presented to the user
+    pub questions: Vec<Question>,
+    /// Original tool arguments, retained for host-specific UI rendering
+    pub tool_args: serde_json::Value,
+}
+impl From<lb::HumanInteraction> for HumanInteraction {
+    fn from(v: lb::HumanInteraction) -> Self {
+        Self {
+            tool_call_id: v.tool_call_id,
+            interrupt_id: v.interrupt_id,
+            interaction_type: v.interaction_type,
+            tool_name: v.tool_name,
+            questions: v.questions.into_iter().map(Into::into).collect(),
+            tool_args: v.tool_args,
+        }
+    }
+}
+
 /// Present when a conversation run is interrupted, waiting for
 /// `AgentContext.continueConversation`
 #[napi_derive::napi(object)]
@@ -188,6 +234,8 @@ pub struct Interrupt {
     pub tool_call_id: String,
     /// Questions you need to answer
     pub questions: Vec<Question>,
+    /// Full interaction descriptors used to render and answer the pause
+    pub interactions: Vec<HumanInteraction>,
     /// ID of the paused message
     pub message_id: i64,
     /// ID of the owning conversation
@@ -199,6 +247,7 @@ impl From<lb::Interrupt> for Interrupt {
             node_id: v.node_id,
             tool_call_id: v.tool_call_id,
             questions: v.questions.into_iter().map(Into::into).collect(),
+            interactions: v.interactions.into_iter().map(Into::into).collect(),
             message_id: v.message_id,
             chat_id: v.chat_id,
         }
@@ -240,6 +289,8 @@ pub struct ConversationResponse {
     pub answer: String,
     /// Sources referenced by the answer
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions
+    pub further_questions: Option<Vec<String>>,
     /// Run duration in seconds
     pub elapsed_time: f64,
     /// Present only when `status` is `interrupted`
@@ -257,6 +308,7 @@ impl From<lb::ConversationResponse> for ConversationResponse {
             references: v
                 .references
                 .map(|refs| refs.into_iter().map(Into::into).collect()),
+            further_questions: v.further_questions,
             elapsed_time: v.elapsed_time,
             interrupt: v.interrupt.map(Into::into),
             error: v.error.map(Into::into),
@@ -272,12 +324,21 @@ pub struct ChatStartedPayload {
     pub chat_uid: String,
     /// Message ID of this round
     pub message_id: String,
+    /// ID of the owning conversation
+    pub chat_id: i64,
+    /// Error detail; empty at start
+    pub error: String,
+    /// User-facing error message; empty at start
+    pub error_message: String,
 }
 impl From<lb::ChatStartedPayload> for ChatStartedPayload {
     fn from(v: lb::ChatStartedPayload) -> Self {
         Self {
             chat_uid: v.chat_uid,
             message_id: v.message_id,
+            chat_id: v.chat_id,
+            error: v.error,
+            error_message: v.error_message,
         }
     }
 }

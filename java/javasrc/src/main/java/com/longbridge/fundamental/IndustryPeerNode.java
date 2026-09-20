@@ -8,8 +8,8 @@ package com.longbridge.fundamental;
 public class IndustryPeerNode {
     /** Node name */
     public String name;
-    /** Counter ID */
-    public String counterId;
+    /** Node symbol */
+    public String symbol;
     /** Number of stocks in this node */
     public int stockNum;
     /** Change percentage */

@@ -6,8 +6,8 @@ use longbridge::trade::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions,
-    SubmitOrderOptions, TradeContext,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderLeg,
+    SubmitMultiLegOrderOptions, SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};
@@ -23,7 +23,7 @@ use crate::{
         types::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
             EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
-            Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
+            MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
             ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
             SubmitOrderResponse, TimeInForceType, TopicType,
         },
@@ -76,6 +76,16 @@ impl AsyncTradeContext {
             self.callbacks.lock().order_changed = None;
         } else {
             self.callbacks.lock().order_changed = Some(callback);
+        }
+    }
+
+    /// Set grid order changed callback. May be sync or async (coroutines are
+    /// scheduled).
+    fn set_on_grid_order_changed(&self, py: Python<'_>, callback: Py<PyAny>) {
+        if callback.is_none(py) {
+            self.callbacks.lock().grid_order_changed = None;
+        } else {
+            self.callbacks.lock().grid_order_changed = Some(callback);
         }
     }
 
@@ -163,45 +173,44 @@ impl AsyncTradeContext {
         .map(|b| b.unbind())
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions. Returns awaitable.
-    // #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at =
-    // None, page = None))] fn all_executions(
-    // &self,
-    // py: Python<'_>,
-    // symbol: Option<String>,
-    // order_id: Option<String>,
-    // start_at: Option<PyOffsetDateTimeWrapper>,
-    // end_at: Option<PyOffsetDateTimeWrapper>,
-    // page: Option<u64>,
-    // ) -> PyResult<Py<PyAny>> {
-    // let ctx = self.ctx.clone();
-    // let mut opts = GetAllExecutionsOptions::new();
-    // if let Some(s) = symbol {
-    // opts = opts.symbol(s);
-    // }
-    // if let Some(o) = order_id {
-    // opts = opts.order_id(o);
-    // }
-    // if let Some(s) = start_at {
-    // opts = opts.start_at(s.0);
-    // }
-    // if let Some(e) = end_at {
-    // opts = opts.end_at(e.0);
-    // }
-    // if let Some(p) = page {
-    // opts = opts.page(p);
-    // }
-    // pyo3_async_runtimes::tokio::future_into_py(py, async move {
-    // let r: AllExecutionsResponse = ctx
-    // .all_executions(Some(opts))
-    // .await
-    // .map_err(ErrorNewType)?
-    // .try_into()?;
-    // Ok(r)
-    // })
-    // .map(|b| b.unbind())
-    // }
+    /// Get all executions. Returns awaitable.
+    #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
+    fn all_executions(
+        &self,
+        py: Python<'_>,
+        symbol: Option<String>,
+        order_id: Option<String>,
+        start_at: Option<PyOffsetDateTimeWrapper>,
+        end_at: Option<PyOffsetDateTimeWrapper>,
+        page: Option<u64>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = GetAllExecutionsOptions::new();
+        if let Some(s) = symbol {
+            opts = opts.symbol(s);
+        }
+        if let Some(o) = order_id {
+            opts = opts.order_id(o);
+        }
+        if let Some(s) = start_at {
+            opts = opts.start_at(s.0);
+        }
+        if let Some(e) = end_at {
+            opts = opts.end_at(e.0);
+        }
+        if let Some(p) = page {
+            opts = opts.page(p);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: AllExecutionsResponse = ctx
+                .all_executions(Some(opts))
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
 
     /// Get history orders. Returns awaitable.
     #[allow(clippy::too_many_arguments)]
@@ -416,6 +425,61 @@ impl AsyncTradeContext {
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: SubmitOrderResponse = ctx
                 .submit_order(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Submit a multi-leg option combination order. Returns awaitable.
+    ///
+    /// `legs` is a list of `(symbol, ratio_quantity)` tuples.  Each
+    /// `ratio_quantity` must be a positive number: the direction of a leg is
+    /// implied by `strategy` together with `side`, not by the sign of the
+    /// ratio, and a negative or zero ratio is rejected by the server with
+    /// `602001`.
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None))]
+    #[allow(clippy::too_many_arguments)]
+    fn submit_multileg(
+        &self,
+        py: Python<'_>,
+        side: OrderSide,
+        order_type: OrderType,
+        submitted_quantity: PyDecimal,
+        strategy: MultiLegStrategy,
+        legs: Vec<(String, PyDecimal)>,
+        submitted_price: Option<PyDecimal>,
+        remark: Option<String>,
+        client_request_id: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let legs = legs
+            .into_iter()
+            .map(|(symbol, ratio_quantity)| {
+                SubmitMultiLegOrderLeg::new(symbol, ratio_quantity.into())
+            })
+            .collect::<Vec<_>>();
+        let mut opts = SubmitMultiLegOrderOptions::new(
+            side.into(),
+            order_type.into(),
+            submitted_quantity.into(),
+            strategy.into(),
+            legs,
+        );
+        if let Some(p) = submitted_price {
+            opts = opts.submitted_price(p.into());
+        }
+        if let Some(r) = remark {
+            opts = opts.remark(r);
+        }
+        if let Some(id) = client_request_id {
+            opts = opts.client_request_id(id);
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: SubmitOrderResponse = ctx
+                .submit_multileg(opts)
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;

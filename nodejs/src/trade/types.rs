@@ -30,6 +30,8 @@ pub struct Execution {
     quantity: Decimal,
     /// Executed price
     price: Decimal,
+    /// Order side
+    side: OrderSide,
 }
 
 #[napi_derive::napi]
@@ -268,6 +270,100 @@ pub struct AttachedOrderDetail {
     submit_price: Option<Decimal>,
 }
 
+/// Multi-leg strategy
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::trade::MultiLegStrategy")]
+pub enum MultiLegStrategy {
+    /// Unknown
+    Unknown,
+    /// Covered call (covered stock)
+    CoveredCall,
+    /// Covered put (covered stock)
+    CoveredPut,
+    /// Vertical call spread
+    VerticalCallSpread,
+    /// Vertical put spread
+    VerticalPutSpread,
+    /// Collar
+    Collar,
+    /// Straddle
+    Straddle,
+    /// Strangle
+    Strangle,
+    /// Calendar call spread
+    CalendarCallSpread,
+    /// Calendar put spread
+    CalendarPutSpread,
+}
+
+/// Multi-leg position direction
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::trade::MultiLegPosition")]
+pub enum MultiLegPosition {
+    /// Unknown
+    Unknown,
+    /// Long
+    Long,
+    /// Short
+    Short,
+}
+
+/// Option contract type
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::trade::ContractDirection")]
+pub enum ContractDirection {
+    /// Unknown
+    Unknown,
+    /// Call
+    Call,
+    /// Put
+    Put,
+}
+
+/// A leg of a multi-leg combination order
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::MultiLegOrderLeg")]
+pub struct MultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    symbol: String,
+    /// Order side
+    side: OrderSide,
+    /// Position direction
+    position: MultiLegPosition,
+    /// Leg ratio quantity
+    ratio_quantity: Decimal,
+    /// Strike price
+    #[js(opt)]
+    strike_price: Option<Decimal>,
+    /// Option expiry date
+    #[js(opt)]
+    expire_date: Option<NaiveDate>,
+    /// Contract type
+    contract_direction: ContractDirection,
+}
+
+/// Multi-leg strategy information
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::MultiLegInfo")]
+pub struct MultiLegInfo {
+    /// Multi-leg strategy
+    strategy: MultiLegStrategy,
+    /// Strategy name
+    strategy_name: String,
+    /// Multi-leg combination ID
+    multileg_id: String,
+    /// Multi-leg combination code
+    code: String,
+    /// Legs of the combination order
+    #[js(array)]
+    legs: Vec<MultiLegOrderLeg>,
+}
+
 /// Order
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
@@ -350,6 +446,10 @@ pub struct Order {
     /// Attached orders
     #[js(array)]
     attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[js(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Commission-free Status
@@ -573,6 +673,10 @@ pub struct OrderDetail {
     /// Attached orders
     #[js(array)]
     attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[js(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Order changed message
@@ -641,6 +745,10 @@ pub struct PushOrderChanged {
     last_price: Option<Decimal>,
     /// Remark message
     remark: String,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[js(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Response for submit order request
@@ -1403,4 +1511,43 @@ impl From<longbridge::trade::USOrderDetailResponse> for USOrderDetailResponse {
             current_millisecond: v.current_millisecond,
         }
     }
+}
+
+// ── Grid trading types ────────────────────────────────────────────────────
+
+/// Grid trading master-order changed message.
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longbridge::trade::PushGridOrderChanged")]
+pub struct PushGridOrderChanged {
+    /// Grid master order ID
+    order_id: String,
+    /// Order status
+    status: String,
+    /// Security symbol (e.g. `700.HK`)
+    symbol: String,
+    /// Suspend reason, if any
+    suspend_reason: String,
+    /// Submitted base price
+    submitted_base_price: String,
+    /// Current base price
+    current_base_price: String,
+    /// Upper price bound
+    upper_limit_price: String,
+    /// Lower price bound
+    lower_limit_price: String,
+    /// Trigger price type
+    trigger_price_type: i32,
+    /// Quantity per trigger
+    trigger_quantity: String,
+    /// Settlement currency
+    settlement_currency: String,
+    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+    time_in_force: i32,
+    /// Regular trading hours flag
+    rth: i32,
+    /// Sell-side order type when depth is 0
+    grid_order_type_up: String,
+    /// Buy-side order type when depth is 0
+    grid_order_type_down: String,
 }

@@ -1,14 +1,10 @@
 use std::sync::Arc;
 
 use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
-use serde::{Serialize, de::DeserializeOwned};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{
-    Config, Result,
-    market::types::*,
-    utils::counter::{counter_id_to_symbol, index_symbol_to_counter_id, symbol_to_counter_id},
-};
+use crate::{Config, Result, market::types::*};
 
 /// Convert a Unix-seconds value (integer or string) to RFC 3339.
 fn unix_secs_to_rfc3339(ts: i64) -> String {
@@ -151,14 +147,14 @@ impl MarketContext {
         };
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             #[serde(rename = "type")]
             period: &'static str,
         }
         self.get_dc(
             "/v1/quote/broker-holding",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 period: period_str,
             },
             DcRegion::Ap,
@@ -175,12 +171,12 @@ impl MarketContext {
     ) -> Result<BrokerHoldingDetail> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         self.get_dc(
             "/v1/quote/broker-holding/detail",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             },
             DcRegion::Ap,
         )
@@ -197,13 +193,13 @@ impl MarketContext {
     ) -> Result<BrokerHoldingDailyHistory> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             parti_number: String,
         }
         self.get_dc(
             "/v1/quote/broker-holding/daily",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 parti_number: broker_id.into(),
             },
             DcRegion::Ap,
@@ -224,14 +220,14 @@ impl MarketContext {
     ) -> Result<AhPremiumKlines> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             line_type: &'static str,
             line_num: u32,
         }
         self.get(
             "/v1/quote/ahpremium/klines",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 line_type: period.to_line_type(),
                 line_num: count,
             },
@@ -248,13 +244,13 @@ impl MarketContext {
     ) -> Result<AhPremiumIntraday> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             days: &'static str,
         }
         self.get(
             "/v1/quote/ahpremium/timeshares",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
                 days: "1",
             },
         )
@@ -269,12 +265,12 @@ impl MarketContext {
     pub async fn trade_stats(&self, symbol: impl Into<String>) -> Result<TradeStatsResponse> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         self.get(
             "/v1/quote/trades-statistics",
             Query {
-                counter_id: symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             },
         )
         .await
@@ -311,12 +307,12 @@ impl MarketContext {
     pub async fn constituent(&self, symbol: impl Into<String>) -> Result<IndexConstituents> {
         #[derive(Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
         }
         self.get(
             "/v1/quote/index-constituents",
             Query {
-                counter_id: index_symbol_to_counter_id(&symbol.into()),
+                symbol: symbol.into(),
             },
         )
         .await
@@ -373,7 +369,7 @@ impl MarketContext {
                 };
                 let stock_val = &ev["stock"];
                 let stock = TopMoversStock {
-                    symbol: counter_id_to_symbol(stock_val["counter_id"].as_str().unwrap_or("")),
+                    symbol: stock_val["symbol"].as_str().unwrap_or("").to_string(),
                     code: stock_val["code"].as_str().unwrap_or("").to_string(),
                     name: stock_val["name"].as_str().unwrap_or("").to_string(),
                     full_name: stock_val["full_name"].as_str().unwrap_or("").to_string(),
@@ -399,7 +395,7 @@ impl MarketContext {
                 }
             })
             .collect();
-        let next_params = raw["next_params"].clone();
+        let next_params = serde_json::to_string(&raw["next_params"]).unwrap_or_default();
         Ok(TopMoversResponse {
             events,
             next_params,
@@ -414,28 +410,50 @@ impl MarketContext {
     pub async fn rank_categories(&self) -> Result<RankCategoriesResponse> {
         #[derive(Serialize)]
         struct Empty {}
-        let mut raw: serde_json::Value = self
+        #[derive(Deserialize)]
+        struct RawSubTag {
+            key: String,
+            name: String,
+            #[serde(default)]
+            market: String,
+        }
+        #[derive(Deserialize)]
+        struct RawTag {
+            key: String,
+            name: String,
+            #[serde(default)]
+            second_tags: Vec<RawSubTag>,
+        }
+        #[derive(Deserialize)]
+        struct RawData {
+            #[serde(default)]
+            first_tags: Vec<RawTag>,
+        }
+        let raw: RawData = self
             .get("/v1/quote/market/rank/categories", Empty {})
             .await?;
-        // Strip the "ib_" prefix from all key fields so callers get clean keys
-        // that can be passed back to rank_list without the prefix.
-        if let Some(tags) = raw["first_tags"].as_array_mut() {
-            for tag in tags.iter_mut() {
-                if let Some(k) = tag["key"].as_str() {
-                    let stripped = k.strip_prefix("ib_").unwrap_or(k).to_string();
-                    tag["key"] = serde_json::Value::String(stripped);
+        let categories = raw
+            .first_tags
+            .into_iter()
+            .map(|tag| {
+                let key = tag.key.strip_prefix("ib_").unwrap_or(&tag.key).to_string();
+                let sub_categories = tag
+                    .second_tags
+                    .into_iter()
+                    .map(|sub| RankSubCategory {
+                        key: sub.key.strip_prefix("ib_").unwrap_or(&sub.key).to_string(),
+                        name: sub.name,
+                        market: sub.market,
+                    })
+                    .collect();
+                RankCategory {
+                    key,
+                    name: tag.name,
+                    sub_categories,
                 }
-                if let Some(subs) = tag["second_tags"].as_array_mut() {
-                    for sub in subs.iter_mut() {
-                        if let Some(sk) = sub["key"].as_str() {
-                            let stripped = sk.strip_prefix("ib_").unwrap_or(sk).to_string();
-                            sub["key"] = serde_json::Value::String(stripped);
-                        }
-                    }
-                }
-            }
-        }
-        Ok(RankCategoriesResponse { data: raw })
+            })
+            .collect();
+        Ok(RankCategoriesResponse { categories })
     }
 
     // ── rank_list ─────────────────────────────────────────────────
@@ -478,7 +496,7 @@ impl MarketContext {
             .unwrap_or_default()
             .into_iter()
             .map(|item| RankListItem {
-                symbol: counter_id_to_symbol(item["counter_id"].as_str().unwrap_or("")),
+                symbol: item["symbol"].as_str().unwrap_or("").to_string(),
                 code: item["code"].as_str().unwrap_or("").to_string(),
                 name: item["name"].as_str().unwrap_or("").to_string(),
                 last_done: item["last_done"].as_str().unwrap_or("").to_string(),

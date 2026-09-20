@@ -51,21 +51,21 @@ impl SharelistContextSync {
             .call(move |ctx| async move { ctx.create(name, description).await })
     }
     /// Delete a sharelist.
-    pub fn delete(&self, id: i64) -> Result<serde_json::Value> {
+    pub fn delete(&self, id: i64) -> Result<()> {
         self.rt.call(move |ctx| async move { ctx.delete(id).await })
     }
     /// Add securities to a sharelist.
-    pub fn add_securities(&self, id: i64, symbols: Vec<String>) -> Result<serde_json::Value> {
+    pub fn add_securities(&self, id: i64, symbols: Vec<String>) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.add_securities(id, symbols).await })
     }
     /// Remove securities from a sharelist.
-    pub fn remove_securities(&self, id: i64, symbols: Vec<String>) -> Result<serde_json::Value> {
+    pub fn remove_securities(&self, id: i64, symbols: Vec<String>) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.remove_securities(id, symbols).await })
     }
     /// Reorder securities in a sharelist.
-    pub fn sort_securities(&self, id: i64, symbols: Vec<String>) -> Result<serde_json::Value> {
+    pub fn sort_securities(&self, id: i64, symbols: Vec<String>) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.sort_securities(id, symbols).await })
     }

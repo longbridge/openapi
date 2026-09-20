@@ -7,13 +7,13 @@ use crate::serde_utils;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TopicAuthor {
     /// Member ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub member_id: String,
     /// Display name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Avatar URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub avatar: String,
 }
 
@@ -21,13 +21,13 @@ pub struct TopicAuthor {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TopicImage {
     /// Original image URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub url: String,
     /// Small thumbnail URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub sm: String,
     /// Large image URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub lg: String,
 }
 
@@ -37,42 +37,42 @@ pub struct OwnedTopic {
     /// Topic ID
     pub id: String,
     /// Title
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
     /// Plain text excerpt
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// Markdown body
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub body: String,
     /// Author
     pub author: TopicAuthor,
     /// Related stock tickers, format: {symbol}.{market}
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tickers: Vec<String>,
     /// Hashtag names
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub hashtags: Vec<String>,
     /// Images
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub images: Vec<TopicImage>,
     /// Likes count
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub likes_count: i32,
     /// Comments count
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub comments_count: i32,
     /// Views count
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub views_count: i32,
     /// Shares count
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub shares_count: i32,
     /// Content type: "article" or "post"
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub topic_type: String,
     /// URL to the full topic page
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub detail_url: String,
     /// Created time
     #[serde(
@@ -126,10 +126,10 @@ pub struct TopicItem {
     /// Topic ID
     pub id: String,
     /// Title
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
     /// Description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// URL
     pub url: String,
@@ -181,21 +181,21 @@ pub struct TopicReply {
     /// Topic ID this reply belongs to
     pub topic_id: String,
     /// Reply body (plain text)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub body: String,
     /// ID of the parent reply (`"0"` means top-level)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub reply_to_id: String,
     /// Author info
     pub author: TopicAuthor,
     /// Attached images
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub images: Vec<TopicImage>,
     /// Likes count
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub likes_count: i32,
     /// Nested replies count
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub comments_count: i32,
     /// Created time
     #[serde(
@@ -211,10 +211,10 @@ pub struct NewsItem {
     /// News ID
     pub id: String,
     /// Title
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
     /// Description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// URL
     pub url: String,

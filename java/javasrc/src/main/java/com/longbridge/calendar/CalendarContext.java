@@ -17,7 +17,7 @@ public class CalendarContext implements AutoCloseable {
     }
     public static CalendarContext create(Config config) {
         CalendarContext ctx = new CalendarContext();
-        ctx.raw = SdkNative.newCalendarContext(config.getRaw());
+        synchronized (config) { ctx.raw = SdkNative.newCalendarContext(config.getRaw()); }
         return ctx;
     }
     @Override
@@ -30,7 +30,7 @@ public class CalendarContext implements AutoCloseable {
     }
 
     /** Get financial calendar events */
-    public CompletableFuture<CalendarEventsResponse> getFinanceCalendar(FinanceCalendarOptions opts) throws OpenApiException {
+    public synchronized CompletableFuture<CalendarEventsResponse> getFinanceCalendar(FinanceCalendarOptions opts) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> SdkNative.calendarContextFinanceCalendar(raw(), opts, callback));
     }
 }

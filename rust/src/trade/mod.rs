@@ -8,13 +8,13 @@ mod requests;
 mod types;
 
 pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, TradeContext};
-pub use push_types::{PushEvent, PushOrderChanged, TopicType};
+pub use push_types::{PushEvent, PushGridOrderChanged, PushOrderChanged, TopicType};
 pub use requests::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
     GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions,
-    SubmitAttachedParams, SubmitOrderOptions,
+    SubmitAttachedParams, SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions,
 };
 pub use types::{
     AccountBalance,
@@ -27,6 +27,7 @@ pub use types::{
     CashInfo,
     ChargeCategoryCode,
     CommissionFreeStatus,
+    ContractDirection,
     DeductionStatus,
     Execution,
     FrozenTransactionFee,
@@ -37,6 +38,10 @@ pub use types::{
     GetUSHistoryOrders,
     GetUSRealizedPLOptions,
     MarginRatio,
+    MultiLegInfo,
+    MultiLegOrderLeg,
+    MultiLegPosition,
+    MultiLegStrategy,
     Order,
     OrderChargeDetail,
     OrderChargeFee,

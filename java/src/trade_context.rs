@@ -3,8 +3,8 @@ use std::sync::Arc;
 use jni::{
     JNIEnv, JavaVM,
     errors::Result,
-    objects::{GlobalRef, JClass, JObject, JString},
-    sys::{jboolean, jobjectArray},
+    objects::{GlobalRef, JClass, JObject, JObjectArray, JString},
+    sys::jobjectArray,
 };
 use longbridge::{
     Config, Decimal, Market, TradeContext,
@@ -12,9 +12,10 @@ use longbridge::{
         AttachedOrderType, BalanceType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, QueryUSOrdersOptions, ReplaceAttachedParams,
-        ReplaceOrderOptions, SubmitAttachedParams, SubmitOrderOptions, TimeInForceType, TopicType,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        MultiLegStrategy, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
+        ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitMultiLegOrderLeg,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;
@@ -29,6 +30,7 @@ use crate::{
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<GlobalRef>,
+    grid_order_changed: Option<GlobalRef>,
 }
 
 struct ContextObj {
@@ -47,6 +49,17 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                     handler,
                     "onOrderChanged",
                     "(Lcom/longbridge/trade/PushOrderChanged;)V",
+                    &[event.borrow()],
+                )?;
+            }
+        }
+        PushEvent::GridOrderChanged(grid_order_changed) => {
+            if let Some(handler) = &callbacks.grid_order_changed {
+                let event = grid_order_changed.into_jvalue(&mut env)?;
+                env.call_method(
+                    handler,
+                    "onGridOrderChanged",
+                    "(Lcom/longbridge/trade/PushGridOrderChanged;)V",
                     &[event.borrow()],
                 )?;
             }
@@ -105,6 +118,24 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnOrd
             context.callbacks.lock().order_changed = Some(env.new_global_ref(handler)?);
         } else {
             context.callbacks.lock().order_changed = None;
+        }
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSetOnGridOrderChanged(
+    mut env: JNIEnv,
+    _class: JClass,
+    ctx: i64,
+    handler: JObject,
+) {
+    let context = &*(ctx as *const ContextObj);
+    jni_result(&mut env, (), |env| {
+        if !handler.is_null() {
+            context.callbacks.lock().grid_order_changed = Some(env.new_global_ref(handler)?);
+        } else {
+            context.callbacks.lock().grid_order_changed = None;
         }
         Ok(())
     })
@@ -218,49 +249,48 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextTodayExe
     })
 }
 
-// TODO: temporarily disabled — restore when API is available
-// #[unsafe(no_mangle)]
-// pub unsafe extern "system" fn
-// Java_com_longbridge_SdkNative_tradeContextAllExecutions( mut env: JNIEnv,
-// _class: JClass,
-// context: i64,
-// opts: JObject,
-// callback: JObject,
-// ) {
-// jni_result(&mut env, (), |env| {
-// let context = &*(context as *const ContextObj);
-// let opts = if !opts.is_null() {
-// let mut new_opts = GetAllExecutionsOptions::new();
-// let symbol: Option<String> = get_field(env, &opts, "symbol")?;
-// if let Some(symbol) = symbol {
-// new_opts = new_opts.symbol(symbol);
-// }
-// let order_id: Option<String> = get_field(env, &opts, "orderId")?;
-// if let Some(order_id) = order_id {
-// new_opts = new_opts.order_id(order_id);
-// }
-// let start_at: Option<OffsetDateTime> = get_field(env, &opts, "startAt")?;
-// if let Some(start_at) = start_at {
-// new_opts = new_opts.start_at(start_at);
-// }
-// let end_at: Option<OffsetDateTime> = get_field(env, &opts, "endAt")?;
-// if let Some(end_at) = end_at {
-// new_opts = new_opts.end_at(end_at);
-// }
-// let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
-// if let Some(page) = page {
-// new_opts = new_opts.page(i32::from(page) as u64);
-// }
-// Some(new_opts)
-// } else {
-// None
-// };
-// async_util::execute(env, callback, async move {
-// Ok(__owned_ctx.all_executions(opts).await?)
-// })?;
-// Ok(())
-// })
-// }
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextAllExecutions(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let opts = if !opts.is_null() {
+            let mut new_opts = GetAllExecutionsOptions::new();
+            let symbol: Option<String> = get_field(env, &opts, "symbol")?;
+            if let Some(symbol) = symbol {
+                new_opts = new_opts.symbol(symbol);
+            }
+            let order_id: Option<String> = get_field(env, &opts, "orderId")?;
+            if let Some(order_id) = order_id {
+                new_opts = new_opts.order_id(order_id);
+            }
+            let start_at: Option<OffsetDateTime> = get_field(env, &opts, "startAt")?;
+            if let Some(start_at) = start_at {
+                new_opts = new_opts.start_at(start_at);
+            }
+            let end_at: Option<OffsetDateTime> = get_field(env, &opts, "endAt")?;
+            if let Some(end_at) = end_at {
+                new_opts = new_opts.end_at(end_at);
+            }
+            let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
+            if let Some(page) = page {
+                new_opts = new_opts.page(i32::from(page) as u64);
+            }
+            Some(new_opts)
+        } else {
+            None
+        };
+        async_util::execute(env, callback, async move {
+            Ok(context.ctx.all_executions(opts).await?)
+        })?;
+        Ok(())
+    })
+}
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextHistoryOrders(
@@ -624,6 +654,63 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitOr
 
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.submit_order(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextSubmitMultileg(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let side: OrderSide = get_field(env, &opts, "side")?;
+        let order_type: OrderType = get_field(env, &opts, "orderType")?;
+        let submitted_quantity: Decimal = get_field(env, &opts, "submittedQuantity")?;
+        let strategy: MultiLegStrategy = get_field(env, &opts, "strategy")?;
+
+        let legs_obj = env
+            .get_field(
+                &opts,
+                "legs",
+                "[Lcom/longbridge/trade/SubmitMultiLegOrderLeg;",
+            )?
+            .l()?;
+        let mut legs = Vec::new();
+        if !legs_obj.is_null() {
+            let legs_array: JObjectArray = legs_obj.into();
+            let len = env.get_array_length(&legs_array)?;
+            for i in 0..len {
+                let leg_obj = env.get_object_array_element(&legs_array, i)?;
+                let symbol: String = get_field(env, &leg_obj, "symbol")?;
+                let ratio_quantity: Decimal = get_field(env, &leg_obj, "ratioQuantity")?;
+                legs.push(SubmitMultiLegOrderLeg::new(symbol, ratio_quantity));
+            }
+        }
+
+        let mut new_opts =
+            SubmitMultiLegOrderOptions::new(side, order_type, submitted_quantity, strategy, legs);
+        let submitted_price: Option<Decimal> = get_field(env, &opts, "submittedPrice")?;
+        if let Some(submitted_price) = submitted_price {
+            new_opts = new_opts.submitted_price(submitted_price);
+        }
+        let remark: Option<String> = get_field(env, &opts, "remark")?;
+        if let Some(remark) = remark {
+            new_opts = new_opts.remark(remark);
+        }
+        let client_request_id: Option<String> = get_field(env, &opts, "clientRequestId")?;
+        if let Some(id) = client_request_id {
+            new_opts = new_opts.client_request_id(id);
+        }
+
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.submit_multileg(new_opts).await?)
         })?;
         Ok(())
     })

@@ -270,9 +270,17 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longbridge/quote/StrikePriceInfo",
-    longbridge::quote::StrikePriceInfo,
-    [price, call_symbol, put_symbol, standard]
+    "com/longbridge/quote/OptionChainContract",
+    longbridge::quote::OptionChainContract,
+    [
+        symbol,
+        expiry_date,
+        strike_price,
+        direction,
+        option_type,
+        standard_attr,
+        days_to_expiry
+    ]
 );
 
 impl_java_class!(
@@ -614,6 +622,33 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/trade/MultiLegOrderLeg",
+    longbridge::trade::MultiLegOrderLeg,
+    [
+        symbol,
+        side,
+        position,
+        ratio_quantity,
+        strike_price,
+        expire_date,
+        contract_direction
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/MultiLegInfo",
+    longbridge::trade::MultiLegInfo,
+    [
+        strategy,
+        strategy_name,
+        multileg_id,
+        code,
+        #[java(objarray)]
+        legs
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/trade/PushOrderChanged",
     longbridge::trade::PushOrderChanged,
     [
@@ -641,14 +676,23 @@ impl_java_class!(
         account_no,
         last_share,
         last_price,
-        remark
+        remark,
+        multi_leg
     ]
 );
 
 impl_java_class!(
     "com/longbridge/trade/Execution",
     longbridge::trade::Execution,
-    [order_id, trade_id, symbol, trade_done_at, quantity, price]
+    [
+        order_id,
+        trade_id,
+        symbol,
+        trade_done_at,
+        quantity,
+        price,
+        side
+    ]
 );
 
 impl_java_class!(
@@ -697,7 +741,8 @@ impl_java_class!(
         monitor_price,
         remark,
         #[java(objarray)]
-        attached_orders
+        attached_orders,
+        multi_leg
     ]
 );
 
@@ -976,7 +1021,8 @@ impl_java_class!(
         history,
         charge_detail,
         #[java(objarray)]
-        attached_orders
+        attached_orders,
+        multi_leg
     ]
 );
 
@@ -984,6 +1030,273 @@ impl_java_class!(
     "com/longbridge/trade/EstimateMaxPurchaseQuantityResponse",
     longbridge::trade::EstimateMaxPurchaseQuantityResponse,
     [cash_max_qty, margin_max_qty]
+);
+
+// ── Grid trading types ────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/grid/SubmitGridOrderResponse",
+    longbridge::grid::SubmitGridOrderResponse,
+    [order_id]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrder",
+    longbridge::grid::GridOrder,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        market,
+        status,
+        grid_status,
+        submitted_base_price,
+        current_base_price,
+        pre_trigger_base_price,
+        post_trigger_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        trigger_sell_order_type,
+        trigger_buy_order_type,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        multiple_trigger,
+        trigger_times,
+        total_buy_quantity,
+        total_sell_quantity,
+        total_profit_balance,
+        settlement_currency,
+        time_in_force,
+        gtd,
+        created_at,
+        rth,
+        support_shortsell,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderSubOrder",
+    longbridge::grid::GridOrderSubOrder,
+    [
+        id,
+        price,
+        order_type,
+        quantity,
+        executed_qty,
+        action,
+        status,
+        submitted_at,
+        rth
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderHistory",
+    longbridge::grid::GridOrderHistory,
+    [history_id, created_at, status, suspend_reason, reason]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrderDetail",
+    longbridge::grid::GridOrderDetail,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        status,
+        grid_status,
+        suspend_reason,
+        sleeping_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        multiple_trigger,
+        time_in_force,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        created_at,
+        updated_at,
+        settlement_currency,
+        expire_time,
+        gtd,
+        #[java(objarray)]
+        grid_sub_orders,
+        sub_has_more,
+        #[java(objarray)]
+        grid_order_history,
+        history_has_more,
+        support_shortsell,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/TriggerOrder",
+    longbridge::grid::TriggerOrder,
+    [
+        id,
+        status,
+        name,
+        symbol,
+        price,
+        quantity,
+        executed_price,
+        executed_qty,
+        submitted_at,
+        action,
+        order_type,
+        trigger_price,
+        msg,
+        currency,
+        last_done,
+        updated_at,
+        time_in_force,
+        gtd,
+        trigger_at,
+        trigger_status
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridBidSize",
+    longbridge::grid::GridBidSize,
+    [str_proceed, end_proceed, bid_size]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridChannelInfo",
+    longbridge::grid::GridChannelInfo,
+    [
+        strategy_granted,
+        support_rth,
+        currency,
+        #[java(objarray)]
+        settlement_currency
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/grid/GridSymbolInfo",
+    longbridge::grid::GridSymbolInfo,
+    [
+        name,
+        last_done,
+        lot_size,
+        buy_lot_size,
+        sell_lot_size,
+        #[java(objarray)]
+        bid_sizes,
+        channel_info
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/trade/PushGridOrderChanged",
+    longbridge::trade::PushGridOrderChanged,
+    [
+        order_id,
+        status,
+        symbol,
+        suspend_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_quantity,
+        settlement_currency,
+        time_in_force,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+// Mirror the grid list / trigger-history responses with binding-side structs so
+// the `has_more` paging flag can be flattened alongside the item array.
+pub(crate) struct GridOrdersResponse {
+    grid_order: Vec<longbridge::grid::GridOrder>,
+    has_more: bool,
+}
+
+impl GridOrdersResponse {
+    pub(crate) fn new(grid_order: Vec<longbridge::grid::GridOrder>, has_more: bool) -> Self {
+        Self {
+            grid_order,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/grid/GridOrdersResponse",
+    GridOrdersResponse,
+    [
+        #[java(objarray)]
+        grid_order,
+        has_more
+    ]
+);
+
+pub(crate) struct GridTriggerHistoryResponse {
+    trigger_orders: Vec<longbridge::grid::TriggerOrder>,
+    has_more: bool,
+}
+
+impl GridTriggerHistoryResponse {
+    pub(crate) fn new(trigger_orders: Vec<longbridge::grid::TriggerOrder>, has_more: bool) -> Self {
+        Self {
+            trigger_orders,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longbridge/grid/GridTriggerHistoryResponse",
+    GridTriggerHistoryResponse,
+    [
+        #[java(objarray)]
+        trigger_orders,
+        has_more
+    ]
 );
 
 impl_java_class!(
@@ -1712,6 +2025,16 @@ impl_java_class!(
 // ── AlertContext types ────────────────────────────────────────────
 
 impl_java_class!(
+    "com/longbridge/alert/AlertValueMap",
+    longbridge::alert::AlertValueMap,
+    [
+        price,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        chg
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/alert/AlertItem",
     longbridge::alert::AlertItem,
     [
@@ -2396,13 +2719,25 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/fundamental/RatingIndicator",
     longbridge::fundamental::RatingIndicator,
-    [name, score, letter]
+    [
+        name,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
     "com/longbridge/fundamental/RatingLeafIndicator",
     longbridge::fundamental::RatingLeafIndicator,
-    [name, value, value_type, score, letter]
+    [
+        name,
+        value,
+        value_type,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
@@ -2432,13 +2767,18 @@ impl_java_class!(
         style_txt_name,
         scale_txt_name,
         report_period_txt,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         multi_score,
         multi_letter,
         multi_score_change,
         industry_name,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_rank,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_total,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_mean_score,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_median_score,
         #[java(objarray)]
         ratings
@@ -2514,7 +2854,7 @@ impl_java_class!(
     longbridge::fundamental::IndustryRankItem,
     [
         name,
-        counter_id,
+        symbol,
         chg,
         leading_name,
         leading_ticker,
@@ -2586,7 +2926,7 @@ impl crate::types::IntoJValue for longbridge::fundamental::IndustryPeerNode {
     ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
         let longbridge::fundamental::IndustryPeerNode {
             name,
-            counter_id,
+            symbol,
             stock_num,
             chg,
             ytd_chg,
@@ -2596,7 +2936,7 @@ impl crate::types::IntoJValue for longbridge::fundamental::IndustryPeerNode {
         let cls = <Self as crate::types::ClassLoader>::class_ref();
         let obj = env.new_object(cls.borrow(), "()V", &[])?;
         crate::types::set_field(env, &obj, "name", name)?;
-        crate::types::set_field(env, &obj, "counterId", counter_id)?;
+        crate::types::set_field(env, &obj, "symbol", symbol)?;
         crate::types::set_field(env, &obj, "stockNum", stock_num)?;
         crate::types::set_field(env, &obj, "chg", chg)?;
         crate::types::set_field(env, &obj, "ytdChg", ytd_chg)?;
@@ -2669,6 +3009,7 @@ impl_java_class!(
     longbridge::portfolio::FlowItem,
     [
         executed_date,
+        #[java(nullable)]
         executed_timestamp,
         code,
         direction,
@@ -2837,9 +3178,29 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/market/RankSubCategory",
+    longbridge::market::RankSubCategory,
+    [key, name, market]
+);
+
+impl_java_class!(
+    "com/longbridge/market/RankCategory",
+    longbridge::market::RankCategory,
+    [
+        key,
+        name,
+        #[java(objarray)]
+        sub_categories
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/market/RankCategoriesResponse",
     longbridge::market::RankCategoriesResponse,
-    [data]
+    [
+        #[java(objarray)]
+        categories
+    ]
 );
 
 impl_java_class!(
@@ -2953,13 +3314,13 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/Reference",
     longbridge::agent::Reference,
-    [index, title, url]
+    [index, original_index, ref_type, id, title, url, content]
 );
 
 impl_java_class!(
     "com/longbridge/agent/QuestionOption",
     longbridge::agent::QuestionOption,
-    [description]
+    [label, description]
 );
 
 impl_java_class!(
@@ -2974,6 +3335,20 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longbridge/agent/HumanInteraction",
+    longbridge::agent::HumanInteraction,
+    [
+        tool_call_id,
+        interrupt_id,
+        interaction_type,
+        tool_name,
+        #[java(objarray)]
+        questions,
+        tool_args
+    ]
+);
+
+impl_java_class!(
     "com/longbridge/agent/Interrupt",
     longbridge::agent::Interrupt,
     [
@@ -2981,6 +3356,8 @@ impl_java_class!(
         tool_call_id,
         #[java(objarray)]
         questions,
+        #[java(objarray)]
+        interactions,
         message_id,
         chat_id
     ]
@@ -3000,7 +3377,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/agent/ChatStartedEvent",
     longbridge::agent::ChatStartedPayload,
-    [chat_uid, message_id]
+    [chat_uid, message_id, chat_id, error, error_message]
 );
 
 // JNI-side view of `longbridge::agent::WorkflowStartedInputs`, the `inputs`
@@ -3315,16 +3692,18 @@ impl_java_class!(
 );
 
 /// JNI-side view of [`longbridge::agent::ConversationResponse`], with
-/// `references` normalized from `Option<Vec<Reference>>` down to a plain
-/// `Vec` (empty when absent) so it can use the same `#[java(objarray)]`
-/// convention as every other list field — mirrors how `StockPosition` above
-/// collapses `Option<Decimal>`/`Option<i64>` fields with `unwrap_or_default`.
+/// `references`/`further_questions` normalized from `Option<Vec<_>>` down to
+/// a plain `Vec` (empty when absent) so they can use the same
+/// `#[java(objarray)]` convention as every other list field — mirrors how
+/// `StockPosition` above collapses `Option<Decimal>`/`Option<i64>` fields
+/// with `unwrap_or_default`.
 pub(crate) struct ConversationResponse {
     pub(crate) chat_uid: String,
     pub(crate) message_id: String,
     pub(crate) status: longbridge::agent::ConversationStatus,
     pub(crate) answer: String,
     pub(crate) references: Vec<longbridge::agent::Reference>,
+    pub(crate) further_questions: Vec<String>,
     pub(crate) elapsed_time: f64,
     pub(crate) interrupt: Option<longbridge::agent::Interrupt>,
     pub(crate) error: Option<longbridge::agent::AgentError>,
@@ -3338,6 +3717,7 @@ impl From<longbridge::agent::ConversationResponse> for ConversationResponse {
             status: value.status,
             answer: value.answer,
             references: value.references.unwrap_or_default(),
+            further_questions: value.further_questions.unwrap_or_default(),
             elapsed_time: value.elapsed_time,
             interrupt: value.interrupt,
             error: value.error,
@@ -3355,6 +3735,8 @@ impl_java_class!(
         answer,
         #[java(objarray)]
         references,
+        #[java(objarray)]
+        further_questions,
         elapsed_time,
         interrupt,
         error

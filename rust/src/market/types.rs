@@ -1,12 +1,10 @@
-#![allow(missing_docs)]
-
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum_macros::{FromRepr, IntoStaticStr};
 use time::OffsetDateTime;
 
-use crate::{types::Market, utils::counter::deserialize_counter_id_as_symbol};
+use crate::types::Market;
 
 // ── market_status ─────────────────────────────────────────────────
 
@@ -442,7 +440,7 @@ pub struct BrokerHoldingTop {
     /// Top brokers by net selling
     pub sell: Vec<BrokerHoldingEntry>,
     /// Last updated (may be empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: String,
 }
 
@@ -468,7 +466,7 @@ pub struct BrokerHoldingDetail {
     /// Full list of broker holdings
     pub list: Vec<BrokerHoldingDetailItem>,
     /// Last updated (may be empty)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: String,
 }
 
@@ -649,10 +647,6 @@ pub struct AnomalyResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnomalyItem {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Security name
     pub name: String,
@@ -685,10 +679,6 @@ pub struct IndexConstituents {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConstituentStock {
     /// Security symbol
-    #[serde(
-        rename = "counter_id",
-        deserialize_with = "deserialize_counter_id_as_symbol"
-    )]
     pub symbol: String,
     /// Security name
     pub name: String,
@@ -733,14 +723,14 @@ pub struct ConstituentStock {
 /// Stock information within a top-movers event.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TopMoversStock {
-    /// Symbol (converted from counter_id, e.g. `"NVDA.US"`)
+    /// Symbol, e.g. `"NVDA.US"`
     pub symbol: String,
     /// Ticker code (e.g. `"NVDA"`)
     pub code: String,
     /// Security name
     pub name: String,
     /// Full name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub full_name: String,
     /// Price change (decimal ratio)
     pub change: String,
@@ -749,10 +739,10 @@ pub struct TopMoversStock {
     /// Market code
     pub market: String,
     /// Labels / tags
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub labels: Vec<String>,
     /// Logo URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub logo: String,
 }
 
@@ -776,20 +766,41 @@ pub struct TopMoversEvent {
 pub struct TopMoversResponse {
     /// Top-mover events
     pub events: Vec<TopMoversEvent>,
-    /// Pagination cursor for next page
-    pub next_params: serde_json::Value,
+    /// Pagination cursor for next page (pass as-is to the next call; empty
+    /// string means no more pages)
+    pub next_params: String,
 }
 
 // ── rank_categories ───────────────────────────────────────────────
 
+/// A leaf rank sub-category whose `key` can be passed to
+/// [`MarketContext::rank_list`](crate::MarketContext::rank_list).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankSubCategory {
+    /// Sub-category key, e.g. `"hot_all-us"`. Pass directly to `rank_list`.
+    pub key: String,
+    /// Display name, e.g. `"美股总热度"`
+    pub name: String,
+    /// Market code, e.g. `"US"`, `"HK"`, `"CN"`, `"SG"`
+    pub market: String,
+}
+
+/// A top-level rank category grouping one or more sub-categories.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankCategory {
+    /// Top-level key, e.g. `"hot"`
+    pub key: String,
+    /// Display name, e.g. `"热度排行"`
+    pub name: String,
+    /// Sub-categories
+    pub sub_categories: Vec<RankSubCategory>,
+}
+
 /// Response for [`crate::MarketContext::rank_categories`]
-///
-/// The raw data contains all available rank category keys and labels.
-/// The exact structure varies so the payload is preserved as raw JSON.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankCategoriesResponse {
-    /// Raw rank category data
-    pub data: serde_json::Value,
+    /// All top-level rank categories
+    pub categories: Vec<RankCategory>,
 }
 
 // ── rank_list ─────────────────────────────────────────────────────
@@ -797,7 +808,7 @@ pub struct RankCategoriesResponse {
 /// One ranked security item.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankListItem {
-    /// Symbol (converted from counter_id, e.g. `"MU.US"`)
+    /// Symbol, e.g. `"MU.US"`
     pub symbol: String,
     /// Ticker code (e.g. `"MU"`)
     pub code: String,
@@ -816,25 +827,25 @@ pub struct RankListItem {
     /// Industry name
     pub industry: String,
     /// Pre/post market price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pre_post_price: String,
     /// Pre/post market change
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pre_post_chg: String,
     /// Amplitude
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub amplitude: String,
     /// 5-day change
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub five_day_chg: String,
     /// Turnover rate
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub turnover_rate: String,
     /// Volume ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub volume_rate: String,
     /// P/B ratio (TTM)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub pb_ttm: String,
 }
 

@@ -13,6 +13,7 @@ public class Execution {
     private OffsetDateTime tradeDoneAt;
     private BigDecimal quantity;
     private BigDecimal price;
+    private OrderSide side;
 
     /**
      * Returns the order ID.
@@ -68,9 +69,18 @@ public class Execution {
         return price;
     }
 
+    /**
+     * Returns the order side.
+     *
+     * @return order side
+     */
+    public OrderSide getSide() {
+        return side;
+    }
+
     @Override
     public String toString() {
-        return "Execution [orderId=" + orderId + ", price=" + price + ", quantity=" + quantity + ", symbol=" + symbol
-                + ", tradeDoneAt=" + tradeDoneAt + ", tradeId=" + tradeId + "]";
+        return "Execution [orderId=" + orderId + ", price=" + price + ", quantity=" + quantity + ", side=" + side
+                + ", symbol=" + symbol + ", tradeDoneAt=" + tradeDoneAt + ", tradeId=" + tradeId + "]";
     }
 }

@@ -23,7 +23,7 @@ public class SharelistContext implements AutoCloseable {
      * @param config Config object
      * @return A new SharelistContext instance
      */
-    public static SharelistContext create(Config config) { SharelistContext ctx = new SharelistContext(); ctx.raw = SdkNative.newSharelistContext(config.getRaw()); return ctx; }
+    public static SharelistContext create(Config config) { SharelistContext ctx = new SharelistContext(); synchronized (config) { ctx.raw = SdkNative.newSharelistContext(config.getRaw()); } return ctx; }
 
     @Override
     public synchronized void close() throws Exception {
@@ -41,7 +41,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the sharelist collection
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SharelistList> list(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextList(raw(), count, cb)); }
+    public synchronized CompletableFuture<SharelistList> list(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextList(raw(), count, cb)); }
 
     /**
      * Get sharelist detail including its constituent securities.
@@ -50,7 +50,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the sharelist detail
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SharelistDetail> detail(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDetail(raw(), id, cb)); }
+    public synchronized CompletableFuture<SharelistDetail> detail(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDetail(raw(), id, cb)); }
 
     /**
      * Get popular sharelists.
@@ -59,7 +59,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the popular sharelist collection
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<SharelistList> popular(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextPopular(raw(), count, cb)); }
+    public synchronized CompletableFuture<SharelistList> popular(int count) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextPopular(raw(), count, cb)); }
 
     /**
      * Create a new sharelist.
@@ -68,7 +68,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future resolving to the newly created sharelist detail
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> create(CreateSharelistOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextCreate(raw(), opts, cb)); }
+    public synchronized CompletableFuture<Void> create(CreateSharelistOptions opts) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextCreate(raw(), opts, cb)); }
 
     /**
      * Add securities to a sharelist.
@@ -78,7 +78,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the securities have been added
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> addSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextAddSecurities(raw(), id, symbols, cb)); }
+    public synchronized CompletableFuture<Void> addSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextAddSecurities(raw(), id, symbols, cb)); }
 
     /**
      * Delete a sharelist.
@@ -87,7 +87,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the sharelist has been deleted
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> delete(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDelete(raw(), id, cb)); }
+    public synchronized CompletableFuture<Void> delete(long id) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextDelete(raw(), id, cb)); }
 
     /**
      * Remove securities from a sharelist.
@@ -97,7 +97,7 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the securities have been removed
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> removeSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextRemoveSecurities(raw(), id, symbols, cb)); }
+    public synchronized CompletableFuture<Void> removeSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextRemoveSecurities(raw(), id, symbols, cb)); }
 
     /**
      * Reorder securities in a sharelist.
@@ -107,5 +107,5 @@ public class SharelistContext implements AutoCloseable {
      * @return A Future that completes when the securities have been reordered
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> sortSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextSortSecurities(raw(), id, symbols, cb)); }
+    public synchronized CompletableFuture<Void> sortSecurities(long id, String[] symbols) throws OpenApiException { return AsyncCallback.executeTask((cb) -> SdkNative.sharelistContextSortSecurities(raw(), id, symbols, cb)); }
 }

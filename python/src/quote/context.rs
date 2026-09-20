@@ -17,12 +17,12 @@ use crate::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
             FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
             HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-            MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
-            PinnedMode, QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security,
-            SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
-            SecurityStaticInfo, SortOrderType, StrikePriceInfo, SubType, SubTypes, Subscription,
-            Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
-            WarrantType, WatchlistGroup,
+            MarketTradingDays, MarketTradingSession, OptionChainContract, OptionQuote,
+            ParticipantInfo, Period, PinnedMode, QuotePackageDetail, RealtimeQuote,
+            SecuritiesUpdateMode, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+            SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType, SubType,
+            SubTypes, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
+            WarrantStatus, WarrantType, WatchlistGroup,
         },
     },
     time::{PyDateWrapper, PyOffsetDateTimeWrapper},
@@ -354,14 +354,17 @@ impl QuoteContext {
             .collect())
     }
 
-    /// Get option chain info by date
+    /// Get the option contract list of an underlying security for a given
+    /// expiry date
+    #[pyo3(signature = (symbol, expiry_date, standard_only = false))]
     fn option_chain_info_by_date(
         &self,
         symbol: String,
         expiry_date: PyDateWrapper,
-    ) -> PyResult<Vec<StrikePriceInfo>> {
+        standard_only: bool,
+    ) -> PyResult<Vec<OptionChainContract>> {
         self.ctx
-            .option_chain_info_by_date(symbol, expiry_date.0)
+            .option_chain_info_by_date(symbol, expiry_date.0, standard_only)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)

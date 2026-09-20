@@ -442,8 +442,9 @@ impl From<lb::ProfitAnalysisByMarket> for ProfitAnalysisByMarket {
 #[derive(Debug, Clone)]
 pub struct FlowItem {
     pub executed_date: String,
-    /// Execution timestamp as a JSON value string
-    pub executed_timestamp: String,
+    /// Execution timestamp as a Unix-seconds string (absent when not yet
+    /// executed)
+    pub executed_timestamp: Option<String>,
     pub code: String,
     pub direction: crate::types::FlowDirection,
     pub executed_quantity: Option<String>,
@@ -456,7 +457,7 @@ impl From<lb::FlowItem> for FlowItem {
     fn from(v: lb::FlowItem) -> Self {
         Self {
             executed_date: v.executed_date,
-            executed_timestamp: v.executed_timestamp.to_string(),
+            executed_timestamp: v.executed_timestamp,
             code: v.code,
             direction: v.direction.into(),
             executed_quantity: v.executed_quantity.map(|d| d.to_string()),

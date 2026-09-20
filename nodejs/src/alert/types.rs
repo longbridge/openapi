@@ -1,5 +1,31 @@
 use longbridge::alert::types as lb;
 
+/// Trigger value of a price alert (exactly one field is populated).
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct AlertValueMap {
+    /// Absolute price threshold as a decimal string, e.g. `"500"`.
+    pub price: Option<String>,
+    /// Percentage-change threshold, e.g. `5`.
+    pub chg: Option<f64>,
+}
+impl From<lb::AlertValueMap> for AlertValueMap {
+    fn from(v: lb::AlertValueMap) -> Self {
+        Self {
+            price: v.price.map(|d| d.to_string()),
+            chg: v.chg,
+        }
+    }
+}
+impl From<AlertValueMap> for lb::AlertValueMap {
+    fn from(v: AlertValueMap) -> Self {
+        Self {
+            price: v.price.and_then(|s| s.parse().ok()),
+            chg: v.chg,
+        }
+    }
+}
+
 /// One price alert
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
@@ -18,8 +44,8 @@ pub struct AlertItem {
     pub text: String,
     /// Trigger state flags
     pub state: Vec<i32>,
-    /// Trigger value: `{"price":"500"}` or `{"chg":"5"}`
-    pub value_map: serde_json::Value,
+    /// Trigger value, e.g. `{"price":"500"}` or `{"chg":"5"}`
+    pub value_map: AlertValueMap,
 }
 impl From<lb::AlertItem> for AlertItem {
     fn from(v: lb::AlertItem) -> Self {
@@ -31,7 +57,7 @@ impl From<lb::AlertItem> for AlertItem {
             scope: v.scope,
             text: v.text,
             state: v.state,
-            value_map: v.value_map,
+            value_map: v.value_map.into(),
         }
     }
 }
@@ -46,7 +72,7 @@ impl From<AlertItem> for lb::AlertItem {
             scope: v.scope,
             text: v.text,
             state: v.state,
-            value_map: v.value_map,
+            value_map: v.value_map.into(),
         }
     }
 }

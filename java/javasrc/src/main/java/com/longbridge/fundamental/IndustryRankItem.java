@@ -4,8 +4,8 @@ package com.longbridge.fundamental;
 public class IndustryRankItem {
     /** Industry / sector name */
     public String name;
-    /** Counter ID of the industry */
-    public String counterId;
+    /** Industry symbol */
+    public String symbol;
     /** Change percentage */
     public String chg;
     /** Name of the leading stock */

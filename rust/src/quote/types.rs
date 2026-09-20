@@ -499,6 +499,36 @@ pub enum OptionDirection {
     Call,
 }
 
+/// Special expiration cycle of an option contract
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Serialize, Deserialize)]
+pub enum OptionExpiryCycleType {
+    /// Unknown
+    Unknown,
+    /// Standard monthly option
+    #[strum(serialize = "")]
+    Monthly,
+    /// Weekly option, expires weekly
+    #[strum(serialize = "W")]
+    Weekly,
+    /// Quarterly option, expires quarterly
+    #[strum(serialize = "Q")]
+    Quarterly,
+}
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action (e.g. a stock split or a merger)
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Serialize, Deserialize)]
+pub enum OptionStandardAttr {
+    /// Unknown
+    Unknown,
+    /// A normal, active contract
+    #[strum(serialize = "")]
+    Normal,
+    /// A legacy contract produced by a corporate action
+    #[strum(serialize = "old")]
+    Old,
+}
+
 /// Quote of option
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OptionQuote {
@@ -940,30 +970,31 @@ impl longbridge_candlesticks::CandlestickType for Candlestick {
     }
 }
 
-/// Strike price info
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StrikePriceInfo {
+pub struct OptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    pub symbol: String,
+    /// Expiry date, in US Eastern time
+    pub expiry_date: Date,
     /// Strike price
-    pub price: Decimal,
-    /// Security code of call option
-    pub call_symbol: String,
-    /// Security code of put option
-    pub put_symbol: String,
-    /// Is standard
-    pub standard: bool,
-}
-
-impl TryFrom<quote::StrikePriceInfo> for StrikePriceInfo {
-    type Error = Error;
-
-    fn try_from(value: quote::StrikePriceInfo) -> Result<Self> {
-        Ok(Self {
-            price: value.price.parse().unwrap_or_default(),
-            call_symbol: value.call_symbol,
-            put_symbol: value.put_symbol,
-            standard: value.standard,
-        })
-    }
+    pub strike_price: Decimal,
+    /// Contract direction
+    pub direction: OptionDirection,
+    /// Special expiration cycle of the contract
+    pub option_type: OptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    pub standard_attr: OptionStandardAttr,
+    /// Number of days remaining until the option expires, updated daily at
+    /// midnight ET
+    ///
+    /// `0` for options expiring today, and negative for already-expired
+    /// options.
+    pub days_to_expiry: i32,
 }
 
 /// Issuer info
@@ -1082,6 +1113,11 @@ pub enum FilterWarrantInOutBoundsType {
 )]
 #[repr(i32)]
 pub enum WarrantStatus {
+    /// Unknown
+    ///
+    /// The server reports an unrecognized status (e.g. `0` on placeholder
+    /// rows).
+    Unknown = 0,
     /// Suspend
     Suspend = 2,
     /// Prepare List
@@ -1110,7 +1146,9 @@ pub struct WarrantInfo {
     /// Turnover
     pub turnover: Decimal,
     /// Expiry date
-    pub expiry_date: Date,
+    ///
+    /// `None` if the server does not report an expiry date for this warrant.
+    pub expiry_date: Option<Date>,
     /// Strike price
     pub strike_price: Option<Decimal>,
     /// Upper strike price
@@ -1163,8 +1201,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 change_value: info.change_val.parse().unwrap_or_default(),
                 volume: info.volume,
                 turnover: info.turnover.parse().unwrap_or_default(),
-                expiry_date: parse_date(&info.expiry_date)
-                    .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                expiry_date: parse_date(&info.expiry_date).ok(),
                 strike_price: info.strike_price.parse().ok(),
                 upper_strike_price: info.upper_strike_price.parse().ok(),
                 lower_strike_price: info.lower_strike_price.parse().ok(),
@@ -1180,8 +1217,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 leverage_ratio: info.leverage_ratio.parse().unwrap_or_default(),
                 conversion_ratio: info.conversion_ratio.parse().ok(),
                 balance_point: info.balance_point.parse().ok(),
-                status: WarrantStatus::try_from(info.status)
-                    .map_err(|err| Error::parse_field_error("state", err))?,
+                status: WarrantStatus::try_from(info.status).unwrap_or(WarrantStatus::Unknown),
             }),
             WarrantType::Bull | WarrantType::Bear => Ok(Self {
                 symbol: info.symbol,
@@ -1192,8 +1228,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 change_value: info.change_val.parse().unwrap_or_default(),
                 volume: info.volume,
                 turnover: info.turnover.parse().unwrap_or_default(),
-                expiry_date: parse_date(&info.expiry_date)
-                    .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                expiry_date: parse_date(&info.expiry_date).ok(),
                 strike_price: Some(info.strike_price.parse().unwrap_or_default()),
                 upper_strike_price: None,
                 lower_strike_price: None,
@@ -1209,8 +1244,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 leverage_ratio: info.leverage_ratio.parse().unwrap_or_default(),
                 conversion_ratio: Some(info.conversion_ratio.parse().unwrap_or_default()),
                 balance_point: Some(info.balance_point.parse().unwrap_or_default()),
-                status: WarrantStatus::try_from(info.status)
-                    .map_err(|err| Error::parse_field_error("state", err))?,
+                status: WarrantStatus::try_from(info.status).unwrap_or(WarrantStatus::Unknown),
             }),
             WarrantType::Inline => Ok(Self {
                 symbol: info.symbol,
@@ -1221,8 +1255,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 change_value: info.change_val.parse().unwrap_or_default(),
                 volume: info.volume,
                 turnover: info.turnover.parse().unwrap_or_default(),
-                expiry_date: parse_date(&info.expiry_date)
-                    .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                expiry_date: parse_date(&info.expiry_date).ok(),
                 strike_price: None,
                 upper_strike_price: Some(info.upper_strike_price.parse().unwrap_or_default()),
                 lower_strike_price: Some(info.lower_strike_price.parse().unwrap_or_default()),
@@ -1238,8 +1271,7 @@ impl TryFrom<quote::FilterWarrant> for WarrantInfo {
                 leverage_ratio: info.leverage_ratio.parse().unwrap_or_default(),
                 conversion_ratio: None,
                 balance_point: None,
-                status: WarrantStatus::try_from(info.status)
-                    .map_err(|err| Error::parse_field_error("state", err))?,
+                status: WarrantStatus::try_from(info.status).unwrap_or(WarrantStatus::Unknown),
             }),
         }
     }
@@ -1405,7 +1437,7 @@ pub struct WatchlistSecurity {
     )]
     pub watched_at: OffsetDateTime,
     /// Whether the security is pinned to the top of the group
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_pinned: bool,
 }
 
@@ -1725,29 +1757,23 @@ pub struct SecurityCalcIndex {
     pub balance_point: Option<Decimal>,
     /// Open interest
     pub open_interest: Option<i64>,
-    /// Delta
+    /// Delta. Measures the expected change in option price for a $1 move in the
+    /// underlying asset price.
     pub delta: Option<Decimal>,
-    /// Gamma
+    /// Gamma. Measures the expected change in Delta for a $1 move in the
+    /// underlying asset price.
     pub gamma: Option<Decimal>,
-    /// Theta
-    ///
-    /// The raw value returned by the API is annualized (scaled by 252 trading
-    /// days per year). To obtain the standard per-calendar-day theta, divide
-    /// by 252: `theta / 252`.
+    /// Theta. Measures the expected change in option price as one day passes;
+    /// the raw value has been divided by 365 to convert to a daily value,
+    /// representing the impact of one day's time decay on the option price.
     pub theta: Option<Decimal>,
-    /// Vega
-    ///
-    /// The raw value returned by the API is expressed per 1 percentage-point
-    /// change in implied volatility (i.e. the value has been multiplied by
-    /// 100). To obtain the standard vega (per unit change in IV), divide by
-    /// 100: `vega / 100`.
+    /// Vega. Measures the expected change in option price when implied
+    /// volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+    /// get the expected price change per 1% move in IV.
     pub vega: Option<Decimal>,
-    /// Rho
-    ///
-    /// The raw value returned by the API is expressed per 1 percentage-point
-    /// change in the risk-free rate (i.e. the value has been multiplied by
-    /// 100). To obtain the standard rho (per unit change in rate), divide by
-    /// 100: `rho / 100`.
+    /// Rho. Measures the expected change in option price when the risk-free
+    /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+    /// the expected price change per 1% move in the interest rate.
     pub rho: Option<Decimal>,
 }
 
@@ -1956,7 +1982,7 @@ pub struct MarketTemperature {
     /// Temperature value
     pub temperature: i32,
     /// Temperature description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// Market valuation
     pub valuation: i32,
@@ -2006,7 +2032,7 @@ pub struct FilingItem {
     /// Title
     pub title: String,
     /// Description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// File name
     pub file_name: String,
@@ -2025,6 +2051,8 @@ impl_serde_for_enum_string!(Granularity);
 impl_default_for_enum_string!(
     OptionType,
     OptionDirection,
+    OptionExpiryCycleType,
+    OptionStandardAttr,
     WarrantType,
     SecurityBoard,
     Granularity
@@ -2042,22 +2070,22 @@ pub struct ShortPositionsItem {
     /// Closing price (both markets)
     pub close: String,
     /// [US] Number of short shares outstanding
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub current_shares_short: String,
     /// [US] Average daily share volume
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub avg_daily_share_volume: String,
     /// [US] Days to cover ratio
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub days_to_cover: String,
     /// [HK] Short sale amount (HKD)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub amount: String,
     /// [HK] Short position balance
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub balance: String,
     /// [HK] Cost / closing price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub cost: String,
 }
 
@@ -2129,19 +2157,19 @@ pub struct ShortTradesItem {
     /// Closing price
     pub close: String,
     /// [US] NYSE short amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub nus_amount: String,
     /// [US] NY short amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ny_amount: String,
     /// [US] Total short amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total_amount: String,
     /// [HK] Short sale amount
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub amount: String,
     /// [HK] Short position balance
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub balance: String,
 }
 
@@ -2173,57 +2201,52 @@ pub enum PinnedMode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct USCryptoOverview {
     /// Full name (e.g. `"Bitcoin"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub name: String,
     /// Ticker symbol (e.g. `"BTC"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ticker: String,
     /// Pricing currency
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// All-time high price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_high: String,
     /// All-time high date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_high_date: String,
     /// All-time low price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_low: String,
     /// All-time low date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub all_time_low_date: String,
     /// Listing date
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub ipo_date: String,
     /// Issue price
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub issue_price: String,
     /// Circulating supply
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub shares: String,
-    /// User-facing symbol (e.g. `"BTCUSD.BKKT"`), converted from the API's
-    /// `counter_id` field (e.g. `"VA/BKKT/BTCUSD"`).
-    #[serde(
-        default,
-        rename = "counter_id",
-        deserialize_with = "crate::utils::counter::deserialize_counter_id_as_symbol"
-    )]
+    /// User-facing symbol (e.g. `"BTCUSD.BKKT"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Base asset code (e.g. `"BTC"`)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub base_asset: String,
     /// Official website URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub official_web_address: String,
     /// Logo image URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub logo: String,
     /// In-app wiki URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub wiki_url: String,
     /// Multi-language profile / description (JSON string)
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub profile: String,
 }
 

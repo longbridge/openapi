@@ -52,6 +52,52 @@ pub enum CFinancialReportKind {
     FinancialReportKindAll,
 }
 
+/// Ranking indicator for industry rank
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::fundamental::types::IndustryRankIndicator")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CIndustryRankIndicator {
+    /// Leading gainer
+    #[c(remote = "LeadingGainer")]
+    IndustryRankIndicatorLeadingGainer,
+    /// Today's trend
+    #[c(remote = "TodayTrend")]
+    IndustryRankIndicatorTodayTrend,
+    /// Popularity
+    #[c(remote = "Popularity")]
+    IndustryRankIndicatorPopularity,
+    /// Market capitalisation
+    #[c(remote = "MarketCap")]
+    IndustryRankIndicatorMarketCap,
+    /// Revenue
+    #[c(remote = "Revenue")]
+    IndustryRankIndicatorRevenue,
+    /// Revenue growth
+    #[c(remote = "RevenueGrowth")]
+    IndustryRankIndicatorRevenueGrowth,
+    /// Net profit
+    #[c(remote = "NetProfit")]
+    IndustryRankIndicatorNetProfit,
+    /// Net profit growth
+    #[c(remote = "NetProfitGrowth")]
+    IndustryRankIndicatorNetProfitGrowth,
+}
+
+/// Sort mode for industry rank
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::fundamental::types::IndustryRankSortType")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CIndustryRankSortType {
+    /// Rank by the single selected indicator
+    #[c(remote = "Single")]
+    IndustryRankSortTypeSingle,
+    /// Rank by a composite of several indicators
+    #[c(remote = "Multi")]
+    IndustryRankSortTypeMulti,
+}
+
 /// Financial report period
 #[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
 #[c(remote = "longbridge::fundamental::types::FinancialReportPeriod")]

@@ -90,9 +90,10 @@ impl JniError {
         match res {
             Ok(obj) => obj,
             Err(_) => {
-                // Building the error object failed (e.g. an exception is already
-                // pending). Fall back to a null error rather than panicking:
-                // this runs on a background callback thread, where a panic would
+                // Building the error object failed (e.g. an exception is
+                // already pending). Fall back to a null error
+                // rather than panicking: this runs on a
+                // background callback thread, where a panic would
                 // unwind across the FFI boundary and abort the whole JVM.
                 let _ = env.exception_clear();
                 JObject::null()
@@ -107,9 +108,9 @@ impl JniError {
             JniError::Other(err) => Self::throw_runtime_error(env, err),
         };
         if let Err(err) = res {
-            // Mapping the error to a Java exception failed. Fall back to a plain
-            // RuntimeException instead of `fatal_error`, which would abort the
-            // JVM outright.
+            // Mapping the error to a Java exception failed. Fall back to a
+            // plain RuntimeException instead of `fatal_error`,
+            // which would abort the JVM outright.
             if !env.exception_check().unwrap_or(false) {
                 let _ = env.throw_new("java/lang/RuntimeException", err.to_string());
             }
@@ -125,8 +126,9 @@ where
         Ok(value) => value,
         Err(err) => {
             // If a Java exception is already pending (e.g. thrown directly by a
-            // `from_jvalue` conversion via `throw_illegal_argument`, or raised by
-            // a Java method we called), keep it instead of throwing a second one.
+            // `from_jvalue` conversion via `throw_illegal_argument`, or raised
+            // by a Java method we called), keep it instead of
+            // throwing a second one.
             if !env.exception_check().unwrap_or(false) {
                 err.throw(env);
             }

@@ -13,6 +13,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::Reference>()?;
     parent.add_class::<types::QuestionOption>()?;
     parent.add_class::<types::Question>()?;
+    parent.add_class::<types::HumanInteraction>()?;
     parent.add_class::<types::Interrupt>()?;
     parent.add_class::<types::AgentError>()?;
     parent.add_class::<types::ConversationResponse>()?;

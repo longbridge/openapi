@@ -10,9 +10,9 @@ use crate::{
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
         GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
-        OrderDetail, PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
-        USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        OrderDetail, PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, SubmitOrderResponse, TopicType,
+        TradeContext, USAssetOverview, USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -114,15 +114,14 @@ impl TradeContextSync {
             .call(move |ctx| async move { ctx.today_executions(options).await })
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions
-    // pub fn all_executions(
-    // &self,
-    // options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
-    // ) -> Result<AllExecutionsResponse> {
-    // self.rt
-    // .call(move |ctx| async move { ctx.all_executions(options).await })
-    // }
+    /// Get all executions
+    pub fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
+    ) -> Result<AllExecutionsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.all_executions(options).await })
+    }
 
     /// Get history orders
     ///
@@ -270,6 +269,17 @@ impl TradeContextSync {
     pub fn submit_order(&self, options: SubmitOrderOptions) -> Result<SubmitOrderResponse> {
         self.rt
             .call(move |ctx| async move { ctx.submit_order(options).await })
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    pub fn submit_multileg(
+        &self,
+        options: SubmitMultiLegOrderOptions,
+    ) -> Result<SubmitOrderResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.submit_multileg(options).await })
     }
 
     /// Cancel order
@@ -473,7 +483,8 @@ impl TradeContextSync {
             .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
     }
 
-    // ── US-market blocking wrappers ───────────────────────────────────────────
+    // ── US-market blocking wrappers
+    // ───────────────────────────────────────────
 
     /// Query the paginated US order list (blocking)
     pub fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {

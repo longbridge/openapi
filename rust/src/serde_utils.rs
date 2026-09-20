@@ -56,6 +56,41 @@ pub(crate) mod date_opt {
     }
 }
 
+pub(crate) mod date_ymd_opt {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<Date>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if !value.is_empty() {
+            let date = Date::parse(
+                &value,
+                time::macros::format_description!("[year][month][day]"),
+            )
+            .map_err(D::Error::custom)?;
+            Ok(Some(date))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub(crate) fn serialize<S>(date: &Option<Date>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match date {
+            Some(date) => serializer.serialize_str(
+                &date
+                    .format(time::macros::format_description!("[year][month][day]"))
+                    .unwrap(),
+            ),
+            None => serializer.serialize_none(),
+        }
+    }
+}
+
 pub(crate) mod timestamp {
     use super::*;
 
@@ -73,6 +108,27 @@ pub(crate) mod timestamp {
         S: Serializer,
     {
         serializer.collect_str(&datetime.unix_timestamp())
+    }
+}
+
+pub(crate) mod timestamp_ms {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<OffsetDateTime, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        let value = value.parse::<i64>().map_err(D::Error::custom)?;
+        OffsetDateTime::from_unix_timestamp_nanos(i128::from(value) * 1_000_000)
+            .map_err(D::Error::custom)
+    }
+
+    pub(crate) fn serialize<S>(datetime: &OffsetDateTime, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_str(&(datetime.unix_timestamp_nanos() / 1_000_000))
     }
 }
 
@@ -491,6 +547,34 @@ pub(crate) mod f64_str {
     }
 }
 
+/// Deserializes a stringly-typed `f64` into `Option<f64>`.  An empty or
+/// non-parseable string (e.g. `"--"`) yields `None`.  Serializes back to a
+/// string form for symmetry with the API's request format.
+pub(crate) mod f64_opt_str {
+    use super::*;
+
+    pub(crate) fn serialize<S>(value: &Option<f64>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.collect_str(value),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        if value.is_empty() {
+            return Ok(None);
+        }
+        Ok(value.parse::<f64>().ok())
+    }
+}
+
 /// Deserializer that maps a JSON `null` to the type's `Default` value.
 pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
 where
@@ -498,4 +582,35 @@ where
     T: Deserialize<'de> + Default,
 {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
+}
+
+/// Deserializes a field that may be a JSON number, string, or null into
+/// `Option<String>`.  Null and missing fields produce `None`; numbers are
+/// converted to their decimal string representation.
+pub(crate) mod value_as_opt_string {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(d: D) -> Result<Option<String>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let v = serde_json::Value::deserialize(d)?;
+        Ok(match v {
+            serde_json::Value::Null => None,
+            serde_json::Value::String(s) if s.is_empty() => None,
+            serde_json::Value::String(s) => Some(s),
+            serde_json::Value::Number(n) => Some(n.to_string()),
+            other => Some(other.to_string()),
+        })
+    }
+
+    pub(crate) fn serialize<S>(v: &Option<String>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match v {
+            Some(val) => s.serialize_str(val),
+            None => s.serialize_none(),
+        }
+    }
 }

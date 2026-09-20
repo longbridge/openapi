@@ -700,6 +700,8 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
+  /** Order side */
+  get side(): OrderSide
 }
 
 /** Filing item */
@@ -772,8 +774,6 @@ export declare class FundamentalContext {
   operating(symbol: string): Promise<OperatingList>
   /** Get buyback data for a security */
   buyback(symbol: string): Promise<BuybackData>
-  /** Get stock ratings for a security */
-  ratings(symbol: string): Promise<StockRatings>
   /** Get ranked list of top shareholders */
   shareholderTop(symbol: string): Promise<ShareholderTopResponse>
   /** Get holding history and detail for one shareholder */
@@ -795,8 +795,11 @@ export declare class FundamentalContext {
   usValuationOverview(symbol: string): Promise<USValuationOverview>
   /** Get US financial overview. US token required. */
   usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
-  /** Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required. */
-  usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
+  /**
+   * Get US financial statement v3. `kind` selects one statement (there is
+   * no "all" mode). US token required.
+   */
+  usFinancialStatement(symbol: string, kind: FinancialStatementKind, report: string): Promise<USFinancialStatement>
   /** Get US key financial metrics. US token required. */
   usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
   /** Get US analyst consensus estimates. US token required. */
@@ -845,6 +848,343 @@ export declare class FundPositionsResponse {
   toJSON(): any
   /** Channels */
   get channels(): Array<FundPositionChannel>
+}
+
+/** A price-step (bid-size) rule entry from the symbol-info response. */
+export declare class GridBidSize {
+  toString(): string
+  toJSON(): any
+  /** Range start price (inclusive) */
+  get strProceed(): Decimal | null
+  /** Range end price */
+  get endProceed(): Decimal | null
+  /** Price step within the range */
+  get bidSize(): Decimal | null
+}
+
+/** Channel / authorization info nested in the symbol-info response. */
+export declare class GridChannelInfo {
+  toString(): string
+  toJSON(): any
+  /** Whether the strategy compliance authorization has been granted */
+  get strategyGranted(): boolean
+  /** Whether the RTH toggle is supported */
+  get supportRth(): boolean
+  /** Trading currency */
+  get currency(): string
+  /** Supported settlement currencies */
+  get settlementCurrency(): Array<string>
+}
+
+/** Grid trading context. */
+export declare class GridContext {
+  /** Create a new `GridContext`. */
+  static new(config: Config): GridContext
+  /** Submit a grid trading order */
+  submit(opts: SubmitGridOrderOptions): Promise<SubmitGridOrderResponse>
+  /** Replace (modify) a grid trading order */
+  replace(opts: ReplaceGridOrderOptions): Promise<undefined>
+  /** Get grid trading orders (paged list) */
+  list(opts?: GetGridOrdersOptions | undefined | null): Promise<GridOrdersResponse>
+  /** Query grid trading orders by IDs */
+  listByIds(opts: GetGridOrdersByIdsOptions): Promise<Array<GridOrder>>
+  /** Get grid trading order detail (and paged history) */
+  detail(opts: GetGridOrderDetailOptions): Promise<GridOrderDetail>
+  /** Get grid trading trigger history */
+  triggerHistory(opts: GetGridTriggerHistoryOptions): Promise<GridTriggerHistoryResponse>
+  /** Cancel a grid trading order */
+  cancel(orderId: string): Promise<void>
+  /** Suspend a grid trading order */
+  suspend(orderId: string): Promise<void>
+  /** Restart a grid trading order */
+  restart(orderId: string): Promise<void>
+  /**
+   * Get the security (symbol) info used to build a grid order (lot size,
+   * authorization flag, settlement currency, etc.).
+   */
+  symbolInfo(symbol: string): Promise<GridSymbolInfo>
+}
+
+/** A grid trading order (element of the list / by-ids responses). */
+export declare class GridOrder {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Stock name */
+  get stockName(): string
+  /** Market */
+  get market(): string
+  /** Order status */
+  get status(): string
+  /** Grid running status */
+  get gridStatus(): string
+  /** Submitted base price */
+  get submittedBasePrice(): Decimal | null
+  /** Current base price */
+  get currentBasePrice(): Decimal | null
+  /** Base price before the last trigger */
+  get preTriggerBasePrice(): Decimal | null
+  /** Base price after the last trigger */
+  get postTriggerBasePrice(): Decimal | null
+  /** Upper price bound */
+  get upperLimitPrice(): Decimal | null
+  /** Lower price bound */
+  get lowerLimitPrice(): Decimal | null
+  /** Trigger price type */
+  get triggerPriceType(): TriggerPriceType
+  /** Upward trigger spread */
+  get triggerSpreadUp(): Decimal | null
+  /** Downward trigger spread */
+  get triggerSpreadDown(): Decimal | null
+  /** Upward trigger percent */
+  get triggerPercentUp(): Decimal | null
+  /** Downward trigger percent */
+  get triggerPercentDown(): Decimal | null
+  /** Pullback percent */
+  get pullbackPercent(): Decimal | null
+  /** Pullback spread */
+  get pullbackSpread(): Decimal | null
+  /** Rebound percent */
+  get reboundPercent(): Decimal | null
+  /** Rebound spread */
+  get reboundSpread(): Decimal | null
+  /** Sell-side execution order type (e.g. `MO`) */
+  get triggerSellOrderType(): string
+  /** Buy-side execution order type (e.g. `MO`) */
+  get triggerBuyOrderType(): string
+  /** Sell-side order-book depth */
+  get triggerSellDepth(): number
+  /** Buy-side order-book depth */
+  get triggerBuyDepth(): number
+  /** Quantity per trigger */
+  get triggerQuantity(): Decimal | null
+  /** Quantity per sell trigger */
+  get triggerSellQuantity(): Decimal | null
+  /** Quantity per buy trigger */
+  get triggerBuyQuantity(): Decimal | null
+  /** Quantity handled at the upper bound */
+  get upperLimitQuantity(): Decimal | null
+  /** Quantity handled at the lower bound */
+  get lowerLimitQuantity(): Decimal | null
+  /** Action at the upper bound */
+  get upperLimitEvent(): GridLimitEvent
+  /** Action at the lower bound */
+  get lowerLimitEvent(): GridLimitEvent
+  /** Whether a single grid level may trigger multiple times */
+  get multipleTrigger(): boolean
+  /** Number of times the grid has triggered */
+  get triggerTimes(): number
+  /** Accumulated bought quantity */
+  get totalBuyQuantity(): Decimal | null
+  /** Accumulated sold quantity */
+  get totalSellQuantity(): Decimal | null
+  /** Accumulated profit balance */
+  get totalProfitBalance(): Decimal | null
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Whether short selling is allowed */
+  get supportShortsell(): boolean
+  /** Sell-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeUp(): string
+  /** Buy-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeDown(): string
+}
+
+/** Detail of a grid trading order. */
+export declare class GridOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Stock name */
+  get stockName(): string
+  /** Order status */
+  get status(): string
+  /** Grid running status */
+  get gridStatus(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Sleeping reason, if any */
+  get sleepingReason(): string
+  /** Submitted base price */
+  get submittedBasePrice(): Decimal | null
+  /** Current base price */
+  get currentBasePrice(): Decimal | null
+  /** Upper price bound */
+  get upperLimitPrice(): Decimal | null
+  /** Lower price bound */
+  get lowerLimitPrice(): Decimal | null
+  /** Trigger price type */
+  get triggerPriceType(): TriggerPriceType
+  /** Upward trigger spread */
+  get triggerSpreadUp(): Decimal | null
+  /** Downward trigger spread */
+  get triggerSpreadDown(): Decimal | null
+  /** Upward trigger percent */
+  get triggerPercentUp(): Decimal | null
+  /** Downward trigger percent */
+  get triggerPercentDown(): Decimal | null
+  /** Pullback percent */
+  get pullbackPercent(): Decimal | null
+  /** Pullback spread */
+  get pullbackSpread(): Decimal | null
+  /** Rebound percent */
+  get reboundPercent(): Decimal | null
+  /** Rebound spread */
+  get reboundSpread(): Decimal | null
+  /** Whether a single grid level may trigger multiple times */
+  get multipleTrigger(): boolean
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Quantity per trigger */
+  get triggerQuantity(): Decimal | null
+  /** Quantity per sell trigger */
+  get triggerSellQuantity(): Decimal | null
+  /** Quantity per buy trigger */
+  get triggerBuyQuantity(): Decimal | null
+  /** Quantity handled at the upper bound */
+  get upperLimitQuantity(): Decimal | null
+  /** Quantity handled at the lower bound */
+  get lowerLimitQuantity(): Decimal | null
+  /** Action at the upper bound */
+  get upperLimitEvent(): GridLimitEvent
+  /** Action at the lower bound */
+  get lowerLimitEvent(): GridLimitEvent
+  /** Sell-side order-book depth */
+  get triggerSellDepth(): number
+  /** Buy-side order-book depth */
+  get triggerBuyDepth(): number
+  /** Created time */
+  get createdAt(): Date | null
+  /** Last updated time */
+  get updatedAt(): Date | null
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Expiry time */
+  get expireTime(): Date | null
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Triggered sub-orders */
+  get gridSubOrders(): Array<GridOrderSubOrder>
+  /** Whether there are more sub-orders to page */
+  get subHasMore(): boolean
+  /** Lifecycle history entries */
+  get gridOrderHistory(): Array<GridOrderHistory>
+  /** Whether there are more history entries to page */
+  get historyHasMore(): boolean
+  /** Whether short selling is allowed */
+  get supportShortsell(): boolean
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Sell-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeUp(): string
+  /** Buy-side grid order type (`GMO` / `GLO` / `GTG`) */
+  get gridOrderTypeDown(): string
+}
+
+/** A grid order lifecycle-history entry carried in the grid order detail. */
+export declare class GridOrderHistory {
+  toString(): string
+  toJSON(): any
+  /** History entry ID (paging cursor) */
+  get historyId(): string
+  /** Created time */
+  get createdAt(): Date | null
+  /** Status at this point */
+  get status(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Additional reason detail, if any */
+  get reason(): string
+}
+
+/**
+ * Response for get grid trading orders (list) request.
+ *
+ * Hand-written because the underlying `longbridge::grid::GridOrdersResponse`
+ * is not re-exported from the SDK; the wrapper is built directly in the
+ * context method.
+ */
+export declare class GridOrdersResponse {
+  toString(): string
+  toJSON(): any
+  /** Grid orders */
+  get gridOrder(): Array<GridOrder>
+  /** Whether there are more pages */
+  get hasMore(): boolean
+}
+
+/** A triggered sub-order carried in the grid order detail. */
+export declare class GridOrderSubOrder {
+  toString(): string
+  toJSON(): any
+  /** Sub-order ID */
+  get id(): string
+  /** Order price */
+  get price(): Decimal | null
+  /** Order type */
+  get orderType(): string
+  /** Order quantity */
+  get quantity(): Decimal | null
+  /** Executed quantity */
+  get executedQty(): Decimal | null
+  /** Buy / sell direction */
+  get action(): number
+  /** Order status */
+  get status(): string
+  /** Submitted time */
+  get submittedAt(): Date | null
+  /** Regular trading hours flag */
+  get rth(): number
+}
+
+/** Security (symbol) info used to build a grid order. */
+export declare class GridSymbolInfo {
+  toString(): string
+  toJSON(): any
+  /** Security name */
+  get name(): string
+  /** Latest quote price */
+  get lastDone(): Decimal | null
+  /** Board lot size */
+  get lotSize(): Decimal | null
+  /** Buy-side board lot size */
+  get buyLotSize(): Decimal | null
+  /** Sell-side board lot size */
+  get sellLotSize(): Decimal | null
+  /** Price-step (bid-size) rule table */
+  get bidSizes(): Array<GridBidSize>
+  /** Channel / authorization info (strategy grant, RTH, currencies) */
+  get channelInfo(): GridChannelInfo
+}
+
+/**
+ * Response for get grid trading trigger history request.
+ *
+ * Hand-written because the underlying
+ * `longbridge::grid::GridTriggerHistoryResponse` is not re-exported from the
+ * SDK; the wrapper is built directly in the context method.
+ */
+export declare class GridTriggerHistoryResponse {
+  toString(): string
+  toJSON(): any
+  /** Trigger history entries */
+  get triggerOrders(): Array<TriggerOrder>
+  /** Whether there are more pages */
+  get hasMore(): boolean
 }
 
 /** History market temperature response */
@@ -1012,6 +1352,42 @@ export declare class MarketTradingSession {
   get tradeSessions(): Array<TradingSessionInfo>
 }
 
+/** Multi-leg strategy information */
+export declare class MultiLegInfo {
+  toString(): string
+  toJSON(): any
+  /** Multi-leg strategy */
+  get strategy(): MultiLegStrategy
+  /** Strategy name */
+  get strategyName(): string
+  /** Multi-leg combination ID */
+  get multilegId(): string
+  /** Multi-leg combination code */
+  get code(): string
+  /** Legs of the combination order */
+  get legs(): Array<MultiLegOrderLeg>
+}
+
+/** A leg of a multi-leg combination order */
+export declare class MultiLegOrderLeg {
+  toString(): string
+  toJSON(): any
+  /** Option symbol, in `ticker.region` format */
+  get symbol(): string
+  /** Order side */
+  get side(): OrderSide
+  /** Position direction */
+  get position(): MultiLegPosition
+  /** Leg ratio quantity */
+  get ratioQuantity(): Decimal
+  /** Strike price */
+  get strikePrice(): Decimal | null
+  /** Option expiry date */
+  get expireDate(): NaiveDate | null
+  /** Contract type */
+  get contractDirection(): ContractDirection
+}
+
 /** Naive date type */
 export declare class NaiveDate {
   constructor(year: number, month: number, day: number)
@@ -1088,6 +1464,37 @@ export declare class OAuth {
    *          `HttpClient.fromOAuth`
    */
   static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
+}
+
+/**
+ * A single option contract of an option chain
+ *
+ * Every contract is an independent entry: calls and puts are not paired, so a
+ * strike price that is listed on one side only yields a single entry.
+ */
+export declare class OptionChainContract {
+  toString(): string
+  toJSON(): any
+  /** Option contract code, in `ticker.region` format */
+  get symbol(): string
+  /** Expiry date, in US Eastern time */
+  get expiryDate(): NaiveDate
+  /** Strike price */
+  get strikePrice(): Decimal
+  /** Contract direction */
+  get direction(): OptionDirection
+  /** Special expiration cycle of the contract */
+  get optionType(): OptionExpiryCycleType
+  /**
+   * Whether the contract is a legacy contract left over from a corporate
+   * action
+   */
+  get standardAttr(): OptionStandardAttr
+  /**
+   * Number of days remaining until the option expires, `0` on the expiry
+   * day and negative once expired
+   */
+  get daysToExpiry(): number
 }
 
 /** Quote of option */
@@ -1236,6 +1643,11 @@ export declare class Order {
   get remark(): string
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Order charge detail */
@@ -1362,6 +1774,11 @@ export declare class OrderDetail {
   get chargeDetail(): OrderChargeDetail | null
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Order history detail */
@@ -1542,6 +1959,42 @@ export declare class PushDepthEvent {
   toString(): string
 }
 
+/** Grid trading master-order changed message. */
+export declare class PushGridOrderChanged {
+  toString(): string
+  toJSON(): any
+  /** Grid master order ID */
+  get orderId(): string
+  /** Order status */
+  get status(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Suspend reason, if any */
+  get suspendReason(): string
+  /** Submitted base price */
+  get submittedBasePrice(): string
+  /** Current base price */
+  get currentBasePrice(): string
+  /** Upper price bound */
+  get upperLimitPrice(): string
+  /** Lower price bound */
+  get lowerLimitPrice(): string
+  /** Trigger price type */
+  get triggerPriceType(): number
+  /** Quantity per trigger */
+  get triggerQuantity(): string
+  /** Settlement currency */
+  get settlementCurrency(): string
+  /** Time in force (`0` = Day, `1` = GTC, `6` = GTD) */
+  get timeInForce(): number
+  /** Regular trading hours flag */
+  get rth(): number
+  /** Sell-side order type when depth is 0 */
+  get gridOrderTypeUp(): string
+  /** Buy-side order type when depth is 0 */
+  get gridOrderTypeDown(): string
+}
+
 /** Order changed message */
 export declare class PushOrderChanged {
   toString(): string
@@ -1596,6 +2049,11 @@ export declare class PushOrderChanged {
   get lastPrice(): Decimal | null
   /** Remark message */
   get remark(): string
+  /**
+   * Multi-leg strategy information (only present for multi-leg option
+   * combination orders)
+   */
+  get multiLeg(): MultiLegInfo | null
 }
 
 /** Push real-time quote */
@@ -1918,7 +2376,16 @@ export declare class QuoteContext {
    */
   optionChainExpiryDateList(symbol: string): Promise<Array<NaiveDate>>
   /**
-   * Get option chain info by date
+   * Get the option contract list of an underlying security for a given
+   * expiry date
+   *
+   * Every contract is an independent entry: calls and puts are not paired,
+   * so a strike price that is listed on one side only yields a single entry.
+   *
+   * `standardOnly` filters out the legacy contracts produced by corporate
+   * actions. `true` returns standard contracts only; omitted or `false`
+   * returns everything, including the contracts carrying a `standardAttr`
+   * of `Old`.
    *
    * #### Example
    *
@@ -1933,7 +2400,7 @@ export declare class QuoteContext {
    * }
    * ```
    */
-  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate): Promise<Array<StrikePriceInfo>>
+  optionChainInfoByDate(symbol: string, expiryDate: NaiveDate, standardOnly?: boolean | undefined | null): Promise<Array<OptionChainContract>>
   /**
    * Get warrant issuers
    *
@@ -2426,34 +2893,32 @@ export declare class SecurityCalcIndex {
   get balancePoint(): Decimal | null
   /** Open interest */
   get openInterest(): number | null
-  /** Delta */
+  /**
+   * Delta. Measures the expected change in option price for a $1 move in the
+   * underlying asset price.
+   */
   get delta(): Decimal | null
-  /** Gamma */
+  /**
+   * Gamma. Measures the expected change in Delta for a $1 move in the
+   * underlying asset price.
+   */
   get gamma(): Decimal | null
   /**
-   * Theta
-   *
-   * The raw value returned by the API is annualized (scaled by 252 trading
-   * days per year). To obtain the standard per-calendar-day theta, divide
-   * by 252: `theta / 252`.
+   * Theta. Measures the expected change in option price as one day passes;
+   * the raw value has been divided by 365 to convert to a daily value,
+   * representing the impact of one day's time decay on the option price.
    */
   get theta(): Decimal | null
   /**
-   * Vega
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in implied volatility (i.e. the value has been multiplied by
-   * 100). To obtain the standard vega (per unit change in IV), divide by
-   * 100: `vega / 100`.
+   * Vega. Measures the expected change in option price when implied
+   * volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+   * get the expected price change per 1% move in IV.
    */
   get vega(): Decimal | null
   /**
-   * Rho
-   *
-   * The raw value returned by the API is expressed per 1 percentage-point
-   * change in the risk-free rate (i.e. the value has been multiplied by
-   * 100). To obtain the standard rho (per unit change in rate), divide by
-   * 100: `rho / 100`.
+   * Rho. Measures the expected change in option price when the risk-free
+   * interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+   * the expected price change per 1% move in the interest rate.
    */
   get rho(): Decimal | null
 }
@@ -2607,18 +3072,12 @@ export declare class StockPositionsResponse {
   get channels(): Array<StockPositionChannel>
 }
 
-/** Strike price info */
-export declare class StrikePriceInfo {
+/** Response for submit grid trading order request */
+export declare class SubmitGridOrderResponse {
   toString(): string
   toJSON(): any
-  /** Strike price */
-  get price(): Decimal
-  /** Security code of call option */
-  get callSymbol(): string
-  /** Security code of put option */
-  get putSymbol(): string
-  /** Is standard */
-  get standard(): boolean
+  /** Grid master order id */
+  get orderId(): string
 }
 
 /** Response for submit order request */
@@ -2720,6 +3179,11 @@ export declare class TradeContext {
    */
   setOnOrderChanged(callback: (err: null | Error, event: PushOrderChanged) => void): void
   /**
+   * Set grid order changed callback, after receiving the grid order changed
+   * event, it will call back to this function.
+   */
+  setOnGridOrderChanged(callback: (err: null | Error, event: PushGridOrderChanged) => void): void
+  /**
    * Subscribe
    *
    * #### Example
@@ -2791,6 +3255,8 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
+  /** Get all executions */
+  allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
    *
@@ -2896,6 +3362,40 @@ export declare class TradeContext {
    * ```
    */
   submitOrder(opts: SubmitOrderOptions): Promise<SubmitOrderResponse>
+  /**
+   * Submit a multi-leg option combination order (such as vertical spreads,
+   * straddles, strangles, collars, etc.). All legs are submitted together
+   * as a single strategy order.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const {
+   *   OAuth, Config,
+   *   TradeContext,
+   *   OrderType,
+   *   OrderSide,
+   *   Decimal,
+   *   MultiLegStrategy,
+   * } = require('longbridge');
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.submitMultileg({
+   *   side: OrderSide.Buy,
+   *   orderType: OrderType.LO,
+   *   submittedQuantity: new Decimal("1"),
+   *   strategy: MultiLegStrategy.VerticalCallSpread,
+   *   submittedPrice: new Decimal("1.5"),
+   *   legs: [
+   *     { symbol: "QQQ260731C764000.US", ratioQuantity: new Decimal("1") },
+   *     { symbol: "QQQ260731C767000.US", ratioQuantity: new Decimal("1") },
+   *   ],
+   * });
+   * console.log(resp.toString());
+   * ```
+   */
+  submitMultileg(opts: SubmitMultiLegOrderOptions): Promise<SubmitOrderResponse>
   /**
    * Cancel order
    *
@@ -3053,6 +3553,52 @@ export declare class TradingSessionInfo {
   get tradeSession(): TradeSession
 }
 
+/** A grid trigger-history entry (one triggered order). */
+export declare class TriggerOrder {
+  toString(): string
+  toJSON(): any
+  /** Triggered order ID */
+  get id(): string
+  /** Order status */
+  get status(): string
+  /** Stock name */
+  get name(): string
+  /** Security symbol (e.g. `700.HK`) */
+  get symbol(): string
+  /** Order price */
+  get price(): Decimal | null
+  /** Order quantity */
+  get quantity(): Decimal | null
+  /** Executed average price */
+  get executedPrice(): Decimal | null
+  /** Executed total quantity */
+  get executedQty(): Decimal | null
+  /** Submitted time */
+  get submittedAt(): Date | null
+  /** Buy / sell direction */
+  get action(): number
+  /** Order type */
+  get orderType(): string
+  /** Trigger price */
+  get triggerPrice(): Decimal | null
+  /** Rejection reason, if any */
+  get msg(): string
+  /** Settlement currency */
+  get currency(): string
+  /** Latest quote price */
+  get lastDone(): Decimal | null
+  /** Last updated time */
+  get updatedAt(): Date | null
+  /** Time in force */
+  get timeInForce(): GridTimeInForce
+  /** Expiry date (`YYYY-MM-DD`, GTD) */
+  get gtd(): string
+  /** Trigger time */
+  get triggerAt(): Date | null
+  /** Conditional trigger status */
+  get triggerStatus(): number
+}
+
 /** Warrant info */
 export declare class WarrantInfo {
   toString(): string
@@ -3074,7 +3620,7 @@ export declare class WarrantInfo {
   /** Turnover */
   get turnover(): Decimal
   /** Expiry date */
-  get expiryDate(): NaiveDate
+  get expiryDate(): NaiveDate | null
   /** Strike price */
   get strikePrice(): Decimal | null
   /** Upper strike price */
@@ -3410,8 +3956,8 @@ export interface AlertItem {
   text: string
   /** Trigger state flags */
   state: Array<number>
-  /** Trigger value: `{"price":"500"}` or `{"chg":"5"}` */
-  valueMap: any
+  /** Trigger value, e.g. `{"price":"500"}` or `{"chg":"5"}` */
+  valueMap: AlertValueMap
 }
 
 /** Alert list response */
@@ -3440,6 +3986,14 @@ export interface AlertSymbolGroup {
   product: string
   /** Alert items */
   indicators: Array<AlertItem>
+}
+
+/** Trigger value of a price alert (exactly one field is populated). */
+export interface AlertValueMap {
+  /** Absolute price threshold as a decimal string, e.g. `"500"`. */
+  price?: string
+  /** Percentage-change threshold, e.g. `5`. */
+  chg?: number
 }
 
 /** One market anomaly event (e.g. large block trade, margin buying surge) */
@@ -3854,6 +4408,12 @@ export interface ChatStartedPayload {
   chatUid: string
   /** Message ID of this round */
   messageId: string
+  /** ID of the owning conversation */
+  chatId: number
+  /** Error detail; empty at start */
+  error: string
+  /** User-facing error message; empty at start */
+  errorMessage: string
 }
 
 /**
@@ -3922,7 +4482,7 @@ export interface CompanyOverview {
   category: string
   /** Fiscal year end */
   yearEnd: string
-  /** Number of employees */
+  /** Number of employees (returned as a string by the API, e.g. `"10000"`) */
   employees: string
   /** Phone number */
   phone: string
@@ -4049,6 +4609,16 @@ export interface ContextCompressStartedPayload {
   inputs?: any
 }
 
+/** Option contract type */
+export declare const enum ContractDirection {
+  /** Unknown */
+  Unknown = 0,
+  /** Call */
+  Call = 1,
+  /** Put */
+  Put = 2
+}
+
 /**
  * Response for `AgentContext.conversation`,
  * `AgentContext.continueConversation`, and the final result of the streamed
@@ -4068,6 +4638,8 @@ export interface ConversationResponse {
   answer: string
   /** Sources referenced by the answer */
   references?: Array<Reference>
+  /** Suggested follow-up questions */
+  furtherQuestions?: Array<string>
   /** Run duration in seconds */
   elapsedTime: number
   /** Present only when `status` is `interrupted` */
@@ -4518,8 +5090,8 @@ export interface ExchangeRates {
 
 /** Executives for one security */
 export interface ExecutiveGroup {
-  /** Security symbol */
-  symbol: string
+  /** Security symbol (`null` when the server omits it) */
+  symbol?: string
   /** Company wiki URL */
   forwardUrl: string
   /** Total executives */
@@ -4652,6 +5224,21 @@ export interface FinancialReports {
   list: any
 }
 
+/**
+ * Financial statement kind
+ *
+ * Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+ * needs one specific statement per request.
+ */
+export declare const enum FinancialStatementKind {
+  /** Income statement */
+  IncomeStatement = 0,
+  /** Balance sheet */
+  BalanceSheet = 1,
+  /** Cash flow statement */
+  CashFlow = 2
+}
+
 export declare const enum FlowDirection {
   /** Unknown */
   Unknown = 0,
@@ -4664,8 +5251,11 @@ export declare const enum FlowDirection {
 /** One profit-analysis flow record */
 export interface FlowItem {
   executedDate: string
-  /** Execution timestamp as a JSON value string */
-  executedTimestamp: string
+  /**
+   * Execution timestamp as a Unix-seconds string (absent when not yet
+   * executed)
+   */
+  executedTimestamp?: string
   code: string
   direction: FlowDirection
   executedQuantity?: string
@@ -4752,6 +5342,50 @@ export interface GetCashFlowOptions {
   page?: number
   /** Page size */
   size?: number
+}
+
+/** Options for get grid trading order detail request */
+export interface GetGridOrderDetailOptions {
+  /** Grid master order id */
+  orderId: string
+  /** History cursor for paging through the trigger history */
+  historyId?: string
+  /** Page size */
+  limit?: number
+}
+
+/** Options for query grid trading orders by IDs request */
+export interface GetGridOrdersByIdsOptions {
+  /** Grid master order IDs */
+  orderIds: Array<string>
+}
+
+/** Options for get grid trading orders (list) request */
+export interface GetGridOrdersOptions {
+  /** Page number */
+  page?: number
+  /** Page size */
+  limit?: number
+  /** Market */
+  market?: Market
+  /** Comma-joined status filter (e.g. `Performing,Suspended`) */
+  status?: string
+  /** Security symbol filter (e.g. `700.HK`) */
+  symbol?: string
+  /** Sort field */
+  sortBy?: string
+  /** Sort order */
+  sortOrder?: string
+}
+
+/** Options for get grid trading trigger history request */
+export interface GetGridTriggerHistoryOptions {
+  /** Grid master order id */
+  gridOrderId: string
+  /** Page number */
+  page?: number
+  /** Page size */
+  limit?: number
 }
 
 /** Options for get history executions request */
@@ -4848,6 +5482,93 @@ export declare const enum Granularity {
   Monthly = 3
 }
 
+/**
+ * Action taken when a grid boundary is reached.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum GridLimitEvent {
+  /** Unknown / unset */
+  Unknown = 0,
+  /** Ignore — keep the grid running */
+  Ignore = 1,
+  /** Close the position at the last price */
+  CloseAtLast = 2
+}
+
+/**
+ * Time in force for a grid order.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum GridTimeInForce {
+  /** Day order */
+  Day = 0,
+  /** Good-til-canceled */
+  GoodTilCanceled = 1,
+  /** Good-til-date */
+  GoodTilDate = 2,
+  /** Unknown value */
+  Unknown = 3
+}
+
+/**
+ * Grid trading rule — parameters for submit / replace.
+ *
+ * Prices and quantities are decimals; trigger price type, time in force and
+ * limit events are named enums.
+ */
+export interface GridTradeRule {
+  /** Base price the grid is anchored to */
+  submittedBasePrice?: Decimal
+  /** Upper price bound */
+  upperLimitPrice?: Decimal
+  /** Lower price bound */
+  lowerLimitPrice?: Decimal
+  /** Trigger price type (`Spread` / `Percent`) */
+  triggerPriceType?: TriggerPriceType
+  /** Upward trigger spread (absolute) */
+  triggerSpreadUp?: Decimal
+  /** Downward trigger spread (absolute) */
+  triggerSpreadDown?: Decimal
+  /** Upward trigger percent */
+  triggerPercentUp?: Decimal
+  /** Downward trigger percent */
+  triggerPercentDown?: Decimal
+  /** Whether a single grid level may trigger multiple times */
+  multipleTrigger?: boolean
+  /** Time in force (`Day` / `GoodTilCanceled` / `GoodTilDate`) */
+  timeInForce?: GridTimeInForce
+  /** Quantity handled when the upper bound is reached */
+  upperLimitQuantity?: Decimal
+  /** Quantity handled when the lower bound is reached */
+  lowerLimitQuantity?: Decimal
+  /** Expiry time (unix seconds), used with GTD */
+  expireTime?: number
+  /** Action when the upper bound is reached (`Ignore` / `CloseAtLast`) */
+  upperLimitEvent?: GridLimitEvent
+  /** Action when the lower bound is reached (`Ignore` / `CloseAtLast`) */
+  lowerLimitEvent?: GridLimitEvent
+  /** Sell-side order-book depth (-5..5, `0` = use `grid_order_type_up`) */
+  triggerSellDepth?: number
+  /** Buy-side order-book depth (-5..5, `0` = use `grid_order_type_down`) */
+  triggerBuyDepth?: number
+  /** Quantity per trigger */
+  triggerQuantity?: Decimal
+  /** Whether short selling is allowed */
+  supportShortsell?: boolean
+  /** Regular trading hours flag (`0` / `1` / `2`) */
+  rth?: number
+  /** Sell-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) */
+  gridOrderTypeUp?: string
+  /** Buy-side order type when depth is `0` (`GMO` / `GLO` / `GTG`) */
+  gridOrderTypeDown?: string
+}
+
 /** Holding detail of an ETF asset allocation element (holdings only) */
 export interface HoldingDetail {
   /** Industry ID */
@@ -4862,6 +5583,22 @@ export interface HoldingDetail {
   holdingType: string
   /** Holding type name */
   holdingTypeName: string
+}
+
+/** A single interaction requested while an Agent workflow is paused */
+export interface HumanInteraction {
+  /** Tool call that requested the interaction */
+  toolCallId: string
+  /** Stable key expected by `answersByToolCall` */
+  interruptId: string
+  /** Interaction type such as `ask_human` or `trade_password` */
+  interactionType: string
+  /** Human-readable tool name */
+  toolName: string
+  /** Questions and answer options presented to the user */
+  questions: Array<Question>
+  /** Original tool arguments, retained for host-specific UI rendering */
+  toolArgs: any
 }
 
 /** Index constituents response */
@@ -5070,6 +5807,8 @@ export interface Interrupt {
   toolCallId: string
   /** Questions you need to answer */
   questions: Array<Question>
+  /** Full interaction descriptors used to render and answer the pause */
+  interactions: Array<HumanInteraction>
   /** ID of the paused message */
   messageId: number
   /** ID of the owning conversation */
@@ -5260,6 +5999,40 @@ export interface MultiLanguageText {
   traditionalChinese: string
 }
 
+/** Multi-leg position direction */
+export declare const enum MultiLegPosition {
+  /** Unknown */
+  Unknown = 0,
+  /** Long */
+  Long = 1,
+  /** Short */
+  Short = 2
+}
+
+/** Multi-leg strategy */
+export declare const enum MultiLegStrategy {
+  /** Unknown */
+  Unknown = 0,
+  /** Covered call (covered stock) */
+  CoveredCall = 1,
+  /** Covered put (covered stock) */
+  CoveredPut = 2,
+  /** Vertical call spread */
+  VerticalCallSpread = 3,
+  /** Vertical put spread */
+  VerticalPutSpread = 4,
+  /** Collar */
+  Collar = 5,
+  /** Straddle */
+  Straddle = 6,
+  /** Strangle */
+  Strangle = 7,
+  /** Calendar call spread */
+  CalendarCallSpread = 8,
+  /** Calendar put spread */
+  CalendarPutSpread = 9
+}
+
 /** Options for listing topics created by the current authenticated user */
 export interface MyTopicsRequest {
   /** Page number (default 1) */
@@ -5417,6 +6190,31 @@ export declare const enum OptionDirection {
   Put = 1,
   /** Call */
   Call = 2
+}
+
+/** Special expiration cycle of an option contract */
+export declare const enum OptionExpiryCycleType {
+  /** Unknown */
+  Unknown = 0,
+  /** Standard monthly option */
+  Monthly = 1,
+  /** Weekly option, expires weekly */
+  Weekly = 2,
+  /** Quarterly option, expires quarterly */
+  Quarterly = 3
+}
+
+/**
+ * Whether an option contract is a legacy contract left over from a corporate
+ * action (e.g. a stock split or a merger)
+ */
+export declare const enum OptionStandardAttr {
+  /** Unknown */
+  Unknown = 0,
+  /** A normal, active contract */
+  Normal = 1,
+  /** A legacy contract produced by a corporate action */
+  Old = 2
 }
 
 /** Option type */
@@ -5884,14 +6682,26 @@ export interface Question {
 
 /** One option of a `Question` */
 export interface QuestionOption {
+  /** Short UI label for the option */
+  label: string
   /** Option text */
   description: string
 }
 
-/** Rank categories response. `data` is a JSON string. */
+/** Rank categories response. */
 export interface RankCategoriesResponse {
-  /** Raw rank categories data (JSON string) */
-  data: string
+  /** All top-level rank categories */
+  categories: Array<RankCategory>
+}
+
+/** A top-level rank category grouping sub-categories. */
+export interface RankCategory {
+  /** Top-level key (e.g. `"hot"`) */
+  key: string
+  /** Display name (e.g. `"热度排行"`) */
+  name: string
+  /** Sub-categories */
+  subCategories: Array<RankSubCategory>
 }
 
 /** One ranked security item. */
@@ -5936,6 +6746,16 @@ export interface RankListResponse {
   bmp: boolean
   /** Ranked security items */
   lists: Array<RankListItem>
+}
+
+/** One leaf rank sub-category. */
+export interface RankSubCategory {
+  /** Sub-category key (e.g. `"hot_all-us"`). Pass to `rank_list`. */
+  key: string
+  /** Display name (e.g. `"美股总热度"`) */
+  name: string
+  /** Market code (e.g. `"US"`, `"HK"`) */
+  market: string
 }
 
 /** Analyst rating distribution counts */
@@ -6001,10 +6821,21 @@ export interface RecentBuybacks {
 export interface Reference {
   /** Reference index */
   index: number
+  /** Original index in the source list, before any reranking */
+  originalIndex: number
+  /** Reference kind, e.g. `"NewsArticle"` */
+  refType: string
+  /** Reference id */
+  id: string
   /** Reference title */
   title: string
   /** Reference URL */
   url: string
+  /**
+   * Full reference payload as sent by the server; kept as raw JSON
+   * because the field set varies by reference `ref_type`
+   */
+  content?: any
 }
 
 /** Parameters for replacing an attached order */
@@ -6039,6 +6870,14 @@ export interface ReplaceAttachedParams {
   quantity?: Decimal
   /** Market price */
   marketPrice?: Decimal
+}
+
+/** Options for replace grid trading order request */
+export interface ReplaceGridOrderOptions {
+  /** Grid master order id */
+  orderId: string
+  /** Grid trading rule */
+  gridTradingRule: GridTradeRule
 }
 
 /** Options for replace order request */
@@ -6409,12 +7248,12 @@ export interface StockRatings {
   styleTxtName: string
   scaleTxtName: string
   reportPeriodTxt: string
-  /** Composite score as a JSON string */
-  multiScore: string
+  /** Composite score (`null` when not rated) */
+  multiScore?: number
   multiLetter: string
   multiScoreChange: number
   industryName: string
-  industryRank: number
+  industryRank?: number
   /** Full ratings array as a JSON string */
   ratingsJson: string
 }
@@ -6516,6 +7355,53 @@ export interface SubmitAttachedParams {
   stopLossSubmitPrice?: Decimal
   /** Activate RTH */
   activateRth?: OutsideRTH
+}
+
+/** Options for submit grid trading order request */
+export interface SubmitGridOrderOptions {
+  /** Security code */
+  symbol: string
+  /** Settlement currency */
+  settlementCurrency: string
+  /** Grid trading rule */
+  gridTradingRule: GridTradeRule
+}
+
+/** A leg of a multi-leg combination order to submit */
+export interface SubmitMultiLegOrderLeg {
+  /** Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`) */
+  symbol: string
+  /**
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by `strategy` together with the order `side`, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
+   */
+  ratioQuantity: Decimal
+}
+
+/** Options for submit multi-leg order request */
+export interface SubmitMultiLegOrderOptions {
+  /** Order side */
+  side: OrderSide
+  /** Order type */
+  orderType: OrderType
+  /** Submitted quantity (number of combinations) */
+  submittedQuantity: Decimal
+  /** Multi-leg strategy */
+  strategy: MultiLegStrategy
+  /** Legs of the combination order */
+  legs: Array<SubmitMultiLegOrderLeg>
+  /** Submitted price (required for limit order types such as `LO`) */
+  submittedPrice?: Decimal
+  /** Remark (Maximum 255 characters) */
+  remark?: string
+  /**
+   * Client request ID for idempotency control.
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  clientRequestId?: string
 }
 
 /** Options for submit order request */
@@ -6635,7 +7521,7 @@ export interface TopMoversEvent {
 export interface TopMoversResponse {
   /** Top-mover events */
   events: Array<TopMoversEvent>
-  /** Pagination cursor for next page (JSON string) */
+  /** Pagination cursor for next page (empty string means no more pages) */
   nextParams: string
 }
 
@@ -6756,6 +7642,22 @@ export declare const enum TradeStatus {
   WarrantPrepareList = 9,
   /** Warrant To BeListed */
   Suspend = 10
+}
+
+/**
+ * How grid trigger thresholds are interpreted.
+ *
+ * The underlying SDK models unknown wire values with a catch-all data variant;
+ * the binding collapses those to `Unknown`, so the conversions are
+ * hand-written instead of derived.
+ */
+export declare const enum TriggerPriceType {
+  /** Unknown / unset */
+  Unknown = 0,
+  /** Trigger by absolute price spread */
+  Spread = 1,
+  /** Trigger by percent */
+  Percent = 2
 }
 
 /** Trigger status */
@@ -6921,7 +7823,7 @@ export interface USCryptoOverview {
   issuePrice: string
   shares: string
   officialWebAddress: string
-  /** User-facing symbol (e.g. "BTCUSD.BKKT"), converted from counter_id */
+  /** User-facing symbol (e.g. "BTCUSD.BKKT") */
   symbol: string
   baseAsset: string
   logo: string
@@ -7484,12 +8386,14 @@ export declare const enum WarrantSortBy {
 
 /** Warrant status */
 export declare const enum WarrantStatus {
+  /** Unknown */
+  Unknown = 0,
   /** Suspend */
-  Suspend = 0,
+  Suspend = 1,
   /** Prepare List */
-  PrepareList = 1,
+  PrepareList = 2,
   /** Normal */
-  Normal = 2
+  Normal = 3
 }
 
 /** Warrant type */

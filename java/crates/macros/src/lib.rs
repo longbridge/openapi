@@ -129,8 +129,8 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
         let java_field = ident.to_string().to_camel_case();
 
         if let Some(set_type) = args.set_as_opt.as_ref() {
-            // Option<T> field: pass ident.map(set_type::from) as Option<set_type>, which
-            // implements IntoJValue
+            // Option<T> field: pass ident.map(set_type::from) as
+            // Option<set_type>, which implements IntoJValue
             set_fields.push(quote! {
                 crate::types::set_field(env, &obj, #java_field, #ident.map(#set_type::from))?;
             });

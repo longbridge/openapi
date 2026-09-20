@@ -118,16 +118,29 @@ pub(crate) enum ConversationStatus {
 #[derive(Debug, Clone)]
 pub(crate) struct Reference {
     pub index: i32,
+    /// Original index in the source list, before any reranking
+    pub original_index: i32,
+    /// Reference kind, e.g. `"NewsArticle"`
+    pub ref_type: String,
+    /// Reference id
+    pub id: String,
     pub title: String,
     pub url: String,
+    /// Full reference payload as sent by the server. Kept as raw JSON
+    /// because the field set varies by reference `ref_type`.
+    pub content: Option<JsonValue>,
 }
 
 impl From<longbridge::agent::Reference> for Reference {
     fn from(v: longbridge::agent::Reference) -> Self {
         Self {
             index: v.index,
+            original_index: v.original_index,
+            ref_type: v.ref_type,
+            id: v.id,
             title: v.title,
             url: v.url,
+            content: v.content.map(JsonValue),
         }
     }
 }
@@ -136,12 +149,14 @@ impl From<longbridge::agent::Reference> for Reference {
 #[pyclass(get_all, skip_from_py_object)]
 #[derive(Debug, Clone)]
 pub(crate) struct QuestionOption {
+    pub label: String,
     pub description: String,
 }
 
 impl From<longbridge::agent::QuestionOption> for QuestionOption {
     fn from(v: longbridge::agent::QuestionOption) -> Self {
         Self {
+            label: v.label,
             description: v.description,
         }
     }
@@ -166,6 +181,31 @@ impl From<longbridge::agent::Question> for Question {
     }
 }
 
+/// A single interaction requested while an Agent workflow is paused
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct HumanInteraction {
+    pub tool_call_id: String,
+    pub interrupt_id: String,
+    pub interaction_type: String,
+    pub tool_name: String,
+    pub questions: Vec<Question>,
+    pub tool_args: JsonValue,
+}
+
+impl From<longbridge::agent::HumanInteraction> for HumanInteraction {
+    fn from(v: longbridge::agent::HumanInteraction) -> Self {
+        Self {
+            tool_call_id: v.tool_call_id,
+            interrupt_id: v.interrupt_id,
+            interaction_type: v.interaction_type,
+            tool_name: v.tool_name,
+            questions: v.questions.into_iter().map(Into::into).collect(),
+            tool_args: JsonValue(v.tool_args),
+        }
+    }
+}
+
 /// Present when a conversation run is interrupted, waiting for
 /// `AgentContext.continue_conversation`
 #[pyclass(get_all, skip_from_py_object)]
@@ -174,6 +214,7 @@ pub(crate) struct Interrupt {
     pub node_id: String,
     pub tool_call_id: String,
     pub questions: Vec<Question>,
+    pub interactions: Vec<HumanInteraction>,
     pub message_id: i64,
     pub chat_id: i64,
 }
@@ -184,6 +225,7 @@ impl From<longbridge::agent::Interrupt> for Interrupt {
             node_id: v.node_id,
             tool_call_id: v.tool_call_id,
             questions: v.questions.into_iter().map(Into::into).collect(),
+            interactions: v.interactions.into_iter().map(Into::into).collect(),
             message_id: v.message_id,
             chat_id: v.chat_id,
         }
@@ -218,6 +260,8 @@ pub(crate) struct ConversationResponse {
     pub status: ConversationStatus,
     pub answer: String,
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions ("you might also ask")
+    pub further_questions: Option<Vec<String>>,
     pub elapsed_time: f64,
     pub interrupt: Option<Interrupt>,
     pub error: Option<AgentError>,
@@ -233,6 +277,7 @@ impl From<longbridge::agent::ConversationResponse> for ConversationResponse {
             references: v
                 .references
                 .map(|refs| refs.into_iter().map(Into::into).collect()),
+            further_questions: v.further_questions,
             elapsed_time: v.elapsed_time,
             interrupt: v.interrupt.map(Into::into),
             error: v.error.map(Into::into),
@@ -246,6 +291,12 @@ impl From<longbridge::agent::ConversationResponse> for ConversationResponse {
 pub(crate) struct ChatStartedPayload {
     pub chat_uid: String,
     pub message_id: String,
+    /// ID of the owning conversation
+    pub chat_id: i64,
+    /// Error detail; empty at start
+    pub error: String,
+    /// User-facing error message; empty at start
+    pub error_message: String,
 }
 
 impl From<longbridge::agent::ChatStartedPayload> for ChatStartedPayload {
@@ -253,6 +304,9 @@ impl From<longbridge::agent::ChatStartedPayload> for ChatStartedPayload {
         Self {
             chat_uid: v.chat_uid,
             message_id: v.message_id,
+            chat_id: v.chat_id,
+            error: v.error,
+            error_message: v.error_message,
         }
     }
 }

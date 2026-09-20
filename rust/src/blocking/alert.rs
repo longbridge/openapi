@@ -38,18 +38,18 @@ impl AlertContextSync {
         condition: AlertCondition,
         trigger_value: impl Into<String> + Send + 'static,
         frequency: AlertFrequency,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<()> {
         self.rt.call(move |ctx| async move {
             ctx.add(symbol, condition, trigger_value, frequency).await
         })
     }
     /// Update (enable or disable) a price alert.
-    pub fn update(&self, item: AlertItem) -> Result<serde_json::Value> {
+    pub fn update(&self, item: AlertItem) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.update(&item).await })
     }
     /// Delete price alerts.
-    pub fn delete(&self, alert_ids: Vec<String>) -> Result<serde_json::Value> {
+    pub fn delete(&self, alert_ids: Vec<String>) -> Result<()> {
         self.rt
             .call(move |ctx| async move { ctx.delete(alert_ids).await })
     }

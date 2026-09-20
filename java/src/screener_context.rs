@@ -81,12 +81,13 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_screenerContextStrat
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    id: i64,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
+        let id: i64 = get_field(env, &opts, "id")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx.screener_strategy(id).await?;
             Ok(resp)

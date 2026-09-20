@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
 use longbridge_geo::DcRegion;
 use reqwest::{
@@ -10,6 +10,17 @@ use serde::Deserialize;
 use crate::{
     AuthConfig, HttpClientConfig, HttpClientError, HttpClientResult, Json, RequestBuilder,
 };
+
+/// Process-wide shared `reqwest::Client`.
+///
+/// `reqwest::Client` is internally reference-counted and owns the connection
+/// pool, DNS cache and TLS state; cloning it is cheap and shares that pool.
+/// Every SDK context builds its own [`HttpClient`], so a process that churns
+/// thousands of contexts would otherwise spin up thousands of independent
+/// connection pools. All requests target the same OpenAPI host and auth is
+/// applied per-request, so a single shared client is both correct and far
+/// cheaper.
+static SHARED_HTTP_CLIENT: LazyLock<Client> = LazyLock::new(Client::new);
 
 /// Longbridge HTTP client
 #[derive(Clone)]
@@ -23,7 +34,7 @@ impl HttpClient {
     /// Create a new `HttpClient`
     pub fn new(config: HttpClientConfig) -> Self {
         Self {
-            http_cli: Client::new(),
+            http_cli: SHARED_HTTP_CLIENT.clone(),
             config: Arc::new(config),
             default_headers: HeaderMap::new(),
         }

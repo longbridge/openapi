@@ -651,19 +651,81 @@ jobs:
       - name: Package
         run: tar czvf openapi-cpp-sdk-$SDK_VERSION.tar.gz ./sdk
 
-      - name: Upload SDK to BJ
+      # Hand the packaged tarball off to the region-specific upload jobs below.
+      # The S3 uploads are split into independent jobs (upload-cpp-sdk-bj /
+      # upload-cpp-sdk-hk) so that a transient network failure to one region
+      # neither blocks the other region nor fails the whole release.
+      - name: Upload SDK tarball artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpp-sdk-tarball
+          path: openapi-cpp-sdk-*.tar.gz
+          retention-days: 1
+          if-no-files-found: error
+
+  # Region uploads run as independent jobs: each retries on its own, and one
+  # region's failure does not cancel or block the other (fail-fast is per-job).
+  upload-cpp-sdk-bj:
+    needs:
+      - publish-cpp-sdk
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download SDK tarball
+        uses: actions/download-artifact@v5
+        with:
+          name: cpp-sdk-tarball
+      - name: Upload SDK to BJ (with retry)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_SECRET }}
+          AWS_REGION: ${{ secrets.PROD_BJ_AWS_DEFAULT_REGION }}
+          BUCKET: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_BUCKET }}
         run: |
-          aws --region=${{ secrets.PROD_BJ_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
+          file=$(ls openapi-cpp-sdk-*.tar.gz)
+          for attempt in 1 2 3 4 5; do
+            echo "::group::BJ upload attempt $attempt"
+            if aws --region="$AWS_REGION" s3 cp "$file" "s3://$BUCKET/openapi-sdk/" --cache-control max-age=31536000; then
+              echo "::endgroup::"
+              echo "Uploaded $file to BJ on attempt $attempt"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "BJ upload attempt $attempt failed"
+            sleep $((attempt * 10))
+          done
+          echo "BJ upload failed after 5 attempts"
+          exit 1
 
-      - name: Upload SDK to HK
+  upload-cpp-sdk-hk:
+    needs:
+      - publish-cpp-sdk
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download SDK tarball
+        uses: actions/download-artifact@v5
+        with:
+          name: cpp-sdk-tarball
+      - name: Upload SDK to HK (with retry)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_SECRET }}
+          AWS_REGION: ${{ secrets.PROD_HK_AWS_DEFAULT_REGION }}
+          BUCKET: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}
         run: |
-          aws --region=${{ secrets.PROD_HK_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
+          file=$(ls openapi-cpp-sdk-*.tar.gz)
+          for attempt in 1 2 3 4 5; do
+            echo "::group::HK upload attempt $attempt"
+            if aws --region="$AWS_REGION" s3 cp "$file" "s3://$BUCKET/openapi-sdk/" --cache-control max-age=31536000; then
+              echo "::endgroup::"
+              echo "Uploaded $file to HK on attempt $attempt"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "HK upload attempt $attempt failed"
+            sleep $((attempt * 10))
+          done
+          echo "HK upload failed after 5 attempts"
+          exit 1
 
   publish-python-sdk:
     runs-on: ubuntu-24.04
@@ -685,6 +747,10 @@ jobs:
           python-version: 3.8
       - name: Publish to PyPi
         uses: pypa/gh-action-pypi-publish@release/v1
+        # Skip files already on PyPI so a re-run of the release (e.g. to retry a
+        # different SDK's publish) does not fail on an already-published version.
+        with:
+          skip-existing: true
 
   publish-nodejs-sdk:
     runs-on: ubuntu-24.04
@@ -702,7 +768,12 @@ jobs:
           node-version: 20
           check-latest: true
       - name: Install napi-rs/cli
-        run: npm install -g @napi-rs/cli
+        # Pinned: @napi-rs/cli 3.9.x changed `napi prepublish` behaviour and
+        # breaks npm publish with a spurious `E404 PUT .../longbridge-<target>`
+        # during prepublish. 3.8.6 is the last version that published cleanly
+        # (used by the v4.5.0 release). Do not float this to latest without
+        # re-verifying a full nodejs publish.
+        run: npm install -g @napi-rs/cli@3.8.6
       - name: Download all artifacts
         uses: actions/download-artifact@v5
         with:
@@ -790,11 +861,28 @@ jobs:
       - name: Get version
         run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
 
+      # Maven Central releases are immutable — re-deploying an existing version
+      # fails. Skip the deploy when this version is already published so a
+      # release re-run (e.g. to retry another SDK) is idempotent.
+      - name: Check if version already on Maven Central
+        run: |
+          url="https://repo1.maven.org/maven2/io/github/longbridge/openapi-sdk/${PACKAGE_VERSION}/"
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+          if [ "$code" = "200" ]; then
+            echo "openapi-sdk ${PACKAGE_VERSION} already on Maven Central; skipping deploy."
+            echo "MAVEN_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "openapi-sdk ${PACKAGE_VERSION} not found on Maven Central (HTTP $code); will deploy."
+            echo "MAVEN_EXISTS=false" >> $GITHUB_ENV
+          fi
+
       - name: Update version
+        if: env.MAVEN_EXISTS != 'true'
         working-directory: java/javasrc
         run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
 
       - name: Import GPG private key
+        if: env.MAVEN_EXISTS != 'true'
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -804,5 +892,6 @@ jobs:
           rm private.key
 
       - name: Deploy Maven package
+        if: env.MAVEN_EXISTS != 'true'
         working-directory: java/javasrc
         run: mvn deploy --activate-profiles release

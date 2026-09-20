@@ -386,9 +386,10 @@ impl AgentContext {
         let agent_id = agent_id.into();
         let chat_uid = chat_uid.into();
         let message_id = message_id.into();
-        // We already know chat_uid/message_id from the caller (unlike a brand-new
-        // conversation) — seed `started` so the final ConversationResponse carries
-        // them even if the server doesn't re-emit a `chat_started` event here.
+        // We already know chat_uid/message_id from the caller (unlike a
+        // brand-new conversation) — seed `started` so the final
+        // ConversationResponse carries them even if the server doesn't
+        // re-emit a `chat_started` event here.
         let mut started = Some((chat_uid.clone(), message_id.clone()));
         let raw = self
             .0
@@ -519,8 +520,8 @@ mod tests {
     }
 
     // https://github.com/longbridge/developers/pull/1176 — an interrupted
-    // run's stream never emits `workflow_finished`; `human_interaction_required`
-    // is the terminal event instead.
+    // run's stream never emits `workflow_finished`;
+    // `human_interaction_required` is the terminal event instead.
     const HUMAN_INTERACTION_REQUIRED: &str = r#"{"event":"human_interaction_required","workflow_run_id":"wr_1","data":{"node_id":"n_ask_human","tool_call_id":"call_abc123","questions":[{"question":"Which time range would you like to check?","options":[{"description":"Past week"},{"description":"Past month"}],"multi_select":false}],"message_id":43,"chat_id":1001}}"#;
 
     #[test]

@@ -13,7 +13,7 @@ use crate::{
     async_call::{CAsyncCallback, execute_async},
     callback::CFreeUserDataFunc,
     config::CConfig,
-    types::{CCow, ToFFI, cstr_to_rust},
+    types::{CCow, ToFFI, cstr_to_rust, slice_from_raw_parts},
 };
 
 /// AI Agent conversation context
@@ -65,10 +65,10 @@ unsafe fn answers_from_ffi(
     num_answers: usize,
 ) -> AnswersByToolCall {
     let mut map: AnswersByToolCall = HashMap::new();
-    for entry in std::slice::from_raw_parts(answers, num_answers) {
+    for entry in slice_from_raw_parts(answers, num_answers) {
         let tool_call_id = cstr_to_rust(entry.tool_call_id);
         let mut questions = HashMap::new();
-        for qa in std::slice::from_raw_parts(entry.answers, entry.num_answers) {
+        for qa in slice_from_raw_parts(entry.answers, entry.num_answers) {
             questions.insert(cstr_to_rust(qa.question), cstr_to_rust(qa.answer));
         }
         map.insert(tool_call_id, questions);

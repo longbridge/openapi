@@ -10,6 +10,7 @@ use crate::types::ClassLoader;
 
 pub(crate) static INTEGER_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static LONG_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DOUBLE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static STRING_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DECIMAL_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_INSTANT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
@@ -61,6 +62,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         env,
         (INTEGER_CLASS, "java/lang/Integer"),
         (LONG_CLASS, "java/lang/Long"),
+        (DOUBLE_CLASS, "java/lang/Double"),
         (STRING_CLASS, "java/lang/String"),
         (DECIMAL_CLASS, "java/math/BigDecimal"),
         (TIME_INSTANT_CLASS, "java/time/Instant"),
@@ -90,6 +92,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::TradeDirection,
         longbridge::quote::OptionType,
         longbridge::quote::OptionDirection,
+        longbridge::quote::OptionExpiryCycleType,
+        longbridge::quote::OptionStandardAttr,
         longbridge::quote::WarrantType,
         longbridge::quote::WarrantStatus,
         longbridge::quote::SortOrderType,
@@ -118,11 +122,17 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::DeductionStatus,
         longbridge::trade::ChargeCategoryCode,
         longbridge::trade::AttachedOrderType,
+        longbridge::trade::MultiLegStrategy,
+        longbridge::trade::MultiLegPosition,
+        longbridge::trade::ContractDirection,
         longbridge::quote::PinnedMode,
         longbridge::portfolio::types::FlowDirection,
         longbridge::portfolio::types::AssetType,
         longbridge::fundamental::types::InstitutionRecommend,
         longbridge::fundamental::types::FinancialReportKind,
+        longbridge::fundamental::types::FinancialStatementKind,
+        longbridge::fundamental::types::IndustryRankIndicator,
+        longbridge::fundamental::types::IndustryRankSortType,
         longbridge::fundamental::types::FinancialReportPeriod,
         longbridge::market::types::BrokerHoldingPeriod,
         longbridge::market::types::AhPremiumPeriod,
@@ -131,7 +141,10 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::alert::types::AlertCondition,
         longbridge::alert::types::AlertFrequency,
         longbridge::calendar::types::CalendarCategory,
-        longbridge::agent::ConversationStatus
+        longbridge::agent::ConversationStatus,
+        longbridge::grid::TriggerPriceType,
+        longbridge::grid::GridLimitEvent,
+        longbridge::grid::GridTimeInForce
     );
 
     // classes
@@ -156,7 +169,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::ParticipantInfo,
         longbridge::quote::IntradayLine,
         longbridge::quote::Candlestick,
-        longbridge::quote::StrikePriceInfo,
+        longbridge::quote::OptionChainContract,
         longbridge::quote::IssuerInfo,
         longbridge::quote::WarrantInfo,
         longbridge::quote::MarketTradingSession,
@@ -176,6 +189,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::quote::HistoryMarketTemperatureResponse,
         longbridge::quote::FilingItem,
         longbridge::trade::AttachedOrderDetail,
+        longbridge::trade::MultiLegOrderLeg,
+        longbridge::trade::MultiLegInfo,
         longbridge::trade::PushOrderChanged,
         longbridge::trade::Execution,
         longbridge::trade::AllExecutionsResponse,
@@ -198,6 +213,20 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::OrderChargeDetail,
         longbridge::trade::OrderDetail,
         longbridge::trade::EstimateMaxPurchaseQuantityResponse,
+        // Grid trading (GridContext types live in `longbridge::grid`)
+        longbridge::grid::SubmitGridOrderResponse,
+        longbridge::grid::GridOrder,
+        longbridge::grid::GridOrderSubOrder,
+        longbridge::grid::GridOrderHistory,
+        longbridge::grid::GridOrderDetail,
+        longbridge::grid::TriggerOrder,
+        longbridge::grid::GridBidSize,
+        longbridge::grid::GridChannelInfo,
+        longbridge::grid::GridSymbolInfo,
+        // Grid push stays on the trade side
+        longbridge::trade::PushGridOrderChanged,
+        crate::types::GridOrdersResponse,
+        crate::types::GridTriggerHistoryResponse,
         longbridge::content::TopicItem,
         longbridge::content::NewsItem,
         longbridge::content::TopicAuthor,
@@ -232,6 +261,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::dca::DcaSupportInfo,
         longbridge::dca::DcaSupportList,
         // AlertContext
+        longbridge::alert::AlertValueMap,
         longbridge::alert::AlertItem,
         longbridge::alert::AlertSymbolGroup,
         longbridge::alert::AlertList,
@@ -399,10 +429,30 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fundamental::ValuationHistoryPoint,
         longbridge::fundamental::ValuationComparisonItem,
         longbridge::fundamental::ValuationComparisonResponse,
+        // FundamentalContext: industry rank / peers
+        longbridge::fundamental::IndustryRankItem,
+        longbridge::fundamental::IndustryRankGroup,
+        longbridge::fundamental::IndustryRankResponse,
+        longbridge::fundamental::IndustryPeersTop,
+        longbridge::fundamental::IndustryPeerNode,
+        longbridge::fundamental::IndustryPeersResponse,
+        // FundamentalContext: business segments / rating views / snapshot
+        longbridge::fundamental::BusinessSegmentItem,
+        longbridge::fundamental::BusinessSegments,
+        longbridge::fundamental::BusinessSegmentHistoryItem,
+        longbridge::fundamental::BusinessSegmentsHistoricalItem,
+        longbridge::fundamental::BusinessSegmentsHistory,
+        longbridge::fundamental::InstitutionRatingViewItem,
+        longbridge::fundamental::InstitutionRatingViews,
+        longbridge::fundamental::SnapshotForecastMetric,
+        longbridge::fundamental::SnapshotReportedMetric,
+        longbridge::fundamental::FinancialReportSnapshot,
         // MarketContext: top movers / rank
         longbridge::market::TopMoversStock,
         longbridge::market::TopMoversEvent,
         longbridge::market::TopMoversResponse,
+        longbridge::market::RankSubCategory,
+        longbridge::market::RankCategory,
         longbridge::market::RankCategoriesResponse,
         longbridge::market::RankListItem,
         longbridge::market::RankListResponse,
@@ -425,6 +475,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::agent::Reference,
         longbridge::agent::QuestionOption,
         longbridge::agent::Question,
+        longbridge::agent::HumanInteraction,
         longbridge::agent::Interrupt,
         longbridge::agent::AgentError,
         longbridge::agent::ChatStartedPayload,

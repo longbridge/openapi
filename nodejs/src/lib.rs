@@ -10,6 +10,7 @@ mod dca;
 mod decimal;
 mod error;
 mod fundamental;
+mod grid;
 mod http_client;
 mod market;
 mod oauth;

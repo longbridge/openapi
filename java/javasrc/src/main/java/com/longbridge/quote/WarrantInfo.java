@@ -108,7 +108,8 @@ public class WarrantInfo {
     /**
      * Returns the expiry date.
      *
-     * @return the expiry date
+     * @return the expiry date, or {@code null} if the server does not report an
+     *         expiry date for this warrant
      */
     public LocalDate getExpiryDate() {
         return expiryDate;

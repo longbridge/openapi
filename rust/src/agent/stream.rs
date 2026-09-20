@@ -173,6 +173,7 @@ mod tests {
                 node_id: "n_ask_human".to_string(),
                 tool_call_id: "call_1".to_string(),
                 questions: vec![],
+                interactions: vec![],
                 message_id: 1,
                 chat_id: 1,
             },
@@ -181,6 +182,9 @@ mod tests {
             Ok(ConversationStreamEvent::ChatStarted(ChatStartedPayload {
                 chat_uid: "ct_1".to_string(),
                 message_id: "1".to_string(),
+                chat_id: 0,
+                error: String::new(),
+                error_message: String::new(),
             })),
             Ok(ConversationStreamEvent::HumanInteractionRequired(
                 interrupt_resp,

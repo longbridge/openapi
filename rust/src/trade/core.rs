@@ -100,83 +100,103 @@ impl Core {
         Ok(())
     }
 
-    pub(crate) async fn run(mut self) {
+    pub(crate) async fn run(mut self, mut shutdown_rx: mpsc::UnboundedReceiver<()>) {
         while !self.close {
             match self.main_loop().await {
                 Ok(()) => return,
                 Err(err) => tracing::error!(error = %err, "trade disconnected"),
             }
 
+            // Reconnect until we either succeed or the owning context is
+            // dropped. `shutdown_rx` closes once the context (and its
+            // `command_tx`) has been dropped, so a context evicted while its
+            // server is unreachable stops reconnecting instead of leaking this
+            // task and its connection forever.
             loop {
-                // reconnect
-                tokio::time::sleep(RECONNECT_DELAY).await;
+                tokio::select! {
+                    biased;
+                    _ = shutdown_rx.recv() => return,
+                    reconnected = self.reconnect() => {
+                        if reconnected {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-                let (url, res) = self.config.create_trade_ws_request().await;
-                tracing::info!(url = url, "connecting to trade server");
-                let request = res.expect("BUG: failed to create trade ws request");
+    /// Perform a single reconnect attempt. Returns `true` once the connection,
+    /// session and subscriptions have all been restored; `false` if the caller
+    /// should retry.
+    async fn reconnect(&mut self) -> bool {
+        // reconnect
+        tokio::time::sleep(RECONNECT_DELAY).await;
 
-                match WsClient::open(
-                    request,
-                    ProtocolVersion::Version1,
-                    CodecType::Protobuf,
-                    Platform::OpenAPI,
-                    self.event_tx.clone(),
-                    vec![],
-                )
-                .await
+        let (url, res) = self.config.create_trade_ws_request().await;
+        tracing::info!(url = url, "connecting to trade server");
+        let request = res.expect("BUG: failed to create trade ws request");
+
+        match WsClient::open(
+            request,
+            ProtocolVersion::Version1,
+            CodecType::Protobuf,
+            Platform::OpenAPI,
+            self.event_tx.clone(),
+            vec![],
+        )
+        .await
+        {
+            Ok(ws_cli) => self.ws_cli = Some(ws_cli),
+            Err(err) => {
+                tracing::error!(error = %err, "failed to connect trade server");
+                return false;
+            }
+        }
+
+        tracing::info!(url = url, "trade server connected");
+
+        // request new session
+        let ws_cli = self.ws_cli.as_ref().expect("ws_cli set above");
+        match &self.session {
+            Some(session) if !session.is_expired() => {
+                match ws_cli
+                    .request_reconnect(&session.session_id, Default::default())
+                    .await
                 {
-                    Ok(ws_cli) => self.ws_cli = Some(ws_cli),
+                    Ok(new_session) => self.session = Some(new_session),
                     Err(err) => {
-                        tracing::error!(error = %err, "failed to connect trade server");
-                        continue;
+                        self.session = None; // invalid session
+                        tracing::error!(error = %err, "failed to request session id");
+                        return false;
                     }
                 }
-
-                tracing::info!(url = url, "trade server connected");
-
-                // request new session
-                let ws_cli = self.ws_cli.as_ref().expect("ws_cli set above");
-                match &self.session {
-                    Some(session) if !session.is_expired() => {
-                        match ws_cli
-                            .request_reconnect(&session.session_id, Default::default())
-                            .await
-                        {
-                            Ok(new_session) => self.session = Some(new_session),
-                            Err(err) => {
-                                self.session = None; // invalid session
-                                tracing::error!(error = %err, "failed to request session id");
-                                continue;
-                            }
-                        }
-                    }
-                    _ => {
-                        let otp = match self.http_cli.get_otp().await {
-                            Ok(otp) => otp,
-                            Err(err) => {
-                                tracing::error!(error = %err, "failed to request otp");
-                                continue;
-                            }
-                        };
-
-                        match ws_cli.request_auth(otp, Default::default()).await {
-                            Ok(new_session) => self.session = Some(new_session),
-                            Err(err) => {
-                                tracing::error!(error = %err, "failed to request session id");
-                                continue;
-                            }
-                        }
-                    }
-                }
-
-                // handle reconnect
-                match self.resubscribe().await {
-                    Ok(()) => break,
+            }
+            _ => {
+                let otp = match self.http_cli.get_otp().await {
+                    Ok(otp) => otp,
                     Err(err) => {
-                        tracing::error!(error = %err, "failed to subscribe topics");
-                        continue;
+                        tracing::error!(error = %err, "failed to request otp");
+                        return false;
+                    }
+                };
+
+                match ws_cli.request_auth(otp, Default::default()).await {
+                    Ok(new_session) => self.session = Some(new_session),
+                    Err(err) => {
+                        tracing::error!(error = %err, "failed to request session id");
+                        return false;
                     }
                 }
+            }
+        }
+
+        // handle reconnect
+        match self.resubscribe().await {
+            Ok(()) => true,
+            Err(err) => {
+                tracing::error!(error = %err, "failed to subscribe topics");
+                false
             }
         }
     }

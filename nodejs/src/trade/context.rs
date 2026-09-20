@@ -9,14 +9,16 @@ use crate::{
     error::ErrorNewType,
     trade::{
         requests::{
-            EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions, GetHistoryExecutionsOptions,
-            GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-            ReplaceOrderOptions, SubmitOrderOptions,
+            EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
+            GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions,
+            GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderOptions,
+            SubmitOrderOptions,
         },
         types::{
-            AccountBalance, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
-            FundPositionsResponse, MarginRatio, Order, OrderDetail, PushOrderChanged,
-            StockPositionsResponse, SubmitOrderResponse, TopicType,
+            AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityResponse,
+            Execution, FundPositionsResponse, MarginRatio, Order, OrderDetail,
+            PushGridOrderChanged, PushOrderChanged, StockPositionsResponse, SubmitOrderResponse,
+            TopicType,
         },
     },
     utils::JsCallback,
@@ -25,6 +27,7 @@ use crate::{
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<JsCallback<PushOrderChanged>>,
+    grid_order_changed: Option<JsCallback<PushGridOrderChanged>>,
 }
 
 /// Trade context
@@ -64,6 +67,24 @@ impl TradeContext {
                                 );
                             }
                         },
+                        PushEvent::GridOrderChanged(grid_order_changed) => {
+                            match grid_order_changed.try_into() {
+                                Ok(grid_order_changed) => {
+                                    if let Some(callback) = &callbacks.grid_order_changed {
+                                        callback.call(
+                                            Ok(grid_order_changed),
+                                            ThreadsafeFunctionCallMode::Blocking,
+                                        );
+                                    }
+                                }
+                                Err(e) => {
+                                    tracing::warn!(
+                                        error = %e,
+                                        "grid order changed push event conversion failed"
+                                    );
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -77,6 +98,22 @@ impl TradeContext {
     #[napi(ts_args_type = "callback: (err: null | Error, event: PushOrderChanged) => void")]
     pub fn set_on_order_changed(&self, callback: Function<PushOrderChanged, ()>) -> Result<()> {
         self.callbacks.lock().order_changed = Some(
+            callback
+                .build_threadsafe_function()
+                .callee_handled::<true>()
+                .build()?,
+        );
+        Ok(())
+    }
+
+    /// Set grid order changed callback, after receiving the grid order changed
+    /// event, it will call back to this function.
+    #[napi(ts_args_type = "callback: (err: null | Error, event: PushGridOrderChanged) => void")]
+    pub fn set_on_grid_order_changed(
+        &self,
+        callback: Function<PushGridOrderChanged, ()>,
+    ) -> Result<()> {
+        self.callbacks.lock().grid_order_changed = Some(
             callback
                 .build_threadsafe_function()
                 .callee_handled::<true>()
@@ -193,19 +230,18 @@ impl TradeContext {
             .collect()
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions
-    // #[napi]
-    // pub async fn all_executions(
-    // &self,
-    // opts: Option<GetAllExecutionsOptions>,
-    // ) -> Result<AllExecutionsResponse> {
-    // self.ctx
-    // .all_executions(opts.map(Into::into))
-    // .await
-    // .map_err(ErrorNewType)?
-    // .try_into()
-    // }
+    /// Get all executions
+    #[napi]
+    pub async fn all_executions(
+        &self,
+        opts: Option<GetAllExecutionsOptions>,
+    ) -> Result<AllExecutionsResponse> {
+        self.ctx
+            .all_executions(opts.map(Into::into))
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
 
     /// Get history orders
     ///
@@ -349,6 +385,51 @@ impl TradeContext {
         let opts = longbridge::trade::SubmitOrderOptions::from(opts);
         env.spawn_future(async move {
             let res = ctx.submit_order(opts).await.map_err(ErrorNewType)?;
+            SubmitOrderResponse::try_from(res)
+        })
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const {
+    ///   OAuth, Config,
+    ///   TradeContext,
+    ///   OrderType,
+    ///   OrderSide,
+    ///   Decimal,
+    ///   MultiLegStrategy,
+    /// } = require('longbridge');
+    ///
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.submitMultileg({
+    ///   side: OrderSide.Buy,
+    ///   orderType: OrderType.LO,
+    ///   submittedQuantity: new Decimal("1"),
+    ///   strategy: MultiLegStrategy.VerticalCallSpread,
+    ///   submittedPrice: new Decimal("1.5"),
+    ///   legs: [
+    ///     { symbol: "QQQ260731C764000.US", ratioQuantity: new Decimal("1") },
+    ///     { symbol: "QQQ260731C767000.US", ratioQuantity: new Decimal("1") },
+    ///   ],
+    /// });
+    /// console.log(resp.toString());
+    /// ```
+    #[napi]
+    pub fn submit_multileg<'env>(
+        &self,
+        env: &'env Env,
+        opts: SubmitMultiLegOrderOptions<'env>,
+    ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::SubmitMultiLegOrderOptions::from(opts);
+        env.spawn_future(async move {
+            let res = ctx.submit_multileg(opts).await.map_err(ErrorNewType)?;
             SubmitOrderResponse::try_from(res)
         })
     }

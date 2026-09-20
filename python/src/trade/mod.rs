@@ -20,6 +20,11 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::AttachedOrderDetail>()?;
     parent.add_class::<types::SubmitAttachedParams>()?;
     parent.add_class::<types::ReplaceAttachedParams>()?;
+    parent.add_class::<types::MultiLegStrategy>()?;
+    parent.add_class::<types::MultiLegPosition>()?;
+    parent.add_class::<types::ContractDirection>()?;
+    parent.add_class::<types::MultiLegOrderLeg>()?;
+    parent.add_class::<types::MultiLegInfo>()?;
     parent.add_class::<types::Order>()?;
     parent.add_class::<types::PushOrderChanged>()?;
     parent.add_class::<types::MarginRatio>()?;
@@ -60,6 +65,8 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::USAttachedOrder>()?;
     parent.add_class::<types::USOrderDetail>()?;
     parent.add_class::<types::USOrderDetailResponse>()?;
+
+    parent.add_class::<types::PushGridOrderChanged>()?;
 
     parent.add_class::<context::TradeContext>()?;
     parent.add_class::<context_async::AsyncTradeContext>()?;

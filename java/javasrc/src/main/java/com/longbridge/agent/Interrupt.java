@@ -10,6 +10,7 @@ public class Interrupt {
     private String nodeId;
     private String toolCallId;
     private Question[] questions;
+    private HumanInteraction[] interactions;
     private long messageId;
     private long chatId;
 
@@ -42,6 +43,16 @@ public class Interrupt {
     }
 
     /**
+     * Returns the full interaction descriptors used to render and answer the
+     * pause.
+     *
+     * @return interactions
+     */
+    public HumanInteraction[] getInteractions() {
+        return interactions;
+    }
+
+    /**
      * Returns the ID of the paused message.
      *
      * @return message ID
@@ -62,6 +73,7 @@ public class Interrupt {
     @Override
     public String toString() {
         return "Interrupt [nodeId=" + nodeId + ", toolCallId=" + toolCallId + ", questions="
-                + Arrays.toString(questions) + ", messageId=" + messageId + ", chatId=" + chatId + "]";
+                + Arrays.toString(questions) + ", interactions=" + Arrays.toString(interactions)
+                + ", messageId=" + messageId + ", chatId=" + chatId + "]";
     }
 }

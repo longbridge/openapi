@@ -221,8 +221,6 @@ TradeContext::today_executions(
     new AsyncCallback<TradeContext, std::vector<Execution>>(callback));
 }
 
-// TODO: temporarily disabled — restore when API is available
-/*
 /// Get all executions
 void
 TradeContext::all_executions(
@@ -261,7 +259,6 @@ TradeContext::all_executions(
     },
     new AsyncCallback<TradeContext, AllExecutionsResponse>(callback));
 }
-*/
 
 /// Get history orders
 void
@@ -530,6 +527,65 @@ TradeContext::submit_order(
   }
 
   lb_trade_context_submit_order(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<TradeContext, SubmitOrderResponse>(
+          res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        SubmitOrderResponse resp =
+          convert((const lb_submit_order_response_t*)res->data);
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitOrderResponse>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<TradeContext, SubmitOrderResponse>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, SubmitOrderResponse>(callback));
+}
+
+void
+TradeContext::submit_multileg(
+  const SubmitMultiLegOrderOptions& opts,
+  AsyncCallback<TradeContext, SubmitOrderResponse> callback) const
+{
+  std::vector<CSubmitMultiLegOrderLeg> legs;
+  legs.reserve(opts.legs.size());
+  for (const auto& leg : opts.legs) {
+    legs.push_back(CSubmitMultiLegOrderLeg{
+      leg.symbol.c_str(),
+      (const lb_decimal_t*)leg.ratio_quantity,
+    });
+  }
+
+  CSubmitMultiLegOrderOptions opts2 = {
+    convert(opts.side),
+    convert(opts.order_type),
+    (const lb_decimal_t*)opts.submitted_quantity,
+    convert(opts.strategy),
+    legs.data(),
+    legs.size(),
+    nullptr,
+    nullptr,
+    nullptr,
+  };
+
+  if (opts.submitted_price) {
+    opts2.submitted_price = (const lb_decimal_t*)opts.submitted_price.value();
+  }
+  if (opts.remark) {
+    opts2.remark = opts.remark->c_str();
+  }
+  if (opts.client_request_id) {
+    opts2.client_request_id = opts.client_request_id->c_str();
+  }
+
+  lb_trade_context_submit_multileg(
     ctx_,
     &opts2,
     [](auto res) {
@@ -892,6 +948,26 @@ TradeContext::estimate_max_purchase_quantity(
     },
     new AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse>(
       callback));
+}
+
+void
+TradeContext::set_on_grid_order_changed(
+  PushCallback<TradeContext, PushGridOrderChanged> callback) const
+{
+  lb_trade_context_set_on_grid_order_changed(
+    ctx_,
+    [](auto ctx, auto event, auto userdata) {
+      auto callback_ptr =
+        callback::get_push_callback<TradeContext, PushGridOrderChanged>(
+          userdata);
+      PushGridOrderChanged event2 = convert(event);
+      (*callback_ptr)(PushEvent<TradeContext, PushGridOrderChanged>(
+        TradeContext(ctx), &event2));
+    },
+    new PushCallback<TradeContext, PushGridOrderChanged>(callback),
+    [](auto p) {
+      delete (PushCallback<TradeContext, PushGridOrderChanged>*)p;
+    });
 }
 
 } // namespace trade

@@ -9,6 +9,7 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Tuple,
     Type,
 )
 
@@ -1148,6 +1149,52 @@ class OptionDirection:
         Call
         """
 
+class OptionExpiryCycleType:
+    """
+    Special expiration cycle of an option contract
+    """
+
+    class Unknown(OptionExpiryCycleType):
+        """
+        Unknown
+        """
+
+    class Monthly(OptionExpiryCycleType):
+        """
+        Standard monthly option
+        """
+
+    class Weekly(OptionExpiryCycleType):
+        """
+        Weekly option, expires weekly
+        """
+
+    class Quarterly(OptionExpiryCycleType):
+        """
+        Quarterly option, expires quarterly
+        """
+
+class OptionStandardAttr:
+    """
+    Whether an option contract is a legacy contract left over from a corporate
+    action (e.g. a stock split or a merger)
+    """
+
+    class Unknown(OptionStandardAttr):
+        """
+        Unknown
+        """
+
+    class Normal(OptionStandardAttr):
+        """
+        A normal, active contract
+        """
+
+    class Old(OptionStandardAttr):
+        """
+        A legacy contract produced by a corporate action
+        """
+
 class OptionQuote:
     """
     Quote of option
@@ -1799,29 +1846,48 @@ class Period:
         Yearly
         """
 
-class StrikePriceInfo:
+class OptionChainContract:
     """
-    Strike price info
+    A single option contract of an option chain
+
+    Every contract is an independent entry: calls and puts are not paired, so a
+    strike price that is listed on one side only yields a single entry.
     """
 
-    price: Decimal
+    symbol: str
+    """
+    Option contract code, in `ticker.region` format
+    """
+
+    expiry_date: date
+    """
+    Expiry date, in US Eastern time
+    """
+
+    strike_price: Decimal
     """
     Strike price
     """
 
-    call_symbol: str
+    direction: OptionDirection
     """
-    Security code of call option
-    """
-
-    put_symbol: str
-    """
-    Security code of put option
+    Contract direction
     """
 
-    standard: bool
+    option_type: OptionExpiryCycleType
     """
-    Is standard
+    Special expiration cycle of the contract
+    """
+
+    standard_attr: OptionStandardAttr
+    """
+    Whether the contract is a legacy contract left over from a corporate action
+    """
+
+    days_to_expiry: int
+    """
+    Number of days remaining until the option expires, `0` on the expiry day
+    and negative once expired
     """
 
 class IssuerInfo:
@@ -1853,6 +1919,11 @@ class WarrantStatus:
     """
     Warrant status
     """
+
+    class Unknown(WarrantStatus):
+        """
+        Unknown
+        """
 
     class Suspend(WarrantStatus):
         """
@@ -2084,9 +2155,10 @@ class WarrantInfo:
     Turnover
     """
 
-    expiry_date: date
+    expiry_date: Optional[date]
     """
-    Expiry date
+    Expiry date, or `None` if the server does not report an expiry date for
+    this warrant
     """
 
     strike_price: Optional[Decimal]
@@ -2800,27 +2872,35 @@ class SecurityCalcIndex:
 
     delta: Optional[Decimal]
     """
-    Delta
+    Delta. Measures the expected change in option price for a $1 move in the
+    underlying asset price.
     """
 
     gamma: Optional[Decimal]
     """
-    Gamma
+    Gamma. Measures the expected change in Delta for a $1 move in the
+    underlying asset price.
     """
 
     theta: Optional[Decimal]
     """
-    Theta
+    Theta. Measures the expected change in option price as one day passes; the
+    raw value has been divided by 365 to convert to a daily value, representing
+    the impact of one day's time decay on the option price.
     """
 
     vega: Optional[Decimal]
     """
-    Vega
+    Vega. Measures the expected change in option price when implied volatility
+    (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to get the expected
+    price change per 1% move in IV.
     """
 
     rho: Optional[Decimal]
     """
-    Rho
+    Rho. Measures the expected change in option price when the risk-free
+    interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get the
+    expected price change per 1% move in the interest rate.
     """
 
 class QuotePackageDetail:
@@ -2867,6 +2947,41 @@ class TradeSessions:
         """
         All
         """
+
+class FilingItem:
+    """
+    Filing item
+    """
+
+    id: str
+    """
+    Filing ID
+    """
+
+    title: str
+    """
+    Title
+    """
+
+    description: str
+    """
+    Description
+    """
+
+    file_name: str
+    """
+    File name
+    """
+
+    file_urls: List[str]
+    """
+    File URLs
+    """
+
+    published_at: datetime
+    """
+    Published time
+    """
 
 class MarketTemperature:
     """
@@ -3433,17 +3548,26 @@ class QuoteContext:
         """
 
     def option_chain_info_by_date(
-        self, symbol: str, expiry_date: date
-    ) -> List[StrikePriceInfo]:
+        self, symbol: str, expiry_date: date, standard_only: bool = False
+    ) -> List[OptionChainContract]:
         """
-        Get option chain info by date
+        Get the option contract list of an underlying security for a given
+        expiry date
+
+        Every contract is an independent entry: calls and puts are not paired,
+        so a strike price that is listed on one side only yields a single
+        entry.
 
         Args:
             symbol: Security code
             expiry_date: Expiry date
+            standard_only: Whether to filter out the legacy contracts produced
+                by corporate actions. `True` returns standard contracts only;
+                `False` returns everything, including the contracts carrying a
+                `standard_attr` of `Old`
 
         Returns:
-            Option chain info
+            Option contract list
 
         Examples:
             ::
@@ -4076,6 +4200,17 @@ class QuoteContext:
 
         Returns:
             :class:`USCryptoOverview`
+        """
+        ...
+
+    def filings(self, symbol: str) -> List["FilingItem"]:
+        """Get corporate filings for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            List of :class:`FilingItem`
         """
         ...
 
@@ -4763,14 +4898,24 @@ class AsyncQuoteContext:
         ...
 
     def option_chain_info_by_date(
-        self, symbol: str, expiry_date: date
-    ) -> Awaitable[List[StrikePriceInfo]]:
+        self, symbol: str, expiry_date: date, standard_only: bool = False
+    ) -> Awaitable[List[OptionChainContract]]:
         """
-        Get option chain info by date. Returns an awaitable that resolves to strike price info list.
+        Get the option contract list of an underlying security for a given
+        expiry date. Returns an awaitable that resolves to the option contract
+        list.
+
+        Every contract is an independent entry: calls and puts are not paired,
+        so a strike price that is listed on one side only yields a single
+        entry.
 
         Args:
             symbol: Security code.
             expiry_date: Expiry date.
+            standard_only: Whether to filter out the legacy contracts produced
+                by corporate actions. `True` returns standard contracts only;
+                `False` returns everything, including the contracts carrying a
+                `standard_attr` of `Old`.
 
         Examples:
             ::
@@ -5431,32 +5576,6 @@ class AsyncQuoteContext:
         """
         ...
 
-    def option_volume(self, symbol: str) -> "Awaitable[OptionVolumeStats]":
-        """Get real-time option call/put volume. Returns awaitable.
-
-        Args:
-            symbol: Underlying symbol, e.g. ``"AAPL.US"``
-
-        Returns:
-            Awaitable resolving to :class:`OptionVolumeStats`
-        """
-        ...
-
-    def option_volume_daily(
-        self, symbol: str, timestamp: int = 0, count: int = 30
-    ) -> "Awaitable[OptionVolumeDaily]":
-        """Get daily historical option volume. Returns awaitable.
-
-        Args:
-            symbol: Underlying symbol, e.g. ``"AAPL.US"``
-            timestamp: Start timestamp (0 = most recent)
-            count: Number of days to return (default 30)
-
-        Returns:
-            Awaitable resolving to :class:`OptionVolumeDaily`
-        """
-        ...
-
     def us_crypto_overview(self, symbol: str) -> "Awaitable[USCryptoOverview]":
         """Get US cryptocurrency market overview. US token required. Returns awaitable.
 
@@ -5465,6 +5584,17 @@ class AsyncQuoteContext:
 
         Returns:
             Awaitable resolving to :class:`USCryptoOverview`
+        """
+        ...
+
+    async def filings(self, symbol: str) -> List["FilingItem"]:
+        """Get corporate filings for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            List of :class:`FilingItem`
         """
         ...
 
@@ -5743,6 +5873,11 @@ class Execution:
     Executed price
     """
 
+    side: OrderSide
+    """
+    Order side
+    """
+
 class AllExecutionsResponse:
     """
     Response for get all executions request
@@ -5757,6 +5892,56 @@ class AllExecutionsResponse:
     """
     Execution list
     """
+
+class PushGridOrderChanged:
+    """
+    Grid order changed push event
+    """
+
+    order_id: str
+    """Grid master order ID"""
+
+    status: str
+    """Order status"""
+
+    symbol: str
+    """Security symbol (e.g. ``700.HK``)"""
+
+    suspend_reason: str
+    """Suspend reason, if any"""
+
+    submitted_base_price: str
+    """Submitted base price"""
+
+    current_base_price: str
+    """Current base price"""
+
+    upper_limit_price: str
+    """Upper price bound"""
+
+    lower_limit_price: str
+    """Lower price bound"""
+
+    trigger_price_type: int
+    """Trigger price type"""
+
+    trigger_quantity: str
+    """Quantity per trigger"""
+
+    settlement_currency: str
+    """Settlement currency"""
+
+    time_in_force: int
+    """Time in force (``0`` = Day, ``1`` = GTC, ``6`` = GTD)"""
+
+    rth: int
+    """Regular trading hours flag"""
+
+    grid_order_type_up: str
+    """Sell-side order type when depth is 0"""
+
+    grid_order_type_down: str
+    """Buy-side order type when depth is 0"""
 
 class PushOrderChanged:
     """
@@ -5886,6 +6071,12 @@ class PushOrderChanged:
     remark: str
     """
     Remark message
+    """
+
+    multi_leg: Optional[MultiLegInfo]
+    """
+    Multi-leg strategy information (only present for multi-leg option
+    combination orders)
     """
 
 class TimeInForceType:
@@ -6122,6 +6313,171 @@ class ReplaceAttachedParams:
         market_price: Optional[Decimal] = None,
     ) -> None: ...
 
+class MultiLegStrategy:
+    """
+    Multi-leg strategy
+    """
+
+    class Unknown(MultiLegStrategy):
+        """
+        Unknown
+        """
+
+    class CoveredCall(MultiLegStrategy):
+        """
+        Covered call (covered stock)
+        """
+
+    class CoveredPut(MultiLegStrategy):
+        """
+        Covered put (covered stock)
+        """
+
+    class VerticalCallSpread(MultiLegStrategy):
+        """
+        Vertical call spread
+        """
+
+    class VerticalPutSpread(MultiLegStrategy):
+        """
+        Vertical put spread
+        """
+
+    class Collar(MultiLegStrategy):
+        """
+        Collar
+        """
+
+    class Straddle(MultiLegStrategy):
+        """
+        Straddle
+        """
+
+    class Strangle(MultiLegStrategy):
+        """
+        Strangle
+        """
+
+    class CalendarCallSpread(MultiLegStrategy):
+        """
+        Calendar call spread
+        """
+
+    class CalendarPutSpread(MultiLegStrategy):
+        """
+        Calendar put spread
+        """
+
+class MultiLegPosition:
+    """
+    Multi-leg position direction
+    """
+
+    class Unknown(MultiLegPosition):
+        """
+        Unknown
+        """
+
+    class Long(MultiLegPosition):
+        """
+        Long
+        """
+
+    class Short(MultiLegPosition):
+        """
+        Short
+        """
+
+class ContractDirection:
+    """
+    Option contract type
+    """
+
+    class Unknown(ContractDirection):
+        """
+        Unknown
+        """
+
+    class Call(ContractDirection):
+        """
+        Call
+        """
+
+    class Put(ContractDirection):
+        """
+        Put
+        """
+
+class MultiLegOrderLeg:
+    """
+    A leg of a multi-leg combination order
+    """
+
+    symbol: str
+    """
+    Option symbol, in `ticker.region` format
+    """
+
+    side: Type[OrderSide]
+    """
+    Order side
+    """
+
+    position: Type[MultiLegPosition]
+    """
+    Position direction
+    """
+
+    ratio_quantity: Decimal
+    """
+    Leg ratio quantity
+    """
+
+    strike_price: Optional[Decimal]
+    """
+    Strike price
+    """
+
+    expire_date: Optional[date]
+    """
+    Option expiry date
+    """
+
+    contract_direction: Type[ContractDirection]
+    """
+    Contract type
+    """
+
+class MultiLegInfo:
+    """
+    Multi-leg strategy information
+    """
+
+    strategy: Type[MultiLegStrategy]
+    """
+    Multi-leg strategy
+    """
+
+    strategy_name: str
+    """
+    Strategy name
+    """
+
+    multileg_id: str
+    """
+    Multi-leg combination ID
+    """
+
+    code: str
+    """
+    Multi-leg combination code
+    """
+
+    legs: List[MultiLegOrderLeg]
+    """
+    Legs of the combination order
+    """
+
 class Order:
     """
     Order
@@ -6275,6 +6631,12 @@ class Order:
     attached_orders: List[AttachedOrderDetail]
     """
     Attached orders
+    """
+
+    multi_leg: Optional[MultiLegInfo]
+    """
+    Multi-leg strategy information (only present for multi-leg option
+    combination orders)
     """
 
 class CommissionFreeStatus:
@@ -6660,6 +7022,12 @@ class OrderDetail:
     attached_orders: List[AttachedOrderDetail]
     """
     Attached orders
+    """
+
+    multi_leg: Optional[MultiLegInfo]
+    """
+    Multi-leg strategy information (only present for multi-leg option
+    combination orders)
     """
 
 class SubmitOrderResponse:
@@ -7156,15 +7524,27 @@ class TradeContext:
                 print(resp)
         """
 
-    # TODO: temporarily disabled — restore when API is available
-    # def all_executions(
-    #     self,
-    #     symbol: Optional[str] = None,
-    #     order_id: Optional[str] = None,
-    #     start_at: Optional[datetime] = None,
-    #     end_at: Optional[datetime] = None,
-    #     page: Optional[int] = None,
-    # ) -> AllExecutionsResponse: ...
+    def all_executions(
+        self,
+        symbol: Optional[str] = None,
+        order_id: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+        page: Optional[int] = None,
+    ) -> AllExecutionsResponse:
+        """
+        Get all executions
+
+        Args:
+            symbol: Filter by security code
+            order_id: Filter by order ID
+            start_at: Start time filter
+            end_at: End time filter
+            page: Page number
+
+        Returns:
+            All executions response
+        """
 
     def history_orders(
         self,
@@ -7371,6 +7751,63 @@ class TradeContext:
                     submitted_quantity = Decimal(200),
                     time_in_force = TimeInForceType.Day,
                     remark = "Hello from Python SDK",
+                )
+                print(resp)
+        """
+
+    def submit_multileg(
+        self,
+        side: Type[OrderSide],
+        order_type: Type[OrderType],
+        submitted_quantity: Decimal,
+        strategy: Type[MultiLegStrategy],
+        legs: List[Tuple[str, Decimal]],
+        submitted_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
+    ) -> SubmitOrderResponse:
+        """
+        Submit a multi-leg option combination order (such as vertical spreads,
+        straddles, strangles, collars, etc.). All legs are submitted together
+        as a single strategy order.
+
+        Args:
+            side: Order Side
+            order_type: Order type
+            submitted_quantity: Submitted quantity (number of combinations)
+            strategy: Multi-leg strategy
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples. Each ``ratio_quantity`` must be positive — a leg's direction comes from
+                ``strategy`` plus ``side``, not from the sign of the ratio; a negative or
+                zero ratio is rejected by the server with ``602001``
+            submitted_price: Submitted price (required for limit order types such as `LO`)
+            remark: Remark (Maximum 255 characters)
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+
+        Returns:
+            Response
+
+        Examples:
+            ::
+
+                from decimal import Decimal
+                from longbridge.openapi import OAuthBuilder, TradeContext, Config, OrderSide, OrderType, MultiLegStrategy
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = TradeContext(config)
+
+                resp = ctx.submit_multileg(
+                    side = OrderSide.Buy,
+                    order_type = OrderType.LO,
+                    submitted_quantity = Decimal(1),
+                    strategy = MultiLegStrategy.VerticalCallSpread,
+                    submitted_price = Decimal("1.5"),
+                    legs = [
+                        ("QQQ260731C764000.US", Decimal(1)),
+                        ("QQQ260731C767000.US", Decimal(1)),
+                    ],
                 )
                 print(resp)
         """
@@ -7672,6 +8109,912 @@ class TradeContext:
         """
         ...
 
+    def set_on_grid_order_changed(self, callback: Callable[["PushGridOrderChanged"], None]) -> None:
+        """Set the grid-order-changed push callback."""
+        ...
+
+class TriggerPriceType:
+    """
+    How grid trigger thresholds are interpreted
+    """
+
+    class Unknown(TriggerPriceType):
+        """
+        Unknown / unset
+        """
+
+    class Spread(TriggerPriceType):
+        """
+        Trigger by absolute price spread
+        """
+
+    class Percent(TriggerPriceType):
+        """
+        Trigger by percent
+        """
+
+class GridTimeInForce:
+    """
+    Time in force for a grid order
+    """
+
+    class Day(GridTimeInForce):
+        """
+        Day order
+        """
+
+    class GoodTilCanceled(GridTimeInForce):
+        """
+        Good-til-canceled
+        """
+
+    class GoodTilDate(GridTimeInForce):
+        """
+        Good-til-date
+        """
+
+    class Unknown(GridTimeInForce):
+        """
+        Unknown value
+        """
+
+class GridLimitEvent:
+    """
+    Action taken when a grid boundary is reached
+    """
+
+    class Unknown(GridLimitEvent):
+        """
+        Unknown / unset
+        """
+
+    class Ignore(GridLimitEvent):
+        """
+        Ignore - keep the grid running
+        """
+
+    class CloseAtLast(GridLimitEvent):
+        """
+        Close the position at the last price
+        """
+
+class GridTradeRule:
+    """
+    Grid trading rule - parameters for submit / replace.
+
+    The constructor takes the minimum field set a valid grid order requires as
+    positional arguments; the remaining fields are optional keyword arguments.
+    The trigger thresholds are expressed as a ``trigger_price_type``
+    (``TriggerPriceType.Spread`` or ``TriggerPriceType.Percent``) plus the
+    up / down values that go with it.
+
+    Args:
+        base_price: Base price
+        upper_price: Upper price bound
+        lower_price: Lower price bound
+        trigger_price_type: Trigger price type (``Spread`` or ``Percent``)
+        trigger_up: Upward trigger threshold (spread or percent)
+        trigger_down: Downward trigger threshold (spread or percent)
+        quantity: Quantity per trigger
+        upper_quantity: Quantity handled at the upper bound
+        lower_quantity: Quantity handled at the lower bound
+        time_in_force: Time in force
+        upper_limit_event: Action at the upper bound
+        lower_limit_event: Action at the lower bound
+        trigger_sell_depth: Sell-side order-book depth
+        trigger_buy_depth: Buy-side order-book depth
+        grid_order_type_up: Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+        grid_order_type_down: Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+        multiple_trigger: Whether a single grid level may trigger multiple times
+        support_shortsell: Whether short selling is allowed
+        rth: Regular trading hours flag
+        expire_time: Expiry time (unix timestamp, GTD)
+    """
+
+    def __init__(
+        self,
+        base_price: Decimal,
+        upper_price: Decimal,
+        lower_price: Decimal,
+        trigger_price_type: Type[TriggerPriceType],
+        trigger_up: Decimal,
+        trigger_down: Decimal,
+        quantity: Decimal,
+        upper_quantity: Decimal,
+        lower_quantity: Decimal,
+        time_in_force: Type[GridTimeInForce],
+        *,
+        upper_limit_event: Optional[Type[GridLimitEvent]] = None,
+        lower_limit_event: Optional[Type[GridLimitEvent]] = None,
+        trigger_sell_depth: Optional[int] = None,
+        trigger_buy_depth: Optional[int] = None,
+        grid_order_type_up: Optional[str] = None,
+        grid_order_type_down: Optional[str] = None,
+        multiple_trigger: Optional[bool] = None,
+        support_shortsell: Optional[bool] = None,
+        rth: Optional[int] = None,
+        expire_time: Optional[int] = None,
+    ) -> None: ...
+
+class SubmitGridOrderResponse:
+    """
+    Response for submit grid trading order request
+    """
+
+    order_id: str
+    """
+    Grid master order id
+    """
+
+class GridOrder:
+    """
+    A grid trading order (element of the list / by-ids responses)
+    """
+
+    order_id: str
+    """
+    Grid master order ID
+    """
+    symbol: str
+    """
+    Security symbol (e.g. `700.HK`)
+    """
+    stock_name: str
+    """
+    Stock name
+    """
+    market: str
+    """
+    Market
+    """
+    status: str
+    """
+    Order status
+    """
+    grid_status: str
+    """
+    Grid running status
+    """
+    submitted_base_price: Optional[Decimal]
+    """
+    Submitted base price
+    """
+    current_base_price: Optional[Decimal]
+    """
+    Current base price
+    """
+    pre_trigger_base_price: Optional[Decimal]
+    """
+    Base price before the last trigger
+    """
+    post_trigger_base_price: Optional[Decimal]
+    """
+    Base price after the last trigger
+    """
+    upper_limit_price: Optional[Decimal]
+    """
+    Upper price bound
+    """
+    lower_limit_price: Optional[Decimal]
+    """
+    Lower price bound
+    """
+    trigger_price_type: Type[TriggerPriceType]
+    """
+    Trigger price type
+    """
+    trigger_spread_up: Optional[Decimal]
+    """
+    Upward trigger spread
+    """
+    trigger_spread_down: Optional[Decimal]
+    """
+    Downward trigger spread
+    """
+    trigger_percent_up: Optional[Decimal]
+    """
+    Upward trigger percent
+    """
+    trigger_percent_down: Optional[Decimal]
+    """
+    Downward trigger percent
+    """
+    pullback_percent: Optional[Decimal]
+    """
+    Pullback percent
+    """
+    pullback_spread: Optional[Decimal]
+    """
+    Pullback spread
+    """
+    rebound_percent: Optional[Decimal]
+    """
+    Rebound percent
+    """
+    rebound_spread: Optional[Decimal]
+    """
+    Rebound spread
+    """
+    trigger_sell_order_type: str
+    """
+    Sell-side execution order type (e.g. `MO`)
+    """
+    trigger_buy_order_type: str
+    """
+    Buy-side execution order type (e.g. `MO`)
+    """
+    trigger_sell_depth: int
+    """
+    Sell-side order-book depth
+    """
+    trigger_buy_depth: int
+    """
+    Buy-side order-book depth
+    """
+    trigger_quantity: Optional[Decimal]
+    """
+    Quantity per trigger
+    """
+    trigger_sell_quantity: Optional[Decimal]
+    """
+    Quantity per sell trigger
+    """
+    trigger_buy_quantity: Optional[Decimal]
+    """
+    Quantity per buy trigger
+    """
+    upper_limit_quantity: Optional[Decimal]
+    """
+    Quantity handled at the upper bound
+    """
+    lower_limit_quantity: Optional[Decimal]
+    """
+    Quantity handled at the lower bound
+    """
+    upper_limit_event: Type[GridLimitEvent]
+    """
+    Action at the upper bound
+    """
+    lower_limit_event: Type[GridLimitEvent]
+    """
+    Action at the lower bound
+    """
+    multiple_trigger: bool
+    """
+    Whether a single grid level may trigger multiple times
+    """
+    trigger_times: int
+    """
+    Number of times the grid has triggered
+    """
+    total_buy_quantity: Optional[Decimal]
+    """
+    Accumulated bought quantity
+    """
+    total_sell_quantity: Optional[Decimal]
+    """
+    Accumulated sold quantity
+    """
+    total_profit_balance: Optional[Decimal]
+    """
+    Accumulated profit balance
+    """
+    settlement_currency: str
+    """
+    Settlement currency
+    """
+    time_in_force: Type[GridTimeInForce]
+    """
+    Time in force
+    """
+    gtd: str
+    """
+    Expiry date (`YYYY-MM-DD`, GTD)
+    """
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+    rth: int
+    """
+    Regular trading hours flag
+    """
+    support_shortsell: bool
+    """
+    Whether short selling is allowed
+    """
+    grid_order_type_up: str
+    """
+    Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+    """
+    grid_order_type_down: str
+    """
+    Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+    """
+
+class GridOrderSubOrder:
+    """
+    A triggered sub-order carried in the grid order detail
+    """
+
+    id: str
+    """
+    Sub-order ID
+    """
+    price: Optional[Decimal]
+    """
+    Order price
+    """
+    order_type: str
+    """
+    Order type
+    """
+    quantity: Optional[Decimal]
+    """
+    Order quantity
+    """
+    executed_qty: Optional[Decimal]
+    """
+    Executed quantity
+    """
+    action: int
+    """
+    Buy / sell direction
+    """
+    status: str
+    """
+    Order status
+    """
+    submitted_at: Optional[datetime]
+    """
+    Submitted time
+    """
+    rth: int
+    """
+    Regular trading hours flag
+    """
+
+class GridOrderHistory:
+    """
+    A grid order lifecycle-history entry carried in the grid order detail
+    """
+
+    history_id: str
+    """
+    History entry ID (paging cursor)
+    """
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+    status: str
+    """
+    Status at this point
+    """
+    suspend_reason: str
+    """
+    Suspend reason, if any
+    """
+    reason: str
+    """
+    Additional reason detail, if any
+    """
+
+class GridOrderDetail:
+    """
+    Detail of a grid trading order
+    """
+
+    order_id: str
+    """
+    Grid master order ID
+    """
+    symbol: str
+    """
+    Security symbol (e.g. `700.HK`)
+    """
+    stock_name: str
+    """
+    Stock name
+    """
+    status: str
+    """
+    Order status
+    """
+    grid_status: str
+    """
+    Grid running status
+    """
+    suspend_reason: str
+    """
+    Suspend reason, if any
+    """
+    sleeping_reason: str
+    """
+    Sleeping reason, if any
+    """
+    submitted_base_price: Optional[Decimal]
+    """
+    Submitted base price
+    """
+    current_base_price: Optional[Decimal]
+    """
+    Current base price
+    """
+    upper_limit_price: Optional[Decimal]
+    """
+    Upper price bound
+    """
+    lower_limit_price: Optional[Decimal]
+    """
+    Lower price bound
+    """
+    trigger_price_type: Type[TriggerPriceType]
+    """
+    Trigger price type
+    """
+    trigger_spread_up: Optional[Decimal]
+    """
+    Upward trigger spread
+    """
+    trigger_spread_down: Optional[Decimal]
+    """
+    Downward trigger spread
+    """
+    trigger_percent_up: Optional[Decimal]
+    """
+    Upward trigger percent
+    """
+    trigger_percent_down: Optional[Decimal]
+    """
+    Downward trigger percent
+    """
+    pullback_percent: Optional[Decimal]
+    """
+    Pullback percent
+    """
+    pullback_spread: Optional[Decimal]
+    """
+    Pullback spread
+    """
+    rebound_percent: Optional[Decimal]
+    """
+    Rebound percent
+    """
+    rebound_spread: Optional[Decimal]
+    """
+    Rebound spread
+    """
+    multiple_trigger: bool
+    """
+    Whether a single grid level may trigger multiple times
+    """
+    time_in_force: Type[GridTimeInForce]
+    """
+    Time in force
+    """
+    trigger_quantity: Optional[Decimal]
+    """
+    Quantity per trigger
+    """
+    trigger_sell_quantity: Optional[Decimal]
+    """
+    Quantity per sell trigger
+    """
+    trigger_buy_quantity: Optional[Decimal]
+    """
+    Quantity per buy trigger
+    """
+    upper_limit_quantity: Optional[Decimal]
+    """
+    Quantity handled at the upper bound
+    """
+    lower_limit_quantity: Optional[Decimal]
+    """
+    Quantity handled at the lower bound
+    """
+    upper_limit_event: Type[GridLimitEvent]
+    """
+    Action at the upper bound
+    """
+    lower_limit_event: Type[GridLimitEvent]
+    """
+    Action at the lower bound
+    """
+    trigger_sell_depth: int
+    """
+    Sell-side order-book depth
+    """
+    trigger_buy_depth: int
+    """
+    Buy-side order-book depth
+    """
+    created_at: Optional[datetime]
+    """
+    Created time
+    """
+    updated_at: Optional[datetime]
+    """
+    Last updated time
+    """
+    settlement_currency: str
+    """
+    Settlement currency
+    """
+    expire_time: Optional[datetime]
+    """
+    Expiry time
+    """
+    gtd: str
+    """
+    Expiry date (`YYYY-MM-DD`, GTD)
+    """
+    grid_sub_orders: List[GridOrderSubOrder]
+    """
+    Triggered sub-orders
+    """
+    sub_has_more: bool
+    """
+    Whether there are more sub-orders to page
+    """
+    grid_order_history: List[GridOrderHistory]
+    """
+    Lifecycle history entries
+    """
+    history_has_more: bool
+    """
+    Whether there are more history entries to page
+    """
+    support_shortsell: bool
+    """
+    Whether short selling is allowed
+    """
+    rth: int
+    """
+    Regular trading hours flag
+    """
+    grid_order_type_up: str
+    """
+    Sell-side grid order type (`GMO` / `GLO` / `GTG`)
+    """
+    grid_order_type_down: str
+    """
+    Buy-side grid order type (`GMO` / `GLO` / `GTG`)
+    """
+
+class TriggerOrder:
+    """
+    A grid trigger-history entry (one triggered order)
+    """
+
+    id: str
+    """
+    Triggered order ID
+    """
+    status: str
+    """
+    Order status
+    """
+    name: str
+    """
+    Stock name
+    """
+    symbol: str
+    """
+    Security symbol (e.g. `700.HK`)
+    """
+    price: Optional[Decimal]
+    """
+    Order price
+    """
+    quantity: Optional[Decimal]
+    """
+    Order quantity
+    """
+    executed_price: Optional[Decimal]
+    """
+    Executed average price
+    """
+    executed_qty: Optional[Decimal]
+    """
+    Executed total quantity
+    """
+    submitted_at: Optional[datetime]
+    """
+    Submitted time
+    """
+    action: int
+    """
+    Buy / sell direction
+    """
+    order_type: str
+    """
+    Order type
+    """
+    trigger_price: Optional[Decimal]
+    """
+    Trigger price
+    """
+    msg: str
+    """
+    Rejection reason, if any
+    """
+    currency: str
+    """
+    Settlement currency
+    """
+    last_done: Optional[Decimal]
+    """
+    Latest quote price
+    """
+    updated_at: Optional[datetime]
+    """
+    Last updated time
+    """
+    time_in_force: Type[GridTimeInForce]
+    """
+    Time in force
+    """
+    gtd: str
+    """
+    Expiry date (`YYYY-MM-DD`, GTD)
+    """
+    trigger_at: Optional[datetime]
+    """
+    Trigger time
+    """
+    trigger_status: int
+    """
+    Conditional trigger status
+    """
+
+class GridBidSize:
+    """
+    A price-step (bid-size) rule entry from the symbol-info response
+    """
+
+    str_proceed: Optional[Decimal]
+    """
+    Range start price (inclusive)
+    """
+    end_proceed: Optional[Decimal]
+    """
+    Range end price
+    """
+    bid_size: Optional[Decimal]
+    """
+    Price step within the range
+    """
+
+class GridChannelInfo:
+    """
+    Channel / authorization info nested in the symbol-info response
+    """
+
+    strategy_granted: bool
+    """
+    Whether the strategy compliance authorization has been granted
+    """
+    support_rth: bool
+    """
+    Whether the RTH toggle is supported
+    """
+    currency: str
+    """
+    Trading currency
+    """
+    settlement_currency: List[str]
+    """
+    Supported settlement currencies
+    """
+
+class GridSymbolInfo:
+    """
+    Security (symbol) info (`/v1/orders/info`) used to build a grid order
+    """
+
+    name: str
+    """
+    Security name
+    """
+    last_done: Optional[Decimal]
+    """
+    Latest quote price
+    """
+    lot_size: Optional[Decimal]
+    """
+    Board lot size
+    """
+    buy_lot_size: Optional[Decimal]
+    """
+    Buy-side board lot size
+    """
+    sell_lot_size: Optional[Decimal]
+    """
+    Sell-side board lot size
+    """
+    bid_sizes: List[GridBidSize]
+    """
+    Price-step (bid-size) rule table
+    """
+    channel_info: GridChannelInfo
+    """
+    Channel / authorization info (strategy grant, RTH, currencies)
+    """
+
+class GridOrdersResponse:
+    """
+    Response for get grid trading orders (list) request
+    """
+
+    grid_order: List[GridOrder]
+    """
+    Grid orders
+    """
+    has_more: bool
+    """
+    Whether there are more pages
+    """
+
+class GridTriggerHistoryResponse:
+    """
+    Response for get grid trading trigger history request
+    """
+
+    trigger_orders: List[TriggerOrder]
+    """
+    Trigger history entries
+    """
+    has_more: bool
+    """
+    Whether there are more pages
+    """
+
+class GridContext:
+    """
+    Grid trading management context (REST-only).
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+    def submit(
+        self,
+        symbol: str,
+        settlement_currency: str,
+        grid_trading_rule: GridTradeRule,
+    ) -> SubmitGridOrderResponse:
+        """
+        Submit a grid trading order
+
+        Args:
+            symbol: Security symbol (e.g. `700.HK`)
+            settlement_currency: Settlement currency
+            grid_trading_rule: Grid trading rule
+
+        Returns:
+            Submit grid order response
+        """
+
+    def replace(self, order_id: str, grid_trading_rule: GridTradeRule) -> None:
+        """
+        Replace (modify) a grid trading order
+
+        Args:
+            order_id: Grid master order ID
+            grid_trading_rule: Grid trading rule
+        """
+
+    def list(
+        self,
+        page: Optional[int] = None,
+        limit: Optional[int] = None,
+        market: Optional[Type[Market]] = None,
+        status: Optional[str] = None,
+        symbol: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_order: Optional[str] = None,
+    ) -> GridOrdersResponse:
+        """
+        Get grid trading orders (paged list)
+
+        Args:
+            page: Page number
+            limit: Page size
+            market: Filter by market
+            status: Filter by order status
+            symbol: Filter by security symbol (e.g. `700.HK`)
+            sort_by: Sort field
+            sort_order: Sort order
+
+        Returns:
+            Grid orders response
+        """
+
+    def list_by_ids(self, order_ids: List[str]) -> List[GridOrder]:
+        """
+        Query grid trading orders by IDs
+
+        Args:
+            order_ids: Grid master order IDs
+
+        Returns:
+            Grid order list
+        """
+
+    def detail(
+        self,
+        order_id: str,
+        history_id: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> GridOrderDetail:
+        """
+        Get grid trading order detail (and paged history)
+
+        Args:
+            order_id: Grid master order ID
+            history_id: History entry ID paging cursor
+            limit: Page size
+
+        Returns:
+            Grid order detail
+        """
+
+    def trigger_history(
+        self,
+        grid_order_id: str,
+        page: Optional[int] = None,
+        limit: Optional[int] = None,
+    ) -> GridTriggerHistoryResponse:
+        """
+        Get grid trading trigger history
+
+        Args:
+            grid_order_id: Grid master order ID
+            page: Page number
+            limit: Page size
+
+        Returns:
+            Grid trigger history response
+        """
+
+    def cancel(self, order_id: str) -> None:
+        """
+        Cancel a grid trading order
+
+        Args:
+            order_id: Grid master order ID
+        """
+
+    def suspend(self, order_id: str) -> None:
+        """
+        Suspend a grid trading order
+
+        Args:
+            order_id: Grid master order ID
+        """
+
+    def restart(self, order_id: str) -> None:
+        """
+        Restart a grid trading order
+
+        Args:
+            order_id: Grid master order ID
+        """
+
+    def symbol_info(self, symbol: str) -> GridSymbolInfo:
+        """
+        Get the security (symbol) info used to build a grid order (lot size,
+        authorization flag, settlement currency, etc.).
+
+        Args:
+            symbol: Security symbol (e.g. `700.HK`)
+
+        Returns:
+            Grid symbol info
+        """
+
 class AsyncTradeContext:
     """
     Async trade context for use with asyncio. Create via `AsyncTradeContext.create(config)` and await inside asyncio.
@@ -7861,15 +9204,25 @@ class AsyncTradeContext:
         """
         ...
 
-    # TODO: temporarily disabled — restore when API is available
-    # def all_executions(
-    #     self,
-    #     symbol: Optional[str] = None,
-    #     order_id: Optional[str] = None,
-    #     start_at: Optional[datetime] = None,
-    #     end_at: Optional[datetime] = None,
-    #     page: Optional[int] = None,
-    # ) -> Awaitable[AllExecutionsResponse]: ...
+    def all_executions(
+        self,
+        symbol: Optional[str] = None,
+        order_id: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+        page: Optional[int] = None,
+    ) -> Awaitable[AllExecutionsResponse]:
+        """
+        Get all executions. Returns an awaitable that resolves to AllExecutionsResponse.
+
+        Args:
+            symbol: Filter by security code.
+            order_id: Filter by order ID.
+            start_at: Start time filter.
+            end_at: End time filter.
+            page: Page number.
+        """
+        ...
 
     def history_orders(
         self,
@@ -8100,6 +9453,72 @@ class AsyncTradeContext:
                         time_in_force=TimeInForceType.Day,
                         submitted_price=Decimal(50),
                         remark="Hello from Python SDK",
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def submit_multileg(
+        self,
+        side: Type[OrderSide],
+        order_type: Type[OrderType],
+        submitted_quantity: Decimal,
+        strategy: Type[MultiLegStrategy],
+        legs: List[Tuple[str, Decimal]],
+        submitted_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
+    ) -> Awaitable[SubmitOrderResponse]:
+        """
+        Submit a multi-leg option combination order (such as vertical spreads,
+        straddles, strangles, collars, etc.). Returns an awaitable that
+        resolves to SubmitOrderResponse. Same parameters as sync
+        TradeContext.submit_multileg.
+
+        Args:
+            side: Order side.
+            order_type: Order type.
+            submitted_quantity: Submitted quantity (number of combinations).
+            strategy: Multi-leg strategy.
+            legs: Legs of the combination order, a list of `(symbol, ratio_quantity)` tuples. Each ``ratio_quantity`` must be positive — a leg's direction comes from
+                ``strategy`` plus ``side``, not from the sign of the ratio; a negative or
+                zero ratio is rejected by the server with ``602001``
+            submitted_price: Submitted price (required for limit order types such as `LO`).
+            remark: Remark (max 255 characters).
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longbridge.openapi import (
+                    OAuthBuilder,
+                    AsyncTradeContext,
+                    Config,
+                    OrderSide,
+                    OrderType,
+                    MultiLegStrategy,
+                )
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncTradeContext.create(config)
+                    resp = await ctx.submit_multileg(
+                        side=OrderSide.Buy,
+                        order_type=OrderType.LO,
+                        submitted_quantity=Decimal(1),
+                        strategy=MultiLegStrategy.VerticalCallSpread,
+                        submitted_price=Decimal("1.5"),
+                        legs=[
+                            ("QQQ260731C764000.US", Decimal(1)),
+                            ("QQQ260731C767000.US", Decimal(1)),
+                        ],
                     )
                     print(resp)
 
@@ -8414,6 +9833,10 @@ class AsyncTradeContext:
         Returns:
             Awaitable resolving to :class:`USRealizedPL`
         """
+        ...
+
+    async def set_on_grid_order_changed(self, callback: Callable[["PushGridOrderChanged"], None]) -> None:
+        """Set the grid-order-changed push callback."""
         ...
 
 class StatementType:
@@ -9263,6 +10686,222 @@ class AsyncContentContext:
 
 # ── FundamentalContext ────────────────────────────────────────────
 
+    async def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[List[str]] = None,
+        hashtags: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Create a new community topic
+
+        Args:
+            title: Topic title (required for "article"; optional for "post")
+            body: Topic body (plain text for "post", Markdown for "article")
+            topic_type: "post" (default) or "article"
+            tickers: Associated stock symbols, e.g. ["700.HK"], max 10
+            hashtags: Hashtag names, max 5
+
+        Returns:
+            The new topic ID
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic_id = ctx.create_topic(
+                    title="My Article",
+                    body="Hello world",
+                    topic_type="article",
+                    tickers=["700.HK"],
+                )
+                print(topic_id)
+        """
+        ...
+
+    async def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """
+        Post a reply to a community topic
+
+        Args:
+            topic_id: Topic ID
+            body: Reply body (plain text only)
+            reply_to_id: ID of the parent reply to nest under; empty or "0" for top-level
+
+        Returns:
+            The created reply
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                reply = ctx.create_topic_reply("123456", "Great post!")
+                print(reply.id)
+        """
+        ...
+
+    async def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[TopicReply]:
+        """
+        List replies on a topic
+
+        Args:
+            topic_id: Topic ID
+            page: Page number (default 1)
+            size: Page size (default 20, range 1-50)
+
+        Returns:
+            List of topic replies
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                replies = ctx.list_topic_replies("123456")
+                for r in replies:
+                    print(r.id, r.body)
+        """
+        ...
+
+    async def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> List[OwnedTopic]:
+        """
+        Get topics created by the current authenticated user
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 50, range 1-500)
+            topic_type: Filter by type: "article" or "post"; empty returns all
+
+        Returns:
+            List of owned topics
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.my_topics(size=20)
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
+
+    async def news(self, symbol: str) -> List[NewsItem]:
+        """
+        Get news list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of news items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                news = ctx.news("700.HK")
+                for n in news:
+                    print(n.id, n.title)
+        """
+        ...
+
+    async def topic_detail(self, id: str) -> OwnedTopic:
+        """
+        Get full details of a topic by its ID
+
+        Args:
+            id: Topic ID
+
+        Returns:
+            Full topic detail
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic = ctx.topic_detail("123456")
+                print(topic.title, topic.body)
+        """
+        ...
+
+    async def topics(self, symbol: str) -> List[TopicItem]:
+        """
+        Get discussion topics list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of topic items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.topics("700.HK")
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
+
 class FinancialReports:
     """
     Financial reports response.
@@ -9771,7 +11410,7 @@ class CompanyOverview:
     year_end: str
     """Fiscal year end"""
     employees: str
-    """Number of employees"""
+    """Number of employees (returned as a string by the API, e.g. "10000")"""
     phone: str
     """Phone number"""
     fax: str
@@ -9816,8 +11455,8 @@ class Professional:
 class ExecutiveGroup:
     """Executives for one security."""
 
-    symbol: str
-    """Security symbol"""
+    symbol: Optional[str]
+    """Security symbol (``None`` when the server omits it)"""
     forward_url: str
     """Link to company wiki page"""
     total: int
@@ -10103,16 +11742,16 @@ class StockRatings:
     """Scale display name"""
     report_period_txt: str
     """Report period display text"""
-    multi_score: str
-    """Composite score (string representation)"""
+    multi_score: Optional[float]
+    """Composite score (``None`` when not rated)"""
     multi_letter: str
     """Composite score letter grade"""
     multi_score_change: int
     """Score change vs previous period"""
     industry_name: str
     """Industry name"""
-    industry_rank: int
-    """Industry rank"""
+    industry_rank: Optional[int]
+    """Industry rank (``None`` when unavailable)"""
     ratings_json: str
     """Full ratings array as a JSON string"""
 
@@ -10128,6 +11767,22 @@ class FinancialReportKind:
     """Cash flow statement (CF)"""
     class All(FinancialReportKind): ...
     """All statements (default)"""
+
+
+class FinancialStatementKind:
+    """Financial statement kind.
+
+    Unlike :class:`FinancialReportKind` there is no ``All``: the statements
+    endpoint needs one specific statement per request and returns an empty
+    list for ``ALL``.
+    """
+
+    class IncomeStatement(FinancialStatementKind): ...
+    """Income statement (IS)"""
+    class BalanceSheet(FinancialStatementKind): ...
+    """Balance sheet (BS)"""
+    class CashFlow(FinancialStatementKind): ...
+    """Cash flow statement (CF)"""
 
 
 class FinancialReportPeriod:
@@ -10283,17 +11938,18 @@ class FundamentalContext:
         """
         ...
 
-    def ratings(self, symbol: str) -> "StockRatings":
-        """
-        Get stock ratings for a security.
-
-        Args:
-            symbol: Security symbol, e.g. ``"AAPL.US"``
-
-        Returns:
-            :class:`StockRatings`
-        """
-        ...
+    # TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    # def ratings(self, symbol: str) -> "StockRatings":
+    #     """
+    #     Get stock ratings for a security.
+    #
+    #     Args:
+    #         symbol: Security symbol, e.g. ``"AAPL.US"``
+    #
+    #     Returns:
+    #         :class:`StockRatings`
+    #     """
+    #     ...
 
     def shareholder_top(self, symbol: str) -> "ShareholderTopResponse":
         """
@@ -10355,18 +12011,22 @@ class FundamentalContext:
 
     def macroeconomic_indicators(
         self,
+        country: "MacroeconomicCountry | None" = None,
+        keyword: str | None = None,
         offset: int | None = None,
         limit: int | None = None,
-    ) -> list["MacroeconomicIndicator"]:
+    ) -> "MacroeconomicIndicatorListResponse":
         """
         List macroeconomic indicators.
 
         Args:
+            country: Filter by country / region (optional)
+            keyword: Filter by keyword (optional)
             offset: Pagination offset (default 0)
             limit: Page size (default 100, max 1000)
 
         Returns:
-            List of :class:`MacroeconomicIndicator`
+            :class:`MacroeconomicIndicatorListResponse`
         """
         ...
 
@@ -10375,6 +12035,7 @@ class FundamentalContext:
         indicator_code: str,
         start_date: str | None = None,
         end_date: str | None = None,
+        offset: int | None = None,
         limit: int | None = None,
     ) -> "MacroeconomicResponse":
         """
@@ -10384,6 +12045,7 @@ class FundamentalContext:
             indicator_code: External vendor code from ``macroeconomic_indicators``
             start_date: Start date in ``"YYYY-MM-DD"`` format (optional)
             end_date: End date in ``"YYYY-MM-DD"`` format (optional)
+            offset: Pagination offset (optional)
             limit: Max records to return (default 100, max 100)
 
         Returns:
@@ -10425,12 +12087,12 @@ class FundamentalContext:
         """
         ...
 
-    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
+    def us_financial_statement(self, symbol: str, kind: FinancialStatementKind, report: str) -> "USFinancialStatement":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            kind: Which statement to fetch — there is no "all statements" mode
             report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
@@ -10538,12 +12200,12 @@ class AsyncFundamentalContext:
         """
         ...
 
-    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "Awaitable[USFinancialStatement]":
+    def us_financial_statement(self, symbol: str, kind: FinancialStatementKind, report: str) -> "Awaitable[USFinancialStatement]":
         """Get US financial statement detail (IS/BS/CF). US token required.
 
         Args:
             symbol: Symbol, e.g. ``"AAPL.US"``
-            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            kind: Which statement to fetch — there is no "all statements" mode
             report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
 
         Returns:
@@ -10611,6 +12273,218 @@ class AsyncFundamentalContext:
 
 
 # ── FundamentalContext new response types ─────────────────────────
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncFundamentalContext: ...
+
+    async def buyback(self, symbol: str) -> "BuybackData":
+        """
+        Get buyback data for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`BuybackData`
+        """
+        ...
+
+    async def company(self, symbol: str) -> "CompanyOverview":
+        """Get company overview."""
+        ...
+
+    async def consensus(self, symbol: str) -> "FinancialConsensus":
+        """Get financial consensus estimates."""
+        ...
+
+    async def corp_action(self, symbol: str) -> "CorpActions":
+        """Get corporate actions (dividends, splits, buybacks, etc.)."""
+        ...
+
+    async def dividend(self, symbol: str) -> "DividendList":
+        """Get dividend history."""
+        ...
+
+    async def dividend_detail(self, symbol: str) -> "DividendList":
+        """Get detailed dividend information."""
+        ...
+
+    async def etf_asset_allocation(self, symbol: str) -> "AssetAllocationResponse":
+        """
+        Get ETF asset allocation (holdings / regional / asset class / industry).
+
+        Args:
+            symbol: ETF security code (e.g. ``"QQQ.US"``)
+
+        Returns:
+            :class:`AssetAllocationResponse` with allocation groups
+        """
+        ...
+
+    async def executive(self, symbol: str) -> "ExecutiveList":
+        """Get executive and board member information."""
+        ...
+
+    async def financial_report(
+        self,
+        symbol: str,
+        kind: "FinancialReportKind" = ...,
+        period: "FinancialReportPeriod | None" = None,
+    ) -> "FinancialReports":
+        """
+        Get financial reports.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            kind: Report kind (default ``All``)
+            period: Report period (``None`` means not specified)
+
+        Returns:
+            Financial reports response
+        """
+        ...
+
+    async def forecast_eps(self, symbol: str) -> "ForecastEps":
+        """Get EPS forecasts."""
+        ...
+
+    async def fund_holder(self, symbol: str) -> "FundHolders":
+        """Get funds and ETFs that hold the security."""
+        ...
+
+    async def industry_valuation(self, symbol: str) -> "IndustryValuationList":
+        """Get industry peer valuation comparison."""
+        ...
+
+    async def industry_valuation_dist(self, symbol: str) -> "IndustryValuationDist":
+        """Get industry valuation distribution."""
+        ...
+
+    async def institution_rating(self, symbol: str) -> "InstitutionRating":
+        """
+        Get analyst ratings (latest snapshot + consensus summary).
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            Combined analyst rating response
+        """
+        ...
+
+    async def institution_rating_detail(self, symbol: str) -> "InstitutionRatingDetail":
+        """Get historical analyst rating details."""
+        ...
+
+    async def invest_relation(self, symbol: str) -> "InvestRelations":
+        """Get investor relations / investment holdings."""
+        ...
+
+    async def macroeconomic(
+        self,
+        indicator_code: str,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> "MacroeconomicResponse":
+        """
+        Get historical data for a macroeconomic indicator.
+
+        Args:
+            indicator_code: External vendor code from ``macroeconomic_indicators``
+            start_date: Start date in ``"YYYY-MM-DD"`` format (optional)
+            end_date: End date in ``"YYYY-MM-DD"`` format (optional)
+            offset: Pagination offset (optional)
+            limit: Max records to return (default 100, max 100)
+
+        Returns:
+            :class:`MacroeconomicResponse`
+        """
+        ...
+
+    async def macroeconomic_indicators(
+        self,
+        country: "MacroeconomicCountry | None" = None,
+        keyword: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> "MacroeconomicIndicatorListResponse":
+        """
+        List macroeconomic indicators.
+
+        Args:
+            country: Filter by country / region (optional)
+            keyword: Filter by keyword (optional)
+            offset: Pagination offset (default 0)
+            limit: Page size (default 100, max 1000)
+
+        Returns:
+            :class:`MacroeconomicIndicatorListResponse`
+        """
+        ...
+
+    async def operating(self, symbol: str) -> "OperatingList":
+        """Get operating metrics and financial report summaries."""
+        ...
+
+    async def shareholder(self, symbol: str) -> "ShareholderList":
+        """Get major shareholders."""
+        ...
+
+    async def shareholder_detail(
+        self, symbol: str, object_id: int
+    ) -> "ShareholderDetailResponse":
+        """
+        Get holding history and detail for one shareholder.
+
+        Args:
+            symbol: Security symbol
+            object_id: Shareholder object ID
+
+        Returns:
+            :class:`ShareholderDetailResponse` with raw JSON data
+        """
+        ...
+
+    async def shareholder_top(self, symbol: str) -> "ShareholderTopResponse":
+        """
+        Get ranked list of top shareholders.
+
+        Args:
+            symbol: Security symbol
+
+        Returns:
+            :class:`ShareholderTopResponse` with raw JSON data
+        """
+        ...
+
+    async def valuation(self, symbol: str) -> "ValuationData":
+        """Get valuation metrics (PE / PB / PS / dividend yield)."""
+        ...
+
+    async def valuation_comparison(
+        self,
+        symbol: str,
+        currency: str,
+        comparison_symbols: Optional[List[str]] = None,
+    ) -> "ValuationComparisonResponse":
+        """
+        Get valuation comparison between a security and optional peers.
+
+        Args:
+            symbol: Security symbol
+            currency: Currency code (e.g. ``"USD"``)
+            comparison_symbols: Optional list of peer symbols
+
+        Returns:
+            :class:`ValuationComparisonResponse` with raw JSON data
+        """
+        ...
+
+    async def valuation_history(self, symbol: str) -> "ValuationHistoryResponse":
+        """Get historical valuation data."""
+        ...
 
 class ShareholderTopResponse:
     """Top-shareholder list response. ``data`` is a Python dict/list from JSON."""
@@ -10759,6 +12633,44 @@ class MultiLanguageText:
     simplified_chinese: str
     traditional_chinese: str
 
+
+class MacroeconomicCountry:
+    """
+    Macroeconomic country / region
+    """
+
+    class HongKong(MacroeconomicCountry):
+        """Hong Kong"""
+
+    class China(MacroeconomicCountry):
+        """China"""
+
+    class UnitedStates(MacroeconomicCountry):
+        """United States"""
+
+    class EuroZone(MacroeconomicCountry):
+        """Euro Zone"""
+
+    class Japan(MacroeconomicCountry):
+        """Japan"""
+
+    class Singapore(MacroeconomicCountry):
+        """Singapore"""
+
+class MacroeconomicIndicatorListResponse:
+    """
+    Response for :meth:`FundamentalContext.macroeconomic_indicators`
+    """
+
+    data: List["MacroeconomicIndicator"]
+    """
+    Macroeconomic indicators
+    """
+
+    count: int
+    """
+    Total number of indicators
+    """
 
 class MacroeconomicIndicator:
     """Metadata for one macroeconomic indicator."""
@@ -11226,7 +13138,7 @@ class MarketContext:
         Get all available rank category keys and labels.
 
         Returns:
-            :class:`RankCategoriesResponse` with raw JSON data
+            :class:`RankCategoriesResponse` with typed categories
         """
         ...
 
@@ -11247,6 +13159,136 @@ class MarketContext:
 
 
 # ── MarketContext new response types ──────────────────────────────
+
+
+class AsyncMarketContext:
+    """
+    Async market context. Create via ``AsyncMarketContext.create(config)``.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncMarketContext: ...
+
+    async def market_status(self) -> "MarketStatusResponse":
+        """Get current trading status for all markets."""
+        ...
+
+    async def broker_holding(
+        self,
+        symbol: str,
+        period: "BrokerHoldingPeriod" = ...,
+    ) -> "BrokerHoldingTop":
+        """
+        Get top broker holdings (buy/sell leaders) for a security.
+
+        Args:
+            symbol: Security symbol
+            period: Lookback period (default ``Rct1``)
+        """
+        ...
+
+    async def broker_holding_detail(self, symbol: str) -> "BrokerHoldingDetail":
+        """Get full broker holding details for a security."""
+        ...
+
+    async def broker_holding_daily(
+        self, symbol: str, broker_id: str
+    ) -> "BrokerHoldingDailyHistory":
+        """
+        Get daily holding history for a specific broker.
+
+        Args:
+            symbol: Security symbol
+            broker_id: Broker participant number, e.g. ``"B01451"``
+        """
+        ...
+
+    async def ah_premium(
+        self,
+        symbol: str,
+        period: "AhPremiumPeriod" = ...,
+        count: int = 100,
+    ) -> "AhPremiumKlines":
+        """
+        Get A/H premium K-line data for a dual-listed security.
+
+        Args:
+            symbol: H-share symbol, e.g. ``"2318.HK"``
+            period: K-line period (default ``Day``)
+            count: Number of K-lines to return
+        """
+        ...
+
+    async def ah_premium_intraday(self, symbol: str) -> "AhPremiumIntraday":
+        """Get A/H premium intraday data for a dual-listed security."""
+        ...
+
+    async def trade_stats(self, symbol: str) -> "TradeStatsResponse":
+        """Get buy/sell/neutral trade statistics for a security."""
+        ...
+
+    async def anomaly(self, market: str) -> "AnomalyResponse":
+        """
+        Get market anomaly alerts (unusual price/volume events).
+
+        Args:
+            market: Market code: ``"HK"``, ``"US"``, ``"CN"``, ``"SG"``
+        """
+        ...
+
+    async def constituent(self, symbol: str) -> "IndexConstituents":
+        """
+        Get constituent stocks for an index.
+
+        Args:
+            symbol: Index symbol, e.g. ``"HSI.HK"``
+        """
+        ...
+
+    async def top_movers(
+        self,
+        markets: List[str],
+        sort: int = 0,
+        date: Optional[str] = None,
+        limit: int = 20,
+    ) -> "TopMoversResponse":
+        """
+        Get top movers (stocks with unusual price movements) across one or more markets.
+
+        Args:
+            markets: List of market codes, e.g. ``["HK", "US"]``
+            sort: Sort order (0=ascending, 1=descending)
+            date: Optional date filter (``"YYYY-MM-DD"``)
+            limit: Max records to return
+
+        Returns:
+            :class:`TopMoversResponse` with raw JSON data
+        """
+        ...
+
+    async def rank_categories(self) -> "RankCategoriesResponse":
+        """
+        Get all available rank category keys and labels.
+
+        Returns:
+            :class:`RankCategoriesResponse` with typed categories
+        """
+        ...
+
+    async def rank_list(
+        self, key: str, need_article: bool = False
+    ) -> "RankListResponse":
+        """
+        Get a ranked list of securities for the given category key.
+
+        Args:
+            key: Category key from :meth:`rank_categories`
+            need_article: Whether to include article content
+
+        Returns:
+            :class:`RankListResponse` with raw JSON data
+        """
+        ...
 
 class TopMoversStock:
     """Stock information within a top-movers event."""
@@ -11291,15 +13333,37 @@ class TopMoversResponse:
 
     events: List[TopMoversEvent]
     """Top-mover events"""
-    next_params: object
-    """Pagination cursor for next page (raw JSON object)"""
+    next_params: str
+    """Pagination cursor for next page (empty string means no more pages)"""
+
+
+class RankSubCategory:
+    """One leaf rank sub-category."""
+
+    key: str
+    """Sub-category key (e.g. ``"hot_all-us"``). Pass to :meth:`MarketContext.rank_list`."""
+    name: str
+    """Display name (e.g. ``"美股总热度"``)"""
+    market: str
+    """Market code (e.g. ``"US"``, ``"HK"``)"""
+
+
+class RankCategory:
+    """A top-level rank category grouping sub-categories."""
+
+    key: str
+    """Top-level key (e.g. ``"hot"``)"""
+    name: str
+    """Display name (e.g. ``"热度排行"``)"""
+    sub_categories: List[RankSubCategory]
+    """Sub-categories"""
 
 
 class RankCategoriesResponse:
-    """Rank categories response. ``data`` is a Python dict/list from JSON."""
+    """Rank categories response."""
 
-    data: object
-    """Raw rank categories data (JSON object / list)"""
+    categories: List[RankCategory]
+    """All top-level rank categories"""
 
 
 class RankListItem:
@@ -11644,6 +13708,33 @@ class CalendarContext:
 
 
 # ── PortfolioContext ──────────────────────────────────────────────
+
+
+class AsyncCalendarContext:
+    """
+    Async calendar context. Create via ``AsyncCalendarContext.create(config)``.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncCalendarContext: ...
+
+    async def finance_calendar(
+        self,
+        category: "CalendarCategory",
+        start: str,
+        end: str,
+        market: str | None = None,
+    ) -> "CalendarEventsResponse":
+        """
+        Get financial calendar events.
+
+        Args:
+            category: Event category
+            start: Start date in ``YYYY-MM-DD`` format
+            end: End date in ``YYYY-MM-DD`` format
+            market: Optional market filter, e.g. ``"HK"``
+        """
+        ...
 
 class ExchangeRate:
     """One currency exchange rate."""
@@ -11995,6 +14086,71 @@ class PortfolioContext:
         ...
 
 
+class AsyncPortfolioContext:
+    """
+    Async portfolio context. Create via ``AsyncPortfolioContext.create(config)``.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncPortfolioContext: ...
+
+    async def exchange_rate(self) -> "ExchangeRates":
+        """Get exchange rates for supported currencies."""
+        ...
+
+    async def profit_analysis(
+        self,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysis":
+        """
+        Get portfolio P&L analysis (summary + per-security breakdown).
+
+        Args:
+            start: Optional start date in ``YYYY-MM-DD`` format
+            end: Optional end date in ``YYYY-MM-DD`` format
+        """
+        ...
+
+    async def profit_analysis_detail(
+        self,
+        symbol: str,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysisDetail":
+        """
+        Get P&L detail for a specific security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            start: Optional start date
+            end: Optional end date
+        """
+        ...
+
+    async def profit_analysis_flows(
+        self,
+        symbol: str,
+        page: int,
+        size: int,
+        derivative: bool,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> "ProfitAnalysisFlows":
+        """
+        Get paginated P&L flow records for a security.
+
+        Args:
+            symbol: Security symbol, e.g. ``"700.HK"``
+            page: Page number (1-based)
+            size: Page size
+            derivative: Whether to include derivative flows
+            start: Optional start date in ``YYYY-MM-DD`` format
+            end: Optional end date in ``YYYY-MM-DD`` format
+        """
+        ...
+
+
 class ProfitAnalysisByMarketItem:
     """One security entry in a by-market P&L response."""
 
@@ -12024,8 +14180,8 @@ class FlowItem:
 
     executed_date: str
     """Execution date string, e.g. ``"2024-01-15"``"""
-    executed_timestamp: str
-    """Execution timestamp (string representation)"""
+    executed_timestamp: Optional[str]
+    """Execution timestamp as a Unix-seconds string (``None`` when not yet executed)"""
     code: str
     """Security code / ticker"""
     direction: FlowDirection
@@ -12051,6 +14207,15 @@ class ProfitAnalysisFlows:
 
 # ── AlertContext ──────────────────────────────────────────────────
 
+class AlertValueMap:
+    """Trigger value of a price alert (exactly one field is populated)."""
+
+    price: Optional[Decimal]
+    """Absolute price threshold, e.g. ``500``"""
+    chg: Optional[float]
+    """Percentage-change threshold, e.g. ``5``"""
+
+
 class AlertItem:
     """One price alert."""
 
@@ -12068,6 +14233,8 @@ class AlertItem:
     """Display text, e.g. ``"价格涨到 600"``"""
     state: list[int]
     """Trigger state flags"""
+    value_map: AlertValueMap
+    """Trigger value, e.g. ``{"price":"500"}`` or ``{"chg":"5"}``"""
 
 
 class AlertSymbolGroup:
@@ -12168,12 +14335,8 @@ class AlertContext:
         """
         ...
 
-    def enable(self, alert_id: str) -> None:
-        """Enable a price alert."""
-        ...
-
-    def disable(self, alert_id: str) -> None:
-        """Disable a price alert."""
+    def update(self, item: "AlertItem") -> None:
+        """Update an existing price alert."""
         ...
 
     def delete(self, alert_ids: list[str]) -> None:
@@ -12231,6 +14394,16 @@ class DcaPlan:
     cum_profit: str
     """Cumulative profit/loss"""
 
+
+class DcaCreateResult:
+    """
+    Result of creating or updating a DCA plan
+    """
+
+    plan_id: str
+    """
+    The created or updated plan ID
+    """
 
 class DcaList:
     """DCA plan list response."""
@@ -12387,7 +14560,7 @@ class DCAContext:
         day_of_week: str | None = None,
         day_of_month: int | None = None,
         allow_margin: bool = False,
-    ) -> "DcaList":
+    ) -> "DcaCreateResult":
         """
         Create a new DCA plan.
 
@@ -12401,15 +14574,37 @@ class DCAContext:
         """
         ...
 
-    def pause(self, plan_id: str) -> "DcaList":
+    def update(
+        self,
+        plan_id: str,
+        amount: str | None = None,
+        frequency: "DCAFrequency | None" = None,
+        day_of_week: str | None = None,
+        day_of_month: int | None = None,
+        allow_margin: bool | None = None,
+    ) -> "DcaCreateResult":
+        """
+        Update an existing DCA plan. Only the provided fields are changed.
+
+        Args:
+            plan_id: Plan ID
+            amount: Investment amount per period
+            frequency: Investment frequency
+            day_of_week: Day of week for weekly plans, e.g. ``"Mon"``
+            day_of_month: Day of month for monthly plans (1–28)
+            allow_margin: Whether to allow margin finance
+        """
+        ...
+
+    def pause(self, plan_id: str) -> None:
         """Pause (suspend) a DCA plan."""
         ...
 
-    def resume(self, plan_id: str) -> "DcaList":
+    def resume(self, plan_id: str) -> None:
         """Resume a suspended DCA plan."""
         ...
 
-    def stop(self, plan_id: str) -> "DcaList":
+    def stop(self, plan_id: str) -> None:
         """Permanently stop a DCA plan."""
         ...
 
@@ -12606,7 +14801,7 @@ class SharelistContext:
         """
         ...
 
-    def create(self, name: str, description: str | None = None) -> "SharelistDetail":
+    def create(self, name: str, description: str | None = None) -> None:
         """
         Create a new community sharelist.
 
@@ -12911,7 +15106,7 @@ class USCryptoEntry:
     average_cost: str
     """Average cost price"""
     symbol: str
-    """Internal counter_id, e.g. ``"VA/BKKT/BTCUSD"``"""
+    """Symbol"""
     currency: str
     """Settlement currency"""
     industry_counter_id: str
@@ -13420,14 +15615,25 @@ class Reference:
 
     index: int
     """Reference index"""
+    original_index: int
+    """Original index in the source list, before any reranking"""
+    ref_type: str
+    """Reference kind, e.g. ``"NewsArticle"``"""
+    id: str
+    """Reference id"""
     title: str
     """Reference title"""
     url: str
     """Reference URL"""
+    content: Any | None
+    """Full reference payload as sent by the server. Kept as raw JSON
+    because the field set varies by reference ``ref_type``"""
 
 class QuestionOption:
     """One option of a Question."""
 
+    label: str
+    """Short UI label for the option"""
     description: str
     """Option text"""
 
@@ -13441,6 +15647,22 @@ class Question:
     multi_select: bool
     """Whether multiple options may be selected"""
 
+class HumanInteraction:
+    """A single interaction requested while an Agent workflow is paused."""
+
+    tool_call_id: str
+    """Tool call that requested the interaction"""
+    interrupt_id: str
+    """Stable key expected by the answers map when continuing"""
+    interaction_type: str
+    """Interaction type such as `ask_human` or `trade_password`"""
+    tool_name: str
+    """Human-readable tool name"""
+    questions: list[Question]
+    """Questions and answer options presented to the user"""
+    tool_args: Any
+    """Original tool arguments, retained for host-specific UI rendering"""
+
 class Interrupt:
     """Present when a conversation run is interrupted, waiting for
     AgentContext.continue_conversation."""
@@ -13451,6 +15673,8 @@ class Interrupt:
     """Tool call ID of this inquiry; used as the answer key when continuing"""
     questions: list[Question]
     """Questions you need to answer"""
+    interactions: list[HumanInteraction]
+    """Full interaction descriptors used to render and answer the pause"""
     message_id: int
     """ID of the paused message"""
     chat_id: int
@@ -13481,6 +15705,8 @@ class ConversationResponse:
     """Final answer text; valid when status is ConversationStatus.Succeeded"""
     references: list[Reference] | None
     """Sources referenced by the answer"""
+    further_questions: list[str] | None
+    """Suggested follow-up questions ("you might also ask")"""
     elapsed_time: float
     """Run duration in seconds"""
     interrupt: Interrupt | None
@@ -13495,6 +15721,12 @@ class ChatStartedPayload:
     """Conversation identifier"""
     message_id: str
     """Message ID of this round"""
+    chat_id: int
+    """ID of the owning conversation"""
+    error: str
+    """Error detail; empty at start"""
+    error_message: str
+    """User-facing error message; empty at start"""
 
 class MessagePayload:
     """

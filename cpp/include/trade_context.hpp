@@ -53,13 +53,10 @@ public:
     const std::optional<GetTodayExecutionsOptions>& opts,
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
 
-  // TODO: temporarily disabled — restore when API is available
-  /*
   /// Get all executions
   void all_executions(
     const std::optional<GetAllExecutionsOptions>& opts,
     AsyncCallback<TradeContext, AllExecutionsResponse> callback) const;
-  */
 
   /// Get history orders
   void history_orders(
@@ -78,6 +75,13 @@ public:
   /// Submit order
   void submit_order(
     const SubmitOrderOptions& opts,
+    AsyncCallback<TradeContext, SubmitOrderResponse> callback) const;
+
+  /// Submit a multi-leg option combination order (such as vertical spreads,
+  /// straddles, strangles, collars, etc.). All legs are submitted together as
+  /// a single strategy order.
+  void submit_multileg(
+    const SubmitMultiLegOrderOptions& opts,
     AsyncCallback<TradeContext, SubmitOrderResponse> callback) const;
 
   /// Cancel order
@@ -128,6 +132,11 @@ public:
     const EstimateMaxPurchaseQuantityOptions& opts,
     AsyncCallback<TradeContext, EstimateMaxPurchaseQuantityResponse> callback)
     const;
+
+  /// Set grid order changed callback, after receiving the grid order changed
+  /// event, it will call back to this function.
+  void set_on_grid_order_changed(
+    PushCallback<TradeContext, PushGridOrderChanged> callback) const;
 };
 
 } // namespace trade

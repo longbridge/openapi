@@ -1,6 +1,7 @@
 //! AI Agent conversation types and context
 mod context;
 mod stream;
+/// Request and response data types for this context.
 pub mod types;
 
 pub use context::AgentContext;

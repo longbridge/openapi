@@ -20,13 +20,14 @@ use jni::{
 
 pub(crate) use self::{
     classes::{
-        ConversationResponse, CreateWatchlistGroupResponse, HumanInteractionRequiredEvent,
-        NodeToolUseOutputs, OtherEvent, PingEvent, SecurityCalcIndex, StockPosition,
-        StockPositionChannel, StockPositionsResponse, SubagentOutputs, WorkflowFinishedEvent,
+        ConversationResponse, CreateWatchlistGroupResponse, GridOrdersResponse,
+        GridTriggerHistoryResponse, HumanInteractionRequiredEvent, NodeToolUseOutputs, OtherEvent,
+        PingEvent, SecurityCalcIndex, StockPosition, StockPositionChannel, StockPositionsResponse,
+        SubagentOutputs, WorkflowFinishedEvent,
     },
     object_array::ObjectArray,
     primary_array::PrimaryArray,
-    primary_types::{JavaInteger, JavaLong},
+    primary_types::{JavaDouble, JavaInteger, JavaLong},
 };
 
 pub(crate) trait ClassLoader {

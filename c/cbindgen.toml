@@ -24,6 +24,8 @@ cpp_compat = true
 "CTradeStatus" = "lb_trade_status_t"
 "CTradeDirection" = "lb_trade_direction_t"
 "COptionDirection" = "lb_option_direction_t"
+"COptionExpiryCycleType" = "lb_option_expiry_cycle_type_t"
+"COptionStandardAttr" = "lb_option_standard_attr_t"
 "COptionType" = "lb_option_type_t"
 "CWarrantType" = "lb_warrant_type_t"
 "CAdjustType" = "lb_adjust_type_t"
@@ -52,7 +54,7 @@ cpp_compat = true
 "CSecurityBrokers" = "lb_security_brokers_t"
 "CParticipantInfo" = "lb_participant_info_t"
 "CIntradayLine" = "lb_intraday_line_t"
-"CStrikePriceInfo" = "lb_strike_price_info_t"
+"COptionChainContract" = "lb_option_chain_contract_t"
 "CIssuerInfo" = "lb_issuer_info_t"
 "CTradingSessionInfo" = "lb_trading_session_info_t"
 "CMarketTradingSession" = "lb_market_trading_session_t"
@@ -111,6 +113,25 @@ cpp_compat = true
 "COrderChargeItem" = "lb_order_charge_item_t"
 "COrderChargeDetail" = "lb_order_charge_detail_t"
 "COrderDetail" = "lb_order_detail_t"
+"CGridTradeRule" = "lb_grid_trade_rule_t"
+"CSubmitGridOrderOptions" = "lb_submit_grid_order_options_t"
+"CReplaceGridOrderOptions" = "lb_replace_grid_order_options_t"
+"CGetGridOrdersOptions" = "lb_get_grid_orders_options_t"
+"CGetGridOrdersByIdsOptions" = "lb_get_grid_orders_by_ids_options_t"
+"CGetGridOrderDetailOptions" = "lb_get_grid_order_detail_options_t"
+"CGetGridTriggerHistoryOptions" = "lb_get_grid_trigger_history_options_t"
+"CSubmitGridOrderResponse" = "lb_submit_grid_order_response_t"
+"CGridOrder" = "lb_grid_order_t"
+"CGridOrderSubOrder" = "lb_grid_order_sub_order_t"
+"CGridOrderHistory" = "lb_grid_order_history_t"
+"CGridOrderDetail" = "lb_grid_order_detail_t"
+"CTriggerOrder" = "lb_trigger_order_t"
+"CGridBidSize" = "lb_grid_bid_size_t"
+"CGridChannelInfo" = "lb_grid_channel_info_t"
+"CGridSymbolInfo" = "lb_grid_symbol_info_t"
+"CGridOrdersResponse" = "lb_grid_orders_response_t"
+"CGridTriggerHistoryResponse" = "lb_grid_trigger_history_response_t"
+"CPushGridOrderChanged" = "lb_push_grid_order_changed_t"
 "CEstimateMaxPurchaseQuantityOptions" = "lb_estimate_max_purchase_quantity_options_t"
 "CEstimateMaxPurchaseQuantityResponse" = "lb_estimate_max_purchase_quantity_response_t"
 "CCreateWatchlistGroup" = "lb_create_watchlist_group_t"
@@ -143,10 +164,13 @@ cpp_compat = true
 "CFundamentalContext" = "lb_fundamental_context_t"
 "CAlertContext" = "lb_alert_context_t"
 "CDCAContext" = "lb_dca_context_t"
+"CGridContext" = "lb_grid_context_t"
 "CSharelistContext" = "lb_sharelist_context_t"
 "CCalendarContext" = "lb_calendar_context_t"
 "CPortfolioContext" = "lb_portfolio_context_t"
 "CMarketContext" = "lb_market_context_t"
+"CAssetContext" = "lb_asset_context_t"
+"CStatementItem" = "lb_statement_item_t"
 # MarketContext types
 "CMarketTimeItem" = "lb_market_time_item_t"
 "CMarketStatusResponse" = "lb_market_status_response_t"
@@ -232,6 +256,8 @@ cpp_compat = true
 "CCalendarCategory" = "lb_calendar_category_t"
 # FundamentalContext enums
 "CFinancialReportKind" = "lb_financial_report_kind_t"
+"CIndustryRankIndicator" = "lb_industry_rank_indicator_t"
+"CIndustryRankSortType" = "lb_industry_rank_sort_type_t"
 "CFinancialReportPeriod" = "lb_financial_report_period_t"
 "CInstitutionRecommend" = "lb_institution_recommend_t"
 # MarketContext enums
@@ -322,6 +348,8 @@ cpp_compat = true
 "CTopMoversStock" = "lb_top_movers_stock_t"
 "CTopMoversEvent" = "lb_top_movers_event_t"
 "CTopMoversResponse" = "lb_top_movers_response_t"
+"CRankSubCategory" = "lb_rank_sub_category_t"
+"CRankCategory" = "lb_rank_category_t"
 "CRankCategoriesResponse" = "lb_rank_categories_response_t"
 "CRankListItem" = "lb_rank_list_item_t"
 "CRankListResponse" = "lb_rank_list_response_t"
@@ -345,6 +373,7 @@ cpp_compat = true
 "CReference" = "lb_reference_t"
 "CQuestionOption" = "lb_question_option_t"
 "CQuestion" = "lb_question_t"
+"CHumanInteraction" = "lb_human_interaction_t"
 "CInterrupt" = "lb_interrupt_t"
 "CAgentError" = "lb_agent_error_t"
 "CConversationResponse" = "lb_conversation_response_t"
@@ -386,7 +415,7 @@ include = [
     "CSecurityBrokers",
     "CParticipantInfo",
     "CIntradayLine",
-    "CStrikePriceInfo",
+    "COptionChainContract",
     "CIssuerInfo",
     "CTradingSessionInfo",
     "CMarketTradingSession",
@@ -407,6 +436,15 @@ include = [
     "CWatchlistSecurity",
     "CMarginRatio",
     "COrderDetail",
+    # AssetContext: statements (reachable only via void* async data pointer)
+    "CStatementItem",
+    # GridContext: grid trading (reachable only via void* async data pointer)
+    "CSubmitGridOrderResponse",
+    "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",
+    "CTriggerOrder", "CGridBidSize", "CGridChannelInfo", "CGridSymbolInfo",
+    "CGridOrdersResponse", "CGridTriggerHistoryResponse",
+    # TradeContext: grid trading push (stays on trade side)
+    "CPushGridOrderChanged",
     "CEstimateMaxPurchaseQuantityResponse",
     "CSecurityCalcIndex",
     "CWarrantInfo",
@@ -472,6 +510,7 @@ include = [
     "CCalendarCategory",
     # FundamentalContext enums
     "CFinancialReportKind", "CFinancialReportPeriod", "CInstitutionRecommend",
+    "CIndustryRankIndicator", "CIndustryRankSortType",
     # MarketContext enums
     "CBrokerHoldingPeriod", "CAhPremiumPeriod",
     # PortfolioContext enums
@@ -499,7 +538,7 @@ include = [
     "CValuationHistoryPoint", "CValuationComparisonItem", "CValuationComparisonResponse",
     # MarketContext new types
     "CTopMoversStock", "CTopMoversEvent", "CTopMoversResponse",
-    "CRankCategoriesResponse",
+    "CRankSubCategory", "CRankCategory", "CRankCategoriesResponse",
     "CRankListItem", "CRankListResponse",
     # ScreenerContext
     "CScreenerContext",

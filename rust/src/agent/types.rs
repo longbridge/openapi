@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
@@ -18,10 +16,10 @@ pub struct Workspace {
     /// Workspace name
     pub name: String,
     /// Creation time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub created_at: i64,
     /// Last updated time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: i64,
 }
 
@@ -41,25 +39,25 @@ pub struct Agent {
     /// Agent name
     pub name: String,
     /// Agent description
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
     /// Agent mode, e.g. `chat`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub mode: String,
     /// Icon URL
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub icon: String,
     /// Whether published; only published Agents can start conversations
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_published: bool,
     /// Publish time, Unix timestamp in seconds; 0 if unpublished
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub published_at: i64,
     /// Creation time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub created_at: i64,
     /// Last updated time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: i64,
 }
 
@@ -69,7 +67,7 @@ pub struct AgentsResponse {
     /// Agent list
     pub agents: Vec<Agent>,
     /// Total number of matching Agents
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub total: i32,
 }
 
@@ -141,14 +139,35 @@ pub enum ConversationStatus {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Reference {
     /// Reference index
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub index: i32,
-    /// Reference title
-    #[serde(default)]
+    /// Original index in the source list, before any reranking
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub original_index: i32,
+    /// Reference kind, e.g. `"NewsArticle"`
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "type"
+    )]
+    pub ref_type: String,
+    /// Reference id
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub id: String,
+    /// Reference title. Often empty at the top level — the human-readable
+    /// title usually lives in [`content`](Self::content).
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
-    /// Reference URL
-    #[serde(default)]
+    /// Reference URL. Often empty at the top level — see
+    /// [`content`](Self::content).
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub url: String,
+    /// Full reference payload as sent by the server (`source`, `description`,
+    /// `published_at`, `source_url`, `source_logo`, `kind`, …). Kept as raw
+    /// JSON because the field set varies by reference
+    /// [`ref_type`](Self::ref_type).
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub content: Option<serde_json::Value>,
 }
 
 /// One question the Agent needs you to answer
@@ -157,18 +176,21 @@ pub struct Question {
     /// Question text
     pub question: String,
     /// Options; empty means free-form answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub options: Vec<QuestionOption>,
     /// Whether multiple options may be selected
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub multi_select: bool,
 }
 
 /// One option of a [`Question`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuestionOption {
+    /// Short UI label for the option.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub label: String,
     /// Option text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub description: String,
 }
 
@@ -181,24 +203,54 @@ pub struct Interrupt {
     /// Tool call ID of this inquiry; used as the answer key when continuing
     pub tool_call_id: String,
     /// Questions you need to answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub questions: Vec<Question>,
+    /// Full interaction descriptors used to render and answer the pause.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub interactions: Vec<HumanInteraction>,
     /// ID of the paused message
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub message_id: i64,
     /// ID of the owning conversation
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chat_id: i64,
+}
+
+/// A single interaction requested while an Agent workflow is paused.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HumanInteraction {
+    /// Tool call that requested the interaction.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub tool_call_id: String,
+    /// Stable key expected by `answers_by_tool_call`.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub interrupt_id: String,
+    /// Interaction type such as `ask_human` or `trade_password`.
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "type"
+    )]
+    pub interaction_type: String,
+    /// Human-readable tool name.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub tool_name: String,
+    /// Questions and answer options presented to the user.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub questions: Vec<Question>,
+    /// Original tool arguments, retained for host-specific UI rendering.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub tool_args: serde_json::Value,
 }
 
 /// Present when a conversation run failed
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentError {
     /// Error code
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub code: i32,
     /// Error message
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub message: String,
 }
 
@@ -217,19 +269,23 @@ pub struct ConversationResponse {
     /// Final run status
     pub status: ConversationStatus,
     /// Final answer text; valid when `status` is `succeeded`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub answer: String,
     /// Sources referenced by the answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions ("you might also ask"); present when the
+    /// run produced them
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub further_questions: Option<Vec<String>>,
     /// Run duration in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub elapsed_time: f64,
     /// Present only when `status` is `interrupted`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub interrupt: Option<Interrupt>,
     /// Present only when the run failed
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error: Option<AgentError>,
 }
 
@@ -252,6 +308,7 @@ impl ConversationResponse {
             status: payload.status,
             answer: payload.outputs.answer.unwrap_or_default(),
             references: payload.outputs.references,
+            further_questions: payload.outputs.further_questions,
             elapsed_time: payload.elapsed_time,
             interrupt: None,
             error,
@@ -277,6 +334,7 @@ impl ConversationResponse {
             status: ConversationStatus::Interrupted,
             answer: String::new(),
             references: None,
+            further_questions: None,
             elapsed_time: 0.0,
             interrupt: Some(interrupt),
             error: None,
@@ -285,7 +343,7 @@ impl ConversationResponse {
 }
 
 /// Payload of a `chat_started` SSE event
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatStartedPayload {
     /// Conversation identifier
     pub chat_uid: String,
@@ -294,92 +352,109 @@ pub struct ChatStartedPayload {
     /// which is a quoted string) — accept either.
     #[serde(deserialize_with = "crate::serde_utils::deserialize_string_or_int_as_string")]
     pub message_id: String,
+    /// ID of the owning conversation
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub chat_id: i64,
+    /// Error detail; empty at start
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub error: String,
+    /// User-facing error message; empty at start
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub error_message: String,
 }
 
 /// Payload of a `message` SSE event — an incremental text chunk. This is the
 /// highest-frequency event; concatenate `text` fragments in arrival order.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MessagePayload {
     /// Incremental text fragment
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub text: String,
     /// `answer` — final answer text; `think` — reasoning process; `process`
     /// — stage progress description
-    #[serde(default, rename = "type")]
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::null_as_default",
+        rename = "type"
+    )]
     pub message_type: String,
     /// Identifier of the stream segment this fragment belongs to. Fragments
     /// with the same `key` form one continuous block — group by `key` when
     /// rendering
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub key: String,
     /// Time this segment started, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// Stage identifier; only present when `message_type` is `"process"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stage: String,
     /// Stage title while running; only present when `message_type` is
     /// `"process"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stage_title: String,
     /// Stage title after it finishes; only present when `message_type` is
     /// `"process"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub stage_finished_title: String,
     /// Extra payload attached to the fragment; usually absent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: Option<serde_json::Value>,
 }
 
 /// `outputs` of a `workflow_finished` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WorkflowOutputs {
     /// Final answer text; present when the run succeeded
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub answer: Option<String>,
     /// Sources referenced by the answer
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub references: Option<Vec<Reference>>,
+    /// Suggested follow-up questions ("you might also ask"); present when the
+    /// run produced them
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub further_questions: Option<Vec<String>>,
 }
 
 /// Payload of a `workflow_finished` SSE event. `status` is never
 /// `interrupted` here — an interrupted run doesn't emit `workflow_finished`
 /// at all; see [`ConversationStreamEvent::HumanInteractionRequired`].
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkflowFinishedPayload {
     /// Final run status: `succeeded` / `failed` / `stopped`
     pub status: ConversationStatus,
     /// Run duration in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub elapsed_time: f64,
     /// Run outputs
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: WorkflowOutputs,
     /// Localized error description; only present when `status` is `failed`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error: String,
     /// Error code; only present when `status` is `failed`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error_code: i32,
     /// User-facing error message; only present on failure
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error_message: String,
     /// Extra error context (e.g. `workflow_run_id`); may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error_args: Option<serde_json::Value>,
     /// Process stages the run went through; for display only
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub process_data: Vec<serde_json::Value>,
 }
 
 /// `inputs` of a `workflow_started` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WorkflowStartedInputs {
     /// ID of the owning conversation
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chat_id: i64,
     /// Conversation identifier
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chat_uid: String,
     /// Message ID of this round (observed as a raw JSON number; accepts a
     /// string too, see [`ChatStartedPayload::message_id`])
@@ -389,37 +464,37 @@ pub struct WorkflowStartedInputs {
     )]
     pub message_id: String,
     /// The question that was asked
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub query: String,
 }
 
 /// Payload of a `workflow_started` SSE event, observed right after
 /// `chat_started`
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WorkflowStartedPayload {
     /// Whether this run's answer was served from a cache
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub hit_cache: bool,
     /// Echoes the run's inputs
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub inputs: WorkflowStartedInputs,
     /// Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// Internal workflow run ID
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub workflow_id: i64,
 }
 
 /// Payload of a `chat_finished` SSE event, observed once all `message` events
 /// for this round have been sent, shortly before `workflow_finished`
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ChatFinishedPayload {
     /// ID of the owning conversation
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chat_id: i64,
     /// Conversation identifier
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chat_uid: String,
     /// Message ID of this round (observed as a raw JSON number; accepts a
     /// string too, see [`ChatStartedPayload::message_id`])
@@ -429,32 +504,32 @@ pub struct ChatFinishedPayload {
     )]
     pub message_id: String,
     /// Error detail; empty on success
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error: String,
     /// User-facing error message; empty on success
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error_message: String,
 }
 
 /// Payload of a `chat_title_updated` SSE event — the server auto-generates a
 /// short title for the conversation as a UI convenience. Can arrive before
 /// *or* after `workflow_finished`; not tied to the run's outcome.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ChatTitleUpdatedPayload {
     /// ID of the owning conversation
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chat_id: i64,
     /// Conversation identifier
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub chat_uid: String,
     /// Where the title came from, e.g. `"ai_generated"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub source: String,
     /// The new (possibly truncated) title
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
     /// Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub updated_at: i64,
 }
 
@@ -462,402 +537,402 @@ pub struct ChatTitleUpdatedPayload {
 /// reasoning phase (analyzing the question, planning tool calls). Between
 /// this and [`ConversationStreamEvent::ThinkingFinished`], `Message` events
 /// with `message_type == "think"` and tool-call events may arrive.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ThinkingStartedPayload {
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
 }
 
 /// Payload of a `thinking_finished` SSE event — the reasoning phase is over;
 /// answer text (`Message` with `message_type == "answer"`) follows.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ThinkingFinishedPayload {
     /// Finish time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub finished_at: i64,
     /// Reasoning duration in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub elapsed_time: i32,
 }
 
 /// Payload of a `node_tool_use_started` SSE event — an ordinary tool call has
 /// started. Match it to its `NodeToolUseFinished` counterpart by
 /// `tool_use_id`.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct NodeToolUseStartedPayload {
     /// Unique ID of this call; matches the finished event
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_use_id: String,
     /// Localized display name of the tool
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_name: String,
     /// Locale-stable tool identifier; use this for logic keyed on the tool
     /// kind
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_func_name: String,
     /// Call arguments as a JSON string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_args: String,
     /// Progress text suitable for direct display, e.g. `"Searching the
     /// web…"`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tips: String,
     /// Short tags accompanying `tips`; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// Round number. Calls in the same round (same `iteration`) run in
     /// parallel
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub iteration: i32,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
 }
 
 /// `outputs` of a [`NodeToolUseFinishedPayload`] — only carries fields meant
 /// for display
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct NodeToolUseOutputs {
     /// Sources referenced by the tool result
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub references: Option<Vec<Reference>>,
     /// Domains of the referenced sources
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub reference_domains: Option<Vec<String>>,
     /// The query the tool executed
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub query: Option<String>,
     /// Raw response text of the tool
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub text: Option<String>,
     /// Parsed request arguments
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_args: Option<serde_json::Value>,
     /// Structured result; present only for selected tools
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub data: Option<serde_json::Value>,
 }
 
 /// Payload of a `node_tool_use_finished` SSE event — the tool call has
 /// ended.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct NodeToolUseFinishedPayload {
     /// Matches the `tool_use_id` of the started event
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_use_id: String,
     /// `succeeded` / `failed`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: String,
     /// Error description on failure
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error: String,
     /// Call duration in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub elapsed_time: f64,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// Localized display name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_name: String,
     /// Locale-stable tool identifier
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_func_name: String,
     /// Call arguments as a JSON string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_args: String,
     /// Tool category
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_type: String,
     /// Progress text
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tips: String,
     /// Short tags; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// Round number
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub iteration: i32,
     /// `true` if the call happened during the thinking phase
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_thinking: bool,
     /// Filtered call results, for display
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: NodeToolUseOutputs,
 }
 
 /// Payload of a `subagent_started` SSE event. When the Agent spawns a
 /// subagent to work on a sub-task, the subagent's lifecycle is reported with
 /// this dedicated event family instead of `node_tool_use_*`.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentStartedPayload {
     /// ID of the node that spawned the subagent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub node_id: String,
     /// Unique ID of this spawn; matches the finished event
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_use_id: String,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// Goal assigned to the subagent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub goal: String,
     /// Full task prompt given to the subagent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub prompt: String,
     /// Subagent identifier; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subagent_id: String,
     /// Tools granted to the subagent; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tools: Vec<serde_json::Value>,
 }
 
 /// Payload of a `subagent_progress` SSE event, emitted every time the
 /// subagent calls one of its own tools. Use it to render a live timeline
 /// inside the subagent card.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentProgressPayload {
     /// ID of the node that spawned the subagent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub node_id: String,
     /// `tool_use_id` of the owning `SubagentStarted` event
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub parent_tool_call_id: String,
     /// Name of the tool the subagent called
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subagent_tool_name: String,
     /// Arguments of that call, as a JSON string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subagent_tool_args: String,
     /// Status of that call: `running` / `succeeded` / `failed`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subagent_status: String,
     /// Duration of that call in milliseconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subagent_duration_ms: i64,
     /// The subagent's internal round number
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subagent_iteration: i32,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
 }
 
 /// `outputs` of a [`SubagentFinishedPayload`]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentOutputs {
     /// The goal that was assigned to the subagent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub goal: Option<String>,
     /// The subagent's result
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub result: Option<String>,
     /// Timeline of tool calls the subagent made
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub subagent_tools: Option<Vec<serde_json::Value>>,
 }
 
 /// Payload of a `subagent_finished` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SubagentFinishedPayload {
     /// ID of the node that spawned the subagent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub node_id: String,
     /// Matches the `tool_use_id` of `SubagentStarted`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_use_id: String,
     /// `succeeded` / `failed`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: String,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// Total subagent duration in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub elapsed_time: f64,
     /// Error description on failure
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error: String,
     /// Subagent result: `goal`, `result`, and the timeline of tool calls it
     /// made
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: SubagentOutputs,
 }
 
 /// Payload of an `agent_tool_started` SSE event. When the Agent delegates to
 /// another Agent as a tool, that inner run is reported with the
 /// `agent_tool_*` family — the shape mirrors the subagent events.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AgentToolStartedPayload {
     /// ID of the calling node
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub node_id: String,
     /// Unique ID of this call; matches the finished event
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_use_id: String,
     /// Identifier of the Agent being called
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub agent_tool_name: String,
     /// Display title; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub title: String,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// Call arguments as a JSON string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_args: String,
     /// Localized display name
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_name: String,
     /// Progress text; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tips: String,
     /// Short tags; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// `true` if called during the thinking phase
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_thinking: bool,
 }
 
 /// Payload of an `agent_tool_progress` SSE event, emitted for each inner
 /// tool call the delegated Agent makes.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AgentToolProgressPayload {
     /// ID of the calling node
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub node_id: String,
     /// `tool_use_id` of the owning `AgentToolStarted` event
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub parent_tool_call_id: String,
     /// Identifier of the Agent being called
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub agent_tool_name: String,
     /// Name of the inner tool the delegated Agent called
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub inner_tool_name: String,
     /// Arguments of that inner call, as a JSON string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub inner_tool_args: String,
     /// Status of the inner call: `running` / `succeeded` / `failed`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: String,
     /// Duration of the inner call in milliseconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub duration_ms: i64,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// `true` if during the thinking phase
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_thinking: bool,
 }
 
 /// Payload of an `agent_tool_finished` SSE event
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AgentToolFinishedPayload {
     /// ID of the calling node
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub node_id: String,
     /// Matches the `tool_use_id` of `AgentToolStarted`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_use_id: String,
     /// Identifier of the Agent being called
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub agent_tool_name: String,
     /// `succeeded` / `failed`
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub status: String,
     /// Start time, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// Total duration in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub elapsed_time: f64,
     /// Error description on failure
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub error: String,
     /// Call arguments as a JSON string
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_args: String,
     /// Result of the delegated Agent
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: Option<serde_json::Value>,
     /// Tool category
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_type: String,
     /// Progress text; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tips: String,
     /// Short tags; may be omitted
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tip_chips: Vec<String>,
     /// `true` if during the thinking phase
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub is_thinking: bool,
 }
 
 /// Payload of a `query_masked` SSE event — sensitive content in the user
 /// query was masked before processing. Display `masked_query` instead of the
 /// original query.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct QueryMaskedPayload {
     /// The original user query
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub raw_query: String,
     /// The masked query
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub masked_query: String,
 }
 
 /// Payload of a `plan_changed` SSE event — the Agent created or updated its
 /// task plan.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PlanChangedPayload {
     /// ID of the planning node
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub node_id: String,
     /// Time of the change, Unix timestamp in seconds
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: i64,
     /// The current plan content
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: Option<serde_json::Value>,
     /// Identifies the planning tool. Carried as a top-level sibling of
     /// `data` in the raw SSE envelope rather than inside `data` itself.
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub tool_name: String,
 }
 
 /// Payload of a `context_compress_started` SSE event, marking the start of a
 /// context-compression pass triggered by a long conversation. Unlike other
 /// events, the timestamp here is an RFC 3339 string.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ContextCompressStartedPayload {
     /// Start time, RFC 3339
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub started_at: String,
     /// Compression input summary
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub inputs: Option<serde_json::Value>,
 }
 
 /// Payload of a `context_compress_finished` SSE event. Unlike other events,
 /// the timestamp here is an RFC 3339 string.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ContextCompressFinishedPayload {
     /// Finish time, RFC 3339
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub created_at: String,
     /// Compression input summary
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub inputs: Option<serde_json::Value>,
     /// Compression result summary
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub outputs: Option<serde_json::Value>,
 }
 
@@ -967,6 +1042,38 @@ pub enum ConversationStreamEvent {
 mod tests {
     use super::*;
 
+    #[test]
+    fn workflow_finished_tolerates_null_outputs() {
+        // A resumed/continued conversation can send `"outputs": null`; that
+        // must deserialize to the default rather than erroring,
+        // otherwise the whole event stream fails mid-turn.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded","outputs":null}"#).unwrap();
+        assert!(payload.outputs.answer.is_none());
+
+        // A missing key must keep working too.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded"}"#).unwrap();
+        assert!(payload.outputs.answer.is_none());
+    }
+
+    #[test]
+    fn streamed_vec_fields_tolerate_null_sequences() {
+        // The server can send an explicit `null` for list-typed fields; that
+        // must deserialize to an empty list, not error with
+        // "invalid type: null, expected a sequence" and abort the stream.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded","process_data":null}"#).unwrap();
+        assert!(payload.process_data.is_empty());
+
+        let payload: NodeToolUseStartedPayload =
+            serde_json::from_str(r#"{"tip_chips":null}"#).unwrap();
+        assert!(payload.tip_chips.is_empty());
+
+        let payload: SubagentStartedPayload = serde_json::from_str(r#"{"tools":null}"#).unwrap();
+        assert!(payload.tools.is_empty());
+    }
+
     // The `data` payload of the "Run succeeded" example from
     // https://open.longbridge.com/en/docs/ai/chat/conversation
     const SUCCEEDED_JSON: &str = r#"{
@@ -1065,13 +1172,23 @@ mod tests {
 
     #[test]
     fn deserialize_workflow_finished_payload() {
-        let json = r#"{"status":"succeeded","elapsed_time":3.21,"outputs":{"answer":"Tesla (TSLA.US) recently..."}}"#;
+        let json = r#"{"status":"succeeded","elapsed_time":3.21,"outputs":{"answer":"Tesla (TSLA.US) recently...","further_questions":["What is Tesla's P/E?","How did Q3 deliveries look?"]}}"#;
         let payload: WorkflowFinishedPayload = serde_json::from_str(json).unwrap();
         assert_eq!(payload.status, ConversationStatus::Succeeded);
         assert!((payload.elapsed_time - 3.21).abs() < f64::EPSILON);
         assert_eq!(
             payload.outputs.answer.as_deref(),
             Some("Tesla (TSLA.US) recently...")
+        );
+        assert_eq!(
+            payload.outputs.further_questions.as_deref(),
+            Some(
+                [
+                    "What is Tesla's P/E?".to_string(),
+                    "How did Q3 deliveries look?".to_string(),
+                ]
+                .as_slice()
+            )
         );
 
         let resp = ConversationResponse::from_stream_parts(
@@ -1081,6 +1198,8 @@ mod tests {
         assert_eq!(resp.chat_uid, "ct_9f2c1a5b");
         assert_eq!(resp.message_id, "42");
         assert_eq!(resp.answer, "Tesla (TSLA.US) recently...");
+        // Follow-up questions thread through the folded response.
+        assert_eq!(resp.further_questions.as_ref().unwrap().len(), 2);
         assert!(resp.interrupt.is_none());
         assert!(resp.error.is_none());
     }
@@ -1140,6 +1259,33 @@ mod tests {
     }
 
     #[test]
+    fn deserialize_reference_with_nested_content() {
+        // The real wire reference nests the human-readable fields under
+        // `content` and carries `type`/`id`/`original_index` at the top
+        // level; only `index` overlaps the old flat shape.
+        let json = r#"{"type":"NewsArticle","id":"295354885","index":1,"original_index":10,"content":{"source":"智通财经","description":"Jefferies cut Tesla's target.","published_at":"2026-08-10T03:45:02Z","source_url":"https://example.com/a","title":""}}"#;
+        let r: Reference = serde_json::from_str(json).unwrap();
+        assert_eq!(r.index, 1);
+        assert_eq!(r.original_index, 10);
+        assert_eq!(r.ref_type, "NewsArticle");
+        assert_eq!(r.id, "295354885");
+        let content = r.content.expect("content");
+        assert_eq!(content["source"], "智通财经");
+        assert_eq!(content["published_at"], "2026-08-10T03:45:02Z");
+    }
+
+    #[test]
+    fn deserialize_reference_flat_shape_still_works() {
+        // The docs' example uses a flat {index,title,url}; new fields default.
+        let r: Reference = serde_json::from_str(r#"{"index":1,"title":"t","url":"u"}"#).unwrap();
+        assert_eq!(r.index, 1);
+        assert_eq!(r.title, "t");
+        assert_eq!(r.url, "u");
+        assert!(r.content.is_none());
+        assert_eq!(r.ref_type, "");
+    }
+
+    #[test]
     fn deserialize_plan_changed_payload_picks_up_sibling_tool_name() {
         let mut payload: PlanChangedPayload =
             serde_json::from_str(r#"{"node_id":"n_plan","started_at":1752048000}"#).unwrap();
@@ -1184,5 +1330,54 @@ mod tests {
         assert_eq!(resp.total, 12);
         assert_eq!(resp.agents[0].uid, "ag_7d3f9b2c");
         assert!(resp.agents[0].is_published);
+    }
+
+    #[test]
+    fn deserialize_interrupt_treats_null_questions_as_empty() {
+        let interrupt: Interrupt = serde_json::from_str(
+            r#"{"node_id":"approval","tool_call_id":"call-1","questions":null}"#,
+        )
+        .unwrap();
+        assert!(interrupt.questions.is_empty());
+    }
+
+    #[test]
+    fn deserialize_question_treats_null_options_as_empty() {
+        let question: Question =
+            serde_json::from_str(r#"{"question":"Continue?","options":null}"#).unwrap();
+        assert!(question.options.is_empty());
+    }
+
+    #[test]
+    fn deserialize_human_interaction_preserves_labels_and_answer_keys() {
+        let interrupt: Interrupt = serde_json::from_str(
+            r#"{
+            "node_id":"ask",
+            "tool_call_id":"call-1",
+            "questions":[],
+            "interactions":[{
+                "tool_call_id":"call-1",
+                "interrupt_id":"call-1",
+                "type":"ask_human",
+                "tool_name":"AskHuman",
+                "questions":[{
+                    "question":"从哪个方向开始？",
+                    "options":[{"label":"看行情","description":"比较当前价格"}],
+                    "multi_select":false
+                }],
+                "tool_args":{}
+            }]
+        }"#,
+        )
+        .unwrap();
+        assert_eq!(interrupt.interactions[0].interrupt_id, "call-1");
+        assert_eq!(
+            interrupt.interactions[0].questions[0].options[0].label,
+            "看行情"
+        );
+        assert_eq!(
+            interrupt.interactions[0].questions[0].options[0].description,
+            "比较当前价格"
+        );
     }
 }

@@ -101,7 +101,7 @@ public class Config implements AutoCloseable {
      * @throws OpenApiException If an error occurs
      */
     public static Config fromOAuth(OAuth oauth) throws OpenApiException {
-        return new Config(SdkNative.newConfigFromOauth(oauth.getRaw()));
+        synchronized (oauth) { return new Config(SdkNative.newConfigFromOauth(oauth.getRaw())); }
     }
 
     /**
@@ -112,7 +112,7 @@ public class Config implements AutoCloseable {
      * @param httpUrl OpenAPI endpoint (Default: {@code https://openapi.longbridge.com})
      * @return this object
      */
-    public Config httpUrl(String httpUrl) {
+    public synchronized Config httpUrl(String httpUrl) {
         this.raw = SdkNative.configSetHttpUrl(raw(), httpUrl);
         return this;
     }
@@ -125,7 +125,7 @@ public class Config implements AutoCloseable {
      * @param quoteWsUrl OpenAPI quote websocket endpoint
      * @return this object
      */
-    public Config quoteWebsocketUrl(String quoteWsUrl) {
+    public synchronized Config quoteWebsocketUrl(String quoteWsUrl) {
         this.raw = SdkNative.configSetQuoteWsUrl(raw(), quoteWsUrl);
         return this;
     }
@@ -138,7 +138,7 @@ public class Config implements AutoCloseable {
      * @param tradeWsUrl OpenAPI trade websocket endpoint
      * @return this object
      */
-    public Config tradeWebsocketUrl(String tradeWsUrl) {
+    public synchronized Config tradeWebsocketUrl(String tradeWsUrl) {
         this.raw = SdkNative.configSetTradeWsUrl(raw(), tradeWsUrl);
         return this;
     }
@@ -149,7 +149,7 @@ public class Config implements AutoCloseable {
      * @param language Language identifier (Default: {@link Language#EN})
      * @return this object
      */
-    public Config language(Language language) {
+    public synchronized Config language(Language language) {
         this.raw = SdkNative.configSetLanguage(raw(), language);
         return this;
     }
@@ -159,7 +159,7 @@ public class Config implements AutoCloseable {
      *
      * @return this object
      */
-    public Config enableOvernight() {
+    public synchronized Config enableOvernight() {
         this.raw = SdkNative.configSetEnableOvernight(raw());
         return this;
     }
@@ -170,7 +170,7 @@ public class Config implements AutoCloseable {
      * @param mode Mode (Default: {@link PushCandlestickMode#Realtime})
      * @return this object
      */
-    public Config pushCandlestickMode(PushCandlestickMode mode) {
+    public synchronized Config pushCandlestickMode(PushCandlestickMode mode) {
         this.raw = SdkNative.configSetPushCandlestickMode(raw(), mode);
         return this;
     }
@@ -180,7 +180,7 @@ public class Config implements AutoCloseable {
      *
      * @return this object
      */
-    public Config disablePrintQuotePackages() {
+    public synchronized Config disablePrintQuotePackages() {
         this.raw = SdkNative.configSetEnablePrintQuotePackages(raw(), false);
         return this;
     }
@@ -191,7 +191,7 @@ public class Config implements AutoCloseable {
      * @param path The path of the log files (Default: no logs)
      * @return this object
      */
-    public Config logPath(String path) {
+    public synchronized Config logPath(String path) {
         this.raw = SdkNative.configSetLogPath(raw(), path);
         return this;
     }
@@ -210,7 +210,7 @@ public class Config implements AutoCloseable {
      *
      * @return this object
      */
-    public Config enablePapertrading() {
+    public synchronized Config enablePapertrading() {
         this.raw = SdkNative.configSetEnablePapertrading(raw());
         return this;
     }
@@ -228,7 +228,7 @@ public class Config implements AutoCloseable {
      *         string.
      * @see <a href="https://open.longportapp.com/en/docs/refresh-token-api">Refresh Token API</a>
      */
-    public CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) {
+    public synchronized CompletableFuture<String> refreshAccessToken(OffsetDateTime expiredAt) {
         CompletableFuture<String> future = new CompletableFuture<>();
         SdkNative.configRefreshAccessToken(raw(), expiredAt, new AsyncCallback() {
             @Override
@@ -247,7 +247,7 @@ public class Config implements AutoCloseable {
      * @hidden
      * @return Context pointer
      */
-    public long getRaw() {
+    public synchronized long getRaw() {
         return raw();
     }
 

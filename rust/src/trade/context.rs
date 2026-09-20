@@ -16,8 +16,8 @@ use crate::{
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
         USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
@@ -48,6 +48,9 @@ struct InnerTradeContext {
     command_tx: mpsc::UnboundedSender<Command>,
     http_cli: HttpClient,
     log_subscriber: Arc<dyn Subscriber + Send + Sync>,
+    /// Kept alive only so the background `Core::run` task can observe the
+    /// context being dropped (via this channel closing) and stop reconnecting.
+    _shutdown_tx: mpsc::UnboundedSender<()>,
 }
 
 impl Drop for InnerTradeContext {
@@ -74,10 +77,12 @@ impl TradeContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
+        let (shutdown_tx, shutdown_rx) = mpsc::unbounded_channel();
         let core = Core::new(config, command_rx, push_tx);
-        crate::runtime::RUNTIME
-            .handle()
-            .spawn(core.run().with_subscriber(log_subscriber.clone()));
+        crate::runtime::RUNTIME.handle().spawn(
+            core.run(shutdown_rx)
+                .with_subscriber(log_subscriber.clone()),
+        );
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
             tracing::info!("trade context created");
@@ -88,6 +93,7 @@ impl TradeContext {
                 http_cli,
                 command_tx,
                 log_subscriber,
+                _shutdown_tx: shutdown_tx,
             })),
             push_rx,
         )
@@ -208,22 +214,50 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryExecutionsOptions>>,
     ) -> Result<Vec<Execution>> {
+        use std::collections::HashSet;
+
         #[derive(Deserialize)]
         struct Response {
+            #[serde(default)]
+            has_more: bool,
             trades: Vec<Execution>,
         }
 
-        Ok(self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/trade/execution/history")
-            .query_params(options.into().unwrap_or_default())
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?
-            .0
-            .trades)
+        // The endpoint caps each response at 1000 records; walk the `page`
+        // param (1-based) until `has_more` is false. Dedupe by
+        // `trade_id` and stop if a page adds nothing new, guarding
+        // against the gateway ignoring `page`. Bounded to 1000 pages as
+        // a runaway guard.
+        let mut options = options.into().unwrap_or_default();
+        let mut all: Vec<Execution> = Vec::new();
+        let mut seen: HashSet<String> = HashSet::new();
+        for page in 1..=1000u32 {
+            options = options.with_page(page);
+            let resp = self
+                .0
+                .http_cli
+                .request(Method::GET, "/v1/trade/execution/history")
+                .query_params(&options)
+                .response::<Json<Response>>()
+                .send()
+                .with_subscriber(self.0.log_subscriber.clone())
+                .await?
+                .0;
+            if resp.trades.is_empty() {
+                break;
+            }
+            let mut added = 0usize;
+            for t in resp.trades {
+                if seen.insert(t.trade_id.clone()) {
+                    all.push(t);
+                    added += 1;
+                }
+            }
+            if !resp.has_more || added == 0 {
+                break;
+            }
+        }
+        Ok(all)
     }
 
     /// Get today executions
@@ -276,25 +310,24 @@ impl TradeContext {
             .trades)
     }
 
-    // TODO: temporarily disabled — restore when API is available
-    // Get all executions
-    //
-    // Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
-    // pub async fn all_executions(
-    // &self,
-    // options: impl Into<Option<GetAllExecutionsOptions>>,
-    // ) -> Result<AllExecutionsResponse> {
-    // Ok(self
-    // .0
-    // .http_cli
-    // .request(Method::GET, "/v3/trade/execution/all")
-    // .query_params(options.into().unwrap_or_default())
-    // .response::<Json<AllExecutionsResponse>>()
-    // .send()
-    // .with_subscriber(self.0.log_subscriber.clone())
-    // .await?
-    // .0)
-    // }
+    /// Get all executions
+    ///
+    /// Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
+    pub async fn all_executions(
+        &self,
+        options: impl Into<Option<GetAllExecutionsOptions>>,
+    ) -> Result<AllExecutionsResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v3/trade/execution/all")
+            .query_params(options.into().unwrap_or_default())
+            .response::<Json<AllExecutionsResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
 
     /// Get history orders
     ///
@@ -489,6 +522,67 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::POST, "/v1/trade/order")
+            .body(Json(options))
+            .response::<Json<_>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0;
+        _ = self.0.command_tx.send(Command::SubmittedOrder {
+            order_id: resp.order_id.clone(),
+        });
+        Ok(resp)
+    }
+
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longbridge::{
+    ///     Config, decimal,
+    ///     oauth::OAuthBuilder,
+    ///     trade::{
+    ///         MultiLegStrategy, OrderSide, OrderType, SubmitMultiLegOrderLeg,
+    ///         SubmitMultiLegOrderOptions, TradeContext,
+    ///     },
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let (ctx, _) = TradeContext::new(config);
+    ///
+    /// let opts = SubmitMultiLegOrderOptions::new(
+    ///     OrderSide::Buy,
+    ///     OrderType::LO,
+    ///     decimal!(1i32),
+    ///     MultiLegStrategy::VerticalCallSpread,
+    ///     [
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C764000.US", decimal!(1i32)),
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C767000.US", decimal!(1i32)),
+    ///     ],
+    /// )
+    /// .submitted_price(decimal!(1.5));
+    /// let resp = ctx.submit_multileg(opts).await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn submit_multileg(
+        &self,
+        options: SubmitMultiLegOrderOptions,
+    ) -> Result<SubmitOrderResponse> {
+        let resp: SubmitOrderResponse = self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/trade/order/multileg")
             .body(Json(options))
             .response::<Json<_>>()
             .send()
@@ -848,7 +942,8 @@ impl TradeContext {
             .0)
     }
 
-    // ── US-market APIs ────────────────────────────────────────────────────────
+    // ── US-market APIs
+    // ────────────────────────────────────────────────────────
 
     /// Query the paginated US order list.
     ///
@@ -857,8 +952,6 @@ impl TradeContext {
     /// US token required.
     pub async fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
-
-        use crate::utils::counter::symbol_to_counter_id;
 
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -871,11 +964,11 @@ impl TradeContext {
             _ => 0,
         };
 
-        let counter_ids = opts
+        let symbols = opts
             .symbol
             .as_deref()
             .filter(|s| !s.is_empty())
-            .map(|s| vec![symbol_to_counter_id(s)])
+            .map(|s| vec![s.to_string()])
             .unwrap_or_default();
 
         let start_at = if opts.start_at == 0 {
@@ -896,7 +989,7 @@ impl TradeContext {
             action,
             start_at,
             end_at,
-            counter_ids,
+            symbols,
             security_types: vec![],
             query_type: opts.query_type,
             page,
