@@ -13666,6 +13666,15 @@ class CalendarCategory:
     """Stock consolidations / mergers"""
 
 
+class CalendarPageDirection:
+    """Pagination direction for ``finance_calendar`` (the ``next`` parameter)."""
+
+    class Later(CalendarPageDirection): ...
+    """Page towards later dates"""
+    class Earlier(CalendarPageDirection): ...
+    """Page towards earlier dates"""
+
+
 class CalendarContext:
     """
     Financial calendar context.
@@ -13694,15 +13703,26 @@ class CalendarContext:
         start: str,
         end: str,
         market: str | None = None,
+        count: int | None = None,
+        offset: int | None = None,
+        next: "CalendarPageDirection | None" = None,
     ) -> "CalendarEventsResponse":
         """
         Get financial calendar events.
+
+        The endpoint paginates: the server caps each response (historically 10
+        events per page unless a larger ``count`` is requested) and returns a
+        ``next_date`` cursor. To page through the full window, request a larger
+        ``count``, or re-call with the returned ``next_date`` as ``start``.
 
         Args:
             category: Event category
             start: Start date in ``YYYY-MM-DD`` format
             end: End date in ``YYYY-MM-DD`` format
             market: Optional market filter, e.g. ``"HK"``
+            count: Maximum number of events per page (server default when omitted)
+            offset: Number of events to skip from the start of the window
+            next: Direction to page from the cursor
         """
         ...
 
@@ -13724,15 +13744,26 @@ class AsyncCalendarContext:
         start: str,
         end: str,
         market: str | None = None,
+        count: int | None = None,
+        offset: int | None = None,
+        next: "CalendarPageDirection | None" = None,
     ) -> "CalendarEventsResponse":
         """
         Get financial calendar events.
+
+        The endpoint paginates: the server caps each response (historically 10
+        events per page unless a larger ``count`` is requested) and returns a
+        ``next_date`` cursor. To page through the full window, request a larger
+        ``count``, or re-call with the returned ``next_date`` as ``start``.
 
         Args:
             category: Event category
             start: Start date in ``YYYY-MM-DD`` format
             end: End date in ``YYYY-MM-DD`` format
             market: Optional market filter, e.g. ``"HK"``
+            count: Maximum number of events per page (server default when omitted)
+            offset: Number of events to skip from the start of the window
+            next: Direction to page from the cursor
         """
         ...
 

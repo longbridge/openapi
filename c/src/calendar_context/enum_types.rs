@@ -31,3 +31,17 @@ pub enum CCalendarCategory {
     #[c(remote = "Merge")]
     CalendarCategoryMerge,
 }
+
+/// Pagination direction for finance_calendar (the `next` query parameter)
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longbridge::calendar::types::CalendarPageDirection")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CCalendarPageDirection {
+    /// Page towards later dates
+    #[c(remote = "Later")]
+    CalendarPageDirectionLater,
+    /// Page towards earlier dates
+    #[c(remote = "Earlier")]
+    CalendarPageDirectionEarlier,
+}

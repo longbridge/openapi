@@ -528,6 +528,11 @@ impl_java_enum!(
     ]
 );
 impl_java_enum!(
+    "com/longbridge/calendar/CalendarPageDirection",
+    longbridge::calendar::types::CalendarPageDirection,
+    [Later, Earlier]
+);
+impl_java_enum!(
     "com/longbridge/fundamental/FinancialReportKind",
     longbridge::fundamental::types::FinancialReportKind,
     [IncomeStatement, BalanceSheet, CashFlow, All]
