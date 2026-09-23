@@ -32,6 +32,9 @@ pub unsafe extern "C" fn lb_calendar_context_release(ctx: *const CCalendarContex
 }
 
 /// Get financial calendar events.
+///
+/// `count`, `offset` and `next` are optional pagination controls; pass `NULL`
+/// to omit any of them and use the server default.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_calendar_context_finance_calendar(
     ctx: *const CCalendarContext,
@@ -39,6 +42,9 @@ pub unsafe extern "C" fn lb_calendar_context_finance_calendar(
     start: *const c_char,
     end: *const c_char,
     market: *const c_char,
+    count: *const i32,
+    offset: *const i32,
+    next: *const CCalendarPageDirection,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -51,10 +57,15 @@ pub unsafe extern "C" fn lb_calendar_context_finance_calendar(
     } else {
         Some(cstr_to_rust(market))
     };
+    let count = count.as_ref().copied();
+    let offset = offset.as_ref().copied();
+    let next = next.as_ref().map(|d| (*d).into());
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CCalendarEventsResponseOwned> =
             CCow::new(CCalendarEventsResponseOwned::from(
-                ctx_inner.finance_calendar(cat, start, end, mkt).await?,
+                ctx_inner
+                    .finance_calendar(cat, start, end, mkt, count, offset, next)
+                    .await?,
             ));
         Ok(resp)
     });

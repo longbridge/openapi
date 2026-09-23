@@ -250,8 +250,18 @@ export declare class CalendarContext {
    *
    * `start` and `end` are date strings in `YYYY-MM-DD` format.
    * `market` is an optional market filter (e.g. `"HK"` or `"US"`).
+   *
+   * The endpoint paginates: the server caps each response (historically 10
+   * events per page unless a larger `count` is requested) and returns a
+   * `nextDate` cursor. To page through the full window, request a larger
+   * `count`, or re-call with the returned `nextDate` as `start`.
+   *
+   * - `count` — maximum number of events per page (server default when
+   *   omitted).
+   * - `offset` — number of events to skip from the start of the window.
+   * - `next` — direction to page from the cursor.
    */
-  financeCalendar(category: CalendarCategory, start: string, end: string, market?: string | undefined | null): Promise<CalendarEventsResponse>
+  financeCalendar(category: CalendarCategory, start: string, end: string, market?: string | undefined | null, count?: number | undefined | null, offset?: number | undefined | null, next?: CalendarPageDirection | undefined | null): Promise<CalendarEventsResponse>
 }
 
 /** Candlestick */
@@ -4364,6 +4374,14 @@ export interface CalendarEventsResponse {
   date: string
   /** Per-day event groups */
   list: Array<CalendarDateGroup>
+}
+
+/** Pagination direction for `financeCalendar` (the `next` query parameter). */
+export declare const enum CalendarPageDirection {
+  /** Page towards later dates */
+  Later = 0,
+  /** Page towards earlier dates */
+  Earlier = 1
 }
 
 export declare const enum CashFlowDirection {

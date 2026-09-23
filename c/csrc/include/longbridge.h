@@ -272,6 +272,20 @@ typedef enum lb_calendar_category_t {
 } lb_calendar_category_t;
 
 /**
+ * Pagination direction for finance_calendar (the `next` query parameter)
+ */
+typedef enum lb_calendar_page_direction_t {
+  /**
+   * Page towards later dates
+   */
+  CalendarPageDirectionLater,
+  /**
+   * Page towards earlier dates
+   */
+  CalendarPageDirectionEarlier,
+} lb_calendar_page_direction_t;
+
+/**
  * Language identifer
  */
 typedef enum lb_language_t {
@@ -12115,12 +12129,18 @@ void lb_calendar_context_release(const struct lb_calendar_context_t *ctx);
 
 /**
  * Get financial calendar events.
+ *
+ * `count`, `offset` and `next` are optional pagination controls; pass `NULL`
+ * to omit any of them and use the server default.
  */
 void lb_calendar_context_finance_calendar(const struct lb_calendar_context_t *ctx,
                                           enum lb_calendar_category_t category,
                                           const char *start,
                                           const char *end,
                                           const char *market,
+                                          const int32_t *count,
+                                          const int32_t *offset,
+                                          const enum lb_calendar_page_direction_t *next,
                                           lb_async_callback_t callback,
                                           void *userdata);
 

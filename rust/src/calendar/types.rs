@@ -116,3 +116,17 @@ pub enum CalendarCategory {
     #[serde(rename = "merge")]
     Merge,
 }
+
+/// Pagination direction for [`crate::CalendarContext::finance_calendar`].
+///
+/// Passed as the `next` query parameter to control which side of the cursor
+/// the next page is taken from.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum CalendarPageDirection {
+    /// Page towards later dates (`next=later`)
+    #[serde(rename = "later")]
+    Later,
+    /// Page towards earlier dates (`next=earlier`)
+    #[serde(rename = "earlier")]
+    Earlier,
+}
