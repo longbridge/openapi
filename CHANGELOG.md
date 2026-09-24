@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Rust core (async + blocking):** new `FundContext` / `FundContextSync` for the mutual-fund channel, covering 28 endpoints across fund catalog & market data (hot funds, fund list, filters, detail, analysis/trend, annual/quarterly returns, performance & comparison, latest/historical NAV, top-10 holdings, reverse stock holdings), the user's fund positions (overview, single position, performance, profits, NAV history, dividends), and fund orders/trading (order list & detail, transactions/cash-flow, order validate/submit/cancel). Identifiers are exposed as `symbol` (the OpenAPI gateway maps them to the backend `counter_id`). Propagation to the C, C++, Java, Node.js and Python layers is pending.
+
 ### Changed
 
 - **All SDKs:** `CalendarContext.finance_calendar` now exposes the endpoint's pagination controls so callers can page through results themselves. Previously the method issued a single request with no page-size control, so the server's default page cap (historically ~10 events) made even a one-day query look truncated at 10 results. Three optional parameters were added — `count` (max events per page), `offset` (events to skip), and `next` (a new `CalendarPageDirection` enum: `Later` / `Earlier`) — and the response's `next_date` cursor is returned as-is. To retrieve a full window, request a larger `count`, or re-call with the returned `next_date` as `start` until it comes back empty. This is a signature change across every layer (Rust core + blocking, C, C++, Java, Node.js, Python); the new arguments are optional in the languages that support defaults. Reported as longbridge/developers#1265
