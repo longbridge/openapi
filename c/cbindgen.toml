@@ -99,6 +99,46 @@ cpp_compat = true
 "CFundPositionsResponse" = "lb_fund_position_response_t"
 "CFundPositionChannel" = "lb_fund_position_channel_t"
 "CFundPosition" = "lb_fund_position_t"
+# --- fund module response views ---
+"CFundAnalysis" = "lb_fund_analysis_t"
+"CFundAnalysisDetail" = "lb_fund_analysis_detail_t"
+"CFundAnnualReturn" = "lb_fund_annual_return_t"
+"CFundAssetAllocation" = "lb_fund_asset_allocation_t"
+"CFundAssetAllocationItem" = "lb_fund_asset_allocation_item_t"
+"CFundBrief" = "lb_fund_brief_t"
+"CFundDatedValue" = "lb_fund_dated_value_t"
+"CFundDetail" = "lb_fund_detail_t"
+"CFundDividend" = "lb_fund_dividend_t"
+"CFundDividends" = "lb_fund_dividends_t"
+"CFundFilters" = "lb_fund_filters_t"
+"CFundHolding" = "lb_fund_holding_t"
+"CFundHoldings" = "lb_fund_holdings_t"
+"CFundNamedContrast" = "lb_fund_named_contrast_t"
+"CFundNavValue" = "lb_fund_nav_value_t"
+"CFundOrder" = "lb_fund_order_t"
+"CFundOrderDetail" = "lb_fund_order_detail_t"
+"CFundOrderInfo" = "lb_fund_order_info_t"
+"CFundOrderKeyword" = "lb_fund_order_keyword_t"
+"CFundOrderStage" = "lb_fund_order_stage_t"
+"CFundOrderSubmitResponse" = "lb_fund_order_submit_response_t"
+"CFundOrderValidation" = "lb_fund_order_validation_t"
+"CFundPerformance" = "lb_fund_performance_t"
+"CFundPerformanceComparison" = "lb_fund_performance_comparison_t"
+"CFundPerformancePoint" = "lb_fund_performance_point_t"
+"CFundPositionDetail" = "lb_fund_position_detail_t"
+"CFundPositionDetailValues" = "lb_fund_position_detail_values_t"
+"CFundPositionItem" = "lb_fund_position_item_t"
+"CFundPositionNav" = "lb_fund_position_nav_t"
+"CFundPositionPerformance" = "lb_fund_position_performance_t"
+"CFundPositionProfits" = "lb_fund_position_profits_t"
+"CFundPositions" = "lb_fund_positions_t"
+"CFundQuarterlyReturn" = "lb_fund_quarterly_return_t"
+"CFundStockHolding" = "lb_fund_stock_holding_t"
+"CFundTransaction" = "lb_fund_transaction_t"
+"CFundTrend" = "lb_fund_trend_t"
+"CFundTrendContrast" = "lb_fund_trend_contrast_t"
+"CFundUnitValue" = "lb_fund_unit_value_t"
+"CHotFund" = "lb_hot_fund_t"
 "CGetStockPositionsOptions" = "lb_get_stock_positions_options_t"
 "CStockPositionsResponse" = "lb_stock_position_response_t"
 "CStockPositionChannel" = "lb_stock_position_channel_t"
@@ -445,6 +485,17 @@ include = [
     "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",
     "CTriggerOrder", "CGridBidSize", "CGridChannelInfo", "CGridSymbolInfo",
     "CGridOrdersResponse", "CGridTriggerHistoryResponse",
+    # FundContext: mutual-fund response views (via void* async data pointer)
+    "CFundAnalysis", "CFundAnalysisDetail", "CFundAnnualReturn", "CFundAssetAllocation",
+    "CFundAssetAllocationItem", "CFundBrief", "CFundDatedValue", "CFundDetail",
+    "CFundDividend", "CFundDividends", "CFundFilters", "CFundHolding",
+    "CFundHoldings", "CFundNamedContrast", "CFundNavValue", "CFundOrder",
+    "CFundOrderDetail", "CFundOrderInfo", "CFundOrderKeyword", "CFundOrderStage",
+    "CFundOrderSubmitResponse", "CFundOrderValidation", "CFundPerformance", "CFundPerformanceComparison",
+    "CFundPerformancePoint", "CFundPositionDetail", "CFundPositionDetailValues", "CFundPositionItem",
+    "CFundPositionNav", "CFundPositionPerformance", "CFundPositionProfits", "CFundPositions",
+    "CFundQuarterlyReturn", "CFundStockHolding", "CFundTransaction", "CFundTrend",
+    "CFundTrendContrast", "CFundUnitValue", "CHotFund",
     # TradeContext: grid trading push (stays on trade side)
     "CPushGridOrderChanged",
     "CEstimateMaxPurchaseQuantityResponse",

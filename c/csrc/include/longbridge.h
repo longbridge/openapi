@@ -7238,6 +7238,1824 @@ typedef struct lb_grid_trigger_history_response_t {
 } lb_grid_trigger_history_response_t;
 
 /**
+ * Fund analysis (level 1).
+ */
+typedef struct lb_fund_analysis_t {
+  /**
+   * Actual period
+   */
+  int32_t actual_period;
+  /**
+   * Cost level (JSON string)
+   */
+  const char *cost_level;
+  /**
+   * Return ability (JSON string)
+   */
+  const char *return_ability;
+  /**
+   * Risk ability (JSON string)
+   */
+  const char *risk_ability;
+  /**
+   * Updated at
+   */
+  const char *updated_at;
+  /**
+   * Value for money (JSON string)
+   */
+  const char *value_for_money;
+  /**
+   * Whether visible
+   */
+  bool visible;
+} lb_fund_analysis_t;
+
+/**
+ * Fund analysis detail (level 2).
+ */
+typedef struct lb_fund_analysis_detail_t {
+  /**
+   * Actual period
+   */
+  int32_t actual_period;
+  /**
+   * Available periods
+   */
+  const int32_t *available_periods;
+  /**
+   * Number of available periods
+   */
+  uintptr_t num_available_periods;
+  /**
+   * Cost level (JSON string)
+   */
+  const char *cost_level;
+  /**
+   * Return ability (JSON string)
+   */
+  const char *return_ability;
+  /**
+   * Risk ability (JSON string)
+   */
+  const char *risk_ability;
+  /**
+   * Updated at
+   */
+  const char *updated_at;
+  /**
+   * Value for money (JSON string)
+   */
+  const char *value_for_money;
+  /**
+   * Whether visible
+   */
+  bool visible;
+} lb_fund_analysis_detail_t;
+
+/**
+ * A fund annual return entry.
+ */
+typedef struct lb_fund_annual_return_t {
+  /**
+   * Change percent
+   */
+  const char *change_percent;
+  /**
+   * Year
+   */
+  int32_t year;
+} lb_fund_annual_return_t;
+
+/**
+ * A single holding entry inside a fund's asset allocation.
+ */
+typedef struct lb_fund_asset_allocation_item_t {
+  /**
+   * Security code
+   */
+  const char *code;
+  /**
+   * Security counter id
+   */
+  const char *counter_id;
+  /**
+   * Name
+   */
+  const char *name;
+  /**
+   * Position ratio
+   */
+  const char *position_ratio;
+} lb_fund_asset_allocation_item_t;
+
+/**
+ * A fund's asset allocation.
+ */
+typedef struct lb_fund_asset_allocation_t {
+  /**
+   * Asset type
+   */
+  int32_t asset_type;
+  /**
+   * Allocation entries
+   */
+  const struct lb_fund_asset_allocation_item_t *lists;
+  /**
+   * Number of allocation entries
+   */
+  uintptr_t num_lists;
+  /**
+   * Report date
+   */
+  const char *report_date;
+} lb_fund_asset_allocation_t;
+
+/**
+ * A fund entry in the fund list.
+ */
+typedef struct lb_fund_brief_t {
+  /**
+   * Asset class
+   */
+  int32_t asset_class;
+  /**
+   * Asset class name
+   */
+  const char *asset_class_name;
+  /**
+   * Fund code
+   */
+  const char *code;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * Earning rate
+   */
+  const char *earning_rate;
+  /**
+   * Whether the user is holding this fund
+   */
+  bool holding;
+  /**
+   * ISIN
+   */
+  const char *isin;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Product
+   */
+  const char *product;
+  /**
+   * Minimum purchase amount
+   */
+  const char *purchase_amount;
+  /**
+   * Recommendation text
+   */
+  const char *recommendation_text;
+  /**
+   * Risk level
+   */
+  int32_t risk_level;
+  /**
+   * Risk level name
+   */
+  const char *risk_level_name;
+  /**
+   * Time interval of the earning rate
+   */
+  const char *time_interval;
+  /**
+   * Unit value
+   */
+  const char *unit_value;
+} lb_fund_brief_t;
+
+/**
+ * A dated value point.
+ */
+typedef struct lb_fund_dated_value_t {
+  /**
+   * Date (unix seconds)
+   */
+  int64_t date;
+  /**
+   * Value
+   */
+  const char *value;
+} lb_fund_dated_value_t;
+
+/**
+ * Fund detail.
+ */
+typedef struct lb_fund_detail_t {
+  /**
+   * Additional purchase amount
+   */
+  const char *additional_purchase_amount;
+  /**
+   * Affirm day
+   */
+  int32_t affirm_day;
+  /**
+   * Amount affirm day
+   */
+  const char *amount_affirm_day;
+  /**
+   * Asset allocation
+   */
+  struct lb_fund_asset_allocation_t asset_allocation;
+  /**
+   * Asset class
+   */
+  int32_t asset_class;
+  /**
+   * Asset class name
+   */
+  const char *asset_class_name;
+  /**
+   * Bill purchase rate
+   */
+  const char *bill_purchase_rate;
+  /**
+   * Channel
+   */
+  const char *channel;
+  /**
+   * Close period
+   */
+  const char *close_period;
+  /**
+   * Fund code
+   */
+  const char *code;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Cut off time
+   */
+  const char *cut_off_time;
+  /**
+   * Whether it is a derivative
+   */
+  bool derivatives;
+  /**
+   * Done day
+   */
+  int32_t done_day;
+  /**
+   * Excess return fee
+   */
+  const char *excess_return_fee;
+  /**
+   * GST rate
+   */
+  const char *gst_rate;
+  /**
+   * Introduction
+   */
+  const char *introduce;
+  /**
+   * Whether it is a cash-plus fund
+   */
+  bool is_cash_plus;
+  /**
+   * Whether it is a complex product
+   */
+  bool is_complex;
+  /**
+   * Whether it is a new cash-plus fund
+   */
+  bool is_new_cash_plus;
+  /**
+   * Whether it is a Yinghebao fund
+   */
+  bool is_yinghebao;
+  /**
+   * ISIN
+   */
+  const char *isin;
+  /**
+   * Management rate
+   */
+  const char *manage_rate;
+  /**
+   * Manager
+   */
+  const char *manager;
+  /**
+   * Minimum holding cash
+   */
+  const char *min_hold_cash;
+  /**
+   * Minimum holding share
+   */
+  const char *min_hold_share;
+  /**
+   * Minimum sell share
+   */
+  const char *min_sell_share;
+  /**
+   * Month raise day
+   */
+  const char *month_raise_day;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Net value deadline
+   */
+  const char *nav_deadline;
+  /**
+   * Whether it is no-load
+   */
+  bool no_load;
+  /**
+   * Open date
+   */
+  const char *open_date;
+  /**
+   * Open period
+   */
+  const char *open_period;
+  /**
+   * Product
+   */
+  const char *product;
+  /**
+   * Product information locals
+   */
+  const char *product_information_locals;
+  /**
+   * Profile
+   */
+  const char *profile;
+  /**
+   * Whether purchasable
+   */
+  int32_t purchasable;
+  /**
+   * Purchase affirm day
+   */
+  const char *purchase_affirm_day;
+  /**
+   * Minimum purchase amount
+   */
+  const char *purchase_amount;
+  /**
+   * Purchase rate
+   */
+  const char *purchase_rate;
+  /**
+   * Rating
+   */
+  int32_t rating;
+  /**
+   * Whether redeemable
+   */
+  int32_t redeemable;
+  /**
+   * Redemption advance day
+   */
+  const char *redemption_advance_day;
+  /**
+   * Redemption amount
+   */
+  const char *redemption_amount;
+  /**
+   * Redemption close period text
+   */
+  const char *redemption_close_period_shows;
+  /**
+   * Redemption done day
+   */
+  const char *redemption_done_day;
+  /**
+   * Redemption open day text
+   */
+  const char *redemption_open_day_shows;
+  /**
+   * Risk level
+   */
+  int32_t risk_level;
+  /**
+   * Risk level name
+   */
+  const char *risk_level_name;
+  /**
+   * Verify status
+   */
+  int32_t verify_status;
+  /**
+   * Whether it is a virtual currency fund
+   */
+  bool virtual_currency;
+  /**
+   * Year to date yield
+   */
+  const char *year_to_date_yield;
+  /**
+   * Year to date yield type
+   */
+  int32_t ytd_yield_type;
+} lb_fund_detail_t;
+
+/**
+ * A cash dividend record for a held fund.
+ */
+typedef struct lb_fund_dividend_t {
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Date (unix seconds)
+   */
+  int64_t date;
+  /**
+   * Dividend method
+   */
+  const char *div_method;
+  /**
+   * Fund name
+   */
+  const char *name;
+} lb_fund_dividend_t;
+
+/**
+ * The user's dividend records for a held fund.
+ */
+typedef struct lb_fund_dividends_t {
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Dividend records
+   */
+  const struct lb_fund_dividend_t *div_cash_infos;
+  /**
+   * Number of dividend records
+   */
+  uintptr_t num_div_cash_infos;
+  /**
+   * Latest dividend date (unix seconds)
+   */
+  int64_t lastest_date;
+  /**
+   * Total cash dividend
+   */
+  const char *total_div_cash;
+} lb_fund_dividends_t;
+
+/**
+ * Fund list filter options. Each list holds JSON-encoded option objects.
+ */
+typedef struct lb_fund_filters_t {
+  /**
+   * Asset class options (JSON strings)
+   */
+  const char *const *asset_class;
+  /**
+   * Number of asset class options
+   */
+  uintptr_t num_asset_class;
+  /**
+   * Company options (JSON strings)
+   */
+  const char *const *company;
+  /**
+   * Number of company options
+   */
+  uintptr_t num_company;
+  /**
+   * Currency options (JSON strings)
+   */
+  const char *const *currency;
+  /**
+   * Number of currency options
+   */
+  uintptr_t num_currency;
+  /**
+   * Industry category options (JSON strings)
+   */
+  const char *const *industry_category_name;
+  /**
+   * Number of industry category options
+   */
+  uintptr_t num_industry_category_name;
+  /**
+   * Risk level options (JSON strings)
+   */
+  const char *const *risk_level;
+  /**
+   * Number of risk level options
+   */
+  uintptr_t num_risk_level;
+} lb_fund_filters_t;
+
+/**
+ * A single fund holding (top-10 holdings).
+ */
+typedef struct lb_fund_holding_t {
+  /**
+   * Bond type
+   */
+  const char *bond_type;
+  /**
+   * Bond type name
+   */
+  const char *bond_type_name;
+  /**
+   * Country name
+   */
+  const char *country_name;
+  /**
+   * Holding type
+   */
+  const char *holding_type;
+  /**
+   * Industry name
+   */
+  const char *industry_name;
+  /**
+   * Market value
+   */
+  const char *market_value;
+  /**
+   * Maturity date
+   */
+  const char *maturity_date;
+  /**
+   * Name
+   */
+  const char *name;
+  /**
+   * Share change
+   */
+  const char *share_change;
+  /**
+   * Share change percent
+   */
+  const char *share_change_percent;
+  /**
+   * Shares
+   */
+  const char *shares;
+  /**
+   * Weighting
+   */
+  const char *weighting;
+} lb_fund_holding_t;
+
+/**
+ * A fund's top-10 holdings.
+ */
+typedef struct lb_fund_holdings_t {
+  /**
+   * Holding entries
+   */
+  const struct lb_fund_holding_t *holdings;
+  /**
+   * Number of holding entries
+   */
+  uintptr_t num_holdings;
+  /**
+   * Report date
+   */
+  const char *report_date;
+  /**
+   * Total weighting
+   */
+  const char *weighting;
+} lb_fund_holdings_t;
+
+/**
+ * A named contrast performance series.
+ */
+typedef struct lb_fund_named_contrast_t {
+  /**
+   * Series name
+   */
+  const char *name;
+  /**
+   * Performance points (JSON strings)
+   */
+  const char *const *performances;
+  /**
+   * Number of performance points
+   */
+  uintptr_t num_performances;
+} lb_fund_named_contrast_t;
+
+/**
+ * A fund net-asset-value data point (latest / historical).
+ */
+typedef struct lb_fund_nav_value_t {
+  /**
+   * Net value change
+   */
+  const char *change;
+  /**
+   * Net value change percent
+   */
+  const char *change_percent;
+  /**
+   * Formatted change percent
+   */
+  const char *change_percent_format;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *counter_name;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Formatted date
+   */
+  const char *date_format;
+  /**
+   * ISIN
+   */
+  const char *isin;
+  /**
+   * Last update time (unix seconds)
+   */
+  int64_t last_update_time;
+  /**
+   * Net value
+   */
+  const char *value;
+  /**
+   * Formatted net value
+   */
+  const char *value_format;
+} lb_fund_nav_value_t;
+
+/**
+ * A fund order (list view).
+ */
+typedef struct lb_fund_order_t {
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Order id
+   */
+  int64_t id;
+  /**
+   * Whether it is an auto (DCA) order
+   */
+  bool is_auto;
+  /**
+   * Net worth
+   */
+  const char *net_worth;
+  /**
+   * Product type
+   */
+  const char *product_type;
+  /**
+   * State
+   */
+  const char *state;
+  /**
+   * State description
+   */
+  const char *state_desc;
+  /**
+   * Units
+   */
+  const char *units;
+} lb_fund_order_t;
+
+/**
+ * A keyword block in a fund order detail.
+ */
+typedef struct lb_fund_order_keyword_t {
+  /**
+   * Content
+   */
+  const char *content;
+  /**
+   * Group
+   */
+  const char *group;
+  /**
+   * Key
+   */
+  const char *key;
+  /**
+   * Line strategy
+   */
+  const char *line_strategy;
+  /**
+   * Title
+   */
+  const char *title;
+} lb_fund_order_keyword_t;
+
+/**
+ * The full information of a fund order.
+ */
+typedef struct lb_fund_order_info_t {
+  /**
+   * Account id
+   */
+  int64_t aaid;
+  /**
+   * Account channel
+   */
+  const char *account_channel;
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Channel
+   */
+  const char *channel;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Dividend option
+   */
+  const char *dividend_option;
+  /**
+   * Equity time (unix seconds)
+   */
+  int64_t eq_at;
+  /**
+   * Fee
+   */
+  const char *fee;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Fund source
+   */
+  const char *fund_source;
+  /**
+   * Histories
+   */
+  const char *histories;
+  /**
+   * Order id
+   */
+  int64_t id;
+  /**
+   * Message
+   */
+  const char *message;
+  /**
+   * Net worth
+   */
+  const char *net_worth;
+  /**
+   * Price time (unix seconds)
+   */
+  int64_t price_at;
+  /**
+   * Processed at (unix seconds)
+   */
+  int64_t processed_at;
+  /**
+   * Product type
+   */
+  const char *product_type;
+  /**
+   * Whether repurchaseable
+   */
+  bool repurchaseable;
+  /**
+   * Sale proceeds
+   */
+  const char *sale_proceeds;
+  /**
+   * Sales charge
+   */
+  const char *sales_charge;
+  /**
+   * Sales price
+   */
+  const char *sales_price;
+  /**
+   * Sales unit
+   */
+  const char *sales_unit;
+  /**
+   * State
+   */
+  const char *state;
+  /**
+   * State description
+   */
+  const char *state_desc;
+  /**
+   * Status
+   */
+  int32_t status;
+  /**
+   * Extended status
+   */
+  int32_t status_ex;
+  /**
+   * T+ description
+   */
+  const char *t_description;
+  /**
+   * Time partition
+   */
+  const char *time_partition;
+  /**
+   * Total amount
+   */
+  const char *total_amount;
+  /**
+   * Transaction at (unix seconds)
+   */
+  int64_t transaction_at;
+  /**
+   * Units
+   */
+  const char *units;
+  /**
+   * Withdraw at (unix seconds)
+   */
+  int64_t withdraw_at;
+  /**
+   * Whether withdrawable
+   */
+  bool withdrawable;
+} lb_fund_order_info_t;
+
+/**
+ * A processing stage in a fund order detail.
+ */
+typedef struct lb_fund_order_stage_t {
+  /**
+   * Description
+   */
+  const char *desc;
+  /**
+   * Key
+   */
+  const char *key;
+  /**
+   * Link
+   */
+  const char *link;
+  /**
+   * Link text
+   */
+  const char *link_text;
+  /**
+   * Progress
+   */
+  const char *progress;
+  /**
+   * Stage
+   */
+  const char *stage;
+} lb_fund_order_stage_t;
+
+/**
+ * Fund order detail.
+ */
+typedef struct lb_fund_order_detail_t {
+  /**
+   * Keyword blocks
+   */
+  const struct lb_fund_order_keyword_t *keywords;
+  /**
+   * Number of keyword blocks
+   */
+  uintptr_t num_keywords;
+  /**
+   * The order
+   */
+  struct lb_fund_order_info_t order;
+  /**
+   * Processing stages
+   */
+  const struct lb_fund_order_stage_t *stages;
+  /**
+   * Number of processing stages
+   */
+  uintptr_t num_stages;
+} lb_fund_order_detail_t;
+
+/**
+ * The result of submitting a fund order.
+ */
+typedef struct lb_fund_order_submit_response_t {
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Order id
+   */
+  int64_t id;
+  /**
+   * Message
+   */
+  const char *msg;
+  /**
+   * Status
+   */
+  int32_t status;
+  /**
+   * Units
+   */
+  const char *units;
+} lb_fund_order_submit_response_t;
+
+/**
+ * The result of validating a fund order.
+ */
+typedef struct lb_fund_order_validation_t {
+  /**
+   * Auth token to carry into submit
+   */
+  const char *auth_token;
+  /**
+   * Risk-assessment eval address
+   */
+  const char *eval_address;
+  /**
+   * Fund risk level
+   */
+  int32_t fund_risk_level;
+  /**
+   * Message
+   */
+  const char *msg;
+  /**
+   * User PI status
+   */
+  int32_t user_pi;
+  /**
+   * User risk level
+   */
+  int32_t user_risk_level;
+} lb_fund_order_validation_t;
+
+/**
+ * A fund's detailed performance figures.
+ */
+typedef struct lb_fund_performance_t {
+  /**
+   * Annualized return (5y)
+   */
+  const char *annualized_return_five;
+  /**
+   * Annualized return (1y)
+   */
+  const char *annualized_return_one;
+  /**
+   * Annualized return (10y)
+   */
+  const char *annualized_return_ten;
+  /**
+   * Annualized return (3y)
+   */
+  const char *annualized_return_three;
+  /**
+   * Annualized return (2y)
+   */
+  const char *annualized_return_two;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Rank (5y)
+   */
+  int32_t performance_rank_five_years;
+  /**
+   * Rank (1d)
+   */
+  int32_t performance_rank_one_day;
+  /**
+   * Rank (1m)
+   */
+  int32_t performance_rank_one_month;
+  /**
+   * Rank (1w)
+   */
+  int32_t performance_rank_one_week;
+  /**
+   * Rank (1y)
+   */
+  int32_t performance_rank_one_year;
+  /**
+   * Rank (6m)
+   */
+  int32_t performance_rank_six_months;
+  /**
+   * Rank (10y)
+   */
+  int32_t performance_rank_ten_years;
+  /**
+   * Rank (3m)
+   */
+  int32_t performance_rank_three_months;
+  /**
+   * Rank (3y)
+   */
+  int32_t performance_rank_three_years;
+  /**
+   * Rank (2y)
+   */
+  int32_t performance_rank_two_years;
+  /**
+   * Rank (ytd)
+   */
+  int32_t performance_rank_ytd;
+  /**
+   * Return (5y)
+   */
+  const char *performance_return_five_years;
+  /**
+   * Return (1d)
+   */
+  const char *performance_return_one_day;
+  /**
+   * Return (1m)
+   */
+  const char *performance_return_one_month;
+  /**
+   * Return (1w)
+   */
+  const char *performance_return_one_week;
+  /**
+   * Return (1y)
+   */
+  const char *performance_return_one_year;
+  /**
+   * Return (6m)
+   */
+  const char *performance_return_six_months;
+  /**
+   * Return (10y)
+   */
+  const char *performance_return_ten_years;
+  /**
+   * Return (3m)
+   */
+  const char *performance_return_three_months;
+  /**
+   * Return (3y)
+   */
+  const char *performance_return_three_years;
+  /**
+   * Return (2y)
+   */
+  const char *performance_return_two_years;
+  /**
+   * Return (ytd)
+   */
+  const char *performance_return_ytd;
+  /**
+   * Total peers (5y)
+   */
+  int32_t performance_total_five_years;
+  /**
+   * Total peers (1d)
+   */
+  int32_t performance_total_one_day;
+  /**
+   * Total peers (1m)
+   */
+  int32_t performance_total_one_month;
+  /**
+   * Total peers (1w)
+   */
+  int32_t performance_total_one_week;
+  /**
+   * Total peers (1y)
+   */
+  int32_t performance_total_one_year;
+  /**
+   * Total peers (6m)
+   */
+  int32_t performance_total_six_months;
+  /**
+   * Total peers (10y)
+   */
+  int32_t performance_total_ten_years;
+  /**
+   * Total peers (3m)
+   */
+  int32_t performance_total_three_months;
+  /**
+   * Total peers (3y)
+   */
+  int32_t performance_total_three_years;
+  /**
+   * Total peers (2y)
+   */
+  int32_t performance_total_two_years;
+  /**
+   * Total peers (ytd)
+   */
+  int32_t performance_total_ytd;
+  /**
+   * Seven days annualized
+   */
+  const char *seven_days_annualized;
+  /**
+   * Ten thousand price
+   */
+  const char *ten_thousand_price;
+  /**
+   * Update time (unix seconds)
+   */
+  int64_t update_time;
+} lb_fund_performance_t;
+
+/**
+ * Fund performance comparison.
+ */
+typedef struct lb_fund_performance_comparison_t {
+  /**
+   * Contrast performance series
+   */
+  const struct lb_fund_named_contrast_t *contrast_performances;
+  /**
+   * Number of contrast performance series
+   */
+  uintptr_t num_contrast_performances;
+  /**
+   * Fund performances (JSON strings)
+   */
+  const char *const *fund_performances;
+  /**
+   * Number of fund performances
+   */
+  uintptr_t num_fund_performances;
+} lb_fund_performance_comparison_t;
+
+/**
+ * A recent performance point used by the hot-fund list.
+ */
+typedef struct lb_fund_performance_point_t {
+  /**
+   * Date
+   */
+  const char *date;
+  /**
+   * Last done value
+   */
+  const char *last_done;
+} lb_fund_performance_point_t;
+
+/**
+ * Detail values of a single fund position.
+ */
+typedef struct lb_fund_position_detail_values_t {
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Holding cost
+   */
+  const char *holding_cost;
+  /**
+   * Holding profit
+   */
+  const char *holding_profit;
+  /**
+   * Holding profit rate
+   */
+  const char *holding_profit_rate;
+  /**
+   * Holding units
+   */
+  const char *holding_units;
+  /**
+   * Holding value
+   */
+  const char *holding_value;
+  /**
+   * Pending buy value
+   */
+  const char *pending_buy_value;
+  /**
+   * Pending sell value
+   */
+  const char *pending_sell_value;
+  /**
+   * Accumulated profit (to date)
+   */
+  const char *profit_amount_accum_td;
+  /**
+   * Accumulated profit rate (to date)
+   */
+  const char *profit_amount_accum_td_rate;
+  /**
+   * Recent profit
+   */
+  const char *recent_profit;
+  /**
+   * Recent trading day (unix seconds)
+   */
+  int64_t recent_tradingday;
+  /**
+   * Recent unit value
+   */
+  const char *recent_unit_value;
+  /**
+   * Sold pending-confirm units
+   */
+  const char *sold_pending_confirm_units;
+} lb_fund_position_detail_values_t;
+
+/**
+ * A fund unit-value point (position view).
+ */
+typedef struct lb_fund_unit_value_t {
+  /**
+   * Date (unix seconds)
+   */
+  int64_t date;
+  /**
+   * Day increase rate
+   */
+  const char *day_increase_rate;
+  /**
+   * Total value
+   */
+  const char *total_value;
+  /**
+   * Unit value
+   */
+  const char *unit_value;
+} lb_fund_unit_value_t;
+
+/**
+ * Detail of a single fund position.
+ */
+typedef struct lb_fund_position_detail_t {
+  /**
+   * Detail values
+   */
+  struct lb_fund_position_detail_values_t detail_values;
+  /**
+   * Accumulated profit series
+   */
+  const struct lb_fund_dated_value_t *sum_profit;
+  /**
+   * Number of accumulated-profit points
+   */
+  uintptr_t num_sum_profit;
+  /**
+   * Unit value series
+   */
+  const struct lb_fund_unit_value_t *ut_value;
+  /**
+   * Number of unit-value points
+   */
+  uintptr_t num_ut_value;
+} lb_fund_position_detail_t;
+
+/**
+ * A single fund position held by the user.
+ */
+typedef struct lb_fund_position_item_t {
+  /**
+   * Holding amount
+   */
+  const char *amount;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Frozen units
+   */
+  const char *freeze_units;
+  /**
+   * Holding profit
+   */
+  const char *holding_profit;
+  /**
+   * Holding units
+   */
+  const char *holding_units;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Recent profit
+   */
+  const char *recent_profit;
+  /**
+   * Recent trading day (unix seconds)
+   */
+  int64_t recent_trading_day;
+  /**
+   * Accumulated recent profit
+   */
+  const char *sum_recent_profit;
+} lb_fund_position_item_t;
+
+/**
+ * A held-fund net-value point (position view).
+ */
+typedef struct lb_fund_position_nav_t {
+  /**
+   * Net value change
+   */
+  const char *change;
+  /**
+   * Net value change percent
+   */
+  const char *change_percent;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *counter_name;
+  /**
+   * Last update time (unix seconds)
+   */
+  int64_t last_update_time;
+  /**
+   * Net value
+   */
+  const char *value;
+} lb_fund_position_nav_t;
+
+/**
+ * Performance figures for a held fund.
+ */
+typedef struct lb_fund_position_performance_t {
+  /**
+   * Annualized return (5y)
+   */
+  const char *annualized_return_five;
+  /**
+   * Annualized return (1y)
+   */
+  const char *annualized_return_one;
+  /**
+   * Annualized return (10y)
+   */
+  const char *annualized_return_ten;
+  /**
+   * Annualized return (3y)
+   */
+  const char *annualized_return_three;
+  /**
+   * Annualized return (2y)
+   */
+  const char *annualized_return_two;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Fund name
+   */
+  const char *fund_name;
+  /**
+   * Return (5y)
+   */
+  const char *performance_return_five_years;
+  /**
+   * Return (1d)
+   */
+  const char *performance_return_one_day;
+  /**
+   * Return (1m)
+   */
+  const char *performance_return_one_month;
+  /**
+   * Return (1w)
+   */
+  const char *performance_return_one_week;
+  /**
+   * Return (1y)
+   */
+  const char *performance_return_one_year;
+  /**
+   * Return (6m)
+   */
+  const char *performance_return_six_months;
+  /**
+   * Return (10y)
+   */
+  const char *performance_return_ten_years;
+  /**
+   * Return (3m)
+   */
+  const char *performance_return_three_months;
+  /**
+   * Return (3y)
+   */
+  const char *performance_return_three_years;
+  /**
+   * Return (2y)
+   */
+  const char *performance_return_two_years;
+  /**
+   * Return (ytd)
+   */
+  const char *performance_return_ytd;
+  /**
+   * Update time (unix seconds)
+   */
+  int64_t update_time;
+} lb_fund_position_performance_t;
+
+/**
+ * The user's cumulative profit for a held fund.
+ */
+typedef struct lb_fund_position_profits_t {
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Profit series
+   */
+  const struct lb_fund_dated_value_t *history_value;
+  /**
+   * Number of profit points
+   */
+  uintptr_t num_history_value;
+  /**
+   * Last update time (unix seconds)
+   */
+  int64_t last_update_time;
+  /**
+   * Total profit
+   */
+  const char *sum_profit;
+} lb_fund_position_profits_t;
+
+/**
+ * The user's fund positions overview.
+ */
+typedef struct lb_fund_positions_t {
+  /**
+   * Account channel
+   */
+  const char *account_channel;
+  /**
+   * Position entries
+   */
+  const struct lb_fund_position_item_t *list;
+  /**
+   * Number of position entries
+   */
+  uintptr_t num_list;
+  /**
+   * Pending buy orders amount
+   */
+  const char *pending_buy_orders;
+  /**
+   * Recent trading day (unix seconds)
+   */
+  int64_t recent_trading_day;
+  /**
+   * Sold pending credit orders amount
+   */
+  const char *sold_pending_credit_orders;
+} lb_fund_positions_t;
+
+/**
+ * A fund quarterly return entry.
+ */
+typedef struct lb_fund_quarterly_return_t {
+  /**
+   * Change percent
+   */
+  const char *change_percent;
+  /**
+   * Quarter
+   */
+  int32_t quarter;
+  /**
+   * Year
+   */
+  int32_t year;
+} lb_fund_quarterly_return_t;
+
+/**
+ * A stock held by the fund (reverse lookup).
+ */
+typedef struct lb_fund_stock_holding_t {
+  /**
+   * Stock code
+   */
+  const char *code;
+  /**
+   * Stock counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Stock name
+   */
+  const char *name;
+  /**
+   * Position ratio
+   */
+  const char *position_ratio;
+  /**
+   * Report date
+   */
+  const char *report_date;
+} lb_fund_stock_holding_t;
+
+/**
+ * A fund transaction / cash-flow record.
+ */
+typedef struct lb_fund_transaction_t {
+  /**
+   * Amount
+   */
+  const char *amount;
+  /**
+   * Category
+   */
+  const char *category;
+  /**
+   * Created at (unix seconds)
+   */
+  int64_t created_at;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Description
+   */
+  const char *description;
+  /**
+   * Detail created at (unix seconds)
+   */
+  int64_t detail_created_at;
+  /**
+   * Detail type
+   */
+  const char *detail_type;
+  /**
+   * Done at (unix seconds)
+   */
+  int64_t done_at;
+  /**
+   * Quantity description
+   */
+  const char *quantity_description;
+  /**
+   * Redirect page
+   */
+  const char *redirect_page;
+  /**
+   * Redirect page (v2)
+   */
+  const char *redirect_page_v2;
+  /**
+   * Reference number
+   */
+  const char *ref_no;
+  /**
+   * Stock quantity
+   */
+  const char *stock_quantity;
+  /**
+   * Transaction type
+   */
+  const char *tx_type;
+  /**
+   * Type name
+   */
+  const char *type_name;
+} lb_fund_transaction_t;
+
+/**
+ * A benchmark contrast series in a fund trend chart.
+ */
+typedef struct lb_fund_trend_contrast_t {
+  /**
+   * Benchmark name
+   */
+  const char *benchmark_name;
+  /**
+   * Performance points (JSON strings)
+   */
+  const char *const *performances;
+  /**
+   * Number of performance points
+   */
+  uintptr_t num_performances;
+} lb_fund_trend_contrast_t;
+
+/**
+ * Fund trend chart.
+ */
+typedef struct lb_fund_trend_t {
+  /**
+   * Actual period
+   */
+  int32_t actual_period;
+  /**
+   * Available periods
+   */
+  const int32_t *available_periods;
+  /**
+   * Number of available periods
+   */
+  uintptr_t num_available_periods;
+  /**
+   * Category average performances (JSON strings)
+   */
+  const char *const *category_average_performances;
+  /**
+   * Number of category average performances
+   */
+  uintptr_t num_category_average_performances;
+  /**
+   * Benchmark contrast performances
+   */
+  struct lb_fund_trend_contrast_t contrast_performances;
+  /**
+   * Fund performances (JSON strings)
+   */
+  const char *const *fund_performances;
+  /**
+   * Number of fund performances
+   */
+  uintptr_t num_fund_performances;
+} lb_fund_trend_t;
+
+/**
+ * A hot-selling fund entry.
+ */
+typedef struct lb_hot_fund_t {
+  /**
+   * Asset class
+   */
+  int32_t asset_class;
+  /**
+   * Asset class name
+   */
+  const char *asset_class_name;
+  /**
+   * Fund counter id
+   */
+  const char *counter_id;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Earning rate
+   */
+  const char *earning_rate;
+  /**
+   * Recent performance points
+   */
+  const struct lb_fund_performance_point_t *fund_performances;
+  /**
+   * Number of recent performance points
+   */
+  uintptr_t num_fund_performances;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Minimum purchase amount
+   */
+  const char *purchase_amount;
+  /**
+   * Recommendation text
+   */
+  const char *recommendation_text;
+  /**
+   * Risk level
+   */
+  int32_t risk_level;
+  /**
+   * Risk level name
+   */
+  const char *risk_level_name;
+  /**
+   * Time interval of the earning rate
+   */
+  const char *time_interval;
+} lb_hot_fund_t;
+
+/**
  * Options for estimate maximum purchase quantity
  */
 typedef struct lb_estimate_max_purchase_quantity_response_t {
