@@ -21,10 +21,10 @@ use crate::{
         CFundOrderSubmitResponseOwned, CFundOrderValidationOwned, CFundPageOptions,
         CFundPerformanceComparisonOwned, CFundPerformanceOwned, CFundPositionDetailOwned,
         CFundPositionNavOwned, CFundPositionPerformanceOwned, CFundPositionProfitsOwned,
-        CFundPositionsOwned, CFundQuarterlyReturnOwned, CFundStockHoldingOwned,
-        CFundTransactionOwned, CFundTrendOwned, CGetFundAnalysisOptions, CGetFundHoldingsOptions,
-        CGetFundOrdersOptions, CGetFundPositionDividendsOptions, CGetFundPositionOptions,
-        CGetFundPositionProfitsOptions, CGetFundPositionsOptions, CGetFundStockHoldingsOptions,
+        CFundPositionsOptions, CFundPositionsOwned, CFundQuarterlyReturnOwned,
+        CFundStockHoldingOwned, CFundTransactionOwned, CFundTrendOwned, CGetFundAnalysisOptions,
+        CGetFundHoldingsOptions, CGetFundOrdersOptions, CGetFundPositionDividendsOptions,
+        CGetFundPositionOptions, CGetFundPositionProfitsOptions, CGetFundStockHoldingsOptions,
         CGetFundTransactionsOptions, CGetFundsOptions, CHotFundOwned, CSubmitFundOrderOptions,
         CValidateFundOrderOptions,
     },
@@ -127,9 +127,7 @@ unsafe fn build_stock_holdings_options(
     o
 }
 
-unsafe fn build_positions_options(
-    opts: *const CGetFundPositionsOptions,
-) -> GetFundPositionsOptions {
+unsafe fn build_positions_options(opts: *const CFundPositionsOptions) -> GetFundPositionsOptions {
     let mut o = GetFundPositionsOptions::new();
     if !opts.is_null() {
         if !(*opts).account_channel.is_null() {
@@ -652,7 +650,7 @@ pub unsafe extern "C" fn lb_fund_context_stock_holdings(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_positions(
     ctx: *const CFundContext,
-    opts: *const CGetFundPositionsOptions,
+    opts: *const CFundPositionsOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {

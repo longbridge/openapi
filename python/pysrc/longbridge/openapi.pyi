@@ -9015,6 +9015,2204 @@ class GridContext:
             Grid symbol info
         """
 
+class FundNavValue:
+    """
+    A fund net-asset-value data point (latest / historical)
+    """
+
+    change: str
+    """
+    Net value change
+    """
+    change_percent: str
+    """
+    Net value change percent
+    """
+    change_percent_format: str
+    """
+    Formatted change percent
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    counter_name: str
+    """
+    Fund name
+    """
+    currency: str
+    """
+    Currency
+    """
+    date_format: str
+    """
+    Formatted date
+    """
+    isin: str
+    """
+    ISIN
+    """
+    last_update_time: int
+    """
+    Last update time (unix seconds)
+    """
+    value: str
+    """
+    Net value
+    """
+    value_format: str
+    """
+    Formatted net value
+    """
+
+class FundPerformancePoint:
+    """
+    A recent performance point used by the hot-fund list
+    """
+
+    date: str
+    """
+    Date
+    """
+    last_done: str
+    """
+    Last done value
+    """
+
+class HotFund:
+    """
+    A hot-selling fund entry
+    """
+
+    asset_class: int
+    """
+    Asset class
+    """
+    asset_class_name: str
+    """
+    Asset class name
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    currency: str
+    """
+    Currency
+    """
+    earning_rate: str
+    """
+    Earning rate
+    """
+    fund_performances: List[FundPerformancePoint]
+    """
+    Recent performance points
+    """
+    name: str
+    """
+    Fund name
+    """
+    purchase_amount: str
+    """
+    Minimum purchase amount
+    """
+    recommendation_text: str
+    """
+    Recommendation text
+    """
+    risk_level: int
+    """
+    Risk level
+    """
+    risk_level_name: str
+    """
+    Risk level name
+    """
+    time_interval: str
+    """
+    Time interval of the earning rate
+    """
+
+class FundBrief:
+    """
+    A fund entry in the fund list
+    """
+
+    asset_class: int
+    """
+    Asset class
+    """
+    asset_class_name: str
+    """
+    Asset class name
+    """
+    code: str
+    """
+    Fund code
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    currency: str
+    """
+    Currency
+    """
+    description: str
+    """
+    Description
+    """
+    earning_rate: str
+    """
+    Earning rate
+    """
+    holding: bool
+    """
+    Whether the user is holding this fund
+    """
+    isin: str
+    """
+    ISIN
+    """
+    name: str
+    """
+    Fund name
+    """
+    product: str
+    """
+    Product
+    """
+    purchase_amount: str
+    """
+    Minimum purchase amount
+    """
+    recommendation_text: str
+    """
+    Recommendation text
+    """
+    risk_level: int
+    """
+    Risk level
+    """
+    risk_level_name: str
+    """
+    Risk level name
+    """
+    time_interval: str
+    """
+    Time interval of the earning rate
+    """
+    unit_value: str
+    """
+    Unit value
+    """
+
+class FundFilters:
+    """
+    Fund list filter options. Each list holds server-defined option objects
+    exposed as raw JSON strings.
+    """
+
+    asset_class: List[str]
+    """
+    Asset class options (raw JSON strings)
+    """
+    company: List[str]
+    """
+    Company options (raw JSON strings)
+    """
+    currency: List[str]
+    """
+    Currency options (raw JSON strings)
+    """
+    industry_category_name: List[str]
+    """
+    Industry category options (raw JSON strings)
+    """
+    risk_level: List[str]
+    """
+    Risk level options (raw JSON strings)
+    """
+
+class FundAssetAllocationItem:
+    """
+    A single holding entry inside a fund's asset allocation
+    """
+
+    code: str
+    """
+    Security code
+    """
+    counter_id: str
+    """
+    Security counter id
+    """
+    name: str
+    """
+    Name
+    """
+    position_ratio: str
+    """
+    Position ratio
+    """
+
+class FundAssetAllocation:
+    """
+    A fund's asset allocation
+    """
+
+    asset_type: int
+    """
+    Asset type
+    """
+    lists: List[FundAssetAllocationItem]
+    """
+    Allocation entries
+    """
+    report_date: str
+    """
+    Report date
+    """
+
+class FundDetail:
+    """
+    Fund detail
+    """
+
+    additional_purchase_amount: str
+    """
+    Additional purchase amount
+    """
+    affirm_day: int
+    """
+    Affirm day
+    """
+    amount_affirm_day: str
+    """
+    Amount affirm day
+    """
+    asset_allocation: FundAssetAllocation
+    """
+    Asset allocation
+    """
+    asset_class: int
+    """
+    Asset class
+    """
+    asset_class_name: str
+    """
+    Asset class name
+    """
+    bill_purchase_rate: str
+    """
+    Bill purchase rate
+    """
+    channel: str
+    """
+    Channel
+    """
+    close_period: str
+    """
+    Close period
+    """
+    code: str
+    """
+    Fund code
+    """
+    currency: str
+    """
+    Currency
+    """
+    cut_off_time: str
+    """
+    Cut off time
+    """
+    derivatives: bool
+    """
+    Whether it is a derivative
+    """
+    done_day: int
+    """
+    Done day
+    """
+    excess_return_fee: str
+    """
+    Excess return fee
+    """
+    gst_rate: str
+    """
+    GST rate
+    """
+    introduce: str
+    """
+    Introduction
+    """
+    is_cash_plus: bool
+    """
+    Whether it is a cash-plus fund
+    """
+    is_complex: bool
+    """
+    Whether it is a complex product
+    """
+    is_new_cash_plus: bool
+    """
+    Whether it is a new cash-plus fund
+    """
+    is_yinghebao: bool
+    """
+    Whether it is a Yinghebao fund
+    """
+    isin: str
+    """
+    ISIN
+    """
+    manage_rate: str
+    """
+    Management rate
+    """
+    manager: str
+    """
+    Manager
+    """
+    min_hold_cash: str
+    """
+    Minimum holding cash
+    """
+    min_hold_share: str
+    """
+    Minimum holding share
+    """
+    min_sell_share: str
+    """
+    Minimum sell share
+    """
+    month_raise_day: str
+    """
+    Month raise day
+    """
+    name: str
+    """
+    Fund name
+    """
+    nav_deadline: str
+    """
+    Net value deadline
+    """
+    no_load: bool
+    """
+    Whether it is no-load
+    """
+    open_date: str
+    """
+    Open date
+    """
+    open_period: str
+    """
+    Open period
+    """
+    product: str
+    """
+    Product
+    """
+    product_information_locals: str
+    """
+    Product information locals
+    """
+    profile: str
+    """
+    Profile
+    """
+    purchasable: int
+    """
+    Whether purchasable
+    """
+    purchase_affirm_day: str
+    """
+    Purchase affirm day
+    """
+    purchase_amount: str
+    """
+    Minimum purchase amount
+    """
+    purchase_rate: str
+    """
+    Purchase rate
+    """
+    rating: int
+    """
+    Rating
+    """
+    redeemable: int
+    """
+    Whether redeemable
+    """
+    redemption_advance_day: str
+    """
+    Redemption advance day
+    """
+    redemption_amount: str
+    """
+    Redemption amount
+    """
+    redemption_close_period_shows: str
+    """
+    Redemption close period text
+    """
+    redemption_done_day: str
+    """
+    Redemption done day
+    """
+    redemption_open_day_shows: str
+    """
+    Redemption open day text
+    """
+    risk_level: int
+    """
+    Risk level
+    """
+    risk_level_name: str
+    """
+    Risk level name
+    """
+    verify_status: int
+    """
+    Verify status
+    """
+    virtual_currency: bool
+    """
+    Whether it is a virtual currency fund
+    """
+    year_to_date_yield: str
+    """
+    Year to date yield
+    """
+    ytd_yield_type: int
+    """
+    Year to date yield type
+    """
+
+class FundAnalysis:
+    """
+    Fund analysis (level 1)
+    """
+
+    actual_period: int
+    """
+    Actual period
+    """
+    cost_level: str
+    """
+    Cost level (server-defined structure, raw JSON string)
+    """
+    return_ability: str
+    """
+    Return ability (server-defined structure, raw JSON string)
+    """
+    risk_ability: str
+    """
+    Risk ability (server-defined structure, raw JSON string)
+    """
+    updated_at: str
+    """
+    Updated at
+    """
+    value_for_money: str
+    """
+    Value for money (server-defined structure, raw JSON string)
+    """
+    visible: bool
+    """
+    Whether visible
+    """
+
+class FundAnalysisDetail:
+    """
+    Fund analysis detail (level 2)
+    """
+
+    actual_period: int
+    """
+    Actual period
+    """
+    available_periods: List[int]
+    """
+    Available periods
+    """
+    cost_level: str
+    """
+    Cost level (server-defined structure, raw JSON string)
+    """
+    return_ability: str
+    """
+    Return ability (server-defined structure, raw JSON string)
+    """
+    risk_ability: str
+    """
+    Risk ability (server-defined structure, raw JSON string)
+    """
+    updated_at: str
+    """
+    Updated at
+    """
+    value_for_money: str
+    """
+    Value for money (server-defined structure, raw JSON string)
+    """
+    visible: bool
+    """
+    Whether visible
+    """
+
+class FundTrendContrast:
+    """
+    A benchmark contrast series in a fund trend chart
+    """
+
+    benchmark_name: str
+    """
+    Benchmark name
+    """
+    performances: List[str]
+    """
+    Performance points (server-defined structure, raw JSON strings)
+    """
+
+class FundTrend:
+    """
+    Fund trend chart
+    """
+
+    actual_period: int
+    """
+    Actual period
+    """
+    available_periods: List[int]
+    """
+    Available periods
+    """
+    category_average_performances: List[str]
+    """
+    Category average performances (server-defined structure, raw JSON strings)
+    """
+    contrast_performances: FundTrendContrast
+    """
+    Benchmark contrast performances
+    """
+    fund_performances: List[str]
+    """
+    Fund performances (server-defined structure, raw JSON strings)
+    """
+
+class FundNamedContrast:
+    """
+    A named contrast performance series
+    """
+
+    name: str
+    """
+    Series name
+    """
+    performances: List[str]
+    """
+    Performance points (server-defined structure, raw JSON strings)
+    """
+
+class FundPerformanceComparison:
+    """
+    Fund performance comparison
+    """
+
+    contrast_performances: List[FundNamedContrast]
+    """
+    Contrast performance series
+    """
+    fund_performances: List[str]
+    """
+    Fund performances (server-defined structure, raw JSON strings)
+    """
+
+class FundAnnualReturn:
+    """
+    A fund annual return entry
+    """
+
+    change_percent: str
+    """
+    Change percent
+    """
+    year: int
+    """
+    Year
+    """
+
+class FundQuarterlyReturn:
+    """
+    A fund quarterly return entry
+    """
+
+    change_percent: str
+    """
+    Change percent
+    """
+    quarter: int
+    """
+    Quarter
+    """
+    year: int
+    """
+    Year
+    """
+
+class FundPerformance:
+    """
+    A fund's detailed performance figures
+    """
+
+    annualized_return_five: str
+    """
+    Annualized return (5y)
+    """
+    annualized_return_one: str
+    """
+    Annualized return (1y)
+    """
+    annualized_return_ten: str
+    """
+    Annualized return (10y)
+    """
+    annualized_return_three: str
+    """
+    Annualized return (3y)
+    """
+    annualized_return_two: str
+    """
+    Annualized return (2y)
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    fund_name: str
+    """
+    Fund name
+    """
+    performance_rank_five_years: int
+    """
+    Rank (5y)
+    """
+    performance_rank_one_day: int
+    """
+    Rank (1d)
+    """
+    performance_rank_one_month: int
+    """
+    Rank (1m)
+    """
+    performance_rank_one_week: int
+    """
+    Rank (1w)
+    """
+    performance_rank_one_year: int
+    """
+    Rank (1y)
+    """
+    performance_rank_six_months: int
+    """
+    Rank (6m)
+    """
+    performance_rank_ten_years: int
+    """
+    Rank (10y)
+    """
+    performance_rank_three_months: int
+    """
+    Rank (3m)
+    """
+    performance_rank_three_years: int
+    """
+    Rank (3y)
+    """
+    performance_rank_two_years: int
+    """
+    Rank (2y)
+    """
+    performance_rank_ytd: int
+    """
+    Rank (ytd)
+    """
+    performance_return_five_years: str
+    """
+    Return (5y)
+    """
+    performance_return_one_day: str
+    """
+    Return (1d)
+    """
+    performance_return_one_month: str
+    """
+    Return (1m)
+    """
+    performance_return_one_week: str
+    """
+    Return (1w)
+    """
+    performance_return_one_year: str
+    """
+    Return (1y)
+    """
+    performance_return_six_months: str
+    """
+    Return (6m)
+    """
+    performance_return_ten_years: str
+    """
+    Return (10y)
+    """
+    performance_return_three_months: str
+    """
+    Return (3m)
+    """
+    performance_return_three_years: str
+    """
+    Return (3y)
+    """
+    performance_return_two_years: str
+    """
+    Return (2y)
+    """
+    performance_return_ytd: str
+    """
+    Return (ytd)
+    """
+    performance_total_five_years: int
+    """
+    Total peers (5y)
+    """
+    performance_total_one_day: int
+    """
+    Total peers (1d)
+    """
+    performance_total_one_month: int
+    """
+    Total peers (1m)
+    """
+    performance_total_one_week: int
+    """
+    Total peers (1w)
+    """
+    performance_total_one_year: int
+    """
+    Total peers (1y)
+    """
+    performance_total_six_months: int
+    """
+    Total peers (6m)
+    """
+    performance_total_ten_years: int
+    """
+    Total peers (10y)
+    """
+    performance_total_three_months: int
+    """
+    Total peers (3m)
+    """
+    performance_total_three_years: int
+    """
+    Total peers (3y)
+    """
+    performance_total_two_years: int
+    """
+    Total peers (2y)
+    """
+    performance_total_ytd: int
+    """
+    Total peers (ytd)
+    """
+    seven_days_annualized: str
+    """
+    Seven days annualized
+    """
+    ten_thousand_price: str
+    """
+    Ten thousand price
+    """
+    update_time: int
+    """
+    Update time (unix seconds)
+    """
+
+class FundHolding:
+    """
+    A single fund holding (top-10 holdings)
+    """
+
+    bond_type: str
+    """
+    Bond type
+    """
+    bond_type_name: str
+    """
+    Bond type name
+    """
+    country_name: str
+    """
+    Country name
+    """
+    holding_type: str
+    """
+    Holding type
+    """
+    industry_name: str
+    """
+    Industry name
+    """
+    market_value: str
+    """
+    Market value
+    """
+    maturity_date: str
+    """
+    Maturity date
+    """
+    name: str
+    """
+    Name
+    """
+    share_change: str
+    """
+    Share change
+    """
+    share_change_percent: str
+    """
+    Share change percent
+    """
+    shares: str
+    """
+    Shares
+    """
+    weighting: str
+    """
+    Weighting
+    """
+
+class FundHoldings:
+    """
+    A fund's top-10 holdings
+    """
+
+    holdings: List[FundHolding]
+    """
+    Holding entries
+    """
+    report_date: str
+    """
+    Report date
+    """
+    weighting: str
+    """
+    Total weighting
+    """
+
+class FundStockHolding:
+    """
+    A stock held by the fund (reverse lookup)
+    """
+
+    code: str
+    """
+    Stock code
+    """
+    counter_id: str
+    """
+    Stock counter id
+    """
+    currency: str
+    """
+    Currency
+    """
+    name: str
+    """
+    Stock name
+    """
+    position_ratio: str
+    """
+    Position ratio
+    """
+    report_date: str
+    """
+    Report date
+    """
+
+class FundPosition:
+    """
+    A single fund position held by the user
+    """
+
+    amount: str
+    """
+    Holding amount
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    currency: str
+    """
+    Currency
+    """
+    freeze_units: str
+    """
+    Frozen units
+    """
+    holding_profit: str
+    """
+    Holding profit
+    """
+    holding_units: str
+    """
+    Holding units
+    """
+    name: str
+    """
+    Fund name
+    """
+    recent_profit: str
+    """
+    Recent profit
+    """
+    recent_trading_day: int
+    """
+    Recent trading day (unix seconds)
+    """
+    sum_recent_profit: str
+    """
+    Accumulated recent profit
+    """
+
+class FundPositions:
+    """
+    The user's fund positions overview
+    """
+
+    account_channel: str
+    """
+    Account channel
+    """
+    list: List[FundPosition]
+    """
+    Position entries
+    """
+    pending_buy_orders: str
+    """
+    Pending buy orders amount
+    """
+    recent_trading_day: int
+    """
+    Recent trading day (unix seconds)
+    """
+    sold_pending_credit_orders: str
+    """
+    Sold pending credit orders amount
+    """
+
+class FundDatedValue:
+    """
+    A dated value point
+    """
+
+    date: int
+    """
+    Date (unix seconds)
+    """
+    value: str
+    """
+    Value
+    """
+
+class FundUnitValue:
+    """
+    A fund unit-value point (position view)
+    """
+
+    date: int
+    """
+    Date (unix seconds)
+    """
+    day_increase_rate: str
+    """
+    Day increase rate
+    """
+    total_value: str
+    """
+    Total value
+    """
+    unit_value: str
+    """
+    Unit value
+    """
+
+class FundPositionDetailValues:
+    """
+    Detail values of a single fund position
+    """
+
+    amount: str
+    """
+    Amount
+    """
+    currency: str
+    """
+    Currency
+    """
+    holding_cost: str
+    """
+    Holding cost
+    """
+    holding_profit: str
+    """
+    Holding profit
+    """
+    holding_profit_rate: str
+    """
+    Holding profit rate
+    """
+    holding_units: str
+    """
+    Holding units
+    """
+    holding_value: str
+    """
+    Holding value
+    """
+    pending_buy_value: str
+    """
+    Pending buy value
+    """
+    pending_sell_value: str
+    """
+    Pending sell value
+    """
+    profit_amount_accum_td: str
+    """
+    Accumulated profit (to date)
+    """
+    profit_amount_accum_td_rate: str
+    """
+    Accumulated profit rate (to date)
+    """
+    recent_profit: str
+    """
+    Recent profit
+    """
+    recent_tradingday: int
+    """
+    Recent trading day (unix seconds)
+    """
+    recent_unit_value: str
+    """
+    Recent unit value
+    """
+    sold_pending_confirm_units: str
+    """
+    Sold pending-confirm units
+    """
+
+class FundPositionDetail:
+    """
+    Detail of a single fund position
+    """
+
+    detail_values: FundPositionDetailValues
+    """
+    Detail values
+    """
+    sum_profit: List[FundDatedValue]
+    """
+    Accumulated profit series
+    """
+    ut_value: List[FundUnitValue]
+    """
+    Unit value series
+    """
+
+class FundPositionPerformance:
+    """
+    Performance figures for a held fund
+    """
+
+    annualized_return_five: str
+    """
+    Annualized return (5y)
+    """
+    annualized_return_one: str
+    """
+    Annualized return (1y)
+    """
+    annualized_return_ten: str
+    """
+    Annualized return (10y)
+    """
+    annualized_return_three: str
+    """
+    Annualized return (3y)
+    """
+    annualized_return_two: str
+    """
+    Annualized return (2y)
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    fund_name: str
+    """
+    Fund name
+    """
+    performance_return_five_years: str
+    """
+    Return (5y)
+    """
+    performance_return_one_day: str
+    """
+    Return (1d)
+    """
+    performance_return_one_month: str
+    """
+    Return (1m)
+    """
+    performance_return_one_week: str
+    """
+    Return (1w)
+    """
+    performance_return_one_year: str
+    """
+    Return (1y)
+    """
+    performance_return_six_months: str
+    """
+    Return (6m)
+    """
+    performance_return_ten_years: str
+    """
+    Return (10y)
+    """
+    performance_return_three_months: str
+    """
+    Return (3m)
+    """
+    performance_return_three_years: str
+    """
+    Return (3y)
+    """
+    performance_return_two_years: str
+    """
+    Return (2y)
+    """
+    performance_return_ytd: str
+    """
+    Return (ytd)
+    """
+    update_time: int
+    """
+    Update time (unix seconds)
+    """
+
+class FundPositionProfits:
+    """
+    The user's cumulative profit for a held fund
+    """
+
+    currency: str
+    """
+    Currency
+    """
+    history_value: List[FundDatedValue]
+    """
+    Profit series
+    """
+    last_update_time: int
+    """
+    Last update time (unix seconds)
+    """
+    sum_profit: str
+    """
+    Total profit
+    """
+
+class FundPositionNav:
+    """
+    A held-fund net-value point (position view)
+    """
+
+    change: str
+    """
+    Net value change
+    """
+    change_percent: str
+    """
+    Net value change percent
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    counter_name: str
+    """
+    Fund name
+    """
+    last_update_time: int
+    """
+    Last update time (unix seconds)
+    """
+    value: str
+    """
+    Net value
+    """
+
+class FundDividend:
+    """
+    A cash dividend record for a held fund
+    """
+
+    amount: str
+    """
+    Amount
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    currency: str
+    """
+    Currency
+    """
+    date: int
+    """
+    Date (unix seconds)
+    """
+    div_method: str
+    """
+    Dividend method
+    """
+    name: str
+    """
+    Fund name
+    """
+
+class FundDividends:
+    """
+    The user's dividend records for a held fund
+    """
+
+    currency: str
+    """
+    Currency
+    """
+    div_cash_infos: List[FundDividend]
+    """
+    Dividend records
+    """
+    lastest_date: int
+    """
+    Latest dividend date (unix seconds)
+    """
+    total_div_cash: str
+    """
+    Total cash dividend
+    """
+
+class FundOrder:
+    """
+    A fund order (list view)
+    """
+
+    action: str
+    """
+    Action (buy/sell)
+    """
+    amount: str
+    """
+    Amount
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    created_at: int
+    """
+    Created at (unix seconds)
+    """
+    currency: str
+    """
+    Currency
+    """
+    fund_name: str
+    """
+    Fund name
+    """
+    id: int
+    """
+    Order id
+    """
+    is_auto: bool
+    """
+    Whether it is an auto (DCA) order
+    """
+    net_worth: str
+    """
+    Net worth
+    """
+    product_type: str
+    """
+    Product type
+    """
+    state: str
+    """
+    State
+    """
+    state_desc: str
+    """
+    State description
+    """
+    units: str
+    """
+    Units
+    """
+
+class FundOrderKeyword:
+    """
+    A keyword block in a fund order detail
+    """
+
+    content: str
+    """
+    Content
+    """
+    group: str
+    """
+    Group
+    """
+    key: str
+    """
+    Key
+    """
+    line_strategy: str
+    """
+    Line strategy
+    """
+    title: str
+    """
+    Title
+    """
+
+class FundOrderStage:
+    """
+    A processing stage in a fund order detail
+    """
+
+    desc: str
+    """
+    Description
+    """
+    key: str
+    """
+    Key
+    """
+    link: str
+    """
+    Link
+    """
+    link_text: str
+    """
+    Link text
+    """
+    progress: str
+    """
+    Progress
+    """
+    stage: str
+    """
+    Stage
+    """
+
+class FundOrderInfo:
+    """
+    The full information of a fund order
+    """
+
+    aaid: int
+    """
+    Account id
+    """
+    account_channel: str
+    """
+    Account channel
+    """
+    action: str
+    """
+    Action (buy/sell)
+    """
+    amount: str
+    """
+    Amount
+    """
+    channel: str
+    """
+    Channel
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    created_at: int
+    """
+    Created at (unix seconds)
+    """
+    currency: str
+    """
+    Currency
+    """
+    dividend_option: str
+    """
+    Dividend option
+    """
+    eq_at: int
+    """
+    Equity time (unix seconds)
+    """
+    fee: str
+    """
+    Fee
+    """
+    fund_name: str
+    """
+    Fund name
+    """
+    fund_source: str
+    """
+    Fund source
+    """
+    histories: str
+    """
+    Histories
+    """
+    id: int
+    """
+    Order id
+    """
+    message: str
+    """
+    Message
+    """
+    net_worth: str
+    """
+    Net worth
+    """
+    price_at: int
+    """
+    Price time (unix seconds)
+    """
+    processed_at: int
+    """
+    Processed at (unix seconds)
+    """
+    product_type: str
+    """
+    Product type
+    """
+    repurchaseable: bool
+    """
+    Whether repurchaseable
+    """
+    sale_proceeds: str
+    """
+    Sale proceeds
+    """
+    sales_charge: str
+    """
+    Sales charge
+    """
+    sales_price: str
+    """
+    Sales price
+    """
+    sales_unit: str
+    """
+    Sales unit
+    """
+    state: str
+    """
+    State
+    """
+    state_desc: str
+    """
+    State description
+    """
+    status: int
+    """
+    Status
+    """
+    status_ex: int
+    """
+    Extended status
+    """
+    t_description: str
+    """
+    T+ description
+    """
+    time_partition: str
+    """
+    Time partition
+    """
+    total_amount: str
+    """
+    Total amount
+    """
+    transaction_at: int
+    """
+    Transaction at (unix seconds)
+    """
+    units: str
+    """
+    Units
+    """
+    withdraw_at: int
+    """
+    Withdraw at (unix seconds)
+    """
+    withdrawable: bool
+    """
+    Whether withdrawable
+    """
+
+class FundOrderDetail:
+    """
+    Fund order detail
+    """
+
+    keywords: List[FundOrderKeyword]
+    """
+    Keyword blocks
+    """
+    order: FundOrderInfo
+    """
+    The order
+    """
+    stages: List[FundOrderStage]
+    """
+    Processing stages
+    """
+
+class FundTransaction:
+    """
+    A fund transaction / cash-flow record
+    """
+
+    amount: str
+    """
+    Amount
+    """
+    category: str
+    """
+    Category
+    """
+    created_at: int
+    """
+    Created at (unix seconds)
+    """
+    currency: str
+    """
+    Currency
+    """
+    description: str
+    """
+    Description
+    """
+    detail_created_at: int
+    """
+    Detail created at (unix seconds)
+    """
+    detail_type: str
+    """
+    Detail type
+    """
+    done_at: int
+    """
+    Done at (unix seconds)
+    """
+    quantity_description: str
+    """
+    Quantity description
+    """
+    redirect_page: str
+    """
+    Redirect page
+    """
+    redirect_page_v2: str
+    """
+    Redirect page (v2)
+    """
+    ref_no: str
+    """
+    Reference number
+    """
+    stock_quantity: str
+    """
+    Stock quantity
+    """
+    tx_type: str
+    """
+    Transaction type
+    """
+    type_name: str
+    """
+    Type name
+    """
+
+class FundOrderValidation:
+    """
+    The result of validating a fund order
+    """
+
+    auth_token: str
+    """
+    Auth token to carry into submit
+    """
+    eval_address: str
+    """
+    Risk-assessment eval address
+    """
+    fund_risk_level: int
+    """
+    Fund risk level
+    """
+    msg: str
+    """
+    Message
+    """
+    user_pi: int
+    """
+    User PI status
+    """
+    user_risk_level: int
+    """
+    User risk level
+    """
+
+class FundOrderSubmitResponse:
+    """
+    The result of submitting a fund order
+    """
+
+    action: str
+    """
+    Action (buy/sell)
+    """
+    amount: str
+    """
+    Amount
+    """
+    counter_id: str
+    """
+    Fund counter id
+    """
+    created_at: int
+    """
+    Created at (unix seconds)
+    """
+    fund_name: str
+    """
+    Fund name
+    """
+    id: int
+    """
+    Order id
+    """
+    msg: str
+    """
+    Message
+    """
+    status: int
+    """
+    Status
+    """
+    units: str
+    """
+    Units
+    """
+
+class FundContext:
+    """
+    Fund (mutual fund) channel context (REST-only).
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+    def hot_funds(self) -> List[HotFund]:
+        """
+        Get the hot-selling fund list
+
+        Returns:
+            Hot-selling fund list
+        """
+
+    def funds(
+        self,
+        filter: Optional[str] = None,
+        quick_ids: Optional[List[int]] = None,
+        time_interval: Optional[List[str]] = None,
+    ) -> List[FundBrief]:
+        """
+        Get the fund list
+
+        Args:
+            filter: Server-defined filter object encoded as a JSON string
+            quick_ids: Quick-filter ids
+            time_interval: Earning-rate time intervals
+
+        Returns:
+            Fund list
+        """
+
+    def filters(self) -> FundFilters:
+        """
+        Get the fund list filter options
+
+        Returns:
+            Fund list filter options
+        """
+
+    def detail(self, symbol: str) -> FundDetail:
+        """
+        Get fund detail
+
+        Args:
+            symbol: Fund symbol
+
+        Returns:
+            Fund detail
+        """
+
+    def analysis(self, symbol: str, period: Optional[int] = None) -> FundAnalysis:
+        """
+        Get fund analysis (level 1)
+
+        Args:
+            symbol: Fund symbol
+            period: Analysis period
+
+        Returns:
+            Fund analysis
+        """
+
+    def analysis_detail(
+        self, symbol: str, period: Optional[int] = None
+    ) -> FundAnalysisDetail:
+        """
+        Get fund analysis detail (level 2)
+
+        Args:
+            symbol: Fund symbol
+            period: Analysis period
+
+        Returns:
+            Fund analysis detail
+        """
+
+    def trend(self, symbol: str, period: Optional[int] = None) -> FundTrend:
+        """
+        Get fund trend chart
+
+        Args:
+            symbol: Fund symbol
+            period: Analysis period
+
+        Returns:
+            Fund trend chart
+        """
+
+    def annual_returns(
+        self, symbol: str, page: Optional[int] = None, size: Optional[int] = None
+    ) -> List[FundAnnualReturn]:
+        """
+        Get fund annual returns
+
+        Args:
+            symbol: Fund symbol
+            page: Page number
+            size: Page size
+
+        Returns:
+            Fund annual returns
+        """
+
+    def quarterly_returns(
+        self, symbol: str, page: Optional[int] = None, size: Optional[int] = None
+    ) -> List[FundQuarterlyReturn]:
+        """
+        Get fund quarterly returns
+
+        Args:
+            symbol: Fund symbol
+            page: Page number
+            size: Page size
+
+        Returns:
+            Fund quarterly returns
+        """
+
+    def performance(self, symbol: str) -> List[FundPerformance]:
+        """
+        Get fund performance figures
+
+        Args:
+            symbol: Fund symbol
+
+        Returns:
+            Fund performance figures
+        """
+
+    def performance_comparison(
+        self, symbol: str, period: Optional[int] = None
+    ) -> FundPerformanceComparison:
+        """
+        Get fund performance comparison
+
+        Args:
+            symbol: Fund symbol
+            period: Analysis period
+
+        Returns:
+            Fund performance comparison
+        """
+
+    def nav(self, symbol: str) -> List[FundNavValue]:
+        """
+        Get fund latest net value
+
+        Args:
+            symbol: Fund symbol
+
+        Returns:
+            Fund latest net value
+        """
+
+    def nav_history(
+        self, symbol: str, page: Optional[int] = None, size: Optional[int] = None
+    ) -> List[FundNavValue]:
+        """
+        Get fund historical net value (paged)
+
+        Args:
+            symbol: Fund symbol
+            page: Page number
+            size: Page size
+
+        Returns:
+            Fund historical net value
+        """
+
+    def nav_range(
+        self,
+        symbol: str,
+        month_before: Optional[int] = None,
+        year_before: Optional[int] = None,
+    ) -> List[FundNavValue]:
+        """
+        Get fund historical net value by relative time range
+
+        Args:
+            symbol: Fund symbol
+            month_before: Number of months before now
+            year_before: Number of years before now
+
+        Returns:
+            Fund historical net value
+        """
+
+    def holdings(self, symbol: str, scene: Optional[int] = None) -> FundHoldings:
+        """
+        Get a fund's top-10 holdings
+
+        Args:
+            symbol: Fund symbol
+            scene: Scene
+
+        Returns:
+            Fund top-10 holdings
+        """
+
+    def stock_holdings(
+        self, symbol: str, limit: Optional[int] = None
+    ) -> List[FundStockHolding]:
+        """
+        Get the stocks held by a fund (reverse lookup)
+
+        Args:
+            symbol: Fund symbol
+            limit: Maximum number of stocks to return
+
+        Returns:
+            Stocks held by the fund
+        """
+
+    def positions(
+        self, account_channel: Optional[str] = None, aaid: Optional[int] = None
+    ) -> FundPositions:
+        """
+        Get the user's fund positions overview
+
+        Args:
+            account_channel: Account channel
+            aaid: Account id
+
+        Returns:
+            Fund positions overview
+        """
+
+    def position(
+        self,
+        symbol: str,
+        account_channel: Optional[str] = None,
+        aaid: Optional[int] = None,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+    ) -> FundPositionDetail:
+        """
+        Get the user's single fund position detail
+
+        Args:
+            symbol: Fund symbol
+            account_channel: Account channel
+            aaid: Account id
+            start: Range start
+            end: Range end
+
+        Returns:
+            Fund position detail
+        """
+
+    def position_performance(self, symbol: str) -> List[FundPositionPerformance]:
+        """
+        Get the performance figures of a held fund
+
+        Args:
+            symbol: Fund symbol
+
+        Returns:
+            Performance figures of the held fund
+        """
+
+    def position_profits(
+        self,
+        symbol: str,
+        account_channel: Optional[str] = None,
+        aaid: Optional[int] = None,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> FundPositionProfits:
+        """
+        Get the cumulative-profit series of a held fund
+
+        Args:
+            symbol: Fund symbol
+            account_channel: Account channel
+            aaid: Account id
+            start: Range start
+            end: Range end
+            page: Page number
+            size: Page size
+
+        Returns:
+            Cumulative-profit series of the held fund
+        """
+
+    def position_nav(
+        self,
+        symbol: str,
+        month_before: Optional[int] = None,
+        year_before: Optional[int] = None,
+    ) -> List[FundPositionNav]:
+        """
+        Get the net-value history of a held fund
+
+        Args:
+            symbol: Fund symbol
+            month_before: Number of months before now
+            year_before: Number of years before now
+
+        Returns:
+            Net-value history of the held fund
+        """
+
+    def position_dividends(
+        self,
+        symbol: str,
+        account_channel: Optional[str] = None,
+        aaid: Optional[int] = None,
+        currency: Optional[str] = None,
+        start: Optional[int] = None,
+        end: Optional[int] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> FundDividends:
+        """
+        Get the dividend records of a held fund
+
+        Args:
+            symbol: Fund symbol
+            account_channel: Account channel
+            aaid: Account id
+            currency: Currency
+            start: Range start (unix seconds)
+            end: Range end (unix seconds)
+            page: Page number
+            size: Page size
+
+        Returns:
+            Dividend records of the held fund
+        """
+
+    def orders(
+        self,
+        symbols: Optional[List[str]] = None,
+        actions: Optional[str] = None,
+        states: Optional[str] = None,
+        currency: Optional[str] = None,
+        start: Optional[int] = None,
+        end: Optional[int] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[FundOrder]:
+        """
+        Get the user's fund orders (also serves as the trade/execution record)
+
+        Args:
+            symbols: Filter by fund symbols
+            actions: Filter by actions (comma-separated)
+            states: Filter by states (comma-separated)
+            currency: Filter by currency
+            start: Range start (unix seconds)
+            end: Range end (unix seconds)
+            page: Page number
+            size: Page size
+
+        Returns:
+            Fund orders
+        """
+
+    def order(self, order_id: int) -> FundOrderDetail:
+        """
+        Get a fund order detail
+
+        Args:
+            order_id: Order id
+
+        Returns:
+            Fund order detail
+        """
+
+    def transactions(
+        self,
+        account_channel: Optional[str] = None,
+        business_type: Optional[str] = None,
+        category: Optional[str] = None,
+        currencies: Optional[str] = None,
+        start: Optional[int] = None,
+        end: Optional[int] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[FundTransaction]:
+        """
+        Get the user's fund transactions (cash-flow records)
+
+        Args:
+            account_channel: Account channel
+            business_type: Business type
+            category: Category
+            currencies: Currencies (comma-separated)
+            start: Range start (unix seconds)
+            end: Range end (unix seconds)
+            page: Page number
+            size: Page size
+
+        Returns:
+            Fund transactions
+        """
+
+    def validate_order(
+        self,
+        symbol: str,
+        action: str,
+        currency: str,
+        amount: Optional[str] = None,
+        units: Optional[str] = None,
+        dividend_option: Optional[int] = None,
+        fund_source: Optional[int] = None,
+        account_channel: Optional[str] = None,
+    ) -> FundOrderValidation:
+        """
+        Validate a fund order before submitting
+
+        Args:
+            symbol: Fund symbol
+            action: Action (buy/sell)
+            currency: Currency
+            amount: Amount (for amount-based orders)
+            units: Units (for unit-based orders)
+            dividend_option: Dividend option
+            fund_source: Fund source
+            account_channel: Account channel
+
+        Returns:
+            Fund order validation result
+        """
+
+    def submit_order(
+        self,
+        symbol: str,
+        action: str,
+        currency: str,
+        amount: Optional[str] = None,
+        units: Optional[str] = None,
+        dividend_option: Optional[int] = None,
+        fee: Optional[str] = None,
+        is_sell_all: Optional[bool] = None,
+        remark: Optional[str] = None,
+        trade_method: Optional[int] = None,
+    ) -> FundOrderSubmitResponse:
+        """
+        Submit a fund order (buy / sell)
+
+        Args:
+            symbol: Fund symbol
+            action: Action (buy/sell)
+            currency: Currency
+            amount: Amount (for amount-based orders)
+            units: Units (for unit-based orders)
+            dividend_option: Dividend option
+            fee: Fee
+            is_sell_all: Whether to sell all
+            remark: Remark
+            trade_method: Trade method
+
+        Returns:
+            Fund order submit result
+        """
+
+    def cancel_order(self, order_id: int) -> None:
+        """
+        Cancel (withdraw) a fund order
+
+        Args:
+            order_id: Order id
+        """
+
 class AsyncTradeContext:
     """
     Async trade context for use with asyncio. Create via `AsyncTradeContext.create(config)` and await inside asyncio.

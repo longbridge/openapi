@@ -3830,3 +3830,623 @@ impl crate::types::IntoJValue for longbridge::agent::ConversationStreamEvent {
         }
     }
 }
+
+// ── Fund (mutual fund) types ───────────────────────────────────────
+
+impl_java_class!(
+    "com/longbridge/fund/FundNavValue",
+    longbridge::fund::FundNavValue,
+    [
+        change,
+        change_percent,
+        change_percent_format,
+        counter_id,
+        counter_name,
+        currency,
+        date_format,
+        isin,
+        last_update_time,
+        value,
+        value_format
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPerformancePoint",
+    longbridge::fund::FundPerformancePoint,
+    [date, last_done]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/HotFund",
+    longbridge::fund::HotFund,
+    [
+        asset_class,
+        asset_class_name,
+        counter_id,
+        currency,
+        earning_rate,
+        #[java(objarray)]
+        fund_performances,
+        name,
+        purchase_amount,
+        recommendation_text,
+        risk_level,
+        risk_level_name,
+        time_interval
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundBrief",
+    longbridge::fund::FundBrief,
+    [
+        asset_class,
+        asset_class_name,
+        code,
+        counter_id,
+        currency,
+        description,
+        earning_rate,
+        holding,
+        isin,
+        name,
+        product,
+        purchase_amount,
+        recommendation_text,
+        risk_level,
+        risk_level_name,
+        time_interval,
+        unit_value
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundFilters",
+    longbridge::fund::FundFilters,
+    [
+        #[java(objarray)]
+        asset_class,
+        #[java(objarray)]
+        company,
+        #[java(objarray)]
+        currency,
+        #[java(objarray)]
+        industry_category_name,
+        #[java(objarray)]
+        risk_level
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAssetAllocationItem",
+    longbridge::fund::FundAssetAllocationItem,
+    [code, counter_id, name, position_ratio]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAssetAllocation",
+    longbridge::fund::FundAssetAllocation,
+    [
+        asset_type,
+        #[java(objarray)]
+        lists,
+        report_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDetail",
+    longbridge::fund::FundDetail,
+    [
+        additional_purchase_amount,
+        affirm_day,
+        amount_affirm_day,
+        asset_allocation,
+        asset_class,
+        asset_class_name,
+        bill_purchase_rate,
+        channel,
+        close_period,
+        code,
+        currency,
+        cut_off_time,
+        derivatives,
+        done_day,
+        excess_return_fee,
+        gst_rate,
+        introduce,
+        is_cash_plus,
+        is_complex,
+        is_new_cash_plus,
+        is_yinghebao,
+        isin,
+        manage_rate,
+        manager,
+        min_hold_cash,
+        min_hold_share,
+        min_sell_share,
+        month_raise_day,
+        name,
+        nav_deadline,
+        no_load,
+        open_date,
+        open_period,
+        product,
+        product_information_locals,
+        profile,
+        purchasable,
+        purchase_affirm_day,
+        purchase_amount,
+        purchase_rate,
+        rating,
+        redeemable,
+        redemption_advance_day,
+        redemption_amount,
+        redemption_close_period_shows,
+        redemption_done_day,
+        redemption_open_day_shows,
+        risk_level,
+        risk_level_name,
+        verify_status,
+        virtual_currency,
+        year_to_date_yield,
+        ytd_yield_type
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAnalysis",
+    longbridge::fund::FundAnalysis,
+    [
+        actual_period,
+        cost_level,
+        return_ability,
+        risk_ability,
+        updated_at,
+        value_for_money,
+        visible
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAnalysisDetail",
+    longbridge::fund::FundAnalysisDetail,
+    [
+        actual_period,
+        #[java(priarray)]
+        available_periods,
+        cost_level,
+        return_ability,
+        risk_ability,
+        updated_at,
+        value_for_money,
+        visible
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundTrendContrast",
+    longbridge::fund::FundTrendContrast,
+    [
+        benchmark_name,
+        #[java(objarray)]
+        performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundTrend",
+    longbridge::fund::FundTrend,
+    [
+        actual_period,
+        #[java(priarray)]
+        available_periods,
+        #[java(objarray)]
+        category_average_performances,
+        contrast_performances,
+        #[java(objarray)]
+        fund_performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundNamedContrast",
+    longbridge::fund::FundNamedContrast,
+    [
+        name,
+        #[java(objarray)]
+        performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPerformanceComparison",
+    longbridge::fund::FundPerformanceComparison,
+    [
+        #[java(objarray)]
+        contrast_performances,
+        #[java(objarray)]
+        fund_performances
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundAnnualReturn",
+    longbridge::fund::FundAnnualReturn,
+    [change_percent, year]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundQuarterlyReturn",
+    longbridge::fund::FundQuarterlyReturn,
+    [change_percent, quarter, year]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPerformance",
+    longbridge::fund::FundPerformance,
+    [
+        annualized_return_five,
+        annualized_return_one,
+        annualized_return_ten,
+        annualized_return_three,
+        annualized_return_two,
+        counter_id,
+        fund_name,
+        performance_rank_five_years,
+        performance_rank_one_day,
+        performance_rank_one_month,
+        performance_rank_one_week,
+        performance_rank_one_year,
+        performance_rank_six_months,
+        performance_rank_ten_years,
+        performance_rank_three_months,
+        performance_rank_three_years,
+        performance_rank_two_years,
+        performance_rank_ytd,
+        performance_return_five_years,
+        performance_return_one_day,
+        performance_return_one_month,
+        performance_return_one_week,
+        performance_return_one_year,
+        performance_return_six_months,
+        performance_return_ten_years,
+        performance_return_three_months,
+        performance_return_three_years,
+        performance_return_two_years,
+        performance_return_ytd,
+        performance_total_five_years,
+        performance_total_one_day,
+        performance_total_one_month,
+        performance_total_one_week,
+        performance_total_one_year,
+        performance_total_six_months,
+        performance_total_ten_years,
+        performance_total_three_months,
+        performance_total_three_years,
+        performance_total_two_years,
+        performance_total_ytd,
+        seven_days_annualized,
+        ten_thousand_price,
+        update_time
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundHolding",
+    longbridge::fund::FundHolding,
+    [
+        bond_type,
+        bond_type_name,
+        country_name,
+        holding_type,
+        industry_name,
+        market_value,
+        maturity_date,
+        name,
+        share_change,
+        share_change_percent,
+        shares,
+        weighting
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundHoldings",
+    longbridge::fund::FundHoldings,
+    [
+        #[java(objarray)]
+        holdings,
+        report_date,
+        weighting
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundStockHolding",
+    longbridge::fund::FundStockHolding,
+    [
+        code,
+        counter_id,
+        currency,
+        name,
+        position_ratio,
+        report_date
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPosition",
+    longbridge::fund::FundPosition,
+    [
+        amount,
+        counter_id,
+        currency,
+        freeze_units,
+        holding_profit,
+        holding_units,
+        name,
+        recent_profit,
+        recent_trading_day,
+        sum_recent_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositions",
+    longbridge::fund::FundPositions,
+    [
+        account_channel,
+        #[java(objarray)]
+        list,
+        pending_buy_orders,
+        recent_trading_day,
+        sold_pending_credit_orders
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDatedValue",
+    longbridge::fund::FundDatedValue,
+    [date, value]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundUnitValue",
+    longbridge::fund::FundUnitValue,
+    [date, day_increase_rate, total_value, unit_value]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionDetailValues",
+    longbridge::fund::FundPositionDetailValues,
+    [
+        amount,
+        currency,
+        holding_cost,
+        holding_profit,
+        holding_profit_rate,
+        holding_units,
+        holding_value,
+        pending_buy_value,
+        pending_sell_value,
+        profit_amount_accum_td,
+        profit_amount_accum_td_rate,
+        recent_profit,
+        recent_tradingday,
+        recent_unit_value,
+        sold_pending_confirm_units
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionDetail",
+    longbridge::fund::FundPositionDetail,
+    [
+        detail_values,
+        #[java(objarray)]
+        sum_profit,
+        #[java(objarray)]
+        ut_value
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionPerformance",
+    longbridge::fund::FundPositionPerformance,
+    [
+        annualized_return_five,
+        annualized_return_one,
+        annualized_return_ten,
+        annualized_return_three,
+        annualized_return_two,
+        counter_id,
+        fund_name,
+        performance_return_five_years,
+        performance_return_one_day,
+        performance_return_one_month,
+        performance_return_one_week,
+        performance_return_one_year,
+        performance_return_six_months,
+        performance_return_ten_years,
+        performance_return_three_months,
+        performance_return_three_years,
+        performance_return_two_years,
+        performance_return_ytd,
+        update_time
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionProfits",
+    longbridge::fund::FundPositionProfits,
+    [
+        currency,
+        #[java(objarray)]
+        history_value,
+        last_update_time,
+        sum_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundPositionNav",
+    longbridge::fund::FundPositionNav,
+    [
+        change,
+        change_percent,
+        counter_id,
+        counter_name,
+        last_update_time,
+        value
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDividend",
+    longbridge::fund::FundDividend,
+    [amount, counter_id, currency, date, div_method, name]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundDividends",
+    longbridge::fund::FundDividends,
+    [
+        currency,
+        #[java(objarray)]
+        div_cash_infos,
+        lastest_date,
+        total_div_cash
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrder",
+    longbridge::fund::FundOrder,
+    [
+        action,
+        amount,
+        counter_id,
+        created_at,
+        currency,
+        fund_name,
+        id,
+        is_auto,
+        net_worth,
+        product_type,
+        state,
+        state_desc,
+        units
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderKeyword",
+    longbridge::fund::FundOrderKeyword,
+    [content, group, key, line_strategy, title]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderStage",
+    longbridge::fund::FundOrderStage,
+    [desc, key, link, link_text, progress, stage]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderInfo",
+    longbridge::fund::FundOrderInfo,
+    [
+        aaid,
+        account_channel,
+        action,
+        amount,
+        channel,
+        counter_id,
+        created_at,
+        currency,
+        dividend_option,
+        eq_at,
+        fee,
+        fund_name,
+        fund_source,
+        histories,
+        id,
+        message,
+        net_worth,
+        price_at,
+        processed_at,
+        product_type,
+        repurchaseable,
+        sale_proceeds,
+        sales_charge,
+        sales_price,
+        sales_unit,
+        state,
+        state_desc,
+        status,
+        status_ex,
+        t_description,
+        time_partition,
+        total_amount,
+        transaction_at,
+        units,
+        withdraw_at,
+        withdrawable
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderDetail",
+    longbridge::fund::FundOrderDetail,
+    [
+        #[java(objarray)]
+        keywords,
+        order,
+        #[java(objarray)]
+        stages
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundTransaction",
+    longbridge::fund::FundTransaction,
+    [
+        amount,
+        category,
+        created_at,
+        currency,
+        description,
+        detail_created_at,
+        detail_type,
+        done_at,
+        quantity_description,
+        redirect_page,
+        redirect_page_v2,
+        ref_no,
+        stock_quantity,
+        tx_type,
+        type_name
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderValidation",
+    longbridge::fund::FundOrderValidation,
+    [
+        auth_token,
+        eval_address,
+        fund_risk_level,
+        msg,
+        user_pi,
+        user_risk_level
+    ]
+);
+
+impl_java_class!(
+    "com/longbridge/fund/FundOrderSubmitResponse",
+    longbridge::fund::FundOrderSubmitResponse,
+    [
+        action, amount, counter_id, created_at, fund_name, id, msg, status, units
+    ]
+);

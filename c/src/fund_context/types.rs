@@ -1620,7 +1620,7 @@ impl ToFFI for CFundStockHoldingOwned {
 
 /// A single fund position held by the user.
 #[repr(C)]
-pub struct CFundPosition {
+pub struct CFundPositionItem {
     /// Holding amount
     pub amount: *const c_char,
     /// Fund counter id
@@ -1644,7 +1644,7 @@ pub struct CFundPosition {
 }
 
 #[derive(Debug)]
-pub(crate) struct CFundPositionOwned {
+pub(crate) struct CFundPositionItemOwned {
     amount: CString,
     counter_id: CString,
     currency: CString,
@@ -1657,9 +1657,9 @@ pub(crate) struct CFundPositionOwned {
     sum_recent_profit: CString,
 }
 
-impl From<FundPosition> for CFundPositionOwned {
+impl From<FundPosition> for CFundPositionItemOwned {
     fn from(p: FundPosition) -> Self {
-        CFundPositionOwned {
+        CFundPositionItemOwned {
             amount: p.amount.into(),
             counter_id: p.counter_id.into(),
             currency: p.currency.into(),
@@ -1674,11 +1674,11 @@ impl From<FundPosition> for CFundPositionOwned {
     }
 }
 
-impl ToFFI for CFundPositionOwned {
-    type FFIType = CFundPosition;
+impl ToFFI for CFundPositionItemOwned {
+    type FFIType = CFundPositionItem;
 
     fn to_ffi_type(&self) -> Self::FFIType {
-        CFundPosition {
+        CFundPositionItem {
             amount: self.amount.to_ffi_type(),
             counter_id: self.counter_id.to_ffi_type(),
             currency: self.currency.to_ffi_type(),
@@ -1699,7 +1699,7 @@ pub struct CFundPositions {
     /// Account channel
     pub account_channel: *const c_char,
     /// Position entries
-    pub list: *const CFundPosition,
+    pub list: *const CFundPositionItem,
     /// Number of position entries
     pub num_list: usize,
     /// Pending buy orders amount
@@ -1713,7 +1713,7 @@ pub struct CFundPositions {
 #[derive(Debug)]
 pub(crate) struct CFundPositionsOwned {
     account_channel: CString,
-    list: CVec<CFundPositionOwned>,
+    list: CVec<CFundPositionItemOwned>,
     pending_buy_orders: CString,
     recent_trading_day: i64,
     sold_pending_credit_orders: CString,
@@ -3054,7 +3054,7 @@ pub struct CGetFundStockHoldingsOptions {
 /// Options for the fund positions overview request.
 #[derive(Debug)]
 #[repr(C)]
-pub struct CGetFundPositionsOptions {
+pub struct CFundPositionsOptions {
     /// Account channel (can be null)
     pub account_channel: *const c_char,
     /// Account id (can be null)

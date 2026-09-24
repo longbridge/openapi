@@ -1,6 +1,7 @@
 #pragma once
 
 #include "longbridge.h"
+#include "fund_ffi.hpp"
 #include "types.hpp"
 #include "portfolio_context.hpp"
 #include <algorithm>
@@ -135,6 +136,47 @@ using longbridge::grid::GridTriggerHistoryResponse;
 using longbridge::trade::PushGridOrderChanged;
 using longbridge::grid::SubmitGridOrderResponse;
 using longbridge::grid::TriggerOrder;
+using longbridge::fund::FundAnalysis;
+using longbridge::fund::FundAnalysisDetail;
+using longbridge::fund::FundAnnualReturn;
+using longbridge::fund::FundAssetAllocation;
+using longbridge::fund::FundAssetAllocationItem;
+using longbridge::fund::FundBrief;
+using longbridge::fund::FundDatedValue;
+using longbridge::fund::FundDetail;
+using longbridge::fund::FundDividend;
+using longbridge::fund::FundDividends;
+using longbridge::fund::FundFilters;
+using longbridge::fund::FundHolding;
+using longbridge::fund::FundHoldings;
+using longbridge::fund::FundNamedContrast;
+using longbridge::fund::FundNavValue;
+using longbridge::fund::FundOrder;
+using longbridge::fund::FundOrderDetail;
+using longbridge::fund::FundOrderInfo;
+using longbridge::fund::FundOrderKeyword;
+using longbridge::fund::FundOrderStage;
+using longbridge::fund::FundOrderSubmitResponse;
+using longbridge::fund::FundOrderValidation;
+using longbridge::fund::FundPerformance;
+using longbridge::fund::FundPerformanceComparison;
+using longbridge::fund::FundPerformancePoint;
+// NB: `FundPosition` is intentionally NOT imported here — it collides with
+// `longbridge::trade::FundPosition`. The fund converters qualify it as
+// `fund::FundPosition`.
+using longbridge::fund::FundPositionDetail;
+using longbridge::fund::FundPositionDetailValues;
+using longbridge::fund::FundPositionNav;
+using longbridge::fund::FundPositionPerformance;
+using longbridge::fund::FundPositionProfits;
+using longbridge::fund::FundPositions;
+using longbridge::fund::FundQuarterlyReturn;
+using longbridge::fund::FundStockHolding;
+using longbridge::fund::FundTransaction;
+using longbridge::fund::FundTrend;
+using longbridge::fund::FundTrendContrast;
+using longbridge::fund::FundUnitValue;
+using longbridge::fund::HotFund;
 using longbridge::quote::FilingItem;
 using longbridge::content::OwnedTopic;
 using longbridge::content::NewsItem;
@@ -3993,6 +4035,740 @@ inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event
       throw std::invalid_argument("unreachable");
   }
   return event;
+}
+
+// ── fund converters ──────────────────────────────────────────────────────────
+
+/// Convert a C array of JSON-encoded C strings to a vector of raw JSON strings.
+inline std::vector<std::string>
+convert_fund_json_list(const char* const* items, uintptr_t count)
+{
+  std::vector<std::string> out;
+  out.reserve(count);
+  for (uintptr_t i = 0; i < count; i++) {
+    out.emplace_back(items[i]);
+  }
+  return out;
+}
+
+inline FundPerformancePoint
+convert(const fund::ffi::CFundPerformancePoint* p)
+{
+  return FundPerformancePoint{
+    p->date,
+    p->last_done,
+  };
+}
+
+inline FundNavValue
+convert(const fund::ffi::CFundNavValue* v)
+{
+  return FundNavValue{
+    v->change,
+    v->change_percent,
+    v->change_percent_format,
+    v->counter_id,
+    v->counter_name,
+    v->currency,
+    v->date_format,
+    v->isin,
+    v->last_update_time,
+    v->value,
+    v->value_format,
+  };
+}
+
+inline HotFund
+convert(const fund::ffi::CHotFund* f)
+{
+  std::vector<FundPerformancePoint> fund_performances;
+  std::transform(f->fund_performances,
+                 f->fund_performances + f->num_fund_performances,
+                 std::back_inserter(fund_performances),
+                 [](auto& item) { return convert(&item); });
+
+  return HotFund{
+    f->asset_class,
+    f->asset_class_name,
+    f->counter_id,
+    f->currency,
+    f->earning_rate,
+    fund_performances,
+    f->name,
+    f->purchase_amount,
+    f->recommendation_text,
+    f->risk_level,
+    f->risk_level_name,
+    f->time_interval,
+  };
+}
+
+inline FundBrief
+convert(const fund::ffi::CFundBrief* f)
+{
+  return FundBrief{
+    f->asset_class,
+    f->asset_class_name,
+    f->code,
+    f->counter_id,
+    f->currency,
+    f->description,
+    f->earning_rate,
+    f->holding,
+    f->isin,
+    f->name,
+    f->product,
+    f->purchase_amount,
+    f->recommendation_text,
+    f->risk_level,
+    f->risk_level_name,
+    f->time_interval,
+    f->unit_value,
+  };
+}
+
+inline FundFilters
+convert(const fund::ffi::CFundFilters* f)
+{
+  return FundFilters{
+    convert_fund_json_list(f->asset_class, f->num_asset_class),
+    convert_fund_json_list(f->company, f->num_company),
+    convert_fund_json_list(f->currency, f->num_currency),
+    convert_fund_json_list(f->industry_category_name,
+                           f->num_industry_category_name),
+    convert_fund_json_list(f->risk_level, f->num_risk_level),
+  };
+}
+
+inline FundAssetAllocationItem
+convert(const fund::ffi::CFundAssetAllocationItem* i)
+{
+  return FundAssetAllocationItem{
+    i->code,
+    i->counter_id,
+    i->name,
+    i->position_ratio,
+  };
+}
+
+inline FundAssetAllocation
+convert(const fund::ffi::CFundAssetAllocation* a)
+{
+  std::vector<FundAssetAllocationItem> lists;
+  std::transform(a->lists,
+                 a->lists + a->num_lists,
+                 std::back_inserter(lists),
+                 [](auto& item) { return convert(&item); });
+
+  return FundAssetAllocation{
+    a->asset_type,
+    lists,
+    a->report_date,
+  };
+}
+
+inline FundDetail
+convert(const fund::ffi::CFundDetail* d)
+{
+  return FundDetail{
+    d->additional_purchase_amount,
+    d->affirm_day,
+    d->amount_affirm_day,
+    convert(&d->asset_allocation),
+    d->asset_class,
+    d->asset_class_name,
+    d->bill_purchase_rate,
+    d->channel,
+    d->close_period,
+    d->code,
+    d->currency,
+    d->cut_off_time,
+    d->derivatives,
+    d->done_day,
+    d->excess_return_fee,
+    d->gst_rate,
+    d->introduce,
+    d->is_cash_plus,
+    d->is_complex,
+    d->is_new_cash_plus,
+    d->is_yinghebao,
+    d->isin,
+    d->manage_rate,
+    d->manager,
+    d->min_hold_cash,
+    d->min_hold_share,
+    d->min_sell_share,
+    d->month_raise_day,
+    d->name,
+    d->nav_deadline,
+    d->no_load,
+    d->open_date,
+    d->open_period,
+    d->product,
+    d->product_information_locals,
+    d->profile,
+    d->purchasable,
+    d->purchase_affirm_day,
+    d->purchase_amount,
+    d->purchase_rate,
+    d->rating,
+    d->redeemable,
+    d->redemption_advance_day,
+    d->redemption_amount,
+    d->redemption_close_period_shows,
+    d->redemption_done_day,
+    d->redemption_open_day_shows,
+    d->risk_level,
+    d->risk_level_name,
+    d->verify_status,
+    d->virtual_currency,
+    d->year_to_date_yield,
+    d->ytd_yield_type,
+  };
+}
+
+inline FundAnalysis
+convert(const fund::ffi::CFundAnalysis* a)
+{
+  return FundAnalysis{
+    a->actual_period,
+    a->cost_level,
+    a->return_ability,
+    a->risk_ability,
+    a->updated_at,
+    a->value_for_money,
+    a->visible,
+  };
+}
+
+inline FundAnalysisDetail
+convert(const fund::ffi::CFundAnalysisDetail* a)
+{
+  std::vector<int32_t> available_periods(
+    a->available_periods, a->available_periods + a->num_available_periods);
+
+  return FundAnalysisDetail{
+    a->actual_period,
+    available_periods,
+    a->cost_level,
+    a->return_ability,
+    a->risk_ability,
+    a->updated_at,
+    a->value_for_money,
+    a->visible,
+  };
+}
+
+inline FundTrendContrast
+convert(const fund::ffi::CFundTrendContrast* c)
+{
+  return FundTrendContrast{
+    c->benchmark_name,
+    convert_fund_json_list(c->performances, c->num_performances),
+  };
+}
+
+inline FundTrend
+convert(const fund::ffi::CFundTrend* t)
+{
+  std::vector<int32_t> available_periods(
+    t->available_periods, t->available_periods + t->num_available_periods);
+
+  return FundTrend{
+    t->actual_period,
+    available_periods,
+    convert_fund_json_list(t->category_average_performances,
+                           t->num_category_average_performances),
+    convert(&t->contrast_performances),
+    convert_fund_json_list(t->fund_performances, t->num_fund_performances),
+  };
+}
+
+inline FundNamedContrast
+convert(const fund::ffi::CFundNamedContrast* c)
+{
+  return FundNamedContrast{
+    c->name,
+    convert_fund_json_list(c->performances, c->num_performances),
+  };
+}
+
+inline FundPerformanceComparison
+convert(const fund::ffi::CFundPerformanceComparison* c)
+{
+  std::vector<FundNamedContrast> contrast_performances;
+  std::transform(c->contrast_performances,
+                 c->contrast_performances + c->num_contrast_performances,
+                 std::back_inserter(contrast_performances),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPerformanceComparison{
+    contrast_performances,
+    convert_fund_json_list(c->fund_performances, c->num_fund_performances),
+  };
+}
+
+inline FundAnnualReturn
+convert(const fund::ffi::CFundAnnualReturn* r)
+{
+  return FundAnnualReturn{
+    r->change_percent,
+    r->year,
+  };
+}
+
+inline FundQuarterlyReturn
+convert(const fund::ffi::CFundQuarterlyReturn* r)
+{
+  return FundQuarterlyReturn{
+    r->change_percent,
+    r->quarter,
+    r->year,
+  };
+}
+
+inline FundPerformance
+convert(const fund::ffi::CFundPerformance* p)
+{
+  return FundPerformance{
+    p->annualized_return_five,
+    p->annualized_return_one,
+    p->annualized_return_ten,
+    p->annualized_return_three,
+    p->annualized_return_two,
+    p->counter_id,
+    p->fund_name,
+    p->performance_rank_five_years,
+    p->performance_rank_one_day,
+    p->performance_rank_one_month,
+    p->performance_rank_one_week,
+    p->performance_rank_one_year,
+    p->performance_rank_six_months,
+    p->performance_rank_ten_years,
+    p->performance_rank_three_months,
+    p->performance_rank_three_years,
+    p->performance_rank_two_years,
+    p->performance_rank_ytd,
+    p->performance_return_five_years,
+    p->performance_return_one_day,
+    p->performance_return_one_month,
+    p->performance_return_one_week,
+    p->performance_return_one_year,
+    p->performance_return_six_months,
+    p->performance_return_ten_years,
+    p->performance_return_three_months,
+    p->performance_return_three_years,
+    p->performance_return_two_years,
+    p->performance_return_ytd,
+    p->performance_total_five_years,
+    p->performance_total_one_day,
+    p->performance_total_one_month,
+    p->performance_total_one_week,
+    p->performance_total_one_year,
+    p->performance_total_six_months,
+    p->performance_total_ten_years,
+    p->performance_total_three_months,
+    p->performance_total_three_years,
+    p->performance_total_two_years,
+    p->performance_total_ytd,
+    p->seven_days_annualized,
+    p->ten_thousand_price,
+    p->update_time,
+  };
+}
+
+inline FundHolding
+convert(const fund::ffi::CFundHolding* h)
+{
+  return FundHolding{
+    h->bond_type,
+    h->bond_type_name,
+    h->country_name,
+    h->holding_type,
+    h->industry_name,
+    h->market_value,
+    h->maturity_date,
+    h->name,
+    h->share_change,
+    h->share_change_percent,
+    h->shares,
+    h->weighting,
+  };
+}
+
+inline FundHoldings
+convert(const fund::ffi::CFundHoldings* h)
+{
+  std::vector<FundHolding> holdings;
+  std::transform(h->holdings,
+                 h->holdings + h->num_holdings,
+                 std::back_inserter(holdings),
+                 [](auto& item) { return convert(&item); });
+
+  return FundHoldings{
+    holdings,
+    h->report_date,
+    h->weighting,
+  };
+}
+
+inline FundStockHolding
+convert(const fund::ffi::CFundStockHolding* h)
+{
+  return FundStockHolding{
+    h->code,
+    h->counter_id,
+    h->currency,
+    h->name,
+    h->position_ratio,
+    h->report_date,
+  };
+}
+
+inline fund::FundPosition
+convert(const fund::ffi::CFundPosition* p)
+{
+  return fund::FundPosition{
+    p->amount,
+    p->counter_id,
+    p->currency,
+    p->freeze_units,
+    p->holding_profit,
+    p->holding_units,
+    p->name,
+    p->recent_profit,
+    p->recent_trading_day,
+    p->sum_recent_profit,
+  };
+}
+
+inline FundPositions
+convert(const fund::ffi::CFundPositions* p)
+{
+  std::vector<fund::FundPosition> list;
+  std::transform(p->list,
+                 p->list + p->num_list,
+                 std::back_inserter(list),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPositions{
+    p->account_channel,
+    list,
+    p->pending_buy_orders,
+    p->recent_trading_day,
+    p->sold_pending_credit_orders,
+  };
+}
+
+inline FundDatedValue
+convert(const fund::ffi::CFundDatedValue* v)
+{
+  return FundDatedValue{
+    v->date,
+    v->value,
+  };
+}
+
+inline FundUnitValue
+convert(const fund::ffi::CFundUnitValue* v)
+{
+  return FundUnitValue{
+    v->date,
+    v->day_increase_rate,
+    v->total_value,
+    v->unit_value,
+  };
+}
+
+inline FundPositionDetailValues
+convert(const fund::ffi::CFundPositionDetailValues* v)
+{
+  return FundPositionDetailValues{
+    v->amount,
+    v->currency,
+    v->holding_cost,
+    v->holding_profit,
+    v->holding_profit_rate,
+    v->holding_units,
+    v->holding_value,
+    v->pending_buy_value,
+    v->pending_sell_value,
+    v->profit_amount_accum_td,
+    v->profit_amount_accum_td_rate,
+    v->recent_profit,
+    v->recent_tradingday,
+    v->recent_unit_value,
+    v->sold_pending_confirm_units,
+  };
+}
+
+inline FundPositionDetail
+convert(const fund::ffi::CFundPositionDetail* d)
+{
+  std::vector<FundDatedValue> sum_profit;
+  std::transform(d->sum_profit,
+                 d->sum_profit + d->num_sum_profit,
+                 std::back_inserter(sum_profit),
+                 [](auto& item) { return convert(&item); });
+
+  std::vector<FundUnitValue> ut_value;
+  std::transform(d->ut_value,
+                 d->ut_value + d->num_ut_value,
+                 std::back_inserter(ut_value),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPositionDetail{
+    convert(&d->detail_values),
+    sum_profit,
+    ut_value,
+  };
+}
+
+inline FundPositionPerformance
+convert(const fund::ffi::CFundPositionPerformance* p)
+{
+  return FundPositionPerformance{
+    p->annualized_return_five,
+    p->annualized_return_one,
+    p->annualized_return_ten,
+    p->annualized_return_three,
+    p->annualized_return_two,
+    p->counter_id,
+    p->fund_name,
+    p->performance_return_five_years,
+    p->performance_return_one_day,
+    p->performance_return_one_month,
+    p->performance_return_one_week,
+    p->performance_return_one_year,
+    p->performance_return_six_months,
+    p->performance_return_ten_years,
+    p->performance_return_three_months,
+    p->performance_return_three_years,
+    p->performance_return_two_years,
+    p->performance_return_ytd,
+    p->update_time,
+  };
+}
+
+inline FundPositionProfits
+convert(const fund::ffi::CFundPositionProfits* p)
+{
+  std::vector<FundDatedValue> history_value;
+  std::transform(p->history_value,
+                 p->history_value + p->num_history_value,
+                 std::back_inserter(history_value),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPositionProfits{
+    p->currency,
+    history_value,
+    p->last_update_time,
+    p->sum_profit,
+  };
+}
+
+inline FundPositionNav
+convert(const fund::ffi::CFundPositionNav* v)
+{
+  return FundPositionNav{
+    v->change,
+    v->change_percent,
+    v->counter_id,
+    v->counter_name,
+    v->last_update_time,
+    v->value,
+  };
+}
+
+inline FundDividend
+convert(const fund::ffi::CFundDividend* d)
+{
+  return FundDividend{
+    d->amount,
+    d->counter_id,
+    d->currency,
+    d->date,
+    d->div_method,
+    d->name,
+  };
+}
+
+inline FundDividends
+convert(const fund::ffi::CFundDividends* d)
+{
+  std::vector<FundDividend> div_cash_infos;
+  std::transform(d->div_cash_infos,
+                 d->div_cash_infos + d->num_div_cash_infos,
+                 std::back_inserter(div_cash_infos),
+                 [](auto& item) { return convert(&item); });
+
+  return FundDividends{
+    d->currency,
+    div_cash_infos,
+    d->lastest_date,
+    d->total_div_cash,
+  };
+}
+
+inline FundOrder
+convert(const fund::ffi::CFundOrder* o)
+{
+  return FundOrder{
+    o->action,
+    o->amount,
+    o->counter_id,
+    o->created_at,
+    o->currency,
+    o->fund_name,
+    o->id,
+    o->is_auto,
+    o->net_worth,
+    o->product_type,
+    o->state,
+    o->state_desc,
+    o->units,
+  };
+}
+
+inline FundOrderKeyword
+convert(const fund::ffi::CFundOrderKeyword* k)
+{
+  return FundOrderKeyword{
+    k->content,
+    k->group,
+    k->key,
+    k->line_strategy,
+    k->title,
+  };
+}
+
+inline FundOrderStage
+convert(const fund::ffi::CFundOrderStage* s)
+{
+  return FundOrderStage{
+    s->desc,
+    s->key,
+    s->link,
+    s->link_text,
+    s->progress,
+    s->stage,
+  };
+}
+
+inline FundOrderInfo
+convert(const fund::ffi::CFundOrderInfo* o)
+{
+  return FundOrderInfo{
+    o->aaid,
+    o->account_channel,
+    o->action,
+    o->amount,
+    o->channel,
+    o->counter_id,
+    o->created_at,
+    o->currency,
+    o->dividend_option,
+    o->eq_at,
+    o->fee,
+    o->fund_name,
+    o->fund_source,
+    o->histories,
+    o->id,
+    o->message,
+    o->net_worth,
+    o->price_at,
+    o->processed_at,
+    o->product_type,
+    o->repurchaseable,
+    o->sale_proceeds,
+    o->sales_charge,
+    o->sales_price,
+    o->sales_unit,
+    o->state,
+    o->state_desc,
+    o->status,
+    o->status_ex,
+    o->t_description,
+    o->time_partition,
+    o->total_amount,
+    o->transaction_at,
+    o->units,
+    o->withdraw_at,
+    o->withdrawable,
+  };
+}
+
+inline FundOrderDetail
+convert(const fund::ffi::CFundOrderDetail* d)
+{
+  std::vector<FundOrderKeyword> keywords;
+  std::transform(d->keywords,
+                 d->keywords + d->num_keywords,
+                 std::back_inserter(keywords),
+                 [](auto& item) { return convert(&item); });
+
+  std::vector<FundOrderStage> stages;
+  std::transform(d->stages,
+                 d->stages + d->num_stages,
+                 std::back_inserter(stages),
+                 [](auto& item) { return convert(&item); });
+
+  return FundOrderDetail{
+    keywords,
+    convert(&d->order),
+    stages,
+  };
+}
+
+inline FundTransaction
+convert(const fund::ffi::CFundTransaction* t)
+{
+  return FundTransaction{
+    t->amount,
+    t->category,
+    t->created_at,
+    t->currency,
+    t->description,
+    t->detail_created_at,
+    t->detail_type,
+    t->done_at,
+    t->quantity_description,
+    t->redirect_page,
+    t->redirect_page_v2,
+    t->ref_no,
+    t->stock_quantity,
+    t->tx_type,
+    t->type_name,
+  };
+}
+
+inline FundOrderValidation
+convert(const fund::ffi::CFundOrderValidation* v)
+{
+  return FundOrderValidation{
+    v->auth_token,
+    v->eval_address,
+    v->fund_risk_level,
+    v->msg,
+    v->user_pi,
+    v->user_risk_level,
+  };
+}
+
+inline FundOrderSubmitResponse
+convert(const fund::ffi::CFundOrderSubmitResponse* r)
+{
+  return FundOrderSubmitResponse{
+    r->action,
+    r->amount,
+    r->counter_id,
+    r->created_at,
+    r->fund_name,
+    r->id,
+    r->msg,
+    r->status,
+    r->units,
+  };
 }
 
 } // namespace convert

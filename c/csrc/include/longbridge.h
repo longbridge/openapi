@@ -3326,7 +3326,7 @@ typedef struct CGetFundStockHoldingsOptions {
 /**
  * Options for the fund positions overview request.
  */
-typedef struct lb_get_fund_positions_options_t {
+typedef struct lb_fund_positions_options_t {
   /**
    * Account channel (can be null)
    */
@@ -3335,7 +3335,7 @@ typedef struct lb_get_fund_positions_options_t {
    * Account id (can be null)
    */
   const int64_t *aaid;
-} lb_get_fund_positions_options_t;
+} lb_fund_positions_options_t;
 
 /**
  * Options for a single fund position detail request.
@@ -4896,6 +4896,20 @@ typedef struct lb_get_cash_flow_options_t {
 } lb_get_cash_flow_options_t;
 
 /**
+ * Options for get fund positions request
+ */
+typedef struct lb_get_fund_positions_options_t {
+  /**
+   * Fund symbols (can be null)
+   */
+  const char *const *symbols;
+  /**
+   * Number of fund symbols
+   */
+  uintptr_t num_symbols;
+} lb_get_fund_positions_options_t;
+
+/**
  * Options for get stock positions request
  */
 typedef struct lb_get_stock_positions_options_t {
@@ -6056,49 +6070,37 @@ typedef struct lb_cash_flow_t {
 } lb_cash_flow_t;
 
 /**
- * A single fund position held by the user.
+ * Fund position
  */
 typedef struct lb_fund_position_t {
   /**
-   * Holding amount
+   * Fund ISIN code
    */
-  const char *amount;
+  const char *symbol;
   /**
-   * Fund counter id
+   * Current equity
    */
-  const char *counter_id;
+  const struct lb_decimal_t *current_net_asset_value;
+  /**
+   * Current equity time
+   */
+  int64_t net_asset_value_day;
+  /**
+   * Fund name
+   */
+  const char *symbol_name;
   /**
    * Currency
    */
   const char *currency;
   /**
-   * Frozen units
+   * Net cost
    */
-  const char *freeze_units;
-  /**
-   * Holding profit
-   */
-  const char *holding_profit;
+  const struct lb_decimal_t *cost_net_asset_value;
   /**
    * Holding units
    */
-  const char *holding_units;
-  /**
-   * Fund name
-   */
-  const char *name;
-  /**
-   * Recent profit
-   */
-  const char *recent_profit;
-  /**
-   * Recent trading day (unix seconds)
-   */
-  int64_t recent_trading_day;
-  /**
-   * Accumulated recent profit
-   */
-  const char *sum_recent_profit;
+  const struct lb_decimal_t *holding_units;
 } lb_fund_position_t;
 
 /**
@@ -13026,7 +13028,7 @@ void lb_fund_context_stock_holdings(const struct CFundContext *ctx,
  * @param[in] opts Options for the positions request (can be null)
  */
 void lb_fund_context_positions(const struct CFundContext *ctx,
-                               const struct lb_get_fund_positions_options_t *opts,
+                               const struct lb_fund_positions_options_t *opts,
                                lb_async_callback_t callback,
                                void *userdata);
 

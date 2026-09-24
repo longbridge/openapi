@@ -95,6 +95,7 @@ cpp_compat = true
 "CChargeCategoryCode" = "lb_charge_category_code_t"
 "CGetCashFlowOptions" = "lb_get_cash_flow_options_t"
 "CGetFundPositionsOptions" = "lb_get_fund_positions_options_t"
+"CFundPositionsOptions" = "lb_fund_positions_options_t"
 "CFundPositionsResponse" = "lb_fund_position_response_t"
 "CFundPositionChannel" = "lb_fund_position_channel_t"
 "CFundPosition" = "lb_fund_position_t"
