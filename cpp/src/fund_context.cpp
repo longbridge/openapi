@@ -155,18 +155,18 @@ FundContext::filters(AsyncCallback<FundContext, FundFilters> callback) const
 }
 
 void
-FundContext::detail(const std::string& symbol,
+FundContext::detail(const std::string& counter_id,
                     AsyncCallback<FundContext, FundDetail> callback) const
 {
   lb_fund_context_detail(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     FUND_OBJ_CALLBACK(CFundDetail, FundDetail),
     new AsyncCallback<FundContext, FundDetail>(callback));
 }
 
 void
-FundContext::analysis(const std::string& symbol,
+FundContext::analysis(const std::string& counter_id,
                       const std::optional<GetFundAnalysisOptions>& opts,
                       AsyncCallback<FundContext, FundAnalysis> callback) const
 {
@@ -176,7 +176,7 @@ FundContext::analysis(const std::string& symbol,
 
   lb_fund_context_analysis(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundAnalysis, FundAnalysis),
     new AsyncCallback<FundContext, FundAnalysis>(callback));
@@ -184,7 +184,7 @@ FundContext::analysis(const std::string& symbol,
 
 void
 FundContext::analysis_detail(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<GetFundAnalysisOptions>& opts,
   AsyncCallback<FundContext, FundAnalysisDetail> callback) const
 {
@@ -194,14 +194,14 @@ FundContext::analysis_detail(
 
   lb_fund_context_analysis_detail(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundAnalysisDetail, FundAnalysisDetail),
     new AsyncCallback<FundContext, FundAnalysisDetail>(callback));
 }
 
 void
-FundContext::trend(const std::string& symbol,
+FundContext::trend(const std::string& counter_id,
                    const std::optional<GetFundAnalysisOptions>& opts,
                    AsyncCallback<FundContext, FundTrend> callback) const
 {
@@ -211,7 +211,7 @@ FundContext::trend(const std::string& symbol,
 
   lb_fund_context_trend(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundTrend, FundTrend),
     new AsyncCallback<FundContext, FundTrend>(callback));
@@ -219,7 +219,7 @@ FundContext::trend(const std::string& symbol,
 
 void
 FundContext::annual_returns(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<FundPageOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundAnnualReturn>> callback) const
 {
@@ -231,7 +231,7 @@ FundContext::annual_returns(
 
   lb_fund_context_annual_returns(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_VEC_CALLBACK(CFundAnnualReturn, FundAnnualReturn),
     new AsyncCallback<FundContext, std::vector<FundAnnualReturn>>(callback));
@@ -239,7 +239,7 @@ FundContext::annual_returns(
 
 void
 FundContext::quarterly_returns(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<FundPageOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundQuarterlyReturn>> callback) const
 {
@@ -251,7 +251,7 @@ FundContext::quarterly_returns(
 
   lb_fund_context_quarterly_returns(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_VEC_CALLBACK(CFundQuarterlyReturn, FundQuarterlyReturn),
     new AsyncCallback<FundContext, std::vector<FundQuarterlyReturn>>(callback));
@@ -259,19 +259,19 @@ FundContext::quarterly_returns(
 
 void
 FundContext::performance(
-  const std::string& symbol,
+  const std::string& counter_id,
   AsyncCallback<FundContext, std::vector<FundPerformance>> callback) const
 {
   lb_fund_context_performance(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     FUND_VEC_CALLBACK(CFundPerformance, FundPerformance),
     new AsyncCallback<FundContext, std::vector<FundPerformance>>(callback));
 }
 
 void
 FundContext::performance_comparison(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<GetFundAnalysisOptions>& opts,
   AsyncCallback<FundContext, FundPerformanceComparison> callback) const
 {
@@ -281,7 +281,7 @@ FundContext::performance_comparison(
 
   lb_fund_context_performance_comparison(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundPerformanceComparison, FundPerformanceComparison),
     new AsyncCallback<FundContext, FundPerformanceComparison>(callback));
@@ -289,19 +289,19 @@ FundContext::performance_comparison(
 
 void
 FundContext::nav(
-  const std::string& symbol,
+  const std::string& counter_id,
   AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const
 {
   lb_fund_context_nav(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     FUND_VEC_CALLBACK(CFundNavValue, FundNavValue),
     new AsyncCallback<FundContext, std::vector<FundNavValue>>(callback));
 }
 
 void
 FundContext::nav_history(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<FundPageOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const
 {
@@ -313,7 +313,7 @@ FundContext::nav_history(
 
   lb_fund_context_nav_history(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_VEC_CALLBACK(CFundNavValue, FundNavValue),
     new AsyncCallback<FundContext, std::vector<FundNavValue>>(callback));
@@ -321,7 +321,7 @@ FundContext::nav_history(
 
 void
 FundContext::nav_range(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<FundNavRangeOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const
 {
@@ -334,14 +334,14 @@ FundContext::nav_range(
 
   lb_fund_context_nav_range(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_VEC_CALLBACK(CFundNavValue, FundNavValue),
     new AsyncCallback<FundContext, std::vector<FundNavValue>>(callback));
 }
 
 void
-FundContext::holdings(const std::string& symbol,
+FundContext::holdings(const std::string& counter_id,
                       const std::optional<GetFundHoldingsOptions>& opts,
                       AsyncCallback<FundContext, FundHoldings> callback) const
 {
@@ -351,7 +351,7 @@ FundContext::holdings(const std::string& symbol,
 
   lb_fund_context_holdings(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundHoldings, FundHoldings),
     new AsyncCallback<FundContext, FundHoldings>(callback));
@@ -359,7 +359,7 @@ FundContext::holdings(const std::string& symbol,
 
 void
 FundContext::stock_holdings(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<GetFundStockHoldingsOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundStockHolding>> callback) const
 {
@@ -369,7 +369,7 @@ FundContext::stock_holdings(
 
   lb_fund_context_stock_holdings(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_VEC_CALLBACK(CFundStockHolding, FundStockHolding),
     new AsyncCallback<FundContext, std::vector<FundStockHolding>>(callback));
@@ -395,7 +395,7 @@ FundContext::positions(const std::optional<GetFundPositionsOptions>& opts,
 
 void
 FundContext::position(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<GetFundPositionOptions>& opts,
   AsyncCallback<FundContext, FundPositionDetail> callback) const
 {
@@ -410,7 +410,7 @@ FundContext::position(
 
   lb_fund_context_position(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundPositionDetail, FundPositionDetail),
     new AsyncCallback<FundContext, FundPositionDetail>(callback));
@@ -418,13 +418,13 @@ FundContext::position(
 
 void
 FundContext::position_performance(
-  const std::string& symbol,
+  const std::string& counter_id,
   AsyncCallback<FundContext, std::vector<FundPositionPerformance>> callback)
   const
 {
   lb_fund_context_position_performance(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     FUND_VEC_CALLBACK(CFundPositionPerformance, FundPositionPerformance),
     new AsyncCallback<FundContext, std::vector<FundPositionPerformance>>(
       callback));
@@ -432,7 +432,7 @@ FundContext::position_performance(
 
 void
 FundContext::position_profits(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<GetFundPositionProfitsOptions>& opts,
   AsyncCallback<FundContext, FundPositionProfits> callback) const
 {
@@ -451,7 +451,7 @@ FundContext::position_profits(
 
   lb_fund_context_position_profits(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundPositionProfits, FundPositionProfits),
     new AsyncCallback<FundContext, FundPositionProfits>(callback));
@@ -459,7 +459,7 @@ FundContext::position_profits(
 
 void
 FundContext::position_nav(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<FundNavRangeOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundPositionNav>> callback) const
 {
@@ -472,7 +472,7 @@ FundContext::position_nav(
 
   lb_fund_context_position_nav(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_VEC_CALLBACK(CFundPositionNav, FundPositionNav),
     new AsyncCallback<FundContext, std::vector<FundPositionNav>>(callback));
@@ -480,7 +480,7 @@ FundContext::position_nav(
 
 void
 FundContext::position_dividends(
-  const std::string& symbol,
+  const std::string& counter_id,
   const std::optional<GetFundPositionDividendsOptions>& opts,
   AsyncCallback<FundContext, FundDividends> callback) const
 {
@@ -500,7 +500,7 @@ FundContext::position_dividends(
 
   lb_fund_context_position_dividends(
     ctx_,
-    symbol.c_str(),
+    counter_id.c_str(),
     &opts2,
     FUND_OBJ_CALLBACK(CFundDividends, FundDividends),
     new AsyncCallback<FundContext, FundDividends>(callback));

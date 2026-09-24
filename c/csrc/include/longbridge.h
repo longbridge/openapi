@@ -14710,7 +14710,7 @@ void lb_fund_context_filters(const struct CFundContext *ctx,
  * Get fund detail
  */
 void lb_fund_context_detail(const struct CFundContext *ctx,
-                            const char *symbol,
+                            const char *counter_id,
                             lb_async_callback_t callback,
                             void *userdata);
 
@@ -14720,7 +14720,7 @@ void lb_fund_context_detail(const struct CFundContext *ctx,
  * @param[in] opts Options for the analysis request (can be null)
  */
 void lb_fund_context_analysis(const struct CFundContext *ctx,
-                              const char *symbol,
+                              const char *counter_id,
                               const struct CGetFundAnalysisOptions *opts,
                               lb_async_callback_t callback,
                               void *userdata);
@@ -14731,7 +14731,7 @@ void lb_fund_context_analysis(const struct CFundContext *ctx,
  * @param[in] opts Options for the analysis request (can be null)
  */
 void lb_fund_context_analysis_detail(const struct CFundContext *ctx,
-                                     const char *symbol,
+                                     const char *counter_id,
                                      const struct CGetFundAnalysisOptions *opts,
                                      lb_async_callback_t callback,
                                      void *userdata);
@@ -14742,7 +14742,7 @@ void lb_fund_context_analysis_detail(const struct CFundContext *ctx,
  * @param[in] opts Options for the trend request (can be null)
  */
 void lb_fund_context_trend(const struct CFundContext *ctx,
-                           const char *symbol,
+                           const char *counter_id,
                            const struct CGetFundAnalysisOptions *opts,
                            lb_async_callback_t callback,
                            void *userdata);
@@ -14753,7 +14753,7 @@ void lb_fund_context_trend(const struct CFundContext *ctx,
  * @param[in] opts Paging options (can be null)
  */
 void lb_fund_context_annual_returns(const struct CFundContext *ctx,
-                                    const char *symbol,
+                                    const char *counter_id,
                                     const struct CFundPageOptions *opts,
                                     lb_async_callback_t callback,
                                     void *userdata);
@@ -14764,7 +14764,7 @@ void lb_fund_context_annual_returns(const struct CFundContext *ctx,
  * @param[in] opts Paging options (can be null)
  */
 void lb_fund_context_quarterly_returns(const struct CFundContext *ctx,
-                                       const char *symbol,
+                                       const char *counter_id,
                                        const struct CFundPageOptions *opts,
                                        lb_async_callback_t callback,
                                        void *userdata);
@@ -14773,7 +14773,7 @@ void lb_fund_context_quarterly_returns(const struct CFundContext *ctx,
  * Get fund performance figures
  */
 void lb_fund_context_performance(const struct CFundContext *ctx,
-                                 const char *symbol,
+                                 const char *counter_id,
                                  lb_async_callback_t callback,
                                  void *userdata);
 
@@ -14783,7 +14783,7 @@ void lb_fund_context_performance(const struct CFundContext *ctx,
  * @param[in] opts Options for the comparison request (can be null)
  */
 void lb_fund_context_performance_comparison(const struct CFundContext *ctx,
-                                            const char *symbol,
+                                            const char *counter_id,
                                             const struct CGetFundAnalysisOptions *opts,
                                             lb_async_callback_t callback,
                                             void *userdata);
@@ -14792,7 +14792,7 @@ void lb_fund_context_performance_comparison(const struct CFundContext *ctx,
  * Get fund latest net value
  */
 void lb_fund_context_nav(const struct CFundContext *ctx,
-                         const char *symbol,
+                         const char *counter_id,
                          lb_async_callback_t callback,
                          void *userdata);
 
@@ -14802,7 +14802,7 @@ void lb_fund_context_nav(const struct CFundContext *ctx,
  * @param[in] opts Paging options (can be null)
  */
 void lb_fund_context_nav_history(const struct CFundContext *ctx,
-                                 const char *symbol,
+                                 const char *counter_id,
                                  const struct CFundPageOptions *opts,
                                  lb_async_callback_t callback,
                                  void *userdata);
@@ -14813,7 +14813,7 @@ void lb_fund_context_nav_history(const struct CFundContext *ctx,
  * @param[in] opts Net-value range options (can be null)
  */
 void lb_fund_context_nav_range(const struct CFundContext *ctx,
-                               const char *symbol,
+                               const char *counter_id,
                                const struct CFundNavRangeOptions *opts,
                                lb_async_callback_t callback,
                                void *userdata);
@@ -14824,7 +14824,7 @@ void lb_fund_context_nav_range(const struct CFundContext *ctx,
  * @param[in] opts Options for the holdings request (can be null)
  */
 void lb_fund_context_holdings(const struct CFundContext *ctx,
-                              const char *symbol,
+                              const char *counter_id,
                               const struct CGetFundHoldingsOptions *opts,
                               lb_async_callback_t callback,
                               void *userdata);
@@ -14835,7 +14835,7 @@ void lb_fund_context_holdings(const struct CFundContext *ctx,
  * @param[in] opts Options for the stock-holdings request (can be null)
  */
 void lb_fund_context_stock_holdings(const struct CFundContext *ctx,
-                                    const char *symbol,
+                                    const char *counter_id,
                                     const struct CGetFundStockHoldingsOptions *opts,
                                     lb_async_callback_t callback,
                                     void *userdata);
@@ -14856,7 +14856,7 @@ void lb_fund_context_positions(const struct CFundContext *ctx,
  * @param[in] opts Options for the position request (can be null)
  */
 void lb_fund_context_position(const struct CFundContext *ctx,
-                              const char *symbol,
+                              const char *counter_id,
                               const struct CGetFundPositionOptions *opts,
                               lb_async_callback_t callback,
                               void *userdata);
@@ -14865,7 +14865,7 @@ void lb_fund_context_position(const struct CFundContext *ctx,
  * Get the performance figures of a held fund
  */
 void lb_fund_context_position_performance(const struct CFundContext *ctx,
-                                          const char *symbol,
+                                          const char *counter_id,
                                           lb_async_callback_t callback,
                                           void *userdata);
 
@@ -14875,7 +14875,7 @@ void lb_fund_context_position_performance(const struct CFundContext *ctx,
  * @param[in] opts Options for the profits request (can be null)
  */
 void lb_fund_context_position_profits(const struct CFundContext *ctx,
-                                      const char *symbol,
+                                      const char *counter_id,
                                       const struct CGetFundPositionProfitsOptions *opts,
                                       lb_async_callback_t callback,
                                       void *userdata);
@@ -14886,7 +14886,7 @@ void lb_fund_context_position_profits(const struct CFundContext *ctx,
  * @param[in] opts Net-value range options (can be null)
  */
 void lb_fund_context_position_nav(const struct CFundContext *ctx,
-                                  const char *symbol,
+                                  const char *counter_id,
                                   const struct CFundNavRangeOptions *opts,
                                   lb_async_callback_t callback,
                                   void *userdata);
@@ -14897,7 +14897,7 @@ void lb_fund_context_position_nav(const struct CFundContext *ctx,
  * @param[in] opts Options for the dividends request (can be null)
  */
 void lb_fund_context_position_dividends(const struct CFundContext *ctx,
-                                        const char *symbol,
+                                        const char *counter_id,
                                         const struct CGetFundPositionDividendsOptions *opts,
                                         lb_async_callback_t callback,
                                         void *userdata);

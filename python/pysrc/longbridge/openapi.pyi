@@ -10785,23 +10785,23 @@ class FundContext:
             Fund list filter options
         """
 
-    def detail(self, symbol: str) -> FundDetail:
+    def detail(self, counter_id: str) -> FundDetail:
         """
         Get fund detail
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
 
         Returns:
             Fund detail
         """
 
-    def analysis(self, symbol: str, period: Optional[int] = None) -> FundAnalysis:
+    def analysis(self, counter_id: str, period: Optional[int] = None) -> FundAnalysis:
         """
         Get fund analysis (level 1)
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             period: Analysis period
 
         Returns:
@@ -10809,25 +10809,25 @@ class FundContext:
         """
 
     def analysis_detail(
-        self, symbol: str, period: Optional[int] = None
+        self, counter_id: str, period: Optional[int] = None
     ) -> FundAnalysisDetail:
         """
         Get fund analysis detail (level 2)
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             period: Analysis period
 
         Returns:
             Fund analysis detail
         """
 
-    def trend(self, symbol: str, period: Optional[int] = None) -> FundTrend:
+    def trend(self, counter_id: str, period: Optional[int] = None) -> FundTrend:
         """
         Get fund trend chart
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             period: Analysis period
 
         Returns:
@@ -10835,13 +10835,13 @@ class FundContext:
         """
 
     def annual_returns(
-        self, symbol: str, page: Optional[int] = None, size: Optional[int] = None
+        self, counter_id: str, page: Optional[int] = None, size: Optional[int] = None
     ) -> List[FundAnnualReturn]:
         """
         Get fund annual returns
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             page: Page number
             size: Page size
 
@@ -10850,13 +10850,13 @@ class FundContext:
         """
 
     def quarterly_returns(
-        self, symbol: str, page: Optional[int] = None, size: Optional[int] = None
+        self, counter_id: str, page: Optional[int] = None, size: Optional[int] = None
     ) -> List[FundQuarterlyReturn]:
         """
         Get fund quarterly returns
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             page: Page number
             size: Page size
 
@@ -10864,50 +10864,50 @@ class FundContext:
             Fund quarterly returns
         """
 
-    def performance(self, symbol: str) -> List[FundPerformance]:
+    def performance(self, counter_id: str) -> List[FundPerformance]:
         """
         Get fund performance figures
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
 
         Returns:
             Fund performance figures
         """
 
     def performance_comparison(
-        self, symbol: str, period: Optional[int] = None
+        self, counter_id: str, period: Optional[int] = None
     ) -> FundPerformanceComparison:
         """
         Get fund performance comparison
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             period: Analysis period
 
         Returns:
             Fund performance comparison
         """
 
-    def nav(self, symbol: str) -> List[FundNavValue]:
+    def nav(self, counter_id: str) -> List[FundNavValue]:
         """
         Get fund latest net value
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
 
         Returns:
             Fund latest net value
         """
 
     def nav_history(
-        self, symbol: str, page: Optional[int] = None, size: Optional[int] = None
+        self, counter_id: str, page: Optional[int] = None, size: Optional[int] = None
     ) -> List[FundNavValue]:
         """
         Get fund historical net value (paged)
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             page: Page number
             size: Page size
 
@@ -10917,7 +10917,7 @@ class FundContext:
 
     def nav_range(
         self,
-        symbol: str,
+        counter_id: str,
         month_before: Optional[int] = None,
         year_before: Optional[int] = None,
     ) -> List[FundNavValue]:
@@ -10925,7 +10925,7 @@ class FundContext:
         Get fund historical net value by relative time range
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             month_before: Number of months before now
             year_before: Number of years before now
 
@@ -10933,12 +10933,12 @@ class FundContext:
             Fund historical net value
         """
 
-    def holdings(self, symbol: str, scene: Optional[int] = None) -> FundHoldings:
+    def holdings(self, counter_id: str, scene: Optional[int] = None) -> FundHoldings:
         """
         Get a fund's top-10 holdings
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             scene: Scene
 
         Returns:
@@ -10946,13 +10946,13 @@ class FundContext:
         """
 
     def stock_holdings(
-        self, symbol: str, limit: Optional[int] = None
+        self, counter_id: str, limit: Optional[int] = None
     ) -> List[FundStockHolding]:
         """
         Get the stocks held by a fund (reverse lookup)
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             limit: Maximum number of stocks to return
 
         Returns:
@@ -10975,7 +10975,7 @@ class FundContext:
 
     def position(
         self,
-        symbol: str,
+        counter_id: str,
         account_channel: Optional[str] = None,
         aaid: Optional[int] = None,
         start: Optional[str] = None,
@@ -10985,7 +10985,7 @@ class FundContext:
         Get the user's single fund position detail
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             account_channel: Account channel
             aaid: Account id
             start: Range start
@@ -10995,12 +10995,12 @@ class FundContext:
             Fund position detail
         """
 
-    def position_performance(self, symbol: str) -> List[FundPositionPerformance]:
+    def position_performance(self, counter_id: str) -> List[FundPositionPerformance]:
         """
         Get the performance figures of a held fund
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
 
         Returns:
             Performance figures of the held fund
@@ -11008,7 +11008,7 @@ class FundContext:
 
     def position_profits(
         self,
-        symbol: str,
+        counter_id: str,
         account_channel: Optional[str] = None,
         aaid: Optional[int] = None,
         start: Optional[str] = None,
@@ -11020,7 +11020,7 @@ class FundContext:
         Get the cumulative-profit series of a held fund
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             account_channel: Account channel
             aaid: Account id
             start: Range start
@@ -11034,7 +11034,7 @@ class FundContext:
 
     def position_nav(
         self,
-        symbol: str,
+        counter_id: str,
         month_before: Optional[int] = None,
         year_before: Optional[int] = None,
     ) -> List[FundPositionNav]:
@@ -11042,7 +11042,7 @@ class FundContext:
         Get the net-value history of a held fund
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             month_before: Number of months before now
             year_before: Number of years before now
 
@@ -11052,7 +11052,7 @@ class FundContext:
 
     def position_dividends(
         self,
-        symbol: str,
+        counter_id: str,
         account_channel: Optional[str] = None,
         aaid: Optional[int] = None,
         currency: Optional[str] = None,
@@ -11065,7 +11065,7 @@ class FundContext:
         Get the dividend records of a held fund
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             account_channel: Account channel
             aaid: Account id
             currency: Currency

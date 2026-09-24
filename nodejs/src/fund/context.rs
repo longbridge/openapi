@@ -79,9 +79,9 @@ impl FundContext {
 
     /// Get fund detail.
     #[napi]
-    pub async fn detail(&self, symbol: String) -> Result<FundDetail> {
+    pub async fn detail(&self, counter_id: String) -> Result<FundDetail> {
         self.ctx
-            .detail(symbol)
+            .detail(counter_id)
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -91,11 +91,11 @@ impl FundContext {
     #[napi]
     pub async fn analysis(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundAnalysisOptions>,
     ) -> Result<FundAnalysis> {
         self.ctx
-            .analysis(symbol, opts.map(Into::into))
+            .analysis(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -105,11 +105,11 @@ impl FundContext {
     #[napi]
     pub async fn analysis_detail(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundAnalysisOptions>,
     ) -> Result<FundAnalysisDetail> {
         self.ctx
-            .analysis_detail(symbol, opts.map(Into::into))
+            .analysis_detail(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -119,11 +119,11 @@ impl FundContext {
     #[napi]
     pub async fn trend(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundAnalysisOptions>,
     ) -> Result<FundTrend> {
         self.ctx
-            .trend(symbol, opts.map(Into::into))
+            .trend(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -133,11 +133,11 @@ impl FundContext {
     #[napi]
     pub async fn annual_returns(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<FundPageOptions>,
     ) -> Result<Vec<FundAnnualReturn>> {
         self.ctx
-            .annual_returns(symbol, opts.map(Into::into))
+            .annual_returns(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -149,11 +149,11 @@ impl FundContext {
     #[napi]
     pub async fn quarterly_returns(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<FundPageOptions>,
     ) -> Result<Vec<FundQuarterlyReturn>> {
         self.ctx
-            .quarterly_returns(symbol, opts.map(Into::into))
+            .quarterly_returns(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -163,9 +163,9 @@ impl FundContext {
 
     /// Get fund performance figures.
     #[napi]
-    pub async fn performance(&self, symbol: String) -> Result<Vec<FundPerformance>> {
+    pub async fn performance(&self, counter_id: String) -> Result<Vec<FundPerformance>> {
         self.ctx
-            .performance(symbol)
+            .performance(counter_id)
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -177,11 +177,11 @@ impl FundContext {
     #[napi]
     pub async fn performance_comparison(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundAnalysisOptions>,
     ) -> Result<FundPerformanceComparison> {
         self.ctx
-            .performance_comparison(symbol, opts.map(Into::into))
+            .performance_comparison(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -189,9 +189,9 @@ impl FundContext {
 
     /// Get fund latest net value.
     #[napi]
-    pub async fn nav(&self, symbol: String) -> Result<Vec<FundNavValue>> {
+    pub async fn nav(&self, counter_id: String) -> Result<Vec<FundNavValue>> {
         self.ctx
-            .nav(symbol)
+            .nav(counter_id)
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -203,11 +203,11 @@ impl FundContext {
     #[napi]
     pub async fn nav_history(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<FundPageOptions>,
     ) -> Result<Vec<FundNavValue>> {
         self.ctx
-            .nav_history(symbol, opts.map(Into::into))
+            .nav_history(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -219,11 +219,11 @@ impl FundContext {
     #[napi]
     pub async fn nav_range(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<FundNavRangeOptions>,
     ) -> Result<Vec<FundNavValue>> {
         self.ctx
-            .nav_range(symbol, opts.map(Into::into))
+            .nav_range(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -235,11 +235,11 @@ impl FundContext {
     #[napi]
     pub async fn holdings(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundHoldingsOptions>,
     ) -> Result<FundHoldings> {
         self.ctx
-            .holdings(symbol, opts.map(Into::into))
+            .holdings(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -249,11 +249,11 @@ impl FundContext {
     #[napi]
     pub async fn stock_holdings(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundStockHoldingsOptions>,
     ) -> Result<Vec<FundStockHolding>> {
         self.ctx
-            .stock_holdings(symbol, opts.map(Into::into))
+            .stock_holdings(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -277,11 +277,11 @@ impl FundContext {
     #[napi]
     pub async fn position(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundPositionOptions>,
     ) -> Result<FundPositionDetail> {
         self.ctx
-            .position(symbol, opts.map(Into::into))
+            .position(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -291,10 +291,10 @@ impl FundContext {
     #[napi]
     pub async fn position_performance(
         &self,
-        symbol: String,
+        counter_id: String,
     ) -> Result<Vec<FundPositionPerformance>> {
         self.ctx
-            .position_performance(symbol)
+            .position_performance(counter_id)
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -306,11 +306,11 @@ impl FundContext {
     #[napi]
     pub async fn position_profits(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundPositionProfitsOptions>,
     ) -> Result<FundPositionProfits> {
         self.ctx
-            .position_profits(symbol, opts.map(Into::into))
+            .position_profits(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()
@@ -320,11 +320,11 @@ impl FundContext {
     #[napi]
     pub async fn position_nav(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<FundNavRangeOptions>,
     ) -> Result<Vec<FundPositionNav>> {
         self.ctx
-            .position_nav(symbol, opts.map(Into::into))
+            .position_nav(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .into_iter()
@@ -336,11 +336,11 @@ impl FundContext {
     #[napi]
     pub async fn position_dividends(
         &self,
-        symbol: String,
+        counter_id: String,
         opts: Option<GetFundPositionDividendsOptions>,
     ) -> Result<FundDividends> {
         self.ctx
-            .position_dividends(symbol, opts.map(Into::into))
+            .position_dividends(counter_id, opts.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .try_into()

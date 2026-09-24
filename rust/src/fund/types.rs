@@ -9,6 +9,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::serde_utils;
+
 /// A fund net-asset-value data point (latest / historical).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
@@ -30,6 +32,7 @@ pub struct FundNavValue {
     /// ISIN
     pub isin: String,
     /// Last update time (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub last_update_time: i64,
     /// Net value
     pub value: String,
@@ -470,6 +473,7 @@ pub struct FundPerformance {
     /// Ten thousand price
     pub ten_thousand_price: String,
     /// Update time (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub update_time: i64,
 }
 
@@ -554,6 +558,7 @@ pub struct FundPosition {
     /// Recent profit
     pub recent_profit: String,
     /// Recent trading day (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub recent_trading_day: i64,
     /// Accumulated recent profit
     pub sum_recent_profit: String,
@@ -570,6 +575,7 @@ pub struct FundPositions {
     /// Pending buy orders amount
     pub pending_buy_orders: String,
     /// Recent trading day (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub recent_trading_day: i64,
     /// Sold pending credit orders amount
     pub sold_pending_credit_orders: String,
@@ -580,6 +586,7 @@ pub struct FundPositions {
 #[serde(default)]
 pub struct FundDatedValue {
     /// Date (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub date: i64,
     /// Value
     pub value: String,
@@ -590,6 +597,7 @@ pub struct FundDatedValue {
 #[serde(default)]
 pub struct FundUnitValue {
     /// Date (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub date: i64,
     /// Day increase rate
     pub day_increase_rate: String,
@@ -628,6 +636,7 @@ pub struct FundPositionDetailValues {
     /// Recent profit
     pub recent_profit: String,
     /// Recent trading day (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub recent_tradingday: i64,
     /// Recent unit value
     pub recent_unit_value: String,
@@ -688,6 +697,7 @@ pub struct FundPositionPerformance {
     /// Return (ytd)
     pub performance_return_ytd: String,
     /// Update time (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub update_time: i64,
 }
 
@@ -700,6 +710,7 @@ pub struct FundPositionProfits {
     /// Profit series
     pub history_value: Vec<FundDatedValue>,
     /// Last update time (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub last_update_time: i64,
     /// Total profit
     pub sum_profit: String,
@@ -718,6 +729,7 @@ pub struct FundPositionNav {
     /// Fund name
     pub counter_name: String,
     /// Last update time (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub last_update_time: i64,
     /// Net value
     pub value: String,
@@ -734,6 +746,7 @@ pub struct FundDividend {
     /// Currency
     pub currency: String,
     /// Date (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub date: i64,
     /// Dividend method
     pub div_method: String,
@@ -750,6 +763,7 @@ pub struct FundDividends {
     /// Dividend records
     pub div_cash_infos: Vec<FundDividend>,
     /// Latest dividend date (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub lastest_date: i64,
     /// Total cash dividend
     pub total_div_cash: String,
@@ -766,12 +780,14 @@ pub struct FundOrder {
     /// Fund counter id
     pub counter_id: String,
     /// Created at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub created_at: i64,
     /// Currency
     pub currency: String,
     /// Fund name
     pub fund_name: String,
     /// Order id
+    #[serde(with = "serde_utils::int64_str")]
     pub id: i64,
     /// Whether it is an auto (DCA) order
     pub is_auto: bool,
@@ -826,6 +842,7 @@ pub struct FundOrderStage {
 #[serde(default)]
 pub struct FundOrderInfo {
     /// Account id
+    #[serde(with = "serde_utils::int64_str")]
     pub aaid: i64,
     /// Account channel
     pub account_channel: String,
@@ -838,12 +855,14 @@ pub struct FundOrderInfo {
     /// Fund counter id
     pub counter_id: String,
     /// Created at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub created_at: i64,
     /// Currency
     pub currency: String,
     /// Dividend option
     pub dividend_option: String,
     /// Equity time (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub eq_at: i64,
     /// Fee
     pub fee: String,
@@ -854,14 +873,17 @@ pub struct FundOrderInfo {
     /// Histories
     pub histories: String,
     /// Order id
+    #[serde(with = "serde_utils::int64_str")]
     pub id: i64,
     /// Message
     pub message: String,
     /// Net worth
     pub net_worth: String,
     /// Price time (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub price_at: i64,
     /// Processed at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub processed_at: i64,
     /// Product type
     pub product_type: String,
@@ -890,10 +912,12 @@ pub struct FundOrderInfo {
     /// Total amount
     pub total_amount: String,
     /// Transaction at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub transaction_at: i64,
     /// Units
     pub units: String,
     /// Withdraw at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub withdraw_at: i64,
     /// Whether withdrawable
     pub withdrawable: bool,
@@ -920,16 +944,19 @@ pub struct FundTransaction {
     /// Category
     pub category: String,
     /// Created at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub created_at: i64,
     /// Currency
     pub currency: String,
     /// Description
     pub description: String,
     /// Detail created at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub detail_created_at: i64,
     /// Detail type
     pub detail_type: String,
     /// Done at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub done_at: i64,
     /// Quantity description
     pub quantity_description: String,
@@ -976,10 +1003,12 @@ pub struct FundOrderSubmitResponse {
     /// Fund counter id
     pub counter_id: String,
     /// Created at (unix seconds)
+    #[serde(with = "serde_utils::int64_str")]
     pub created_at: i64,
     /// Fund name
     pub fund_name: String,
     /// Order id
+    #[serde(with = "serde_utils::int64_str")]
     pub id: i64,
     /// Message
     pub msg: String,

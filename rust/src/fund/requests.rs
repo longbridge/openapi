@@ -1,9 +1,10 @@
 //! Request option builders for the fund endpoints.
 //!
-//! The fund identifier is exposed as `symbol` (the gateway converts it to the
-//! backend `counter_id`). Path-parameter symbols are passed as separate method
-//! arguments; these option structs only carry query-string / request-body
-//! fields.
+//! The fund identifier is exposed as `counter_id` (e.g. `UT/FD/HK0000384492`).
+//! Because it contains `/` it cannot live in the URL path, so endpoints that
+//! target a single fund take `counter_id` as a separate method argument and
+//! send it as the `counter_id` query parameter; these option structs only carry
+//! the remaining query-string / request-body fields.
 
 use serde::Serialize;
 use serde_json::Value;

@@ -85,60 +85,67 @@ impl FundContext {
     }
 
     /// Get fund detail
-    fn detail(&self, symbol: String) -> PyResult<FundDetail> {
-        self.ctx.detail(symbol).map_err(ErrorNewType)?.try_into()
+    fn detail(&self, counter_id: String) -> PyResult<FundDetail> {
+        self.ctx
+            .detail(counter_id)
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get fund analysis (level 1)
-    #[pyo3(signature = (symbol, period = None))]
-    fn analysis(&self, symbol: String, period: Option<i32>) -> PyResult<FundAnalysis> {
+    #[pyo3(signature = (counter_id, period = None))]
+    fn analysis(&self, counter_id: String, period: Option<i32>) -> PyResult<FundAnalysis> {
         let mut opts = GetFundAnalysisOptions::new();
         if let Some(period) = period {
             opts = opts.period(period);
         }
         self.ctx
-            .analysis(symbol, opts)
+            .analysis(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get fund analysis detail (level 2)
-    #[pyo3(signature = (symbol, period = None))]
-    fn analysis_detail(&self, symbol: String, period: Option<i32>) -> PyResult<FundAnalysisDetail> {
+    #[pyo3(signature = (counter_id, period = None))]
+    fn analysis_detail(
+        &self,
+        counter_id: String,
+        period: Option<i32>,
+    ) -> PyResult<FundAnalysisDetail> {
         let mut opts = GetFundAnalysisOptions::new();
         if let Some(period) = period {
             opts = opts.period(period);
         }
         self.ctx
-            .analysis_detail(symbol, opts)
+            .analysis_detail(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get fund trend chart
-    #[pyo3(signature = (symbol, period = None))]
-    fn trend(&self, symbol: String, period: Option<i32>) -> PyResult<FundTrend> {
+    #[pyo3(signature = (counter_id, period = None))]
+    fn trend(&self, counter_id: String, period: Option<i32>) -> PyResult<FundTrend> {
         let mut opts = GetFundAnalysisOptions::new();
         if let Some(period) = period {
             opts = opts.period(period);
         }
         self.ctx
-            .trend(symbol, opts)
+            .trend(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get fund annual returns
-    #[pyo3(signature = (symbol, page = None, size = None))]
+    #[pyo3(signature = (counter_id, page = None, size = None))]
     fn annual_returns(
         &self,
-        symbol: String,
+        counter_id: String,
         page: Option<i32>,
         size: Option<i32>,
     ) -> PyResult<Vec<FundAnnualReturn>> {
         let opts = build_page_options(page, size);
         self.ctx
-            .annual_returns(symbol, opts)
+            .annual_returns(counter_id, opts)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -146,16 +153,16 @@ impl FundContext {
     }
 
     /// Get fund quarterly returns
-    #[pyo3(signature = (symbol, page = None, size = None))]
+    #[pyo3(signature = (counter_id, page = None, size = None))]
     fn quarterly_returns(
         &self,
-        symbol: String,
+        counter_id: String,
         page: Option<i32>,
         size: Option<i32>,
     ) -> PyResult<Vec<FundQuarterlyReturn>> {
         let opts = build_page_options(page, size);
         self.ctx
-            .quarterly_returns(symbol, opts)
+            .quarterly_returns(counter_id, opts)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -163,9 +170,9 @@ impl FundContext {
     }
 
     /// Get fund performance figures
-    fn performance(&self, symbol: String) -> PyResult<Vec<FundPerformance>> {
+    fn performance(&self, counter_id: String) -> PyResult<Vec<FundPerformance>> {
         self.ctx
-            .performance(symbol)
+            .performance(counter_id)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -173,10 +180,10 @@ impl FundContext {
     }
 
     /// Get fund performance comparison
-    #[pyo3(signature = (symbol, period = None))]
+    #[pyo3(signature = (counter_id, period = None))]
     fn performance_comparison(
         &self,
-        symbol: String,
+        counter_id: String,
         period: Option<i32>,
     ) -> PyResult<FundPerformanceComparison> {
         let mut opts = GetFundAnalysisOptions::new();
@@ -184,15 +191,15 @@ impl FundContext {
             opts = opts.period(period);
         }
         self.ctx
-            .performance_comparison(symbol, opts)
+            .performance_comparison(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get fund latest net value
-    fn nav(&self, symbol: String) -> PyResult<Vec<FundNavValue>> {
+    fn nav(&self, counter_id: String) -> PyResult<Vec<FundNavValue>> {
         self.ctx
-            .nav(symbol)
+            .nav(counter_id)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -200,16 +207,16 @@ impl FundContext {
     }
 
     /// Get fund historical net value (paged)
-    #[pyo3(signature = (symbol, page = None, size = None))]
+    #[pyo3(signature = (counter_id, page = None, size = None))]
     fn nav_history(
         &self,
-        symbol: String,
+        counter_id: String,
         page: Option<i32>,
         size: Option<i32>,
     ) -> PyResult<Vec<FundNavValue>> {
         let opts = build_page_options(page, size);
         self.ctx
-            .nav_history(symbol, opts)
+            .nav_history(counter_id, opts)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -217,16 +224,16 @@ impl FundContext {
     }
 
     /// Get fund historical net value by relative time range
-    #[pyo3(signature = (symbol, month_before = None, year_before = None))]
+    #[pyo3(signature = (counter_id, month_before = None, year_before = None))]
     fn nav_range(
         &self,
-        symbol: String,
+        counter_id: String,
         month_before: Option<i32>,
         year_before: Option<i32>,
     ) -> PyResult<Vec<FundNavValue>> {
         let opts = build_nav_range_options(month_before, year_before);
         self.ctx
-            .nav_range(symbol, opts)
+            .nav_range(counter_id, opts)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -234,23 +241,23 @@ impl FundContext {
     }
 
     /// Get a fund's top-10 holdings
-    #[pyo3(signature = (symbol, scene = None))]
-    fn holdings(&self, symbol: String, scene: Option<i32>) -> PyResult<FundHoldings> {
+    #[pyo3(signature = (counter_id, scene = None))]
+    fn holdings(&self, counter_id: String, scene: Option<i32>) -> PyResult<FundHoldings> {
         let mut opts = GetFundHoldingsOptions::new();
         if let Some(scene) = scene {
             opts = opts.scene(scene);
         }
         self.ctx
-            .holdings(symbol, opts)
+            .holdings(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get the stocks held by a fund (reverse lookup)
-    #[pyo3(signature = (symbol, limit = None))]
+    #[pyo3(signature = (counter_id, limit = None))]
     fn stock_holdings(
         &self,
-        symbol: String,
+        counter_id: String,
         limit: Option<i32>,
     ) -> PyResult<Vec<FundStockHolding>> {
         let mut opts = GetFundStockHoldingsOptions::new();
@@ -258,7 +265,7 @@ impl FundContext {
             opts = opts.limit(limit);
         }
         self.ctx
-            .stock_holdings(symbol, opts)
+            .stock_holdings(counter_id, opts)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -285,10 +292,10 @@ impl FundContext {
     }
 
     /// Get the user's single fund position detail
-    #[pyo3(signature = (symbol, account_channel = None, aaid = None, start = None, end = None))]
+    #[pyo3(signature = (counter_id, account_channel = None, aaid = None, start = None, end = None))]
     fn position(
         &self,
-        symbol: String,
+        counter_id: String,
         account_channel: Option<String>,
         aaid: Option<i64>,
         start: Option<String>,
@@ -308,15 +315,15 @@ impl FundContext {
             opts = opts.end(end);
         }
         self.ctx
-            .position(symbol, opts)
+            .position(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get the performance figures of a held fund
-    fn position_performance(&self, symbol: String) -> PyResult<Vec<FundPositionPerformance>> {
+    fn position_performance(&self, counter_id: String) -> PyResult<Vec<FundPositionPerformance>> {
         self.ctx
-            .position_performance(symbol)
+            .position_performance(counter_id)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -324,11 +331,11 @@ impl FundContext {
     }
 
     /// Get the cumulative-profit series of a held fund
-    #[pyo3(signature = (symbol, account_channel = None, aaid = None, start = None, end = None, page = None, size = None))]
+    #[pyo3(signature = (counter_id, account_channel = None, aaid = None, start = None, end = None, page = None, size = None))]
     #[allow(clippy::too_many_arguments)]
     fn position_profits(
         &self,
-        symbol: String,
+        counter_id: String,
         account_channel: Option<String>,
         aaid: Option<i64>,
         start: Option<String>,
@@ -356,22 +363,22 @@ impl FundContext {
             opts = opts.size(size);
         }
         self.ctx
-            .position_profits(symbol, opts)
+            .position_profits(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }
 
     /// Get the net-value history of a held fund
-    #[pyo3(signature = (symbol, month_before = None, year_before = None))]
+    #[pyo3(signature = (counter_id, month_before = None, year_before = None))]
     fn position_nav(
         &self,
-        symbol: String,
+        counter_id: String,
         month_before: Option<i32>,
         year_before: Option<i32>,
     ) -> PyResult<Vec<FundPositionNav>> {
         let opts = build_nav_range_options(month_before, year_before);
         self.ctx
-            .position_nav(symbol, opts)
+            .position_nav(counter_id, opts)
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)
@@ -379,11 +386,11 @@ impl FundContext {
     }
 
     /// Get the dividend records of a held fund
-    #[pyo3(signature = (symbol, account_channel = None, aaid = None, currency = None, start = None, end = None, page = None, size = None))]
+    #[pyo3(signature = (counter_id, account_channel = None, aaid = None, currency = None, start = None, end = None, page = None, size = None))]
     #[allow(clippy::too_many_arguments)]
     fn position_dividends(
         &self,
-        symbol: String,
+        counter_id: String,
         account_channel: Option<String>,
         aaid: Option<i64>,
         currency: Option<String>,
@@ -415,7 +422,7 @@ impl FundContext {
             opts = opts.size(size);
         }
         self.ctx
-            .position_dividends(symbol, opts)
+            .position_dividends(counter_id, opts)
             .map_err(ErrorNewType)?
             .try_into()
     }

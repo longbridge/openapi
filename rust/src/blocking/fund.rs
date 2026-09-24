@@ -60,124 +60,124 @@ impl FundContextSync {
     }
 
     /// Get fund detail (blocking)
-    pub fn detail(&self, symbol: impl Into<String> + Send + 'static) -> Result<FundDetail> {
+    pub fn detail(&self, counter_id: impl Into<String> + Send + 'static) -> Result<FundDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.detail(symbol).await })
+            .call(move |ctx| async move { ctx.detail(counter_id).await })
     }
 
     /// Get fund analysis (level 1) (blocking)
     pub fn analysis(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundAnalysisOptions>> + Send + 'static,
     ) -> Result<FundAnalysis> {
         self.rt
-            .call(move |ctx| async move { ctx.analysis(symbol, options).await })
+            .call(move |ctx| async move { ctx.analysis(counter_id, options).await })
     }
 
     /// Get fund analysis detail (level 2) (blocking)
     pub fn analysis_detail(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundAnalysisOptions>> + Send + 'static,
     ) -> Result<FundAnalysisDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.analysis_detail(symbol, options).await })
+            .call(move |ctx| async move { ctx.analysis_detail(counter_id, options).await })
     }
 
     /// Get fund trend chart (blocking)
     pub fn trend(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundAnalysisOptions>> + Send + 'static,
     ) -> Result<FundTrend> {
         self.rt
-            .call(move |ctx| async move { ctx.trend(symbol, options).await })
+            .call(move |ctx| async move { ctx.trend(counter_id, options).await })
     }
 
     /// Get fund annual returns (blocking)
     pub fn annual_returns(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<FundPageOptions>> + Send + 'static,
     ) -> Result<Vec<FundAnnualReturn>> {
         self.rt
-            .call(move |ctx| async move { ctx.annual_returns(symbol, options).await })
+            .call(move |ctx| async move { ctx.annual_returns(counter_id, options).await })
     }
 
     /// Get fund quarterly returns (blocking)
     pub fn quarterly_returns(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<FundPageOptions>> + Send + 'static,
     ) -> Result<Vec<FundQuarterlyReturn>> {
         self.rt
-            .call(move |ctx| async move { ctx.quarterly_returns(symbol, options).await })
+            .call(move |ctx| async move { ctx.quarterly_returns(counter_id, options).await })
     }
 
     /// Get fund performance figures (blocking)
     pub fn performance(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
     ) -> Result<Vec<FundPerformance>> {
         self.rt
-            .call(move |ctx| async move { ctx.performance(symbol).await })
+            .call(move |ctx| async move { ctx.performance(counter_id).await })
     }
 
     /// Get fund performance comparison (blocking)
     pub fn performance_comparison(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundAnalysisOptions>> + Send + 'static,
     ) -> Result<FundPerformanceComparison> {
         self.rt
-            .call(move |ctx| async move { ctx.performance_comparison(symbol, options).await })
+            .call(move |ctx| async move { ctx.performance_comparison(counter_id, options).await })
     }
 
     /// Get fund latest net value (blocking)
-    pub fn nav(&self, symbol: impl Into<String> + Send + 'static) -> Result<Vec<FundNavValue>> {
+    pub fn nav(&self, counter_id: impl Into<String> + Send + 'static) -> Result<Vec<FundNavValue>> {
         self.rt
-            .call(move |ctx| async move { ctx.nav(symbol).await })
+            .call(move |ctx| async move { ctx.nav(counter_id).await })
     }
 
     /// Get fund historical net value (paged) (blocking)
     pub fn nav_history(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<FundPageOptions>> + Send + 'static,
     ) -> Result<Vec<FundNavValue>> {
         self.rt
-            .call(move |ctx| async move { ctx.nav_history(symbol, options).await })
+            .call(move |ctx| async move { ctx.nav_history(counter_id, options).await })
     }
 
     /// Get fund historical net value by relative time range (blocking)
     pub fn nav_range(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<FundNavRangeOptions>> + Send + 'static,
     ) -> Result<Vec<FundNavValue>> {
         self.rt
-            .call(move |ctx| async move { ctx.nav_range(symbol, options).await })
+            .call(move |ctx| async move { ctx.nav_range(counter_id, options).await })
     }
 
     /// Get a fund's top-10 holdings (blocking)
     pub fn holdings(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundHoldingsOptions>> + Send + 'static,
     ) -> Result<FundHoldings> {
         self.rt
-            .call(move |ctx| async move { ctx.holdings(symbol, options).await })
+            .call(move |ctx| async move { ctx.holdings(counter_id, options).await })
     }
 
     /// Get the stocks held by a fund (reverse lookup) (blocking)
     pub fn stock_holdings(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundStockHoldingsOptions>> + Send + 'static,
     ) -> Result<Vec<FundStockHolding>> {
         self.rt
-            .call(move |ctx| async move { ctx.stock_holdings(symbol, options).await })
+            .call(move |ctx| async move { ctx.stock_holdings(counter_id, options).await })
     }
 
     /// Get the user's fund positions overview (blocking)
@@ -192,50 +192,50 @@ impl FundContextSync {
     /// Get the user's single fund position detail (blocking)
     pub fn position(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundPositionOptions>> + Send + 'static,
     ) -> Result<FundPositionDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.position(symbol, options).await })
+            .call(move |ctx| async move { ctx.position(counter_id, options).await })
     }
 
     /// Get the performance figures of a held fund (blocking)
     pub fn position_performance(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
     ) -> Result<Vec<FundPositionPerformance>> {
         self.rt
-            .call(move |ctx| async move { ctx.position_performance(symbol).await })
+            .call(move |ctx| async move { ctx.position_performance(counter_id).await })
     }
 
     /// Get the cumulative-profit series of a held fund (blocking)
     pub fn position_profits(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundPositionProfitsOptions>> + Send + 'static,
     ) -> Result<FundPositionProfits> {
         self.rt
-            .call(move |ctx| async move { ctx.position_profits(symbol, options).await })
+            .call(move |ctx| async move { ctx.position_profits(counter_id, options).await })
     }
 
     /// Get the net-value history of a held fund (blocking)
     pub fn position_nav(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<FundNavRangeOptions>> + Send + 'static,
     ) -> Result<Vec<FundPositionNav>> {
         self.rt
-            .call(move |ctx| async move { ctx.position_nav(symbol, options).await })
+            .call(move |ctx| async move { ctx.position_nav(counter_id, options).await })
     }
 
     /// Get the dividend records of a held fund (blocking)
     pub fn position_dividends(
         &self,
-        symbol: impl Into<String> + Send + 'static,
+        counter_id: impl Into<String> + Send + 'static,
         options: impl Into<Option<GetFundPositionDividendsOptions>> + Send + 'static,
     ) -> Result<FundDividends> {
         self.rt
-            .call(move |ctx| async move { ctx.position_dividends(symbol, options).await })
+            .call(move |ctx| async move { ctx.position_dividends(counter_id, options).await })
     }
 
     /// Get the user's fund orders (blocking)

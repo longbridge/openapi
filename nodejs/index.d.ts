@@ -957,43 +957,43 @@ export declare class FundContext {
   /** Get the fund list filter options. */
   filters(): Promise<FundFilters>
   /** Get fund detail. */
-  detail(symbol: string): Promise<FundDetail>
+  detail(counterId: string): Promise<FundDetail>
   /** Get fund analysis (level 1). */
-  analysis(symbol: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysis>
+  analysis(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysis>
   /** Get fund analysis detail (level 2). */
-  analysisDetail(symbol: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysisDetail>
+  analysisDetail(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysisDetail>
   /** Get fund trend chart. */
-  trend(symbol: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundTrend>
+  trend(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundTrend>
   /** Get fund annual returns. */
-  annualReturns(symbol: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundAnnualReturn>>
+  annualReturns(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundAnnualReturn>>
   /** Get fund quarterly returns. */
-  quarterlyReturns(symbol: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundQuarterlyReturn>>
+  quarterlyReturns(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundQuarterlyReturn>>
   /** Get fund performance figures. */
-  performance(symbol: string): Promise<Array<FundPerformance>>
+  performance(counterId: string): Promise<Array<FundPerformance>>
   /** Get fund performance comparison. */
-  performanceComparison(symbol: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundPerformanceComparison>
+  performanceComparison(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundPerformanceComparison>
   /** Get fund latest net value. */
-  nav(symbol: string): Promise<Array<FundNavValue>>
+  nav(counterId: string): Promise<Array<FundNavValue>>
   /** Get fund historical net value (paged). */
-  navHistory(symbol: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundNavValue>>
+  navHistory(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundNavValue>>
   /** Get fund historical net value by relative time range. */
-  navRange(symbol: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundNavValue>>
+  navRange(counterId: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundNavValue>>
   /** Get a fund's top-10 holdings. */
-  holdings(symbol: string, opts?: GetFundHoldingsOptions | undefined | null): Promise<FundHoldings>
+  holdings(counterId: string, opts?: GetFundHoldingsOptions | undefined | null): Promise<FundHoldings>
   /** Get the stocks held by a fund (reverse lookup). */
-  stockHoldings(symbol: string, opts?: GetFundStockHoldingsOptions | undefined | null): Promise<Array<FundStockHolding>>
+  stockHoldings(counterId: string, opts?: GetFundStockHoldingsOptions | undefined | null): Promise<Array<FundStockHolding>>
   /** Get the user's fund positions overview. */
   positions(opts?: GetFundPositionsOptions | undefined | null): Promise<FundPositions>
   /** Get the user's single fund position detail. */
-  position(symbol: string, opts?: GetFundPositionOptions | undefined | null): Promise<FundPositionDetail>
+  position(counterId: string, opts?: GetFundPositionOptions | undefined | null): Promise<FundPositionDetail>
   /** Get the performance figures of a held fund. */
-  positionPerformance(symbol: string): Promise<Array<FundPositionPerformance>>
+  positionPerformance(counterId: string): Promise<Array<FundPositionPerformance>>
   /** Get the cumulative-profit series of a held fund. */
-  positionProfits(symbol: string, opts?: GetFundPositionProfitsOptions | undefined | null): Promise<FundPositionProfits>
+  positionProfits(counterId: string, opts?: GetFundPositionProfitsOptions | undefined | null): Promise<FundPositionProfits>
   /** Get the net-value history of a held fund. */
-  positionNav(symbol: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundPositionNav>>
+  positionNav(counterId: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundPositionNav>>
   /** Get the dividend records of a held fund. */
-  positionDividends(symbol: string, opts?: GetFundPositionDividendsOptions | undefined | null): Promise<FundDividends>
+  positionDividends(counterId: string, opts?: GetFundPositionDividendsOptions | undefined | null): Promise<FundDividends>
   /** Get the user's fund orders (also serves as the trade/execution record). */
   orders(opts?: GetFundOrdersOptions | undefined | null): Promise<Array<FundOrder>>
   /** Get a fund order detail. */

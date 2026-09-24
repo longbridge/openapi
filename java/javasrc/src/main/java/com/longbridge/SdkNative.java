@@ -312,58 +312,58 @@ public class SdkNative {
 
         public static native void fundContextFilters(long context, AsyncCallback callback);
 
-        public static native void fundContextDetail(long context, String symbol, AsyncCallback callback);
+        public static native void fundContextDetail(long context, String counterId, AsyncCallback callback);
 
-        public static native void fundContextAnalysis(long context, String symbol,
+        public static native void fundContextAnalysis(long context, String counterId,
                         com.longbridge.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
 
-        public static native void fundContextAnalysisDetail(long context, String symbol,
+        public static native void fundContextAnalysisDetail(long context, String counterId,
                         com.longbridge.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
 
-        public static native void fundContextTrend(long context, String symbol,
+        public static native void fundContextTrend(long context, String counterId,
                         com.longbridge.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
 
-        public static native void fundContextAnnualReturns(long context, String symbol,
+        public static native void fundContextAnnualReturns(long context, String counterId,
                         com.longbridge.fund.FundPageOptions opts, AsyncCallback callback);
 
-        public static native void fundContextQuarterlyReturns(long context, String symbol,
+        public static native void fundContextQuarterlyReturns(long context, String counterId,
                         com.longbridge.fund.FundPageOptions opts, AsyncCallback callback);
 
-        public static native void fundContextPerformance(long context, String symbol, AsyncCallback callback);
+        public static native void fundContextPerformance(long context, String counterId, AsyncCallback callback);
 
-        public static native void fundContextPerformanceComparison(long context, String symbol,
+        public static native void fundContextPerformanceComparison(long context, String counterId,
                         com.longbridge.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
 
-        public static native void fundContextNav(long context, String symbol, AsyncCallback callback);
+        public static native void fundContextNav(long context, String counterId, AsyncCallback callback);
 
-        public static native void fundContextNavHistory(long context, String symbol,
+        public static native void fundContextNavHistory(long context, String counterId,
                         com.longbridge.fund.FundPageOptions opts, AsyncCallback callback);
 
-        public static native void fundContextNavRange(long context, String symbol,
+        public static native void fundContextNavRange(long context, String counterId,
                         com.longbridge.fund.FundNavRangeOptions opts, AsyncCallback callback);
 
-        public static native void fundContextHoldings(long context, String symbol,
+        public static native void fundContextHoldings(long context, String counterId,
                         com.longbridge.fund.GetFundHoldingsOptions opts, AsyncCallback callback);
 
-        public static native void fundContextStockHoldings(long context, String symbol,
+        public static native void fundContextStockHoldings(long context, String counterId,
                         com.longbridge.fund.GetFundStockHoldingsOptions opts, AsyncCallback callback);
 
         public static native void fundContextPositions(long context,
                         com.longbridge.fund.GetFundPositionsOptions opts, AsyncCallback callback);
 
-        public static native void fundContextPosition(long context, String symbol,
+        public static native void fundContextPosition(long context, String counterId,
                         com.longbridge.fund.GetFundPositionOptions opts, AsyncCallback callback);
 
-        public static native void fundContextPositionPerformance(long context, String symbol,
+        public static native void fundContextPositionPerformance(long context, String counterId,
                         AsyncCallback callback);
 
-        public static native void fundContextPositionProfits(long context, String symbol,
+        public static native void fundContextPositionProfits(long context, String counterId,
                         com.longbridge.fund.GetFundPositionProfitsOptions opts, AsyncCallback callback);
 
-        public static native void fundContextPositionNav(long context, String symbol,
+        public static native void fundContextPositionNav(long context, String counterId,
                         com.longbridge.fund.FundNavRangeOptions opts, AsyncCallback callback);
 
-        public static native void fundContextPositionDividends(long context, String symbol,
+        public static native void fundContextPositionDividends(long context, String counterId,
                         com.longbridge.fund.GetFundPositionDividendsOptions opts, AsyncCallback callback);
 
         public static native void fundContextOrders(long context,

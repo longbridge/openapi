@@ -1,7 +1,7 @@
 //! napi request-option structs for the fund endpoints.
 //!
 //! Each struct mirrors a builder-style options type from the Rust core and
-//! converts into it. The `symbol` path parameter is passed as a separate method
+//! converts into it. The fund `counter_id` is passed as a separate method
 //! argument, so these structs only carry query-string / request-body fields.
 
 use napi::bindgen_prelude::*;

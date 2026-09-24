@@ -393,14 +393,14 @@ pub unsafe extern "C" fn lb_fund_context_filters(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_detail(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CFundDetailOwned> = CCow::new(ctx_inner.detail(symbol).await?);
+        let resp: CCow<CFundDetailOwned> = CCow::new(ctx_inner.detail(counter_id).await?);
         Ok(resp)
     });
 }
@@ -411,16 +411,16 @@ pub unsafe extern "C" fn lb_fund_context_detail(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_analysis(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundAnalysisOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_analysis_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CFundAnalysisOwned> = CCow::new(ctx_inner.analysis(symbol, opts).await?);
+        let resp: CCow<CFundAnalysisOwned> = CCow::new(ctx_inner.analysis(counter_id, opts).await?);
         Ok(resp)
     });
 }
@@ -431,17 +431,17 @@ pub unsafe extern "C" fn lb_fund_context_analysis(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_analysis_detail(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundAnalysisOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_analysis_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CFundAnalysisDetailOwned> =
-            CCow::new(ctx_inner.analysis_detail(symbol, opts).await?);
+            CCow::new(ctx_inner.analysis_detail(counter_id, opts).await?);
         Ok(resp)
     });
 }
@@ -452,16 +452,16 @@ pub unsafe extern "C" fn lb_fund_context_analysis_detail(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_trend(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundAnalysisOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_analysis_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CFundTrendOwned> = CCow::new(ctx_inner.trend(symbol, opts).await?);
+        let resp: CCow<CFundTrendOwned> = CCow::new(ctx_inner.trend(counter_id, opts).await?);
         Ok(resp)
     });
 }
@@ -472,17 +472,17 @@ pub unsafe extern "C" fn lb_fund_context_trend(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_annual_returns(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CFundPageOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_page_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CFundAnnualReturnOwned> =
-            ctx_inner.annual_returns(symbol, opts).await?.into();
+            ctx_inner.annual_returns(counter_id, opts).await?.into();
         Ok(rows)
     });
 }
@@ -493,17 +493,17 @@ pub unsafe extern "C" fn lb_fund_context_annual_returns(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_quarterly_returns(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CFundPageOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_page_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CFundQuarterlyReturnOwned> =
-            ctx_inner.quarterly_returns(symbol, opts).await?.into();
+            ctx_inner.quarterly_returns(counter_id, opts).await?.into();
         Ok(rows)
     });
 }
@@ -512,14 +512,14 @@ pub unsafe extern "C" fn lb_fund_context_quarterly_returns(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_performance(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CFundPerformanceOwned> = ctx_inner.performance(symbol).await?.into();
+        let rows: CVec<CFundPerformanceOwned> = ctx_inner.performance(counter_id).await?.into();
         Ok(rows)
     });
 }
@@ -530,17 +530,17 @@ pub unsafe extern "C" fn lb_fund_context_performance(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_performance_comparison(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundAnalysisOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_analysis_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CFundPerformanceComparisonOwned> =
-            CCow::new(ctx_inner.performance_comparison(symbol, opts).await?);
+            CCow::new(ctx_inner.performance_comparison(counter_id, opts).await?);
         Ok(resp)
     });
 }
@@ -549,14 +549,14 @@ pub unsafe extern "C" fn lb_fund_context_performance_comparison(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_nav(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CFundNavValueOwned> = ctx_inner.nav(symbol).await?.into();
+        let rows: CVec<CFundNavValueOwned> = ctx_inner.nav(counter_id).await?.into();
         Ok(rows)
     });
 }
@@ -567,16 +567,16 @@ pub unsafe extern "C" fn lb_fund_context_nav(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_nav_history(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CFundPageOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_page_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CFundNavValueOwned> = ctx_inner.nav_history(symbol, opts).await?.into();
+        let rows: CVec<CFundNavValueOwned> = ctx_inner.nav_history(counter_id, opts).await?.into();
         Ok(rows)
     });
 }
@@ -587,16 +587,16 @@ pub unsafe extern "C" fn lb_fund_context_nav_history(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_nav_range(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CFundNavRangeOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_nav_range_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CFundNavValueOwned> = ctx_inner.nav_range(symbol, opts).await?.into();
+        let rows: CVec<CFundNavValueOwned> = ctx_inner.nav_range(counter_id, opts).await?.into();
         Ok(rows)
     });
 }
@@ -607,16 +607,16 @@ pub unsafe extern "C" fn lb_fund_context_nav_range(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_holdings(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundHoldingsOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_holdings_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let resp: CCow<CFundHoldingsOwned> = CCow::new(ctx_inner.holdings(symbol, opts).await?);
+        let resp: CCow<CFundHoldingsOwned> = CCow::new(ctx_inner.holdings(counter_id, opts).await?);
         Ok(resp)
     });
 }
@@ -627,17 +627,17 @@ pub unsafe extern "C" fn lb_fund_context_holdings(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_stock_holdings(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundStockHoldingsOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_stock_holdings_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CFundStockHoldingOwned> =
-            ctx_inner.stock_holdings(symbol, opts).await?.into();
+            ctx_inner.stock_holdings(counter_id, opts).await?.into();
         Ok(rows)
     });
 }
@@ -668,17 +668,17 @@ pub unsafe extern "C" fn lb_fund_context_positions(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_position(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundPositionOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_position_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CFundPositionDetailOwned> =
-            CCow::new(ctx_inner.position(symbol, opts).await?);
+            CCow::new(ctx_inner.position(counter_id, opts).await?);
         Ok(resp)
     });
 }
@@ -687,15 +687,15 @@ pub unsafe extern "C" fn lb_fund_context_position(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_position_performance(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CFundPositionPerformanceOwned> =
-            ctx_inner.position_performance(symbol).await?.into();
+            ctx_inner.position_performance(counter_id).await?.into();
         Ok(rows)
     });
 }
@@ -706,17 +706,17 @@ pub unsafe extern "C" fn lb_fund_context_position_performance(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_position_profits(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundPositionProfitsOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_position_profits_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CFundPositionProfitsOwned> =
-            CCow::new(ctx_inner.position_profits(symbol, opts).await?);
+            CCow::new(ctx_inner.position_profits(counter_id, opts).await?);
         Ok(resp)
     });
 }
@@ -727,16 +727,17 @@ pub unsafe extern "C" fn lb_fund_context_position_profits(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_position_nav(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CFundNavRangeOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_nav_range_options(opts);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CFundPositionNavOwned> = ctx_inner.position_nav(symbol, opts).await?.into();
+        let rows: CVec<CFundPositionNavOwned> =
+            ctx_inner.position_nav(counter_id, opts).await?.into();
         Ok(rows)
     });
 }
@@ -747,17 +748,17 @@ pub unsafe extern "C" fn lb_fund_context_position_nav(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_fund_context_position_dividends(
     ctx: *const CFundContext,
-    symbol: *const c_char,
+    counter_id: *const c_char,
     opts: *const CGetFundPositionDividendsOptions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let symbol = cstr_to_rust(symbol);
+    let counter_id = cstr_to_rust(counter_id);
     let opts = build_position_dividends_options(opts);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CFundDividendsOwned> =
-            CCow::new(ctx_inner.position_dividends(symbol, opts).await?);
+            CCow::new(ctx_inner.position_dividends(counter_id, opts).await?);
         Ok(resp)
     });
 }

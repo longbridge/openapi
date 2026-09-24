@@ -127,15 +127,15 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextDetail(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.detail(symbol).await?)
+            Ok(__owned_ctx.detail(counter_id).await?)
         })?;
         Ok(())
     })
@@ -213,17 +213,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextAnalysis(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_analysis_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.analysis(symbol, opts).await?)
+            Ok(__owned_ctx.analysis(counter_id, opts).await?)
         })?;
         Ok(())
     })
@@ -234,17 +234,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextAnalysisD
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_analysis_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.analysis_detail(symbol, opts).await?)
+            Ok(__owned_ctx.analysis_detail(counter_id, opts).await?)
         })?;
         Ok(())
     })
@@ -255,17 +255,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextTrend(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_analysis_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.trend(symbol, opts).await?)
+            Ok(__owned_ctx.trend(counter_id, opts).await?)
         })?;
         Ok(())
     })
@@ -276,17 +276,19 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextAnnualRet
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_page_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.annual_returns(symbol, opts).await?))
+            Ok(ObjectArray(
+                __owned_ctx.annual_returns(counter_id, opts).await?,
+            ))
         })?;
         Ok(())
     })
@@ -297,18 +299,18 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextQuarterly
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_page_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
-                __owned_ctx.quarterly_returns(symbol, opts).await?,
+                __owned_ctx.quarterly_returns(counter_id, opts).await?,
             ))
         })?;
         Ok(())
@@ -320,15 +322,15 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPerforman
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.performance(symbol).await?))
+            Ok(ObjectArray(__owned_ctx.performance(counter_id).await?))
         })?;
         Ok(())
     })
@@ -339,17 +341,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPerforman
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_analysis_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.performance_comparison(symbol, opts).await?)
+            Ok(__owned_ctx.performance_comparison(counter_id, opts).await?)
         })?;
         Ok(())
     })
@@ -360,15 +362,15 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextNav(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.nav(symbol).await?))
+            Ok(ObjectArray(__owned_ctx.nav(counter_id).await?))
         })?;
         Ok(())
     })
@@ -379,17 +381,19 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextNavHistor
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_page_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.nav_history(symbol, opts).await?))
+            Ok(ObjectArray(
+                __owned_ctx.nav_history(counter_id, opts).await?,
+            ))
         })?;
         Ok(())
     })
@@ -400,17 +404,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextNavRange(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_nav_range_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.nav_range(symbol, opts).await?))
+            Ok(ObjectArray(__owned_ctx.nav_range(counter_id, opts).await?))
         })?;
         Ok(())
     })
@@ -421,14 +425,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextHoldings(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundHoldingsOptions::new();
             if let Some(scene) = get_field::<_, _, Option<JavaInteger>>(env, &opts, "scene")? {
@@ -439,7 +443,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextHoldings(
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.holdings(symbol, opts).await?)
+            Ok(__owned_ctx.holdings(counter_id, opts).await?)
         })?;
         Ok(())
     })
@@ -450,14 +454,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextStockHold
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundStockHoldingsOptions::new();
             if let Some(limit) = get_field::<_, _, Option<JavaInteger>>(env, &opts, "limit")? {
@@ -468,7 +472,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextStockHold
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.stock_holdings(symbol, opts).await?))
+            Ok(ObjectArray(
+                __owned_ctx.stock_holdings(counter_id, opts).await?,
+            ))
         })?;
         Ok(())
     })
@@ -513,14 +519,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPosition(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundPositionOptions::new();
             if let Some(account_channel) =
@@ -542,7 +548,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPosition(
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.position(symbol, opts).await?)
+            Ok(__owned_ctx.position(counter_id, opts).await?)
         })?;
         Ok(())
     })
@@ -553,15 +559,17 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPositionP
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.position_performance(symbol).await?))
+            Ok(ObjectArray(
+                __owned_ctx.position_performance(counter_id).await?,
+            ))
         })?;
         Ok(())
     })
@@ -572,14 +580,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPositionP
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundPositionProfitsOptions::new();
             if let Some(account_channel) =
@@ -607,7 +615,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPositionP
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.position_profits(symbol, opts).await?)
+            Ok(__owned_ctx.position_profits(counter_id, opts).await?)
         })?;
         Ok(())
     })
@@ -618,17 +626,19 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPositionN
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = read_nav_range_opts(env, &opts)?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(__owned_ctx.position_nav(symbol, opts).await?))
+            Ok(ObjectArray(
+                __owned_ctx.position_nav(counter_id, opts).await?,
+            ))
         })?;
         Ok(())
     })
@@ -639,14 +649,14 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPositionD
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JString,
+    counter_id: JString,
     opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let counter_id: String = FromJValue::from_jvalue(env, counter_id.into())?;
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundPositionDividendsOptions::new();
             if let Some(account_channel) =
@@ -677,7 +687,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextPositionD
             None
         };
         async_util::execute(env, callback, async move {
-            Ok(__owned_ctx.position_dividends(symbol, opts).await?)
+            Ok(__owned_ctx.position_dividends(counter_id, opts).await?)
         })?;
         Ok(())
     })

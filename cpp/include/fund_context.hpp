@@ -43,72 +43,72 @@ public:
   void filters(AsyncCallback<FundContext, FundFilters> callback) const;
 
   /// Get fund detail
-  void detail(const std::string& symbol,
+  void detail(const std::string& counter_id,
               AsyncCallback<FundContext, FundDetail> callback) const;
 
   /// Get fund analysis (level 1)
-  void analysis(const std::string& symbol,
+  void analysis(const std::string& counter_id,
                 const std::optional<GetFundAnalysisOptions>& opts,
                 AsyncCallback<FundContext, FundAnalysis> callback) const;
 
   /// Get fund analysis detail (level 2)
   void analysis_detail(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<GetFundAnalysisOptions>& opts,
     AsyncCallback<FundContext, FundAnalysisDetail> callback) const;
 
   /// Get fund trend chart
-  void trend(const std::string& symbol,
+  void trend(const std::string& counter_id,
              const std::optional<GetFundAnalysisOptions>& opts,
              AsyncCallback<FundContext, FundTrend> callback) const;
 
   /// Get fund annual returns
   void annual_returns(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<FundPageOptions>& opts,
     AsyncCallback<FundContext, std::vector<FundAnnualReturn>> callback) const;
 
   /// Get fund quarterly returns
   void quarterly_returns(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<FundPageOptions>& opts,
     AsyncCallback<FundContext, std::vector<FundQuarterlyReturn>> callback) const;
 
   /// Get fund performance figures
   void performance(
-    const std::string& symbol,
+    const std::string& counter_id,
     AsyncCallback<FundContext, std::vector<FundPerformance>> callback) const;
 
   /// Get fund performance comparison
   void performance_comparison(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<GetFundAnalysisOptions>& opts,
     AsyncCallback<FundContext, FundPerformanceComparison> callback) const;
 
   /// Get fund latest net value
-  void nav(const std::string& symbol,
+  void nav(const std::string& counter_id,
            AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const;
 
   /// Get fund historical net value (paged)
   void nav_history(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<FundPageOptions>& opts,
     AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const;
 
   /// Get fund historical net value by relative time range
   void nav_range(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<FundNavRangeOptions>& opts,
     AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const;
 
   /// Get a fund's top-10 holdings
-  void holdings(const std::string& symbol,
+  void holdings(const std::string& counter_id,
                 const std::optional<GetFundHoldingsOptions>& opts,
                 AsyncCallback<FundContext, FundHoldings> callback) const;
 
   /// Get the stocks held by a fund (reverse lookup)
   void stock_holdings(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<GetFundStockHoldingsOptions>& opts,
     AsyncCallback<FundContext, std::vector<FundStockHolding>> callback) const;
 
@@ -119,31 +119,31 @@ public:
                  AsyncCallback<FundContext, FundPositions> callback) const;
 
   /// Get the user's single fund position detail
-  void position(const std::string& symbol,
+  void position(const std::string& counter_id,
                 const std::optional<GetFundPositionOptions>& opts,
                 AsyncCallback<FundContext, FundPositionDetail> callback) const;
 
   /// Get the performance figures of a held fund
   void position_performance(
-    const std::string& symbol,
+    const std::string& counter_id,
     AsyncCallback<FundContext, std::vector<FundPositionPerformance>> callback)
     const;
 
   /// Get the cumulative-profit series of a held fund
   void position_profits(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<GetFundPositionProfitsOptions>& opts,
     AsyncCallback<FundContext, FundPositionProfits> callback) const;
 
   /// Get the net-value history of a held fund
   void position_nav(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<FundNavRangeOptions>& opts,
     AsyncCallback<FundContext, std::vector<FundPositionNav>> callback) const;
 
   /// Get the dividend records of a held fund
   void position_dividends(
-    const std::string& symbol,
+    const std::string& counter_id,
     const std::optional<GetFundPositionDividendsOptions>& opts,
     AsyncCallback<FundContext, FundDividends> callback) const;
 
