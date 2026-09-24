@@ -822,6 +822,793 @@ export declare class FundamentalContext {
   usEtfFiles(symbol: string, size?: number | undefined | null): Promise<USETFFilesResponse>
 }
 
+/**
+ * Fund analysis (level 1). The ability/cost breakdowns are server-defined
+ * structures exposed as raw JSON strings.
+ */
+export declare class FundAnalysis {
+  toString(): string
+  toJSON(): any
+  /** Actual period */
+  get actualPeriod(): number
+  /** Cost level (raw JSON string) */
+  get costLevel(): string
+  /** Return ability (raw JSON string) */
+  get returnAbility(): string
+  /** Risk ability (raw JSON string) */
+  get riskAbility(): string
+  /** Updated at */
+  get updatedAt(): string
+  /** Value for money (raw JSON string) */
+  get valueForMoney(): string
+  /** Whether visible */
+  get visible(): boolean
+}
+
+/**
+ * Fund analysis detail (level 2). The ability/cost breakdowns are
+ * server-defined structures exposed as raw JSON strings.
+ */
+export declare class FundAnalysisDetail {
+  toString(): string
+  toJSON(): any
+  /** Actual period */
+  get actualPeriod(): number
+  /** Available periods */
+  get availablePeriods(): Array<number>
+  /** Cost level (raw JSON string) */
+  get costLevel(): string
+  /** Return ability (raw JSON string) */
+  get returnAbility(): string
+  /** Risk ability (raw JSON string) */
+  get riskAbility(): string
+  /** Updated at */
+  get updatedAt(): string
+  /** Value for money (raw JSON string) */
+  get valueForMoney(): string
+  /** Whether visible */
+  get visible(): boolean
+}
+
+/** A fund annual return entry. */
+export declare class FundAnnualReturn {
+  toString(): string
+  toJSON(): any
+  /** Change percent */
+  get changePercent(): string
+  /** Year */
+  get year(): number
+}
+
+/** A fund's asset allocation. */
+export declare class FundAssetAllocation {
+  toString(): string
+  toJSON(): any
+  /** Asset type */
+  get assetType(): number
+  /** Allocation entries */
+  get lists(): Array<FundAssetAllocationItem>
+  /** Report date */
+  get reportDate(): string
+}
+
+/** A single holding entry inside a fund's asset allocation. */
+export declare class FundAssetAllocationItem {
+  toString(): string
+  toJSON(): any
+  /** Security code */
+  get code(): string
+  /** Security counter id */
+  get counterId(): string
+  /** Name */
+  get name(): string
+  /** Position ratio */
+  get positionRatio(): string
+}
+
+/** A fund entry in the fund list. */
+export declare class FundBrief {
+  toString(): string
+  toJSON(): any
+  /** Asset class */
+  get assetClass(): number
+  /** Asset class name */
+  get assetClassName(): string
+  /** Fund code */
+  get code(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Description */
+  get description(): string
+  /** Earning rate */
+  get earningRate(): string
+  /** Whether the user is holding this fund */
+  get holding(): boolean
+  /** ISIN */
+  get isin(): string
+  /** Fund name */
+  get name(): string
+  /** Product */
+  get product(): string
+  /** Minimum purchase amount */
+  get purchaseAmount(): string
+  /** Recommendation text */
+  get recommendationText(): string
+  /** Risk level */
+  get riskLevel(): number
+  /** Risk level name */
+  get riskLevelName(): string
+  /** Time interval of the earning rate */
+  get timeInterval(): string
+  /** Unit value */
+  get unitValue(): string
+}
+
+/** Fund (mutual fund) channel context. */
+export declare class FundContext {
+  /** Create a new `FundContext`. */
+  static new(config: Config): FundContext
+  /** Get the hot-selling fund list. */
+  hotFunds(): Promise<Array<HotFund>>
+  /** Get the fund list. */
+  funds(opts?: GetFundsOptions | undefined | null): Promise<Array<FundBrief>>
+  /** Get the fund list filter options. */
+  filters(): Promise<FundFilters>
+  /** Get fund detail. */
+  detail(counterId: string): Promise<FundDetail>
+  /** Get fund analysis (level 1). */
+  analysis(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysis>
+  /** Get fund analysis detail (level 2). */
+  analysisDetail(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundAnalysisDetail>
+  /** Get fund trend chart. */
+  trend(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundTrend>
+  /** Get fund annual returns. */
+  annualReturns(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundAnnualReturn>>
+  /** Get fund quarterly returns. */
+  quarterlyReturns(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundQuarterlyReturn>>
+  /** Get fund performance figures. */
+  performance(counterId: string): Promise<Array<FundPerformance>>
+  /** Get fund performance comparison. */
+  performanceComparison(counterId: string, opts?: GetFundAnalysisOptions | undefined | null): Promise<FundPerformanceComparison>
+  /** Get fund latest net value. */
+  nav(counterId: string): Promise<Array<FundNavValue>>
+  /** Get fund historical net value (paged). */
+  navHistory(counterId: string, opts?: FundPageOptions | undefined | null): Promise<Array<FundNavValue>>
+  /** Get fund historical net value by relative time range. */
+  navRange(counterId: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundNavValue>>
+  /** Get a fund's top-10 holdings. */
+  holdings(counterId: string, opts?: GetFundHoldingsOptions | undefined | null): Promise<FundHoldings>
+  /** Get the stocks held by a fund (reverse lookup). */
+  stockHoldings(counterId: string, opts?: GetFundStockHoldingsOptions | undefined | null): Promise<Array<FundStockHolding>>
+  /** Get the user's fund positions overview. */
+  positions(opts?: GetFundPositionsOptions | undefined | null): Promise<FundPositions>
+  /** Get the user's single fund position detail. */
+  position(counterId: string, opts?: GetFundPositionOptions | undefined | null): Promise<FundPositionDetail>
+  /** Get the performance figures of a held fund. */
+  positionPerformance(counterId: string): Promise<Array<FundPositionPerformance>>
+  /** Get the cumulative-profit series of a held fund. */
+  positionProfits(counterId: string, opts?: GetFundPositionProfitsOptions | undefined | null): Promise<FundPositionProfits>
+  /** Get the net-value history of a held fund. */
+  positionNav(counterId: string, opts?: FundNavRangeOptions | undefined | null): Promise<Array<FundPositionNav>>
+  /** Get the dividend records of a held fund. */
+  positionDividends(counterId: string, opts?: GetFundPositionDividendsOptions | undefined | null): Promise<FundDividends>
+  /** Get the user's fund orders (also serves as the trade/execution record). */
+  orders(opts?: GetFundOrdersOptions | undefined | null): Promise<Array<FundOrder>>
+  /** Get a fund order detail. */
+  order(orderId: number): Promise<FundOrderDetail>
+  /** Get the user's fund transactions (cash-flow records). */
+  transactions(opts?: GetFundTransactionsOptions | undefined | null): Promise<Array<FundTransaction>>
+  /** Validate a fund order before submitting. */
+  validateOrder(opts: ValidateFundOrderOptions): Promise<FundOrderValidation>
+  /** Submit a fund order (buy / sell). */
+  submitOrder(opts: SubmitFundOrderOptions): Promise<FundOrderSubmitResponse>
+  /** Cancel (withdraw) a fund order. */
+  cancelOrder(orderId: number): Promise<void>
+}
+
+/** A dated value point. */
+export declare class FundDatedValue {
+  toString(): string
+  toJSON(): any
+  /** Date (unix seconds) */
+  get date(): number
+  /** Value */
+  get value(): string
+}
+
+/** Fund detail. */
+export declare class FundDetail {
+  toString(): string
+  toJSON(): any
+  /** Additional purchase amount */
+  get additionalPurchaseAmount(): string
+  /** Affirm day */
+  get affirmDay(): number
+  /** Amount affirm day */
+  get amountAffirmDay(): string
+  /** Asset allocation */
+  get assetAllocation(): FundAssetAllocation
+  /** Asset class */
+  get assetClass(): number
+  /** Asset class name */
+  get assetClassName(): string
+  /** Bill purchase rate */
+  get billPurchaseRate(): string
+  /** Channel */
+  get channel(): string
+  /** Close period */
+  get closePeriod(): string
+  /** Fund code */
+  get code(): string
+  /** Currency */
+  get currency(): string
+  /** Cut off time */
+  get cutOffTime(): string
+  /** Whether it is a derivative */
+  get derivatives(): boolean
+  /** Done day */
+  get doneDay(): number
+  /** Excess return fee */
+  get excessReturnFee(): string
+  /** GST rate */
+  get gstRate(): string
+  /** Introduction */
+  get introduce(): string
+  /** Whether it is a cash-plus fund */
+  get isCashPlus(): boolean
+  /** Whether it is a complex product */
+  get isComplex(): boolean
+  /** Whether it is a new cash-plus fund */
+  get isNewCashPlus(): boolean
+  /** Whether it is a Yinghebao fund */
+  get isYinghebao(): boolean
+  /** ISIN */
+  get isin(): string
+  /** Management rate */
+  get manageRate(): string
+  /** Manager */
+  get manager(): string
+  /** Minimum holding cash */
+  get minHoldCash(): string
+  /** Minimum holding share */
+  get minHoldShare(): string
+  /** Minimum sell share */
+  get minSellShare(): string
+  /** Month raise day */
+  get monthRaiseDay(): string
+  /** Fund name */
+  get name(): string
+  /** Net value deadline */
+  get navDeadline(): string
+  /** Whether it is no-load */
+  get noLoad(): boolean
+  /** Open date */
+  get openDate(): string
+  /** Open period */
+  get openPeriod(): string
+  /** Product */
+  get product(): string
+  /** Product information locals */
+  get productInformationLocals(): string
+  /** Profile */
+  get profile(): string
+  /** Whether purchasable */
+  get purchasable(): number
+  /** Purchase affirm day */
+  get purchaseAffirmDay(): string
+  /** Minimum purchase amount */
+  get purchaseAmount(): string
+  /** Purchase rate */
+  get purchaseRate(): string
+  /** Rating */
+  get rating(): number
+  /** Whether redeemable */
+  get redeemable(): number
+  /** Redemption advance day */
+  get redemptionAdvanceDay(): string
+  /** Redemption amount */
+  get redemptionAmount(): string
+  /** Redemption close period text */
+  get redemptionClosePeriodShows(): string
+  /** Redemption done day */
+  get redemptionDoneDay(): string
+  /** Redemption open day text */
+  get redemptionOpenDayShows(): string
+  /** Risk level */
+  get riskLevel(): number
+  /** Risk level name */
+  get riskLevelName(): string
+  /** Verify status */
+  get verifyStatus(): number
+  /** Whether it is a virtual currency fund */
+  get virtualCurrency(): boolean
+  /** Year to date yield */
+  get yearToDateYield(): string
+  /** Year to date yield type */
+  get ytdYieldType(): number
+}
+
+/** A cash dividend record for a held fund. */
+export declare class FundDividend {
+  toString(): string
+  toJSON(): any
+  /** Amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Date (unix seconds) */
+  get date(): number
+  /** Dividend method */
+  get divMethod(): string
+  /** Fund name */
+  get name(): string
+}
+
+/** The user's dividend records for a held fund. */
+export declare class FundDividends {
+  toString(): string
+  toJSON(): any
+  /** Currency */
+  get currency(): string
+  /** Dividend records */
+  get divCashInfos(): Array<FundDividend>
+  /** Latest dividend date (unix seconds) */
+  get lastestDate(): number
+  /** Total cash dividend */
+  get totalDivCash(): string
+}
+
+/**
+ * Fund list filter options. Each list holds server-defined option objects
+ * serialized as raw JSON strings.
+ */
+export declare class FundFilters {
+  toString(): string
+  toJSON(): any
+  /** Asset class options (each a raw JSON string) */
+  get assetClass(): Array<string>
+  /** Company options (each a raw JSON string) */
+  get company(): Array<string>
+  /** Currency options (each a raw JSON string) */
+  get currency(): Array<string>
+  /** Industry category options (each a raw JSON string) */
+  get industryCategoryName(): Array<string>
+  /** Risk level options (each a raw JSON string) */
+  get riskLevel(): Array<string>
+}
+
+/** A single fund holding (top-10 holdings). */
+export declare class FundHolding {
+  toString(): string
+  toJSON(): any
+  /** Bond type */
+  get bondType(): string
+  /** Bond type name */
+  get bondTypeName(): string
+  /** Country name */
+  get countryName(): string
+  /** Holding type */
+  get holdingType(): string
+  /** Industry name */
+  get industryName(): string
+  /** Market value */
+  get marketValue(): string
+  /** Maturity date */
+  get maturityDate(): string
+  /** Name */
+  get name(): string
+  /** Share change */
+  get shareChange(): string
+  /** Share change percent */
+  get shareChangePercent(): string
+  /** Shares */
+  get shares(): string
+  /** Weighting */
+  get weighting(): string
+}
+
+/**
+ * A single fund position held by the user.
+ *
+ * Exposed to JavaScript as `FundHoldingPosition` to avoid a name clash with
+ * the trade channel's existing `FundPosition` class.
+ */
+export declare class FundHoldingPosition {
+  toString(): string
+  toJSON(): any
+  /** Holding amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Frozen units */
+  get freezeUnits(): string
+  /** Holding profit */
+  get holdingProfit(): string
+  /** Holding units */
+  get holdingUnits(): string
+  /** Fund name */
+  get name(): string
+  /** Recent profit */
+  get recentProfit(): string
+  /** Recent trading day (unix seconds) */
+  get recentTradingDay(): number
+  /** Accumulated recent profit */
+  get sumRecentProfit(): string
+}
+export type FundPosition = FundHoldingPosition
+
+/** A fund's top-10 holdings. */
+export declare class FundHoldings {
+  toString(): string
+  toJSON(): any
+  /** Holding entries */
+  get holdings(): Array<FundHolding>
+  /** Report date */
+  get reportDate(): string
+  /** Total weighting */
+  get weighting(): string
+}
+
+/**
+ * A named contrast performance series. The performance points are
+ * server-defined structures exposed as raw JSON strings.
+ */
+export declare class FundNamedContrast {
+  toString(): string
+  toJSON(): any
+  /** Series name */
+  get name(): string
+  /** Performance points (each a raw JSON string) */
+  get performances(): Array<string>
+}
+
+/** A fund net-asset-value data point (latest / historical). */
+export declare class FundNavValue {
+  toString(): string
+  toJSON(): any
+  /** Net value change */
+  get change(): string
+  /** Net value change percent */
+  get changePercent(): string
+  /** Formatted change percent */
+  get changePercentFormat(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get counterName(): string
+  /** Currency */
+  get currency(): string
+  /** Formatted date */
+  get dateFormat(): string
+  /** ISIN */
+  get isin(): string
+  /** Last update time (unix seconds) */
+  get lastUpdateTime(): number
+  /** Net value */
+  get value(): string
+  /** Formatted net value */
+  get valueFormat(): string
+}
+
+/** A fund order (list view). */
+export declare class FundOrder {
+  toString(): string
+  toJSON(): any
+  /** Action (buy/sell) */
+  get action(): string
+  /** Amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Currency */
+  get currency(): string
+  /** Fund name */
+  get fundName(): string
+  /** Order id */
+  get id(): number
+  /** Whether it is an auto (DCA) order */
+  get isAuto(): boolean
+  /** Net worth */
+  get netWorth(): string
+  /** Product type */
+  get productType(): string
+  /** State */
+  get state(): string
+  /** State description */
+  get stateDesc(): string
+  /** Units */
+  get units(): string
+}
+
+/** Fund order detail. */
+export declare class FundOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Keyword blocks */
+  get keywords(): Array<FundOrderKeyword>
+  /** The order */
+  get order(): FundOrderInfo
+  /** Processing stages */
+  get stages(): Array<FundOrderStage>
+}
+
+/** The full information of a fund order. */
+export declare class FundOrderInfo {
+  toString(): string
+  toJSON(): any
+  /** Account id */
+  get aaid(): number
+  /** Account channel */
+  get accountChannel(): string
+  /** Action (buy/sell) */
+  get action(): string
+  /** Amount */
+  get amount(): string
+  /** Channel */
+  get channel(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Currency */
+  get currency(): string
+  /** Dividend option */
+  get dividendOption(): string
+  /** Equity time (unix seconds) */
+  get eqAt(): number
+  /** Fee */
+  get fee(): string
+  /** Fund name */
+  get fundName(): string
+  /** Fund source */
+  get fundSource(): string
+  /** Histories */
+  get histories(): string
+  /** Order id */
+  get id(): number
+  /** Message */
+  get message(): string
+  /** Net worth */
+  get netWorth(): string
+  /** Price time (unix seconds) */
+  get priceAt(): number
+  /** Processed at (unix seconds) */
+  get processedAt(): number
+  /** Product type */
+  get productType(): string
+  /** Whether repurchaseable */
+  get repurchaseable(): boolean
+  /** Sale proceeds */
+  get saleProceeds(): string
+  /** Sales charge */
+  get salesCharge(): string
+  /** Sales price */
+  get salesPrice(): string
+  /** Sales unit */
+  get salesUnit(): string
+  /** State */
+  get state(): string
+  /** State description */
+  get stateDesc(): string
+  /** Status */
+  get status(): number
+  /** Extended status */
+  get statusEx(): number
+  /** T+ description */
+  get tDescription(): string
+  /** Time partition */
+  get timePartition(): string
+  /** Total amount */
+  get totalAmount(): string
+  /** Transaction at (unix seconds) */
+  get transactionAt(): number
+  /** Units */
+  get units(): string
+  /** Withdraw at (unix seconds) */
+  get withdrawAt(): number
+  /** Whether withdrawable */
+  get withdrawable(): boolean
+}
+
+/** A keyword block in a fund order detail. */
+export declare class FundOrderKeyword {
+  toString(): string
+  toJSON(): any
+  /** Content */
+  get content(): string
+  /** Group */
+  get group(): string
+  /** Key */
+  get key(): string
+  /** Line strategy */
+  get lineStrategy(): string
+  /** Title */
+  get title(): string
+}
+
+/** A processing stage in a fund order detail. */
+export declare class FundOrderStage {
+  toString(): string
+  toJSON(): any
+  /** Description */
+  get desc(): string
+  /** Key */
+  get key(): string
+  /** Link */
+  get link(): string
+  /** Link text */
+  get linkText(): string
+  /** Progress */
+  get progress(): string
+  /** Stage */
+  get stage(): string
+}
+
+/** The result of submitting a fund order. */
+export declare class FundOrderSubmitResponse {
+  toString(): string
+  toJSON(): any
+  /** Action (buy/sell) */
+  get action(): string
+  /** Amount */
+  get amount(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Fund name */
+  get fundName(): string
+  /** Order id */
+  get id(): number
+  /** Message */
+  get msg(): string
+  /** Status */
+  get status(): number
+  /** Units */
+  get units(): string
+}
+
+/** The result of validating a fund order. */
+export declare class FundOrderValidation {
+  toString(): string
+  toJSON(): any
+  /** Auth token to carry into submit */
+  get authToken(): string
+  /** Risk-assessment eval address */
+  get evalAddress(): string
+  /** Fund risk level */
+  get fundRiskLevel(): number
+  /** Message */
+  get msg(): string
+  /** User PI status */
+  get userPi(): number
+  /** User risk level */
+  get userRiskLevel(): number
+}
+
+/** A fund's detailed performance figures. */
+export declare class FundPerformance {
+  toString(): string
+  toJSON(): any
+  /** Annualized return (5y) */
+  get annualizedReturnFive(): string
+  /** Annualized return (1y) */
+  get annualizedReturnOne(): string
+  /** Annualized return (10y) */
+  get annualizedReturnTen(): string
+  /** Annualized return (3y) */
+  get annualizedReturnThree(): string
+  /** Annualized return (2y) */
+  get annualizedReturnTwo(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get fundName(): string
+  /** Rank (5y) */
+  get performanceRankFiveYears(): number
+  /** Rank (1d) */
+  get performanceRankOneDay(): number
+  /** Rank (1m) */
+  get performanceRankOneMonth(): number
+  /** Rank (1w) */
+  get performanceRankOneWeek(): number
+  /** Rank (1y) */
+  get performanceRankOneYear(): number
+  /** Rank (6m) */
+  get performanceRankSixMonths(): number
+  /** Rank (10y) */
+  get performanceRankTenYears(): number
+  /** Rank (3m) */
+  get performanceRankThreeMonths(): number
+  /** Rank (3y) */
+  get performanceRankThreeYears(): number
+  /** Rank (2y) */
+  get performanceRankTwoYears(): number
+  /** Rank (ytd) */
+  get performanceRankYtd(): number
+  /** Return (5y) */
+  get performanceReturnFiveYears(): string
+  /** Return (1d) */
+  get performanceReturnOneDay(): string
+  /** Return (1m) */
+  get performanceReturnOneMonth(): string
+  /** Return (1w) */
+  get performanceReturnOneWeek(): string
+  /** Return (1y) */
+  get performanceReturnOneYear(): string
+  /** Return (6m) */
+  get performanceReturnSixMonths(): string
+  /** Return (10y) */
+  get performanceReturnTenYears(): string
+  /** Return (3m) */
+  get performanceReturnThreeMonths(): string
+  /** Return (3y) */
+  get performanceReturnThreeYears(): string
+  /** Return (2y) */
+  get performanceReturnTwoYears(): string
+  /** Return (ytd) */
+  get performanceReturnYtd(): string
+  /** Total peers (5y) */
+  get performanceTotalFiveYears(): number
+  /** Total peers (1d) */
+  get performanceTotalOneDay(): number
+  /** Total peers (1m) */
+  get performanceTotalOneMonth(): number
+  /** Total peers (1w) */
+  get performanceTotalOneWeek(): number
+  /** Total peers (1y) */
+  get performanceTotalOneYear(): number
+  /** Total peers (6m) */
+  get performanceTotalSixMonths(): number
+  /** Total peers (10y) */
+  get performanceTotalTenYears(): number
+  /** Total peers (3m) */
+  get performanceTotalThreeMonths(): number
+  /** Total peers (3y) */
+  get performanceTotalThreeYears(): number
+  /** Total peers (2y) */
+  get performanceTotalTwoYears(): number
+  /** Total peers (ytd) */
+  get performanceTotalYtd(): number
+  /** Seven days annualized */
+  get sevenDaysAnnualized(): string
+  /** Ten thousand price */
+  get tenThousandPrice(): string
+  /** Update time (unix seconds) */
+  get updateTime(): number
+}
+
+/**
+ * Fund performance comparison. The fund performance series is a
+ * server-defined structure exposed as raw JSON strings.
+ */
+export declare class FundPerformanceComparison {
+  toString(): string
+  toJSON(): any
+  /** Contrast performance series */
+  get contrastPerformances(): Array<FundNamedContrast>
+  /** Fund performances (each a raw JSON string) */
+  get fundPerformances(): Array<string>
+}
+
+/** A recent performance point used by the hot-fund list. */
+export declare class FundPerformancePoint {
+  toString(): string
+  toJSON(): any
+  /** Date */
+  get date(): string
+  /** Last done value */
+  get lastDone(): string
+}
+
 /** Fund position */
 export declare class FundPosition {
   toString(): string
@@ -849,7 +1636,147 @@ export declare class FundPositionChannel {
   /** Account type */
   get accountChannel(): string
   /** Fund positions */
-  get positions(): Array<FundPosition>
+  get positions(): Array<FundHoldingPosition>
+}
+
+/** Detail of a single fund position. */
+export declare class FundPositionDetail {
+  toString(): string
+  toJSON(): any
+  /** Detail values */
+  get detailValues(): FundPositionDetailValues
+  /** Accumulated profit series */
+  get sumProfit(): Array<FundDatedValue>
+  /** Unit value series */
+  get utValue(): Array<FundUnitValue>
+}
+
+/** Detail values of a single fund position. */
+export declare class FundPositionDetailValues {
+  toString(): string
+  toJSON(): any
+  /** Amount */
+  get amount(): string
+  /** Currency */
+  get currency(): string
+  /** Holding cost */
+  get holdingCost(): string
+  /** Holding profit */
+  get holdingProfit(): string
+  /** Holding profit rate */
+  get holdingProfitRate(): string
+  /** Holding units */
+  get holdingUnits(): string
+  /** Holding value */
+  get holdingValue(): string
+  /** Pending buy value */
+  get pendingBuyValue(): string
+  /** Pending sell value */
+  get pendingSellValue(): string
+  /** Accumulated profit (to date) */
+  get profitAmountAccumTd(): string
+  /** Accumulated profit rate (to date) */
+  get profitAmountAccumTdRate(): string
+  /** Recent profit */
+  get recentProfit(): string
+  /** Recent trading day (unix seconds) */
+  get recentTradingday(): number
+  /** Recent unit value */
+  get recentUnitValue(): string
+  /** Sold pending-confirm units */
+  get soldPendingConfirmUnits(): string
+}
+
+/** A held-fund net-value point (position view). */
+export declare class FundPositionNav {
+  toString(): string
+  toJSON(): any
+  /** Net value change */
+  get change(): string
+  /** Net value change percent */
+  get changePercent(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get counterName(): string
+  /** Last update time (unix seconds) */
+  get lastUpdateTime(): number
+  /** Net value */
+  get value(): string
+}
+
+/** Performance figures for a held fund. */
+export declare class FundPositionPerformance {
+  toString(): string
+  toJSON(): any
+  /** Annualized return (5y) */
+  get annualizedReturnFive(): string
+  /** Annualized return (1y) */
+  get annualizedReturnOne(): string
+  /** Annualized return (10y) */
+  get annualizedReturnTen(): string
+  /** Annualized return (3y) */
+  get annualizedReturnThree(): string
+  /** Annualized return (2y) */
+  get annualizedReturnTwo(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Fund name */
+  get fundName(): string
+  /** Return (5y) */
+  get performanceReturnFiveYears(): string
+  /** Return (1d) */
+  get performanceReturnOneDay(): string
+  /** Return (1m) */
+  get performanceReturnOneMonth(): string
+  /** Return (1w) */
+  get performanceReturnOneWeek(): string
+  /** Return (1y) */
+  get performanceReturnOneYear(): string
+  /** Return (6m) */
+  get performanceReturnSixMonths(): string
+  /** Return (10y) */
+  get performanceReturnTenYears(): string
+  /** Return (3m) */
+  get performanceReturnThreeMonths(): string
+  /** Return (3y) */
+  get performanceReturnThreeYears(): string
+  /** Return (2y) */
+  get performanceReturnTwoYears(): string
+  /** Return (ytd) */
+  get performanceReturnYtd(): string
+  /** Update time (unix seconds) */
+  get updateTime(): number
+}
+
+/** The user's cumulative profit for a held fund. */
+export declare class FundPositionProfits {
+  toString(): string
+  toJSON(): any
+  /** Currency */
+  get currency(): string
+  /** Profit series */
+  get historyValue(): Array<FundDatedValue>
+  /** Last update time (unix seconds) */
+  get lastUpdateTime(): number
+  /** Total profit */
+  get sumProfit(): string
+}
+
+/** The user's fund positions overview. */
+export declare class FundPositions {
+  toString(): string
+  toJSON(): any
+  /** Account channel */
+  get accountChannel(): string
+  /** Position entries */
+  get list(): Array<FundHoldingPosition>
+  /** Pending buy orders amount */
+  get pendingBuyOrders(): string
+  /** Recent trading day (unix seconds) */
+  get recentTradingDay(): number
+  /** Sold pending credit orders amount */
+  get soldPendingCreditOrders(): string
 }
 
 /** Fund positions response */
@@ -858,6 +1785,118 @@ export declare class FundPositionsResponse {
   toJSON(): any
   /** Channels */
   get channels(): Array<FundPositionChannel>
+}
+
+/** A fund quarterly return entry. */
+export declare class FundQuarterlyReturn {
+  toString(): string
+  toJSON(): any
+  /** Change percent */
+  get changePercent(): string
+  /** Quarter */
+  get quarter(): number
+  /** Year */
+  get year(): number
+}
+
+/** A stock held by the fund (reverse lookup). */
+export declare class FundStockHolding {
+  toString(): string
+  toJSON(): any
+  /** Stock code */
+  get code(): string
+  /** Stock counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Stock name */
+  get name(): string
+  /** Position ratio */
+  get positionRatio(): string
+  /** Report date */
+  get reportDate(): string
+}
+
+/** A fund transaction / cash-flow record. */
+export declare class FundTransaction {
+  toString(): string
+  toJSON(): any
+  /** Amount */
+  get amount(): string
+  /** Category */
+  get category(): string
+  /** Created at (unix seconds) */
+  get createdAt(): number
+  /** Currency */
+  get currency(): string
+  /** Description */
+  get description(): string
+  /** Detail created at (unix seconds) */
+  get detailCreatedAt(): number
+  /** Detail type */
+  get detailType(): string
+  /** Done at (unix seconds) */
+  get doneAt(): number
+  /** Quantity description */
+  get quantityDescription(): string
+  /** Redirect page */
+  get redirectPage(): string
+  /** Redirect page (v2) */
+  get redirectPageV2(): string
+  /** Reference number */
+  get refNo(): string
+  /** Stock quantity */
+  get stockQuantity(): string
+  /** Transaction type */
+  get txType(): string
+  /** Type name */
+  get typeName(): string
+}
+
+/**
+ * Fund trend chart. The performance series are server-defined structures
+ * exposed as raw JSON strings.
+ */
+export declare class FundTrend {
+  toString(): string
+  toJSON(): any
+  /** Actual period */
+  get actualPeriod(): number
+  /** Available periods */
+  get availablePeriods(): Array<number>
+  /** Category average performances (each a raw JSON string) */
+  get categoryAveragePerformances(): Array<string>
+  /** Benchmark contrast performances */
+  get contrastPerformances(): FundTrendContrast
+  /** Fund performances (each a raw JSON string) */
+  get fundPerformances(): Array<string>
+}
+
+/**
+ * A benchmark contrast series in a fund trend chart. The performance points
+ * are server-defined structures exposed as raw JSON strings.
+ */
+export declare class FundTrendContrast {
+  toString(): string
+  toJSON(): any
+  /** Benchmark name */
+  get benchmarkName(): string
+  /** Performance points (each a raw JSON string) */
+  get performances(): Array<string>
+}
+
+/** A fund unit-value point (position view). */
+export declare class FundUnitValue {
+  toString(): string
+  toJSON(): any
+  /** Date (unix seconds) */
+  get date(): number
+  /** Day increase rate */
+  get dayIncreaseRate(): string
+  /** Total value */
+  get totalValue(): string
+  /** Unit value */
+  get unitValue(): string
 }
 
 /** A price-step (bid-size) rule entry from the symbol-info response. */
@@ -1205,6 +2244,36 @@ export declare class HistoryMarketTemperatureResponse {
   get granularity(): Granularity
   /** Records */
   get records(): Array<MarketTemperature>
+}
+
+/** A hot-selling fund entry. */
+export declare class HotFund {
+  toString(): string
+  toJSON(): any
+  /** Asset class */
+  get assetClass(): number
+  /** Asset class name */
+  get assetClassName(): string
+  /** Fund counter id */
+  get counterId(): string
+  /** Currency */
+  get currency(): string
+  /** Earning rate */
+  get earningRate(): string
+  /** Recent performance points */
+  get fundPerformances(): Array<FundPerformancePoint>
+  /** Fund name */
+  get name(): string
+  /** Minimum purchase amount */
+  get purchaseAmount(): string
+  /** Recommendation text */
+  get recommendationText(): string
+  /** Risk level */
+  get riskLevel(): number
+  /** Risk level name */
+  get riskLevelName(): string
+  /** Time interval of the earning rate */
+  get timeInterval(): string
 }
 
 export declare class HttpClient {
@@ -5332,6 +6401,22 @@ export interface FundHolders {
   lists: Array<FundHolder>
 }
 
+/** Net-value range options (relative months / years before now). */
+export interface FundNavRangeOptions {
+  /** Number of months before now */
+  monthBefore?: number
+  /** Number of years before now */
+  yearBefore?: number
+}
+
+/** Paging options (page / size). */
+export interface FundPageOptions {
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
 /** Options for get all executions request */
 export interface GetAllExecutionsOptions {
   /** Security symbol */
@@ -5356,6 +6441,128 @@ export interface GetCashFlowOptions {
   businessType?: BalanceType
   /** Security symbol */
   symbol?: string
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for the fund analysis / trend / comparison endpoints. */
+export interface GetFundAnalysisOptions {
+  /** Analysis period */
+  period?: number
+}
+
+/** Options for the fund holdings endpoint. */
+export interface GetFundHoldingsOptions {
+  /** Scene */
+  scene?: number
+}
+
+/** Options for the fund orders list. */
+export interface GetFundOrdersOptions {
+  /** Filter by fund symbols */
+  symbols?: Array<string>
+  /** Filter by actions (comma-separated) */
+  actions?: string
+  /** Filter by states (comma-separated) */
+  states?: string
+  /** Filter by currency */
+  currency?: string
+  /** Range start (unix seconds) */
+  start?: number
+  /** Range end (unix seconds) */
+  end?: number
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for a single fund position dividend list. */
+export interface GetFundPositionDividendsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+  /** Currency */
+  currency?: string
+  /** Range start (unix seconds) */
+  start?: number
+  /** Range end (unix seconds) */
+  end?: number
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for a single fund position detail. */
+export interface GetFundPositionOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+  /** Range start */
+  start?: string
+  /** Range end */
+  end?: string
+}
+
+/** Options for a single fund position cumulative-profit list. */
+export interface GetFundPositionProfitsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+  /** Range start */
+  start?: string
+  /** Range end */
+  end?: string
+  /** Page number */
+  page?: number
+  /** Page size */
+  size?: number
+}
+
+/** Options for the fund positions overview endpoint. */
+export interface GetFundPositionsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Account id */
+  aaid?: number
+}
+
+/** Options for the fund list. */
+export interface GetFundsOptions {
+  /** Server-defined filter object, as a raw JSON string */
+  filter?: string
+  /** Quick-filter ids */
+  quickIds?: Array<number>
+  /** Earning-rate time intervals */
+  timeInterval?: Array<string>
+}
+
+/** Options for the fund stock-holdings (reverse) endpoint. */
+export interface GetFundStockHoldingsOptions {
+  /** Maximum number of stocks to return */
+  limit?: number
+}
+
+/** Options for the fund transactions (cash-flow) list. */
+export interface GetFundTransactionsOptions {
+  /** Account channel */
+  accountChannel?: string
+  /** Business type */
+  businessType?: string
+  /** Category */
+  category?: string
+  /** Currencies (comma-separated) */
+  currencies?: string
+  /** Range start (unix seconds) */
+  start?: number
+  /** Range end (unix seconds) */
+  end?: number
   /** Page number */
   page?: number
   /** Page size */
@@ -7375,6 +8582,30 @@ export interface SubmitAttachedParams {
   activateRth?: OutsideRTH
 }
 
+/** Options for submitting a fund order. */
+export interface SubmitFundOrderOptions {
+  /** Fund symbol */
+  symbol: string
+  /** Action (buy/sell) */
+  action: string
+  /** Currency */
+  currency: string
+  /** Amount (for amount-based orders) */
+  amount?: string
+  /** Units (for unit-based orders) */
+  units?: string
+  /** Dividend option */
+  dividendOption?: number
+  /** Fee */
+  fee?: string
+  /** Whether to sell all */
+  isSellAll?: boolean
+  /** Remark */
+  remark?: string
+  /** Trade method */
+  tradeMethod?: number
+}
+
 /** Options for submit grid trading order request */
 export interface SubmitGridOrderOptions {
   /** Security code */
@@ -8206,6 +9437,26 @@ export interface USValuationOverview {
   ccySymbol: string
   aichatData: USAIChatData
   aiSummary: string
+}
+
+/** Options for validating a fund order. */
+export interface ValidateFundOrderOptions {
+  /** Fund symbol */
+  symbol: string
+  /** Action (buy/sell) */
+  action: string
+  /** Currency */
+  currency: string
+  /** Amount (for amount-based orders) */
+  amount?: string
+  /** Units (for unit-based orders) */
+  units?: string
+  /** Dividend option */
+  dividendOption?: number
+  /** Fund source */
+  fundSource?: number
+  /** Account channel */
+  accountChannel?: string
 }
 
 /** One security's valuation comparison item. */
