@@ -1992,6 +1992,8 @@ typedef struct lb_decimal_t lb_decimal_t;
 
 typedef struct lb_error_t lb_error_t;
 
+typedef struct CFundContext CFundContext;
+
 typedef struct lb_fundamental_context_t lb_fundamental_context_t;
 
 typedef struct lb_grid_context_t lb_grid_context_t;
@@ -3236,6 +3238,354 @@ typedef struct lb_alert_item_t {
    */
   struct CAlertValueMap value_map;
 } lb_alert_item_t;
+
+/**
+ * Options for the fund list request.
+ */
+typedef struct CGetFundsOptions {
+  /**
+   * Server-defined filter object as a JSON string (can be null)
+   */
+  const char *filter;
+  /**
+   * Quick-filter ids (can be null)
+   */
+  const int64_t *quick_ids;
+  /**
+   * Number of quick-filter ids
+   */
+  uintptr_t num_quick_ids;
+  /**
+   * Earning-rate time intervals (can be null)
+   */
+  const char *const *time_interval;
+  /**
+   * Number of time intervals
+   */
+  uintptr_t num_time_interval;
+} CGetFundsOptions;
+
+/**
+ * Options for the fund analysis / trend / comparison request.
+ */
+typedef struct CGetFundAnalysisOptions {
+  /**
+   * Analysis period (can be null)
+   */
+  const int32_t *period;
+} CGetFundAnalysisOptions;
+
+/**
+ * Paging options (page / size).
+ */
+typedef struct CFundPageOptions {
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} CFundPageOptions;
+
+/**
+ * Net-value range options (relative months / years before now).
+ */
+typedef struct CFundNavRangeOptions {
+  /**
+   * Number of months before now (can be null)
+   */
+  const int32_t *month_before;
+  /**
+   * Number of years before now (can be null)
+   */
+  const int32_t *year_before;
+} CFundNavRangeOptions;
+
+/**
+ * Options for the fund holdings request.
+ */
+typedef struct CGetFundHoldingsOptions {
+  /**
+   * Scene (can be null)
+   */
+  const int32_t *scene;
+} CGetFundHoldingsOptions;
+
+/**
+ * Options for the fund stock-holdings (reverse) request.
+ */
+typedef struct CGetFundStockHoldingsOptions {
+  /**
+   * Maximum number of stocks to return (can be null)
+   */
+  const int32_t *limit;
+} CGetFundStockHoldingsOptions;
+
+/**
+ * Options for the fund positions overview request.
+ */
+typedef struct lb_get_fund_positions_options_t {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+} lb_get_fund_positions_options_t;
+
+/**
+ * Options for a single fund position detail request.
+ */
+typedef struct CGetFundPositionOptions {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+  /**
+   * Range start (can be null)
+   */
+  const char *start;
+  /**
+   * Range end (can be null)
+   */
+  const char *end;
+} CGetFundPositionOptions;
+
+/**
+ * Options for a single fund position cumulative-profit request.
+ */
+typedef struct CGetFundPositionProfitsOptions {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+  /**
+   * Range start (can be null)
+   */
+  const char *start;
+  /**
+   * Range end (can be null)
+   */
+  const char *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} CGetFundPositionProfitsOptions;
+
+/**
+ * Options for a single fund position dividend request.
+ */
+typedef struct CGetFundPositionDividendsOptions {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Account id (can be null)
+   */
+  const int64_t *aaid;
+  /**
+   * Currency (can be null)
+   */
+  const char *currency;
+  /**
+   * Range start (unix seconds) (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Range end (unix seconds) (can be null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} CGetFundPositionDividendsOptions;
+
+/**
+ * Options for the fund orders list request.
+ */
+typedef struct CGetFundOrdersOptions {
+  /**
+   * Filter by fund symbols (can be null)
+   */
+  const char *const *symbols;
+  /**
+   * Number of fund symbols
+   */
+  uintptr_t num_symbols;
+  /**
+   * Filter by actions (comma-separated) (can be null)
+   */
+  const char *actions;
+  /**
+   * Filter by states (comma-separated) (can be null)
+   */
+  const char *states;
+  /**
+   * Filter by currency (can be null)
+   */
+  const char *currency;
+  /**
+   * Range start (unix seconds) (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Range end (unix seconds) (can be null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} CGetFundOrdersOptions;
+
+/**
+ * Options for the fund transactions (cash-flow) list request.
+ */
+typedef struct CGetFundTransactionsOptions {
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+  /**
+   * Business type (can be null)
+   */
+  const char *business_type;
+  /**
+   * Category (can be null)
+   */
+  const char *category;
+  /**
+   * Currencies (comma-separated) (can be null)
+   */
+  const char *currencies;
+  /**
+   * Range start (unix seconds) (can be null)
+   */
+  const int64_t *start;
+  /**
+   * Range end (unix seconds) (can be null)
+   */
+  const int64_t *end;
+  /**
+   * Page number (can be null)
+   */
+  const int32_t *page;
+  /**
+   * Page size (can be null)
+   */
+  const int32_t *size;
+} CGetFundTransactionsOptions;
+
+/**
+ * Options for validating a fund order.
+ */
+typedef struct CValidateFundOrderOptions {
+  /**
+   * Fund symbol
+   */
+  const char *symbol;
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Amount (for amount-based orders) (can be null)
+   */
+  const char *amount;
+  /**
+   * Units (for unit-based orders) (can be null)
+   */
+  const char *units;
+  /**
+   * Dividend option (can be null)
+   */
+  const int32_t *dividend_option;
+  /**
+   * Fund source (can be null)
+   */
+  const int32_t *fund_source;
+  /**
+   * Account channel (can be null)
+   */
+  const char *account_channel;
+} CValidateFundOrderOptions;
+
+/**
+ * Options for submitting a fund order.
+ */
+typedef struct CSubmitFundOrderOptions {
+  /**
+   * Fund symbol
+   */
+  const char *symbol;
+  /**
+   * Action (buy/sell)
+   */
+  const char *action;
+  /**
+   * Currency
+   */
+  const char *currency;
+  /**
+   * Amount (for amount-based orders) (can be null)
+   */
+  const char *amount;
+  /**
+   * Units (for unit-based orders) (can be null)
+   */
+  const char *units;
+  /**
+   * Dividend option (can be null)
+   */
+  const int32_t *dividend_option;
+  /**
+   * Fee (can be null)
+   */
+  const char *fee;
+  /**
+   * Whether to sell all (can be null)
+   */
+  const bool *is_sell_all;
+  /**
+   * Remark (can be null)
+   */
+  const char *remark;
+  /**
+   * Trade method (can be null)
+   */
+  const int32_t *trade_method;
+} CSubmitFundOrderOptions;
 
 /**
  * Grid trading rule — parameters for submit / replace.
@@ -4546,20 +4896,6 @@ typedef struct lb_get_cash_flow_options_t {
 } lb_get_cash_flow_options_t;
 
 /**
- * Options for get fund positions request
- */
-typedef struct lb_get_fund_positions_options_t {
-  /**
-   * Fund symbols (can be null)
-   */
-  const char *const *symbols;
-  /**
-   * Number of fund symbols
-   */
-  uintptr_t num_symbols;
-} lb_get_fund_positions_options_t;
-
-/**
  * Options for get stock positions request
  */
 typedef struct lb_get_stock_positions_options_t {
@@ -5720,37 +6056,49 @@ typedef struct lb_cash_flow_t {
 } lb_cash_flow_t;
 
 /**
- * Fund position
+ * A single fund position held by the user.
  */
 typedef struct lb_fund_position_t {
   /**
-   * Fund ISIN code
+   * Holding amount
    */
-  const char *symbol;
+  const char *amount;
   /**
-   * Current equity
+   * Fund counter id
    */
-  const struct lb_decimal_t *current_net_asset_value;
-  /**
-   * Current equity time
-   */
-  int64_t net_asset_value_day;
-  /**
-   * Fund name
-   */
-  const char *symbol_name;
+  const char *counter_id;
   /**
    * Currency
    */
   const char *currency;
   /**
-   * Net cost
+   * Frozen units
    */
-  const struct lb_decimal_t *cost_net_asset_value;
+  const char *freeze_units;
+  /**
+   * Holding profit
+   */
+  const char *holding_profit;
   /**
    * Holding units
    */
-  const struct lb_decimal_t *holding_units;
+  const char *holding_units;
+  /**
+   * Fund name
+   */
+  const char *name;
+  /**
+   * Recent profit
+   */
+  const char *recent_profit;
+  /**
+   * Recent trading day (unix seconds)
+   */
+  int64_t recent_trading_day;
+  /**
+   * Accumulated recent profit
+   */
+  const char *sum_recent_profit;
 } lb_fund_position_t;
 
 /**
@@ -12507,6 +12855,288 @@ const char *lb_error_message(const struct lb_error_t *error);
 int64_t lb_error_code(const struct lb_error_t *error);
 
 enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
+
+const struct CFundContext *lb_fund_context_new(const struct lb_config_t *config);
+
+void lb_fund_context_retain(const struct CFundContext *ctx);
+
+void lb_fund_context_release(const struct CFundContext *ctx);
+
+/**
+ * Get the hot-selling fund list
+ */
+void lb_fund_context_hot_funds(const struct CFundContext *ctx,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get the fund list
+ *
+ * @param[in] opts Options for get funds request (can be null)
+ */
+void lb_fund_context_funds(const struct CFundContext *ctx,
+                           const struct CGetFundsOptions *opts,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Get the fund list filter options
+ */
+void lb_fund_context_filters(const struct CFundContext *ctx,
+                             lb_async_callback_t callback,
+                             void *userdata);
+
+/**
+ * Get fund detail
+ */
+void lb_fund_context_detail(const struct CFundContext *ctx,
+                            const char *symbol,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Get fund analysis (level 1)
+ *
+ * @param[in] opts Options for the analysis request (can be null)
+ */
+void lb_fund_context_analysis(const struct CFundContext *ctx,
+                              const char *symbol,
+                              const struct CGetFundAnalysisOptions *opts,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get fund analysis detail (level 2)
+ *
+ * @param[in] opts Options for the analysis request (can be null)
+ */
+void lb_fund_context_analysis_detail(const struct CFundContext *ctx,
+                                     const char *symbol,
+                                     const struct CGetFundAnalysisOptions *opts,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
+
+/**
+ * Get fund trend chart
+ *
+ * @param[in] opts Options for the trend request (can be null)
+ */
+void lb_fund_context_trend(const struct CFundContext *ctx,
+                           const char *symbol,
+                           const struct CGetFundAnalysisOptions *opts,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Get fund annual returns
+ *
+ * @param[in] opts Paging options (can be null)
+ */
+void lb_fund_context_annual_returns(const struct CFundContext *ctx,
+                                    const char *symbol,
+                                    const struct CFundPageOptions *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get fund quarterly returns
+ *
+ * @param[in] opts Paging options (can be null)
+ */
+void lb_fund_context_quarterly_returns(const struct CFundContext *ctx,
+                                       const char *symbol,
+                                       const struct CFundPageOptions *opts,
+                                       lb_async_callback_t callback,
+                                       void *userdata);
+
+/**
+ * Get fund performance figures
+ */
+void lb_fund_context_performance(const struct CFundContext *ctx,
+                                 const char *symbol,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get fund performance comparison
+ *
+ * @param[in] opts Options for the comparison request (can be null)
+ */
+void lb_fund_context_performance_comparison(const struct CFundContext *ctx,
+                                            const char *symbol,
+                                            const struct CGetFundAnalysisOptions *opts,
+                                            lb_async_callback_t callback,
+                                            void *userdata);
+
+/**
+ * Get fund latest net value
+ */
+void lb_fund_context_nav(const struct CFundContext *ctx,
+                         const char *symbol,
+                         lb_async_callback_t callback,
+                         void *userdata);
+
+/**
+ * Get fund historical net value (paged)
+ *
+ * @param[in] opts Paging options (can be null)
+ */
+void lb_fund_context_nav_history(const struct CFundContext *ctx,
+                                 const char *symbol,
+                                 const struct CFundPageOptions *opts,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get fund historical net value by relative time range
+ *
+ * @param[in] opts Net-value range options (can be null)
+ */
+void lb_fund_context_nav_range(const struct CFundContext *ctx,
+                               const char *symbol,
+                               const struct CFundNavRangeOptions *opts,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get a fund's top-10 holdings
+ *
+ * @param[in] opts Options for the holdings request (can be null)
+ */
+void lb_fund_context_holdings(const struct CFundContext *ctx,
+                              const char *symbol,
+                              const struct CGetFundHoldingsOptions *opts,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get the stocks held by a fund (reverse lookup)
+ *
+ * @param[in] opts Options for the stock-holdings request (can be null)
+ */
+void lb_fund_context_stock_holdings(const struct CFundContext *ctx,
+                                    const char *symbol,
+                                    const struct CGetFundStockHoldingsOptions *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Get the user's fund positions overview
+ *
+ * @param[in] opts Options for the positions request (can be null)
+ */
+void lb_fund_context_positions(const struct CFundContext *ctx,
+                               const struct lb_get_fund_positions_options_t *opts,
+                               lb_async_callback_t callback,
+                               void *userdata);
+
+/**
+ * Get the user's single fund position detail
+ *
+ * @param[in] opts Options for the position request (can be null)
+ */
+void lb_fund_context_position(const struct CFundContext *ctx,
+                              const char *symbol,
+                              const struct CGetFundPositionOptions *opts,
+                              lb_async_callback_t callback,
+                              void *userdata);
+
+/**
+ * Get the performance figures of a held fund
+ */
+void lb_fund_context_position_performance(const struct CFundContext *ctx,
+                                          const char *symbol,
+                                          lb_async_callback_t callback,
+                                          void *userdata);
+
+/**
+ * Get the cumulative-profit series of a held fund
+ *
+ * @param[in] opts Options for the profits request (can be null)
+ */
+void lb_fund_context_position_profits(const struct CFundContext *ctx,
+                                      const char *symbol,
+                                      const struct CGetFundPositionProfitsOptions *opts,
+                                      lb_async_callback_t callback,
+                                      void *userdata);
+
+/**
+ * Get the net-value history of a held fund
+ *
+ * @param[in] opts Net-value range options (can be null)
+ */
+void lb_fund_context_position_nav(const struct CFundContext *ctx,
+                                  const char *symbol,
+                                  const struct CFundNavRangeOptions *opts,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Get the dividend records of a held fund
+ *
+ * @param[in] opts Options for the dividends request (can be null)
+ */
+void lb_fund_context_position_dividends(const struct CFundContext *ctx,
+                                        const char *symbol,
+                                        const struct CGetFundPositionDividendsOptions *opts,
+                                        lb_async_callback_t callback,
+                                        void *userdata);
+
+/**
+ * Get the user's fund orders
+ *
+ * @param[in] opts Options for the orders request (can be null)
+ */
+void lb_fund_context_orders(const struct CFundContext *ctx,
+                            const struct CGetFundOrdersOptions *opts,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Get a fund order detail
+ */
+void lb_fund_context_order(const struct CFundContext *ctx,
+                           int64_t order_id,
+                           lb_async_callback_t callback,
+                           void *userdata);
+
+/**
+ * Get the user's fund transactions (cash-flow records)
+ *
+ * @param[in] opts Options for the transactions request (can be null)
+ */
+void lb_fund_context_transactions(const struct CFundContext *ctx,
+                                  const struct CGetFundTransactionsOptions *opts,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Validate a fund order before submitting
+ *
+ * @param[in] opts Options for the validate request
+ */
+void lb_fund_context_validate_order(const struct CFundContext *ctx,
+                                    const struct CValidateFundOrderOptions *opts,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Submit a fund order (buy / sell)
+ *
+ * @param[in] opts Options for the submit request
+ */
+void lb_fund_context_submit_order(const struct CFundContext *ctx,
+                                  const struct CSubmitFundOrderOptions *opts,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
+
+/**
+ * Cancel (withdraw) a fund order
+ */
+void lb_fund_context_cancel_order(const struct CFundContext *ctx,
+                                  int64_t order_id,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
 
 const struct lb_fundamental_context_t *lb_fundamental_context_new(const struct lb_config_t *config);
 
