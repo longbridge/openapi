@@ -4174,7 +4174,8 @@ convert(const fund::ffi::CFundDetail* d)
     d->additional_purchase_amount,
     d->affirm_day,
     d->amount_affirm_day,
-    convert(&d->asset_allocation),
+    d->asset_allocation ? std::optional{ convert(d->asset_allocation) }
+                        : std::nullopt,
     d->asset_class,
     d->asset_class_name,
     d->bill_purchase_rate,
@@ -4279,7 +4280,8 @@ convert(const fund::ffi::CFundTrend* t)
     available_periods,
     convert_fund_json_list(t->category_average_performances,
                            t->num_category_average_performances),
-    convert(&t->contrast_performances),
+    t->contrast_performances ? std::optional{ convert(t->contrast_performances) }
+                             : std::nullopt,
     convert_fund_json_list(t->fund_performances, t->num_fund_performances),
   };
 }
@@ -4518,7 +4520,8 @@ convert(const fund::ffi::CFundPositionDetail* d)
                  [](auto& item) { return convert(&item); });
 
   return FundPositionDetail{
-    convert(&d->detail_values),
+    d->detail_values ? std::optional{ convert(d->detail_values) }
+                     : std::nullopt,
     sum_profit,
     ut_value,
   };
@@ -4715,7 +4718,7 @@ convert(const fund::ffi::CFundOrderDetail* d)
 
   return FundOrderDetail{
     keywords,
-    convert(&d->order),
+    d->order ? std::optional{ convert(d->order) } : std::nullopt,
     stages,
   };
 }

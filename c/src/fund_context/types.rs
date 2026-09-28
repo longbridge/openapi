@@ -12,7 +12,7 @@ use longbridge::fund::{
 };
 use serde_json::Value;
 
-use crate::types::{CString, CVec, ToFFI};
+use crate::types::{COption, CString, CVec, ToFFI};
 
 // Helpers for `serde_json::Value` ("any") fields ------------------------------
 
@@ -519,8 +519,8 @@ pub struct CFundDetail {
     pub affirm_day: i32,
     /// Amount affirm day
     pub amount_affirm_day: *const c_char,
-    /// Asset allocation
-    pub asset_allocation: CFundAssetAllocation,
+    /// Asset allocation, or null if unavailable
+    pub asset_allocation: *const CFundAssetAllocation,
     /// Asset class
     pub asset_class: i32,
     /// Asset class name
@@ -626,7 +626,7 @@ pub(crate) struct CFundDetailOwned {
     additional_purchase_amount: CString,
     affirm_day: i32,
     amount_affirm_day: CString,
-    asset_allocation: CFundAssetAllocationOwned,
+    asset_allocation: COption<CFundAssetAllocationOwned>,
     asset_class: i32,
     asset_class_name: CString,
     bill_purchase_rate: CString,
@@ -983,8 +983,8 @@ pub struct CFundTrend {
     pub category_average_performances: *const *const c_char,
     /// Number of category average performances
     pub num_category_average_performances: usize,
-    /// Benchmark contrast performances
-    pub contrast_performances: CFundTrendContrast,
+    /// Benchmark contrast performances, or null if unavailable
+    pub contrast_performances: *const CFundTrendContrast,
     /// Fund performances (JSON strings)
     pub fund_performances: *const *const c_char,
     /// Number of fund performances
@@ -996,7 +996,7 @@ pub(crate) struct CFundTrendOwned {
     actual_period: i32,
     available_periods: CVec<i32>,
     category_average_performances: CVec<CString>,
-    contrast_performances: CFundTrendContrastOwned,
+    contrast_performances: COption<CFundTrendContrastOwned>,
     fund_performances: CVec<CString>,
 }
 
@@ -1932,7 +1932,7 @@ impl ToFFI for CFundPositionDetailValuesOwned {
 #[repr(C)]
 pub struct CFundPositionDetail {
     /// Detail values
-    pub detail_values: CFundPositionDetailValues,
+    pub detail_values: *const CFundPositionDetailValues,
     /// Accumulated profit series
     pub sum_profit: *const CFundDatedValue,
     /// Number of accumulated-profit points
@@ -1945,7 +1945,7 @@ pub struct CFundPositionDetail {
 
 #[derive(Debug)]
 pub(crate) struct CFundPositionDetailOwned {
-    detail_values: CFundPositionDetailValuesOwned,
+    detail_values: COption<CFundPositionDetailValuesOwned>,
     sum_profit: CVec<CFundDatedValueOwned>,
     ut_value: CVec<CFundUnitValueOwned>,
 }
@@ -2720,7 +2720,7 @@ pub struct CFundOrderDetail {
     /// Number of keyword blocks
     pub num_keywords: usize,
     /// The order
-    pub order: CFundOrderInfo,
+    pub order: *const CFundOrderInfo,
     /// Processing stages
     pub stages: *const CFundOrderStage,
     /// Number of processing stages
@@ -2730,7 +2730,7 @@ pub struct CFundOrderDetail {
 #[derive(Debug)]
 pub(crate) struct CFundOrderDetailOwned {
     keywords: CVec<CFundOrderKeywordOwned>,
-    order: CFundOrderInfoOwned,
+    order: COption<CFundOrderInfoOwned>,
     stages: CVec<CFundOrderStageOwned>,
 }
 

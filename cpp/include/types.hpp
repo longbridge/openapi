@@ -5721,7 +5721,7 @@ struct FundDetail
   /// Amount affirm day
   std::string amount_affirm_day;
   /// Asset allocation
-  FundAssetAllocation asset_allocation;
+  std::optional<FundAssetAllocation> asset_allocation;
   /// Asset class
   int32_t asset_class;
   /// Asset class name
@@ -5881,7 +5881,7 @@ struct FundTrend
   /// Category average performances (raw JSON strings)
   std::vector<std::string> category_average_performances;
   /// Benchmark contrast performances
-  FundTrendContrast contrast_performances;
+  std::optional<FundTrendContrast> contrast_performances;
   /// Fund performances (raw JSON strings)
   std::vector<std::string> fund_performances;
 };
@@ -6173,7 +6173,7 @@ struct FundPositionDetailValues
 struct FundPositionDetail
 {
   /// Detail values
-  FundPositionDetailValues detail_values;
+  std::optional<FundPositionDetailValues> detail_values;
   /// Accumulated profit series
   std::vector<FundDatedValue> sum_profit;
   /// Unit value series
@@ -6429,7 +6429,7 @@ struct FundOrderDetail
   /// Keyword blocks
   std::vector<FundOrderKeyword> keywords;
   /// The order
-  FundOrderInfo order;
+  std::optional<FundOrderInfo> order;
   /// Processing stages
   std::vector<FundOrderStage> stages;
 };

@@ -173,7 +173,8 @@ pub struct FundDetail {
     /// Amount affirm day
     pub amount_affirm_day: String,
     /// Asset allocation
-    pub asset_allocation: FundAssetAllocation,
+    #[serde(default)]
+    pub asset_allocation: Option<FundAssetAllocation>,
     /// Asset class
     pub asset_class: i32,
     /// Asset class name
@@ -337,7 +338,8 @@ pub struct FundTrend {
     /// Category average performances (server-defined structure)
     pub category_average_performances: Vec<Value>,
     /// Benchmark contrast performances
-    pub contrast_performances: FundTrendContrast,
+    #[serde(default)]
+    pub contrast_performances: Option<FundTrendContrast>,
     /// Fund performances (server-defined structure)
     pub fund_performances: Vec<Value>,
 }
@@ -649,7 +651,8 @@ pub struct FundPositionDetailValues {
 #[serde(default)]
 pub struct FundPositionDetail {
     /// Detail values
-    pub detail_values: FundPositionDetailValues,
+    #[serde(default)]
+    pub detail_values: Option<FundPositionDetailValues>,
     /// Accumulated profit series
     pub sum_profit: Vec<FundDatedValue>,
     /// Unit value series
@@ -930,7 +933,8 @@ pub struct FundOrderDetail {
     /// Keyword blocks
     pub keywords: Vec<FundOrderKeyword>,
     /// The order
-    pub order: FundOrderInfo,
+    #[serde(default)]
+    pub order: Option<FundOrderInfo>,
     /// Processing stages
     pub stages: Vec<FundOrderStage>,
 }

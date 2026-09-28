@@ -7476,9 +7476,9 @@ typedef struct lb_fund_detail_t {
    */
   const char *amount_affirm_day;
   /**
-   * Asset allocation
+   * Asset allocation, or null if unavailable
    */
-  struct lb_fund_asset_allocation_t asset_allocation;
+  const struct lb_fund_asset_allocation_t *asset_allocation;
   /**
    * Asset class
    */
@@ -8202,7 +8202,7 @@ typedef struct lb_fund_order_detail_t {
   /**
    * The order
    */
-  struct lb_fund_order_info_t order;
+  const struct lb_fund_order_info_t *order;
   /**
    * Processing stages
    */
@@ -8594,7 +8594,7 @@ typedef struct lb_fund_position_detail_t {
   /**
    * Detail values
    */
-  struct lb_fund_position_detail_values_t detail_values;
+  const struct lb_fund_position_detail_values_t *detail_values;
   /**
    * Accumulated profit series
    */
@@ -8984,9 +8984,9 @@ typedef struct lb_fund_trend_t {
    */
   uintptr_t num_category_average_performances;
   /**
-   * Benchmark contrast performances
+   * Benchmark contrast performances, or null if unavailable
    */
-  struct lb_fund_trend_contrast_t contrast_performances;
+  const struct lb_fund_trend_contrast_t *contrast_performances;
   /**
    * Fund performances (JSON strings)
    */

@@ -233,7 +233,8 @@ pub(crate) struct FundDetail {
     /// Amount affirm day
     amount_affirm_day: String,
     /// Asset allocation
-    asset_allocation: FundAssetAllocation,
+    #[py(opt)]
+    asset_allocation: Option<FundAssetAllocation>,
     /// Asset class
     asset_class: i32,
     /// Asset class name
@@ -404,7 +405,8 @@ pub(crate) struct FundTrend {
     #[py(array)]
     category_average_performances: Vec<PyJson>,
     /// Benchmark contrast performances
-    contrast_performances: FundTrendContrast,
+    #[py(opt)]
+    contrast_performances: Option<FundTrendContrast>,
     /// Fund performances (server-defined structure, raw JSON strings)
     #[py(array)]
     fund_performances: Vec<PyJson>,
@@ -730,7 +732,8 @@ pub(crate) struct FundPositionDetailValues {
 #[py(remote = "longbridge::fund::FundPositionDetail")]
 pub(crate) struct FundPositionDetail {
     /// Detail values
-    detail_values: FundPositionDetailValues,
+    #[py(opt)]
+    detail_values: Option<FundPositionDetailValues>,
     /// Accumulated profit series
     #[py(array)]
     sum_profit: Vec<FundDatedValue>,
@@ -1011,7 +1014,8 @@ pub(crate) struct FundOrderDetail {
     #[py(array)]
     keywords: Vec<FundOrderKeyword>,
     /// The order
-    order: FundOrderInfo,
+    #[py(opt)]
+    order: Option<FundOrderInfo>,
     /// Processing stages
     #[py(array)]
     stages: Vec<FundOrderStage>,

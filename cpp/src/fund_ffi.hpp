@@ -14,6 +14,7 @@
 //   * `CVec<CString>`        -> `const char* const*` + `uintptr_t num_*`
 //   * `CVec<T>`              -> `const T*` + `uintptr_t num_*`
 //   * nested struct          -> embedded by value
+//   * COption<T>             -> `const T*` (nullable; null when `None`)
 //   * i64/i32/bool           -> int64_t/int32_t/bool
 // Field order matches the Rust `#[repr(C)]` declaration order exactly.
 
@@ -117,7 +118,7 @@ struct CFundDetail
   const char* additional_purchase_amount;
   int32_t affirm_day;
   const char* amount_affirm_day;
-  CFundAssetAllocation asset_allocation;
+  const CFundAssetAllocation* asset_allocation;
   int32_t asset_class;
   const char* asset_class_name;
   const char* bill_purchase_rate;
@@ -207,7 +208,7 @@ struct CFundTrend
   uintptr_t num_available_periods;
   const char* const* category_average_performances;
   uintptr_t num_category_average_performances;
-  CFundTrendContrast contrast_performances;
+  const CFundTrendContrast* contrast_performances;
   const char* const* fund_performances;
   uintptr_t num_fund_performances;
 };
@@ -380,7 +381,7 @@ struct CFundPositionDetailValues
 
 struct CFundPositionDetail
 {
-  CFundPositionDetailValues detail_values;
+  const CFundPositionDetailValues* detail_values;
   const CFundDatedValue* sum_profit;
   uintptr_t num_sum_profit;
   const CFundUnitValue* ut_value;
@@ -528,7 +529,7 @@ struct CFundOrderDetail
 {
   const CFundOrderKeyword* keywords;
   uintptr_t num_keywords;
-  CFundOrderInfo order;
+  const CFundOrderInfo* order;
   const CFundOrderStage* stages;
   uintptr_t num_stages;
 };

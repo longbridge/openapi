@@ -9291,7 +9291,7 @@ class FundDetail:
     """
     Amount affirm day
     """
-    asset_allocation: FundAssetAllocation
+    asset_allocation: Optional[FundAssetAllocation]
     """
     Asset allocation
     """
@@ -9595,7 +9595,7 @@ class FundTrend:
     """
     Category average performances (server-defined structure, raw JSON strings)
     """
-    contrast_performances: FundTrendContrast
+    contrast_performances: Optional[FundTrendContrast]
     """
     Benchmark contrast performances
     """
@@ -10123,7 +10123,7 @@ class FundPositionDetail:
     Detail of a single fund position
     """
 
-    detail_values: FundPositionDetailValues
+    detail_values: Optional[FundPositionDetailValues]
     """
     Detail values
     """
@@ -10595,7 +10595,7 @@ class FundOrderDetail:
     """
     Keyword blocks
     """
-    order: FundOrderInfo
+    order: Optional[FundOrderInfo]
     """
     The order
     """

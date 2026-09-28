@@ -172,7 +172,8 @@ pub struct FundDetail {
     /// Amount affirm day
     amount_affirm_day: String,
     /// Asset allocation
-    asset_allocation: FundAssetAllocation,
+    #[js(opt)]
+    asset_allocation: Option<FundAssetAllocation>,
     /// Asset class
     asset_class: i32,
     /// Asset class name
@@ -571,7 +572,8 @@ pub struct FundPositionDetailValues {
 #[js(remote = "longbridge::fund::FundPositionDetail")]
 pub struct FundPositionDetail {
     /// Detail values
-    detail_values: FundPositionDetailValues,
+    #[js(opt)]
+    detail_values: Option<FundPositionDetailValues>,
     /// Accumulated profit series
     #[js(array)]
     sum_profit: Vec<FundDatedValue>,
@@ -852,7 +854,8 @@ pub struct FundOrderDetail {
     #[js(array)]
     keywords: Vec<FundOrderKeyword>,
     /// The order
-    order: FundOrderInfo,
+    #[js(opt)]
+    order: Option<FundOrderInfo>,
     /// Processing stages
     #[js(array)]
     stages: Vec<FundOrderStage>,
@@ -1342,7 +1345,7 @@ pub struct FundTrend {
     actual_period: i32,
     available_periods: Vec<i32>,
     category_average_performances: Vec<String>,
-    contrast_performances: FundTrendContrast,
+    contrast_performances: Option<FundTrendContrast>,
     fund_performances: Vec<String>,
 }
 
@@ -1354,7 +1357,7 @@ impl ::std::convert::TryFrom<longbridge::fund::FundTrend> for FundTrend {
             actual_period: v.actual_period,
             available_periods: v.available_periods,
             category_average_performances: values_to_json_strings(v.category_average_performances),
-            contrast_performances: v.contrast_performances.into(),
+            contrast_performances: v.contrast_performances.map(Into::into),
             fund_performances: values_to_json_strings(v.fund_performances),
         })
     }
@@ -1396,7 +1399,7 @@ impl FundTrend {
     /// Benchmark contrast performances
     #[napi(getter)]
     #[inline]
-    pub fn contrast_performances(&self) -> FundTrendContrast {
+    pub fn contrast_performances(&self) -> Option<FundTrendContrast> {
         self.contrast_performances.clone()
     }
 

@@ -1029,7 +1029,7 @@ export declare class FundDetail {
   /** Amount affirm day */
   get amountAffirmDay(): string
   /** Asset allocation */
-  get assetAllocation(): FundAssetAllocation
+  get assetAllocation(): FundAssetAllocation | null
   /** Asset class */
   get assetClass(): number
   /** Asset class name */
@@ -1335,7 +1335,7 @@ export declare class FundOrderDetail {
   /** Keyword blocks */
   get keywords(): Array<FundOrderKeyword>
   /** The order */
-  get order(): FundOrderInfo
+  get order(): FundOrderInfo | null
   /** Processing stages */
   get stages(): Array<FundOrderStage>
 }
@@ -1644,7 +1644,7 @@ export declare class FundPositionDetail {
   toString(): string
   toJSON(): any
   /** Detail values */
-  get detailValues(): FundPositionDetailValues
+  get detailValues(): FundPositionDetailValues | null
   /** Accumulated profit series */
   get sumProfit(): Array<FundDatedValue>
   /** Unit value series */
@@ -1867,7 +1867,7 @@ export declare class FundTrend {
   /** Category average performances (each a raw JSON string) */
   get categoryAveragePerformances(): Array<string>
   /** Benchmark contrast performances */
-  get contrastPerformances(): FundTrendContrast
+  get contrastPerformances(): FundTrendContrast | null
   /** Fund performances (each a raw JSON string) */
   get fundPerformances(): Array<string>
 }
