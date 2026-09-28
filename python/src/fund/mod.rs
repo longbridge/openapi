@@ -25,7 +25,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<FundHolding>()?;
     parent.add_class::<FundHoldings>()?;
     parent.add_class::<FundStockHolding>()?;
-    parent.add_class::<FundPosition>()?;
+    parent.add_class::<FundHoldingPosition>()?;
     parent.add_class::<FundPositions>()?;
     parent.add_class::<FundDatedValue>()?;
     parent.add_class::<FundUnitValue>()?;

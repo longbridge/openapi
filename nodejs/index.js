@@ -615,7 +615,6 @@ module.exports.FundDividends = nativeBinding.FundDividends
 module.exports.FundFilters = nativeBinding.FundFilters
 module.exports.FundHolding = nativeBinding.FundHolding
 module.exports.FundHoldingPosition = nativeBinding.FundHoldingPosition
-module.exports.FundPosition = nativeBinding.FundPosition
 module.exports.FundHoldings = nativeBinding.FundHoldings
 module.exports.FundNamedContrast = nativeBinding.FundNamedContrast
 module.exports.FundNavValue = nativeBinding.FundNavValue

@@ -9944,9 +9944,12 @@ class FundStockHolding:
     Report date
     """
 
-class FundPosition:
+class FundHoldingPosition:
     """
     A single fund position held by the user
+
+    Named ``FundHoldingPosition`` to avoid a name clash with the trade
+    channel's existing ``FundPosition`` class.
     """
 
     amount: str
@@ -9999,7 +10002,7 @@ class FundPositions:
     """
     Account channel
     """
-    list: List[FundPosition]
+    list: List[FundHoldingPosition]
     """
     Position entries
     """

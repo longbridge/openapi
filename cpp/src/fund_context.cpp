@@ -18,7 +18,7 @@ FundContext::FundContext()
 {
 }
 
-FundContext::FundContext(const CFundContext* ctx)
+FundContext::FundContext(const lb_fund_context_t* ctx)
 {
   ctx_ = ctx;
   if (ctx_)
@@ -70,7 +70,7 @@ FundContext::create(const Config& config)
     auto callback_ptr =                                                         \
       callback::get_async_callback<FundContext, std::vector<Value>>(           \
         res->userdata);                                                         \
-    FundContext ctx((const CFundContext*)res->ctx);                            \
+    FundContext ctx((const lb_fund_context_t*)res->ctx);                            \
     Status status(res->error);                                                  \
     if (status) {                                                               \
       auto rows = (const fund::ffi::Elem*)res->data;                            \
@@ -92,7 +92,7 @@ FundContext::create(const Config& config)
   [](auto res) {                                                               \
     auto callback_ptr =                                                         \
       callback::get_async_callback<FundContext, Value>(res->userdata);         \
-    FundContext ctx((const CFundContext*)res->ctx);                            \
+    FundContext ctx((const lb_fund_context_t*)res->ctx);                            \
     Status status(res->error);                                                  \
     if (status) {                                                               \
       Value resp = convert((const fund::ffi::Elem*)res->data);                 \
@@ -119,7 +119,7 @@ FundContext::funds(
   const std::optional<GetFundsOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundBrief>> callback) const
 {
-  CGetFundsOptions opts2 = { nullptr, nullptr, 0, nullptr, 0 };
+  lb_get_funds_options_t opts2 = { nullptr, nullptr, 0, nullptr, 0 };
   std::vector<const char*> time_interval;
 
   if (opts) {
@@ -170,7 +170,7 @@ FundContext::analysis(const std::string& counter_id,
                       const std::optional<GetFundAnalysisOptions>& opts,
                       AsyncCallback<FundContext, FundAnalysis> callback) const
 {
-  CGetFundAnalysisOptions opts2 = { nullptr };
+  lb_get_fund_analysis_options_t opts2 = { nullptr };
   if (opts)
     opts2.period = opts->period ? &opts->period.value() : nullptr;
 
@@ -188,7 +188,7 @@ FundContext::analysis_detail(
   const std::optional<GetFundAnalysisOptions>& opts,
   AsyncCallback<FundContext, FundAnalysisDetail> callback) const
 {
-  CGetFundAnalysisOptions opts2 = { nullptr };
+  lb_get_fund_analysis_options_t opts2 = { nullptr };
   if (opts)
     opts2.period = opts->period ? &opts->period.value() : nullptr;
 
@@ -205,7 +205,7 @@ FundContext::trend(const std::string& counter_id,
                    const std::optional<GetFundAnalysisOptions>& opts,
                    AsyncCallback<FundContext, FundTrend> callback) const
 {
-  CGetFundAnalysisOptions opts2 = { nullptr };
+  lb_get_fund_analysis_options_t opts2 = { nullptr };
   if (opts)
     opts2.period = opts->period ? &opts->period.value() : nullptr;
 
@@ -223,7 +223,7 @@ FundContext::annual_returns(
   const std::optional<FundPageOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundAnnualReturn>> callback) const
 {
-  CFundPageOptions opts2 = { nullptr, nullptr };
+  lb_fund_page_options_t opts2 = { nullptr, nullptr };
   if (opts) {
     opts2.page = opts->page ? &opts->page.value() : nullptr;
     opts2.size = opts->size ? &opts->size.value() : nullptr;
@@ -243,7 +243,7 @@ FundContext::quarterly_returns(
   const std::optional<FundPageOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundQuarterlyReturn>> callback) const
 {
-  CFundPageOptions opts2 = { nullptr, nullptr };
+  lb_fund_page_options_t opts2 = { nullptr, nullptr };
   if (opts) {
     opts2.page = opts->page ? &opts->page.value() : nullptr;
     opts2.size = opts->size ? &opts->size.value() : nullptr;
@@ -275,7 +275,7 @@ FundContext::performance_comparison(
   const std::optional<GetFundAnalysisOptions>& opts,
   AsyncCallback<FundContext, FundPerformanceComparison> callback) const
 {
-  CGetFundAnalysisOptions opts2 = { nullptr };
+  lb_get_fund_analysis_options_t opts2 = { nullptr };
   if (opts)
     opts2.period = opts->period ? &opts->period.value() : nullptr;
 
@@ -305,7 +305,7 @@ FundContext::nav_history(
   const std::optional<FundPageOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const
 {
-  CFundPageOptions opts2 = { nullptr, nullptr };
+  lb_fund_page_options_t opts2 = { nullptr, nullptr };
   if (opts) {
     opts2.page = opts->page ? &opts->page.value() : nullptr;
     opts2.size = opts->size ? &opts->size.value() : nullptr;
@@ -325,7 +325,7 @@ FundContext::nav_range(
   const std::optional<FundNavRangeOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundNavValue>> callback) const
 {
-  CFundNavRangeOptions opts2 = { nullptr, nullptr };
+  lb_fund_nav_range_options_t opts2 = { nullptr, nullptr };
   if (opts) {
     opts2.month_before =
       opts->month_before ? &opts->month_before.value() : nullptr;
@@ -345,7 +345,7 @@ FundContext::holdings(const std::string& counter_id,
                       const std::optional<GetFundHoldingsOptions>& opts,
                       AsyncCallback<FundContext, FundHoldings> callback) const
 {
-  CGetFundHoldingsOptions opts2 = { nullptr };
+  lb_get_fund_holdings_options_t opts2 = { nullptr };
   if (opts)
     opts2.scene = opts->scene ? &opts->scene.value() : nullptr;
 
@@ -363,7 +363,7 @@ FundContext::stock_holdings(
   const std::optional<GetFundStockHoldingsOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundStockHolding>> callback) const
 {
-  CGetFundStockHoldingsOptions opts2 = { nullptr };
+  lb_get_fund_stock_holdings_options_t opts2 = { nullptr };
   if (opts)
     opts2.limit = opts->limit ? &opts->limit.value() : nullptr;
 
@@ -399,7 +399,7 @@ FundContext::position(
   const std::optional<GetFundPositionOptions>& opts,
   AsyncCallback<FundContext, FundPositionDetail> callback) const
 {
-  CGetFundPositionOptions opts2 = { nullptr, nullptr, nullptr, nullptr };
+  lb_get_fund_position_options_t opts2 = { nullptr, nullptr, nullptr, nullptr };
   if (opts) {
     opts2.account_channel =
       opts->account_channel ? opts->account_channel->c_str() : nullptr;
@@ -436,7 +436,7 @@ FundContext::position_profits(
   const std::optional<GetFundPositionProfitsOptions>& opts,
   AsyncCallback<FundContext, FundPositionProfits> callback) const
 {
-  CGetFundPositionProfitsOptions opts2 = {
+  lb_get_fund_position_profits_options_t opts2 = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
   };
   if (opts) {
@@ -463,7 +463,7 @@ FundContext::position_nav(
   const std::optional<FundNavRangeOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundPositionNav>> callback) const
 {
-  CFundNavRangeOptions opts2 = { nullptr, nullptr };
+  lb_fund_nav_range_options_t opts2 = { nullptr, nullptr };
   if (opts) {
     opts2.month_before =
       opts->month_before ? &opts->month_before.value() : nullptr;
@@ -484,7 +484,7 @@ FundContext::position_dividends(
   const std::optional<GetFundPositionDividendsOptions>& opts,
   AsyncCallback<FundContext, FundDividends> callback) const
 {
-  CGetFundPositionDividendsOptions opts2 = {
+  lb_get_fund_position_dividends_options_t opts2 = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
   };
   if (opts) {
@@ -511,7 +511,7 @@ FundContext::orders(
   const std::optional<GetFundOrdersOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundOrder>> callback) const
 {
-  CGetFundOrdersOptions opts2 = {
+  lb_get_fund_orders_options_t opts2 = {
     nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
   };
   std::vector<const char*> counter_ids;
@@ -557,7 +557,7 @@ FundContext::transactions(
   const std::optional<GetFundTransactionsOptions>& opts,
   AsyncCallback<FundContext, std::vector<FundTransaction>> callback) const
 {
-  CGetFundTransactionsOptions opts2 = {
+  lb_get_fund_transactions_options_t opts2 = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
   };
   if (opts) {
@@ -585,7 +585,7 @@ FundContext::validate_order(
   const ValidateFundOrderOptions& opts,
   AsyncCallback<FundContext, FundOrderValidation> callback) const
 {
-  CValidateFundOrderOptions opts2 = {
+  lb_validate_fund_order_options_t opts2 = {
     opts.counter_id.c_str(),
     opts.action.c_str(),
     opts.currency.c_str(),
@@ -608,7 +608,7 @@ FundContext::submit_order(
   const SubmitFundOrderOptions& opts,
   AsyncCallback<FundContext, FundOrderSubmitResponse> callback) const
 {
-  CSubmitFundOrderOptions opts2 = {
+  lb_submit_fund_order_options_t opts2 = {
     opts.counter_id.c_str(),
     opts.action.c_str(),
     opts.currency.c_str(),
@@ -639,7 +639,7 @@ FundContext::cancel_order(int64_t order_id,
       auto callback_ptr =
         callback::get_async_callback<FundContext, void>(res->userdata);
       (*callback_ptr)(AsyncResult<FundContext, void>(
-        FundContext((const CFundContext*)res->ctx),
+        FundContext((const lb_fund_context_t*)res->ctx),
         Status(res->error),
         nullptr));
     },

@@ -9,9 +9,9 @@
 use serde::Serialize;
 use serde_json::Value;
 
-/// Options for the fund list ([`FundContext::list_funds`]).
+/// Options for the fund list ([`FundContext::funds`]).
 ///
-/// [`FundContext::list_funds`]: crate::fund::FundContext::list_funds
+/// [`FundContext::funds`]: crate::fund::FundContext::funds
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct GetFundsOptions {
     /// Server-defined filter object

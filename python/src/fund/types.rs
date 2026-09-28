@@ -619,10 +619,13 @@ pub(crate) struct FundStockHolding {
 }
 
 /// A single fund position held by the user.
+///
+/// Named `FundHoldingPosition` to avoid a name clash with the trade channel's
+/// existing `FundPosition` class.
 #[pyclass(skip_from_py_object)]
 #[derive(Debug, PyObject, Clone)]
 #[py(remote = "longbridge::fund::FundPosition")]
-pub(crate) struct FundPosition {
+pub(crate) struct FundHoldingPosition {
     /// Holding amount
     amount: String,
     /// Fund counter id
@@ -654,7 +657,7 @@ pub(crate) struct FundPositions {
     account_channel: String,
     /// Position entries
     #[py(array)]
-    list: Vec<FundPosition>,
+    list: Vec<FundHoldingPosition>,
     /// Pending buy orders amount
     pending_buy_orders: String,
     /// Recent trading day (unix seconds)

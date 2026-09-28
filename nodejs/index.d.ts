@@ -1214,8 +1214,8 @@ export declare class FundHolding {
 /**
  * A single fund position held by the user.
  *
- * Exposed to JavaScript as `FundHoldingPosition` to avoid a name clash with
- * the trade channel's existing `FundPosition` class.
+ * Named `FundHoldingPosition` to avoid a name clash with the trade channel's
+ * existing `FundPosition` class.
  */
 export declare class FundHoldingPosition {
   toString(): string
@@ -1241,7 +1241,6 @@ export declare class FundHoldingPosition {
   /** Accumulated recent profit */
   get sumRecentProfit(): string
 }
-export type FundPosition = FundHoldingPosition
 
 /** A fund's top-10 holdings. */
 export declare class FundHoldings {
@@ -1636,7 +1635,7 @@ export declare class FundPositionChannel {
   /** Account type */
   get accountChannel(): string
   /** Fund positions */
-  get positions(): Array<FundHoldingPosition>
+  get positions(): Array<FundPosition>
 }
 
 /** Detail of a single fund position. */

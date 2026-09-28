@@ -6,7 +6,7 @@
 #include "types.hpp"
 #include <vector>
 
-typedef struct CFundContext CFundContext;
+typedef struct lb_fund_context_t lb_fund_context_t;
 
 namespace longbridge {
 namespace fund {
@@ -15,11 +15,11 @@ namespace fund {
 class FundContext
 {
 private:
-  const CFundContext* ctx_;
+  const lb_fund_context_t* ctx_;
 
 public:
   FundContext();
-  FundContext(const CFundContext* ctx);
+  FundContext(const lb_fund_context_t* ctx);
   FundContext(const FundContext& ctx);
   FundContext(FundContext&& ctx);
   ~FundContext();

@@ -457,12 +457,12 @@ pub struct FundStockHolding {
 
 /// A single fund position held by the user.
 ///
-/// Exposed to JavaScript as `FundHoldingPosition` to avoid a name clash with
-/// the trade channel's existing `FundPosition` class.
-#[napi_derive::napi(js_name = "FundHoldingPosition")]
+/// Named `FundHoldingPosition` to avoid a name clash with the trade channel's
+/// existing `FundPosition` class.
+#[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::fund::FundPosition")]
-pub struct FundPosition {
+pub struct FundHoldingPosition {
     /// Holding amount
     amount: String,
     /// Fund counter id
@@ -494,7 +494,7 @@ pub struct FundPositions {
     account_channel: String,
     /// Position entries
     #[js(array)]
-    list: Vec<FundPosition>,
+    list: Vec<FundHoldingPosition>,
     /// Pending buy orders amount
     pending_buy_orders: String,
     /// Recent trading day (unix seconds)
