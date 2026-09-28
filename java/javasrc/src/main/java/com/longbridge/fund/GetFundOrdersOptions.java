@@ -5,7 +5,7 @@ package com.longbridge.fund;
  */
 @SuppressWarnings("unused")
 public class GetFundOrdersOptions {
-    private String[] symbols;
+    private String[] counterIds;
     private String actions;
     private String states;
     private String currency;
@@ -15,13 +15,13 @@ public class GetFundOrdersOptions {
     private Integer size;
 
     /**
-     * Sets symbols.
+     * Sets counterIds.
      *
-     * @param symbols symbols
+     * @param counterIds counterIds
      * @return this instance for chaining
      */
-    public GetFundOrdersOptions setSymbols(String[] symbols) {
-        this.symbols = symbols;
+    public GetFundOrdersOptions setCounterIds(String[] counterIds) {
+        this.counterIds = counterIds;
         return this;
     }
 

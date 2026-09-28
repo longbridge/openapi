@@ -3117,10 +3117,10 @@ pub struct CGetFundPositionDividendsOptions {
 #[derive(Debug)]
 #[repr(C)]
 pub struct CGetFundOrdersOptions {
-    /// Filter by fund symbols (can be null)
-    pub symbols: *const *const c_char,
-    /// Number of fund symbols
-    pub num_symbols: usize,
+    /// Filter by fund counter ids (can be null)
+    pub counter_ids: *const *const c_char,
+    /// Number of fund counter ids
+    pub num_counter_ids: usize,
     /// Filter by actions (comma-separated) (can be null)
     pub actions: *const c_char,
     /// Filter by states (comma-separated) (can be null)
@@ -3163,8 +3163,8 @@ pub struct CGetFundTransactionsOptions {
 #[derive(Debug)]
 #[repr(C)]
 pub struct CValidateFundOrderOptions {
-    /// Fund symbol
-    pub symbol: *const c_char,
+    /// Fund counter id
+    pub counter_id: *const c_char,
     /// Action (buy/sell)
     pub action: *const c_char,
     /// Currency
@@ -3185,8 +3185,8 @@ pub struct CValidateFundOrderOptions {
 #[derive(Debug)]
 #[repr(C)]
 pub struct CSubmitFundOrderOptions {
-    /// Fund symbol
-    pub symbol: *const c_char,
+    /// Fund counter id
+    pub counter_id: *const c_char,
     /// Action (buy/sell)
     pub action: *const c_char,
     /// Currency

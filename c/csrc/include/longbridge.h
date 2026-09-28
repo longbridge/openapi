@@ -3428,13 +3428,13 @@ typedef struct CGetFundPositionDividendsOptions {
  */
 typedef struct CGetFundOrdersOptions {
   /**
-   * Filter by fund symbols (can be null)
+   * Filter by fund counter ids (can be null)
    */
-  const char *const *symbols;
+  const char *const *counter_ids;
   /**
-   * Number of fund symbols
+   * Number of fund counter ids
    */
-  uintptr_t num_symbols;
+  uintptr_t num_counter_ids;
   /**
    * Filter by actions (comma-separated) (can be null)
    */
@@ -3508,9 +3508,9 @@ typedef struct CGetFundTransactionsOptions {
  */
 typedef struct CValidateFundOrderOptions {
   /**
-   * Fund symbol
+   * Fund counter id
    */
-  const char *symbol;
+  const char *counter_id;
   /**
    * Action (buy/sell)
    */
@@ -3546,9 +3546,9 @@ typedef struct CValidateFundOrderOptions {
  */
 typedef struct CSubmitFundOrderOptions {
   /**
-   * Fund symbol
+   * Fund counter id
    */
-  const char *symbol;
+  const char *counter_id;
   /**
    * Action (buy/sell)
    */

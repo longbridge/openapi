@@ -430,11 +430,11 @@ impl FundContext {
     // ----- fund orders & trading (scope: order) -----
 
     /// Get the user's fund orders (also serves as the trade/execution record)
-    #[pyo3(signature = (symbols = None, actions = None, states = None, currency = None, start = None, end = None, page = None, size = None))]
+    #[pyo3(signature = (counter_ids = None, actions = None, states = None, currency = None, start = None, end = None, page = None, size = None))]
     #[allow(clippy::too_many_arguments)]
     fn orders(
         &self,
-        symbols: Option<Vec<String>>,
+        counter_ids: Option<Vec<String>>,
         actions: Option<String>,
         states: Option<String>,
         currency: Option<String>,
@@ -444,8 +444,8 @@ impl FundContext {
         size: Option<i32>,
     ) -> PyResult<Vec<FundOrder>> {
         let mut opts = GetFundOrdersOptions::new();
-        if let Some(symbols) = symbols {
-            opts = opts.symbols(symbols);
+        if let Some(counter_ids) = counter_ids {
+            opts = opts.counter_ids(counter_ids);
         }
         if let Some(actions) = actions {
             opts = opts.actions(actions);
@@ -529,11 +529,11 @@ impl FundContext {
     }
 
     /// Validate a fund order before submitting
-    #[pyo3(signature = (symbol, action, currency, amount = None, units = None, dividend_option = None, fund_source = None, account_channel = None))]
+    #[pyo3(signature = (counter_id, action, currency, amount = None, units = None, dividend_option = None, fund_source = None, account_channel = None))]
     #[allow(clippy::too_many_arguments)]
     fn validate_order(
         &self,
-        symbol: String,
+        counter_id: String,
         action: String,
         currency: String,
         amount: Option<String>,
@@ -542,7 +542,7 @@ impl FundContext {
         fund_source: Option<i32>,
         account_channel: Option<String>,
     ) -> PyResult<FundOrderValidation> {
-        let mut opts = ValidateFundOrderOptions::new(symbol, action, currency);
+        let mut opts = ValidateFundOrderOptions::new(counter_id, action, currency);
         if let Some(amount) = amount {
             opts = opts.amount(amount);
         }
@@ -565,11 +565,11 @@ impl FundContext {
     }
 
     /// Submit a fund order (buy / sell)
-    #[pyo3(signature = (symbol, action, currency, amount = None, units = None, dividend_option = None, fee = None, is_sell_all = None, remark = None, trade_method = None))]
+    #[pyo3(signature = (counter_id, action, currency, amount = None, units = None, dividend_option = None, fee = None, is_sell_all = None, remark = None, trade_method = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
-        symbol: String,
+        counter_id: String,
         action: String,
         currency: String,
         amount: Option<String>,
@@ -580,7 +580,7 @@ impl FundContext {
         remark: Option<String>,
         trade_method: Option<i32>,
     ) -> PyResult<FundOrderSubmitResponse> {
-        let mut opts = SubmitFundOrderOptions::new(symbol, action, currency);
+        let mut opts = SubmitFundOrderOptions::new(counter_id, action, currency);
         if let Some(amount) = amount {
             opts = opts.amount(amount);
         }

@@ -221,9 +221,9 @@ unsafe fn build_orders_options(opts: *const CGetFundOrdersOptions) -> GetFundOrd
     if opts.is_null() {
         return o;
     }
-    let symbols = cstr_array_to_rust((*opts).symbols, (*opts).num_symbols);
-    if !symbols.is_empty() {
-        o = o.symbols(symbols);
+    let counter_ids = cstr_array_to_rust((*opts).counter_ids, (*opts).num_counter_ids);
+    if !counter_ids.is_empty() {
+        o = o.counter_ids(counter_ids);
     }
     if !(*opts).actions.is_null() {
         o = o.actions(cstr_to_rust((*opts).actions));
@@ -287,7 +287,7 @@ unsafe fn build_validate_order_options(
     opts: *const CValidateFundOrderOptions,
 ) -> ValidateFundOrderOptions {
     let mut o = ValidateFundOrderOptions::new(
-        cstr_to_rust((*opts).symbol),
+        cstr_to_rust((*opts).counter_id),
         cstr_to_rust((*opts).action),
         cstr_to_rust((*opts).currency),
     );
@@ -313,7 +313,7 @@ unsafe fn build_submit_order_options(
     opts: *const CSubmitFundOrderOptions,
 ) -> SubmitFundOrderOptions {
     let mut o = SubmitFundOrderOptions::new(
-        cstr_to_rust((*opts).symbol),
+        cstr_to_rust((*opts).counter_id),
         cstr_to_rust((*opts).action),
         cstr_to_rust((*opts).currency),
     );

@@ -532,9 +532,9 @@ impl GetFundPositionDividendsOptions {
 /// Options for the fund orders list.
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct GetFundOrdersOptions {
-    /// Filter by fund symbols
-    #[serde(rename = "symbol", skip_serializing_if = "Vec::is_empty")]
-    symbols: Vec<String>,
+    /// Filter by fund counter ids
+    #[serde(rename = "counter_id", skip_serializing_if = "Vec::is_empty")]
+    counter_ids: Vec<String>,
     /// Filter by actions (comma-separated)
     #[serde(skip_serializing_if = "Option::is_none")]
     actions: Option<String>,
@@ -566,16 +566,16 @@ impl GetFundOrdersOptions {
         Self::default()
     }
 
-    /// Filter by fund symbols
+    /// Filter by fund counter ids
     #[inline]
     #[must_use]
-    pub fn symbols<I, T>(self, symbols: I) -> Self
+    pub fn counter_ids<I, T>(self, counter_ids: I) -> Self
     where
         I: IntoIterator<Item = T>,
         T: Into<String>,
     {
         Self {
-            symbols: symbols.into_iter().map(Into::into).collect(),
+            counter_ids: counter_ids.into_iter().map(Into::into).collect(),
             ..self
         }
     }
@@ -772,8 +772,8 @@ impl GetFundTransactionsOptions {
 /// Options for validating a fund order.
 #[derive(Debug, Clone, Serialize)]
 pub struct ValidateFundOrderOptions {
-    /// Fund symbol
-    symbol: String,
+    /// Fund counter id
+    counter_id: String,
     /// Action (buy/sell)
     action: String,
     /// Currency
@@ -800,12 +800,12 @@ impl ValidateFundOrderOptions {
     #[inline]
     #[must_use]
     pub fn new(
-        symbol: impl Into<String>,
+        counter_id: impl Into<String>,
         action: impl Into<String>,
         currency: impl Into<String>,
     ) -> Self {
         Self {
-            symbol: symbol.into(),
+            counter_id: counter_id.into(),
             action: action.into(),
             currency: currency.into(),
             amount: None,
@@ -870,8 +870,8 @@ impl ValidateFundOrderOptions {
 /// Options for submitting a fund order.
 #[derive(Debug, Clone, Serialize)]
 pub struct SubmitFundOrderOptions {
-    /// Fund symbol
-    symbol: String,
+    /// Fund counter id
+    counter_id: String,
     /// Action (buy/sell)
     action: String,
     /// Currency
@@ -904,12 +904,12 @@ impl SubmitFundOrderOptions {
     #[inline]
     #[must_use]
     pub fn new(
-        symbol: impl Into<String>,
+        counter_id: impl Into<String>,
         action: impl Into<String>,
         currency: impl Into<String>,
     ) -> Self {
         Self {
-            symbol: symbol.into(),
+            counter_id: counter_id.into(),
             action: action.into(),
             currency: currency.into(),
             amount: None,

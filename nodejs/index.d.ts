@@ -6461,8 +6461,8 @@ export interface GetFundHoldingsOptions {
 
 /** Options for the fund orders list. */
 export interface GetFundOrdersOptions {
-  /** Filter by fund symbols */
-  symbols?: Array<string>
+  /** Filter by fund counter ids */
+  counterIds?: Array<string>
   /** Filter by actions (comma-separated) */
   actions?: string
   /** Filter by states (comma-separated) */
@@ -8584,8 +8584,8 @@ export interface SubmitAttachedParams {
 
 /** Options for submitting a fund order. */
 export interface SubmitFundOrderOptions {
-  /** Fund symbol */
-  symbol: string
+  /** Fund counter id */
+  counterId: string
   /** Action (buy/sell) */
   action: string
   /** Currency */
@@ -9441,8 +9441,8 @@ export interface USValuationOverview {
 
 /** Options for validating a fund order. */
 export interface ValidateFundOrderOptions {
-  /** Fund symbol */
-  symbol: string
+  /** Fund counter id */
+  counterId: string
   /** Action (buy/sell) */
   action: string
   /** Currency */

@@ -708,9 +708,9 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextOrders(
         let __owned_ctx = context.ctx.clone();
         let opts = if !opts.is_null() {
             let mut new_opts = GetFundOrdersOptions::new();
-            let symbols: ObjectArray<String> = get_field(env, &opts, "symbols")?;
-            if !symbols.0.is_empty() {
-                new_opts = new_opts.symbols(symbols.0);
+            let counter_ids: ObjectArray<String> = get_field(env, &opts, "counterIds")?;
+            if !counter_ids.0.is_empty() {
+                new_opts = new_opts.counter_ids(counter_ids.0);
             }
             if let Some(actions) = get_field::<_, _, Option<String>>(env, &opts, "actions")? {
                 new_opts = new_opts.actions(actions);
@@ -825,10 +825,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextValidateO
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = get_field(env, &opts, "symbol")?;
+        let counter_id: String = get_field(env, &opts, "counterId")?;
         let action: String = get_field(env, &opts, "action")?;
         let currency: String = get_field(env, &opts, "currency")?;
-        let mut new_opts = ValidateFundOrderOptions::new(symbol, action, currency);
+        let mut new_opts = ValidateFundOrderOptions::new(counter_id, action, currency);
         if let Some(amount) = get_field::<_, _, Option<String>>(env, &opts, "amount")? {
             new_opts = new_opts.amount(amount);
         }
@@ -867,10 +867,10 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_fundContextSubmitOrd
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = get_field(env, &opts, "symbol")?;
+        let counter_id: String = get_field(env, &opts, "counterId")?;
         let action: String = get_field(env, &opts, "action")?;
         let currency: String = get_field(env, &opts, "currency")?;
-        let mut new_opts = SubmitFundOrderOptions::new(symbol, action, currency);
+        let mut new_opts = SubmitFundOrderOptions::new(counter_id, action, currency);
         if let Some(amount) = get_field::<_, _, Option<String>>(env, &opts, "amount")? {
             new_opts = new_opts.amount(amount);
         }

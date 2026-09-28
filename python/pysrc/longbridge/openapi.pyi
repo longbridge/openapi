@@ -11080,7 +11080,7 @@ class FundContext:
 
     def orders(
         self,
-        symbols: Optional[List[str]] = None,
+        counter_ids: Optional[List[str]] = None,
         actions: Optional[str] = None,
         states: Optional[str] = None,
         currency: Optional[str] = None,
@@ -11093,7 +11093,7 @@ class FundContext:
         Get the user's fund orders (also serves as the trade/execution record)
 
         Args:
-            symbols: Filter by fund symbols
+            counter_ids: Filter by fund counter ids
             actions: Filter by actions (comma-separated)
             states: Filter by states (comma-separated)
             currency: Filter by currency
@@ -11147,7 +11147,7 @@ class FundContext:
 
     def validate_order(
         self,
-        symbol: str,
+        counter_id: str,
         action: str,
         currency: str,
         amount: Optional[str] = None,
@@ -11160,7 +11160,7 @@ class FundContext:
         Validate a fund order before submitting
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             action: Action (buy/sell)
             currency: Currency
             amount: Amount (for amount-based orders)
@@ -11175,7 +11175,7 @@ class FundContext:
 
     def submit_order(
         self,
-        symbol: str,
+        counter_id: str,
         action: str,
         currency: str,
         amount: Optional[str] = None,
@@ -11190,7 +11190,7 @@ class FundContext:
         Submit a fund order (buy / sell)
 
         Args:
-            symbol: Fund symbol
+            counter_id: Fund counter id
             action: Action (buy/sell)
             currency: Currency
             amount: Amount (for amount-based orders)

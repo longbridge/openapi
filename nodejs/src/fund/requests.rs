@@ -287,8 +287,8 @@ impl From<GetFundPositionDividendsOptions> for longbridge::fund::GetFundPosition
 /// Options for the fund orders list.
 #[napi_derive::napi(object)]
 pub struct GetFundOrdersOptions {
-    /// Filter by fund symbols
-    pub symbols: Option<Vec<String>>,
+    /// Filter by fund counter ids
+    pub counter_ids: Option<Vec<String>>,
     /// Filter by actions (comma-separated)
     pub actions: Option<String>,
     /// Filter by states (comma-separated)
@@ -309,8 +309,8 @@ impl From<GetFundOrdersOptions> for longbridge::fund::GetFundOrdersOptions {
     #[inline]
     fn from(opts: GetFundOrdersOptions) -> Self {
         let mut opts2 = longbridge::fund::GetFundOrdersOptions::new();
-        if let Some(symbols) = opts.symbols {
-            opts2 = opts2.symbols(symbols);
+        if let Some(counter_ids) = opts.counter_ids {
+            opts2 = opts2.counter_ids(counter_ids);
         }
         if let Some(actions) = opts.actions {
             opts2 = opts2.actions(actions);
@@ -393,8 +393,8 @@ impl From<GetFundTransactionsOptions> for longbridge::fund::GetFundTransactionsO
 /// Options for validating a fund order.
 #[napi_derive::napi(object)]
 pub struct ValidateFundOrderOptions {
-    /// Fund symbol
-    pub symbol: String,
+    /// Fund counter id
+    pub counter_id: String,
     /// Action (buy/sell)
     pub action: String,
     /// Currency
@@ -415,7 +415,7 @@ impl From<ValidateFundOrderOptions> for longbridge::fund::ValidateFundOrderOptio
     #[inline]
     fn from(opts: ValidateFundOrderOptions) -> Self {
         let mut opts2 = longbridge::fund::ValidateFundOrderOptions::new(
-            opts.symbol,
+            opts.counter_id,
             opts.action,
             opts.currency,
         );
@@ -441,8 +441,8 @@ impl From<ValidateFundOrderOptions> for longbridge::fund::ValidateFundOrderOptio
 /// Options for submitting a fund order.
 #[napi_derive::napi(object)]
 pub struct SubmitFundOrderOptions {
-    /// Fund symbol
-    pub symbol: String,
+    /// Fund counter id
+    pub counter_id: String,
     /// Action (buy/sell)
     pub action: String,
     /// Currency
@@ -466,8 +466,11 @@ pub struct SubmitFundOrderOptions {
 impl From<SubmitFundOrderOptions> for longbridge::fund::SubmitFundOrderOptions {
     #[inline]
     fn from(opts: SubmitFundOrderOptions) -> Self {
-        let mut opts2 =
-            longbridge::fund::SubmitFundOrderOptions::new(opts.symbol, opts.action, opts.currency);
+        let mut opts2 = longbridge::fund::SubmitFundOrderOptions::new(
+            opts.counter_id,
+            opts.action,
+            opts.currency,
+        );
         if let Some(amount) = opts.amount {
             opts2 = opts2.amount(amount);
         }

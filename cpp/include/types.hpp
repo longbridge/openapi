@@ -5481,8 +5481,8 @@ struct GetFundPositionDividendsOptions
 /// Options for the fund orders list request.
 struct GetFundOrdersOptions
 {
-  /// Filter by fund symbols
-  std::vector<std::string> symbols;
+  /// Filter by fund counter ids
+  std::vector<std::string> counter_ids;
   /// Filter by actions (comma-separated)
   std::optional<std::string> actions;
   /// Filter by states (comma-separated)
@@ -5523,8 +5523,8 @@ struct GetFundTransactionsOptions
 /// Options for validating a fund order.
 struct ValidateFundOrderOptions
 {
-  /// Fund symbol
-  std::string symbol;
+  /// Fund counter id
+  std::string counter_id;
   /// Action (buy/sell)
   std::string action;
   /// Currency
@@ -5544,8 +5544,8 @@ struct ValidateFundOrderOptions
 /// Options for submitting a fund order.
 struct SubmitFundOrderOptions
 {
-  /// Fund symbol
-  std::string symbol;
+  /// Fund counter id
+  std::string counter_id;
   /// Action (buy/sell)
   std::string action;
   /// Currency

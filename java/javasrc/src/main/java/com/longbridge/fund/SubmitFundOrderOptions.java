@@ -5,7 +5,7 @@ package com.longbridge.fund;
  */
 @SuppressWarnings("unused")
 public class SubmitFundOrderOptions {
-    private String symbol;
+    private String counterId;
     private String action;
     private String currency;
     private String amount;
@@ -19,12 +19,12 @@ public class SubmitFundOrderOptions {
     /**
      * Creates a new SubmitFundOrderOptions.
      *
-     * @param symbol symbol
+     * @param counterId counterId
      * @param action action
      * @param currency currency
      */
-    public SubmitFundOrderOptions(String symbol, String action, String currency) {
-        this.symbol = symbol;
+    public SubmitFundOrderOptions(String counterId, String action, String currency) {
+        this.counterId = counterId;
         this.action = action;
         this.currency = currency;
     }

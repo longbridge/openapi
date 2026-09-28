@@ -514,16 +514,16 @@ FundContext::orders(
   CGetFundOrdersOptions opts2 = {
     nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
   };
-  std::vector<const char*> symbols;
+  std::vector<const char*> counter_ids;
 
   if (opts) {
-    std::transform(opts->symbols.cbegin(),
-                   opts->symbols.cend(),
-                   std::back_inserter(symbols),
+    std::transform(opts->counter_ids.cbegin(),
+                   opts->counter_ids.cend(),
+                   std::back_inserter(counter_ids),
                    [](auto& s) { return s.c_str(); });
-    if (!symbols.empty()) {
-      opts2.symbols = symbols.data();
-      opts2.num_symbols = symbols.size();
+    if (!counter_ids.empty()) {
+      opts2.counter_ids = counter_ids.data();
+      opts2.num_counter_ids = counter_ids.size();
     }
     opts2.actions = opts->actions ? opts->actions->c_str() : nullptr;
     opts2.states = opts->states ? opts->states->c_str() : nullptr;
@@ -586,7 +586,7 @@ FundContext::validate_order(
   AsyncCallback<FundContext, FundOrderValidation> callback) const
 {
   CValidateFundOrderOptions opts2 = {
-    opts.symbol.c_str(),
+    opts.counter_id.c_str(),
     opts.action.c_str(),
     opts.currency.c_str(),
     opts.amount ? opts.amount->c_str() : nullptr,
@@ -609,7 +609,7 @@ FundContext::submit_order(
   AsyncCallback<FundContext, FundOrderSubmitResponse> callback) const
 {
   CSubmitFundOrderOptions opts2 = {
-    opts.symbol.c_str(),
+    opts.counter_id.c_str(),
     opts.action.c_str(),
     opts.currency.c_str(),
     opts.amount ? opts.amount->c_str() : nullptr,

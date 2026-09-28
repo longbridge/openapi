@@ -5,7 +5,7 @@ package com.longbridge.fund;
  */
 @SuppressWarnings("unused")
 public class ValidateFundOrderOptions {
-    private String symbol;
+    private String counterId;
     private String action;
     private String currency;
     private String amount;
@@ -17,12 +17,12 @@ public class ValidateFundOrderOptions {
     /**
      * Creates a new ValidateFundOrderOptions.
      *
-     * @param symbol symbol
+     * @param counterId counterId
      * @param action action
      * @param currency currency
      */
-    public ValidateFundOrderOptions(String symbol, String action, String currency) {
-        this.symbol = symbol;
+    public ValidateFundOrderOptions(String counterId, String action, String currency) {
+        this.counterId = counterId;
         this.action = action;
         this.currency = currency;
     }
