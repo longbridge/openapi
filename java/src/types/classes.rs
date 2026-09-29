@@ -829,7 +829,7 @@ impl_java_class!(
     "com/longbridge/trade/FundPosition",
     longbridge::trade::FundPosition,
     [
-        symbol,
+        counter_id,
         current_net_asset_value,
         net_asset_value_day,
         symbol_name,
