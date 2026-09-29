@@ -1698,7 +1698,7 @@ mod tests {
         assert_eq!(channel.positions.len(), 1);
 
         let position = &channel.positions[0];
-        assert_eq!(position.symbol, "HK0000447943");
+        assert_eq!(position.counter_id, "HK0000447943");
         assert_eq!(position.symbol_name, "高腾亚洲收益基金");
         assert_eq!(position.currency, "USD");
         assert_eq!(position.current_net_asset_value, decimal!(0i32));
