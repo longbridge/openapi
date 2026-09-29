@@ -1612,8 +1612,8 @@ export declare class FundPerformancePoint {
 export declare class FundPosition {
   toString(): string
   toJSON(): any
-  /** Fund ISIN code */
-  get symbol(): string
+  /** Fund counter id (the ISIN is the last `/`-separated segment) */
+  get counterId(): string
   /** Current equity */
   get currentNetAssetValue(): Decimal
   /** Current equity time */

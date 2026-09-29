@@ -1854,7 +1854,7 @@ inline FundPosition
 convert(const lb_fund_position_t* position)
 {
   return FundPosition{
-    position->symbol,
+    position->counter_id,
     Decimal(position->current_net_asset_value),
     position->net_asset_value_day,
     position->symbol_name,

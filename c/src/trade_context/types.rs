@@ -1786,8 +1786,8 @@ impl ToFFI for CFundPositionChannelOwned {
 /// Fund position
 #[repr(C)]
 pub struct CFundPosition {
-    /// Fund ISIN code
-    pub symbol: *const c_char,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    pub counter_id: *const c_char,
     /// Current equity
     pub current_net_asset_value: *const CDecimal,
     /// Current equity time
@@ -1803,7 +1803,7 @@ pub struct CFundPosition {
 }
 
 pub(crate) struct CFundPositionOwned {
-    symbol: CString,
+    counter_id: CString,
     current_net_asset_value: CDecimal,
     net_asset_value_day: i64,
     symbol_name: CString,
@@ -1815,7 +1815,7 @@ pub(crate) struct CFundPositionOwned {
 impl From<FundPosition> for CFundPositionOwned {
     fn from(position: FundPosition) -> Self {
         let FundPosition {
-            symbol,
+            counter_id,
             current_net_asset_value,
             net_asset_value_day,
             symbol_name,
@@ -1824,7 +1824,7 @@ impl From<FundPosition> for CFundPositionOwned {
             holding_units,
         } = position;
         Self {
-            symbol: symbol.into(),
+            counter_id: counter_id.into(),
             current_net_asset_value: current_net_asset_value.into(),
             net_asset_value_day: net_asset_value_day.unix_timestamp(),
             symbol_name: symbol_name.into(),
@@ -1840,7 +1840,7 @@ impl ToFFI for CFundPositionOwned {
 
     fn to_ffi_type(&self) -> Self::FFIType {
         let CFundPositionOwned {
-            symbol,
+            counter_id,
             current_net_asset_value,
             net_asset_value_day,
             symbol_name,
@@ -1849,7 +1849,7 @@ impl ToFFI for CFundPositionOwned {
             holding_units,
         } = self;
         CFundPosition {
-            symbol: symbol.to_ffi_type(),
+            counter_id: counter_id.to_ffi_type(),
             current_net_asset_value: current_net_asset_value.to_ffi_type(),
             net_asset_value_day: *net_asset_value_day,
             symbol_name: symbol_name.to_ffi_type(),

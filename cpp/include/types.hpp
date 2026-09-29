@@ -2164,8 +2164,8 @@ struct GetStockPositionsOptions
 /// Fund position
 struct FundPosition
 {
-  /// Fund ISIN code
-  std::string symbol;
+  /// Fund counter id (the ISIN is the last `/`-separated segment)
+  std::string counter_id;
   /// Current equity
   Decimal current_net_asset_value;
   /// Current equity time

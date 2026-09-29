@@ -6074,9 +6074,9 @@ typedef struct lb_cash_flow_t {
  */
 typedef struct lb_fund_position_t {
   /**
-   * Fund ISIN code
+   * Fund counter id (the ISIN is the last `/`-separated segment)
    */
-  const char *symbol;
+  const char *counter_id;
   /**
    * Current equity
    */

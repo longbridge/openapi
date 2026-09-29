@@ -897,8 +897,9 @@ pub struct FundPositionChannel {
 /// Fund position
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FundPosition {
-    /// Fund ISIN code
-    pub symbol: String,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    #[serde(alias = "symbol")]
+    pub counter_id: String,
     /// Current equity
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub current_net_asset_value: Decimal,

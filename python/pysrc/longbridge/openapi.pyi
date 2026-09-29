@@ -7218,9 +7218,9 @@ class FundPosition:
     Fund position
     """
 
-    symbol: str
+    counter_id: str
     """
-    Fund ISIN code
+    Fund counter id (the ISIN is the last ``/``-separated segment)
     """
 
     current_net_asset_value: Decimal
