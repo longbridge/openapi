@@ -897,8 +897,9 @@ pub struct FundPositionChannel {
 /// Fund position
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FundPosition {
-    /// Fund ISIN code
-    pub symbol: String,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    #[serde(alias = "symbol")]
+    pub counter_id: String,
     /// Current equity
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub current_net_asset_value: Decimal,
@@ -1677,7 +1678,7 @@ mod tests {
             "list": [{
                 "account_channel": "lb",
                 "fund_info": [{
-                    "symbol": "HK0000447943",
+                    "counter_id": "UT/FD/HK0000447943",
                     "symbol_name": "高腾亚洲收益基金",
                     "currency": "USD",
                     "holding_units": "5.000",
@@ -1697,13 +1698,19 @@ mod tests {
         assert_eq!(channel.positions.len(), 1);
 
         let position = &channel.positions[0];
-        assert_eq!(position.symbol, "HK0000447943");
+        assert_eq!(position.counter_id, "UT/FD/HK0000447943");
         assert_eq!(position.symbol_name, "高腾亚洲收益基金");
         assert_eq!(position.currency, "USD");
         assert_eq!(position.current_net_asset_value, decimal!(0i32));
         assert_eq!(position.cost_net_asset_value, decimal!(0i32));
         assert_eq!(position.holding_units, decimal!(5i32));
         assert_eq!(position.net_asset_value_day, datetime!(2022-4-14 0:00 +8));
+
+        // Transition compatibility: the legacy `symbol` key (which carried a
+        // bare ISIN) still deserializes into `counter_id` via the serde alias.
+        let legacy = r#"{"list":[{"account_channel":"lb","fund_info":[{"symbol":"HK0000447943","symbol_name":"x","currency":"USD","holding_units":"0","current_net_asset_value":"0","cost_net_asset_value":"0","net_asset_value_day":"1649865600"}]}]}"#;
+        let resp: FundPositionsResponse = serde_json::from_str(legacy).unwrap();
+        assert_eq!(resp.channels[0].positions[0].counter_id, "HK0000447943");
     }
 
     #[test]

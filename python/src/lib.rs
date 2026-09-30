@@ -15,6 +15,7 @@ mod content;
 mod dca;
 mod decimal;
 mod error;
+mod fund;
 mod fundamental;
 mod grid;
 mod http_client;
@@ -48,6 +49,7 @@ fn longbridge(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     dca::register_types(&openapi)?;
     sharelist::register_types(&openapi)?;
     calendar::register_types(&openapi)?;
+    fund::register_types(&openapi)?;
     fundamental::register_types(&openapi)?;
     grid::register_types(&openapi)?;
     market::register_types(&openapi)?;

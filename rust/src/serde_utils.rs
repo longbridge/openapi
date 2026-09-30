@@ -436,8 +436,19 @@ pub(crate) mod int64_str {
     where
         D: Deserializer<'de>,
     {
-        let value = String::deserialize(deserializer)?;
-        Ok(value.parse::<i64>().unwrap_or_default())
+        // The backend may send an int64 as either a JSON string or a JSON
+        // number; accept both so a numeric value never fails the whole
+        // response.
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum StringOrInt {
+            String(String),
+            Int(i64),
+        }
+        match StringOrInt::deserialize(deserializer)? {
+            StringOrInt::Int(n) => Ok(n),
+            StringOrInt::String(s) => Ok(s.parse::<i64>().unwrap_or_default()),
+        }
     }
 }
 
@@ -612,5 +623,47 @@ pub(crate) mod value_as_opt_string {
             Some(val) => s.serialize_str(val),
             None => s.serialize_none(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    struct Wrap {
+        #[serde(with = "super::int64_str")]
+        value: i64,
+    }
+
+    #[test]
+    fn int64_str_accepts_string_and_number() {
+        // The backend may send an int64 as a quoted string or a bare number;
+        // both must deserialize to the same value.
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":"123"}"#)
+                .unwrap()
+                .value,
+            123
+        );
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":123}"#)
+                .unwrap()
+                .value,
+            123
+        );
+        // Negative values pass through; an unparseable string falls back to 0.
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":-9}"#)
+                .unwrap()
+                .value,
+            -9
+        );
+        assert_eq!(
+            serde_json::from_str::<Wrap>(r#"{"value":""}"#)
+                .unwrap()
+                .value,
+            0
+        );
     }
 }

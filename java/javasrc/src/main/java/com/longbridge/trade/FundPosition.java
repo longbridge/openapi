@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
  * Fund position
  */
 public class FundPosition {
-    private String symbol;
+    private String counterId;
     private BigDecimal currentNetAssetValue;
     private OffsetDateTime netAssetValueDay;
     private String symbolName;
@@ -16,12 +16,12 @@ public class FundPosition {
     private BigDecimal holdingUnits;
 
     /**
-     * Returns the fund symbol.
+     * Returns the fund counter id (the ISIN is the last {@code /}-separated segment).
      *
-     * @return fund symbol
+     * @return fund counter id
      */
-    public String getSymbol() {
-        return symbol;
+    public String getCounterId() {
+        return counterId;
     }
 
     /**
@@ -80,7 +80,7 @@ public class FundPosition {
 
     @Override
     public String toString() {
-        return "FundPosition [symbol=" + symbol + ", currentNetAssetValue=" + currentNetAssetValue
+        return "FundPosition [counterId=" + counterId + ", currentNetAssetValue=" + currentNetAssetValue
                 + ", netAssetValueDay=" + netAssetValueDay + ", symbolName=" + symbolName + ", currency=" + currency
                 + ", costNetAssetValue=" + costNetAssetValue + ", holdingUnits=" + holdingUnits + "]";
     }

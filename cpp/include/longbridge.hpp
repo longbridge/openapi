@@ -7,6 +7,7 @@
 #include "alert_context.hpp"
 #include "dca_context.hpp"
 #include "grid_context.hpp"
+#include "fund_context.hpp"
 #include "sharelist_context.hpp"
 #include "calendar_context.hpp"
 #include "fundamental_context.hpp"
