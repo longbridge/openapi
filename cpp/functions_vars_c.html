@@ -104,8 +104,13 @@ $(function() {
 : <a class="el" href="structlongbridge_1_1market_1_1_rank_categories_response.html#a77bd7575c3f8c6511c7485f44b7cfff9">longbridge::market::RankCategoriesResponse</a>
 </li>
 <li>category
-: <a class="el" href="structlongbridge_1_1fundamental_1_1_company_overview.html#a621fa3299e6e37965799ade62e6270cb">longbridge::fundamental::CompanyOverview</a>
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_transaction.html#aa24c4a65cf985e897730c8128fd11c17">longbridge::fund::FundTransaction</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_get_fund_transactions_options.html#a20e36d2e49f40dcd5689a879a0f57134">longbridge::fund::GetFundTransactionsOptions</a>
+, <a class="el" href="structlongbridge_1_1fundamental_1_1_company_overview.html#a621fa3299e6e37965799ade62e6270cb">longbridge::fundamental::CompanyOverview</a>
 , <a class="el" href="structlongbridge_1_1quote_1_1_warrant_quote.html#a1f54dfe95bcfb9ab706b4d621793c716">longbridge::quote::WarrantQuote</a>
+</li>
+<li>category_average_performances
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_trend.html#a8d0532bc5cc7a6b6c5a5720f372b47eb">longbridge::fund::FundTrend</a>
 </li>
 <li>ccy_symbol
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_institution_rating_detail.html#a9f17da920ec56cbb05024f0c0efd30cc">longbridge::fundamental::InstitutionRatingDetail</a>
@@ -118,10 +123,21 @@ $(function() {
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_company_overview.html#a6a4a2165067e87b39ae4e6303c040a43">longbridge::fundamental::CompanyOverview</a>
 </li>
 <li>change
-: <a class="el" href="structlongbridge_1_1fundamental_1_1_institution_rating_summary.html#a7585278b3015c1af9614d10beb684341">longbridge::fundamental::InstitutionRatingSummary</a>
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_nav_value.html#a88ff5bf5f95af1ea23a7986cd49895f3">longbridge::fund::FundNavValue</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position_nav.html#a701a6191879aae1905c6fb2fa7f504c9">longbridge::fund::FundPositionNav</a>
+, <a class="el" href="structlongbridge_1_1fundamental_1_1_institution_rating_summary.html#a7585278b3015c1af9614d10beb684341">longbridge::fundamental::InstitutionRatingSummary</a>
 , <a class="el" href="structlongbridge_1_1market_1_1_rank_list_item.html#a16e9ddb35aab0a2c884bd2d0119693bc">longbridge::market::RankListItem</a>
 , <a class="el" href="structlongbridge_1_1market_1_1_top_movers_stock.html#a83162f53f292d15990761c8d34874c5d">longbridge::market::TopMoversStock</a>
 , <a class="el" href="structlongbridge_1_1sharelist_1_1_sharelist_stock.html#a3417478dd5fb261977a2a331b68a6bf3">longbridge::sharelist::SharelistStock</a>
+</li>
+<li>change_percent
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_annual_return.html#a5d5d05933c28b6e6444536d0e20bd803">longbridge::fund::FundAnnualReturn</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_nav_value.html#a77a3d7c710da1c454f133959b949a46f">longbridge::fund::FundNavValue</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position_nav.html#a7abca5c567c768b92daecc774abda9ad">longbridge::fund::FundPositionNav</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_quarterly_return.html#a39af189830339f51b2c468e0df656d55">longbridge::fund::FundQuarterlyReturn</a>
+</li>
+<li>change_percent_format
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_nav_value.html#aecb281b157a06fa27670103943e810de">longbridge::fund::FundNavValue</a>
 </li>
 <li>change_rate
 : <a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#a0e3cdcaf09ee25257ec624bc66cb9184">longbridge::quote::SecurityCalcIndex</a>
@@ -136,6 +152,10 @@ $(function() {
 </li>
 <li>changes
 : <a class="el" href="structlongbridge_1_1market_1_1_anomaly_response.html#a0a241d84ad327e72a6747ba121f988dc">longbridge::market::AnomalyResponse</a>
+</li>
+<li>channel
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_detail.html#a531bcc6d1e23303270e39ce7b158120a">longbridge::fund::FundDetail</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order_info.html#aee5b132eef52c45c7f4a2e0a89e588aa">longbridge::fund::FundOrderInfo</a>
 </li>
 <li>channel_info
 : <a class="el" href="structlongbridge_1_1grid_1_1_grid_symbol_info.html#a702712c6770dd3ccc92eb780bf13a8e3">longbridge::grid::GridSymbolInfo</a>
@@ -213,12 +233,19 @@ $(function() {
 , <a class="el" href="structlongbridge_1_1quote_1_1_short_positions_item.html#a2793c355222071117e5cf6b5c0b4282c">longbridge::quote::ShortPositionsItem</a>
 , <a class="el" href="structlongbridge_1_1quote_1_1_short_trades_item.html#aa1731be7041a911e5b6b8679a0d460c2">longbridge::quote::ShortTradesItem</a>
 </li>
+<li>close_period
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_detail.html#a698642544e698983cff78dd32d9a739f">longbridge::fund::FundDetail</a>
+</li>
 <li>cmp_desc
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_snapshot_forecast_metric.html#a97b5ce30147e4a3665a8090fb6a542b4">longbridge::fundamental::SnapshotForecastMetric</a>
 </li>
 <li>code
 : <a class="el" href="structlongbridge_1_1agent_1_1_agent_error.html#a85b57319270cb8fc49c9dbc8e50babbd">longbridge::agent::AgentError</a>
 , <a class="el" href="structlongbridge_1_1alert_1_1_alert_symbol_group.html#a3f45782ebd64c6fc4205239bfbc00cb6">longbridge::alert::AlertSymbolGroup</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_asset_allocation_item.html#a4a7d60b8b553c6f601eaca4015d1c830">longbridge::fund::FundAssetAllocationItem</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_brief.html#a030d68940a1986ea509857c25fc68b91">longbridge::fund::FundBrief</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_detail.html#a23784cabe67d34dd5f825b6d88c3ae6a">longbridge::fund::FundDetail</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_stock_holding.html#ac5abf510a783bc6df495aa4c9f64d649">longbridge::fund::FundStockHolding</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_asset_allocation_item.html#acc97865f0aa82f8c3e8bfbe3a1757f11">longbridge::fundamental::AssetAllocationItem</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_fund_holder.html#a0858a018193b90bac7833637d27a74b3">longbridge::fundamental::FundHolder</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_shareholder_stock.html#acfeae44fa12b365a0a7d3b2322e84539">longbridge::fundamental::ShareholderStock</a>
@@ -245,6 +272,9 @@ $(function() {
 <li>comp_value
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_consensus_detail.html#af9d681a4954ce880930d772130cb198e">longbridge::fundamental::ConsensusDetail</a>
 </li>
+<li>company
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_filters.html#a3ec163146838b48e2fc4927e7ff17d10">longbridge::fund::FundFilters</a>
+</li>
 <li>company_id
 : <a class="el" href="structlongbridge_1_1fundamental_1_1_invest_security.html#a585148fd3ca397072eccb954fefe9dcb">longbridge::fundamental::InvestSecurity</a>
 </li>
@@ -260,6 +290,7 @@ $(function() {
 </li>
 <li>content
 : <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_event_info.html#a2ca9fb54739fb29793ee20698b9f48ea">longbridge::calendar::CalendarEventInfo</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order_keyword.html#a16b7666d353c0dc67b9185f379608304">longbridge::fund::FundOrderKeyword</a>
 </li>
 <li>content_json
 : <a class="el" href="structlongbridge_1_1agent_1_1_reference.html#a39354f397ef7cd09d6662abd75d03e33">longbridge::agent::Reference</a>
@@ -282,6 +313,10 @@ $(function() {
 <li>contract_type
 : <a class="el" href="structlongbridge_1_1quote_1_1_option_quote.html#a5ad9e1c3904b842bcbcf6e89387368a4">longbridge::quote::OptionQuote</a>
 </li>
+<li>contrast_performances
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_performance_comparison.html#a807adb09b0bec8a564c90226cd42b92f">longbridge::fund::FundPerformanceComparison</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_trend.html#a4fd0159f0f18a0a26d4af59c2e20d794">longbridge::fund::FundTrend</a>
+</li>
 <li>conversion_ratio
 : <a class="el" href="structlongbridge_1_1quote_1_1_security_calc_index.html#a1c28908bf496cbce40e3b850f709b4b3">longbridge::quote::SecurityCalcIndex</a>
 , <a class="el" href="structlongbridge_1_1quote_1_1_warrant_info.html#a00cd624103e6ecf7b8bb88ddeb763d17">longbridge::quote::WarrantInfo</a>
@@ -289,6 +324,10 @@ $(function() {
 </li>
 <li>cost
 : <a class="el" href="structlongbridge_1_1quote_1_1_short_positions_item.html#a62177bab56acbdf8d8e09e399f0f1a62">longbridge::quote::ShortPositionsItem</a>
+</li>
+<li>cost_level
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_analysis.html#a0f5400fdee1ecb2f74c10bc96e6e3526">longbridge::fund::FundAnalysis</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_analysis_detail.html#a62da158579b9dbc8b54d0a19d5fdd268">longbridge::fund::FundAnalysisDetail</a>
 </li>
 <li>cost_net_asset_value
 : <a class="el" href="structlongbridge_1_1trade_1_1_fund_position.html#ae6a9b4d838368f3f66866692f47a97f0">longbridge::trade::FundPosition</a>
@@ -300,10 +339,34 @@ $(function() {
 : <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_date_group.html#a629c8c1682a16474a595e74c4b0f99d5">longbridge::calendar::CalendarDateGroup</a>
 </li>
 <li>counter_id
-: <a class="el" href="structlongbridge_1_1trade_1_1_attached_order_detail.html#a107d0c19fac2ae0b248cffbbe9b4e408">longbridge::trade::AttachedOrderDetail</a>
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_asset_allocation_item.html#a64bfaa547739f1ec10b870862e6a5ab9">longbridge::fund::FundAssetAllocationItem</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_brief.html#a22d351cce0d00ac5d7cbb46b81d40de8">longbridge::fund::FundBrief</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_dividend.html#ab230565972fab657ae0e3cdc75e2c91c">longbridge::fund::FundDividend</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_nav_value.html#a39fcf1587ddfa3d282840a1a80ef0c69">longbridge::fund::FundNavValue</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order.html#a22b49735023b817c4d1b422abbeaaf59">longbridge::fund::FundOrder</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order_info.html#a1f9c3eedbc87a5f3a503c3ceed682e31">longbridge::fund::FundOrderInfo</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order_submit_response.html#aa9511850e5d0fee75ac7560dcce4d679">longbridge::fund::FundOrderSubmitResponse</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_performance.html#af587a9d893a486f8f6b602a86f347520">longbridge::fund::FundPerformance</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position.html#ac683b1b2e742dc2830d0a6398128f03b">longbridge::fund::FundPosition</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position_nav.html#ae9a0785fe3496aa29155f48111bd47e4">longbridge::fund::FundPositionNav</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position_performance.html#a037b12e648b91fcea347980813ece84c">longbridge::fund::FundPositionPerformance</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_stock_holding.html#ab596e21e27dd1dd3237b36e7474a325f">longbridge::fund::FundStockHolding</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_hot_fund.html#a2aefcd31ce1dc438b2f4f7d639278293">longbridge::fund::HotFund</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_submit_fund_order_options.html#afb9b8b9f8fe0ca36ec4deb5bd4418967">longbridge::fund::SubmitFundOrderOptions</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_validate_fund_order_options.html#afb4b1f05260d8de94052667acbd0e880">longbridge::fund::ValidateFundOrderOptions</a>
+, <a class="el" href="structlongbridge_1_1trade_1_1_attached_order_detail.html#a107d0c19fac2ae0b248cffbbe9b4e408">longbridge::trade::AttachedOrderDetail</a>
+, <a class="el" href="structlongbridge_1_1trade_1_1_fund_position.html#ab0b45c341438bc8cdd8158830abf9f85">longbridge::trade::FundPosition</a>
+</li>
+<li>counter_ids
+: <a class="el" href="structlongbridge_1_1fund_1_1_get_fund_orders_options.html#a61778617707590966a5bd02042bcb436">longbridge::fund::GetFundOrdersOptions</a>
 </li>
 <li>counter_name
 : <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_event_info.html#aa890f2ddbe3f9a43b7768a0c283f9410">longbridge::calendar::CalendarEventInfo</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_nav_value.html#a9e6547fe332df2b0e5313b3a1a0544ff">longbridge::fund::FundNavValue</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position_nav.html#acbf4950946082d122a0ff7ef3a689f3c">longbridge::fund::FundPositionNav</a>
+</li>
+<li>country_name
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_holding.html#a84809ae05b07b55880926a767204399d">longbridge::fund::FundHolding</a>
 </li>
 <li>cover
 : <a class="el" href="structlongbridge_1_1sharelist_1_1_sharelist_info.html#a60507042ce2df23004da4c1b015920bd">longbridge::sharelist::SharelistInfo</a>
@@ -315,6 +378,10 @@ $(function() {
 , <a class="el" href="structlongbridge_1_1content_1_1_owned_topic.html#a66eca67befbafeb147dcb4ba99631f6e">longbridge::content::OwnedTopic</a>
 , <a class="el" href="structlongbridge_1_1dca_1_1_dca_history_record.html#a6a116ef3dd311548c99681302b704266">longbridge::dca::DcaHistoryRecord</a>
 , <a class="el" href="structlongbridge_1_1dca_1_1_dca_plan.html#aba977ede29d218b68e5603b3dfc83a80">longbridge::dca::DcaPlan</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order.html#a150cae39f67a4c2bd338078895e0839b">longbridge::fund::FundOrder</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order_info.html#ac9925d727f2ab3fb0acec9dbf35b2bbb">longbridge::fund::FundOrderInfo</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order_submit_response.html#a7dd39bb0af24132452cf331ed013b7fd">longbridge::fund::FundOrderSubmitResponse</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_transaction.html#a482b74cd361e0806ac1f773d3c4e7e2e">longbridge::fund::FundTransaction</a>
 , <a class="el" href="structlongbridge_1_1grid_1_1_grid_order.html#aebb561cb2e3d167c5ce13cecfb4a51b2">longbridge::grid::GridOrder</a>
 , <a class="el" href="structlongbridge_1_1grid_1_1_grid_order_detail.html#a1d527286f75322cad916e0f7befbb5c5">longbridge::grid::GridOrderDetail</a>
 , <a class="el" href="structlongbridge_1_1grid_1_1_grid_order_history.html#a3524d872fb1cbbc3ebf7d6758f35e5e2">longbridge::grid::GridOrderHistory</a>
@@ -347,8 +414,29 @@ $(function() {
 <li>cumulative_transaction_amount
 : <a class="el" href="structlongbridge_1_1portfolio_1_1_profit_summary_breakdown.html#aec93d6f0436f3764725c15741c7363de">longbridge::portfolio::ProfitSummaryBreakdown</a>
 </li>
+<li>currencies
+: <a class="el" href="structlongbridge_1_1fund_1_1_get_fund_transactions_options.html#ad0723705dd80785b2c3cb1563a244fb6">longbridge::fund::GetFundTransactionsOptions</a>
+</li>
 <li>currency
 : <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_event_info.html#a6fba496b7397ad7f52413afc88dec200">longbridge::calendar::CalendarEventInfo</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_brief.html#a0f40a5e641707759128093163104ea6a">longbridge::fund::FundBrief</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_detail.html#a32b425f932692e9e7fa664a1165dac08">longbridge::fund::FundDetail</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_dividend.html#a9cbf3d10ce08cbe3042e8e3efc0f6e5f">longbridge::fund::FundDividend</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_dividends.html#a07065cbf4e0728cf1c6db015044477cc">longbridge::fund::FundDividends</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_filters.html#ad7d3303f0094a676ba9f631b009316e1">longbridge::fund::FundFilters</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_nav_value.html#af183a0fdbdda2bc3b34fa51b3559babb">longbridge::fund::FundNavValue</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order.html#a0d800dcff3d85033e096316abf740e09">longbridge::fund::FundOrder</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_order_info.html#a9e29612381792d3ab866e262e2452d34">longbridge::fund::FundOrderInfo</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position.html#a265acc1e970f43add6ebe8a59c7c7512">longbridge::fund::FundPosition</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position_detail_values.html#aee665603013f0d0bd950385ec78f0928">longbridge::fund::FundPositionDetailValues</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_position_profits.html#a28f5a6f1edaab687c66fd3f5daaf7d62">longbridge::fund::FundPositionProfits</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_stock_holding.html#a58baee418dbd053186c5d0ac3d1e4725">longbridge::fund::FundStockHolding</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_fund_transaction.html#a0d3895a4ec3eae8bfa99225ca7c81bf2">longbridge::fund::FundTransaction</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_get_fund_orders_options.html#a08ec3705590cd0a6fe86985aae96c18a">longbridge::fund::GetFundOrdersOptions</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_get_fund_position_dividends_options.html#a76d4d09e555e78af868dc9279fa3069d">longbridge::fund::GetFundPositionDividendsOptions</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_hot_fund.html#ae4646ac0d4ac8ab785514184b7b5897a">longbridge::fund::HotFund</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_submit_fund_order_options.html#a46ec6aa06fedd22959124c06b4a781ac">longbridge::fund::SubmitFundOrderOptions</a>
+, <a class="el" href="structlongbridge_1_1fund_1_1_validate_fund_order_options.html#a263b63ab3dca29a8930a2ef837fc5258">longbridge::fund::ValidateFundOrderOptions</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_business_segments.html#abf1d48463b519768f3d88427370b3b89">longbridge::fundamental::BusinessSegments</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_business_segments_historical_item.html#a5e8959054bc1bf820d98b5b19c1d3e04">longbridge::fundamental::BusinessSegmentsHistoricalItem</a>
 , <a class="el" href="structlongbridge_1_1fundamental_1_1_buyback_history_item.html#ac38357eb5d393363adf64e42e3ecc048">longbridge::fundamental::BuybackHistoryItem</a>
@@ -403,6 +491,9 @@ $(function() {
 </li>
 <li>current_volume
 : <a class="el" href="structlongbridge_1_1quote_1_1_push_quote.html#a6aa47ad1df57d304ccc5acf4ab0294e7">longbridge::quote::PushQuote</a>
+</li>
+<li>cut_off_time
+: <a class="el" href="structlongbridge_1_1fund_1_1_fund_detail.html#a5fd8d8df35b9e93f287e1762ff8f914b">longbridge::fund::FundDetail</a>
 </li>
 </ul>
 </div><!-- contents -->

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/calendar/context.rs`."><title>context.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.1 (48a229cea 2026-09-01)" data-channel="1.98.1" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/calendar/</div>context.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-2"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::sync::Arc;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `rust/src/calendar/context.rs`."><title>context.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="longbridge" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.1 (48a229cea 2026-09-01)" data-channel="1.98.1" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">longbridge/calendar/</div>context.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::sync::Arc;
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>longbridge_httpcli::{HttpClient, Json, Method};
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>serde::Serialize;
@@ -48,51 +48,77 @@
 <a href=#48 id=48 data-nosnippet>48</a>
 <a href=#49 id=49 data-nosnippet>49</a>    <span class="doccomment">/// Get financial calendar events.
 <a href=#50 id=50 data-nosnippet>50</a>    ///
-<a href=#51 id=51 data-nosnippet>51</a>    /// The endpoint is paginated via `next_date`. When the returned
-<a href=#52 id=52 data-nosnippet>52</a>    /// `next_date` is non-empty, pass it as `start` to fetch the next page.
-<a href=#53 id=53 data-nosnippet>53</a>    ///
-<a href=#54 id=54 data-nosnippet>54</a>    /// Path: `GET /v1/quote/finance_calendar`
-<a href=#55 id=55 data-nosnippet>55</a>    </span><span class="kw">pub async fn </span>finance_calendar(
-<a href=#56 id=56 data-nosnippet>56</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#57 id=57 data-nosnippet>57</a>        category: CalendarCategory,
-<a href=#58 id=58 data-nosnippet>58</a>        start: <span class="kw">impl </span>Into&lt;String&gt;,
-<a href=#59 id=59 data-nosnippet>59</a>        end: <span class="kw">impl </span>Into&lt;String&gt;,
-<a href=#60 id=60 data-nosnippet>60</a>        market: <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#61 id=61 data-nosnippet>61</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;CalendarEventsResponse&gt; {
-<a href=#62 id=62 data-nosnippet>62</a>        <span class="kw">let </span>cat_str = <span class="kw">match </span>category {
-<a href=#63 id=63 data-nosnippet>63</a>            CalendarCategory::Report =&gt; <span class="string">"report"</span>,
-<a href=#64 id=64 data-nosnippet>64</a>            CalendarCategory::Dividend =&gt; <span class="string">"dividend"</span>,
-<a href=#65 id=65 data-nosnippet>65</a>            CalendarCategory::Split =&gt; <span class="string">"split"</span>,
-<a href=#66 id=66 data-nosnippet>66</a>            CalendarCategory::Ipo =&gt; <span class="string">"ipo"</span>,
-<a href=#67 id=67 data-nosnippet>67</a>            CalendarCategory::MacroData =&gt; <span class="string">"macrodata"</span>,
-<a href=#68 id=68 data-nosnippet>68</a>            CalendarCategory::Closed =&gt; <span class="string">"closed"</span>,
-<a href=#69 id=69 data-nosnippet>69</a>            CalendarCategory::Meeting =&gt; <span class="string">"meeting"</span>,
-<a href=#70 id=70 data-nosnippet>70</a>            CalendarCategory::Merge =&gt; <span class="string">"merge"</span>,
-<a href=#71 id=71 data-nosnippet>71</a>        };
-<a href=#72 id=72 data-nosnippet>72</a>        <span class="attr">#[derive(Serialize)]
-<a href=#73 id=73 data-nosnippet>73</a>        </span><span class="kw">struct </span>Query {
-<a href=#74 id=74 data-nosnippet>74</a>            date: String,
-<a href=#75 id=75 data-nosnippet>75</a>            date_end: String,
-<a href=#76 id=76 data-nosnippet>76</a>            <span class="attr">#[serde(rename = <span class="string">"types[]"</span>)]
-<a href=#77 id=77 data-nosnippet>77</a>            </span>types: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
-<a href=#78 id=78 data-nosnippet>78</a>            <span class="attr">#[serde(rename = <span class="string">"markets[]"</span>, skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#79 id=79 data-nosnippet>79</a>            </span>markets: <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#80 id=80 data-nosnippet>80</a>        }
-<a href=#81 id=81 data-nosnippet>81</a>        <span class="prelude-val">Ok</span>(<span class="self">self
-<a href=#82 id=82 data-nosnippet>82</a>            </span>.<span class="number">0
-<a href=#83 id=83 data-nosnippet>83</a>            </span>.http_cli
-<a href=#84 id=84 data-nosnippet>84</a>            .request(Method::GET, <span class="string">"/v1/quote/finance_calendar"</span>)
-<a href=#85 id=85 data-nosnippet>85</a>            .query_params(Query {
-<a href=#86 id=86 data-nosnippet>86</a>                date: start.into(),
-<a href=#87 id=87 data-nosnippet>87</a>                date_end: end.into(),
-<a href=#88 id=88 data-nosnippet>88</a>                types: cat_str,
-<a href=#89 id=89 data-nosnippet>89</a>                markets: market,
-<a href=#90 id=90 data-nosnippet>90</a>            })
-<a href=#91 id=91 data-nosnippet>91</a>            .response::&lt;Json&lt;CalendarEventsResponse&gt;&gt;()
-<a href=#92 id=92 data-nosnippet>92</a>            .send()
-<a href=#93 id=93 data-nosnippet>93</a>            .with_subscriber(<span class="self">self</span>.<span class="number">0</span>.log_subscriber.clone())
-<a href=#94 id=94 data-nosnippet>94</a>            .<span class="kw">await</span><span class="question-mark">?
-<a href=#95 id=95 data-nosnippet>95</a>            </span>.<span class="number">0</span>)
-<a href=#96 id=96 data-nosnippet>96</a>    }
-<a href=#97 id=97 data-nosnippet>97</a>}
+<a href=#51 id=51 data-nosnippet>51</a>    /// The endpoint is paginated. The server caps each response (it
+<a href=#52 id=52 data-nosnippet>52</a>    /// historically returns at most 10 events per page unless a larger
+<a href=#53 id=53 data-nosnippet>53</a>    /// `count` is requested) and reports a `next_date` cursor. To page
+<a href=#54 id=54 data-nosnippet>54</a>    /// through the full window, either request a larger `count`, or re-call
+<a href=#55 id=55 data-nosnippet>55</a>    /// this method passing the returned `next_date` as `start` until
+<a href=#56 id=56 data-nosnippet>56</a>    /// `next_date` comes back empty.
+<a href=#57 id=57 data-nosnippet>57</a>    ///
+<a href=#58 id=58 data-nosnippet>58</a>    /// - `count` — maximum number of events per page (server default when
+<a href=#59 id=59 data-nosnippet>59</a>    ///   `None`).
+<a href=#60 id=60 data-nosnippet>60</a>    /// - `offset` — number of events to skip from the start of the window.
+<a href=#61 id=61 data-nosnippet>61</a>    /// - `next` — direction to page from the cursor (see
+<a href=#62 id=62 data-nosnippet>62</a>    ///   [`CalendarPageDirection`]).
+<a href=#63 id=63 data-nosnippet>63</a>    ///
+<a href=#64 id=64 data-nosnippet>64</a>    /// Path: `GET /v1/quote/finance_calendar`
+<a href=#65 id=65 data-nosnippet>65</a>    </span><span class="kw">pub async fn </span>finance_calendar(
+<a href=#66 id=66 data-nosnippet>66</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#67 id=67 data-nosnippet>67</a>        category: CalendarCategory,
+<a href=#68 id=68 data-nosnippet>68</a>        start: <span class="kw">impl </span>Into&lt;String&gt;,
+<a href=#69 id=69 data-nosnippet>69</a>        end: <span class="kw">impl </span>Into&lt;String&gt;,
+<a href=#70 id=70 data-nosnippet>70</a>        market: <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#71 id=71 data-nosnippet>71</a>        count: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#72 id=72 data-nosnippet>72</a>        offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#73 id=73 data-nosnippet>73</a>        next: <span class="prelude-ty">Option</span>&lt;CalendarPageDirection&gt;,
+<a href=#74 id=74 data-nosnippet>74</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;CalendarEventsResponse&gt; {
+<a href=#75 id=75 data-nosnippet>75</a>        <span class="kw">let </span>cat_str = <span class="kw">match </span>category {
+<a href=#76 id=76 data-nosnippet>76</a>            CalendarCategory::Report =&gt; <span class="string">"report"</span>,
+<a href=#77 id=77 data-nosnippet>77</a>            CalendarCategory::Dividend =&gt; <span class="string">"dividend"</span>,
+<a href=#78 id=78 data-nosnippet>78</a>            CalendarCategory::Split =&gt; <span class="string">"split"</span>,
+<a href=#79 id=79 data-nosnippet>79</a>            CalendarCategory::Ipo =&gt; <span class="string">"ipo"</span>,
+<a href=#80 id=80 data-nosnippet>80</a>            CalendarCategory::MacroData =&gt; <span class="string">"macrodata"</span>,
+<a href=#81 id=81 data-nosnippet>81</a>            CalendarCategory::Closed =&gt; <span class="string">"closed"</span>,
+<a href=#82 id=82 data-nosnippet>82</a>            CalendarCategory::Meeting =&gt; <span class="string">"meeting"</span>,
+<a href=#83 id=83 data-nosnippet>83</a>            CalendarCategory::Merge =&gt; <span class="string">"merge"</span>,
+<a href=#84 id=84 data-nosnippet>84</a>        };
+<a href=#85 id=85 data-nosnippet>85</a>        <span class="kw">let </span>next_str = next.map(|d| <span class="kw">match </span>d {
+<a href=#86 id=86 data-nosnippet>86</a>            CalendarPageDirection::Later =&gt; <span class="string">"later"</span>,
+<a href=#87 id=87 data-nosnippet>87</a>            CalendarPageDirection::Earlier =&gt; <span class="string">"earlier"</span>,
+<a href=#88 id=88 data-nosnippet>88</a>        });
+<a href=#89 id=89 data-nosnippet>89</a>        <span class="attr">#[derive(Serialize)]
+<a href=#90 id=90 data-nosnippet>90</a>        </span><span class="kw">struct </span>Query {
+<a href=#91 id=91 data-nosnippet>91</a>            date: String,
+<a href=#92 id=92 data-nosnippet>92</a>            date_end: String,
+<a href=#93 id=93 data-nosnippet>93</a>            <span class="attr">#[serde(rename = <span class="string">"types[]"</span>)]
+<a href=#94 id=94 data-nosnippet>94</a>            </span>types: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+<a href=#95 id=95 data-nosnippet>95</a>            <span class="attr">#[serde(rename = <span class="string">"markets[]"</span>, skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#96 id=96 data-nosnippet>96</a>            </span>markets: <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#97 id=97 data-nosnippet>97</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#98 id=98 data-nosnippet>98</a>            </span>count: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#99 id=99 data-nosnippet>99</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#100 id=100 data-nosnippet>100</a>            </span>offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+<a href=#101 id=101 data-nosnippet>101</a>            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#102 id=102 data-nosnippet>102</a>            </span>next: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
+<a href=#103 id=103 data-nosnippet>103</a>        }
+<a href=#104 id=104 data-nosnippet>104</a>        <span class="prelude-val">Ok</span>(<span class="self">self
+<a href=#105 id=105 data-nosnippet>105</a>            </span>.<span class="number">0
+<a href=#106 id=106 data-nosnippet>106</a>            </span>.http_cli
+<a href=#107 id=107 data-nosnippet>107</a>            .request(Method::GET, <span class="string">"/v1/quote/finance_calendar"</span>)
+<a href=#108 id=108 data-nosnippet>108</a>            .query_params(Query {
+<a href=#109 id=109 data-nosnippet>109</a>                date: start.into(),
+<a href=#110 id=110 data-nosnippet>110</a>                date_end: end.into(),
+<a href=#111 id=111 data-nosnippet>111</a>                types: cat_str,
+<a href=#112 id=112 data-nosnippet>112</a>                markets: market,
+<a href=#113 id=113 data-nosnippet>113</a>                count,
+<a href=#114 id=114 data-nosnippet>114</a>                offset,
+<a href=#115 id=115 data-nosnippet>115</a>                next: next_str,
+<a href=#116 id=116 data-nosnippet>116</a>            })
+<a href=#117 id=117 data-nosnippet>117</a>            .response::&lt;Json&lt;CalendarEventsResponse&gt;&gt;()
+<a href=#118 id=118 data-nosnippet>118</a>            .send()
+<a href=#119 id=119 data-nosnippet>119</a>            .with_subscriber(<span class="self">self</span>.<span class="number">0</span>.log_subscriber.clone())
+<a href=#120 id=120 data-nosnippet>120</a>            .<span class="kw">await</span><span class="question-mark">?
+<a href=#121 id=121 data-nosnippet>121</a>            </span>.<span class="number">0</span>)
+<a href=#122 id=122 data-nosnippet>122</a>    }
+<a href=#123 id=123 data-nosnippet>123</a>}
 </code></pre></div></section></main></body></html>

@@ -94,6 +94,10 @@ $(function() {
 , <a class="el" href="structlb__calendar__events__response__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_calendar_events_response_t</a>
 , <a class="el" href="structlb__corp__action__item__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_corp_action_item_t</a>
 , <a class="el" href="structlb__datetime__t.html#a19b0489b519578815d513f4215255a97">lb_datetime_t</a>
+, <a class="el" href="structlb__fund__dated__value__t.html#afe14ac0a8f27189a35e85d11b1f8028d">lb_fund_dated_value_t</a>
+, <a class="el" href="structlb__fund__dividend__t.html#afe14ac0a8f27189a35e85d11b1f8028d">lb_fund_dividend_t</a>
+, <a class="el" href="structlb__fund__performance__point__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_fund_performance_point_t</a>
+, <a class="el" href="structlb__fund__unit__value__t.html#afe14ac0a8f27189a35e85d11b1f8028d">lb_fund_unit_value_t</a>
 , <a class="el" href="structlb__industry__valuation__history__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_industry_valuation_history_t</a>
 , <a class="el" href="structlb__institution__rating__detail__evaluate__item__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_institution_rating_detail_evaluate_item_t</a>
 , <a class="el" href="structlb__institution__rating__detail__target__item__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_institution_rating_detail_target_item_t</a>
@@ -101,6 +105,9 @@ $(function() {
 , <a class="el" href="structlb__option__volume__daily__stat__t.html#a19b0489b519578815d513f4215255a97">lb_option_volume_daily_stat_t</a>
 , <a class="el" href="structlb__rating__summary__evaluate__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_rating_summary_evaluate_t</a>
 , <a class="el" href="structlb__valuation__history__point__t.html#aac1c234e94e0244007c46e4ec78e9735">lb_valuation_history_point_t</a>
+</li>
+<li>date_format
+: <a class="el" href="structlb__fund__nav__value__t.html#a345ab9d7e99dc6a6411b3a99def30616">lb_fund_nav_value_t</a>
 </li>
 <li>date_str
 : <a class="el" href="structlb__corp__action__item__t.html#ac02428fdac0090c6f8e1a5574e21a5ec">lb_corp_action_item_t</a>
@@ -117,6 +124,9 @@ $(function() {
 </li>
 <li>day
 : <a class="el" href="structlb__date__t.html#a72369a1087b2aeffe374bb054cb97c12">lb_date_t</a>
+</li>
+<li>day_increase_rate
+: <a class="el" href="structlb__fund__unit__value__t.html#afe3709351ea57b1522d7a62058196f40">lb_fund_unit_value_t</a>
 </li>
 <li>days_to_cover
 : <a class="el" href="structlb__short__positions__item__t.html#a79fbf0fdd04b614c476ab491c67c82ef">lb_short_positions_item_t</a>
@@ -161,11 +171,15 @@ $(function() {
 <li>derivative_pnl_details
 : <a class="el" href="structlb__profit__analysis__detail__t.html#a334d1a9f143e2e764a8cd6a620acf34c">lb_profit_analysis_detail_t</a>
 </li>
+<li>derivatives
+: <a class="el" href="structlb__fund__detail__t.html#a16946b124f8d196ead54ab6f9a7ed731">lb_fund_detail_t</a>
+</li>
 <li>derivatives_profit
 : <a class="el" href="structlb__profit__analysis__item__t.html#a5ae2314cd4dc8189b9eb3bef727e04dc">lb_profit_analysis_item_t</a>
 </li>
 <li>desc
 : <a class="el" href="structlb__dividend__item__t.html#a710bce51374aba96ab04912897666c35">lb_dividend_item_t</a>
+, <a class="el" href="structlb__fund__order__stage__t.html#a710bce51374aba96ab04912897666c35">lb_fund_order_stage_t</a>
 , <a class="el" href="structlb__valuation__metric__data__t.html#a710bce51374aba96ab04912897666c35">lb_valuation_metric_data_t</a>
 </li>
 <li>describe
@@ -177,6 +191,8 @@ $(function() {
 , <a class="el" href="structlb__cash__flow__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_cash_flow_t</a>
 , <a class="el" href="structlb__consensus__detail__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_consensus_detail_t</a>
 , <a class="el" href="structlb__filing__item__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_filing_item_t</a>
+, <a class="el" href="structlb__fund__brief__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_fund_brief_t</a>
+, <a class="el" href="structlb__fund__transaction__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_fund_transaction_t</a>
 , <a class="el" href="structlb__market__temperature__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_market_temperature_t</a>
 , <a class="el" href="structlb__news__item__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_news_item_t</a>
 , <a class="el" href="structlb__owned__topic__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_owned_topic_t</a>
@@ -185,8 +201,17 @@ $(function() {
 , <a class="el" href="structlb__sharelist__info__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_sharelist_info_t</a>
 , <a class="el" href="structlb__topic__item__t.html#a68344fa88cf4e86b5079fd69a5c22d57">lb_topic_item_t</a>
 </li>
+<li>detail_created_at
+: <a class="el" href="structlb__fund__transaction__t.html#ae0927a2b7b21abef55556babf539662c">lb_fund_transaction_t</a>
+</li>
+<li>detail_type
+: <a class="el" href="structlb__fund__transaction__t.html#ae53f4ba5611e1d9181d10b734a88af82">lb_fund_transaction_t</a>
+</li>
 <li>detail_url
 : <a class="el" href="structlb__owned__topic__t.html#aa88e73da4bc0337f944b5f51368ffea9">lb_owned_topic_t</a>
+</li>
+<li>detail_values
+: <a class="el" href="structlb__fund__position__detail__t.html#aec528ef845f5929eac5d076d1b73c978">lb_fund_position_detail_t</a>
 </li>
 <li>details
 : <a class="el" href="structlb__consensus__report__t.html#a3709b0f847623dccb6d82ec9076b7ad9">lb_consensus_report_t</a>
@@ -201,6 +226,12 @@ $(function() {
 <li>display_account
 : <a class="el" href="structlb__dca__plan__t.html#adc03374dc318584d17482915c0040d4e">lb_dca_plan_t</a>
 </li>
+<li>div_cash_infos
+: <a class="el" href="structlb__fund__dividends__t.html#a2067849dd7b7ef2e6c302bd05202394c">lb_fund_dividends_t</a>
+</li>
+<li>div_method
+: <a class="el" href="structlb__fund__dividend__t.html#a0436ffdd3aec9c906c3e63f938e19e29">lb_fund_dividend_t</a>
+</li>
 <li>div_payout_ratio
 : <a class="el" href="structlb__industry__valuation__item__t.html#a784db309b3476fb576dba36a1030a07c">lb_industry_valuation_item_t</a>
 </li>
@@ -208,11 +239,22 @@ $(function() {
 : <a class="el" href="structlb__industry__valuation__item__t.html#ababe1b50fe810b29e0e0d8706d9b5b77">lb_industry_valuation_item_t</a>
 , <a class="el" href="structlb__valuation__comparison__item__t.html#ababe1b50fe810b29e0e0d8706d9b5b77">lb_valuation_comparison_item_t</a>
 </li>
+<li>dividend_option
+: <a class="el" href="structlb__fund__order__info__t.html#af3ffdca43cc1a9166512b47319328eff">lb_fund_order_info_t</a>
+, <a class="el" href="structlb__submit__fund__order__options__t.html#aaeb6483874fea843565ed2b37b2f4099">lb_submit_fund_order_options_t</a>
+, <a class="el" href="structlb__validate__fund__order__options__t.html#aaeb6483874fea843565ed2b37b2f4099">lb_validate_fund_order_options_t</a>
+</li>
 <li>dividend_ratio_ttm
 : <a class="el" href="structlb__security__calc__index__t.html#aa4f9f28b5b04c6d93f714e0d69ca5471">lb_security_calc_index_t</a>
 </li>
 <li>dividend_yield
 : <a class="el" href="structlb__security__static__info__t.html#a1e65ffedd6eda21d4ad4788aa0517fe5">lb_security_static_info_t</a>
+</li>
+<li>done_at
+: <a class="el" href="structlb__fund__transaction__t.html#a0b35a9f31d0c18858c3a777492f5a8e7">lb_fund_transaction_t</a>
+</li>
+<li>done_day
+: <a class="el" href="structlb__fund__detail__t.html#a93ba55c04f90bdfc683b33b43ff0249b">lb_fund_detail_t</a>
 </li>
 <li>dps
 : <a class="el" href="structlb__industry__valuation__item__t.html#aa5d31394e62c2eb3a8f8be39ec63cd2c">lb_industry_valuation_item_t</a>

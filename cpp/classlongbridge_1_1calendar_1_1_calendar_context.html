@@ -93,9 +93,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:acb110866d231bd58570bb9f1f0c473f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b3590493e572330f597ddca94b971c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html">CalendarContext</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html#a2b3590493e572330f597ddca94b971c2">operator=</a> (const <a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html">CalendarContext</a> &amp;)</td></tr>
 <tr class="separator:a2b3590493e572330f597ddca94b971c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93b3ad3eec3f18648998f85758162a38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html#a93b3ad3eec3f18648998f85758162a38">finance_calendar</a> (<a class="el" href="namespacelongbridge_1_1calendar.html#a8648be6517036379f5152d356943e0d8">CalendarCategory</a> category, const std::string &amp;start, const std::string &amp;end, const std::string &amp;market, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html">CalendarContext</a>, <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_events_response.html">CalendarEventsResponse</a> &gt; callback) const</td></tr>
-<tr class="memdesc:a93b3ad3eec3f18648998f85758162a38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get financial calendar events for the given date range.  <a href="classlongbridge_1_1calendar_1_1_calendar_context.html#a93b3ad3eec3f18648998f85758162a38">More...</a><br /></td></tr>
-<tr class="separator:a93b3ad3eec3f18648998f85758162a38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8115b32074ddd6b9127d357386ea0181"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html#a8115b32074ddd6b9127d357386ea0181">finance_calendar</a> (<a class="el" href="namespacelongbridge_1_1calendar.html#a8648be6517036379f5152d356943e0d8">CalendarCategory</a> category, const std::string &amp;start, const std::string &amp;end, const std::string &amp;market, std::optional&lt; int32_t &gt; count, std::optional&lt; int32_t &gt; offset, std::optional&lt; <a class="el" href="namespacelongbridge_1_1calendar.html#a3bf808d0be12aab9f4afc97d730cf85f">CalendarPageDirection</a> &gt; next, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html">CalendarContext</a>, <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_events_response.html">CalendarEventsResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:a8115b32074ddd6b9127d357386ea0181"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -223,8 +222,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a93b3ad3eec3f18648998f85758162a38"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a93b3ad3eec3f18648998f85758162a38">&#9670;&nbsp;</a></span>finance_calendar()</h2>
+<a id="a8115b32074ddd6b9127d357386ea0181"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8115b32074ddd6b9127d357386ea0181">&#9670;&nbsp;</a></span>finance_calendar()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -256,6 +255,24 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">std::optional&lt; int32_t &gt;&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::optional&lt; int32_t &gt;&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::optional&lt; <a class="el" href="namespacelongbridge_1_1calendar.html#a3bf808d0be12aab9f4afc97d730cf85f">CalendarPageDirection</a> &gt;&#160;</td>
+          <td class="paramname"><em>next</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1calendar_1_1_calendar_context.html">CalendarContext</a>, <a class="el" href="structlongbridge_1_1calendar_1_1_calendar_events_response.html">CalendarEventsResponse</a> &gt;&#160;</td>
           <td class="paramname"><em>callback</em>&#160;</td>
         </tr>
@@ -266,8 +283,8 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Get financial calendar events for the given date range. </p>
+<p>Get financial calendar events for the given date range.</p>
+<p>The endpoint paginates: the server caps each response (historically 10 events per page unless a larger <code>count</code> is requested) and returns a <code>next_date</code> cursor. To page through the full window, request a larger <code>count</code>, or re-call with the returned <code>next_date</code> as <code>start</code>. <code>count</code>, <code>offset</code> and <code>next</code> are optional (pass <code>std::nullopt</code> to use the server default). </p>
 
 </div>
 </div>

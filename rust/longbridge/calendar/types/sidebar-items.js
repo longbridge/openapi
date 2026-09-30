@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["CalendarCategory"],"struct":["CalendarDataKv","CalendarDateGroup","CalendarEventInfo","CalendarEventsResponse"]};
+window.SIDEBAR_ITEMS = {"enum":["CalendarCategory","CalendarPageDirection"],"struct":["CalendarDataKv","CalendarDateGroup","CalendarEventInfo","CalendarEventsResponse"]};
