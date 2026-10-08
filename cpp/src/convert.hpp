@@ -177,6 +177,9 @@ using longbridge::fund::FundTrend;
 using longbridge::fund::FundTrendContrast;
 using longbridge::fund::FundUnitValue;
 using longbridge::fund::HotFund;
+using longbridge::forex::ForexOrderDetail;
+using longbridge::forex::ForexOrderStatus;
+using longbridge::forex::ForexQuote;
 using longbridge::quote::FilingItem;
 using longbridge::content::OwnedTopic;
 using longbridge::content::NewsItem;
@@ -4771,6 +4774,44 @@ convert(const fund::ffi::CFundOrderSubmitResponse* r)
     r->msg,
     r->status,
     r->units,
+  };
+}
+
+inline ForexOrderStatus
+convert(lb_forex_order_status_t state)
+{
+  switch (state) {
+    case ForexOrderStatusProcessing:
+      return ForexOrderStatus::Processing;
+    case ForexOrderStatusSuccess:
+      return ForexOrderStatus::Success;
+    case ForexOrderStatusFailed:
+      return ForexOrderStatus::Failed;
+    default:
+      return ForexOrderStatus::Processing;
+  }
+}
+
+inline ForexQuote
+convert(const lb_forex_quote_t* q)
+{
+  return ForexQuote{
+    q->quote_id,
+    Decimal(q->rate),
+    q->expire_at,
+    q->ccy_pair,
+  };
+}
+
+inline ForexOrderDetail
+convert(const lb_forex_order_detail_t* d)
+{
+  return ForexOrderDetail{
+    convert(d->state),
+    d->rate ? std::optional{ Decimal(d->rate) } : std::nullopt,
+    d->from_amount ? std::optional{ Decimal(d->from_amount) } : std::nullopt,
+    d->to_amount ? std::optional{ Decimal(d->to_amount) } : std::nullopt,
+    d->fail_reason,
   };
 }
 

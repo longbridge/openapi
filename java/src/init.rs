@@ -145,7 +145,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::agent::ConversationStatus,
         longbridge::grid::TriggerPriceType,
         longbridge::grid::GridLimitEvent,
-        longbridge::grid::GridTimeInForce
+        longbridge::grid::GridTimeInForce,
+        longbridge::forex::ForexOrderStatus
     );
 
     // classes
@@ -268,6 +269,8 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::fund::FundTransaction,
         longbridge::fund::FundOrderValidation,
         longbridge::fund::FundOrderSubmitResponse,
+        longbridge::forex::ForexQuote,
+        longbridge::forex::ForexOrderDetail,
         longbridge::content::TopicItem,
         longbridge::content::NewsItem,
         longbridge::content::TopicAuthor,

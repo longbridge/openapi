@@ -6511,4 +6511,47 @@ struct FundOrderSubmitResponse
 
 } // namespace fund
 
+namespace forex {
+
+/// Forex order state
+enum class ForexOrderStatus
+{
+  /// Processing (includes manual review); keep polling.
+  Processing,
+  /// Conversion succeeded.
+  Success,
+  /// Conversion failed; frozen funds have been returned.
+  Failed,
+};
+
+/// A forex quote
+struct ForexQuote
+{
+  /// Quote id, used when submitting the order
+  std::string quote_id;
+  /// Customer execution rate (standard currency-pair terms)
+  Decimal rate;
+  /// Quote expiry, Unix milliseconds
+  int64_t expire_at;
+  /// The standard currency pair for `rate`, format `BASE/QUOTE`
+  std::string ccy_pair;
+};
+
+/// A forex order's state
+struct ForexOrderDetail
+{
+  /// Order state
+  ForexOrderStatus state;
+  /// Execution rate (standard currency-pair terms); empty until filled
+  std::optional<Decimal> rate;
+  /// Converted-from amount (actual value once filled); empty until filled
+  std::optional<Decimal> from_amount;
+  /// Converted-to amount (actual value once filled); empty until filled
+  std::optional<Decimal> to_amount;
+  /// Failure reason; empty when not failed
+  std::string fail_reason;
+};
+
+} // namespace forex
+
 } // namespace longbridge

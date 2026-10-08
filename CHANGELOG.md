@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Forex (currency exchange) channel:** new `ForexContext` / `ForexContextSync` for the currency-exchange flow — `quote` (`POST /v1/forex/quote`), `submit_order` (`POST /v1/forex/order`) and `order` (`GET /v1/forex/order`) — across all SDK layers (Rust core async + blocking, C, C++, Java, Node.js, Python). Conversion is asynchronous: a successful `submit_order` only means the order was accepted, so callers poll `order` by `client_order_id` until it reaches a terminal state. The order state is an integer-coded enum `ForexOrderStatus` (`Processing` / `Success` / `Failed`); the quote `rate` and the order's `rate` / `from_amount` / `to_amount` are decimals, with the three order amounts modeled as nullable (they arrive empty until the order is filled). `rate` / `expire_at` (Unix ms) / `ccy_pair` follow the standard currency-pair convention (`1 BASE = rate QUOTE`), independent of the request's from/to direction. Mirrored into `c/csrc/include/longbridge.h` (`lb_forex_context_*`, `lb_forex_quote_t`, `lb_forex_order_detail_t`, `lb_forex_order_status_t`), `nodejs/index.d.ts`, the Java classes under `com.longbridge.forex`, and the `openapi.pyi` stub; the separate Go SDK is pending.
+
 ## [5.2.0] - 2026-09-30
 
 ### Added
