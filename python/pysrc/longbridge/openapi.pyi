@@ -10745,6 +10745,129 @@ class FundOrderSubmitResponse:
     Units
     """
 
+class ForexOrderStatus:
+    """
+    Forex order state
+    """
+
+    class Processing(ForexOrderStatus):
+        """
+        Processing (includes manual review); keep polling.
+        """
+
+    class Success(ForexOrderStatus):
+        """
+        Conversion succeeded.
+        """
+
+    class Failed(ForexOrderStatus):
+        """
+        Conversion failed; frozen funds have been returned.
+        """
+
+class ForexQuote:
+    """
+    A forex quote
+    """
+
+    quote_id: str
+    """
+    Quote id, used when submitting the order
+    """
+    rate: Decimal
+    """
+    Customer execution rate (standard currency-pair terms)
+    """
+    expire_at: int
+    """
+    Quote expiry, Unix milliseconds
+    """
+    ccy_pair: str
+    """
+    The standard currency pair for `rate`, format `BASE/QUOTE`
+    """
+
+class ForexOrderDetail:
+    """
+    A forex order's state
+    """
+
+    state: ForexOrderStatus
+    """
+    Order state
+    """
+    rate: Optional[Decimal]
+    """
+    Execution rate (standard currency-pair terms); `None` until filled
+    """
+    from_amount: Optional[Decimal]
+    """
+    Converted-from amount (actual value once filled); `None` until filled
+    """
+    to_amount: Optional[Decimal]
+    """
+    Converted-to amount (actual value once filled); `None` until filled
+    """
+    fail_reason: str
+    """
+    Failure reason; empty when not failed
+    """
+
+class ForexContext:
+    """
+    Forex (currency exchange) channel context (REST-only).
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+    def quote(
+        self,
+        from_: str,
+        to: str,
+        amount: Optional[str] = None,
+        target_amount: Optional[str] = None,
+    ) -> ForexQuote:
+        """
+        Get a forex quote.
+
+        `from_` / `to` are ISO 4217 currency codes. Provide at most one of
+        `amount` / `target_amount` (decimal strings, e.g. ``"1000.00"``).
+
+        Args:
+            from_: Convert-out currency (ISO 4217, e.g. ``USD``)
+            to: Convert-in currency (e.g. ``HKD``)
+            amount: Convert-out amount; mutually exclusive with ``target_amount``
+            target_amount: Convert-in amount; mutually exclusive with ``amount``
+
+        Returns:
+            The forex quote
+        """
+
+    def submit_order(self, quote_id: str, client_order_id: str) -> None:
+        """
+        Submit a forex order.
+
+        Success only means the order was accepted; conversion is asynchronous —
+        poll `order` with the same `client_order_id` for the final state.
+
+        Args:
+            quote_id: Quote id returned by `quote`
+            client_order_id: Caller-supplied unique order id
+        """
+
+    def order(self, client_order_id: str) -> ForexOrderDetail:
+        """
+        Query a forex order by `client_order_id`.
+
+        Args:
+            client_order_id: Caller-supplied order id
+
+        Returns:
+            The forex order detail
+        """
+
 class FundContext:
     """
     Fund (mutual fund) channel context (REST-only).
