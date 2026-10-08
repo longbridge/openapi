@@ -4450,3 +4450,15 @@ impl_java_class!(
         action, amount, counter_id, created_at, fund_name, id, msg, status, units
     ]
 );
+
+impl_java_class!(
+    "com/longbridge/forex/ForexQuote",
+    longbridge::forex::ForexQuote,
+    [quote_id, rate, expire_at, ccy_pair]
+);
+
+impl_java_class!(
+    "com/longbridge/forex/ForexOrderDetail",
+    longbridge::forex::ForexOrderDetail,
+    [state, rate, from_amount, to_amount, fail_reason]
+);
