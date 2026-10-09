@@ -986,6 +986,22 @@ pub struct EstimateMaxPurchaseQuantityResponse {
     margin_max_qty: Decimal,
 }
 
+/// Response for estimating a multi-leg option combination's tradable quantity
+/// and margin impact
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::EstimateMultiLegAvailableQuantityResponse")]
+pub struct EstimateMultiLegAvailableQuantityResponse {
+    /// Maximum open quantity of the combination
+    max_open_qty: Decimal,
+    /// Margin required per combination unit
+    unit_margin: Decimal,
+    /// Change of the initial margin after placing the order
+    initial_margin_change: Decimal,
+    /// Change of the maintenance margin after placing the order
+    maintenance_margin_change: Decimal,
+}
+
 // ── US-market types ──────────────────────────────────────────────────────────
 
 /// One cash currency entry in USAssetOverview

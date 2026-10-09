@@ -9,16 +9,16 @@ use crate::{
     error::ErrorNewType,
     trade::{
         requests::{
-            EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
-            GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions,
-            GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderOptions,
-            SubmitOrderOptions,
+            EstimateMaxPurchaseQuantityOptions, EstimateMultiLegAvailableQuantityOptions,
+            GetAllExecutionsOptions, GetCashFlowOptions, GetHistoryExecutionsOptions,
+            GetHistoryOrdersOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+            ReplaceOrderOptions, SubmitMultiLegOrderOptions, SubmitOrderOptions,
         },
         types::{
             AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityResponse,
-            Execution, FundPositionsResponse, MarginRatio, Order, OrderDetail,
-            PushGridOrderChanged, PushOrderChanged, StockPositionsResponse, SubmitOrderResponse,
-            TopicType,
+            EstimateMultiLegAvailableQuantityResponse, Execution, FundPositionsResponse,
+            MarginRatio, Order, OrderDetail, PushGridOrderChanged, PushOrderChanged,
+            StockPositionsResponse, SubmitOrderResponse, TopicType,
         },
     },
     utils::JsCallback,
@@ -724,6 +724,25 @@ impl TradeContext {
                 .await
                 .map_err(ErrorNewType)?;
             EstimateMaxPurchaseQuantityResponse::try_from(res)
+        })
+    }
+
+    /// Estimate a multi-leg option combination's maximum tradable quantity and
+    /// margin impact before submitting the order (US market only).
+    #[napi]
+    pub fn estimate_multileg_available_quantity<'env>(
+        &self,
+        env: &'env Env,
+        opts: EstimateMultiLegAvailableQuantityOptions<'env>,
+    ) -> Result<PromiseRaw<'env, EstimateMultiLegAvailableQuantityResponse>> {
+        let ctx = self.ctx.clone();
+        let opts = longbridge::trade::EstimateMultiLegAvailableQuantityOptions::from(opts);
+        env.spawn_future(async move {
+            let res = ctx
+                .estimate_multileg_available_quantity(opts)
+                .await
+                .map_err(ErrorNewType)?;
+            EstimateMultiLegAvailableQuantityResponse::try_from(res)
         })
     }
 }
