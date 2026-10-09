@@ -11,14 +11,14 @@ use crate::{
     Config, Result, serde_utils,
     trade::{
         AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
-        EstimateMaxPurchaseQuantityOptions, Execution, FundPositionsResponse,
-        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        EstimateMaxPurchaseQuantityOptions, EstimateMultiLegAvailableQuantityOptions, Execution,
+        FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
+        OrderDetail, OrderSide, PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions,
+        StockPositionsResponse, SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType,
+        USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -42,6 +42,26 @@ pub struct EstimateMaxPurchaseQuantityResponse {
     /// Margin available quantity
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub margin_max_qty: Decimal,
+}
+
+/// Response for estimating a multi-leg option combination's tradable quantity
+/// and margin impact.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EstimateMultiLegAvailableQuantityResponse {
+    /// Maximum open quantity of the combination
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub max_open_qty: Decimal,
+    /// Margin required per combination unit
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub unit_margin: Decimal,
+    /// Change of the initial margin after placing the order (after minus
+    /// before)
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub initial_margin_change: Decimal,
+    /// Change of the maintenance margin after placing the order (after minus
+    /// before)
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub maintenance_margin_change: Decimal,
 }
 
 struct InnerTradeContext {
@@ -936,6 +956,28 @@ impl TradeContext {
             .request(Method::GET, "/v1/trade/estimate/buy_limit")
             .query_params(opts)
             .response::<Json<EstimateMaxPurchaseQuantityResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Estimate a multi-leg option combination's maximum tradable quantity and
+    /// margin impact before submitting the order.
+    ///
+    /// Only the US market is supported; all legs must share the same underlying
+    /// and settlement currency, each leg must be an option or the underlying
+    /// stock, and duplicate legs (same symbol and side) are rejected.
+    pub async fn estimate_multileg_available_quantity(
+        &self,
+        opts: EstimateMultiLegAvailableQuantityOptions,
+    ) -> Result<EstimateMultiLegAvailableQuantityResponse> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/trade/estimate/multileg")
+            .body(Json(opts))
+            .response::<Json<EstimateMultiLegAvailableQuantityResponse>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
