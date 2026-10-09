@@ -7395,6 +7395,32 @@ class EstimateMaxPurchaseQuantityResponse:
     Margin available quantity
     """
 
+class EstimateMultiLegAvailableQuantityResponse:
+    """
+    Response for estimating a multi-leg option combination's tradable quantity
+    and margin impact
+    """
+
+    max_open_qty: Decimal
+    """
+    Maximum open quantity of the combination
+    """
+
+    unit_margin: Decimal
+    """
+    Margin required per combination unit
+    """
+
+    initial_margin_change: Decimal
+    """
+    Change of the initial margin after placing the order
+    """
+
+    maintenance_margin_change: Decimal
+    """
+    Change of the maintenance margin after placing the order
+    """
+
 class TradeContext:
     """
     Trade context
@@ -8048,6 +8074,31 @@ class TradeContext:
                     side = OrderSide.Buy,
                 )
                 print(resp)
+        """
+
+    def estimate_multileg_available_quantity(
+        self,
+        side: Type[OrderSide],
+        order_type: Type[OrderType],
+        submitted_quantity: Decimal,
+        strategy: Type[MultiLegStrategy],
+        legs: list[str],
+        submitted_price: Optional[Decimal] = None,
+    ) -> EstimateMultiLegAvailableQuantityResponse:
+        """
+        Estimate a multi-leg option combination's maximum tradable quantity and
+        margin impact before submitting the order (US market only).
+
+        Args:
+            side: Order side of the combination
+            order_type: Order type
+            submitted_quantity: Submitted quantity (number of combinations)
+            strategy: Multi-leg strategy
+            legs: Combination leg symbols (``ticker.region`` format)
+            submitted_price: Estimated order price, required for limit order types such as ``LO``
+
+        Returns:
+            Response
         """
 
     def us_query_orders(
@@ -11975,6 +12026,30 @@ class AsyncTradeContext:
                     print(resp)
 
                 asyncio.run(main())
+        """
+        ...
+
+    def estimate_multileg_available_quantity(
+        self,
+        side: Type[OrderSide],
+        order_type: Type[OrderType],
+        submitted_quantity: Decimal,
+        strategy: Type[MultiLegStrategy],
+        legs: list[str],
+        submitted_price: Optional[Decimal] = None,
+    ) -> Awaitable[EstimateMultiLegAvailableQuantityResponse]:
+        """
+        Estimate a multi-leg option combination's maximum tradable quantity and
+        margin impact before submitting the order (US market only). Returns an
+        awaitable that resolves to the estimate response.
+
+        Args:
+            side: Order side of the combination
+            order_type: Order type
+            submitted_quantity: Submitted quantity (number of combinations)
+            strategy: Multi-leg strategy
+            legs: Combination leg symbols (``ticker.region`` format)
+            submitted_price: Estimated order price, required for limit order types such as ``LO``
         """
         ...
 

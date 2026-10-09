@@ -1105,6 +1105,22 @@ pub(crate) struct EstimateMaxPurchaseQuantityResponse {
     pub margin_max_qty: PyDecimal,
 }
 
+/// Response for estimating a multi-leg option combination's tradable quantity
+/// and margin impact
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longbridge::trade::EstimateMultiLegAvailableQuantityResponse")]
+pub(crate) struct EstimateMultiLegAvailableQuantityResponse {
+    /// Maximum open quantity of the combination
+    pub max_open_qty: PyDecimal,
+    /// Margin required per combination unit
+    pub unit_margin: PyDecimal,
+    /// Change of the initial margin after placing the order
+    pub initial_margin_change: PyDecimal,
+    /// Change of the maintenance margin after placing the order
+    pub maintenance_margin_change: PyDecimal,
+}
+
 // ── US-market types ──────────────────────────────────────────────────────────
 
 /// One cash currency entry in USAssetOverview
