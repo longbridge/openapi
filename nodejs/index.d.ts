@@ -694,6 +694,23 @@ export declare class EstimateMaxPurchaseQuantityResponse {
   get marginMaxQty(): Decimal
 }
 
+/**
+ * Response for estimating a multi-leg option combination's tradable quantity
+ * and margin impact
+ */
+export declare class EstimateMultiLegAvailableQuantityResponse {
+  toString(): string
+  toJSON(): any
+  /** Maximum open quantity of the combination */
+  get maxOpenQty(): Decimal
+  /** Margin required per combination unit */
+  get unitMargin(): Decimal
+  /** Change of the initial margin after placing the order */
+  get initialMarginChange(): Decimal
+  /** Change of the maintenance margin after placing the order */
+  get maintenanceMarginChange(): Decimal
+}
+
 /** Trade */
 export declare class Execution {
   toString(): string
@@ -4617,6 +4634,11 @@ export declare class TradeContext {
    * ```
    */
   estimateMaxPurchaseQuantity(opts: EstimateMaxPurchaseQuantityOptions): Promise<EstimateMaxPurchaseQuantityResponse>
+  /**
+   * Estimate a multi-leg option combination's maximum tradable quantity and
+   * margin impact before submitting the order (US market only).
+   */
+  estimateMultilegAvailableQuantity(opts: EstimateMultiLegAvailableQuantityOptions): Promise<EstimateMultiLegAvailableQuantityResponse>
 }
 
 /** The information of trading session */
@@ -6152,6 +6174,36 @@ export interface EstimateMaxPurchaseQuantityOptions {
   currency?: string
   orderId?: string
   fractionalShares: boolean
+}
+
+/**
+ * Options for estimating a multi-leg option combination's maximum tradable
+ * quantity and margin impact
+ */
+export interface EstimateMultiLegAvailableQuantityOptions {
+  /** Order side of the combination */
+  side: OrderSide
+  /** Order type */
+  orderType: OrderType
+  /** Submitted quantity (number of combinations) */
+  submittedQuantity: Decimal
+  /** Multi-leg strategy */
+  strategy: MultiLegStrategy
+  /** Legs of the combination */
+  legs: Array<EstimateMultiLegOrderLeg>
+  /** Submitted price (required for limit order types such as `LO`) */
+  submittedPrice?: Decimal
+}
+
+/** A leg of a multi-leg combination for the pre-trade estimate */
+export interface EstimateMultiLegOrderLeg {
+  /**
+   * Option or underlying-stock symbol, in `ticker.region` format
+   * (e.g. `QQQ260731C764000.US`)
+   */
+  symbol: string
+  /** Leg order side. Reserved field, not in use for now. */
+  side?: OrderSide
 }
 
 /** One currency exchange rate */

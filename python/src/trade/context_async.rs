@@ -3,7 +3,8 @@
 use std::sync::Arc;
 
 use longbridge::trade::{
-    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+    EstimateMultiLegAvailableQuantityOptions, EstimateMultiLegOrderLeg, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
     GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderLeg,
@@ -22,10 +23,11 @@ use crate::{
         push::handle_push_event,
         types::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
-            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
-            MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
-            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
-            SubmitOrderResponse, TimeInForceType, TopicType,
+            EstimateMaxPurchaseQuantityResponse, EstimateMultiLegAvailableQuantityResponse,
+            Execution, FundPositionsResponse, MarginRatio, MultiLegStrategy, Order, OrderDetail,
+            OrderSide, OrderStatus, OrderType, OutsideRTH, ReplaceAttachedParams,
+            StockPositionsResponse, SubmitAttachedParams, SubmitOrderResponse, TimeInForceType,
+            TopicType,
         },
     },
     types::Market,
@@ -748,6 +750,45 @@ impl AsyncTradeContext {
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let r: EstimateMaxPurchaseQuantityResponse = ctx
                 .estimate_max_purchase_quantity(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .try_into()?;
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Estimate a multi-leg option combination's maximum tradable quantity and
+    /// margin impact before submitting the order (US market only).
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None))]
+    fn estimate_multileg_available_quantity(
+        &self,
+        py: Python<'_>,
+        side: OrderSide,
+        order_type: OrderType,
+        submitted_quantity: PyDecimal,
+        strategy: MultiLegStrategy,
+        legs: Vec<String>,
+        submitted_price: Option<PyDecimal>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let legs = legs
+            .into_iter()
+            .map(EstimateMultiLegOrderLeg::new)
+            .collect::<Vec<_>>();
+        let mut opts = EstimateMultiLegAvailableQuantityOptions::new(
+            side.into(),
+            order_type.into(),
+            submitted_quantity.into(),
+            strategy.into(),
+            legs,
+        );
+        if let Some(submitted_price) = submitted_price {
+            opts = opts.submitted_price(submitted_price.into());
+        }
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: EstimateMultiLegAvailableQuantityResponse = ctx
+                .estimate_multileg_available_quantity(opts)
                 .await
                 .map_err(ErrorNewType)?
                 .try_into()?;

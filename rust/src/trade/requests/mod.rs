@@ -1,5 +1,6 @@
 mod cancel_order;
 mod estimate_max_purchase_quantity;
+mod estimate_multileg;
 mod get_all_executions;
 mod get_cash_flow;
 mod get_fund_positions;
@@ -15,6 +16,7 @@ mod submit_order;
 
 pub use cancel_order::CancelOrderOptions;
 pub use estimate_max_purchase_quantity::EstimateMaxPurchaseQuantityOptions;
+pub use estimate_multileg::{EstimateMultiLegAvailableQuantityOptions, EstimateMultiLegOrderLeg};
 pub use get_all_executions::GetAllExecutionsOptions;
 pub use get_cash_flow::GetCashFlowOptions;
 pub use get_fund_positions::GetFundPositionsOptions;

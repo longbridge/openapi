@@ -10,6 +10,7 @@ use longbridge::{
     Config, Decimal, Market, TradeContext,
     trade::{
         AttachedOrderType, BalanceType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+        EstimateMultiLegAvailableQuantityOptions, EstimateMultiLegOrderLeg,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
@@ -941,6 +942,66 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimate
         }
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.estimate_max_purchase_quantity(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextEstimateMultilegAvailableQuantity(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let side: OrderSide = get_field(env, &opts, "side")?;
+        let order_type: OrderType = get_field(env, &opts, "orderType")?;
+        let submitted_quantity: Decimal = get_field(env, &opts, "submittedQuantity")?;
+        let strategy: MultiLegStrategy = get_field(env, &opts, "strategy")?;
+
+        let legs_obj = env
+            .get_field(
+                &opts,
+                "legs",
+                "[Lcom/longbridge/trade/EstimateMultiLegOrderLeg;",
+            )?
+            .l()?;
+        let mut legs = Vec::new();
+        if !legs_obj.is_null() {
+            let legs_array: JObjectArray = legs_obj.into();
+            let len = env.get_array_length(&legs_array)?;
+            for i in 0..len {
+                let leg_obj = env.get_object_array_element(&legs_array, i)?;
+                let symbol: String = get_field(env, &leg_obj, "symbol")?;
+                let mut leg = EstimateMultiLegOrderLeg::new(symbol);
+                let leg_side: Option<OrderSide> = get_field(env, &leg_obj, "side")?;
+                if let Some(leg_side) = leg_side {
+                    leg = leg.side(leg_side);
+                }
+                legs.push(leg);
+            }
+        }
+
+        let mut new_opts = EstimateMultiLegAvailableQuantityOptions::new(
+            side,
+            order_type,
+            submitted_quantity,
+            strategy,
+            legs,
+        );
+        let submitted_price: Option<Decimal> = get_field(env, &opts, "submittedPrice")?;
+        if let Some(submitted_price) = submitted_price {
+            new_opts = new_opts.submitted_price(submitted_price);
+        }
+
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx
+                .estimate_multileg_available_quantity(new_opts)
+                .await?)
         })?;
         Ok(())
     })

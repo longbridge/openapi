@@ -951,6 +951,72 @@ TradeContext::estimate_max_purchase_quantity(
 }
 
 void
+TradeContext::estimate_multileg_available_quantity(
+  const EstimateMultiLegAvailableQuantityOptions& opts,
+  AsyncCallback<TradeContext, EstimateMultiLegAvailableQuantityResponse>
+    callback) const
+{
+  // `leg_sides` holds the converted optional leg sides so each leg's `side`
+  // pointer stays valid for the duration of the call; reserve to the final
+  // size up front so no push_back reallocates and invalidates a pointer.
+  std::vector<lb_order_side_t> leg_sides;
+  leg_sides.reserve(opts.legs.size());
+  std::vector<lb_estimate_multileg_order_leg_t> legs;
+  legs.reserve(opts.legs.size());
+  for (const auto& leg : opts.legs) {
+    const lb_order_side_t* side_ptr = nullptr;
+    if (leg.side) {
+      leg_sides.push_back(convert(leg.side.value()));
+      side_ptr = &leg_sides.back();
+    }
+    legs.push_back(
+      lb_estimate_multileg_order_leg_t{ leg.symbol.c_str(), side_ptr });
+  }
+
+  lb_estimate_multileg_available_quantity_options_t opts2 = {
+    convert(opts.side),
+    convert(opts.order_type),
+    (const lb_decimal_t*)opts.submitted_quantity,
+    convert(opts.strategy),
+    legs.data(),
+    legs.size(),
+    opts.submitted_price ? (const lb_decimal_t*)opts.submitted_price.value()
+                         : nullptr,
+  };
+
+  lb_trade_context_estimate_multileg_available_quantity(
+    ctx_,
+    &opts2,
+    [](auto res) {
+      auto callback_ptr = callback::get_async_callback<
+        TradeContext,
+        EstimateMultiLegAvailableQuantityResponse>(res->userdata);
+      TradeContext ctx((const lb_trade_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        auto res_data =
+          (const lb_estimate_multileg_available_quantity_response_t*)res->data;
+        EstimateMultiLegAvailableQuantityResponse resp = {
+          res_data->max_open_qty,
+          res_data->unit_margin,
+          res_data->initial_margin_change,
+          res_data->maintenance_margin_change,
+        };
+        (*callback_ptr)(
+          AsyncResult<TradeContext, EstimateMultiLegAvailableQuantityResponse>(
+            ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<TradeContext, EstimateMultiLegAvailableQuantityResponse>(
+            ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<TradeContext, EstimateMultiLegAvailableQuantityResponse>(
+      callback));
+}
+
+void
 TradeContext::set_on_grid_order_changed(
   PushCallback<TradeContext, PushGridOrderChanged> callback) const
 {

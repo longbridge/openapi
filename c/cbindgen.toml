@@ -190,6 +190,9 @@ cpp_compat = true
 "CPushGridOrderChanged" = "lb_push_grid_order_changed_t"
 "CEstimateMaxPurchaseQuantityOptions" = "lb_estimate_max_purchase_quantity_options_t"
 "CEstimateMaxPurchaseQuantityResponse" = "lb_estimate_max_purchase_quantity_response_t"
+"CEstimateMultiLegOrderLeg" = "lb_estimate_multileg_order_leg_t"
+"CEstimateMultiLegAvailableQuantityOptions" = "lb_estimate_multileg_available_quantity_options_t"
+"CEstimateMultiLegAvailableQuantityResponse" = "lb_estimate_multileg_available_quantity_response_t"
 "CCreateWatchlistGroup" = "lb_create_watchlist_group_t"
 "CUpdateWatchlistGroup" = "lb_update_watchlist_group_t"
 "CSecuritiesUpdateMode" = "lb_securities_update_mode_t"
@@ -514,6 +517,7 @@ include = [
     # TradeContext: grid trading push (stays on trade side)
     "CPushGridOrderChanged",
     "CEstimateMaxPurchaseQuantityResponse",
+    "CEstimateMultiLegAvailableQuantityResponse",
     "CSecurityCalcIndex",
     "CWarrantInfo",
     "CQuotePackageDetail",
