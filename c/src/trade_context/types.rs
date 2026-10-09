@@ -5,12 +5,13 @@ use longbridge::{
     trade::{
         AccountBalance, AllExecutionsResponse, AttachedOrderDetail, AttachedOrderType, BalanceType,
         CashFlow, CashFlowDirection, CashInfo, ContractDirection,
-        EstimateMaxPurchaseQuantityResponse, Execution, FrozenTransactionFee, FundPosition,
-        FundPositionChannel, FundPositionsResponse, MarginRatio, MultiLegInfo, MultiLegOrderLeg,
-        MultiLegPosition, MultiLegStrategy, Order, OrderChargeDetail, OrderChargeFee,
-        OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag,
-        OrderType, PushGridOrderChanged, PushOrderChanged, StockPosition, StockPositionChannel,
-        StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
+        EstimateMaxPurchaseQuantityResponse, EstimateMultiLegAvailableQuantityResponse, Execution,
+        FrozenTransactionFee, FundPosition, FundPositionChannel, FundPositionsResponse,
+        MarginRatio, MultiLegInfo, MultiLegOrderLeg, MultiLegPosition, MultiLegStrategy, Order,
+        OrderChargeDetail, OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail,
+        OrderSide, OrderStatus, OrderTag, OrderType, PushGridOrderChanged, PushOrderChanged,
+        StockPosition, StockPositionChannel, StockPositionsResponse, SubmitOrderResponse,
+        TimeInForceType,
     },
 };
 use time::OffsetDateTime;
@@ -2765,6 +2766,86 @@ impl ToFFI for CEstimateMaxPurchaseQuantityResponseOwned {
         CEstimateMaxPurchaseQuantityResponse {
             cash_max_qty: self.cash_max_qty.to_ffi_type(),
             margin_max_qty: self.margin_max_qty.to_ffi_type(),
+        }
+    }
+}
+
+/// A leg of a multi-leg combination for the pre-trade estimate
+#[repr(C)]
+pub struct CEstimateMultiLegOrderLeg {
+    /// Option or underlying-stock symbol, in `ticker.region` format
+    /// (e.g. `QQQ260731C764000.US`)
+    pub symbol: *const c_char,
+    /// Leg order side (reserved; not in use for now) (can be null)
+    pub side: *const COrderSide,
+}
+
+/// Options for estimating a multi-leg option combination's tradable quantity
+/// and margin impact
+#[repr(C)]
+pub struct CEstimateMultiLegAvailableQuantityOptions {
+    /// Order side of the combination
+    pub side: COrderSide,
+    /// Order type
+    pub order_type: COrderType,
+    /// Submitted quantity (number of combinations)
+    pub submitted_quantity: *const CDecimal,
+    /// Multi-leg strategy
+    pub strategy: CMultiLegStrategy,
+    /// Legs of the combination
+    pub legs: *const CEstimateMultiLegOrderLeg,
+    /// Number of legs
+    pub num_legs: usize,
+    /// Submitted price (required for limit order types such as `LO`) (can be
+    /// null)
+    pub submitted_price: *const CDecimal,
+}
+
+/// Response for estimating a multi-leg option combination's tradable quantity
+/// and margin impact
+#[repr(C)]
+pub struct CEstimateMultiLegAvailableQuantityResponse {
+    /// Maximum open quantity of the combination
+    pub max_open_qty: *const CDecimal,
+    /// Margin required per combination unit
+    pub unit_margin: *const CDecimal,
+    /// Change of the initial margin after placing the order
+    pub initial_margin_change: *const CDecimal,
+    /// Change of the maintenance margin after placing the order
+    pub maintenance_margin_change: *const CDecimal,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct CEstimateMultiLegAvailableQuantityResponseOwned {
+    max_open_qty: CDecimal,
+    unit_margin: CDecimal,
+    initial_margin_change: CDecimal,
+    maintenance_margin_change: CDecimal,
+}
+
+impl From<EstimateMultiLegAvailableQuantityResponse>
+    for CEstimateMultiLegAvailableQuantityResponseOwned
+{
+    fn from(value: EstimateMultiLegAvailableQuantityResponse) -> Self {
+        CEstimateMultiLegAvailableQuantityResponseOwned {
+            max_open_qty: value.max_open_qty.into(),
+            unit_margin: value.unit_margin.into(),
+            initial_margin_change: value.initial_margin_change.into(),
+            maintenance_margin_change: value.maintenance_margin_change.into(),
+        }
+    }
+}
+
+impl ToFFI for CEstimateMultiLegAvailableQuantityResponseOwned {
+    type FFIType = CEstimateMultiLegAvailableQuantityResponse;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        CEstimateMultiLegAvailableQuantityResponse {
+            max_open_qty: self.max_open_qty.to_ffi_type(),
+            unit_margin: self.unit_margin.to_ffi_type(),
+            initial_margin_change: self.initial_margin_change.to_ffi_type(),
+            maintenance_margin_change: self.maintenance_margin_change.to_ffi_type(),
         }
     }
 }
