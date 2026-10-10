@@ -307,14 +307,19 @@ impl QuoteContext {
     }
 
     /// Convert a candlestick page, dropping overnight candlesticks when
-    /// [`Self::aligns_overnight`] and `symbol` is a US equity. Returns the
-    /// candlesticks and how many were dropped.
+    /// [`Self::aligns_overnight`], `symbol` is a US equity and the query asked
+    /// for all sessions (the only case that both drops and tops up). Returns
+    /// the candlesticks and how many were dropped.
     fn convert_candlesticks(
         &self,
         symbol: &str,
+        trade_sessions: TradeSessions,
         resp: quote::SecurityCandlestickResponse,
     ) -> Result<(Vec<Candlestick>, usize)> {
-        if self.aligns_overnight() && overnight::is_us_equity_symbol(symbol) {
+        if self.aligns_overnight()
+            && trade_sessions == TradeSessions::All
+            && overnight::is_us_equity_symbol(symbol)
+        {
             overnight::drop_overnight(resp.candlesticks)
         } else {
             Ok((
@@ -345,7 +350,7 @@ impl QuoteContext {
     ) -> Result<Vec<Candlestick>> {
         let target = overnight::window_target(window, &resp.candlesticks);
         let cursor = overnight::raw_edge(&resp.candlesticks, forward);
-        let (candlesticks, dropped) = self.convert_candlesticks(symbol, resp)?;
+        let (candlesticks, dropped) = self.convert_candlesticks(symbol, trade_sessions, resp)?;
         let (Some(target), true) = (target, dropped > 0 && trade_sessions == TradeSessions::All)
         else {
             return Ok(candlesticks);
@@ -379,6 +384,18 @@ impl QuoteContext {
             },
         )
         .await
+        .inspect(|candlesticks| {
+            if candlesticks.len() < target {
+                dispatcher::with_default(&self.0.log_subscriber.clone().into(), || {
+                    tracing::warn!(
+                        symbol,
+                        target,
+                        got = candlesticks.len(),
+                        "overnight top-up returned fewer candlesticks than the WebSocket would"
+                    );
+                });
+            }
+        })
     }
 
     /// Returns the REST path to use for `command_code`, if the HTTP transport
@@ -700,7 +717,7 @@ impl QuoteContext {
             .into_iter()
             .map(|mut quote| {
                 // See `overnight`: HTTP always returns overnight quotes.
-                if self.aligns_overnight() {
+                if self.aligns_overnight() && overnight::is_us_equity_symbol(&quote.symbol) {
                     quote.over_night_quote = None;
                 }
                 quote.try_into()

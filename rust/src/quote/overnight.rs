@@ -72,16 +72,17 @@ pub(crate) fn window_target(
         // A page shorter than `count` is either all the data there is or the
         // server's cap; either way it is the window the WebSocket would return.
         CandlestickWindow::Count(count) => Some(count.min(raw.len())),
-        // With a `start`, the window is capped only if it did not reach the
-        // first bar of that day (midnight New York, where the overnight
-        // session begins); without one, a page at least as long as the request
-        // cap is taken as capped.
+        // A page shorter than the request cap cannot have been cut off. A
+        // full-size page is capped unless it already reaches the first bar of
+        // `start` (midnight New York, where the overnight session begins);
+        // without a `start` it is taken as capped.
         CandlestickWindow::DateRange { start } => {
-            let capped = match (start, raw_edge(raw, false)) {
-                (Some(start), Some(earliest)) => new_york_local(earliest) > start.midnight(),
-                (None, Some(_)) => raw.len() >= MAX_HISTORY_CANDLESTICKS,
-                _ => false,
-            };
+            let capped = raw.len() >= MAX_HISTORY_CANDLESTICKS
+                && match (start, raw_edge(raw, false)) {
+                    (Some(start), Some(earliest)) => new_york_local(earliest) > start.midnight(),
+                    (None, Some(_)) => true,
+                    _ => false,
+                };
             capped.then_some(raw.len())
         }
     }
@@ -524,10 +525,15 @@ mod tests {
             window_target(CandlestickWindow::DateRange { start }, &data),
             None
         );
-        // Earliest bar later than midnight of `start`: capped.
+        // A short page is never capped, whatever its first bar.
         assert_eq!(
             window_target(CandlestickWindow::DateRange { start }, &data[20 * 60..]),
-            Some(4 * 60)
+            None
+        );
+        // A full-size page starting after midnight of `start`: capped.
+        assert_eq!(
+            window_target(CandlestickWindow::DateRange { start }, &data[4 * 60..]),
+            Some(1200)
         );
         // Earlier `start` the page did not reach: capped.
         let earlier = Some(DAY.date().previous_day().unwrap());
