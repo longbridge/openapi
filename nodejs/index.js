@@ -772,6 +772,7 @@ module.exports.OutsideRTH = nativeBinding.OutsideRTH
 module.exports.Period = nativeBinding.Period
 module.exports.PinnedMode = nativeBinding.PinnedMode
 module.exports.PushCandlestickMode = nativeBinding.PushCandlestickMode
+module.exports.QuoteTransport = nativeBinding.QuoteTransport
 module.exports.SecuritiesUpdateMode = nativeBinding.SecuritiesUpdateMode
 module.exports.SecurityBoard = nativeBinding.SecurityBoard
 module.exports.SecurityListCategory = nativeBinding.SecurityListCategory

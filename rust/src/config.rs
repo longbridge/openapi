@@ -119,6 +119,38 @@ impl fmt::Debug for AuthMode {
     }
 }
 
+/// Transport used by the [`QuoteContext`](crate::quote::QuoteContext) pull
+/// (request/response) APIs.
+///
+/// Subscriptions, push events, `realtime_*`, `member_id` / `quote_level` /
+/// `quote_package_details` and the few APIs without a REST equivalent always
+/// use the WebSocket connection; this only selects how the other pull APIs
+/// reach the server. Results are the same either way: with `Http` the SDK
+/// applies the WebSocket's US overnight rule (overnight data only when
+/// [`Config::enable_overnight`] is set) client-side.
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub enum QuoteTransport {
+    /// Send pull requests over the quote WebSocket connection (default).
+    #[default]
+    WebSocket,
+    /// Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+    /// equivalent, falling back to the WebSocket for the rest. Using only
+    /// HTTP-backed APIs never opens a WebSocket connection.
+    Http,
+}
+
+impl FromStr for QuoteTransport {
+    type Err = ();
+
+    fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
+        match s.to_ascii_lowercase().as_str() {
+            "ws" => Ok(QuoteTransport::WebSocket),
+            "http" => Ok(QuoteTransport::Http),
+            _ => Err(()),
+        }
+    }
+}
+
 /// Configuration options for Longbridge SDK
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -134,6 +166,7 @@ pub struct Config {
     /// Extra headers injected into every HTTP and WebSocket upgrade request.
     pub(crate) custom_headers: HashMap<String, String>,
     pub(crate) enable_papertrading: bool,
+    pub(crate) quote_transport: QuoteTransport,
 }
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
@@ -166,6 +199,7 @@ struct ConfigExtras {
     enable_print_quote_packages: bool,
     log_path: Option<PathBuf>,
     enable_papertrading: bool,
+    quote_transport: QuoteTransport,
 }
 
 impl ConfigExtras {
@@ -191,6 +225,15 @@ impl ConfigExtras {
             enable_print_quote_packages,
             log_path: env_var("LOG_PATH").map(PathBuf::from),
             enable_papertrading,
+            quote_transport: env_var("QUOTE_TRANSPORT")
+                .and_then(|v| {
+                    let parsed = v.parse().ok();
+                    if parsed.is_none() {
+                        tracing::warn!(value = %v, "invalid LONGBRIDGE_QUOTE_TRANSPORT, using ws");
+                    }
+                    parsed
+                })
+                .unwrap_or_default(),
         }
     }
 }
@@ -201,7 +244,7 @@ impl Config {
     /// All optional environment variables (`LONGBRIDGE_HTTP_URL`,
     /// `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
     /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
-    /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
+    /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
     /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`) are read from
     /// the environment (or `.env` file) and applied automatically if set.
     ///
@@ -230,6 +273,7 @@ impl Config {
             log_path: extras.log_path,
             custom_headers: Default::default(),
             enable_papertrading: extras.enable_papertrading,
+            quote_transport: extras.quote_transport,
         }
     }
 
@@ -238,7 +282,7 @@ impl Config {
     /// All optional environment variables (`LONGBRIDGE_HTTP_URL`,
     /// `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
     /// `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
-    /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
+    /// `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
     /// `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`) are read from
     /// the environment (or `.env` file) and applied automatically if set.
     ///
@@ -280,6 +324,7 @@ impl Config {
             log_path: extras.log_path,
             custom_headers: Default::default(),
             enable_papertrading: extras.enable_papertrading,
+            quote_transport: extras.quote_transport,
         }
     }
 
@@ -305,6 +350,8 @@ impl Config {
     ///   `false` (Default: `false`)
     /// - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
     ///   (Default: `realtime`)
+    /// - `LONGBRIDGE_QUOTE_TRANSPORT` - Transport for the quote pull APIs, `ws`
+    ///   or `http` (Default: `ws`)
     /// - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
     ///   connected, `true` or `false` (Default: `true`)
     /// - `LONGBRIDGE_LOG_PATH` - Set the path of the log files (Default: `no
@@ -336,6 +383,7 @@ impl Config {
             log_path: extras.log_path,
             custom_headers: Default::default(),
             enable_papertrading: extras.enable_papertrading,
+            quote_transport: extras.quote_transport,
         })
     }
 
@@ -426,6 +474,17 @@ impl Config {
     pub fn enable_papertrading(mut self) -> Self {
         self.enable_papertrading = true;
         self
+    }
+
+    /// Specifies the transport used by the quote pull APIs.
+    ///
+    /// Default: `QuoteTransport::WebSocket` (or `LONGBRIDGE_QUOTE_TRANSPORT`
+    /// = `ws` / `http`)
+    pub fn quote_transport(self, quote_transport: QuoteTransport) -> Self {
+        Self {
+            quote_transport,
+            ..self
+        }
     }
 
     /// Create metadata for auth/reconnect request
@@ -679,6 +738,13 @@ impl Config {
     /// See [`Config::enable_papertrading`] for full semantics.
     pub fn set_enable_papertrading(&mut self) {
         self.enable_papertrading = true;
+    }
+
+    /// Set the quote transport in place.
+    ///
+    /// See [`Config::quote_transport`] for full semantics.
+    pub fn set_quote_transport(&mut self, quote_transport: QuoteTransport) {
+        self.quote_transport = quote_transport;
     }
 
     /// Set the log path in place.

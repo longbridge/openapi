@@ -367,7 +367,8 @@ export declare class Config {
    * (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
    * `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
    * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-   * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+   * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+   * `LONGBRIDGE_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param appKey       Application key
@@ -407,6 +408,8 @@ export declare class Config {
    *   `false` (Default: `false`)
    * - `LONGBRIDGE_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
    *   (Default: `realtime`)
+   * - `LONGBRIDGE_QUOTE_TRANSPORT` - Transport for quote pull APIs, `ws` or
+   *   `http` (Default: `ws`)
    * - `LONGBRIDGE_PRINT_QUOTE_PACKAGES` - Print quote packages when
    *   connected, `true` or `false` (Default: `true`)
    * - `LONGBRIDGE_LOG_PATH` - Log file directory (Default: no logs)
@@ -422,7 +425,8 @@ export declare class Config {
    * (`LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`,
    * `LONGBRIDGE_QUOTE_WS_URL`, `LONGBRIDGE_TRADE_WS_URL`,
    * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
-   * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`).  Fields
+   * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+   * `LONGBRIDGE_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param oauth  OAuth handle obtained from `OAuth.build(...)`
@@ -6216,6 +6220,14 @@ export interface ExtraConfigParams {
   /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
   pushCandlestickMode?: PushCandlestickMode
   /**
+   * Transport for quote pull (request/response) APIs (default:
+   * QuoteTransport.WebSocket)
+   *
+   * Subscriptions and push events always use the WebSocket connection; this
+   * only selects how request/response quote APIs reach the server.
+   */
+  quoteTransport?: QuoteTransport
+  /**
    * Enable printing the opened quote packages when connected to the server
    * (default: true).  Set to `false` to suppress the output.
    */
@@ -7910,6 +7922,17 @@ export interface QuestionOption {
   label: string
   /** Option text */
   description: string
+}
+
+export declare const enum QuoteTransport {
+  /** Send pull requests over the quote WebSocket connection (default) */
+  WebSocket = 0,
+  /**
+   * Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+   * equivalent, falling back to the WebSocket for the rest. Using only
+   * HTTP-backed APIs never opens a WebSocket connection.
+   */
+  Http = 1
 }
 
 /** Rank categories response. */

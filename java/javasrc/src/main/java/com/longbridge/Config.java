@@ -32,7 +32,8 @@ public class Config implements AutoCloseable {
      * {@code LONGBRIDGE_HTTP_URL}, {@code LONGBRIDGE_LANGUAGE},
      * {@code LONGBRIDGE_QUOTE_WS_URL}, {@code LONGBRIDGE_TRADE_WS_URL},
      * {@code LONGBRIDGE_ENABLE_OVERNIGHT}, {@code LONGBRIDGE_PUSH_CANDLESTICK_MODE},
-     * {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES}, {@code LONGBRIDGE_LOG_PATH}.
+     * {@code LONGBRIDGE_QUOTE_TRANSPORT}, {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES},
+     * {@code LONGBRIDGE_LOG_PATH}.
      * Use the chainable setter methods (e.g. {@link #httpUrl}) to override any of
      * these values.
      *
@@ -69,6 +70,8 @@ public class Config implements AutoCloseable {
      * or {@code false} (Default: {@code false})</li>
      * <li>{@code LONGBRIDGE_PUSH_CANDLESTICK_MODE} - {@code realtime} or
      * {@code confirmed} (Default: {@code realtime})</li>
+     * <li>{@code LONGBRIDGE_QUOTE_TRANSPORT} - Transport for the quote pull APIs,
+     * {@code ws} or {@code http} (Default: {@code ws})</li>
      * <li>{@code LONGBRIDGE_PRINT_QUOTE_PACKAGES} - Print quote packages when
      * connected, {@code true} or {@code false} (Default: {@code true})</li>
      * <li>{@code LONGBRIDGE_LOG_PATH} - Set the path of the log files (Default: no
@@ -92,7 +95,8 @@ public class Config implements AutoCloseable {
      * {@code LONGBRIDGE_HTTP_URL}, {@code LONGBRIDGE_LANGUAGE},
      * {@code LONGBRIDGE_QUOTE_WS_URL}, {@code LONGBRIDGE_TRADE_WS_URL},
      * {@code LONGBRIDGE_ENABLE_OVERNIGHT}, {@code LONGBRIDGE_PUSH_CANDLESTICK_MODE},
-     * {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES}, {@code LONGBRIDGE_LOG_PATH}.
+     * {@code LONGBRIDGE_QUOTE_TRANSPORT}, {@code LONGBRIDGE_PRINT_QUOTE_PACKAGES},
+     * {@code LONGBRIDGE_LOG_PATH}.
      * Use the chainable setter methods (e.g. {@link #httpUrl}) to override any of
      * these values.
      *
@@ -172,6 +176,17 @@ public class Config implements AutoCloseable {
      */
     public synchronized Config pushCandlestickMode(PushCandlestickMode mode) {
         this.raw = SdkNative.configSetPushCandlestickMode(raw(), mode);
+        return this;
+    }
+
+    /**
+     * Set the transport used by the quote pull APIs.
+     *
+     * @param transport Transport (Default: {@link QuoteTransport#WebSocket})
+     * @return this object
+     */
+    public synchronized Config quoteTransport(QuoteTransport transport) {
+        this.raw = SdkNative.configSetQuoteTransport(raw(), transport);
         return this;
     }
 

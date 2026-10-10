@@ -8,13 +8,13 @@ use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
 use rust_decimal::Decimal;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use time::{Date, PrimitiveDateTime};
 use tokio::sync::{mpsc, oneshot};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
 use crate::{
-    Config, Error, Language, Market, Result,
+    Config, Error, Language, Market, QuoteTransport, Result,
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
@@ -29,6 +29,7 @@ use crate::{
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
+        http_json, overnight,
         sub_flags::SubFlags,
         types::{
             FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, PinnedMode,
@@ -41,6 +42,47 @@ use crate::{
 
 const RETRY_COUNT: usize = 3;
 const PARTICIPANT_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
+
+fn history_offset_request(
+    symbol: String,
+    period: Period,
+    adjust_type: AdjustType,
+    forward: bool,
+    time: Option<PrimitiveDateTime>,
+    count: usize,
+    trade_sessions: TradeSessions,
+) -> quote::SecurityHistoryCandlestickRequest {
+    quote::SecurityHistoryCandlestickRequest {
+        symbol,
+        period: period.into(),
+        adjust_type: adjust_type.into(),
+        query_type: quote::HistoryCandlestickQueryType::QueryByOffset.into(),
+        offset_request: Some(quote::security_history_candlestick_request::OffsetQuery {
+            direction: if forward {
+                quote::Direction::Forward
+            } else {
+                quote::Direction::Backward
+            }
+            .into(),
+            date: time
+                .map(|time| {
+                    format!(
+                        "{:04}{:02}{:02}",
+                        time.year(),
+                        time.month() as u8,
+                        time.day()
+                    )
+                })
+                .unwrap_or_default(),
+            minute: time
+                .map(|time| format!("{:02}{:02}", time.hour(), time.minute()))
+                .unwrap_or_default(),
+            count: count as i32,
+        }),
+        date_request: None,
+        trade_session: trade_sessions as i32,
+    }
+}
 
 /// Convert a Unix-seconds string (or integer string) to an RFC 3339 timestamp.
 /// If parsing fails, the original string is returned unchanged.
@@ -60,6 +102,8 @@ const TRADING_SESSION_CACHE_TIMEOUT: Duration = Duration::from_secs(60 * 60 * 2)
 
 struct InnerQuoteContext {
     language: Language,
+    quote_transport: QuoteTransport,
+    enable_overnight: bool,
     http_cli: HttpClient,
     command_tx: mpsc::UnboundedSender<Command>,
     /// Kept alive only so the background `Core::run` task can observe the
@@ -101,6 +145,8 @@ impl QuoteContext {
         });
 
         let language = config.language;
+        let quote_transport = config.quote_transport;
+        let enable_overnight = config.enable_overnight.unwrap_or_default();
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
@@ -119,6 +165,8 @@ impl QuoteContext {
         (
             QuoteContext(Arc::new(InnerQuoteContext {
                 language,
+                quote_transport,
+                enable_overnight,
                 http_cli,
                 command_tx,
                 _shutdown_tx: shutdown_tx,
@@ -219,11 +267,20 @@ impl QuoteContext {
     }
 
     /// Send a request `T` to get a response `R`
+    ///
+    /// With [`QuoteTransport::Http`], a command that has a REST equivalent is
+    /// sent as `POST /quote/*` with the same message as a JSON body, and the
+    /// JSON response is decoded into the same message type, so callers are
+    /// transport-agnostic.
     async fn request<T, R>(&self, command_code: u8, req: T) -> Result<R>
     where
-        T: prost::Message,
-        R: prost::Message + Default,
+        T: prost::Message + Serialize,
+        R: prost::Message + Default + DeserializeOwned,
     {
+        if let Some(path) = self.http_path(command_code) {
+            return self.http_request(path, req).await;
+        }
+
         let resp = self.request_raw(command_code, req.encode_to_vec()).await?;
         Ok(R::decode(&*resp)?)
     }
@@ -231,10 +288,146 @@ impl QuoteContext {
     /// Send a request to get a response `R`
     async fn request_without_body<R>(&self, command_code: u8) -> Result<R>
     where
-        R: prost::Message + Default,
+        R: prost::Message + Default + DeserializeOwned,
     {
+        if let Some(path) = self.http_path(command_code) {
+            return self
+                .http_request(path, serde_json::Value::Object(Default::default()))
+                .await;
+        }
+
         let resp = self.request_raw(command_code, vec![]).await?;
         Ok(R::decode(&*resp)?)
+    }
+
+    /// Whether this context must drop US overnight data to match what the
+    /// WebSocket returns: see [`overnight`].
+    fn aligns_overnight(&self) -> bool {
+        self.0.quote_transport == QuoteTransport::Http && !self.0.enable_overnight
+    }
+
+    /// Convert a candlestick page, dropping overnight candlesticks when
+    /// [`Self::aligns_overnight`], `symbol` is a US equity and the query asked
+    /// for all sessions (the only case that both drops and tops up). Returns
+    /// the candlesticks and how many were dropped.
+    fn convert_candlesticks(
+        &self,
+        symbol: &str,
+        trade_sessions: TradeSessions,
+        resp: quote::SecurityCandlestickResponse,
+    ) -> Result<(Vec<Candlestick>, usize)> {
+        if self.aligns_overnight()
+            && trade_sessions == TradeSessions::All
+            && overnight::is_us_equity_symbol(symbol)
+        {
+            overnight::drop_overnight(resp.candlesticks)
+        } else {
+            Ok((
+                resp.candlesticks
+                    .into_iter()
+                    .map(TryInto::try_into)
+                    .collect::<Result<_>>()?,
+                0,
+            ))
+        }
+    }
+
+    /// Convert a raw candlestick page and, on the HTTP transport, top up a
+    /// capped US window after overnight bars were dropped so it covers the
+    /// same bars as the WebSocket (see [`overnight`]). The top-up pages with
+    /// `POST /quote/history-candlesticks` offset queries; a failure there
+    /// fails the call.
+    #[allow(clippy::too_many_arguments)]
+    async fn align_candlesticks(
+        &self,
+        resp: quote::SecurityCandlestickResponse,
+        symbol: &str,
+        period: Period,
+        adjust_type: AdjustType,
+        trade_sessions: TradeSessions,
+        forward: bool,
+        window: overnight::CandlestickWindow,
+    ) -> Result<Vec<Candlestick>> {
+        let target = overnight::window_target(window, &resp.candlesticks);
+        let cursor = overnight::raw_edge(&resp.candlesticks, forward);
+        let (candlesticks, dropped) = self.convert_candlesticks(symbol, trade_sessions, resp)?;
+        let (Some(target), true) = (target, dropped > 0 && trade_sessions == TradeSessions::All)
+        else {
+            return Ok(candlesticks);
+        };
+        let bound = match window {
+            overnight::CandlestickWindow::DateRange { start } => start,
+            overnight::CandlestickWindow::Count(_) => None,
+        };
+        overnight::refill(
+            forward,
+            candlesticks,
+            cursor,
+            target,
+            bound,
+            |anchor, count| {
+                let request = history_offset_request(
+                    symbol.to_string(),
+                    period,
+                    adjust_type,
+                    forward,
+                    Some(anchor),
+                    count,
+                    trade_sessions,
+                );
+                async move {
+                    let resp: quote::SecurityCandlestickResponse = self
+                        .request(cmd_code::GET_SECURITY_HISTORY_CANDLESTICKS, request)
+                        .await?;
+                    Ok(resp.candlesticks)
+                }
+            },
+        )
+        .await
+        .inspect(|candlesticks| {
+            if candlesticks.len() < target {
+                dispatcher::with_default(&self.0.log_subscriber.clone().into(), || {
+                    tracing::warn!(
+                        symbol,
+                        target,
+                        got = candlesticks.len(),
+                        "overnight top-up returned fewer candlesticks than the WebSocket would"
+                    );
+                });
+            }
+        })
+    }
+
+    /// Returns the REST path to use for `command_code`, if the HTTP transport
+    /// is selected and the command has a REST equivalent.
+    fn http_path(&self, command_code: u8) -> Option<&'static str> {
+        match self.0.quote_transport {
+            QuoteTransport::Http => cmd_code::http_path(command_code),
+            QuoteTransport::WebSocket => None,
+        }
+    }
+
+    /// `POST` `body` to `path` and decode the proto-JSON response into `R`.
+    ///
+    /// Absent sub-messages (`Option::None`) are omitted from the body instead
+    /// of being sent as `null`, matching how a proto-JSON client would encode
+    /// them.
+    async fn http_request<B, R>(&self, path: &'static str, body: B) -> Result<R>
+    where
+        B: Serialize,
+        R: DeserializeOwned,
+    {
+        let mut body = serde_json::to_value(body)?;
+        http_json::strip_nulls(&mut body);
+        let Json(value) = self
+            .0
+            .http_cli
+            .request(Method::POST, path)
+            .body(Json(body))
+            .response::<Json<serde_json::Value>>()
+            .send()
+            .await?;
+        Ok(http_json::from_value(value)?)
     }
 
     /// Subscribe
@@ -520,7 +713,16 @@ impl QuoteContext {
                 },
             )
             .await?;
-        resp.secu_quote.into_iter().map(TryInto::try_into).collect()
+        resp.secu_quote
+            .into_iter()
+            .map(|mut quote| {
+                // See `overnight`: HTTP always returns overnight quotes.
+                if self.aligns_overnight() && overnight::is_us_equity_symbol(&quote.symbol) {
+                    quote.over_night_quote = None;
+                }
+                quote.try_into()
+            })
+            .collect()
     }
 
     /// Get quote of option securities
@@ -676,7 +878,7 @@ impl QuoteContext {
         let current = self.0.http_cli.dc_region().await;
         if !current.allows(longbridge_httpcli::DcRegion::Ap) {
             return Err(longbridge_httpcli::HttpClientError::DcRegionRestricted {
-                path: "quote/brokers (WebSocket)".to_string(),
+                path: "quote/brokers".to_string(),
                 required: longbridge_httpcli::DcRegion::Ap,
                 current,
             }
@@ -811,11 +1013,13 @@ impl QuoteContext {
         symbol: impl Into<String>,
         trade_sessions: TradeSessions,
     ) -> Result<Vec<IntradayLine>> {
+        let symbol = symbol.into();
+        let drop_overnight = self.aligns_overnight() && overnight::is_us_equity_symbol(&symbol);
         let resp: quote::SecurityIntradayResponse = self
             .request(
                 cmd_code::GET_SECURITY_INTRADAY,
                 quote::SecurityIntradayRequest {
-                    symbol: symbol.into(),
+                    symbol,
                     trade_session: trade_sessions as i32,
                 },
             )
@@ -823,7 +1027,12 @@ impl QuoteContext {
         let lines = resp
             .lines
             .into_iter()
-            .map(TryInto::try_into)
+            .map(TryInto::<IntradayLine>::try_into)
+            .filter(|line| {
+                // See `overnight`: HTTP always returns the overnight session.
+                !drop_overnight
+                    || !matches!(line, Ok(line) if overnight::is_us_overnight(line.timestamp))
+            })
             .collect::<Result<Vec<_>>>()?;
         Ok(lines)
     }
@@ -871,11 +1080,12 @@ impl QuoteContext {
         adjust_type: AdjustType,
         trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
+        let symbol = symbol.into();
         let resp: quote::SecurityCandlestickResponse = self
             .request(
                 cmd_code::GET_SECURITY_CANDLESTICKS,
                 quote::SecurityCandlestickRequest {
-                    symbol: symbol.into(),
+                    symbol: symbol.clone(),
                     period: period.into(),
                     count: count as i32,
                     adjust_type: adjust_type.into(),
@@ -883,12 +1093,16 @@ impl QuoteContext {
                 },
             )
             .await?;
-        let candlesticks = resp
-            .candlesticks
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect::<Result<Vec<_>>>()?;
-        Ok(candlesticks)
+        self.align_candlesticks(
+            resp,
+            &symbol,
+            period,
+            adjust_type,
+            trade_sessions,
+            false,
+            overnight::CandlestickWindow::Count(count),
+        )
+        .await
     }
 
     /// Get security history candlesticks by offset
@@ -903,49 +1117,31 @@ impl QuoteContext {
         count: usize,
         trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
+        let symbol = symbol.into();
         let resp: quote::SecurityCandlestickResponse = self
             .request(
                 cmd_code::GET_SECURITY_HISTORY_CANDLESTICKS,
-                quote::SecurityHistoryCandlestickRequest {
-                    symbol: symbol.into(),
-                    period: period.into(),
-                    adjust_type: adjust_type.into(),
-                    query_type: quote::HistoryCandlestickQueryType::QueryByOffset.into(),
-                    offset_request: Some(
-                        quote::security_history_candlestick_request::OffsetQuery {
-                            direction: if forward {
-                                quote::Direction::Forward
-                            } else {
-                                quote::Direction::Backward
-                            }
-                            .into(),
-                            date: time
-                                .map(|time| {
-                                    format!(
-                                        "{:04}{:02}{:02}",
-                                        time.year(),
-                                        time.month() as u8,
-                                        time.day()
-                                    )
-                                })
-                                .unwrap_or_default(),
-                            minute: time
-                                .map(|time| format!("{:02}{:02}", time.hour(), time.minute()))
-                                .unwrap_or_default(),
-                            count: count as i32,
-                        },
-                    ),
-                    date_request: None,
-                    trade_session: trade_sessions as i32,
-                },
+                history_offset_request(
+                    symbol.clone(),
+                    period,
+                    adjust_type,
+                    forward,
+                    time,
+                    count,
+                    trade_sessions,
+                ),
             )
             .await?;
-        let candlesticks = resp
-            .candlesticks
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect::<Result<Vec<_>>>()?;
-        Ok(candlesticks)
+        self.align_candlesticks(
+            resp,
+            &symbol,
+            period,
+            adjust_type,
+            trade_sessions,
+            forward,
+            overnight::CandlestickWindow::Count(count),
+        )
+        .await
     }
 
     /// Get security history candlesticks by date
@@ -958,11 +1154,12 @@ impl QuoteContext {
         end: Option<Date>,
         trade_sessions: TradeSessions,
     ) -> Result<Vec<Candlestick>> {
+        let symbol = symbol.into();
         let resp: quote::SecurityCandlestickResponse = self
             .request(
                 cmd_code::GET_SECURITY_HISTORY_CANDLESTICKS,
                 quote::SecurityHistoryCandlestickRequest {
-                    symbol: symbol.into(),
+                    symbol: symbol.clone(),
                     period: period.into(),
                     adjust_type: adjust_type.into(),
                     query_type: quote::HistoryCandlestickQueryType::QueryByDate.into(),
@@ -993,12 +1190,16 @@ impl QuoteContext {
                 },
             )
             .await?;
-        let candlesticks = resp
-            .candlesticks
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect::<Result<Vec<_>>>()?;
-        Ok(candlesticks)
+        self.align_candlesticks(
+            resp,
+            &symbol,
+            period,
+            adjust_type,
+            trade_sessions,
+            false,
+            overnight::CandlestickWindow::DateRange { start },
+        )
+        .await
     }
 
     /// Get option chain expiry date list

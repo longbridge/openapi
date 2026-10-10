@@ -19,3 +19,6 @@ build
 *.node
 .venv/
 python/.venv/
+.env
+.env.local
+__pycache__/

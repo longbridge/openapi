@@ -179,6 +179,7 @@ setx LONGBRIDGE_ACCESS_TOKEN "Access Token get from user center"
 | LONGBRIDGE_TRADE_WS_URL          | Trade websocket endpoint url (Default: `wss://openapi-trade.longbridge.com/v2`) |
 | LONGBRIDGE_ENABLE_OVERNIGHT      | Enable overnight quote, `true` or `false` (Default: `false`)                    |
 | LONGBRIDGE_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                 |
+| LONGBRIDGE_QUOTE_TRANSPORT       | Transport for quote pull APIs, `ws` or `http` (Default: `ws`)                   |
 | LONGBRIDGE_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)        |
 | LONGBRIDGE_LOG_PATH              | Set the path of the log files (Default: `no logs`)                              |
 | LONGBRIDGE_PAPERTRADING          | Enable paper trading mode, `true` or `false` (Default: `false`). See [Paper Trading](#paper-trading). |

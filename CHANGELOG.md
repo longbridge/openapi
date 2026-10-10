@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Rust core:** `QuoteTransport` config option (`Config::quote_transport` / `Config::set_quote_transport`, env `LONGBRIDGE_QUOTE_TRANSPORT=ws|http`, default `WebSocket`). With `QuoteTransport::Http`, the 20 `QuoteContext` pull methods backed by the 19 WebSocket commands that have a REST equivalent (`static_info`, `quote`, `option_quote`, `warrant_quote`, `depth`, `brokers`, `participants`, `trades`, `intraday`, `candlesticks`, `history_candlesticks_by_offset`, `history_candlesticks_by_date`, `option_chain_expiry_date_list`, `warrant_issuers`, `warrant_list`, `trading_session`, `trading_days`, `capital_flow`, `capital_distribution`, `calc_indexes`) are served over `POST /quote/*` instead of the quote WebSocket, so a process that only pulls data never opens a WebSocket connection. Public method signatures and return types are unchanged: the gateway proto-JSON is decoded into the same protobuf messages as the WebSocket path (tolerating int64-as-string, omitted/`null` fields and camelCase keys) and the existing conversions are reused. Subscriptions, push events, `realtime_*`, `member_id` / `quote_level` / `quote_package_details` still use the WebSocket.
+  - **US overnight alignment:** the WebSocket only returns US overnight data when `Config::enable_overnight` is set, while REST always does. On the HTTP path (and only there) the SDK applies the WebSocket's rule for US equities: `quote().overnight_quote` is cleared, overnight `intraday` lines are dropped, and for `TradeSessions::All` candlestick queries overnight bars are dropped and count/range-capped windows are topped up with `POST /quote/history-candlesticks` offset queries (≤1000 bars per request, ≤8 extra requests; a failure in a top-up request fails the call). `trades` and `calc_indexes` are passed through unchanged.
+  - **Known differences:** HTTP errors are `Error::HttpClient(OpenApi { .. })` rather than `Error::WsClient(ResponseError { .. })` (`Error::openapi_error_code()` / `into_simple_error()` cover both, but a non-JSON gateway error surfaces as `HttpClientError::UnexpectedHttpResponse` with no code); the HTTP client retries `429` with back-off while the WebSocket does not; the REST gateway currently reports business errors (e.g. `301600`, `301607`) as `500`; during the US overnight session itself (20:00–04:00 New York) REST `quote` / `trades` values may reflect overnight trading that the WebSocket (without `enable_overnight`) does not report — not verified in this release.
+- **C / C++ / Java / Node.js / Python:** the `QuoteTransport` enum and the corresponding config option are exposed in every binding layer.
+
 ## [5.2.0] - 2026-09-30
 
 ### Added
