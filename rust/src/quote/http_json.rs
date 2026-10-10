@@ -395,6 +395,27 @@ mod tests {
     }
 
     #[test]
+    fn strip_nulls_on_history_request() {
+        use longbridge_proto::quote::{
+            SecurityHistoryCandlestickRequest, security_history_candlestick_request::OffsetQuery,
+        };
+        let req = SecurityHistoryCandlestickRequest {
+            symbol: "AAPL.US".into(),
+            offset_request: Some(OffsetQuery {
+                count: 10,
+                ..Default::default()
+            }),
+            date_request: None,
+            ..Default::default()
+        };
+        let mut v = serde_json::to_value(&req).unwrap();
+        strip_nulls(&mut v);
+        assert!(v.get("date_request").is_none(), "{v}");
+        assert_eq!(v["offset_request"]["count"], 10);
+        assert_eq!(v["offset_request"]["date"], "");
+    }
+
+    #[test]
     fn strip_nulls_omits_absent_messages() {
         let mut v = json!({ "a": null, "b": { "c": null, "d": 1 }, "e": [ { "f": null } ] });
         strip_nulls(&mut v);

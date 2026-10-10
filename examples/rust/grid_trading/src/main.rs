@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
 use longbridge::{
+    Config,
     grid::{
         GetGridOrderDetailOptions, GetGridOrdersOptions, GetGridTriggerHistoryOptions, GridContext,
         GridTradeRule, SubmitGridOrderOptions,
     },
     oauth::OAuthBuilder,
     trade::TradeContext,
-    Config,
 };
 use rust_decimal::Decimal;
 use tracing_subscriber::EnvFilter;
@@ -65,11 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let list = ctx
         .list(GetGridOrdersOptions::new().symbol("700.HK").limit(20))
         .await?;
-    println!(
-        "grid orders: {} (has_more={})",
-        list.grid_order.len(),
-        list.has_more
-    );
+    println!("grid orders: {} (has_more={})", list.grid_order.len(), list.has_more);
 
     // Detail.
     let detail = ctx
@@ -79,9 +75,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Query by IDs.
     let by_ids = ctx
-        .list_by_ids(longbridge::grid::GetGridOrdersByIdsOptions::new([
-            &order_id,
-        ]))
+        .list_by_ids(longbridge::grid::GetGridOrdersByIdsOptions::new([&order_id]))
         .await?;
     println!("grid orders by ids: {}", by_ids.len());
 

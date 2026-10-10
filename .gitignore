@@ -20,5 +20,5 @@ build
 .venv/
 python/.venv/
 .env
-.env.*
+.env.local
 __pycache__/

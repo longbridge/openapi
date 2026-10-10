@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use longbridge::{
+    Config,
     oauth::OAuthBuilder,
     quote::{QuoteContext, SubFlags},
-    Config,
 };
 use tracing_subscriber::EnvFilter;
 

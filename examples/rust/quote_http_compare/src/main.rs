@@ -2,7 +2,9 @@
 //!
 //! Reads credentials from `LONGBRIDGE_*` env (or `.env`). Point
 //! `LONGBRIDGE_HTTP_URL` / `LONGBRIDGE_QUOTE_WS_URL` at an environment that
-//! serves the `/quote/*` routes (canary). For each call prints the arguments,
+//! serves the `/quote/*` routes (canary). Dates below are hard-coded for the
+//! October 2026 verification runs and must be moved along before reuse. For
+//! each call prints the arguments,
 //! both results (`Debug`), latency and whether WS == HTTP.
 use std::{sync::Arc, time::Instant};
 

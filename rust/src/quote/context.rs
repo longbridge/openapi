@@ -307,13 +307,14 @@ impl QuoteContext {
     }
 
     /// Convert a candlestick page, dropping overnight candlesticks when
-    /// [`Self::aligns_overnight`]. Returns the candlesticks and how many were
-    /// dropped.
+    /// [`Self::aligns_overnight`] and `symbol` is a US equity. Returns the
+    /// candlesticks and how many were dropped.
     fn convert_candlesticks(
         &self,
+        symbol: &str,
         resp: quote::SecurityCandlestickResponse,
     ) -> Result<(Vec<Candlestick>, usize)> {
-        if self.aligns_overnight() {
+        if self.aligns_overnight() && overnight::is_us_equity_symbol(symbol) {
             overnight::drop_overnight(resp.candlesticks)
         } else {
             Ok((
@@ -326,10 +327,11 @@ impl QuoteContext {
         }
     }
 
-    /// Top up a capped US candlestick window after overnight bars were dropped,
-    /// so the HTTP transport covers the same bars as the WebSocket. `resp` is
-    /// the raw first page, `target` the number of bars the window should hold
-    /// and `bound` the New York start date of a date-range query.
+    /// Convert a raw candlestick page and, on the HTTP transport, top up a
+    /// capped US window after overnight bars were dropped so it covers the
+    /// same bars as the WebSocket (see [`overnight`]). The top-up pages with
+    /// `POST /quote/history-candlesticks` offset queries; a failure there
+    /// fails the call.
     #[allow(clippy::too_many_arguments)]
     async fn align_candlesticks(
         &self,
@@ -339,17 +341,19 @@ impl QuoteContext {
         adjust_type: AdjustType,
         trade_sessions: TradeSessions,
         forward: bool,
-        target: usize,
-        bound: Option<Date>,
+        window: overnight::CandlestickWindow,
     ) -> Result<Vec<Candlestick>> {
+        let target = overnight::window_target(window, &resp.candlesticks);
         let cursor = overnight::raw_edge(&resp.candlesticks, forward);
-        let (candlesticks, dropped) = self.convert_candlesticks(resp)?;
-        if dropped == 0
-            || trade_sessions != TradeSessions::All
-            || !overnight::is_us_equity_symbol(symbol)
-        {
+        let (candlesticks, dropped) = self.convert_candlesticks(symbol, resp)?;
+        let (Some(target), true) = (target, dropped > 0 && trade_sessions == TradeSessions::All)
+        else {
             return Ok(candlesticks);
-        }
+        };
+        let bound = match window {
+            overnight::CandlestickWindow::DateRange { start } => start,
+            overnight::CandlestickWindow::Count(_) => None,
+        };
         overnight::refill(
             forward,
             candlesticks,
@@ -1072,9 +1076,6 @@ impl QuoteContext {
                 },
             )
             .await?;
-        // A page shorter than `count` is either all the data there is or the
-        // server's cap; either way it is the window the WebSocket would return.
-        let target = count.min(resp.candlesticks.len());
         self.align_candlesticks(
             resp,
             &symbol,
@@ -1082,8 +1083,7 @@ impl QuoteContext {
             adjust_type,
             trade_sessions,
             false,
-            target,
-            None,
+            overnight::CandlestickWindow::Count(count),
         )
         .await
     }
@@ -1115,7 +1115,6 @@ impl QuoteContext {
                 ),
             )
             .await?;
-        let target = count.min(resp.candlesticks.len());
         self.align_candlesticks(
             resp,
             &symbol,
@@ -1123,8 +1122,7 @@ impl QuoteContext {
             adjust_type,
             trade_sessions,
             forward,
-            target,
-            None,
+            overnight::CandlestickWindow::Count(count),
         )
         .await
     }
@@ -1175,18 +1173,6 @@ impl QuoteContext {
                 },
             )
             .await?;
-        // A date range is served newest-first and capped at a fixed number of
-        // bars. With a `start`, the window is capped only if it did not reach
-        // the first bar of that day (midnight New York, where the overnight
-        // session begins); without one, a page at least as long as the request
-        // cap is taken as capped. The response size is then the window the
-        // WebSocket would have filled.
-        let capped = match (start, overnight::raw_edge(&resp.candlesticks, false)) {
-            (Some(start), Some(earliest)) => overnight::new_york_local(earliest) > start.midnight(),
-            (None, Some(_)) => resp.candlesticks.len() >= overnight::MAX_HISTORY_CANDLESTICKS,
-            _ => false,
-        };
-        let target = if capped { resp.candlesticks.len() } else { 0 };
         self.align_candlesticks(
             resp,
             &symbol,
@@ -1194,8 +1180,7 @@ impl QuoteContext {
             adjust_type,
             trade_sessions,
             false,
-            target,
-            start,
+            overnight::CandlestickWindow::DateRange { start },
         )
         .await
     }

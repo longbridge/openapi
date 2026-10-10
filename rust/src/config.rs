@@ -144,7 +144,7 @@ impl FromStr for QuoteTransport {
 
     fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
         match s.to_ascii_lowercase().as_str() {
-            "ws" | "websocket" => Ok(QuoteTransport::WebSocket),
+            "ws" => Ok(QuoteTransport::WebSocket),
             "http" => Ok(QuoteTransport::Http),
             _ => Err(()),
         }

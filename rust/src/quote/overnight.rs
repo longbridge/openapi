@@ -15,7 +15,9 @@ use time_tz::{OffsetDateTimeExt, timezones::db::america::NEW_YORK};
 
 use crate::{Result, quote::Candlestick};
 
-/// Server-side cap on the `count` of a candlestick request.
+/// Server-side cap on the `count` of a candlestick request (`count = 5000` is
+/// rejected with `301607`; date-range queries observed returning up to 1440
+/// bars, so a page of at least this size is treated as capped).
 pub(crate) const MAX_HISTORY_CANDLESTICKS: usize = 1000;
 
 /// Hard limit on extra requests one call may issue while topping up a window.
@@ -48,6 +50,41 @@ pub(crate) fn new_york_local(timestamp: OffsetDateTime) -> PrimitiveDateTime {
 /// New York calendar date of `timestamp`.
 pub(crate) fn new_york_date(timestamp: OffsetDateTime) -> Date {
     timestamp.to_timezone(NEW_YORK).date()
+}
+
+/// How many bars a candlestick window should hold once overnight bars are
+/// dropped, i.e. what the WebSocket (which drops them before capping) returns.
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum CandlestickWindow {
+    /// A count-limited query (`count` requested).
+    Count(usize),
+    /// A date-range query, served newest-first and capped at a fixed size.
+    DateRange { start: Option<Date> },
+}
+
+/// The number of bars the WebSocket would return for `window` given the raw
+/// page, or `None` if the page is not capped (nothing to top up).
+pub(crate) fn window_target(
+    window: CandlestickWindow,
+    raw: &[quote::Candlestick],
+) -> Option<usize> {
+    match window {
+        // A page shorter than `count` is either all the data there is or the
+        // server's cap; either way it is the window the WebSocket would return.
+        CandlestickWindow::Count(count) => Some(count.min(raw.len())),
+        // With a `start`, the window is capped only if it did not reach the
+        // first bar of that day (midnight New York, where the overnight
+        // session begins); without one, a page at least as long as the request
+        // cap is taken as capped.
+        CandlestickWindow::DateRange { start } => {
+            let capped = match (start, raw_edge(raw, false)) {
+                (Some(start), Some(earliest)) => new_york_local(earliest) > start.midnight(),
+                (None, Some(_)) => raw.len() >= MAX_HISTORY_CANDLESTICKS,
+                _ => false,
+            };
+            capped.then_some(raw.len())
+        }
+    }
 }
 
 /// Earliest (`forward == false`) or latest (`forward == true`) timestamp in a
@@ -100,6 +137,7 @@ where
     F: FnMut(PrimitiveDateTime, usize) -> Fut,
     Fut: Future<Output = Result<Vec<quote::Candlestick>>>,
 {
+    let mut stalled = false;
     for _ in 0..MAX_REFILL_ROUNDS {
         if candlesticks.len() >= target {
             break;
@@ -108,9 +146,15 @@ where
             break;
         };
         let need = target - candlesticks.len();
-        // Over-fetch: roughly a third of a US day is overnight, and the anchor
-        // bar itself comes back and is discarded.
-        let count = (need + need / 2 + 1).min(MAX_HISTORY_CANDLESTICKS);
+        // Over-fetch a little for the anchor bar (returned and discarded) and
+        // scattered overnight bars. The overnight session is one contiguous
+        // 20:00–04:00 block, so once a page yields nothing the cursor is
+        // inside it: jump with a full page rather than inching through it.
+        let count = if stalled {
+            MAX_HISTORY_CANDLESTICKS
+        } else {
+            (need + need / 2 + 1).min(MAX_HISTORY_CANDLESTICKS)
+        };
         let raw = fetch(new_york_local(anchor), count).await?;
         let exhausted = raw.len() < count;
         let next_cursor = raw_edge(&raw, forward);
@@ -137,6 +181,7 @@ where
             });
         }
 
+        stalled = more.is_empty();
         if forward {
             more.truncate(need);
             candlesticks.extend(more);
@@ -392,6 +437,117 @@ mod tests {
             .unwrap();
         assert!(out.is_empty());
         assert_eq!(calls.get(), 1);
+    }
+
+    #[test]
+    fn small_need_inside_overnight_block_backward() {
+        // Raw page 03:50–05:29: 10 overnight + 90 pre. Only 10 bars are
+        // needed, but they lie on the far side of the 8-hour overnight block.
+        let data = timeline(DAY - time::Duration::days(1), 2 * 24 * 60);
+        let start = 24 * 60 + 3 * 60 + 50;
+        let page = data[start..start + 100].to_vec();
+        let cursor = raw_edge(&page, false);
+        let (kept, dropped) = drop_overnight(page).unwrap();
+        assert_eq!((kept.len(), dropped), (90, 10));
+        let calls = Rc::new(Cell::new(0));
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .unwrap();
+        let out = rt
+            .block_on(refill(
+                false,
+                kept,
+                cursor,
+                100,
+                None,
+                server(data, false, calls.clone()),
+            ))
+            .unwrap();
+        assert_eq!(out.len(), 100);
+        assert_sorted_unique(&out);
+        let m = minutes(&out);
+        assert_eq!(
+            (m[0].as_str(), m[9].as_str(), m[10].as_str()),
+            ("19:50", "19:59", "04:00")
+        );
+        assert!(calls.get() <= 3, "took {} rounds", calls.get());
+    }
+
+    #[test]
+    fn small_need_inside_overnight_block_forward() {
+        // Raw page 19:40–21:19: 20 post + 80 overnight; the next bars are at
+        // 04:00 the following day.
+        let data = timeline(DAY, 2 * 24 * 60);
+        let start = 19 * 60 + 40;
+        let page = data[start..start + 100].to_vec();
+        let cursor = raw_edge(&page, true);
+        let (kept, dropped) = drop_overnight(page).unwrap();
+        assert_eq!((kept.len(), dropped), (20, 80));
+        let calls = Rc::new(Cell::new(0));
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .unwrap();
+        let out = rt
+            .block_on(refill(
+                true,
+                kept,
+                cursor,
+                100,
+                None,
+                server(data, true, calls.clone()),
+            ))
+            .unwrap();
+        assert_eq!(out.len(), 100);
+        assert_sorted_unique(&out);
+        let m = minutes(&out);
+        assert_eq!(
+            (m[19].as_str(), m[20].as_str(), m[99].as_str()),
+            ("19:59", "04:00", "05:19")
+        );
+        assert!(calls.get() <= 3, "took {} rounds", calls.get());
+    }
+
+    #[test]
+    fn window_targets() {
+        let data = timeline(DAY, 24 * 60);
+        assert_eq!(
+            window_target(CandlestickWindow::Count(1000), &data[..300]),
+            Some(300)
+        );
+        assert_eq!(
+            window_target(CandlestickWindow::Count(100), &data[..300]),
+            Some(100)
+        );
+        let start = Some(DAY.date());
+        // Reaches midnight of `start`: not capped.
+        assert_eq!(
+            window_target(CandlestickWindow::DateRange { start }, &data),
+            None
+        );
+        // Earliest bar later than midnight of `start`: capped.
+        assert_eq!(
+            window_target(CandlestickWindow::DateRange { start }, &data[20 * 60..]),
+            Some(4 * 60)
+        );
+        // Earlier `start` the page did not reach: capped.
+        let earlier = Some(DAY.date().previous_day().unwrap());
+        assert_eq!(
+            window_target(CandlestickWindow::DateRange { start: earlier }, &data),
+            Some(1440)
+        );
+        // No start: only a full-size page counts as capped.
+        assert_eq!(
+            window_target(CandlestickWindow::DateRange { start: None }, &data[..999]),
+            None
+        );
+        assert_eq!(
+            window_target(CandlestickWindow::DateRange { start: None }, &data),
+            Some(1440)
+        );
+        assert_eq!(
+            window_target(CandlestickWindow::DateRange { start }, &[]),
+            None
+        );
     }
 
     #[test]
