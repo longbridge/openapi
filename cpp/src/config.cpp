@@ -113,6 +113,13 @@ Config::set_push_candlestick_mode(PushCandlestickMode mode)
 }
 
 Config&
+Config::set_quote_transport(QuoteTransport transport)
+{
+  lb_config_set_quote_transport(config_, convert::convert(transport));
+  return *this;
+}
+
+Config&
 Config::disable_print_quote_packages()
 {
   lb_config_disable_print_quote_packages(config_);

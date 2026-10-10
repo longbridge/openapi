@@ -229,6 +229,19 @@ convert(PushCandlestickMode mode)
   }
 }
 
+inline lb_quote_transport_t
+convert(QuoteTransport transport)
+{
+  switch (transport) {
+    case QuoteTransport::WebSocket:
+      return QuoteTransport_WebSocket;
+    case QuoteTransport::Http:
+      return QuoteTransport_Http;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
 inline Market
 convert(lb_market_t market)
 {

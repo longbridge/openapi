@@ -75,3 +75,30 @@ pub(crate) const PUSH_REALTIME_BROKERS: u8 = 103;
 
 /// Push Real-time Trades
 pub(crate) const PUSH_REALTIME_TRADES: u8 = 104;
+
+/// Returns the REST path (`POST`) that serves the same request/response
+/// messages as the WebSocket command `command_code`, if there is one.
+pub(crate) fn http_path(command_code: u8) -> Option<&'static str> {
+    Some(match command_code {
+        GET_TRADING_SESSION => "/quote/markets/trading-sessions",
+        GET_TRADING_DAYS => "/quote/markets/trading-days",
+        GET_BASIC_INFO => "/quote/static-info",
+        GET_REALTIME_QUOTE => "/quote/quotes",
+        GET_REALTIME_OPTION_QUOTE => "/quote/options/quotes",
+        GET_REALTIME_WARRANT_QUOTE => "/quote/warrants/quotes",
+        GET_SECURITY_DEPTH => "/quote/depth",
+        GET_SECURITY_BROKERS => "/quote/brokers",
+        GET_BROKER_IDS => "/quote/participants",
+        GET_SECURITY_TRADES => "/quote/trades",
+        GET_SECURITY_INTRADAY => "/quote/intraday",
+        GET_SECURITY_CANDLESTICKS => "/quote/candlesticks",
+        GET_OPTION_CHAIN_EXPIRY_DATE_LIST => "/quote/options/expiry-dates",
+        GET_WARRANT_ISSUER_IDS => "/quote/warrants/issuers",
+        GET_FILTERED_WARRANT => "/quote/warrants",
+        GET_CAPITAL_FLOW_INTRADAY => "/quote/capital-flow",
+        GET_SECURITY_CAPITAL_DISTRIBUTION => "/quote/capital-distribution",
+        GET_CALC_INDEXES => "/quote/calc-indexes",
+        GET_SECURITY_HISTORY_CANDLESTICKS => "/quote/history-candlesticks",
+        _ => return None,
+    })
+}

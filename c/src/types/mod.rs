@@ -6,6 +6,7 @@ mod language;
 mod market;
 mod option;
 mod push_candlestick_mode;
+mod quote_transport;
 mod string;
 
 use std::{ffi::CStr, os::raw::c_char};
@@ -18,6 +19,7 @@ pub(crate) use language::CLanguage;
 pub(crate) use market::CMarket;
 pub(crate) use option::COption;
 pub(crate) use push_candlestick_mode::CPushCandlestickMode;
+pub(crate) use quote_transport::CQuoteTransport;
 pub(crate) use string::CString;
 
 pub(crate) trait ToFFI {

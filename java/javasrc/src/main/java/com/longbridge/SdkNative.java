@@ -50,6 +50,8 @@ public class SdkNative {
 
         public static native long configSetPushCandlestickMode(long config, PushCandlestickMode mode);
 
+        public static native long configSetQuoteTransport(long config, QuoteTransport transport);
+
         public static native long configSetEnablePrintQuotePackages(long config, boolean enable);
 
         public static native long configSetLogPath(long config, String logPath);

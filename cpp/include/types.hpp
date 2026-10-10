@@ -47,6 +47,17 @@ enum class PushCandlestickMode
   Confirmed,
 };
 
+/// Transport used by the quote pull APIs
+enum class QuoteTransport
+{
+  /// Send pull requests over the quote WebSocket connection (default)
+  WebSocket,
+  /// Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+  /// equivalent, falling back to the WebSocket for the rest. Using only
+  /// HTTP-backed APIs never opens a WebSocket connection.
+  Http,
+};
+
 /// Market
 enum class Market
 {

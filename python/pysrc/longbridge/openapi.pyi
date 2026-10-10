@@ -198,6 +198,23 @@ class PushCandlestickMode:
         Confirmed
         """
 
+class QuoteTransport:
+    """
+    Transport used by the quote pull APIs
+    """
+
+    class WebSocket(QuoteTransport):
+        """
+        Send pull requests over the quote WebSocket connection (default)
+        """
+
+    class Http(QuoteTransport):
+        """
+        Send pull requests over HTTP (``POST /quote/*``) where the API has a
+        REST equivalent, falling back to the WebSocket for the rest. Using
+        only HTTP-backed APIs never opens a WebSocket connection.
+        """
+
 class OAuth:
     """
     OAuth 2.0 client handle for Longbridge OpenAPI.
@@ -291,6 +308,8 @@ class Config:
         enable_print_quote_packages: Print opened quote packages on connect
             (default: ``True``)
         log_path: Path for log files (default: no logs)
+        quote_transport: Transport used by the quote pull APIs
+            (default: ``QuoteTransport.WebSocket``)
     """
 
     @staticmethod
@@ -307,6 +326,7 @@ class Config:
         enable_print_quote_packages: bool = True,
         log_path: Optional[str] = None,
         enable_papertrading: bool = False,
+        quote_transport: Optional[Type[QuoteTransport]] = None,
     ) -> Config:
         """
         Create a new ``Config`` using API Key authentication.
@@ -316,7 +336,7 @@ class Config:
         ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
         ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
         ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``,
-        ``LONGBRIDGE_PAPERTRADING``).
+        ``LONGBRIDGE_PAPERTRADING``, ``LONGBRIDGE_QUOTE_TRANSPORT``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -341,6 +361,9 @@ class Config:
                 the token: if it belongs to a real-money account the server
                 returns an error.  Default: ``False`` (no restriction imposed
                 by server).
+            quote_transport: Transport used by the quote pull APIs (reads
+                ``LONGBRIDGE_QUOTE_TRANSPORT`` from env if omitted; default:
+                ``QuoteTransport.WebSocket``)
         """
 
     @classmethod
@@ -369,6 +392,7 @@ class Config:
         - ``LONGBRIDGE_PRINT_QUOTE_PACKAGES`` - ``true`` or ``false``
           (Default: ``true``)
         - ``LONGBRIDGE_LOG_PATH`` - Log file directory (Default: no logs)
+        - ``LONGBRIDGE_QUOTE_TRANSPORT`` - ``ws`` or ``http`` (Default: ``ws``)
         """
 
     @classmethod
@@ -384,6 +408,7 @@ class Config:
         enable_print_quote_packages: Optional[bool] = None,
         log_path: Optional[str] = None,
         enable_papertrading: Optional[bool] = None,
+        quote_transport: Optional[Type[QuoteTransport]] = None,
     ) -> Config:
         """
         Create a new ``Config`` for OAuth 2.0 authentication.
@@ -396,7 +421,7 @@ class Config:
         ``LONGBRIDGE_QUOTE_WS_URL``, ``LONGBRIDGE_TRADE_WS_URL``,
         ``LONGBRIDGE_ENABLE_OVERNIGHT``, ``LONGBRIDGE_PUSH_CANDLESTICK_MODE``,
         ``LONGBRIDGE_PRINT_QUOTE_PACKAGES``, ``LONGBRIDGE_LOG_PATH``,
-        ``LONGBRIDGE_PAPERTRADING``).
+        ``LONGBRIDGE_PAPERTRADING``, ``LONGBRIDGE_QUOTE_TRANSPORT``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -420,6 +445,7 @@ class Config:
                 the token: if it belongs to a real-money account the server
                 returns an error.  Default: ``None`` (no restriction imposed
                 by server).
+            quote_transport: Transport used by the quote pull APIs (optional)
 
         Returns:
             Config object

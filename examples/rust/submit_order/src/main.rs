@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
 use longbridge::{
-    Config, decimal,
+    decimal,
     oauth::OAuthBuilder,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType, TradeContext},
+    Config,
 };
 use tracing_subscriber::EnvFilter;
 

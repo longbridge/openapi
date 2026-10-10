@@ -318,6 +318,22 @@ typedef enum lb_push_candlestick_mode_t {
 } lb_push_candlestick_mode_t;
 
 /**
+ * Transport used by the quote pull APIs
+ */
+typedef enum lb_quote_transport_t {
+  /**
+   * Send pull requests over the quote WebSocket connection (default)
+   */
+  QuoteTransport_WebSocket,
+  /**
+   * Send pull requests over HTTP (`POST /quote/...`) where the API has a
+   * REST equivalent, falling back to the WebSocket for the rest. Using
+   * only HTTP-backed APIs never opens a WebSocket connection.
+   */
+  QuoteTransport_Http,
+} lb_quote_transport_t;
+
+/**
  * DCA investment frequency
  */
 typedef enum lb_dca_frequency_t {
@@ -14318,9 +14334,10 @@ void lb_calendar_context_finance_calendar(const struct lb_calendar_context_t *ct
  * Optional environment variables are read automatically:
  * `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
- * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
- * `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
- * to override any of these values after construction.
+ * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+ * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+ * corresponding `lb_config_set_*` functions to override any of these values
+ * after construction.
  *
  * @param app_key       App key
  * @param app_secret    App secret
@@ -14339,7 +14356,8 @@ struct lb_config_t *lb_config_from_apikey(const char *app_key,
  * `LONGBRIDGE_ACCESS_TOKEN`, `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_LANGUAGE`,
  * `LONGBRIDGE_ENABLE_OVERNIGHT`, `LONGBRIDGE_PUSH_CANDLESTICK_MODE`,
- * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`
+ * `LONGBRIDGE_QUOTE_TRANSPORT`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
+ * `LONGBRIDGE_LOG_PATH`
  */
 struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
 
@@ -14349,9 +14367,10 @@ struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
  * Optional environment variables are read automatically:
  * `LONGBRIDGE_HTTP_URL`, `LONGBRIDGE_LANGUAGE`, `LONGBRIDGE_QUOTE_WS_URL`,
  * `LONGBRIDGE_TRADE_WS_URL`, `LONGBRIDGE_ENABLE_OVERNIGHT`,
- * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_PRINT_QUOTE_PACKAGES`,
- * `LONGBRIDGE_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
- * to override any of these values after construction.
+ * `LONGBRIDGE_PUSH_CANDLESTICK_MODE`, `LONGBRIDGE_QUOTE_TRANSPORT`,
+ * `LONGBRIDGE_PRINT_QUOTE_PACKAGES`, `LONGBRIDGE_LOG_PATH`.  Use the
+ * corresponding `lb_config_set_*` functions to override any of these values
+ * after construction.
  *
  * Does **not** take ownership of `oauth`. The caller must free `oauth` with
  * `lb_oauth_free` after this call returns.
@@ -14407,6 +14426,17 @@ void lb_config_enable_overnight(struct lb_config_t *config);
  */
 void lb_config_set_push_candlestick_mode(struct lb_config_t *config,
                                          enum lb_push_candlestick_mode_t mode);
+
+/**
+ * Set the transport used by the quote pull APIs
+ *
+ * Default: `QuoteTransport_WebSocket` (or `LONGBRIDGE_QUOTE_TRANSPORT` =
+ * `ws` / `http`)
+ *
+ * @param config     Config object
+ * @param transport  Quote transport
+ */
+void lb_config_set_quote_transport(struct lb_config_t *config, enum lb_quote_transport_t transport);
 
 /**
  * Disable printing of quote packages on connection

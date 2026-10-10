@@ -3,7 +3,7 @@ use jni::{
     objects::{JClass, JObject, JString},
     sys::{jboolean, jlong},
 };
-use longbridge::{Config, Language, PushCandlestickMode};
+use longbridge::{Config, Language, PushCandlestickMode, QuoteTransport};
 use time::OffsetDateTime;
 
 use crate::{async_util, error::jni_result, types::FromJValue};
@@ -133,6 +133,20 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetPushCandles
     jni_result(&mut env, config, |env| {
         let mode = PushCandlestickMode::from_jvalue(env, mode.into())?;
         (*(config as *mut Config)).set_push_candlestick_mode(mode);
+        Ok(config)
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_configSetQuoteTransport(
+    mut env: JNIEnv,
+    _class: JClass,
+    config: jlong,
+    transport: JObject,
+) -> jlong {
+    jni_result(&mut env, config, |env| {
+        let transport = QuoteTransport::from_jvalue(env, transport.into())?;
+        (*(config as *mut Config)).set_quote_transport(transport);
         Ok(config)
     })
 }

@@ -42,6 +42,18 @@ pub enum PushCandlestickMode {
 }
 
 #[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq)]
+#[js(remote = "longbridge::QuoteTransport")]
+pub enum QuoteTransport {
+    /// Send pull requests over the quote WebSocket connection (default)
+    WebSocket,
+    /// Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+    /// equivalent, falling back to the WebSocket for the rest. Using only
+    /// HTTP-backed APIs never opens a WebSocket connection.
+    Http,
+}
+
+#[napi_derive::napi]
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longbridge::portfolio::types::FlowDirection")]
 pub enum FlowDirection {
