@@ -385,19 +385,18 @@ impl QuoteContext {
             },
         )
         .await
-        .inspect(|candlesticks| {
-            // A date range legitimately stops short at `start`; a count window
-            // coming up short means the round limit was hit.
-            if bound.is_none() && candlesticks.len() < target {
+        .map(|(candlesticks, round_limit_hit)| {
+            if round_limit_hit {
                 dispatcher::with_default(&self.0.log_subscriber.clone().into(), || {
                     tracing::warn!(
                         symbol,
                         target,
                         got = candlesticks.len(),
-                        "overnight top-up returned fewer candlesticks than the WebSocket would"
+                        "overnight top-up hit its round limit; fewer candlesticks than the WebSocket would return"
                     );
                 });
             }
+            candlesticks
         })
     }
 
@@ -2560,5 +2559,72 @@ fn normalize_symbol(symbol: &str) -> &str {
     match symbol.split_once('.') {
         Some((_, market)) if market.eq_ignore_ascii_case("HK") => symbol.trim_start_matches('0'),
         _ => symbol,
+    }
+}
+
+#[cfg(test)]
+mod http_request_tests {
+    use serde_json::json;
+    use time::macros::datetime;
+
+    use super::*;
+
+    /// Locks the JSON shape the HTTP transport sends for a top-up offset
+    /// query: proto field names, numeric enums, New York wall-clock
+    /// `date`/`minute`, and no `date_request` key.
+    #[test]
+    fn history_offset_request_json() {
+        let req = history_offset_request(
+            "AAPL.US".to_string(),
+            Period::OneMinute,
+            AdjustType::NoAdjust,
+            false,
+            Some(datetime!(2026-10-09 03:59)),
+            16,
+            TradeSessions::All,
+        );
+        let mut v = serde_json::to_value(&req).unwrap();
+        http_json::strip_nulls(&mut v);
+        assert_eq!(
+            v,
+            json!({
+                "symbol": "AAPL.US",
+                "period": quote::Period::OneMinute as i32,
+                "adjust_type": quote::AdjustType::NoAdjust as i32,
+                "query_type": quote::HistoryCandlestickQueryType::QueryByOffset as i32,
+                "offset_request": {
+                    "direction": quote::Direction::Backward as i32,
+                    "date": "20261009",
+                    "minute": "0359",
+                    "count": 16,
+                },
+                "trade_session": 100,
+            })
+        );
+    }
+
+    /// Request bodies for a few other mapped commands keep proto names, and
+    /// the warrant filter's `r#type` is sent as `type`.
+    #[test]
+    fn request_json_shapes() {
+        let v = serde_json::to_value(quote::MultiSecurityRequest {
+            symbol: vec!["700.HK".into()],
+        })
+        .unwrap();
+        assert_eq!(v, json!({ "symbol": ["700.HK"] }));
+
+        let v = serde_json::to_value(quote::SecurityIntradayRequest {
+            symbol: "AAPL.US".into(),
+            trade_session: TradeSessions::All as i32,
+        })
+        .unwrap();
+        assert_eq!(v, json!({ "symbol": "AAPL.US", "trade_session": 100 }));
+
+        let v = serde_json::to_value(quote::FilterConfig {
+            r#type: vec![0],
+            ..Default::default()
+        })
+        .unwrap();
+        assert_eq!(v["type"], json!([0]));
     }
 }

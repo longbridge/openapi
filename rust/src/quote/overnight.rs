@@ -1,6 +1,12 @@
 //! Keeps HTTP-transport quote data aligned with the WebSocket's US overnight
 //! rule.
 //!
+//! This is a client-side stopgap for a gateway gap (no REST opt-out for US
+//! overnight data). It relies on observed server behaviour (a 1000-bar request
+//! cap, date ranges served newest-first, offset queries anchored inclusively
+//! in New York time) and should be removed once the REST endpoints honour
+//! `need_over_night_quote` like the WebSocket does.
+//!
 //! The quote WebSocket only returns the US overnight session when the
 //! connection opted in (`need_over_night_quote`, i.e.
 //! `Config::enable_overnight`), and it applies that *before* count / range
@@ -137,17 +143,20 @@ pub(crate) async fn refill<F, Fut>(
     target: usize,
     bound: Option<Date>,
     mut fetch: F,
-) -> Result<Vec<Candlestick>>
+) -> Result<(Vec<Candlestick>, bool)>
 where
     F: FnMut(PrimitiveDateTime, usize) -> Fut,
     Fut: Future<Output = Result<Vec<quote::Candlestick>>>,
 {
     let mut stalled = false;
+    let mut round_limit_hit = true;
     for _ in 0..MAX_REFILL_ROUNDS {
         if candlesticks.len() >= target {
+            round_limit_hit = false;
             break;
         }
         let Some(anchor) = cursor else {
+            round_limit_hit = false;
             break;
         };
         let need = target - candlesticks.len();
@@ -196,12 +205,15 @@ where
         }
 
         if exhausted || crossed_bound || next_cursor.is_none() || next_cursor == cursor {
+            round_limit_hit = false;
             break;
         }
         cursor = next_cursor;
     }
 
-    Ok(candlesticks)
+    // The flag means "stopped by the round limit while still short".
+    let round_limit_hit = round_limit_hit && candlesticks.len() < target;
+    Ok((candlesticks, round_limit_hit))
 }
 
 #[cfg(test)]
@@ -320,7 +332,8 @@ mod tests {
                 None,
                 server(data, false, calls.clone()),
             ))
-            .unwrap();
+            .unwrap()
+            .0;
         assert_eq!(out.len(), 100);
         assert_sorted_unique(&out);
         let m = minutes(&out);
@@ -354,7 +367,8 @@ mod tests {
                 None,
                 server(data, true, calls.clone()),
             ))
-            .unwrap();
+            .unwrap()
+            .0;
         assert_eq!(out.len(), 100);
         assert_sorted_unique(&out);
         let m = minutes(&out);
@@ -388,7 +402,8 @@ mod tests {
                 None,
                 server(data, false, calls.clone()),
             ))
-            .unwrap();
+            .unwrap()
+            .0;
         assert_eq!(out.len(), 100);
         assert_sorted_unique(&out);
         let m = minutes(&out);
@@ -420,7 +435,8 @@ mod tests {
                 Some(DAY.date()),
                 server(data.clone(), false, calls.clone()),
             ))
-            .unwrap();
+            .unwrap()
+            .0;
         assert!(out.is_empty());
         assert_eq!(calls.get(), 1);
 
@@ -439,7 +455,8 @@ mod tests {
                 None,
                 server(data, false, calls.clone()),
             ))
-            .unwrap();
+            .unwrap()
+            .0;
         assert!(out.is_empty());
         assert_eq!(calls.get(), 1);
     }
@@ -467,7 +484,8 @@ mod tests {
                 None,
                 server(data, false, calls.clone()),
             ))
-            .unwrap();
+            .unwrap()
+            .0;
         assert_eq!(out.len(), 100);
         assert_sorted_unique(&out);
         let m = minutes(&out);
@@ -501,7 +519,8 @@ mod tests {
                 None,
                 server(data, true, calls.clone()),
             ))
-            .unwrap();
+            .unwrap()
+            .0;
         assert_eq!(out.len(), 100);
         assert_sorted_unique(&out);
         let m = minutes(&out);
@@ -590,6 +609,8 @@ mod tests {
         let out = rt
             .block_on(refill(false, vec![], Some(DAY), 50, None, fetch))
             .unwrap();
+        assert!(out.1, "round limit not reported");
+        let out = out.0;
         assert!(out.is_empty());
         assert_eq!(calls.get(), MAX_REFILL_ROUNDS);
     }
