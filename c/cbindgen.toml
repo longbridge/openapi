@@ -154,6 +154,11 @@ cpp_compat = true
 "CGetFundTransactionsOptions" = "lb_get_fund_transactions_options_t"
 "CValidateFundOrderOptions" = "lb_validate_fund_order_options_t"
 "CSubmitFundOrderOptions" = "lb_submit_fund_order_options_t"
+# --- forex module: context + response views ---
+"CForexContext" = "lb_forex_context_t"
+"CForexQuote" = "lb_forex_quote_t"
+"CForexOrderDetail" = "lb_forex_order_detail_t"
+"CForexOrderStatus" = "lb_forex_order_status_t"
 "CGetStockPositionsOptions" = "lb_get_stock_positions_options_t"
 "CStockPositionsResponse" = "lb_stock_position_response_t"
 "CStockPositionChannel" = "lb_stock_position_channel_t"
@@ -511,6 +516,8 @@ include = [
     "CFundPositionNav", "CFundPositionPerformance", "CFundPositionProfits", "CFundPositions",
     "CFundQuarterlyReturn", "CFundStockHolding", "CFundTransaction", "CFundTrend",
     "CFundTrendContrast", "CFundUnitValue", "CHotFund",
+    # ForexContext: currency-exchange response views (via void* async data pointer)
+    "CForexQuote", "CForexOrderDetail", "CForexOrderStatus",
     # TradeContext: grid trading push (stays on trade side)
     "CPushGridOrderChanged",
     "CEstimateMaxPurchaseQuantityResponse",

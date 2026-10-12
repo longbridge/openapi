@@ -732,6 +732,58 @@ export declare class FilingItem {
   get publishedAt(): Date
 }
 
+/** Forex (currency exchange) channel context. */
+export declare class ForexContext {
+  /** Create a new `ForexContext`. */
+  static new(config: Config): ForexContext
+  /**
+   * Get a forex quote.
+   *
+   * `from` / `to` are ISO 4217 currency codes. Provide at most one of
+   * `amount` / `target_amount` (decimal strings, e.g. `"1000.00"`).
+   */
+  quote(from: string, to: string, amount?: string | undefined | null, targetAmount?: string | undefined | null): Promise<ForexQuote>
+  /**
+   * Submit a forex order.
+   *
+   * Success only means the order was accepted; conversion is asynchronous —
+   * poll `order` with the same `client_order_id` for the final state.
+   */
+  submitOrder(quoteId: string, clientOrderId: string): Promise<void>
+  /** Query a forex order by `client_order_id`. */
+  order(clientOrderId: string): Promise<ForexOrderDetail>
+}
+
+/** A forex order's state. */
+export declare class ForexOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Order state */
+  get state(): ForexOrderStatus
+  /** Execution rate (standard currency-pair terms); empty until filled */
+  get rate(): Decimal | null
+  /** Converted-from amount (actual value once filled); empty until filled */
+  get fromAmount(): Decimal | null
+  /** Converted-to amount (actual value once filled); empty until filled */
+  get toAmount(): Decimal | null
+  /** Failure reason; empty when not failed */
+  get failReason(): string
+}
+
+/** A forex quote. */
+export declare class ForexQuote {
+  toString(): string
+  toJSON(): any
+  /** Quote id, used when submitting the order */
+  get quoteId(): string
+  /** Customer execution rate (standard currency-pair terms) */
+  get rate(): Decimal
+  /** Quote expiry, Unix milliseconds */
+  get expireAt(): number
+  /** The standard currency pair for `rate`, format `BASE/QUOTE` */
+  get ccyPair(): string
+}
+
 /** Frozen transaction fee */
 export declare class FrozenTransactionFee {
   toString(): string
@@ -6376,6 +6428,16 @@ export interface ForecastEpsItem {
   forecastStartDate: number
   /** Forecast window end (ms timestamp) */
   forecastEndDate: number
+}
+
+/** Forex order state. */
+export declare const enum ForexOrderStatus {
+  /** Processing (includes manual review); keep polling. */
+  Processing = 0,
+  /** Conversion succeeded. */
+  Success = 1,
+  /** Conversion failed; frozen funds have been returned. */
+  Failed = 2
 }
 
 /** A fund or ETF holding the security */

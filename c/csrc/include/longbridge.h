@@ -1785,6 +1785,24 @@ typedef enum lb_charge_category_code_t {
 } lb_charge_category_code_t;
 
 /**
+ * Forex order state.
+ */
+typedef enum lb_forex_order_status_t {
+  /**
+   * Processing (includes manual review); keep polling.
+   */
+  ForexOrderStatusProcessing,
+  /**
+   * Conversion succeeded.
+   */
+  ForexOrderStatusSuccess,
+  /**
+   * Conversion failed; frozen funds have been returned.
+   */
+  ForexOrderStatusFailed,
+} lb_forex_order_status_t;
+
+/**
  * Data granularity
  */
 typedef enum lb_granularity_t {
@@ -1991,6 +2009,8 @@ typedef struct lb_dca_context_t lb_dca_context_t;
 typedef struct lb_decimal_t lb_decimal_t;
 
 typedef struct lb_error_t lb_error_t;
+
+typedef struct lb_forex_context_t lb_forex_context_t;
 
 typedef struct lb_fund_context_t lb_fund_context_t;
 
@@ -9056,6 +9076,54 @@ typedef struct lb_hot_fund_t {
 } lb_hot_fund_t;
 
 /**
+ * A forex quote.
+ */
+typedef struct lb_forex_quote_t {
+  /**
+   * Quote id, used when submitting the order
+   */
+  const char *quote_id;
+  /**
+   * Customer execution rate (standard currency-pair terms)
+   */
+  const struct lb_decimal_t *rate;
+  /**
+   * Quote expiry, Unix milliseconds
+   */
+  int64_t expire_at;
+  /**
+   * The standard currency pair for `rate`, format `BASE/QUOTE`
+   */
+  const char *ccy_pair;
+} lb_forex_quote_t;
+
+/**
+ * A forex order's state.
+ */
+typedef struct lb_forex_order_detail_t {
+  /**
+   * Order state
+   */
+  enum lb_forex_order_status_t state;
+  /**
+   * Execution rate (standard currency-pair terms); null until filled
+   */
+  const struct lb_decimal_t *rate;
+  /**
+   * Converted-from amount (actual value once filled); null until filled
+   */
+  const struct lb_decimal_t *from_amount;
+  /**
+   * Converted-to amount (actual value once filled); null until filled
+   */
+  const struct lb_decimal_t *to_amount;
+  /**
+   * Failure reason; empty when not failed
+   */
+  const char *fail_reason;
+} lb_forex_order_detail_t;
+
+/**
  * Options for estimate maximum purchase quantity
  */
 typedef struct lb_estimate_max_purchase_quantity_response_t {
@@ -14675,6 +14743,48 @@ const char *lb_error_message(const struct lb_error_t *error);
 int64_t lb_error_code(const struct lb_error_t *error);
 
 enum lb_error_kind_t lb_error_kind(const struct lb_error_t *error);
+
+const struct lb_forex_context_t *lb_forex_context_new(const struct lb_config_t *config);
+
+void lb_forex_context_retain(const struct lb_forex_context_t *ctx);
+
+void lb_forex_context_release(const struct lb_forex_context_t *ctx);
+
+/**
+ * Get a forex quote.
+ *
+ * @param[in] from Convert-out currency (ISO 4217, e.g. `USD`)
+ * @param[in] to Convert-in currency (e.g. `HKD`)
+ * @param[in] amount Convert-out amount (can be null)
+ * @param[in] target_amount Convert-in amount (can be null)
+ */
+void lb_forex_context_quote(const struct lb_forex_context_t *ctx,
+                            const char *from,
+                            const char *to,
+                            const struct lb_decimal_t *amount,
+                            const struct lb_decimal_t *target_amount,
+                            lb_async_callback_t callback,
+                            void *userdata);
+
+/**
+ * Submit a forex order.
+ *
+ * @param[in] quote_id Quote id returned by the quote endpoint
+ * @param[in] client_order_id Caller-supplied unique order id
+ */
+void lb_forex_context_submit_order(const struct lb_forex_context_t *ctx,
+                                   const char *quote_id,
+                                   const char *client_order_id,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
+
+/**
+ * Query a forex order by `client_order_id`.
+ */
+void lb_forex_context_order(const struct lb_forex_context_t *ctx,
+                            const char *client_order_id,
+                            lb_async_callback_t callback,
+                            void *userdata);
 
 const struct lb_fund_context_t *lb_fund_context_new(const struct lb_config_t *config);
 
