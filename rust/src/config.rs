@@ -125,9 +125,10 @@ impl fmt::Debug for AuthMode {
 /// Subscriptions, push events, `realtime_*`, `member_id` / `quote_level` /
 /// `quote_package_details` and the few APIs without a REST equivalent always
 /// use the WebSocket connection; this only selects how the other pull APIs
-/// reach the server. Results are the same either way: with `Http` the SDK
-/// applies the WebSocket's US overnight rule (overnight data only when
-/// [`Config::enable_overnight`] is set) client-side.
+/// reach the server. Return types are the same either way, and with `Http`
+/// the SDK applies the WebSocket's US overnight rule (overnight data only when
+/// [`Config::enable_overnight`] is set) client-side. Error codes, rate
+/// limiting and some session-specific values can differ; see the changelog.
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub enum QuoteTransport {
     /// Send pull requests over the quote WebSocket connection (default).

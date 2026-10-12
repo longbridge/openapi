@@ -27,7 +27,11 @@ pub(crate) const MAX_REFILL_ROUNDS: usize = 8;
 /// the WebSocket gates. Indices (`.VIX.US`) trade on their own schedule and
 /// are left alone.
 pub(crate) fn is_us_equity_symbol(symbol: &str) -> bool {
-    symbol.ends_with(".US") && !symbol.starts_with('.')
+    let n = symbol.len();
+    n > 3
+        && symbol.is_char_boundary(n - 3)
+        && symbol[n - 3..].eq_ignore_ascii_case(".US")
+        && !symbol.starts_with('.')
 }
 
 /// Whether `timestamp` falls in the US overnight session (20:00–04:00 New
@@ -608,6 +612,8 @@ mod tests {
             assert!(is_us_overnight(at(23, 59)));
         }
         assert!(is_us_equity_symbol("AAPL.US"));
+        assert!(is_us_equity_symbol("aapl.us"));
+        assert!(!is_us_equity_symbol(".US"));
         assert!(is_us_equity_symbol("AAPL251017C340000.US"));
         assert!(!is_us_equity_symbol(".VIX.US"));
         assert!(!is_us_equity_symbol("700.HK"));

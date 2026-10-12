@@ -140,6 +140,7 @@ impl QuoteContext {
                 enable_overnight = ?config.enable_overnight,
                 push_candlestick_mode = ?config.push_candlestick_mode,
                 enable_print_quote_packages = ?config.enable_print_quote_packages,
+                quote_transport = ?config.quote_transport,
                 "creating quote context"
             );
         });
@@ -385,7 +386,9 @@ impl QuoteContext {
         )
         .await
         .inspect(|candlesticks| {
-            if candlesticks.len() < target {
+            // A date range legitimately stops short at `start`; a count window
+            // coming up short means the round limit was hit.
+            if bound.is_none() && candlesticks.len() < target {
                 dispatcher::with_default(&self.0.log_subscriber.clone().into(), || {
                     tracing::warn!(
                         symbol,
@@ -426,6 +429,7 @@ impl QuoteContext {
             .body(Json(body))
             .response::<Json<serde_json::Value>>()
             .send()
+            .with_subscriber(self.0.log_subscriber.clone())
             .await?;
         Ok(http_json::from_value(value)?)
     }
