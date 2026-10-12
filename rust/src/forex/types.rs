@@ -42,6 +42,7 @@ pub struct ForexQuote {
     /// (`1 BASE = rate QUOTE`), independent of the request from/to direction.
     pub rate: Decimal,
     /// Quote expiry, Unix milliseconds.
+    #[serde(with = "crate::serde_utils::int64_str")]
     pub expire_at: i64,
     /// The standard currency pair for `rate`, format `BASE/QUOTE`.
     pub ccy_pair: String,
@@ -82,6 +83,15 @@ mod tests {
         assert_eq!(q.rate, Decimal::new(77812, 4));
         assert_eq!(q.expire_at, 1790000000000);
         assert_eq!(q.ccy_pair, "USD/HKD");
+    }
+
+    #[test]
+    fn deserialize_quote_expire_at_as_string() {
+        let q: ForexQuote = serde_json::from_str(
+            r#"{"quote_id":"802184948","rate":"7.8175","expire_at":"1791776947453","ccy_pair":"USD/HKD"}"#,
+        )
+        .unwrap();
+        assert_eq!(q.expire_at, 1791776947453);
     }
 
     #[test]
