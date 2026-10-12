@@ -42,7 +42,8 @@ impl EstimateMultiLegOrderLeg {
 ///
 /// Only the US market is supported; all legs must share the same underlying and
 /// settlement currency, each leg must be an option or the underlying stock, and
-/// duplicate legs (same symbol and side) are rejected.
+/// duplicate legs (same symbol and side) are rejected. Leg order does not
+/// matter: each leg's role is derived from `strategy` together with `side`.
 ///
 /// [`TradeContext::estimate_multileg_available_quantity`]: crate::trade::TradeContext::estimate_multileg_available_quantity
 #[derive(Debug, Serialize, Clone)]
@@ -78,7 +79,8 @@ impl EstimateMultiLegAvailableQuantityOptions {
 
     /// Set the submitted price.
     ///
-    /// Required for limit order types such as `LO`.
+    /// Required for limit order types such as `LO`. The estimate is currently
+    /// computed from market prices, so this value does not change the result.
     #[inline]
     #[must_use]
     pub fn submitted_price(self, submitted_price: Decimal) -> Self {

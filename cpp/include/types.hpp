@@ -2468,7 +2468,9 @@ struct EstimateMultiLegAvailableQuantityOptions
   MultiLegStrategy strategy;
   /// Legs of the combination
   std::vector<EstimateMultiLegOrderLeg> legs;
-  /// Submitted price (required for limit order types such as `LO`)
+  /// Submitted price (required for limit order types such as `LO`; the estimate
+  /// is currently computed from market prices, so it does not change the
+  /// result)
   std::optional<Decimal> submitted_price;
 };
 
@@ -2476,13 +2478,21 @@ struct EstimateMultiLegAvailableQuantityOptions
 /// and margin impact
 struct EstimateMultiLegAvailableQuantityResponse
 {
-  /// Maximum open quantity of the combination
+  /// Maximum number of combinations the account can open. The server returns
+  /// `i64::MAX` (9223372036854775807) when the legs do not form the given
+  /// strategy; treat that as no usable estimate
   Decimal max_open_qty;
-  /// Margin required per combination unit
+  /// Funds required per combination unit: the net debit at current market
+  /// prices for debit (premium-paying) combinations, or the margin requirement
+  /// for credit / short combinations
   Decimal unit_margin;
-  /// Change of the initial margin after placing the order
+  /// Change of the initial margin after placing `submitted_quantity`
+  /// combinations (after minus before); `0` for debit combinations, which
+  /// consume cash instead
   Decimal initial_margin_change;
-  /// Change of the maintenance margin after placing the order
+  /// Change of the maintenance margin after placing `submitted_quantity`
+  /// combinations (after minus before); `0` for debit combinations, which
+  /// consume cash instead
   Decimal maintenance_margin_change;
 };
 

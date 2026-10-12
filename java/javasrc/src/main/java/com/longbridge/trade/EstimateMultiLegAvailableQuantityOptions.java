@@ -39,7 +39,8 @@ public class EstimateMultiLegAvailableQuantityOptions {
 
     /**
      * Sets the submitted price (required for limit order types such as
-     * {@code LO}).
+     * {@code LO}; the estimate is currently computed from market prices, so it does
+     * not change the result).
      *
      * @param submittedPrice submitted price
      * @return this instance for chaining

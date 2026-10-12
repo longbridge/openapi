@@ -760,6 +760,7 @@ impl AsyncTradeContext {
 
     /// Estimate a multi-leg option combination's maximum tradable quantity and
     /// margin impact before submitting the order (US market only).
+    #[allow(clippy::too_many_arguments)]
     #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None))]
     fn estimate_multileg_available_quantity(
         &self,

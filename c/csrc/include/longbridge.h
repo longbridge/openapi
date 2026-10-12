@@ -5003,8 +5003,9 @@ typedef struct lb_estimate_multileg_available_quantity_options_t {
    */
   uintptr_t num_legs;
   /**
-   * Submitted price (required for limit order types such as `LO`) (can be
-   * null)
+   * Submitted price (required for limit order types such as `LO`; the
+   * estimate is currently computed from market prices, so it does not change
+   * the result) (can be null)
    */
   const struct lb_decimal_t *submitted_price;
 } lb_estimate_multileg_available_quantity_options_t;
@@ -9126,19 +9127,27 @@ typedef struct lb_estimate_max_purchase_quantity_response_t {
  */
 typedef struct lb_estimate_multileg_available_quantity_response_t {
   /**
-   * Maximum open quantity of the combination
+   * Maximum number of combinations the account can open. The server returns
+   * `i64::MAX` (9223372036854775807) when the legs do not form the given
+   * strategy; treat that as no usable estimate
    */
   const struct lb_decimal_t *max_open_qty;
   /**
-   * Margin required per combination unit
+   * Funds required per combination unit: the net debit at current market
+   * prices for debit (premium-paying) combinations, or the margin
+   * requirement for credit / short combinations
    */
   const struct lb_decimal_t *unit_margin;
   /**
-   * Change of the initial margin after placing the order
+   * Change of the initial margin after placing `submitted_quantity`
+   * combinations (after minus before); `0` for debit combinations, which
+   * consume cash instead
    */
   const struct lb_decimal_t *initial_margin_change;
   /**
-   * Change of the maintenance margin after placing the order
+   * Change of the maintenance margin after placing `submitted_quantity`
+   * combinations (after minus before); `0` for debit combinations, which
+   * consume cash instead
    */
   const struct lb_decimal_t *maintenance_margin_change;
 } lb_estimate_multileg_available_quantity_response_t;

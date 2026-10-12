@@ -48,18 +48,24 @@ pub struct EstimateMaxPurchaseQuantityResponse {
 /// and margin impact.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EstimateMultiLegAvailableQuantityResponse {
-    /// Maximum open quantity of the combination
+    /// Maximum number of combinations the account can open. The server returns
+    /// `i64::MAX` (9223372036854775807) when the legs do not form the given
+    /// strategy; treat that as no usable estimate
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub max_open_qty: Decimal,
-    /// Margin required per combination unit
+    /// Funds required per combination unit: the net debit at current market
+    /// prices for debit (premium-paying) combinations, or the margin
+    /// requirement for credit / short combinations
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub unit_margin: Decimal,
-    /// Change of the initial margin after placing the order (after minus
-    /// before)
+    /// Change of the initial margin after placing `submitted_quantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub initial_margin_change: Decimal,
-    /// Change of the maintenance margin after placing the order (after minus
-    /// before)
+    /// Change of the maintenance margin after placing `submitted_quantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub maintenance_margin_change: Decimal,
 }

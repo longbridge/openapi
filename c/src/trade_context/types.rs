@@ -2796,8 +2796,9 @@ pub struct CEstimateMultiLegAvailableQuantityOptions {
     pub legs: *const CEstimateMultiLegOrderLeg,
     /// Number of legs
     pub num_legs: usize,
-    /// Submitted price (required for limit order types such as `LO`) (can be
-    /// null)
+    /// Submitted price (required for limit order types such as `LO`; the
+    /// estimate is currently computed from market prices, so it does not change
+    /// the result) (can be null)
     pub submitted_price: *const CDecimal,
 }
 
@@ -2805,13 +2806,21 @@ pub struct CEstimateMultiLegAvailableQuantityOptions {
 /// and margin impact
 #[repr(C)]
 pub struct CEstimateMultiLegAvailableQuantityResponse {
-    /// Maximum open quantity of the combination
+    /// Maximum number of combinations the account can open. The server returns
+    /// `i64::MAX` (9223372036854775807) when the legs do not form the given
+    /// strategy; treat that as no usable estimate
     pub max_open_qty: *const CDecimal,
-    /// Margin required per combination unit
+    /// Funds required per combination unit: the net debit at current market
+    /// prices for debit (premium-paying) combinations, or the margin
+    /// requirement for credit / short combinations
     pub unit_margin: *const CDecimal,
-    /// Change of the initial margin after placing the order
+    /// Change of the initial margin after placing `submitted_quantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
     pub initial_margin_change: *const CDecimal,
-    /// Change of the maintenance margin after placing the order
+    /// Change of the maintenance margin after placing `submitted_quantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
     pub maintenance_margin_change: *const CDecimal,
 }
 

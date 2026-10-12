@@ -13,7 +13,9 @@ public class EstimateMultiLegAvailableQuantityResponse {
     private BigDecimal maintenanceMarginChange;
 
     /**
-     * Returns the maximum open quantity of the combination.
+     * Returns the maximum number of combinations the account can open. The
+     * server returns {@code Long.MAX_VALUE} (9223372036854775807) when the legs
+     * do not form the given strategy; treat that as no usable estimate.
      *
      * @return maximum open quantity
      */
@@ -22,7 +24,9 @@ public class EstimateMultiLegAvailableQuantityResponse {
     }
 
     /**
-     * Returns the margin required per combination unit.
+     * Returns the funds required per combination unit: the net debit at current
+     * market prices for debit (premium-paying) combinations, or the margin
+     * requirement for credit / short combinations.
      *
      * @return unit margin
      */
@@ -31,7 +35,9 @@ public class EstimateMultiLegAvailableQuantityResponse {
     }
 
     /**
-     * Returns the change of the initial margin after placing the order.
+     * Returns the change of the initial margin after placing
+     * {@code submittedQuantity} combinations (after minus before); {@code 0} for debit
+     * combinations, which consume cash instead.
      *
      * @return initial margin change
      */
@@ -40,7 +46,9 @@ public class EstimateMultiLegAvailableQuantityResponse {
     }
 
     /**
-     * Returns the change of the maintenance margin after placing the order.
+     * Returns the change of the maintenance margin after placing
+     * {@code submittedQuantity} combinations (after minus before); {@code 0} for debit
+     * combinations, which consume cash instead.
      *
      * @return maintenance margin change
      */

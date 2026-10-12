@@ -7403,22 +7403,29 @@ class EstimateMultiLegAvailableQuantityResponse:
 
     max_open_qty: Decimal
     """
-    Maximum open quantity of the combination
+    Maximum number of combinations the account can open. The server returns
+    `i64::MAX` (9223372036854775807) when the legs do not form the given
+    strategy; treat that as no usable estimate
     """
 
     unit_margin: Decimal
     """
-    Margin required per combination unit
+    Funds required per combination unit: the net debit at current market prices
+    for debit (premium-paying) combinations, or the margin requirement for
+    credit / short combinations
     """
 
     initial_margin_change: Decimal
     """
-    Change of the initial margin after placing the order
+    Change of the initial margin after placing `submitted_quantity` combinations
+    (after minus before); `0` for debit combinations, which consume cash instead
     """
 
     maintenance_margin_change: Decimal
     """
-    Change of the maintenance margin after placing the order
+    Change of the maintenance margin after placing `submitted_quantity`
+    combinations (after minus before); `0` for debit combinations, which consume
+    cash instead
     """
 
 class TradeContext:
@@ -8095,7 +8102,7 @@ class TradeContext:
             submitted_quantity: Submitted quantity (number of combinations)
             strategy: Multi-leg strategy
             legs: Combination leg symbols (``ticker.region`` format)
-            submitted_price: Estimated order price, required for limit order types such as ``LO``
+            submitted_price: Estimated order price, required for limit order types such as ``LO``; the estimate is currently computed from market prices, so it does not change the result
 
         Returns:
             Response
@@ -12049,7 +12056,7 @@ class AsyncTradeContext:
             submitted_quantity: Submitted quantity (number of combinations)
             strategy: Multi-leg strategy
             legs: Combination leg symbols (``ticker.region`` format)
-            submitted_price: Estimated order price, required for limit order types such as ``LO``
+            submitted_price: Estimated order price, required for limit order types such as ``LO``; the estimate is currently computed from market prices, so it does not change the result
         """
         ...
 

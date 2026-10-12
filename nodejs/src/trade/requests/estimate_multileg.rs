@@ -29,7 +29,9 @@ pub struct EstimateMultiLegAvailableQuantityOptions<'env> {
     pub strategy: MultiLegStrategy,
     /// Legs of the combination
     pub legs: Vec<EstimateMultiLegOrderLeg>,
-    /// Submitted price (required for limit order types such as `LO`)
+    /// Submitted price (required for limit order types such as `LO`; the
+    /// estimate is currently computed from market prices, so it does not change
+    /// the result)
     pub submitted_price: Option<ClassInstance<'env, Decimal>>,
 }
 

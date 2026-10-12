@@ -992,13 +992,21 @@ pub struct EstimateMaxPurchaseQuantityResponse {
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::trade::EstimateMultiLegAvailableQuantityResponse")]
 pub struct EstimateMultiLegAvailableQuantityResponse {
-    /// Maximum open quantity of the combination
+    /// Maximum number of combinations the account can open. The server returns
+    /// `i64::MAX` (9223372036854775807) when the legs do not form the given
+    /// strategy; treat that as no usable estimate
     max_open_qty: Decimal,
-    /// Margin required per combination unit
+    /// Funds required per combination unit: the net debit at current market
+    /// prices for debit (premium-paying) combinations, or the margin
+    /// requirement for credit / short combinations
     unit_margin: Decimal,
-    /// Change of the initial margin after placing the order
+    /// Change of the initial margin after placing `submittedQuantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
     initial_margin_change: Decimal,
-    /// Change of the maintenance margin after placing the order
+    /// Change of the maintenance margin after placing `submittedQuantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
     maintenance_margin_change: Decimal,
 }
 
