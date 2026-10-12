@@ -986,6 +986,30 @@ pub struct EstimateMaxPurchaseQuantityResponse {
     margin_max_qty: Decimal,
 }
 
+/// Response for estimating a multi-leg option combination's tradable quantity
+/// and margin impact
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longbridge::trade::EstimateMultiLegAvailableQuantityResponse")]
+pub struct EstimateMultiLegAvailableQuantityResponse {
+    /// Maximum number of combinations the account can open. The server returns
+    /// `i64::MAX` (9223372036854775807) when the legs do not form the given
+    /// strategy; treat that as no usable estimate
+    max_open_qty: Decimal,
+    /// Funds required per combination unit: the net debit at current market
+    /// prices for debit (premium-paying) combinations, or the margin
+    /// requirement for credit / short combinations
+    unit_margin: Decimal,
+    /// Change of the initial margin after placing `submittedQuantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
+    initial_margin_change: Decimal,
+    /// Change of the maintenance margin after placing `submittedQuantity`
+    /// combinations (after minus before); `0` for debit combinations, which
+    /// consume cash instead
+    maintenance_margin_change: Decimal,
+}
+
 // ── US-market types ──────────────────────────────────────────────────────────
 
 /// One cash currency entry in USAssetOverview

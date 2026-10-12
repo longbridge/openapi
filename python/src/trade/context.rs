@@ -3,11 +3,13 @@ use std::sync::Arc;
 use longbridge::{
     blocking::TradeContextSync,
     trade::{
-        CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
-        GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
-        GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions,
-        SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions,
+        CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+        EstimateMultiLegAvailableQuantityOptions, EstimateMultiLegOrderLeg,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        ReplaceOrderOptions, SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions,
+        SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;
@@ -22,10 +24,11 @@ use crate::{
         push::handle_push_event,
         types::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
-            EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
-            MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
-            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
-            SubmitOrderResponse, TimeInForceType, TopicType,
+            EstimateMaxPurchaseQuantityResponse, EstimateMultiLegAvailableQuantityResponse,
+            Execution, FundPositionsResponse, MarginRatio, MultiLegStrategy, Order, OrderDetail,
+            OrderSide, OrderStatus, OrderType, OutsideRTH, ReplaceAttachedParams,
+            StockPositionsResponse, SubmitAttachedParams, SubmitOrderResponse, TimeInForceType,
+            TopicType,
         },
     },
     types::Market,
@@ -631,6 +634,38 @@ impl TradeContext {
 
         self.ctx
             .estimate_max_purchase_quantity(opts)
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Estimate a multi-leg option combination's maximum tradable quantity and
+    /// margin impact before submitting the order (US market only).
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None))]
+    fn estimate_multileg_available_quantity(
+        &self,
+        side: OrderSide,
+        order_type: OrderType,
+        submitted_quantity: PyDecimal,
+        strategy: MultiLegStrategy,
+        legs: Vec<String>,
+        submitted_price: Option<PyDecimal>,
+    ) -> PyResult<EstimateMultiLegAvailableQuantityResponse> {
+        let legs = legs
+            .into_iter()
+            .map(EstimateMultiLegOrderLeg::new)
+            .collect::<Vec<_>>();
+        let mut opts = EstimateMultiLegAvailableQuantityOptions::new(
+            side.into(),
+            order_type.into(),
+            submitted_quantity.into(),
+            strategy.into(),
+            legs,
+        );
+        if let Some(submitted_price) = submitted_price {
+            opts = opts.submitted_price(submitted_price.into());
+        }
+        self.ctx
+            .estimate_multileg_available_quantity(opts)
             .map_err(ErrorNewType)?
             .try_into()
     }

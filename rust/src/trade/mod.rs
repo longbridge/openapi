@@ -7,10 +7,14 @@ mod push_types;
 mod requests;
 mod types;
 
-pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, TradeContext};
+pub use context::{
+    EstimateMaxPurchaseQuantityResponse, EstimateMultiLegAvailableQuantityResponse,
+    SubmitOrderResponse, TradeContext,
+};
 pub use push_types::{PushEvent, PushGridOrderChanged, PushOrderChanged, TopicType};
 pub use requests::{
-    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
+    CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+    EstimateMultiLegAvailableQuantityOptions, EstimateMultiLegOrderLeg, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
     GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions,

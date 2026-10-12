@@ -597,6 +597,7 @@ module.exports.DCAContext = nativeBinding.DCAContext
 module.exports.Decimal = nativeBinding.Decimal
 module.exports.Depth = nativeBinding.Depth
 module.exports.EstimateMaxPurchaseQuantityResponse = nativeBinding.EstimateMaxPurchaseQuantityResponse
+module.exports.EstimateMultiLegAvailableQuantityResponse = nativeBinding.EstimateMultiLegAvailableQuantityResponse
 module.exports.Execution = nativeBinding.Execution
 module.exports.FilingItem = nativeBinding.FilingItem
 module.exports.FrozenTransactionFee = nativeBinding.FrozenTransactionFee

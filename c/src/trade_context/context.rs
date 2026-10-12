@@ -4,6 +4,7 @@ use longbridge::{
     TradeContext,
     trade::{
         AttachedOrderType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+        EstimateMultiLegAvailableQuantityOptions, EstimateMultiLegOrderLeg,
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, PushEvent,
@@ -23,13 +24,15 @@ use crate::{
         types::{
             CAccountBalanceOwned, CAllExecutionsResponseOwned, CCashFlowOwned,
             CEstimateMaxPurchaseQuantityOptions, CEstimateMaxPurchaseQuantityResponseOwned,
-            CExecutionOwned, CFundPositionsResponseOwned, CGetAllExecutionsOptions,
-            CGetCashFlowOptions, CGetFundPositionsOptions, CGetHistoryExecutionsOptions,
-            CGetHistoryOrdersOptions, CGetStockPositionsOptions, CGetTodayExecutionsOptions,
-            CGetTodayOrdersOptions, CMarginRatioOwned, COrderDetailOwned, COrderOwned,
-            CPushGridOrderChanged, CPushGridOrderChangedOwned, CPushOrderChanged,
-            CPushOrderChangedOwned, CReplaceOrderOptions, CStockPositionsResponseOwned,
-            CSubmitMultiLegOrderOptions, CSubmitOrderOptions, CSubmitOrderResponseOwned,
+            CEstimateMultiLegAvailableQuantityOptions,
+            CEstimateMultiLegAvailableQuantityResponseOwned, CExecutionOwned,
+            CFundPositionsResponseOwned, CGetAllExecutionsOptions, CGetCashFlowOptions,
+            CGetFundPositionsOptions, CGetHistoryExecutionsOptions, CGetHistoryOrdersOptions,
+            CGetStockPositionsOptions, CGetTodayExecutionsOptions, CGetTodayOrdersOptions,
+            CMarginRatioOwned, COrderDetailOwned, COrderOwned, CPushGridOrderChanged,
+            CPushGridOrderChangedOwned, CPushOrderChanged, CPushOrderChangedOwned,
+            CReplaceOrderOptions, CStockPositionsResponseOwned, CSubmitMultiLegOrderOptions,
+            CSubmitOrderOptions, CSubmitOrderResponseOwned,
         },
     },
     types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust, slice_from_raw_parts},
@@ -870,6 +873,52 @@ pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CEstimateMaxPurchaseQuantityResponseOwned> =
             CCow::new(ctx_inner.estimate_max_purchase_quantity(opts2).await?);
+        Ok(resp)
+    });
+}
+
+/// Estimate a multi-leg option combination's maximum tradable quantity and
+/// margin impact before submitting the order.
+///
+/// @param[in] opts Options for the multi-leg estimate request
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_estimate_multileg_available_quantity(
+    ctx: *const CTradeContext,
+    opts: *const CEstimateMultiLegAvailableQuantityOptions,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let side = (*opts).side.into();
+    let order_type = (*opts).order_type.into();
+    let submitted_quantity = (*(*opts).submitted_quantity).value;
+    let strategy = (*opts).strategy.into();
+    let legs = slice_from_raw_parts((*opts).legs, (*opts).num_legs)
+        .iter()
+        .map(|leg| {
+            let mut l = EstimateMultiLegOrderLeg::new(cstr_to_rust(leg.symbol));
+            if !leg.side.is_null() {
+                l = l.side((*leg.side).into());
+            }
+            l
+        })
+        .collect::<Vec<_>>();
+    let mut opts2 = EstimateMultiLegAvailableQuantityOptions::new(
+        side,
+        order_type,
+        submitted_quantity,
+        strategy,
+        legs,
+    );
+    if !(*opts).submitted_price.is_null() {
+        opts2 = opts2.submitted_price((*(*opts).submitted_price).value);
+    }
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CEstimateMultiLegAvailableQuantityResponseOwned> = CCow::new(
+            ctx_inner
+                .estimate_multileg_available_quantity(opts2)
+                .await?,
+        );
         Ok(resp)
     });
 }

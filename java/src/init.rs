@@ -214,6 +214,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::OrderChargeDetail,
         longbridge::trade::OrderDetail,
         longbridge::trade::EstimateMaxPurchaseQuantityResponse,
+        longbridge::trade::EstimateMultiLegAvailableQuantityResponse,
         // Grid trading (GridContext types live in `longbridge::grid`)
         longbridge::grid::SubmitGridOrderResponse,
         longbridge::grid::GridOrder,

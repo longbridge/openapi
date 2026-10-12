@@ -694,6 +694,22 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Estimate a multi-leg option combination's maximum tradable quantity and
+     * margin impact before submitting the order (US market only).
+     *
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<EstimateMultiLegAvailableQuantityResponse> estimateMultilegAvailableQuantity(
+            EstimateMultiLegAvailableQuantityOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextEstimateMultilegAvailableQuantity(raw(), opts, callback);
+        });
+    }
+
+    /**
      * Set grid trading order changed event callback. After receiving a grid order
      * changed event, it will call back to this handler.
      *

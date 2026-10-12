@@ -4959,6 +4959,58 @@ typedef struct lb_estimate_max_purchase_quantity_options_t {
 } lb_estimate_max_purchase_quantity_options_t;
 
 /**
+ * A leg of a multi-leg combination for the pre-trade estimate
+ */
+typedef struct lb_estimate_multileg_order_leg_t {
+  /**
+   * Option or underlying-stock symbol, in `ticker.region` format
+   * (e.g. `QQQ260731C764000.US`)
+   */
+  const char *symbol;
+  /**
+   * Leg order side (reserved; not in use for now) (can be null)
+   */
+  const enum lb_order_side_t *side;
+} lb_estimate_multileg_order_leg_t;
+
+/**
+ * Options for estimating a multi-leg option combination's tradable quantity
+ * and margin impact
+ */
+typedef struct lb_estimate_multileg_available_quantity_options_t {
+  /**
+   * Order side of the combination
+   */
+  enum lb_order_side_t side;
+  /**
+   * Order type
+   */
+  enum lb_order_type_t order_type;
+  /**
+   * Submitted quantity (number of combinations)
+   */
+  const struct lb_decimal_t *submitted_quantity;
+  /**
+   * Multi-leg strategy
+   */
+  enum CMultiLegStrategy strategy;
+  /**
+   * Legs of the combination
+   */
+  const struct lb_estimate_multileg_order_leg_t *legs;
+  /**
+   * Number of legs
+   */
+  uintptr_t num_legs;
+  /**
+   * Submitted price (required for limit order types such as `LO`; the
+   * estimate is currently computed from market prices, so it does not change
+   * the result) (can be null)
+   */
+  const struct lb_decimal_t *submitted_price;
+} lb_estimate_multileg_available_quantity_options_t;
+
+/**
  * Active subscription for a security
  */
 typedef struct lb_subscription_t {
@@ -9068,6 +9120,37 @@ typedef struct lb_estimate_max_purchase_quantity_response_t {
    */
   const struct lb_decimal_t *margin_max_qty;
 } lb_estimate_max_purchase_quantity_response_t;
+
+/**
+ * Response for estimating a multi-leg option combination's tradable quantity
+ * and margin impact
+ */
+typedef struct lb_estimate_multileg_available_quantity_response_t {
+  /**
+   * Maximum number of combinations the account can open. The server returns
+   * `i64::MAX` (9223372036854775807) when the legs do not form the given
+   * strategy; treat that as no usable estimate
+   */
+  const struct lb_decimal_t *max_open_qty;
+  /**
+   * Funds required per combination unit: the net debit at current market
+   * prices for debit (premium-paying) combinations, or the margin
+   * requirement for credit / short combinations
+   */
+  const struct lb_decimal_t *unit_margin;
+  /**
+   * Change of the initial margin after placing `submitted_quantity`
+   * combinations (after minus before); `0` for debit combinations, which
+   * consume cash instead
+   */
+  const struct lb_decimal_t *initial_margin_change;
+  /**
+   * Change of the maintenance margin after placing `submitted_quantity`
+   * combinations (after minus before); `0` for debit combinations, which
+   * consume cash instead
+   */
+  const struct lb_decimal_t *maintenance_margin_change;
+} lb_estimate_multileg_available_quantity_response_t;
 
 /**
  * Security calc index response
@@ -16465,6 +16548,17 @@ void lb_trade_context_estimate_max_purchase_quantity(const struct lb_trade_conte
                                                      const struct lb_estimate_max_purchase_quantity_options_t *opts,
                                                      lb_async_callback_t callback,
                                                      void *userdata);
+
+/**
+ * Estimate a multi-leg option combination's maximum tradable quantity and
+ * margin impact before submitting the order.
+ *
+ * @param[in] opts Options for the multi-leg estimate request
+ */
+void lb_trade_context_estimate_multileg_available_quantity(const struct lb_trade_context_t *ctx,
+                                                           const struct lb_estimate_multileg_available_quantity_options_t *opts,
+                                                           lb_async_callback_t callback,
+                                                           void *userdata);
 
 /**
  * Create a decimal value with a 64 bit `m` representation and corresponding

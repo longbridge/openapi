@@ -1032,6 +1032,17 @@ impl_java_class!(
     [cash_max_qty, margin_max_qty]
 );
 
+impl_java_class!(
+    "com/longbridge/trade/EstimateMultiLegAvailableQuantityResponse",
+    longbridge::trade::EstimateMultiLegAvailableQuantityResponse,
+    [
+        max_open_qty,
+        unit_margin,
+        initial_margin_change,
+        maintenance_margin_change
+    ]
+);
+
 // ── Grid trading types ────────────────────────────────────────────
 
 impl_java_class!(

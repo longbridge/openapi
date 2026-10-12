@@ -1,4 +1,5 @@
 mod estimate_max_purchase_quantity;
+mod estimate_multileg;
 mod get_all_executions;
 mod get_cash_flow;
 mod get_history_executions;
@@ -10,6 +11,7 @@ mod submit_multileg;
 mod submit_order;
 
 pub use estimate_max_purchase_quantity::EstimateMaxPurchaseQuantityOptions;
+pub use estimate_multileg::EstimateMultiLegAvailableQuantityOptions;
 pub use get_all_executions::GetAllExecutionsOptions;
 pub use get_cash_flow::GetCashFlowOptions;
 pub use get_history_executions::GetHistoryExecutionsOptions;

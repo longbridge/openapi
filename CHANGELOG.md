@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Trade: estimate multi-leg option trading info** — new `TradeContext.estimate_multileg_available_quantity` (`POST /v1/trade/estimate/multileg`) estimating a US option combination strategy's maximum tradable quantity and margin impact before submitting. Takes `side`, `order_type`, `submitted_quantity`, `strategy` (`MultiLegStrategy`), the combination `legs` (each an `EstimateMultiLegOrderLeg` — symbol plus a reserved `side`), and an optional `submitted_price`; returns `max_open_qty`, `unit_margin`, `initial_margin_change` and `maintenance_margin_change`. Unlike the single-leg `estimate_max_purchase_quantity` (a `GET` with scalar query params), the multi-leg estimate carries a `legs` array so it is a `POST` with a JSON body, matching the multi-leg submit endpoint. Added across the Rust core (async + blocking) and mirrored to the C, C++, Java, Node.js and Python layers; the separate Go SDK is tracked separately.
+
 ## [5.2.0] - 2026-09-30
 
 ### Added

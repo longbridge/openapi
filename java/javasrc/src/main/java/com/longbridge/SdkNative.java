@@ -266,6 +266,10 @@ public class SdkNative {
                         EstimateMaxPurchaseQuantityOptions opts,
                         AsyncCallback callback);
 
+        public static native void tradeContextEstimateMultilegAvailableQuantity(long context,
+                        com.longbridge.trade.EstimateMultiLegAvailableQuantityOptions opts,
+                        AsyncCallback callback);
+
         // ── Grid trading push (stays on the trade side) ───────────────
         public static native void tradeContextSetOnGridOrderChanged(long context, GridOrderChangedHandler handler);
 

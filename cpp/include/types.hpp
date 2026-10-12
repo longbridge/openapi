@@ -2444,6 +2444,58 @@ struct EstimateMaxPurchaseQuantityResponse
   Decimal margin_max_qty;
 };
 
+/// A leg of a multi-leg combination for the pre-trade estimate
+struct EstimateMultiLegOrderLeg
+{
+  /// Option or underlying-stock symbol, in `ticker.region` format
+  /// (e.g. `QQQ260731C764000.US`)
+  std::string symbol;
+  /// Leg order side (reserved; not in use for now)
+  std::optional<OrderSide> side;
+};
+
+/// Options for estimating a multi-leg option combination's tradable quantity
+/// and margin impact
+struct EstimateMultiLegAvailableQuantityOptions
+{
+  /// Order side of the combination
+  OrderSide side;
+  /// Order type
+  OrderType order_type;
+  /// Submitted quantity (number of combinations)
+  Decimal submitted_quantity;
+  /// Multi-leg strategy
+  MultiLegStrategy strategy;
+  /// Legs of the combination
+  std::vector<EstimateMultiLegOrderLeg> legs;
+  /// Submitted price (required for limit order types such as `LO`; the estimate
+  /// is currently computed from market prices, so it does not change the
+  /// result)
+  std::optional<Decimal> submitted_price;
+};
+
+/// Response for estimating a multi-leg option combination's tradable quantity
+/// and margin impact
+struct EstimateMultiLegAvailableQuantityResponse
+{
+  /// Maximum number of combinations the account can open. The server returns
+  /// `i64::MAX` (9223372036854775807) when the legs do not form the given
+  /// strategy; treat that as no usable estimate
+  Decimal max_open_qty;
+  /// Funds required per combination unit: the net debit at current market
+  /// prices for debit (premium-paying) combinations, or the margin requirement
+  /// for credit / short combinations
+  Decimal unit_margin;
+  /// Change of the initial margin after placing `submitted_quantity`
+  /// combinations (after minus before); `0` for debit combinations, which
+  /// consume cash instead
+  Decimal initial_margin_change;
+  /// Change of the maintenance margin after placing `submitted_quantity`
+  /// combinations (after minus before); `0` for debit combinations, which
+  /// consume cash instead
+  Decimal maintenance_margin_change;
+};
+
 
 /// Grid trading master-order changed message.
 struct PushGridOrderChanged
