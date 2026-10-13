@@ -86,6 +86,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::SimpleErrorKind,
         longbridge::Language,
         longbridge::PushCandlestickMode,
+        longbridge::QuoteTransport,
         longbridge::Market,
         longbridge::quote::TradeStatus,
         longbridge::quote::TradeSession,

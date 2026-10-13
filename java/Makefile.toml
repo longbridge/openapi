@@ -47,6 +47,7 @@ args = [
   "javasrc/src/main/java/com/longbridge/OAuthBuilder.java",
   "javasrc/src/main/java/com/longbridge/OpenApiException.java",
   "javasrc/src/main/java/com/longbridge/PushCandlestickMode.java",
+  "javasrc/src/main/java/com/longbridge/QuoteTransport.java",
   "javasrc/src/main/java/com/longbridge/SdkNative.java",
 
   "javasrc/src/main/java/com/longbridge/HttpClient.java",

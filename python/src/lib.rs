@@ -41,6 +41,7 @@ fn longbridge(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     openapi.add_class::<types::Language>()?;
     openapi.add_class::<types::Market>()?;
     openapi.add_class::<types::PushCandlestickMode>()?;
+    openapi.add_class::<types::QuoteTransport>()?;
     openapi.add_class::<http_client::HttpClient>()?;
     openapi.add_class::<error::ErrorKind>()?;
     agent::register_types(&openapi)?;

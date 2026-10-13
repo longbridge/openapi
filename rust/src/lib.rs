@@ -41,7 +41,7 @@ pub use agent::AgentContext;
 pub use alert::AlertContext;
 pub use asset::AssetContext;
 pub use calendar::CalendarContext;
-pub use config::{Config, Language, PushCandlestickMode};
+pub use config::{Config, Language, PushCandlestickMode, QuoteTransport};
 pub use content::ContentContext;
 pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
