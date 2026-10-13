@@ -940,8 +940,6 @@ pub struct COrder {
     pub monitor_price: *const CDecimal,
     /// Remark
     pub remark: *const c_char,
-    /// Time-condition submit time (maybe null)
-    pub delayed_until: *const i64,
     /// Attached orders
     pub attached_orders: *const CAttachedOrderDetail,
     /// Number of attached orders
@@ -951,6 +949,8 @@ pub struct COrder {
     pub has_multi_leg: bool,
     /// Multi-leg strategy information (only valid when has_multi_leg is true)
     pub multi_leg: CMultiLegInfo,
+    /// Time-condition submit time (maybe null)
+    pub delayed_until: *const i64,
 }
 
 #[derive(Debug)]
@@ -2389,8 +2389,6 @@ pub struct COrderDetail {
     pub monitor_price: *const CDecimal,
     /// Remark
     pub remark: *const c_char,
-    /// Time-condition submit time (maybe null)
-    pub delayed_until: *const i64,
     /// Commission-free Status
     pub free_status: CCommissionFreeStatus,
     /// Commission-free amount
@@ -2426,6 +2424,8 @@ pub struct COrderDetail {
     pub has_multi_leg: bool,
     /// Multi-leg strategy information (only valid when has_multi_leg is true)
     pub multi_leg: CMultiLegInfo,
+    /// Time-condition submit time (maybe null)
+    pub delayed_until: *const i64,
 }
 
 #[derive(Debug)]

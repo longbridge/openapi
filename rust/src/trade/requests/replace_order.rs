@@ -147,17 +147,21 @@ impl ReplaceOrderOptions {
     /// Set a new time-condition submit time.
     ///
     /// Must be later than now and no more than 90 days ahead. Leave unset to
-    /// keep the order's current time condition.
+    /// keep the order's current time condition. If combined with
+    /// [`clear_delayed_until`](Self::clear_delayed_until), the last call wins.
     #[inline]
     #[must_use]
     pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
         Self {
-            delayed_until: Some(delayed_until.unix_timestamp()),
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
             ..self
         }
     }
 
     /// Clear the time condition, turning the order into a regular order.
+    ///
+    /// If combined with [`delayed_until`](Self::delayed_until), the last call
+    /// wins.
     #[inline]
     #[must_use]
     pub fn clear_delayed_until(self) -> Self {
@@ -351,6 +355,13 @@ mod tests {
         assert_eq!(
             serde_json::to_value(&opts).unwrap()["delayed_until"],
             serde_json::json!(1767225600)
+        );
+
+        let opts = opts.delayed_until(OffsetDateTime::UNIX_EPOCH + time::Duration::SECOND);
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(2),
+            "a time that maps to the clear sentinel must not be sent as 1"
         );
 
         let opts = opts.clear_delayed_until();

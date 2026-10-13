@@ -7707,7 +7707,7 @@ class TradeContext:
             trigger_count: Trigger count
             monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
-            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition
+            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
             clear_delayed_until: Clear the time condition, turning the order into a regular order (takes precedence over ``delayed_until``)
 
         Examples:
@@ -7773,7 +7773,7 @@ class TradeContext:
             remark: Remark (Maximum 64 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
             attached_params: Attached order parameters
-            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead)
+            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
 
         Returns:
             Response
@@ -7830,7 +7830,7 @@ class TradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`)
             remark: Remark (Maximum 255 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
-            delayed_until: Time-condition submit time (only ``LO`` / ``MO`` support time conditions)
+            delayed_until: Time-condition submit time (only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
 
         Returns:
             Response
@@ -11610,7 +11610,7 @@ class AsyncTradeContext:
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
             attached_params: Attached order parameters.
-            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition.
+            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
             clear_delayed_until: Clear the time condition, turning the order into a regular order (takes precedence over ``delayed_until``).
 
         Examples:
@@ -11680,7 +11680,7 @@ class AsyncTradeContext:
             remark: Remark (max 64 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
             attached_params: Attached order parameters.
-            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead).
+            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
 
         Examples:
             ::
@@ -11745,7 +11745,7 @@ class AsyncTradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`).
             remark: Remark (max 255 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
-            delayed_until: Time-condition submit time (only ``LO`` / ``MO`` support time conditions).
+            delayed_until: Time-condition submit time (only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
 
         Examples:
             ::

@@ -5952,10 +5952,6 @@ typedef struct lb_order_t {
    */
   const char *remark;
   /**
-   * Time-condition submit time (maybe null)
-   */
-  const int64_t *delayed_until;
-  /**
    * Attached orders
    */
   const struct CAttachedOrderDetail *attached_orders;
@@ -5972,6 +5968,10 @@ typedef struct lb_order_t {
    * Multi-leg strategy information (only valid when has_multi_leg is true)
    */
   struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_t;
 
 /**
@@ -6540,10 +6540,6 @@ typedef struct lb_order_detail_t {
    */
   const char *remark;
   /**
-   * Time-condition submit time (maybe null)
-   */
-  const int64_t *delayed_until;
-  /**
    * Commission-free Status
    */
   enum lb_commission_free_status_t free_status;
@@ -6612,6 +6608,10 @@ typedef struct lb_order_detail_t {
    * Multi-leg strategy information (only valid when has_multi_leg is true)
    */
   struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_detail_t;
 
 /**

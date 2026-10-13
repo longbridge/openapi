@@ -2175,6 +2175,7 @@ mod tests {
             "trigger_count": 0,
             "monitor_price": "",
             "remark": "1680863603.927165",
+            "delayed_until": "0",
             "free_status": "None",
             "free_amount": "",
             "free_currency": "",
@@ -2213,6 +2214,17 @@ mod tests {
         }
         "#;
 
-        _ = serde_json::from_str::<OrderDetail>(data).unwrap();
+        let detail = serde_json::from_str::<OrderDetail>(data).unwrap();
+        assert!(
+            detail.delayed_until.is_none(),
+            "\"0\" means no time condition"
+        );
+
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["status"] = "DelayedNotReported".into();
+        value["delayed_until"] = "1767225600".into();
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert_eq!(detail.status, OrderStatus::DelayedNotReported);
+        assert_eq!(detail.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
     }
 }

@@ -205,7 +205,7 @@ impl SubmitOrderOptions {
     #[must_use]
     pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
         Self {
-            delayed_until: Some(delayed_until.unix_timestamp()),
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
             ..self
         }
     }
@@ -311,5 +311,45 @@ impl SubmitAttachedParams {
             activate_rth: Some(v),
             ..self
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use time::macros::datetime;
+
+    use super::*;
+
+    fn options() -> SubmitOrderOptions {
+        SubmitOrderOptions::new(
+            "700.HK",
+            OrderType::LO,
+            OrderSide::Buy,
+            Decimal::from(100),
+            TimeInForceType::Day,
+        )
+    }
+
+    #[test]
+    fn delayed_until() {
+        assert!(
+            serde_json::to_value(options())
+                .unwrap()
+                .get("delayed_until")
+                .is_none()
+        );
+
+        let opts = options().delayed_until(datetime!(2026-01-01 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767225600)
+        );
+
+        let opts = options().delayed_until(OffsetDateTime::UNIX_EPOCH);
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(2),
+            "a time that maps to 0 must not be sent as a regular order"
+        );
     }
 }

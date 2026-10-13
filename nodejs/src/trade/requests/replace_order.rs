@@ -122,7 +122,7 @@ pub struct ReplaceOrderOptions<'env> {
     /// more than 90 days ahead. Leave unset to keep the current time condition.
     pub delayed_until: Option<DateTime<Utc>>,
     /// Clear the time condition, turning the order into a regular order (takes
-    /// precedence over `delayed_until`)
+    /// precedence over `delayedUntil`)
     pub clear_delayed_until: Option<bool>,
 }
 

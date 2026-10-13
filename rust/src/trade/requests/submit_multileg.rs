@@ -113,8 +113,38 @@ impl SubmitMultiLegOrderOptions {
     #[must_use]
     pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
         Self {
-            delayed_until: Some(delayed_until.unix_timestamp()),
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
             ..self
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use time::macros::datetime;
+
+    use super::*;
+
+    #[test]
+    fn delayed_until() {
+        let opts = SubmitMultiLegOrderOptions::new(
+            OrderSide::Buy,
+            OrderType::MO,
+            Decimal::from(1),
+            MultiLegStrategy::Straddle,
+            [],
+        );
+        assert!(
+            serde_json::to_value(&opts)
+                .unwrap()
+                .get("delayed_until")
+                .is_none()
+        );
+
+        let opts = opts.delayed_until(datetime!(2026-01-01 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767225600)
+        );
     }
 }

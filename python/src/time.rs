@@ -22,6 +22,15 @@ impl<'a, 'py> FromPyObject<'a, 'py> for PyOffsetDateTimeWrapper {
 
     fn extract(ob: Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
         let date: Bound<PyDateTime> = ob.extract()?;
+        // A timezone-aware datetime denotes an exact instant, so honour its
+        // offset; a naive one keeps the historical behaviour of being read as
+        // UTC.
+        if !date.getattr("tzinfo")?.is_none() {
+            let timestamp: f64 = date.call_method0("timestamp")?.extract()?;
+            return OffsetDateTime::from_unix_timestamp(timestamp.floor() as i64)
+                .map(Self)
+                .map_err(|err| pyo3::exceptions::PyValueError::new_err(err.to_string()));
+        }
         let year = date.get_year();
         let month = date.get_month();
         let day = date.get_day();
