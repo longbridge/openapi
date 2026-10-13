@@ -4699,8 +4699,9 @@ typedef struct lb_replace_order_options_t {
    */
   const struct CReplaceAttachedParams *attached_params;
   /**
-   * New time-condition submit time, Unix timestamp in seconds (can be
-   * null to keep the current time condition)
+   * New time-condition submit time, Unix timestamp in seconds; must be
+   * later than now and no more than 90 days ahead (can be null to keep the
+   * current time condition)
    */
   const int64_t *delayed_until;
   /**
@@ -4834,7 +4835,7 @@ typedef struct lb_submit_order_options_t {
   /**
    * Time-condition submit time, Unix timestamp in seconds (can be null).
    * The order is held in `DelayedNotReported` status and only submitted at
-   * this time.
+   * this time, which must be later than now and no more than 90 days ahead.
    */
   const int64_t *delayed_until;
 } lb_submit_order_options_t;
@@ -4900,8 +4901,9 @@ typedef struct CSubmitMultiLegOrderOptions {
    */
   const char *client_request_id;
   /**
-   * Time-condition submit time, Unix timestamp in seconds (can be null).
-   * Only `LO` / `MO` support time conditions.
+   * Time-condition submit time, Unix timestamp in seconds (can be null);
+   * must be later than now and no more than 90 days ahead. Only `LO` / `MO`
+   * support time conditions.
    */
   const int64_t *delayed_until;
 } CSubmitMultiLegOrderOptions;

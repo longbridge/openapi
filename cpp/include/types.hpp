@@ -1962,8 +1962,9 @@ struct ReplaceOrderOptions
   std::optional<std::string> remark;
   /// Attached order params
   std::optional<ReplaceAttachedParams> attached_params;
-  /// New time-condition submit time (Unix timestamp in seconds); not set
-  /// keeps the current time condition
+  /// New time-condition submit time (Unix timestamp in seconds), later than
+  /// now and no more than 90 days ahead; not set keeps the current time
+  /// condition
   std::optional<int64_t> delayed_until;
   /// Clear the time condition, turning the order into a regular order (takes
   /// precedence over `delayed_until`)
@@ -2013,7 +2014,8 @@ struct SubmitOrderOptions
   /// Attached order params
   std::optional<SubmitAttachedParams> attached_params;
   /// Time-condition submit time (Unix timestamp in seconds). The order is held
-  /// in `DelayedNotReported` status and only submitted at this time.
+  /// in `DelayedNotReported` status and only submitted at this time, which
+  /// must be later than now and no more than 90 days ahead.
   std::optional<int64_t> delayed_until;
 };
 
@@ -2057,8 +2059,8 @@ struct SubmitMultiLegOrderOptions
   /// If not specified, idempotency control is skipped.
   /// The server caches this ID for 10 minutes.
   std::optional<std::string> client_request_id;
-  /// Time-condition submit time (Unix timestamp in seconds). Only `LO` / `MO`
-  /// support time conditions.
+  /// Time-condition submit time (Unix timestamp in seconds), later than now
+  /// and no more than 90 days ahead. Only `LO` / `MO` support time conditions.
   std::optional<int64_t> delayed_until;
 };
 

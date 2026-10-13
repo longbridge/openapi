@@ -41,7 +41,8 @@ pub struct SubmitMultiLegOrderOptions<'env> {
     /// The server caches this ID for 10 minutes.
     pub client_request_id: Option<String>,
     /// Time-condition submit time. The order is held in `DelayedNotReported`
-    /// status and only submitted at this time. Only `LO` / `MO` support time
+    /// status and only submitted at this time, which must be later than now
+    /// and no more than 90 days ahead. Only `LO` / `MO` support time
     /// conditions.
     pub delayed_until: Option<DateTime<Utc>>,
 }

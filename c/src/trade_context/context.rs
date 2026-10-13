@@ -527,7 +527,7 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
         opts2 = opts2.attached_params(rp);
     }
     execute_async(callback, ctx, userdata, async move {
-        if let Some(delayed_until) = delayed_until? {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
             opts2 = opts2.delayed_until(delayed_until);
         }
         ctx_inner.replace_order(opts2).await?;
@@ -626,7 +626,7 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
         opts2 = opts2.attached_params(sp);
     }
     execute_async(callback, ctx, userdata, async move {
-        if let Some(delayed_until) = delayed_until? {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
             opts2 = opts2.delayed_until(delayed_until);
         }
         let resp: CCow<CSubmitOrderResponseOwned> = CCow::new(ctx_inner.submit_order(opts2).await?);
@@ -670,7 +670,7 @@ pub unsafe extern "C" fn lb_trade_context_submit_multileg(
     }
     let delayed_until = parse_delayed_until((*opts).delayed_until);
     execute_async(callback, ctx, userdata, async move {
-        if let Some(delayed_until) = delayed_until? {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
             opts2 = opts2.delayed_until(delayed_until);
         }
         let resp: CCow<CSubmitOrderResponseOwned> =
@@ -893,14 +893,18 @@ pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
 
 /// Converts an optional C `delayed_until` (Unix seconds) into a time, reporting
 /// an out-of-range value through the callback instead of panicking.
-unsafe fn parse_delayed_until(value: *const i64) -> longbridge::Result<Option<OffsetDateTime>> {
+unsafe fn parse_delayed_until(
+    value: *const i64,
+) -> Result<Option<OffsetDateTime>, time::error::ComponentRange> {
     if value.is_null() {
         return Ok(None);
     }
-    unsafe { OffsetDateTime::from_unix_timestamp(*value) }
-        .map(Some)
-        .map_err(|err| longbridge::Error::ParseField {
-            name: "delayed_until",
-            error: err.to_string(),
-        })
+    unsafe { OffsetDateTime::from_unix_timestamp(*value) }.map(Some)
+}
+
+fn delayed_until_error(err: time::error::ComponentRange) -> longbridge::Error {
+    longbridge::Error::ParseField {
+        name: "delayed_until",
+        error: err.to_string(),
+    }
 }

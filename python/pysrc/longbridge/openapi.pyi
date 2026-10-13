@@ -7830,7 +7830,7 @@ class TradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`)
             remark: Remark (Maximum 255 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
-            delayed_until: Time-condition submit time (only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
+            delayed_until: Time-condition submit time (later than now, at most 90 days ahead; only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
 
         Returns:
             Response
@@ -11745,7 +11745,7 @@ class AsyncTradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`).
             remark: Remark (max 255 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
-            delayed_until: Time-condition submit time (only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
+            delayed_until: Time-condition submit time (later than now, at most 90 days ahead; only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
 
         Examples:
             ::

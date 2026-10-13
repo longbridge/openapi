@@ -1258,8 +1258,9 @@ pub struct CReplaceOrderOptions {
     pub remark: *const c_char,
     /// Attached order parameters (can be null)
     pub attached_params: *const CReplaceAttachedParams,
-    /// New time-condition submit time, Unix timestamp in seconds (can be
-    /// null to keep the current time condition)
+    /// New time-condition submit time, Unix timestamp in seconds; must be
+    /// later than now and no more than 90 days ahead (can be null to keep the
+    /// current time condition)
     pub delayed_until: *const i64,
     /// Clear the time condition, turning the order into a regular order
     /// (takes precedence over `delayed_until`)
@@ -1311,7 +1312,7 @@ pub struct CSubmitOrderOptions {
     pub attached_params: *const CSubmitAttachedParams,
     /// Time-condition submit time, Unix timestamp in seconds (can be null).
     /// The order is held in `DelayedNotReported` status and only submitted at
-    /// this time.
+    /// this time, which must be later than now and no more than 90 days ahead.
     pub delayed_until: *const i64,
 }
 
@@ -1381,8 +1382,9 @@ pub struct CSubmitMultiLegOrderOptions {
     /// If not specified, idempotency control is skipped.
     /// The server caches this ID for 10 minutes.
     pub client_request_id: *const c_char,
-    /// Time-condition submit time, Unix timestamp in seconds (can be null).
-    /// Only `LO` / `MO` support time conditions.
+    /// Time-condition submit time, Unix timestamp in seconds (can be null);
+    /// must be later than now and no more than 90 days ahead. Only `LO` / `MO`
+    /// support time conditions.
     pub delayed_until: *const i64,
 }
 
