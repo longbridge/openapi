@@ -4,7 +4,7 @@ use napi::bindgen_prelude::ClassInstance;
 use crate::{
     decimal::Decimal,
     trade::types::{MultiLegStrategy, OrderSide, OrderType},
-    utils::from_datetime,
+    utils::try_from_datetime,
 };
 
 /// A leg of a multi-leg combination order to submit
@@ -46,11 +46,12 @@ pub struct SubmitMultiLegOrderOptions<'env> {
     pub delayed_until: Option<DateTime<Utc>>,
 }
 
-impl<'env> From<SubmitMultiLegOrderOptions<'env>>
+impl<'env> TryFrom<SubmitMultiLegOrderOptions<'env>>
     for longbridge::trade::SubmitMultiLegOrderOptions
 {
-    #[inline]
-    fn from(opts: SubmitMultiLegOrderOptions<'env>) -> Self {
+    type Error = napi::Error;
+
+    fn try_from(opts: SubmitMultiLegOrderOptions<'env>) -> napi::Result<Self> {
         let legs = opts.legs.into_iter().map(|leg| {
             longbridge::trade::SubmitMultiLegOrderLeg::new(leg.symbol, leg.ratio_quantity.0)
         });
@@ -71,8 +72,8 @@ impl<'env> From<SubmitMultiLegOrderOptions<'env>>
             opts2 = opts2.client_request_id(id);
         }
         if let Some(delayed_until) = opts.delayed_until {
-            opts2 = opts2.delayed_until(from_datetime(delayed_until));
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
         }
-        opts2
+        Ok(opts2)
     }
 }

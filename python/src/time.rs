@@ -22,15 +22,6 @@ impl<'a, 'py> FromPyObject<'a, 'py> for PyOffsetDateTimeWrapper {
 
     fn extract(ob: Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
         let date: Bound<PyDateTime> = ob.extract()?;
-        // A timezone-aware datetime denotes an exact instant, so honour its
-        // offset; a naive one keeps the historical behaviour of being read as
-        // UTC.
-        if !date.getattr("tzinfo")?.is_none() {
-            let timestamp: f64 = date.call_method0("timestamp")?.extract()?;
-            return OffsetDateTime::from_unix_timestamp(timestamp.floor() as i64)
-                .map(Self)
-                .map_err(|err| pyo3::exceptions::PyValueError::new_err(err.to_string()));
-        }
         let year = date.get_year();
         let month = date.get_month();
         let day = date.get_day();
@@ -61,6 +52,32 @@ impl<'py> IntoPyObject<'py> for PyOffsetDateTimeWrapper {
     type Error = PyErr;
     fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         PyDateTime::from_timestamp(py, self.0.unix_timestamp() as f64, None)
+    }
+}
+
+/// A Python `datetime` read as an exact instant: a timezone-aware value
+/// (one whose `utcoffset()` is not `None`) converts by its actual offset, and a
+/// naive value is read as UTC like [`PyOffsetDateTimeWrapper`].
+///
+/// Used where the value decides *when* something happens (e.g. the submit
+/// time of a time-condition order), so an aware `datetime` must not be shifted
+/// by its UTC offset. Existing parameters keep [`PyOffsetDateTimeWrapper`],
+/// whose wall-clock semantics some callers rely on.
+#[derive(Copy, Clone)]
+pub(crate) struct PyInstantWrapper(pub(crate) OffsetDateTime);
+
+impl<'a, 'py> FromPyObject<'a, 'py> for PyInstantWrapper {
+    type Error = PyErr;
+
+    fn extract(ob: Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
+        let date: Bound<PyDateTime> = ob.extract()?;
+        if date.call_method0("utcoffset")?.is_none() {
+            return Ok(Self(PyOffsetDateTimeWrapper::extract(ob)?.0));
+        }
+        let timestamp: f64 = date.call_method0("timestamp")?.extract()?;
+        OffsetDateTime::from_unix_timestamp(timestamp.floor() as i64)
+            .map(Self)
+            .map_err(|err| pyo3::exceptions::PyValueError::new_err(err.to_string()))
     }
 }
 

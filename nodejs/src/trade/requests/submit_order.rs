@@ -5,7 +5,7 @@ use crate::{
     decimal::Decimal,
     time::NaiveDate,
     trade::types::{AttachedOrderType, OrderSide, OrderType, OutsideRTH, TimeInForceType},
-    utils::from_datetime,
+    utils::try_from_datetime,
 };
 
 /// Parameters for submitting an attached order
@@ -110,9 +110,10 @@ pub struct SubmitOrderOptions<'env> {
     pub delayed_until: Option<DateTime<Utc>>,
 }
 
-impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
-    #[inline]
-    fn from(opts: SubmitOrderOptions<'env>) -> Self {
+impl<'env> TryFrom<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
+    type Error = napi::Error;
+
+    fn try_from(opts: SubmitOrderOptions<'env>) -> napi::Result<Self> {
         let mut opts2 = longbridge::trade::SubmitOrderOptions::new(
             opts.symbol,
             opts.order_type.into(),
@@ -160,8 +161,8 @@ impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOpti
             opts2 = opts2.attached_params(p.into());
         }
         if let Some(delayed_until) = opts.delayed_until {
-            opts2 = opts2.delayed_until(from_datetime(delayed_until));
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
         }
-        opts2
+        Ok(opts2)
     }
 }

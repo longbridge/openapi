@@ -16,7 +16,7 @@ use crate::{
     config::Config,
     decimal::PyDecimal,
     error::ErrorNewType,
-    time::{PyDateWrapper, PyOffsetDateTimeWrapper},
+    time::{PyDateWrapper, PyInstantWrapper, PyOffsetDateTimeWrapper},
     trade::{
         context::Callbacks,
         push::handle_push_event,
@@ -310,7 +310,7 @@ impl AsyncTradeContext {
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
         attached_params: Option<ReplaceAttachedParams>,
-        delayed_until: Option<PyOffsetDateTimeWrapper>,
+        delayed_until: Option<PyInstantWrapper>,
         clear_delayed_until: bool,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -381,7 +381,7 @@ impl AsyncTradeContext {
         remark: Option<String>,
         client_request_id: Option<String>,
         attached_params: Option<SubmitAttachedParams>,
-        delayed_until: Option<PyOffsetDateTimeWrapper>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let mut opts = SubmitOrderOptions::new(
@@ -464,7 +464,7 @@ impl AsyncTradeContext {
         submitted_price: Option<PyDecimal>,
         remark: Option<String>,
         client_request_id: Option<String>,
-        delayed_until: Option<PyOffsetDateTimeWrapper>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         let legs = legs

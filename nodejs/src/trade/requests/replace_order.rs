@@ -4,7 +4,7 @@ use napi::bindgen_prelude::ClassInstance;
 use crate::{
     decimal::Decimal,
     trade::types::{AttachedOrderType, OrderType, OutsideRTH, TimeInForceType},
-    utils::from_datetime,
+    utils::try_from_datetime,
 };
 
 /// Parameters for replacing an attached order
@@ -126,9 +126,10 @@ pub struct ReplaceOrderOptions<'env> {
     pub clear_delayed_until: Option<bool>,
 }
 
-impl<'env> From<ReplaceOrderOptions<'env>> for longbridge::trade::ReplaceOrderOptions {
-    #[inline]
-    fn from(opts: ReplaceOrderOptions<'env>) -> Self {
+impl<'env> TryFrom<ReplaceOrderOptions<'env>> for longbridge::trade::ReplaceOrderOptions {
+    type Error = napi::Error;
+
+    fn try_from(opts: ReplaceOrderOptions<'env>) -> napi::Result<Self> {
         let mut opts2 = longbridge::trade::ReplaceOrderOptions::new(opts.order_id, opts.quantity.0);
         if let Some(price) = opts.price {
             opts2 = opts2.price(price.0);
@@ -163,8 +164,8 @@ impl<'env> From<ReplaceOrderOptions<'env>> for longbridge::trade::ReplaceOrderOp
         if opts.clear_delayed_until.unwrap_or_default() {
             opts2 = opts2.clear_delayed_until();
         } else if let Some(delayed_until) = opts.delayed_until {
-            opts2 = opts2.delayed_until(from_datetime(delayed_until));
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
         }
-        opts2
+        Ok(opts2)
     }
 }

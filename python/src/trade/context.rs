@@ -17,7 +17,7 @@ use crate::{
     config::Config,
     decimal::PyDecimal,
     error::ErrorNewType,
-    time::{PyDateWrapper, PyOffsetDateTimeWrapper},
+    time::{PyDateWrapper, PyInstantWrapper, PyOffsetDateTimeWrapper},
     trade::{
         push::handle_push_event,
         types::{
@@ -273,7 +273,7 @@ impl TradeContext {
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
         attached_params: Option<ReplaceAttachedParams>,
-        delayed_until: Option<PyOffsetDateTimeWrapper>,
+        delayed_until: Option<PyInstantWrapper>,
         clear_delayed_until: bool,
     ) -> PyResult<()> {
         let mut opts = ReplaceOrderOptions::new(order_id, quantity.into());
@@ -341,7 +341,7 @@ impl TradeContext {
         remark: Option<String>,
         client_request_id: Option<String>,
         attached_params: Option<SubmitAttachedParams>,
-        delayed_until: Option<PyOffsetDateTimeWrapper>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<SubmitOrderResponse> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
@@ -421,7 +421,7 @@ impl TradeContext {
         submitted_price: Option<PyDecimal>,
         remark: Option<String>,
         client_request_id: Option<String>,
-        delayed_until: Option<PyOffsetDateTimeWrapper>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<SubmitOrderResponse> {
         let legs = legs
             .into_iter()

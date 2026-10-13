@@ -369,5 +369,12 @@ mod tests {
             serde_json::to_value(&opts).unwrap()["delayed_until"],
             serde_json::json!(1)
         );
+
+        // The last of `delayed_until` / `clear_delayed_until` wins.
+        let opts = opts.delayed_until(datetime!(2026-01-02 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767312000)
+        );
     }
 }
