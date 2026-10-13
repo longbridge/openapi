@@ -9,6 +9,7 @@ mod content;
 mod dca;
 mod decimal;
 mod error;
+mod fund;
 mod fundamental;
 mod grid;
 mod http_client;

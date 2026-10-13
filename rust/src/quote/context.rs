@@ -1,4 +1,5 @@
 use std::{
+    str::FromStr,
     sync::{Arc, RwLock},
     time::Duration,
 };
@@ -6,6 +7,7 @@ use std::{
 use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use longbridge_proto::quote;
 use longbridge_wscli::WsClientError;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use time::{Date, PrimitiveDateTime};
 use tokio::sync::{mpsc, oneshot};
@@ -16,13 +18,14 @@ use crate::{
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily,
+        MarketTradingDays, MarketTradingSession, OptionChainContract, OptionDirection,
+        OptionExpiryCycleType, OptionQuote, OptionStandardAttr, OptionVolumeDaily,
         OptionVolumeDailyStat, OptionVolumeStats, ParticipantInfo, Period, PushEvent,
         QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
         RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
         SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsItem,
-        ShortPositionsResponse, ShortTradesItem, ShortTradesResponse, StrikePriceInfo,
-        Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
+        ShortPositionsResponse, ShortTradesItem, ShortTradesResponse, Subscription, Trade,
+        TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core, UserProfile},
@@ -53,7 +56,6 @@ fn unix_secs_to_rfc3339(s: &str) -> String {
 }
 const ISSUER_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const OPTION_CHAIN_EXPIRY_DATE_LIST_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
-const OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 const TRADING_SESSION_CACHE_TIMEOUT: Duration = Duration::from_secs(60 * 60 * 2);
 
 struct InnerQuoteContext {
@@ -66,7 +68,6 @@ struct InnerQuoteContext {
     cache_participants: Cache<Vec<ParticipantInfo>>,
     cache_issuers: Cache<Vec<IssuerInfo>>,
     cache_option_chain_expiry_date_list: CacheWithKey<String, Vec<Date>>,
-    cache_option_chain_strike_info: CacheWithKey<(String, Date), Vec<StrikePriceInfo>>,
     cache_trading_session: Cache<Vec<MarketTradingSession>>,
     user_profile: Arc<RwLock<Option<UserProfile>>>,
     log_subscriber: Arc<dyn Subscriber + Send + Sync>,
@@ -125,9 +126,6 @@ impl QuoteContext {
                 cache_issuers: Cache::new(ISSUER_INFO_CACHE_TIMEOUT),
                 cache_option_chain_expiry_date_list: CacheWithKey::new(
                     OPTION_CHAIN_EXPIRY_DATE_LIST_CACHE_TIMEOUT,
-                ),
-                cache_option_chain_strike_info: CacheWithKey::new(
-                    OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT,
                 ),
                 cache_trading_session: Cache::new(TRADING_SESSION_CACHE_TIMEOUT),
                 user_profile,
@@ -1049,9 +1047,18 @@ impl QuoteContext {
             .await
     }
 
-    /// Get option chain info by date
+    /// Get the option contract list of an underlying security for a given
+    /// expiry date
     ///
-    /// Reference: <https://open.longbridge.com/en/docs/quote/pull/optionchain-date-strike>
+    /// Every contract is an independent entry: calls and puts are not paired,
+    /// so a strike price that is listed on one side only yields a single entry.
+    ///
+    /// `standard_only` filters out the legacy contracts produced by corporate
+    /// actions. `true` returns standard contracts only; `false` returns
+    /// everything, including the contracts carrying
+    /// [`OptionStandardAttr::Old`].
+    ///
+    /// Path: `GET /v1/gemini/option/option_chain_list`
     ///
     /// # Examples
     ///
@@ -1069,7 +1076,7 @@ impl QuoteContext {
     /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
-    ///     .option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20))
+    ///     .option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20), false)
     ///     .await?;
     /// println!("{:?}", resp);
     /// # Ok::<_, Box<dyn std::error::Error>>(())
@@ -1079,28 +1086,72 @@ impl QuoteContext {
         &self,
         symbol: impl Into<String>,
         expiry_date: Date,
-    ) -> Result<Vec<StrikePriceInfo>> {
+        standard_only: bool,
+    ) -> Result<Vec<OptionChainContract>> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            symbol: String,
+            expiry_date: String,
+            // `false` and an omitted parameter mean the same thing to the
+            // endpoint, so send nothing rather than `standard_only=false`.
+            #[serde(skip_serializing_if = "std::ops::Not::not")]
+            standard_only: bool,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct RawOptionChainContract {
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            symbol: String,
+            expiry_date: String,
+            #[serde(with = "crate::serde_utils::decimal_empty_is_0")]
+            strike_price: Decimal,
+            direction: String,
+            // Both of these are documented as an empty string for the common
+            // case, so tolerate an explicit `null` as well.
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            option_type: String,
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            standard_attr: String,
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            days_to_expiry: i32,
+        }
+
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+            list: Vec<RawOptionChainContract>,
+        }
+
         self.0
-            .cache_option_chain_strike_info
-            .get_or_update(
-                (symbol.into(), expiry_date),
-                |(symbol, expiry_date)| async move {
-                    let resp: quote::OptionChainDateStrikeInfoResponse = self
-                        .request(
-                            cmd_code::GET_OPTION_CHAIN_INFO_BY_DATE,
-                            quote::OptionChainDateStrikeInfoRequest {
-                                symbol,
-                                expiry_date: format_date(expiry_date),
-                            },
-                        )
-                        .await?;
-                    resp.strike_price_info
-                        .into_iter()
-                        .map(TryInto::try_into)
-                        .collect::<Result<Vec<_>>>()
-                },
-            )
-            .await
+            .http_cli
+            .request(Method::GET, "/v1/gemini/option/option_chain_list")
+            .query_params(Request {
+                symbol: symbol.into(),
+                expiry_date: format_date(expiry_date),
+                standard_only,
+            })
+            .response::<Json<Response>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0
+            .list
+            .into_iter()
+            .map(|row| {
+                Ok(OptionChainContract {
+                    symbol: row.symbol,
+                    expiry_date: parse_date(&row.expiry_date)
+                        .map_err(|err| Error::parse_field_error("expiry_date", err))?,
+                    strike_price: row.strike_price,
+                    direction: OptionDirection::from_str(&row.direction).unwrap_or_default(),
+                    option_type: OptionExpiryCycleType::from_str(&row.option_type)
+                        .unwrap_or_default(),
+                    standard_attr: OptionStandardAttr::from_str(&row.standard_attr)
+                        .unwrap_or_default(),
+                    days_to_expiry: row.days_to_expiry,
+                })
+            })
+            .collect()
     }
 
     /// Get warrant issuers

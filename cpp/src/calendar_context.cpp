@@ -5,7 +5,7 @@ extern "C" {
 const lb_calendar_context_t* lb_calendar_context_new(const lb_config_t* config);
 void lb_calendar_context_retain(const lb_calendar_context_t* ctx);
 void lb_calendar_context_release(const lb_calendar_context_t* ctx);
-void lb_calendar_context_finance_calendar(const lb_calendar_context_t*, lb_calendar_category_t, const char*, const char*, const char*, lb_async_callback_t, void*);
+void lb_calendar_context_finance_calendar(const lb_calendar_context_t*, lb_calendar_category_t, const char*, const char*, const char*, const int32_t*, const int32_t*, const lb_calendar_page_direction_t*, lb_async_callback_t, void*);
 }
 
 namespace longbridge {
@@ -19,8 +19,13 @@ CalendarContext::~CalendarContext() { if (ctx_) lb_calendar_context_release(ctx_
 CalendarContext& CalendarContext::operator=(const CalendarContext& ctx) { ctx_ = ctx.ctx_; if (ctx_) lb_calendar_context_retain(ctx_); return *this; }
 CalendarContext CalendarContext::create(const Config& config) { auto* ptr = lb_calendar_context_new(config); CalendarContext ctx(ptr); if (ptr) lb_calendar_context_release(ptr); return ctx; }
 
-void CalendarContext::finance_calendar(CalendarCategory category, const std::string& start, const std::string& end, const std::string& market, AsyncCallback<CalendarContext, CalendarEventsResponse> callback) const {
-  lb_calendar_context_finance_calendar(ctx_, (lb_calendar_category_t)category, start.c_str(), end.c_str(), market.empty() ? nullptr : market.c_str(),
+void CalendarContext::finance_calendar(CalendarCategory category, const std::string& start, const std::string& end, const std::string& market, std::optional<int32_t> count, std::optional<int32_t> offset, std::optional<CalendarPageDirection> next, AsyncCallback<CalendarContext, CalendarEventsResponse> callback) const {
+  int32_t count_val = 0, offset_val = 0;
+  lb_calendar_page_direction_t next_val{};
+  const int32_t* count_ptr = count.has_value() ? (count_val = count.value(), &count_val) : nullptr;
+  const int32_t* offset_ptr = offset.has_value() ? (offset_val = offset.value(), &offset_val) : nullptr;
+  const lb_calendar_page_direction_t* next_ptr = next.has_value() ? (next_val = (lb_calendar_page_direction_t)next.value(), &next_val) : nullptr;
+  lb_calendar_context_finance_calendar(ctx_, (lb_calendar_category_t)category, start.c_str(), end.c_str(), market.empty() ? nullptr : market.c_str(), count_ptr, offset_ptr, next_ptr,
     [](auto res) {
       auto cb = callback::get_async_callback<CalendarContext, CalendarEventsResponse>(res->userdata);
       CalendarContext fctx((const lb_calendar_context_t*)res->ctx);

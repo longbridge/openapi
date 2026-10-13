@@ -208,6 +208,35 @@ pub enum OptionDirection {
     Call,
 }
 
+/// Special expiration cycle of an option contract
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::quote::OptionExpiryCycleType")]
+pub enum OptionExpiryCycleType {
+    /// Unknown
+    Unknown,
+    /// Standard monthly option
+    Monthly,
+    /// Weekly option, expires weekly
+    Weekly,
+    /// Quarterly option, expires quarterly
+    Quarterly,
+}
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action (e.g. a stock split or a merger)
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longbridge::quote::OptionStandardAttr")]
+pub enum OptionStandardAttr {
+    /// Unknown
+    Unknown,
+    /// A normal, active contract
+    Normal,
+    /// A legacy contract produced by a corporate action
+    Old,
+}
+
 /// Warrant type
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
@@ -690,19 +719,30 @@ pub struct Candlestick {
     trade_session: TradeSession,
 }
 
-/// Strike price info
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longbridge::quote::StrikePriceInfo")]
-pub struct StrikePriceInfo {
+#[js(remote = "longbridge::quote::OptionChainContract")]
+pub struct OptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    symbol: String,
+    /// Expiry date, in US Eastern time
+    expiry_date: NaiveDate,
     /// Strike price
-    price: Decimal,
-    /// Security code of call option
-    call_symbol: String,
-    /// Security code of put option
-    put_symbol: String,
-    /// Is standard
-    standard: bool,
+    strike_price: Decimal,
+    /// Contract direction
+    direction: OptionDirection,
+    /// Special expiration cycle of the contract
+    option_type: OptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    standard_attr: OptionStandardAttr,
+    /// Number of days remaining until the option expires, `0` on the expiry
+    /// day and negative once expired
+    days_to_expiry: i32,
 }
 
 /// Issuer info

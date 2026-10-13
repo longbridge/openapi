@@ -48,8 +48,18 @@ impl CalendarContext {
 
     /// Get financial calendar events.
     ///
-    /// The endpoint is paginated via `next_date`. When the returned
-    /// `next_date` is non-empty, pass it as `start` to fetch the next page.
+    /// The endpoint is paginated. The server caps each response (it
+    /// historically returns at most 10 events per page unless a larger
+    /// `count` is requested) and reports a `next_date` cursor. To page
+    /// through the full window, either request a larger `count`, or re-call
+    /// this method passing the returned `next_date` as `start` until
+    /// `next_date` comes back empty.
+    ///
+    /// - `count` — maximum number of events per page (server default when
+    ///   `None`).
+    /// - `offset` — number of events to skip from the start of the window.
+    /// - `next` — direction to page from the cursor (see
+    ///   [`CalendarPageDirection`]).
     ///
     /// Path: `GET /v1/quote/finance_calendar`
     pub async fn finance_calendar(
@@ -58,6 +68,9 @@ impl CalendarContext {
         start: impl Into<String>,
         end: impl Into<String>,
         market: Option<String>,
+        count: Option<i32>,
+        offset: Option<i32>,
+        next: Option<CalendarPageDirection>,
     ) -> Result<CalendarEventsResponse> {
         let cat_str = match category {
             CalendarCategory::Report => "report",
@@ -69,6 +82,10 @@ impl CalendarContext {
             CalendarCategory::Meeting => "meeting",
             CalendarCategory::Merge => "merge",
         };
+        let next_str = next.map(|d| match d {
+            CalendarPageDirection::Later => "later",
+            CalendarPageDirection::Earlier => "earlier",
+        });
         #[derive(Serialize)]
         struct Query {
             date: String,
@@ -77,6 +94,12 @@ impl CalendarContext {
             types: &'static str,
             #[serde(rename = "markets[]", skip_serializing_if = "Option::is_none")]
             markets: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            count: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            offset: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            next: Option<&'static str>,
         }
         Ok(self
             .0
@@ -87,6 +110,9 @@ impl CalendarContext {
                 date_end: end.into(),
                 types: cat_str,
                 markets: market,
+                count,
+                offset,
+                next: next_str,
             })
             .response::<Json<CalendarEventsResponse>>()
             .send()

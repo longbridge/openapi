@@ -20,7 +20,7 @@ impl AsyncCalendarContext {
         }
     }
 
-    #[pyo3(signature = (category, start, end, market = None))]
+    #[pyo3(signature = (category, start, end, market = None, count = None, offset = None, next = None))]
     fn finance_calendar(
         &self,
         py: Python<'_>,
@@ -28,13 +28,24 @@ impl AsyncCalendarContext {
         start: String,
         end: String,
         market: Option<String>,
+        count: Option<i32>,
+        offset: Option<i32>,
+        next: Option<CalendarPageDirection>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(CalendarEventsResponse::from(
-                ctx.finance_calendar(category.into(), start, end, market)
-                    .await
-                    .map_err(ErrorNewType)?,
+                ctx.finance_calendar(
+                    category.into(),
+                    start,
+                    end,
+                    market,
+                    count,
+                    offset,
+                    next.map(Into::into),
+                )
+                .await
+                .map_err(ErrorNewType)?,
             ))
         })
         .map(|b| b.unbind())

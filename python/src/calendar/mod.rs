@@ -9,6 +9,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<CalendarDateGroup>()?;
     parent.add_class::<CalendarEventsResponse>()?;
     parent.add_class::<CalendarCategory>()?;
+    parent.add_class::<CalendarPageDirection>()?;
     parent.add_class::<context::CalendarContext>()?;
     parent.add_class::<context_async::AsyncCalendarContext>()?;
     Ok(())

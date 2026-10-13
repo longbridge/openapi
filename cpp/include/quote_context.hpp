@@ -167,11 +167,21 @@ public:
     const std::string& symbol,
     AsyncCallback<QuoteContext, std::vector<Date>> callback) const;
 
-  /// Get option chain expiry date list
+  /// Get the option contract list of an underlying security for a given expiry
+  /// date
+  ///
+  /// Every contract is an independent entry: calls and puts are not paired, so
+  /// a strike price that is listed on one side only yields a single entry.
+  ///
+  /// `standard_only` filters out the legacy contracts produced by corporate
+  /// actions. `true` returns standard contracts only; `false` returns
+  /// everything, including the contracts carrying `OptionStandardAttr::Old`.
   void option_chain_info_by_date(
     const std::string& symbol,
     Date expiry_date,
-    AsyncCallback<QuoteContext, std::vector<StrikePriceInfo>> callback) const;
+    bool standard_only,
+    AsyncCallback<QuoteContext, std::vector<OptionChainContract>> callback)
+    const;
 
   /// Get warrant issuers
   void warrant_issuers(

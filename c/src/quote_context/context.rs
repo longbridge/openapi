@@ -23,12 +23,12 @@ use crate::{
             CCandlestickOwned, CCapitalDistributionResponseOwned, CCapitalFlowLineOwned,
             CCreateWatchlistGroup, CFilingItemOwned, CHistoryMarketTemperatureResponseOwned,
             CIntradayLineOwned, CIssuerInfoOwned, CMarketTemperatureOwned, CMarketTradingDaysOwned,
-            CMarketTradingSessionOwned, COptionQuoteOwned, CParticipantInfoOwned, CPushBrokers,
-            CPushBrokersOwned, CPushCandlestick, CPushCandlestickOwned, CPushDepth,
-            CPushDepthOwned, CPushQuote, CPushQuoteOwned, CPushTrades, CPushTradesOwned,
-            CQuotePackageDetailOwned, CRealtimeQuoteOwned, CSecurityBrokersOwned,
-            CSecurityCalcIndexOwned, CSecurityDepthOwned, CSecurityOwned, CSecurityQuoteOwned,
-            CSecurityStaticInfoOwned, CStrikePriceInfoOwned, CSubscriptionOwned, CTradeOwned,
+            CMarketTradingSessionOwned, COptionChainContractOwned, COptionQuoteOwned,
+            CParticipantInfoOwned, CPushBrokers, CPushBrokersOwned, CPushCandlestick,
+            CPushCandlestickOwned, CPushDepth, CPushDepthOwned, CPushQuote, CPushQuoteOwned,
+            CPushTrades, CPushTradesOwned, CQuotePackageDetailOwned, CRealtimeQuoteOwned,
+            CSecurityBrokersOwned, CSecurityCalcIndexOwned, CSecurityDepthOwned, CSecurityOwned,
+            CSecurityQuoteOwned, CSecurityStaticInfoOwned, CSubscriptionOwned, CTradeOwned,
             CUpdateWatchlistGroup, CWarrantInfoOwned, CWarrantQuoteOwned, CWatchlistGroupOwned,
             LB_WATCHLIST_GROUP_NAME, LB_WATCHLIST_GROUP_SECURITIES,
         },
@@ -725,12 +725,21 @@ pub unsafe extern "C" fn lb_quote_context_option_chain_expiry_date_list(
     });
 }
 
-/// Get option chain info by date
+/// Get the option contract list of an underlying security for a given expiry
+/// date
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
+///
+/// `standard_only` filters out the legacy contracts produced by corporate
+/// actions. `true` returns standard contracts only; `false` returns everything,
+/// including the contracts carrying `OptionStandardAttrOld`.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_option_chain_info_by_date(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
     expiry_date: *const CDate,
+    standard_only: bool,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -738,8 +747,8 @@ pub unsafe extern "C" fn lb_quote_context_option_chain_info_by_date(
     let symbol = cstr_to_rust(symbol);
     let expiry_date = (*expiry_date).into();
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CStrikePriceInfoOwned> = ctx_inner
-            .option_chain_info_by_date(symbol, expiry_date)
+        let rows: CVec<COptionChainContractOwned> = ctx_inner
+            .option_chain_info_by_date(symbol, expiry_date, standard_only)
             .await?
             .into();
         Ok(rows)

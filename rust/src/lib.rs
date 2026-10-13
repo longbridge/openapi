@@ -26,6 +26,7 @@ pub mod asset;
 pub mod calendar;
 pub mod content;
 pub mod dca;
+pub mod fund;
 pub mod fundamental;
 pub mod grid;
 pub mod market;
@@ -44,6 +45,7 @@ pub use config::{Config, Language, PushCandlestickMode};
 pub use content::ContentContext;
 pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
+pub use fund::FundContext;
 pub use fundamental::FundamentalContext;
 // ── US-market type re-exports ─────────────────────────────────────────────────
 pub use fundamental::types::{

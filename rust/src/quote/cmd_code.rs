@@ -46,9 +46,6 @@ pub(crate) const GET_SECURITY_CANDLESTICKS: u8 = 19;
 /// Get Option Chain Expiry Date List
 pub(crate) const GET_OPTION_CHAIN_EXPIRY_DATE_LIST: u8 = 20;
 
-/// Get Option Chain Info By Date
-pub(crate) const GET_OPTION_CHAIN_INFO_BY_DATE: u8 = 21;
-
 /// Get Warrant Issuer IDs
 pub(crate) const GET_WARRANT_ISSUER_IDS: u8 = 22;
 

@@ -158,3 +158,21 @@ impl From<CalendarCategory> for lb::CalendarCategory {
         }
     }
 }
+
+/// Pagination direction for `financeCalendar` (the `next` query parameter).
+#[napi_derive::napi]
+#[derive(Debug, Clone, Copy)]
+pub enum CalendarPageDirection {
+    /// Page towards later dates
+    Later,
+    /// Page towards earlier dates
+    Earlier,
+}
+impl From<CalendarPageDirection> for lb::CalendarPageDirection {
+    fn from(v: CalendarPageDirection) -> Self {
+        match v {
+            CalendarPageDirection::Later => lb::CalendarPageDirection::Later,
+            CalendarPageDirection::Earlier => lb::CalendarPageDirection::Earlier,
+        }
+    }
+}

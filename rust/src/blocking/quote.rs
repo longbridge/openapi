@@ -9,13 +9,14 @@ use crate::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
         FilingItem, FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
         HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
-        MarketTradingDays, MarketTradingSession, OptionQuote, OptionVolumeDaily, OptionVolumeStats,
-        ParticipantInfo, Period, PinnedMode, PushEvent, QuotePackageDetail, RealtimeQuote,
-        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
-        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        ShortPositionsResponse, ShortTradesResponse, SortOrderType, StrikePriceInfo, SubFlags,
-        Subscription, Trade, TradeSessions, USCryptoOverview, WarrantInfo, WarrantQuote,
-        WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
+        MarketTradingDays, MarketTradingSession, OptionChainContract, OptionQuote,
+        OptionVolumeDaily, OptionVolumeStats, ParticipantInfo, Period, PinnedMode, PushEvent,
+        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityListCategory, SecurityQuote, SecurityStaticInfo, ShortPositionsResponse,
+        ShortTradesResponse, SortOrderType, SubFlags, Subscription, Trade, TradeSessions,
+        USCryptoOverview, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType,
+        WatchlistGroup,
     },
 };
 
@@ -578,7 +579,16 @@ impl QuoteContextSync {
             .call(move |ctx| async move { ctx.option_chain_expiry_date_list(symbol).await })
     }
 
-    /// Get option chain info by date
+    /// Get the option contract list of an underlying security for a given
+    /// expiry date
+    ///
+    /// Every contract is an independent entry: calls and puts are not paired,
+    /// so a strike price that is listed on one side only yields a single entry.
+    ///
+    /// `standard_only` filters out the legacy contracts produced by corporate
+    /// actions. `true` returns standard contracts only; `false` returns
+    /// everything, including the contracts carrying
+    /// [`OptionStandardAttr::Old`](crate::quote::OptionStandardAttr::Old).
     ///
     /// # Examples
     ///
@@ -594,7 +604,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_oauth(oauth));
     /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
-    /// let resp = ctx.option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20))?;
+    /// let resp = ctx.option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20), false)?;
     /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
@@ -603,10 +613,12 @@ impl QuoteContextSync {
         &self,
         symbol: impl Into<String> + Send + 'static,
         expiry_date: Date,
-    ) -> Result<Vec<StrikePriceInfo>> {
-        self.rt.call(
-            move |ctx| async move { ctx.option_chain_info_by_date(symbol, expiry_date).await },
-        )
+        standard_only: bool,
+    ) -> Result<Vec<OptionChainContract>> {
+        self.rt.call(move |ctx| async move {
+            ctx.option_chain_info_by_date(symbol, expiry_date, standard_only)
+                .await
+        })
     }
 
     /// Get warrant issuers

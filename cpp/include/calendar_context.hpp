@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "async_result.hpp"
 #include "callback.hpp"
 #include "config.hpp"
@@ -19,6 +21,13 @@ enum class CalendarCategory
   Closed    = 5,
 };
 
+/// Pagination direction for finance_calendar (the `next` query parameter).
+enum class CalendarPageDirection
+{
+  Later   = 0,
+  Earlier = 1,
+};
+
 /// Key-value metadata entry attached to a calendar event.
 struct CalendarDataKv { std::string key; std::string value; std::string value_type; std::string value_raw; };
 /// A single financial calendar event (earnings report, dividend, IPO, etc.).
@@ -37,7 +46,14 @@ public:
   /// Create a CalendarContext from a Config.
   static CalendarContext create(const Config& config);
   /// Get financial calendar events for the given date range.
-  void finance_calendar(CalendarCategory category, const std::string& start, const std::string& end, const std::string& market, AsyncCallback<CalendarContext, CalendarEventsResponse> callback) const;
+  ///
+  /// The endpoint paginates: the server caps each response (historically 10
+  /// events per page unless a larger `count` is requested) and returns a
+  /// `next_date` cursor. To page through the full window, request a larger
+  /// `count`, or re-call with the returned `next_date` as `start`. `count`,
+  /// `offset` and `next` are optional (pass `std::nullopt` to use the server
+  /// default).
+  void finance_calendar(CalendarCategory category, const std::string& start, const std::string& end, const std::string& market, std::optional<int32_t> count, std::optional<int32_t> offset, std::optional<CalendarPageDirection> next, AsyncCallback<CalendarContext, CalendarEventsResponse> callback) const;
 };
 
 } // namespace calendar

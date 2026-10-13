@@ -27,7 +27,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::Trade>()?;
     parent.add_class::<types::IntradayLine>()?;
     parent.add_class::<types::Candlestick>()?;
-    parent.add_class::<types::StrikePriceInfo>()?;
+    parent.add_class::<types::OptionChainContract>()?;
     parent.add_class::<types::IssuerInfo>()?;
     parent.add_class::<types::TradingSessionInfo>()?;
     parent.add_class::<types::MarketTradingSession>()?;
@@ -63,6 +63,8 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::SecurityBoard>()?;
     parent.add_class::<types::Subscription>()?;
     parent.add_class::<types::OptionDirection>()?;
+    parent.add_class::<types::OptionExpiryCycleType>()?;
+    parent.add_class::<types::OptionStandardAttr>()?;
     parent.add_class::<types::QuotePackageDetail>()?;
     parent.add_class::<types::ShortPositionsItem>()?;
     parent.add_class::<types::ShortPositionsResponse>()?;

@@ -293,6 +293,10 @@ pub enum MultiLegStrategy {
     Straddle,
     /// Strangle
     Strangle,
+    /// Calendar call spread
+    CalendarCallSpread,
+    /// Calendar put spread
+    CalendarPutSpread,
 }
 
 /// Multi-leg position direction
@@ -896,8 +900,8 @@ pub struct FundPositionChannel {
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longbridge::trade::FundPosition")]
 pub struct FundPosition {
-    /// Fund ISIN code
-    symbol: String,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    counter_id: String,
     /// Current equity
     current_net_asset_value: Decimal,
     /// Current equity time

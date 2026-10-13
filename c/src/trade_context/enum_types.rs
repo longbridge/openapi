@@ -356,6 +356,12 @@ pub enum CMultiLegStrategy {
     /// Strangle
     #[c(remote = "Strangle")]
     MultiLegStrategyStrangle,
+    /// Calendar call spread
+    #[c(remote = "CalendarCallSpread")]
+    MultiLegStrategyCalendarCallSpread,
+    /// Calendar put spread
+    #[c(remote = "CalendarPutSpread")]
+    MultiLegStrategyCalendarPutSpread,
 }
 
 /// Multi-leg position direction

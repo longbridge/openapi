@@ -184,3 +184,22 @@ impl From<CalendarCategory> for lb::CalendarCategory {
         }
     }
 }
+
+/// Pagination direction for `finance_calendar` (the `next` query parameter).
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
+pub(crate) enum CalendarPageDirection {
+    /// Page towards later dates
+    Later = 0,
+    /// Page towards earlier dates
+    Earlier = 1,
+}
+
+impl From<CalendarPageDirection> for lb::CalendarPageDirection {
+    fn from(v: CalendarPageDirection) -> Self {
+        match v {
+            CalendarPageDirection::Later => lb::CalendarPageDirection::Later,
+            CalendarPageDirection::Earlier => lb::CalendarPageDirection::Earlier,
+        }
+    }
+}

@@ -29,15 +29,20 @@ impl CalendarContextSync {
     }
 
     /// Get financial calendar events
+    #[allow(clippy::too_many_arguments)]
     pub fn finance_calendar(
         &self,
         category: CalendarCategory,
         start: impl Into<String> + Send + 'static,
         end: impl Into<String> + Send + 'static,
         market: Option<String>,
+        count: Option<i32>,
+        offset: Option<i32>,
+        next: Option<CalendarPageDirection>,
     ) -> Result<CalendarEventsResponse> {
-        self.rt.call(
-            move |ctx| async move { ctx.finance_calendar(category, start, end, market).await },
-        )
+        self.rt.call(move |ctx| async move {
+            ctx.finance_calendar(category, start, end, market, count, offset, next)
+                .await
+        })
     }
 }
