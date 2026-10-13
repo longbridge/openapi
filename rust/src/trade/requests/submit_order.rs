@@ -1,6 +1,6 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
-use time::Date;
+use time::{Date, OffsetDateTime};
 
 use crate::{
     serde_utils,
@@ -43,6 +43,8 @@ pub struct SubmitOrderOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     client_request_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    delayed_until: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     attached_params: Option<SubmitAttachedParams>,
 }
 
@@ -74,6 +76,7 @@ impl SubmitOrderOptions {
             monitor_price: None,
             remark: None,
             client_request_id: None,
+            delayed_until: None,
             attached_params: None,
         }
     }
@@ -190,6 +193,19 @@ impl SubmitOrderOptions {
     pub fn client_request_id(self, id: impl Into<String>) -> Self {
         Self {
             client_request_id: Some(id.into()),
+            ..self
+        }
+    }
+
+    /// Set the time-condition submit time.
+    ///
+    /// The order is held in `DelayedNotReported` status and only submitted at
+    /// this time, which must be later than now and no more than 90 days ahead.
+    #[inline]
+    #[must_use]
+    pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
+        Self {
+            delayed_until: Some(delayed_until.unix_timestamp()),
             ..self
         }
     }

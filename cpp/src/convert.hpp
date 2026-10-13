@@ -1738,6 +1738,8 @@ convert(const lb_order_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     attached_orders,
     order->has_multi_leg ? std::optional{ convert(&order->multi_leg) }
                          : std::nullopt,
@@ -2171,6 +2173,8 @@ convert(const lb_order_detail_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     convert(order->free_status),
     order->free_amount ? std::optional{ Decimal(order->free_amount) }
                        : std::nullopt,

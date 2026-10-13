@@ -1,9 +1,11 @@
+use chrono::{DateTime, Utc};
 use napi::bindgen_prelude::ClassInstance;
 
 use crate::{
     decimal::Decimal,
     time::NaiveDate,
     trade::types::{AttachedOrderType, OrderSide, OrderType, OutsideRTH, TimeInForceType},
+    utils::from_datetime,
 };
 
 /// Parameters for submitting an attached order
@@ -102,6 +104,10 @@ pub struct SubmitOrderOptions<'env> {
     pub client_request_id: Option<String>,
     /// Attached order parameters
     pub attached_params: Option<SubmitAttachedParams<'env>>,
+    /// Time-condition submit time. The order is held in `DelayedNotReported`
+    /// status and only submitted at this time, which must be later than now
+    /// and no more than 90 days ahead.
+    pub delayed_until: Option<DateTime<Utc>>,
 }
 
 impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
@@ -152,6 +158,9 @@ impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOpti
         }
         if let Some(p) = opts.attached_params {
             opts2 = opts2.attached_params(p.into());
+        }
+        if let Some(delayed_until) = opts.delayed_until {
+            opts2 = opts2.delayed_until(from_datetime(delayed_until));
         }
         opts2
     }

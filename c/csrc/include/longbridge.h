@@ -4698,6 +4698,16 @@ typedef struct lb_replace_order_options_t {
    * Attached order parameters (can be null)
    */
   const struct CReplaceAttachedParams *attached_params;
+  /**
+   * New time-condition submit time, Unix timestamp in seconds (can be
+   * null to keep the current time condition)
+   */
+  const int64_t *delayed_until;
+  /**
+   * Clear the time condition, turning the order into a regular order
+   * (takes precedence over `delayed_until`)
+   */
+  bool clear_delayed_until;
 } lb_replace_order_options_t;
 
 /**
@@ -4821,6 +4831,12 @@ typedef struct lb_submit_order_options_t {
    * Attached order parameters (can be null)
    */
   const struct CSubmitAttachedParams *attached_params;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null).
+   * The order is held in `DelayedNotReported` status and only submitted at
+   * this time.
+   */
+  const int64_t *delayed_until;
 } lb_submit_order_options_t;
 
 /**
@@ -4883,6 +4899,11 @@ typedef struct CSubmitMultiLegOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   const char *client_request_id;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null).
+   * Only `LO` / `MO` support time conditions.
+   */
+  const int64_t *delayed_until;
 } CSubmitMultiLegOrderOptions;
 
 /**
@@ -5931,6 +5952,10 @@ typedef struct lb_order_t {
    */
   const char *remark;
   /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
+  /**
    * Attached orders
    */
   const struct CAttachedOrderDetail *attached_orders;
@@ -6514,6 +6539,10 @@ typedef struct lb_order_detail_t {
    * Remark
    */
   const char *remark;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
   /**
    * Commission-free Status
    */

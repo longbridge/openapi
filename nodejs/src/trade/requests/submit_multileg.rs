@@ -1,8 +1,10 @@
+use chrono::{DateTime, Utc};
 use napi::bindgen_prelude::ClassInstance;
 
 use crate::{
     decimal::Decimal,
     trade::types::{MultiLegStrategy, OrderSide, OrderType},
+    utils::from_datetime,
 };
 
 /// A leg of a multi-leg combination order to submit
@@ -38,6 +40,10 @@ pub struct SubmitMultiLegOrderOptions<'env> {
     /// If not specified, idempotency control is skipped.
     /// The server caches this ID for 10 minutes.
     pub client_request_id: Option<String>,
+    /// Time-condition submit time. The order is held in `DelayedNotReported`
+    /// status and only submitted at this time. Only `LO` / `MO` support time
+    /// conditions.
+    pub delayed_until: Option<DateTime<Utc>>,
 }
 
 impl<'env> From<SubmitMultiLegOrderOptions<'env>>
@@ -63,6 +69,9 @@ impl<'env> From<SubmitMultiLegOrderOptions<'env>>
         }
         if let Some(id) = opts.client_request_id {
             opts2 = opts2.client_request_id(id);
+        }
+        if let Some(delayed_until) = opts.delayed_until {
+            opts2 = opts2.delayed_until(from_datetime(delayed_until));
         }
         opts2
     }

@@ -502,6 +502,14 @@ pub struct Order {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
     /// Attached orders
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_orders: Vec<AttachedOrderDetail>,
@@ -703,6 +711,14 @@ pub struct OrderDetail {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
     /// Commission-free Status
     pub free_status: CommissionFreeStatus,
     /// Commission-free amount
@@ -1966,7 +1982,8 @@ mod tests {
                 "limit_depth_level": 0,
                 "trigger_count": 0,
                 "monitor_price": "",
-                "remark": "abc"
+                "remark": "abc",
+                "delayed_until": "1767225600"
               }
             ]
           }
@@ -2007,6 +2024,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert_eq!(order.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
     }
 
     #[test]
@@ -2084,6 +2102,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert!(order.delayed_until.is_none());
     }
 
     #[test]

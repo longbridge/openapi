@@ -445,6 +445,10 @@ pub struct Order {
     monitor_price: Option<Decimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[js(opt, datetime)]
+    delayed_until: Option<DateTime<Utc>>,
     /// Attached orders
     #[js(array)]
     attached_orders: Vec<AttachedOrderDetail>,
@@ -643,6 +647,10 @@ pub struct OrderDetail {
     monitor_price: Option<Decimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[js(opt, datetime)]
+    delayed_until: Option<DateTime<Utc>>,
     /// Commission-free Status
     free_status: CommissionFreeStatus,
     /// Commission-free amount

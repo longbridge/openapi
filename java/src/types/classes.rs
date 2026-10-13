@@ -740,6 +740,7 @@ impl_java_class!(
         trigger_count,
         monitor_price,
         remark,
+        delayed_until,
         #[java(objarray)]
         attached_orders,
         multi_leg
@@ -1008,6 +1009,7 @@ impl_java_class!(
         trigger_count,
         monitor_price,
         remark,
+        delayed_until,
         free_status,
         free_amount,
         free_currency,

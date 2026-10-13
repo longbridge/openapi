@@ -472,6 +472,14 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
     }
+    if (*opts).clear_delayed_until {
+        opts2 = opts2.clear_delayed_until();
+    } else if !(*opts).delayed_until.is_null() {
+        opts2 = opts2.delayed_until(
+            OffsetDateTime::from_unix_timestamp(*(*opts).delayed_until)
+                .expect("invalid delayed until"),
+        );
+    }
     if !(*opts).attached_params.is_null() {
         let ap = &*(*opts).attached_params;
         let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
@@ -585,6 +593,12 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     if !(*opts).client_request_id.is_null() {
         opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
     }
+    if !(*opts).delayed_until.is_null() {
+        opts2 = opts2.delayed_until(
+            OffsetDateTime::from_unix_timestamp(*(*opts).delayed_until)
+                .expect("invalid delayed until"),
+        );
+    }
     if !(*opts).attached_params.is_null() {
         let ap = &*(*opts).attached_params;
         let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
@@ -654,6 +668,12 @@ pub unsafe extern "C" fn lb_trade_context_submit_multileg(
     }
     if !(*opts).client_request_id.is_null() {
         opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
+    }
+    if !(*opts).delayed_until.is_null() {
+        opts2 = opts2.delayed_until(
+            OffsetDateTime::from_unix_timestamp(*(*opts).delayed_until)
+                .expect("invalid delayed until"),
+        );
     }
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CSubmitOrderResponseOwned> =
