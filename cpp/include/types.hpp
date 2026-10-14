@@ -1527,6 +1527,8 @@ enum class OrderStatus
   Expired,
   /// Partial Withdrawal
   PartialWithdrawal,
+  /// Monitoring (Time-Conditional Order)
+  DelayedNotReported,
 };
 
 /// Order type
@@ -1831,6 +1833,9 @@ struct Order
   std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
+  /// Time-condition submit time (Unix timestamp in seconds, not set when
+  /// the order is not a time-condition order)
+  std::optional<int64_t> delayed_until;
   /// Attached orders
   std::vector<AttachedOrderDetail> attached_orders;
   /// Multi-leg strategy information (only present for multi-leg option
@@ -1957,6 +1962,13 @@ struct ReplaceOrderOptions
   std::optional<std::string> remark;
   /// Attached order params
   std::optional<ReplaceAttachedParams> attached_params;
+  /// New time-condition submit time (Unix timestamp in seconds), later than
+  /// now and no more than 90 days ahead; not set keeps the current time
+  /// condition
+  std::optional<int64_t> delayed_until;
+  /// Clear the time condition, turning the order into a regular order (takes
+  /// precedence over `delayed_until`)
+  bool clear_delayed_until = false;
 };
 
 /// Options for submit order request
@@ -2001,6 +2013,10 @@ struct SubmitOrderOptions
   std::optional<std::string> client_request_id;
   /// Attached order params
   std::optional<SubmitAttachedParams> attached_params;
+  /// Time-condition submit time (Unix timestamp in seconds). The order is held
+  /// in `DelayedNotReported` status and only submitted at this time, which
+  /// must be later than now and no more than 90 days ahead.
+  std::optional<int64_t> delayed_until;
 };
 
 /// Response for submit order request
@@ -2043,6 +2059,9 @@ struct SubmitMultiLegOrderOptions
   /// If not specified, idempotency control is skipped.
   /// The server caches this ID for 10 minutes.
   std::optional<std::string> client_request_id;
+  /// Time-condition submit time (Unix timestamp in seconds), later than now
+  /// and no more than 90 days ahead. Only `LO` / `MO` support time conditions.
+  std::optional<int64_t> delayed_until;
 };
 
 /// Cash info
@@ -2397,6 +2416,9 @@ struct OrderDetail
   std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
+  /// Time-condition submit time (Unix timestamp in seconds, not set when
+  /// the order is not a time-condition order)
+  std::optional<int64_t> delayed_until;
   /// Commission-free Status
   CommissionFreeStatus free_status;
   /// Commission-free amount

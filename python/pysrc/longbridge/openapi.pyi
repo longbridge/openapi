@@ -5814,6 +5814,11 @@ class OrderStatus:
         PartialWithdrawal
         """
 
+    class DelayedNotReported(OrderStatus):
+        """
+        Monitoring (Time-Conditional Order)
+        """
+
 class OrderTag:
     """
     Order tag
@@ -6654,6 +6659,11 @@ class Order:
     Remark
     """
 
+    delayed_until: Optional[datetime]
+    """
+    Time-condition submit time (``None`` when the order is not a time-condition order)
+    """
+
     attached_orders: List[AttachedOrderDetail]
     """
     Attached orders
@@ -6988,6 +6998,11 @@ class OrderDetail:
     remark: str
     """
     Remark
+    """
+
+    delayed_until: Optional[datetime]
+    """
+    Time-condition submit time (``None`` when the order is not a time-condition order)
     """
 
     free_status: Type[CommissionFreeStatus]
@@ -7675,6 +7690,8 @@ class TradeContext:
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         attached_params: Optional[ReplaceAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
+        clear_delayed_until: bool = False,
     ) -> None:
         """
         Replace order
@@ -7690,6 +7707,8 @@ class TradeContext:
             trigger_count: Trigger count
             monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
+            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
+            clear_delayed_until: Clear the time condition, turning the order into a regular order (takes precedence over ``delayed_until``)
 
         Examples:
             ::
@@ -7730,6 +7749,7 @@ class TradeContext:
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
         attached_params: Optional[SubmitAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> SubmitOrderResponse:
         """
         Submit order
@@ -7753,6 +7773,7 @@ class TradeContext:
             remark: Remark (Maximum 64 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
             attached_params: Attached order parameters
+            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
 
         Returns:
             Response
@@ -7791,6 +7812,7 @@ class TradeContext:
         submitted_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> SubmitOrderResponse:
         """
         Submit a multi-leg option combination order (such as vertical spreads,
@@ -7808,6 +7830,7 @@ class TradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`)
             remark: Remark (Maximum 255 characters)
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            delayed_until: Time-condition submit time (later than now, at most 90 days ahead; only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back)
 
         Returns:
             Response
@@ -11568,6 +11591,8 @@ class AsyncTradeContext:
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         attached_params: Optional[ReplaceAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
+        clear_delayed_until: bool = False,
     ) -> Awaitable[None]:
         """
         Replace order. Returns an awaitable. Same parameters as sync TradeContext.replace_order.
@@ -11585,6 +11610,8 @@ class AsyncTradeContext:
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
             attached_params: Attached order parameters.
+            delayed_until: New time-condition submit time (later than now, at most 90 days ahead); ``None`` keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
+            clear_delayed_until: Clear the time condition, turning the order into a regular order (takes precedence over ``delayed_until``).
 
         Examples:
             ::
@@ -11629,6 +11656,7 @@ class AsyncTradeContext:
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
         attached_params: Optional[SubmitAttachedParams] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
@@ -11652,6 +11680,7 @@ class AsyncTradeContext:
             remark: Remark (max 64 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
             attached_params: Attached order parameters.
+            delayed_until: Time-condition submit time. The order is held in ``DelayedNotReported`` status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
 
         Examples:
             ::
@@ -11697,6 +11726,7 @@ class AsyncTradeContext:
         submitted_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
         client_request_id: Optional[str] = None,
+        delayed_until: Optional[datetime] = None,
     ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit a multi-leg option combination order (such as vertical spreads,
@@ -11715,6 +11745,7 @@ class AsyncTradeContext:
             submitted_price: Submitted price (required for limit order types such as `LO`).
             remark: Remark (max 255 characters).
             client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            delayed_until: Time-condition submit time (later than now, at most 90 days ahead; only ``LO`` / ``MO`` support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (``Order.delayed_until`` is naive local time, so call ``.astimezone()`` on it before passing it back).
 
         Examples:
             ::

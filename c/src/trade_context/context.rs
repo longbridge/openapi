@@ -472,6 +472,12 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
     }
+    let delayed_until = if (*opts).clear_delayed_until {
+        opts2 = opts2.clear_delayed_until();
+        Ok(None)
+    } else {
+        parse_delayed_until((*opts).delayed_until)
+    };
     if !(*opts).attached_params.is_null() {
         let ap = &*(*opts).attached_params;
         let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
@@ -521,6 +527,9 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
         opts2 = opts2.attached_params(rp);
     }
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         ctx_inner.replace_order(opts2).await?;
         Ok(())
     });
@@ -585,6 +594,7 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     if !(*opts).client_request_id.is_null() {
         opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
     }
+    let delayed_until = parse_delayed_until((*opts).delayed_until);
     if !(*opts).attached_params.is_null() {
         let ap = &*(*opts).attached_params;
         let attached_order_type: AttachedOrderType = ap.attached_order_type.into();
@@ -616,6 +626,9 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
         opts2 = opts2.attached_params(sp);
     }
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         let resp: CCow<CSubmitOrderResponseOwned> = CCow::new(ctx_inner.submit_order(opts2).await?);
         Ok(resp)
     });
@@ -655,7 +668,11 @@ pub unsafe extern "C" fn lb_trade_context_submit_multileg(
     if !(*opts).client_request_id.is_null() {
         opts2 = opts2.client_request_id(cstr_to_rust((*opts).client_request_id));
     }
+    let delayed_until = parse_delayed_until((*opts).delayed_until);
     execute_async(callback, ctx, userdata, async move {
+        if let Some(delayed_until) = delayed_until.map_err(delayed_until_error)? {
+            opts2 = opts2.delayed_until(delayed_until);
+        }
         let resp: CCow<CSubmitOrderResponseOwned> =
             CCow::new(ctx_inner.submit_multileg(opts2).await?);
         Ok(resp)
@@ -872,4 +889,22 @@ pub unsafe extern "C" fn lb_trade_context_estimate_max_purchase_quantity(
             CCow::new(ctx_inner.estimate_max_purchase_quantity(opts2).await?);
         Ok(resp)
     });
+}
+
+/// Converts an optional C `delayed_until` (Unix seconds) into a time, reporting
+/// an out-of-range value through the callback instead of panicking.
+unsafe fn parse_delayed_until(
+    value: *const i64,
+) -> Result<Option<OffsetDateTime>, time::error::ComponentRange> {
+    if value.is_null() {
+        return Ok(None);
+    }
+    unsafe { OffsetDateTime::from_unix_timestamp(*value) }.map(Some)
+}
+
+fn delayed_until_error(err: time::error::ComponentRange) -> longbridge::Error {
+    longbridge::Error::ParseField {
+        name: "delayed_until",
+        error: err.to_string(),
+    }
 }

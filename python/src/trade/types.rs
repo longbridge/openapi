@@ -90,6 +90,8 @@ pub(crate) enum OrderStatus {
     Expired,
     /// Partial Withdrawal
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    DelayedNotReported,
 }
 
 #[pyclass(eq, eq_int, from_py_object)]
@@ -568,6 +570,10 @@ pub(crate) struct Order {
     monitor_price: Option<PyDecimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[py(opt)]
+    delayed_until: Option<PyOffsetDateTimeWrapper>,
     /// Attached orders
     #[py(array)]
     attached_orders: Vec<AttachedOrderDetail>,
@@ -766,6 +772,10 @@ pub(crate) struct OrderDetail {
     monitor_price: Option<PyDecimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[py(opt)]
+    delayed_until: Option<PyOffsetDateTimeWrapper>,
     /// Commission-free Status
     free_status: CommissionFreeStatus,
     /// Commission-free amount

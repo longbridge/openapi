@@ -1,9 +1,11 @@
+use chrono::{DateTime, Utc};
 use napi::bindgen_prelude::ClassInstance;
 
 use crate::{
     decimal::Decimal,
     time::NaiveDate,
     trade::types::{AttachedOrderType, OrderSide, OrderType, OutsideRTH, TimeInForceType},
+    utils::try_from_datetime,
 };
 
 /// Parameters for submitting an attached order
@@ -102,11 +104,16 @@ pub struct SubmitOrderOptions<'env> {
     pub client_request_id: Option<String>,
     /// Attached order parameters
     pub attached_params: Option<SubmitAttachedParams<'env>>,
+    /// Time-condition submit time. The order is held in `DelayedNotReported`
+    /// status and only submitted at this time, which must be later than now
+    /// and no more than 90 days ahead.
+    pub delayed_until: Option<DateTime<Utc>>,
 }
 
-impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
-    #[inline]
-    fn from(opts: SubmitOrderOptions<'env>) -> Self {
+impl<'env> TryFrom<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOptions {
+    type Error = napi::Error;
+
+    fn try_from(opts: SubmitOrderOptions<'env>) -> napi::Result<Self> {
         let mut opts2 = longbridge::trade::SubmitOrderOptions::new(
             opts.symbol,
             opts.order_type.into(),
@@ -153,6 +160,9 @@ impl<'env> From<SubmitOrderOptions<'env>> for longbridge::trade::SubmitOrderOpti
         if let Some(p) = opts.attached_params {
             opts2 = opts2.attached_params(p.into());
         }
-        opts2
+        if let Some(delayed_until) = opts.delayed_until {
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
+        }
+        Ok(opts2)
     }
 }

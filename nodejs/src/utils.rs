@@ -13,6 +13,13 @@ pub(crate) fn from_datetime(time: DateTime<Utc>) -> OffsetDateTime {
     OffsetDateTime::from_unix_timestamp(time.timestamp()).expect("invalid timestamp")
 }
 
+/// Like [`from_datetime`], but reports an out-of-range `Date` as an
+/// `InvalidArg` error instead of panicking.
+pub(crate) fn try_from_datetime(name: &str, time: DateTime<Utc>) -> napi::Result<OffsetDateTime> {
+    OffsetDateTime::from_unix_timestamp(time.timestamp())
+        .map_err(|err| napi::Error::new(napi::Status::InvalidArg, format!("invalid {name}: {err}")))
+}
+
 pub(crate) trait ToJSON {
     fn to_json(&self) -> Value;
 }

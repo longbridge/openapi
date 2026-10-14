@@ -37,6 +37,7 @@ public class Order {
     private Integer triggerCount;
     private BigDecimal monitorPrice;
     private String remark;
+    private OffsetDateTime delayedUntil;
     private AttachedOrderDetail[] attachedOrders = new AttachedOrderDetail[0];
     private MultiLegInfo multiLeg;
 
@@ -275,6 +276,16 @@ public class Order {
     }
 
     /**
+     * Returns the time-condition submit time.
+     *
+     * @return time-condition submit time, or {@code null} when the order is not
+     *         a time-condition order
+     */
+    public OffsetDateTime getDelayedUntil() {
+        return delayedUntil;
+    }
+
+    /**
      * Returns the limit depth level.
      *
      * @return limit depth level
@@ -330,7 +341,7 @@ public class Order {
                 + updatedAt + ", triggerAt=" + triggerAt + ", trailingAmount=" + trailingAmount + ", trailingPercent="
                 + trailingPercent + ", limitOffset=" + limitOffset + ", triggerStatus=" + triggerStatus + ", currency="
                 + currency + ", outsideRth=" + outsideRth + ", limitDepthLevel=" + limitDepthLevel + ", triggerCount="
-                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", multiLeg=" + multiLeg
+                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", delayedUntil=" + delayedUntil + ", multiLeg=" + multiLeg
                 + "]";
     }
 

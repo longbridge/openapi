@@ -1291,6 +1291,10 @@ typedef enum lb_order_status_t {
    * Partial Withdrawal
    */
   OrderStatusPartialWithdrawal,
+  /**
+   * Monitoring (Time-Conditional Order)
+   */
+  OrderStatusDelayedNotReported,
 } lb_order_status_t;
 
 /**
@@ -4694,6 +4698,17 @@ typedef struct lb_replace_order_options_t {
    * Attached order parameters (can be null)
    */
   const struct CReplaceAttachedParams *attached_params;
+  /**
+   * New time-condition submit time, Unix timestamp in seconds; must be
+   * later than now and no more than 90 days ahead (can be null to keep the
+   * current time condition)
+   */
+  const int64_t *delayed_until;
+  /**
+   * Clear the time condition, turning the order into a regular order
+   * (takes precedence over `delayed_until`)
+   */
+  bool clear_delayed_until;
 } lb_replace_order_options_t;
 
 /**
@@ -4817,6 +4832,12 @@ typedef struct lb_submit_order_options_t {
    * Attached order parameters (can be null)
    */
   const struct CSubmitAttachedParams *attached_params;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null).
+   * The order is held in `DelayedNotReported` status and only submitted at
+   * this time, which must be later than now and no more than 90 days ahead.
+   */
+  const int64_t *delayed_until;
 } lb_submit_order_options_t;
 
 /**
@@ -4879,6 +4900,12 @@ typedef struct CSubmitMultiLegOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   const char *client_request_id;
+  /**
+   * Time-condition submit time, Unix timestamp in seconds (can be null);
+   * must be later than now and no more than 90 days ahead. Only `LO` / `MO`
+   * support time conditions.
+   */
+  const int64_t *delayed_until;
 } CSubmitMultiLegOrderOptions;
 
 /**
@@ -5943,6 +5970,10 @@ typedef struct lb_order_t {
    * Multi-leg strategy information (only valid when has_multi_leg is true)
    */
   struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_t;
 
 /**
@@ -6579,6 +6610,10 @@ typedef struct lb_order_detail_t {
    * Multi-leg strategy information (only valid when has_multi_leg is true)
    */
   struct CMultiLegInfo multi_leg;
+  /**
+   * Time-condition submit time (maybe null)
+   */
+  const int64_t *delayed_until;
 } lb_order_detail_t;
 
 /**

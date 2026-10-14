@@ -169,6 +169,34 @@ pub(crate) mod timestamp_opt {
     }
 }
 
+/// Lenient optional Unix-seconds timestamp for newly added response fields:
+/// accepts a string or an integer; `null`, empty, `0`, a negative value, or a
+/// value that cannot be parsed or is out of range all become `None` instead of
+/// failing the whole response.
+pub(crate) mod timestamp_opt_lenient {
+    use serde_json::Value;
+
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<OffsetDateTime>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let seconds = match Option::<Value>::deserialize(deserializer)? {
+            Some(Value::String(value)) => value.trim().parse::<i64>().ok(),
+            Some(Value::Number(value)) => value.as_i64(),
+            _ => None,
+        };
+        let seconds = seconds.filter(|seconds| *seconds > 0);
+        let datetime =
+            seconds.and_then(|seconds| OffsetDateTime::from_unix_timestamp(seconds).ok());
+        if seconds.is_some() && datetime.is_none() {
+            tracing::warn!(?seconds, "ignoring out-of-range timestamp");
+        }
+        Ok(datetime)
+    }
+}
+
 pub(crate) mod rfc3339_opt {
     use super::*;
 

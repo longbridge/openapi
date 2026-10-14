@@ -109,6 +109,9 @@ pub enum OrderStatus {
     /// Partial Withdrawal
     #[strum(serialize = "PartialWithdrawal")]
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    #[strum(serialize = "DelayedNotReported")]
+    DelayedNotReported,
 }
 
 /// Execution
@@ -499,6 +502,14 @@ pub struct Order {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
     /// Attached orders
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_orders: Vec<AttachedOrderDetail>,
@@ -700,6 +711,14 @@ pub struct OrderDetail {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
     /// Commission-free Status
     pub free_status: CommissionFreeStatus,
     /// Commission-free amount
@@ -1963,7 +1982,8 @@ mod tests {
                 "limit_depth_level": 0,
                 "trigger_count": 0,
                 "monitor_price": "",
-                "remark": "abc"
+                "remark": "abc",
+                "delayed_until": "1767225600"
               }
             ]
           }
@@ -2004,6 +2024,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert_eq!(order.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
     }
 
     #[test]
@@ -2081,6 +2102,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert!(order.delayed_until.is_none());
     }
 
     #[test]
@@ -2153,6 +2175,7 @@ mod tests {
             "trigger_count": 0,
             "monitor_price": "",
             "remark": "1680863603.927165",
+            "delayed_until": "0",
             "free_status": "None",
             "free_amount": "",
             "free_currency": "",
@@ -2191,6 +2214,40 @@ mod tests {
         }
         "#;
 
-        _ = serde_json::from_str::<OrderDetail>(data).unwrap();
+        let detail = serde_json::from_str::<OrderDetail>(data).unwrap();
+        assert!(
+            detail.delayed_until.is_none(),
+            "\"0\" means no time condition"
+        );
+
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["status"] = "DelayedNotReported".into();
+        value["delayed_until"] = "1767225600".into();
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert_eq!(detail.status, OrderStatus::DelayedNotReported);
+        assert_eq!(detail.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
+
+        // The spec marks delayed_until nullable.
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["delayed_until"] = serde_json::Value::Null;
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert!(detail.delayed_until.is_none());
+
+        // A malformed value in this new field must not fail the whole response.
+        for (raw, expected) in [
+            (
+                serde_json::json!(1767225600),
+                Some(datetime!(2026-01-01 00:00 UTC)),
+            ),
+            (serde_json::json!("abc"), None),
+            (serde_json::json!("99999999999999"), None),
+            (serde_json::json!(""), None),
+            (serde_json::json!("-5"), None),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+            value["delayed_until"] = raw.clone();
+            let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+            assert_eq!(detail.delayed_until, expected, "{raw}");
+        }
     }
 }

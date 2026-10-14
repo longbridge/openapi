@@ -1,6 +1,7 @@
 package com.longbridge.trade;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 /**
  * Options for replacing an order
@@ -19,6 +20,8 @@ public class ReplaceOrderOptions {
     private BigDecimal monitorPrice;
     private String remark;
     private ReplaceAttachedParams attachedParams;
+    private OffsetDateTime delayedUntil;
+    private boolean clearDelayedUntil;
 
     /**
      * Constructs options for replacing an order.
@@ -150,4 +153,27 @@ public class ReplaceOrderOptions {
         return attachedParams;
     }
 
+    /**
+     * Sets a new time-condition submit time, which must be later than now and no
+     * more than 90 days ahead. Leave unset to keep the order's current time
+     * condition.
+     *
+     * @param delayedUntil new time-condition submit time
+     * @return this instance for chaining
+     */
+    public ReplaceOrderOptions setDelayedUntil(OffsetDateTime delayedUntil) {
+        this.delayedUntil = delayedUntil;
+        return this;
+    }
+
+    /**
+     * Clears the time condition, turning the order into a regular order. Takes
+     * precedence over {@link #setDelayedUntil(OffsetDateTime)}.
+     *
+     * @return this instance for chaining
+     */
+    public ReplaceOrderOptions clearDelayedUntil() {
+        this.clearDelayedUntil = true;
+        return this;
+    }
 }

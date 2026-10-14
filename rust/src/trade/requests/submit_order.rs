@@ -1,6 +1,6 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
-use time::Date;
+use time::{Date, OffsetDateTime};
 
 use crate::{
     serde_utils,
@@ -43,6 +43,8 @@ pub struct SubmitOrderOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     client_request_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    delayed_until: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     attached_params: Option<SubmitAttachedParams>,
 }
 
@@ -74,6 +76,7 @@ impl SubmitOrderOptions {
             monitor_price: None,
             remark: None,
             client_request_id: None,
+            delayed_until: None,
             attached_params: None,
         }
     }
@@ -194,6 +197,19 @@ impl SubmitOrderOptions {
         }
     }
 
+    /// Set the time-condition submit time.
+    ///
+    /// The order is held in `DelayedNotReported` status and only submitted at
+    /// this time, which must be later than now and no more than 90 days ahead.
+    #[inline]
+    #[must_use]
+    pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
+        Self {
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
+            ..self
+        }
+    }
+
     /// Set attached order parameters
     pub fn attached_params(self, params: SubmitAttachedParams) -> Self {
         Self {
@@ -295,5 +311,45 @@ impl SubmitAttachedParams {
             activate_rth: Some(v),
             ..self
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use time::macros::datetime;
+
+    use super::*;
+
+    fn options() -> SubmitOrderOptions {
+        SubmitOrderOptions::new(
+            "700.HK",
+            OrderType::LO,
+            OrderSide::Buy,
+            Decimal::from(100),
+            TimeInForceType::Day,
+        )
+    }
+
+    #[test]
+    fn delayed_until() {
+        assert!(
+            serde_json::to_value(options())
+                .unwrap()
+                .get("delayed_until")
+                .is_none()
+        );
+
+        let opts = options().delayed_until(datetime!(2026-01-01 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767225600)
+        );
+
+        let opts = options().delayed_until(OffsetDateTime::UNIX_EPOCH);
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(2),
+            "a time that maps to 0 must not be sent as a regular order"
+        );
     }
 }

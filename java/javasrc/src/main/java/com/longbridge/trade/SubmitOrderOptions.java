@@ -1,6 +1,7 @@
 package com.longbridge.trade;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.time.LocalDate;
 
 /**
@@ -26,6 +27,7 @@ public class SubmitOrderOptions {
     private String remark;
     private String clientRequestId;
     private SubmitAttachedParams attachedParams;
+    private OffsetDateTime delayedUntil;
 
     /**
      * Constructs options for submitting an order.
@@ -201,5 +203,18 @@ public class SubmitOrderOptions {
      */
     public SubmitAttachedParams getAttachedParams() {
         return attachedParams;
+    }
+
+    /**
+     * Sets the time-condition submit time. The order is held in
+     * {@code DelayedNotReported} status and only submitted at this time, which
+     * must be later than now and no more than 90 days ahead.
+     *
+     * @param delayedUntil time-condition submit time
+     * @return this instance for chaining
+     */
+    public SubmitOrderOptions setDelayedUntil(OffsetDateTime delayedUntil) {
+        this.delayedUntil = delayedUntil;
+        return this;
     }
 }

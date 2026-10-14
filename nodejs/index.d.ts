@@ -2723,6 +2723,11 @@ export declare class Order {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
   /**
@@ -2832,6 +2837,11 @@ export declare class OrderDetail {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
   /** Commission-free Status */
   get freeStatus(): CommissionFreeStatus
   /** Commission-free amount */
@@ -7518,7 +7528,9 @@ export declare const enum OrderStatus {
   /** Expired */
   Expired = 16,
   /** Partial Withdrawal */
-  PartialWithdrawal = 17
+  PartialWithdrawal = 17,
+  /** Monitoring (Time-Conditional Order) */
+  DelayedNotReported = 18
 }
 
 /** Order tag */
@@ -8153,6 +8165,16 @@ export interface ReplaceOrderOptions {
   remark?: string
   /** Attached order parameters */
   attachedParams?: ReplaceAttachedParams
+  /**
+   * New time-condition submit time, which must be later than now and no
+   * more than 90 days ahead. Leave unset to keep the current time condition.
+   */
+  delayedUntil?: Date
+  /**
+   * Clear the time condition, turning the order into a regular order (takes
+   * precedence over `delayedUntil`)
+   */
+  clearDelayedUntil?: boolean
 }
 
 /** A filter condition for screener_search Mode B. */
@@ -8673,6 +8695,13 @@ export interface SubmitMultiLegOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   clientRequestId?: string
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead. Only `LO` / `MO` support time
+   * conditions.
+   */
+  delayedUntil?: Date
 }
 
 /** Options for submit order request */
@@ -8720,6 +8749,12 @@ export interface SubmitOrderOptions {
   clientRequestId?: string
   /** Attached order parameters */
   attachedParams?: SubmitAttachedParams
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead.
+   */
+  delayedUntil?: Date
 }
 
 /** Quote type of subscription */

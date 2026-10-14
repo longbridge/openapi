@@ -1,8 +1,10 @@
+use chrono::{DateTime, Utc};
 use napi::bindgen_prelude::ClassInstance;
 
 use crate::{
     decimal::Decimal,
     trade::types::{AttachedOrderType, OrderType, OutsideRTH, TimeInForceType},
+    utils::try_from_datetime,
 };
 
 /// Parameters for replacing an attached order
@@ -116,11 +118,18 @@ pub struct ReplaceOrderOptions<'env> {
     pub remark: Option<String>,
     /// Attached order parameters
     pub attached_params: Option<ReplaceAttachedParams<'env>>,
+    /// New time-condition submit time, which must be later than now and no
+    /// more than 90 days ahead. Leave unset to keep the current time condition.
+    pub delayed_until: Option<DateTime<Utc>>,
+    /// Clear the time condition, turning the order into a regular order (takes
+    /// precedence over `delayedUntil`)
+    pub clear_delayed_until: Option<bool>,
 }
 
-impl<'env> From<ReplaceOrderOptions<'env>> for longbridge::trade::ReplaceOrderOptions {
-    #[inline]
-    fn from(opts: ReplaceOrderOptions<'env>) -> Self {
+impl<'env> TryFrom<ReplaceOrderOptions<'env>> for longbridge::trade::ReplaceOrderOptions {
+    type Error = napi::Error;
+
+    fn try_from(opts: ReplaceOrderOptions<'env>) -> napi::Result<Self> {
         let mut opts2 = longbridge::trade::ReplaceOrderOptions::new(opts.order_id, opts.quantity.0);
         if let Some(price) = opts.price {
             opts2 = opts2.price(price.0);
@@ -152,6 +161,11 @@ impl<'env> From<ReplaceOrderOptions<'env>> for longbridge::trade::ReplaceOrderOp
         if let Some(p) = opts.attached_params {
             opts2 = opts2.attached_params(p.into());
         }
-        opts2
+        if opts.clear_delayed_until.unwrap_or_default() {
+            opts2 = opts2.clear_delayed_until();
+        } else if let Some(delayed_until) = opts.delayed_until {
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
+        }
+        Ok(opts2)
     }
 }

@@ -1,5 +1,6 @@
 use rust_decimal::Decimal;
 use serde::Serialize;
+use time::OffsetDateTime;
 
 use crate::trade::{AttachedOrderType, OrderType, OutsideRTH, TimeInForceType};
 
@@ -27,6 +28,8 @@ pub struct ReplaceOrderOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     remark: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    delayed_until: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     attached_params: Option<ReplaceAttachedParams>,
 }
 
@@ -46,6 +49,7 @@ impl ReplaceOrderOptions {
             trigger_count: None,
             monitor_price: None,
             remark: None,
+            delayed_until: None,
             attached_params: None,
         }
     }
@@ -136,6 +140,33 @@ impl ReplaceOrderOptions {
     pub fn remark(self, remark: impl Into<String>) -> Self {
         Self {
             remark: Some(remark.into()),
+            ..self
+        }
+    }
+
+    /// Set a new time-condition submit time.
+    ///
+    /// Must be later than now and no more than 90 days ahead. Leave unset to
+    /// keep the order's current time condition. If combined with
+    /// [`clear_delayed_until`](Self::clear_delayed_until), the last call wins.
+    #[inline]
+    #[must_use]
+    pub fn delayed_until(self, delayed_until: OffsetDateTime) -> Self {
+        Self {
+            delayed_until: Some(super::delayed_until_timestamp(delayed_until)),
+            ..self
+        }
+    }
+
+    /// Clear the time condition, turning the order into a regular order.
+    ///
+    /// If combined with [`delayed_until`](Self::delayed_until), the last call
+    /// wins.
+    #[inline]
+    #[must_use]
+    pub fn clear_delayed_until(self) -> Self {
+        Self {
+            delayed_until: Some(1),
             ..self
         }
     }
@@ -301,5 +332,49 @@ impl ReplaceAttachedParams {
             market_price: Some(v),
             ..self
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use time::macros::datetime;
+
+    use super::*;
+
+    #[test]
+    fn delayed_until() {
+        let opts = ReplaceOrderOptions::new("1", Decimal::from(100));
+        assert!(
+            serde_json::to_value(&opts)
+                .unwrap()
+                .get("delayed_until")
+                .is_none()
+        );
+
+        let opts = opts.delayed_until(datetime!(2026-01-01 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767225600)
+        );
+
+        let opts = opts.delayed_until(OffsetDateTime::UNIX_EPOCH + time::Duration::SECOND);
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(2),
+            "a time that maps to the clear sentinel must not be sent as 1"
+        );
+
+        let opts = opts.clear_delayed_until();
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1)
+        );
+
+        // The last of `delayed_until` / `clear_delayed_until` wins.
+        let opts = opts.delayed_until(datetime!(2026-01-02 00:00 UTC));
+        assert_eq!(
+            serde_json::to_value(&opts).unwrap()["delayed_until"],
+            serde_json::json!(1767312000)
+        );
     }
 }
