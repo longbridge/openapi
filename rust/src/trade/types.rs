@@ -2242,6 +2242,7 @@ mod tests {
             (serde_json::json!("abc"), None),
             (serde_json::json!("99999999999999"), None),
             (serde_json::json!(""), None),
+            (serde_json::json!("-5"), None),
         ] {
             let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
             value["delayed_until"] = raw.clone();

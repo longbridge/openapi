@@ -170,9 +170,9 @@ pub(crate) mod timestamp_opt {
 }
 
 /// Lenient optional Unix-seconds timestamp for newly added response fields:
-/// accepts a string or a number; `null`, empty, `0`, or a value that cannot be
-/// parsed or is out of range all become `None` instead of failing the whole
-/// response.
+/// accepts a string or an integer; `null`, empty, `0`, a negative value, or a
+/// value that cannot be parsed or is out of range all become `None` instead of
+/// failing the whole response.
 pub(crate) mod timestamp_opt_lenient {
     use serde_json::Value;
 
@@ -187,10 +187,10 @@ pub(crate) mod timestamp_opt_lenient {
             Some(Value::Number(value)) => value.as_i64(),
             _ => None,
         };
-        let datetime = seconds
-            .filter(|seconds| *seconds != 0)
-            .and_then(|seconds| OffsetDateTime::from_unix_timestamp(seconds).ok());
-        if seconds.is_some_and(|seconds| seconds != 0) && datetime.is_none() {
+        let seconds = seconds.filter(|seconds| *seconds > 0);
+        let datetime =
+            seconds.and_then(|seconds| OffsetDateTime::from_unix_timestamp(seconds).ok());
+        if seconds.is_some() && datetime.is_none() {
             tracing::warn!(?seconds, "ignoring out-of-range timestamp");
         }
         Ok(datetime)
