@@ -830,6 +830,8 @@ Typedefs</h2></td></tr>
 <tr class="separator:a981f073772d050b09a0fcfca085c98c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1942b9ec9cdef916c871e9ecfcd05f48"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longbridge_8h.html#ab14fa1bbca5a7f0fc42b5c15e23e158e">lb_push_candlestick_mode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a1942b9ec9cdef916c871e9ecfcd05f48">lb_push_candlestick_mode_t</a></td></tr>
 <tr class="separator:a1942b9ec9cdef916c871e9ecfcd05f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad448a3a979e883bb283d49bc0e38b5aa"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fc">lb_quote_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ad448a3a979e883bb283d49bc0e38b5aa">lb_quote_transport_t</a></td></tr>
+<tr class="separator:ad448a3a979e883bb283d49bc0e38b5aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9dd7a68fd97c8e58275982fc771c764f"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longbridge_8h.html#aced1e35b08a0d88a3d0163df96e85513">lb_dca_frequency_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a9dd7a68fd97c8e58275982fc771c764f">lb_dca_frequency_t</a></td></tr>
 <tr class="separator:a9dd7a68fd97c8e58275982fc771c764f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dbdedca79d9b8c7b658105488706980"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longbridge_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a1dbdedca79d9b8c7b658105488706980">lb_error_kind_t</a></td></tr>
@@ -1784,6 +1786,10 @@ Enumerations</h2></td></tr>
 , <a class="el" href="longbridge_8h.html#ab14fa1bbca5a7f0fc42b5c15e23e158eaaf089e219fe14e02e0cd08d86b9dd2d3">PushCandlestickMode_Confirmed</a>
  }</td></tr>
 <tr class="separator:ab14fa1bbca5a7f0fc42b5c15e23e158e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2c9f9c004cc819dac073f4d074363fc"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fc">lb_quote_transport_t</a> { <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fca1142f1128a0cba2b177a2b1e4bd46439">QuoteTransport_WebSocket</a>
+, <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fcacac214f84cca532751acd451b7c4cecb">QuoteTransport_Http</a>
+ }</td></tr>
+<tr class="separator:ad2c9f9c004cc819dac073f4d074363fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aced1e35b08a0d88a3d0163df96e85513"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#aced1e35b08a0d88a3d0163df96e85513">lb_dca_frequency_t</a> { <a class="el" href="longbridge_8h.html#aced1e35b08a0d88a3d0163df96e85513a9494bfc3b01a4b96a66694c7f49f4f3f">DcaFrequencyDaily</a>
 , <a class="el" href="longbridge_8h.html#aced1e35b08a0d88a3d0163df96e85513a794b8d94110511785a6fa9024ba3fb7d">DcaFrequencyWeekly</a>
 , <a class="el" href="longbridge_8h.html#aced1e35b08a0d88a3d0163df96e85513a5d85647c4f1f2d0f4d8db0f7f0c645de">DcaFrequencyFortnightly</a>
@@ -2086,6 +2092,7 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="longbridge_8h.html#adae641382b85328e0044b193dd240a65a1d44ab8406984bff0d1b3b5396ea4e11">OrderStatusExpired</a>
 , <a class="el" href="longbridge_8h.html#adae641382b85328e0044b193dd240a65a5c221d03b3834fa4c587a0c97657e9fa">OrderStatusPartialWithdrawal</a>
+, <a class="el" href="longbridge_8h.html#adae641382b85328e0044b193dd240a65a88de8e2c1163d4d08c28bc6dd800e751">OrderStatusDelayedNotReported</a>
 <br />
  }</td></tr>
 <tr class="separator:adae641382b85328e0044b193dd240a65"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2378,6 +2385,8 @@ Functions</h2></td></tr>
 <tr class="separator:adabf7ec227ed7291a2c7379a835e6a38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13652b2988d78e1a95a4e78bee1004e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a13652b2988d78e1a95a4e78bee1004e1">lb_config_set_push_candlestick_mode</a> (struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config, enum <a class="el" href="longbridge_8h.html#ab14fa1bbca5a7f0fc42b5c15e23e158e">lb_push_candlestick_mode_t</a> mode)</td></tr>
 <tr class="separator:a13652b2988d78e1a95a4e78bee1004e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4378661ced18a565ea827d52aff8612"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ae4378661ced18a565ea827d52aff8612">lb_config_set_quote_transport</a> (struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config, enum <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fc">lb_quote_transport_t</a> transport)</td></tr>
+<tr class="separator:ae4378661ced18a565ea827d52aff8612"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2a9a89a871b9b88f60fdc8919d4e306"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#ab2a9a89a871b9b88f60fdc8919d4e306">lb_config_disable_print_quote_packages</a> (struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config)</td></tr>
 <tr class="separator:ab2a9a89a871b9b88f60fdc8919d4e306"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a2754cb9f34e004349a4a111a1d716b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longbridge_8h.html#a8a2754cb9f34e004349a4a111a1d716b">lb_config_enable_papertrading</a> (struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *config)</td></tr>
@@ -8073,6 +8082,21 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ad448a3a979e883bb283d49bc0e38b5aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad448a3a979e883bb283d49bc0e38b5aa">&#9670;&nbsp;</a></span>lb_quote_transport_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef enum <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fc">lb_quote_transport_t</a> <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fc">lb_quote_transport_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Transport used by the quote pull APIs </p>
+
+</div>
+</div>
 <a id="a21263ce9ef7b77cf43224d5d16914b3b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a21263ce9ef7b77cf43224d5d16914b3b">&#9670;&nbsp;</a></span>lb_rank_categories_response_t</h2>
 
@@ -10931,6 +10955,8 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="adae641382b85328e0044b193dd240a65a5c221d03b3834fa4c587a0c97657e9fa"></a>OrderStatusPartialWithdrawal&#160;</td><td class="fielddoc"><p>Partial Withdrawal </p>
 </td></tr>
+<tr><td class="fieldname"><a id="adae641382b85328e0044b193dd240a65a88de8e2c1163d4d08c28bc6dd800e751"></a>OrderStatusDelayedNotReported&#160;</td><td class="fielddoc"><p>Monitoring (Time-Conditional Order) </p>
+</td></tr>
 </table>
 
 </div>
@@ -11103,6 +11129,27 @@ Functions</h2></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab14fa1bbca5a7f0fc42b5c15e23e158ea0f866b65ef97032450617ae3b16fc76a"></a>PushCandlestickMode_Realtime&#160;</td><td class="fielddoc"><p>Real-time </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ab14fa1bbca5a7f0fc42b5c15e23e158eaaf089e219fe14e02e0cd08d86b9dd2d3"></a>PushCandlestickMode_Confirmed&#160;</td><td class="fielddoc"><p>Confirmed </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="ad2c9f9c004cc819dac073f4d074363fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2c9f9c004cc819dac073f4d074363fc">&#9670;&nbsp;</a></span>lb_quote_transport_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fc">lb_quote_transport_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Transport used by the quote pull APIs </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ad2c9f9c004cc819dac073f4d074363fca1142f1128a0cba2b177a2b1e4bd46439"></a>QuoteTransport_WebSocket&#160;</td><td class="fielddoc"><p>Send pull requests over the quote WebSocket connection (default) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ad2c9f9c004cc819dac073f4d074363fcacac214f84cca532751acd451b7c4cecb"></a>QuoteTransport_Http&#160;</td><td class="fielddoc"><p>Send pull requests over HTTP (<code>POST /quote/...</code>) where the API has a REST equivalent, falling back to the WebSocket for the rest. Using only HTTP-backed APIs never opens a WebSocket connection. </p>
 </td></tr>
 </table>
 
@@ -12736,7 +12783,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Create a new <code>Config</code> using API Key authentication</p>
-<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the corresponding <code>lb_config_set_*</code> functions to override any of these values after construction.</p>
+<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the corresponding <code>lb_config_set_*</code> functions to override any of these values after construction.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">app_key</td><td>App key </td></tr>
@@ -12765,7 +12812,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Create a new <code>Config</code> from environment variables (API Key mode)</p>
 <p>It first reads the <code>.env</code> file in the current directory.</p>
-<p>Variables: <code>LONGBRIDGE_APP_KEY</code>, <code>LONGBRIDGE_APP_SECRET</code>, <code>LONGBRIDGE_ACCESS_TOKEN</code>, <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code> </p>
+<p>Variables: <code>LONGBRIDGE_APP_KEY</code>, <code>LONGBRIDGE_APP_SECRET</code>, <code>LONGBRIDGE_ACCESS_TOKEN</code>, <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code> </p>
 
 </div>
 </div>
@@ -12785,7 +12832,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Create a new <code>Config</code> for OAuth 2.0 authentication</p>
-<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the corresponding <code>lb_config_set_*</code> functions to override any of these values after construction.</p>
+<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the corresponding <code>lb_config_set_*</code> functions to override any of these values after construction.</p>
 <p>Does <b>not</b> take ownership of <code>oauth</code>. The caller must free <code>oauth</code> with <code>lb_oauth_free</code> after this call returns.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -12985,6 +13032,43 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">config</td><td>Config object </td></tr>
     <tr><td class="paramname">mode</td><td>Push candlestick mode </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae4378661ced18a565ea827d52aff8612"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4378661ced18a565ea827d52aff8612">&#9670;&nbsp;</a></span>lb_config_set_quote_transport()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lb_config_set_quote_transport </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="longbridge_8h.html#a1dcafee980a8ac92f4de67fdb7541d55">lb_config_t</a> *&#160;</td>
+          <td class="paramname"><em>config</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum <a class="el" href="longbridge_8h.html#ad2c9f9c004cc819dac073f4d074363fc">lb_quote_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the transport used by the quote pull APIs</p>
+<p>Default: <code>QuoteTransport_WebSocket</code> (or <code>LONGBRIDGE_QUOTE_TRANSPORT</code> = <code>ws</code> / <code>http</code>)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">config</td><td>Config object </td></tr>
+    <tr><td class="paramname">transport</td><td>Quote transport </td></tr>
   </table>
   </dd>
 </dl>

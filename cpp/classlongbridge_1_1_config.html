@@ -110,6 +110,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2e7a5514baa91edd70c41b516f49b633"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#a2e7a5514baa91edd70c41b516f49b633">set_push_candlestick_mode</a> (<a class="el" href="namespacelongbridge.html#aad376e5dd35664b8b6533d6dacef015a">PushCandlestickMode</a> mode)</td></tr>
 <tr class="memdesc:a2e7a5514baa91edd70c41b516f49b633"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the push candlestick mode.  <a href="classlongbridge_1_1_config.html#a2e7a5514baa91edd70c41b516f49b633">More...</a><br /></td></tr>
 <tr class="separator:a2e7a5514baa91edd70c41b516f49b633"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab03e60d2fd8f41f36c0f65be14c595b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#ab03e60d2fd8f41f36c0f65be14c595b2">set_quote_transport</a> (<a class="el" href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2e">QuoteTransport</a> transport)</td></tr>
+<tr class="separator:ab03e60d2fd8f41f36c0f65be14c595b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a663b6a4f99c4ebd062632eba9092b94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1_config.html#a663b6a4f99c4ebd062632eba9092b94c">disable_print_quote_packages</a> ()</td></tr>
 <tr class="memdesc:a663b6a4f99c4ebd062632eba9092b94c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable printing of quote packages on connection.  <a href="classlongbridge_1_1_config.html#a663b6a4f99c4ebd062632eba9092b94c">More...</a><br /></td></tr>
 <tr class="separator:a663b6a4f99c4ebd062632eba9092b94c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -325,7 +327,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Create a new <code><a class="el" href="classlongbridge_1_1_config.html">Config</a></code> for API Key authentication</p>
-<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
+<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">app_key</td><td>App key </td></tr>
@@ -361,7 +363,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Create a new <code><a class="el" href="classlongbridge_1_1_config.html">Config</a></code> from environment variables (API Key mode)</p>
-<p>Variables: <code>LONGBRIDGE_APP_KEY</code>, <code>LONGBRIDGE_APP_SECRET</code>, <code>LONGBRIDGE_ACCESS_TOKEN</code>, <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code> </p>
+<p>Variables: <code>LONGBRIDGE_APP_KEY</code>, <code>LONGBRIDGE_APP_SECRET</code>, <code>LONGBRIDGE_ACCESS_TOKEN</code>, <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code> </p>
 
 </div>
 </div>
@@ -389,7 +391,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Create a new <code><a class="el" href="classlongbridge_1_1_config.html">Config</a></code> for <a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 authentication</p>
-<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
+<p>Optional environment variables are read automatically: <code>LONGBRIDGE_HTTP_URL</code>, <code>LONGBRIDGE_LANGUAGE</code>, <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>, <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>, <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">oauth</td><td><a class="el" href="classlongbridge_1_1_o_auth.html">OAuth</a> 2.0 client obtained from <code><a class="el" href="classlongbridge_1_1_o_auth_builder.html#a637a26b824300d839c2fdf116ec633d9">OAuthBuilder::build</a></code> </td></tr>
@@ -530,6 +532,26 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Set the push candlestick mode. </p>
+
+</div>
+</div>
+<a id="ab03e60d2fd8f41f36c0f65be14c595b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab03e60d2fd8f41f36c0f65be14c595b2">&#9670;&nbsp;</a></span>set_quote_transport()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classlongbridge_1_1_config.html">Config</a>&amp; longbridge::Config::set_quote_transport </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2e">QuoteTransport</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the transport used by the quote pull APIs</p>
+<p>Default: <code><a class="el" href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2ea45edc1b96407d9d213dd1135962a32a0" title="Send pull requests over the quote WebSocket connection (default)">QuoteTransport::WebSocket</a></code> (or <code>LONGBRIDGE_QUOTE_TRANSPORT</code> = <code>ws</code> / <code>http</code>) </p>
 
 </div>
 </div>

@@ -90,6 +90,8 @@ Data Fields</h2></td></tr>
 <tr class="separator:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bef6ba609dfe06b42ed6fc78797486e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_submit_multi_leg_order_options.html#a2bef6ba609dfe06b42ed6fc78797486e">client_request_id</a></td></tr>
 <tr class="separator:a2bef6ba609dfe06b42ed6fc78797486e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f76ca65dfe4fd40ae37ca5968ac028b"><td class="memItemLeft" align="right" valign="top">const int64_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_submit_multi_leg_order_options.html#a2f76ca65dfe4fd40ae37ca5968ac028b">delayed_until</a></td></tr>
+<tr class="separator:a2f76ca65dfe4fd40ae37ca5968ac028b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for submit multi-leg order request </p>
@@ -106,6 +108,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Idempotent request ID for preventing duplicate orders (can be null). If not specified, idempotency control is skipped. The server caches this ID for 10 minutes. </p>
+
+</div>
+</div>
+<a id="a2f76ca65dfe4fd40ae37ca5968ac028b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f76ca65dfe4fd40ae37ca5968ac028b">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int64_t* delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Time-condition submit time, Unix timestamp in seconds (can be null); must be later than now and no more than 90 days ahead. Only <code>LO</code> / <code>MO</code> support time conditions. </p>
 
 </div>
 </div>

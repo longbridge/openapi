@@ -116,6 +116,10 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:afd779cc3eda1735048c1f4cd4ce16945"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structlongbridge_1_1trade_1_1_replace_attached_params.html">ReplaceAttachedParams</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_replace_order_options.html#afd779cc3eda1735048c1f4cd4ce16945">attached_params</a></td></tr>
 <tr class="memdesc:afd779cc3eda1735048c1f4cd4ce16945"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attached order params.  <a href="structlongbridge_1_1trade_1_1_replace_order_options.html#afd779cc3eda1735048c1f4cd4ce16945">More...</a><br /></td></tr>
 <tr class="separator:afd779cc3eda1735048c1f4cd4ce16945"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a782dbc205c70f7e1fa7aa947126c97e2"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_replace_order_options.html#a782dbc205c70f7e1fa7aa947126c97e2">delayed_until</a></td></tr>
+<tr class="separator:a782dbc205c70f7e1fa7aa947126c97e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a313302333de03fac45216aa3d291a40b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_replace_order_options.html#a313302333de03fac45216aa3d291a40b">clear_delayed_until</a> = false</td></tr>
+<tr class="separator:a313302333de03fac45216aa3d291a40b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for replace order request. </p>
@@ -133,6 +137,36 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Attached order params. </p>
+
+</div>
+</div>
+<a id="a313302333de03fac45216aa3d291a40b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a313302333de03fac45216aa3d291a40b">&#9670;&nbsp;</a></span>clear_delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool longbridge::trade::ReplaceOrderOptions::clear_delayed_until = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Clear the time condition, turning the order into a regular order (takes precedence over <code>delayed_until</code>) </p>
+
+</div>
+</div>
+<a id="a782dbc205c70f7e1fa7aa947126c97e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a782dbc205c70f7e1fa7aa947126c97e2">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int64_t&gt; longbridge::trade::ReplaceOrderOptions::delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>New time-condition submit time (Unix timestamp in seconds), later than now and no more than 90 days ahead; not set keeps the current time condition </p>
 
 </div>
 </div>

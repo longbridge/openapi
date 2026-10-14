@@ -94,6 +94,14 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.QuoteTransport">QuoteTransport</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.QuoteTransport.WebSocket">WebSocket</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.QuoteTransport.Http">Http</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OAuth">OAuth</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OAuthBuilder">OAuthBuilder</a>
@@ -1572,6 +1580,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OrderStatus.PartialWithdrawal">PartialWithdrawal</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OrderStatus.DelayedNotReported">DelayedNotReported</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.OrderTag">OrderTag</a>
@@ -1946,6 +1956,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Order.remark">remark</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Order.delayed_until">delayed_until</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Order.attached_orders">attached_orders</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.Order.multi_leg">multi_leg</a>
@@ -2095,6 +2107,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OrderDetail.monitor_price">monitor_price</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OrderDetail.remark">remark</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OrderDetail.delayed_until">delayed_until</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.OrderDetail.free_status">free_status</a>
     </li>
@@ -8897,6 +8911,150 @@ asyncio.run(main())</code></pre>
 
 
 
+<h2 id="longbridge.openapi.QuoteTransport" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">QuoteTransport</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Transport used by the quote pull APIs</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.QuoteTransport.WebSocket" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">WebSocket</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="QuoteTransport (longbridge.openapi.QuoteTransport)" href="#longbridge.openapi.QuoteTransport">QuoteTransport</a></code></p>
+
+
+
+        <p>Send pull requests over the quote WebSocket connection (default)</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.QuoteTransport.Http" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Http</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="QuoteTransport (longbridge.openapi.QuoteTransport)" href="#longbridge.openapi.QuoteTransport">QuoteTransport</a></code></p>
+
+
+
+        <p>Send pull requests over HTTP (<code>POST /quote/*</code>) where the API has a
+REST equivalent, falling back to the WebSocket for the rest. Using
+only HTTP-backed APIs never opens a WebSocket connection.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="longbridge.openapi.OAuth" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">OAuth</span>
 
@@ -9293,6 +9451,14 @@ string.</p>
                 <p>Path for log files (default: no logs)</p>
               </div>
             </li>
+            <li>
+              <b><code>quote_transport</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Transport used by the quote pull APIs
+(default: <code>QuoteTransport.WebSocket</code>)</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -9330,7 +9496,7 @@ string.</p>
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">from_apikey(app_key: str, app_secret: str, access_token: str, http_url: Optional[str] = None, quote_ws_url: Optional[str] = None, trade_ws_url: Optional[str] = None, language: Optional[Type[Language]] = None, enable_overnight: bool = False, push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime, enable_print_quote_packages: bool = True, log_path: Optional[str] = None, enable_papertrading: bool = False) -&gt; Config</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">from_apikey(app_key: str, app_secret: str, access_token: str, http_url: Optional[str] = None, quote_ws_url: Optional[str] = None, trade_ws_url: Optional[str] = None, language: Optional[Type[Language]] = None, enable_overnight: bool = False, push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime, enable_print_quote_packages: bool = True, log_path: Optional[str] = None, enable_papertrading: bool = False, quote_transport: Optional[Type[QuoteTransport]] = None) -&gt; Config</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -9340,7 +9506,7 @@ string.</p>
 <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>,
 <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>,
 <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>,
-<code>LONGBRIDGE_PAPERTRADING</code>).
+<code>LONGBRIDGE_PAPERTRADING</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>).
 Any explicit parameter overrides the corresponding env variable.</p>
 
 
@@ -9477,6 +9643,18 @@ returns an error.  Default: <code>False</code> (no restriction imposed
 by server).</p>
               </div>
             </li>
+            <li>
+              <b><code>quote_transport</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="typing.Type" href="https://docs.python.org/3/library/typing.html#typing.Type">Type</a>[<a class="autorefs autorefs-internal" title="QuoteTransport (longbridge.openapi.QuoteTransport)" href="#longbridge.openapi.QuoteTransport">QuoteTransport</a>]]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Transport used by the quote pull APIs (reads
+<code>LONGBRIDGE_QUOTE_TRANSPORT</code> from env if omitted; default:
+<code>QuoteTransport.WebSocket</code>)</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -9524,6 +9702,7 @@ current directory.</p>
 <li><code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code> - <code>true</code> or <code>false</code>
   (Default: <code>true</code>)</li>
 <li><code>LONGBRIDGE_LOG_PATH</code> - Log file directory (Default: no logs)</li>
+<li><code>LONGBRIDGE_QUOTE_TRANSPORT</code> - <code>ws</code> or <code>http</code> (Default: <code>ws</code>)</li>
 </ul>
 
 
@@ -9543,7 +9722,7 @@ current directory.</p>
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">from_oauth(oauth: OAuth, http_url: Optional[str] = None, quote_ws_url: Optional[str] = None, trade_ws_url: Optional[str] = None, language: Optional[Type[Language]] = None, enable_overnight: Optional[bool] = None, push_candlestick_mode: Optional[Type[PushCandlestickMode]] = None, enable_print_quote_packages: Optional[bool] = None, log_path: Optional[str] = None, enable_papertrading: Optional[bool] = None) -&gt; Config</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">from_oauth(oauth: OAuth, http_url: Optional[str] = None, quote_ws_url: Optional[str] = None, trade_ws_url: Optional[str] = None, language: Optional[Type[Language]] = None, enable_overnight: Optional[bool] = None, push_candlestick_mode: Optional[Type[PushCandlestickMode]] = None, enable_print_quote_packages: Optional[bool] = None, log_path: Optional[str] = None, enable_papertrading: Optional[bool] = None, quote_transport: Optional[Type[QuoteTransport]] = None) -&gt; Config</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -9555,7 +9734,7 @@ HMAC signatures required.</p>
 <code>LONGBRIDGE_QUOTE_WS_URL</code>, <code>LONGBRIDGE_TRADE_WS_URL</code>,
 <code>LONGBRIDGE_ENABLE_OVERNIGHT</code>, <code>LONGBRIDGE_PUSH_CANDLESTICK_MODE</code>,
 <code>LONGBRIDGE_PRINT_QUOTE_PACKAGES</code>, <code>LONGBRIDGE_LOG_PATH</code>,
-<code>LONGBRIDGE_PAPERTRADING</code>).
+<code>LONGBRIDGE_PAPERTRADING</code>, <code>LONGBRIDGE_QUOTE_TRANSPORT</code>).
 Any explicit parameter overrides the corresponding env variable.</p>
 
 
@@ -9675,6 +9854,16 @@ paper trading (simulation) environment.  The server validates
 the token: if it belongs to a real-money account the server
 returns an error.  Default: <code>None</code> (no restriction imposed
 by server).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>quote_transport</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="typing.Type" href="https://docs.python.org/3/library/typing.html#typing.Type">Type</a>[<a class="autorefs autorefs-internal" title="QuoteTransport (longbridge.openapi.QuoteTransport)" href="#longbridge.openapi.QuoteTransport">QuoteTransport</a>]]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Transport used by the quote pull APIs (optional)</p>
               </div>
             </li>
         </ul>
@@ -36780,6 +36969,54 @@ otherwise US endpoint.</p>
 
 </div>
 
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longbridge.openapi.OrderStatus.DelayedNotReported" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">DelayedNotReported</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="OrderStatus (longbridge.openapi.OrderStatus)" href="#longbridge.openapi.OrderStatus">OrderStatus</a></code></p>
+
+
+
+        <p>Monitoring (Time-Conditional Order)</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
 
 
 
@@ -41997,6 +42234,29 @@ combination orders)</p>
 
 
 
+<h3 id="longbridge.openapi.Order.delayed_until" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">delayed_until</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">delayed_until: Optional[datetime]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Time-condition submit time (<code>None</code> when the order is not a time-condition order)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="longbridge.openapi.Order.attached_orders" class="doc doc-heading">
             <span class="doc doc-object-name doc-attribute-name">attached_orders</span>
 
@@ -44039,6 +44299,29 @@ combination orders)</p>
     <div class="doc doc-contents ">
 
         <p>Remark</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.OrderDetail.delayed_until" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">delayed_until</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">delayed_until: Optional[datetime]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Time-condition submit time (<code>None</code> when the order is not a time-condition order)</p>
 
     </div>
 
@@ -47513,7 +47796,7 @@ print(resp)</code></pre>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">replace_order(order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, attached_params: Optional[ReplaceAttachedParams] = None) -&gt; None</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">replace_order(order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, attached_params: Optional[ReplaceAttachedParams] = None, delayed_until: Optional[datetime] = None, clear_delayed_until: bool = False) -&gt; None</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -47628,6 +47911,26 @@ print(resp)</code></pre>
                 <p>Remark (Maximum 64 characters)</p>
               </div>
             </li>
+            <li>
+              <b><code>delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>New time-condition submit time (later than now, at most 90 days ahead); <code>None</code> keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (<code>Order.delayed_until</code> is naive local time, so call <code>.astimezone()</code> on it before passing it back)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>clear_delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Clear the time condition, turning the order into a regular order (takes precedence over <code>delayed_until</code>)</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -47664,7 +47967,7 @@ ctx.replace_order(
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">submit_order(symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None, outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None, attached_params: Optional[SubmitAttachedParams] = None) -&gt; SubmitOrderResponse</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">submit_order(symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None, outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None, attached_params: Optional[SubmitAttachedParams] = None, delayed_until: Optional[datetime] = None) -&gt; SubmitOrderResponse</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -47851,6 +48154,16 @@ ctx.replace_order(
                 <p>Attached order parameters</p>
               </div>
             </li>
+            <li>
+              <b><code>delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Time-condition submit time. The order is held in <code>DelayedNotReported</code> status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (<code>Order.delayed_until</code> is naive local time, so call <code>.astimezone()</code> on it before passing it back)</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -47915,7 +48228,7 @@ print(resp)</code></pre>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">submit_multileg(side: Type[OrderSide], order_type: Type[OrderType], submitted_quantity: Decimal, strategy: Type[MultiLegStrategy], legs: List[Tuple[str, Decimal]], submitted_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None) -&gt; SubmitOrderResponse</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">submit_multileg(side: Type[OrderSide], order_type: Type[OrderType], submitted_quantity: Decimal, strategy: Type[MultiLegStrategy], legs: List[Tuple[str, Decimal]], submitted_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None, delayed_until: Optional[datetime] = None) -&gt; SubmitOrderResponse</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -48004,6 +48317,16 @@ zero ratio is rejected by the server with <code>602001</code></p>
               –
               <div class="doc-md-description">
                 <p>Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Time-condition submit time (later than now, at most 90 days ahead; only <code>LO</code> / <code>MO</code> support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (<code>Order.delayed_until</code> is naive local time, so call <code>.astimezone()</code> on it before passing it back)</p>
               </div>
             </li>
         </ul>
@@ -68300,7 +68623,7 @@ asyncio.run(main())</code></pre>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">replace_order(order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, attached_params: Optional[ReplaceAttachedParams] = None) -&gt; Awaitable[None]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">replace_order(order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, attached_params: Optional[ReplaceAttachedParams] = None, delayed_until: Optional[datetime] = None, clear_delayed_until: bool = False) -&gt; Awaitable[None]</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -68433,6 +68756,26 @@ asyncio.run(main())</code></pre>
                 <p>Attached order parameters.</p>
               </div>
             </li>
+            <li>
+              <b><code>delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>New time-condition submit time (later than now, at most 90 days ahead); <code>None</code> keeps the current time condition. Pass a timezone-aware datetime; a naive one is read as UTC (<code>Order.delayed_until</code> is naive local time, so call <code>.astimezone()</code> on it before passing it back).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>clear_delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Clear the time condition, turning the order into a regular order (takes precedence over <code>delayed_until</code>).</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -68472,7 +68815,7 @@ asyncio.run(main())</code></pre>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">submit_order(symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None, outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None, attached_params: Optional[SubmitAttachedParams] = None) -&gt; Awaitable[SubmitOrderResponse]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">submit_order(symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None, outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None, attached_params: Optional[SubmitAttachedParams] = None, delayed_until: Optional[datetime] = None) -&gt; Awaitable[SubmitOrderResponse]</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -68659,6 +69002,16 @@ asyncio.run(main())</code></pre>
                 <p>Attached order parameters.</p>
               </div>
             </li>
+            <li>
+              <b><code>delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Time-condition submit time. The order is held in <code>DelayedNotReported</code> status and only submitted at this time (later than now, at most 90 days ahead). Pass a timezone-aware datetime; a naive one is read as UTC (<code>Order.delayed_until</code> is naive local time, so call <code>.astimezone()</code> on it before passing it back).</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -68709,7 +69062,7 @@ asyncio.run(main())</code></pre>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">submit_multileg(side: Type[OrderSide], order_type: Type[OrderType], submitted_quantity: Decimal, strategy: Type[MultiLegStrategy], legs: List[Tuple[str, Decimal]], submitted_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None) -&gt; Awaitable[SubmitOrderResponse]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">submit_multileg(side: Type[OrderSide], order_type: Type[OrderType], submitted_quantity: Decimal, strategy: Type[MultiLegStrategy], legs: List[Tuple[str, Decimal]], submitted_price: Optional[Decimal] = None, remark: Optional[str] = None, client_request_id: Optional[str] = None, delayed_until: Optional[datetime] = None) -&gt; Awaitable[SubmitOrderResponse]</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -68799,6 +69152,16 @@ zero ratio is rejected by the server with <code>602001</code></p>
               –
               <div class="doc-md-description">
                 <p>Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>delayed_until</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Time-condition submit time (later than now, at most 90 days ahead; only <code>LO</code> / <code>MO</code> support time conditions). Pass a timezone-aware datetime; a naive one is read as UTC (<code>Order.delayed_until</code> is naive local time, so call <code>.astimezone()</code> on it before passing it back).</p>
               </div>
             </li>
         </ul>

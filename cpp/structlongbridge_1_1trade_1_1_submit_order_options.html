@@ -132,6 +132,8 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:abc1301d0c12b64d209ce404c07d643e1"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structlongbridge_1_1trade_1_1_submit_attached_params.html">SubmitAttachedParams</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_submit_order_options.html#abc1301d0c12b64d209ce404c07d643e1">attached_params</a></td></tr>
 <tr class="memdesc:abc1301d0c12b64d209ce404c07d643e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attached order params.  <a href="structlongbridge_1_1trade_1_1_submit_order_options.html#abc1301d0c12b64d209ce404c07d643e1">More...</a><br /></td></tr>
 <tr class="separator:abc1301d0c12b64d209ce404c07d643e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a804ba0474b446952da13b398b5ce85"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_submit_order_options.html#a9a804ba0474b446952da13b398b5ce85">delayed_until</a></td></tr>
+<tr class="separator:a9a804ba0474b446952da13b398b5ce85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for submit order request. </p>
@@ -164,6 +166,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Idempotent request ID for preventing duplicate orders. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes. </p>
+
+</div>
+</div>
+<a id="a9a804ba0474b446952da13b398b5ce85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a804ba0474b446952da13b398b5ce85">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int64_t&gt; longbridge::trade::SubmitOrderOptions::delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Time-condition submit time (Unix timestamp in seconds). The order is held in <code>DelayedNotReported</code> status and only submitted at this time, which must be later than now and no more than 90 days ahead. </p>
 
 </div>
 </div>

@@ -103,6 +103,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a1db035f46e4a0254f10ee02a6f1a8c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f0a5b1a1120634696d6a32b2c11ee78"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_submit_multi_leg_order_options.html#a7f0a5b1a1120634696d6a32b2c11ee78">client_request_id</a></td></tr>
 <tr class="separator:a7f0a5b1a1120634696d6a32b2c11ee78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ef397991105c71e2c2530621d0471eb"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_submit_multi_leg_order_options.html#a9ef397991105c71e2c2530621d0471eb">delayed_until</a></td></tr>
+<tr class="separator:a9ef397991105c71e2c2530621d0471eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for submit multi-leg order request. </p>
@@ -119,6 +121,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Idempotent request ID for preventing duplicate orders. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes. </p>
+
+</div>
+</div>
+<a id="a9ef397991105c71e2c2530621d0471eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ef397991105c71e2c2530621d0471eb">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int64_t&gt; longbridge::trade::SubmitMultiLegOrderOptions::delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Time-condition submit time (Unix timestamp in seconds), later than now and no more than 90 days ahead. Only <code>LO</code> / <code>MO</code> support time conditions. </p>
 
 </div>
 </div>

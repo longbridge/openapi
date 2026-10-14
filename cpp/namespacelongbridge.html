@@ -164,6 +164,11 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:aad376e5dd35664b8b6533d6dacef015a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push candlestick mode.  <a href="namespacelongbridge.html#aad376e5dd35664b8b6533d6dacef015a">More...</a><br /></td></tr>
 <tr class="separator:aad376e5dd35664b8b6533d6dacef015a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d0a58098f9791768531caeedf200f2e"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2e">QuoteTransport</a> { <a class="el" href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2ea45edc1b96407d9d213dd1135962a32a0">WebSocket</a>
+, <a class="el" href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2ea9d4d43de68f0b3555d5a5ef5dc05bb95">Http</a>
+ }</td></tr>
+<tr class="memdesc:a1d0a58098f9791768531caeedf200f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transport used by the quote pull APIs.  <a href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2e">More...</a><br /></td></tr>
+<tr class="separator:a1d0a58098f9791768531caeedf200f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac23c9164f0ed3247af35cd39ec1f0619"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongbridge.html#ac23c9164f0ed3247af35cd39ec1f0619">Market</a> { <br />
 &#160;&#160;<a class="el" href="namespacelongbridge.html#ac23c9164f0ed3247af35cd39ec1f0619a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a>
 , <a class="el" href="namespacelongbridge.html#ac23c9164f0ed3247af35cd39ec1f0619a7516fd43adaa5e0b8a65a672c39845d2">US</a>
@@ -339,6 +344,36 @@ template&lt;typename Ctx , typename T &gt; </div>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aad376e5dd35664b8b6533d6dacef015aaa5ff58bda67e2160b5e5d5a47a4333c3"></a>Realtime&#160;</td><td class="fielddoc"><p>Real-time. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="aad376e5dd35664b8b6533d6dacef015aa205bc73c4ab4286a1fb9d4c18322777c"></a>Confirmed&#160;</td><td class="fielddoc"><p>Confirmed. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a1d0a58098f9791768531caeedf200f2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d0a58098f9791768531caeedf200f2e">&#9670;&nbsp;</a></span>QuoteTransport</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacelongbridge.html#a1d0a58098f9791768531caeedf200f2e">longbridge::QuoteTransport</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Transport used by the quote pull APIs. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1d0a58098f9791768531caeedf200f2ea45edc1b96407d9d213dd1135962a32a0"></a>WebSocket&#160;</td><td class="fielddoc"><p>Send pull requests over the quote WebSocket connection (default) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a1d0a58098f9791768531caeedf200f2ea9d4d43de68f0b3555d5a5ef5dc05bb95"></a>Http&#160;</td><td class="fielddoc"><p>Send pull requests over HTTP (<code>POST /quote/*</code>) where the API has a REST equivalent, falling back to the WebSocket for the rest. Using only HTTP-backed APIs never opens a WebSocket connection. </p>
 </td></tr>
 </table>
 
