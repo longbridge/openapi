@@ -2226,5 +2226,11 @@ mod tests {
         let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
         assert_eq!(detail.status, OrderStatus::DelayedNotReported);
         assert_eq!(detail.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
+
+        // The spec marks delayed_until nullable.
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["delayed_until"] = serde_json::Value::Null;
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert!(detail.delayed_until.is_none());
     }
 }
