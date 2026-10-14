@@ -506,7 +506,7 @@ pub struct Order {
     /// time-condition order)
     #[serde(
         default,
-        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
         serialize_with = "serde_utils::rfc3339_opt::serialize"
     )]
     pub delayed_until: Option<OffsetDateTime>,
@@ -715,7 +715,7 @@ pub struct OrderDetail {
     /// time-condition order)
     #[serde(
         default,
-        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
         serialize_with = "serde_utils::rfc3339_opt::serialize"
     )]
     pub delayed_until: Option<OffsetDateTime>,
@@ -2232,5 +2232,21 @@ mod tests {
         value["delayed_until"] = serde_json::Value::Null;
         let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
         assert!(detail.delayed_until.is_none());
+
+        // A malformed value in this new field must not fail the whole response.
+        for (raw, expected) in [
+            (
+                serde_json::json!(1767225600),
+                Some(datetime!(2026-01-01 00:00 UTC)),
+            ),
+            (serde_json::json!("abc"), None),
+            (serde_json::json!("99999999999999"), None),
+            (serde_json::json!(""), None),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+            value["delayed_until"] = raw.clone();
+            let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+            assert_eq!(detail.delayed_until, expected, "{raw}");
+        }
     }
 }
