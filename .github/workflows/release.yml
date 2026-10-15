@@ -787,7 +787,23 @@ jobs:
         run: ls -R ./npm
         shell: bash
         working-directory: ./nodejs
+      # npm refuses to publish over an existing version (E403), so a re-run of
+      # the release (e.g. to retry a different SDK's publish) would fail here.
+      # Skip when this version is already published. Only the main package is
+      # checked: it is published last, after every platform package.
+      - name: Check if version already on npm
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ -n "$(npm view "longbridge@${version}" version 2>/dev/null)" ]; then
+            echo "longbridge ${version} already on npm; skipping publish."
+            echo "NPM_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "longbridge ${version} not found on npm; will publish."
+            echo "NPM_EXISTS=false" >> $GITHUB_ENV
+          fi
+        working-directory: ./nodejs
       - name: Publish
+        if: env.NPM_EXISTS != 'true'
         run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
           npm publish --access public
