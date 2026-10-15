@@ -509,16 +509,26 @@ where
     timestamp::deserialize(deserializer)
 }
 
-/// Like `int32_opt_0_is_none`, but also accepts `null`, for newly added
-/// response fields.
+/// Lenient variant of `int32_opt_0_is_none` for newly added response fields:
+/// accepts an integer or a numeric string; `null`, `0`, or a value that is not
+/// a valid `i32` become `None` instead of failing the whole response.
 pub(crate) mod int32_opt_null_or_0_is_none {
+    use serde_json::Value;
+
     use super::*;
 
     pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<i32>, D::Error>
     where
         D: Deserializer<'de>,
     {
-        Ok(Option::<i32>::deserialize(deserializer)?.filter(|value| *value != 0))
+        let value = match Option::<Value>::deserialize(deserializer)? {
+            Some(Value::Number(value)) => value.as_i64(),
+            Some(Value::String(value)) => value.trim().parse::<i64>().ok(),
+            _ => None,
+        };
+        Ok(value
+            .and_then(|value| i32::try_from(value).ok())
+            .filter(|value| *value != 0))
     }
 }
 

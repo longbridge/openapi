@@ -2289,6 +2289,9 @@ mod tests {
         for (raw, expected) in [
             (serde_json::json!(0), None),
             (serde_json::json!(3), Some(3)),
+            (serde_json::json!(-2), Some(-2)),
+            (serde_json::json!("3"), Some(3)),
+            (serde_json::json!("abc"), None),
             (serde_json::Value::Null, None),
         ] {
             let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
