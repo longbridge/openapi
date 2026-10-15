@@ -13,6 +13,8 @@ public class SubmitAttachedParams {
     private BigDecimal profitTakerSubmitPrice;
     private BigDecimal stopLossSubmitPrice;
     private OutsideRTH activateRth;
+    private Integer profitTakerDepthLevel;
+    private Integer stopLossDepthLevel;
 
     public SubmitAttachedParams(AttachedOrderType attachedOrderType) {
         this.attachedOrderType = attachedOrderType;
@@ -51,4 +53,26 @@ public class SubmitAttachedParams {
     public SubmitAttachedParams setActivateRth(OutsideRTH v) { this.activateRth = v; return this; }
 
     public OutsideRTH getActivateRth() { return activateRth; }
+
+    /**
+     * Sets the bid/ask depth level for the take-profit limit order submitted
+     * price, valid when {@code activateOrderType} is {@code LIT}.
+     *
+     * @param v depth level
+     * @return this instance for chaining
+     */
+    public SubmitAttachedParams setProfitTakerDepthLevel(Integer v) { this.profitTakerDepthLevel = v; return this; }
+
+    public Integer getProfitTakerDepthLevel() { return profitTakerDepthLevel; }
+
+    /**
+     * Sets the bid/ask depth level for the stop-loss limit order submitted
+     * price, valid when {@code activateOrderType} is {@code LIT}.
+     *
+     * @param v depth level
+     * @return this instance for chaining
+     */
+    public SubmitAttachedParams setStopLossDepthLevel(Integer v) { this.stopLossDepthLevel = v; return this; }
+
+    public Integer getStopLossDepthLevel() { return stopLossDepthLevel; }
 }

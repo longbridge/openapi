@@ -106,6 +106,8 @@ pub struct CAttachedOrderDetail {
     pub activate_rth: *const COutsideRTH,
     /// Submit price (maybe null)
     pub submit_price: *const CDecimal,
+    /// Bid/ask depth level of the limit order submitted price (maybe null)
+    pub limit_depth_level: *const i32,
 }
 
 #[derive(Debug)]
@@ -131,6 +133,7 @@ pub(crate) struct CAttachedOrderDetailOwned {
     activate_order_type: OrderType,
     activate_rth: Option<COutsideRTH>,
     submit_price: Option<CDecimal>,
+    limit_depth_level: Option<i32>,
 }
 
 impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
@@ -157,6 +160,7 @@ impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
             activate_order_type,
             activate_rth,
             submit_price,
+            limit_depth_level,
         } = detail;
         Self {
             order_id: order_id.into(),
@@ -180,6 +184,7 @@ impl From<AttachedOrderDetail> for CAttachedOrderDetailOwned {
             activate_order_type,
             activate_rth: activate_rth.map(Into::into),
             submit_price: submit_price.map(Into::into),
+            limit_depth_level,
         }
     }
 }
@@ -210,6 +215,7 @@ impl ToFFI for CAttachedOrderDetailOwned {
             activate_order_type,
             activate_rth,
             submit_price,
+            limit_depth_level,
         } = self;
         CAttachedOrderDetail {
             order_id: order_id.to_ffi_type(),
@@ -253,6 +259,10 @@ impl ToFFI for CAttachedOrderDetailOwned {
             submit_price: submit_price
                 .as_ref()
                 .map(ToFFI::to_ffi_type)
+                .unwrap_or(std::ptr::null()),
+            limit_depth_level: limit_depth_level
+                .as_ref()
+                .map(|value| value as *const i32)
                 .unwrap_or(std::ptr::null()),
         }
     }
@@ -444,6 +454,12 @@ pub struct CSubmitAttachedParams {
     pub stop_loss_submit_price: *const CDecimal,
     /// RTH setting for activated order (can be null)
     pub activate_rth: *const COutsideRTH,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub profit_taker_depth_level: *const i32,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub stop_loss_depth_level: *const i32,
 }
 
 /// Options for replace attached order params
@@ -480,6 +496,12 @@ pub struct CReplaceAttachedParams {
     pub quantity: *const CDecimal,
     /// Market price (can be null)
     pub market_price: *const CDecimal,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub profit_taker_depth_level: *const i32,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activate_order_type` is `LIT` (can be null)
+    pub stop_loss_depth_level: *const i32,
 }
 
 /// Order changed message

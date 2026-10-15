@@ -617,7 +617,8 @@ impl_java_class!(
         reviewed,
         activate_order_type,
         activate_rth,
-        submit_price
+        submit_price,
+        limit_depth_level
     ]
 );
 

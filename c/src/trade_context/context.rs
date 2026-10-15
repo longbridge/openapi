@@ -524,6 +524,12 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
         if !ap.market_price.is_null() {
             rp = rp.market_price((*ap.market_price).value);
         }
+        if !ap.profit_taker_depth_level.is_null() {
+            rp = rp.profit_taker_depth_level(*ap.profit_taker_depth_level);
+        }
+        if !ap.stop_loss_depth_level.is_null() {
+            rp = rp.stop_loss_depth_level(*ap.stop_loss_depth_level);
+        }
         opts2 = opts2.attached_params(rp);
     }
     execute_async(callback, ctx, userdata, async move {
@@ -622,6 +628,12 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
         }
         if !ap.activate_rth.is_null() {
             sp = sp.activate_rth((*ap.activate_rth).into());
+        }
+        if !ap.profit_taker_depth_level.is_null() {
+            sp = sp.profit_taker_depth_level(*ap.profit_taker_depth_level);
+        }
+        if !ap.stop_loss_depth_level.is_null() {
+            sp = sp.stop_loss_depth_level(*ap.stop_loss_depth_level);
         }
         opts2 = opts2.attached_params(sp);
     }

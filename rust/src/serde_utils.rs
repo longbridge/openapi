@@ -509,6 +509,19 @@ where
     timestamp::deserialize(deserializer)
 }
 
+/// Like `int32_opt_0_is_none`, but also accepts `null`, for newly added
+/// response fields.
+pub(crate) mod int32_opt_null_or_0_is_none {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<i32>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(Option::<i32>::deserialize(deserializer)?.filter(|value| *value != 0))
+    }
+}
+
 pub(crate) mod int32_opt_0_is_none {
 
     use super::*;

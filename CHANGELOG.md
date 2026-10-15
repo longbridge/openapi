@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **All SDKs:** attached (take-profit / stop-loss) orders gain bid/ask depth levels (longbridge/developers#1189). `SubmitAttachedParams` and `ReplaceAttachedParams` gain `profit_taker_depth_level` / `stop_loss_depth_level` (int32): the depth level used for the take-profit / stop-loss limit order's submitted price, valid when `activate_order_type` is `LIT`. `AttachedOrderDetail` gains `limit_depth_level`, returned on the `attached_orders` of `today_orders` / `history_orders` / `order_detail` (unset when the server returns `0`, `null` or omits it). Per layer: Rust `profit_taker_depth_level(i32)` / `stop_loss_depth_level(i32)` builders and `Option<i32>`; C `const int32_t *` fields appended at the end of `CSubmitAttachedParams` / `CReplaceAttachedParams` / `CAttachedOrderDetail`; C++ `std::optional<int32_t>`; Java `setProfitTakerDepthLevel(Integer)` / `setStopLossDepthLevel(Integer)` / `getLimitDepthLevel()`; Node.js `profitTakerDepthLevel?` / `stopLossDepthLevel?` / `limitDepthLevel`; Python keyword arguments and `AttachedOrderDetail.limit_depth_level`
+
 ## [5.2.1] - 2026-10-14
 
 ### Added

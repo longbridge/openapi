@@ -6300,9 +6300,18 @@ class AttachedOrderDetail:
     Submit price
     """
 
+    limit_depth_level: Optional[int]
+    """
+    Bid/ask depth level of the limit order submitted price
+    """
+
 class SubmitAttachedParams:
     """
     Submit attached order parameters
+
+    ``profit_taker_depth_level`` / ``stop_loss_depth_level`` set the bid/ask
+    depth level for the take-profit / stop-loss limit order submitted price,
+    valid when ``activate_order_type`` is ``LIT``.
     """
 
     def __init__(
@@ -6317,11 +6326,17 @@ class SubmitAttachedParams:
         profit_taker_submit_price: Optional[Decimal] = None,
         stop_loss_submit_price: Optional[Decimal] = None,
         activate_rth: Optional[Type[OutsideRTH]] = None,
+        profit_taker_depth_level: Optional[int] = None,
+        stop_loss_depth_level: Optional[int] = None,
     ) -> None: ...
 
 class ReplaceAttachedParams:
     """
     Replace attached order parameters
+
+    ``profit_taker_depth_level`` / ``stop_loss_depth_level`` set the bid/ask
+    depth level for the take-profit / stop-loss limit order submitted price,
+    valid when ``activate_order_type`` is ``LIT``.
     """
 
     def __init__(
@@ -6342,6 +6357,8 @@ class ReplaceAttachedParams:
         main_id: Optional[int] = None,
         quantity: Optional[Decimal] = None,
         market_price: Optional[Decimal] = None,
+        profit_taker_depth_level: Optional[int] = None,
+        stop_loss_depth_level: Optional[int] = None,
     ) -> None: ...
 
 class MultiLegStrategy:

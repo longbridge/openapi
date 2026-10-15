@@ -270,6 +270,9 @@ pub struct AttachedOrderDetail {
     /// Submit price
     #[js(opt)]
     submit_price: Option<Decimal>,
+    /// Bid/ask depth level of the limit order submitted price
+    #[js(opt)]
+    limit_depth_level: Option<i32>,
 }
 
 /// Multi-leg strategy

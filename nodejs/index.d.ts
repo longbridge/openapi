@@ -229,6 +229,8 @@ export declare class AttachedOrderDetail {
   get activateRth(): OutsideRTH | null
   /** Submit price */
   get submitPrice(): Decimal | null
+  /** Bid/ask depth level of the limit order submitted price */
+  get limitDepthLevel(): number | null
 }
 
 /** Brokers */
@@ -8129,6 +8131,16 @@ export interface ReplaceAttachedParams {
   quantity?: Decimal
   /** Market price */
   marketPrice?: Decimal
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
 }
 
 /** Options for replace grid trading order request */
@@ -8624,6 +8636,16 @@ export interface SubmitAttachedParams {
   stopLossSubmitPrice?: Decimal
   /** Activate RTH */
   activateRth?: OutsideRTH
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
 }
 
 /** Options for submitting a fund order. */
