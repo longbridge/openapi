@@ -272,6 +272,9 @@ pub(crate) struct AttachedOrderDetail {
     /// Submit price
     #[py(opt)]
     submit_price: Option<PyDecimal>,
+    /// Bid/ask depth level of the limit order submitted price
+    #[py(opt)]
+    limit_depth_level: Option<i32>,
 }
 
 /// Submit attached order parameters
@@ -283,7 +286,7 @@ pub(crate) struct SubmitAttachedParams(pub(crate) longbridge::trade::SubmitAttac
 impl SubmitAttachedParams {
     #[new]
     #[allow(clippy::too_many_arguments)]
-    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None))]
+    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None, profit_taker_depth_level=None, stop_loss_depth_level=None))]
     fn new(
         attached_order_type: AttachedOrderType,
         profit_taker_price: Option<PyDecimal>,
@@ -294,6 +297,8 @@ impl SubmitAttachedParams {
         profit_taker_submit_price: Option<PyDecimal>,
         stop_loss_submit_price: Option<PyDecimal>,
         activate_rth: Option<OutsideRTH>,
+        profit_taker_depth_level: Option<i32>,
+        stop_loss_depth_level: Option<i32>,
     ) -> Self {
         let mut p = longbridge::trade::SubmitAttachedParams::new(attached_order_type.into());
         if let Some(v) = profit_taker_price {
@@ -320,6 +325,12 @@ impl SubmitAttachedParams {
         if let Some(v) = activate_rth {
             p = p.activate_rth(v.into());
         }
+        if let Some(v) = profit_taker_depth_level {
+            p = p.profit_taker_depth_level(v);
+        }
+        if let Some(v) = stop_loss_depth_level {
+            p = p.stop_loss_depth_level(v);
+        }
         Self(p)
     }
 }
@@ -332,7 +343,7 @@ pub(crate) struct ReplaceAttachedParams(pub(crate) longbridge::trade::ReplaceAtt
 #[pymethods]
 impl ReplaceAttachedParams {
     #[new]
-    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None, profit_taker_id=None, stop_loss_id=None, cancel_all_attached=None, main_id=None, quantity=None, market_price=None))]
+    #[pyo3(signature = (attached_order_type, *, profit_taker_price=None, stop_loss_price=None, time_in_force=None, expire_time=None, activate_order_type=None, profit_taker_submit_price=None, stop_loss_submit_price=None, activate_rth=None, profit_taker_id=None, stop_loss_id=None, cancel_all_attached=None, main_id=None, quantity=None, market_price=None, profit_taker_depth_level=None, stop_loss_depth_level=None))]
     #[allow(clippy::too_many_arguments)]
     fn new(
         attached_order_type: AttachedOrderType,
@@ -350,6 +361,8 @@ impl ReplaceAttachedParams {
         main_id: Option<i64>,
         quantity: Option<PyDecimal>,
         market_price: Option<PyDecimal>,
+        profit_taker_depth_level: Option<i32>,
+        stop_loss_depth_level: Option<i32>,
     ) -> Self {
         let mut p = longbridge::trade::ReplaceAttachedParams::new(attached_order_type.into());
         if let Some(v) = profit_taker_price {
@@ -393,6 +406,12 @@ impl ReplaceAttachedParams {
         }
         if let Some(v) = market_price {
             p = p.market_price(v.into());
+        }
+        if let Some(v) = profit_taker_depth_level {
+            p = p.profit_taker_depth_level(v);
+        }
+        if let Some(v) = stop_loss_depth_level {
+            p = p.stop_loss_depth_level(v);
         }
         Self(p)
     }

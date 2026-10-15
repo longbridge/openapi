@@ -316,6 +316,13 @@ pub struct AttachedOrderDetail {
     /// Submit price (limit price)
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub submit_price: Option<Decimal>,
+    /// Bid/ask depth level of the limit order submitted price
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::int32_opt_null_or_0_is_none::deserialize",
+        serialize_with = "serde_utils::int32_opt_0_is_none::serialize"
+    )]
+    pub limit_depth_level: Option<i32>,
 }
 
 /// Multi-leg strategy
@@ -2249,5 +2256,54 @@ mod tests {
             let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
             assert_eq!(detail.delayed_until, expected, "{raw}");
         }
+    }
+
+    #[test]
+    fn attached_order_limit_depth_level() {
+        let data = r#"
+        {
+            "order_id": "706388312699592705",
+            "attached_type_display": "STOP_LOSS",
+            "trigger_price": "10.500",
+            "quantity": "200",
+            "executed_qty": "0",
+            "status": "NewStatus",
+            "updated_at": "1651644898",
+            "withdrawn": false,
+            "gtd": "",
+            "time_in_force": "Day",
+            "counter_id": "",
+            "trigger_status": "NOT_USED",
+            "executed_amount": "0",
+            "tag": "Normal",
+            "submitted_at": "1651644897",
+            "executed_price": "0.000",
+            "force_only_rth": "RTH_ONLY",
+            "reviewed": false,
+            "activate_order_type": "MIT",
+            "activate_rth": "RTH_ONLY",
+            "submit_price": "",
+            "limit_depth_level": 0
+        }
+        "#;
+        for (raw, expected) in [
+            (serde_json::json!(0), None),
+            (serde_json::json!(3), Some(3)),
+            (serde_json::json!(-2), Some(-2)),
+            (serde_json::json!("3"), Some(3)),
+            (serde_json::json!("abc"), None),
+            (serde_json::Value::Null, None),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+            value["limit_depth_level"] = raw.clone();
+            let detail = serde_json::from_value::<AttachedOrderDetail>(value).unwrap();
+            assert_eq!(detail.limit_depth_level, expected, "{raw}");
+        }
+
+        // Responses that predate the field still deserialize.
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value.as_object_mut().unwrap().remove("limit_depth_level");
+        let detail = serde_json::from_value::<AttachedOrderDetail>(value).unwrap();
+        assert!(detail.limit_depth_level.is_none());
     }
 }

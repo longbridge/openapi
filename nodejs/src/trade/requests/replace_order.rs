@@ -40,6 +40,12 @@ pub struct ReplaceAttachedParams<'env> {
     pub quantity: Option<ClassInstance<'env, Decimal>>,
     /// Market price
     pub market_price: Option<ClassInstance<'env, Decimal>>,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activateOrderType` is `LIT`
+    pub profit_taker_depth_level: Option<i32>,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activateOrderType` is `LIT`
+    pub stop_loss_depth_level: Option<i32>,
 }
 
 impl<'env> From<ReplaceAttachedParams<'env>> for longbridge::trade::ReplaceAttachedParams {
@@ -86,6 +92,12 @@ impl<'env> From<ReplaceAttachedParams<'env>> for longbridge::trade::ReplaceAttac
         }
         if let Some(v) = p.market_price {
             opts = opts.market_price(v.0);
+        }
+        if let Some(v) = p.profit_taker_depth_level {
+            opts = opts.profit_taker_depth_level(v);
+        }
+        if let Some(v) = p.stop_loss_depth_level {
+            opts = opts.stop_loss_depth_level(v);
         }
         opts
     }

@@ -19,6 +19,8 @@ public class ReplaceAttachedParams {
     private Long mainId;
     private BigDecimal quantity;
     private BigDecimal marketPrice;
+    private Integer profitTakerDepthLevel;
+    private Integer stopLossDepthLevel;
 
     public ReplaceAttachedParams(AttachedOrderType attachedOrderType) {
         this.attachedOrderType = attachedOrderType;
@@ -81,4 +83,26 @@ public class ReplaceAttachedParams {
     public ReplaceAttachedParams setMarketPrice(BigDecimal v) { this.marketPrice = v; return this; }
 
     public BigDecimal getMarketPrice() { return marketPrice; }
+
+    /**
+     * Sets the bid/ask depth level for the take-profit limit order submitted
+     * price, valid when {@code activateOrderType} is {@code LIT}.
+     *
+     * @param v depth level
+     * @return this instance for chaining
+     */
+    public ReplaceAttachedParams setProfitTakerDepthLevel(Integer v) { this.profitTakerDepthLevel = v; return this; }
+
+    public Integer getProfitTakerDepthLevel() { return profitTakerDepthLevel; }
+
+    /**
+     * Sets the bid/ask depth level for the stop-loss limit order submitted
+     * price, valid when {@code activateOrderType} is {@code LIT}.
+     *
+     * @param v depth level
+     * @return this instance for chaining
+     */
+    public ReplaceAttachedParams setStopLossDepthLevel(Integer v) { this.stopLossDepthLevel = v; return this; }
+
+    public Integer getStopLossDepthLevel() { return stopLossDepthLevel; }
 }

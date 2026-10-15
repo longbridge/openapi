@@ -1470,6 +1470,8 @@ convert(const CAttachedOrderDetail* detail)
                          : std::nullopt,
     detail->submit_price ? std::optional{ Decimal(detail->submit_price) }
                          : std::nullopt,
+    detail->limit_depth_level ? std::optional{ *detail->limit_depth_level }
+                              : std::nullopt,
   };
 }
 
@@ -1514,6 +1516,10 @@ convert_submit_attached(const SubmitAttachedParams& src)
     s.activate_rth = convert(*src.activate_rth);
     s.params.activate_rth = &s.activate_rth;
   }
+  s.params.profit_taker_depth_level =
+    src.profit_taker_depth_level ? &*src.profit_taker_depth_level : nullptr;
+  s.params.stop_loss_depth_level =
+    src.stop_loss_depth_level ? &*src.stop_loss_depth_level : nullptr;
   return s;
 }
 
@@ -1568,6 +1574,10 @@ convert_replace_attached(const ReplaceAttachedParams& src)
     src.quantity ? (const lb_decimal_t*)src.quantity.value() : nullptr;
   s.params.market_price =
     src.market_price ? (const lb_decimal_t*)src.market_price.value() : nullptr;
+  s.params.profit_taker_depth_level =
+    src.profit_taker_depth_level ? &*src.profit_taker_depth_level : nullptr;
+  s.params.stop_loss_depth_level =
+    src.stop_loss_depth_level ? &*src.stop_loss_depth_level : nullptr;
   return s;
 }
 

@@ -239,6 +239,10 @@ pub struct SubmitAttachedParams {
     stop_loss_submit_price: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
     activate_rth: Option<OutsideRTH>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    profit_taker_depth_level: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stop_loss_depth_level: Option<i32>,
 }
 
 impl SubmitAttachedParams {
@@ -254,6 +258,8 @@ impl SubmitAttachedParams {
             profit_taker_submit_price: None,
             stop_loss_submit_price: None,
             activate_rth: None,
+            profit_taker_depth_level: None,
+            stop_loss_depth_level: None,
         }
     }
     /// Set the take-profit trigger price
@@ -312,6 +318,24 @@ impl SubmitAttachedParams {
             ..self
         }
     }
+
+    /// Set the bid/ask depth level for the take-profit limit order submitted
+    /// price, valid when `activate_order_type` is `LIT`
+    pub fn profit_taker_depth_level(self, v: i32) -> Self {
+        Self {
+            profit_taker_depth_level: Some(v),
+            ..self
+        }
+    }
+
+    /// Set the bid/ask depth level for the stop-loss limit order submitted
+    /// price, valid when `activate_order_type` is `LIT`
+    pub fn stop_loss_depth_level(self, v: i32) -> Self {
+        Self {
+            stop_loss_depth_level: Some(v),
+            ..self
+        }
+    }
 }
 
 #[cfg(test)]
@@ -351,5 +375,18 @@ mod tests {
             serde_json::json!(2),
             "a time that maps to 0 must not be sent as a regular order"
         );
+    }
+
+    #[test]
+    fn attached_params_depth_level() {
+        let params = SubmitAttachedParams::new(AttachedOrderType::Bracket);
+        let value = serde_json::to_value(&params).unwrap();
+        assert!(value.get("profit_taker_depth_level").is_none());
+        assert!(value.get("stop_loss_depth_level").is_none());
+
+        let params = params.profit_taker_depth_level(2).stop_loss_depth_level(5);
+        let value = serde_json::to_value(&params).unwrap();
+        assert_eq!(value["profit_taker_depth_level"], serde_json::json!(2));
+        assert_eq!(value["stop_loss_depth_level"], serde_json::json!(5));
     }
 }

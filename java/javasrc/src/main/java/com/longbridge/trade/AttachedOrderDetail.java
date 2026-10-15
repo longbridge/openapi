@@ -29,6 +29,7 @@ public class AttachedOrderDetail {
     private OrderType activateOrderType;
     private OutsideRTH activateRth;
     private BigDecimal submitPrice;
+    private Integer limitDepthLevel;
 
     /**
      * Returns the order ID.
@@ -219,6 +220,15 @@ public class AttachedOrderDetail {
         return submitPrice;
     }
 
+    /**
+     * Returns the bid/ask depth level of the limit order submitted price.
+     *
+     * @return depth level, or {@code null} if not set
+     */
+    public Integer getLimitDepthLevel() {
+        return limitDepthLevel;
+    }
+
     @Override
     public String toString() {
         return "AttachedOrderDetail [orderId=" + orderId + ", attachedTypeDisplay=" + attachedTypeDisplay
@@ -228,6 +238,6 @@ public class AttachedOrderDetail {
                 + ", executedAmount=" + executedAmount + ", tag=" + tag + ", submittedAt=" + submittedAt
                 + ", executedPrice=" + executedPrice + ", forceOnlyRth=" + forceOnlyRth + ", reviewed=" + reviewed
                 + ", activateOrderType=" + activateOrderType + ", activateRth=" + activateRth + ", submitPrice="
-                + submitPrice + "]";
+                + submitPrice + ", limitDepthLevel=" + limitDepthLevel + "]";
     }
 }

@@ -29,6 +29,12 @@ pub struct SubmitAttachedParams<'env> {
     pub stop_loss_submit_price: Option<ClassInstance<'env, Decimal>>,
     /// Activate RTH
     pub activate_rth: Option<OutsideRTH>,
+    /// Bid/ask depth level for the take-profit limit order submitted price,
+    /// valid when `activateOrderType` is `LIT`
+    pub profit_taker_depth_level: Option<i32>,
+    /// Bid/ask depth level for the stop-loss limit order submitted price,
+    /// valid when `activateOrderType` is `LIT`
+    pub stop_loss_depth_level: Option<i32>,
 }
 
 impl<'env> From<SubmitAttachedParams<'env>> for longbridge::trade::SubmitAttachedParams {
@@ -57,6 +63,12 @@ impl<'env> From<SubmitAttachedParams<'env>> for longbridge::trade::SubmitAttache
         }
         if let Some(v) = p.activate_rth {
             opts = opts.activate_rth(v.into());
+        }
+        if let Some(v) = p.profit_taker_depth_level {
+            opts = opts.profit_taker_depth_level(v);
+        }
+        if let Some(v) = p.stop_loss_depth_level {
+            opts = opts.stop_loss_depth_level(v);
         }
         opts
     }
