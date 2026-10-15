@@ -511,7 +511,7 @@ where
 
 /// Lenient variant of `int32_opt_0_is_none` for newly added response fields:
 /// accepts an integer or a numeric string; `null`, `0`, or a value that is not
-/// a valid `i32` become `None` instead of failing the whole response.
+/// a valid `i32` becomes `None` instead of failing the whole response.
 pub(crate) mod int32_opt_null_or_0_is_none {
     use serde_json::Value;
 
