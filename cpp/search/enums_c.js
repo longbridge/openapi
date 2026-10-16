@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['period_4022',['Period',['../namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4',1,'longbridge::quote']]],
-  ['pushcandlestickmode_4023',['PushCandlestickMode',['../namespacelongbridge.html#aad376e5dd35664b8b6533d6dacef015a',1,'longbridge']]]
+  ['period_4021',['Period',['../namespacelongbridge_1_1quote.html#a2bb54e3a1823a0571a6cacbdbf231fc4',1,'longbridge::quote']]],
+  ['pushcandlestickmode_4022',['PushCandlestickMode',['../namespacelongbridge.html#aad376e5dd35664b8b6533d6dacef015a',1,'longbridge']]]
 ];

@@ -110,6 +110,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ae21c404fe91cc0176ae3ad9f6577a76d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59e5f1d5a209a8065112d411405a1340"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongbridge_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_replace_attached_params.html#a59e5f1d5a209a8065112d411405a1340">market_price</a></td></tr>
 <tr class="separator:a59e5f1d5a209a8065112d411405a1340"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaee82d22ed21a0b26cd4702ce91b9bec"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_replace_attached_params.html#aaee82d22ed21a0b26cd4702ce91b9bec">profit_taker_depth_level</a></td></tr>
+<tr class="separator:aaee82d22ed21a0b26cd4702ce91b9bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c90f0dc157e4aa487b06570e72699fd"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongbridge_1_1trade_1_1_replace_attached_params.html#a8c90f0dc157e4aa487b06570e72699fd">stop_loss_depth_level</a></td></tr>
+<tr class="separator:a8c90f0dc157e4aa487b06570e72699fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Replace attached order params. </p>
@@ -212,6 +216,21 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="aaee82d22ed21a0b26cd4702ce91b9bec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaee82d22ed21a0b26cd4702ce91b9bec">&#9670;&nbsp;</a></span>profit_taker_depth_level</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int32_t&gt; longbridge::trade::ReplaceAttachedParams::profit_taker_depth_level</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Bid/ask depth level for the take-profit limit order submitted price, valid when <code>activate_order_type</code> is <code>LIT</code> </p>
+
+</div>
+</div>
 <a id="adb62f5240f46fbb48f5a84f58ed0e6a7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adb62f5240f46fbb48f5a84f58ed0e6a7">&#9670;&nbsp;</a></span>profit_taker_id</h2>
 
@@ -265,6 +284,21 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8c90f0dc157e4aa487b06570e72699fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c90f0dc157e4aa487b06570e72699fd">&#9670;&nbsp;</a></span>stop_loss_depth_level</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int32_t&gt; longbridge::trade::ReplaceAttachedParams::stop_loss_depth_level</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Bid/ask depth level for the stop-loss limit order submitted price, valid when <code>activate_order_type</code> is <code>LIT</code> </p>
 
 </div>
 </div>

@@ -102,6 +102,10 @@ Data Fields</h2></td></tr>
 <tr class="separator:a15a1ea598e01b8b70800af9580b2176e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfe769bb42135cfe5b03ee95abea51c6"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="longbridge_8h.html#a050557cb28af08567f39a2dac995788c">lb_decimal_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_replace_attached_params.html#acfe769bb42135cfe5b03ee95abea51c6">market_price</a></td></tr>
 <tr class="separator:acfe769bb42135cfe5b03ee95abea51c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d7fc763beea636251c68a1ec6a51863"><td class="memItemLeft" align="right" valign="top">const int32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_replace_attached_params.html#a9d7fc763beea636251c68a1ec6a51863">profit_taker_depth_level</a></td></tr>
+<tr class="separator:a9d7fc763beea636251c68a1ec6a51863"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b67a180144a1c1bbd8ac815d17ea651"><td class="memItemLeft" align="right" valign="top">const int32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_replace_attached_params.html#a5b67a180144a1c1bbd8ac815d17ea651">stop_loss_depth_level</a></td></tr>
+<tr class="separator:a5b67a180144a1c1bbd8ac815d17ea651"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for replace attached order params </p>
@@ -211,6 +215,21 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
+<a id="a9d7fc763beea636251c68a1ec6a51863"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d7fc763beea636251c68a1ec6a51863">&#9670;&nbsp;</a></span>profit_taker_depth_level</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int32_t* profit_taker_depth_level</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Bid/ask depth level for the take-profit limit order submitted price, valid when <code>activate_order_type</code> is <code>LIT</code> (can be null) </p>
+
+</div>
+</div>
 <a id="a0f053b0bdd2e27ef61de18ed7a0826f7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0f053b0bdd2e27ef61de18ed7a0826f7">&#9670;&nbsp;</a></span>profit_taker_id</h2>
 
@@ -268,6 +287,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Quantity (can be null) </p>
+
+</div>
+</div>
+<a id="a5b67a180144a1c1bbd8ac815d17ea651"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b67a180144a1c1bbd8ac815d17ea651">&#9670;&nbsp;</a></span>stop_loss_depth_level</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int32_t* stop_loss_depth_level</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Bid/ask depth level for the stop-loss limit order submitted price, valid when <code>activate_order_type</code> is <code>LIT</code> (can be null) </p>
 
 </div>
 </div>

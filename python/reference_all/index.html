@@ -1806,6 +1806,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AttachedOrderDetail.submit_price">submit_price</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AttachedOrderDetail.limit_depth_level">limit_depth_level</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.SubmitAttachedParams">SubmitAttachedParams</a>
@@ -40117,6 +40119,29 @@ combination orders)</p>
 
 </div>
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.AttachedOrderDetail.limit_depth_level" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">limit_depth_level</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">limit_depth_level: Optional[int]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Bid/ask depth level of the limit order submitted price</p>
+
+    </div>
+
+</div>
+
 
 
 
@@ -40145,6 +40170,9 @@ combination orders)</p>
 
 
         <p>Submit attached order parameters</p>
+<p><code>profit_taker_depth_level</code> / <code>stop_loss_depth_level</code> set the bid/ask
+depth level for the take-profit / stop-loss limit order submitted price,
+valid when <code>activate_order_type</code> is <code>LIT</code>.</p>
 
 
 
@@ -40174,7 +40202,7 @@ combination orders)</p>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">__init__(attached_order_type: Type[AttachedOrderType], *, profit_taker_price: Optional[Decimal] = None, stop_loss_price: Optional[Decimal] = None, time_in_force: Optional[Type[TimeInForceType]] = None, expire_time: Optional[int] = None, activate_order_type: Optional[Type[OrderType]] = None, profit_taker_submit_price: Optional[Decimal] = None, stop_loss_submit_price: Optional[Decimal] = None, activate_rth: Optional[Type[OutsideRTH]] = None) -&gt; None</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">__init__(attached_order_type: Type[AttachedOrderType], *, profit_taker_price: Optional[Decimal] = None, stop_loss_price: Optional[Decimal] = None, time_in_force: Optional[Type[TimeInForceType]] = None, expire_time: Optional[int] = None, activate_order_type: Optional[Type[OrderType]] = None, profit_taker_submit_price: Optional[Decimal] = None, stop_loss_submit_price: Optional[Decimal] = None, activate_rth: Optional[Type[OutsideRTH]] = None, profit_taker_depth_level: Optional[int] = None, stop_loss_depth_level: Optional[int] = None) -&gt; None</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -40208,6 +40236,9 @@ combination orders)</p>
 
 
         <p>Replace attached order parameters</p>
+<p><code>profit_taker_depth_level</code> / <code>stop_loss_depth_level</code> set the bid/ask
+depth level for the take-profit / stop-loss limit order submitted price,
+valid when <code>activate_order_type</code> is <code>LIT</code>.</p>
 
 
 
@@ -40237,7 +40268,7 @@ combination orders)</p>
 
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">__init__(attached_order_type: Type[AttachedOrderType], *, profit_taker_price: Optional[Decimal] = None, stop_loss_price: Optional[Decimal] = None, time_in_force: Optional[Type[TimeInForceType]] = None, expire_time: Optional[int] = None, activate_order_type: Optional[Type[OrderType]] = None, profit_taker_submit_price: Optional[Decimal] = None, stop_loss_submit_price: Optional[Decimal] = None, activate_rth: Optional[Type[OutsideRTH]] = None, profit_taker_id: Optional[int] = None, stop_loss_id: Optional[int] = None, cancel_all_attached: Optional[bool] = None, main_id: Optional[int] = None, quantity: Optional[Decimal] = None, market_price: Optional[Decimal] = None) -&gt; None</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">__init__(attached_order_type: Type[AttachedOrderType], *, profit_taker_price: Optional[Decimal] = None, stop_loss_price: Optional[Decimal] = None, time_in_force: Optional[Type[TimeInForceType]] = None, expire_time: Optional[int] = None, activate_order_type: Optional[Type[OrderType]] = None, profit_taker_submit_price: Optional[Decimal] = None, stop_loss_submit_price: Optional[Decimal] = None, activate_rth: Optional[Type[OutsideRTH]] = None, profit_taker_id: Optional[int] = None, stop_loss_id: Optional[int] = None, cancel_all_attached: Optional[bool] = None, main_id: Optional[int] = None, quantity: Optional[Decimal] = None, market_price: Optional[Decimal] = None, profit_taker_depth_level: Optional[int] = None, stop_loss_depth_level: Optional[int] = None) -&gt; None</code></pre>
 
     <div class="doc doc-contents ">
 

@@ -1,16 +1,16 @@
 var searchData=
 [
-  ['oauth_4188',['OAuth',['../namespacelongbridge.html#ae47e393ec668e34c6bb11272a11ae1e0a54699d9a7e6df4edbca4053281b2458e',1,'longbridge']]],
-  ['odd_4189',['ODD',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa57a1355d5527355458c7cc08ba70bf94',1,'longbridge::trade']]],
-  ['old_4190',['Old',['../namespacelongbridge_1_1quote.html#a8a81f60c339e461e83b55a0670b7131dac7268757fbabf48019f4984933539d8a',1,'longbridge::quote']]],
-  ['once_4191',['Once',['../namespacelongbridge_1_1alert.html#ac312623a5e979f07230f3403d9de2e46ae1a9dc9f23534e63de9df0d540ac1611',1,'longbridge::alert']]],
-  ['openapi_4192',['OpenApi',['../namespacelongbridge.html#ae47e393ec668e34c6bb11272a11ae1e0a240af0311ea8ca4d95ff911ef427e302',1,'longbridge']]],
-  ['openinterest_4193',['OpenInterest',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011ae7e246aa3fb87bf22f1f1611959cf10f',1,'longbridge::quote']]],
-  ['optionpremarket_4194',['OptionPreMarket',['../namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1ac3b3a1c7e52f69b85c5f5873370cfd40',1,'longbridge::trade']]],
-  ['other_4195',['Other',['../namespacelongbridge.html#ae47e393ec668e34c6bb11272a11ae1e0a6311ae17c1ee52b36e68aaf4ad066387',1,'longbridge::Other()'],['../namespacelongbridge_1_1agent.html#af8b8c0e13c2fc57234fa94dc3adff7c6a6311ae17c1ee52b36e68aaf4ad066387',1,'longbridge::agent::Other()']]],
-  ['out_4196',['Out',['../namespacelongbridge_1_1quote.html#a5289e222e3bb502777ccfbdf64078802a7c147cda9e49590f6abe83d118b7353b',1,'longbridge::quote::Out()'],['../namespacelongbridge_1_1trade.html#a23d5b3d471eb835afb9e747c717363a8a7c147cda9e49590f6abe83d118b7353b',1,'longbridge::trade::Out()']]],
-  ['outstandingqty_4197',['OutstandingQty',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a08248a7064d0dbcc13e34087fe48ac19',1,'longbridge::quote']]],
-  ['outstandingquantity_4198',['OutstandingQuantity',['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7ae021c126cdb3026ede83458ffa919052',1,'longbridge::quote']]],
-  ['outstandingratio_4199',['OutstandingRatio',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011adc4d115301602dfff1f47945ba57eb73',1,'longbridge::quote::OutstandingRatio()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7adc4d115301602dfff1f47945ba57eb73',1,'longbridge::quote::OutstandingRatio()']]],
-  ['overnight_4200',['Overnight',['../namespacelongbridge_1_1quote.html#a3ecf294ed501aeb9673ad1cd6cd71669a60d2e80b9b8ac1b2afaf1d7181b725c2',1,'longbridge::quote::Overnight()'],['../namespacelongbridge_1_1quote.html#abd0ad1fcac6d23460ec4c165279f1a10a60d2e80b9b8ac1b2afaf1d7181b725c2',1,'longbridge::quote::Overnight()'],['../namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1a60d2e80b9b8ac1b2afaf1d7181b725c2',1,'longbridge::trade::Overnight()']]]
+  ['oauth_4187',['OAuth',['../namespacelongbridge.html#ae47e393ec668e34c6bb11272a11ae1e0a54699d9a7e6df4edbca4053281b2458e',1,'longbridge']]],
+  ['odd_4188',['ODD',['../namespacelongbridge_1_1trade.html#ae7d41371b5280feed3513fe83f92685aa57a1355d5527355458c7cc08ba70bf94',1,'longbridge::trade']]],
+  ['old_4189',['Old',['../namespacelongbridge_1_1quote.html#a8a81f60c339e461e83b55a0670b7131dac7268757fbabf48019f4984933539d8a',1,'longbridge::quote']]],
+  ['once_4190',['Once',['../namespacelongbridge_1_1alert.html#ac312623a5e979f07230f3403d9de2e46ae1a9dc9f23534e63de9df0d540ac1611',1,'longbridge::alert']]],
+  ['openapi_4191',['OpenApi',['../namespacelongbridge.html#ae47e393ec668e34c6bb11272a11ae1e0a240af0311ea8ca4d95ff911ef427e302',1,'longbridge']]],
+  ['openinterest_4192',['OpenInterest',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011ae7e246aa3fb87bf22f1f1611959cf10f',1,'longbridge::quote']]],
+  ['optionpremarket_4193',['OptionPreMarket',['../namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1ac3b3a1c7e52f69b85c5f5873370cfd40',1,'longbridge::trade']]],
+  ['other_4194',['Other',['../namespacelongbridge.html#ae47e393ec668e34c6bb11272a11ae1e0a6311ae17c1ee52b36e68aaf4ad066387',1,'longbridge::Other()'],['../namespacelongbridge_1_1agent.html#af8b8c0e13c2fc57234fa94dc3adff7c6a6311ae17c1ee52b36e68aaf4ad066387',1,'longbridge::agent::Other()']]],
+  ['out_4195',['Out',['../namespacelongbridge_1_1quote.html#a5289e222e3bb502777ccfbdf64078802a7c147cda9e49590f6abe83d118b7353b',1,'longbridge::quote::Out()'],['../namespacelongbridge_1_1trade.html#a23d5b3d471eb835afb9e747c717363a8a7c147cda9e49590f6abe83d118b7353b',1,'longbridge::trade::Out()']]],
+  ['outstandingqty_4196',['OutstandingQty',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011a08248a7064d0dbcc13e34087fe48ac19',1,'longbridge::quote']]],
+  ['outstandingquantity_4197',['OutstandingQuantity',['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7ae021c126cdb3026ede83458ffa919052',1,'longbridge::quote']]],
+  ['outstandingratio_4198',['OutstandingRatio',['../namespacelongbridge_1_1quote.html#ad39c9a73ead7e383f2835b40fe921011adc4d115301602dfff1f47945ba57eb73',1,'longbridge::quote::OutstandingRatio()'],['../namespacelongbridge_1_1quote.html#a0784391e71dd8568f9377acf80e739b7adc4d115301602dfff1f47945ba57eb73',1,'longbridge::quote::OutstandingRatio()']]],
+  ['overnight_4199',['Overnight',['../namespacelongbridge_1_1quote.html#a3ecf294ed501aeb9673ad1cd6cd71669a60d2e80b9b8ac1b2afaf1d7181b725c2',1,'longbridge::quote::Overnight()'],['../namespacelongbridge_1_1quote.html#abd0ad1fcac6d23460ec4c165279f1a10a60d2e80b9b8ac1b2afaf1d7181b725c2',1,'longbridge::quote::Overnight()'],['../namespacelongbridge_1_1trade.html#a508bac29dd591e908e6754f6bea0cdc1a60d2e80b9b8ac1b2afaf1d7181b725c2',1,'longbridge::trade::Overnight()']]]
 ];
