@@ -3,20 +3,20 @@ resolver = "3"
 members = ["rust", "python", "nodejs", "java", "c"]
 
 [workspace.package]
-version = "5.2.1"
+version = "5.2.2"
 edition = "2024"
 
 [profile.release]
 lto = true
 
 [workspace.dependencies]
-longbridge-geo = { path = "rust/crates/geo", version = "5.2.1" }
-longbridge-wscli = { path = "rust/crates/wsclient", version = "5.2.1" }
-longbridge-httpcli = { path = "rust/crates/httpclient", version = "5.2.1" }
-longbridge-proto = { path = "rust/crates/proto", version = "5.2.1" }
-longbridge-candlesticks = { path = "rust/crates/candlesticks", version = "5.2.1" }
-longbridge-oauth = { path = "rust/crates/oauth", version = "5.2.1" }
-longbridge = { path = "rust", version = "5.2.1" }
+longbridge-geo = { path = "rust/crates/geo", version = "5.2.2" }
+longbridge-wscli = { path = "rust/crates/wsclient", version = "5.2.2" }
+longbridge-httpcli = { path = "rust/crates/httpclient", version = "5.2.2" }
+longbridge-proto = { path = "rust/crates/proto", version = "5.2.2" }
+longbridge-candlesticks = { path = "rust/crates/candlesticks", version = "5.2.2" }
+longbridge-oauth = { path = "rust/crates/oauth", version = "5.2.2" }
+longbridge = { path = "rust", version = "5.2.2" }
 
 tokio = "1.47.1"
 tokio-tungstenite = "0.27.0"
