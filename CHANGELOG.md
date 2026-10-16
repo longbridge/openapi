@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All SDKs:** `CalendarContext.finance_calendar` now exposes the endpoint's pagination controls so callers can page through results themselves. Previously the method issued a single request with no page-size control, so the server's default page cap (historically ~10 events) made even a one-day query look truncated at 10 results. Three optional parameters were added — `count` (max events per page), `offset` (events to skip), and `next` (a new `CalendarPageDirection` enum: `Later` / `Earlier`) — and the response's `next_date` cursor is returned as-is. To retrieve a full window, request a larger `count`, or re-call with the returned `next_date` as `start` until it comes back empty. This is a signature change across every layer (Rust core + blocking, C, C++, Java, Node.js, Python); the new arguments are optional in the languages that support defaults. Reported as longbridge/developers#1265
 
+### Fixed
+
+- **Node.js & Python SDKs:** the Linux `x86_64`/`aarch64` **gnu** native binaries were built directly on the `ubuntu-24.04` CI runner (glibc 2.39), so they required glibc ≥ 2.39 at load time and failed with `ERR_DLOPEN_FAILED` / `GLIBC_2.39 not found` on glibc-2.34 platforms (Amazon Linux 2023, AWS Lambda, Vercel, RHEL 9, Ubuntu 22.04). The gnu builds now target an older glibc baseline — Python wheels build in the `manylinux_2_28` container (glibc 2.28) and the Node.js bindings cross-compile with `@napi-rs/cross-toolchain` (`--use-napi-cross`) — restoring compatibility with current serverless/older-glibc environments. The musl builds and the Java JNI (cross-built) artifacts were already unaffected. Reported as longbridge/developers#811
+
 ## [5.1.0] - 2026-09-20
 
 ### Breaking changes
