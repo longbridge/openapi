@@ -34,6 +34,7 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
+          manylinux: ${{ startsWith(matrix.runs-on, 'ubuntu') && '2_28' || 'auto' }}
           args: -i python --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
@@ -94,10 +95,17 @@ jobs:
       matrix:
         settings:
           - host: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            build: yarn build:debug --target x86_64-unknown-linux-gnu --use-napi-cross
           - host: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            build: yarn build:debug --target aarch64-unknown-linux-gnu --use-napi-cross
           - host: macos-15
+            build: yarn build:debug --target aarch64-apple-darwin
           - host: macos-15-intel
+            build: yarn build:debug
           - host: windows-latest
+            build: yarn build:debug
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -124,14 +132,8 @@ jobs:
         run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
 
       - name: Build
-        if: ${{ matrix.settings.host != 'macos-15' }}
         working-directory: nodejs
-        run: yarn build:debug
-
-      - name: Build
-        if: ${{ matrix.settings.host == 'macos-15' }}
-        working-directory: nodejs
-        run: yarn build:debug --target aarch64-apple-darwin
+        run: ${{ matrix.settings.build }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
