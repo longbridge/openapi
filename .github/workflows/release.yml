@@ -35,7 +35,11 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           manylinux: ${{ startsWith(matrix.runs-on, 'ubuntu') && '2_28' || 'auto' }}
-          args: -i python --release --out dist -m python/Cargo.toml
+          # Inside the manylinux container a bare `python` is the image's default
+          # interpreter, not the runner's setup-python one, so name the version
+          # explicitly there (same as the musl job). Windows/macOS build on the
+          # runner itself, where `python` is the setup-python interpreter.
+          args: -i ${{ startsWith(matrix.runs-on, 'ubuntu') && format('python{0}', matrix.python-version) || 'python' }} --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longbridge --no-index --find-links dist --force-reinstall
