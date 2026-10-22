@@ -104,6 +104,8 @@ public:
     AsyncCallback<TradeContext, std::vector<CashFlow>> callback) const;
 
   /// Get fund positions
+  ///
+  /// AP accounts only: US data-center accounts have no fund holdings.
   void fund_positions(
     const std::optional<GetFundPositionsOptions>& opts,
     AsyncCallback<TradeContext, FundPositionsResponse> callback) const;
@@ -114,6 +116,8 @@ public:
     AsyncCallback<TradeContext, StockPositionsResponse> callback) const;
 
   /// Get margin ratio
+  ///
+  /// AP accounts only: US data-center accounts have no margin-ratio data.
   void margin_ratio(const std::string& symbol,
                     AsyncCallback<TradeContext, MarginRatio> callback) const;
 

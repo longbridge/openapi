@@ -16506,6 +16506,8 @@ void lb_trade_context_cash_flow(const struct lb_trade_context_t *ctx,
 /**
  * Get fund positions
  *
+ * AP accounts only: US data-center accounts have no fund holdings.
+ *
  * @param[in] opts Options for get fund positions request
  */
 void lb_trade_context_fund_positions(const struct lb_trade_context_t *ctx,
@@ -16525,6 +16527,8 @@ void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
 
 /**
  * Get margin ratio
+ *
+ * AP accounts only: US data-center accounts have no margin-ratio data.
  */
 void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
                                    const char *symbol,

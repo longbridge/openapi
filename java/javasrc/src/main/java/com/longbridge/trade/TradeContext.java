@@ -537,6 +537,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get fund positions
+     * <p>
+     * AP accounts only: US data-center accounts have no fund holdings.
      * 
      * <pre>
      * {@code
@@ -601,6 +603,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get margin ratio
+     * <p>
+     * AP accounts only: US data-center accounts have no margin-ratio data.
      * 
      * <pre>
      * {@code

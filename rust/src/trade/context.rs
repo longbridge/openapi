@@ -729,6 +729,9 @@ impl TradeContext {
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/asset/fund>
     ///
+    /// AP accounts only: US data-center accounts have no fund holdings, and
+    /// the call returns an error for them.
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -756,6 +759,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/fund")
+            .dc_restrict(DcRegion::Ap)
             .query_params(opts.into().unwrap_or_default())
             .response::<Json<FundPositionsResponse>>()
             .send()
@@ -807,6 +811,9 @@ impl TradeContext {
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/asset/margin_ratio>
     ///
+    /// AP accounts only: US data-center accounts have no margin-ratio data,
+    /// and the call returns an error for them.
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -836,6 +843,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/risk/margin-ratio")
+            .dc_restrict(DcRegion::Ap)
             .query_params(Request {
                 symbol: symbol.into(),
             })

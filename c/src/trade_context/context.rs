@@ -777,6 +777,8 @@ pub unsafe extern "C" fn lb_trade_context_cash_flow(
 
 /// Get fund positions
 ///
+/// AP accounts only: US data-center accounts have no fund holdings.
+///
 /// @param[in] opts Options for get fund positions request
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_fund_positions(
@@ -820,6 +822,8 @@ pub unsafe extern "C" fn lb_trade_context_stock_positions(
 }
 
 /// Get margin ratio
+///
+/// AP accounts only: US data-center accounts have no margin-ratio data.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_margin_ratio(
     ctx: *const CTradeContext,
