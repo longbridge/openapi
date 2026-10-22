@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Rust core (async + blocking), Node.js, Python:** four US-account asset methods on `TradeContext`, all restricted to US data-center tokens (`dc_restrict(DcRegion::Us)`, so a non-US token gets `HttpClientError::DcRegionRestricted` without a request):
+  - `us_cash_and_buy_power(currency)` — `GET /v1/us/assets/cash-and-buy-power`: buying power (`USBuyLimitInfo`), cash per currency (`USCashDetail`) and margin status (`USMarginStatus`) as `USCashAndBuyPower`.
+  - `us_available_holding(opts)` — `GET /v1/us/assets/available-holding`: quantity of a stock / option / crypto holding available to trade (`USAvailableHolding`); `equity_type` defaults to `STOCK`, `position_side` to `LONG`.
+  - `us_transaction_history(opts)` — `POST /v1/us/assets/transaction-history`: one page of account transactions (`USTransactionHistory` / `USTransaction`) between two times, with optional transaction-type and currency filters (`page` defaults to 1, `size` to 20).
+  - `us_exchange_rates()` — `GET /v1/us/assets/exchange-rates`: the upstream two-level map is flattened into `USExchangeRates.exchanges` (`USExchangeRate`), sorted by the two upstream map keys, which are kept on each entry as `universal_key` / `spec_key`; rates accept a JSON number or string and read as an empty string when absent.
+  - Node.js takes the transaction-history request as a `GetUSTransactionHistoryOptions` object; Python as `start_at` / `end_at` `datetime` plus keyword arguments; the `openapi.pyi` stub is updated.
+- **Java:** JNI entry points for the four methods (`tradeContextUsCashAndBuyPower`, `tradeContextUsAvailableHolding`, `tradeContextUsTransactionHistory`, `tradeContextUsExchangeRates`), returning the response as JSON like the existing US JNI stubs; no Java-side `TradeContext` wrappers yet, matching the other US methods.
+
+### Changed
+
+- **All SDKs:** `fund_positions` and `margin_ratio` are AP-only (`dc_restrict(DcRegion::Ap)`): US data-center accounts have no fund holdings or margin-ratio data, so they now get a region error (`HttpClientError::DcRegionRestricted`) instead of an opaque server error. The method docs in every layer say so.
+
 ## [5.2.2] - 2026-10-16
 
 ### Added
