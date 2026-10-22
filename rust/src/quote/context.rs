@@ -1262,7 +1262,7 @@ impl QuoteContext {
     /// everything, including the contracts carrying
     /// [`OptionStandardAttr::Old`].
     ///
-    /// Path: `GET /v1/gemini/option/option_chain_list`
+    /// Path: `POST /v1/quote/options/strikes`
     ///
     /// # Examples
     ///
@@ -1296,8 +1296,8 @@ impl QuoteContext {
         struct Request {
             symbol: String,
             expiry_date: String,
-            // `false` and an omitted parameter mean the same thing to the
-            // endpoint, so send nothing rather than `standard_only=false`.
+            // `false` and an omitted field mean the same thing to the
+            // endpoint, so send nothing rather than `"standard_only": false`.
             #[serde(skip_serializing_if = "std::ops::Not::not")]
             standard_only: bool,
         }
@@ -1328,12 +1328,12 @@ impl QuoteContext {
 
         self.0
             .http_cli
-            .request(Method::GET, "/v1/gemini/option/option_chain_list")
-            .query_params(Request {
+            .request(Method::POST, "/v1/quote/options/strikes")
+            .body(Json(Request {
                 symbol: symbol.into(),
                 expiry_date: format_date(expiry_date),
                 standard_only,
-            })
+            }))
             .response::<Json<Response>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
