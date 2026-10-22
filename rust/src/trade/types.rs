@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use num_enum::{FromPrimitive, IntoPrimitive};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -1691,11 +1693,400 @@ pub struct USRealizedPL {
     pub realized_pl_list: Vec<USRealizedPLEntry>,
 }
 
+/// Request for [`crate::TradeContext::us_available_holding`].
+#[derive(Debug, Clone, Default)]
+pub struct GetUSAvailableHoldingOptions {
+    /// Security symbol, e.g. `"AAPL.US"`, an option symbol such as
+    /// `"AAPL261120C345000.US"`, or a crypto pair such as `"BTCUSD.BKKT"`.
+    pub symbol: String,
+    /// Holding type: `"STOCK"`, `"OPTION"` or `"CRYPTO"`. Defaults to
+    /// `"STOCK"` if empty.
+    pub equity_type: String,
+    /// Position side: `"LONG"` or `"SHORT"`. Defaults to `"LONG"` if empty.
+    pub position_side: String,
+}
+
+/// Response for [`crate::TradeContext::us_available_holding`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAvailableHolding {
+    /// Quantity available to sell (long) or buy to cover (short); negative for
+    /// a short position
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub available_qty: String,
+}
+
+/// Buying power in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USBuyLimitInfo {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Cash buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_buy_power: String,
+    /// Overnight buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub overnight_buy_power: String,
+    /// Day-trade buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub day_trade_buy_power: String,
+    /// Instant buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub instant_buy_power: String,
+    /// Intraday margin buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub intraday_margin_buy_power: String,
+    /// Option buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub option_buy_power: String,
+    /// Crypto buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub crypto_buy_power: String,
+    /// Margin maintenance excess used for buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub mme: String,
+}
+
+/// One cash currency entry in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashDetail {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Total cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub total_amount: String,
+    /// Available cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub available_cash: String,
+    /// Withdrawable cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub withdraw_cash: String,
+    /// Cash frozen for pending orders
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub frozen_cash: String,
+    /// Settled cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub settled_cash: String,
+    /// Outstanding (unsettled) amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub outstanding: String,
+    /// Amount held for external use (e.g. IPO or fund subscriptions)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub external_amount: String,
+}
+
+/// Margin account status in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USMarginStatus {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Net liquidation value
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub nlv: String,
+    /// Margin equity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_equity: String,
+    /// Margin maintenance excess
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_maintenance_excess: String,
+    /// Maintenance margin requirement
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub mmr: String,
+    /// Regulation T excess
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub reg_t_excess: String,
+    /// Special memorandum account
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub sma: String,
+}
+
+/// Response for [`crate::TradeContext::us_cash_and_buy_power`].
+/// Field names match `GET /v1/us/assets/cash-and-buy-power`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashAndBuyPower {
+    /// Buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub buy_limit_info: USBuyLimitInfo,
+    /// Cash per currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_list: Vec<USCashDetail>,
+    /// Margin account status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_status: USMarginStatus,
+}
+
+/// Request for [`crate::TradeContext::us_transaction_history`].
+#[derive(Debug, Clone)]
+pub struct GetUSTransactionHistoryOptions {
+    /// Start time (inclusive)
+    pub start_at: OffsetDateTime,
+    /// End time (inclusive)
+    pub end_at: OffsetDateTime,
+    /// Page number, starting at 1. Defaults to 1 if 0.
+    pub page: i32,
+    /// Page size. Defaults to 20 if 0.
+    pub size: i32,
+    /// Transaction types to include; empty means all. Values:
+    /// `"TT_DEPOSIT_AND_WITHDRAWAL"`, `"TT_STOCKS_AND_ETFS_TRADING"`,
+    /// `"TT_OPTIONS_TRADING"`, `"TT_CRYPTO_TRADING"`, `"TT_CORPORATE_ACTION"`,
+    /// `"TT_TRANSFER_IN_AND_OUT"`, `"TT_CRYPTO_TRANSFER"`,
+    /// `"TT_MARGIN_FINANCING"`, `"TT_OTHER"`.
+    pub types: Vec<String>,
+    /// Currency filter, e.g. `"USD"`; empty means all.
+    pub currency: String,
+}
+
+impl GetUSTransactionHistoryOptions {
+    /// Create a request for transactions between `start_at` and `end_at`.
+    pub fn new(start_at: OffsetDateTime, end_at: OffsetDateTime) -> Self {
+        Self {
+            start_at,
+            end_at,
+            page: 1,
+            size: 20,
+            types: Vec::new(),
+            currency: String::new(),
+        }
+    }
+}
+
+/// One record in [`USTransactionHistory`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USTransaction {
+    /// Display title
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub title: String,
+    /// Business code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub biz_code: String,
+    /// Business code name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub biz_code_name: String,
+    /// Amount; negative for outflows
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub amount: String,
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Security symbol, if the record relates to one (e.g. `"AAPL.US"`)
+    #[serde(
+        default,
+        alias = "counter_id",
+        deserialize_with = "crate::serde_utils::null_as_default"
+    )]
+    pub symbol: String,
+    /// Market code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market: String,
+    /// Holding type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub equity_type: String,
+    /// Position side
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub position_side: String,
+    /// Quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
+    /// Quantity description
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity_description: String,
+    /// Reference number
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub ref_no: String,
+    /// Remark
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub remark: String,
+    /// Creation time
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "crate::serde_utils::rfc3339_opt::serialize"
+    )]
+    pub create_at: Option<OffsetDateTime>,
+    /// Completion time
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "crate::serde_utils::rfc3339_opt::serialize"
+    )]
+    pub done_at: Option<OffsetDateTime>,
+}
+
+/// Response for [`crate::TradeContext::us_transaction_history`].
+/// Field names match `POST /v1/us/assets/transaction-history`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USTransactionHistory {
+    /// Current page number
+    #[serde(default, with = "crate::serde_utils::int64_str")]
+    pub current_page: i64,
+    /// Records on this page. The API returns no total count: a page shorter
+    /// than the requested size is the last one.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub items: Vec<USTransaction>,
+}
+
+/// One exchange rate in [`USExchangeRates`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USExchangeRate {
+    /// Outer upstream map key (`universal_exchanges` key)
+    pub universal_key: String,
+    /// Inner upstream map key (`spec_exchanges` key)
+    pub spec_key: String,
+    /// Base currency
+    pub base_currency: String,
+    /// Other (quote) currency
+    pub other_currency: String,
+    /// Bid rate
+    pub bid_rate: String,
+    /// Offer rate
+    pub offer_rate: String,
+    /// Average rate
+    pub average_rate: String,
+}
+
+/// Response for [`crate::TradeContext::us_exchange_rates`].
+///
+/// The upstream response is a two-level map
+/// (`universal_exchanges.<key>.spec_exchanges.<key>.exchanges[]`); it is
+/// flattened into a single list, sorted by the two upstream map keys, with
+/// the keys kept on each entry as [`USExchangeRate::universal_key`] and
+/// [`USExchangeRate::spec_key`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(from = "RawUSExchangeRates")]
+pub struct USExchangeRates {
+    /// Exchange rates
+    pub exchanges: Vec<USExchangeRate>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSExchangeRate {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    base_currency: String,
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    other_currency: String,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    bid_rate: Option<String>,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    offer_rate: Option<String>,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    average_rate: Option<String>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSSpecExchanges {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    exchanges: Vec<RawUSExchangeRate>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSUniversalExchanges {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    spec_exchanges: BTreeMap<String, RawUSSpecExchanges>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSExchangeRates {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    universal_exchanges: BTreeMap<String, RawUSUniversalExchanges>,
+    /// Already-flattened form, so that the serialized [`USExchangeRates`]
+    /// deserializes back.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    exchanges: Vec<USExchangeRate>,
+}
+
+impl From<RawUSExchangeRates> for USExchangeRates {
+    fn from(raw: RawUSExchangeRates) -> Self {
+        let mut exchanges = raw.exchanges;
+        for (universal_key, universal) in raw.universal_exchanges {
+            for (spec_key, spec) in universal.spec_exchanges {
+                exchanges.extend(spec.exchanges.into_iter().map(|rate| USExchangeRate {
+                    universal_key: universal_key.clone(),
+                    spec_key: spec_key.clone(),
+                    base_currency: rate.base_currency,
+                    other_currency: rate.other_currency,
+                    bid_rate: rate.bid_rate.unwrap_or_default(),
+                    offer_rate: rate.offer_rate.unwrap_or_default(),
+                    average_rate: rate.average_rate.unwrap_or_default(),
+                }));
+            }
+        }
+        Self { exchanges }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use time::macros::datetime;
 
     use super::*;
+
+    #[test]
+    fn us_exchange_rates_response() {
+        let data = r#"{
+            "universal_exchanges": {
+                "2": {"spec_exchanges": {"USD": {"exchanges": [
+                    {"base_currency": "USD", "other_currency": "HKD", "bid_rate": 7.8, "offer_rate": "7.85", "average_rate": null}
+                ]}}},
+                "1": {"spec_exchanges": {
+                    "b": {"exchanges": [{"base_currency": "USD", "other_currency": "CNH", "bid_rate": "7.1"}]},
+                    "a": {"exchanges": null}
+                }}
+            }
+        }"#;
+        let resp: USExchangeRates = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.exchanges.len(), 2);
+        assert_eq!(resp.exchanges[0].universal_key, "1");
+        assert_eq!(resp.exchanges[0].spec_key, "b");
+        assert_eq!(resp.exchanges[0].other_currency, "CNH");
+        assert_eq!(resp.exchanges[0].offer_rate, "");
+        assert_eq!(resp.exchanges[1].universal_key, "2");
+        assert_eq!(resp.exchanges[1].spec_key, "USD");
+        assert_eq!(resp.exchanges[1].bid_rate, "7.8");
+        assert_eq!(resp.exchanges[1].offer_rate, "7.85");
+        assert_eq!(resp.exchanges[1].average_rate, "");
+
+        let json = serde_json::to_string(&resp).unwrap();
+        let back: USExchangeRates = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.exchanges.len(), 2);
+        assert_eq!(back.exchanges[1].bid_rate, "7.8");
+    }
+
+    #[test]
+    fn us_cash_and_buy_power_response() {
+        let data = r#"{
+            "buy_limit_info": {"currency": "USD", "cash_buy_power": "100.5", "overnight_buy_power": "90"},
+            "cash_list": [{"currency": "USD", "total_amount": "120", "available_cash": "100.5", "withdraw_cash": "80", "frozen_cash": null}],
+            "margin_status": {"currency": "USD", "nlv": "1200"}
+        }"#;
+        let resp: USCashAndBuyPower = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.buy_limit_info.cash_buy_power, "100.5");
+        assert_eq!(resp.cash_list[0].withdraw_cash, "80");
+        assert_eq!(resp.cash_list[0].frozen_cash, "");
+        assert_eq!(resp.margin_status.nlv, "1200");
+    }
+
+    #[test]
+    fn us_transaction_history_response() {
+        let data = r#"{
+            "current_page": "2",
+            "items": [
+                {"title": "Buy", "amount": "-100", "currency": "USD", "symbol": "AAPL.US", "create_at": "1792600000", "done_at": 1792600060},
+                {"title": "Deposit", "amount": "500", "currency": "USD", "counter_id": "ST/US/AAPL", "done_at": "0"}
+            ]
+        }"#;
+        let resp: USTransactionHistory = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.current_page, 2);
+        assert_eq!(resp.items[0].symbol, "AAPL.US");
+        assert_eq!(
+            resp.items[0].create_at.unwrap().unix_timestamp(),
+            1792600000
+        );
+        assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1792600060);
+        assert_eq!(resp.items[1].symbol, "ST/US/AAPL");
+        assert!(resp.items[1].done_at.is_none());
+    }
 
     #[test]
     fn fund_position_response() {

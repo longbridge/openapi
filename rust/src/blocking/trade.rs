@@ -9,10 +9,12 @@ use crate::{
         FundPositionsResponse, GetAllExecutionsOptions, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
         GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
-        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
-        OrderDetail, PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        GetTodayOrdersOptions, GetUSAvailableHoldingOptions, GetUSHistoryOrders,
+        GetUSRealizedPLOptions, GetUSTransactionHistoryOptions, MarginRatio, Order, OrderDetail,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
         SubmitMultiLegOrderOptions, SubmitOrderOptions, SubmitOrderResponse, TopicType,
-        TradeContext, USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        TradeContext, USAssetOverview, USAvailableHolding, USCashAndBuyPower, USExchangeRates,
+        USOrderDetailResponse, USRealizedPL, USTransactionHistory,
     },
 };
 
@@ -511,5 +513,36 @@ impl TradeContextSync {
     pub fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
         self.rt
             .call(move |ctx| async move { ctx.us_realized_pl(opts).await })
+    }
+
+    /// Get cash, buying power and margin status for the US account (blocking)
+    pub fn us_cash_and_buy_power(&self, currency: Option<&str>) -> Result<USCashAndBuyPower> {
+        let currency = currency.map(ToString::to_string);
+        self.rt
+            .call(move |ctx| async move { ctx.us_cash_and_buy_power(currency.as_deref()).await })
+    }
+
+    /// Get the quantity of a US holding that is available to trade (blocking)
+    pub fn us_available_holding(
+        &self,
+        opts: GetUSAvailableHoldingOptions,
+    ) -> Result<USAvailableHolding> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_available_holding(opts).await })
+    }
+
+    /// Get the US account transaction history (blocking)
+    pub fn us_transaction_history(
+        &self,
+        opts: GetUSTransactionHistoryOptions,
+    ) -> Result<USTransactionHistory> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_transaction_history(opts).await })
+    }
+
+    /// Get the exchange rates used by the US account (blocking)
+    pub fn us_exchange_rates(&self) -> Result<USExchangeRates> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_exchange_rates().await })
     }
 }

@@ -65,8 +65,11 @@ pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
 pub use signal::SignalContext;
 pub use trade::{
-    GetUSHistoryOrders, GetUSRealizedPLOptions, QueryUSOrdersOptions, QueryUSOrdersResponse,
-    TradeContext, USAssetOverview, USCashEntry, USCryptoEntry, USOrderDetailResponse,
-    USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+    GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
+    GetUSTransactionHistoryOptions, QueryUSOrdersOptions, QueryUSOrdersResponse, TradeContext,
+    USAssetOverview, USAvailableHolding, USBuyLimitInfo, USCashAndBuyPower, USCashDetail,
+    USCashEntry, USCryptoEntry, USExchangeRate, USExchangeRates, USMarginStatus,
+    USOrderDetailResponse, USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+    USTransaction, USTransactionHistory,
 };
 pub use types::Market;

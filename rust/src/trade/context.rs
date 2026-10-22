@@ -15,10 +15,12 @@ use crate::{
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
+        GetUSTransactionHistoryOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
+        QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
         SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        USAvailableHolding, USCashAndBuyPower, USExchangeRates, USOrderDetailResponse,
+        USRealizedPL, USTransactionHistory,
         core::{Command, Core},
     },
 };
@@ -1096,6 +1098,141 @@ impl TradeContext {
             .dc_restrict(DcRegion::Us)
             .query_params(Query { currency, category })
             .response::<Json<USRealizedPL>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get cash, buying power and margin status for the US account.
+    ///
+    /// `currency`: optional, e.g. `"USD"`.
+    ///
+    /// Path: `GET /v1/us/assets/cash-and-buy-power`
+    ///
+    /// US token required.
+    pub async fn us_cash_and_buy_power(&self, currency: Option<&str>) -> Result<USCashAndBuyPower> {
+        #[derive(Serialize)]
+        struct Query<'a> {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            currency: Option<&'a str>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/cash-and-buy-power")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query { currency })
+            .response::<Json<USCashAndBuyPower>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the quantity of a US holding that is available to trade.
+    ///
+    /// Path: `GET /v1/us/assets/available-holding`
+    ///
+    /// US token required.
+    pub async fn us_available_holding(
+        &self,
+        opts: GetUSAvailableHoldingOptions,
+    ) -> Result<USAvailableHolding> {
+        #[derive(Serialize)]
+        struct Query {
+            symbol: String,
+            equity_type: String,
+            position_side: String,
+        }
+
+        let equity_type = if opts.equity_type.is_empty() {
+            "STOCK".to_string()
+        } else {
+            opts.equity_type
+        };
+        let position_side = if opts.position_side.is_empty() {
+            "LONG".to_string()
+        } else {
+            opts.position_side
+        };
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/available-holding")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                symbol: opts.symbol,
+                equity_type,
+                position_side,
+            })
+            .response::<Json<USAvailableHolding>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the US account transaction history (deposits, withdrawals, trades,
+    /// corporate actions, transfers and so on), one page at a time.
+    ///
+    /// Path: `POST /v1/us/assets/transaction-history`
+    ///
+    /// US token required.
+    pub async fn us_transaction_history(
+        &self,
+        opts: GetUSTransactionHistoryOptions,
+    ) -> Result<USTransactionHistory> {
+        #[derive(Debug, Serialize)]
+        struct Body {
+            start: i64,
+            end: i64,
+            page: i32,
+            size: i32,
+            #[serde(skip_serializing_if = "Vec::is_empty")]
+            types: Vec<String>,
+            #[serde(skip_serializing_if = "String::is_empty")]
+            currency: String,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/us/assets/transaction-history")
+            .dc_restrict(DcRegion::Us)
+            .body(Json(Body {
+                start: opts.start_at.unix_timestamp(),
+                end: opts.end_at.unix_timestamp(),
+                page: if opts.page > 0 { opts.page } else { 1 },
+                size: if opts.size > 0 { opts.size } else { 20 },
+                types: opts.types,
+                currency: opts.currency,
+            }))
+            .response::<Json<USTransactionHistory>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the exchange rates used by the US account.
+    ///
+    /// The upstream two-level map is flattened into
+    /// [`USExchangeRates::exchanges`]; each entry keeps the two upstream map
+    /// keys as `universal_key` and `spec_key`.
+    ///
+    /// Path: `GET /v1/us/assets/exchange-rates`
+    ///
+    /// US token required.
+    pub async fn us_exchange_rates(&self) -> Result<USExchangeRates> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/exchange-rates")
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USExchangeRates>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
