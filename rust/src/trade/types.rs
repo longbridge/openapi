@@ -1519,15 +1519,67 @@ pub struct USCryptoEntry {
     /// Asset type (e.g. `"CRYPTO"`)
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub asset_type: String,
-    /// Average cost price
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub average_cost: String,
-    /// User-facing trading-pair symbol (e.g. `"BTCUSD.BKKT"`)
+    /// Trading-pair code (e.g. `"BTCUSD"`); the user-facing symbol is
+    /// `"<symbol>.<market>"` (e.g. `"BTCUSD.BKKT"`)
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
+    /// Holding quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
     /// Settlement currency
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
+    /// Average cost price; empty when the server has none
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub average_cost: String,
+    /// Market code (e.g. `"BKKT"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market: String,
+    /// Trade status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trade_status: String,
+    /// Previous close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub prev_close: String,
+    /// Latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub last_done: String,
+    /// Market price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market_price: String,
+    /// Pre-market close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_close: String,
+    /// Today's investment value
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub stock_invest_of_today: String,
+    /// Today's profit/loss
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub today_pl: String,
+    /// Today's investment value (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_stock_invest_of_today: String,
+    /// Today's profit/loss (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_today_pl: String,
+    /// Overnight-session latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_last_done: String,
+    /// Overnight-session previous close
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_prev_close: String,
+    /// Position side (long/short)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub position_side: String,
+    /// Position open time (Unix-second string; `"0"` when unknown)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub open_position_time: String,
+    /// Asset name (e.g. `"Bitcoin"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub name: String,
+    /// Industry classification ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub industry_counter_id: String,
     /// Industry name
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_name: String,
@@ -2083,6 +2135,61 @@ mod tests {
         assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1792600060);
         assert_eq!(resp.items[1].symbol, "BTCUSD.BKKT");
         assert!(resp.items[1].done_at.is_none());
+    }
+
+    /// Shapes (field names, JSON types, map keys) as returned by US prod.
+    #[test]
+    fn us_asset_responses_as_returned_by_prod() {
+        let data = r#"{
+            "current_page": 1,
+            "items": [{
+                "amount": "0.5", "biz_code": "LVAVNSCR", "biz_code_name": "Cryptocurrency Deposit",
+                "counter_id": "VA/BKKT/BTCUSD", "create_at": "1791478565", "currency": "",
+                "done_at": "1791478565", "equity_type": "CRYPTO", "market": "BKKT",
+                "position_side": "LONG", "quantity": "0.5", "quantity_description": "0.5",
+                "ref_no": "R1", "remark": "", "symbol": "BTCUSD.BKKT",
+                "title": "Cryptocurrency Deposit: BTCUSD"
+            }]
+        }"#;
+        let resp: USTransactionHistory = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.current_page, 1);
+        assert_eq!(resp.items[0].symbol, "BTCUSD.BKKT");
+        assert_eq!(resp.items[0].equity_type, "CRYPTO");
+        assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1791478565);
+
+        let data = r#"{"universal_exchanges": {"us_lb_apex": {"spec_exchanges": {
+            "reference": {"exchanges": [{"average_rate": 1, "base_currency": "USD", "bid_rate": 1, "offer_rate": 1, "other_currency": "USD"}]},
+            "am": {"exchanges": [{"average_rate": 1, "base_currency": "USD", "bid_rate": 1, "offer_rate": 1, "other_currency": "USD"}]}
+        }}}}"#;
+        let resp: USExchangeRates = serde_json::from_str(data).unwrap();
+        let keys: Vec<_> = resp
+            .exchanges
+            .iter()
+            .map(|e| (e.universal_key.as_str(), e.spec_key.as_str()))
+            .collect();
+        assert_eq!(keys, [("us_lb_apex", "am"), ("us_lb_apex", "reference")]);
+        assert_eq!(resp.exchanges[0].average_rate, "1");
+
+        let data = r#"{
+            "account_type": "1", "asset_timestamp": "1792661597", "currency": "USD",
+            "stock_list": [{"symbol": "MULL", "full_symbol": "MULL.US", "counter_id": "ETF/US/MULL", "quantity": "10", "market": "US"}],
+            "crypto_list": [{
+                "asset_type": "CRYPTO", "average_cost": "", "counter_id": "VA/BKKT/ETHUSD",
+                "currency": "USD", "last_done": "2500", "market": "BKKT", "market_price": "2500",
+                "name": "Ethereum", "open_position_time": "0", "position_side": "LONG",
+                "quantity": "0.1", "symbol": "ETHUSD", "today_pl": "", "trade_status": "105"
+            }],
+            "option_list": [], "multi_leg": {"holdings": []}
+        }"#;
+        let resp: USAssetOverview = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.asset_timestamp.unwrap().unix_timestamp(), 1792661597);
+        assert_eq!(resp.stock_list[0].full_symbol, "MULL.US");
+        let crypto = &resp.crypto_list[0];
+        assert_eq!(crypto.symbol, "ETHUSD");
+        assert_eq!(crypto.market, "BKKT");
+        assert_eq!(crypto.quantity, "0.1");
+        assert_eq!(crypto.name, "Ethereum");
+        assert_eq!(crypto.market_price, "2500");
     }
 
     #[test]

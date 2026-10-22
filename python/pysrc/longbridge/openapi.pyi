@@ -17549,12 +17549,32 @@ class USCryptoEntry:
 
     asset_type: str
     """Asset type, e.g. ``"CRYPTO"``"""
-    average_cost: str
-    """Average cost price"""
     symbol: str
-    """Symbol"""
+    """Trading-pair code, e.g. ``"BTCUSD"``; the user-facing symbol is ``"<symbol>.<market>"``, e.g. ``"BTCUSD.BKKT"``"""
+    quantity: str
+    """Holding quantity"""
     currency: str
     """Settlement currency"""
+    average_cost: str
+    """Average cost price; empty when the server has none"""
+    market: str
+    """Market code, e.g. ``"BKKT"``"""
+    trade_status: str
+    prev_close: str
+    last_done: str
+    market_price: str
+    pretrade_close: str
+    stock_invest_of_today: str
+    today_pl: str
+    pretrade_stock_invest_of_today: str
+    pretrade_today_pl: str
+    night_last_done: str
+    night_prev_close: str
+    position_side: str
+    open_position_time: str
+    """Position open time (Unix-second string; ``"0"`` when unknown)"""
+    name: str
+    """Asset name, e.g. ``"Bitcoin"``"""
     industry_counter_id: str
     """Industry counter_id"""
     industry_name: str

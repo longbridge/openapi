@@ -9217,9 +9217,26 @@ export interface USConsensusItem {
 /** One cryptocurrency holding in USAssetOverview */
 export interface USCryptoEntry {
   assetType: string
-  averageCost: string
   symbol: string
+  quantity: string
   currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
   industryName: string
 }
 
