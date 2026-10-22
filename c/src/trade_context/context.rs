@@ -840,6 +840,8 @@ pub unsafe extern "C" fn lb_trade_context_margin_ratio(
 }
 
 /// Get order detail
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_order_detail(
     ctx: *const CTradeContext,

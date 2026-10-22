@@ -637,6 +637,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get order detail
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code

@@ -541,6 +541,9 @@ impl TradeContext {
     }
 
     /// Get order detail
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
     #[pyo3(signature = (order_id, is_attached = false))]
     fn order_detail(&self, order_id: String, is_attached: bool) -> PyResult<OrderDetail> {
         let mut opts = GetOrderDetailOptions::new(order_id);

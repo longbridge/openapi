@@ -8054,6 +8054,8 @@ class TradeContext:
         """
         Get order detail
 
+        AP accounts only: US data-center accounts get a region error; use ``us_order_detail`` instead.
+
         Args:
             order_id: Order id
             is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
@@ -12057,6 +12059,8 @@ class AsyncTradeContext:
     def order_detail(self, order_id: str, is_attached: bool = False) -> Awaitable[OrderDetail]:
         """
         Get order detail by order_id. Returns an awaitable that resolves to order detail.
+
+        AP accounts only: US data-center accounts get a region error; use ``us_order_detail`` instead.
 
         Args:
             order_id: Order ID.

@@ -122,6 +122,8 @@ public:
                     AsyncCallback<TradeContext, MarginRatio> callback) const;
 
   /// Get order detail
+  ///
+  /// AP accounts only: US data-center accounts get a region error.
   void order_detail(const std::string& order_id,
                     AsyncCallback<TradeContext, OrderDetail> callback) const;
 

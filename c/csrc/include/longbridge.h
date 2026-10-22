@@ -16537,6 +16537,8 @@ void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
 
 /**
  * Get order detail
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_trade_context_order_detail(const struct lb_trade_context_t *ctx,
                                    const char *order_id,

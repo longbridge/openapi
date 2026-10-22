@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **All SDKs:** `fund_positions` and `margin_ratio` are AP-only (`dc_restrict(DcRegion::Ap)`): US data-center accounts have no fund holdings or margin-ratio data, so they now get a region error (`HttpClientError::DcRegionRestricted`) instead of an opaque server error. The method docs in every layer say so.
+- **All SDKs:** `order_detail` is AP-only (`dc_restrict(DcRegion::Ap)`). For a US data-center account, `GET /v1/trade/order` returned HTTP 500 because the order gateway panics on US orders. It now gets a region error without sending the request. US accounts should use `us_order_detail` (`GET /v1/us/orders/{order_id}`).
 
 ### Fixed
 

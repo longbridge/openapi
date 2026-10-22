@@ -626,6 +626,9 @@ impl AsyncTradeContext {
     }
 
     /// Get order detail. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
     #[pyo3(signature = (order_id, is_attached = false))]
     fn order_detail(
         &self,

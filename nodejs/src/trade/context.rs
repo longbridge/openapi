@@ -583,6 +583,9 @@ impl TradeContext {
 
     /// Get order detail
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usOrderDetail` instead.
+    ///
     /// #### Example
     ///
     /// ```javascript

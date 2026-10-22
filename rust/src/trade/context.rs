@@ -858,6 +858,9 @@ impl TradeContext {
 
     /// Get order detail
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
+    ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/order/order_detail>
     ///
     /// # Examples
@@ -892,6 +895,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/trade/order")
+            .dc_restrict(DcRegion::Ap)
             .response::<Json<OrderDetail>>()
             .query_params(options.into())
             .send()
