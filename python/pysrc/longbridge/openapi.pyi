@@ -7973,6 +7973,8 @@ class TradeContext:
         """
         Get fund positions
 
+        AP accounts only: US data-center accounts have no fund holdings.
+
         Args:
             symbols: Filter by fund codes
 
@@ -8024,6 +8026,8 @@ class TradeContext:
     def margin_ratio(self, symbol: str) -> MarginRatio:
         """
         Get margin ratio
+
+        AP accounts only: US data-center accounts have no margin-ratio data.
 
         Args:
             symbol: Security symbol
@@ -8172,6 +8176,72 @@ class TradeContext:
 
         Returns:
             :class:`USRealizedPL`
+        """
+        ...
+
+    def us_cash_and_buy_power(self, currency: Optional[str] = None) -> "USCashAndBuyPower":
+        """Get cash, buying power and margin status for the US account. US token required.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``); ``None`` for the server default
+
+        Returns:
+            :class:`USCashAndBuyPower`
+        """
+        ...
+
+    def us_available_holding(
+        self,
+        symbol: str,
+        equity_type: Optional[str] = None,
+        position_side: Optional[str] = None,
+    ) -> "USAvailableHolding":
+        """Get the quantity of a US holding that is available to trade. US token required.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``, an option symbol such as
+                ``"AAPL261120C345000.US"``, or a crypto pair such as ``"BTCUSD.BKKT"``
+            equity_type: ``"STOCK"`` (default), ``"OPTION"`` or ``"CRYPTO"``
+            position_side: ``"LONG"`` (default) or ``"SHORT"``
+
+        Returns:
+            :class:`USAvailableHolding`
+        """
+        ...
+
+    def us_transaction_history(
+        self,
+        start_at: datetime,
+        end_at: datetime,
+        page: int = 1,
+        size: int = 20,
+        types: Optional[List[str]] = None,
+        currency: Optional[str] = None,
+    ) -> "USTransactionHistory":
+        """Get the US account transaction history, one page at a time. US token required.
+
+        Args:
+            start_at: Start time (inclusive)
+            end_at: End time (inclusive)
+            page: Page number, starting at 1
+            size: Page size
+            types: Transaction types to include; ``None`` for all. Values:
+                ``"TT_DEPOSIT_AND_WITHDRAWAL"``, ``"TT_STOCKS_AND_ETFS_TRADING"``,
+                ``"TT_OPTIONS_TRADING"``, ``"TT_CRYPTO_TRADING"``,
+                ``"TT_CORPORATE_ACTION"``, ``"TT_TRANSFER_IN_AND_OUT"``,
+                ``"TT_CRYPTO_TRANSFER"``, ``"TT_MARGIN_FINANCING"``, ``"TT_OTHER"``
+            currency: Currency filter (e.g. ``"USD"``); ``None`` for all
+
+        Returns:
+            :class:`USTransactionHistory`
+        """
+        ...
+
+    def us_exchange_rates(self) -> "USExchangeRates":
+        """Get the exchange rates used by the US account. US token required.
+
+        Returns:
+            :class:`USExchangeRates`
         """
         ...
 
@@ -11904,6 +11974,8 @@ class AsyncTradeContext:
         """
         Get fund positions. Optional filter: symbols. Returns an awaitable that resolves to fund positions response.
 
+        AP accounts only: US data-center accounts have no fund holdings.
+
         Args:
             symbols: Filter by fund codes.
 
@@ -11957,6 +12029,8 @@ class AsyncTradeContext:
     def margin_ratio(self, symbol: str) -> Awaitable[MarginRatio]:
         """
         Get margin ratio for symbol. Returns an awaitable that resolves to margin ratio.
+
+        AP accounts only: US data-center accounts have no margin-ratio data.
 
         Args:
             symbol: Security symbol.
@@ -12107,6 +12181,72 @@ class AsyncTradeContext:
 
         Returns:
             Awaitable resolving to :class:`USRealizedPL`
+        """
+        ...
+
+    def us_cash_and_buy_power(self, currency: Optional[str] = None) -> "Awaitable[USCashAndBuyPower]":
+        """Get cash, buying power and margin status for the US account. US token required. Returns awaitable.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``); ``None`` for the server default
+
+        Returns:
+            Awaitable resolving to :class:`USCashAndBuyPower`
+        """
+        ...
+
+    def us_available_holding(
+        self,
+        symbol: str,
+        equity_type: Optional[str] = None,
+        position_side: Optional[str] = None,
+    ) -> "Awaitable[USAvailableHolding]":
+        """Get the quantity of a US holding that is available to trade. US token required. Returns awaitable.
+
+        Args:
+            symbol: Security symbol, e.g. ``"AAPL.US"``, an option symbol such as
+                ``"AAPL261120C345000.US"``, or a crypto pair such as ``"BTCUSD.BKKT"``
+            equity_type: ``"STOCK"`` (default), ``"OPTION"`` or ``"CRYPTO"``
+            position_side: ``"LONG"`` (default) or ``"SHORT"``
+
+        Returns:
+            Awaitable resolving to :class:`USAvailableHolding`
+        """
+        ...
+
+    def us_transaction_history(
+        self,
+        start_at: datetime,
+        end_at: datetime,
+        page: int = 1,
+        size: int = 20,
+        types: Optional[List[str]] = None,
+        currency: Optional[str] = None,
+    ) -> "Awaitable[USTransactionHistory]":
+        """Get the US account transaction history, one page at a time. US token required. Returns awaitable.
+
+        Args:
+            start_at: Start time (inclusive)
+            end_at: End time (inclusive)
+            page: Page number, starting at 1
+            size: Page size
+            types: Transaction types to include; ``None`` for all. Values:
+                ``"TT_DEPOSIT_AND_WITHDRAWAL"``, ``"TT_STOCKS_AND_ETFS_TRADING"``,
+                ``"TT_OPTIONS_TRADING"``, ``"TT_CRYPTO_TRADING"``,
+                ``"TT_CORPORATE_ACTION"``, ``"TT_TRANSFER_IN_AND_OUT"``,
+                ``"TT_CRYPTO_TRANSFER"``, ``"TT_MARGIN_FINANCING"``, ``"TT_OTHER"``
+            currency: Currency filter (e.g. ``"USD"``); ``None`` for all
+
+        Returns:
+            Awaitable resolving to :class:`USTransactionHistory`
+        """
+        ...
+
+    def us_exchange_rates(self) -> "Awaitable[USExchangeRates]":
+        """Get the exchange rates used by the US account. US token required. Returns awaitable.
+
+        Returns:
+            Awaitable resolving to :class:`USExchangeRates`
         """
         ...
 
@@ -17501,6 +17641,161 @@ class USRealizedPL:
 
     realized_pl_list: List[USRealizedPLEntry]
     """Per-category realized P&L entries"""
+
+
+class USAvailableHolding:
+    """Quantity of a US holding that is available to trade. Returned by TradeContext.us_available_holding."""
+
+    available_qty: str
+    """Quantity available to sell (long) or buy to cover (short); negative for a short position"""
+
+
+class USBuyLimitInfo:
+    """Buying power in USCashAndBuyPower."""
+
+    currency: str
+    """Currency"""
+    cash_buy_power: str
+    """Cash buying power"""
+    overnight_buy_power: str
+    """Overnight buying power"""
+    day_trade_buy_power: str
+    """Day-trade buying power"""
+    instant_buy_power: str
+    """Instant buying power"""
+    intraday_margin_buy_power: str
+    """Intraday margin buying power"""
+    option_buy_power: str
+    """Option buying power"""
+    crypto_buy_power: str
+    """Crypto buying power"""
+    mme: str
+    """Margin maintenance excess used for buying power"""
+
+
+class USCashDetail:
+    """One cash currency entry in USCashAndBuyPower."""
+
+    currency: str
+    """Currency"""
+    total_amount: str
+    """Total cash"""
+    available_cash: str
+    """Available cash"""
+    withdraw_cash: str
+    """Withdrawable cash"""
+    frozen_cash: str
+    """Cash frozen for pending orders"""
+    settled_cash: str
+    """Settled cash"""
+    outstanding: str
+    """Outstanding (unsettled) amount"""
+    external_amount: str
+    """Amount held for external use (e.g. IPO or fund subscriptions)"""
+
+
+class USMarginStatus:
+    """Margin account status in USCashAndBuyPower."""
+
+    currency: str
+    """Currency"""
+    nlv: str
+    """Net liquidation value"""
+    margin_equity: str
+    """Margin equity"""
+    margin_maintenance_excess: str
+    """Margin maintenance excess"""
+    mmr: str
+    """Maintenance margin requirement"""
+    reg_t_excess: str
+    """Regulation T excess"""
+    sma: str
+    """Special memorandum account"""
+
+
+class USCashAndBuyPower:
+    """Cash, buying power and margin status of a US account. Returned by TradeContext.us_cash_and_buy_power."""
+
+    buy_limit_info: USBuyLimitInfo
+    """Buying power"""
+    cash_list: List[USCashDetail]
+    """Cash per currency"""
+    margin_status: USMarginStatus
+    """Margin account status"""
+
+
+class USTransaction:
+    """One record in USTransactionHistory."""
+
+    title: str
+    """Display title"""
+    biz_code: str
+    """Business code"""
+    biz_code_name: str
+    """Business code name"""
+    amount: str
+    """Amount; negative for outflows"""
+    currency: str
+    """Currency"""
+    symbol: str
+    """Security symbol, if the record relates to one (e.g. ``"AAPL.US"``)"""
+    market: str
+    """Market code"""
+    equity_type: str
+    """Holding type"""
+    position_side: str
+    """Position side"""
+    quantity: str
+    """Quantity"""
+    quantity_description: str
+    """Quantity description"""
+    ref_no: str
+    """Reference number"""
+    remark: str
+    """Remark"""
+    create_at: Optional[datetime]
+    """Creation time"""
+    done_at: Optional[datetime]
+    """Completion time"""
+
+
+class USTransactionHistory:
+    """One page of US account transaction history. Returned by TradeContext.us_transaction_history."""
+
+    current_page: int
+    """Current page number"""
+    items: List[USTransaction]
+    """Records on this page. There is no total count: a page shorter than the requested size is the last one."""
+
+
+class USExchangeRate:
+    """One exchange rate in USExchangeRates."""
+
+    universal_key: str
+    """Outer upstream map key (``universal_exchanges`` key)"""
+    spec_key: str
+    """Inner upstream map key (``spec_exchanges`` key)"""
+    base_currency: str
+    """Base currency"""
+    other_currency: str
+    """Other (quote) currency"""
+    bid_rate: str
+    """Bid rate; empty if not provided"""
+    offer_rate: str
+    """Offer rate; empty if not provided"""
+    average_rate: str
+    """Average rate; empty if not provided"""
+
+
+class USExchangeRates:
+    """Exchange rates of a US account. Returned by TradeContext.us_exchange_rates.
+
+    The upstream two-level map is flattened into ``exchanges``, sorted by the two
+    upstream map keys, which are kept on each entry as ``universal_key`` and ``spec_key``.
+    """
+
+    exchanges: List[USExchangeRate]
+    """Exchange rates"""
 
 
 class USOrderHistory:

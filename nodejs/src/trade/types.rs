@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use longbridge_nodejs_macros::{JsEnum, JsObject};
 
-use crate::{decimal::Decimal, time::NaiveDate, types::Market};
+use crate::{decimal::Decimal, time::NaiveDate, types::Market, utils::to_datetime};
 
 /// Topic type
 #[napi_derive::napi]
@@ -1193,6 +1193,229 @@ impl From<longbridge::trade::USRealizedPL> for USRealizedPL {
     fn from(v: longbridge::trade::USRealizedPL) -> Self {
         Self {
             realized_pl_list: v.realized_pl_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Quantity of a US holding that is available to trade
+#[napi_derive::napi(object, js_name = "USAvailableHolding")]
+#[derive(Debug, Clone, Default)]
+pub struct USAvailableHolding {
+    pub available_qty: String,
+}
+
+impl From<longbridge::trade::USAvailableHolding> for USAvailableHolding {
+    fn from(v: longbridge::trade::USAvailableHolding) -> Self {
+        Self {
+            available_qty: v.available_qty,
+        }
+    }
+}
+
+/// Buying power in USCashAndBuyPower
+#[napi_derive::napi(object, js_name = "USBuyLimitInfo")]
+#[derive(Debug, Clone, Default)]
+pub struct USBuyLimitInfo {
+    pub currency: String,
+    pub cash_buy_power: String,
+    pub overnight_buy_power: String,
+    pub day_trade_buy_power: String,
+    pub instant_buy_power: String,
+    pub intraday_margin_buy_power: String,
+    pub option_buy_power: String,
+    pub crypto_buy_power: String,
+    pub mme: String,
+}
+
+impl From<longbridge::trade::USBuyLimitInfo> for USBuyLimitInfo {
+    fn from(v: longbridge::trade::USBuyLimitInfo) -> Self {
+        Self {
+            currency: v.currency,
+            cash_buy_power: v.cash_buy_power,
+            overnight_buy_power: v.overnight_buy_power,
+            day_trade_buy_power: v.day_trade_buy_power,
+            instant_buy_power: v.instant_buy_power,
+            intraday_margin_buy_power: v.intraday_margin_buy_power,
+            option_buy_power: v.option_buy_power,
+            crypto_buy_power: v.crypto_buy_power,
+            mme: v.mme,
+        }
+    }
+}
+
+/// One cash currency entry in USCashAndBuyPower
+#[napi_derive::napi(object, js_name = "USCashDetail")]
+#[derive(Debug, Clone, Default)]
+pub struct USCashDetail {
+    pub currency: String,
+    pub total_amount: String,
+    pub available_cash: String,
+    pub withdraw_cash: String,
+    pub frozen_cash: String,
+    pub settled_cash: String,
+    pub outstanding: String,
+    pub external_amount: String,
+}
+
+impl From<longbridge::trade::USCashDetail> for USCashDetail {
+    fn from(v: longbridge::trade::USCashDetail) -> Self {
+        Self {
+            currency: v.currency,
+            total_amount: v.total_amount,
+            available_cash: v.available_cash,
+            withdraw_cash: v.withdraw_cash,
+            frozen_cash: v.frozen_cash,
+            settled_cash: v.settled_cash,
+            outstanding: v.outstanding,
+            external_amount: v.external_amount,
+        }
+    }
+}
+
+/// Margin account status in USCashAndBuyPower
+#[napi_derive::napi(object, js_name = "USMarginStatus")]
+#[derive(Debug, Clone, Default)]
+pub struct USMarginStatus {
+    pub currency: String,
+    pub nlv: String,
+    pub margin_equity: String,
+    pub margin_maintenance_excess: String,
+    pub mmr: String,
+    pub reg_t_excess: String,
+    pub sma: String,
+}
+
+impl From<longbridge::trade::USMarginStatus> for USMarginStatus {
+    fn from(v: longbridge::trade::USMarginStatus) -> Self {
+        Self {
+            currency: v.currency,
+            nlv: v.nlv,
+            margin_equity: v.margin_equity,
+            margin_maintenance_excess: v.margin_maintenance_excess,
+            mmr: v.mmr,
+            reg_t_excess: v.reg_t_excess,
+            sma: v.sma,
+        }
+    }
+}
+
+/// Cash, buying power and margin status of a US account
+#[napi_derive::napi(object, js_name = "USCashAndBuyPower")]
+#[derive(Debug, Clone, Default)]
+pub struct USCashAndBuyPower {
+    pub buy_limit_info: USBuyLimitInfo,
+    pub cash_list: Vec<USCashDetail>,
+    pub margin_status: USMarginStatus,
+}
+
+impl From<longbridge::trade::USCashAndBuyPower> for USCashAndBuyPower {
+    fn from(v: longbridge::trade::USCashAndBuyPower) -> Self {
+        Self {
+            buy_limit_info: v.buy_limit_info.into(),
+            cash_list: v.cash_list.into_iter().map(Into::into).collect(),
+            margin_status: v.margin_status.into(),
+        }
+    }
+}
+
+/// One record in USTransactionHistory
+#[napi_derive::napi(object, js_name = "USTransaction")]
+#[derive(Debug, Clone, Default)]
+pub struct USTransaction {
+    pub title: String,
+    pub biz_code: String,
+    pub biz_code_name: String,
+    pub amount: String,
+    pub currency: String,
+    pub symbol: String,
+    pub market: String,
+    pub equity_type: String,
+    pub position_side: String,
+    pub quantity: String,
+    pub quantity_description: String,
+    pub ref_no: String,
+    pub remark: String,
+    pub create_at: Option<DateTime<Utc>>,
+    pub done_at: Option<DateTime<Utc>>,
+}
+
+impl From<longbridge::trade::USTransaction> for USTransaction {
+    fn from(v: longbridge::trade::USTransaction) -> Self {
+        Self {
+            title: v.title,
+            biz_code: v.biz_code,
+            biz_code_name: v.biz_code_name,
+            amount: v.amount,
+            currency: v.currency,
+            symbol: v.symbol,
+            market: v.market,
+            equity_type: v.equity_type,
+            position_side: v.position_side,
+            quantity: v.quantity,
+            quantity_description: v.quantity_description,
+            ref_no: v.ref_no,
+            remark: v.remark,
+            create_at: v.create_at.map(to_datetime),
+            done_at: v.done_at.map(to_datetime),
+        }
+    }
+}
+
+/// One page of US account transaction history
+#[napi_derive::napi(object, js_name = "USTransactionHistory")]
+#[derive(Debug, Clone, Default)]
+pub struct USTransactionHistory {
+    pub current_page: i64,
+    pub items: Vec<USTransaction>,
+}
+
+impl From<longbridge::trade::USTransactionHistory> for USTransactionHistory {
+    fn from(v: longbridge::trade::USTransactionHistory) -> Self {
+        Self {
+            current_page: v.current_page,
+            items: v.items.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One exchange rate in USExchangeRates
+#[napi_derive::napi(object, js_name = "USExchangeRate")]
+#[derive(Debug, Clone, Default)]
+pub struct USExchangeRate {
+    pub universal_key: String,
+    pub spec_key: String,
+    pub base_currency: String,
+    pub other_currency: String,
+    pub bid_rate: String,
+    pub offer_rate: String,
+    pub average_rate: String,
+}
+
+impl From<longbridge::trade::USExchangeRate> for USExchangeRate {
+    fn from(v: longbridge::trade::USExchangeRate) -> Self {
+        Self {
+            universal_key: v.universal_key,
+            spec_key: v.spec_key,
+            base_currency: v.base_currency,
+            other_currency: v.other_currency,
+            bid_rate: v.bid_rate,
+            offer_rate: v.offer_rate,
+            average_rate: v.average_rate,
+        }
+    }
+}
+
+/// Exchange rates of a US account
+#[napi_derive::napi(object, js_name = "USExchangeRates")]
+#[derive(Debug, Clone, Default)]
+pub struct USExchangeRates {
+    pub exchanges: Vec<USExchangeRate>,
+}
+
+impl From<longbridge::trade::USExchangeRates> for USExchangeRates {
+    fn from(v: longbridge::trade::USExchangeRates) -> Self {
+        Self {
+            exchanges: v.exchanges.into_iter().map(Into::into).collect(),
         }
     }
 }

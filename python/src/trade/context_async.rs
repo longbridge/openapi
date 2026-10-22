@@ -576,6 +576,8 @@ impl AsyncTradeContext {
     }
 
     /// Get fund positions. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings.
     #[pyo3(signature = (symbols = None))]
     fn fund_positions(&self, py: Python<'_>, symbols: Option<Vec<String>>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -608,6 +610,8 @@ impl AsyncTradeContext {
     }
 
     /// Get margin ratio. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts have no margin-ratio data.
     fn margin_ratio(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
@@ -726,6 +730,95 @@ impl AsyncTradeContext {
                 .await
                 .map_err(ErrorNewType)?
                 .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get cash, buying power and margin status for the US account. US token
+    /// required. Returns awaitable.
+    #[pyo3(signature = (currency = None))]
+    fn us_cash_and_buy_power(
+        &self,
+        py: Python<'_>,
+        currency: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USCashAndBuyPower = ctx
+                .us_cash_and_buy_power(currency.as_deref())
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the quantity of a US holding that is available to trade. US token
+    /// required. Returns awaitable.
+    #[pyo3(signature = (symbol, equity_type = None, position_side = None))]
+    fn us_available_holding(
+        &self,
+        py: Python<'_>,
+        symbol: String,
+        equity_type: Option<String>,
+        position_side: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USAvailableHolding = ctx
+                .us_available_holding(longbridge::trade::GetUSAvailableHoldingOptions {
+                    symbol,
+                    equity_type: equity_type.unwrap_or_default(),
+                    position_side: position_side.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the US account transaction history. US token required. Returns
+    /// awaitable.
+    #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (start_at, end_at, page = 1, size = 20, types = None, currency = None))]
+    fn us_transaction_history(
+        &self,
+        py: Python<'_>,
+        start_at: PyOffsetDateTimeWrapper,
+        end_at: PyOffsetDateTimeWrapper,
+        page: i32,
+        size: i32,
+        types: Option<Vec<String>>,
+        currency: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        let mut opts = longbridge::trade::GetUSTransactionHistoryOptions::new(start_at.0, end_at.0);
+        opts.page = page;
+        opts.size = size;
+        opts.types = types.unwrap_or_default();
+        opts.currency = currency.unwrap_or_default();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USTransactionHistory = ctx
+                .us_transaction_history(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .into();
+            Ok(r)
+        })
+        .map(|b| b.unbind())
+    }
+
+    /// Get the exchange rates used by the US account. US token required.
+    /// Returns awaitable.
+    fn us_exchange_rates(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let r: crate::trade::types::USExchangeRates =
+                ctx.us_exchange_rates().await.map_err(ErrorNewType)?.into();
             Ok(r)
         })
         .map(|b| b.unbind())
