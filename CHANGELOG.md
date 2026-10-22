@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All SDKs:** `fund_positions` and `margin_ratio` are AP-only (`dc_restrict(DcRegion::Ap)`): US data-center accounts have no fund holdings or margin-ratio data, so they now get a region error (`HttpClientError::DcRegionRestricted`) instead of an opaque server error. The method docs in every layer say so.
 
+### Fixed
+
+- **All SDKs:** `QuoteContext.option_chain_info_by_date` now calls `POST /v1/quote/options/strikes` with a JSON body. The `GET /v1/gemini/option/option_chain_list` endpoint it used since 5.1.0 was renamed on the gateway and returned `404000 api not found` in every region, so the method failed on every call. The signature and the returned `OptionChainContract` are unchanged
+
 ## [5.2.2] - 2026-10-16
 
 ### Added
