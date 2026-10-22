@@ -1871,11 +1871,7 @@ pub struct USTransaction {
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
     /// Security symbol, if the record relates to one (e.g. `"AAPL.US"`)
-    #[serde(
-        default,
-        alias = "counter_id",
-        deserialize_with = "crate::serde_utils::null_as_default"
-    )]
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
     /// Market code
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
@@ -1930,9 +1926,10 @@ pub struct USTransactionHistory {
 /// One exchange rate in [`USExchangeRates`].
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct USExchangeRate {
-    /// Outer upstream map key (`universal_exchanges` key)
+    /// Account channel the rates apply to, e.g. `"us_lb_apex"` (outer
+    /// `universal_exchanges` key)
     pub universal_key: String,
-    /// Inner upstream map key (`spec_exchanges` key)
+    /// Rate type, e.g. `"am"` or `"reference"` (inner `spec_exchanges` key)
     pub spec_key: String,
     /// Base currency
     pub base_currency: String,
@@ -2073,7 +2070,7 @@ mod tests {
             "current_page": "2",
             "items": [
                 {"title": "Buy", "amount": "-100", "currency": "USD", "symbol": "AAPL.US", "create_at": "1792600000", "done_at": 1792600060},
-                {"title": "Deposit", "amount": "500", "currency": "USD", "counter_id": "ST/US/AAPL", "done_at": "0"}
+                {"title": "Buy", "amount": "-10", "currency": "USD", "symbol": "BTCUSD.BKKT", "counter_id": "VA/BKKT/BTCUSD", "done_at": "0"}
             ]
         }"#;
         let resp: USTransactionHistory = serde_json::from_str(data).unwrap();
@@ -2084,7 +2081,7 @@ mod tests {
             1792600000
         );
         assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1792600060);
-        assert_eq!(resp.items[1].symbol, "ST/US/AAPL");
+        assert_eq!(resp.items[1].symbol, "BTCUSD.BKKT");
         assert!(resp.items[1].done_at.is_none());
     }
 

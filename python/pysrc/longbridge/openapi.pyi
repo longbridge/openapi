@@ -17772,9 +17772,9 @@ class USExchangeRate:
     """One exchange rate in USExchangeRates."""
 
     universal_key: str
-    """Outer upstream map key (``universal_exchanges`` key)"""
+    """Account channel the rates apply to, e.g. ``us_lb_apex`` (outer ``universal_exchanges`` key)"""
     spec_key: str
-    """Inner upstream map key (``spec_exchanges`` key)"""
+    """Rate type, e.g. ``am`` or ``reference`` (inner ``spec_exchanges`` key)"""
     base_currency: str
     """Base currency"""
     other_currency: str
