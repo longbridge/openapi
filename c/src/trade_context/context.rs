@@ -252,6 +252,8 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
 
 /// Get history executions
 ///
+/// `side` may be `Unknown` on Longbridge US accounts.
+///
 /// @param[in] opts Options for get history executions request (can be null)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_history_executions(
@@ -310,6 +312,9 @@ pub unsafe extern "C" fn lb_trade_context_today_executions(
 }
 
 /// Get all executions
+///
+/// AP accounts only: US data-center accounts get a region error; use
+/// `lb_trade_context_history_executions` instead.
 ///
 /// @param[in] opts Options for get all executions request (can be null)
 #[unsafe(no_mangle)]
@@ -726,6 +731,8 @@ pub unsafe extern "C" fn lb_trade_context_cancel_order_attached(
 }
 
 /// Get account balance
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_account_balance(
     ctx: *const CTradeContext,
@@ -743,6 +750,8 @@ pub unsafe extern "C" fn lb_trade_context_account_balance(
 }
 
 /// Get cash flow
+///
+/// AP accounts only: US data-center accounts get a region error.
 ///
 /// @param[in] opts Options for get cash flow request
 #[unsafe(no_mangle)]
@@ -777,6 +786,9 @@ pub unsafe extern "C" fn lb_trade_context_cash_flow(
 
 /// Get fund positions
 ///
+/// AP accounts only: US data-center accounts have no fund holdings and get a
+/// region error. No US equivalent.
+///
 /// @param[in] opts Options for get fund positions request
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_fund_positions(
@@ -799,6 +811,8 @@ pub unsafe extern "C" fn lb_trade_context_fund_positions(
 
 /// Get stock positions
 ///
+/// AP accounts only: US data-center accounts get a region error.
+///
 /// @param[in] opts Options for get stock positions request
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_stock_positions(
@@ -820,6 +834,9 @@ pub unsafe extern "C" fn lb_trade_context_stock_positions(
 }
 
 /// Get margin ratio
+///
+/// AP accounts only: US data-center accounts get a region error. No US
+/// equivalent.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_margin_ratio(
     ctx: *const CTradeContext,
@@ -836,6 +853,8 @@ pub unsafe extern "C" fn lb_trade_context_margin_ratio(
 }
 
 /// Get order detail
+///
+/// AP accounts only: US data-center accounts get a region error.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_order_detail(
     ctx: *const CTradeContext,

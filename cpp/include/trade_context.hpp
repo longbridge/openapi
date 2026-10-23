@@ -44,6 +44,8 @@ public:
     PushCallback<TradeContext, PushOrderChanged> callback) const;
 
   /// Get history executions
+  ///
+  /// `side` may be `Unknown` on Longbridge US accounts.
   void history_executions(
     const std::optional<GetHistoryExecutionsOptions>& opts,
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
@@ -54,6 +56,9 @@ public:
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
 
   /// Get all executions
+  ///
+  /// AP accounts only: US data-center accounts get a region error; use
+  /// `history_executions` instead.
   void all_executions(
     const std::optional<GetAllExecutionsOptions>& opts,
     AsyncCallback<TradeContext, AllExecutionsResponse> callback) const;
@@ -90,34 +95,48 @@ public:
                     bool is_attached = false) const;
 
   /// Get account balance with currency
+  ///
+  /// AP accounts only: US data-center accounts get a region error.
   void account_balance(
     const std::string& currency,
     AsyncCallback<TradeContext, std::vector<AccountBalance>> callback) const;
 
   /// Get account balance
+  ///
+  /// AP accounts only: US data-center accounts get a region error.
   void account_balance(
     AsyncCallback<TradeContext, std::vector<AccountBalance>> callback) const;
 
   /// Get cash flow
+  ///
+  /// AP accounts only: US data-center accounts get a region error.
   void account_balance(
     const GetCashFlowOptions& opts,
     AsyncCallback<TradeContext, std::vector<CashFlow>> callback) const;
 
   /// Get fund positions
+  ///
+  /// AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
   void fund_positions(
     const std::optional<GetFundPositionsOptions>& opts,
     AsyncCallback<TradeContext, FundPositionsResponse> callback) const;
 
   /// Get stock positions
+  ///
+  /// AP accounts only: US data-center accounts get a region error.
   void stock_positions(
     const std::optional<GetStockPositionsOptions>& opts,
     AsyncCallback<TradeContext, StockPositionsResponse> callback) const;
 
   /// Get margin ratio
+  ///
+  /// AP accounts only: US data-center accounts get a region error. No US equivalent.
   void margin_ratio(const std::string& symbol,
                     AsyncCallback<TradeContext, MarginRatio> callback) const;
 
   /// Get order detail
+  ///
+  /// AP accounts only: US data-center accounts get a region error.
   void order_detail(const std::string& order_id,
                     AsyncCallback<TradeContext, OrderDetail> callback) const;
 

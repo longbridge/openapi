@@ -108,6 +108,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get history executions
+     * <p>
+     * {@code side} may be {@code Unknown} on Longbridge US accounts.
      * 
      * <pre>
      * {@code
@@ -181,6 +183,9 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get all executions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error; use
+     * {@link #getHistoryExecutions} instead.
      *
      * @param opts Options for this request
      * @return A Future representing the result of the operation
@@ -435,6 +440,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get account balance with currency
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -468,6 +475,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get account balance
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -500,6 +509,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get cash flow
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -537,6 +548,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get fund positions
+     * <p>
+     * AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
      * 
      * <pre>
      * {@code
@@ -569,6 +582,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get stock positions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -601,6 +616,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get margin ratio
+     * <p>
+     * AP accounts only: US data-center accounts get a region error. No US equivalent.
      * 
      * <pre>
      * {@code
@@ -633,6 +650,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get order detail
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code

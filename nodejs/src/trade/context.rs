@@ -11,8 +11,8 @@ use crate::{
         requests::{
             EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions, GetCashFlowOptions,
             GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetTodayExecutionsOptions,
-            GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderOptions,
-            SubmitOrderOptions,
+            GetTodayOrdersOptions, GetUSTransactionHistoryOptions, ReplaceOrderOptions,
+            SubmitMultiLegOrderOptions, SubmitOrderOptions,
         },
         types::{
             AccountBalance, AllExecutionsResponse, CashFlow, EstimateMaxPurchaseQuantityResponse,
@@ -172,6 +172,8 @@ impl TradeContext {
 
     /// Get history executions
     ///
+    /// `side` may be `Unknown` on Longbridge US accounts.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -231,6 +233,9 @@ impl TradeContext {
     }
 
     /// Get all executions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `historyExecutions` instead.
     #[napi]
     pub async fn all_executions(
         &self,
@@ -457,6 +462,9 @@ impl TradeContext {
 
     /// Get account balance
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usCashAndBuyPower` (or `usAssetOverview`) instead.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -481,6 +489,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usTransactionHistory` instead.
     ///
     /// #### Example
     ///
@@ -510,6 +521,9 @@ impl TradeContext {
 
     /// Get fund positions
     ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -533,6 +547,9 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usAssetOverview` (`stockList`) instead.
     ///
     /// #### Example
     ///
@@ -558,6 +575,10 @@ impl TradeContext {
 
     /// Get margin ratio
     ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `usCashAndBuyPower`
+    /// (`marginStatus`).
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -578,6 +599,9 @@ impl TradeContext {
     }
 
     /// Get order detail
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usOrderDetail` instead.
     ///
     /// #### Example
     ///
@@ -682,6 +706,84 @@ impl TradeContext {
                 .map_err(ErrorNewType)?
                 .into())
         })
+    }
+
+    /// Get cash, buying power and margin status for the US account. US token
+    /// required.
+    ///
+    /// `currency`: optional, e.g. `"USD"`.
+    #[napi]
+    pub fn us_cash_and_buy_power<'env>(
+        &self,
+        env: &'env Env,
+        currency: Option<String>,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USCashAndBuyPower>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_cash_and_buy_power(currency.as_deref())
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get the quantity of a US holding that is available to trade. US token
+    /// required.
+    ///
+    /// `equityType`: `"STOCK"` (default), `"OPTION"` or `"CRYPTO"`;
+    /// `positionSide`: `"LONG"` (default) or `"SHORT"`.
+    #[napi]
+    pub fn us_available_holding<'env>(
+        &self,
+        env: &'env Env,
+        symbol: String,
+        equity_type: Option<String>,
+        position_side: Option<String>,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USAvailableHolding>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_available_holding(longbridge::trade::GetUSAvailableHoldingOptions {
+                    symbol,
+                    equity_type: equity_type.unwrap_or_default(),
+                    position_side: position_side.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get the US account transaction history, one page at a time. US token
+    /// required.
+    #[napi]
+    pub fn us_transaction_history<'env>(
+        &self,
+        env: &'env Env,
+        opts: GetUSTransactionHistoryOptions,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USTransactionHistory>> {
+        let ctx = self.ctx.clone();
+        let opts = opts.into();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_transaction_history(opts)
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get the exchange rates used by the US account. US token required.
+    #[napi]
+    pub fn us_exchange_rates<'env>(
+        &self,
+        env: &'env Env,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USExchangeRates>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(
+            async move { Ok(ctx.us_exchange_rates().await.map_err(ErrorNewType)?.into()) },
+        )
     }
 
     #[napi]

@@ -147,6 +147,9 @@ impl TradeContext {
     }
 
     /// Get all executions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
     #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
     fn all_executions(
         &self,
@@ -466,6 +469,9 @@ impl TradeContext {
     }
 
     /// Get account balance
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
     #[pyo3(signature = (currency = None))]
     fn account_balance(&self, currency: Option<String>) -> PyResult<Vec<AccountBalance>> {
         self.ctx
@@ -477,6 +483,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     #[pyo3(signature = (start_at, end_at, business_type = None, symbol = None, page = None, size = None))]
     fn cash_flow(
         &self,
@@ -511,6 +520,9 @@ impl TradeContext {
     }
 
     /// Get fund positions
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     #[pyo3(signature = (symbols = None))]
     fn fund_positions(&self, symbols: Option<Vec<String>>) -> PyResult<FundPositionsResponse> {
         self.ctx
@@ -520,6 +532,9 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
     #[pyo3(signature = (symbols = None))]
     fn stock_positions(&self, symbols: Option<Vec<String>>) -> PyResult<StockPositionsResponse> {
         self.ctx
@@ -529,6 +544,10 @@ impl TradeContext {
     }
 
     /// Get margin ratio
+    ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
     fn margin_ratio(&self, symbol: String) -> PyResult<MarginRatio> {
         self.ctx
             .margin_ratio(symbol)
@@ -537,6 +556,9 @@ impl TradeContext {
     }
 
     /// Get order detail
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
     #[pyo3(signature = (order_id, is_attached = false))]
     fn order_detail(&self, order_id: String, is_attached: bool) -> PyResult<OrderDetail> {
         let mut opts = GetOrderDetailOptions::new(order_id);
@@ -612,6 +634,68 @@ impl TradeContext {
             })
             .map_err(ErrorNewType)?
             .into())
+    }
+
+    /// Get cash, buying power and margin status for the US account. US token
+    /// required.
+    #[pyo3(signature = (currency = None))]
+    fn us_cash_and_buy_power(
+        &self,
+        currency: Option<String>,
+    ) -> PyResult<crate::trade::types::USCashAndBuyPower> {
+        Ok(self
+            .ctx
+            .us_cash_and_buy_power(currency.as_deref())
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the quantity of a US holding that is available to trade. US token
+    /// required.
+    #[pyo3(signature = (symbol, equity_type = None, position_side = None))]
+    fn us_available_holding(
+        &self,
+        symbol: String,
+        equity_type: Option<String>,
+        position_side: Option<String>,
+    ) -> PyResult<crate::trade::types::USAvailableHolding> {
+        Ok(self
+            .ctx
+            .us_available_holding(longbridge::trade::GetUSAvailableHoldingOptions {
+                symbol,
+                equity_type: equity_type.unwrap_or_default(),
+                position_side: position_side.unwrap_or_default(),
+            })
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the US account transaction history. US token required.
+    #[pyo3(signature = (start_at, end_at, page = 1, size = 20, types = None, currency = None))]
+    fn us_transaction_history(
+        &self,
+        start_at: PyOffsetDateTimeWrapper,
+        end_at: PyOffsetDateTimeWrapper,
+        page: i32,
+        size: i32,
+        types: Option<Vec<String>>,
+        currency: Option<String>,
+    ) -> PyResult<crate::trade::types::USTransactionHistory> {
+        let mut opts = longbridge::trade::GetUSTransactionHistoryOptions::new(start_at.0, end_at.0);
+        opts.page = page;
+        opts.size = size;
+        opts.types = types.unwrap_or_default();
+        opts.currency = currency.unwrap_or_default();
+        Ok(self
+            .ctx
+            .us_transaction_history(opts)
+            .map_err(ErrorNewType)?
+            .into())
+    }
+
+    /// Get the exchange rates used by the US account. US token required.
+    fn us_exchange_rates(&self) -> PyResult<crate::trade::types::USExchangeRates> {
+        Ok(self.ctx.us_exchange_rates().map_err(ErrorNewType)?.into())
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,

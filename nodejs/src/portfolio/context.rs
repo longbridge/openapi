@@ -22,6 +22,9 @@ impl PortfolioContext {
     }
 
     /// Get exchange rates for supported currencies.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `TradeContext.usExchangeRates` instead.
     #[napi]
     pub async fn exchange_rate(&self) -> Result<ExchangeRates> {
         Ok(self.ctx.exchange_rate().await.map_err(ErrorNewType)?.into())

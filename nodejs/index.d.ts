@@ -716,7 +716,10 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
-  /** Order side */
+  /**
+   * Order side. `Unknown` when the response omits it (Longbridge US
+   * `/v1/trade/execution/history`)
+   */
   get side(): OrderSide
 }
 
@@ -2953,7 +2956,12 @@ export declare class ParticipantInfo {
 export declare class PortfolioContext {
   /** Create a new PortfolioContext. */
   static new(config: Config): PortfolioContext
-  /** Get exchange rates for supported currencies. */
+  /**
+   * Get exchange rates for supported currencies.
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `TradeContext.usExchangeRates` instead.
+   */
   exchangeRate(): Promise<ExchangeRates>
   /**
    * Get portfolio P&L analysis (summary + per-security breakdown).
@@ -4314,6 +4322,8 @@ export declare class TradeContext {
   /**
    * Get history executions
    *
+   * `side` may be `Unknown` on Longbridge US accounts.
+   *
    * #### Example
    *
    * ```javascript
@@ -4349,7 +4359,12 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
-  /** Get all executions */
+  /**
+   * Get all executions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `historyExecutions` instead.
+   */
   allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders
@@ -4507,6 +4522,9 @@ export declare class TradeContext {
   /**
    * Get account balance
    *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usCashAndBuyPower` (or `usAssetOverview`) instead.
+   *
    * #### Example
    *
    * ```javascript
@@ -4523,6 +4541,9 @@ export declare class TradeContext {
   accountBalance(currency?: string | undefined | null): Promise<Array<AccountBalance>>
   /**
    * Get cash flow
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usTransactionHistory` instead.
    *
    * #### Example
    *
@@ -4544,6 +4565,9 @@ export declare class TradeContext {
   /**
    * Get fund positions
    *
+   * AP accounts only: US data-center accounts have no fund holdings and
+   * get a region error. No US equivalent.
+   *
    * #### Example
    *
    * ```javascript
@@ -4558,6 +4582,9 @@ export declare class TradeContext {
   fundPositions(symbols?: Array<string> | undefined | null): Promise<FundPositionsResponse>
   /**
    * Get stock positions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usAssetOverview` (`stockList`) instead.
    *
    * #### Example
    *
@@ -4574,6 +4601,10 @@ export declare class TradeContext {
   /**
    * Get margin ratio
    *
+   * AP accounts only: US data-center accounts get a region error. No US
+   * equivalent; for US margin info see `usCashAndBuyPower`
+   * (`marginStatus`).
+   *
    * #### Example
    *
    * ```javascript
@@ -4588,6 +4619,9 @@ export declare class TradeContext {
   marginRatio(symbol: string): Promise<MarginRatio>
   /**
    * Get order detail
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usOrderDetail` instead.
    *
    * #### Example
    *
@@ -4612,6 +4646,28 @@ export declare class TradeContext {
   usAssetOverview(): Promise<USAssetOverview>
   /** Get US realized P&L. US token required. */
   usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
+  /**
+   * Get cash, buying power and margin status for the US account. US token
+   * required.
+   *
+   * `currency`: optional, e.g. `"USD"`.
+   */
+  usCashAndBuyPower(currency?: string | undefined | null): Promise<USCashAndBuyPower>
+  /**
+   * Get the quantity of a US holding that is available to trade. US token
+   * required.
+   *
+   * `equityType`: `"STOCK"` (default), `"OPTION"` or `"CRYPTO"`;
+   * `positionSide`: `"LONG"` (default) or `"SHORT"`.
+   */
+  usAvailableHolding(symbol: string, equityType?: string | undefined | null, positionSide?: string | undefined | null): Promise<USAvailableHolding>
+  /**
+   * Get the US account transaction history, one page at a time. US token
+   * required.
+   */
+  usTransactionHistory(opts: GetUSTransactionHistoryOptions): Promise<USTransactionHistory>
+  /** Get the exchange rates used by the US account. US token required. */
+  usExchangeRates(): Promise<USExchangeRates>
   orderDetailAttached(orderId: string): Promise<OrderDetail>
   /**
    * Estimating the maximum purchase quantity for Hong Kong and US stocks,
@@ -6716,6 +6772,28 @@ export interface GetTodayOrdersOptions {
    * Order entry (not the parent order). Has no effect without order_id.
    */
   isAttached?: boolean
+}
+
+/** Options for the US transaction history request */
+export interface GetUSTransactionHistoryOptions {
+  /** Start time (inclusive) */
+  startAt: Date
+  /** End time (inclusive) */
+  endAt: Date
+  /** Page number, starting at 1 (default 1) */
+  page?: number
+  /** Page size (default 20) */
+  size?: number
+  /**
+   * Transaction types to include; empty means all. Values:
+   * `TT_DEPOSIT_AND_WITHDRAWAL`, `TT_STOCKS_AND_ETFS_TRADING`,
+   * `TT_OPTIONS_TRADING`, `TT_CRYPTO_TRADING`, `TT_CORPORATE_ACTION`,
+   * `TT_TRANSFER_IN_AND_OUT`, `TT_CRYPTO_TRANSFER`, `TT_MARGIN_FINANCING`,
+   * `TT_OTHER`
+   */
+  types?: Array<string>
+  /** Currency filter, e.g. `USD`; empty means all */
+  currency?: string
 }
 
 /** Data granularity */
@@ -9065,11 +9143,48 @@ export interface USAttachedOrder {
   withdrawn: boolean
 }
 
+/** Quantity of a US holding that is available to trade */
+export interface USAvailableHolding {
+  availableQty: string
+}
+
 /** Action-button state for an order. */
 export interface USButtonControl {
   withdraw: number
   replace: number
   exceptionable: Array<string>
+}
+
+/** Buying power in USCashAndBuyPower */
+export interface USBuyLimitInfo {
+  currency: string
+  cashBuyPower: string
+  overnightBuyPower: string
+  dayTradeBuyPower: string
+  instantBuyPower: string
+  intradayMarginBuyPower: string
+  optionBuyPower: string
+  cryptoBuyPower: string
+  mme: string
+}
+
+/** Cash, buying power and margin status of a US account */
+export interface USCashAndBuyPower {
+  buyLimitInfo: USBuyLimitInfo
+  cashList: Array<USCashDetail>
+  marginStatus: USMarginStatus
+}
+
+/** One cash currency entry in USCashAndBuyPower */
+export interface USCashDetail {
+  currency: string
+  totalAmount: string
+  availableCash: string
+  withdrawCash: string
+  frozenCash: string
+  settledCash: string
+  outstanding: string
+  externalAmount: string
 }
 
 /** One cash currency entry in USAssetOverview */
@@ -9132,9 +9247,26 @@ export interface USConsensusItem {
 /** One cryptocurrency holding in USAssetOverview */
 export interface USCryptoEntry {
   assetType: string
-  averageCost: string
   symbol: string
+  quantity: string
   currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
   industryName: string
 }
 
@@ -9220,6 +9352,22 @@ export interface USETFFile {
 /** US ETF files response */
 export interface USETFFilesResponse {
   files: Array<USETFFile>
+}
+
+/** One exchange rate in USExchangeRates */
+export interface USExchangeRate {
+  universalKey: string
+  specKey: string
+  baseCurrency: string
+  otherCurrency: string
+  bidRate: string
+  offerRate: string
+  averageRate: string
+}
+
+/** Exchange rates of a US account */
+export interface USExchangeRates {
+  exchanges: Array<USExchangeRate>
 }
 
 /** One balance-sheet entry in USFinancialOverview. */
@@ -9310,6 +9458,17 @@ export interface USKeyMetricItem {
   reportTxt: string
   rptDate: string
   fields: Array<any>
+}
+
+/** Margin account status in USCashAndBuyPower */
+export interface USMarginStatus {
+  currency: string
+  nlv: string
+  marginEquity: string
+  marginMaintenanceExcess: string
+  mmr: string
+  regTExcess: string
+  sma: string
 }
 
 /** Full typed order object within USOrderDetailResponse. */
@@ -9496,6 +9655,31 @@ export interface USStockEntry {
   name: string
   industryCounterId: string
   industryName: string
+}
+
+/** One record in USTransactionHistory */
+export interface USTransaction {
+  title: string
+  bizCode: string
+  bizCodeName: string
+  amount: string
+  currency: string
+  symbol: string
+  market: string
+  equityType: string
+  positionSide: string
+  quantity: string
+  quantityDescription: string
+  refNo: string
+  remark: string
+  createAt?: Date
+  doneAt?: Date
+}
+
+/** One page of US account transaction history */
+export interface USTransactionHistory {
+  currentPage: number
+  items: Array<USTransaction>
 }
 
 /** One valuation metric entry in USValuationOverview.metrics */

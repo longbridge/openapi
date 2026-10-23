@@ -764,7 +764,8 @@ pub struct CExecution {
     pub quantity: *const CDecimal,
     /// Executed price
     pub price: *const CDecimal,
-    /// Order side
+    /// Order side. `Unknown` when the response omits it (Longbridge US
+    /// `/v1/trade/execution/history`)
     pub side: COrderSide,
 }
 

@@ -15,10 +15,12 @@ use crate::{
         GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
+        GetUSTransactionHistoryOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
+        QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
         SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        USAvailableHolding, USCashAndBuyPower, USExchangeRates, USOrderDetailResponse,
+        USRealizedPL, USTransactionHistory,
         core::{Command, Core},
     },
 };
@@ -180,6 +182,8 @@ impl TradeContext {
 
     /// Get history executions
     ///
+    /// `side` may be `Unknown` on Longbridge US accounts.
+    ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/execution/history_executions>
     ///
     /// # Examples
@@ -312,6 +316,9 @@ impl TradeContext {
 
     /// Get all executions
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
+    ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
     pub async fn all_executions(
         &self,
@@ -321,6 +328,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v3/trade/execution/all")
+            .dc_restrict(DcRegion::Ap)
             .query_params(options.into().unwrap_or_default())
             .response::<Json<AllExecutionsResponse>>()
             .send()
@@ -632,6 +640,9 @@ impl TradeContext {
 
     /// Get account balance
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
+    ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/asset/account>
     ///
     /// # Examples
@@ -668,6 +679,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/account")
+            .dc_restrict(DcRegion::Ap)
             .query_params(Request { currency })
             .response::<Json<Response>>()
             .send()
@@ -678,6 +690,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/asset/cashflow>
     ///
@@ -716,6 +731,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/cashflow")
+            .dc_restrict(DcRegion::Ap)
             .query_params(options)
             .response::<Json<Response>>()
             .send()
@@ -728,6 +744,9 @@ impl TradeContext {
     /// Get fund positions
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/asset/fund>
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     ///
     /// # Examples
     ///
@@ -756,6 +775,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/fund")
+            .dc_restrict(DcRegion::Ap)
             .query_params(opts.into().unwrap_or_default())
             .response::<Json<FundPositionsResponse>>()
             .send()
@@ -765,6 +785,9 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/asset/stock>
     ///
@@ -795,6 +818,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/stock")
+            .dc_restrict(DcRegion::Ap)
             .query_params(opts.into().unwrap_or_default())
             .response::<Json<StockPositionsResponse>>()
             .send()
@@ -806,6 +830,10 @@ impl TradeContext {
     /// Get margin ratio
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/asset/margin_ratio>
+    ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
     ///
     /// # Examples
     ///
@@ -836,6 +864,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/risk/margin-ratio")
+            .dc_restrict(DcRegion::Ap)
             .query_params(Request {
                 symbol: symbol.into(),
             })
@@ -847,6 +876,9 @@ impl TradeContext {
     }
 
     /// Get order detail
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/order/order_detail>
     ///
@@ -882,6 +914,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/trade/order")
+            .dc_restrict(DcRegion::Ap)
             .response::<Json<OrderDetail>>()
             .query_params(options.into())
             .send()
@@ -1092,5 +1125,195 @@ impl TradeContext {
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
             .0)
+    }
+
+    /// Get cash, buying power and margin status for the US account.
+    ///
+    /// `currency`: optional, e.g. `"USD"`.
+    ///
+    /// Path: `GET /v1/us/assets/cash-and-buy-power`
+    ///
+    /// US token required.
+    pub async fn us_cash_and_buy_power(&self, currency: Option<&str>) -> Result<USCashAndBuyPower> {
+        #[derive(Serialize)]
+        struct Query<'a> {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            currency: Option<&'a str>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/cash-and-buy-power")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query { currency })
+            .response::<Json<USCashAndBuyPower>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the quantity of a US holding that is available to trade.
+    ///
+    /// Path: `GET /v1/us/assets/available-holding`
+    ///
+    /// US token required.
+    pub async fn us_available_holding(
+        &self,
+        opts: GetUSAvailableHoldingOptions,
+    ) -> Result<USAvailableHolding> {
+        #[derive(Serialize)]
+        struct Query {
+            symbol: String,
+            equity_type: String,
+            position_side: String,
+        }
+
+        let equity_type = if opts.equity_type.is_empty() {
+            "STOCK".to_string()
+        } else {
+            opts.equity_type
+        };
+        let position_side = if opts.position_side.is_empty() {
+            "LONG".to_string()
+        } else {
+            opts.position_side
+        };
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/available-holding")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                symbol: opts.symbol,
+                equity_type,
+                position_side,
+            })
+            .response::<Json<USAvailableHolding>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the US account transaction history (deposits, withdrawals, trades,
+    /// corporate actions, transfers and so on), one page at a time.
+    ///
+    /// Path: `POST /v1/us/assets/transaction-history`
+    ///
+    /// US token required.
+    pub async fn us_transaction_history(
+        &self,
+        opts: GetUSTransactionHistoryOptions,
+    ) -> Result<USTransactionHistory> {
+        #[derive(Debug, Serialize)]
+        struct Body {
+            start: i64,
+            end: i64,
+            page: i32,
+            size: i32,
+            #[serde(skip_serializing_if = "Vec::is_empty")]
+            types: Vec<String>,
+            #[serde(skip_serializing_if = "String::is_empty")]
+            currency: String,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/us/assets/transaction-history")
+            .dc_restrict(DcRegion::Us)
+            .body(Json(Body {
+                start: opts.start_at.unix_timestamp(),
+                end: opts.end_at.unix_timestamp(),
+                page: if opts.page > 0 { opts.page } else { 1 },
+                size: if opts.size > 0 { opts.size } else { 20 },
+                types: opts.types,
+                currency: opts.currency,
+            }))
+            .response::<Json<USTransactionHistory>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the exchange rates used by the US account.
+    ///
+    /// The upstream two-level map is flattened into
+    /// [`USExchangeRates::exchanges`]; each entry keeps the two upstream map
+    /// keys as `universal_key` and `spec_key`.
+    ///
+    /// Path: `GET /v1/us/assets/exchange-rates`
+    ///
+    /// US token required.
+    pub async fn us_exchange_rates(&self) -> Result<USExchangeRates> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/exchange-rates")
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USExchangeRates>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+}
+
+#[cfg(test)]
+mod dc_restrict_tests {
+    use longbridge_httpcli::HttpClientError;
+    use time::macros::datetime;
+
+    use super::*;
+    use crate::Error;
+
+    fn us_trade_context() -> TradeContext {
+        let config = Arc::new(Config::from_apikey("us_app_key", "app_secret", "us_token"));
+        TradeContext::new(config).0
+    }
+
+    #[track_caller]
+    fn assert_ap_restricted<T>(res: Result<T>, path: &str)
+    where
+        T: std::fmt::Debug,
+    {
+        match res {
+            Err(Error::HttpClient(HttpClientError::DcRegionRestricted {
+                path: p,
+                required,
+                current,
+            })) => {
+                assert_eq!(p, path, "restricted path mismatch");
+                assert_eq!(required, DcRegion::Ap, "expected AP-only restriction");
+                assert_eq!(current, DcRegion::Us, "expected US session region");
+            }
+            other => panic!("expected DcRegionRestricted for {path}, got {other:?}"),
+        }
+    }
+
+    /// AP-only asset/risk/order endpoints fail fast for a US (`us_`) token
+    /// instead of sending a request the US data center rejects.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn ap_only_endpoints_reject_us_token() {
+        let ctx = us_trade_context();
+
+        assert_ap_restricted(ctx.account_balance(None).await, "/v1/asset/account");
+        assert_ap_restricted(
+            ctx.cash_flow(GetCashFlowOptions::new(
+                datetime!(2026-01-01 0:00 UTC),
+                datetime!(2026-01-02 0:00 UTC),
+            ))
+            .await,
+            "/v1/asset/cashflow",
+        );
+        assert_ap_restricted(ctx.fund_positions(None).await, "/v1/asset/fund");
+        assert_ap_restricted(ctx.stock_positions(None).await, "/v1/asset/stock");
+        assert_ap_restricted(ctx.margin_ratio("700.HK").await, "/v1/risk/margin-ratio");
+        assert_ap_restricted(ctx.order_detail("1").await, "/v1/trade/order");
+        assert_ap_restricted(ctx.all_executions(None).await, "/v3/trade/execution/all");
     }
 }

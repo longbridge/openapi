@@ -37,8 +37,12 @@ pub enum HttpClientError {
 
     /// The requested API is restricted to one data center and cannot be reached
     /// from a session in a different region.
+    ///
+    /// The message names the API to call instead when one exists, so callers
+    /// (including LLM agents) can recover without parsing the path.
     #[error(
-        "this API ({path}) is only available in the {required} data center and is not supported for your {current}-region account"
+        "this API ({path}) is only available in the {required} data center and is not supported for your {current}-region account{}",
+        DcRegionHint::new(.path, *.required)
     )]
     DcRegionRestricted {
         /// The restricted API path (or WebSocket command) that was requested.
@@ -111,6 +115,114 @@ pub enum HttpClientError {
     Sse(String),
 }
 
+/// Suffix appended to [`HttpClientError::DcRegionRestricted`] messages that
+/// tells the caller which API to use instead.
+struct DcRegionHint(Option<&'static str>);
+
+impl DcRegionHint {
+    fn new(path: &str, required: DcRegion) -> Self {
+        Self(region_alternative(path, required))
+    }
+}
+
+impl std::fmt::Display for DcRegionHint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.0 {
+            Some(hint) => write!(f, "; {hint}"),
+            None => Ok(()),
+        }
+    }
+}
+
+/// Hint for an AP-only path with no US counterpart.
+const NO_US_EQUIVALENT: &str = "there is no US equivalent";
+
+/// Hint for a US-only path with no AP counterpart.
+const NO_AP_EQUIVALENT: &str = "there is no AP equivalent";
+
+/// Returns the recovery hint for a region-restricted API path.
+///
+/// The hint is shared by every binding (Rust, Python, Node.js, Java, C, C++)
+/// and by MCP servers built on the SDK, whose method and tool names differ,
+/// so it names the alternative by HTTP endpoint rather than by method.
+fn region_alternative(path: &str, required: DcRegion) -> Option<&'static str> {
+    match required {
+        DcRegion::Ap => ap_only_alternative(path),
+        DcRegion::Us => us_only_alternative(path),
+    }
+}
+
+/// Hint for a US-region account calling an AP-only path.
+fn ap_only_alternative(path: &str) -> Option<&'static str> {
+    let hint = match path {
+        "/v1/asset/account" => {
+            "use the US endpoint GET /v1/us/assets/cash-and-buy-power or GET \
+             /v1/us/assets/overview (TradeContext US methods)"
+        }
+        "/v1/asset/cashflow" => {
+            "use the US endpoint POST /v1/us/assets/transaction-history (TradeContext US methods)"
+        }
+        "/v1/asset/stock" => {
+            "use the US endpoint GET /v1/us/assets/overview (TradeContext US methods)"
+        }
+        "/v1/asset/exchange_rates" => {
+            "use the US endpoint GET /v1/us/assets/exchange-rates (TradeContext US methods)"
+        }
+        "/v1/trade/order" => {
+            "use the US endpoint GET /v1/us/orders/{order_id} (TradeContext US methods)"
+        }
+        "/v3/trade/execution/all" => "use GET /v1/trade/execution/history",
+        "/v1/risk/margin-ratio" => {
+            "there is no US equivalent; account-level margin is at GET \
+             /v1/us/assets/cash-and-buy-power (margin_status)"
+        }
+        "/v1/asset/fund" | "quote/brokers" | "/v1/quote/operatings" => NO_US_EQUIVALENT,
+        _ if path.starts_with("/v1/quote/broker-holding")
+            || path.starts_with("/v1/dailycoins/") =>
+        {
+            NO_US_EQUIVALENT
+        }
+        _ => return None,
+    };
+    Some(hint)
+}
+
+/// Hint for an AP-region account calling a US-only path.
+fn us_only_alternative(path: &str) -> Option<&'static str> {
+    let hint = match path {
+        "/v1/us/orders/query" => {
+            "use the AP endpoint GET /v1/trade/order/today or GET /v1/trade/order/history"
+        }
+        "/v1/us/assets/overview" => {
+            "use the AP endpoints GET /v1/asset/account and GET /v1/asset/stock"
+        }
+        "/v1/us/assets/transaction-history" => "use the AP endpoint GET /v1/asset/cashflow",
+        "/v1/us/assets/exchange-rates" => "use the AP endpoint GET /v1/asset/exchange_rates",
+        "/v1/us/assets/cash-and-buy-power" => "use the AP endpoint GET /v1/asset/account",
+        "/v1/us/assets/available-holding" => {
+            "use the AP endpoint GET /v1/asset/stock (available_quantity)"
+        }
+        "/v1/us/stock-info/company-overview" => "use the AP endpoint GET /v1/quote/comp-overview",
+        "/v1/us/stock-info/valuation-overview" => "use the AP endpoint GET /v1/quote/valuation",
+        "/v1/us/stock-info/finn-overview" | "/v1/us/quote/financials/statements" => {
+            "use the AP endpoint GET /v1/quote/financial-reports"
+        }
+        "/v1/us/stock-info/fin-keyfactor" => {
+            "use the AP endpoint GET /v1/quote/financials/earnings-snapshot"
+        }
+        "/v1/us/stock-info/fin-consensus" => {
+            "use the AP endpoint GET /v1/quote/financial-consensus-detail"
+        }
+        "/v1/us/stock-info/etf-dividend-info" | "/v1/us/stock-info/company-dividends" => {
+            "use the AP endpoint GET /v1/quote/dividends"
+        }
+        _ if path.starts_with("/v1/us/orders/") => "use the AP endpoint GET /v1/trade/order",
+        _ if path.starts_with("/v1/us/") => NO_AP_EQUIVALENT,
+        _ => return None,
+    };
+    Some(hint)
+}
+
 /// Represents an HTTP error
 #[derive(Debug)]
 pub struct HttpError(pub reqwest::Error);
@@ -136,3 +248,169 @@ impl std::error::Error for HttpError {}
 
 /// Http client result type
 pub type HttpClientResult<T, E = HttpClientError> = std::result::Result<T, E>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn restricted(path: &str, required: DcRegion) -> String {
+        let current = match required {
+            DcRegion::Ap => DcRegion::Us,
+            DcRegion::Us => DcRegion::Ap,
+        };
+        HttpClientError::DcRegionRestricted {
+            path: path.to_string(),
+            required,
+            current,
+        }
+        .to_string()
+    }
+
+    const AP_PREFIX: &str =
+        "is only available in the AP data center and is not supported for your US-region account";
+    const US_PREFIX: &str =
+        "is only available in the US data center and is not supported for your AP-region account";
+
+    #[test]
+    fn dc_region_restricted_names_us_alternative() {
+        let cases = [
+            (
+                "/v1/asset/account",
+                "use the US endpoint GET /v1/us/assets/cash-and-buy-power or GET /v1/us/assets/overview (TradeContext US methods)",
+            ),
+            (
+                "/v1/asset/cashflow",
+                "use the US endpoint POST /v1/us/assets/transaction-history (TradeContext US methods)",
+            ),
+            (
+                "/v1/asset/stock",
+                "use the US endpoint GET /v1/us/assets/overview (TradeContext US methods)",
+            ),
+            (
+                "/v1/asset/exchange_rates",
+                "use the US endpoint GET /v1/us/assets/exchange-rates (TradeContext US methods)",
+            ),
+            (
+                "/v1/trade/order",
+                "use the US endpoint GET /v1/us/orders/{order_id} (TradeContext US methods)",
+            ),
+            (
+                "/v1/risk/margin-ratio",
+                "there is no US equivalent; account-level margin is at GET /v1/us/assets/cash-and-buy-power (margin_status)",
+            ),
+            (
+                "/v3/trade/execution/all",
+                "use GET /v1/trade/execution/history",
+            ),
+            ("/v1/asset/fund", "there is no US equivalent"),
+            ("quote/brokers", "there is no US equivalent"),
+            ("/v1/quote/operatings", "there is no US equivalent"),
+            ("/v1/quote/broker-holding", "there is no US equivalent"),
+            (
+                "/v1/quote/broker-holding/detail",
+                "there is no US equivalent",
+            ),
+            (
+                "/v1/quote/broker-holding/daily",
+                "there is no US equivalent",
+            ),
+            ("/v1/dailycoins/query", "there is no US equivalent"),
+            ("/v1/dailycoins/create", "there is no US equivalent"),
+        ];
+        for (path, hint) in cases {
+            assert_eq!(
+                restricted(path, DcRegion::Ap),
+                format!("this API ({path}) {AP_PREFIX}; {hint}"),
+                "unexpected message for {path}"
+            );
+        }
+    }
+
+    #[test]
+    fn dc_region_restricted_names_ap_alternative() {
+        let cases = [
+            (
+                "/v1/us/orders/123",
+                "use the AP endpoint GET /v1/trade/order",
+            ),
+            (
+                "/v1/us/orders/query",
+                "use the AP endpoint GET /v1/trade/order/today or GET /v1/trade/order/history",
+            ),
+            (
+                "/v1/us/assets/overview",
+                "use the AP endpoints GET /v1/asset/account and GET /v1/asset/stock",
+            ),
+            (
+                "/v1/us/assets/transaction-history",
+                "use the AP endpoint GET /v1/asset/cashflow",
+            ),
+            (
+                "/v1/us/assets/exchange-rates",
+                "use the AP endpoint GET /v1/asset/exchange_rates",
+            ),
+            (
+                "/v1/us/assets/cash-and-buy-power",
+                "use the AP endpoint GET /v1/asset/account",
+            ),
+            (
+                "/v1/us/assets/available-holding",
+                "use the AP endpoint GET /v1/asset/stock (available_quantity)",
+            ),
+            ("/v1/us/assets/pl/realized", "there is no AP equivalent"),
+            ("/v1/us/gemini/crypto-overview", "there is no AP equivalent"),
+            ("/v1/us/stock-info/etf-files", "there is no AP equivalent"),
+            (
+                "/v1/us/stock-info/company-overview",
+                "use the AP endpoint GET /v1/quote/comp-overview",
+            ),
+            (
+                "/v1/us/stock-info/valuation-overview",
+                "use the AP endpoint GET /v1/quote/valuation",
+            ),
+            (
+                "/v1/us/stock-info/finn-overview",
+                "use the AP endpoint GET /v1/quote/financial-reports",
+            ),
+            (
+                "/v1/us/quote/financials/statements",
+                "use the AP endpoint GET /v1/quote/financial-reports",
+            ),
+            (
+                "/v1/us/stock-info/fin-keyfactor",
+                "use the AP endpoint GET /v1/quote/financials/earnings-snapshot",
+            ),
+            (
+                "/v1/us/stock-info/fin-consensus",
+                "use the AP endpoint GET /v1/quote/financial-consensus-detail",
+            ),
+            (
+                "/v1/us/stock-info/etf-dividend-info",
+                "use the AP endpoint GET /v1/quote/dividends",
+            ),
+            (
+                "/v1/us/stock-info/company-dividends",
+                "use the AP endpoint GET /v1/quote/dividends",
+            ),
+        ];
+        for (path, hint) in cases {
+            assert_eq!(
+                restricted(path, DcRegion::Us),
+                format!("this API ({path}) {US_PREFIX}; {hint}"),
+                "unexpected message for {path}"
+            );
+        }
+    }
+
+    #[test]
+    fn dc_region_restricted_without_hint_keeps_message() {
+        assert_eq!(
+            restricted("/v1/unknown", DcRegion::Ap),
+            format!("this API (/v1/unknown) {AP_PREFIX}")
+        );
+        assert_eq!(
+            restricted("/v1/unknown", DcRegion::Us),
+            format!("this API (/v1/unknown) {US_PREFIX}")
+        );
+    }
+}

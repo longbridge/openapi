@@ -23,7 +23,7 @@ use time::{Date, OffsetDateTime};
 
 use crate::{
     async_util,
-    error::jni_result,
+    error::{JniError, jni_result},
     types::{FromJValue, IntoJValue, JavaInteger, JavaLong, ObjectArray, get_field},
 };
 
@@ -1085,6 +1085,111 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsRealiz
                     category: category.unwrap_or_default(),
                 })
                 .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsCashAndBuyPower(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    currency: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let currency: Option<String> = FromJValue::from_jvalue(env, currency.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .us_cash_and_buy_power(currency.as_deref())
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsAvailableHolding(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    equity_type: JObject,
+    position_side: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let equity_type: Option<String> = FromJValue::from_jvalue(env, equity_type.into())?;
+        let position_side: Option<String> = FromJValue::from_jvalue(env, position_side.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .us_available_holding(longbridge::trade::GetUSAvailableHoldingOptions {
+                    symbol,
+                    equity_type: equity_type.unwrap_or_default(),
+                    position_side: position_side.unwrap_or_default(),
+                })
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsTransactionHistory(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    start_at: i64,
+    end_at: i64,
+    page: i64,
+    size: i64,
+    types: JObject,
+    currency: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let types: ObjectArray<String> = FromJValue::from_jvalue(env, types.into())?;
+        let currency: Option<String> = FromJValue::from_jvalue(env, currency.into())?;
+        let start_at = OffsetDateTime::from_unix_timestamp(start_at)
+            .map_err(|err| JniError::Other(format!("invalid start_at: {err}")))?;
+        let end_at = OffsetDateTime::from_unix_timestamp(end_at)
+            .map_err(|err| JniError::Other(format!("invalid end_at: {err}")))?;
+        let mut opts = longbridge::trade::GetUSTransactionHistoryOptions::new(start_at, end_at);
+        opts.page = page as i32;
+        opts.size = size as i32;
+        opts.types = types.0;
+        opts.currency = currency.unwrap_or_default();
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.us_transaction_history(opts).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_tradeContextUsExchangeRates(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.us_exchange_rates().await?;
             Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
