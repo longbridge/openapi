@@ -525,6 +525,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="Execution.html" title="class in com.longbridge.trade">Execution</a>[]&gt;&nbsp;getHistoryExecutions&#8203;(<a href="GetHistoryExecutionsOptions.html" title="class in com.longbridge.trade">GetHistoryExecutionsOptions</a>&nbsp;opts)
                                                     throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get history executions
+ <p>
+ <code>side</code> may be <code>Unknown</code> on Longbridge US accounts.
  
  <pre>
  <code>
@@ -608,7 +610,10 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <h4>getAllExecutions</h4>
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="AllExecutionsResponse.html" title="class in com.longbridge.trade">AllExecutionsResponse</a>&gt;&nbsp;getAllExecutions&#8203;(<a href="GetAllExecutionsOptions.html" title="class in com.longbridge.trade">GetAllExecutionsOptions</a>&nbsp;opts)
                                                           throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
-<div class="block">Get all executions</div>
+<div class="block">Get all executions
+ <p>
+ AP accounts only: US data-center accounts get a region error; use
+ <a href="#getHistoryExecutions(com.longbridge.trade.GetHistoryExecutionsOptions)"><code>getHistoryExecutions(com.longbridge.trade.GetHistoryExecutionsOptions)</code></a> instead.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>opts</code> - Options for this request</dd>
@@ -909,6 +914,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="AccountBalance.html" title="class in com.longbridge.trade">AccountBalance</a>[]&gt;&nbsp;getAccountBalance&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;currency)
                                                       throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get account balance with currency
+ <p>
+ AP accounts only: US data-center accounts get a region error.
  
  <pre>
  <code>
@@ -948,6 +955,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="AccountBalance.html" title="class in com.longbridge.trade">AccountBalance</a>[]&gt;&nbsp;getAccountBalance()
                                                       throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get account balance
+ <p>
+ AP accounts only: US data-center accounts get a region error.
  
  <pre>
  <code>
@@ -985,6 +994,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="CashFlow.html" title="class in com.longbridge.trade">CashFlow</a>[]&gt;&nbsp;getCashFlow&#8203;(<a href="GetCashFlowOptions.html" title="class in com.longbridge.trade">GetCashFlowOptions</a>&nbsp;opts)
                                           throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get cash flow
+ <p>
+ AP accounts only: US data-center accounts get a region error.
  
  <pre>
  <code>
@@ -1028,6 +1039,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="FundPositionsResponse.html" title="class in com.longbridge.trade">FundPositionsResponse</a>&gt;&nbsp;getFundPositions&#8203;(<a href="GetFundPositionsOptions.html" title="class in com.longbridge.trade">GetFundPositionsOptions</a>&nbsp;opts)
                                                           throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get fund positions
+ <p>
+ AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
  
  <pre>
  <code>
@@ -1065,6 +1078,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="StockPositionsResponse.html" title="class in com.longbridge.trade">StockPositionsResponse</a>&gt;&nbsp;getStockPositions&#8203;(<a href="GetStockPositionsOptions.html" title="class in com.longbridge.trade">GetStockPositionsOptions</a>&nbsp;opts)
                                                             throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get stock positions
+ <p>
+ AP accounts only: US data-center accounts get a region error.
  
  <pre>
  <code>
@@ -1102,6 +1117,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="MarginRatio.html" title="class in com.longbridge.trade">MarginRatio</a>&gt;&nbsp;getMarginRatio&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;symbol)
                                               throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get margin ratio
+ <p>
+ AP accounts only: US data-center accounts get a region error. No US equivalent.
  
  <pre>
  <code>
@@ -1139,6 +1156,8 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="OrderDetail.html" title="class in com.longbridge.trade">OrderDetail</a>&gt;&nbsp;getOrderDetail&#8203;(<a href="https://docs.oracle.com/javase/9/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;orderId)
                                               throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
 <div class="block">Get order detail
+ <p>
+ AP accounts only: US data-center accounts get a region error.
  
  <pre>
  <code>

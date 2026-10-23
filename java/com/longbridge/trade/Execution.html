@@ -364,7 +364,10 @@ extends <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Object.html
 <li class="blockList">
 <h4>getSide</h4>
 <pre class="methodSignature">public&nbsp;<a href="OrderSide.html" title="enum in com.longbridge.trade">OrderSide</a>&nbsp;getSide()</pre>
-<div class="block">Returns the order side.</div>
+<div class="block">Returns the order side.
+ <p>
+ <code>Unknown</code> when the response omits it (Longbridge US
+ <code>/v1/trade/execution/history</code>).</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>order side</dd>

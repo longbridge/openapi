@@ -1262,7 +1262,7 @@
 <a href=#1262 id=1262 data-nosnippet>1262</a>    /// everything, including the contracts carrying
 <a href=#1263 id=1263 data-nosnippet>1263</a>    /// [`OptionStandardAttr::Old`].
 <a href=#1264 id=1264 data-nosnippet>1264</a>    ///
-<a href=#1265 id=1265 data-nosnippet>1265</a>    /// Path: `GET /v1/gemini/option/option_chain_list`
+<a href=#1265 id=1265 data-nosnippet>1265</a>    /// Path: `POST /v1/quote/options/strikes`
 <a href=#1266 id=1266 data-nosnippet>1266</a>    ///
 <a href=#1267 id=1267 data-nosnippet>1267</a>    /// # Examples
 <a href=#1268 id=1268 data-nosnippet>1268</a>    ///
@@ -1296,8 +1296,8 @@
 <a href=#1296 id=1296 data-nosnippet>1296</a>        </span><span class="kw">struct </span>Request {
 <a href=#1297 id=1297 data-nosnippet>1297</a>            symbol: String,
 <a href=#1298 id=1298 data-nosnippet>1298</a>            expiry_date: String,
-<a href=#1299 id=1299 data-nosnippet>1299</a>            <span class="comment">// `false` and an omitted parameter mean the same thing to the
-<a href=#1300 id=1300 data-nosnippet>1300</a>            // endpoint, so send nothing rather than `standard_only=false`.
+<a href=#1299 id=1299 data-nosnippet>1299</a>            <span class="comment">// `false` and an omitted field mean the same thing to the
+<a href=#1300 id=1300 data-nosnippet>1300</a>            // endpoint, so send nothing rather than `"standard_only": false`.
 <a href=#1301 id=1301 data-nosnippet>1301</a>            </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"std::ops::Not::not"</span>)]
 <a href=#1302 id=1302 data-nosnippet>1302</a>            </span>standard_only: bool,
 <a href=#1303 id=1303 data-nosnippet>1303</a>        }
@@ -1328,12 +1328,12 @@
 <a href=#1328 id=1328 data-nosnippet>1328</a>
 <a href=#1329 id=1329 data-nosnippet>1329</a>        <span class="self">self</span>.<span class="number">0
 <a href=#1330 id=1330 data-nosnippet>1330</a>            </span>.http_cli
-<a href=#1331 id=1331 data-nosnippet>1331</a>            .request(Method::GET, <span class="string">"/v1/gemini/option/option_chain_list"</span>)
-<a href=#1332 id=1332 data-nosnippet>1332</a>            .query_params(Request {
+<a href=#1331 id=1331 data-nosnippet>1331</a>            .request(Method::POST, <span class="string">"/v1/quote/options/strikes"</span>)
+<a href=#1332 id=1332 data-nosnippet>1332</a>            .body(Json(Request {
 <a href=#1333 id=1333 data-nosnippet>1333</a>                symbol: symbol.into(),
 <a href=#1334 id=1334 data-nosnippet>1334</a>                expiry_date: format_date(expiry_date),
 <a href=#1335 id=1335 data-nosnippet>1335</a>                standard_only,
-<a href=#1336 id=1336 data-nosnippet>1336</a>            })
+<a href=#1336 id=1336 data-nosnippet>1336</a>            }))
 <a href=#1337 id=1337 data-nosnippet>1337</a>            .response::&lt;Json&lt;Response&gt;&gt;()
 <a href=#1338 id=1338 data-nosnippet>1338</a>            .send()
 <a href=#1339 id=1339 data-nosnippet>1339</a>            .with_subscriber(<span class="self">self</span>.<span class="number">0</span>.log_subscriber.clone())

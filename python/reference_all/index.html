@@ -2378,6 +2378,14 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.us_realized_pl">us_realized_pl</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.us_cash_and_buy_power">us_cash_and_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.us_available_holding">us_available_holding</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.us_transaction_history">us_transaction_history</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.us_exchange_rates">us_exchange_rates</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.TradeContext.set_on_grid_order_changed">set_on_grid_order_changed</a>
     </li>
         </ul>
@@ -3787,6 +3795,14 @@
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.us_asset_overview">us_asset_overview</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.us_realized_pl">us_realized_pl</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.us_cash_and_buy_power">us_cash_and_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.us_available_holding">us_available_holding</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.us_transaction_history">us_transaction_history</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.us_exchange_rates">us_exchange_rates</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.AsyncTradeContext.set_on_grid_order_changed">set_on_grid_order_changed</a>
     </li>
@@ -6774,11 +6790,43 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.asset_type">asset_type</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.average_cost">average_cost</a>
-    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.symbol">symbol</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.quantity">quantity</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.currency">currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.average_cost">average_cost</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.market">market</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.trade_status">trade_status</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.prev_close">prev_close</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.last_done">last_done</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.market_price">market_price</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.pretrade_close">pretrade_close</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.stock_invest_of_today">stock_invest_of_today</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.today_pl">today_pl</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.pretrade_stock_invest_of_today">pretrade_stock_invest_of_today</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.pretrade_today_pl">pretrade_today_pl</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.night_last_done">night_last_done</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.night_prev_close">night_prev_close</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.position_side">position_side</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.open_position_time">open_position_time</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.name">name</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCryptoEntry.industry_counter_id">industry_counter_id</a>
     </li>
@@ -6881,6 +6929,148 @@
     <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USRealizedPL">USRealizedPL</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USRealizedPL.realized_pl_list">realized_pl_list</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USAvailableHolding">USAvailableHolding</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USAvailableHolding.available_qty">available_qty</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo">USBuyLimitInfo</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.currency">currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.cash_buy_power">cash_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.overnight_buy_power">overnight_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.day_trade_buy_power">day_trade_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.instant_buy_power">instant_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.intraday_margin_buy_power">intraday_margin_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.option_buy_power">option_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.crypto_buy_power">crypto_buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USBuyLimitInfo.mme">mme</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USCashDetail">USCashDetail</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.currency">currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.total_amount">total_amount</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.available_cash">available_cash</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.withdraw_cash">withdraw_cash</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.frozen_cash">frozen_cash</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.settled_cash">settled_cash</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.outstanding">outstanding</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashDetail.external_amount">external_amount</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USMarginStatus">USMarginStatus</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USMarginStatus.currency">currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USMarginStatus.nlv">nlv</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USMarginStatus.margin_equity">margin_equity</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USMarginStatus.margin_maintenance_excess">margin_maintenance_excess</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USMarginStatus.mmr">mmr</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USMarginStatus.reg_t_excess">reg_t_excess</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USMarginStatus.sma">sma</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USCashAndBuyPower">USCashAndBuyPower</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashAndBuyPower.buy_limit_info">buy_limit_info</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashAndBuyPower.cash_list">cash_list</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USCashAndBuyPower.margin_status">margin_status</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USTransaction">USTransaction</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.title">title</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.biz_code">biz_code</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.biz_code_name">biz_code_name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.amount">amount</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.currency">currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.symbol">symbol</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.market">market</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.equity_type">equity_type</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.position_side">position_side</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.quantity">quantity</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.quantity_description">quantity_description</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.ref_no">ref_no</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.remark">remark</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.create_at">create_at</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransaction.done_at">done_at</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USTransactionHistory">USTransactionHistory</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransactionHistory.current_page">current_page</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USTransactionHistory.items">items</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USExchangeRate">USExchangeRate</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRate.universal_key">universal_key</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRate.spec_key">spec_key</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRate.base_currency">base_currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRate.other_currency">other_currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRate.bid_rate">bid_rate</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRate.offer_rate">offer_rate</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRate.average_rate">average_rate</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longbridge.openapi.USExchangeRates">USExchangeRates</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longbridge.openapi.USExchangeRates.exchanges">exchanges</a>
     </li>
         </ul>
     </li>
@@ -37694,7 +37884,7 @@ otherwise US endpoint.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Order side</p>
+        <p>Order side. <code>Unknown</code> when the response omits it (Longbridge US <code>/v1/trade/execution/history</code>)</p>
 
     </div>
 
@@ -47248,6 +47438,7 @@ sleep(5)  # waiting for push event</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get history executions</p>
+<p><code>side</code> may be <code>OrderSide.Unknown</code> on Longbridge US accounts.</p>
 
 
 <table class="field-list">
@@ -47447,6 +47638,7 @@ print(resp)</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get all executions</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>history_executions</code> instead.</p>
 
 
 <table class="field-list">
@@ -48497,6 +48689,7 @@ ctx.cancel_order("709043056541253632")</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get account balance</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_cash_and_buy_power</code> (or <code>us_asset_overview</code>) instead.</p>
 
 
 <table class="field-list">
@@ -48579,6 +48772,7 @@ print(resp)</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get cash flow</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_transaction_history</code> instead.</p>
 
 
 <table class="field-list">
@@ -48711,6 +48905,7 @@ print(resp)</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get fund positions</p>
+<p>AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.</p>
 
 
 <table class="field-list">
@@ -48793,6 +48988,7 @@ print(resp)</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get stock positions</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_asset_overview</code> (<code>stock_list</code>) instead.</p>
 
 
 <table class="field-list">
@@ -48875,6 +49071,7 @@ print(resp)</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get margin ratio</p>
+<p>AP accounts only: US data-center accounts get a region error. No US equivalent; for US margin info see <code>us_cash_and_buy_power</code> (<code>margin_status</code>).</p>
 
 
 <table class="field-list">
@@ -48955,6 +49152,7 @@ print(resp)</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get order detail</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_order_detail</code> instead.</p>
 
 
 <table class="field-list">
@@ -49480,6 +49678,321 @@ print(resp)</code></pre>
               –
               <div class="doc-md-description">
                 <p>class:<code>USRealizedPL</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.TradeContext.us_cash_and_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_cash_and_buy_power</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_cash_and_buy_power(currency: Optional[str] = None) -&gt; USCashAndBuyPower</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get cash, buying power and margin status for the US account. US token required.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>currency</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Currency (e.g. <code>"USD"</code>); <code>None</code> for the server default</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="USCashAndBuyPower (longbridge.openapi.USCashAndBuyPower)" href="#longbridge.openapi.USCashAndBuyPower">USCashAndBuyPower</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>USCashAndBuyPower</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.TradeContext.us_available_holding" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_available_holding</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_available_holding(symbol: str, equity_type: Optional[str] = None, position_side: Optional[str] = None) -&gt; USAvailableHolding</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the quantity of a US holding that is available to trade. US token required.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>symbol</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Security symbol, e.g. <code>"AAPL.US"</code>, an option symbol such as
+<code>"AAPL261120C345000.US"</code>, or a crypto pair such as <code>"BTCUSD.BKKT"</code></p>
+              </div>
+            </li>
+            <li>
+              <b><code>equity_type</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>"STOCK"</code> (default), <code>"OPTION"</code> or <code>"CRYPTO"</code></p>
+              </div>
+            </li>
+            <li>
+              <b><code>position_side</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>"LONG"</code> (default) or <code>"SHORT"</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="USAvailableHolding (longbridge.openapi.USAvailableHolding)" href="#longbridge.openapi.USAvailableHolding">USAvailableHolding</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>USAvailableHolding</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.TradeContext.us_transaction_history" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_transaction_history</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_transaction_history(start_at: datetime, end_at: datetime, page: int = 1, size: int = 20, types: Optional[List[str]] = None, currency: Optional[str] = None) -&gt; USTransactionHistory</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the US account transaction history, one page at a time. US token required.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>start_at</code></b>
+                  (<code><a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Start time (inclusive)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>end_at</code></b>
+                  (<code><a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>End time (inclusive)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>page</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>, default:
+                      <code>1</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page number, starting at 1</p>
+              </div>
+            </li>
+            <li>
+              <b><code>size</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>, default:
+                      <code>20</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page size</p>
+              </div>
+            </li>
+            <li>
+              <b><code>types</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Transaction types to include; <code>None</code> for all. Values:
+<code>"TT_DEPOSIT_AND_WITHDRAWAL"</code>, <code>"TT_STOCKS_AND_ETFS_TRADING"</code>,
+<code>"TT_OPTIONS_TRADING"</code>, <code>"TT_CRYPTO_TRADING"</code>,
+<code>"TT_CORPORATE_ACTION"</code>, <code>"TT_TRANSFER_IN_AND_OUT"</code>,
+<code>"TT_CRYPTO_TRANSFER"</code>, <code>"TT_MARGIN_FINANCING"</code>, <code>"TT_OTHER"</code></p>
+              </div>
+            </li>
+            <li>
+              <b><code>currency</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Currency filter (e.g. <code>"USD"</code>); <code>None</code> for all</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="USTransactionHistory (longbridge.openapi.USTransactionHistory)" href="#longbridge.openapi.USTransactionHistory">USTransactionHistory</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>USTransactionHistory</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.TradeContext.us_exchange_rates" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_exchange_rates</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_exchange_rates() -&gt; USExchangeRates</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the exchange rates used by the US account. US token required.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="USExchangeRates (longbridge.openapi.USExchangeRates)" href="#longbridge.openapi.USExchangeRates">USExchangeRates</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>USExchangeRates</code></p>
               </div>
             </li>
         </ul>
@@ -68166,6 +68679,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get history executions. Optional filters: symbol, start_at, end_at. Returns an awaitable that resolves to execution list.</p>
+<p><code>side</code> may be <code>OrderSide.Unknown</code> on Longbridge US accounts.</p>
 
 
 <table class="field-list">
@@ -68325,6 +68839,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get all executions. Returns an awaitable that resolves to AllExecutionsResponse.</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>history_executions</code> instead.</p>
 
 
 <table class="field-list">
@@ -69322,6 +69837,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get account balance. Optional currency filter. Returns an awaitable that resolves to account balance list.</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_cash_and_buy_power</code> (or <code>us_asset_overview</code>) instead.</p>
 
 
 <table class="field-list">
@@ -69384,6 +69900,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get cash flow. Required: start_at, end_at. Optional: business_type, symbol, page, size. Returns an awaitable that resolves to cash flow list.</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_transaction_history</code> instead.</p>
 
 
 <table class="field-list">
@@ -69496,6 +70013,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get fund positions. Optional filter: symbols. Returns an awaitable that resolves to fund positions response.</p>
+<p>AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.</p>
 
 
 <table class="field-list">
@@ -69558,6 +70076,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get stock positions. Optional filter: symbols. Returns an awaitable that resolves to stock positions response.</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_asset_overview</code> (<code>stock_list</code>) instead.</p>
 
 
 <table class="field-list">
@@ -69620,6 +70139,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get margin ratio for symbol. Returns an awaitable that resolves to margin ratio.</p>
+<p>AP accounts only: US data-center accounts get a region error. No US equivalent; for US margin info see <code>us_cash_and_buy_power</code> (<code>margin_status</code>).</p>
 
 
 <table class="field-list">
@@ -69680,6 +70200,7 @@ asyncio.run(main())</code></pre>
     <div class="doc doc-contents ">
 
         <p>Get order detail by order_id. Returns an awaitable that resolves to order detail.</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>us_order_detail</code> instead.</p>
 
 
 <table class="field-list">
@@ -70158,6 +70679,321 @@ asyncio.run(main())</code></pre>
               –
               <div class="doc-md-description">
                 <p>Awaitable resolving to :class:<code>USRealizedPL</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.AsyncTradeContext.us_cash_and_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_cash_and_buy_power</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_cash_and_buy_power(currency: Optional[str] = None) -&gt; Awaitable[USCashAndBuyPower]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get cash, buying power and margin status for the US account. US token required. Returns awaitable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>currency</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Currency (e.g. <code>"USD"</code>); <code>None</code> for the server default</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" title="typing.Awaitable" href="https://docs.python.org/3/library/typing.html#typing.Awaitable">Awaitable</a>[<a class="autorefs autorefs-internal" title="USCashAndBuyPower (longbridge.openapi.USCashAndBuyPower)" href="#longbridge.openapi.USCashAndBuyPower">USCashAndBuyPower</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Awaitable resolving to :class:<code>USCashAndBuyPower</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.AsyncTradeContext.us_available_holding" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_available_holding</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_available_holding(symbol: str, equity_type: Optional[str] = None, position_side: Optional[str] = None) -&gt; Awaitable[USAvailableHolding]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the quantity of a US holding that is available to trade. US token required. Returns awaitable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>symbol</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Security symbol, e.g. <code>"AAPL.US"</code>, an option symbol such as
+<code>"AAPL261120C345000.US"</code>, or a crypto pair such as <code>"BTCUSD.BKKT"</code></p>
+              </div>
+            </li>
+            <li>
+              <b><code>equity_type</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>"STOCK"</code> (default), <code>"OPTION"</code> or <code>"CRYPTO"</code></p>
+              </div>
+            </li>
+            <li>
+              <b><code>position_side</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>"LONG"</code> (default) or <code>"SHORT"</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" title="typing.Awaitable" href="https://docs.python.org/3/library/typing.html#typing.Awaitable">Awaitable</a>[<a class="autorefs autorefs-internal" title="USAvailableHolding (longbridge.openapi.USAvailableHolding)" href="#longbridge.openapi.USAvailableHolding">USAvailableHolding</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Awaitable resolving to :class:<code>USAvailableHolding</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.AsyncTradeContext.us_transaction_history" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_transaction_history</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_transaction_history(start_at: datetime, end_at: datetime, page: int = 1, size: int = 20, types: Optional[List[str]] = None, currency: Optional[str] = None) -&gt; Awaitable[USTransactionHistory]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the US account transaction history, one page at a time. US token required. Returns awaitable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>start_at</code></b>
+                  (<code><a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Start time (inclusive)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>end_at</code></b>
+                  (<code><a class="autorefs autorefs-external" title="datetime.datetime" href="https://docs.python.org/3/library/datetime.html#datetime.datetime">datetime</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>End time (inclusive)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>page</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>, default:
+                      <code>1</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page number, starting at 1</p>
+              </div>
+            </li>
+            <li>
+              <b><code>size</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>, default:
+                      <code>20</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Page size</p>
+              </div>
+            </li>
+            <li>
+              <b><code>types</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Transaction types to include; <code>None</code> for all. Values:
+<code>"TT_DEPOSIT_AND_WITHDRAWAL"</code>, <code>"TT_STOCKS_AND_ETFS_TRADING"</code>,
+<code>"TT_OPTIONS_TRADING"</code>, <code>"TT_CRYPTO_TRADING"</code>,
+<code>"TT_CORPORATE_ACTION"</code>, <code>"TT_TRANSFER_IN_AND_OUT"</code>,
+<code>"TT_CRYPTO_TRANSFER"</code>, <code>"TT_MARGIN_FINANCING"</code>, <code>"TT_OTHER"</code></p>
+              </div>
+            </li>
+            <li>
+              <b><code>currency</code></b>
+                  (<code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Currency filter (e.g. <code>"USD"</code>); <code>None</code> for all</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" title="typing.Awaitable" href="https://docs.python.org/3/library/typing.html#typing.Awaitable">Awaitable</a>[<a class="autorefs autorefs-internal" title="USTransactionHistory (longbridge.openapi.USTransactionHistory)" href="#longbridge.openapi.USTransactionHistory">USTransactionHistory</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Awaitable resolving to :class:<code>USTransactionHistory</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longbridge.openapi.AsyncTradeContext.us_exchange_rates" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">us_exchange_rates</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">us_exchange_rates() -&gt; Awaitable[USExchangeRates]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the exchange rates used by the US account. US token required. Returns awaitable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" title="typing.Awaitable" href="https://docs.python.org/3/library/typing.html#typing.Awaitable">Awaitable</a>[<a class="autorefs autorefs-internal" title="USExchangeRates (longbridge.openapi.USExchangeRates)" href="#longbridge.openapi.USExchangeRates">USExchangeRates</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Awaitable resolving to :class:<code>USExchangeRates</code></p>
               </div>
             </li>
         </ul>
@@ -101476,6 +102312,7 @@ for r in rates.exchanges:
     <div class="doc doc-contents ">
 
         <p>Get exchange rates for supported currencies.</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>TradeContext.us_exchange_rates</code> instead.</p>
 
 
     </div>
@@ -101866,6 +102703,7 @@ for r in rates.exchanges:
     <div class="doc doc-contents ">
 
         <p>Get exchange rates for supported currencies.</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>AsyncTradeContext.us_exchange_rates</code> instead.</p>
 
 
     </div>
@@ -111135,29 +111973,6 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longbridge.openapi.USCryptoEntry.average_cost" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">average_cost</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">average_cost: str</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Average cost price</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
 <h3 id="longbridge.openapi.USCryptoEntry.symbol" class="doc doc-heading">
             <span class="doc doc-object-name doc-attribute-name">symbol</span>
 
@@ -111171,7 +111986,30 @@ for sl in lists.sharelists:
 
     <div class="doc doc-contents ">
 
-        <p>Symbol</p>
+        <p>Trading-pair code, e.g. <code>"BTCUSD"</code>; the user-facing symbol is <code>"&lt;symbol&gt;.&lt;market&gt;"</code>, e.g. <code>"BTCUSD.BKKT"</code></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.quantity" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">quantity</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">quantity: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Holding quantity</p>
 
     </div>
 
@@ -111195,6 +112033,350 @@ for sl in lists.sharelists:
     <div class="doc doc-contents ">
 
         <p>Settlement currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.average_cost" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">average_cost</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">average_cost: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Average cost price; empty when the server has none</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.market" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">market</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">market: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Market code, e.g. <code>"BKKT"</code></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.trade_status" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">trade_status</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">trade_status: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.prev_close" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">prev_close</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">prev_close: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.last_done" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">last_done</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">last_done: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.market_price" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">market_price</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">market_price: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.pretrade_close" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pretrade_close</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pretrade_close: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.stock_invest_of_today" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">stock_invest_of_today</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">stock_invest_of_today: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.today_pl" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">today_pl</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">today_pl: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.pretrade_stock_invest_of_today" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pretrade_stock_invest_of_today</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pretrade_stock_invest_of_today: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.pretrade_today_pl" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pretrade_today_pl</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pretrade_today_pl: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.night_last_done" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">night_last_done</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">night_last_done: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.night_prev_close" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">night_prev_close</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">night_prev_close: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.position_side" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">position_side</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">position_side: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.open_position_time" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">open_position_time</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">open_position_time: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Position open time (Unix-second string; <code>"0"</code> when unknown)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCryptoEntry.name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">name: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Asset name, e.g. <code>"Bitcoin"</code></p>
 
     </div>
 
@@ -112326,6 +113508,1641 @@ for sl in lists.sharelists:
     <div class="doc doc-contents ">
 
         <p>Per-category realized P&amp;L entries</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USAvailableHolding" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USAvailableHolding</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Quantity of a US holding that is available to trade. Returned by TradeContext.us_available_holding.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USAvailableHolding.available_qty" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">available_qty</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">available_qty: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Quantity available to sell (long) or buy to cover (short); negative for a short position</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USBuyLimitInfo" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USBuyLimitInfo</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Buying power in USCashAndBuyPower.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.currency" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">currency</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">currency: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.cash_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">cash_buy_power</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">cash_buy_power: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Cash buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.overnight_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">overnight_buy_power</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">overnight_buy_power: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Overnight buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.day_trade_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">day_trade_buy_power</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">day_trade_buy_power: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Day-trade buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.instant_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">instant_buy_power</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">instant_buy_power: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Instant buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.intraday_margin_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">intraday_margin_buy_power</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">intraday_margin_buy_power: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Intraday margin buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.option_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">option_buy_power</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">option_buy_power: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Option buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.crypto_buy_power" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">crypto_buy_power</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">crypto_buy_power: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Crypto buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USBuyLimitInfo.mme" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">mme</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">mme: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Margin maintenance excess used for buying power</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USCashDetail" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USCashDetail</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>One cash currency entry in USCashAndBuyPower.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.currency" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">currency</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">currency: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.total_amount" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">total_amount</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">total_amount: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Total cash</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.available_cash" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">available_cash</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">available_cash: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Available cash</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.withdraw_cash" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">withdraw_cash</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">withdraw_cash: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Withdrawable cash</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.frozen_cash" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">frozen_cash</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">frozen_cash: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Cash frozen for pending orders</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.settled_cash" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">settled_cash</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">settled_cash: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Settled cash</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.outstanding" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">outstanding</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">outstanding: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Outstanding (unsettled) amount</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashDetail.external_amount" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">external_amount</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">external_amount: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Amount held for external use (e.g. IPO or fund subscriptions)</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USMarginStatus" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USMarginStatus</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Margin account status in USCashAndBuyPower.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USMarginStatus.currency" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">currency</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">currency: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USMarginStatus.nlv" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">nlv</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">nlv: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Net liquidation value</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USMarginStatus.margin_equity" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">margin_equity</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">margin_equity: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Margin equity</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USMarginStatus.margin_maintenance_excess" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">margin_maintenance_excess</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">margin_maintenance_excess: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Margin maintenance excess</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USMarginStatus.mmr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">mmr</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">mmr: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Maintenance margin requirement</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USMarginStatus.reg_t_excess" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">reg_t_excess</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">reg_t_excess: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Regulation T excess</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USMarginStatus.sma" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">sma</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">sma: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Special memorandum account</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USCashAndBuyPower" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USCashAndBuyPower</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Cash, buying power and margin status of a US account. Returned by TradeContext.us_cash_and_buy_power.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashAndBuyPower.buy_limit_info" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">buy_limit_info</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">buy_limit_info: USBuyLimitInfo</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Buying power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashAndBuyPower.cash_list" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">cash_list</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">cash_list: List[USCashDetail]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Cash per currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USCashAndBuyPower.margin_status" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">margin_status</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">margin_status: USMarginStatus</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Margin account status</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USTransaction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USTransaction</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>One record in USTransactionHistory.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.title" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">title</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">title: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Display title</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.biz_code" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">biz_code</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">biz_code: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Business code</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.biz_code_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">biz_code_name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">biz_code_name: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Business code name</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.amount" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">amount</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">amount: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Amount; negative for outflows</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.currency" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">currency</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">currency: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.symbol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">symbol</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Security symbol, if the record relates to one (e.g. <code>"AAPL.US"</code>)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.market" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">market</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">market: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Market code</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.equity_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">equity_type</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">equity_type: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Holding type</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.position_side" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">position_side</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">position_side: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Position side</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.quantity" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">quantity</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">quantity: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Quantity</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.quantity_description" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">quantity_description</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">quantity_description: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Quantity description</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.ref_no" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">ref_no</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">ref_no: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Reference number</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.remark" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">remark</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">remark: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Remark</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.create_at" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">create_at</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">create_at: Optional[datetime]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Creation time</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransaction.done_at" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">done_at</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">done_at: Optional[datetime]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Completion time</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USTransactionHistory" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USTransactionHistory</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>One page of US account transaction history. Returned by TradeContext.us_transaction_history.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransactionHistory.current_page" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">current_page</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">current_page: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Current page number</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USTransactionHistory.items" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">items</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">items: List[USTransaction]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Records on this page. There is no total count: a page shorter than the requested size is the last one.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USExchangeRate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USExchangeRate</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>One exchange rate in USExchangeRates.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRate.universal_key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">universal_key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">universal_key: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Account channel the rates apply to, e.g. <code>us_lb_apex</code> (outer <code>universal_exchanges</code> key)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRate.spec_key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">spec_key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">spec_key: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Rate type, e.g. <code>am</code> or <code>reference</code> (inner <code>spec_exchanges</code> key)</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRate.base_currency" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">base_currency</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">base_currency: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Base currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRate.other_currency" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">other_currency</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">other_currency: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Other (quote) currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRate.bid_rate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">bid_rate</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">bid_rate: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Bid rate; empty if not provided</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRate.offer_rate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">offer_rate</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">offer_rate: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Offer rate; empty if not provided</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRate.average_rate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">average_rate</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">average_rate: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Average rate; empty if not provided</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="longbridge.openapi.USExchangeRates" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">USExchangeRates</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Exchange rates of a US account. Returned by TradeContext.us_exchange_rates.</p>
+<p>The upstream two-level map is flattened into <code>exchanges</code>, sorted by the two
+upstream map keys, which are kept on each entry as <code>universal_key</code> and <code>spec_key</code>.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longbridge.openapi.USExchangeRates.exchanges" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">exchanges</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">exchanges: List[USExchangeRate]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Exchange rates</p>
 
     </div>
 

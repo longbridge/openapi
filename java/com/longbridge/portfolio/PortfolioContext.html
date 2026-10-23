@@ -302,7 +302,9 @@ implements <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/AutoClos
 <h4>getExchangeRate</h4>
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/CompletableFuture.html?is-external=true" title="class or interface in java.util.concurrent" class="externalLink">CompletableFuture</a>&lt;<a href="ExchangeRates.html" title="class in com.longbridge.portfolio">ExchangeRates</a>&gt;&nbsp;getExchangeRate()
                                                  throws <a href="../OpenApiException.html" title="class in com.longbridge">OpenApiException</a></pre>
-<div class="block">Get exchange rates for supported currencies.</div>
+<div class="block">Get exchange rates for supported currencies.
+ <p>
+ AP accounts only: US data-center accounts get a region error.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A Future resolving to the current exchange rates</dd>

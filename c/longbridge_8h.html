@@ -19346,7 +19346,8 @@ Variables</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get exchange rates. Returns CExchangeRates. </p>
+<p>Get exchange rates. Returns CExchangeRates.</p>
+<p>AP accounts only: US data-center accounts get a region error. </p>
 
 </div>
 </div>
@@ -22983,7 +22984,8 @@ Variables</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get account balance </p>
+<p>Get account balance</p>
+<p>AP accounts only: US data-center accounts get a region error. </p>
 
 </div>
 </div>
@@ -23025,6 +23027,7 @@ Variables</h1>
       </table>
 </div><div class="memdoc">
 <p>Get all executions</p>
+<p>AP accounts only: US data-center accounts get a region error; use <code>lb_trade_context_history_executions</code> instead.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">opts</td><td>Options for get all executions request (can be null) </td></tr>
@@ -23154,6 +23157,7 @@ Variables</h1>
       </table>
 </div><div class="memdoc">
 <p>Get cash flow</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">opts</td><td>Options for get cash flow request </td></tr>
@@ -23242,6 +23246,7 @@ Variables</h1>
       </table>
 </div><div class="memdoc">
 <p>Get fund positions</p>
+<p>AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">opts</td><td>Options for get fund positions request </td></tr>
@@ -23289,6 +23294,7 @@ Variables</h1>
       </table>
 </div><div class="memdoc">
 <p>Get history executions</p>
+<p><code>side</code> may be <code>Unknown</code> on Longbridge US accounts.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">opts</td><td>Options for get history executions request (can be null) </td></tr>
@@ -23382,7 +23388,8 @@ Variables</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get margin ratio </p>
+<p>Get margin ratio</p>
+<p>AP accounts only: US data-center accounts get a region error. No US equivalent. </p>
 
 </div>
 </div>
@@ -23441,7 +23448,8 @@ Variables</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get order detail </p>
+<p>Get order detail</p>
+<p>AP accounts only: US data-center accounts get a region error. </p>
 
 </div>
 </div>
@@ -23763,6 +23771,7 @@ Variables</h1>
       </table>
 </div><div class="memdoc">
 <p>Get stock positions</p>
+<p>AP accounts only: US data-center accounts get a region error.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">opts</td><td>Options for get stock positions request </td></tr>

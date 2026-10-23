@@ -94,7 +94,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7f3cc1d4adddfd48116f71fa2eda0c64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html">PortfolioContext</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html#a7f3cc1d4adddfd48116f71fa2eda0c64">operator=</a> (const <a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html">PortfolioContext</a> &amp;)</td></tr>
 <tr class="separator:a7f3cc1d4adddfd48116f71fa2eda0c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77e5e414d318f70fe0aae64725e7cbd4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html#a77e5e414d318f70fe0aae64725e7cbd4">exchange_rate</a> (<a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html">PortfolioContext</a>, <a class="el" href="structlongbridge_1_1portfolio_1_1_exchange_rates.html">ExchangeRates</a> &gt; callback) const</td></tr>
-<tr class="memdesc:a77e5e414d318f70fe0aae64725e7cbd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get exchange rates for all supported currencies.  <a href="classlongbridge_1_1portfolio_1_1_portfolio_context.html#a77e5e414d318f70fe0aae64725e7cbd4">More...</a><br /></td></tr>
 <tr class="separator:a77e5e414d318f70fe0aae64725e7cbd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8b35273bff841ef75191677a575c2b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html#af8b35273bff841ef75191677a575c2b0">profit_analysis</a> (const std::string &amp;start, const std::string &amp;end, <a class="el" href="namespacelongbridge.html#ac08a510ffe531a5eb0ea8dc2238c55dc">AsyncCallback</a>&lt; <a class="el" href="classlongbridge_1_1portfolio_1_1_portfolio_context.html">PortfolioContext</a>, <a class="el" href="structlongbridge_1_1portfolio_1_1_profit_analysis.html">ProfitAnalysis</a> &gt; callback) const</td></tr>
 <tr class="memdesc:af8b35273bff841ef75191677a575c2b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get portfolio P&amp;L analysis. start/end: optional "YYYY-MM-DD"; pass empty string for none.  <a href="classlongbridge_1_1portfolio_1_1_portfolio_context.html#af8b35273bff841ef75191677a575c2b0">More...</a><br /></td></tr>
@@ -248,8 +247,8 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Get exchange rates for all supported currencies. </p>
+<p>Get exchange rates for all supported currencies.</p>
+<p>AP accounts only: US data-center accounts get a region error. </p>
 
 </div>
 </div>
