@@ -204,10 +204,11 @@ fn us_only_alternative(path: &str) -> Option<&'static str> {
         }
         "/v1/us/stock-info/company-overview" => "use the AP endpoint GET /v1/quote/comp-overview",
         "/v1/us/stock-info/valuation-overview" => "use the AP endpoint GET /v1/quote/valuation",
-        "/v1/us/stock-info/finn-overview"
-        | "/v1/us/quote/financials/statements"
-        | "/v1/us/stock-info/fin-keyfactor" => {
+        "/v1/us/stock-info/finn-overview" | "/v1/us/quote/financials/statements" => {
             "use the AP endpoint GET /v1/quote/financial-reports"
+        }
+        "/v1/us/stock-info/fin-keyfactor" => {
+            "use the AP endpoint GET /v1/quote/financials/earnings-snapshot"
         }
         "/v1/us/stock-info/fin-consensus" => {
             "use the AP endpoint GET /v1/quote/financial-consensus-detail"
@@ -377,7 +378,7 @@ mod tests {
             ),
             (
                 "/v1/us/stock-info/fin-keyfactor",
-                "use the AP endpoint GET /v1/quote/financial-reports",
+                "use the AP endpoint GET /v1/quote/financials/earnings-snapshot",
             ),
             (
                 "/v1/us/stock-info/fin-consensus",
