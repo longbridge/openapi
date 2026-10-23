@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use longbridge::FundamentalContext;
 use pyo3::{prelude::*, types::PyType};
-// needed for us_financial_overview / us_key_financial_metrics / us_analyst_consensus
+// needed for us_financial_overview / us_key_financial_metrics /
+// us_analyst_consensus
 #[allow(unused_imports)]
 use pythonize;
 
