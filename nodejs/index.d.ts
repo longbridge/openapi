@@ -716,7 +716,10 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
-  /** Order side */
+  /**
+   * Order side. `Unknown` when the response omits it (Longbridge US
+   * `/v1/trade/execution/history`)
+   */
   get side(): OrderSide
 }
 
@@ -4318,6 +4321,8 @@ export declare class TradeContext {
   unsubscribe(topics: Array<TopicType>): Promise<void>
   /**
    * Get history executions
+   *
+   * `side` may be `Unknown` on Longbridge US accounts.
    *
    * #### Example
    *

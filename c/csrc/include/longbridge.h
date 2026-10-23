@@ -5740,7 +5740,8 @@ typedef struct lb_execution_t {
    */
   const struct lb_decimal_t *price;
   /**
-   * Order side
+   * Order side. `Unknown` when the response omits it (Longbridge US
+   * `/v1/trade/execution/history`)
    */
   enum lb_order_side_t side;
 } lb_execution_t;
@@ -16391,6 +16392,8 @@ void lb_trade_context_unsubscribe(const struct lb_trade_context_t *ctx,
 
 /**
  * Get history executions
+ *
+ * `side` may be `Unknown` on Longbridge US accounts.
  *
  * @param[in] opts Options for get history executions request (can be null)
  */

@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All SDKs:** `Execution.side` now defaults to `Unknown` when the response omits it. `/v1/trade/execution/history` returns trades without `side` for Longbridge US accounts, which made `history_executions` fail to deserialize.
 - **Rust core, Node.js, Python:** `USAssetOverview.crypto_list` entries (`USCryptoEntry`) now carry the holding `quantity`, `market`, `name`, prices (`last_done`, `market_price`, `prev_close`, ...), `today_pl`, `position_side` and the other fields `GET /v1/us/assets/overview` returns for crypto, which were previously dropped, so a crypto holding could not be sized. `symbol` is the bare pair code (e.g. `BTCUSD`); the user-facing symbol is `<symbol>.<market>` (e.g. `BTCUSD.BKKT`).
-- **All SDKs:** `QuoteContext.option_chain_info_by_date` now calls `POST /v1/quote/options/strikes` with a JSON body. The `GET /v1/gemini/option/option_chain_list` endpoint it used since 5.1.0 was renamed on the gateway and returned `404000 api not found` in every region, so the method failed on every call. The signature and the returned `OptionChainContract` are unchanged
+- **All SDKs:** `QuoteContext.option_chain_info_by_date` now calls `POST /v1/quote/options/strikes` with a JSON body. The `GET /v1/gemini/option/option_chain_list` endpoint it used since 5.1.0 was renamed on the gateway and returned `404000 api not found` in every region, so the method failed on every call. The signature and the returned `OptionChainContract` are unchanged.
 
 ## [5.2.2] - 2026-10-16
 

@@ -71,6 +71,9 @@ public class Execution {
 
     /**
      * Returns the order side.
+     * <p>
+     * {@code Unknown} when the response omits it (Longbridge US
+     * {@code /v1/trade/execution/history}).
      *
      * @return order side
      */

@@ -5906,7 +5906,7 @@ class Execution:
 
     side: OrderSide
     """
-    Order side
+    Order side. `Unknown` when the response omits it (Longbridge US `/v1/trade/execution/history`)
     """
 
 class AllExecutionsResponse:
@@ -7525,6 +7525,8 @@ class TradeContext:
     ) -> List[Execution]:
         """
         Get history executions
+
+        ``side`` may be ``OrderSide.Unknown`` on Longbridge US accounts.
 
         Args:
             symbol: Filter by security code, example: `700.HK`, `AAPL.US`
@@ -11492,6 +11494,8 @@ class AsyncTradeContext:
     ) -> Awaitable[List[Execution]]:
         """
         Get history executions. Optional filters: symbol, start_at, end_at. Returns an awaitable that resolves to execution list.
+
+        ``side`` may be ``OrderSide.Unknown`` on Longbridge US accounts.
 
         Args:
             symbol: Filter by security code.

@@ -34,7 +34,8 @@ pub(crate) struct Execution {
     quantity: PyDecimal,
     /// Executed price
     price: PyDecimal,
-    /// Order side
+    /// Order side. `Unknown` when the response omits it (Longbridge US
+    /// `/v1/trade/execution/history`)
     side: OrderSide,
 }
 

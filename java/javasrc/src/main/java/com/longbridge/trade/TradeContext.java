@@ -108,6 +108,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get history executions
+     * <p>
+     * {@code side} may be {@code Unknown} on Longbridge US accounts.
      * 
      * <pre>
      * {@code

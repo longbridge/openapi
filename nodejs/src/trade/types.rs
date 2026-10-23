@@ -30,7 +30,8 @@ pub struct Execution {
     quantity: Decimal,
     /// Executed price
     price: Decimal,
-    /// Order side
+    /// Order side. `Unknown` when the response omits it (Longbridge US
+    /// `/v1/trade/execution/history`)
     side: OrderSide,
 }
 

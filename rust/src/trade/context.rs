@@ -182,6 +182,8 @@ impl TradeContext {
 
     /// Get history executions
     ///
+    /// `side` may be `Unknown` on Longbridge US accounts.
+    ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/execution/history_executions>
     ///
     /// # Examples

@@ -54,6 +54,8 @@ impl TradeContextSync {
 
     /// Get history executions
     ///
+    /// `side` may be `Unknown` on Longbridge US accounts.
+    ///
     /// # Examples
     ///
     /// ```no_run

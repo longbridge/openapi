@@ -44,6 +44,8 @@ public:
     PushCallback<TradeContext, PushOrderChanged> callback) const;
 
   /// Get history executions
+  ///
+  /// `side` may be `Unknown` on Longbridge US accounts.
   void history_executions(
     const std::optional<GetHistoryExecutionsOptions>& opts,
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
