@@ -135,7 +135,9 @@ pub struct Execution {
     pub quantity: Decimal,
     /// Executed price
     pub price: Decimal,
-    /// Order side
+    /// Order side. `Unknown` when the response omits it, as
+    /// `/v1/trade/execution/history` does for Longbridge US accounts.
+    #[serde(default)]
     pub side: OrderSide,
 }
 
@@ -2070,6 +2072,27 @@ mod tests {
     use time::macros::datetime;
 
     use super::*;
+
+    #[test]
+    fn execution_without_side_defaults_to_unknown() {
+        // `/v1/trade/execution/history` on a Longbridge US account returns
+        // trades with no `side`; they must still deserialize.
+        let data = r#"{
+            "order_id": "1000000000000000001",
+            "trade_id": "1000000000000000001-1",
+            "symbol": "ETHUSD.BKKT",
+            "trade_done_at": "1790203596",
+            "quantity": "0.168",
+            "price": "2690.34165646"
+        }"#;
+        let execution: Execution = serde_json::from_str(data).expect("execution without side");
+        assert_eq!(
+            execution.side,
+            OrderSide::Unknown,
+            "missing side defaults to Unknown"
+        );
+        assert_eq!(execution.symbol, "ETHUSD.BKKT", "symbol is kept");
+    }
 
     #[test]
     fn us_exchange_rates_response() {
