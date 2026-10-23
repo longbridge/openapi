@@ -314,6 +314,9 @@ impl TradeContext {
 
     /// Get all executions
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
+    ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/execution/all_executions>
     pub async fn all_executions(
         &self,
@@ -323,6 +326,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v3/trade/execution/all")
+            .dc_restrict(DcRegion::Ap)
             .query_params(options.into().unwrap_or_default())
             .response::<Json<AllExecutionsResponse>>()
             .send()
@@ -1308,5 +1312,6 @@ mod dc_restrict_tests {
         assert_ap_restricted(ctx.stock_positions(None).await, "/v1/asset/stock");
         assert_ap_restricted(ctx.margin_ratio("700.HK").await, "/v1/risk/margin-ratio");
         assert_ap_restricted(ctx.order_detail("1").await, "/v1/trade/order");
+        assert_ap_restricted(ctx.all_executions(None).await, "/v3/trade/execution/all");
     }
 }

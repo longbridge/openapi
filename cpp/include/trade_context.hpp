@@ -54,6 +54,9 @@ public:
     AsyncCallback<TradeContext, std::vector<Execution>> callback) const;
 
   /// Get all executions
+  ///
+  /// AP accounts only: US data-center accounts get a region error; use
+  /// `history_executions` instead.
   void all_executions(
     const std::optional<GetAllExecutionsOptions>& opts,
     AsyncCallback<TradeContext, AllExecutionsResponse> callback) const;

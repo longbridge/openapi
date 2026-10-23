@@ -181,6 +181,9 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get all executions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error; use
+     * {@link #getHistoryExecutions} instead.
      *
      * @param opts Options for this request
      * @return A Future representing the result of the operation

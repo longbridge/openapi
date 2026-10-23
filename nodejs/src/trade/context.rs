@@ -231,6 +231,9 @@ impl TradeContext {
     }
 
     /// Get all executions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `historyExecutions` instead.
     #[napi]
     pub async fn all_executions(
         &self,

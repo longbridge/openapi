@@ -4354,7 +4354,12 @@ export declare class TradeContext {
    * ```
    */
   todayExecutions(opts?: GetTodayExecutionsOptions | undefined | null): Promise<Array<Execution>>
-  /** Get all executions */
+  /**
+   * Get all executions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `historyExecutions` instead.
+   */
   allExecutions(opts?: GetAllExecutionsOptions | undefined | null): Promise<AllExecutionsResponse>
   /**
    * Get history orders

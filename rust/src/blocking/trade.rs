@@ -117,6 +117,9 @@ impl TradeContextSync {
     }
 
     /// Get all executions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
     pub fn all_executions(
         &self,
         options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,

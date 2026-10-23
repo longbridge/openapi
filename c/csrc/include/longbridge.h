@@ -16412,6 +16412,9 @@ void lb_trade_context_today_executions(const struct lb_trade_context_t *ctx,
 /**
  * Get all executions
  *
+ * AP accounts only: US data-center accounts get a region error; use
+ * `lb_trade_context_history_executions` instead.
+ *
  * @param[in] opts Options for get all executions request (can be null)
  */
 void lb_trade_context_all_executions(const struct lb_trade_context_t *ctx,

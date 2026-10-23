@@ -166,11 +166,12 @@ fn ap_only_alternative(path: &str) -> Option<&'static str> {
             "use the US endpoint GET /v1/us/assets/overview (TradeContext US methods)"
         }
         "/v1/asset/exchange_rates" => {
-            "the US equivalent is on TradeContext (GET /v1/us/assets/exchange-rates)"
+            "use the US endpoint GET /v1/us/assets/exchange-rates (TradeContext US methods)"
         }
         "/v1/trade/order" => {
             "use the US endpoint GET /v1/us/orders/{order_id} (TradeContext US methods)"
         }
+        "/v3/trade/execution/all" => "use GET /v1/trade/execution/history",
         "/v1/risk/margin-ratio" => {
             "there is no US equivalent; account-level margin is at GET \
              /v1/us/assets/cash-and-buy-power (margin_status)"
@@ -200,6 +201,19 @@ fn us_only_alternative(path: &str) -> Option<&'static str> {
         "/v1/us/assets/cash-and-buy-power" => "use the AP endpoint GET /v1/asset/account",
         "/v1/us/assets/available-holding" => {
             "use the AP endpoint GET /v1/asset/stock (available_quantity)"
+        }
+        "/v1/us/stock-info/company-overview" => "use the AP endpoint GET /v1/quote/comp-overview",
+        "/v1/us/stock-info/valuation-overview" => "use the AP endpoint GET /v1/quote/valuation",
+        "/v1/us/stock-info/finn-overview"
+        | "/v1/us/quote/financials/statements"
+        | "/v1/us/stock-info/fin-keyfactor" => {
+            "use the AP endpoint GET /v1/quote/financial-reports"
+        }
+        "/v1/us/stock-info/fin-consensus" => {
+            "use the AP endpoint GET /v1/quote/financial-consensus-detail"
+        }
+        "/v1/us/stock-info/etf-dividend-info" | "/v1/us/stock-info/company-dividends" => {
+            "use the AP endpoint GET /v1/quote/dividends"
         }
         _ if path.starts_with("/v1/us/orders/") => "use the AP endpoint GET /v1/trade/order",
         _ if path.starts_with("/v1/us/") => NO_AP_EQUIVALENT,
@@ -273,7 +287,7 @@ mod tests {
             ),
             (
                 "/v1/asset/exchange_rates",
-                "the US equivalent is on TradeContext (GET /v1/us/assets/exchange-rates)",
+                "use the US endpoint GET /v1/us/assets/exchange-rates (TradeContext US methods)",
             ),
             (
                 "/v1/trade/order",
@@ -282,6 +296,10 @@ mod tests {
             (
                 "/v1/risk/margin-ratio",
                 "there is no US equivalent; account-level margin is at GET /v1/us/assets/cash-and-buy-power (margin_status)",
+            ),
+            (
+                "/v3/trade/execution/all",
+                "use GET /v1/trade/execution/history",
             ),
             ("/v1/asset/fund", "there is no US equivalent"),
             ("quote/brokers", "there is no US equivalent"),
@@ -340,13 +358,38 @@ mod tests {
             ),
             ("/v1/us/assets/pl/realized", "there is no AP equivalent"),
             ("/v1/us/gemini/crypto-overview", "there is no AP equivalent"),
+            ("/v1/us/stock-info/etf-files", "there is no AP equivalent"),
             (
                 "/v1/us/stock-info/company-overview",
-                "there is no AP equivalent",
+                "use the AP endpoint GET /v1/quote/comp-overview",
+            ),
+            (
+                "/v1/us/stock-info/valuation-overview",
+                "use the AP endpoint GET /v1/quote/valuation",
+            ),
+            (
+                "/v1/us/stock-info/finn-overview",
+                "use the AP endpoint GET /v1/quote/financial-reports",
             ),
             (
                 "/v1/us/quote/financials/statements",
-                "there is no AP equivalent",
+                "use the AP endpoint GET /v1/quote/financial-reports",
+            ),
+            (
+                "/v1/us/stock-info/fin-keyfactor",
+                "use the AP endpoint GET /v1/quote/financial-reports",
+            ),
+            (
+                "/v1/us/stock-info/fin-consensus",
+                "use the AP endpoint GET /v1/quote/financial-consensus-detail",
+            ),
+            (
+                "/v1/us/stock-info/etf-dividend-info",
+                "use the AP endpoint GET /v1/quote/dividends",
+            ),
+            (
+                "/v1/us/stock-info/company-dividends",
+                "use the AP endpoint GET /v1/quote/dividends",
             ),
         ];
         for (path, hint) in cases {

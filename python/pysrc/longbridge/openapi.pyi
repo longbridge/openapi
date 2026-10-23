@@ -7593,6 +7593,8 @@ class TradeContext:
         """
         Get all executions
 
+        AP accounts only: US data-center accounts get a region error; use ``history_executions`` instead.
+
         Args:
             symbol: Filter by security code
             order_id: Filter by order ID
@@ -11559,6 +11561,8 @@ class AsyncTradeContext:
     ) -> Awaitable[AllExecutionsResponse]:
         """
         Get all executions. Returns an awaitable that resolves to AllExecutionsResponse.
+
+        AP accounts only: US data-center accounts get a region error; use ``history_executions`` instead.
 
         Args:
             symbol: Filter by security code.

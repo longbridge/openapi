@@ -311,6 +311,9 @@ pub unsafe extern "C" fn lb_trade_context_today_executions(
 
 /// Get all executions
 ///
+/// AP accounts only: US data-center accounts get a region error; use
+/// `lb_trade_context_history_executions` instead.
+///
 /// @param[in] opts Options for get all executions request (can be null)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_all_executions(

@@ -174,6 +174,9 @@ impl AsyncTradeContext {
     }
 
     /// Get all executions. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `history_executions` instead.
     #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at = None, page = None))]
     fn all_executions(
         &self,
