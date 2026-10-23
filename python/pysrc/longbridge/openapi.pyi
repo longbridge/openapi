@@ -16564,7 +16564,7 @@ class AsyncPortfolioContext:
         """
         Get exchange rates for supported currencies.
 
-        AP accounts only: US data-center accounts get a region error; use ``TradeContext.us_exchange_rates`` instead.
+        AP accounts only: US data-center accounts get a region error; use ``AsyncTradeContext.us_exchange_rates`` instead.
         """
         ...
 

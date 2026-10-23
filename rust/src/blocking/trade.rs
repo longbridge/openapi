@@ -313,6 +313,9 @@ impl TradeContextSync {
 
     /// Get account balance
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -338,6 +341,9 @@ impl TradeContextSync {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     ///
     /// # Examples
     ///
@@ -365,6 +371,9 @@ impl TradeContextSync {
     }
 
     /// Get fund positions
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     ///
     /// # Examples
     ///
@@ -394,6 +403,9 @@ impl TradeContextSync {
 
     /// Get stock positions
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -422,6 +434,10 @@ impl TradeContextSync {
 
     /// Get margin ratio
     ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
+    ///
     /// # Examples
     ///
     /// ```no_run
@@ -446,6 +462,9 @@ impl TradeContextSync {
     }
 
     /// Get order detail
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
     ///
     /// Reference: <https://open.longbridge.com/en/docs/trade/order/order_detail>
     ///
@@ -489,12 +508,16 @@ impl TradeContextSync {
     // ───────────────────────────────────────────
 
     /// Query the paginated US order list (blocking)
+    ///
+    /// US token required.
     pub fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
         self.rt
             .call(move |ctx| async move { ctx.us_query_orders(opts).await })
     }
 
     /// Get US order detail (blocking)
+    ///
+    /// US token required.
     pub fn us_order_detail(
         &self,
         order_id: impl Into<String> + Send + 'static,
@@ -504,18 +527,24 @@ impl TradeContextSync {
     }
 
     /// Get the full US account asset overview (blocking)
+    ///
+    /// US token required.
     pub fn us_asset_overview(&self) -> Result<USAssetOverview> {
         self.rt
             .call(move |ctx| async move { ctx.us_asset_overview().await })
     }
 
     /// Get realized P&L for the US account (blocking)
+    ///
+    /// US token required.
     pub fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
         self.rt
             .call(move |ctx| async move { ctx.us_realized_pl(opts).await })
     }
 
     /// Get cash, buying power and margin status for the US account (blocking)
+    ///
+    /// US token required.
     pub fn us_cash_and_buy_power(&self, currency: Option<&str>) -> Result<USCashAndBuyPower> {
         let currency = currency.map(ToString::to_string);
         self.rt
@@ -523,6 +552,8 @@ impl TradeContextSync {
     }
 
     /// Get the quantity of a US holding that is available to trade (blocking)
+    ///
+    /// US token required.
     pub fn us_available_holding(
         &self,
         opts: GetUSAvailableHoldingOptions,
@@ -532,6 +563,8 @@ impl TradeContextSync {
     }
 
     /// Get the US account transaction history (blocking)
+    ///
+    /// US token required.
     pub fn us_transaction_history(
         &self,
         opts: GetUSTransactionHistoryOptions,
@@ -541,6 +574,8 @@ impl TradeContextSync {
     }
 
     /// Get the exchange rates used by the US account (blocking)
+    ///
+    /// US token required.
     pub fn us_exchange_rates(&self) -> Result<USExchangeRates> {
         self.rt
             .call(move |ctx| async move { ctx.us_exchange_rates().await })
