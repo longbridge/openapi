@@ -2953,7 +2953,12 @@ export declare class ParticipantInfo {
 export declare class PortfolioContext {
   /** Create a new PortfolioContext. */
   static new(config: Config): PortfolioContext
-  /** Get exchange rates for supported currencies. */
+  /**
+   * Get exchange rates for supported currencies.
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `TradeContext.usExchangeRates` instead.
+   */
   exchangeRate(): Promise<ExchangeRates>
   /**
    * Get portfolio P&L analysis (summary + per-security breakdown).
@@ -4507,6 +4512,9 @@ export declare class TradeContext {
   /**
    * Get account balance
    *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usCashAndBuyPower` (or `usAssetOverview`) instead.
+   *
    * #### Example
    *
    * ```javascript
@@ -4523,6 +4531,9 @@ export declare class TradeContext {
   accountBalance(currency?: string | undefined | null): Promise<Array<AccountBalance>>
   /**
    * Get cash flow
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usTransactionHistory` instead.
    *
    * #### Example
    *
@@ -4544,7 +4555,8 @@ export declare class TradeContext {
   /**
    * Get fund positions
    *
-   * AP accounts only: US data-center accounts have no fund holdings.
+   * AP accounts only: US data-center accounts have no fund holdings and
+   * get a region error. No US equivalent.
    *
    * #### Example
    *
@@ -4561,6 +4573,9 @@ export declare class TradeContext {
   /**
    * Get stock positions
    *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usAssetOverview` (`stockList`) instead.
+   *
    * #### Example
    *
    * ```javascript
@@ -4576,7 +4591,9 @@ export declare class TradeContext {
   /**
    * Get margin ratio
    *
-   * AP accounts only: US data-center accounts have no margin-ratio data.
+   * AP accounts only: US data-center accounts get a region error. No US
+   * equivalent; for US margin info see `usCashAndBuyPower`
+   * (`marginStatus`).
    *
    * #### Example
    *

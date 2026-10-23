@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge_httpcli::{HttpClient, Json, Method};
+use longbridge_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
@@ -67,11 +67,21 @@ impl PortfolioContext {
 
     /// Get exchange rates for supported currencies.
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `TradeContext::us_exchange_rates` instead.
+    ///
     /// Path: `GET /v1/asset/exchange_rates`
     pub async fn exchange_rate(&self) -> Result<ExchangeRates> {
-        #[derive(Serialize)]
-        struct Empty {}
-        self.get("/v1/asset/exchange_rates", Empty {}).await
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/asset/exchange_rates")
+            .dc_restrict(DcRegion::Ap)
+            .response::<Json<ExchangeRates>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 
     // ── profit_analysis ───────────────────────────────────────────
@@ -257,4 +267,31 @@ fn date_to_unix_opt(date: Option<&str>) -> Option<i64> {
 /// Convert to end-of-day unix timestamp (23:59:59 UTC).
 fn date_to_unix_end_opt(date: Option<&str>) -> Option<i64> {
     date_to_unix_opt(date).map(|ts| ts + 86399)
+}
+
+#[cfg(test)]
+mod dc_restrict_tests {
+    use longbridge_httpcli::HttpClientError;
+
+    use super::*;
+    use crate::Error;
+
+    /// `exchange_rate` fails fast for a US (`us_`) token.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn exchange_rate_rejects_us_token() {
+        let config = Arc::new(Config::from_apikey("us_app_key", "app_secret", "us_token"));
+        let ctx = PortfolioContext::new(config);
+        match ctx.exchange_rate().await {
+            Err(Error::HttpClient(HttpClientError::DcRegionRestricted {
+                path,
+                required,
+                current,
+            })) => {
+                assert_eq!(path, "/v1/asset/exchange_rates", "restricted path mismatch");
+                assert_eq!(required, DcRegion::Ap, "expected AP-only restriction");
+                assert_eq!(current, DcRegion::Us, "expected US session region");
+            }
+            other => panic!("expected DcRegionRestricted, got {other:?}"),
+        }
+    }
 }

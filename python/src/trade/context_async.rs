@@ -524,6 +524,9 @@ impl AsyncTradeContext {
     }
 
     /// Get account balance. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
     #[pyo3(signature = (currency = None))]
     fn account_balance(&self, py: Python<'_>, currency: Option<String>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -540,6 +543,9 @@ impl AsyncTradeContext {
     }
 
     /// Get cash flow. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     #[allow(clippy::too_many_arguments)]
     #[pyo3(signature = (start_at, end_at, business_type = None, symbol = None, page = None, size = None))]
     fn cash_flow(
@@ -577,7 +583,8 @@ impl AsyncTradeContext {
 
     /// Get fund positions. Returns awaitable.
     ///
-    /// AP accounts only: US data-center accounts have no fund holdings.
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     #[pyo3(signature = (symbols = None))]
     fn fund_positions(&self, py: Python<'_>, symbols: Option<Vec<String>>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -594,6 +601,9 @@ impl AsyncTradeContext {
     }
 
     /// Get stock positions. Returns awaitable.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
     #[pyo3(signature = (symbols = None))]
     fn stock_positions(&self, py: Python<'_>, symbols: Option<Vec<String>>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
@@ -611,7 +621,9 @@ impl AsyncTradeContext {
 
     /// Get margin ratio. Returns awaitable.
     ///
-    /// AP accounts only: US data-center accounts have no margin-ratio data.
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
     fn margin_ratio(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

@@ -7904,6 +7904,8 @@ class TradeContext:
         """
         Get account balance
 
+        AP accounts only: US data-center accounts get a region error; use ``us_cash_and_buy_power`` (or ``us_asset_overview``) instead.
+
         Args:
             currency: Currency
 
@@ -7936,6 +7938,8 @@ class TradeContext:
     ) -> List[CashFlow]:
         """
         Get cash flow
+
+        AP accounts only: US data-center accounts get a region error; use ``us_transaction_history`` instead.
 
         Args:
             start_at: Start time
@@ -7973,7 +7977,7 @@ class TradeContext:
         """
         Get fund positions
 
-        AP accounts only: US data-center accounts have no fund holdings.
+        AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
 
         Args:
             symbols: Filter by fund codes
@@ -8002,6 +8006,8 @@ class TradeContext:
         """
         Get stock positions
 
+        AP accounts only: US data-center accounts get a region error; use ``us_asset_overview`` (``stock_list``) instead.
+
         Args:
             symbols: Filter by stock codes
 
@@ -8027,7 +8033,7 @@ class TradeContext:
         """
         Get margin ratio
 
-        AP accounts only: US data-center accounts have no margin-ratio data.
+        AP accounts only: US data-center accounts get a region error. No US equivalent; for US margin info see ``us_cash_and_buy_power`` (``margin_status``).
 
         Args:
             symbol: Security symbol
@@ -11905,6 +11911,8 @@ class AsyncTradeContext:
         """
         Get account balance. Optional currency filter. Returns an awaitable that resolves to account balance list.
 
+        AP accounts only: US data-center accounts get a region error; use ``us_cash_and_buy_power`` (or ``us_asset_overview``) instead.
+
         Args:
             currency: Currency filter.
 
@@ -11938,6 +11946,8 @@ class AsyncTradeContext:
     ) -> Awaitable[List[CashFlow]]:
         """
         Get cash flow. Required: start_at, end_at. Optional: business_type, symbol, page, size. Returns an awaitable that resolves to cash flow list.
+
+        AP accounts only: US data-center accounts get a region error; use ``us_transaction_history`` instead.
 
         Args:
             start_at: Start time.
@@ -11976,7 +11986,7 @@ class AsyncTradeContext:
         """
         Get fund positions. Optional filter: symbols. Returns an awaitable that resolves to fund positions response.
 
-        AP accounts only: US data-center accounts have no fund holdings.
+        AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
 
         Args:
             symbols: Filter by fund codes.
@@ -12006,6 +12016,8 @@ class AsyncTradeContext:
         """
         Get stock positions. Optional filter: symbols. Returns an awaitable that resolves to stock positions response.
 
+        AP accounts only: US data-center accounts get a region error; use ``us_asset_overview`` (``stock_list``) instead.
+
         Args:
             symbols: Filter by stock codes.
 
@@ -12032,7 +12044,7 @@ class AsyncTradeContext:
         """
         Get margin ratio for symbol. Returns an awaitable that resolves to margin ratio.
 
-        AP accounts only: US data-center accounts have no margin-ratio data.
+        AP accounts only: US data-center accounts get a region error. No US equivalent; for US margin info see ``us_cash_and_buy_power`` (``margin_status``).
 
         Args:
             symbol: Security symbol.
@@ -16458,7 +16470,11 @@ class PortfolioContext:
         ...
 
     def exchange_rate(self) -> "ExchangeRates":
-        """Get exchange rates for supported currencies."""
+        """
+        Get exchange rates for supported currencies.
+
+        AP accounts only: US data-center accounts get a region error; use ``TradeContext.us_exchange_rates`` instead.
+        """
         ...
 
     def profit_analysis(
@@ -16545,7 +16561,11 @@ class AsyncPortfolioContext:
     def create(cls, config: Config) -> AsyncPortfolioContext: ...
 
     async def exchange_rate(self) -> "ExchangeRates":
-        """Get exchange rates for supported currencies."""
+        """
+        Get exchange rates for supported currencies.
+
+        AP accounts only: US data-center accounts get a region error; use ``TradeContext.us_exchange_rates`` instead.
+        """
         ...
 
     async def profit_analysis(

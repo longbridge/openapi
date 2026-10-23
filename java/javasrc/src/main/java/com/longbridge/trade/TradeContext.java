@@ -435,6 +435,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get account balance with currency
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -468,6 +470,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get account balance
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -500,6 +504,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get cash flow
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -538,7 +544,7 @@ public class TradeContext implements AutoCloseable {
     /**
      * Get fund positions
      * <p>
-     * AP accounts only: US data-center accounts have no fund holdings.
+     * AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
      * 
      * <pre>
      * {@code
@@ -571,6 +577,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get stock positions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -604,7 +612,7 @@ public class TradeContext implements AutoCloseable {
     /**
      * Get margin ratio
      * <p>
-     * AP accounts only: US data-center accounts have no margin-ratio data.
+     * AP accounts only: US data-center accounts get a region error. No US equivalent.
      * 
      * <pre>
      * {@code

@@ -466,6 +466,9 @@ impl TradeContext {
     }
 
     /// Get account balance
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
     #[pyo3(signature = (currency = None))]
     fn account_balance(&self, currency: Option<String>) -> PyResult<Vec<AccountBalance>> {
         self.ctx
@@ -477,6 +480,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     #[pyo3(signature = (start_at, end_at, business_type = None, symbol = None, page = None, size = None))]
     fn cash_flow(
         &self,
@@ -512,7 +518,8 @@ impl TradeContext {
 
     /// Get fund positions
     ///
-    /// AP accounts only: US data-center accounts have no fund holdings.
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     #[pyo3(signature = (symbols = None))]
     fn fund_positions(&self, symbols: Option<Vec<String>>) -> PyResult<FundPositionsResponse> {
         self.ctx
@@ -522,6 +529,9 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
     #[pyo3(signature = (symbols = None))]
     fn stock_positions(&self, symbols: Option<Vec<String>>) -> PyResult<StockPositionsResponse> {
         self.ctx
@@ -532,7 +542,9 @@ impl TradeContext {
 
     /// Get margin ratio
     ///
-    /// AP accounts only: US data-center accounts have no margin-ratio data.
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
     fn margin_ratio(&self, symbol: String) -> PyResult<MarginRatio> {
         self.ctx
             .margin_ratio(symbol)

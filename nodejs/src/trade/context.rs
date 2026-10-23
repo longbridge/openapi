@@ -457,6 +457,9 @@ impl TradeContext {
 
     /// Get account balance
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usCashAndBuyPower` (or `usAssetOverview`) instead.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -481,6 +484,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usTransactionHistory` instead.
     ///
     /// #### Example
     ///
@@ -510,7 +516,8 @@ impl TradeContext {
 
     /// Get fund positions
     ///
-    /// AP accounts only: US data-center accounts have no fund holdings.
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     ///
     /// #### Example
     ///
@@ -536,6 +543,9 @@ impl TradeContext {
 
     /// Get stock positions
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `usAssetOverview` (`stockList`) instead.
+    ///
     /// #### Example
     ///
     /// ```javascript
@@ -560,7 +570,9 @@ impl TradeContext {
 
     /// Get margin ratio
     ///
-    /// AP accounts only: US data-center accounts have no margin-ratio data.
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `usCashAndBuyPower`
+    /// (`marginStatus`).
     ///
     /// #### Example
     ///

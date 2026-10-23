@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All SDKs:** `fund_positions` and `margin_ratio` are AP-only (`dc_restrict(DcRegion::Ap)`): US data-center accounts have no fund holdings or margin-ratio data, so they now get a region error (`HttpClientError::DcRegionRestricted`) instead of an opaque server error. The method docs in every layer say so.
 - **All SDKs:** `order_detail` is AP-only (`dc_restrict(DcRegion::Ap)`). For a US data-center account, `GET /v1/trade/order` returned HTTP 500 because the order gateway panics on US orders. It now gets a region error without sending the request. US accounts should use `us_order_detail` (`GET /v1/us/orders/{order_id}`).
+- **All SDKs:** `TradeContext.account_balance` (`GET /v1/asset/account`), `TradeContext.cash_flow` (`GET /v1/asset/cashflow`), `TradeContext.stock_positions` (`GET /v1/asset/stock`) and `PortfolioContext.exchange_rate` (`GET /v1/asset/exchange_rates`) are AP-only (`dc_restrict(DcRegion::Ap)`). For a US data-center account the gateway rejected them with an opaque code 12; they now get a region error (`HttpClientError::DcRegionRestricted`) without sending the request. US accounts should use `us_cash_and_buy_power` / `us_asset_overview` (balance), `us_transaction_history` (cash flow), `us_asset_overview` `stock_list` (positions) and `us_exchange_rates`. The `fund_positions` and `margin_ratio` docs now state there is no US equivalent (for US margin info see `us_cash_and_buy_power` `margin_status`).
 
 ### Fixed
 

@@ -21,6 +21,9 @@ impl PortfolioContext {
     }
 
     /// Get exchange rates.
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `TradeContext.us_exchange_rates` instead.
     fn exchange_rate(&self) -> PyResult<ExchangeRates> {
         Ok(self.ctx.exchange_rate().map_err(ErrorNewType)?.into())
     }
