@@ -2,8 +2,8 @@ use std::{fmt, sync::Arc};
 
 use longbridge_geo::is_cn;
 use oauth2::{
-    AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
-    Scope, TokenUrl, basic::BasicClient, reqwest::async_http_client,
+    AuthUrl, AuthorizationCode, ClientId, CsrfToken, EndpointNotSet, EndpointSet, RedirectUrl,
+    RefreshToken, RevocationUrl, Scope, TokenUrl, basic::BasicClient, reqwest,
 };
 use poem::listener::{Acceptor, Listener, TcpListener};
 
@@ -18,16 +18,28 @@ const OAUTH_BASE_URL: &str = "https://openapi.longbridge.com/oauth2";
 const OAUTH_BASE_URL_CN: &str = "https://openapi.longbridge.cn/oauth2";
 const OAUTH_BASE_URL_TEST: &str = "https://openapi-global.longbridge.xyz/oauth2";
 
-async fn oauth_base_url() -> &'static str {
+#[cfg(test)]
+tokio::task_local! {
+    pub(crate) static TEST_OAUTH_BASE_URL: String;
+}
+
+async fn oauth_base_url() -> String {
+    // Keep protocol tests on their own loopback server without process-wide
+    // state.
+    #[cfg(test)]
+    if let Ok(base) = TEST_OAUTH_BASE_URL.try_with(Clone::clone) {
+        return base;
+    }
+
     if std::env::var("LONGBRIDGE_ENV")
         .map(|v| v == "staging")
         .unwrap_or(false)
     {
-        OAUTH_BASE_URL_TEST
+        OAUTH_BASE_URL_TEST.to_string()
     } else if is_cn().await {
-        OAUTH_BASE_URL_CN
+        OAUTH_BASE_URL_CN.to_string()
     } else {
-        OAUTH_BASE_URL
+        OAUTH_BASE_URL.to_string()
     }
 }
 
@@ -161,9 +173,12 @@ impl OAuth {
         }
 
         tracing::debug!(client_id = %self.0.client_id, "exchanging authorization code for token");
+        let http_client = create_http_client().map_err(|e| OAuthError::ExchangeCodeFailed {
+            message: e.to_string(),
+        })?;
         let token_response = client
             .exchange_code(AuthorizationCode::new(code))
-            .request_async(async_http_client)
+            .request_async(&http_client)
             .await
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to exchange authorization code for token");
@@ -191,9 +206,12 @@ impl OAuth {
             &format!("http://localhost:{}/callback", self.0.callback_port),
         )
         .await;
+        let http_client = create_http_client().map_err(|e| OAuthError::RefreshTokenFailed {
+            message: e.to_string(),
+        })?;
         let token_response = client
             .exchange_refresh_token(&RefreshToken::new(refresh_token_str.to_string()))
-            .request_async(async_http_client)
+            .request_async(&http_client)
             .await
             .map_err(|e| {
                 tracing::error!(client_id = %self.0.client_id, error = %e, "failed to refresh token");
@@ -216,14 +234,21 @@ impl OAuth {
 }
 
 /// Build the oauth2 BasicClient for Longbridge endpoints.
-async fn create_oauth_client(client_id: &str, redirect_uri: &str) -> BasicClient {
+async fn create_oauth_client(
+    client_id: &str,
+    redirect_uri: &str,
+) -> BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointSet, EndpointSet> {
     let base = oauth_base_url().await;
-    BasicClient::new(
-        ClientId::new(client_id.to_string()),
-        None,
-        AuthUrl::new(format!("{base}/authorize")).unwrap(),
-        Some(TokenUrl::new(format!("{base}/token")).unwrap()),
-    )
-    .set_redirect_uri(RedirectUrl::new(redirect_uri.to_string()).unwrap())
-    .set_revocation_uri(RevocationUrl::new(format!("{base}/revoke")).unwrap())
+    BasicClient::new(ClientId::new(client_id.to_string()))
+        .set_auth_uri(AuthUrl::new(format!("{base}/authorize")).unwrap())
+        .set_token_uri(TokenUrl::new(format!("{base}/token")).unwrap())
+        .set_redirect_uri(RedirectUrl::new(redirect_uri.to_string()).unwrap())
+        .set_revocation_url(RevocationUrl::new(format!("{base}/revoke")).unwrap())
+}
+
+fn create_http_client() -> Result<reqwest::Client, reqwest::Error> {
+    reqwest::Client::builder()
+        // Preserve the previous OAuth transport's protection against redirects.
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
 }

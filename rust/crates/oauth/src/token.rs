@@ -37,11 +37,10 @@ pub(crate) struct OAuthToken {
 
 impl OAuthToken {
     /// Build from oauth2 crate token response.
-    pub(crate) fn from_oauth2_response<TT, T>(client_id: String, token_response: &T) -> Self
-    where
-        TT: oauth2::TokenType,
-        T: TokenResponse<TT>,
-    {
+    pub(crate) fn from_oauth2_response<T: TokenResponse>(
+        client_id: String,
+        token_response: &T,
+    ) -> Self {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
