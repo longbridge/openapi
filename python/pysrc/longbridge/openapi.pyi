@@ -224,6 +224,28 @@ class OAuth:
     :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`.
     """
 
+    def revoke(self) -> None:
+        """
+        Revoke the current token on the server (RFC 7009), blocking.
+
+        The refresh token is revoked when present, otherwise the access token.
+        Only the server is contacted; the cached token on disk
+        (``~/.longbridge/openapi/tokens/<client_id>``) is left untouched.
+        Call :meth:`clear` afterwards to drop it locally.
+        """
+    async def revoke_async(self) -> None:
+        """Async version of :meth:`revoke`."""
+    def clear(self) -> None:
+        """
+        Clear the token locally, blocking.
+
+        Drops the in-memory token and deletes the cached token file
+        (``~/.longbridge/openapi/tokens/<client_id>``). The server is not
+        contacted; use :meth:`revoke` for that.
+        """
+    async def clear_async(self) -> None:
+        """Async version of :meth:`clear`."""
+
 class OAuthBuilder:
     """
     Builder for the OAuth 2.0 authorization flow.
