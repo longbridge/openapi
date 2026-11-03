@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    error::OAuthResult,
+    error::{OAuthError, OAuthResult},
     token::{OAuthToken, token_path_for_client_id},
 };
 
@@ -51,6 +51,19 @@ pub trait TokenStorage: Send + Sync + 'static {
 
     /// Persist `token`. Called after every successful authorization or refresh.
     fn save(&self, token: &StoredToken) -> OAuthResult<()>;
+
+    /// Remove the persisted token for `client_id`.
+    ///
+    /// Must succeed (return `Ok`) when no token is stored. The default
+    /// implementation returns an error, so existing implementations keep
+    /// compiling but [`OAuth::clear`](crate::OAuth::clear) fails loudly
+    /// instead of pretending to wipe a backend it cannot touch; override it to
+    /// support `clear`.
+    fn delete(&self, _client_id: &str) -> OAuthResult<()> {
+        Err(OAuthError::Other(
+            "this TokenStorage does not implement `delete`".to_string(),
+        ))
+    }
 }
 
 /// Default file-based token storage.
@@ -67,6 +80,10 @@ impl TokenStorage for FileTokenStorage {
     fn save(&self, token: &StoredToken) -> OAuthResult<()> {
         let path = token_path_for_client_id(&token.client_id)?;
         OAuthToken::from(token.clone()).save_to_path(path)
+    }
+
+    fn delete(&self, client_id: &str) -> OAuthResult<()> {
+        OAuthToken::delete_from_path(token_path_for_client_id(client_id)?)
     }
 }
 

@@ -66,3 +66,43 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeOAuth(
 ) {
     drop(Box::from_raw(oauth as *mut OAuth));
 }
+
+/// Asynchronously revoke the current token on the server (RFC 7009).
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthRevoke(
+    mut env: JNIEnv,
+    _class: JClass,
+    oauth: jlong,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let oauth = (*(oauth as *const OAuth)).clone();
+        async_util::execute(env, callback, async move {
+            oauth
+                .revoke()
+                .await
+                .map_err(|e| crate::error::JniError::Other(e.to_string()))
+        })?;
+        Ok(())
+    })
+}
+
+/// Asynchronously clear the token locally (memory and persisted file).
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_oauthClear(
+    mut env: JNIEnv,
+    _class: JClass,
+    oauth: jlong,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let oauth = (*(oauth as *const OAuth)).clone();
+        async_util::execute(env, callback, async move {
+            oauth
+                .clear()
+                .await
+                .map_err(|e| crate::error::JniError::Other(e.to_string()))
+        })?;
+        Ok(())
+    })
+}

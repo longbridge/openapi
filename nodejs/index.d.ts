@@ -2551,6 +2551,33 @@ export declare class OAuth {
    *          `HttpClient.fromOAuth`
    */
   static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
+  /**
+   * Revoke the current token on the server (RFC 7009).
+   *
+   * The refresh token is revoked when present, otherwise the access token.
+   * Only the server is contacted; the cached token on disk is left
+   * untouched (see `clear`).
+   *
+   * @example
+   * ```javascript
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Open:', url));
+   * await oauth.revoke();
+   * ```
+   */
+  revoke(): Promise<void>
+  /**
+   * Clear the token locally.
+   *
+   * Drops the in-memory token and deletes the cached token file
+   * (`~/.longbridge/openapi/tokens/<clientId>`). The server is not
+   * contacted (see `revoke`).
+   *
+   * @example
+   * ```javascript
+   * await oauth.clear();
+   * ```
+   */
+  clear(): Promise<void>
 }
 
 /**

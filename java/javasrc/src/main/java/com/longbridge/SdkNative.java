@@ -66,6 +66,10 @@ public class SdkNative {
         public static native void oauthBuild(String clientId, int callbackPort,
                         Consumer<String> openUrlCallback, AsyncCallback callback);
 
+        public static native void oauthRevoke(long oauth, AsyncCallback callback);
+
+        public static native void oauthClear(long oauth, AsyncCallback callback);
+
         public static native void freeOAuth(long oauth);
 
         public static native long newAssetContext(long config);

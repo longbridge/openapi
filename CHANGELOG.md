@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **All SDKs:** `OAuth.revoke()` revokes the current token on the server through the existing RFC 7009 endpoint (`POST /oauth2/revoke`): the refresh token when present, otherwise the access token. It only contacts the server; the in-memory and cached tokens are left untouched. On a client created with `from_token` (no client ID) it fails with a `RevokeFailed` error instead of calling the server.
+- **All SDKs:** `OAuth.clear()` drops the token locally: it clears the in-memory copy and deletes the cached token file (`~/.longbridge/openapi/tokens/<client_id>`; a missing file is not an error). It does not contact the server, so call `revoke()` first to disconnect the application completely. After `clear()`, `access_token()` fails with `NoTokenAvailable`. The persisted token is deleted first and the in-memory token is cleared only when that succeeds, so a failed delete leaves the handle usable and the error is returned.
+  - Rust: `OAuth::revoke` / `OAuth::clear` (async), `OAuthError::RevokeFailed`, `OAuthError::TokenFileDelete`. C: `lb_oauth_revoke` / `lb_oauth_clear`. C++: `OAuth::revoke` / `OAuth::clear`. Java: `OAuth.revoke()` / `OAuth.clear()` returning `CompletableFuture<Void>`. Node.js: `oauth.revoke()` / `oauth.clear()` returning promises. Python: `OAuth.revoke()` / `OAuth.clear()` plus `revoke_async()` / `clear_async()`; the `openapi.pyi` stub is updated. The blocking Python calls release the GIL while waiting. In C/C++, a NULL handle (e.g. a moved-from C++ `OAuth`) is reported through the callback as an error instead of crashing.
+- **Rust:** `TokenStorage::delete(client_id)` removes a persisted token. It has a default implementation that returns an error, so existing custom storage backends keep compiling but `OAuth::clear` fails loudly (and keeps the in-memory token) instead of reporting success without wiping anything; override it to support `clear`. `FileTokenStorage` deletes the token file.
+
+### Breaking changes
+
+- **Rust:** `OAuthError` is now `#[non_exhaustive]` and gains `RevokeFailed` and `TokenFileDelete`. Exhaustive `match`es on `OAuthError` outside this crate need a wildcard arm; adding variants will no longer be a breaking change.
+
+### Fixed
+
+- **All SDKs:** the OAuth browser authorization flow now uses PKCE (RFC 7636, `S256`): the authorization request carries a `code_challenge` and the token exchange sends the matching `code_verifier`. The server requires PKCE for `public` clients, so previously such clients (e.g. those created through dynamic client registration) could not authorize through the SDK and failed with `OAuth authorization failed: server_error`. Clients that don't require PKCE are unaffected.
+
 ## [5.3.0] - 2026-10-23
 
 ### Added

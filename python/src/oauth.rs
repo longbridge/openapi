@@ -15,6 +15,55 @@ fn oauth_err(e: OAuthError) -> PyErr {
 #[pyclass(name = "OAuth")]
 pub(crate) struct OAuth(pub(crate) longbridge::oauth::OAuth);
 
+#[pymethods]
+impl OAuth {
+    /// Revoke the current token on the server (RFC 7009), blocking.
+    ///
+    /// The refresh token is revoked when present, otherwise the access token.
+    /// Only the server is contacted; the cached token on disk is left
+    /// untouched (see :meth:`clear`).
+    fn revoke(&self, py: Python<'_>) -> PyResult<()> {
+        let oauth = self.0.clone();
+        // Release the GIL while waiting on the network so other Python threads
+        // keep running.
+        py.detach(|| longbridge::runtime_handle().block_on(oauth.revoke()))
+            .map_err(oauth_err)
+    }
+
+    /// Revoke the current token on the server (RFC 7009), async.
+    ///
+    /// Returns:
+    ///     Awaitable that resolves to ``None``
+    fn revoke_async<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let oauth = self.0.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            oauth.revoke().await.map_err(oauth_err)
+        })
+    }
+
+    /// Clear the token locally, blocking.
+    ///
+    /// Drops the in-memory token and deletes the cached token file
+    /// (``~/.longbridge/openapi/tokens/<client_id>``). The server is not
+    /// contacted (see :meth:`revoke`).
+    fn clear(&self, py: Python<'_>) -> PyResult<()> {
+        let oauth = self.0.clone();
+        py.detach(|| longbridge::runtime_handle().block_on(oauth.clear()))
+            .map_err(oauth_err)
+    }
+
+    /// Clear the token locally, async.
+    ///
+    /// Returns:
+    ///     Awaitable that resolves to ``None``
+    fn clear_async<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let oauth = self.0.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            oauth.clear().await.map_err(oauth_err)
+        })
+    }
+}
+
 /// Builder for the OAuth 2.0 authorization flow
 ///
 /// Args:
