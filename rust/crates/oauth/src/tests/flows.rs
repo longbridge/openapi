@@ -989,8 +989,11 @@ fn authorization_endpoint_selection_uses_isolated_environments() {
 #[tokio::test]
 #[ignore = "launched by authorization_endpoint_selection_uses_isolated_environments"]
 async fn authorization_endpoint_selection_child() {
-    let expected_url = std::env::var("TEST_OAUTH_EXPECTED_AUTHORIZATION_URL")
-        .expect("endpoint selection child must be launched by its parent test");
+    // Only meaningful when launched by the parent test (which checks this
+    // test's output); skip under a plain `--include-ignored` run.
+    let Ok(expected_url) = std::env::var("TEST_OAUTH_EXPECTED_AUTHORIZATION_URL") else {
+        return;
+    };
     timeout(HANG_GUARD, async {
         let storage = Arc::new(MemoryStorage::default());
         let callback = Mutex::new(None);

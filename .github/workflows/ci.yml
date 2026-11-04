@@ -48,10 +48,14 @@ jobs:
           cache-bin: false
 
       - name: Check with clippy
-        run: cargo clippy -p longbridge --all-features
+        run: |
+          cargo clippy -p longbridge --all-features
+          cargo clippy -p longbridge-oauth --all-features --all-targets -- -D warnings
 
       - name: Test
-        run: cargo test -p longbridge --all-features
+        run: |
+          cargo test -p longbridge --all-features
+          cargo test -p longbridge-oauth --all-features
 
   check-python-sdk:
     needs:

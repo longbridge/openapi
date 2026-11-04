@@ -29,8 +29,18 @@ async fn oauth_base_url() -> String {
     // Keep protocol tests on their own loopback server without process-wide
     // state.
     #[cfg(test)]
-    if let Ok(base) = TEST_OAUTH_BASE_URL.try_with(Clone::clone) {
-        return base;
+    {
+        if let Ok(base) = TEST_OAUTH_BASE_URL.try_with(Clone::clone) {
+            return base;
+        }
+        // Fail closed: a test outside the scope (e.g. a request moved into a
+        // spawned task, which does not inherit task-locals) must not silently
+        // reach the real endpoints. Only the endpoint-selection child process
+        // resolves them on purpose, with the region fixed by environment.
+        assert!(
+            std::env::var("TEST_OAUTH_EXPECTED_AUTHORIZATION_URL").is_ok(),
+            "test reached the real OAuth endpoint; run it inside TEST_OAUTH_BASE_URL.scope"
+        );
     }
 
     if std::env::var("LONGBRIDGE_ENV")
@@ -406,6 +416,10 @@ fn create_http_client() -> Result<reqwest::Client, reqwest::Error> {
     reqwest::Client::builder()
         // Preserve the previous OAuth transport's protection against redirects.
         .redirect(reqwest::redirect::Policy::none())
+        // Bounds every token request, including the authorization code
+        // exchange (refresh and revoke are also wrapped in a tokio timeout).
+        .connect_timeout(Duration::from_secs(10))
+        .timeout(TOKEN_REQUEST_TIMEOUT)
         .build()
 }
 
