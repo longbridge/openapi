@@ -55,12 +55,23 @@ class OpenApiException(Exception):
     `None` for other client-side errors.
     """
 
+    trace_id: Optional[str]
+    """
+    Trace ID of the request, if any
+    """
+
     message: str
     """
     Error message
     """
 
-    def __init__(self, code: int, message: str) -> None: ...
+    def __init__(
+        self,
+        kind: ErrorKind,
+        code: Optional[int],
+        trace_id: Optional[str],
+        message: str,
+    ) -> None: ...
 
 class HttpClient:
     """
