@@ -33,6 +33,11 @@ class ErrorKind:
         Other error
         """
 
+    class OAuth(ErrorKind):
+        """
+        OAuth error
+        """
+
 class OpenApiException(Exception):
     """
     OpenAPI exception
@@ -43,7 +48,7 @@ class OpenApiException(Exception):
     Error kind
     """
 
-    code: int
+    code: Optional[int]
     """
     Error code: the HTTP status or OpenAPI code returned by the server, or for
     ``ErrorKind.OAuth`` a stable code identifying the failure (1 no token available, 2 no refresh token, 3 refresh failed, 4 revoke failed, 5 authorization failed, 6 authorization timeout, 7 code exchange failed, 8 CSRF mismatch, 9 callback bind failed, 10 local address failed, 11 callback channel closed, 12 no home dir, 13 token file read, 14 token file parse, 15 token file write, 16 token file delete, 17 create dir failed, 18 serialize token, 0 other).

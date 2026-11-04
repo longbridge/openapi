@@ -571,23 +571,70 @@ mod tests {
 
     #[test]
     fn oauth_error_codes_are_stable() {
-        assert_eq!(OAuthError::Other(String::new()).code(), 0);
-        assert_eq!(OAuthError::NoTokenAvailable.code(), 1);
-        assert_eq!(
-            OAuthError::RevokeFailed {
-                message: String::new()
-            }
-            .code(),
-            4
-        );
-        assert_eq!(
-            OAuthError::TokenFileDelete {
-                path: Default::default(),
-                source: std::io::Error::other("x"),
-            }
-            .code(),
-            16
-        );
+        let io = || std::io::Error::other("x");
+        let json = || serde_json::from_str::<()>("x").unwrap_err();
+        let path = std::path::PathBuf::new;
+        let msg = String::new;
+        let cases = [
+            (OAuthError::Other(msg()), 0),
+            (OAuthError::NoTokenAvailable, 1),
+            (OAuthError::NoRefreshToken, 2),
+            (OAuthError::RefreshTokenFailed { message: msg() }, 3),
+            (OAuthError::RevokeFailed { message: msg() }, 4),
+            (OAuthError::AuthorizationFailed { message: msg() }, 5),
+            (OAuthError::AuthorizationTimeout, 6),
+            (OAuthError::ExchangeCodeFailed { message: msg() }, 7),
+            (OAuthError::CsrfTokenMismatch, 8),
+            (
+                OAuthError::BindCallbackFailed {
+                    port: 0,
+                    message: msg(),
+                },
+                9,
+            ),
+            (OAuthError::LocalAddressFailed, 10),
+            (OAuthError::CallbackChannelClosed, 11),
+            (OAuthError::NoHomeDir, 12),
+            (
+                OAuthError::TokenFileRead {
+                    path: path(),
+                    source: io(),
+                },
+                13,
+            ),
+            (
+                OAuthError::TokenFileParse {
+                    path: path(),
+                    source: json(),
+                },
+                14,
+            ),
+            (
+                OAuthError::TokenFileWrite {
+                    path: path(),
+                    source: io(),
+                },
+                15,
+            ),
+            (
+                OAuthError::TokenFileDelete {
+                    path: path(),
+                    source: io(),
+                },
+                16,
+            ),
+            (
+                OAuthError::CreateDirFailed {
+                    path: path(),
+                    source: io(),
+                },
+                17,
+            ),
+            (OAuthError::SerializeToken { source: json() }, 18),
+        ];
+        for (err, code) in cases {
+            assert_eq!(err.code(), code, "{err:?}");
+        }
     }
 
     #[tokio::test]
