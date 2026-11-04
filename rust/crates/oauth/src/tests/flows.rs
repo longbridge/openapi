@@ -18,6 +18,10 @@ use poem::{
 use tokio::{io::AsyncWriteExt, net::TcpStream, task::JoinHandle, time::timeout};
 
 use super::{MemoryStorage, now_secs};
+
+/// Upper bound for a whole loopback flow. It only guards against hangs, so it
+/// is generous for slow CI runners.
+const HANG_GUARD: Duration = Duration::from_secs(30);
 use crate::{
     OAuth, OAuthBuilder, OAuthError, OAuthResult, StoredToken, TokenStorage,
     client::TEST_OAUTH_BASE_URL,
@@ -248,7 +252,7 @@ async fn build_with_callback(storage: impl TokenStorage) -> OAuthResult<OAuth> {
 
 #[tokio::test]
 async fn build_authorizes_and_persists_token() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([(
             StatusCode::OK,
             serde_json::json!({
@@ -350,7 +354,7 @@ async fn build_authorizes_and_persists_token() {
 
 #[tokio::test]
 async fn revoke_rejects_insecure_endpoint_without_changing_local_tokens() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         for refresh_token in [Some("cached-refresh-token"), None] {
             let server = TokenServer::start([]).await;
             let storage = Arc::new(MemoryStorage::with_token(StoredToken {
@@ -389,7 +393,7 @@ async fn revoke_rejects_insecure_endpoint_without_changing_local_tokens() {
 
 #[tokio::test]
 async fn build_rejects_mismatched_csrf_state_without_exchanging_token() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([]).await;
         let storage = Arc::new(MemoryStorage::default());
         let callback = Mutex::new(None);
@@ -431,7 +435,7 @@ async fn build_rejects_mismatched_csrf_state_without_exchanging_token() {
 
 #[tokio::test]
 async fn build_propagates_access_denied_callback_without_exchanging_token() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([]).await;
         let storage = Arc::new(MemoryStorage::default());
         let callback = Mutex::new(None);
@@ -472,7 +476,7 @@ async fn build_propagates_access_denied_callback_without_exchanging_token() {
 }
 
 async fn assert_refresh_persists_and_caches(response: String, expected_refresh_token: &str) {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([
             (
                 StatusCode::OK,
@@ -577,7 +581,7 @@ async fn access_token_preserves_refresh_token_when_response_omits_it() {
 
 #[tokio::test]
 async fn access_token_retries_failed_refresh_with_original_token() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([
             successful_token_response("expired-access-token", "old-refresh-token", 0),
             (
@@ -626,7 +630,7 @@ async fn access_token_retries_failed_refresh_with_original_token() {
 
 #[tokio::test]
 async fn access_token_preserves_cached_token_until_refreshed_token_is_saved() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([
             successful_token_response("expired-access-token", "old-refresh-token", 0),
             successful_token_response("unsaved-access-token", "unsaved-refresh-token", 3600),
@@ -673,7 +677,7 @@ async fn access_token_preserves_cached_token_until_refreshed_token_is_saved() {
 
 #[tokio::test]
 async fn build_propagates_authorization_exchange_error_without_saving_token() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([(
             StatusCode::BAD_REQUEST,
             serde_json::json!({
@@ -715,7 +719,7 @@ async fn build_propagates_authorization_exchange_error_without_saving_token() {
 
 #[tokio::test]
 async fn build_reauthorizes_when_cached_token_refresh_fails() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([
             (
                 StatusCode::BAD_REQUEST,
@@ -787,7 +791,7 @@ async fn build_reauthorizes_when_cached_token_refresh_fails() {
 
 #[tokio::test]
 async fn build_does_not_follow_authorization_token_redirect() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let probe = TokenServer::start([successful_token_response(
             "redirected-access-token",
             "redirected-refresh-token",
@@ -825,7 +829,7 @@ async fn build_does_not_follow_authorization_token_redirect() {
 
 #[tokio::test]
 async fn access_token_does_not_follow_refresh_redirect_and_can_retry() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let probe = TokenServer::start([successful_token_response(
             "redirected-access-token",
             "redirected-refresh-token",
@@ -876,7 +880,7 @@ async fn access_token_does_not_follow_refresh_redirect_and_can_retry() {
 
 #[tokio::test]
 async fn build_defaults_missing_expiry_to_one_hour() {
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let server = TokenServer::start([(
             StatusCode::OK,
             serde_json::json!({
@@ -928,7 +932,7 @@ fn build_blocking_loads_valid_cached_token_without_authorizing() {
         .build()
         .unwrap();
     let token = runtime.block_on(async {
-        timeout(Duration::from_secs(5), oauth.access_token())
+        timeout(HANG_GUARD, oauth.access_token())
             .await
             .expect("cached access token lookup timed out")
             .unwrap()
@@ -987,7 +991,7 @@ fn authorization_endpoint_selection_uses_isolated_environments() {
 async fn authorization_endpoint_selection_child() {
     let expected_url = std::env::var("TEST_OAUTH_EXPECTED_AUTHORIZATION_URL")
         .expect("endpoint selection child must be launched by its parent test");
-    timeout(Duration::from_secs(5), async {
+    timeout(HANG_GUARD, async {
         let storage = Arc::new(MemoryStorage::default());
         let callback = Mutex::new(None);
         let result = OAuthBuilder::new("test-client")
